@@ -1,0 +1,164 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="../px-vis-common.html" />
+
+
+<!--
+Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
+
+##### Usage
+
+    <px-vis counter-value="1">Hi</px-vis>
+
+@element px-vis
+@blurb Element providing solution to no problem in particular.
+@homepage index.html
+@demo demo.html
+-->
+<dom-module id="px-vis-scale">
+    <template>
+
+      <content></content>
+    </template>
+</dom-module>
+
+<script>
+    Polymer({
+
+        is: 'px-vis-scale',
+
+        behaviors: [pxVisCommonBehavior,pxVisSVGChartCommonBehavior],
+
+        /**
+         * Properties block, expose attribute values to the DOM via 'reflect'
+         *
+         * @property properties
+         * @type Object
+         */
+        properties: {
+          /**
+           * Use the selectable attribute if the table rows should be able to be selected.
+           *
+           *      <px-data-table selectable table-data="{{data}}"></px-data-table>
+           *
+           * @default false
+           */
+          xScale: {
+            type: String,
+            value: 'ordinal',
+            notify: true
+          },
+          /**
+           * Use the selectable attribute if the table rows should be able to be selected.
+           *
+           *      <px-data-table selectable table-data="{{data}}"></px-data-table>
+           *
+           * @default false
+           */
+          yScale: {
+            type: String,
+            value: 'ordinal',
+            notify: true
+          },
+        },
+
+        observers: [
+          '_setXScale(width,margin)',
+          '_setYScale(height,margin)',
+          '_setDomain(chartData.*)',
+          '_updateDomain(selectedDomain)',
+        ],
+
+        /**
+         *  Sets the x scale
+         *
+         * @method _setXScale
+         */
+        _setXScale: function(width,margin){
+          var w = width - margin.left - margin.right;
+          this.x = this._setScale(this.xScale,[0, w]);
+          this.notifyPath('x.range', this.x.range);
+        },
+        /**
+         * Sets the y scale
+         *
+         * @method _setYScale
+         */
+        _setYScale: function(height,margin){
+          var h = height - margin.top - margin.bottom;
+          this.y = this._setScale(this.yScale,[h, 0]);
+          this.notifyPath('y', this.y);
+        },
+        /**
+         *  Helper function to set the x and y based on scale type
+         *
+         * @method _setScale
+         */
+        _setScale: function(val, range){
+          if(val === 'time'){
+            return d3.time.scale().range(range);
+          } else if(val === 'linear'){
+            return d3.scale.linear().range(range);
+          } else { //ordinal
+            return d3.scale.ordinal().rangePoints(range, 1);
+          }
+        },
+        /**
+         * Calculates and Sets the x and y domain after data loads
+         *
+         * https://github.com/mbostock/d3/wiki/API-Reference
+         *
+         * @method _setDomain
+         */
+        _setDomain: function() {
+          console.log("set domain");
+          // check to make sure there is data
+          if(this.chartData){
+            // TODO check if dataset has max and min
+            // TODO What do we do if we have Y and not x, which is the case with our sample data?
+
+            // if we dont have max and min in our dataset, we need to chug through the data to get it into a usable form to find max and min
+
+            // Flatten our datasets into an array of series
+            var seriesArr = this.chartData.map(function(d) {
+              return d.series
+            });
+
+            // flatten our array of series into an array of value pairs
+            var valuesArr = Array.prototype.concat.apply([],seriesArr);
+
+            // finally, flatten our arrays of value pairs into arrays of just x and just y
+            // TODO if in the form { x:1, y:2 }
+            var xArr = valuesArr.map(function(d) {
+              return d[0]
+            });
+
+            var yArr = valuesArr.map(function(d) {
+              return d[1]
+            });
+
+            // set the domains
+            // x domain by looking at max and min of data
+            // TODO: dev set extents and dev set max or min
+            // [1420840060000,1425840060000]
+            // TODO check if data has extents
+            this.x.domain(d3.extent(xArr));
+            // y domain assumes 0 and then looks at max
+            // TODO: make this declartive: min, max, set static or dynamic
+            // TODO: multiple Y-Axis?
+            // TODO check if data has max and min (which demo data does)
+            this.y.domain([0, d3.max(yArr)]);
+
+            // Set the domains
+            this.set('setDomainX', this.x.domain());
+            this.set('setDomainY', this.y.domain());
+          }
+        },
+        _updateDomain:function(d){
+          if(d.length > 0){
+            this.x.domain(d);
+            this.set('setDomainX', this.x.domain());
+          }
+        },
+
+    });
+</script>

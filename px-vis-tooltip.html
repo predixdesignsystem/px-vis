@@ -1,0 +1,343 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="../px-vis-svg-chart-common.html" />
+<link rel="import" href="../px-colors-design/colors.html" />
+
+
+<!--
+Element providing on-chart hover functionality to get data values near the mouse cursor.
+- Has options to draw crosshairs around mouse pointer / data points and highlight adjacent datapoints.
+- Sets tooltipData property which can then be used to share adjacent datapoint values with other components, such as the register.
+
+
+##### Usage
+
+    <px-vis-tooltip
+      svg="[[varFromSVGComponent]]"
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      chart-data="[[chartData]]"
+      x="[[varXFromScaleComponent]]"
+      y="[[varYFromScaleComponent]]"
+      vertical-line="full"
+      horizonal-line="none"
+      set-domain-x="[[varXDomainFromScaleComponent]]"
+      set-domain-y="[[varYDomainFromScaleComponent]]"
+      tooltip-data={{tooltipData}}>
+    </px-vis-tooltip>
+
+@element px-vis-tooltip
+@blurb Element providing on-chart hover functionality to get data values near the mouse cursor.
+@homepage index.html
+@demo demo.html
+
+TODO implement a dev setting to choose between only showing data at that x, snapping to nearest data, or interpolating value at x
+
+-->
+<dom-module id="px-vis-tooltip">
+    <link rel="import" type="css" href="css/px-vis.css"/>
+    <template>
+
+    </template>
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'px-vis-tooltip',
+
+    behaviors: [
+      pxVisSVGChartCommonBehavior,
+      commonColors
+    ],
+
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      /**
+       * Holder for the tooltip drawing object
+       *
+       * @property _tooltip
+       * @type Object
+       */
+      _tooltip:{
+        type:Object,
+        value:{}
+      },
+      /**
+       * Holder for the vertical line drawing object
+       *
+       * @property _tooltip
+       * @type Object
+       */
+      _vLine:{
+        type:Object,
+        value:{}
+      },
+      /**
+       * Holder for the horizonal line drawing objects
+       *
+       * @property _tooltip
+       * @type Object
+       */
+      _hLines:{
+        type:Object,
+        value:{}
+      },
+      /**
+       * Holder for the tooltip circle drawing objects
+       *
+       * @property _tooltip
+       * @type Object
+       */
+      _circles:{
+        type:Object,
+        value:{}
+      },
+      /**
+       * Draws a horizontal line through the point. Valid entries:
+       * - full
+       * - none
+       * - left
+       * - right
+       *
+       * <px-vis-tooltip horizontal-line="left" ...></px-vis-tooltip>
+       *
+       * @property horizontalLine
+       * @type String
+       * @default full
+       */
+      horizontalLine:{
+        type:String,
+        value:"full"
+      },
+      /**
+       * Draws a vertical line through the point. Valid entries:
+       * - full
+       * - none
+       * - bottom
+       * - top
+       *
+       * <px-vis-tooltip vertical-line="bottom" ...></px-vis-tooltip>
+       *
+       * @property verticalLine
+       * @type String
+       * @default bottom
+       */
+      verticalLine:{
+        type:String,
+        value:"full"
+      },
+      /**
+       * Draws a circle at the through the point. Valid entries:
+       * - yes
+       * - no
+       *
+       * <px-vis-tooltip circle-point="no" ...></px-vis-tooltip>
+       *
+       * @property circlePoint
+       * @type String
+       * @default yes
+       */
+      circlePoint:{
+        type:String,
+        value:"yes"
+      },
+      /**
+       * Data reported back by the tooltip
+       *
+       * @property tooltipData
+       * @type Array
+       * @default []
+       */
+      tooltipData:{
+        type:Object,
+        value:function(){ return {} },
+        notify:true
+      },
+
+    }, //properties
+
+    observers: [
+      '_drawElement(setDomainX,setDomainY,chartData.*)'
+     ],
+
+    /**
+     * Draws the tooltip elements and sets up listeners and callbacks on chart hover
+     * Sets the tooltipData property which gets passed to the register.
+     *
+     * @method _drawElement
+     */
+    _drawElement: function() {
+      if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && (this.chartData) && this._isObjEmpty(this._tooltip)){
+        
+        // add circle to the line and hide it
+        this._tooltip = this.svg.append("g")
+            .attr("display", "none");
+
+        if(this.horizontalLine !== 'none'){
+          // append the x line
+          this._hLines = this._tooltip.selectAll('line.xline')
+            .data(this.chartData)
+            .enter()
+            .append("line")
+            .attr("class", "xline")
+            .attr("stroke", "blue")
+            .attr("stroke-dasharray", "3,3")
+            .attr("opacity", 0.5)
+            .attr("x1", 0)
+            .attr("x2", this.width);
+        }
+
+        if(this.verticalLine !== 'none'){
+          // append the y line
+          this._vLine = this._tooltip
+            .append("line")
+            .attr("class", "yline")
+            .attr("stroke", "blue")
+            .attr("stroke-dasharray", "3,3")
+            .attr("opacity", 0.5)
+            .attr("y1", 0)
+            .attr("y2", this.height);
+        }
+
+        // if we have multi-series then we need multiple circles...
+        if(this.circlePoint === "yes"){
+          // append the circle
+          this._circles = this._tooltip.selectAll('cirlcle.tooltipPoint')
+            .data(this.chartData)
+            .enter()
+            .append("circle")
+            .attr("class", "tooltipPoint")
+            .attr("fill", (function(d,i){
+              return this.dataVisColors[this.seriesColorOrder[i]]
+            }).bind(this))
+            .attr("r", 3)
+            .attr("stroke", (function(d,i){
+              return this.dataVisColors[this.seriesColorOrder[i]]
+            }).bind(this))
+            .attr("stroke-width", 12)
+            .attr("stroke-opacity", 0.3);
+        }
+
+        // append the rectangle to capture mouse
+        this.svg.append("rect")
+          .attr('id',"mouseCapture")
+          .attr("width", this.width)
+          .attr("height", this.height)
+          .attr("fill", "none")
+          .attr("pointer-events", "all")
+          .on("mouseover", (this._showTooltip).bind(this))
+          .on("mouseout", (this._resetTooltip).bind(this))
+          .on("mousemove",(this._calcDataPoints).bind(this));
+      }  //if we have vars
+    },  //_drawElement
+    /**
+     * Helper function called on mouseover
+     * Shows the tooltip elements
+     *
+     * @method _clearTooltip
+     */
+    _showTooltip:function() {
+      this._tooltip.attr("display", null);
+    },
+
+    /**
+     * Helper function called on mouseout
+     * Hides the tooltip elements and resets tooltipData
+     *
+     * @method _resetTooltip
+     */
+    _resetTooltip: function() {
+      this.set('tooltipData',[]);
+      this._tooltip.attr("display", "none");
+    },
+
+    /**
+     * Helper function called on mousemove
+     * Calculates the mouse position and associated x & y values. Then sets the d3 elements and sets tooltipData for consumption elsewhere
+     *
+     * @method _calcDataPoints
+     */
+    _calcDataPoints:function(){
+
+      //  d3.mouse: returns the x position on the screen of the mouse
+      var mousePos = d3.mouse(this.svg.select('#mouseCapture')[0][0])[0];
+
+      // invert: takes position on the screen and converts it into an equivalent date
+      var x0 = this.x.invert(mousePos);
+
+      // setup a holder for our data to pass out
+      var dataObj = {
+        'time': x0,
+        'series': []
+      };
+
+      /*
+        d3.bisector returns index in our array that corresponds to the horizontal position of the mouse pointer.
+        Specifically this returns the date that falls to the left of the mouse cursor.
+      */
+      var bisectDate = d3.bisector(function(d) { return d[0]; }).left;
+
+      // define vars
+      var index, d0, d1, d,
+          dx = [],
+          dy = [];
+      for(var i = 0; i < this.chartData.length; i++){
+        // get the index number of the timestamp
+        index = bisectDate(this.chartData[i]['series'], x0, 1);
+        // get the data values around the index
+        d0 = this.chartData[i]['series'][index - 1];
+        d1 = (this.chartData[i]['series'][index]) ? this.chartData[i]['series'][index] : this.chartData[i]['series'][index - 1];
+        // sets d as the closest date to the mouse
+        d = x0 - d0[0] > d1[0] - x0 ? d1 : d0;
+        // get the pixel coords for that data
+        dx.push(this.x(d[0]));
+        dy.push(this.y(d[1]));
+
+        // TODO we might have name issues later. Return to this when we decide what we are doing with naming
+        dataObj.series.push({'name':this.chartData[i]['name'],'value': d[1] });
+
+        if(this.horizontalLine === 'full'){
+          this._hLines.filter(function (d,j) { return j === i })
+            .attr("transform", "translate(" + 0 + "," + dy[i] + ")");
+        } else if(this.horizontalLine === 'left'){
+          this._hLines.filter(function (d,j) { return j === i })
+            .attr("transform", "translate(" + dx[i] + "," + dy[i] + ")")
+            .attr("x2",-this.width);
+        } else if(this.horizontalLine === 'right'){
+          this._hLines.filter(function (d,j) { return j === i })
+            .attr("transform", "translate(" + dx[i] + "," + dy[i] + ")");
+        }
+
+        if(this.circlePoint === 'yes'){
+          this._circles.filter(function (d,j) { return j === i })
+            .attr("transform", "translate(" + dx[i] + "," + dy[i] + ")" );
+        }
+      } //for
+
+      // now we can set our data that we want to pass out
+      this.set('tooltipData',dataObj);
+
+      /*
+        Move the vertical line into position;
+        If bottom, just take the lowest datapoint
+        If top, take the highest
+      */
+      if(this.verticalLine === 'full'){
+        this._vLine.attr("transform","translate(" + mousePos + "," + 0 + ")");
+      } else if(this.verticalLine === 'bottom'){
+        var maxY = d3.max(dy);
+        this._vLine.attr("transform","translate(" + dx[dy.indexOf(maxY)] + "," + maxY + ")");
+      } else if(this.verticalLine === 'top'){
+        var minY = d3.min(dy);
+        this._vLine.attr("transform","translate(" + dx[dy.indexOf(minY)] + "," + minY + ")")
+          .attr("y2", -this.height);
+      }
+    } //mousemove
+  });
+</script>

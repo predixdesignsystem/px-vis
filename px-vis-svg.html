@@ -1,0 +1,149 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="../px-vis-common.html" />
+<link rel="import" href="../px-vis-svg-chart-common.html" />
+
+
+<!--
+Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
+
+##### Usage
+
+    <px-vis counter-value="1">Hi</px-vis>
+
+@element px-vis
+@blurb Element providing solution to no problem in particular.
+@homepage index.html
+@demo demo.html
+-->
+<dom-module id="px-vis-svg">
+    <link rel="import" type="css" href="css/px-vis.css"/>
+    <template>
+      <svg class="px-vis-svg" style="border:1px solid blue;">
+        <content></content>
+      </svg>
+    </template>
+</dom-module>
+
+<script>
+    Polymer({
+
+        is: 'px-vis-svg',
+
+        behaviors: [pxVisCommonBehavior,pxVisSVGChartCommonBehavior],
+
+        /**
+         * Properties block, expose attribute values to the DOM via 'reflect'
+         *
+         * @property properties
+         * @type Object
+         */
+        properties: {
+          /**
+           * Use the selectable attribute if the table rows should be able to be selected.
+           *
+           *      <px-data-table selectable table-data="{{data}}"></px-data-table>
+           *
+           * @default false
+           */
+          xScale: {
+            type: String,
+            value: 'ordinal',
+            notify: true
+          },
+          /**
+           * Use the selectable attribute if the table rows should be able to be selected.
+           *
+           *      <px-data-table selectable table-data="{{data}}"></px-data-table>
+           *
+           * @default false
+           */
+          yScale: {
+            type: String,
+            value: 'ordinal',
+            notify: true
+          },
+          /**
+           * A list of sub elements should we need to know our children
+           *
+           *
+           * @default []
+           */
+          _childElems:{
+            type:Array,
+            value:[]
+          },
+          /**
+           * Use the selectable attribute if the table rows should be able to be selected.
+           *
+           *      <px-data-table selectable table-data="{{data}}"></px-data-table>
+           *
+           * @default false
+           */
+          //  parse: {
+          //    type: String,
+          //    value: false,
+          //    observer: 'praser'
+          //  },
+        },
+
+        observers: [
+          '_setSVG(width,height,margin)'
+        ],
+
+        listeners: {
+          'getSVG': '_giveSVG'
+        },
+
+
+        /**
+         *  When ready, let's find out who our children are
+         */
+        ready: function() {
+          Polymer.dom(this).observeNodes(this._onEffectiveDomUpdated.bind(this));
+        },
+        created: function(){
+        },
+        attached: function() {
+        },
+        //
+        // /**
+        //  * Event callback
+        //  * When asked for a svg attr update, send it back as an event
+        //  *
+        //  * @method _giveSVG
+        //  */
+        // _giveSVG:function(e){
+        //   var ne = Polymer.dom(e);
+        //   ne.rootTarget.fire('giveSVG',{ svg:this.svg })
+        //   e.stopPropagation();
+        // },
+
+        _onEffectiveDomUpdated: function (info) {
+          this.async(function () {
+            info.addedNodes.forEach(this._onNodeAdded.bind(this));
+          });
+        },
+        _onNodeAdded: function (node) {
+          if (!(node instanceof Text)) {
+            node.__map = this.map;
+            this._childElems.push(node);
+          }
+        },
+        /**
+         *
+         *
+         * @method _setSVG
+         */
+        _setSVG: function(){
+          var svg = d3.select(this.$$("svg"))
+            .attr('width',this.width)
+            .attr('height',this.height);
+          this.svg = (typeof(this.svg) === 'undefined') ? svg.append('g') : this.svg;
+          this.svg.attr('width',this.width)
+            .attr('height',this.height)
+            .attr("transform", "translate(" + this.margin.left + ',' + this.margin.top + ")");
+
+          this.notifyPath('svg',this.svg);
+        },
+    });
+</script>

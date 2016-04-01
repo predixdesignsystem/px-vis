@@ -1,0 +1,93 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="../px-vis-common.html" />
+
+
+<!--
+Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
+
+##### Usage
+
+    <px-vis counter-value="1">Hi</px-vis>
+
+@element px-vis
+@blurb Element providing solution to no problem in particular.
+@homepage index.html
+@demo demo.html
+-->
+<dom-module id="px-vis-data">
+  <template>
+    <template is="dom-repeat" items="{{urls}}">
+      <iron-ajax
+        url="{{item}}"
+        on-response="responseHandler"
+        auto>
+      </iron-ajax>
+      </template>
+    <content></content>
+  </template>
+</dom-module>
+
+<script>
+    Polymer({
+
+        is: 'px-vis-data',
+
+        behaviors: [
+          pxVisCommonBehavior,
+          pxVisSVGChartCommonBehavior
+        ],
+
+        /**
+         * Properties block, expose attribute values to the DOM via 'reflect'
+         *
+         * @property properties
+         * @type Object
+         */
+        properties: {
+          url:{
+            type:String,
+            observer:'_urlParser'
+          },
+          urls:{
+            type:Array,
+            value:function(){ return [] },
+          },
+          tempData:{
+            type:Array,
+            notify:true,
+            value:function(){ return [] }
+          }
+        },
+        observers: [
+            '_promiseData(tempData.*)'
+        ],
+        _urlParser:function(){
+          this.set('urls', [this.url]);
+        },
+        responseHandler:function(e, detail){
+          // console.log(e);
+          var data = e.detail.response;
+          var name = e.detail.url.split('/');
+          // console.log(name[name.length - 1].split('.')[0]);
+          // TODO check if it has a name
+          data['name'] = name[name.length - 1].split('.')[0];
+          // console.log(data.name);
+          if(!this.tempData){
+            this.set('tempData',[data]);
+          } else {
+            // console.log('temp')
+            this.push('tempData',e.detail.response);
+            this.notifyPath('tempData',this.tempData);
+            // console.log(this.tempData);
+          }
+        },
+        // TODO make this dynamic
+        // TODO make this optional / default
+        _promiseData:function(){
+          // console.log("promise");
+          if(this.tempData.length == 2){
+            this.set('chartData',this.tempData);
+          }
+        }
+    });
+</script>

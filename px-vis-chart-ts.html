@@ -1,0 +1,214 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="../px-vis-common.html" />
+<link rel="import" href="../iron-ajax/iron-ajax.html" />
+<link rel="import" href="px-vis-svg.html"/>
+<link rel="import" href="px-vis-line.html"/>
+<link rel="import" href="px-vis-axis.html"/>
+<link rel="import" href="px-vis-data.html"/>
+<link rel="import" href="px-vis-chart-navigator.html"/>
+<link rel="import" href="px-vis-scale.html"/>
+<link rel="import" href="px-vis-tooltip.html"/>
+<link rel="import" href="px-vis-register.html"/>
+
+
+<!--
+Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
+
+##### Usage
+
+    <px-vis counter-value="1">Hi</px-vis>
+
+@element px-vis
+@blurb Element providing solution to no problem in particular.
+@homepage index.html
+@demo demo.html
+-->
+<dom-module id="px-vis-chart-ts">
+  <link rel="import" type="css" href="css/px-vis.css"/>
+  <template>
+    <div class="flex flex--row u-m">
+      <div class="flex flex--col">
+        <px-vis-data url="[[url]]" urls="[[urls]]" chart-data="{{chartData}}"></px-vis-data>
+        <!-- <px-vis-register
+          height="50"
+          width="[[width]]"
+          type="horizontal"
+          tooltip-data=[[tooltipData]]> -->
+        </px-vis-register>
+        <px-vis-scale
+          x-scale="time"
+          y-scale="linear"
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          x="{{x}}"
+          y="{{y}}"
+          chart-data="[[chartData]]"
+          selected-domain="[[selectedDomain]]"
+          set-domain-x="{{setDomainX}}"
+          set-domain-y="{{setDomainY}}">
+        </px-vis-scale>
+        <px-vis-svg
+          svg="{{svg}}"
+          width="[[width]]"
+          height="[[height]]"
+          margin="{{margin}}">
+        </px-vis-svg>
+
+          <template is="dom-repeat" items="{{chartData}}">
+            <px-vis-line
+              svg="[[svg]]"
+              line-id="[[item.name]]"
+              series-number="[[index]]"
+              chart-data="[[item]]"
+              x="[[x]]"
+              y="[[y]]"
+              set-domain-x="[[setDomainX]]"
+              set-domain-y="[[setDomainY]]">
+            </px-vis-line>
+          </template>
+
+          <px-vis-axis
+            svg="[[svg]]"
+            axis="[[x]]"
+            axis-id="x"
+            margin="[[margin]]"
+            orientation="bottom"
+            set-domain="[[setDomainX]]">
+          </px-vis-axis>
+          <px-vis-axis
+            svg="[[svg]]"
+            axis="[[y]]"
+            axis-id="y"
+            margin="[[margin]]"
+            orientation="left"
+            set-domain="[[setDomainY]]">
+          </px-vis-axis>
+          <px-vis-tooltip
+            svg="[[svg]]"
+            width="[[width]]"
+            height="[[height]]"
+            margin="[[margin]]"
+            chart-data="[[chartData]]"
+            x="[[x]]"
+            y="[[y]]"
+            vertical-line="full"
+            set-domain-x="[[setDomainX]]"
+            set-domain-y="[[setDomainY]]"
+            tooltip-data={{tooltipData}}>
+          </px-vis-tooltip>
+        <px-vis-chart-navigator
+          x-scale="time"
+          y-scale="linear"
+          width="[[width]]"
+          height="100"
+          margin="[[marginNav]]"
+          chart-data="[[chartData]]"
+          selected-domain="{{selectedDomain}}">
+        </px-vis-chart-navigator>
+      </div>
+      <px-vis-register
+        height="[[height]]"
+        width="350"
+        tooltip-data=[[tooltipData]]>
+    </div>
+  </template>
+</dom-module>
+
+<script>
+    Polymer({
+
+        is: 'px-vis-chart-ts',
+
+        behaviors: [
+          pxVisCommonBehavior,
+          pxVisSVGChartCommonBehavior
+        ],
+
+        // listeners: {
+        //   'brushed':'_brushed'
+        // },
+
+        /**
+         * Properties block, expose attribute values to the DOM via 'reflect'
+         *
+         * @property properties
+         * @type Object
+         */
+        properties: {
+          yAxis:{
+            type:Array,
+            value:function(){ return []; }
+          },
+          series:{
+            type:Array,
+            value:function(){ return []; }
+          },
+          xAxisLocation:{
+            type:String,
+            value:'bottom'
+          },
+          yAxisLocation:{
+            type:String,
+            value:'left'
+          },
+          margin:{
+            type:Object,
+            value: { top: 15, right: 15, bottom: 15, left: 15},
+          },
+          marginNav:{
+            type:Object,
+            value: { top: 5, right: 5, bottom: 5, left: 5},
+          },
+          url:{
+            type:String,
+          },
+          urls:{
+            type:Array,
+            value:function(){ return [] },
+          }
+        },
+
+        _calcMargins:function(){
+          var topMargin = 10,
+              rightMargin = 10,
+              bottomMargin = 10,
+              leftMargin = 10;
+          console.log(this.yAxisLocation);
+          console.log(this.xAxisLocation);
+          if(this.xAxisLocation === 'bottom'){
+            bottomMargin = 40;
+          } else if(this.xAxisLocation === 'top'){
+            topMargin = 40;
+          }
+
+          // TODO if multiple Y...
+          if(this.yAxisLocation === 'left'){
+            leftMargin = 40;
+          } else if(this.yAxisLocation === 'right'){
+            rightMargin = 40;
+          }
+
+          this.set('margin', {
+            'top': topMargin,
+            'right': rightMargin,
+            'bottom': bottomMargin,
+            'left': leftMargin
+          });
+          this.set('marginNav', {
+            'top': 5,
+            'right': rightMargin,
+            'bottom': 20,
+            'left': leftMargin
+          });
+        },
+        _brushed:function(e){
+          var ne = Polymer.dom(e);
+          this.brushedDomain = ne.event.detail.domain;
+          e.stopPropagation();
+        },
+        ready:function(){
+          this._calcMargins();
+        }
+    });
+</script>

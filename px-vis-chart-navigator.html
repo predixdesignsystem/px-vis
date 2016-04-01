@@ -1,0 +1,120 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="../px-vis-common.html" />
+<link rel="import" href="../iron-ajax/iron-ajax.html" />
+<link rel="import" href="px-vis-svg.html"/>
+<link rel="import" href="px-vis-line.html"/>
+<link rel="import" href="px-vis-axis.html"/>
+<link rel="import" href="px-vis-brush.html"/>
+<link rel="import" href="px-vis-scale.html"/>
+
+<!--
+Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
+
+##### Usage
+
+    <px-vis counter-value="1">Hi</px-vis>
+
+@element px-vis
+@blurb Element providing solution to no problem in particular.
+@homepage index.html
+@demo demo.html
+-->
+<dom-module id="px-vis-chart-navigator">
+    <link rel="import" type="css" href="css/px-vis.css"/>
+    <template>
+      <px-vis-scale
+        x-scale="{{xScale}}"
+        y-scale="{{yScale}}"
+        width="{{width}}"
+        height="{{height}}"
+        margin="[[margin]]"
+        x="{{x}}"
+        y="{{y}}"
+        chart-data="[[chartData]]"
+        set-domain-x="{{setDomainX}}"
+        set-domain-y="{{setDomainY}}"></px-vis-scale>
+      <px-vis-svg
+        svg="{{svg}}"
+        width="{{width}}"
+        height="{{height}}"
+        margin="[[margin]]">
+      </px-vis-svg>
+
+      <template is="dom-repeat" items="{{chartData}}">
+        <px-vis-line
+          svg="{{svg}}"
+          chart-data="[[item]]"
+          line-id="[[item.name]]"
+          series-number="[[index]]"
+          x="{{x}}"
+          y="{{y}}"
+          set-domain-x="[[setDomainX]]"
+          set-domain-y="[[setDomainY]]">
+      </template>
+
+      <px-vis-axis
+        svg="{{svg}}"
+        axis="{{x}}"
+        axis-id="x"
+        margin="[[margin]]"
+        orientation="bottom"
+        set-domain="[[setDomainX]]">
+      </px-vis-axis>
+      <px-vis-brush
+        svg="[[svg]]"
+        axis="{{x}}"
+        height="{{height}}"
+        selected-domain={{selectedDomain}}
+        set-domain="[[setDomainX]]">
+      </px-vis-brush>
+
+    </template>
+</dom-module>
+
+<script>
+    Polymer({
+
+        is: 'px-vis-chart-navigator',
+
+        behaviors: [pxVisCommonBehavior,pxVisSVGChartCommonBehavior],
+
+        /**
+         * Properties block, expose attribute values to the DOM via 'reflect'
+         *
+         * @property properties
+         * @type Object
+         */
+        properties: {
+          /**
+           * Number of series to display on the navigator
+           *
+           * TODO how to just show all? 'All', INFINITY?
+           * @default 1
+           */
+          series:{
+            type:Number,
+            value: 1
+          },
+          xAxisLocation:{
+            type:String,
+            value:'bottom'
+          },
+          yAxisLocation:{
+            type:String,
+            value:'left'
+          },
+          margin:{
+            type:Object,
+            value: function(){return {}; },
+          },
+          xScale: {
+            type: String,
+            value: 'ordinal',
+          },
+          yScale: {
+            type: String,
+            value: 'ordinal',
+          }
+        }
+    });
+</script>

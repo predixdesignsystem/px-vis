@@ -1,0 +1,124 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="../px-vis-common.html" />
+<link rel="import" href="../px-vis-svg-chart-common.html" />
+
+
+<!--
+Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
+
+##### Usage
+
+    <px-vis counter-value="1">Hi</px-vis>
+
+@element px-vis
+@blurb Element providing solution to no problem in particular.
+@homepage index.html
+@demo demo.html
+-->
+<dom-module id="px-vis-axis">
+    <link rel="import" type="css" href="css/px-vis.css"/>
+    <template>
+
+    </template>
+</dom-module>
+
+<script>
+    Polymer({
+
+        is: 'px-vis-axis',
+
+        behaviors: [pxVisSVGChartCommonBehavior],
+
+        observers: [
+          '_defineAxis(axis)',
+          '_drawElement(setDomain)'
+        ],
+
+        // listeners: {
+        //  'giveSVG': '_setSVG',
+        // },
+
+        /**
+         * Properties block, expose attribute values to the DOM via 'reflect'
+         *
+         * @property properties
+         * @type Object
+         */
+        properties: {
+          _axis:{
+            type: Object,
+            value: {},
+            notify: true
+          },
+          axis:{
+            type: Object,
+            value: {},
+            notify: true,
+          },
+          axisId:{
+            type:String,
+            value:'x',
+          },
+          orientation:{
+            type: String,
+            value: '',
+          },
+          translateAmt:{
+            type: Array,
+            value:function(){ return [0,0]; }
+          }
+
+        },
+        /**
+         *
+         *
+         * @method _drawElement
+         */
+        _defineAxis:function(){
+          this._axis = d3.svg.axis()
+            .scale(this.axis)
+            .orient(this.orientation);
+        },
+        /**
+         *
+         *
+         * @method _drawElement
+         */
+        _drawElement: function() {
+          // console.log('draw axis');
+          // TODO what happens if not?
+          if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this._axis)){
+            if(this.orientation === 'bottom'){
+              var h = this.svg.attr('height') - this.margin.bottom - this.margin.top;
+              this.translateAmt = [0,h];
+            } else if(this.orientation === 'left'){
+              this.translateAmt = [0,0];
+            }
+            // checks to see if the axis already exists. If not, create; if so, update
+            var axisGroup = this.svg.select('g.axis[axis-id=' + this.axisId + ']');
+            if(axisGroup.empty()){
+              var g = this.svg.append("g")
+                .attr("class", "axis")
+                .attr('axis-id',this.axisId)
+                .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
+                .call(this._axis);
+              g.selectAll('line,path')
+                .attr('fill','none')
+                .attr('stroke', '#000')
+                .attr('shape-rendering','crispEdges');
+              g.selectAll('text')
+                .attr('font-size','10px')
+                .attr('font-style','sans-serif');
+            } else {
+              axisGroup
+              // .duration(750)
+              .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
+              .call(this._axis);
+              axisGroup.selectAll('text')
+                .attr('font-size','10px')
+                .attr('font-style','sans-serif');
+            }
+          }
+        },
+    });
+</script>

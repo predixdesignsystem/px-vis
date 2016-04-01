@@ -1,0 +1,120 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="../px-vis-common.html" />
+
+
+<!--
+Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
+
+##### Usage
+
+    <px-vis counter-value="1">Hi</px-vis>
+
+@element px-vis
+@blurb Element providing solution to no problem in particular.
+@homepage index.html
+@demo demo.html
+-->
+<dom-module id="px-vis-register">
+  <link rel="import" type="css" href="css/px-vis.css"/>
+  <link rel="import" type="css" href="css/px-vis-register.css"/>
+  <template>
+
+    <div
+      id="registerWrap"
+      class$="{{regClasses}}"
+      style$="{{regStyles}}">
+      <div>{{tooltipData.time}}</div>
+      <template is="dom-repeat" items="{{tooltipData.series}}">
+        <div class="series">
+          <span class="seriesMarker"></span>
+          {{item.name}} : {{item.value}}</div>
+      </template>
+    </div>
+  </template>
+</dom-module>
+
+<script>
+    Polymer({
+
+        is: 'px-vis-register',
+
+        behaviors: [pxVisCommonBehavior],
+
+        /**
+         * Properties block, expose attribute values to the DOM via 'reflect'
+         *
+         * @property properties
+         * @type Object
+         */
+        properties: {
+          /**
+           * Data reported back by the tooltip
+           *
+           * @property tooltipData
+           * @type Array
+           * @default []
+           */
+          tooltipData:{
+            type:Object,
+            observer:'_getTooltip'
+          },
+          /**
+           * Defines if the register should be horizonal or vertical
+           *
+           * @property type
+           * @type string
+           * @default vertical
+           */
+           type:{
+             type:String,
+             value:"vertical",
+             observer:'_setClasses'
+           },
+           /**
+            * Defines the classes for the register
+            *
+            * @property regClasses
+            * @type string
+            * @default none
+            */
+            regClasses:{
+              type:String,
+              notify:true
+            },
+            /**
+             * Defines the styles for the register
+             *
+             * @property type
+             * @type string
+             * @default none
+             */
+             regStyles:{
+               type:String,
+               notify:true
+             },
+
+
+        },
+        attached:function(){
+          this._setClasses();
+        },
+        /**
+         * Sets the classess and styles for the register
+         *
+         * @property _setClasses
+         */
+        _setClasses:function(){
+          // TODO check if there are dev set styles and classes
+          this.regStyles = "height:" + this.height + "px; width:" + this.width + "px";
+
+          if(this.type === 'horizontal'){
+            this.regClasses = "flex flex--row";
+          } else {
+            this.regClasses = "vertical flex flex--col u-ml";
+          }
+        },
+        _getTooltip:function(){
+          // console.log(this.tooltipData);
+        }
+    });
+</script>

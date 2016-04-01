@@ -1,0 +1,425 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="../px-vis-common.html" />
+<link rel="import" href="../px-vis-svg-chart-common.html" />
+<link rel="import" href="../px-colors-design/colors.html" />
+
+
+<!--
+Element providing user interaction on the navigator.
+
+This element draw the box over the navigator signifying the selected chart extents and provides the user interactions to resize and move the extent box.
+
+This element sets the selectedDomain property based on the extents box. The selectedDomain variable can then be consumed by the scale component to change the main chart extents.
+
+##### Usage
+
+    <px-vis-brush
+      svg="[[varFromSVGComponent]]"
+      axis="{{varXFromScaleComponent}}"
+      height="{{height}}"
+      selected-domain={{selectedDomain}}
+      set-domain="[[varXDomainFromScaleComponent]]">
+    </px-vis-brush>
+
+@element px-vis-brush
+@blurb Element providing user interaction on the navigator.
+@homepage index.html
+@demo demo.html
+-->
+<dom-module id="px-vis-brush">
+    <link rel="import" type="css" href="css/px-vis.css"/>
+    <template>
+
+    </template>
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'px-vis-brush',
+
+    behaviors: [
+      pxVisSVGChartCommonBehavior,
+      commonColors
+    ],
+
+    observers: [
+      '_drawElement(setDomain)'
+    ],
+
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      _brush:{
+        type: Object,
+        value: {},
+      },
+      axis:{
+        type: Object,
+        value: {},
+        notify: true,
+      },
+      brushGroup:{
+        type: Object,
+        value: {},
+      },
+      _handleGroup:{
+        type: Object,
+        value: {},
+      },
+      _centering:{
+        type:Boolean,
+        value:false
+      },
+      _center:{
+        type:Object,
+      },
+      /**
+       * Holder for a clone of the passed in svg container.
+       *
+       * We cant use the normal svg container due to drawing order. The purpose of this clone is to ensure the brush elements are drawn on top of the navigator chart rather than following normal draw order.
+       *
+       * @property bushSvg
+       * @type Object
+       */
+      bushSvg:{
+        type: Object
+      },
+    },
+    /**
+     * Sets up listeners and defines the svg for the brush
+     *
+     * @method _drawElement
+     */
+    _drawElement: function() {
+      // first, define the brush using the axis
+      this._brush = d3.svg.brush()
+        .x(this.axis)
+        .extent(this.setDomain)
+        // .on("brush", (this._brushed).bind(this));
+        .on("brushstart", this._brushstart.bind(this))
+        .on("brush", this._brushmove.bind(this))
+        .on("brushend", this._brushend.bind(this));
+
+      if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this._brush)){
+        /*
+          first thing, clone the 'g' elem we draw to and attach it
+          draw order matters and we want the brush to appear on top of everything else
+          since we cannot ensure it draws after everything else easily, we can stick it in a
+          different 'g' that we know is drawn after the main 'g'
+
+        */
+        var tempSVG = this.svg[0][0],
+            clone = tempSVG.cloneNode();
+
+        tempSVG.parentNode.appendChild(clone);
+
+        this.set('bushSvg',d3.select(clone));
+
+        // now that we have our new g, proceed with drawing brush
+        this.brushGroup = this.bushSvg.append("g")
+          .attr("class", "brush")
+          .call(this._brush);
+
+        var heightOffset = 6;
+        // Style the brush overlay box
+        this.brushGroup.selectAll("rect")
+          .attr("y", -heightOffset)
+          .attr("height", this.height + heightOffset)
+          .attr('stroke',this.colors.gray5)
+          .attr('stroke-width',2)
+          .attr('fill-opacity','.10')
+          .attr('shape-rendering','crispEdges');
+
+        this._drawHandles(heightOffset);
+
+        // Setup listeners for click on the navigator so the brush will jump instead of redraw
+        this.brushGroup.select(".background")
+          .on("mousedown.brush", this._brushcenter.bind(this))
+          .on("touchstart.brush", this._brushcenter.bind(this));
+
+        //if we want fancy color changes, etc, can use brushstart to prime those changes
+        // this._brushstart();
+        // this._brushmove();
+        // this._brush.extent(this.setDomain);
+        //
+        // console.log(this.brushGroup[0][0].parentNode.childNodes);
+        // var nodes = this.brushGroup[0][0].parentNode.childNodes;
+        // console.log(nodes[nodes.length -1]);
+        // if(nodes[nodes.length -1] !== this.brushGroup[0][0]){
+        //   console.log("doesnt match");
+        // }
+      }
+    },
+    /**
+     * Helper function to add class "selecting" to elems selected in the brush
+     * TODO do we want to issue a color change? if not, delete/ comment out
+     *
+     * @method _brushstart
+     */
+    _brushstart: function() {
+      this.bushSvg.classed("selecting", true);
+    },
+    /**
+     * Helper function to remove class "selecting" to elems not selected in the brush
+     * TODO do we want to issue a color change? if not, delete/ comment out
+     *
+     * @method _brushend
+     */
+    _brushend: function () {
+      this.bushSvg.classed("selecting", !d3.event.target.empty());
+    },
+    /**
+     * Helper function fired whtn the brush is moved / extents changed
+     * sets the attr 'selectedDomain' with the new extents
+     * this attr should travel up the compent tree via observers and set the new domain in the chart
+     *
+     * @method _brushmove
+     */
+    _brushmove: function() {
+      // var s = this._brush.extent();
+      // circle.classed("selected", function(d) { return s[0] <= d && d <= s[1]; });
+      this.debounce('brushed', function () {
+        var newDomain = this._brush.empty() ? this.axis.domain() : this._brush.extent();
+        this.set('selectedDomain', newDomain);
+      }, 10);
+    },
+    /**
+     * Helper function fired whtn the navigator is clicked on
+     *
+     * @method _brushcenter
+     */
+    _brushcenter: function() {
+      var win = d3.select(window),
+          target = d3.event.target,
+          extent = this._brush.extent(),
+          // +extent converts a potential date object to unix timestamp
+          // TODO check that this still works without a datetime obj
+          size = +extent[1] - +extent[0],
+          domain = this.axis.domain(),
+          x0 = +domain[0] + size / 2,
+          x1 = +domain[1] - size / 2;
+
+      this._recenter(true);
+      this._brushcentermove(target,x0,x1);
+
+      if (d3.event.changedTouches) {
+        win.on("touchmove.brush", this._brushcentermove.bind(this,target,x0,x1))
+          .on("touchend.brush", this._brushcenterend.bind(this));
+      } else {
+        win.on("mousemove.brush", this._brushcentermove.bind(this,target,x0,x1))
+          .on("mouseup.brush", this._brushcenterend.bind(this));
+      }
+    }, //_brushcenter
+    /**
+     * Helper function to calculate the centerpoint where the brush should move to
+     *
+     * @method _brushcentermove
+     */
+    _brushcentermove: function(target,x0,x1) {
+      d3.event.stopPropagation();
+      this._center = Math.max(x0, Math.min(x1, this.axis.invert(d3.mouse(target)[0])));
+
+      this._recenter(false);
+    },
+    /**
+     * Helper function to to call the setdomain function and disable listner
+     *
+     * @method _brushcenterend
+     */
+    _brushcenterend: function() {
+      this._brushmove();
+      d3.select(window).on(".brush", null);
+    },
+    /**
+     * Helper function to tween and calculate the brush move
+     *
+     * @method _brushcenterend
+     */
+    _recenter: function(smooth) {
+      var _this = this;
+
+      if (this._centering) return; // timer is active and already tweening
+      if (!smooth) return void _this.tween(1); // instantaneous jump
+      this._centering = true;
+
+      // sets up a timer to call tween
+      d3.timer(function() {
+        return _this.tween(0.2);
+      });
+    },
+    /**
+     * Helper function to tween so that the brush slides rather than a jumps
+     *
+     * @method _brushcenterend
+     */
+    tween:function (alpha) {
+      var extent = this._brush.extent(),
+          size = +extent[1] - +extent[0],
+          center1 = this._center * alpha + ( +extent[0] + +extent[1]) / 2 * (1 - alpha);
+
+      // move the brush
+      this.brushGroup
+          .call(this._brush.extent([center1 - size / 2, center1 + size / 2]))
+          .call(this._brush.event);
+
+      // check if it has moved into position within a tolerance (based on overall size of the domain)
+      // TODO check that it works with radically different extents, such as 0.0-1.0
+      return !(this._centering = Math.abs((center1) - (this._center)) > size * 0.01);
+    },
+    /**
+     * Helper function to draw the handle elements
+     *
+     * @method _drawHandles
+     */
+    _drawHandles:function(heightOffset){
+      // Setup sizes for the handles on either end
+      var handleSize = {
+        'h':32,
+        'w':9,
+        's':1.5
+      };
+      handleSize['y'] = this.height/2 - handleSize.h/2 - heightOffset;
+
+      var lineY = [handleSize.y + heightOffset * 1.5 , handleSize.y + handleSize.h - heightOffset * 1.5];
+
+      //draw a group to hold the handles
+      this._handleGroup = this.brushGroup.selectAll(".resize")
+        .append('g')
+        .attr('class','handle')
+        // provide listeners for hover and press events
+        .on('mousedown',this._handleGroupMouseDown.bind(this))
+        .on("mouseenter", this._handleGroupMouseEnter.bind(this))
+        .on("mouseleave", this._handleGroupMouseLeave.bind(this));
+
+      // draw the handle rect / base
+      this._handleGroup.append("rect")
+        .attr('class','base')
+        .attr("x", -handleSize.w/2)
+        .attr("y", handleSize.y)
+        .attr("height", handleSize.h)
+        .attr("width", handleSize.w)
+        .attr('stroke',this.colors.gray5)
+        .attr('fill',this.colors.white)
+        .attr('shape-rendering','crispEdges');
+
+      // draw the lines for the handles
+      this._handleGroup.append("svg:line")
+        .attr("x1", handleSize.s )
+        .attr("x2", handleSize.s )
+        .attr("y1", lineY[0])
+        .attr("y2", lineY[1])
+        .attr("class", "handleLine")
+        .attr('fill','none')
+        .attr('stroke',this.colors.gray5);
+
+      this._handleGroup.append("svg:line")
+          .attr("x1", -handleSize.s )
+          .attr("x2", -handleSize.s )
+          .attr("y1", lineY[0])
+          .attr("y2", lineY[1])
+          .attr("class", "handleLine")
+          .attr('fill','none')
+          .attr('stroke',this.colors.gray5);
+    },
+    /**
+     * Function which just fires a brushmouseup event
+     *
+     * @method _brushMouseUp
+     */
+    _brushMouseUp:function(){
+      this.fire('brushmouseup');
+    },
+    /**
+     * Function to restyle handles on mousedown event
+     *
+     * @method _handleGroupMouseDown
+     */
+    _handleGroupMouseDown:function(d,i){
+        var elem = d3.select(this._handleGroup[0][i]);
+
+        // disable changes on mouseleave because when a person drags, they can leave the elem bounds and we dont want to restyle yet.
+        elem.on("mouseleave", null);
+
+        /*
+          Mouseup is tricky. It lives on the Window rather than our elem.
+          If we just use a d3.select(window).on('mouseup',...) then it overwrites any other d3 mouseup listeners.
+          To be safe, use Polymer listen and fire another event for d3 to listen to
+        */
+        this.listen(window,'mouseup','_brushMouseUp');
+        /*
+          Now we can safely listen for our mouseup without overwriting other listeners
+
+          For mouseup, we must bind 'd' and 'i' in order to pass our handle index down. Otherwise, it doesnt know which handle we are dealing with.
+        */
+        d3.select(window).on('brushmouseup',this._handleGroupMouseUp.bind(this,d,i));
+
+        // set the pressed styles
+        elem.select('rect.base')
+          .attr('stroke', this.colors.gray7)
+          .attr('fill', this.colors.gray6);
+        elem.selectAll('line.handleLine')
+          .attr('stroke', this.colors.gray7);
+    },
+    /**
+     * Function to restyle handles on mouseup event
+     *
+     * @method _handleGroupMouseUp
+     */
+    _handleGroupMouseUp:function(d,i){
+      var elem = d3.select(this._handleGroup[0][i]);
+
+      // clear the d3 mouseup listener
+      d3.select(window).on('brushmouseup',null);
+      // clear our Polymer helper listener
+      this.unlisten(window,'mouseup','_brushMouseUp');
+
+      // reapply the mouseleave function and again, bind our index
+      elem.on("mouseleave", this._handleGroupMouseLeave.bind(this,d,i));
+
+      // style with hover
+      // TODO sometimes the user can be off of the handle after a drag. Need to detect and style as basic
+      elem.select('rect.base')
+        .attr('stroke', this.colors.gray5)
+        .attr('fill', this.colors.white);
+      elem.selectAll('line.handleLine')
+        .attr('stroke', this.colors.gray5);
+      // elem.select('rect.base')
+      //   .attr('stroke', this.colors.gray6)
+      //   .attr('fill', this.colors.gray5);
+      // elem.selectAll('line.handleLine')
+      //   .attr('stroke', this.colors.gray6);
+
+    },
+    /**
+     * Function to restyle handles on mouseleave event
+     *
+     * @method _handleGroupMouseLeave
+     */
+    _handleGroupMouseLeave:function(d,i){
+      var elem = d3.select(this._handleGroup[0][i]);
+      elem.select('rect.base')
+        .attr('stroke', this.colors.gray5)
+        .attr('fill', this.colors.white);
+      elem.selectAll('line.handleLine')
+        .attr('stroke', this.colors.gray5);
+    },
+    /**
+     * Function to restyle handles on mouseenter event
+     *
+     * @method _handleGroupMouseEnter
+     */
+    _handleGroupMouseEnter:function(d,i){
+      var elem = d3.select(this._handleGroup[0][i]);
+      elem.select('rect.base')
+        .attr('stroke', this.colors.gray6)
+        .attr('fill', this.colors.gray5);
+      elem.selectAll('line.handleLine')
+        .attr('stroke', this.colors.gray6);
+    }
+  });
+</script>
