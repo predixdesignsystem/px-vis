@@ -75,22 +75,37 @@ function runTests(){
     test('truncate is correct', function() {
       var series = Polymer.dom(truncate.root).querySelectorAll('.seriesName');
 
-      assert.equal(series[0].textContent,'this_...name0');
-      assert.equal(series[1].textContent,'this_...name1');
+      assert.equal(series[0].firstChild.textContent.trim(),'this_...name0');
+      assert.equal(series[1].firstChild.textContent.trim(),'this_...name1');
     });
 
     test('truncateShort is correct', function() {
       var series = Polymer.dom(truncateShort.root).querySelectorAll('.seriesName');
 
-      assert.equal(series[0].textContent,'thi...e0');
-      assert.equal(series[1].textContent,'thi...e1');
+      assert.equal(series[0].firstChild.textContent.trim(),'thi...e0');
+      assert.equal(series[1].firstChild.textContent.trim(),'thi...e1');
     });
 
     test('noTruncate is correct', function() {
       var series = Polymer.dom(noTruncate.root).querySelectorAll('.seriesName');
 
-      assert.equal(series[0].textContent,'this_is_a_long_name0');
-      assert.equal(series[1].textContent,'this_is_a_long_name1');
+      assert.equal(series[0].firstChild.textContent.trim(),'this_is_a_long_name0');
+      assert.equal(series[1].firstChild.textContent.trim(),'this_is_a_long_name1');
+    });
+
+    test('tooltips are created (or not)', function() {
+      var truncateSeries = Polymer.dom(truncate.root).querySelectorAll('.seriesName');
+      var truncateTT = truncateSeries[0].querySelector('px-tooltip');
+
+      var truncateShortSeries = Polymer.dom(truncateShort.root).querySelectorAll('.seriesName');
+      var truncateShortTT = truncateShortSeries[0].querySelector('px-tooltip');
+
+      var noTruncateSeries = Polymer.dom(noTruncate.root).querySelectorAll('.seriesName');
+      var noTruncateTT = noTruncateSeries[0].querySelector('px-tooltip');
+
+      assert.isTrue(truncateTT !== null);
+      assert.isTrue(truncateShortTT !== null);
+      assert.isTrue(noTruncateTT === null);
     });
   });
 }
@@ -121,7 +136,7 @@ function basicTests(registerID,dir){
     test(registerID + ' names match', function() {
       var series = Polymer.dom(register.root).querySelectorAll('.seriesName');
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].textContent, data.series[i]['name']);
+        assert.equal(series[i].firstChild.textContent.trim(), data.series[i]['name']);
       }
     });
 
@@ -155,7 +170,7 @@ function basicTests(registerID,dir){
     test(registerID + ' still names match', function() {
       var series = Polymer.dom(register.root).querySelectorAll('.seriesName');
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].textContent, data.series[i]['name']);
+        assert.equal(series[i].firstChild.textContent.trim(), data.series[i]['name']);
       }
     });
 
@@ -186,7 +201,7 @@ function basicTests(registerID,dir){
     test(registerID + ' still names match', function() {
       var series = Polymer.dom(register.root).querySelectorAll('.seriesName');
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].textContent, data.series[i]['name']);
+        assert.equal(series[i].firstChild.textContent.trim(), data.series[i]['name']);
       }
     });
 

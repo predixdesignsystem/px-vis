@@ -1,7 +1,8 @@
 <link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="px-vis-common.html" />
 <link rel="import" href="../px-colors-design/colors.html" />
+<link rel="import" href="px-vis-common.html" />
 <link rel="import" href="px-vis-svg-chart-common.html" />
+<link rel="import" href="../px-tooltip/px-tooltip.html" />
 
 <script src="../moment/moment.js"></script>
 
@@ -37,7 +38,12 @@ Element providing solution to no problem in particular. As a simple, increments 
                   name$="{{item.name}}"
                 >&nbsp;</span>
                 <span>
-                  <div class="seriesName" name$="{{item.name}}">{{_truncateName(item.name,truncationLength)}}</div>
+                  <div class="seriesName" name$="{{item.name}}">
+                    {{_truncateName(item.name,truncationLength)}}
+                    <template is="dom-if" if="{{_didTruncate(item.name,truncationLength)}}">
+                      <px-tooltip delay="500">{{item.name}}</px-tooltip>
+                    </template>
+                  </div>
                   <div class="seriesData" name$="{{item.name}}">{{item.value}}</div>
                 </span>
             </span>
@@ -60,7 +66,12 @@ Element providing solution to no problem in particular. As a simple, increments 
               class="seriesMarker"
               style$="background-color:{{_returnItemColor(index)}};"
               name$="{{item.name}}"
-            >&nbsp;</span><span class="seriesName" name$="{{item.name}}">{{_truncateName(item.name,truncationLength)}}</span>
+            >&nbsp;</span><span class="seriesName" name$="{{item.name}}">
+              {{_truncateName(item.name,truncationLength)}}
+              <template is="dom-if" if="{{_didTruncate(item.name,truncationLength)}}">
+                <px-tooltip delay="250">{{item.name}}</px-tooltip>
+              </template>
+            </span>
             <span class="seriesData" name$="{{item.name}}">{{item.value}}</span>
           </div>
         </template>
@@ -261,6 +272,13 @@ Element providing solution to no problem in particular. As a simple, increments 
         var series = this.$$('.series[name=' + keys[i] + ']');
         this.toggleClass('muted', this.mutedSeries[keys[i]], series)
       }
+    },
+    _didTruncate:function(str,len){
+      if(len > 2 || str > len){
+        return true;
+      }
+
+      return false;
     }
   });
 </script>
