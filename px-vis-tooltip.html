@@ -1,5 +1,5 @@
 <link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="../px-vis-svg-chart-common.html" />
+<link rel="import" href="px-vis-svg-chart-common.html" />
 <link rel="import" href="../px-colors-design/colors.html" />
 
 
@@ -163,18 +163,18 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     }, //properties
 
     observers: [
-      '_drawElement(setDomainX,setDomainY,chartData.*)'
+      'drawElement(setDomainX,setDomainY,chartData.*)'
      ],
 
     /**
      * Draws the tooltip elements and sets up listeners and callbacks on chart hover
      * Sets the tooltipData property which gets passed to the register.
      *
-     * @method _drawElement
+     * @method drawElement
      */
-    _drawElement: function() {
+    drawElement: function() {
       if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && (this.chartData) && this._isObjEmpty(this._tooltip)){
-        
+
         // add circle to the line and hide it
         this._tooltip = this.svg.append("g")
             .attr("display", "none");
@@ -186,9 +186,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             .enter()
             .append("line")
             .attr("class", "xline")
-            .attr("stroke", "blue")
+            .attr("stroke", this.colors.gray5)
             .attr("stroke-dasharray", "3,3")
-            .attr("opacity", 0.5)
+            .attr("opacity", 1)
             .attr("x1", 0)
             .attr("x2", this.width);
         }
@@ -198,9 +198,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           this._vLine = this._tooltip
             .append("line")
             .attr("class", "yline")
-            .attr("stroke", "blue")
+            .attr("stroke", this.colors.gray5)
             .attr("stroke-dasharray", "3,3")
-            .attr("opacity", 0.5)
+            .attr("opacity", 1)
             .attr("y1", 0)
             .attr("y2", this.height);
         }
@@ -234,8 +234,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           .on("mouseover", (this._showTooltip).bind(this))
           .on("mouseout", (this._resetTooltip).bind(this))
           .on("mousemove",(this._calcDataPoints).bind(this));
+
+        // send the register etc an empty list of series
+        this._resetTooltip();
       }  //if we have vars
-    },  //_drawElement
+    },  //drawElement
     /**
      * Helper function called on mouseover
      * Shows the tooltip elements
@@ -253,7 +256,16 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * @method _resetTooltip
      */
     _resetTooltip: function() {
-      this.set('tooltipData',[]);
+      var ttD = {
+        'time': null,
+        'series': []
+      };
+
+      for(var i = 0; i < this.chartData.length; i++){
+        ttD.series.push({'name':this.chartData[i]['name'],'value': null });
+      }
+
+      this.set('tooltipData',ttD);
       this._tooltip.attr("display", "none");
     },
 

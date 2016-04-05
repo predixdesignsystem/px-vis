@@ -1,5 +1,5 @@
 <link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="../px-vis-common.html" />
+<link rel="import" href="px-vis-common.html" />
 <link rel="import" href="../iron-ajax/iron-ajax.html" />
 <link rel="import" href="px-vis-svg.html"/>
 <link rel="import" href="px-vis-line.html"/>
@@ -29,12 +29,15 @@ Element providing solution to no problem in particular. As a simple, increments 
     <div class="flex flex--row u-m">
       <div class="flex flex--col">
         <px-vis-data url="[[url]]" urls="[[urls]]" chart-data="{{chartData}}"></px-vis-data>
-        <!-- <px-vis-register
-          height="50"
-          width="[[width]]"
-          type="horizontal"
-          tooltip-data=[[tooltipData]]> -->
-        </px-vis-register>
+        <template is="dom-if" if="{{_topRegister(registerLocation)}}">
+          <px-vis-register
+            height="50"
+            width="[[width]]"
+            type="horizontal"
+            tooltip-data=[[tooltipData]]
+            muted-series="{{mutedSeries}}">
+          </px-vis-register>
+        </template>
         <px-vis-scale
           x-scale="time"
           y-scale="linear"
@@ -64,7 +67,8 @@ Element providing solution to no problem in particular. As a simple, increments 
               x="[[x]]"
               y="[[y]]"
               set-domain-x="[[setDomainX]]"
-              set-domain-y="[[setDomainY]]">
+              set-domain-y="[[setDomainY]]"
+              muted-series="[[mutedSeries]]">
             </px-vis-line>
           </template>
 
@@ -107,10 +111,13 @@ Element providing solution to no problem in particular. As a simple, increments 
           selected-domain="{{selectedDomain}}">
         </px-vis-chart-navigator>
       </div>
-      <px-vis-register
-        height="[[height]]"
-        width="350"
-        tooltip-data=[[tooltipData]]>
+      <template is="dom-if" if="{{_sideRegister(registerLocation)}}">
+        <px-vis-register
+          height="[[height]]"
+          tooltip-data=[[tooltipData]]
+          muted-series="{{mutedSeries}}">
+        </px-vis-register>
+      </template>
     </div>
   </template>
 </dom-module>
@@ -166,6 +173,21 @@ Element providing solution to no problem in particular. As a simple, increments 
           urls:{
             type:Array,
             value:function(){ return [] },
+          },
+          /**
+           * Defines where the register will appear. Valid entries are`:
+           * - 'none'
+           * - 'top'
+           * - 'side'
+           * - 'both'
+           *
+           * @property registerLocation
+           * @type string
+           * @default side
+          */
+          registerLocation:{
+            type:String,
+            value:'side'
           }
         },
 
@@ -209,6 +231,12 @@ Element providing solution to no problem in particular. As a simple, increments 
         },
         ready:function(){
           this._calcMargins();
+        },
+        _sideRegister:function(location){
+          return location === 'side' || location === 'both'
+        },
+        _topRegister:function(location){
+          return location === 'top' || location === 'both'
         }
     });
 </script>

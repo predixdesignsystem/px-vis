@@ -62,6 +62,21 @@ var pxVisSVGChartCommonBehavior = {
         notify:true
       },
       /**
+       * axis is a general holder for the d3 instantiated scale object
+       * Can pass any type of instantiated scale object
+       * This can be set declaratively
+       *
+       * See: https://github.com/mbostock/d3/wiki/Scales
+       *
+       * @property y
+       * @type Object
+       */
+      axis:{
+        type: Object,
+        value: {},
+        notify: true,
+      },
+      /**
        * container for the chart data
        * Generally loaded with an iron-ajax tag (but doesnt have to be)
        * This can be set declaratively
@@ -74,11 +89,11 @@ var pxVisSVGChartCommonBehavior = {
         notify: true
       },
       /**
-       * container for the chart data
-       * Generally loaded with an iron-ajax tag (but doesnt have to be)
-       * This can be set declaratively
+       * New chart extents selected by the user
        *
-       * @property chartData
+       * Serves as a trigger for the scale component to redefine the chart extents
+       *
+       * @property selectedDomain
        * @type Object
        */
       selectedDomain:{
@@ -87,11 +102,11 @@ var pxVisSVGChartCommonBehavior = {
         notify:true
       },
       /**
-       * container for the chart data
-       * Generally loaded with an iron-ajax tag (but doesnt have to be)
-       * This can be set declaratively
+       * The chart extents which have been set by the scale component
        *
-       * @property chartData
+       * Serves as a trigger for many elements to redraw
+       *
+       * @property setDomainX, setDomainY, setDomain
        * @type Object
        */
       setDomainX:{
@@ -109,7 +124,18 @@ var pxVisSVGChartCommonBehavior = {
         value:[],
         notify:true
       },
-
+      /**
+       * A list of user selected muted series. Tied declaratively to series components
+       *
+       * @property mutedSeries
+       * @type Object
+       * @default []
+       */
+      mutedSeries:{
+        type:Object,
+        notify: true,
+        value:function(){ return {} },
+      },
     },
     //
     //

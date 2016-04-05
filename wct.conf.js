@@ -9,6 +9,6 @@ module.exports = {
     }
   },
   suites: [
-    'test/px-vis-test-fixture.html'
+    'test/px-vis-register-fixture.html'
   ]
 };

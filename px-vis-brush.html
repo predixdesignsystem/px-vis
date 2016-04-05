@@ -1,6 +1,6 @@
 <link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="../px-vis-common.html" />
-<link rel="import" href="../px-vis-svg-chart-common.html" />
+<link rel="import" href="px-vis-common.html" />
+<link rel="import" href="px-vis-svg-chart-common.html" />
 <link rel="import" href="../px-colors-design/colors.html" />
 
 
@@ -44,7 +44,7 @@ This element sets the selectedDomain property based on the extents box. The sele
     ],
 
     observers: [
-      '_drawElement(setDomain)'
+      'drawElement(setDomain)'
     ],
 
     /**
@@ -54,30 +54,6 @@ This element sets the selectedDomain property based on the extents box. The sele
      * @type Object
      */
     properties: {
-      _brush:{
-        type: Object,
-        value: {},
-      },
-      axis:{
-        type: Object,
-        value: {},
-        notify: true,
-      },
-      brushGroup:{
-        type: Object,
-        value: {},
-      },
-      _handleGroup:{
-        type: Object,
-        value: {},
-      },
-      _centering:{
-        type:Boolean,
-        value:false
-      },
-      _center:{
-        type:Object,
-      },
       /**
        * Holder for a clone of the passed in svg container.
        *
@@ -89,13 +65,68 @@ This element sets the selectedDomain property based on the extents box. The sele
       bushSvg:{
         type: Object
       },
+      /**
+       * Holder for the d3.svg.brush() object
+       *
+       * See: https://github.com/mbostock/d3/wiki/SVG-Controls
+       *
+       * @property _brush
+       * @type Object
+       */
+      _brush:{
+        type: Object,
+        value: {},
+      },
+      /**
+       * Holder for a SVG group of elements pertaining to the brush
+       *
+       * @property _brushGroup
+       * @type Object
+       */
+      _brushGroup:{
+        type: Object,
+        value: {},
+      },
+      /**
+       * Holder for a SVG group of elements pertaining to the handles
+       *
+       * @property _handleGroup
+       * @type Object
+       */
+      _handleGroup:{
+        type: Object,
+        value: {},
+      },
+      /**
+       * Holder for a calculated center of the extent box
+       *
+       * @property _center
+       * @type Object
+       */
+      _center:{
+        type:Object,
+      },
+      /**
+       * A boolean to tell if the extents box is currently moving
+       *
+       * @property _centering
+       * @type Object
+       */
+      _centering:{
+        type:Boolean,
+        value:false
+      }
     },
     /**
-     * Sets up listeners and defines the svg for the brush
+     * Defines the svg for the brush, draws brush elements, and sets up listeners.
      *
-     * @method _drawElement
+     * Fired though an observer looking at setDomain.
+     *
+     * Can be called manually after svg and setDomain are set.
+     *
+     * @method drawElement
      */
-    _drawElement: function() {
+    drawElement: function() {
       // first, define the brush using the axis
       this._brush = d3.svg.brush()
         .x(this.axis)
@@ -121,13 +152,13 @@ This element sets the selectedDomain property based on the extents box. The sele
         this.set('bushSvg',d3.select(clone));
 
         // now that we have our new g, proceed with drawing brush
-        this.brushGroup = this.bushSvg.append("g")
+        this._brushGroup = this.bushSvg.append("g")
           .attr("class", "brush")
           .call(this._brush);
 
         var heightOffset = 6;
         // Style the brush overlay box
-        this.brushGroup.selectAll("rect")
+        this._brushGroup.selectAll("rect")
           .attr("y", -heightOffset)
           .attr("height", this.height + heightOffset)
           .attr('stroke',this.colors.gray5)
@@ -138,7 +169,7 @@ This element sets the selectedDomain property based on the extents box. The sele
         this._drawHandles(heightOffset);
 
         // Setup listeners for click on the navigator so the brush will jump instead of redraw
-        this.brushGroup.select(".background")
+        this._brushGroup.select(".background")
           .on("mousedown.brush", this._brushcenter.bind(this))
           .on("touchstart.brush", this._brushcenter.bind(this));
 
@@ -147,10 +178,10 @@ This element sets the selectedDomain property based on the extents box. The sele
         // this._brushmove();
         // this._brush.extent(this.setDomain);
         //
-        // console.log(this.brushGroup[0][0].parentNode.childNodes);
-        // var nodes = this.brushGroup[0][0].parentNode.childNodes;
+        // console.log(this._brushGroup[0][0].parentNode.childNodes);
+        // var nodes = this._brushGroup[0][0].parentNode.childNodes;
         // console.log(nodes[nodes.length -1]);
-        // if(nodes[nodes.length -1] !== this.brushGroup[0][0]){
+        // if(nodes[nodes.length -1] !== this._brushGroup[0][0]){
         //   console.log("doesnt match");
         // }
       }
@@ -263,7 +294,7 @@ This element sets the selectedDomain property based on the extents box. The sele
           center1 = this._center * alpha + ( +extent[0] + +extent[1]) / 2 * (1 - alpha);
 
       // move the brush
-      this.brushGroup
+      this._brushGroup
           .call(this._brush.extent([center1 - size / 2, center1 + size / 2]))
           .call(this._brush.event);
 
@@ -288,7 +319,7 @@ This element sets the selectedDomain property based on the extents box. The sele
       var lineY = [handleSize.y + heightOffset * 1.5 , handleSize.y + handleSize.h - heightOffset * 1.5];
 
       //draw a group to hold the handles
-      this._handleGroup = this.brushGroup.selectAll(".resize")
+      this._handleGroup = this._brushGroup.selectAll(".resize")
         .append('g')
         .attr('class','handle')
         // provide listeners for hover and press events

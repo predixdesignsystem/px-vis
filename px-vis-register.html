@@ -1,6 +1,9 @@
 <link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="../px-vis-common.html" />
+<link rel="import" href="px-vis-common.html" />
+<link rel="import" href="../px-colors-design/colors.html" />
+<link rel="import" href="px-vis-svg-chart-common.html" />
 
+<script src="../moment/moment.js"></script>
 
 <!--
 Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
@@ -9,112 +12,237 @@ Element providing solution to no problem in particular. As a simple, increments 
 
     <px-vis counter-value="1">Hi</px-vis>
 
-@element px-vis
+@element px-vis-register
 @blurb Element providing solution to no problem in particular.
 @homepage index.html
 @demo demo.html
 -->
 <dom-module id="px-vis-register">
-  <link rel="import" type="css" href="css/px-vis.css"/>
   <link rel="import" type="css" href="css/px-vis-register.css"/>
   <template>
+    <template is="dom-if" if="{{_typeEqualHorizontal(type)}}">
+      <div
+        id="registerWrap"
+        class="flex flex--col"
+        style$="height:{{height}}px; width:{{width}}px">
+        <div id="dateTime">
+          <span id="firstDateTime">{{_firstDateTime}}</span> <span>{{_separator}}</span> <span id="secondDateTime">{{_secondDateTime}}</span>  &nbsp;
+        </div>
+        <div class="flex flex--row">
+          <template is="dom-repeat" items="{{tooltipData.series}}">
+            <span class="series narrow flex flex--row" name$="{{item.name}}" on-click="_seriesClicked">
+                <span
+                  class="seriesMarker"
+                  style$="background-color:{{_returnItemColor(index)}};"
+                  name$="{{item.name}}"
+                >&nbsp;</span>
+                <span>
+                  <div class="seriesName" name$="{{item.name}}">{{item.name}}</div>
+                  <div class="seriesData" name$="{{item.name}}">{{item.value}}</div>
+                </span>
+            </span>
+          </template>
+        </div>
+      </div>
+    </template>
 
-    <div
-      id="registerWrap"
-      class$="{{regClasses}}"
-      style$="{{regStyles}}">
-      <div>{{tooltipData.time}}</div>
-      <template is="dom-repeat" items="{{tooltipData.series}}">
-        <div class="series">
-          <span class="seriesMarker"></span>
-          {{item.name}} : {{item.value}}</div>
-      </template>
-    </div>
+    <template is="dom-if" if="{{!_typeEqualHorizontal(type)}}">
+      <div
+        id="registerWrap"
+        class="flex flex--col u-ml"
+        style$="height:{{height}}px; width:{{width}}px">
+        <div id="dateTime">
+          <span id="firstDateTime">{{_firstDateTime}}</span> <span>{{_separator}}</span> <span id="secondDateTime">{{_secondDateTime}}</span>  &nbsp;
+        </div>
+        <template is="dom-repeat" items="{{tooltipData.series}}">
+          <div class="series wide flex flex--row" name$="{{item.name}}" on-click="_seriesClicked">
+            <span
+              class="seriesMarker"
+              style$="background-color:{{_returnItemColor(index)}};"
+              name$="{{item.name}}"
+            >&nbsp;</span><span class="seriesName" name$="{{item.name}}">{{item.name}}</span>
+            <span class="seriesData" name$="{{item.name}}">{{item.value}}</span>
+          </div>
+        </template>
+      </div>
+    </template>
+
   </template>
 </dom-module>
 
 <script>
-    Polymer({
+  Polymer({
 
-        is: 'px-vis-register',
+    is: 'px-vis-register',
 
-        behaviors: [pxVisCommonBehavior],
+    behaviors: [
+      pxVisCommonBehavior,
+      pxVisSVGChartCommonBehavior, //Need to add definition for mutedSeries property...
+      commonColors
+    ],
 
-        /**
-         * Properties block, expose attribute values to the DOM via 'reflect'
-         *
-         * @property properties
-         * @type Object
-         */
-        properties: {
-          /**
-           * Data reported back by the tooltip
-           *
-           * @property tooltipData
-           * @type Array
-           * @default []
-           */
-          tooltipData:{
-            type:Object,
-            observer:'_getTooltip'
-          },
-          /**
-           * Defines if the register should be horizonal or vertical
-           *
-           * @property type
-           * @type string
-           * @default vertical
-           */
-           type:{
-             type:String,
-             value:"vertical",
-             observer:'_setClasses'
-           },
-           /**
-            * Defines the classes for the register
-            *
-            * @property regClasses
-            * @type string
-            * @default none
-            */
-            regClasses:{
-              type:String,
-              notify:true
-            },
-            /**
-             * Defines the styles for the register
-             *
-             * @property type
-             * @type string
-             * @default none
-             */
-             regStyles:{
-               type:String,
-               notify:true
-             },
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      /**
+       * Data reported back by the tooltip
+       *
+       * @property tooltipData
+       * @type Object
+       * @default []
+       */
+      tooltipData:{
+        type:Object,
+        observer:'_formatDateTime'
+      },
+      /**
+       * Defines if the register should be horizontal or vertical
+       *
+       * @property type
+       * @type string
+       * @default vertical
+      */
+      type:{
+       type:String,
+       value:"vertical"
+      },
+      /**
+       * Defines the format for the first datetime string. The first datetime is shown in normal font weight.
+       *
+       * Default is the first datetime string is TIME presented as "12:00:00 +0000"
+       *
+       * For valid string formats, see: http://momentjs.com/docs/#/displaying/
+       *
+       * @property firstDateTimeFormat
+       * @type string
+       * @default hh:mm:ss ZZ
+      */
+      firstDateTimeFormat:{
+        type:String,
+        value: 'hh:mm:ss ZZ'
+      },
+      /**
+       * Defines the format for the second datetime string. The second datetime is shown in bold font weight.
+       *
+       * Default is the second datetime string is DATE presented as "12 Feb 2016"
+       *
+       * For valid string formats, see: http://momentjs.com/docs/#/displaying/
+       *
+       * @property secondDateTimeFormat
+       * @type string
+       * @default DD MMM YYYY
+      */
+      secondDateTimeFormat:{
+        type:String,
+        value:'DD MMM YYYY'
+      },
+      /**
+       * Defines a separator character between the two datetime strings.
+       *
+       * @property separator
+       * @type string
+       * @default |
+      */
+      separator:{
+        type:String,
+        value:'|'
+      },
+      /**
+       * Holder for the formated first datetime string
+       *
+       * @property _firstDateTime
+       * @type string
+      */
+      _firstDateTime:{
+        type:String,
+        notify:true
+      },
+      /**
+       * Holder for the formated second datetime string
+       *
+       * @property _secondDateTime
+       * @type string
+      */
+      _secondDateTime:{
+        type:String,
+        notify:true
+      },
+      /**
+       * Holder for the formated separator character
+       *
+       * @property _separator
+       * @type string
+      */
+      _separator:{
+        type:String,
+        notify:true
+      },
+    },
 
+    observers: [
+      '_toggleSeries(mutedSeries.*)'
+     ],
 
-        },
-        attached:function(){
-          this._setClasses();
-        },
-        /**
-         * Sets the classess and styles for the register
-         *
-         * @property _setClasses
-         */
-        _setClasses:function(){
-          // TODO check if there are dev set styles and classes
-          this.regStyles = "height:" + this.height + "px; width:" + this.width + "px";
+    /**
+     * Function which returns true if type equals horizontal
+     *
+     * @method _typeEqualHorizontal
+     */
+    _typeEqualHorizontal: function(type){
+      return type === 'horizontal'
+    },
+    /**
+     * Function which takes an index and returns the appropriate dataVisColor
+     *
+     * @method _returnItemColor
+     */
+    _returnItemColor:function(i){
+      return this.dataVisColors[ this.seriesColorOrder[i] ]
+    },
+    /**
+     * Function which takes the incoming datetime from tooltipData and formats it.
+     *
+     * @method _formatDateTime
+     */
+    _formatDateTime:function(){
+      if(this.tooltipData.time){
+        var momentObj = moment(this.tooltipData.time);
 
-          if(this.type === 'horizontal'){
-            this.regClasses = "flex flex--row";
-          } else {
-            this.regClasses = "vertical flex flex--col u-ml";
-          }
-        },
-        _getTooltip:function(){
-          // console.log(this.tooltipData);
-        }
-    });
+        this.set('_firstDateTime', momentObj.format(this.firstDateTimeFormat));
+        this.set('_secondDateTime', momentObj.format(this.secondDateTimeFormat));
+        this.set('_separator', this.separator);
+
+      } else {
+        this.set('_firstDateTime', '');
+        this.set('_secondDateTime', '');
+        this.set('_separator', '');
+      }
+    },
+    _seriesClicked:function(e){
+      var ne = Polymer.dom(e);
+      var series = ne.rootTarget.getAttribute('name');
+
+      // if it doesnt exist, let's add it and set to true
+      if( typeof(this.mutedSeries[series]) === 'undefined' ){
+        this.set('mutedSeries.' + series, true);
+      } else {
+        //if does exist, flip the bit
+        this.set('mutedSeries.' + series, !this.mutedSeries[series]);
+      }
+
+      e.stopPropagation();
+    },
+    _toggleSeries: function(){
+      // find all series with name and toggle class
+      var keys = Object.getOwnPropertyNames(this.mutedSeries);
+      for(var i = 0; i < keys.length; i++){
+        var series = this.$$('.series[name=' + keys[i] + ']');
+        this.toggleClass('muted', this.mutedSeries[keys[i]], series)
+      }
+    }
+  });
 </script>

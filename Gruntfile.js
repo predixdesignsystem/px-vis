@@ -21,14 +21,19 @@ module.exports = function (grunt) {
                   bower: true
                 }
             },
-            dist: {
+            pxVis: {
                 files: {
-                    'css/noprefix/px-vis-sketch.css': 'sass/px-vis-sketch.scss',
-                    'css/noprefix/px-vis.css': 'sass/px-vis-predix.scss',
-                    'css/noprefix/px-vis-register-sketch.css': 'sass/px-vis-register-sketch.scss',
-                    'css/noprefix/px-vis-register.css': 'sass/px-vis-register-predix.scss'
+                  'css/noprefix/px-vis-sketch.css': 'sass/px-vis-sketch.scss',
+                  'css/noprefix/px-vis.css': 'sass/px-vis-predix.scss',
                 }
-            }
+            },
+            pxRegister: {
+                files: {
+                  'css/noprefix/px-vis-register-sketch.css': 'sass/px-vis-register-sketch.scss',
+                  'css/noprefix/px-vis-register.css': 'sass/px-vis-register-predix.scss',
+                }
+            },
+            
         },
 
         autoprefixer: {

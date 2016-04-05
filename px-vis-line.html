@@ -1,6 +1,6 @@
 <link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="../px-vis-common.html" />
-<link rel="import" href="../px-vis-svg-chart-common.html" />
+<link rel="import" href="px-vis-common.html" />
+<link rel="import" href="px-vis-svg-chart-common.html" />
 <link rel="import" href="../px-colors-design/colors.html" />
 
 
@@ -33,11 +33,6 @@ Element providing solution to no problem in particular. As a simple, increments 
           commonColors
         ],
 
-        observers: [
-          // TODO Does chartData need to be chartData.* or chartData.series.* for dynamic data?
-          '_drawElement(svg,x,y,setDomainX,setDomainY,chartData)'
-         ],
-
         /**
          * Properties block, expose attribute values to the DOM via 'reflect'
          *
@@ -53,42 +48,97 @@ Element providing solution to no problem in particular. As a simple, increments 
           seriesNumber:{
             type:Number,
             value:0
-          }
-
+          },
+          linePath:{
+            type:Object,
+            value:{}
+          },
         },
+
+        observers: [
+          // TODO Does chartData need to be chartData.* or chartData.series.* for dynamic data?
+          'drawElement(svg,x,y,setDomainX,setDomainY,chartData)',
+          'isIdInMuted(mutedSeries.*)'
+         ],
+
         /**
          * Draws or updates the line element.
          * Called from an observer watching for data and the necessary d3 objects
          *
-         * @method _drawElement
+         * @method drawElement
          */
-        _drawElement: function() {
+        drawElement: function() {
           // console.log("line chartdata");
           if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && (this.chartData)){
             var self = this;
             var data = this.chartData.series;
-            var index = this.seriesNumber;
 
             var line = d3.svg.line()
               .x(function(d) { return self.x(d[0]); })
               .y(function(d) { return self.y(d[1]); });
-            // checks to see if the axis already exists. If not, create; if so, update
-            var linePath = this.svg.select('path.series-line[line-id=' + this.lineId + ']');
 
-            if(linePath.empty()){
+            // checks to see if the axis already exists. If not, create; if so, update
+            if(this._isObjEmpty(this.linePath)){
+              // draw the path
               this.svg.append("path")
                 .datum(data)
                 .attr("class", "series-line")
                 .attr("line-id", this.lineId)
                 .attr('fill','none')
-                .attr('stroke',this.dataVisColors[this.seriesColorOrder[index]])
                 .attr("d", line);
+
+              //keep a reference for later
+              this.linePath = this.svg.select('path.series-line[line-id=' + this.lineId + ']');
+
+              // add color
+              this._colorLine();
+
             } else {
-              linePath.datum(data)
+              // update the path
+              this.linePath.datum(data)
               // .duration(750)
               .attr("d", line);
             }
           }
-        }
+        },
+        /**
+         * Checks mutedSeries to see if this ID is in there
+         * Called from an observer watching mutedSeries
+         *
+         * @method isIdInMuted
+         */
+        isIdInMuted: function() {
+          if(this.mutedSeries.hasOwnProperty(this.lineId)){
+            // if true, mute
+            if(this.mutedSeries[this.lineId]){
+              this._muteLine()
+            } else {
+              this._colorLine()
+            }
+          }
+          console.groupEnd();
+
+        },
+        /**
+         * Adds full color to the line.
+         *
+         * @method _colorLine
+         */
+        _colorLine:function(){
+          var index = this.seriesNumber;
+          this.linePath.attr('stroke',this.dataVisColors[this.seriesColorOrder[index]])
+            .attr('stroke-opacity',1);
+        },
+        /**
+         * Adds muted color to the line.
+         *
+         * @method muteElements
+         TODO add dev set color and opacity
+         */
+         _muteLine:function(){
+           var index = this.seriesNumber;
+           this.linePath.attr('stroke',this.dataVisColors[this.seriesColorOrder[index]])
+             .attr('stroke-opacity',0.3);
+         },
     });
 </script>
