@@ -18,11 +18,11 @@ function runTests(){
 
     test('emptyRegister has default properties', function() {
       assert.equal(emptyRegister.type, 'vertical');
-      assert.equal(emptyRegister.querySelector('#dateTime').textContent.trim(), '');
+      assert.equal(Polymer.dom(emptyRegister.root).querySelector('#dateTime').textContent.trim(), '');
     });
 
     test('emptyRegister has no series', function() {
-      assert.isTrue(emptyRegister.querySelector('.series') === null);
+      assert.isTrue(Polymer.dom(emptyRegister.root).querySelector('.series') === null);
     });
   });
 
@@ -44,7 +44,7 @@ function runTests(){
 
     test('doesItMute series has muted class', function() {
       var ms = doesItMute.mutedSeries;
-      var series = doesItMute.querySelectorAll('.series');
+      var series = Polymer.dom(doesItMute.root).querySelectorAll('.series');
 
       assert.isTrue(ms[data.series[1].name]);
       assert.isTrue(series[1].classList.contains('muted'));
@@ -73,21 +73,21 @@ function runTests(){
     });
 
     test('truncate is correct', function() {
-      var series = truncate.querySelectorAll('.seriesName');
+      var series = Polymer.dom(truncate.root).querySelectorAll('.seriesName');
 
       assert.equal(series[0].textContent,'this_...name0');
       assert.equal(series[1].textContent,'this_...name1');
     });
 
     test('truncateShort is correct', function() {
-      var series = truncateShort.querySelectorAll('.seriesName');
+      var series = Polymer.dom(truncateShort.root).querySelectorAll('.seriesName');
 
       assert.equal(series[0].textContent,'thi...e0');
       assert.equal(series[1].textContent,'thi...e1');
     });
 
     test('noTruncate is correct', function() {
-      var series = noTruncate.querySelectorAll('.seriesName');
+      var series = Polymer.dom(noTruncate.root).querySelectorAll('.seriesName');
 
       assert.equal(series[0].textContent,'this_is_a_long_name0');
       assert.equal(series[1].textContent,'this_is_a_long_name1');
@@ -111,15 +111,15 @@ function basicTests(registerID,dir){
 
     test(registerID + ' has default properties', function() {
       assert.equal(register.type, dir);
-      assert.equal(register.querySelector('#dateTime').textContent.trim(), '');
+      assert.equal(Polymer.dom(register.root).querySelector('#dateTime').textContent.trim(), '');
     });
 
     test(registerID + ' has 5 series', function() {
-      assert.equal(register.querySelectorAll('.series').length, 5);
+      assert.equal(Polymer.dom(register.root).querySelectorAll('.series').length, 5);
     });
 
     test(registerID + ' names match', function() {
-      var series = register.querySelectorAll('.seriesName');
+      var series = Polymer.dom(register.root).querySelectorAll('.seriesName');
       for(var i = 0; i < series.length; i++){
         assert.equal(series[i].textContent, data.series[i]['name']);
       }
@@ -128,7 +128,7 @@ function basicTests(registerID,dir){
     test(registerID + ' colors are correct', function() {
       var colorOrder = commonColors.properties.seriesColorOrder.value;
       var colorSet = commonColors.properties.dataVisColors.value;
-      var series = register.querySelectorAll('.seriesMarker');
+      var series = Polymer.dom(register.root).querySelectorAll('.seriesMarker');
       for(var i = 0; i < series.length; i++){
         assert.equal(series[i].getAttribute('style'), 'background-color:' + colorSet[ colorOrder[i] ] + ';');
       }
@@ -144,23 +144,23 @@ function basicTests(registerID,dir){
     });
 
     test(registerID + ' still has 5 series', function() {
-      assert.equal(register.querySelectorAll('.series').length, 5);
+      assert.equal(Polymer.dom(register.root).querySelectorAll('.series').length, 5);
     });
 
     test(registerID + ' shows time', function() {
-      var displayTime = register.querySelector('#dateTime').textContent.trim();
+      var displayTime = Polymer.dom(register.root).querySelector('#dateTime').textContent.trim();
       assert.equal(displayTime, '12:37:47 -0800 | 20 Dec 2014');
     });
 
     test(registerID + ' still names match', function() {
-      var series = register.querySelectorAll('.seriesName');
+      var series = Polymer.dom(register.root).querySelectorAll('.seriesName');
       for(var i = 0; i < series.length; i++){
         assert.equal(series[i].textContent, data.series[i]['name']);
       }
     });
 
     test(registerID + ' values match', function() {
-      var series = register.querySelectorAll('.seriesData');
+      var series = Polymer.dom(register.root).querySelectorAll('.seriesData');
       for(var i = 0; i < series.length; i++){
         assert.equal(series[i].textContent, data.series[i]['value']);
       }
@@ -175,23 +175,23 @@ function basicTests(registerID,dir){
     });
 
     test(registerID + ' still has 5 series', function() {
-      assert.equal(register.querySelectorAll('.series').length, 5);
+      assert.equal(Polymer.dom(register.root).querySelectorAll('.series').length, 5);
     });
 
     test(registerID + ' does not show time', function() {
-      var displayTime = register.querySelector('#dateTime').textContent.trim();
+      var displayTime = Polymer.dom(register.root).querySelector('#dateTime').textContent.trim();
       assert.equal(displayTime, '');
     });
 
     test(registerID + ' still names match', function() {
-      var series = register.querySelectorAll('.seriesName');
+      var series = Polymer.dom(register.root).querySelectorAll('.seriesName');
       for(var i = 0; i < series.length; i++){
         assert.equal(series[i].textContent, data.series[i]['name']);
       }
     });
 
     test(registerID + ' values are blank', function() {
-      var series = register.querySelectorAll('.seriesData');
+      var series = Polymer.dom(register.root).querySelectorAll('.seriesData');
       for(var i = 0; i < series.length; i++){
         assert.equal(series[i].textContent, '');
       }
@@ -208,7 +208,7 @@ function basicTests(registerID,dir){
     });
 
     test(registerID + ' series added to mutedSeries', function() {
-      series = register.querySelectorAll('.series')[1];
+      series = Polymer.dom(register.root).querySelectorAll('.series')[1];
       seriesName = series.querySelector('.seriesName');
       seriesName.click();
 
