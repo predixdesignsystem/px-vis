@@ -1,19 +1,17 @@
-var emptyRegister,
-    verticalSeries;
-
 document.addEventListener("WebComponentsReady", function() {
-  emptyRegister = document.getElementById('emptyRegister');
   runTests();
 });
 
 function runTests(){
-  suite('px-vis-register base test', function() {
+  suite('px-vis-register does Polymer exist?', function() {
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
   });
 
-  suite('px-vis-register emptyRegister', function() {
+  suite('px-vis-register emptyRegister has default config', function() {
+    var emptyRegister = document.getElementById('emptyRegister');
+
     test('emptyRegister fixture is created', function() {
       assert.isTrue(emptyRegister !== null);
     });
@@ -28,13 +26,76 @@ function runTests(){
     });
   });
 
-  basicTests('verticalSeries');
-  basicTests('horizontalSeries');
+  basicTests('verticalSeries','vertical');
+  basicTests('horizontalSeries','horizontal');
 
+  suite('px-vis-register passing in a muteSeries applies muted class to the series', function() {
+    var doesItMute = document.getElementById('doesItMute');
+    var data;
+    setup(function(done) {
+      data = generateDataValues( generateEmptyData(5) );
+      setData(doesItMute, data);
+      setMutedSeries(doesItMute, data.series[1].name, done);
+    });
 
+    test('doesItMute fixture is created', function() {
+      assert.isTrue(doesItMute !== null);
+    });
+
+    test('doesItMute series has muted class', function() {
+      var ms = doesItMute.mutedSeries;
+      var series = doesItMute.querySelectorAll('.series');
+
+      assert.isTrue(ms[data.series[1].name]);
+      assert.isTrue(series[1].classList.contains('muted'));
+    });
+
+  });
+
+  suite('px-vis-register truncates names correctly', function() {
+    var truncate = document.getElementById('truncate'),
+        truncateShort = document.getElementById('truncateShort'),
+        noTruncate = document.getElementById('noTruncate');
+
+    setup(function(done) {
+      var str = 'this_is_a_long_name';
+      var data = generateDataValues( generateEmptyData(2,str) );
+      truncateShort.set('truncationLength',5)
+      setData(truncate, data);
+      setData(truncateShort, data);
+      setData(noTruncate, data, done);
+    });
+
+    test('truncate fixtures are created', function() {
+      assert.isTrue(truncate !== null);
+      assert.isTrue(truncateShort !== null);
+      assert.isTrue(noTruncate !== null);
+    });
+
+    test('truncate is correct', function() {
+      var series = truncate.querySelectorAll('.seriesName');
+
+      assert.equal(series[0].textContent,'this_...name0');
+      assert.equal(series[1].textContent,'this_...name1');
+    });
+
+    test('truncateShort is correct', function() {
+      var series = truncateShort.querySelectorAll('.seriesName');
+
+      assert.equal(series[0].textContent,'thi...e0');
+      assert.equal(series[1].textContent,'thi...e1');
+    });
+
+    test('noTruncate is correct', function() {
+      var series = noTruncate.querySelectorAll('.seriesName');
+
+      assert.equal(series[0].textContent,'this_is_a_long_name0');
+      assert.equal(series[1].textContent,'this_is_a_long_name1');
+    });
+  });
 }
 
-function basicTests(registerID){
+function basicTests(registerID,dir){
   var register = document.getElementById(registerID);
 
   suite('px-vis-register ' + registerID + ' with 5 series -- simulating basic creation', function() {
@@ -49,7 +110,7 @@ function basicTests(registerID){
     });
 
     test(registerID + ' has default properties', function() {
-      assert.equal(register.type, 'vertical');
+      assert.equal(register.type, dir);
       assert.equal(register.querySelector('#dateTime').textContent.trim(), '');
     });
 
@@ -184,13 +245,14 @@ function basicTests(registerID){
 
 }
 
-function generateEmptyData(num){
+function generateEmptyData(num,str){
+  var str = str || 'series_';
   var dataObj = {
     'time': null,
     'series': []
   };
   for(var i = 0; i < num; i++){
-    var name = "series_" + i;
+    var name = str + i;
     dataObj.series.push({'name':name,'value': null });
   }
 
@@ -212,6 +274,16 @@ function setData(series, data, done){
 
   // pause and let the dom repeate chug away
   setTimeout(function(){
-    done();
+    if(done){ done(); }
+  },10);
+}
+
+function setMutedSeries(series, name, done){
+  series.set('mutedSeries', {});
+  series.set('mutedSeries.' + name, true);
+
+  // pause and let the dom repeate chug away
+  setTimeout(function(){
+    if(done){ done(); }
   },10);
 }

@@ -37,7 +37,7 @@ Element providing solution to no problem in particular. As a simple, increments 
                   name$="{{item.name}}"
                 >&nbsp;</span>
                 <span>
-                  <div class="seriesName" name$="{{item.name}}">{{item.name}}</div>
+                  <div class="seriesName" name$="{{item.name}}">{{_truncateName(item.name,truncationLength)}}</div>
                   <div class="seriesData" name$="{{item.name}}">{{item.value}}</div>
                 </span>
             </span>
@@ -60,7 +60,7 @@ Element providing solution to no problem in particular. As a simple, increments 
               class="seriesMarker"
               style$="background-color:{{_returnItemColor(index)}};"
               name$="{{item.name}}"
-            >&nbsp;</span><span class="seriesName" name$="{{item.name}}">{{item.name}}</span>
+            >&nbsp;</span><span class="seriesName" name$="{{item.name}}">{{_truncateName(item.name,truncationLength)}}</span>
             <span class="seriesData" name$="{{item.name}}">{{item.value}}</span>
           </div>
         </template>
@@ -110,6 +110,24 @@ Element providing solution to no problem in particular. As a simple, increments 
        type:String,
        value:"vertical"
       },
+      /**
+       * Defines if the names in the register should get truncated and to how many characters.
+       *
+       * Default length is 10 characters, not including the ellipsis which gets inserted.
+       *
+       * The length must be at least 2.
+       *
+       * To disable truncation, set the value to -1
+       *
+       * @property truncationLength
+       * @type Number
+       * @default 10
+      */
+      truncationLength:{
+       type:Number,
+       value:10
+      },
+
       /**
        * Defines the format for the first datetime string. The first datetime is shown in normal font weight.
        *

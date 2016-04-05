@@ -69,16 +69,41 @@ var pxVisCommonBehavior = {
         },
 
     },
-
     /**
-     * attached() Polymer fires this event automatically, we use it to define
-     * this.svg and initiate the component
+     * _truncateName takes a string and string length [optional].
+     * Returns a truncated string with the middle replaced by an ellipsis. The ellipsis does not count towards the total character count.
+     * Follows these truncation principles: http://www.gesdh.com/predix/product/principles/truncation/
+     * Example: LNG_BAH_HOT_EFFECTIVENESS_CORE8 --> LNG_B...CORE8
+     *
+     * Length cannot be less than 2 characters.
+     * Default length is 10 characters.
+     *
+     * If the string is less than or equal to the length or the length is invalid, returns the original string.
+     *
+     * @param {String} name, {Integer} len
+     * @return {String} truncatedString
     */
-    attached: function() {
-        // this.svg = d3.select(this.$$("svg"));
-        // this._drawChart();
-    },
+    _truncateName:function(name,len){
+      var len = len || 10;
 
+      // make sure length is legit
+      if(len < 2) {
+        return name;
+      }
+
+      //check that name is greater than length; if not, return it
+      if(name.length <= len){
+        return name;
+      }
+
+      // truncate
+      var frontLen = Math.ceil(len / 2),
+          backLen = Math.floor(len / 2),
+          front = name.slice(0,frontLen),
+          back = name.slice(-backLen);
+
+      return front + '...' + back;
+    },
 
     /**
      * _getSeriesTotal() returns the sum of the values of a series
