@@ -2,6 +2,7 @@
 <link rel="import" href="../px-colors-design/colors.html" />
 <link rel="import" href="px-vis-common.html" />
 <link rel="import" href="px-vis-svg-chart-common.html" />
+<link rel="import" href="../numbro-element/numbro-element.html" />
 <link rel="import" href="../px-tooltip/px-tooltip.html" />
 
 <script src="../moment/moment.js"></script>
@@ -44,7 +45,16 @@ Element providing solution to no problem in particular. As a simple, increments 
                       <px-tooltip delay="500">{{item.name}}</px-tooltip>
                     </template>
                   </div>
-                  <div class="seriesData" name$="{{item.name}}">{{item.value}}</div>
+                  <div class="seriesData" name$="{{item.name}}">
+                    <numbro-element
+                      value="[[item.value]]"
+                      format="[[numberFormat]]"
+                      culture="[[numberFormatCulture]]"
+                      currency$="[[numberFormatIsCurrency]]"
+                      default-currency-format="[[numberFormatCurrency]]"
+                      zero-format="[[numberFormatZero]]">
+                    </numbro-element>
+                  </div>
                 </span>
             </span>
           </template>
@@ -72,7 +82,16 @@ Element providing solution to no problem in particular. As a simple, increments 
                 <px-tooltip delay="250">{{item.name}}</px-tooltip>
               </template>
             </span>
-            <span class="seriesData" name$="{{item.name}}">{{item.value}}</span>
+            <span class="seriesData" name$="{{item.name}}">
+              <numbro-element
+                value="[[item.value]]"
+                format="[[numberFormat]]"
+                culture="[[numberFormatCulture]]"
+                currency$="[[numberFormatIsCurrency]]"
+                default-currency-format="[[numberFormatCurrency]]"
+                zero-format="[[numberFormatZero]]">
+              </numbro-element>
+            </span>
           </div>
         </template>
       </div>
@@ -169,6 +188,7 @@ Element providing solution to no problem in particular. As a simple, increments 
         type:String,
         value:'DD MMM YYYY'
       },
+
       /**
        * Defines a separator character between the two datetime strings.
        *
