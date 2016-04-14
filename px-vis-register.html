@@ -8,14 +8,56 @@
 <script src="../moment/moment.js"></script>
 
 <!--
-Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
+Element providing a display and interaction space for series in your chart.
+
+It can be either vertical on the side of the chart or horizonal above or below your chart. It displays a colored bar matching the series color and the series name. When you hover over the chart, the chart sends data to the register via the bound "tooltipData" property. These data values are then displayed in the register.
+
+You can turn series on the chart off by clicking on that series in the register.
 
 ##### Usage
 
-    <px-vis counter-value="1">Hi</px-vis>
+  <px-vis-register
+    height="50"
+    width="[[width]]"
+    type="horizontal"
+    tooltip-data=[[tooltipData]]
+    units='Hz'
+    muted-series="{{mutedSeries}}">
+  </px-vis-register>
+
+
+##### Sending Data to the Register
+tooltipData is in the form:
+  {
+    'time': d3TimeStamp,
+    'series': [
+      {'name':'seriesName0','value': seriesVal0 },
+      {'name':'seriesName1','value': seriesVal1 }
+    ]
+  }
+
+When not hovering on a chart, the tooltipData should still have the series names in order for them to still appear in the register. IE:
+
+  {
+    'time': null,
+    'series': [
+      {'name':'seriesName0','value': null },
+      {'name':'seriesName1','value': null }
+    ]
+  }
+
+##### Reporting Data from the Register
+The component returns an object via mutedSeries which the chart can take and react to:
+  {
+    'seriesId1':true,
+    'seriesId2':false,
+  }
+
+##### Time, number, and name formatting
+Formatting for the timestamps,the data values, and the series names can be controlled via a series of properties. Please see the properties for configuration details.
 
 @element px-vis-register
-@blurb Element providing solution to no problem in particular.
+@blurb Element providing a display and interaction space for series in your chart.
 @homepage index.html
 @demo demo.html
 -->
@@ -54,6 +96,7 @@ Element providing solution to no problem in particular. As a simple, increments 
                       default-currency-format="[[numberFormatCurrency]]"
                       zero-format="[[numberFormatZero]]">
                     </numbro-element>
+                    <template is="dom-if" if="{{item.value}}">{{units}}</template>
                   </div>
                 </span>
             </span>
@@ -91,6 +134,7 @@ Element providing solution to no problem in particular. As a simple, increments 
                 default-currency-format="[[numberFormatCurrency]]"
                 zero-format="[[numberFormatZero]]">
               </numbro-element>
+              <template is="dom-if" if="{{item.value}}">{{units}}</template>
             </span>
           </div>
         </template>
@@ -107,7 +151,7 @@ Element providing solution to no problem in particular. As a simple, increments 
 
     behaviors: [
       pxVisCommonBehavior,
-      pxVisSVGChartCommonBehavior, //Need to add definition for mutedSeries property...
+      pxVisSVGChartCommonBehavior,
       commonColors
     ],
 
@@ -119,18 +163,48 @@ Element providing solution to no problem in particular. As a simple, increments 
      */
     properties: {
       /**
-       * Data reported back by the tooltip
+       * Data reported back by the tooltip. Displays the series name, values, and timestamp in the register. tooltipData is in the form:
+       *   {
+       *     'time': d3TimeStamp,
+       *     'series': [
+       *       {'name':'seriesName0','value': seriesVal0 },
+       *       {'name':'seriesName1','value': seriesVal1 }
+       *     ]
+       *   }
+       *
+       * When not hovering on a chart, the tooltipData should still have the series names in order for them to still appear in the register. IE:
+       *
+       *   {
+       *     'time': null,
+       *     'series': [
+       *       {'name':'seriesName0','value': null },
+       *       {'name':'seriesName1','value': null }
+       *     ]
+       *   }
        *
        * @property tooltipData
        * @type Object
-       * @default []
+       * @default {}
        */
       tooltipData:{
         type:Object,
         observer:'_formatDateTime'
       },
       /**
-       * Defines if the register should be horizontal or vertical
+       * The units of the data
+       *
+       * @property units
+       * @type String`
+       * @default ''
+       */
+      units:{
+        type:String,
+        value:''
+      },
+      /**
+       * Defines if the register should be horizontal or vertical. Options are:
+       *  - 'vertical'
+       *  - 'horizontal'
        *
        * @property type
        * @type string
@@ -237,9 +311,11 @@ Element providing solution to no problem in particular. As a simple, increments 
      ],
 
     /**
-     * Function which returns true if type equals horizontal
+     * dom-if function for type property which returns true if type equals horizontal
      *
      * @method _typeEqualHorizontal
+     * @param {type} dev set type property.
+     * @return {bool} true if type === 'horizontal'; false if not
      */
     _typeEqualHorizontal: function(type){
       return type === 'horizontal'
@@ -248,12 +324,16 @@ Element providing solution to no problem in particular. As a simple, increments 
      * Function which takes an index and returns the appropriate dataVisColor
      *
      * @method _returnItemColor
+     * @param {i} a series index number
+     * @return {rgb(r,g,b)} return the appropriate rgb values based in the series index
      */
     _returnItemColor:function(i){
       return this.dataVisColors[ this.seriesColorOrder[i] ]
     },
     /**
      * Function which takes the incoming datetime from tooltipData and formats it.
+     *
+     * Returns set values via setting helper properties used in the html.
      *
      * @method _formatDateTime
      */
@@ -271,6 +351,14 @@ Element providing solution to no problem in particular. As a simple, increments 
         this.set('_separator', '');
       }
     },
+    /**
+     * Event function which is fired when a series is clicked.
+     *
+     * Adds series to mutedSeries property or toggles that key's boolean.
+     *
+     * @method _seriesClicked
+     * @param {e} click event
+     */
     _seriesClicked:function(e){
       var ne = Polymer.dom(e);
       var series = ne.rootTarget.getAttribute('name');
@@ -285,6 +373,13 @@ Element providing solution to no problem in particular. As a simple, increments 
 
       e.stopPropagation();
     },
+    /**
+     * observer function which is fired when the mutedSeries property is changed.
+     *
+     * Adds or removes muted class to those series in the register.
+     *
+     * @method _toggleSeries
+     */
     _toggleSeries: function(){
       // find all series with name and toggle class
       var keys = Object.getOwnPropertyNames(this.mutedSeries);
@@ -293,11 +388,17 @@ Element providing solution to no problem in particular. As a simple, increments 
         this.toggleClass('muted', this.mutedSeries[keys[i]], series)
       }
     },
+    /**
+     * dom-if function for series names to decide if it was truncated. If so, add a tooltip showing full name
+     *
+     * @method _didTruncate
+     * @param {str} the original string.
+     * @param {len} the truncation length.
+     */
     _didTruncate:function(str,len){
-      if(len > 2 || str > len){
+      if(len > 2 && str.length > len){
         return true;
       }
-
       return false;
     }
   });

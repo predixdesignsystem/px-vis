@@ -60,7 +60,7 @@ function runTests(){
     setup(function(done) {
       var str = 'this_is_a_long_name';
       var data = generateDataValues( generateEmptyData(2,str) );
-      truncateShort.set('truncationLength',5)
+      // truncateShort.set('truncationLength',5)
       setData(truncate, data);
       setData(truncateShort, data);
       setData(noTruncate, data, done);
@@ -106,6 +106,83 @@ function runTests(){
       assert.isTrue(truncateTT !== null);
       assert.isTrue(truncateShortTT !== null);
       assert.isTrue(noTruncateTT === null);
+    });
+  });
+
+  suite('px-vis-register formats time correctly', function() {
+    var datetimeFormat = document.getElementById('datetimeFormat');
+
+    setup(function(done) {
+      var data = generateDataValues( generateEmptyData(2) );
+      setData(datetimeFormat, data,done);
+    });
+
+    test('datetimeFormat fixtures are created', function() {
+      assert.isTrue(datetimeFormat !== null);
+    });
+
+    test('datetimeFormat is correct', function() {
+      var series = Polymer.dom(datetimeFormat.root).querySelector('#dateTime');
+
+      assert.equal(series.textContent.trim(),'December 20th, 2014 @ 12:37:47AM');
+    });
+  });
+
+  suite('px-vis-register add units', function() {
+    var units = document.getElementById('units');
+
+    setup(function(done) {
+      var data = generateDataValues( generateEmptyData(2) );
+      setData(units, data,done);
+    });
+
+    test('units fixtures are created', function() {
+      assert.isTrue(units !== null);
+    });
+
+    test('Added units', function() {
+      var series = Polymer.dom(units.root).querySelectorAll('.seriesData');
+
+      assert.equal(series[0].textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join(''),'1,015.20Hz');
+      assert.equal(series[1].textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join(''),'1,015.20Hz');
+    });
+  });
+
+  suite('px-vis-register formats units', function() {
+    var numberFormat = document.getElementById('numberFormat');
+
+    setup(function(done) {
+      var data = generateDataValues( generateEmptyData(2) );
+      setData(numberFormat, data,done);
+    });
+
+    test('numberFormat fixtures are created', function() {
+      assert.isTrue(numberFormat !== null);
+    });
+
+    test('numberFormat formated', function() {
+      var series = Polymer.dom(numberFormat.root).querySelectorAll('.seriesData');
+
+      assert.equal(series[0].textContent.trim(),'1015.20000');
+    });
+  });
+
+  suite('px-vis-register formats language units', function() {
+    var numberFormatCulture = document.getElementById('numberFormatCulture');
+
+    setup(function(done) {
+      var data = generateDataValues( generateEmptyData(2) );
+      setData(numberFormatCulture, data,done);
+    });
+
+    test('numberFormatCulture fixtures are created', function() {
+      assert.isTrue(numberFormatCulture !== null);
+    });
+
+    test('numberFormatCulture formated', function() {
+      var series = Polymer.dom(numberFormatCulture.root).querySelectorAll('.seriesData');
+
+      assert.equal(series[0].textContent.trim(),'1.015,20');
     });
   });
 }
@@ -177,7 +254,7 @@ function basicTests(registerID,dir){
     test(registerID + ' values match', function() {
       var series = Polymer.dom(register.root).querySelectorAll('.seriesData');
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].textContent, data.series[i]['value']);
+        assert.equal(series[i].textContent.trim(), '1,015.20');
       }
     });
   });
@@ -208,7 +285,7 @@ function basicTests(registerID,dir){
     test(registerID + ' values are blank', function() {
       var series = Polymer.dom(register.root).querySelectorAll('.seriesData');
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].textContent, '');
+        assert.equal(series[i].textContent.trim(), '');
       }
     });
   });
@@ -278,7 +355,7 @@ function generateDataValues(data){
   data.time = new Date('Sat Dec 20 2014 00:37:47 GMT-0800 (PST)');
 
   for(var i = 0; i < data.series.length; i++){
-    data.series[i]['value'] = 15.2;
+    data.series[i]['value'] = 1015.2;
   }
   return data;
 }
