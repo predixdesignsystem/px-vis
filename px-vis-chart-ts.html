@@ -4,6 +4,7 @@
 <link rel="import" href="px-vis-svg.html"/>
 <link rel="import" href="px-vis-line.html"/>
 <link rel="import" href="px-vis-axis.html"/>
+<link rel="import" href="px-vis-gridlines.html"/>
 <link rel="import" href="px-vis-data.html"/>
 <link rel="import" href="px-vis-chart-navigator.html"/>
 <link rel="import" href="px-vis-scale.html"/>
@@ -58,49 +59,58 @@ Element providing solution to no problem in particular. As a simple, increments 
           margin="{{margin}}">
         </px-vis-svg>
 
-          <template is="dom-repeat" items="{{chartData}}">
-            <px-vis-line
-              svg="[[svg]]"
-              line-id="[[item.name]]"
-              series-number="[[index]]"
-              chart-data="[[item]]"
-              x="[[x]]"
-              y="[[y]]"
-              set-domain-x="[[setDomainX]]"
-              set-domain-y="[[setDomainY]]"
-              muted-series="[[mutedSeries]]">
-            </px-vis-line>
-          </template>
-
-          <px-vis-axis
+        <template is="dom-repeat" items="{{chartData}}">
+          <px-vis-line
             svg="[[svg]]"
-            axis="[[x]]"
-            axis-id="x"
-            margin="[[margin]]"
-            orientation="bottom"
-            set-domain="[[setDomainX]]">
-          </px-vis-axis>
-          <px-vis-axis
-            svg="[[svg]]"
-            axis="[[y]]"
-            axis-id="y"
-            margin="[[margin]]"
-            orientation="left"
-            set-domain="[[setDomainY]]">
-          </px-vis-axis>
-          <px-vis-tooltip
-            svg="[[svg]]"
-            width="[[width]]"
-            height="[[height]]"
-            margin="[[margin]]"
-            chart-data="[[chartData]]"
+            line-id="[[item.name]]"
+            series-number="[[index]]"
+            chart-data="[[item]]"
             x="[[x]]"
             y="[[y]]"
-            vertical-line="full"
             set-domain-x="[[setDomainX]]"
             set-domain-y="[[setDomainY]]"
-            tooltip-data={{tooltipData}}>
-          </px-vis-tooltip>
+            muted-series="[[mutedSeries]]">
+          </px-vis-line>
+        </template>
+
+        <px-vis-gridlines
+          svg="[[svg]]"
+          grid="[[y]]"
+          margin="[[margin]]"
+          length="[[width]]"
+          orientation="left"
+          set-domain="[[setDomainY]]">
+        </px-vis-gridlines>
+
+        <px-vis-axis
+          svg="[[svg]]"
+          axis="[[x]]"
+          margin="[[margin]]"
+          orientation="bottom"
+          label-position="after"
+          set-domain="[[setDomainX]]">
+        </px-vis-axis>
+        <px-vis-axis
+          svg="[[svg]]"
+          axis="[[y]]"
+          margin="[[margin]]"
+          orientation="left"
+          set-domain="[[setDomainY]]">
+        </px-vis-axis>
+        <px-vis-tooltip
+          svg="[[svg]]"
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          chart-data="[[chartData]]"
+          x="[[x]]"
+          y="[[y]]"
+          vertical-line="full"
+          set-domain-x="[[setDomainX]]"
+          set-domain-y="[[setDomainY]]"
+          tooltip-data={{tooltipData}}>
+        </px-vis-tooltip>
+
         <px-vis-chart-navigator
           x-scale="time"
           y-scale="linear"

@@ -1,6 +1,7 @@
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="px-vis-common.html" />
 <link rel="import" href="px-vis-svg-chart-common.html" />
+<link rel="import" href="../px-colors-design/colors.html" />
 
 
 <!--
@@ -9,6 +10,9 @@ Element providing solution to no problem in particular. As a simple, increments 
 ##### Usage
 
     <px-vis counter-value="1">Hi</px-vis>
+
+##### d3 reference
+https://github.com/mbostock/d3/wiki/SVG-Axes
 
 @element px-vis
 @blurb Element providing solution to no problem in particular.
@@ -27,16 +31,10 @@ Element providing solution to no problem in particular. As a simple, increments 
 
         is: 'px-vis-axis',
 
-        behaviors: [pxVisSVGChartCommonBehavior],
-
-        observers: [
-          '_defineAxis(axis)',
-          '_drawElement(setDomain)'
+        behaviors: [
+          pxVisSVGChartCommonBehavior,
+          commonColors
         ],
-
-        // listeners: {
-        //  'giveSVG': '_setSVG',
-        // },
 
         /**
          * Properties block, expose attribute values to the DOM via 'reflect'
@@ -45,27 +43,144 @@ Element providing solution to no problem in particular. As a simple, increments 
          * @type Object
          */
         properties: {
+          /**
+           * Holder for the instantiated d3 axis
+           *
+           * @property _axis
+           * @type Object
+           */
           _axis:{
             type: Object,
             value: {},
             notify: true
           },
+          /**
+           * Holder for the axis drawing
+           *
+           * @property _axisGroup
+           * @type Object
+           */
+          _axisGroup:{
+            type: Object,
+            value: {}
+          },
+          /**
+           * Passed in instantiated scale component. Pass in either your x or your y depending which this axis is for.
+           *
+           * @property axis
+           * @type Object
+           */
           axis:{
             type: Object,
             value: {},
-            notify: true,
+            notify: true
           },
+          /**
+           * A unique ID for the axis
+           *
+           * @property axisId
+           * @type String
+           * @default random string
+           */
           axisId:{
             type:String,
-            value:'x',
+            value: '',
+            notify: true,
+            reflectToAttribute: true
           },
+          /**
+           * Defines which side the axis should be on.
+           *  - 'left'
+           *  - 'right'
+           *  - 'bottom'
+           *  - 'top'
+           *
+           * @property orientation
+           * @type String
+           * @default bottom
+           */
           orientation:{
             type: String,
-            value: '',
+            value: 'bottom',
           },
+          /**
+           * Defines on which side the tick mark the label should sit.
+           *  - 'center'
+           *  - 'before'
+           *  - 'after'
+           *
+           * @property labelPosition
+           * @type String
+           * @default center
+           */
+          labelPosition:{
+            type: String,
+            value: 'center',
+          },
+          /**
+           * Defines how the label should be rotated. Number is the degree of rotation
+           *
+           * @property labelOrientation
+           * @type Number
+           * @default 0
+           */
+          labelOrientation:{
+            type: Number,
+            value: 0,
+          },
+          /**
+           * An x,y amount to move the axis to allow for labels and titles
+           *
+           * @property translateAmt
+           * @type Array
+           */
           translateAmt:{
             type: Array,
             value:function(){ return [0,0]; }
+          },
+        },
+
+        observers: [
+          'defineAxis(axis)',
+          'drawElement(setDomain)'
+        ],
+
+
+        ready:function(){
+          // if there is no dev set unique ID, generate one
+          if(!this.axisId){
+            this.set('axisId', this.generateRandomID('axis_'));
+          }
+        },
+
+        /**
+         *
+         *
+         * @method _drawElement
+         */
+        defineAxis:function(){
+          this._axis = d3.svg.axis()
+            .scale(this.axis)
+            .orient(this.orientation);
+
+          // change default (10) ticks
+          // this._axis.ticks();
+          // change default ticks with specific time
+          // this._axis.ticks(d3.time.months, 1);
+          // this._axis.ticks(d3.time.days, 7);
+          // this._axis.ticks(d3.time.minutes, 15);
+
+          // controls the tick mark size for ticks with numbers
+          // this._axis.innerTickSize(-1000);
+          // this._axis.tickPadding(10);
+          // controls the first and last ticks
+          this._axis.outerTickSize(0);
+
+          // https://github.com/mbostock/d3/wiki/Formatting#d3_format
+          // this._axis.tickFormat(d3.format(",.0f"));
+
+          if(this.labelPosition !== 'center'){
+            this._axis.innerTickSize(12);
           }
 
         },
@@ -74,51 +189,96 @@ Element providing solution to no problem in particular. As a simple, increments 
          *
          * @method _drawElement
          */
-        _defineAxis:function(){
-          this._axis = d3.svg.axis()
-            .scale(this.axis)
-            .orient(this.orientation);
-        },
-        /**
-         *
-         *
-         * @method _drawElement
-         */
-        _drawElement: function() {
+        drawElement: function() {
           // console.log('draw axis');
           // TODO what happens if not?
           if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this._axis)){
+            // this._axis.tickValues(this.axis.domain());
             if(this.orientation === 'bottom'){
               var h = this.svg.attr('height') - this.margin.bottom - this.margin.top;
               this.translateAmt = [0,h];
             } else if(this.orientation === 'left'){
               this.translateAmt = [0,0];
             }
+
             // checks to see if the axis already exists. If not, create; if so, update
-            var axisGroup = this.svg.select('g.axis[axis-id=' + this.axisId + ']');
-            if(axisGroup.empty()){
+            if(this._isObjEmpty(this._axisGroup)){
               var g = this.svg.append("g")
                 .attr("class", "axis")
                 .attr('axis-id',this.axisId)
                 .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
                 .call(this._axis);
-              g.selectAll('line,path')
-                .attr('fill','none')
-                .attr('stroke', '#000')
-                .attr('shape-rendering','crispEdges');
-              g.selectAll('text')
-                .attr('font-size','10px')
-                .attr('font-style','sans-serif');
+
+              this._setLineStyles(g,'line,path');
+              this._setLabelStyles(g);
+
+              //keep a reference for later
+              this._axisGroup = this.svg.select('g.axis[axis-id=' + this.axisId + ']');
+
             } else {
-              axisGroup
+              this._axisGroup
               // .duration(750)
               .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
               .call(this._axis);
-              axisGroup.selectAll('text')
-                .attr('font-size','10px')
-                .attr('font-style','sans-serif');
+
+              this._setLineStyles(this._axisGroup,'line');
+              this._setLabelStyles(this._axisGroup);
+
             }
           }
         },
+        setLabelDims: function(){
+          var label = {};
+          switch(this.orientation){
+            case 'bottom':
+              label.x = 3;
+              label.y = 3;
+              label.anchor = (this.labelPosition === 'after') ? 'start' : 'end';
+              break;
+
+            case 'top':
+              label.x = -3;
+              label.y = -3;
+              label.anchor = (this.labelPosition === 'after') ? 'start' : 'end';
+              break;
+
+            case 'left':
+              label.x = -8;
+              label.y = (this.labelPosition === 'after') ? -8 : 8;
+              label.anchor = 'end';
+              break;
+
+            case 'right':
+              label.x = 8;
+              label.y = (this.labelPosition === 'after') ? -8 : 8;
+              label.anchor = 'start';
+              break;
+          }
+
+          return label
+        },
+
+        _setLabelStyles:function(elem){
+          elem.selectAll('text')
+            .attr('font-size','12px')
+            .attr('font-style','GE Inspira Sans');
+
+          if(this.labelPosition !== 'center'){
+            var label = this.setLabelDims();
+
+            elem.selectAll('text')
+              .attr("y", label.y)
+              .attr("x", label.x)
+              .attr("text-anchor", label.anchor)
+              .style("text-anchor", label.anchor);
+          }
+        },
+
+        _setLineStyles:function(elem,lines){
+          elem.selectAll(lines)
+            .attr('fill','none')
+            .attr('stroke', this.colors.grey9)
+            .attr('shape-rendering','crispEdges');
+        }
     });
 </script>

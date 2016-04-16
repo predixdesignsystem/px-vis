@@ -1,0 +1,209 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="px-vis-common.html" />
+<link rel="import" href="px-vis-svg-chart-common.html" />
+<link rel="import" href="../px-colors-design/colors.html" />
+
+
+<!--
+Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
+
+##### Usage
+
+    <px-vis counter-value="1">Hi</px-vis>
+
+##### d3 reference
+https://github.com/mbostock/d3/wiki/SVG-Axes
+
+@element px-vis
+@blurb Element providing solution to no problem in particular.
+@homepage index.html
+@demo demo.html
+-->
+<dom-module id="px-vis-gridlines">
+    <link rel="import" type="css" href="css/px-vis.css"/>
+    <template>
+
+    </template>
+</dom-module>
+
+<script>
+    Polymer({
+
+        is: 'px-vis-gridlines',
+
+        behaviors: [
+          pxVisSVGChartCommonBehavior,
+          commonColors
+        ],
+
+        /**
+         * Properties block, expose attribute values to the DOM via 'reflect'
+         *
+         * @property properties
+         * @type Object
+         */
+        properties: {
+          /**
+           * Holder for the instantiated d3 grid
+           *
+           * @property _grid
+           * @type Object
+           */
+          _grid:{
+            type: Object,
+            value: {},
+            notify: true
+          },
+          /**
+           * Holder for the grid drawing
+           *
+           * @property _gridGroup
+           * @type Object
+           */
+          _gridGroup:{
+            type: Object,
+            value: {}
+          },
+          /**
+           * Passed in instantiated scale component. Pass in either your x or your y depending which this grid is for.
+           *
+           * @property grid
+           * @type Object
+           */
+          grid:{
+            type: Object,
+            value: {},
+            notify: true
+          },
+          /**
+           * A unique ID for the grid
+           *
+           * @property gridId
+           * @type String
+           * @default random string
+           */
+          gridId:{
+            type:String,
+            value: '',
+            notify: true,
+            reflectToAttribute: true
+          },
+          /**
+           * Defines which side the grid should be on.
+           *  - 'left'
+           *  - 'right'
+           *  - 'bottom'
+           *  - 'top'
+           *
+           * @property orientation
+           * @type String
+           * @default bottom
+           */
+          orientation:{
+            type: String,
+            value: 'bottom',
+          },
+          /**
+           * An x,y amount to move the grid to allow for labels and titles
+           *
+           * @property translateAmt
+           * @type Array
+           */
+          translateAmt:{
+            type: Array,
+            value:function(){ return [0,0]; }
+          },
+        },
+
+        observers: [
+          'defineGrid(grid)',
+          'drawElement(setDomain)'
+        ],
+
+
+        ready:function(){
+          // if there is no dev set unique ID, generate one
+          if(!this.gridId){
+            this.set('gridId', this.generateRandomID('grid_'));
+          }
+        },
+
+        /**
+         *
+         *
+         * @method _drawElement
+         */
+        defineGrid:function(){
+          this._grid = d3.svg.axis()
+            .scale(this.grid)
+            .orient(this.orientation);
+
+          // TODO dev set # of gridlines
+          // TODO link to number of gridlines the axis has and dev set multiplier (2x)
+          // change default (10) ticks
+          // this._grid.ticks();
+
+          this._grid.innerTickSize(-this.length);
+        },
+        /**
+         *
+         *
+         * @method _drawElement
+         */
+        drawElement: function() {
+          // console.log('draw grid');
+          // TODO what happens if not?
+          if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this._grid)){
+            // this._grid.tickValues(this.grid.domain());
+            if(this.orientation === 'bottom'){
+              var h = this.svg.attr('height') - this.margin.bottom - this.margin.top;
+              this.translateAmt = [0,h];
+            } else if(this.orientation === 'left'){
+              this.translateAmt = [0,0];
+            }
+
+            // checks to see if the grid already exists. If not, create; if so, update
+            if(this._isObjEmpty(this._gridGroup)){
+              var g = this.svg.append("g")
+                .attr("class", "grid")
+                .attr('grid-id',this.gridId)
+                .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
+                .call(this._grid);
+
+              this._removeUncessaryElems(g);
+              this._setLineStyles(g,'line');
+
+              // the first tick overlaps the x-axis path and is unnessary
+              // TODO make sure this doesnt get us in trouble in different min y values
+              // TODO What if there is no x-axis? How to do this better?
+              g.select('line').remove();
+
+              //keep a reference for later
+              this._gridGroup = this.svg.select('g.grid[grid-id=' + this.gridId + ']');
+
+            } else {
+              this._gridGroup
+              // .duration(750)
+              .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
+              .call(this._grid);
+
+              this._removeUncessaryElems(this._gridGroup);
+              this._setLineStyles(this._gridGroup,'line');
+
+            }
+          }
+        },
+
+        _removeUncessaryElems:function(elem){
+          elem.selectAll('text').remove();
+          elem.selectAll('path').remove();
+        },
+
+        _setLineStyles:function(elem,lines){
+          elem.selectAll(lines)
+            .attr('fill','none')
+            .attr('stroke', this.colors.grey3)
+            .attr('shape-rendering','crispEdges');
+        }
+    });
+</script>

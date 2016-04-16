@@ -43,10 +43,6 @@ This element sets the selectedDomain property based on the extents box. The sele
       commonColors
     ],
 
-    observers: [
-      'drawElement(setDomain)'
-    ],
-
     /**
      * Properties block, expose attribute values to the DOM via 'reflect'
      *
@@ -117,6 +113,11 @@ This element sets the selectedDomain property based on the extents box. The sele
         value:false
       }
     },
+
+    observers: [
+      'drawElement(setDomain)'
+    ],
+
     /**
      * Defines the svg for the brush, draws brush elements, and sets up listeners.
      *
@@ -157,10 +158,11 @@ This element sets the selectedDomain property based on the extents box. The sele
           .call(this._brush);
 
         var heightOffset = 6;
+        console.log(this.height);
         // Style the brush overlay box
         this._brushGroup.selectAll("rect")
-          .attr("y", -heightOffset)
-          .attr("height", this.height + heightOffset)
+          .attr("y", 0)
+          .attr("height", this.height - heightOffset)
           .attr('stroke',this.colors.gray5)
           .attr('stroke-width',2)
           .attr('fill-opacity','.10')
