@@ -148,17 +148,28 @@ This element sets the selectedDomain property based on the extents box. The sele
         var tempSVG = this.svg[0][0],
             clone = tempSVG.cloneNode();
 
+        var heightOffset = 6;
+
         tempSVG.parentNode.appendChild(clone);
 
         this.set('bushSvg',d3.select(clone));
+
+        // // navigator outline
+        // this.bushSvg.append("rect")
+        //   .attr("x", 0)
+        //   .attr("y", 0)
+        //   .attr("height", this.height - heightOffset)
+        //   .attr("width", this.width - 41)
+        //   .attr('stroke',this.colors.gray5)
+        //   .attr('stroke-width',1)
+        //   .attr('fill','none')
+        //   .attr('shape-rendering','crispEdges');
 
         // now that we have our new g, proceed with drawing brush
         this._brushGroup = this.bushSvg.append("g")
           .attr("class", "brush")
           .call(this._brush);
 
-        var heightOffset = 6;
-        console.log(this.height);
         // Style the brush overlay box
         this._brushGroup.selectAll("rect")
           .attr("y", 0)

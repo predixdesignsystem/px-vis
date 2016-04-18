@@ -89,6 +89,17 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             reflectToAttribute: true
           },
           /**
+           * The displayed title for the axis
+           *
+           * @property title
+           * @type String
+           * @default ''
+           */
+          title:{
+            type:String,
+            value: ''
+          },
+          /**
            * Defines which side the axis should be on.
            *  - 'left'
            *  - 'right'
@@ -120,13 +131,46 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           /**
            * Defines how the label should be rotated. Number is the degree of rotation
            *
-           * @property labelOrientation
+           * @property labelRotation
            * @type Number
            * @default 0
            */
-          labelOrientation:{
+          labelRotation:{
             type: Number,
             value: 0,
+          },
+          /**
+           * Defines how the label should be moved in x,y. Array is an x,y pair and coresponds to the number of pixels to move the label
+           *
+           * @property labelTranslation
+           * @type Array
+           * @default [0,0]
+           */
+          labelTranslation:{
+            type: Array,
+            value: [0,0],
+          },
+          /**
+           * Defines the base label type size
+           *
+           * @property labelTypeSize
+           * @type Number
+           * @default 12
+           */
+          labelTypeSize:{
+            type: Number,
+            value: 12,
+          },
+          /**
+           * Array of the series which belong to this axis
+           *
+           * @property series
+           * @type Array
+           * @default []
+           */
+          series:{
+            type: Array,
+            value: function(){ return [] }
           },
           /**
            * An x,y amount to move the axis to allow for labels and titles
@@ -142,7 +186,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
         observers: [
           'defineAxis(axis)',
-          'drawElement(setDomain)'
+          'drawElement(setDomain)',
+          'drawSeriesBars(series.*)'
         ],
 
 
@@ -161,10 +206,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         defineAxis:function(){
           this._axis = d3.svg.axis()
             .scale(this.axis)
-            .orient(this.orientation);
+            .orient(this.orientation)
+            ;
 
           // change default (10) ticks
-          // this._axis.ticks();
+          // this._axis.ticks(5);
           // change default ticks with specific time
           // this._axis.ticks(d3.time.months, 1);
           // this._axis.ticks(d3.time.days, 7);
@@ -180,7 +226,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           // this._axis.tickFormat(d3.format(",.0f"));
 
           if(this.labelPosition !== 'center'){
-            this._axis.innerTickSize(12);
+            this._axis.innerTickSize(this.labelTypeSize);
           }
 
         },
@@ -193,9 +239,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           // console.log('draw axis');
           // TODO what happens if not?
           if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this._axis)){
-            // this._axis.tickValues(this.axis.domain());
+            // TODO unify my orientation checks
             if(this.orientation === 'bottom'){
               var h = this.svg.attr('height') - this.margin.bottom - this.margin.top;
+
               this.translateAmt = [0,h];
             } else if(this.orientation === 'left'){
               this.translateAmt = [0,0];
@@ -215,6 +262,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               //keep a reference for later
               this._axisGroup = this.svg.select('g.axis[axis-id=' + this.axisId + ']');
 
+              if(this.title){
+                this.drawTitle();
+              }
+
             } else {
               this._axisGroup
               // .duration(750)
@@ -223,7 +274,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
               this._setLineStyles(this._axisGroup,'line');
               this._setLabelStyles(this._axisGroup);
-
             }
           }
         },
@@ -231,26 +281,26 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           var label = {};
           switch(this.orientation){
             case 'bottom':
-              label.x = 3;
-              label.y = 3;
+              label.x = this.labelTypeSize / 4;
+              label.y = this.labelTypeSize / 4;
               label.anchor = (this.labelPosition === 'after') ? 'start' : 'end';
               break;
 
             case 'top':
-              label.x = -3;
-              label.y = -3;
+              label.x = this.labelTypeSize / -4;
+              label.y = this.labelTypeSize / -4;
               label.anchor = (this.labelPosition === 'after') ? 'start' : 'end';
               break;
 
             case 'left':
-              label.x = -8;
-              label.y = (this.labelPosition === 'after') ? -8 : 8;
+              label.x = this.labelTypeSize * -2/3;
+              label.y = (this.labelPosition === 'after') ? this.labelTypeSize * -2/3 : this.labelTypeSize * 2/3;
               label.anchor = 'end';
               break;
 
             case 'right':
-              label.x = 8;
-              label.y = (this.labelPosition === 'after') ? -8 : 8;
+              label.x = this.labelTypeSize * 2/3;
+              label.y = (this.labelPosition === 'after') ? this.labelTypeSize * -2/3 : this.labelTypeSize * 2/3;
               label.anchor = 'start';
               break;
           }
@@ -260,7 +310,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
         _setLabelStyles:function(elem){
           elem.selectAll('text')
-            .attr('font-size','12px')
+            .attr('font-size', this.labelTypeSize + 'px')
             .attr('font-style','GE Inspira Sans');
 
           if(this.labelPosition !== 'center'){
@@ -270,7 +320,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               .attr("y", label.y)
               .attr("x", label.x)
               .attr("text-anchor", label.anchor)
-              .style("text-anchor", label.anchor);
+              .style("text-anchor", label.anchor)
+              .attr('transform',"translate(" + this.labelTranslation.join(',') + ") rotate(" + this.labelRotation + ")")
           }
         },
 
@@ -279,6 +330,69 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .attr('fill','none')
             .attr('stroke', this.colors.grey9)
             .attr('shape-rendering','crispEdges');
+        },
+
+        drawTitle:function(){
+          var ext = this._axisGroup[0][0].getBBox();
+          var x,y,r;
+          switch(this.orientation){
+            case 'bottom':
+              x = parseFloat(ext['width']) / 2 + this.translateAmt[0];
+              y = this.labelTypeSize * 1.5 + parseFloat(ext['height']) + this.translateAmt[1];
+              r = 0;
+              break;
+
+            case 'top':
+              x = parseFloat(ext['width']) / 2 + this.translateAmt[0];
+              y = (this.labelTypeSize * 1.5 + parseFloat(ext['height'])) * -1 + this.translateAmt[1];
+              r = 0;
+              break;
+
+            case 'left':
+              x = (this.labelTypeSize + parseFloat(ext['width'])) * -1 + this.translateAmt[0];
+              y = parseFloat(ext['height']) / 2 + this.translateAmt[1]
+              r = -90;
+              break;
+
+            case 'right':
+              x = this.labelTypeSize + parseFloat(ext['width']) + this.translateAmt[0];
+              y = parseFloat(ext['height']) / 2 + this.translateAmt[1];
+              r = 90;
+              break;
+          }
+
+          this.svg.append("g")
+            .attr('class','title-group')
+            .attr('for', this.axisId)
+            .attr('transform',"translate(" + x + ',' + y + ")");
+
+          this._titleGroup = this.svg.select('g.title-group[for=' + this.axisId + ']');
+
+          this._titleGroup.append("text")
+            .attr('class','axis-title')
+            .attr('font-size', (this.labelTypeSize * 1.25) + 'px')
+            .attr('font-style','GE Inspira Sans')
+            .text(this.title)
+            .attr("text-anchor", 'middle')
+            .style("text-anchor", 'middle')
+            .attr('transform',"rotate(" + r + ")");
+        },
+        drawSeriesBars:function(){
+          console.log(this.series);
+          // look at titleGroup
+          // draw a bar for each series
+          // color based on index
+          // FIXME do we need to move the title group based on how many series we have
+          // FIXME when should this fire? on change, but when to strat?
+          // FIXME LARGER - how do we create this obj when we have line and scatter series?
+          // TODO take mutedSeries and mute
+        }
+        _drawBar:function(elem,sid,color,index){
+          elem.append("rect")
+            .attr('height',20)
+            .attr('width',3)
+            .attr('fill',color)
+            .attr('transform',"translate(" + (8 * index) + ",0)");
         }
     });
 </script>

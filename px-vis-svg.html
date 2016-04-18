@@ -75,63 +75,35 @@ Element providing solution to no problem in particular. As a simple, increments 
             type:Array,
             value:[]
           },
-          /**
-           * Use the selectable attribute if the table rows should be able to be selected.
-           *
-           *      <px-data-table selectable table-data="{{data}}"></px-data-table>
-           *
-           * @default false
-           */
-          //  parse: {
-          //    type: String,
-          //    value: false,
-          //    observer: 'praser'
-          //  },
         },
 
         observers: [
           '_setSVG(width,height,margin)'
         ],
 
-        listeners: {
-          'getSVG': '_giveSVG'
-        },
-
-
         /**
          *  When ready, let's find out who our children are
          */
-        ready: function() {
-          Polymer.dom(this).observeNodes(this._onEffectiveDomUpdated.bind(this));
-        },
-        created: function(){
-        },
-        attached: function() {
-        },
-        //
-        // /**
-        //  * Event callback
-        //  * When asked for a svg attr update, send it back as an event
-        //  *
-        //  * @method _giveSVG
-        //  */
-        // _giveSVG:function(e){
-        //   var ne = Polymer.dom(e);
-        //   ne.rootTarget.fire('giveSVG',{ svg:this.svg })
-        //   e.stopPropagation();
+        // ready: function() {
+        //   // Polymer.dom(this).observeNodes(this._onEffectiveDomUpdated.bind(this));
+        // },
+        // created: function(){
+        // },
+        // attached: function() {
         // },
 
-        _onEffectiveDomUpdated: function (info) {
-          this.async(function () {
-            info.addedNodes.forEach(this._onNodeAdded.bind(this));
-          });
-        },
-        _onNodeAdded: function (node) {
-          if (!(node instanceof Text)) {
-            node.__map = this.map;
-            this._childElems.push(node);
-          }
-        },
+        // _onEffectiveDomUpdated: function (info) {
+        //   this.async(function () {
+        //     info.addedNodes.forEach(this._onNodeAdded.bind(this));
+        //   });
+        // },
+        // _onNodeAdded: function (node) {
+        //   if (!(node instanceof Text)) {
+        //     node.__map = this.map;
+        //     this._childElems.push(node);
+        //   }
+        // },
+
         /**
          *
          *
