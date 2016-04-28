@@ -33,7 +33,7 @@ module.exports = function (grunt) {
                   'css/noprefix/px-vis-register.css': 'sass/px-vis-register-predix.scss',
                 }
             },
-            
+
         },
 
         autoprefixer: {
@@ -83,7 +83,7 @@ module.exports = function (grunt) {
                     interrupt: true,
                     livereload: true
                 }
-            }
+            },
         },
 
         depserve: {
@@ -106,6 +106,13 @@ module.exports = function (grunt) {
                     logConcurrentOutput: true
                 }
             }
+        },
+
+        fa: {
+          files: {
+            src: 'bower_components/font-awesome/css/font-awesome.css',
+            dest: 'fa_codes.html',
+          }
         }
     });
 
@@ -118,15 +125,21 @@ module.exports = function (grunt) {
     grunt.loadNpmTasks('webdriver-support');
     grunt.loadNpmTasks('grunt-autoprefixer');
     grunt.loadNpmTasks('grunt-concurrent');
+    grunt.loadNpmTasks('grunt-fa');
 
     // Default task.
     grunt.registerTask('default', 'Basic build', [
         'sass',
-        'autoprefixer'
+        'autoprefixer',
+        'grunt-fa'
     ]);
 
     grunt.registerTask('devmode', 'Development Mode', [
         'concurrent:devmode'
+    ]);
+
+    grunt.registerTask( 'grunt-fa', [
+        'fa'
     ]);
 
     // First run task.

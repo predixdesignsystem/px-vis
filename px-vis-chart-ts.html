@@ -3,6 +3,8 @@
 <link rel="import" href="../iron-ajax/iron-ajax.html" />
 <link rel="import" href="px-vis-svg.html"/>
 <link rel="import" href="px-vis-line.html"/>
+<link rel="import" href="px-vis-event-common.html" />
+<link rel="import" href="px-vis-event.html"/>
 <link rel="import" href="px-vis-axis.html"/>
 <link rel="import" href="px-vis-gridlines.html"/>
 <link rel="import" href="px-vis-data.html"/>
@@ -73,11 +75,24 @@ Element providing solution to no problem in particular. As a simple, increments 
           </px-vis-line>
         </template>
 
+        <template is="dom-repeat" items="{{_returnEvents(chartData)}}">
+          <px-vis-event
+            svg="[[svg]]"
+            event-id="[[item.id]]"
+            chart-data="[[item]]"
+            x="[[x]]"
+            y="[[y]]"
+            event-config="[[eventConfig]]"
+            set-domain-x="[[setDomainX]]"
+            set-domain-y="[[setDomainY]]">
+          </px-vis-event>
+        </template>
+
         <px-vis-gridlines
           svg="[[svg]]"
           grid="[[x]]"
           margin="[[margin]]"
-          length="[[width]]"
+          length="[[height]]"
           orientation="bottom"
           set-domain="[[setDomainX]]">
         </px-vis-gridlines>
@@ -152,12 +167,9 @@ Element providing solution to no problem in particular. As a simple, increments 
 
         behaviors: [
           pxVisCommonBehavior,
-          pxVisSVGChartCommonBehavior
+          pxVisSVGChartCommonBehavior,
+          pxVisEventCommonBehavior
         ],
-
-        // listeners: {
-        //   'brushed':'_brushed'
-        // },
 
         /**
          * Properties block, expose attribute values to the DOM via 'reflect'
@@ -215,7 +227,7 @@ Element providing solution to no problem in particular. As a simple, increments 
         },
 
         _calcMargins:function(){
-          var topMargin = 10,
+          var topMargin = 25,
               rightMargin = 10,
               bottomMargin = 10,
               leftMargin = 10;
@@ -260,6 +272,19 @@ Element providing solution to no problem in particular. As a simple, increments 
         },
         _topRegister:function(location){
           return location === 'top' || location === 'both'
+        },
+        _returnEvents(chartData){
+          var evts = [];
+          for(var i = 0; i < chartData.length; i++){
+            if(typeof(chartData[i]['events']) !== 'undefined'){
+              for(var j = 0; j < chartData[i]['events'].length; j++){
+                evts.push(chartData[i]['events'][j]);
+              }
+            }
+          }
+
+          console.log(evts);
+          return evts
         }
     });
 </script>

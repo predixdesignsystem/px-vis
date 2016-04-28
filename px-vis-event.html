@@ -2,7 +2,9 @@
 <link rel="import" href="px-vis-common.html" />
 <link rel="import" href="px-vis-svg-chart-common.html" />
 <link rel="import" href="../px-colors-design/colors.html" />
-
+<link rel="import" href="fa_codes.html" />
+<link rel="import" href="px-vis-event-common.html" />
+<link rel="import" href="../px-tooltip/px-tooltip.html"/>
 
 <!--
 Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
@@ -30,7 +32,9 @@ Element providing solution to no problem in particular. As a simple, increments 
 
         behaviors: [
           pxVisSVGChartCommonBehavior,
-          commonColors
+          commonColors,
+          faCodes,
+          pxVisEventCommonBehavior
         ],
 
         /**
@@ -46,29 +50,22 @@ Element providing solution to no problem in particular. As a simple, increments 
             notify: true,
             reflectToAttribute: true
           },
-          /**
-           * Configuration object to define what event should map to what icon and color
-           *
-           *
-           *
-           *
-           * @property eventConfig
-           * @type Object
-           */
-          eventConfig:{
-            type:Object,
-            value:{
-              'eventName':{
-                'color':'yellow',
-                'icon':''
-              }
-
-            }
-          },
           eventGroup:{
             type:Object,
             value:{}
           },
+          eventLine:{
+            type:Object,
+            value:{}
+          },
+          eventIcon:{
+            type:Object,
+            value:{}
+          },
+          _thisConfig:{
+            type:Object,
+            value:{}
+          }
         },
 
         observers: [
@@ -84,7 +81,7 @@ Element providing solution to no problem in particular. As a simple, increments 
         },
 
         /**
-         * Draws or updates the line element.
+         * Draws or updates the event element.
          * Called from an observer watching for data and the necessary d3 objects
          *
          * @method drawElement
@@ -92,84 +89,129 @@ Element providing solution to no problem in particular. As a simple, increments 
         drawElement: function() {
           if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && (this.chartData)){
 
+            this._processConfiguration();
+
             // checks to see if the axis already exists. If not, create; if so, update
             if(this._isObjEmpty(this.eventGroup)){
-
-              this.svg.append('g')
+              this.eventGroup = this.svg.append('g')
                 .attr('class','event')
-                .attr('event-id',this.eventId);
+                .attr('event-id',this.eventId)
+                .attr('id','event_'+this.eventId);
 
-              //keep a reference for later
-              this.eventGroup = this.svg.select('g.event[event-id=' + this.eventId + ']');
 
               // draw the path
-              this.eventGroup.append("line")
-                .attr("x1", chartData[0])
-                .attr("x2", chartData[1])
-                .attr("y1", setDomainY[0])
-                .attr("y2", setDomainY[1])
-                .attr('stroke',this.colors.grey9);
+              this.eventLine = this.eventGroup.append("line")
+                .attr('stroke',this.colors[this.lineConfig.color])
+                .attr('stroke-width',this.lineConfig.weight);
 
-              // TODO event type and icon
-              var thisEvent = this.eventConfig[this.event]
-              if(){
-                nodeEnter.append("image")
-      .attr("xlink:href", function(d) { return d.icon; })
-      .attr("x", "-12px")
-      .attr("y", "-12px")
-      .attr("width", "24px")
-      .attr("height", "24px");
+              if(this._thisConfig.type === 'image'){
+                this.eventIcon = this.eventGroup.append("image")
+                  .attr("xlink:href", this._thisConfig.icon)
+                  .attr("width", this._thisConfig.size + 'px')
+                  .attr("height", this._thisConfig.size + 'px');
+              } else if(this._thisConfig.type === 'unicode'){
+                this.eventIcon = this.eventGroup.append("text")
+                  .attr('font-family', 'FontAwesome')
+                  .attr('font-size', this._thisConfig.size)
+                  .attr('fill', this.colors[this._thisConfig.color])
+                  .text(this._thisConfig.icon);
+              } else if(this._thisConfig.type === 'fa'){
+                this.eventIcon = this.eventGroup.append("text")
+                  .attr('font-family', 'FontAwesome')
+                  .attr('font-size', this._thisConfig.size + 'px')
+                  .attr('fill', this.colors[this._thisConfig.color])
+                  .text(String.fromCharCode(parseInt(this.fa[this._thisConfig.icon],16)));
               }
 
-              // add color
-              this._colorLine();
+              this.eventIcon
+                .style("cursor","pointer")
+                .attr('id','ei_' + this.eventId);
 
+              this._positionEvent();
             } else {
               // update the path
-              this.eventGroup.datum(data)
-              // .duration(750)
-              .attr("d", line);
+              this._positionEvent();
             }
+            this._addTooltip();
           }
         },
-        /**
-         * Checks mutedSeries to see if this ID is in there
-         * Called from an observer watching mutedSeries
-         *
-         * @method isIdInMuted
-         */
-        isIdInMuted: function() {
-          if(this.mutedSeries.hasOwnProperty(this.lineId)){
-            // if true, mute
-            if(this.mutedSeries[this.lineId]){
-              this._muteLine()
-            } else {
-              this._colorLine()
+        _positionEvent(){
+          this.eventLine
+            .attr("x1", this.x(this.chartData.time))
+            .attr("x2", this.x(this.chartData.time))
+            .attr("y1", this.y(this.setDomainY[0]))
+            .attr("y2", this.y(this.setDomainY[1]))
+          this.eventIcon
+            .attr('x',this.x(this.chartData.time) - this._thisConfig.size/2 + this._thisConfig.offset[0])
+            .attr("y", this.y(this.setDomainY[1]) - 5 + this._thisConfig.offset[1]);
+        },
+        _processConfiguration:function(){
+          // is there a configuration object for this event type
+          if(this.eventConfig[this.chartData.label]){
+            /*
+            get the keys of the defaultEventConfig, cycle through them and see if the eventConfig object has the property. If so, set it, otherwise use default
+            */
+            var k = Object.keys(this.defaultEventConfig);
+            for(var i = 0; i < k.length; i++){
+              this._thisConfig[k[i]] =  this.eventConfig[this.chartData.label][k[i]] || this.defaultEventConfig[k[i]];
             }
+          } else {
+            // else, set everything to default
+            this._thisConfig = this.defaultEventConfig;
           }
-          console.groupEnd();
+        },
+        _addTooltip:function(){
+          // var fo = this.eventGroup.append("svg:foreignObject")
+          //   .attr('width', this._thisConfig.size)
+          //   .attr('height', this._thisConfig.size)
+          //   .attr('x', this.x(this.chartData.time) - this._thisConfig.size/2 + this._thisConfig.offset[0])
+          //   .attr("y", this.y(this.setDomainY[1]) - this._thisConfig.size - 5 + this._thisConfig.offset[1]);
+          // var tt = fo.append('xhtml:px-tooltip')
+          //   .attr('id','tooltip_' + this.eventId)
+          //   .attr('smartOrientation',true)
+          //   .attr('delay',10);
 
-        },
-        /**
-         * Adds full color to the line.
-         *
-         * @method _colorLine
-         */
-        _colorLine:function(){
-          var index = this.seriesNumber;
-          this.linePath.attr('stroke',this.dataVisColors[this.seriesColorOrder[index]])
-            .attr('stroke-opacity',1);
-        },
-        /**
-         * Adds muted color to the line.
-         *
-         * @method muteElements
-         TODO add dev set color and opacity
-         */
-         _muteLine:function(){
-           var index = this.seriesNumber;
-           this.linePath.attr('stroke',this.dataVisColors[this.seriesColorOrder[index]])
-             .attr('stroke-opacity',0.3);
-         },
+          // var s = tt.append('xhtml:span');
+          // s.append('xhtml:b')
+          //   .text('Event');
+          // s.append('xhtml:span')
+          //   .text(': ' + this.chartData.label);
+          // s.append('xhtml:br');
+          //
+          // s.append('xhtml:b')
+          //   .text('ID');
+          // s.append('xhtml:span')
+          //   .text(': ' + this.chartData.id);
+          // s.append('xhtml:br');
+          //
+          // s.append('xhtml:b')
+          //   .text('Timestamp');
+          // s.append('xhtml:span')
+          //   .text(': ' + this.chartData.time);
+          // s.append('xhtml:br');
+
+          // tt[0][0].set('for',this.eventIcon[0][0]);
+
+          var fo = this.eventGroup.append("svg:foreignObject")
+            .attr('id','tooltip_' + this.eventId)
+            .attr('width', this._thisConfig.size)
+            .attr('height', this._thisConfig.size)
+            .attr('x', this.x(this.chartData.time) - this._thisConfig.size/2 + this._thisConfig.offset[0])
+            .attr("y", this.y(this.setDomainY[1]) - this._thisConfig.size - 5 + this._thisConfig.offset[1]);
+
+
+          var elem = Polymer.dom(this.eventGroup[0][0]).querySelector('#tooltip_' + this.eventId);
+
+          var html = '<px-tooltip smartOrientation delay="10">\
+                        <span>\
+                          <b>Event</b>: '+ this.chartData.label + '<br/>\
+                          <b>ID</b>: '+ this.chartData.id + '<br/>\
+                          <b>Timestamp</b>: '+ this.chartData.time + '<br/>\
+                        </span>\
+                      </px-tooltip>';
+          var tt = elem.innerHTML = html;
+
+          elem.querySelector('px-tooltip').set('for',this.eventIcon[0][0]);
+        }
     });
 </script>
