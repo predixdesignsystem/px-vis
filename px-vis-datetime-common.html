@@ -1,0 +1,94 @@
+<script type="text/javascript" src="../moment/min/moment.min.js"></script>
+<script type="text/javascript" src="../moment-timezone/builds/moment-timezone-with-data-2010-2020.min.js"></script>
+<script>
+/*
+    Name:
+    pxVisCommonBehavior
+
+    Description:
+    Polymer behavior that provides the basic operations for px-vis and associated sub components.
+    For example several functions are made available in order to define the width and height of the
+    components. The adds two attributes to an element: `width` and `height` attributes which may be
+    defined as: Number, Number as String, or "auto".
+    Numbers will be coerced into String and auto will set the element up to be responsive.
+
+    Dependencies:
+    - window.px library
+
+    @polymerBehavior pxVisDatetimeCommonBehavior
+*/
+var pxVisDatetimeCommonBehavior = {
+  properties: {
+    /**
+     * Defines the format for the first datetime string. The first datetime is shown in normal font weight.
+     *
+     * Default is the first datetime string is TIME presented as "12:00:00 +0000"
+     *
+     * For valid string formats, see: http://momentjs.com/docs/#/displaying/
+     *
+     * @property firstDateTimeFormat
+     * @type string
+     * @default hh:mm:ss ZZ
+    */
+    firstDateTimeFormat:{
+      type:String,
+      value: 'hh:mm:ss ZZ'
+    },
+    /**
+     * Defines the format for the second datetime string. The second datetime is shown in bold font weight.
+     *
+     * Default is the second datetime string is DATE presented as "12 Feb 2016"
+     *
+     * For valid string formats, see: http://momentjs.com/docs/#/displaying/
+     *
+     * @property secondDateTimeFormat
+     * @type string
+     * @default DD MMM YYYY
+    */
+    secondDateTimeFormat:{
+      type:String,
+      value:'DD MMM YYYY'
+    },
+
+    /**
+     * Defines a separator character between the two datetime strings.
+     *
+     * @property separator
+     * @type string
+     * @default |
+    */
+    separator:{
+      type:String,
+      value:'|'
+    },
+    /**
+     * Sets what timezone the event time should display in.
+     *
+     * Timezone defaults to UTC time. If a valid timezone is specified, then times include daylight savings time if applicable.
+     *
+     * For a list of valid timezones, see: https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+     *
+     * For more details on timezones, see: http://momentjs.com/timezone/
+     *
+     * @property timezone
+     * @type String
+     * @default utc
+     */
+    timezone:{
+      type:String,
+      value:"utc"
+    },
+  },
+  _formatTimestamp: function(datetime,timezone,format){
+    if(timezone.toLowerCase() !== 'utc'){
+      if(moment.tz.zone(timezone)){
+        return moment.tz(datetime, timezone).format(format);
+      } else {
+        console.warn("Invalid timezone specified; defaulting to UTC");
+      }
+    }
+
+    return moment.utc(datetime).format(format);
+  }
+}
+</script>

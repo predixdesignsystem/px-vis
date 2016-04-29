@@ -4,8 +4,7 @@
 <link rel="import" href="px-vis-svg-chart-common.html" />
 <link rel="import" href="../numbro-element/numbro-element.html" />
 <link rel="import" href="../px-tooltip/px-tooltip.html" />
-
-<script src="../moment/moment.js"></script>
+<link rel="import" href="px-vis-datetime-common.html"/>
 
 <!--
 Element providing a display and interaction space for series in your chart.
@@ -152,7 +151,8 @@ Formatting for the timestamps,the data values, and the series names can be contr
     behaviors: [
       pxVisCommonBehavior,
       pxVisSVGChartCommonBehavior,
-      commonColors
+      commonColors,
+      pxVisDatetimeCommonBehavior
     ],
 
     /**
@@ -230,50 +230,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
       truncationLength:{
        type:Number,
        value:10
-      },
-
-      /**
-       * Defines the format for the first datetime string. The first datetime is shown in normal font weight.
-       *
-       * Default is the first datetime string is TIME presented as "12:00:00 +0000"
-       *
-       * For valid string formats, see: http://momentjs.com/docs/#/displaying/
-       *
-       * @property firstDateTimeFormat
-       * @type string
-       * @default hh:mm:ss ZZ
-      */
-      firstDateTimeFormat:{
-        type:String,
-        value: 'hh:mm:ss ZZ'
-      },
-      /**
-       * Defines the format for the second datetime string. The second datetime is shown in bold font weight.
-       *
-       * Default is the second datetime string is DATE presented as "12 Feb 2016"
-       *
-       * For valid string formats, see: http://momentjs.com/docs/#/displaying/
-       *
-       * @property secondDateTimeFormat
-       * @type string
-       * @default DD MMM YYYY
-      */
-      secondDateTimeFormat:{
-        type:String,
-        value:'DD MMM YYYY'
-      },
-
-      /**
-       * Defines a separator character between the two datetime strings.
-       *
-       * @property separator
-       * @type string
-       * @default |
-      */
-      separator:{
-        type:String,
-        value:'|'
-      },
+     },
       /**
        * Holder for the formated first datetime string
        *
@@ -339,10 +296,11 @@ Formatting for the timestamps,the data values, and the series names can be contr
      */
     _formatDateTime:function(){
       if(this.tooltipData.time){
-        var momentObj = moment(this.tooltipData.time);
+        var momentObj1 = this._formatTimestamp(this.tooltipData.time,this.timezone,this.firstDateTimeFormat);
+        var momentObj2 = this._formatTimestamp(this.tooltipData.time,this.timezone,this.secondDateTimeFormat);
 
-        this.set('_firstDateTime', momentObj.format(this.firstDateTimeFormat));
-        this.set('_secondDateTime', momentObj.format(this.secondDateTimeFormat));
+        this.set('_firstDateTime', momentObj1);
+        this.set('_secondDateTime', momentObj2);
         this.set('_separator', this.separator);
 
       } else {

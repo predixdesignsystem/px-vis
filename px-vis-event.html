@@ -4,8 +4,7 @@
 <link rel="import" href="../px-colors-design/colors.html" />
 <link rel="import" href="fa_codes.html" />
 <link rel="import" href="../px-tooltip/px-tooltip.html"/>
-
-<script type="text/javascript" scr"../moment/min/moment.min.js"></script>
+<link rel="import" href="px-vis-datetime-common.html"/>
 
 <!--
 Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
@@ -26,243 +25,291 @@ Element providing solution to no problem in particular. As a simple, increments 
         <span>
           <b>Event</b>: [[chartData.label]] <br/>
           <b>ID</b>: [[chartData.id]] <br/>
-          <b>Timestamp</b>: [[_formatDateTime(chartData.time)]] <br/>
+          <b>Timestamp</b>: [[_formatDatetime(chartData.time, firstDateTimeFormat)]] [[separator]] [[_formatDatetime(chartData.time,secondDateTimeFormat)]]<br/>
         </span>
       </px-tooltip>
     </template>
 </dom-module>
 
 <script>
-    Polymer({
+  Polymer({
 
-        is: 'px-vis-event',
+    is: 'px-vis-event',
 
-        behaviors: [
-          pxVisSVGChartCommonBehavior,
-          commonColors,
-          faCodes
-        ],
+    behaviors: [
+      pxVisSVGChartCommonBehavior,
+      commonColors,
+      faCodes,
+      pxVisDatetimeCommonBehavior
+    ],
 
-        /**
-         * Properties block, expose attribute values to the DOM via 'reflect'
-         *
-         * @property properties
-         * @type Object
-         */
-        properties: {
-          /**
-           * Configuration object to define what event should map to what icon and color.
-           * The object has a key being the event name, the value being a the configuration object for that event. The configuration object has four properties:
-           * - color: A valid color name found in the px-colors-design
-           * - icon: the reference to the icon; for Font Awesome, it can be a class or a unicode value; for an image, it is a path
-           * - type: 'fa', 'unicode', or 'image'. 'fa' and 'unicode' are font-awesome icons, 'fa' referring to the class ('fa-camera') and 'unicode' referring to the unicode value for the icon formatted as '\uf004'
-           * - offset: an 2 element array with the number of pixels to offset the icon. offset[0] is along the x-axis; offset[1] is along the y-axis; necessary for some icons to adjust their values to acheive a better alignment over the event line.
-           *
-           *
-           * Format: {
-           *   "Event-Name-A":{
-           *     "color": "a_valid_color_from_px-colors-design",
-           *     "icon": "font-awesome-class",
-           *     "type": "fa",
-           *     "offset":[0,0]
-           *   },
-           *   "Event-Name-B":{
-           *     "color": "a_valid_color_from_px-colors-design",
-           *     "icon": "path-to-an-img",
-           *     "type": "image",
-           *     "offset":[0,0]
-           *   },
-           *   "Event-Name-C":{
-           *     "color": "a_valid_color_from_px-colors-design",
-           *     "icon": "unicode-of-the-font-character",
-           *     "type": "unicode",
-           *     "offset":[0,0]
-           *   },
-           * }
-           *
-           * Example: {
-           *   "Recalibrate":{
-           *     "color": "blue",
-           *     "icon": "fa-camera",
-           *     "type": "fa",
-           *     "offset":[-3,0]
-           *   },
-           *   "Fan start":{
-           *     "color": "green",
-           *     "icon": "\uf015",
-           *     "type": "unicode",
-           *     "offset":[5,0]
-           *   }
-           * }
-           *
-           *
-           * @property eventConfig
-           * @type Object
-           */
-          eventConfig:{
-            type:Object,
-            value:{}
-          },
-          /**
-           * Configuration object to define what the default icon should be. This gets used if a) no eventConfig is defined or b) the particular event is not defined in the eventConfig object.
-           *
-           * Default: {
-           *   'color': 'grey7',
-           *   'icon': 'fa-circle',
-           *   'type': 'fa',
-           *   'offset': 0,
-           *   'size': '16'
-           * }
-           *
-           * @property defaultEventConfig
-           * @type Object
-           */
-          defaultEventConfig:{
-            type:Object,
-            value:{
-              'color': 'grey7',
-              'icon': 'fa-info-circle',
-              'type': 'fa',
-              'offset': [0,0],
-              'size':'16'
-            },
-          },
-          lineConfig:{
-            type: Object,
-            value:{
-              'color':'grey9',
-              'weight':1
-            }
-          },
-          eventId:{
-            type:String,
-            value: '',
-            notify: true,
-            reflectToAttribute: true
-          },
-          datetimeFormat:{
-            type: String,
-            value:'DD MMM YYYY | hh:mm:ss ZZ'
-          },
-          timezone:{
-            type:String,
-            value:"utc"
-          },
-          eventGroup:{
-            type:Object,
-            value:{}
-          },
-          eventLine:{
-            type:Object,
-            value:{}
-          },
-          eventIcon:{
-            type:Object,
-            value:{}
-          },
-          _thisConfig:{
-            type:Object,
-            value:{}
-          }
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      /**
+       * Configuration object to define what event should map to what icon and color.
+       * The object has a key being the event name, the value being a the configuration object for that event. The configuration object has four properties:
+       * - color: A valid color name found in the px-colors-design
+       * - icon: the reference to the icon; for Font Awesome, it can be a class or a unicode value; for an image, it is a path
+       * - type: 'fa', 'unicode', or 'image'. 'fa' and 'unicode' are font-awesome icons, 'fa' referring to the class ('fa-camera') and 'unicode' referring to the unicode value for the icon formatted as '\uf004'
+       * - offset: an 2 element array with the number of pixels to offset the icon. offset[0] is along the x-axis; offset[1] is along the y-axis; necessary for some icons to adjust their values to acheive a better alignment over the event line.
+       *
+       *
+       * Format: {
+       *   "Event-Name-A":{
+       *     "color": "a_valid_color_from_px-colors-design",
+       *     "icon": "font-awesome-class",
+       *     "type": "fa",
+       *     "offset":[0,0]
+       *   },
+       *   "Event-Name-B":{
+       *     "color": "a_valid_color_from_px-colors-design",
+       *     "icon": "path-to-an-img",
+       *     "type": "image",
+       *     "offset":[0,0]
+       *   },
+       *   "Event-Name-C":{
+       *     "color": "a_valid_color_from_px-colors-design",
+       *     "icon": "unicode-of-the-font-character",
+       *     "type": "unicode",
+       *     "offset":[0,0]
+       *   },
+       * }
+       *
+       * Example: {
+       *   "Recalibrate":{
+       *     "color": "blue",
+       *     "icon": "fa-camera",
+       *     "type": "fa",
+       *     "offset":[-3,0]
+       *   },
+       *   "Fan start":{
+       *     "color": "green",
+       *     "icon": "\uf015",
+       *     "type": "unicode",
+       *     "offset":[5,0]
+       *   }
+       * }
+       *
+       *
+       * @property eventConfig
+       * @type Object
+       */
+      eventConfig:{
+        type:Object,
+        value:{}
+      },
+      /**
+       * Configuration object to define what the default icon should be. This gets used if a) no eventConfig is defined or b) the particular event is not defined in the eventConfig object.
+       *
+       * Default: {
+       *   'color': 'grey7',
+       *   'icon': 'fa-circle',
+       *   'type': 'fa',
+       *   'offset': 0,
+       *   'size': '16'
+       * }
+       *
+       * @property defaultEventConfig
+       * @type Object
+       */
+      defaultEventConfig:{
+        type:Object,
+        value:{
+          'color': 'grey7',
+          'icon': 'fa-info-circle',
+          'type': 'fa',
+          'offset': [0,0],
+          'size':'16'
         },
-
-        observers: [
-          // TODO Does chartData need to be chartData.* or chartData.series.* for dynamic data?
-          'drawElement(svg,x,y,setDomainX,setDomainY,chartData)',
-         ],
-
-        ready:function(){
-          // if there is no dev set unique ID, generate one
-          if(!this.eventId){
-            this.set('eventId', this.generateRandomID('event_'));
-          }
-        },
-
-        /**
-         * Draws or updates the event element.
-         * Called from an observer watching for data and the necessary d3 objects
-         *
-         * @method drawElement
-         */
-        drawElement: function() {
-          if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && (this.chartData)){
-
-            this._processConfiguration();
-
-            // checks to see if the axis already exists. If not, create; if so, update
-            if(this._isObjEmpty(this.eventGroup)){
-              this.eventGroup = this.svg.append('g')
-                .attr('class','event')
-                .attr('event-id',this.eventId)
-                .attr('id','event_'+this.eventId);
-
-
-              // draw the path
-              this.eventLine = this.eventGroup.append("line")
-                .attr('stroke',this.colors[this.lineConfig.color])
-                .attr('stroke-width',this.lineConfig.weight);
-
-              if(this._thisConfig.type === 'image'){
-                this.eventIcon = this.eventGroup.append("image")
-                  .attr("xlink:href", this._thisConfig.icon)
-                  .attr("width", this._thisConfig.size + 'px')
-                  .attr("height", this._thisConfig.size + 'px');
-              } else if(this._thisConfig.type === 'unicode'){
-                this.eventIcon = this.eventGroup.append("text")
-                  .attr('font-family', 'FontAwesome')
-                  .attr('font-size', this._thisConfig.size)
-                  .attr('fill', this.colors[this._thisConfig.color])
-                  .text(this._thisConfig.icon);
-              } else if(this._thisConfig.type === 'fa'){
-                this.eventIcon = this.eventGroup.append("text")
-                  .attr('font-family', 'FontAwesome')
-                  .attr('font-size', this._thisConfig.size + 'px')
-                  .attr('fill', this.colors[this._thisConfig.color])
-                  .text(String.fromCharCode(parseInt(this.fa[this._thisConfig.icon],16)));
-              }
-
-              this.eventIcon
-                .style("cursor","pointer")
-                .attr('id','ei_' + this.eventId);
-
-              this._positionEvent();
-            } else {
-              // update the path
-              this._positionEvent();
-            }
-            this._addTooltip();
-          }
-        },
-        _positionEvent(){
-          this.eventLine
-            .attr("x1", this.x(this.chartData.time))
-            .attr("x2", this.x(this.chartData.time))
-            .attr("y1", this.y(this.setDomainY[0]))
-            .attr("y2", this.y(this.setDomainY[1]))
-          this.eventIcon
-            .attr('x',this.x(this.chartData.time) - this._thisConfig.size/2 + this._thisConfig.offset[0])
-            .attr("y", this.y(this.setDomainY[1]) - 5 + this._thisConfig.offset[1]);
-        },
-        _processConfiguration:function(){
-          // is there a configuration object for this event type
-          if(this.eventConfig[this.chartData.label]){
-            /*
-            get the keys of the defaultEventConfig, cycle through them and see if the eventConfig object has the property. If so, set it, otherwise use default
-            */
-            var k = Object.keys(this.defaultEventConfig);
-            for(var i = 0; i < k.length; i++){
-              this._thisConfig[k[i]] =  this.eventConfig[this.chartData.label][k[i]] || this.defaultEventConfig[k[i]];
-            }
-          } else {
-            // else, set everything to default
-            this._thisConfig = this.defaultEventConfig;
-          }
-        },
-        _addTooltip:function(){
-          this.$.eventTooltip.set('for',this.eventIcon[0][0]);
-        },
-        _formatDateTime:function(){
-          
+      },
+      /**
+       * Defines the color and weight styles for the event line.
+       *
+       * Default: {
+       *   'color': 'grey9',
+       *   'weight': 1
+       * }
+       *
+       * @property lineConfig
+       * @type Object
+       */
+      lineConfig:{
+        type: Object,
+        value:{
+          'color':'grey9',
+          'weight':1
         }
-    });
+      },
+      /**
+       * The ID of the event
+       *
+       * @property eventId
+       * @type String
+       */
+      eventId:{
+        type:String,
+        value: '',
+        notify: true,
+        reflectToAttribute: true
+      },
+      // /**
+      //  * Defines how the time and date should be displayed for the event.
+      //  *
+      //  * For valid string formats, see: http://momentjs.com/docs/#/displaying/
+      //  *
+      //  * @property datetimeFormat
+      //  * @type String
+      //  * @default 'DD MMM YYYY | hh:mm:ss ZZ'
+      //  */
+      // datetimeFormat:{
+      //   type: String,
+      //   value:'DD MMM YYYY | hh:mm:ss ZZ'
+      // },
+
+      /**
+       * Holder object for the event svg "g" element
+       *
+       * @property eventGroup
+       * @type Object
+       */
+      eventGroup:{
+        type:Object,
+        value:{}
+      },
+      /**
+       * Holder object for the event svg "line" element
+       *
+       * @property eventLine
+       * @type Object
+       */
+      eventLine:{
+        type:Object,
+        value:{}
+      },
+      /**
+       * Holder object for the event svg icon
+       *
+       * @property eventIcon
+       * @type Object
+       */
+      eventIcon:{
+        type:Object,
+        value:{}
+      },
+      /**
+       * Computed configuration object based on dev set styles and default styles
+       *
+       * @property _thisConfig
+       * @type Object
+       */
+      _thisConfig:{
+        type:Object,
+        value:{}
+      }
+    },
+
+    observers: [
+      // TODO Does chartData need to be chartData.* or chartData.series.* for dynamic data?
+      'drawElement(svg,x,y,setDomainX,setDomainY,chartData)',
+     ],
+
+    ready:function(){
+      // if there is no dev set unique ID, generate one
+      if(!this.eventId){
+        this.set('eventId', this.generateRandomID('event_'));
+      }
+    },
+
+    /**
+     * Draws or updates the event element.
+     * Called from an observer watching for data and the necessary d3 objects
+     *
+     * @method drawElement
+     */
+    drawElement: function() {
+      if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && (this.chartData)){
+
+        this._processConfiguration();
+
+        // checks to see if the axis already exists. If not, create; if so, update
+        if(this._isObjEmpty(this.eventGroup)){
+          this.eventGroup = this.svg.append('g')
+            .attr('class','event')
+            .attr('event-id',this.eventId)
+            .attr('id','event_'+this.eventId);
+
+
+          // draw the path
+          this.eventLine = this.eventGroup.append("line")
+            .attr('stroke',this.colors[this.lineConfig.color])
+            .attr('stroke-width',this.lineConfig.weight);
+
+          if(this._thisConfig.type === 'image'){
+            this.eventIcon = this.eventGroup.append("image")
+              .attr("xlink:href", this._thisConfig.icon)
+              .attr("width", this._thisConfig.size + 'px')
+              .attr("height", this._thisConfig.size + 'px');
+          } else if(this._thisConfig.type === 'unicode'){
+            this.eventIcon = this.eventGroup.append("text")
+              .attr('font-family', 'FontAwesome')
+              .attr('font-size', this._thisConfig.size)
+              .attr('fill', this.colors[this._thisConfig.color])
+              .text(this._thisConfig.icon);
+          } else if(this._thisConfig.type === 'fa'){
+            this.eventIcon = this.eventGroup.append("text")
+              .attr('font-family', 'FontAwesome')
+              .attr('font-size', this._thisConfig.size + 'px')
+              .attr('fill', this.colors[this._thisConfig.color])
+              .text(String.fromCharCode(parseInt(this.fa[this._thisConfig.icon],16)));
+          }
+
+          this.eventIcon
+            .style("cursor","pointer")
+            .attr('id','ei_' + this.eventId);
+
+          this._positionEvent();
+        } else {
+          // update the path
+          this._positionEvent();
+        }
+        this._addTooltip();
+      }
+    },
+    _positionEvent(){
+      this.eventLine
+        .attr("x1", this.x(this.chartData.time))
+        .attr("x2", this.x(this.chartData.time))
+        .attr("y1", this.y(this.setDomainY[0]))
+        .attr("y2", this.y(this.setDomainY[1]))
+      this.eventIcon
+        .attr('x',this.x(this.chartData.time) - this._thisConfig.size/2 + this._thisConfig.offset[0])
+        .attr("y", this.y(this.setDomainY[1]) - 5 + this._thisConfig.offset[1]);
+    },
+    _processConfiguration:function(){
+      // is there a configuration object for this event type
+      if(this.eventConfig[this.chartData.label]){
+        /*
+        get the keys of the defaultEventConfig, cycle through them and see if the eventConfig object has the property. If so, set it, otherwise use default
+        */
+        var k = Object.keys(this.defaultEventConfig);
+        for(var i = 0; i < k.length; i++){
+          this._thisConfig[k[i]] =  this.eventConfig[this.chartData.label][k[i]] || this.defaultEventConfig[k[i]];
+        }
+      } else {
+        // else, set everything to default
+        this._thisConfig = this.defaultEventConfig;
+      }
+    },
+    _addTooltip:function(){
+      this.$.eventTooltip.set('for',this.eventIcon[0][0]);
+    },
+    _formatDatetime: function(time,format){
+      return this._formatTimestamp(time, this.timezone, format);
+    }
+  });
 </script>
