@@ -3,8 +3,9 @@
 <link rel="import" href="px-vis-svg-chart-common.html" />
 <link rel="import" href="../px-colors-design/colors.html" />
 <link rel="import" href="fa_codes.html" />
-<link rel="import" href="px-vis-event-common.html" />
 <link rel="import" href="../px-tooltip/px-tooltip.html"/>
+
+<script type="text/javascript" scr"../moment/min/moment.min.js"></script>
 
 <!--
 Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
@@ -21,7 +22,13 @@ Element providing solution to no problem in particular. As a simple, increments 
 <dom-module id="px-vis-event">
     <link rel="import" type="css" href="css/px-vis.css"/>
     <template>
-
+      <px-tooltip id="eventTooltip" smartOrientation delay="10">
+        <span>
+          <b>Event</b>: [[chartData.label]] <br/>
+          <b>ID</b>: [[chartData.id]] <br/>
+          <b>Timestamp</b>: [[_formatDateTime(chartData.time)]] <br/>
+        </span>
+      </px-tooltip>
     </template>
 </dom-module>
 
@@ -33,8 +40,7 @@ Element providing solution to no problem in particular. As a simple, increments 
         behaviors: [
           pxVisSVGChartCommonBehavior,
           commonColors,
-          faCodes,
-          pxVisEventCommonBehavior
+          faCodes
         ],
 
         /**
@@ -44,11 +50,103 @@ Element providing solution to no problem in particular. As a simple, increments 
          * @type Object
          */
         properties: {
+          /**
+           * Configuration object to define what event should map to what icon and color.
+           * The object has a key being the event name, the value being a the configuration object for that event. The configuration object has four properties:
+           * - color: A valid color name found in the px-colors-design
+           * - icon: the reference to the icon; for Font Awesome, it can be a class or a unicode value; for an image, it is a path
+           * - type: 'fa', 'unicode', or 'image'. 'fa' and 'unicode' are font-awesome icons, 'fa' referring to the class ('fa-camera') and 'unicode' referring to the unicode value for the icon formatted as '\uf004'
+           * - offset: an 2 element array with the number of pixels to offset the icon. offset[0] is along the x-axis; offset[1] is along the y-axis; necessary for some icons to adjust their values to acheive a better alignment over the event line.
+           *
+           *
+           * Format: {
+           *   "Event-Name-A":{
+           *     "color": "a_valid_color_from_px-colors-design",
+           *     "icon": "font-awesome-class",
+           *     "type": "fa",
+           *     "offset":[0,0]
+           *   },
+           *   "Event-Name-B":{
+           *     "color": "a_valid_color_from_px-colors-design",
+           *     "icon": "path-to-an-img",
+           *     "type": "image",
+           *     "offset":[0,0]
+           *   },
+           *   "Event-Name-C":{
+           *     "color": "a_valid_color_from_px-colors-design",
+           *     "icon": "unicode-of-the-font-character",
+           *     "type": "unicode",
+           *     "offset":[0,0]
+           *   },
+           * }
+           *
+           * Example: {
+           *   "Recalibrate":{
+           *     "color": "blue",
+           *     "icon": "fa-camera",
+           *     "type": "fa",
+           *     "offset":[-3,0]
+           *   },
+           *   "Fan start":{
+           *     "color": "green",
+           *     "icon": "\uf015",
+           *     "type": "unicode",
+           *     "offset":[5,0]
+           *   }
+           * }
+           *
+           *
+           * @property eventConfig
+           * @type Object
+           */
+          eventConfig:{
+            type:Object,
+            value:{}
+          },
+          /**
+           * Configuration object to define what the default icon should be. This gets used if a) no eventConfig is defined or b) the particular event is not defined in the eventConfig object.
+           *
+           * Default: {
+           *   'color': 'grey7',
+           *   'icon': 'fa-circle',
+           *   'type': 'fa',
+           *   'offset': 0,
+           *   'size': '16'
+           * }
+           *
+           * @property defaultEventConfig
+           * @type Object
+           */
+          defaultEventConfig:{
+            type:Object,
+            value:{
+              'color': 'grey7',
+              'icon': 'fa-info-circle',
+              'type': 'fa',
+              'offset': [0,0],
+              'size':'16'
+            },
+          },
+          lineConfig:{
+            type: Object,
+            value:{
+              'color':'grey9',
+              'weight':1
+            }
+          },
           eventId:{
             type:String,
             value: '',
             notify: true,
             reflectToAttribute: true
+          },
+          datetimeFormat:{
+            type: String,
+            value:'DD MMM YYYY | hh:mm:ss ZZ'
+          },
+          timezone:{
+            type:String,
+            value:"utc"
           },
           eventGroup:{
             type:Object,
@@ -161,57 +259,10 @@ Element providing solution to no problem in particular. As a simple, increments 
           }
         },
         _addTooltip:function(){
-          // var fo = this.eventGroup.append("svg:foreignObject")
-          //   .attr('width', this._thisConfig.size)
-          //   .attr('height', this._thisConfig.size)
-          //   .attr('x', this.x(this.chartData.time) - this._thisConfig.size/2 + this._thisConfig.offset[0])
-          //   .attr("y", this.y(this.setDomainY[1]) - this._thisConfig.size - 5 + this._thisConfig.offset[1]);
-          // var tt = fo.append('xhtml:px-tooltip')
-          //   .attr('id','tooltip_' + this.eventId)
-          //   .attr('smartOrientation',true)
-          //   .attr('delay',10);
-
-          // var s = tt.append('xhtml:span');
-          // s.append('xhtml:b')
-          //   .text('Event');
-          // s.append('xhtml:span')
-          //   .text(': ' + this.chartData.label);
-          // s.append('xhtml:br');
-          //
-          // s.append('xhtml:b')
-          //   .text('ID');
-          // s.append('xhtml:span')
-          //   .text(': ' + this.chartData.id);
-          // s.append('xhtml:br');
-          //
-          // s.append('xhtml:b')
-          //   .text('Timestamp');
-          // s.append('xhtml:span')
-          //   .text(': ' + this.chartData.time);
-          // s.append('xhtml:br');
-
-          // tt[0][0].set('for',this.eventIcon[0][0]);
-
-          var fo = this.eventGroup.append("svg:foreignObject")
-            .attr('id','tooltip_' + this.eventId)
-            .attr('width', this._thisConfig.size)
-            .attr('height', this._thisConfig.size)
-            .attr('x', this.x(this.chartData.time) - this._thisConfig.size/2 + this._thisConfig.offset[0])
-            .attr("y", this.y(this.setDomainY[1]) - this._thisConfig.size - 5 + this._thisConfig.offset[1]);
-
-
-          var elem = Polymer.dom(this.eventGroup[0][0]).querySelector('#tooltip_' + this.eventId);
-
-          var html = '<px-tooltip smartOrientation delay="10">\
-                        <span>\
-                          <b>Event</b>: '+ this.chartData.label + '<br/>\
-                          <b>ID</b>: '+ this.chartData.id + '<br/>\
-                          <b>Timestamp</b>: '+ this.chartData.time + '<br/>\
-                        </span>\
-                      </px-tooltip>';
-          var tt = elem.innerHTML = html;
-
-          elem.querySelector('px-tooltip').set('for',this.eventIcon[0][0]);
+          this.$.eventTooltip.set('for',this.eventIcon[0][0]);
+        },
+        _formatDateTime:function(){
+          
         }
     });
 </script>
