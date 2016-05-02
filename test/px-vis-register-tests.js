@@ -304,7 +304,7 @@ function basicTests(registerID,dir){
       seriesName = series.querySelector('.seriesName');
       seriesName.click();
 
-      var ms = Object.getOwnPropertyNames(register.mutedSeries);
+      var ms = Object.keys(register.mutedSeries);
       assert.equal(ms.length, 1);
       assert.equal(ms[0], seriesName.getAttribute('name'));
       assert.equal(ms[0], data.series[1]['name']);
@@ -315,7 +315,7 @@ function basicTests(registerID,dir){
     test(registerID + ' mutedSeries change to false', function() {
       seriesName.click();
 
-      var ms = Object.getOwnPropertyNames(register.mutedSeries);
+      var ms = Object.keys(register.mutedSeries);
       assert.equal(ms.length, 1);
       assert.equal(ms[0], seriesName.getAttribute('name'));
       assert.equal(ms[0], data.series[1]['name']);
@@ -326,7 +326,7 @@ function basicTests(registerID,dir){
     test(registerID + ' mutedSeries change back to true', function() {
       seriesName.click();
 
-      var ms = Object.getOwnPropertyNames(register.mutedSeries);
+      var ms = Object.keys(register.mutedSeries);
       assert.equal(ms.length, 1);
       assert.equal(ms[0], seriesName.getAttribute('name'));
       assert.equal(ms[0], data.series[1]['name']);

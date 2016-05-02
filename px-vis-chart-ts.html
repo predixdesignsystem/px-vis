@@ -3,7 +3,6 @@
 <link rel="import" href="../iron-ajax/iron-ajax.html" />
 <link rel="import" href="px-vis-svg.html"/>
 <link rel="import" href="px-vis-line.html"/>
-<link rel="import" href="px-vis-event-common.html" />
 <link rel="import" href="px-vis-event.html"/>
 <link rel="import" href="px-vis-axis.html"/>
 <link rel="import" href="px-vis-gridlines.html"/>
@@ -25,6 +24,8 @@ Element providing solution to no problem in particular. As a simple, increments 
 @blurb Element providing solution to no problem in particular.
 @homepage index.html
 @demo demo.html
+TODO TODO TODO Make it work with a config obj instead of individual attrs. Then trim down the common behaviors from this file
+TODO How do I include all config from sub elems in this doc?
 -->
 <dom-module id="px-vis-chart-ts">
   <link rel="import" type="css" href="css/px-vis.css"/>
@@ -166,9 +167,7 @@ Element providing solution to no problem in particular. As a simple, increments 
         is: 'px-vis-chart-ts',
 
         behaviors: [
-          pxVisCommonBehavior,
-          pxVisSVGChartCommonBehavior,
-          pxVisEventCommonBehavior
+
         ],
 
         /**
@@ -223,16 +222,31 @@ Element providing solution to no problem in particular. As a simple, increments 
           registerLocation:{
             type:String,
             value:'side'
+          },
+          /**
+           * Configuration object for the chart. Key is the property name.
+           *
+           * @property options
+           * @type Object
+          */
+          options:{
+            type:Object,
+            notify:true,
+            observer:'_setConfig'
+          },
+        },
+        _setConfig: function(){
+          var keys = Object.keys(this.options);
+          for(var i = 0; i < keys.length; i++){
+            var key = keys[i]
+            this.set(key, this.options[key]);
           }
         },
-
         _calcMargins:function(){
           var topMargin = 25,
               rightMargin = 10,
               bottomMargin = 10,
               leftMargin = 10;
-          console.log(this.yAxisLocation);
-          console.log(this.xAxisLocation);
           if(this.xAxisLocation === 'bottom'){
             bottomMargin = 40;
           } else if(this.xAxisLocation === 'top'){
@@ -273,6 +287,7 @@ Element providing solution to no problem in particular. As a simple, increments 
         _topRegister:function(location){
           return location === 'top' || location === 'both'
         },
+        // TODO move to data? And/or implement different way of separating TS from Events
         _returnEvents(chartData){
           var evts = [];
           for(var i = 0; i < chartData.length; i++){
@@ -282,8 +297,6 @@ Element providing solution to no problem in particular. As a simple, increments 
               }
             }
           }
-
-          console.log(evts);
           return evts
         }
     });
