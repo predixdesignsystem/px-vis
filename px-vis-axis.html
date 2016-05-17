@@ -5,17 +5,25 @@
 
 
 <!--
-Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
+d3 element creating an axis for the chart
 
 ##### Usage
 
-    <px-vis counter-value="1">Hi</px-vis>
+    <px-vis-axis
+        svg="[[svg]]"
+        axis="[[x]]"
+        margin="[[margin]]"
+        title="Date"
+        orientation="bottom"
+        label-position="center"
+        set-domain="[[setDomainX]]">
+    </px-vis-axis>
 
 ##### d3 reference
 https://github.com/mbostock/d3/wiki/SVG-Axes
 
-@element px-vis
-@blurb Element providing solution to no problem in particular.
+@element px-vis-axis
+@blurb d3 element creating an axis for the chart
 @homepage index.html
 @demo demo.html
 -->
@@ -32,7 +40,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         is: 'px-vis-axis',
 
         behaviors: [
-          pxVisSVGChartCommonBehavior,
+          PxVisBehavior.svgChart,
           commonColors
         ],
 
@@ -166,11 +174,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            *
            * @property series
            * @type Array
-           * @default []
            */
           series:{
-            type: Array,
-            value: function(){ return [] }
+            type: Array
           },
           /**
            * An x,y amount to move the axis to allow for labels and titles
@@ -191,7 +197,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         ],
 
 
-        ready:function(){
+        ready: function(){
           // if there is no dev set unique ID, generate one
           if(!this.axisId){
             this.set('axisId', this.generateRandomID('axis_'));
@@ -199,15 +205,14 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         },
 
         /**
+         * sets up this._axis as a d3 axis object.
          *
-         *
-         * @method _drawElement
+         * @method defineAxis
          */
-        defineAxis:function(){
+        defineAxis: function(){
           this._axis = d3.svg.axis()
             .scale(this.axis)
-            .orient(this.orientation)
-            ;
+            .orient(this.orientation);
 
           // change default (10) ticks
           // this._axis.ticks(5);
@@ -231,9 +236,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
         },
         /**
+         * Draws the axis
          *
-         *
-         * @method _drawElement
+         * @method drawElement
          */
         drawElement: function() {
           // console.log('draw axis');
@@ -277,6 +282,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             }
           }
         },
+        /**
+         * Calculates the dimensions for the label.
+         *
+         * @method setLabelDims
+         */
         setLabelDims: function(){
           var label = {};
           switch(this.orientation){
@@ -307,7 +317,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
           return label
         },
-
+        /**
+         * Sets the d3 attrs for the labels
+         *
+         * @method _setLabelStyles
+         */
         _setLabelStyles:function(elem){
           elem.selectAll('text')
             .attr('font-size', this.labelTypeSize + 'px')
@@ -324,14 +338,22 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               .attr('transform',"translate(" + this.labelTranslation.join(',') + ") rotate(" + this.labelRotation + ")")
           }
         },
-
+        /**
+         * Sets the axis line styles
+         *
+         * @method _setLineStyles
+         */
         _setLineStyles:function(elem,lines){
           elem.selectAll(lines)
             .attr('fill','none')
             .attr('stroke', this.colors.grey9)
             .attr('shape-rendering','crispEdges');
         },
-
+        /**
+         * Draws the axis title
+         *
+         * @method drawTitle
+         */
         drawTitle:function(){
           var ext = this._axisGroup[0][0].getBBox();
           var x,y,r;
@@ -377,6 +399,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .style("text-anchor", 'middle')
             .attr('transform',"rotate(" + r + ")");
         },
+        /**
+         * Draws the color bars for each series
+         *
+         * @method drawSeriesBars
+         */
         drawSeriesBars:function(){
           // look at titleGroup
           // draw a bar for each series
@@ -385,7 +412,13 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           // FIXME when should this fire? on change, but when to strat?
           // FIXME LARGER - how do we create this obj when we have line and scatter series?
           // TODO take mutedSeries and mute
+          console.log(this.series);
         },
+        /**
+         * Helper function to draw the series color bar
+         *
+         * @method drawSeriesBars
+         */
         _drawBar:function(elem,sid,color,index){
           elem.append("rect")
             .attr('height',20)

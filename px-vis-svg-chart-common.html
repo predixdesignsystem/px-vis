@@ -1,9 +1,11 @@
 <script type="text/javascript" src="../d3/d3.min.js"></script>
 <script type="text/javascript" src="../px/dist/px.min.js"></script>
 <script>
+var PxVisBehavior = PxVisBehavior || {};
+
 /*
     Name:
-    pxVisSVGChartCommonBehavior
+    PxVisBehavior.svgChart
 
     Description:
     Polymer behavior that provides the basic operations for px-vis svg charts and associated sub components.
@@ -15,10 +17,9 @@
     Dependencies:
     - D3.js
 
-    @polymerBehavior pxVisSVGChartCommonBehavior
+    @polymerBehavior PxVisBehavior.svgChart
 */
-
-var pxVisSVGChartCommonBehavior = {
+PxVisBehavior.svgChart = {
 
     properties: {
       /**
@@ -90,6 +91,18 @@ var pxVisSVGChartCommonBehavior = {
         notify: true
       },
       /**
+       * container for the event data
+       * Generally loaded with an iron-ajax tag (but doesnt have to be)
+       * This can be set declaratively
+       *
+       * @property eventData
+       * @type Object
+       */
+      eventData:{
+        type: Array,
+        notify: true
+      },
+      /**
        * New chart extents selected by the user
        *
        * Serves as a trigger for the scale component to redefine the chart extents
@@ -107,7 +120,7 @@ var pxVisSVGChartCommonBehavior = {
        *
        * Serves as a trigger for many elements to redraw
        *
-       * @property setDomainX, setDomainY, setDomain
+       * @property setDomainX
        * @type Object
        */
       setDomainX:{
@@ -115,11 +128,27 @@ var pxVisSVGChartCommonBehavior = {
         value:[],
         notify:true
       },
+      /**
+       * The chart extents which have been set by the scale component
+       *
+       * Serves as a trigger for many elements to redraw
+       *
+       * @property setDomainY
+       * @type Object
+       */
       setDomainY:{
         type:Array,
         value:[],
         notify:true
       },
+      /**
+       * The chart extents which have been set by the scale component
+       *
+       * Serves as a trigger for many elements to redraw
+       *
+       * @property setDomain
+       * @type Object
+       */
       setDomain:{
         type:Array,
         value:[],
@@ -129,10 +158,14 @@ var pxVisSVGChartCommonBehavior = {
        * A list of user selected muted series. Tied declaratively to series components
        *
        * The series name is the key and the value is a boolean for whether it is muted or not:
+       *
+       *```
        * {
        *     'seriesId1':true,
        *     'seriesId2':false,
        *  }
+       *```
+       *
        * In this example, seriesId1 is muted. seriesId2 was muted, but has been turned back on.
        *
        * @property mutedSeries

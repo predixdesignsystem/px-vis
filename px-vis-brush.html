@@ -15,9 +15,9 @@ This element sets the selectedDomain property based on the extents box. The sele
 
     <px-vis-brush
       svg="[[varFromSVGComponent]]"
-      axis="{{varXFromScaleComponent}}"
-      height="{{height}}"
-      selected-domain={{selectedDomain}}
+      axis="[[varXFromScaleComponent]]"
+      height="[[height]]"
+      selected-domain=[[selectedDomain]]
       set-domain="[[varXDomainFromScaleComponent]]">
     </px-vis-brush>
 
@@ -39,7 +39,7 @@ This element sets the selectedDomain property based on the extents box. The sele
     is: 'px-vis-brush',
 
     behaviors: [
-      pxVisSVGChartCommonBehavior,
+      PxVisBehavior.svgChart,
       commonColors
     ],
 
@@ -282,7 +282,7 @@ This element sets the selectedDomain property based on the extents box. The sele
     /**
      * Helper function to tween and calculate the brush move
      *
-     * @method _brushcenterend
+     * @method _recenter
      */
     _recenter: function(smooth) {
       var _this = this;
@@ -299,7 +299,8 @@ This element sets the selectedDomain property based on the extents box. The sele
     /**
      * Helper function to tween so that the brush slides rather than a jumps
      *
-     * @method _brushcenterend
+     * @method tween
+     * @private
      */
     tween:function (alpha) {
       var extent = this._brush.extent(),

@@ -1,93 +1,302 @@
 <link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="px-vis-common.html" />
-
-
+<link rel="import" href="../iron-ajax/iron-ajax.html">
 <!--
-Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
+Element providing iron-ajax requests and data formating.
 
 ##### Usage
 
-    <px-vis counter-value="1">Hi</px-vis>
+    <px-vis-data
+        id="myId"
+        request-data="[[series]]"
+        type="flat">
+    </px-vis-data>
 
-@element px-vis
-@blurb Element providing solution to no problem in particular.
+requestData is in the form or an Array of Objects and is used for generating the ajax request and formatting the data. At a minimum, it should specify a URL from which to fetch data. It may also include a chart type and a chart name. Default chart type is 'line' and default name is the json file name.
+
+    series = [{
+        "type":"line",
+        "name":"delta-egt-cruise",
+        "url":"/bower_components/px-demo-data/demo-data/aviation/delta-egt-cruise.json"
+     },{
+         "url":"/bower_components/px-demo-data/demo-data/aviation/hpt-acc-position-cruise.json"
+     }];
+
+
+The event, 'px-vis-data-updated' is fired after response and the data is formatted. Details to that event are:
+
+    {
+        'data':formattedData,
+        'type':this.type,
+        'method':{{'set' or 'push'}},
+        'id':this.id
+    }
+The 'method' is specified by whether data is returned asynchronously and therefore needs to be appended to the dataset, or compiled and set.
+
+@element px-vis-data
+@blurb Element providing iron-ajax requests and data formating.
 @homepage index.html
 @demo demo.html
 -->
 <dom-module id="px-vis-data">
   <template>
-    <template is="dom-repeat" items="{{urls}}">
+    <template is="dom-repeat" items="{{requestData}}">
       <iron-ajax
-        url="{{item}}"
+        url="{{item.url}}"
+        type$="{{item.type}}"
+        name$="{{item.name}}"
         on-response="responseHandler"
         auto>
       </iron-ajax>
-      </template>
-    <content></content>
+      <!--  on-request="requestHandler"
+      on-error="errorHandler"-->
+    </template>
   </template>
 </dom-module>
 
 <script>
-    Polymer({
+  Polymer({
 
-        is: 'px-vis-data',
+    is: 'px-vis-data',
 
-        behaviors: [
-          pxVisCommonBehavior,
-          pxVisSVGChartCommonBehavior
-        ],
+    /**
+     * Fired when response data has been processed.
+     *
+     * Detail includes:
+     *
+     * ```
+     *{
+     *   'data':data,
+     *   'type':this.type,
+     *   'method':{{'set' or 'push'}},
+     *   'id':this.id
+     * }
+     * ```
+     *
+     * @event px-vis-data-updated
+     */
 
-        /**
-         * Properties block, expose attribute values to the DOM via 'reflect'
-         *
-         * @property properties
-         * @type Object
-         */
-        properties: {
-          url:{
-            type:String,
-            observer:'_urlParser'
-          },
-          urls:{
-            type:Array,
-            value:function(){ return [] },
-          },
-          tempData:{
-            type:Array,
-            notify:true,
-            value:function(){ return [] }
-          }
-        },
-        observers: [
-            '_promiseData(tempData.*)'
-        ],
-        _urlParser:function(){
-          this.set('urls', [this.url]);
-        },
-        responseHandler:function(e, detail){
-          // console.log(e);
-          var data = e.detail.response;
-          var name = e.detail.url.split('/');
-          // console.log(name[name.length - 1].split('.')[0]);
-          // TODO check if it has a name
-          data['name'] = name[name.length - 1].split('.')[0];
-          // console.log(data.name);
-          if(!this.tempData){
-            this.set('tempData',[data]);
-          } else {
-            // console.log('temp')
-            this.push('tempData',e.detail.response);
-            this.notifyPath('tempData',this.tempData);
-            // console.log(this.tempData);
-          }
-        },
-        // TODO make this dynamic
-        // TODO make this optional / default
-        _promiseData:function(){
-          // console.log("promise");
-          if(this.tempData.length == 2){
-            this.set('chartData',this.tempData);
-          }
-        }
-    });
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      /**
+       * Container for the returned data
+       *
+       * Data is an array of objects. On-response, this component both sets this property with the response data AND fires 'px-vis-data-updated' event
+       *
+       *
+       * @property responseData
+       * @type Array
+       */
+      responseData:{
+        type: Array,
+        notify: true
+      },
+      /**
+       * requestData is in the form or an Array of Objects and is used for generating the ajax request and formatting the data. At a minimum, it should specify a URL from which to fetch data. It may also include a chart type and a chart name. Default chart type is 'line' and default name is the json file name.
+       *
+       * ```
+       * [{
+       *    "type":"line",
+       *    "name":"delta-egt-cruise",
+       *    "url":"/bower_components/px-demo-data/demo-data/aviation/delta-egt-cruise.json"
+       * },{
+       *    "url":"/bower_components/px-demo-data/demo-data/aviation/hpt-acc-position-cruise.json"
+       * }];
+       *```
+       *
+       *
+       * @property requestData
+       * @type Array
+       */
+      requestData:{
+        type:Array
+      },
+      /**
+       * Array for processing the returned data.
+       *
+       * @property _tempData
+       * @type Array
+       */
+      _tempData:{
+        type:Array,
+        notify:true,
+        value:function(){ return [] }
+      },
+      /**
+       * Bool specifying whether response data should be returned asynchronously, or if all chart data should be processed and compiled before returning.
+       *
+       * @property isAsync
+       * @type Boolean
+       * @default false
+       */
+      isAsync:{
+        type:Boolean,
+        value:false
+      },
+      /**
+       * String specifying if response data should be flattened in the formatted data or just appneded.
+       * Valid options are:
+       * - `append`
+       * - `flat`
+       *
+       * Example:
+       * Given two datasets:
+       * ```
+       * [ {a},{b},{c} ] and [ {1},{2} ]
+       * ```
+       * 'append' returns:
+       * ```
+       * [
+       *   [ {a},{b},{c} ],
+       *   [ {1},{2} ]
+       * ]
+       * ```
+       *
+       * 'flat' returns:
+       * ```
+       * [ {a},{b},{c},{1},{2} ]
+       * ```
+       *
+       * @property type
+       * @type String
+       * @default append
+       */
+      type:{
+        value:'append'
+      },
+      /**
+       * A counter to determine if all requests have been returned
+       *
+       * @property _requests
+       * @type Number
+       */
+      _requests:{
+        type:Number,
+        value: 0
+      }
+    },
+    observers: [
+        '_promiseData(_tempData.*)'
+    ],
+    // TODO figure out why casting req as an array does not work
+    // _checkRequest: function(requestData){
+    //   if(Array.isArray(requestData)){
+    //     console.log("Array");
+    //     console.log(requestData);
+    //     return requestData
+    //   } else if(typeof(requestData) === 'object'){
+    //     console.log("Obj");
+    //     var o =[{
+    //       "type":"line",
+    //        "url":"/bower_components/px-demo-data/demo-data/aviation/delta-egt-cruise.json"
+    //      },{
+    //        "url":"/bower_components/px-demo-data/demo-data/aviation/hpt-acc-position-cruise.json"
+    //      }]
+    //     console.log(o);
+    //     this.set('requestData',o);
+    //     return []
+    //   } else {
+    //     console.warn("Invalid Series!!")
+    //   }
+    // },
+
+    /**
+     * Handler called on iron-ajax repsonse
+     *
+     * @param {e} The event object
+     * @private
+     */
+    responseHandler:function(e){
+      // count the number of requests sop we know when all have been received
+      this._requests += 1;
+      // call different handlers depending on what we are doing to combine the data
+      if(this.type === 'append'){
+        this._appendHandler(e);
+      } else {
+        this._flatHandler(e);
+      }
+    },
+    /**
+     * Handler called on when appending data
+     *
+     * @param {e} The event object
+     * @private
+     */
+    _appendHandler:function(e){
+      var ne = Polymer.dom(e);
+      var data = e.detail.response;
+      var name;
+
+      // check if dev specified a type; otherwise default to line
+      var type = (typeof(ne.rootTarget.attributes.type)!== 'undefined') ? ne.rootTarget.attributes.type.value : 'line';
+
+      // check if dev specified a name; otherwise extract json name
+      if(typeof(ne.rootTarget.attributes.name)!== 'undefined'){
+        name = ne.rootTarget.attributes.name.value;
+      } else {
+        var n = e.detail.url.split('/');
+        name = n[n.length - 1].split('.')[0];
+      }
+
+      //set name and type in out data
+      data['name'] = name;
+      data['type'] = type;
+
+      // if we are async, append to out dataset immediately, else, stick it in our temp and trigger our promise
+      if(this.isAsync){
+        this.push('responseData',data);
+        this.notifyPath('responseData',this.responseData);
+        this.fire('px-vis-data-updated', { 'data':data, 'type': this.type, 'method':'push', 'id': this.id });
+      } else {
+        this.push('_tempData',data);
+        this.notifyPath('_tempData',this._tempData);
+      }
+    },
+    /**
+     * Handler called on when flattening data
+     *
+     * @param {e} The event object
+     * @private
+     */
+    _flatHandler: function(e){
+      var d = e.detail.response;
+
+      // if we are async, append to out dataset immediately, else, stick it in our temp and trigger our promise
+      if(this.isAsync){
+        var data = this.responseData.concat(d);
+        this.set('responseData',data);
+        this.fire('px-vis-data-updated', { 'data':data, 'type': this.type, 'method': 'set', 'id': this.id });
+      } else {
+        var data = this._tempData.concat(d);
+        this.set('_tempData',data);
+      }
+    },
+
+    // errorHandler:function(e, resp){
+    //   console.log("error");
+    //   console.log(e);
+    //   console.log(resp);
+    // },
+    // requestHandler:function(e, resp){
+    //   console.log("request");
+    //   console.log(this.request);
+    //   // console.log(e);
+    //   console.log(resp);
+    // },
+
+    /**
+     * Observer checking if we have all our requests and can set our data
+     */
+    _promiseData:function(){
+  //TODO make this optional / default
+      if(this._requests > 0 && this._requests === this.requestData.length){
+        this.set('responseData',this._tempData);
+        this.fire('px-vis-data-updated', { 'data':this._tempData, 'type': this.type, 'method': 'set', 'id': this.id });
+      }
+    }
+  });
 </script>

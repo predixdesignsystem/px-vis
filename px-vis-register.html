@@ -15,42 +15,44 @@ You can turn series on the chart off by clicking on that series in the register.
 
 ##### Usage
 
-  <px-vis-register
-    height="50"
-    width="[[width]]"
-    type="horizontal"
-    tooltip-data=[[tooltipData]]
-    units='Hz'
-    muted-series="{{mutedSeries}}">
-  </px-vis-register>
+    <px-vis-register
+        height="50"
+        width="[[width]]"
+        type="horizontal"
+        tooltip-data=[[tooltipData]]
+        units='Hz'
+        muted-series="{{mutedSeries}}">
+    </px-vis-register>
 
 
 ##### Sending Data to the Register
 tooltipData is in the form:
-  {
-    'time': d3TimeStamp,
-    'series': [
-      {'name':'seriesName0','value': seriesVal0 },
-      {'name':'seriesName1','value': seriesVal1 }
-    ]
-  }
+
+    {
+        'time': d3TimeStamp,
+        'series': [
+            {'name':'seriesName0','value': seriesVal0 },
+            {'name':'seriesName1','value': seriesVal1 }
+        ]
+    }
 
 When not hovering on a chart, the tooltipData should still have the series names in order for them to still appear in the register. IE:
 
-  {
-    'time': null,
-    'series': [
-      {'name':'seriesName0','value': null },
-      {'name':'seriesName1','value': null }
-    ]
-  }
+    {
+        'time': null,
+        'series': [
+            {'name':'seriesName0','value': null },
+            {'name':'seriesName1','value': null }
+        ]
+    }
 
 ##### Reporting Data from the Register
 The component returns an object via mutedSeries which the chart can take and react to:
-  {
-    'seriesId1':true,
-    'seriesId2':false,
-  }
+
+    {
+        'seriesId1':true,
+        'seriesId2':false,
+    }
 
 ##### Time, number, and name formatting
 Formatting for the timestamps,the data values, and the series names can be controlled via a series of properties. Please see the properties for configuration details.
@@ -149,10 +151,10 @@ Formatting for the timestamps,the data values, and the series names can be contr
     is: 'px-vis-register',
 
     behaviors: [
-      pxVisCommonBehavior,
-      pxVisSVGChartCommonBehavior,
-      commonColors,
-      pxVisDatetimeCommonBehavior
+      PxVisBehavior.commonBehavior,
+      PxVisBehavior.datetime,
+      PxVisBehavior.svgChart,
+      commonColors
     ],
 
     /**
@@ -164,6 +166,8 @@ Formatting for the timestamps,the data values, and the series names can be contr
     properties: {
       /**
        * Data reported back by the tooltip. Displays the series name, values, and timestamp in the register. tooltipData is in the form:
+       *
+       *```
        *   {
        *     'time': d3TimeStamp,
        *     'series': [
@@ -171,9 +175,11 @@ Formatting for the timestamps,the data values, and the series names can be contr
        *       {'name':'seriesName1','value': seriesVal1 }
        *     ]
        *   }
+       *```
        *
        * When not hovering on a chart, the tooltipData should still have the series names in order for them to still appear in the register. IE:
        *
+       *```
        *   {
        *     'time': null,
        *     'series': [
@@ -181,6 +187,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
        *       {'name':'seriesName1','value': null }
        *     ]
        *   }
+       *```
        *
        * @property tooltipData
        * @type Object
@@ -194,7 +201,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
        * The units of the data
        *
        * @property units
-       * @type String`
+       * @type String
        * @default ''
        */
       units:{
@@ -203,8 +210,8 @@ Formatting for the timestamps,the data values, and the series names can be contr
       },
       /**
        * Defines if the register should be horizontal or vertical. Options are:
-       *  - 'vertical'
-       *  - 'horizontal'
+       *  - `vertical`
+       *  - `horizontal`
        *
        * @property type
        * @type string
@@ -270,9 +277,13 @@ Formatting for the timestamps,the data values, and the series names can be contr
     /**
      * dom-if function for type property which returns true if type equals horizontal
      *
+     * `type` is dev set type property.
+     *
+     * `bool` is true if type === 'horizontal'; false if not
+     *
      * @method _typeEqualHorizontal
-     * @param {type} dev set type property.
-     * @return {bool} true if type === 'horizontal'; false if not
+     * @param {type}
+     * @return {bool}
      */
     _typeEqualHorizontal: function(type){
       return type === 'horizontal'
@@ -280,9 +291,13 @@ Formatting for the timestamps,the data values, and the series names can be contr
     /**
      * Function which takes an index and returns the appropriate dataVisColor
      *
+     * `i` is a series index number
+     *
+     * `rgb(r,g,b)` return the appropriate rgb values based in the series index
+     *
      * @method _returnItemColor
-     * @param {i} a series index number
-     * @return {rgb(r,g,b)} return the appropriate rgb values based in the series index
+     * @param {i}
+     * @return {rgb}
      */
     _returnItemColor:function(i){
       return this.dataVisColors[ this.seriesColorOrder[i] ]
@@ -296,8 +311,8 @@ Formatting for the timestamps,the data values, and the series names can be contr
      */
     _formatDateTime:function(){
       if(this.tooltipData.time){
-        var momentObj1 = this._formatTimestamp(this.tooltipData.time,this.timezone,this.firstDateTimeFormat);
-        var momentObj2 = this._formatTimestamp(this.tooltipData.time,this.timezone,this.secondDateTimeFormat);
+        var momentObj1 = this.formatTimestamp(this.tooltipData.time,this.timezone,this.firstDateTimeFormat);
+        var momentObj2 = this.formatTimestamp(this.tooltipData.time,this.timezone,this.secondDateTimeFormat);
 
         this.set('_firstDateTime', momentObj1);
         this.set('_secondDateTime', momentObj2);

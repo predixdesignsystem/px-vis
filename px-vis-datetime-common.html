@@ -1,9 +1,11 @@
 <script type="text/javascript" src="../moment/min/moment.min.js"></script>
 <script type="text/javascript" src="../moment-timezone/builds/moment-timezone-with-data-2010-2020.min.js"></script>
 <script>
+var PxVisBehavior = PxVisBehavior || {};
+
 /*
     Name:
-    pxVisCommonBehavior
+    PxVisBehavior.datetime
 
     Description:
     Polymer behavior that provides the basic operations for px-vis and associated sub components.
@@ -15,9 +17,10 @@
     Dependencies:
     - window.px library
 
-    @polymerBehavior pxVisDatetimeCommonBehavior
+    @polymerBehavior PxVisBehavior.datetime
 */
-var pxVisDatetimeCommonBehavior = {
+
+PxVisBehavior.datetime = {
   properties: {
     /**
      * Defines the format for the first datetime string. The first datetime is shown in normal font weight.
@@ -79,7 +82,16 @@ var pxVisDatetimeCommonBehavior = {
       value:"utc"
     },
   },
-  _formatTimestamp: function(datetime,timezone,format){
+  /**
+   * Method that takes a datetime string, timezone string, and a formatting string. Returns a formated datetime string.
+   *
+   * @method formatTimestamp
+   * @param {datetime}
+   * @param {timezone}
+   * @param {format}
+   * @return {formatedDatetimeString}
+   */
+  formatTimestamp: function(datetime,timezone,format){
     if(timezone.toLowerCase() !== 'utc'){
       if(moment.tz.zone(timezone)){
         return moment.tz(datetime, timezone).format(format);

@@ -1,6 +1,5 @@
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="px-vis-common.html" />
-<link rel="import" href="../iron-ajax/iron-ajax.html" />
 <link rel="import" href="px-vis-svg.html"/>
 <link rel="import" href="px-vis-line.html"/>
 <link rel="import" href="px-vis-event.html"/>
@@ -24,16 +23,23 @@ Element providing solution to no problem in particular. As a simple, increments 
 @blurb Element providing solution to no problem in particular.
 @homepage index.html
 @demo demo.html
-TODO TODO TODO Make it work with a config obj instead of individual attrs. Then trim down the common behaviors from this file
-TODO How do I include all config from sub elems in this doc?
 -->
 <dom-module id="px-vis-chart-ts">
   <link rel="import" type="css" href="css/px-vis.css"/>
   <template>
     <div class="flex flex--row u-m">
       <div class="flex flex--col">
-        <px-vis-data url="[[url]]" urls="[[urls]]" chart-data="{{chartData}}"></px-vis-data>
-        <template is="dom-if" if="{{_topRegister(registerLocation)}}">
+        <px-vis-data
+          id = "seriesAjax"
+          request-data = "[[series]]"
+          type="append">
+        </px-vis-data>
+        <px-vis-data
+          id = "eventAjax"
+          request-data = "[[events]]"
+          type = "flat">
+        </px-vis-data>
+        <template is="dom-if" if="[[_topRegister(registerLocation)]]">
           <px-vis-register
             height="50"
             width="[[width]]"
@@ -62,25 +68,27 @@ TODO How do I include all config from sub elems in this doc?
           margin="{{margin}}">
         </px-vis-svg>
 
-        <template is="dom-repeat" items="{{chartData}}">
-          <px-vis-line
-            svg="[[svg]]"
-            line-id="[[item.name]]"
-            series-number="[[index]]"
-            chart-data="[[item]]"
-            x="[[x]]"
-            y="[[y]]"
-            set-domain-x="[[setDomainX]]"
-            set-domain-y="[[setDomainY]]"
-            muted-series="[[mutedSeries]]">
-          </px-vis-line>
+        <template is="dom-repeat" items="[[chartData]]">
+          <template is="dom-if" if="[[_chartTypeLine(item.type)]]">
+            <px-vis-line
+              svg="[[svg]]"
+              line-id="[[item.name]]"
+              series-number="[[index]]"
+              chart-data="[[item]]"
+              x="[[x]]"
+              y="[[y]]"
+              set-domain-x="[[setDomainX]]"
+              set-domain-y="[[setDomainY]]"
+              muted-series="[[mutedSeries]]">
+            </px-vis-line>
+          </template>
         </template>
 
-        <template is="dom-repeat" items="{{_returnEvents(chartData)}}">
+        <template is="dom-repeat" items="[[eventData]]">
           <px-vis-event
             svg="[[svg]]"
             event-id="[[item.id]]"
-            chart-data="[[item]]"
+            event-data="[[item]]"
             x="[[x]]"
             y="[[y]]"
             event-config="[[eventConfig]]"
@@ -122,6 +130,7 @@ TODO How do I include all config from sub elems in this doc?
           margin="[[margin]]"
           title="Hz"
           orientation="left"
+          series=[[mutedSeries]]
           set-domain="[[setDomainY]]">
         </px-vis-axis>
 
@@ -149,7 +158,7 @@ TODO How do I include all config from sub elems in this doc?
           selected-domain="{{selectedDomain}}">
         </px-vis-chart-navigator>
       </div>
-      <template is="dom-if" if="{{_sideRegister(registerLocation)}}">
+      <template is="dom-if" if="[[_sideRegister(registerLocation)]]">
         <px-vis-register
           height="[[height]]"
           units="Hz"
@@ -167,7 +176,9 @@ TODO How do I include all config from sub elems in this doc?
         is: 'px-vis-chart-ts',
 
         behaviors: [
-
+          PxVisBehavior.commonBehavior,
+          PxVisBehavior.datetime,
+          PxVisBehavior.svgChart
         ],
 
         /**
@@ -235,6 +246,9 @@ TODO How do I include all config from sub elems in this doc?
             observer:'_setConfig'
           },
         },
+        listeners:{
+          'px-vis-data-updated': '_updateData'
+        },
         _setConfig: function(){
           var keys = Object.keys(this.options);
           for(var i = 0; i < keys.length; i++){
@@ -287,17 +301,17 @@ TODO How do I include all config from sub elems in this doc?
         _topRegister:function(location){
           return location === 'top' || location === 'both'
         },
-        // TODO move to data? And/or implement different way of separating TS from Events
-        _returnEvents(chartData){
-          var evts = [];
-          for(var i = 0; i < chartData.length; i++){
-            if(typeof(chartData[i]['events']) !== 'undefined'){
-              for(var j = 0; j < chartData[i]['events'].length; j++){
-                evts.push(chartData[i]['events'][j]);
-              }
-            }
+        _chartTypeLine: function(type){
+          return type === 'line'
+        },
+        _updateData: function(evt){
+          var detail = evt.detail;
+          if(detail.id === 'eventAjax'){
+            this[detail.method]('eventData',detail.data);
+          } else if(detail.id === 'seriesAjax'){
+            this[detail.method]('chartData',detail.data);
+            this.notifyPath('chartData',detail.data);
           }
-          return evts
         }
     });
 </script>

@@ -7,14 +7,46 @@
 <link rel="import" href="px-vis-datetime-common.html"/>
 
 <!--
-Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
+d3 element which draws a line and icon on the chart representing an event.
 
 ##### Usage
 
-    <px-vis counter-value="1">Hi</px-vis>
+    <px-vis-event
+        svg="[[svg]]"
+        event-id="[[item.id]]"
+        event-data="[[item]]"
+        x="[[x]]"
+        y="[[y]]"
+        event-config="[[eventConfig]]"
+        set-domain-x="[[setDomainX]]"
+        set-domain-y="[[setDomainY]]">
+    </px-vis-event>
 
-@element px-vis
-@blurb Element providing solution to no problem in particular.
+The configureation object allows developers to set the icon used for each event type. It comes in the form:
+
+    eventConfig = {
+      "Event Name 1":{
+        "color": "blue",
+        "icon": "fa-camera",
+        "type": "fa",
+        "offset":[0,0]
+      },
+      "Event Name 1":{
+        "color": "green",
+        "icon": "\uf015",
+        "type": "unicode",
+        "offset":[1,0]
+      },
+      "Event Name 3":{
+        "icon": "Dancing_banana.gif",
+        "type": "image",
+        "offset":[-2,-20],
+        "size":"25"
+      }
+    }
+
+@element px-vis-event
+@blurb d3 element which draws a line and icon on the chart representing an event.
 @homepage index.html
 @demo demo.html
 -->
@@ -27,9 +59,9 @@ Element providing solution to no problem in particular. As a simple, increments 
         delay="10"
         orientation="[[tooltipOrientation]]">
         <span>
-          <b>Event</b>: [[chartData.label]] <br/>
-          <b>ID</b>: [[chartData.id]] <br/>
-          <b>Timestamp</b>: [[_formatDatetime(chartData.time, firstDateTimeFormat)]] [[separator]] [[_formatDatetime(chartData.time,secondDateTimeFormat)]]<br/>
+          <b>Event</b>: [[eventData.label]] <br/>
+          <b>ID</b>: [[eventData.id]] <br/>
+          <b>Timestamp</b>: [[_formatDatetime(eventData.time, firstDateTimeFormat)]] [[separator]] [[_formatDatetime(eventData.time,secondDateTimeFormat)]]<br/>
         </span>
       </px-tooltip>
     </template>
@@ -41,10 +73,10 @@ Element providing solution to no problem in particular. As a simple, increments 
     is: 'px-vis-event',
 
     behaviors: [
-      pxVisSVGChartCommonBehavior,
+      PxVisBehavior.svgChart,
+      PxVisBehavior.datetime,
       commonColors,
-      faCodes,
-      pxVisDatetimeCommonBehavior
+      faCodes
     ],
 
     /**
@@ -57,12 +89,12 @@ Element providing solution to no problem in particular. As a simple, increments 
       /**
        * Configuration object to define what event should map to what icon and color.
        * The object has a key being the event name, the value being a the configuration object for that event. The configuration object has four properties:
-       * - color: A valid color name found in the px-colors-design
-       * - icon: the reference to the icon; for Font Awesome, it can be a class or a unicode value; for an image, it is a path
-       * - type: 'fa', 'unicode', or 'image'. 'fa' and 'unicode' are font-awesome icons, 'fa' referring to the class ('fa-camera') and 'unicode' referring to the unicode value for the icon formatted as '\uf004'
-       * - offset: an 2 element array with the number of pixels to offset the icon. offset[0] is along the x-axis; offset[1] is along the y-axis; necessary for some icons to adjust their values to acheive a better alignment over the event line.
+       * - `color`: A valid color name found in the px-colors-design
+       * - `icon`: the reference to the icon; for Font Awesome, it can be a class or a unicode value; for an image, it is a path
+       * - `type`: 'fa', 'unicode', or 'image'. 'fa' and 'unicode' are font-awesome icons, 'fa' referring to the class ('fa-camera') and 'unicode' referring to the unicode value for the icon formatted as '\uf004'
+       * - `offset`: an 2 element array with the number of pixels to offset the icon. offset[0] is along the x-axis; offset[1] is along the y-axis; necessary for some icons to adjust their values to acheive a better alignment over the event line.
        *
-       *
+       * ```
        * Format: {
        *   "Event-Name-A":{
        *     "color": "a_valid_color_from_px-colors-design",
@@ -72,18 +104,20 @@ Element providing solution to no problem in particular. As a simple, increments 
        *   },
        *   "Event-Name-B":{
        *     "color": "a_valid_color_from_px-colors-design",
-       *     "icon": "path-to-an-img",
-       *     "type": "image",
-       *     "offset":[0,0]
-       *   },
-       *   "Event-Name-C":{
-       *     "color": "a_valid_color_from_px-colors-design",
        *     "icon": "unicode-of-the-font-character",
        *     "type": "unicode",
        *     "offset":[0,0]
        *   },
+       *   "Event-Name-C":{
+       *     "color": "a_valid_color_from_px-colors-design",
+       *     "icon": "path-to-an-img",
+       *     "type": "image",
+       *     "offset":[0,0]
+       *   },
        * }
+       * ```
        *
+       * ```
        * Example: {
        *   "Recalibrate":{
        *     "color": "blue",
@@ -96,9 +130,15 @@ Element providing solution to no problem in particular. As a simple, increments 
        *     "icon": "\uf015",
        *     "type": "unicode",
        *     "offset":[5,0]
-       *   }
+       *   },
+       *   "Fan stop":{
+       *     "icon": "Dancing_banana.gif",
+       *     "type": "image",
+       *     "offset":[-2,-20],
+       *     "size":"25"
+       *    }
        * }
-       *
+       *```
        *
        * @property eventConfig
        * @type Object
@@ -110,6 +150,7 @@ Element providing solution to no problem in particular. As a simple, increments 
       /**
        * Configuration object to define what the default icon should be. This gets used if a) no eventConfig is defined or b) the particular event is not defined in the eventConfig object.
        *
+       *```
        * Default: {
        *   'color': 'grey7',
        *   'icon': 'fa-circle',
@@ -117,6 +158,7 @@ Element providing solution to no problem in particular. As a simple, increments 
        *   'offset': 0,
        *   'size': '16'
        * }
+       *```
        *
        * @property defaultEventConfig
        * @type Object
@@ -134,10 +176,12 @@ Element providing solution to no problem in particular. As a simple, increments 
       /**
        * Defines the color and weight styles for the event line.
        *
+       *```
        * Default: {
        *   'color': 'grey9',
        *   'weight': 1
        * }
+       *```
        *
        * @property lineConfig
        * @type Object
@@ -150,7 +194,7 @@ Element providing solution to no problem in particular. As a simple, increments 
         }
       },
       /**
-       * The ID of the event
+       * The ID of the event. Either dev set or auto-generated
        *
        * @property eventId
        * @type String
@@ -161,19 +205,6 @@ Element providing solution to no problem in particular. As a simple, increments 
         notify: true,
         reflectToAttribute: true
       },
-      // /**
-      //  * Defines how the time and date should be displayed for the event.
-      //  *
-      //  * For valid string formats, see: http://momentjs.com/docs/#/displaying/
-      //  *
-      //  * @property datetimeFormat
-      //  * @type String
-      //  * @default 'DD MMM YYYY | hh:mm:ss ZZ'
-      //  */
-      // datetimeFormat:{
-      //   type: String,
-      //   value:'DD MMM YYYY | hh:mm:ss ZZ'
-      // },
 
       /**
        * Holder object for the event svg "g" element
@@ -215,6 +246,12 @@ Element providing solution to no problem in particular. As a simple, increments 
         type:Object,
         value:{}
       },
+      /**
+       * Specifies the orientation of the event tooltip
+       *
+       * @property tooltipOrientation
+       * @type Object
+       */
       tooltipOrientation: {
         type: String,
         value: 'left',
@@ -223,8 +260,7 @@ Element providing solution to no problem in particular. As a simple, increments 
     },
 
     observers: [
-      // TODO Does chartData need to be chartData.* or chartData.series.* for dynamic data?
-      'drawElement(svg,x,y,setDomainX,setDomainY,chartData)',
+      'drawElement(svg,x,y,setDomainX,setDomainY,eventData.*)',
      ],
 
     ready:function(){
@@ -241,8 +277,8 @@ Element providing solution to no problem in particular. As a simple, increments 
      * @method drawElement
      */
     drawElement: function() {
-      if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && (this.chartData)){
-
+      // TODO remove this.x and this.y checks?
+      if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && (this.eventData) && this.setDomainX.length > 0 && this.setDomainY.length > 0){
         this._processConfiguration();
 
         // checks to see if the axis already exists. If not, create; if so, update
@@ -291,23 +327,23 @@ Element providing solution to no problem in particular. As a simple, increments 
     },
     _positionEvent(){
       this.eventLine
-        .attr("x1", this.x(this.chartData.time))
-        .attr("x2", this.x(this.chartData.time))
+        .attr("x1", this.x(this.eventData.time))
+        .attr("x2", this.x(this.eventData.time))
         .attr("y1", this.y(this.setDomainY[0]))
         .attr("y2", this.y(this.setDomainY[1]))
       this.eventIcon
-        .attr('x',this.x(this.chartData.time) - this._thisConfig.size/2 + this._thisConfig.offset[0])
+        .attr('x',this.x(this.eventData.time) - this._thisConfig.size/2 + this._thisConfig.offset[0])
         .attr("y", this.y(this.setDomainY[1]) - 5 + this._thisConfig.offset[1]);
     },
     _processConfiguration:function(){
       // is there a configuration object for this event type
-      if(this.eventConfig[this.chartData.label]){
+      if(this.eventConfig[this.eventData.label]){
         /*
         get the keys of the defaultEventConfig, cycle through them and see if the eventConfig object has the property. If so, set it, otherwise use default
         */
         var k = Object.keys(this.defaultEventConfig);
         for(var i = 0; i < k.length; i++){
-          this._thisConfig[k[i]] =  this.eventConfig[this.chartData.label][k[i]] || this.defaultEventConfig[k[i]];
+          this._thisConfig[k[i]] =  this.eventConfig[this.eventData.label][k[i]] || this.defaultEventConfig[k[i]];
         }
       } else {
         // else, set everything to default
@@ -318,7 +354,7 @@ Element providing solution to no problem in particular. As a simple, increments 
       this.$.eventTooltip.set('for',this.eventIcon[0][0]);
     },
     _formatDatetime: function(time,format){
-      return this._formatTimestamp(time, this.timezone, format);
+      return this.formatTimestamp(time, this.timezone, format);
     }
   });
 </script>
