@@ -193,7 +193,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         observers: [
           'defineAxis(axis)',
           'drawElement(setDomain)',
-          'drawSeriesBars(series.*)'
+          'drawSeriesBars(chartData.*)',
+          '_muteSeriesBars(mutedSeries.*)'
         ],
 
 
@@ -270,6 +271,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               if(this.title){
                 this.drawTitle();
               }
+
+              // this.drawSeriesBars();
 
             } else {
               this._axisGroup
@@ -383,12 +386,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               break;
           }
 
-          this.svg.append("g")
+          this._titleGroup = this.svg.append("g")
             .attr('class','title-group')
             .attr('for', this.axisId)
             .attr('transform',"translate(" + x + ',' + y + ")");
-
-          this._titleGroup = this.svg.select('g.title-group[for=' + this.axisId + ']');
 
           this._titleGroup.append("text")
             .attr('class','axis-title')
@@ -405,14 +406,31 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * @method drawSeriesBars
          */
         drawSeriesBars:function(){
-          // look at titleGroup
-          // draw a bar for each series
-          // color based on index
           // FIXME do we need to move the title group based on how many series we have
-          // FIXME when should this fire? on change, but when to strat?
-          // FIXME LARGER - how do we create this obj when we have line and scatter series?
-          // TODO take mutedSeries and mute
-          console.log(this.series);
+          for(var i = 0; i < this.chartData.length; i++){
+            if(typeof(this.chartData[i]['axis']) === 'undefined' || this.chartData[i]['axis'] === '' || this.chartData[i]['axis'] === this.axisId){
+              var color = this.dataVisColors[this.seriesColorOrder[i]],
+                  id = this.chartData[i]['name'];//.split(' ').join('_');
+              this._drawBar(this._titleGroup,id,color,i);
+            }
+          }
+        },
+        /**
+         * Mutes and unmutes the color bars for each series
+         *
+         * @method muteSeriesBars
+         */
+        _muteSeriesBars:function(){
+          var keys = Object.keys(this.mutedSeries);
+          for(var i = 0; i < keys.length; i++){
+            var series = this._titleGroup.select('[series-id=' + keys[i] + ']');
+            // if we want to mute it
+            if(this.mutedSeries[keys[i]]){
+              series.attr('opacity',0.5);
+            } else {
+              series.attr('opacity',1);
+            }
+          }
         },
         /**
          * Helper function to draw the series color bar
@@ -420,11 +438,13 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * @method drawSeriesBars
          */
         _drawBar:function(elem,sid,color,index){
+          var w = elem.select('.axis-title')[0][0].getBoundingClientRect()['height'];
           elem.append("rect")
-            .attr('height',20)
-            .attr('width',3)
+            .attr('height',3)
+            .attr('width',15)
             .attr('fill',color)
-            .attr('transform',"translate(" + (8 * index) + ",0)");
+            .attr('series-id',sid)
+            .attr('transform',"translate( -12," + (-w - 8 * index) + ")");
         }
     });
 </script>

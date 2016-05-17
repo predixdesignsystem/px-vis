@@ -44,6 +44,7 @@ The 'method' is specified by whether data is returned asynchronously and therefo
         url="{{item.url}}"
         type$="{{item.type}}"
         name$="{{item.name}}"
+        axis$="{{item.axis}}"
         on-response="responseHandler"
         auto>
       </iron-ajax>
@@ -234,6 +235,8 @@ The 'method' is specified by whether data is returned asynchronously and therefo
       // check if dev specified a type; otherwise default to line
       var type = (typeof(ne.rootTarget.attributes.type)!== 'undefined') ? ne.rootTarget.attributes.type.value : 'line';
 
+      var axis = (typeof(ne.rootTarget.attributes.axis)!== 'undefined') ? ne.rootTarget.attributes.type.axis : '';
+
       // check if dev specified a name; otherwise extract json name
       if(typeof(ne.rootTarget.attributes.name)!== 'undefined'){
         name = ne.rootTarget.attributes.name.value;
@@ -241,8 +244,8 @@ The 'method' is specified by whether data is returned asynchronously and therefo
         var n = e.detail.url.split('/');
         name = n[n.length - 1].split('.')[0];
       }
-
       //set name and type in out data
+      data['axis'] = axis;
       data['name'] = name;
       data['type'] = type;
 
