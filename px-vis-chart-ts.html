@@ -4,6 +4,7 @@
 <link rel="import" href="../px-colors-design/colors.html" />
 <link rel="import" href="px-vis-svg.html"/>
 <link rel="import" href="px-vis-line.html"/>
+<link rel="import" href="px-vis-scatter.html"/>
 <link rel="import" href="px-vis-event.html"/>
 <link rel="import" href="px-vis-axis.html"/>
 <link rel="import" href="px-vis-gridlines.html"/>
@@ -83,6 +84,19 @@ Creates an interactive timeseries chart
               current-domain-y="[[currentDomainY]]"
               muted-series="[[mutedSeries]]">
             </px-vis-line>
+          </template>
+          <template is="dom-if" if="[[_chartTypeScatter(item.type)]]">
+            <px-vis-scatter
+              svg="[[svg]]"
+              scatter-id="[[item.name]]"
+              series-number="[[index]]"
+              chart-data="[[item]]"
+              x="[[x]]"
+              y="[[y]]"
+              current-domain-x="[[currentDomainX]]"
+              current-domain-y="[[currentDomainY]]"
+              muted-series="[[mutedSeries]]">
+            </px-vis-scatter>
           </template>
         </template>
 
@@ -364,6 +378,14 @@ Creates an interactive timeseries chart
          */
         _chartTypeLine: function(type){
           return type === 'line'
+        },
+        /**
+         * Helper function for the line series. Returns true if the series is a line
+         *
+         * @method _chartTypeLine
+         */
+        _chartTypeScatter: function(type){
+          return type === 'scatter'
         },
         /**
          * Listener for a data update. Updates the data objects so they can precipitate down

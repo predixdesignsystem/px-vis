@@ -4,13 +4,13 @@
 <link rel="import" href="../px-colors-design/colors.html" />
 
 <!--
-Element which draws lines series onto the chart
+Element which draws scatter series onto the chart
 
 ##### Usage
 
-    <px-vis-line
+    <px-vis-scatter
         svg="[[svg]]"
-        line-id="[[item.name]]"
+        scatter-id="[[item.name]]"
         series-number="[[index]]"
         chart-data="[[item]]"
         x="[[x]]"
@@ -18,14 +18,14 @@ Element which draws lines series onto the chart
         current-domain-x="[[currentDomainX]]"
         current-domain-y="[[currentDomainY]]"
         muted-series="[[mutedSeries]]">
-    </px-vis-line>
+    </px-vis-scatter>
 
-@element px-vis-line
+@element px-vis-scatter
 @blurb Element which draws lines series onto the chart
 @homepage index.html
 @demo demo.html
 -->
-<dom-module id="px-vis-line">
+<dom-module id="px-vis-scatter">
     <link rel="import" type="css" href="css/px-vis.css"/>
     <template>
 
@@ -34,7 +34,7 @@ Element which draws lines series onto the chart
 
 <script>
   Polymer({
-    is: 'px-vis-line',
+    is: 'px-vis-scatter',
 
     behaviors: [
       PxVisBehavior.svg,
@@ -57,7 +57,7 @@ Element which draws lines series onto the chart
        * @property lineId
        * @type String
        */
-      lineId:{
+      scatterId:{
         type:String
       },
       /**
@@ -71,64 +71,75 @@ Element which draws lines series onto the chart
         value:0
       },
       /**
-       * A holder object for the series object
+       * A holder object for the series group
        *
-       * @property lineId
-       * @type String
+       * @property scatterGroup
+       * @type Object
        */
-      linePath:{
+      scatterGroup:{
         type:Object,
         value:{}
       },
+      /**
+       * A holder object for the series objects
+       *
+       * @property scatterDots
+       * @type Object
+       */
+      scatterDots:{
+        type:Object,
+        value:{}
+      },
+
     },
 
     observers: [
-      // TODO Does chartData need to be chartData.* or chartData.series.* for dynamic data?
       'drawElement(svg,x,y,currentDomainX,currentDomainY,chartData.*)',
       'isIdInMuted(mutedSeries.*)'
      ],
 
     ready:function(){
       // if there is no dev set unique ID, generate one
-      if(!this.lineId){
-        this.set('lineId', this.generateRandomID('line_'));
+      if(!this.scatterId){
+        this.set('scatterId', this.generateRandomID('scatter_'));
       }
     },
 
     /**
-     * Draws or updates the line element.
+     * Draws or updates the scatter element.
      * Called from an observer watching for data and the necessary d3 objects
      *
      * @method drawElement
      */
     drawElement: function() {
-      // console.log("line chartdata");
       if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && (this.chartData)){
-        var _this = this;
         var data = this.chartData.series;
 
-        var line = d3.svg.line()
-          .x(function(d) { return _this.x(d[0]); })
-          .y(function(d) { return _this.y(d[1]); });
-
         // checks to see if the axis already exists. If not, create; if so, update
-        if(this._isObjEmpty(this.linePath)){
+        if(this._isObjEmpty(this.scatterGroup)){
           // draw the path
-          this.linePath = this.svg.append("path")
-            .datum(data)
-            .attr("class", "series-line")
-            .attr("line-id", this.lineId)
-            .attr('fill','none')
-            .attr("d", line);
+          this.scatterGroup = this.svg.append("g")
+            .attr("scatter-id", this.scatterId)
+            .attr("class", "series-scatter");
+          // TODO different shapes
+          // TODO dev set FA icons & icons
+          this.scatterDots = this.scatterGroup.selectAll('circle.scatter-dot')
+            .data(data)
+            .enter()
+            .append('circle')
+            .attr("class", "scatter-dot")
+            .attr("r", 4)
+            .attr("cx", function(d) { return this.x(d[0]); }.bind(this))
+            .attr("cy", function(d) { return this.y(d[1]); }.bind(this));
 
           // add color
-          this._colorLine();
+          this._colorScatter();
 
         } else {
           // update the path
-          this.linePath.datum(data)
-          // .duration(750)
-          .attr("d", line);
+          this.scatterDots.data(data)
+            .attr("cx", function(d) { return this.x(d[0]); }.bind(this))
+            .attr("cy", function(d) { return this.y(d[1]); }.bind(this));
         }
       }
     },
@@ -139,26 +150,27 @@ Element which draws lines series onto the chart
      * @method isIdInMuted
      */
     isIdInMuted: function() {
-      if(this.mutedSeries.hasOwnProperty(this.lineId)){
+      if(this.mutedSeries.hasOwnProperty(this.scatterId)){
         // if true, mute
-        if(this.mutedSeries[this.lineId]){
-          this._muteLine()
+        if(this.mutedSeries[this.scatterId]){
+          this._muteScatter()
         } else {
-          this._colorLine()
+          this._colorScatter()
         }
       }
-      console.groupEnd();
-
     },
     /**
      * Adds full color to the line.
      *
      * @method _colorLine
      */
-    _colorLine:function(){
+    _colorScatter:function(){
       var index = this.seriesNumber;
-      this.linePath.attr('stroke',this.dataVisColors[this.seriesColorOrder[index]])
-        .attr('stroke-opacity',1);
+      this.scatterGroup
+        .attr('fill',this.dataVisColors[this.seriesColorOrder[index]])
+        .attr('fill-opacity',0.6)
+        // .attr('stroke',this.dataVisColors[this.seriesColorOrder[index]])
+        // .attr('stroke-opacity',1);
     },
     /**
      * Adds muted color to the line.
@@ -166,10 +178,9 @@ Element which draws lines series onto the chart
      * @method muteElements
      TODO add dev set color and opacity
      */
-     _muteLine:function(){
+     _muteScatter:function(){
        var index = this.seriesNumber;
-       this.linePath.attr('stroke',this.dataVisColors[this.seriesColorOrder[index]])
-         .attr('stroke-opacity',0.3);
-     },
+       this.scatterGroup.attr('fill-opacity',0.3);
+     }
   });
 </script>
