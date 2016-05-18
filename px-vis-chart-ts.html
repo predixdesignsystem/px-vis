@@ -1,5 +1,6 @@
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="px-vis-common.html" />
+<link rel="import" href="px-vis-chart-common.html" />
 <link rel="import" href="px-vis-svg.html"/>
 <link rel="import" href="px-vis-line.html"/>
 <link rel="import" href="px-vis-event.html"/>
@@ -13,14 +14,14 @@
 
 
 <!--
-Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
+Creates an interactive timeseries chart
 
 ##### Usage
 
-    <px-vis counter-value="1">Hi</px-vis>
+    <px-vis-timeseries options='{ ... }'></px-vis-timeseries>
 
-@element px-vis
-@blurb Element providing solution to no problem in particular.
+@element px-vis-timeseries
+@blurb Creates an interactive timeseries chart
 @homepage index.html
 @demo demo.html
 -->
@@ -62,10 +63,10 @@ Element providing solution to no problem in particular. As a simple, increments 
           set-domain-y="{{setDomainY}}">
         </px-vis-scale>
         <px-vis-svg
-          svg="{{svg}}"
+          id="chartSVG"
           width="[[width]]"
           height="[[height]]"
-          margin="{{margin}}">
+          margin="[[margin]]">
         </px-vis-svg>
 
         <template is="dom-repeat" items="[[chartData]]">
@@ -179,7 +180,8 @@ Element providing solution to no problem in particular. As a simple, increments 
         behaviors: [
           PxVisBehavior.commonBehavior,
           PxVisBehavior.datetime,
-          PxVisBehavior.svgChart
+          PxVisBehavior.svgChart,
+          PxVisBehavior.chartCommon
         ],
 
         /**
@@ -189,36 +191,73 @@ Element providing solution to no problem in particular. As a simple, increments 
          * @type Object
          */
         properties: {
-          yAxis:{
-            type:Array,
-            value:function(){ return []; }
-          },
+          /**
+           *
+           *
+           *
+           * @type Array
+           */
           series:{
-            type:Array,
-            value:function(){ return []; }
+            type:Array
           },
+          /**
+           *
+           *
+           *
+           * @type Array
+           */
+          events:{
+            type:Array
+          },
+          /**
+           * Defines where to locate the X-axis.
+           * - `bottom`
+           * - `top`
+           *
+           * @property xAxisLocation
+           * @type String
+           * @default bottom
+           */
           xAxisLocation:{
             type:String,
             value:'bottom'
           },
+          /**
+           * Defines where to locate the Y-axis.
+           * - `left`
+           * - `right`
+           *
+           * @property yAxisLocation
+           * @type String
+           * @default left
+           */
           yAxisLocation:{
             type:String,
             value:'left'
           },
-          margin:{
-            type:Object,
-            value: { top: 15, right: 15, bottom: 15, left: 15},
-          },
+          // /**
+          //  * Defines the base margin for the chart. Calcs are run to add to the margin to accomodate axes and other elements which exist within the SVG frame, but outside the chart frame.
+          //  *
+          //  * @property margin
+          //  * @type Object
+          //  * @default { top: 15, right: 15, bottom: 15, left: 15}
+          //  * @private
+          //  */
+          // margin:{
+          //   type:Object,
+          //   value: { top: 15, right: 15, bottom: 15, left: 15},
+          // },
+          /**
+           * Defines the base margin for the navigator.
+           *
+           * @property marginNav
+           * @type Object
+           * @default { top: 5, right: 5, bottom: 5, left: 5}
+           * @private
+           */
           marginNav:{
             type:Object,
             value: { top: 5, right: 5, bottom: 5, left: 5},
-          },
-          url:{
-            type:String,
-          },
-          urls:{
-            type:Array,
-            value:function(){ return [] },
           },
           /**
            * Defines where the register will appear. Valid entries are`:
@@ -247,9 +286,19 @@ Element providing solution to no problem in particular. As a simple, increments 
             observer:'_setConfig'
           },
         },
-        listeners:{
-          'px-vis-data-updated': '_updateData'
+        // listeners:{
+        //   'px-vis-svg-updated': '_updateSVG',
+        //   'px-vis-data-updated': '_updateData'
+        // },
+
+        ready:function(){
+          this._calcMargins();
         },
+        /**
+         * Cycles through the Configuration object and sets each property. Triggers each components declarative binding
+         *
+         * @method _setConfig
+         */
         _setConfig: function(){
           var keys = Object.keys(this.options);
           for(var i = 0; i < keys.length; i++){
@@ -257,11 +306,18 @@ Element providing solution to no problem in particular. As a simple, increments 
             this.set(key, this.options[key]);
           }
         },
+        /**
+         * Overwrites default margins based on settings
+         *
+         * @method _calcMargins
+         */
         _calcMargins:function(){
+          console.log(this.width);
           var topMargin = 25,
               rightMargin = 10,
               bottomMargin = 10,
               leftMargin = 10;
+
           if(this.xAxisLocation === 'bottom'){
             bottomMargin = 40;
           } else if(this.xAxisLocation === 'top'){
@@ -288,23 +344,35 @@ Element providing solution to no problem in particular. As a simple, increments 
             'left': leftMargin
           });
         },
-        _brushed:function(e){
-          var ne = Polymer.dom(e);
-          this.brushedDomain = ne.event.detail.domain;
-          e.stopPropagation();
-        },
-        ready:function(){
-          this._calcMargins();
-        },
+        /**
+         * Helper function for the register. Returns true if the side register should exist
+         *
+         * @method _sideRegister
+         */
         _sideRegister:function(location){
           return location === 'side' || location === 'both'
         },
+        /**
+         * Helper function for the register. Returns true if the top register should exist
+         *
+         * @method _topRegister
+         */
         _topRegister:function(location){
           return location === 'top' || location === 'both'
         },
+        /**
+         * Helper function for the line series. Returns true if the series is a line
+         *
+         * @method _chartTypeLine
+         */
         _chartTypeLine: function(type){
           return type === 'line'
         },
+        /**
+         * Listener for a data update. Updates the data objects so they can precipitate down
+         *
+         * @method _updateData
+         */
         _updateData: function(evt){
           var detail = evt.detail;
           if(detail.id === 'eventAjax'){

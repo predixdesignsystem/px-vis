@@ -325,7 +325,12 @@ The configureation object allows developers to set the icon used for each event 
         this._addTooltip();
       }
     },
-    _positionEvent(){
+    /**
+     * Sets the position for the event line and icon
+     *
+     * @method _positionEvent
+     */
+    _positionEvent: function(){
       this.eventLine
         .attr("x1", this.x(this.eventData.time))
         .attr("x2", this.x(this.eventData.time))
@@ -335,11 +340,16 @@ The configureation object allows developers to set the icon used for each event 
         .attr('x',this.x(this.eventData.time) - this._thisConfig.size/2 + this._thisConfig.offset[0])
         .attr("y", this.y(this.setDomainY[1]) - 5 + this._thisConfig.offset[1]);
     },
+    /**
+     * Compiles a configuration object by looking if there is a dev set style, or if it should use defaults
+     *
+     * @method _processConfiguration
+     */
     _processConfiguration:function(){
-      // is there a configuration object for this event type
+      // is there a configuration object for this event type?
       if(this.eventConfig[this.eventData.label]){
         /*
-        get the keys of the defaultEventConfig, cycle through them and see if the eventConfig object has the property. If so, set it, otherwise use default
+          check each key (icon, color, etc) of the defaultEventConfig and see if the eventConfig is overwriting that property. If so, set it, otherwise use default
         */
         var k = Object.keys(this.defaultEventConfig);
         for(var i = 0; i < k.length; i++){
@@ -350,9 +360,19 @@ The configureation object allows developers to set the icon used for each event 
         this._thisConfig = this.defaultEventConfig;
       }
     },
+    /**
+     * Configures the tooltip for that particuar event
+     *
+     * @method _addTooltip
+     */
     _addTooltip:function(){
       this.$.eventTooltip.set('for',this.eventIcon[0][0]);
     },
+    /**
+     * Formats the datetime to match the dev set format
+     *
+     * @method _formatDatetime
+     */
     _formatDatetime: function(time,format){
       return this.formatTimestamp(time, this.timezone, format);
     }

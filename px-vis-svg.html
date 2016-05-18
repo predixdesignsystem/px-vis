@@ -4,14 +4,19 @@
 
 
 <!--
-Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
+Element which creates an SVG element and sets up d3
 
 ##### Usage
 
-    <px-vis counter-value="1">Hi</px-vis>
+    <px-vis-svg
+        svg="{{svg}}"
+        width="[[width]]"
+        height="[[height]]"
+        margin="[[margin]]">
+    </px-vis-svg>
 
-@element px-vis
-@blurb Element providing solution to no problem in particular.
+@element px-vis-svg
+@blurb Element which creates an SVG element and sets up d3
 @homepage index.html
 @demo demo.html
 -->
@@ -29,8 +34,20 @@ Element providing solution to no problem in particular. As a simple, increments 
 
         is: 'px-vis-svg',
 
+        /****** EVENTS ******/
+        /**
+         * Fired once d3 svg drawing element has been configured
+         *
+         * Detail includes:
+         *
+         * ```
+         * { 'svg': svgElem }
+         * ```
+         *
+         * @event px-vis-svg-updated
+         */
+
         behaviors: [
-          PxVisBehavior.svgChart,
           PxVisBehavior.svgChart
         ],
 
@@ -42,44 +59,22 @@ Element providing solution to no problem in particular. As a simple, increments 
          */
         properties: {
           /**
-           * Use the selectable attribute if the table rows should be able to be selected.
-           *
-           *      <px-data-table selectable table-data="{{data}}"></px-data-table>
-           *
-           * @default false
-           */
-          xScale: {
-            type: String,
-            value: 'ordinal',
-            notify: true
-          },
-          /**
-           * Use the selectable attribute if the table rows should be able to be selected.
-           *
-           *      <px-data-table selectable table-data="{{data}}"></px-data-table>
-           *
-           * @default false
-           */
-          yScale: {
-            type: String,
-            value: 'ordinal',
-            notify: true
-          },
-          /**
            * A list of sub elements should we need to know our children
            *
            *
            * @default []
            */
-          _childElems:{
-            type:Array,
-            value:[]
-          },
+          // _childElems:{
+          //   type:Array,
+          //   value:[]
+          // },
         },
 
         observers: [
           '_setSVG(width,height,margin)'
         ],
+
+
 
         /**
          *  When ready, let's find out who our children are
@@ -105,7 +100,7 @@ Element providing solution to no problem in particular. As a simple, increments 
         // },
 
         /**
-         *
+         * Configures the SVG and d3 drawing element
          *
          * @method _setSVG
          */
@@ -119,6 +114,7 @@ Element providing solution to no problem in particular. As a simple, increments 
             .attr("transform", "translate(" + this.margin.left + ',' + this.margin.top + ")");
 
           this.notifyPath('svg',this.svg);
+          this.fire('px-vis-svg-updated',{ 'svg': this.svg });
         },
     });
 </script>

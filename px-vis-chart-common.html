@@ -1,0 +1,46 @@
+<script>
+var PxVisBehavior = PxVisBehavior || {};
+
+/*
+    Name:
+    PxVisBehavior.chartCommon
+
+    Description:
+    Polymer behavior that provides the basic listeners and methods for charts built with px-vis.
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehavior.chartCommon
+*/
+PxVisBehavior.chartCommon = {
+
+    listeners:{
+      'px-vis-svg-updated': '_updateSVG',
+      'px-vis-data-updated': '_updateData'
+    },
+
+    /**
+     * Listener for a data update. Updates the data objects so they can precipitate down
+     *
+     * @method _updateSVG
+     */
+    _updateSVG: function(evt){
+      var detail = evt.detail,
+          ne = Polymer.dom(evt);
+
+      if(ne.rootTarget === this.$.chartSVG){
+        this.set('svg', detail.svg);
+      }
+    },
+
+    /**
+     * Listener for a data update. Must be set up in the chart
+     *
+     * @method _updateData
+     */
+    _updateData: function(evt){
+      console.warn('Function _updateData does nothing')
+    }
+};
+</script>
