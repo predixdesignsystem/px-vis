@@ -1,6 +1,6 @@
 <link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="px-vis-common.html" />
-<link rel="import" href="px-vis-svg-chart-common.html" />
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="../px-colors-design/colors.html" />
 
 
@@ -29,7 +29,10 @@ Element providing solution to no problem in particular. As a simple, increments 
         is: 'px-vis-line',
 
         behaviors: [
-          PxVisBehavior.svgChart,
+          PxVisBehavior.svg,
+          PxVisBehavior.axes,
+          PxVisBehavior.dataset,
+          PxVisBehavior.mutedSeries,
           commonColors
         ],
 
@@ -57,7 +60,7 @@ Element providing solution to no problem in particular. As a simple, increments 
 
         observers: [
           // TODO Does chartData need to be chartData.* or chartData.series.* for dynamic data?
-          'drawElement(svg,x,y,setDomainX,setDomainY,chartData)',
+          'drawElement(svg,x,y,currentDomainX,currentDomainY,chartData)',
           'isIdInMuted(mutedSeries.*)'
          ],
 

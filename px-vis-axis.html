@@ -1,6 +1,6 @@
 <link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="px-vis-common.html" />
-<link rel="import" href="px-vis-svg-chart-common.html" />
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="../px-colors-design/colors.html" />
 
 
@@ -16,7 +16,7 @@ d3 element creating an axis for the chart
         title="Date"
         orientation="bottom"
         label-position="center"
-        set-domain="[[setDomainX]]">
+        current-domain="[[currentDomainX]]">
     </px-vis-axis>
 
 ##### d3 reference
@@ -40,7 +40,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         is: 'px-vis-axis',
 
         behaviors: [
-          PxVisBehavior.svgChart,
+          PxVisBehavior.svg,
+          PxVisBehavior.axis,
           commonColors
         ],
 
@@ -73,17 +74,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             value: {}
           },
           /**
-           * Passed in instantiated scale component. Pass in either your x or your y depending which this axis is for.
-           *
-           * @property axis
-           * @type Object
-           */
-          axis:{
-            type: Object,
-            value: {},
-            notify: true
-          },
-          /**
            * A unique ID for the axis
            *
            * @property axisId
@@ -106,21 +96,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           title:{
             type:String,
             value: ''
-          },
-          /**
-           * Defines which side the axis should be on.
-           *  - 'left'
-           *  - 'right'
-           *  - 'bottom'
-           *  - 'top'
-           *
-           * @property orientation
-           * @type String
-           * @default bottom
-           */
-          orientation:{
-            type: String,
-            value: 'bottom',
           },
           /**
            * Defines on which side the tick mark the label should sit.
@@ -192,7 +167,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
         observers: [
           'defineAxis(axis)',
-          'drawElement(setDomain)',
+          'drawElement(currentDomain)',
           'drawSeriesBars(chartData.*)',
           '_muteSeriesBars(mutedSeries.*)'
         ],

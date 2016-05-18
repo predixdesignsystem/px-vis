@@ -1,5 +1,6 @@
 <link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="px-vis-svg-chart-common.html" />
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="../px-colors-design/colors.html" />
 
 
@@ -21,8 +22,8 @@ Element providing on-chart hover functionality to get data values near the mouse
       y="[[varYFromScaleComponent]]"
       vertical-line="full"
       horizonal-line="none"
-      set-domain-x="[[varXDomainFromScaleComponent]]"
-      set-domain-y="[[varYDomainFromScaleComponent]]"
+      current-domain-x="[[varXDomainFromScaleComponent]]"
+      current-domain-y="[[varYDomainFromScaleComponent]]"
       tooltip-data={{tooltipData}}>
     </px-vis-tooltip>
 
@@ -47,7 +48,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     is: 'px-vis-tooltip',
 
     behaviors: [
-      PxVisBehavior.svgChart,
+      PxVisBehavior.sizing,
+      PxVisBehavior.svg,
+      PxVisBehavior.axes,
+      PxVisBehavior.dataset,
+      PxVisBehavior.tooltipData,
       commonColors
     ],
 
@@ -146,24 +151,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       circlePoint:{
         type:String,
         value:"yes"
-      },
-      /**
-       * Data reported back by the tooltip
-       *
-       * @property tooltipData
-       * @type Array
-       * @default []
-       */
-      tooltipData:{
-        type:Object,
-        value:function(){ return {} },
-        notify:true
-      },
-
+      }
     }, //properties
 
     observers: [
-      'drawElement(setDomainX,setDomainY,chartData.*)'
+      'drawElement(currentDomainX,currentDomainY,chartData.*)'
      ],
 
     /**

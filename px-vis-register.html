@@ -1,10 +1,9 @@
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="../px-colors-design/colors.html" />
-<link rel="import" href="px-vis-common.html" />
-<link rel="import" href="px-vis-svg-chart-common.html" />
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-datetime.html"/>
 <link rel="import" href="../numbro-element/numbro-element.html" />
 <link rel="import" href="../px-tooltip/px-tooltip.html" />
-<link rel="import" href="px-vis-datetime-common.html"/>
 
 <!--
 Element providing a display and interaction space for series in your chart.
@@ -151,9 +150,11 @@ Formatting for the timestamps,the data values, and the series names can be contr
     is: 'px-vis-register',
 
     behaviors: [
-      PxVisBehavior.commonBehavior,
+      PxVisBehavior.sizing,
+      PxVisBehavior.formatting,
       PxVisBehavior.datetime,
-      PxVisBehavior.svgChart,
+      PxVisBehavior.mutedSeries,
+      PxVisBehavior.tooltipData,
       commonColors
     ],
 
@@ -164,39 +165,6 @@ Formatting for the timestamps,the data values, and the series names can be contr
      * @type Object
      */
     properties: {
-      /**
-       * Data reported back by the tooltip. Displays the series name, values, and timestamp in the register. tooltipData is in the form:
-       *
-       *```
-       *   {
-       *     'time': d3TimeStamp,
-       *     'series': [
-       *       {'name':'seriesName0','value': seriesVal0 },
-       *       {'name':'seriesName1','value': seriesVal1 }
-       *     ]
-       *   }
-       *```
-       *
-       * When not hovering on a chart, the tooltipData should still have the series names in order for them to still appear in the register. IE:
-       *
-       *```
-       *   {
-       *     'time': null,
-       *     'series': [
-       *       {'name':'seriesName0','value': null },
-       *       {'name':'seriesName1','value': null }
-       *     ]
-       *   }
-       *```
-       *
-       * @property tooltipData
-       * @type Object
-       * @default {}
-       */
-      tooltipData:{
-        type:Object,
-        observer:'_formatDateTime'
-      },
       /**
        * The units of the data
        *
@@ -271,7 +239,8 @@ Formatting for the timestamps,the data values, and the series names can be contr
     },
 
     observers: [
-      '_toggleSeries(mutedSeries.*)'
+      '_toggleSeries(mutedSeries.*)',
+      '_formatDateTime(tooltipData.*)'
      ],
 
     /**

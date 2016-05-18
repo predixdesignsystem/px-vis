@@ -1,5 +1,6 @@
 <link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="px-vis-common.html" />
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
 
 
 <!--
@@ -27,8 +28,10 @@ Element providing solution to no problem in particular. As a simple, increments 
         is: 'px-vis-scale',
 
         behaviors: [
-          PxVisBehavior.svgChart,
-          PxVisBehavior.commonBehavior
+          PxVisBehavior.sizing,
+          PxVisBehavior.axes,
+          PxVisBehavior.dataset,
+          PxVisBehavior.selectedDomain
         ],
 
         /**
@@ -67,7 +70,7 @@ Element providing solution to no problem in particular. As a simple, increments 
         observers: [
           '_setXScale(width,margin)',
           '_setYScale(height,margin)',
-          '_setDomain(chartData.*)',
+          '_currentDomain(chartData.*)',
           '_updateDomain(selectedDomain)',
         ],
 
@@ -77,7 +80,6 @@ Element providing solution to no problem in particular. As a simple, increments 
          * @method _setXScale
          */
         _setXScale: function(width,margin){
-          console.log(width);
           var w = width - margin.left - margin.right;
           this.x = this._setScale(this.xScale,[0, w]);
           this.notifyPath('x.range', this.x.range);
@@ -111,9 +113,9 @@ Element providing solution to no problem in particular. As a simple, increments 
          *
          * https://github.com/mbostock/d3/wiki/API-Reference
          *
-         * @method _setDomain
+         * @method _currentDomain
          */
-        _setDomain: function() {
+        _currentDomain: function() {
           // check to make sure there is data
           if(this.chartData){
             // TODO check if dataset has max and min
@@ -152,14 +154,14 @@ Element providing solution to no problem in particular. As a simple, increments 
             this.y.domain([0, d3.max(yArr)]);
 
             // Set the domains
-            this.set('setDomainX', this.x.domain());
-            this.set('setDomainY', this.y.domain());
+            this.set('currentDomainX', this.x.domain());
+            this.set('currentDomainY', this.y.domain());
           }
         },
         _updateDomain:function(d){
           if(d.length > 0){
             this.x.domain(d);
-            this.set('setDomainX', this.x.domain());
+            this.set('currentDomainX', this.x.domain());
           }
         },
 

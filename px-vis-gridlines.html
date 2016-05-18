@@ -1,6 +1,6 @@
 <link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="px-vis-common.html" />
-<link rel="import" href="px-vis-svg-chart-common.html" />
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="../px-colors-design/colors.html" />
 
 
@@ -32,7 +32,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         is: 'px-vis-gridlines',
 
         behaviors: [
-          PxVisBehavior.svgChart,
+          PxVisBehavior.svg,
+          PxVisBehavior.axis,
           commonColors
         ],
 
@@ -65,17 +66,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             value: {}
           },
           /**
-           * Passed in instantiated scale component. Pass in either your x or your y depending which this grid is for.
-           *
-           * @property grid
-           * @type Object
-           */
-          grid:{
-            type: Object,
-            value: {},
-            notify: true
-          },
-          /**
            * A unique ID for the grid
            *
            * @property gridId
@@ -87,21 +77,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             value: '',
             notify: true,
             reflectToAttribute: true
-          },
-          /**
-           * Defines which side the grid should be on.
-           *  - 'left'
-           *  - 'right'
-           *  - 'bottom'
-           *  - 'top'
-           *
-           * @property orientation
-           * @type String
-           * @default bottom
-           */
-          orientation:{
-            type: String,
-            value: 'bottom',
           },
           /**
            * An x,y amount to move the grid to allow for labels and titles
@@ -116,8 +91,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         },
 
         observers: [
-          'defineGrid(grid,margin,length)',
-          'drawElement(setDomain)'
+          'defineGrid(axis,margin,length)',
+          'drawElement(currentDomain)'
         ],
 
 
@@ -135,7 +110,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          */
         defineGrid:function(grid,margin,lenth){
           this._grid = d3.svg.axis()
-            .scale(this.grid)
+            .scale(this.axis)
             .orient(this.orientation);
 
           // TODO dev set # of gridlines
@@ -156,7 +131,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         drawElement: function() {
           // TODO what happens if not?
           if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this._grid)){
-            // this._grid.tickValues(this.grid.domain());
+            // this._grid.tickValues(this.axis.domain());
             if(this.orientation === 'bottom'){
               var h = this.svg.attr('height') - this.margin.bottom - this.margin.top;
               this.translateAmt = [0,h];

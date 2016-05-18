@@ -1,6 +1,6 @@
 <link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="px-vis-common.html" />
-<link rel="import" href="px-vis-chart-common.html" />
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-chart.html" />
 <link rel="import" href="../iron-ajax/iron-ajax.html" />
 <link rel="import" href="px-vis-svg.html"/>
 <link rel="import" href="px-vis-line.html"/>
@@ -32,8 +32,8 @@ Element providing solution to no problem in particular. As a simple, increments 
         x="{{x}}"
         y="{{y}}"
         chart-data="[[chartData]]"
-        set-domain-x="{{setDomainX}}"
-        set-domain-y="{{setDomainY}}"></px-vis-scale>
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}"></px-vis-scale>
       <px-vis-svg
         id="chartSVG"
         svg="{{svg}}"
@@ -50,8 +50,8 @@ Element providing solution to no problem in particular. As a simple, increments 
           series-number="[[index]]"
           x="{{x}}"
           y="{{y}}"
-          set-domain-x="[[setDomainX]]"
-          set-domain-y="[[setDomainY]]">
+          current-domain-x="[[currentDomainX]]"
+          current-domain-y="[[currentDomainY]]">
       </template>
 
       <px-vis-axis
@@ -60,7 +60,7 @@ Element providing solution to no problem in particular. As a simple, increments 
         axis-id="x"
         margin="[[margin]]"
         orientation="bottom"
-        set-domain="[[setDomainX]]">
+        current-domain="[[currentDomainX]]">
       </px-vis-axis>
       <px-vis-brush
         svg="[[svg]]"
@@ -68,7 +68,7 @@ Element providing solution to no problem in particular. As a simple, increments 
         height="{{height}}"
         width="{{width}}"
         selected-domain={{selectedDomain}}
-        set-domain="[[setDomainX]]">
+        current-domain="[[currentDomainX]]">
       </px-vis-brush>
 
     </template>
@@ -80,10 +80,16 @@ Element providing solution to no problem in particular. As a simple, increments 
         is: 'px-vis-chart-navigator',
 
         behaviors: [
-          PxVisBehavior.commonBehavior,
+          PxVisBehavior.sizing,
+          PxVisBehavior.formatting,
           PxVisBehavior.datetime,
-          PxVisBehavior.svgChart,
-          PxVisBehavior.chartCommon
+          PxVisBehavior.svg,
+          PxVisBehavior.axes,
+          PxVisBehavior.axis,
+          PxVisBehavior.selectedDomain,
+          PxVisBehavior.dataset,
+          PxVisBehavior.chartCommon,
+          commonColors
         ],
 
         /**
