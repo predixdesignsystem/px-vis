@@ -1,0 +1,246 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
+<link rel="import" href="../px-colors-design/colors.html" />
+
+<!--
+d3 element which draws a line and icon on the chart representing an event.
+
+##### Usage
+
+    <px-vis-event
+        svg="[[svg]]"
+        event-id="[[item.id]]"
+        chart-data="[[item]]"
+        x="[[x]]"
+        y="[[y]]"
+        event-config="[[eventConfig]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]">
+    </px-vis-event>
+
+The configureation object allows developers to set the icon used for each event type. It comes in the form:
+
+    eventConfig = {
+      "Event Name 1":{
+        "color": "blue",
+        "icon": "fa-camera",
+        "type": "fa",
+        "offset":[0,0]
+      },
+      "Event Name 1":{
+        "color": "green",
+        "icon": "\uf015",
+        "type": "unicode",
+        "offset":[1,0]
+      },
+      "Event Name 3":{
+        "icon": "Dancing_banana.gif",
+        "type": "image",
+        "offset":[-2,-20],
+        "size":"25"
+      }
+    }
+
+@element px-vis-threshold
+@blurb d3 element which draws a line and icon on the chart representing an event.
+@homepage index.html
+@demo demo.html
+-->
+<dom-module id="px-vis-threshold">
+    <link rel="import" type="css" href="css/px-vis.css"/>
+    <template>
+    </template>
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'px-vis-threshold',
+
+    behaviors: [
+      PxVisBehavior.svg,
+      PxVisBehavior.axes,
+      PxVisBehavior.dataset,
+      commonColors
+    ],
+
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      /**
+       * Default color of the threshold.
+       *
+       * @property defaultColor
+       * @type String
+       * @default grey8
+       */
+      defaultColor:{
+        type: String,
+        value:'grey8'
+      },
+      /**
+       * Holder for a clone of the passed in svg container.
+       *
+       * We cant use the normal svg container due to drawing order. The purpose of this clone is to ensure the tooltip capture elements are drawn on top of the chart rather than following normal draw order.
+       *
+       * @property thresholdSvg
+       * @type Object
+       */
+      thresholdSvg:{
+        type: Object
+      },
+      /**
+       * Holder object for the event svg "g" element
+       *
+       * @property thresholdGroup
+       * @type Object
+       */
+      thresholdGroup:{
+        type:Object,
+        value:{}
+      },
+      /**
+       * Holder object for the event line elements
+       *
+       * @property thresholdLine
+       * @type Object
+       */
+      thresholdLine:{
+        type:Object,
+        value:{}
+      },
+      /**
+       * Holder object for the event rectangle elements
+       *
+       * @property thresholdRect
+       * @type Object
+       */
+      thresholdRect:{
+        type:Object,
+        value:{}
+      },
+      /**
+       * Holder object for the event text elements
+       *
+       * @property thresholdText
+       * @type Object
+       */
+      thresholdText:{
+        type:Object,
+        value:{}
+      }
+    },
+
+    observers: [
+      'drawElement(svg,x,y,currentDomainX,currentDomainY,chartData.*)',
+     ],
+
+    ready:function(){
+      // if there is no dev set unique ID, generate one
+      if(!this.thresholdId){
+        this.set('thresholdId', this.generateRandomID('threshold_'));
+      }
+    },
+
+    /**
+     * Draws or updates the threshold element.
+     * Called from an observer watching for data and the necessary d3 objects
+     *
+     * @method drawElement
+     */
+    drawElement: function() {
+      // TODO remove this.x and this.y checks?
+      if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && (this.chartData) && this.currentDomainX.length > 0 && this.currentDomainY.length > 0){
+        this.cloneSVGElem(this.svg[0][0],'thresholdSvg');
+        // checks to see if the threshold already exists. If not, create; if so, update
+        if(this._isObjEmpty(this.thresholdGroup)){
+          this.thresholdGroup = this.thresholdSvg.append('g')
+            .attr('id','thresholds')
+            .selectAll('g.thresholds')
+            .data(this.chartData)
+            .enter()
+            .append("g")
+            .attr('class','thresholds')
+            .attr('threshold-id',function(d,i){ return d.for + i });
+
+          this.thresholdLine = this.thresholdGroup.append("line")
+            .attr('stroke-width', '1')
+            .attr('stroke-dasharray', "5,2")
+            .attr('x1', this.x(this.currentDomainX[0]))
+            .attr('x2', this.x(this.currentDomainX[1]))
+            .attr('y1', function(d){ return this.y(d.value) }.bind(this))
+            .attr('y2', function(d){ return this.y(d.value) }.bind(this));
+
+          this.thresholdRect = this.thresholdGroup.append("rect")
+            .attr('x', this.x(this.currentDomainX[0]) + 5)
+            .attr('y', this._calcYPos.bind(this))
+            .attr('height','18');
+
+          this.thresholdText = this.thresholdGroup.append("text")
+            .attr('font-size', '12px')
+            .attr('font-style','GE Inspira Sans')
+            .attr('fill',"white")
+            .attr('x', this.x(this.currentDomainX[0]) + 5 + 3)
+            .attr('y', function(d,i){ return this._calcYPos(d,i,13) }.bind(this) )
+            .text(function(d){ return (d.value).toFixed(2) });
+
+          //must set rectangle width after text is set so we know how big it is
+          this.thresholdRect.attr('width',function(d,i){
+            return this.thresholdText[0][i].getBBox().width + 5  //should be 6 but 6 looks too big...
+          }.bind(this))
+
+          this._setColors();
+
+        } else {
+          this.thresholdLine
+            .attr('y1', function(d){ return this.y(d.value) }.bind(this))
+            .attr('y2', function(d){ return this.y(d.value) }.bind(this));
+          this.thresholdRect.attr('y', this._calcYPos.bind(this))
+          this.thresholdText.attr('y', function(d,i){ return this._calcYPos(d,i,13) }.bind(this) )
+        }
+      }
+    },
+    /**
+     * Sets the colors
+     *
+     * @method _setColors
+     */
+    _setColors: function(){
+      // FIXME Trigger this when the series are loaded
+      setTimeout(function(){
+        this.thresholdRect.attr('fill', this._getColors.bind(this));
+        this.thresholdLine.attr('stroke', this._getColors.bind(this));
+      }.bind(this), 1);
+    },
+    /**
+     * Returns the color of the associated series or returns the default color
+     *
+     * @method _getColors
+     */
+    _getColors: function(d,i){
+      var color = this.colors[this.defaultColor];
+      if(d.for){
+        var series = this.svg.select('[series-id=' + d.for + ']');
+        color = this.dataVisColors[this.seriesColorOrder[series.attr('series-number')]];
+      }
+      return color;
+    },
+    /**
+     * Calculates a y-position for the text and rectangle
+     *
+     * @method _calcYPos
+     */
+    _calcYPos: function(d,i,offset){
+      var offset = offset | 0,
+          mid = (this.currentDomainY[1] +  this.currentDomainY[0]) / 2,
+          val = (d.value < mid) ? this.y(d.value) -1 + offset: this.y(d.value) -17 + offset;
+
+      return val
+    }
+  });
+</script>

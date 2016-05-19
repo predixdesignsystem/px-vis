@@ -13,6 +13,7 @@
 <link rel="import" href="px-vis-scale.html"/>
 <link rel="import" href="px-vis-tooltip.html"/>
 <link rel="import" href="px-vis-register.html"/>
+<link rel="import" href="px-vis-threshold.html"/>
 
 
 <!--
@@ -40,6 +41,11 @@ Creates an interactive timeseries chart
         <px-vis-data
           id = "eventAjax"
           request-data = "[[events]]"
+          type = "flat">
+        </px-vis-data>
+        <px-vis-data
+          id = "thresholdAjax"
+          request-data = "[[thresholds]]"
           type = "flat">
         </px-vis-data>
         <template is="dom-if" if="[[_topRegister(registerLocation)]]">
@@ -75,7 +81,7 @@ Creates an interactive timeseries chart
           <template is="dom-if" if="[[_chartTypeLine(item.type)]]">
             <px-vis-line
               svg="[[svg]]"
-              line-id="[[item.name]]"
+              series-id="[[item.name]]"
               series-number="[[index]]"
               chart-data="[[item]]"
               x="[[x]]"
@@ -88,7 +94,7 @@ Creates an interactive timeseries chart
           <template is="dom-if" if="[[_chartTypeScatter(item.type)]]">
             <px-vis-scatter
               svg="[[svg]]"
-              scatter-id="[[item.name]]"
+              series-id="[[item.name]]"
               series-number="[[index]]"
               chart-data="[[item]]"
               x="[[x]]"
@@ -112,6 +118,15 @@ Creates an interactive timeseries chart
             current-domain-y="[[currentDomainY]]">
           </px-vis-event>
         </template>
+
+        <px-vis-threshold
+          svg="[[svg]]"
+          chart-data="[[thresholdData]]"
+          x="[[x]]"
+          y="[[y]]"
+          current-domain-x="[[currentDomainX]]"
+          current-domain-y="[[currentDomainY]]">
+        </px-vis-threshold>
 
         <px-vis-gridlines
           svg="[[svg]]"
@@ -233,6 +248,15 @@ Creates an interactive timeseries chart
             type:Array
           },
           /**
+           *
+           *
+           *
+           * @type Array
+           */
+          thresholds:{
+            type:Array
+          },
+          /**
            * Defines where to locate the X-axis.
            * - `bottom`
            * - `top`
@@ -296,11 +320,32 @@ Creates an interactive timeseries chart
             notify:true,
             observer:'_setConfig'
           },
+          /**
+           * container for the data object that drives the thresholds
+           * Generally loaded with an iron-ajax tag (but doesnt have to be)
+           * This can be set declaratively
+           *
+           * @property thresholdData
+           * @type Object
+           */
+          thresholdData:{
+            type: Array,
+            notify: true
+          },
+          /**
+           * container for the data object that drives the events
+           * Generally loaded with an iron-ajax tag (but doesnt have to be)
+           * This can be set declaratively
+           *
+           * @property eventData
+           * @type Object
+           */
+          eventData:{
+            type: Array,
+            notify: true
+          }
         },
-        // listeners:{
-        //   'px-vis-svg-updated': '_updateSVG',
-        //   'px-vis-data-updated': '_updateData'
-        // },
+
 
         ready:function(){
           this._calcMargins();
@@ -323,7 +368,6 @@ Creates an interactive timeseries chart
          * @method _calcMargins
          */
         _calcMargins:function(){
-          console.log(this.width);
           var topMargin = 25,
               rightMargin = 10,
               bottomMargin = 10,
@@ -396,6 +440,8 @@ Creates an interactive timeseries chart
           var detail = evt.detail;
           if(detail.id === 'eventAjax'){
             this[detail.method]('eventData',detail.data);
+          } else if(detail.id === 'thresholdAjax'){
+            this[detail.method]('thresholdData',detail.data);
           } else if(detail.id === 'seriesAjax'){
             this[detail.method]('chartData',detail.data);
             this.notifyPath('chartData',detail.data);

@@ -10,7 +10,7 @@ Element which draws lines series onto the chart
 
     <px-vis-line
         svg="[[svg]]"
-        line-id="[[item.name]]"
+        series-id="[[item.name]]"
         series-number="[[index]]"
         chart-data="[[item]]"
         x="[[x]]"
@@ -54,16 +54,16 @@ Element which draws lines series onto the chart
       /**
        * A unique ID for each line series
        *
-       * @property lineId
+       * @property seriesId
        * @type String
        */
-      lineId:{
+      seriesId:{
         type:String
       },
       /**
        * An index of the series used for calculating its color
        *
-       * @property lineId
+       * @property seriesNumber
        * @type String
        */
       seriesNumber:{
@@ -73,7 +73,7 @@ Element which draws lines series onto the chart
       /**
        * A holder object for the series object
        *
-       * @property lineId
+       * @property linePath
        * @type String
        */
       linePath:{
@@ -90,8 +90,8 @@ Element which draws lines series onto the chart
 
     ready:function(){
       // if there is no dev set unique ID, generate one
-      if(!this.lineId){
-        this.set('lineId', this.generateRandomID('line_'));
+      if(!this.seriesId){
+        this.set('seriesId', this.generateRandomID('line_'));
       }
     },
 
@@ -104,12 +104,11 @@ Element which draws lines series onto the chart
     drawElement: function() {
       // console.log("line chartdata");
       if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && (this.chartData)){
-        var _this = this;
         var data = this.chartData.series;
 
         var line = d3.svg.line()
-          .x(function(d) { return _this.x(d[0]); })
-          .y(function(d) { return _this.y(d[1]); });
+          .x(function(d) { return this.x(d[0]); }.bind(this))
+          .y(function(d) { return this.y(d[1]); }.bind(this));
 
         // checks to see if the axis already exists. If not, create; if so, update
         if(this._isObjEmpty(this.linePath)){
@@ -117,7 +116,8 @@ Element which draws lines series onto the chart
           this.linePath = this.svg.append("path")
             .datum(data)
             .attr("class", "series-line")
-            .attr("line-id", this.lineId)
+            .attr("series-id", this.seriesId)
+            .attr("series-number", this.seriesNumber)
             .attr('fill','none')
             .attr("d", line);
 
@@ -139,9 +139,9 @@ Element which draws lines series onto the chart
      * @method isIdInMuted
      */
     isIdInMuted: function() {
-      if(this.mutedSeries.hasOwnProperty(this.lineId)){
+      if(this.mutedSeries.hasOwnProperty(this.seriesId)){
         // if true, mute
-        if(this.mutedSeries[this.lineId]){
+        if(this.mutedSeries[this.seriesId]){
           this._muteLine()
         } else {
           this._colorLine()

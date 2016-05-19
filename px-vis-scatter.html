@@ -10,7 +10,7 @@ Element which draws scatter series onto the chart
 
     <px-vis-scatter
         svg="[[svg]]"
-        scatter-id="[[item.name]]"
+        series-id="[[item.name]]"
         series-number="[[index]]"
         chart-data="[[item]]"
         x="[[x]]"
@@ -54,16 +54,16 @@ Element which draws scatter series onto the chart
       /**
        * A unique ID for each line series
        *
-       * @property lineId
+       * @property seriesId
        * @type String
        */
-      scatterId:{
+      seriesId:{
         type:String
       },
       /**
        * An index of the series used for calculating its color
        *
-       * @property lineId
+       * @property scatterNumber
        * @type String
        */
       seriesNumber:{
@@ -89,8 +89,7 @@ Element which draws scatter series onto the chart
       scatterDots:{
         type:Object,
         value:{}
-      },
-
+      }
     },
 
     observers: [
@@ -100,8 +99,8 @@ Element which draws scatter series onto the chart
 
     ready:function(){
       // if there is no dev set unique ID, generate one
-      if(!this.scatterId){
-        this.set('scatterId', this.generateRandomID('scatter_'));
+      if(!this.seriesId){
+        this.set('seriesId', this.generateRandomID('scatter_'));
       }
     },
 
@@ -119,7 +118,8 @@ Element which draws scatter series onto the chart
         if(this._isObjEmpty(this.scatterGroup)){
           // draw the path
           this.scatterGroup = this.svg.append("g")
-            .attr("scatter-id", this.scatterId)
+            .attr("series-id", this.seriesId)
+            .attr("series-number", this.seriesNumber)
             .attr("class", "series-scatter");
           // TODO different shapes
           // TODO dev set FA icons & icons
@@ -150,9 +150,9 @@ Element which draws scatter series onto the chart
      * @method isIdInMuted
      */
     isIdInMuted: function() {
-      if(this.mutedSeries.hasOwnProperty(this.scatterId)){
+      if(this.mutedSeries.hasOwnProperty(this.seriesId)){
         // if true, mute
-        if(this.mutedSeries[this.scatterId]){
+        if(this.mutedSeries[this.seriesId]){
           this._muteScatter()
         } else {
           this._colorScatter()
@@ -162,20 +162,20 @@ Element which draws scatter series onto the chart
     /**
      * Adds full color to the line.
      *
-     * @method _colorLine
+     * @method _colorScatter
      */
     _colorScatter:function(){
       var index = this.seriesNumber;
       this.scatterGroup
         .attr('fill',this.dataVisColors[this.seriesColorOrder[index]])
         .attr('fill-opacity',0.6)
-        // .attr('stroke',this.dataVisColors[this.seriesColorOrder[index]])
-        // .attr('stroke-opacity',1);
+        .attr('stroke',this.dataVisColors[this.seriesColorOrder[index]])
+        .attr('stroke-opacity',1);
     },
     /**
      * Adds muted color to the line.
      *
-     * @method muteElements
+     * @method _muteScatter
      TODO add dev set color and opacity
      */
      _muteScatter:function(){

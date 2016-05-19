@@ -51,6 +51,24 @@ PxVisBehavior.svg = {
 
     return id;
   },
+  /*
+   * Clones a SVG elem and sets a component property with the d3 instance of that clone.
+   *
+   * The intent of this is to clone the high level 'g' elem we draw to and attach it.
+   * The draw order matters  in SVG and we want the some stuff to appear on top of everything else
+   * Since we cannot easily ensure it draw order with components, we can stick top level items in a different 'g' that we know is drawn after the main 'g'
+   *
+   * @param {element}
+   * @param {string}
+  */
+  cloneSVGElem: function(svg,prop){
+    var tempSVG = svg,
+        clone = tempSVG.cloneNode();
+
+    tempSVG.parentNode.appendChild(clone);
+
+    this.set(prop,d3.select(clone));
+  },
 
   /**
    * Checks to see if an object is empty

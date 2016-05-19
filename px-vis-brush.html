@@ -141,21 +141,10 @@ This element sets the selectedDomain property based on the extents box. The sele
         .on("brushend", this._brushend.bind(this));
 
       if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this._brush)){
-        /*
-          first thing, clone the 'g' elem we draw to and attach it
-          draw order matters and we want the brush to appear on top of everything else
-          since we cannot ensure it draws after everything else easily, we can stick it in a
-          different 'g' that we know is drawn after the main 'g'
-
-        */
-        var tempSVG = this.svg[0][0],
-            clone = tempSVG.cloneNode();
-
         var heightOffset = 6;
 
-        tempSVG.parentNode.appendChild(clone);
-
-        this.set('bushSvg',d3.select(clone));
+        // make sure the brush draws on top of everything; returns a set property brushSvg
+        this.cloneSVGElem(this.svg[0][0],'bushSvg');
 
         // // navigator outline
         // this.bushSvg.append("rect")
