@@ -8,7 +8,7 @@ Element providing iron-ajax requests and data formating.
     <px-vis-data
         id="myId"
         request-data="[[series]]"
-        type="flat">
+        lists="flat">
     </px-vis-data>
 
 requestData is in the form or an Array of Objects and is used for generating the ajax request and formatting the data. At a minimum, it should specify a URL from which to fetch data. It may also include a chart type and a chart name. Default chart type is 'line' and default name is the json file name.
@@ -42,7 +42,7 @@ The 'method' is specified by whether data is returned asynchronously and therefo
     <template is="dom-repeat" items="{{requestData}}">
       <iron-ajax
         url="{{item.url}}"
-        type$="{{item.type}}"
+        lists$="{{item.type}}"
         name$="{{item.name}}"
         axis$="{{item.axis}}"
         on-response="responseHandler"
@@ -163,12 +163,21 @@ The 'method' is specified by whether data is returned asynchronously and therefo
        * [ {a},{b},{c},{1},{2} ]
        * ```
        *
-       * @property type
+       * @property lists
        * @type String
        * @default append
        */
-      type:{
+      lists:{
         value:'append'
+      },
+      /**
+       * A string to indicate what type of dataset this ajax is getting. Repeated back in the event
+       *
+       * @property dataVar
+       * @type String
+       */
+      dataVar: {
+        type: String
       },
       /**
        * A counter to determine if all requests have been returned
@@ -216,7 +225,7 @@ The 'method' is specified by whether data is returned asynchronously and therefo
       // count the number of requests sop we know when all have been received
       this._requests += 1;
       // call different handlers depending on what we are doing to combine the data
-      if(this.type === 'append'){
+      if(this.lists === 'append'){
         this._appendHandler(e);
       } else {
         this._flatHandler(e);
@@ -254,7 +263,7 @@ The 'method' is specified by whether data is returned asynchronously and therefo
       if(this.isAsync){
         this.push('responseData',data);
         this.notifyPath('responseData',this.responseData);
-        this.fire('px-vis-data-updated', { 'data':data, 'type': this.type, 'method':'push', 'id': this.id });
+        this.fire('px-vis-data-updated', { 'data':data, 'lists': this.lists, 'method':'push', 'dataVar': this.dataVar });
       } else {
         this.push('_tempData',data);
         this.notifyPath('_tempData',this._tempData);
@@ -273,7 +282,7 @@ The 'method' is specified by whether data is returned asynchronously and therefo
       if(this.isAsync){
         var data = this.responseData.concat(d);
         this.set('responseData',data);
-        this.fire('px-vis-data-updated', { 'data':data, 'type': this.type, 'method': 'set', 'id': this.id });
+        this.fire('px-vis-data-updated', { 'data':data, 'method': 'set', 'dataVar': this.dataVar  });
       } else {
         var data = this._tempData.concat(d);
         this.set('_tempData',data);
@@ -299,7 +308,7 @@ The 'method' is specified by whether data is returned asynchronously and therefo
   //TODO make this optional / default
       if(this._requests > 0 && this._requests === this.requestData.length){
         this.set('responseData',this._tempData);
-        this.fire('px-vis-data-updated', { 'data':this._tempData, 'type': this.type, 'method': 'set', 'id': this.id });
+        this.fire('px-vis-data-updated', { 'data':this._tempData, 'method': 'set', 'dataVar': this.dataVar });
       }
     }
   });

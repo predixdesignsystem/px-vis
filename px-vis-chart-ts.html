@@ -36,17 +36,20 @@ Creates an interactive timeseries chart
         <px-vis-data
           id = "seriesAjax"
           request-data = "[[series]]"
-          type="append">
+          data-var="chartData"
+          lists="append">
         </px-vis-data>
         <px-vis-data
           id = "eventAjax"
           request-data = "[[events]]"
-          type = "flat">
+          data-var="eventData"
+          lists = "flat">
         </px-vis-data>
         <px-vis-data
           id = "thresholdAjax"
           request-data = "[[thresholds]]"
-          type = "flat">
+          data-var="thresholdData"
+          lists = "flat">
         </px-vis-data>
         <template is="dom-if" if="[[_topRegister(registerLocation)]]">
           <px-vis-register
@@ -54,7 +57,7 @@ Creates an interactive timeseries chart
             width="[[width]]"
             type="horizontal"
             tooltip-data=[[tooltipData]]
-            muted-series="{{mutedSeries}}">
+            muted-series="[[mutedSeries]]">
           </px-vis-register>
         </template>
         <px-vis-scale
@@ -63,15 +66,10 @@ Creates an interactive timeseries chart
           width="[[width]]"
           height="[[height]]"
           margin="[[margin]]"
-          x="{{x}}"
-          y="{{y}}"
           chart-data="[[chartData]]"
-          selected-domain="[[selectedDomain]]"
-          current-domain-x="{{currentDomainX}}"
-          current-domain-y="{{currentDomainY}}">
+          selected-domain="[[selectedDomain]]">
         </px-vis-scale>
         <px-vis-svg
-          id="chartSVG"
           width="[[width]]"
           height="[[height]]"
           margin="[[margin]]">
@@ -176,8 +174,7 @@ Creates an interactive timeseries chart
           y="[[y]]"
           vertical-line="full"
           current-domain-x="[[currentDomainX]]"
-          current-domain-y="[[currentDomainY]]"
-          tooltip-data={{tooltipData}}>
+          current-domain-y="[[currentDomainY]]">
         </px-vis-tooltip>
 
         <px-vis-chart-navigator
@@ -195,7 +192,7 @@ Creates an interactive timeseries chart
           height="[[height]]"
           units="Hz"
           tooltip-data=[[tooltipData]]
-          muted-series="{{mutedSeries}}">
+          muted-series="[[mutedSeries]]">
         </px-vis-register>
       </template>
     </div>
@@ -436,16 +433,16 @@ Creates an interactive timeseries chart
          *
          * @method _updateData
          */
-        _updateData: function(evt){
-          var detail = evt.detail;
-          if(detail.id === 'eventAjax'){
-            this[detail.method]('eventData',detail.data);
-          } else if(detail.id === 'thresholdAjax'){
-            this[detail.method]('thresholdData',detail.data);
-          } else if(detail.id === 'seriesAjax'){
-            this[detail.method]('chartData',detail.data);
-            this.notifyPath('chartData',detail.data);
-          }
-        }
+        // _updateData: function(evt){
+        //   var detail = evt.detail;
+        //   if(detail.id === 'eventAjax'){
+        //     this[detail.method]('eventData',detail.data);
+        //   } else if(detail.id === 'thresholdAjax'){
+        //     this[detail.method]('thresholdData',detail.data);
+        //   } else if(detail.id === 'seriesAjax'){
+        //     this[detail.method]('chartData',detail.data);
+        //     this.notifyPath('chartData',detail.data);
+        //   }
+        // }
     });
 </script>

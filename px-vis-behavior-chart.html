@@ -16,32 +16,76 @@ var PxVisBehavior = PxVisBehavior || {};
 PxVisBehavior.chartCommon = {
 
     listeners:{
-      'px-vis-svg-updated': '_updateSVG',
-      'px-vis-data-updated': '_updateData'
+      'px-vis-svg-updated'              : '_updateLocalProperty',
+      'px-vis-data-updated'             : '_updateLocalProperty',
+      'px-vis-x-updated'                : '_updateLocalProperty',
+      'px-vis-y-updated'                : '_updateLocalProperty',
+      'px-vis-current-domain-x-updated' : '_updateLocalProperty',
+      'px-vis-current-domain-y-updated' : '_updateLocalProperty',
+      'px-vis-tooltip-updated'          : '_updateLocalProperty',
+      
+      'px-vis-muted-series-updated'     : '_updateGlobalProperty',
+      'px-vis-selected-domain-updated'  : '_updateGlobalProperty'
     },
 
     /**
-     * Listener for a data update. Updates the data objects so they can precipitate down
+     * Helper function that only calls _updateProperty if event originates from a child component of the chart.
      *
-     * @method _updateSVG
+     * Events data packet must come in the form:
+     * ```
+     *  {
+     *    'dataVar': variableName,  //'chartData' or 'mutedSeries.myLineSeries'
+     *    'data': data,
+     *    'method':'set'  //any Polymer method: 'set','push', etc
+     *  }
+     *```
+     * @method _updateLocalProperty
+     * @param {event}
      */
-    _updateSVG: function(evt){
-      var detail = evt.detail,
-        ne = Polymer.dom(evt);
-      // TODO more general approach to finding the SVG target
-      if(ne.rootTarget === this.$.chartSVG){
-        this.set('svg', detail.svg);
+    _updateLocalProperty: function(evt){
+      var detail = evt.detail;
+      var ne = Polymer.dom(evt);
+      if(ne.rootTarget.dataHost === this){
+        this._updateProperty(detail);
       }
     },
-
     /**
-     * Listener for a data update. Must be set up in the chart
+     * Helper function that always calls _updateProperty regardless of origin.
      *
-     * @method _updateData
+     * Events data packet must come in the form:
+     * ```
+     *  {
+     *    'dataVar': variableName,  //'chartData' or 'mutedSeries.myLineSeries'
+     *    'data': data,
+     *    'method':'set'  //any Polymer method: 'set','push', etc
+     *  }
+     *```
+     * @method _updateGlobalProperty
+     * @param {event}
      */
-    _updateData: function(evt){
-      // TODO Figure out a general case for this?
-      console.warn('Function _updateData does nothing')
+    _updateGlobalProperty: function(evt){
+      var detail = evt.detail;
+      this._updateProperty(detail);
+    },
+    /**
+     * Generic variable updater. Triggered by events to support precipitation pattern.
+     *
+     * Events data packet must come in the form:
+     * ```
+     *  {
+     *    'dataVar': variableName,  //'chartData' or 'mutedSeries.myLineSeries'
+     *    'data': data,
+     *    'method':'set'  //any Polymer method: 'set','push', etc
+     *  }
+     *```
+     * @method _updateProperty
+     * @param {object}
+     */
+    _updateProperty: function(detail){
+      this[detail.method](detail.dataVar, detail.data);
+      if(detail.method !== 'set'){
+        this.notifyPath(detail.dataVar,detail.data);
+      }
     }
 };
 </script>

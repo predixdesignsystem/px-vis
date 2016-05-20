@@ -293,9 +293,13 @@ function basicTests(registerID,dir){
   suite('px-vis-register ' + registerID + ' clicking on series', function() {
     var data,
         series,
-        seriesName;
+        seriesName,
+        eventObj;
     setup(function(done) {
       data = generateEmptyData(5);
+      document.addEventListener('px-vis-muted-series-updated',function(evt){
+        eventObj = evt.detail;
+      });
       setData(register, data, done);
     });
 
@@ -310,6 +314,19 @@ function basicTests(registerID,dir){
       assert.equal(ms[0], data.series[1]['name']);
       assert.equal(register.mutedSeries[ms[0]], true);
       assert.isTrue(series.classList.contains('muted'));
+    });
+
+    test(registerID + ' muted-series-updated event fired', function() {
+      assert.isDefined(eventObj);
+    });
+    test(registerID + ' muted-series-updated method is set', function() {
+      assert.equal(eventObj.method, 'set');
+    });
+    test(registerID + ' muted-series-updated dataVar is mutedSeries.series_1', function() {
+      assert.equal(eventObj.dataVar, 'mutedSeries.series_1');
+    });
+    test(registerID + ' muted-series-updated data is true', function() {
+      assert.equal(eventObj.data, true);
     });
 
     test(registerID + ' mutedSeries change to false', function() {
