@@ -1,7 +1,6 @@
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-chart.html" />
-<link rel="import" href="../iron-ajax/iron-ajax.html" />
 <link rel="import" href="px-vis-svg.html"/>
 <link rel="import" href="px-vis-line.html"/>
 <link rel="import" href="px-vis-axis.html"/>
@@ -9,14 +8,22 @@
 <link rel="import" href="px-vis-scale.html"/>
 
 <!--
-Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
+Provides an interactive chart navigator with a brush to adjust the chart domain
 
 ##### Usage
 
-    <px-vis counter-value="1">Hi</px-vis>
+    <px-vis-chart-navigator
+        x-scale="time"
+        y-scale="linear"
+        width="[[width]]"
+        height="100"
+        margin="[[marginNav]]"
+        chart-data="[[chartData]]"
+        nav-series-limit="[[navSeriesLimit]]">
+    </px-vis-chart-navigator>
 
-@element px-vis
-@blurb Element providing solution to no problem in particular.
+@element px-vis-chart-navigator
+@blurb Provides an interactive chart navigator with a brush to adjust the chart domain
 @homepage index.html
 @demo demo.html
 -->
@@ -37,16 +44,32 @@ Element providing solution to no problem in particular. As a simple, increments 
         margin="[[margin]]">
       </px-vis-svg>
 
-      <template is="dom-repeat" items="[[chartData]]">
-        <px-vis-line
-          svg="[[svg]]"
-          chart-data="[[item]]"
-          series-id="[[item.name]]"
-          series-number="[[index]]"
-          x="[[x]]"
-          y="[[y]]"
-          current-domain-x="[[currentDomainX]]"
-          current-domain-y="[[currentDomainY]]">
+      <template is="dom-repeat" items="[[chartData]]" filter="{{_limitSeries(navSeriesLimit)}}">
+        <template is="dom-if" if="[[_chartTypeLine(item.type)]]">
+          <px-vis-line
+            svg="[[svg]]"
+            series-id="[[item.name]]"
+            series-number="[[item.seriesNumber]]"
+            chart-data="[[item]]"
+            x="[[x]]"
+            y="[[y]]"
+            current-domain-x="[[currentDomainX]]"
+            current-domain-y="[[currentDomainY]]">
+          </px-vis-line>
+        </template>
+        <template is="dom-if" if="[[_chartTypeScatter(item.type)]]">
+          <px-vis-scatter
+            svg="[[svg]]"
+            series-id="[[item.name]]"
+            series-number="[[item.seriesNumber]]"
+            chart-data="[[item]]"
+            marker-size="2"
+            x="[[x]]"
+            y="[[y]]"
+            current-domain-x="[[currentDomainX]]"
+            current-domain-y="[[currentDomainY]]">
+          </px-vis-scatter>
+        </template>
       </template>
 
       <px-vis-axis
@@ -99,9 +122,8 @@ Element providing solution to no problem in particular. As a simple, increments 
            * TODO how to just show all? 'All', INFINITY?
            * @default 1
            */
-          series:{
-            type:Number,
-            value: 1
+          navSeriesLimit:{
+            type:Number
           },
           xAxisLocation:{
             type:String,
@@ -122,6 +144,19 @@ Element providing solution to no problem in particular. As a simple, increments 
           yScale: {
             type: String,
             value: 'ordinal',
+          }
+        },
+
+        _limitSeries: function(limit){
+          if (!limit) {
+            // set filter to null to disable filtering
+            return null;
+          } else {
+            // return a filter function for the current search
+            return function(chartData) {
+              // seriesNumber is 0 index, so < limit
+              return chartData.seriesNumber < limit
+            };
           }
         }
     });
