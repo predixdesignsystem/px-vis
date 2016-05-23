@@ -89,7 +89,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
                   </div>
                   <div class="seriesData" name$="{{item.name}}">
                     <numbro-element
-                      value="[[item.value]]"
+                      value="[[_returnVal(item.value)]]"
                       format="[[numberFormat]]"
                       culture="[[numberFormatCulture]]"
                       currency$="[[numberFormatIsCurrency]]"
@@ -108,7 +108,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
     <template is="dom-if" if="{{!_typeEqualHorizontal(type)}}">
       <div
         id="registerWrap"
-        class="flex flex--col u-ml"
+        class="flex flex--col u-ml u-pr u-pt u-pb"
         style$="height:{{height}}px; width:{{width}}px">
         <div id="dateTime">
           <span id="firstDateTime">{{_firstDateTime}}</span> <span>{{_separator}}</span> <span id="secondDateTime">{{_secondDateTime}}</span>  &nbsp;
@@ -127,7 +127,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
             </span>
             <span class="seriesData" name$="{{item.name}}">
               <numbro-element
-                value="[[item.value]]"
+                value="[[_returnVal(item.value)]]"
                 format="[[numberFormat]]"
                 culture="[[numberFormatCulture]]"
                 currency$="[[numberFormatIsCurrency]]"
@@ -344,6 +344,9 @@ Formatting for the timestamps,the data values, and the series names can be contr
         return true;
       }
       return false;
+    },
+    _returnVal: function(val){
+      return val[1]
     }
   });
 </script>

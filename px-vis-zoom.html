@@ -1,0 +1,87 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
+
+
+<!--
+Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
+
+##### Usage
+
+    <px-vis counter-value="1">Hi</px-vis>
+
+@element px-vis
+@blurb Element providing solution to no problem in particular.
+@homepage index.html
+@demo demo.html
+-->
+<dom-module id="px-vis-zoom">
+    <template>
+    </template>
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'px-vis-zoom',
+
+    behaviors: [
+      PxVisBehavior.svg,
+      PxVisBehavior.axes,
+      PxVisBehavior.selectedDomain
+    ],
+
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      /**
+       * Container for the d3 instantiated zoom element
+       *
+       * @property _chartZoom
+       * @type Object
+       */
+      _chartZoom:{
+        type: Object,
+        notify:true
+      }
+    },
+
+    observers: [
+      'configureZoom(x,y,svg)'
+    ],
+    configureZoom: function(){
+      if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y)){
+
+        this._chartZoom = d3.behavior.zoom()
+          .x(this.x)
+          .y(this.y)
+          .on("zoom", this.zooooom.bind(this));
+          // .on("zoom", function(){ console.log('zoom')});
+
+        this.svg.call(this._chartZoom);
+      }
+    },
+
+    zooooom: function() {
+      console.log(d3.event.translate);
+      console.log(d3.event.scale);
+      // svg.select(".x.axis").call(xAxis);
+      // svg.select(".y.axis").call(yAxis);
+      // svg.select(".x.grid")
+      //   .call(make_x_axis()
+      //   .tickSize(-height, 0, 0)
+      //   .tickFormat(""));
+      // svg.select(".y.grid")
+      //   .call(make_y_axis()
+      //   .tickSize(-width, 0, 0)
+      //   .tickFormat(""));
+      // svg.select(".line")
+      //   .attr("class", "line")
+      //   .attr("d", line);
+    }
+  });
+</script>

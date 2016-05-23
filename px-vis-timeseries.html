@@ -11,9 +11,12 @@
 <link rel="import" href="px-vis-data.html"/>
 <link rel="import" href="px-vis-chart-navigator.html"/>
 <link rel="import" href="px-vis-scale.html"/>
+<link rel="import" href="px-vis-interaction-space.html"/>
+<link rel="import" href="px-vis-cursor.html"/>
 <link rel="import" href="px-vis-tooltip.html"/>
 <link rel="import" href="px-vis-register.html"/>
 <link rel="import" href="px-vis-threshold.html"/>
+<!-- <link rel="import" href="px-vis-zoom.html"/> -->
 
 
 <!--
@@ -164,7 +167,7 @@ Creates an interactive timeseries chart
           current-domain="[[currentDomainY]]">
         </px-vis-axis>
 
-        <px-vis-tooltip
+        <px-vis-interaction-space
           svg="[[svg]]"
           width="[[width]]"
           height="[[height]]"
@@ -172,10 +175,21 @@ Creates an interactive timeseries chart
           chart-data="[[chartData]]"
           x="[[x]]"
           y="[[y]]"
-          vertical-line="full"
           current-domain-x="[[currentDomainX]]"
           current-domain-y="[[currentDomainY]]">
-        </px-vis-tooltip>
+        </px-vis-interaction-space>
+
+        <px-vis-cursor
+          svg="[[svg]]"
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          chart-data="[[chartData]]"
+          horizontal-line="full"
+          vertical-line="full"
+          circle-point="yes"
+          tooltip-data="[[tooltipData]]">
+        </px-vis-cursor>
 
         <px-vis-chart-navigator
           x-scale="time"
@@ -187,7 +201,21 @@ Creates an interactive timeseries chart
           nav-series-limit="[[navSeriesLimit]]">
         </px-vis-chart-navigator>
 
+        <!-- <px-vis-zoom
+          svg="[[svg]]"
+          x="[[x]]"
+          y="[[y]]">
+        </px-vis-zoom> -->
       </div>
+      <template is="dom-if" if="[[enableTooltip]]">
+        <px-vis-tooltip
+          svg="[[svg]]"
+          width="250"
+          margin="[[margin]]"
+          chart-data="[[chartData]]"
+          tooltip-data="[[tooltipData]]">
+        </px-vis-tooltip>
+      </template>
       <template is="dom-if" if="[[_sideRegister(registerLocation)]]">
         <px-vis-register
           height="[[height]]"
@@ -217,6 +245,7 @@ Creates an interactive timeseries chart
           PxVisBehavior.selectedDomain,
           PxVisBehavior.dataset,
           PxVisBehavior.chartCommon,
+          PxVisBehavior.interaction,
           commonColors
         ],
 
@@ -341,6 +370,17 @@ Creates an interactive timeseries chart
           eventData:{
             type: Array,
             notify: true
+          },
+          /**
+           * Boolean to turn the on-chart tooltip on or off
+           *
+           * @property enableTooltip
+           * @type Boolean
+           */
+          enableTooltip: {
+            type: Boolean,
+            notify: true,
+            value: false
           }
         },
 
