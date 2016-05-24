@@ -114,11 +114,23 @@ This element sets the selectedDomain property based on the extents box. The sele
       _centering:{
         type:Boolean,
         value:false
-      }
+      },
+      /**
+       * The parent chart's extents
+       *
+       * @property chartDomain
+       * @type Array
+       */
+      chartDomain: {
+        type:Array,
+        value:[],
+        notify:true
+      },
     },
 
     observers: [
-      'drawElement(currentDomain)'
+      'drawElement(currentDomain)',
+      '_zoomBrush(chartDomain)'
     ],
 
     /**
@@ -131,20 +143,20 @@ This element sets the selectedDomain property based on the extents box. The sele
      * @method drawElement
      */
     drawElement: function() {
-      // first, define the brush using the axis
-      this._brush = d3.svg.brush()
-        .x(this.axis)
-        .extent(this.currentDomain)
-        // .on("brush", (this._brushed).bind(this));
-        .on("brushstart", this._brushstart.bind(this))
-        .on("brush", this._brushmove.bind(this))
-        .on("brushend", this._brushend.bind(this));
-
-      if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this._brush)){
+      if(typeof(this.svg) !== 'undefined' && this._isObjEmpty(this._brush) && !this._isObjEmpty(this.axis)){
         var heightOffset = 6;
 
         // make sure the brush draws on top of everything; returns a set property brushSvg
         this.cloneSVGElem(this.svg.node(),'bushSvg');
+
+        // first, define the brush using the axis
+        this._brush = d3.svg.brush()
+          .x(this.axis)
+          .extent(this.currentDomain)
+          // .on("brush", (this._brushed).bind(this));
+          .on("brushstart", this._brushstart.bind(this))
+          .on("brush", this._brushmove.bind(this))
+          .on("brushend", this._brushend.bind(this));
 
         // // navigator outline
         // this.bushSvg.append("rect")
@@ -458,6 +470,20 @@ This element sets the selectedDomain property based on the extents box. The sele
         .attr('fill', this.colors.gray5);
       elem.selectAll('line.handleLine')
         .attr('stroke', this.colors.gray6);
-    }
+    },
+    /**
+     * Function to trigger a brush extent calculation when the main chart extents change.
+     *
+     * @method _zoomBrush
+     */
+    _zoomBrush: function(chartDomain){
+      if(chartDomain.length > 0 && !this._isObjEmpty(this._brush)){
+        if(!((+this.selectedDomain[0] === +chartDomain[0]) && (+this.selectedDomain[1] === +chartDomain[1])) && !this._centering){
+          this._brushGroup
+            .call(this._brush.extent(this.chartDomain))
+            .call(this._brush.event);
+        }
+      }
+    },
   });
 </script>

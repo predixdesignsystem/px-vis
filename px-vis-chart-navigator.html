@@ -85,7 +85,9 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
         axis="[[x]]"
         height="[[height]]"
         width="[[width]]"
-        current-domain="[[currentDomainX]]">
+        current-domain="[[currentDomainX]]"
+        chart-domain=[[chartDomainX]]
+        selected-domain="[[selectedDomain]]">
       </px-vis-brush>
 
     </template>
@@ -144,7 +146,29 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           yScale: {
             type: String,
             value: 'ordinal',
-          }
+          },
+          /**
+           * The parent chart's extents
+           *
+           * @property chartDomainX
+           * @type Array
+           */
+          chartDomainX: {
+            type:Array,
+            value:[],
+            notify:true
+          },
+          /**
+           * The parent chart's extents
+           *
+           * @property chartDomainY
+           * @type Array
+           */
+          chartDomainY: {
+            type:Array,
+            value:[],
+            notify:true
+          },
         },
 
         _limitSeries: function(limit){

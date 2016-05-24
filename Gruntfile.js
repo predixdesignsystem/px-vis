@@ -39,6 +39,12 @@ module.exports = function (grunt) {
                   'css/noprefix/px-vis-tooltip.css': 'sass/px-vis-tooltip-predix.scss',
                 }
             },
+            pxZoom: {
+                files: {
+                  'css/noprefix/px-vis-zoom-sketch.css': 'sass/px-vis-zoom-sketch.scss',
+                  'css/noprefix/px-vis-zoom.css': 'sass/px-vis-zoom-predix.scss',
+                }
+            }
 
         },
 

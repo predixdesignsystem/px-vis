@@ -16,7 +16,9 @@ Element providing solution to no problem in particular. As a simple, increments 
 @demo demo.html
 -->
 <dom-module id="px-vis-zoom">
+    <link rel="import" type="css" href="css/px-vis-zoom.css"/>
     <template>
+      <button id="resetBtn" class="btn hidden" on-click="resetZoom">Reset Zoom</button>
     </template>
 </dom-module>
 
@@ -26,8 +28,7 @@ Element providing solution to no problem in particular. As a simple, increments 
     is: 'px-vis-zoom',
 
     behaviors: [
-      PxVisBehavior.svg,
-      PxVisBehavior.axes,
+      PxVisBehavior.extentsData,
       PxVisBehavior.selectedDomain
     ],
 
@@ -38,50 +39,28 @@ Element providing solution to no problem in particular. As a simple, increments 
      * @type Object
      */
     properties: {
-      /**
-       * Container for the d3 instantiated zoom element
-       *
-       * @property _chartZoom
-       * @type Object
-       */
-      _chartZoom:{
-        type: Object,
-        notify:true
-      }
+
     },
 
     observers: [
-      'configureZoom(x,y,svg)'
+      'zooooom(extentsData)'
     ],
-    configureZoom: function(){
-      if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y)){
-
-        this._chartZoom = d3.behavior.zoom()
-          .x(this.x)
-          .y(this.y)
-          .on("zoom", this.zooooom.bind(this));
-          // .on("zoom", function(){ console.log('zoom')});
-
-        this.svg.call(this._chartZoom);
-      }
+    attached(){
+      // TODO generalize this
+      var rect = Polymer.dom(this).getOwnerRoot().host.$$('px-vis-svg').getBoundingClientRect();
+      this.$.resetBtn.style.left = rect.right - 120 - this.margin.right + 'px';
+      this.$.resetBtn.style.top = rect.top + 10 + this.margin.top  + 'px';
     },
 
-    zooooom: function() {
-      console.log(d3.event.translate);
-      console.log(d3.event.scale);
-      // svg.select(".x.axis").call(xAxis);
-      // svg.select(".y.axis").call(yAxis);
-      // svg.select(".x.grid")
-      //   .call(make_x_axis()
-      //   .tickSize(-height, 0, 0)
-      //   .tickFormat(""));
-      // svg.select(".y.grid")
-      //   .call(make_y_axis()
-      //   .tickSize(-width, 0, 0)
-      //   .tickFormat(""));
-      // svg.select(".line")
-      //   .attr("class", "line")
-      //   .attr("d", line);
+    zooooom: function(extentsData) {
+      this.set('selectedDomain', extentsData.eX);
+      this.fire('px-vis-selected-domain-updated', { 'data':extentsData.eX, 'method': 'set', 'dataVar': 'selectedDomain' });
+      this.toggleClass('hidden', false, this.$.resetBtn);
+    },
+    resetZoom: function(){
+      this.set('selectedDomain', ['reset']);
+      this.fire('px-vis-selected-domain-updated', { 'data':['reset'], 'method': 'set', 'dataVar': 'selectedDomain' });
+      this.toggleClass('hidden', true, this.$.resetBtn);
     }
   });
 </script>

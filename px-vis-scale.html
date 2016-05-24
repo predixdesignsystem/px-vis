@@ -165,9 +165,13 @@ Element providing solution to no problem in particular. As a simple, increments 
         },
         _updateDomain:function(d){
           if(d.length > 0){
-            this.x.domain(d);
-            this.set('currentDomainX', this.x.domain());
-            this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
+            if(d[0] === 'reset'){
+              this._currentDomain();
+            } else {
+              this.x.domain(d);
+              this.set('currentDomainX', this.x.domain());
+              this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
+            }
           }
         },
 
