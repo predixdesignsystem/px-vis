@@ -238,6 +238,7 @@ Creates an interactive timeseries chart
           PxVisBehavior.formatting,
           PxVisBehavior.mutedSeries,
           PxVisBehavior.tooltipData,
+          PxVisBehavior.extentsData,
           PxVisBehavior.datetime,
           PxVisBehavior.svg,
           PxVisBehavior.axes,
@@ -394,6 +395,11 @@ Creates an interactive timeseries chart
          * @method _setConfig
          */
         _setConfig: function(){
+          if(typeof(this.options) !== 'object'){
+            console.error('Configuration options must be valid JSON');
+            return;
+          }
+
           var keys = Object.keys(this.options);
           for(var i = 0; i < keys.length; i++){
             var key = keys[i]

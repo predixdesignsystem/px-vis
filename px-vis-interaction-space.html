@@ -49,6 +49,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehavior.axes,
       PxVisBehavior.dataset,
       PxVisBehavior.tooltipData,
+      PxVisBehavior.extentsData,
       PxVisBehavior.interaction,
       commonColors
     ],
@@ -69,6 +70,10 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       _rect:{
         type:Object,
         value:{}
+      },
+      _actionArea: {
+        type: Object,
+        value: {}
       }
     }, //properties
 
@@ -86,7 +91,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && (this.chartData) && this._isObjEmpty(this._rect)){
 
         // make sure the tooltip draws on top of everything; returns a set property interactionSvg
-        this.cloneSVGElem(this.svg[0][0],'interactionSvg');
+        this.cloneSVGElem(this.svg.node(),'interactionSvg');
         this.fire('px-vis-interaction-svg-updated', { 'dataVar': 'interactionSvg', 'data': this.interactionSvg, 'method':'set' });
 
         // append the rectangle to capture mouse interactions
@@ -96,11 +101,16 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           .attr("height", this.height)
           .attr("fill", "none")
           .attr("pointer-events", "all")
-          .on("mouseover", (this._mouseOver).bind(this))
-          .on("mouseout", (this._resetTooltipData).bind(this))
-          .on("mousemove",(this._calcDataPoints).bind(this))
-          .on("click",function(){ console.log(d3.event)})
+          .on("mouseover", this._mouseOver.bind(this))
+          .on("mouseout.tooltip", this._resetTooltipData.bind(this))
+          .on("mousemove.tooltip",this._calcTooltipData.bind(this))
+          .on( "mousedown.action", this._drawActionBox.bind(this))
+          .on( "mousemove.action", this._updateActionBox.bind(this))
+          .on( "mouseup.action", this._finishActionBox.bind(this))
           .style("cursor","crosshair");
+
+          // TODO if there is no register tooltip or cursor, set .tooltip listeners to null
+          // TODO if there is no zoom or action panel, set action listeners to null
 
         // send the register etc an empty list of series
         this._resetTooltipData();
@@ -137,19 +147,17 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       this.set('tooltipData',ttD);
       this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': ttD, 'method':'set' });
-      console.log("mouseout");
-      // trigger a mouseout
     },
 
     /**
      * Helper function called on mousemove
      * Calculates the mouse position and associated x & y values. Then sets the d3 elements and sets tooltipData for consumption elsewhere
      *
-     * @method _calcDataPoints
+     * @method _calcTooltipData
      */
-    _calcDataPoints:function(){
+    _calcTooltipData:function(){
       //  d3.mouse: returns the x position on the screen of the mouse
-      var mousePos = d3.mouse(this._rect[0][0]);
+      var mousePos = d3.mouse(this._rect.node());
 
       this.debounce('move',function(){
         // invert: takes position on the screen and converts it into an equivalent date
@@ -200,6 +208,89 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         this.set('tooltipData',dataObj);
         this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
       },1)
-    } //mousemove
+    }, //mousemove
+
+    /**
+     * Helper function called on mousedown.action
+     * Draws a rectangle on the chart
+     *
+     * @method _drawActionBox
+     */
+    _drawActionBox: function(){
+      var mousePos = d3.mouse(this._rect.node());
+      // use original svg so it draws under the _rect and does not interfer with our mouse events
+      this._actionArea = this.svg.append( "rect")
+        .attr('class', "action-area")
+        .attr('x', mousePos[0])
+        .attr('y', mousePos[1])
+        .attr('ox', mousePos[0]) // save this original position for calcs
+        .attr('oy', mousePos[1]) // save this original position for calcs
+        .attr('rx', 2)
+        .attr('ry', 2)
+        .attr('width', 0)
+        .attr('height', 0)
+        .attr('fill', this.colors.grey2)
+        .attr('fill-opacity', 0.5)
+        .attr('stroke', this.colors.grey6)
+    },
+    /**
+     * Helper function called on mousedown.action
+     * Updates the size of the action area rectangle
+     *
+     * @method _updateActionBox
+     */
+    _updateActionBox: function() {
+      if(!this._isObjEmpty(this._actionArea)) {
+        var mousePos = d3.mouse(this._rect.node()),
+            ox = parseInt(this._actionArea.attr("ox")),
+            oy = parseInt(this._actionArea.attr("oy"));
+
+        // if current position is greater than the original position
+        if(mousePos[0] >= ox){
+          // set x to the original position to prevent some drift on crossover. width is equal to the difference between the x and current mouse position
+          this._actionArea.attr("x", ox);
+          this._actionArea.attr("width", mousePos[0] - ox);
+        } else {
+          // else, the x is the current pos (because we cant have negative width) and width is the difference
+          this._actionArea.attr("x", mousePos[0]);
+          this._actionArea.attr("width", ox - mousePos[0]);
+        }
+
+        if(mousePos[1] >= oy){
+          this._actionArea.attr("y", oy);
+          this._actionArea.attr("height", mousePos[1] - oy);
+        } else {
+          this._actionArea.attr("y", mousePos[1]);
+          this._actionArea.attr("height", oy - mousePos[1])
+        }
+      }
+    },
+
+    /**
+     * Helper function called on mouseup.action
+     * Gets the size of the action area rectangle, sets the extents, and removes it
+     *
+     * @method _finishActionBox
+     */
+    _finishActionBox: function() {
+      // get dims
+      // set dims
+      // action panel or zoom use dims
+      var extents = {};
+
+      extents.x1 = parseInt(this._actionArea.attr("x"));
+      extents.y1 = parseInt(this._actionArea.attr("y"));
+      extents.w = parseInt(this._actionArea.attr("width"));
+      extents.h = parseInt(this._actionArea.attr("height"));
+      extents.x2 = extents.x1 + extents.w;
+      extents.y2 = extents.y1 + extents.h;
+      extents.eX = [this.x.invert(extents.x1), this.x.invert(extents.x2)];
+      extents.eY = [this.y.invert(extents.y1), this.y.invert(extents.y2)];
+
+      this.set('extentsData', extents);
+      this.fire('px-vis-extents-data-updated', {'data': extents, 'dataVar': 'extentsData', 'method': 'set'});
+      this._actionArea.remove();
+    }
+
   });
 </script>
