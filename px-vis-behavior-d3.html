@@ -271,6 +271,19 @@ PxVisBehavior.dataset = {
     }
 };
 
+
+/*
+    Name:
+    PxVisBehavior.interaction
+
+    Description:
+    Polymer behavior that provides the interactionSvg object for d3 components.
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehavior.interaction
+*/
 PxVisBehavior.interaction = {
   properties: {
     /**
@@ -285,170 +298,6 @@ PxVisBehavior.interaction = {
       type: Object
     }
   }
-}
+};
 
-//
-//
-// /**
-//  * attached() Polymer fires this event automatically, we use it to define
-//  * this.svg and initiate the component
-// */
-// attached: function() {
-//     // this.svg = d3.select(this.$$("svg"));
-//     // this._drawElement();
-// },
-//
-// /**
-//  * _drawChart() removes previous chart, draws new chart. Debounced.
-// */
-// _drawChart: function() {
-//     // if(this.svg) {
-//     //     this._removeChart();
-//     //     // multiple calls to _drawChart need to be debounced
-//     //     this.debounce('_drawChartDebounced', function() {
-//     //         this._drawChartDebounced();
-//     //     }, 310);
-//     // }
-// },
-//
-// /**
-//  * _removeChart() removes previous chart contents. Debounced.
-// */
-// _removeChart: function() {
-//     // this.debounce('_removeChartDebounced', function() {
-//     //     // first ensure that our SVG element is empty
-//     //     this._removeChartDebounced();
-//     // }, 300);
-// },
-//
-// /**
-//  * _removeChartDebounced() resizes the SVG element and clears any internal
-//  * contents. This is necessary between redrawing the chart.
-//  * Depends on this.svg being a D3 selection of the chart's SVG element
-// */
-// _removeChartDebounced: function() {
-// //     this.svg
-// //         .attr("width", 1)
-// //         .attr("height", 1)
-// //         .text("");
-// },
-//
-// /**
-//  * _addStyleScope() adds the style-scope class of the component to all SVG
-//  * child nodes. This is necessary because Polymer, while applying the class
-//  * to child HTML elements, does not apply the class to child SVG elements
-//  *
-// */
-// _addStyleScope: function() {
-//     // // polymer doesn't apply style-scope classes to svg child nodes
-//     // // so we need to add .px-simple-bar-chart-svg here
-//     // if(this.svg[0] && this.svg.node()) {
-//     //     d3.selectAll(this.svg.node().childNodes)
-//     //         .classed(this.is, true);
-//     // };
-// },
-//
-// _addStyleScopeToElement: function(el) {
-//     // pass in a d3 selection and this function will ensure that
-//     // polymer style-scope is applied
-//     // el.classed(this.is, true);
-// },
-
-//
-// /**
-//  * _clearSVG() selects the SVG of the chart, shrinks it to 1px by 1px and
-//  * empties it of child elements. This is necessary to do before drawing or
-//  * redrawing the chart.
-//  *
-// */
-// _clearSVG: function() {
-//     // select the svg element
-//     this.svg
-//         .attr("width", 1)
-//         .attr("height", 1)
-//         .text("");
-// },
-//
-// /**
-//  * _calculateTextSize() method returns the size of an SVG text element and
-//  * its position relative to the viewport.
-//  *
-//  * The essential DOM function is getBoundingClientRect():
-//  * https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect
-//  *
-//  * Returns a rect object with the following properties:
-//  *
-//  *    height - float - Height of the rectangle box (This is identical to bottom minus top). Read only.
-//  *    width - float - Width of the rectangle box (This is identical to right minus left). Read only.
-//  *    top - float - Y-coordinate, relative to the viewport origin, of the top of the rectangle box. Read only.
-//  *    left - float - X-coordinate, relative to the viewport origin, of the left of the rectangle box. Read only.
-//  *    bottom - float - Y-coordinate, relative to the viewport origin, of the bottom of the rectangle box. Read only.
-//  *    right - float - X-coordinate, relative to the viewport origin, of the right of the rectangle box. Read only.
-//  *
-//  * @param {String} text
-//  * @param {String} className
-//  * @return {Promise} - resolves to return rectObject
-// */
-// _calculateTextSize: function(text, className) {
-//     // return a promise because correct bounding rect is unavailable until
-//     // a few milliseconds have passed
-//     var that = this;
-//     return new Promise(function (resolve, reject) {
-//         var textNode = that.svg
-//             .append("text")
-//             .attr("class", className)
-//             .attr("x", 0)
-//             .attr("y", 0)
-//             .text(text);
-//         that._addStyleScopeToElement(textNode);
-//         var textSizeTimeout = setTimeout(function() {
-//             // can use getComputedTextLength, getBBox, getBoundingClientRect
-//             var rectObject = textNode.node().getBBox();
-//             resolve(rectObject);
-//             textNode.remove();
-//         }, 10);
-//     });
-// },
-//
-// /**
-//  * _calculateTextHeight() returns height of SVG text element
-//  *
-//  * @param {String} text
-//  * @param {String} className
-//  * @return {Promise} resolves to Number value - height in pixels
-// */
-// _calculateTextHeight: function(text, className) {
-//     // return a promise - the value is unavailabe immediately
-//     var that = this;
-//     return new Promise(function (resolve, reject) {
-//         // _calculateTextSize - promise that resolves to return a rectObject
-//         var textSizePromise = that._calculateTextSize(text, className);
-//         textSizePromise.then(function(rectObject) {
-//             resolve(Math.round(rectObject.height));
-//         }).catch(function(reason) {
-//             console.log('textSizePromise rejected: ', reason);
-//         });
-//     });
-// },
-//
-// /**
-//  * _calculateTextWidth() returns width of SVG text element
-//  *
-//  * @param {String} text
-//  * @param {String} className
-//  * @return {Promise} resolves to Number value - height in pixels
-// */
-// _calculateTextWidth: function(text, className) {
-//     // return a promise - the value is unavailabe immediately
-//     var that = this;
-//     return new Promise(function (resolve, reject) {
-//         // _calculateTextSize - promise that resolves to return a rectObject
-//         var textSizePromise = that._calculateTextSize(text, className);
-//         textSizePromise.then(function(rectObject) {
-//             resolve(Math.round(rectObject.width));
-//         }).catch(function(reason) {
-//             console.log('textSizePromise rejected: ', reason);
-//         });
-//     });
-// },
 </script>
