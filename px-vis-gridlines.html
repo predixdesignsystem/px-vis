@@ -91,8 +91,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         },
 
         observers: [
-          'defineGrid(axis,margin,length)',
-          'drawElement(currentDomain)'
+          // 'defineGrid(axis,margin,length)',
+          'drawElement(currentDomain,axis,margin,length,svg)'
         ],
 
 
@@ -108,7 +108,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          *
          * @method _drawElement
          */
-        defineGrid:function(grid,margin,lenth){
+        defineGrid:function(){
           this._grid = d3.svg.axis()
             .scale(this.axis)
             .orient(this.orientation);
@@ -129,8 +129,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * @method _drawElement
          */
         drawElement: function() {
-          // TODO what happens if not?
-          if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this._grid)){
+          if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.axis)){
+            
+            this.defineGrid()
             // this._grid.tickValues(this.axis.domain());
             if(this.orientation === 'bottom'){
               var h = this.svg.attr('height') - this.margin.bottom - this.margin.top;

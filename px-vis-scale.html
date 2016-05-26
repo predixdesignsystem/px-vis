@@ -28,6 +28,7 @@ Element providing solution to no problem in particular. As a simple, increments 
         is: 'px-vis-scale',
 
         behaviors: [
+          PxVisBehavior.svg,
           PxVisBehavior.sizing,
           PxVisBehavior.axes,
           PxVisBehavior.dataset,
@@ -70,7 +71,7 @@ Element providing solution to no problem in particular. As a simple, increments 
         observers: [
           '_setXScale(width,margin)',
           '_setYScale(height,margin)',
-          '_currentDomain(chartData.*)',
+          '_currentDomain(chartData.*,x,y)',
           '_updateDomain(selectedDomain)',
         ],
 
@@ -119,7 +120,7 @@ Element providing solution to no problem in particular. As a simple, increments 
          */
         _currentDomain: function() {
           // check to make sure there is data
-          if(this.chartData){
+          if(this.chartData && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y)){
             // TODO check if dataset has max and min
             // TODO What do we do if we have Y and not x, which is the case with our sample data?
 

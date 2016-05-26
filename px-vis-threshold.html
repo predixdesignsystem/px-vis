@@ -224,10 +224,14 @@ The configureation object allows developers to set the icon used for each event 
      */
     _getColors: function(d,i){
       var color = this.colors[this.defaultColor];
+      // TODO make more elegant
       if(d.for){
         var series = this.svg.select('[series-id=' + d.for + ']');
-        color = this.dataVisColors[this.seriesColorOrder[series.attr('series-number')]];
+        if(series.node()){
+          color = this.dataVisColors[this.seriesColorOrder[series.attr('series-number')]];
+        }
       }
+
       return color;
     },
     /**

@@ -166,8 +166,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         },
 
         observers: [
-          'defineAxis(axis)',
-          'drawElement(currentDomain)',
+          // 'defineAxis(axis)',
+          'drawElement(currentDomain,svg,axis,margin)',
           'drawSeriesBars(chartData.*)',
           '_muteSeriesBars(mutedSeries.*)'
         ],
@@ -218,8 +218,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          */
         drawElement: function() {
           // console.log('draw axis');
-          // TODO what happens if not?
-          if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this._axis)){
+          if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.axis) && !this._isObjEmpty(this.margin)){
+            this.defineAxis();
             // TODO unify my orientation checks
             if(this.orientation === 'bottom'){
               var h = this.svg.attr('height') - this.margin.bottom - this.margin.top;
@@ -231,23 +231,20 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
             // checks to see if the axis already exists. If not, create; if so, update
             if(this._isObjEmpty(this._axisGroup)){
-              var g = this.svg.append("g")
+              this._axisGroup = this.svg.append("g")
                 .attr("class", "axis")
                 .attr('axis-id',this.axisId)
                 .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
                 .call(this._axis);
 
-              this._setLineStyles(g,'line,path');
-              this._setLabelStyles(g);
-
-              //keep a reference for later
-              this._axisGroup = this.svg.select('g.axis[axis-id=' + this.axisId + ']');
+              this._setLineStyles(this._axisGroup,'line,path');
+              this._setLabelStyles(this._axisGroup);
 
               if(this.title){
                 this.drawTitle();
               }
 
-              // this.drawSeriesBars();
+              this.drawSeriesBars();
 
             } else {
               this._axisGroup
@@ -381,12 +378,14 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * @method drawSeriesBars
          */
         drawSeriesBars:function(){
-          // FIXME do we need to move the title group based on how many series we have
-          for(var i = 0; i < this.chartData.length; i++){
-            if(typeof(this.chartData[i]['axis']) === 'undefined' || this.chartData[i]['axis'] === '' || this.chartData[i]['axis'] === this.axisId){
-              var color = this.dataVisColors[this.seriesColorOrder[i]],
-                  id = this.chartData[i]['name'];//.split(' ').join('_');
-              this._drawBar(this._titleGroup,id,color,i);
+          if(this.chartData && !this._isObjEmpty(this._axisGroup)){
+            // FIXME do we need to move the title group based on how many series we have
+            for(var i = 0; i < this.chartData.length; i++){
+              if(typeof(this.chartData[i]['axis']) === 'undefined' || this.chartData[i]['axis'] === '' || this.chartData[i]['axis'] === this.axisId){
+                var color = this.dataVisColors[this.seriesColorOrder[i]],
+                    id = this.chartData[i]['name'];//.split(' ').join('_');
+                this._drawBar(this._titleGroup,id,color,i);
+              }
             }
           }
         },
