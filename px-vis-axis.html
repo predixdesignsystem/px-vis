@@ -166,7 +166,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         },
 
         observers: [
-          // 'defineAxis(axis)',
           'drawElement(currentDomain,svg,axis,margin)',
           'drawSeriesBars(chartData.*)',
           '_muteSeriesBars(mutedSeries.*)'
@@ -218,7 +217,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          */
         drawElement: function() {
           // console.log('draw axis');
-          if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.axis) && !this._isObjEmpty(this.margin)){
+          if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.axis) && !this._isObjEmpty(this.margin) && this.currentDomain.length > 0){
             this.defineAxis();
             // TODO unify my orientation checks
             if(this.orientation === 'bottom'){
@@ -332,6 +331,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         drawTitle:function(){
           var ext = this._axisGroup.node().getBBox();
           var x,y,r;
+          
           switch(this.orientation){
             case 'bottom':
               x = parseFloat(ext['width']) / 2 + this.translateAmt[0];
