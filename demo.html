@@ -94,7 +94,8 @@
                     x="{{x}}"
                     y="{{y}}"
                     current-domain-x="{{currentDomainX}}"
-                    current-domain-y="{{currentDomainY}}">
+                    current-domain-y="{{currentDomainY}}"
+                    selected-domain="[[selectedDomain]]">
                   </px-vis-scale>
                 </template>
                 <template is="dom-if" if="{{item.line}}">
@@ -240,6 +241,7 @@
                     margin="[[item.basic.margin]]"
                     chart-data="[[item.basic.chartData]]"
                     tooltip-data={{tooltipData}}
+                    extents-data={{extentsData}}
                     x="[[x]]"
                     y="[[y]]"
                     current-domain-x="[[currentDomainX]]"
@@ -301,6 +303,14 @@
                   </px-vis-tooltip>
                 </template>
 
+                <template is="dom-if" if="{{item.zoom}}">
+                  <px-vis-zoom
+                    svg="[[svg]]"
+                    margin="[[item.basic.margin]]"
+                    extents-data="[[extentsData]]"
+                    selected-domain="{{selectedDomain}}">
+                  </px-vis-zoom>
+                </template>
 
                 <template is="dom-if" if="{{item.navigator}}">
                   <px-vis-chart-navigator
@@ -794,7 +804,7 @@
         demos.push({
           "title": "px-vis-register : dynamic",
           "descriptionText" : [
-            "Example of a live register tied to an interaction-space. Hover over the chart to see values update."
+            "Example of a live register tied to an interaction-space. Hover over the chart to see values update. Click the series name to see the line mute."
           ],
           "elemType" : "register",
           "svg":true,
@@ -815,36 +825,71 @@
 
 // TOOLTIP #########################################################################################
 
-        // demos.push({
-        //   "title": "px-vis-tooltip",
-        //   "descriptionText" : [
-        //     "The tooltip provides similar data display functionality to the register, but on chart and without the user interaction."
-        //   ],
-        //   "elemType" : "register",
-        //   "svg": true,
-        //   "interaction": true,
-        //   "tooltip" : true,
-        //   "config" : [
-        //     { 'name':'width', 'value':basic.width },
-        //     { 'name':'height', 'value':50 },
-        //     { 'name':'type', 'value':'vertical' },
-        //     { 'name':'units', 'value':"Hz" },
-        //     { 'name':'tooltip-data', 'value': "{\
-        //         'time': timestamp,\
-        //         'series': [ \
-        //           {'name':'seriesName0','value': [1464730597421,10.0] }, \
-        //           {'name':'seriesName1','value': [1464730597421,12.2] }, \
-        //           {'name':'seriesName2','value': [1464730597421,8.7] }, \
-        //         ]}"
-        //     },
-        //     { 'name':'muted-series', 'value': "{\
-        //       'seriesName1':true, \
-        //       'seriesName2':false, \
-        //       }"
-        //     }
-        //   ],
-        //   "basic":basic
-        // });
+        demos.push({
+          "title": "px-vis-tooltip",
+          "descriptionText" : [
+            "The tooltip provides similar data display functionality to the register, but on chart and without the user interaction."
+          ],
+          "elemType" : "register",
+          "svg": true,
+          "interaction": true,
+          "line": true,
+          "tooltip" : true,
+          "config" : [
+            { 'name':'width', 'value':basic.width },
+            { 'name':'height', 'value':50 },
+            { 'name':'type', 'value':'vertical' },
+            { 'name':'units', 'value':"Hz" },
+            { 'name':'tooltip-data', 'value': "{\
+                'time': timestamp,\
+                'series': [ \
+                  {'name':'seriesName0','value': [1464730597421,10.0] }, \
+                  {'name':'seriesName1','value': [1464730597421,12.2] }, \
+                  {'name':'seriesName2','value': [1464730597421,8.7] }, \
+                ]}"
+            },
+            { 'name':'muted-series', 'value': "{\
+              'seriesName1':true, \
+              'seriesName2':false, \
+              }"
+            }
+          ],
+          "basic":basic
+        });
+
+// ZOOM ############################################################################################
+
+        demos.push({
+          "title": "px-vis-zoom",
+          "descriptionText" : [
+            "The on-chart zoom action. It requires the px-vis-interaction-space. Click and drag on the chart to see."
+          ],
+          "elemType" : "zoom",
+          "svg": true,
+          "interaction": true,
+          "line": true,
+          "zoom" : true,
+          "config" : [
+            { 'name':'width', 'value':basic.width },
+            { 'name':'height', 'value':50 },
+            { 'name':'type', 'value':'vertical' },
+            { 'name':'units', 'value':"Hz" },
+            { 'name':'tooltip-data', 'value': "{\
+                'time': timestamp,\
+                'series': [ \
+                  {'name':'seriesName0','value': [1464730597421,10.0] }, \
+                  {'name':'seriesName1','value': [1464730597421,12.2] }, \
+                  {'name':'seriesName2','value': [1464730597421,8.7] }, \
+                ]}"
+            },
+            { 'name':'muted-series', 'value': "{\
+              'seriesName1':true, \
+              'seriesName2':false, \
+              }"
+            }
+          ],
+          "basic":basic
+        });
 
 // NAVIGATOR #######################################################################################
         demos.push({

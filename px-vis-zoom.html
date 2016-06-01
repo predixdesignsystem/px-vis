@@ -28,6 +28,7 @@ Element providing solution to no problem in particular. As a simple, increments 
     is: 'px-vis-zoom',
 
     behaviors: [
+      PxVisBehavior.svg,
       PxVisBehavior.extentsData,
       PxVisBehavior.selectedDomain
     ],
@@ -47,7 +48,8 @@ Element providing solution to no problem in particular. As a simple, increments 
     ],
     attached: function(){
       // TODO generalize this
-      var rect = Polymer.dom(this).getOwnerRoot().host.$$('px-vis-svg').getBoundingClientRect();
+      var rect = this.svg.node().getBoundingClientRect();
+      console.log(rect);
       this.$.resetBtn.style.left = rect.right - 120 - this.margin.right + 'px';
       // TODO if register top then add more....
       this.$.resetBtn.style.top = rect.top + 10 + this.margin.top  + 'px';

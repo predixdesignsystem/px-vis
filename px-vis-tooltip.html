@@ -76,9 +76,7 @@ Element providing on-chart tooltip display
       '_updateTooltip(tooltipData.*)'
      ],
     attached: function(){
-      // TODO generalize this
-      console.log(Polymer.dom(this).getOwnerRoot());
-      this.set('_rect', Polymer.dom(this).getOwnerRoot().host.$$('px-vis-svg').getBoundingClientRect());
+      this.set('_rect', this.svg.node().getBoundingClientRect());
     },
     _updateTooltip: function(){
       if(this.tooltipData.time === null){
@@ -89,7 +87,8 @@ Element providing on-chart tooltip display
       }
     },
     _moveTooltip: function() {
-      this.$.tooltip.style.left = this._rect.left + 65 + this.tooltipData.mouse[0] + 'px';
+      // TODO allow spacing adjustment
+      this.$.tooltip.style.left = this._rect.left + 15 + this.tooltipData.mouse[0] + 'px';
       this.$.tooltip.style.top =  this._rect.top + this.tooltipData.mouse[1]  + 'px';
     }
   });
