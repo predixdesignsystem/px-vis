@@ -78,8 +78,23 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     }, //properties
 
     observers: [
-      'drawElement(currentDomainX,currentDomainY,chartData.*)'
+      'drawElement(currentDomainX,currentDomainY,chartData.*,svg)'
      ],
+
+    /**
+    * when attached, re-fire set properties for precipitation pattern
+    *
+    * @method attached
+    */
+    attached: function(){
+      if(this.interactionSvg && !this._isObjEmpty(this.interactionSvg)){
+        this.fire('px-vis-interaction-svg-updated', { 'dataVar': 'interactionSvg', 'data': this.interactionSvg, 'method':'set' });
+      }
+
+      if(this.tooltipData && !this._isObjEmpty(this.tooltipData)){
+        this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': this.tooltipData, 'method':'set' });
+      }
+    },
 
     /**
      * Draws the tooltip elements and sets up listeners and callbacks on chart hover
@@ -93,7 +108,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         // make sure the tooltip draws on top of everything; returns a set property interactionSvg
         this.cloneSVGElem(this.svg.node(),'interactionSvg');
         this.fire('px-vis-interaction-svg-updated', { 'dataVar': 'interactionSvg', 'data': this.interactionSvg, 'method':'set' });
-
+        
         // append the rectangle to capture mouse interactions
         this._rect = this.interactionSvg.append("rect")
           .attr('id',"mouseCapture")

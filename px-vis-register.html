@@ -74,7 +74,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
         </div>
         <div class="flex flex--row">
           <template is="dom-repeat" items="{{tooltipData.series}}">
-            <span class="series narrow flex flex--row" name$="{{item.name}}" on-click="_seriesClicked">
+            <span class$="{{_mutedToStart(item.name)}}" name$="{{item.name}}" on-click="_seriesClicked">
                 <span
                   class="seriesMarker"
                   style$="background-color:{{_returnItemColor(index)}};"
@@ -114,7 +114,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
           <span id="firstDateTime">{{_firstDateTime}}</span> <span>{{_separator}}</span> <span id="secondDateTime">{{_secondDateTime}}</span>  &nbsp;
         </div>
         <template is="dom-repeat" items="{{tooltipData.series}}">
-          <div class="series wide flex flex--row" name$="{{item.name}}" on-click="_seriesClicked">
+          <div class$="{{_mutedToStart(item.name)}}" name$="{{item.name}}" on-click="_seriesClicked">
             <span
               class="seriesMarker"
               style$="background-color:{{_returnItemColor(index)}};"
@@ -239,8 +239,8 @@ Formatting for the timestamps,the data values, and the series names can be contr
     },
 
     observers: [
-      '_toggleSeries(mutedSeries.*)',
-      '_formatDateTime(tooltipData.*)'
+      '_formatDateTime(tooltipData.*)',
+      '_toggleSeries(mutedSeries.*)'
      ],
 
     /**
@@ -331,6 +331,20 @@ Formatting for the timestamps,the data values, and the series names can be contr
         var series = this.$$('.series[name=' + keys[i] + ']');
         this.toggleClass('muted', this.mutedSeries[keys[i]], series)
       }
+    },
+    /**
+     * helper function to set initial classes
+     *
+     * Adds or removes muted class to those series in the register and sets base classes.
+     *
+     * @method _mutedToStart
+     */
+    _mutedToStart: function(name){
+      var baseClasses = (this.type === 'horizontal') ? "series narrow flex flex--row" : "series wide flex flex--row";
+      if(this.mutedSeries[name]){
+        return baseClasses + ' muted'
+      }
+      return baseClasses
     },
     /**
      * dom-if function for series names to decide if it was truncated. If so, add a tooltip showing full name

@@ -129,7 +129,7 @@ This element sets the selectedDomain property based on the extents box. The sele
     },
 
     observers: [
-      'drawElement(currentDomain)',
+      'drawElement(currentDomain,svg)',
       '_zoomBrush(chartDomain)'
     ],
 
@@ -143,7 +143,7 @@ This element sets the selectedDomain property based on the extents box. The sele
      * @method drawElement
      */
     drawElement: function() {
-      if(typeof(this.svg) !== 'undefined' && this._isObjEmpty(this._brush) && !this._isObjEmpty(this.axis)){
+      if(typeof(this.svg) !== 'undefined' && this._isObjEmpty(this._brush) && !this._isObjEmpty(this.axis) && this.currentDomain.length > 0){
         var heightOffset = 6;
 
         // make sure the brush draws on top of everything; returns a set property brushSvg
