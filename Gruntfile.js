@@ -92,14 +92,14 @@ module.exports = function (grunt) {
                 tasks: ['sass', 'autoprefixer'],
                 options: {
                     interrupt: true,
-                    livereload: true
+                    livereload: false
                 }
             },
             htmljs: {
                 files: ['*.html', '*.js'],
                 options: {
                     interrupt: true,
-                    livereload: true
+                    livereload: false
                 }
             },
         },
