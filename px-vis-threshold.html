@@ -133,6 +133,16 @@ The configureation object allows developers to set the icon used for each event 
       thresholdText:{
         type:Object,
         value:{}
+      },
+      /**
+       * Boolean to show or hide the threshold box around the number
+       *
+       * @property showThresholdBox
+       * @type Boolean
+       */
+      showThresholdBox: {
+        type:Boolean,
+        value:false
       }
     },
 
@@ -185,7 +195,6 @@ The configureation object allows developers to set the icon used for each event 
           this.thresholdText = this.thresholdGroup.append("text")
             .attr('font-size', '12px')
             .attr('font-style','GE Inspira Sans')
-            // .attr('fill',"white")
             .attr('x', this.x(this.currentDomainX[0]) + 5 + 3)
             .attr('y', function(d,i){ return this._calcYPos(d,i,13) }.bind(this) )
             .text(function(d){ return (d.value).toFixed(2) });
@@ -214,10 +223,15 @@ The configureation object allows developers to set the icon used for each event 
     _setColors: function(){
       // FIXME Trigger this when the series are loaded
       setTimeout(function(){
-        // this.thresholdRect.attr('fill', this._getColors.bind(this));
-        this.thresholdRect.attr('fill', 'none');
+        if(this.showThresholdBox){
+          this.thresholdRect.attr('fill', this._getColors.bind(this));
+          this.thresholdText.attr('fill',"white");
+        } else {
+          this.thresholdRect.attr('fill', 'none');
+          this.thresholdText.attr('fill',this._getColors.bind(this))
+        }
+        
         this.thresholdLine.attr('stroke', this._getColors.bind(this));
-        this.thresholdText.attr('fill',this._getColors.bind(this))
       }.bind(this), 1);
     },
     /**
