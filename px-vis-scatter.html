@@ -41,6 +41,7 @@ Element which draws scatter series onto the chart
       PxVisBehavior.axes,
       PxVisBehavior.dataset,
       PxVisBehavior.mutedSeries,
+      PxVisBehavior.clipPath,
       commonColors
     ],
 
@@ -105,7 +106,8 @@ Element which draws scatter series onto the chart
 
     observers: [
       'drawElement(svg,x,y,currentDomainX,currentDomainY,chartData.*)',
-      'isIdInMuted(mutedSeries.*)'
+      'isIdInMuted(mutedSeries.*)',
+      '_addClipPath(clipPath)'
      ],
 
     ready:function(){
@@ -146,6 +148,9 @@ Element which draws scatter series onto the chart
           // add color
           this._colorScatter();
 
+          this._addClipPath();
+          
+
         } else {
           // update the path
           this.scatterDots.data(data)
@@ -153,6 +158,14 @@ Element which draws scatter series onto the chart
             .attr("cy", function(d) { return this.y(d[1]); }.bind(this));
         }
       }
+    },
+    /**
+     * Helper to call addClipPath with the elem
+     *
+     * @method _addClipPath
+     */
+    _addClipPath: function(){
+      this.addClipPath(this.scatterGroup);
     },
     /**
      * Checks mutedSeries to see if this ID is in there

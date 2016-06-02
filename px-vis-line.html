@@ -41,6 +41,7 @@ Element which draws lines series onto the chart
       PxVisBehavior.axes,
       PxVisBehavior.dataset,
       PxVisBehavior.mutedSeries,
+      PxVisBehavior.clipPath,
       commonColors
     ],
 
@@ -85,7 +86,8 @@ Element which draws lines series onto the chart
     observers: [
       // TODO Does chartData need to be chartData.* or chartData.series.* for dynamic data?
       'drawElement(svg,x,y,currentDomainX,currentDomainY,chartData.*)',
-      'isIdInMuted(mutedSeries.*)'
+      'isIdInMuted(mutedSeries.*)',
+      '_addClipPath(clipPath)'
      ],
 
     ready:function(){
@@ -124,6 +126,9 @@ Element which draws lines series onto the chart
           // add color
           this._colorLine();
 
+          // addClipPath
+          this._addClipPath();
+
         } else {
           // update the path
           this.linePath.datum(data)
@@ -132,6 +137,15 @@ Element which draws lines series onto the chart
         }
       }
     },
+    /**
+     * Helper to call addClipPath with the elem
+     *
+     * @method _addClipPath
+     */
+    _addClipPath: function(){
+      this.addClipPath(this.linePath);
+    },
+
     /**
      * Checks mutedSeries to see if this ID is in there
      * Called from an observer watching mutedSeries

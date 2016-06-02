@@ -151,7 +151,7 @@ PxVisBehavior.axes = {
       type:Array,
       value:[],
       notify:true
-    },
+    }
   }
 }
 
@@ -302,5 +302,28 @@ PxVisBehavior.interaction = {
     }
   }
 };
+
+PxVisBehavior.clipPath = {
+  properties: {
+    /**
+     * Holder for a clipping path ID
+     *
+     */
+    clipPath: {
+      type:String,
+      notify:true
+    }
+  },
+  /**
+   * Add the clip-path attr to the element
+   *
+   * @method addClipPath
+   */
+  addClipPath: function(elem){
+    if(typeof(this.clipPath) !== 'undefined' && !this._isObjEmpty(elem)){
+      elem.attr("clip-path", 'url(#' + this.clipPath + ')');
+    }
+  }
+}
 
 </script>

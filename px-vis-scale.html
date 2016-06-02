@@ -71,7 +71,7 @@ Element providing solution to no problem in particular. As a simple, increments 
         observers: [
           '_setXScale(width,margin)',
           '_setYScale(height,margin)',
-          '_currentDomain(chartData.*,x,y)',
+          '_currentDomain(chartData.*,x,y,svg)',
           '_updateDomain(selectedDomain)',
         ],
 
@@ -143,7 +143,7 @@ Element providing solution to no problem in particular. As a simple, increments 
          */
         _currentDomain: function() {
           // check to make sure there is data
-          if(this.chartData && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y)){
+          if(this.chartData && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && typeof(this.svg) !== 'undefined'){
             // TODO check if dataset has max and min
             // TODO What do we do if we have Y and not x, which is the case with our sample data?
 
@@ -185,6 +185,7 @@ Element providing solution to no problem in particular. As a simple, increments 
 
             this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
             this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
+
           }
         },
         _updateDomain:function(d){

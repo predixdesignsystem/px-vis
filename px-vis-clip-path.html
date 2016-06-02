@@ -1,0 +1,73 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
+
+
+<!--
+Element providing solution to no problem in particular. As a simple, increments a counter when clicked.
+
+##### Usage
+
+    <px-vis counter-value="1">Hi</px-vis>
+
+@element px-vis
+@blurb Element providing solution to no problem in particular.
+@homepage index.html
+@demo demo.html
+-->
+<dom-module id="px-vis-clip-path">
+    <template>
+
+      <content></content>
+    </template>
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'px-vis-clip-path',
+
+    behaviors: [
+      PxVisBehavior.svg,
+      PxVisBehavior.sizing,
+      PxVisBehavior.axes,
+      PxVisBehavior.clipPath
+    ],
+
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+
+    },
+
+    observers: [
+      '_drawElement(x,y,svg,width,height)'
+    ],
+
+    /**
+     * Creates and sets a clipping path
+     *
+     * @method _drawElement
+     */
+    _drawElement: function() {
+      // keep x & y for now in case we want to support moving the path based on data
+      if(!this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && typeof(this.svg) !== 'undefined'){
+
+        this.set('clipPath', this.generateRandomID('cp_'));
+        this.fire('px-vis-clip-path-updated', { 'dataVar': 'clipPath', 'data': this.clipPath, 'method':'set' });
+        // TODO make these measurements more robust
+        this.svg.append("clipPath")
+          .attr("id",this.clipPath)
+          .append("rect")
+          .attr('y',-this.margin.top)
+          .attr("width", this.width - this.margin.left)
+          .attr("height", this.height - this.margin.bottom);
+
+      }
+    }
+  });
+</script>

@@ -77,7 +77,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
             <span class$="{{_mutedToStart(item.name)}}" name$="{{item.name}}" on-click="_seriesClicked">
                 <span
                   class="seriesMarker"
-                  style$="background-color:{{_returnItemColor(index)}};"
+                  style$="background-color:{{_returnItemColor(item.name)}};"
                   name$="{{item.name}}"
                 >&nbsp;</span>
                 <span>
@@ -117,7 +117,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
           <div class$="{{_mutedToStart(item.name)}}" name$="{{item.name}}" on-click="_seriesClicked">
             <span
               class="seriesMarker"
-              style$="background-color:{{_returnItemColor(index)}};"
+              style$="background-color:{{_returnItemColor(item.name)}};"
               name$="{{item.name}}"
             >&nbsp;</span><span class="seriesName" name$="{{item.name}}">
               {{_truncateName(item.name,truncationLength)}}
@@ -155,6 +155,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
       PxVisBehavior.datetime,
       PxVisBehavior.mutedSeries,
       PxVisBehavior.tooltipData,
+      PxVisBehavior.dataset,
       commonColors
     ],
 
@@ -268,8 +269,13 @@ Formatting for the timestamps,the data values, and the series names can be contr
      * @param {i}
      * @return {rgb}
      */
-    _returnItemColor:function(i){
-      return this.dataVisColors[ this.seriesColorOrder[i] ]
+    _returnItemColor:function(name){
+      // TODO make data pass a separate data obj linking name and number
+      for(var i = 0; i < this.chartData.length; i++){
+        if(this.chartData[i]["name"] === name){
+          return this.dataVisColors[ this.seriesColorOrder[ this.chartData[i]["seriesNumber"] ] ]
+        }
+      }
     },
     /**
      * Function which takes the incoming datetime from tooltipData and formats it.

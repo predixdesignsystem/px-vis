@@ -174,7 +174,8 @@ The configureation object allows developers to set the icon used for each event 
             .attr('x1', this.x(this.currentDomainX[0]))
             .attr('x2', this.x(this.currentDomainX[1]))
             .attr('y1', function(d){ return this.y(d.value) }.bind(this))
-            .attr('y2', function(d){ return this.y(d.value) }.bind(this));
+            .attr('y2', function(d){ return this.y(d.value) }.bind(this))
+            .on("mouseover", this._mouseOver.bind(this));
 
           this.thresholdRect = this.thresholdGroup.append("rect")
             .attr('x', this.x(this.currentDomainX[0]) + 5)
@@ -184,7 +185,7 @@ The configureation object allows developers to set the icon used for each event 
           this.thresholdText = this.thresholdGroup.append("text")
             .attr('font-size', '12px')
             .attr('font-style','GE Inspira Sans')
-            .attr('fill',"white")
+            // .attr('fill',"white")
             .attr('x', this.x(this.currentDomainX[0]) + 5 + 3)
             .attr('y', function(d,i){ return this._calcYPos(d,i,13) }.bind(this) )
             .text(function(d){ return (d.value).toFixed(2) });
@@ -213,8 +214,10 @@ The configureation object allows developers to set the icon used for each event 
     _setColors: function(){
       // FIXME Trigger this when the series are loaded
       setTimeout(function(){
-        this.thresholdRect.attr('fill', this._getColors.bind(this));
+        // this.thresholdRect.attr('fill', this._getColors.bind(this));
+        this.thresholdRect.attr('fill', 'none');
         this.thresholdLine.attr('stroke', this._getColors.bind(this));
+        this.thresholdText.attr('fill',this._getColors.bind(this))
       }.bind(this), 1);
     },
     /**
@@ -245,6 +248,9 @@ The configureation object allows developers to set the icon used for each event 
           val = (d.value < mid) ? this.y(d.value) -1 + offset: this.y(d.value) -17 + offset;
 
       return val
+    },
+    _mouseOver: function(){
+      console.log("mouseover");
     }
   });
 </script>

@@ -77,6 +77,7 @@ The configureation object allows developers to set the icon used for each event 
       PxVisBehavior.axes,
       PxVisBehavior.dataset,
       PxVisBehavior.datetime,
+      PxVisBehavior.clipPath,
       commonColors,
       faCodes
     ],
@@ -263,6 +264,7 @@ The configureation object allows developers to set the icon used for each event 
 
     observers: [
       'drawElement(svg,x,y,currentDomainX,currentDomainY,chartData.*)',
+      '_addClipPath(clipPath)'
      ],
 
     ready:function(){
@@ -320,6 +322,8 @@ The configureation object allows developers to set the icon used for each event 
             .attr('id','ei_' + this.eventId);
 
           this._positionEvent();
+
+          this._addClipPath();
         } else {
           // update the path
           this._positionEvent();
@@ -327,6 +331,17 @@ The configureation object allows developers to set the icon used for each event 
         this._addTooltip();
       }
     },
+
+    /**
+     * Helper to call addClipPath with the elem
+     *
+     * @method _addClipPath
+     */
+    _addClipPath: function(){
+      this.addClipPath(this.eventLine);
+      this.addClipPath(this.eventIcon);
+    },
+
     /**
      * Sets the position for the event line and icon
      *
