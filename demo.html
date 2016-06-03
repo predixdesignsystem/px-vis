@@ -268,6 +268,7 @@
                     height="50"
                     width="[[item.basic.width]]"
                     type="horizontal"
+                    chart-data=[[item.basic.chartData]]
                     tooltip-data=[[item.tooltipData]]>
                   </px-vis-register>
                 </template>
@@ -278,6 +279,7 @@
                     height="[[item.basic.height]]"
                     units="Hz"
                     type="vertical"
+                    chart-data=[[item.basic.chartData]]
                     tooltip-data=[[item.tooltipData]]
                     muted-series="[[item.mutedSeries]]">
                   </px-vis-register>
@@ -288,6 +290,7 @@
                     width="[[item.basic.width]]"
                     height="[[item.basic.height]]"
                     type="horizontal"
+                    chart-data=[[item.basic.chartData]]
                     tooltip-data=[[tooltipData]]
                     muted-series="{{mutedSeries}}">
                   </px-vis-register>
@@ -362,7 +365,8 @@
               [1397458800000, 0.36],
               [1397522940000, 0.32]
             ],
-            "name": "mySeries"
+            "name": "mySeries",
+            "seriesNumber":0
           }],
           chartDataCode : '[ {...} , {...} ]',
           chartDataSeriesCode : '{ \
@@ -735,17 +739,17 @@
             { 'name':'tooltip-data', 'value': "{\
                 'time': timestamp,\
                 'series': [ \
-                  {'name':'seriesName0','value': [1464730597421,10.0] }, \
+                  {'name':'mySeries','value': [1464730597421,10.0] }, \
                   {'name':'seriesName1','value': [1464730597421,12.2] }, \
                   {'name':'seriesName2','value': [1464730597421,8.7] }, \
                 ]}"
             }
           ],
-          "basic":basic,
+          "basic":JSON.parse(JSON.stringify(basic)),
           "tooltipData": {
             'time': moment().format(),
             'series': [
-              {'name':'seriesName0','value': [1464730597421,10.0] },
+              {'name':'mySeries','value': [1464730597421,10.0] },
               {'name':'seriesName1','value': [1464730597421,12.2] },
               {'name':'seriesName2','value': [1464730597421,8.7] },
             ]
@@ -755,6 +759,7 @@
               'seriesName2':false,
           }
         });
+        demos[demos.length-1]['basic']['chartData'].push({ "name":"seriesName1", "seriesNumber": 1},{ "name":"seriesName2", "seriesNumber": 2});
 
 // REGISTER side ###################################################################################
 
@@ -773,7 +778,7 @@
             { 'name':'tooltip-data', 'value': "{\
                 'time': timestamp,\
                 'series': [ \
-                  {'name':'seriesName0','value': [1464730597421,10.0] }, \
+                  {'name':'mySeries','value': [1464730597421,10.0] }, \
                   {'name':'seriesName1','value': [1464730597421,12.2] }, \
                   {'name':'seriesName2','value': [1464730597421,8.7] }, \
                 ]}"
@@ -784,11 +789,11 @@
               }"
             }
           ],
-          "basic":basic,
+          "basic":JSON.parse(JSON.stringify(basic)),
           "tooltipData": {
             'time': moment().format(),
             'series': [
-                {'name':'seriesName0','value': [1464730597421,10.0] },
+                {'name':'mySeries','value': [1464730597421,10.0] },
                 {'name':'seriesName1','value': [1464730597421,12.2] },
                 {'name':'seriesName2','value': [1464730597421,8.7] },
             ]
@@ -798,6 +803,7 @@
               'seriesName2':false,
           }
         });
+        demos[demos.length-1]['basic']['chartData'].push({ "name":"seriesName1", "seriesNumber": 1},{ "name":"seriesName2", "seriesNumber": 2});
 
 // REGISTER Dynamic ################################################################################
 
