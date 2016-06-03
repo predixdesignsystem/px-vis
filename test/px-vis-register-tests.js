@@ -124,7 +124,7 @@ function runTests(){
     test('datetimeFormat is correct', function() {
       var series = Polymer.dom(datetimeFormat.root).querySelector('#dateTime');
 
-      assert.equal(series.textContent.trim(),'December 20th, 2014 @ 12:37:47AM');
+      assert.equal(series.textContent.trim(),'December 20th, 2014 @ 8:37:47AM');
     });
   });
 
@@ -241,7 +241,7 @@ function basicTests(registerID,dir){
 
     test(registerID + ' shows time', function() {
       var displayTime = Polymer.dom(register.root).querySelector('#dateTime').textContent.trim();
-      assert.equal(displayTime, '12:37:47 -0800 | 20 Dec 2014');
+      assert.equal(displayTime, '08:37:47 +0000 | 20 Dec 2014');
     });
 
     test(registerID + ' still names match', function() {
@@ -356,13 +356,14 @@ function basicTests(registerID,dir){
 
 function generateEmptyData(num,str){
   var str = str || 'series_';
+  var chartData = [];
   var dataObj = {
     'time': null,
     'series': []
   };
   for(var i = 0; i < num; i++){
     var name = str + i;
-    dataObj.series.push({'name':name,'value': null });
+    dataObj.series.push({'name':name,'value': null,'seriesNumber': i });
   }
 
   return dataObj;
@@ -372,7 +373,7 @@ function generateDataValues(data){
   data.time = new Date('Sat Dec 20 2014 00:37:47 GMT-0800 (PST)');
 
   for(var i = 0; i < data.series.length; i++){
-    data.series[i]['value'] = 1015.2;
+    data.series[i]['value'] = [ +data.time ,1015.2];
   }
   return data;
 }
@@ -380,6 +381,7 @@ function generateDataValues(data){
 function setData(series, data, done){
   series.set('tooltipData',{});
   series.set('tooltipData',data);
+  series.set('chartData',data.series);
 
   // pause and let the dom repeate chug away
   setTimeout(function(){
