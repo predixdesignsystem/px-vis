@@ -9,6 +9,8 @@ module.exports = {
     }
   },
   suites: [
+    'test/px-vis-svg-fixture.html',
+    'test/px-vis-scale-fixture.html',
     'test/px-vis-register-fixture.html'
   ]
 };

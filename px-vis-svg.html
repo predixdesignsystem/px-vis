@@ -116,17 +116,18 @@ Element which creates an SVG element and sets up d3
          * @method _setSVG
          */
         _setSVG: function(){
-          var svg = d3.select(this.$$("svg"))
-            .attr('width',this.width)
-            .attr('height',this.height);
-          this.svg = (typeof(this.svg) === 'undefined') ? svg.append('g') : this.svg;
-          this.svg.attr('width',this.width)
-            .attr('height',this.height)
-            .attr("transform", "translate(" + this.margin.left + ',' + this.margin.top + ")");
+          if(this.width && this.height && !this._isObjEmpty(this.margin)){
+            var svg = d3.select(this.$$("svg"))
+              .attr('width',this.width)
+              .attr('height',this.height);
+            this.svg = (typeof(this.svg) === 'undefined') ? svg.append('g') : this.svg;
+            this.svg.attr('width',this.width)
+              .attr('height',this.height)
+              .attr("transform", "translate(" + this.margin.left + ',' + this.margin.top + ")");
 
-          this.notifyPath('svg',this.svg);
-          this.fire('px-vis-svg-updated',{ 'data': this.svg, 'dataVar': 'svg', 'method': 'set' });
-
+            this.notifyPath('svg',this.svg);
+            this.fire('px-vis-svg-updated',{ 'data': this.svg, 'dataVar': 'svg', 'method': 'set' });
+          }
         },
     });
 </script>
