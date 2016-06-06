@@ -222,7 +222,7 @@ function basicTests(registerID,dir){
       var colorSet = commonColors.properties.dataVisColors.value;
       var series = Polymer.dom(register.root).querySelectorAll('.seriesMarker');
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].getAttribute('style').replace(/\s+/, ""), 'background-color:' + colorSet[ colorOrder[i] ] + ';');
+        assert.equal(series[i].getAttribute('style').split(' ').join(''), 'background-color:' + colorSet[ colorOrder[i] ] + ';');
       }
     });
 
