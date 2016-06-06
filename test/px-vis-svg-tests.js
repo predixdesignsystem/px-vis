@@ -165,6 +165,6 @@ function basicAttrs(elem, elemName, w,h,m){
     assert.equal(elem.svg.attr('height'), h);
   });
   test(elemName + '.svg has correct translation', function() {
-    assert.equal(elem.svg.attr('transform').trim(), "translate("+m.left+","+m.top+")");
+    assert.isTrue(elem.svg.attr('transform').trim() === "translate("+m.left+","+m.top+")" || elem.svg.attr('transform').trim() === "translate("+m.left+" "+m.top+")");
   });
 }
