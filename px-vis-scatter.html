@@ -127,21 +127,26 @@ Element which draws scatter series onto the chart
       if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && (this.chartData)){
         var data = this.chartData.series;
 
-        // checks to see if the axis already exists. If not, create; if so, update
+        // checks to see if the group already exists. If not, create; if so, update
         if(this._isObjEmpty(this.scatterGroup)){
           // draw the path
           this.scatterGroup = this.svg.append("g")
             .attr("series-id", this.seriesId)
             .attr("series-number", this.seriesNumber)
             .attr("class", "series-scatter");
-          // TODO different shapes
-          // TODO dev set FA icons & icons
+        }
+
+        // TODO different shapes
+        // TODO dev set FA icons & icons
           this.scatterDots = this.scatterGroup.selectAll('circle.scatter-dot')
-            .data(data)
-            .enter()
+            .data(data);
+
+          this.scatterDots.enter()
             .append('circle')
             .attr("class", "scatter-dot")
-            .attr("r", this.markerSize/2)
+            .attr("r", this.markerSize/2);
+
+          this.scatterDots
             .attr("cx", function(d) { return this.x(d[0]); }.bind(this))
             .attr("cy", function(d) { return this.y(d[1]); }.bind(this));
 
@@ -150,13 +155,7 @@ Element which draws scatter series onto the chart
 
           this._addClipPath();
 
-
-        } else {
-          // update the path
-          this.scatterDots.data(data)
-            .attr("cx", function(d) { return this.x(d[0]); }.bind(this))
-            .attr("cy", function(d) { return this.y(d[1]); }.bind(this));
-        }
+          this.scatterDots.exit().remove();
       }
     },
     /**
