@@ -31,6 +31,7 @@ module.exports = {
     'test/px-vis-svg-fixture.html',
     'test/px-vis-scale-fixture.html',
     'test/px-vis-register-fixture.html',
-    'test/px-vis-line-fixture.html'
+    'test/px-vis-line-fixture.html',
+    'test/px-vis-scatter-fixture.html'
   ]
 };

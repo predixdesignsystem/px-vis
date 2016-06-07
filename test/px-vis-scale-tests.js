@@ -311,4 +311,82 @@ function runTests(){
     });
   }); //suite
 
+  suite('px-vis-scale updates with additional series', function() {
+    var updateData = document.getElementById('updateData');
+
+    suiteSetup(function(){
+      // updateData.chartData[0].series.push([1397351280000, 1.5])
+      var d = [{
+        "series": [
+          [1397102460000, 0.99],
+          [1397139660000, 0.92],
+          [1397177400000, 0.97],
+          [1397228040000, 1.12],
+          [1397248260000, 1.09],
+          [1397291280000, 1],
+          [1397351280000, 1.5]
+        ]},{
+        "series": [
+          [1397101460000, 1],
+          [1397139660000, 1],
+          [1397177400000, 1],
+          [1397228040000, 1],
+          [1397248260000, 2],
+          [1397291280000, 2]
+        ]}];
+      updateData.set('chartData',d);
+    });
+
+    test('updateData fixture is created', function() {
+      assert.isTrue(updateData !== null);
+    });
+
+    test('updateData creates an x', function() {
+      assert.isDefined(updateData.x);
+    });
+
+    test('updateData creates an y', function() {
+      assert.isDefined(updateData.y);
+    });
+
+    test('updateData sets currentDomainX', function() {
+      assert.lengthOf(updateData.currentDomainX,2);
+    });
+    test('updateData sets currentDomainY', function() {
+      assert.lengthOf(updateData.currentDomainY,2);
+    });
+
+    test('updateData currentDomainX is correct', function() {
+      assert.equal( +updateData.currentDomainX[0], 1397101460000);
+      assert.equal( +updateData.currentDomainX[1], 1397351280000);
+    });
+    test('updateData currentDomainY is correct', function() {
+      assert.equal( JSON.stringify(updateData.currentDomainY), JSON.stringify([0,2]));
+    });
+
+    test('updateData x returns correct value 1397102460000', function() {
+      assert.equal( updateData.x(1397101460000), 0);
+    });
+
+    test('updateData x returns correct value 1397351280000', function() {
+      assert.equal( updateData.x(1397351280000), 480);
+    });
+    test('updateData x returns correct value 1397226370000', function() {
+      assert.equal( updateData.x(1397226370000), 240);
+    });
+
+    test('updateData y returns correct value 0', function() {
+      assert.equal( updateData.y(0), 270);
+    });
+
+    test('updateData y returns correct value 2', function() {
+      assert.equal( updateData.y(2), 0);
+    });
+
+    test('updateData y returns correct value 1', function() {
+      assert.equal( updateData.y(1), 135);
+    });
+  }); //suite
+
+
 } //runTests
