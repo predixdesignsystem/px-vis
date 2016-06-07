@@ -69,7 +69,7 @@ function runTests(){
     });
 
     test('baseLine line d', function() {
-      assert.equal(baseLine.linePath.attr('d'),'M0,243L120,108L240,0L360,162L480,108');
+      assert.equal(baseLine.linePath.attr('d').split(/[\s,]+/).join(''),'M0243L120108L2400L360162L480108');
     });
   }); //suite
 
@@ -150,7 +150,7 @@ function runTests(){
       assert.equal(mutedLine1.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
     });
     test('mutedLine1 line d', function() {
-      assert.equal(mutedLine1.linePath.attr('d'),'M0,260L120,210L240,170L360,230L480,210');
+      assert.equal(mutedLine1.linePath.attr('d').split(/[\s,]+/).join(''),'M0260L120210L240170L360230L480210');
     });
 
     test('mutedLine2 linePath created', function() {
@@ -169,7 +169,7 @@ function runTests(){
       assert.equal(mutedLine2.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[2] ]);
     });
     test('mutedLine2 line d', function() {
-      assert.equal(mutedLine2.linePath.attr('d'),'M0,260L120,60L240,240L360,170L480,0');
+      assert.equal(mutedLine2.linePath.attr('d').split(/[\s,]+/).join(''),'M0260L12060L240240L360170L4800');
     });
   }); //suite
 
