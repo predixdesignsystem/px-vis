@@ -20,13 +20,11 @@ function runTests(){
     suiteSetup(function(){
       var d = [{
             "series": [
-            [1397102460000, 0.99],
-            [1397139660000, 0.92],
-            [1397177400000, 0.97],
-            [1397228040000, 1.12],
-            [1397248260000, 1.09],
-            [1397291280000, 1],
-            [1397351280000, 1.5]
+            [1397102460000, 1],
+            [1397131620000, 6],
+            [1397160780000, 10],
+            [1397189940000, 4],
+            [1397219100000, 6]
           ]}],
           w = 500,
           h = 300,
@@ -82,14 +80,14 @@ function runTests(){
       assert.equal(baseScatter.scatterDots[0][0].getAttribute('cx'),"0");
     });
     test('baseScatter scatterDot0 cy', function() {
-      assert.equal(baseScatter.scatterDots[0][0].getAttribute('cy'),"91.8");
+      assert.equal(baseScatter.scatterDots[0][0].getAttribute('cy'),"243");
     });
 
     test('baseScatter scatterDot0 cx', function() {
-      assert.equal(baseScatter.scatterDots[0][6].getAttribute('cx'),"480");
+      assert.equal(baseScatter.scatterDots[0][4].getAttribute('cx'),"480");
     });
     test('baseScatter scatterDot0 cy', function() {
-      assert.equal(baseScatter.scatterDots[0][6].getAttribute('cy'),"0");
+      assert.equal(baseScatter.scatterDots[0][4].getAttribute('cy'),"108");
     });
   }); //suite
 
@@ -105,22 +103,18 @@ function runTests(){
     suiteSetup(function(done){
       var d = [{
           "series": [
-            [1397102460000, 0.99],
-            [1397139660000, 0.92],
-            [1397177400000, 0.97],
-            [1397228040000, 1.12],
-            [1397248260000, 1.09],
-            [1397291280000, 1],
-            [1397351280000, 1.5]
+            [1397102460000, 1],
+            [1397131620000, 6],
+            [1397160780000, 10],
+            [1397189940000, 4],
+            [1397219100000, 6]
           ]},{
           "series": [
-            [1397102460000, 2],
-            [1397139660000, 3],
-            [1397177400000, 1],
-            [1397228040000, 2],
-            [1397248260000, 2],
-            [1397291280000, 1],
-            [1397351280000, 1]
+            [1397102460000, 1],
+            [1397131620000, 21],
+            [1397160780000, 3],
+            [1397189940000, 10],
+            [1397219100000, 27]
           ]}],
           w = 500,
           h = 300,
@@ -185,16 +179,16 @@ function runTests(){
       assert.equal(mutedScatter1.scatterDots.attr('r'),2);
     });
     test('mutedScatter1 scatterDot0 cx', function() {
-      assert.equal(mutedScatter1.scatterDots[0][0].getAttribute('cx'),"0");
+      assert.equal(mutedScatter1.scatterDots[0][0].getAttribute('cx'),0);
     });
     test('mutedScatter1 scatterDot0 cy', function() {
-      assert.equal(Math.round(mutedScatter1.scatterDots[0][0].getAttribute('cy') * 10 ) / 10,"180.9");
+      assert.equal(mutedScatter1.scatterDots[0][0].getAttribute('cy'),260);
     });
     test('mutedScatter1 scatterDot1 cx', function() {
-      assert.equal(mutedScatter1.scatterDots[0][6].getAttribute('cx'),"480");
+      assert.equal(mutedScatter1.scatterDots[0][4].getAttribute('cx'),480);
     });
     test('mutedScatter1 scatterDot1 cy', function() {
-      assert.equal(mutedScatter1.scatterDots[0][6].getAttribute('cy'),"135");
+      assert.equal(mutedScatter1.scatterDots[0][4].getAttribute('cy'),210);
     });
 
     test('mutedScatter2 scatterDots created', function() {
@@ -222,17 +216,17 @@ function runTests(){
       assert.equal(mutedScatter2.scatterDots.attr('r'),5);
     });
     test('mutedScatter2 scatterDot0 cx', function() {
-      assert.equal(mutedScatter2.scatterDots[0][0].getAttribute('cx'),"0");
+      assert.equal(mutedScatter2.scatterDots[0][0].getAttribute('cx'),0);
     });
     test('mutedScatter2 scatterDot0 cy', function() {
-      assert.equal(Math.round(mutedScatter2.scatterDots[0][0].getAttribute('cy') *10) / 10 ,"90");
+      assert.equal(mutedScatter2.scatterDots[0][0].getAttribute('cy'),260);
     });
 
     test('mutedScatter2 scatterDot1 cx', function() {
-      assert.equal(mutedScatter2.scatterDots[0][6].getAttribute('cx'),"480");
+      assert.equal(mutedScatter2.scatterDots[0][4].getAttribute('cx'),480);
     });
     test('mutedScatter2 scatterDot1 cy', function() {
-      assert.equal(Math.round(mutedScatter2.scatterDots[0][6].getAttribute('cy') *10) / 10 ,"180");
+      assert.equal(mutedScatter2.scatterDots[0][4].getAttribute('cy'),0);
     });
   }); //suite
 
