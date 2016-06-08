@@ -168,7 +168,7 @@ function runTests(){
       assert.equal(defaultEvent.eventIcon.attr('font-size'),'16px');
     });
     test('defaultEvent eventIcon fill color', function() {
-      assert.equal(defaultEvent.eventIcon.attr('fill'),colors['grey7']);
+      assert.equal(defaultEvent.eventIcon.attr('fill').split(' ').join(''),colors['grey7']);
     });
     test('defaultEvent eventIcon icon', function() {
       // This is weird. the  is the icon, but doesnt render in the text editor since it doesnt have the font file. so pulling the unicode from http://fontawesome.io/cheatsheet/ to test.
@@ -185,7 +185,7 @@ function runTests(){
       assert.equal(defaultEvent.eventLine.node().tagName,'line');
     });
     test('defaultEvent eventLine stroke color', function() {
-      assert.equal(defaultEvent.eventLine.attr('stroke'),colors['grey9']);
+      assert.equal(defaultEvent.eventLine.attr('stroke').split(' ').join(''),colors['grey9']);
     });
     test('defaultEvent eventLine stroke width', function() {
       assert.equal(defaultEvent.eventLine.attr('stroke-width'),1);
@@ -244,7 +244,7 @@ function runTests(){
       assert.equal(faEvent.eventIcon.attr('font-size'),'16px');
     });
     test('faEvent eventIcon fill color', function() {
-      assert.equal(faEvent.eventIcon.attr('fill'),colors['blue']);
+      assert.equal(faEvent.eventIcon.attr('fill').split(' ').join(''),colors['blue']);
     });
     test('faEvent eventIcon icon', function() {
       // This is weird. the  is the icon, but doesnt render in the text editor since it doesnt have the font file. so pulling the unicode from http://fontawesome.io/cheatsheet/ to test.
@@ -261,7 +261,7 @@ function runTests(){
       assert.equal(faEvent.eventLine.node().tagName,'line');
     });
     test('faEvent eventLine stroke color', function() {
-      assert.equal(faEvent.eventLine.attr('stroke'),colors['grey9']);
+      assert.equal(faEvent.eventLine.attr('stroke').split(' ').join(''),colors['grey9']);
     });
     test('faEvent eventLine stroke width', function() {
       assert.equal(faEvent.eventLine.attr('stroke-width'),1);
@@ -320,7 +320,7 @@ function runTests(){
       assert.equal(uniEvent.eventIcon.attr('font-size'),'16px');
     });
     test('uniEvent eventIcon fill color', function() {
-      assert.equal(uniEvent.eventIcon.attr('fill'),colors['green']);
+      assert.equal(uniEvent.eventIcon.attr('fill').split(' ').join(''),colors['green']);
     });
     test('uniEvent eventIcon icon', function() {
       // This is weird. the  is the icon, but doesnt render in the text editor since it doesnt have the font file. so pulling the unicode from http://fontawesome.io/cheatsheet/ to test.
@@ -337,7 +337,7 @@ function runTests(){
       assert.equal(uniEvent.eventLine.node().tagName,'line');
     });
     test('uniEvent eventLine stroke color', function() {
-      assert.equal(uniEvent.eventLine.attr('stroke'),colors['grey9']);
+      assert.equal(uniEvent.eventLine.attr('stroke').split(' ').join(''),colors['grey9']);
     });
     test('uniEvent eventLine stroke width', function() {
       assert.equal(uniEvent.eventLine.attr('stroke-width'),1);
@@ -410,7 +410,7 @@ function runTests(){
       assert.equal(imgEvent.eventLine.node().tagName,'line');
     });
     test('imgEvent eventLine stroke color', function() {
-      assert.equal(imgEvent.eventLine.attr('stroke'),colors['grey9']);
+      assert.equal(imgEvent.eventLine.attr('stroke').split(' ').join(''),colors['grey9']);
     });
     test('imgEvent eventLine stroke width', function() {
       assert.equal(imgEvent.eventLine.attr('stroke-width'),1);
@@ -472,7 +472,7 @@ function runTests(){
       assert.equal(noLabelEvent.eventIcon.attr('font-size'),'16px');
     });
     test('noLabelEvent eventIcon fill color', function() {
-      assert.equal(noLabelEvent.eventIcon.attr('fill'),colors['grey7']);
+      assert.equal(noLabelEvent.eventIcon.attr('fill').split(' ').join(''),colors['grey7']);
     });
     test('noLabelEvent eventIcon icon', function() {
       // This is weird. the  is the icon, but doesnt render in the text editor since it doesnt have the font file. so pulling the unicode from http://fontawesome.io/cheatsheet/ to test.
@@ -489,7 +489,7 @@ function runTests(){
       assert.equal(noLabelEvent.eventLine.node().tagName,'line');
     });
     test('noLabelEvent eventLine stroke color', function() {
-      assert.equal(noLabelEvent.eventLine.attr('stroke'),colors['grey9']);
+      assert.equal(noLabelEvent.eventLine.attr('stroke').split(' ').join(''),colors['grey9']);
     });
     test('noLabelEvent eventLine stroke width', function() {
       assert.equal(noLabelEvent.eventLine.attr('stroke-width'),1);
@@ -551,7 +551,7 @@ function runTests(){
       assert.equal(offsetEvent.eventIcon.attr('font-size'),'16px');
     });
     test('offsetEvent eventIcon fill color', function() {
-      assert.equal(offsetEvent.eventIcon.attr('fill'),colors['red']);
+      assert.equal(offsetEvent.eventIcon.attr('fill').split(' ').join(''),colors['red']);
     });
     test('offsetEvent eventIcon icon', function() {
       // This is weird. the  is the icon, but doesnt render in the text editor since it doesnt have the font file. so pulling the unicode from http://fontawesome.io/cheatsheet/ to test.
@@ -568,7 +568,7 @@ function runTests(){
       assert.equal(offsetEvent.eventLine.node().tagName,'line');
     });
     test('offsetEvent eventLine stroke color', function() {
-      assert.equal(offsetEvent.eventLine.attr('stroke'),colors['grey9']);
+      assert.equal(offsetEvent.eventLine.attr('stroke').split(' ').join(''),colors['grey9']);
     });
     test('offsetEvent eventLine stroke width', function() {
       assert.equal(offsetEvent.eventLine.attr('stroke-width'),1);
