@@ -3,7 +3,7 @@ document.addEventListener("WebComponentsReady", function() {
 });
 
 function runTests(){
-  suite('px-vis-sclae does Polymer exist?', function() {
+  suite('px-vis-line does Polymer exist?', function() {
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });

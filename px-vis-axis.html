@@ -220,6 +220,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.axis) && !this._isObjEmpty(this.margin) && this.currentDomain.length > 0){
             this.defineAxis();
             // TODO unify my orientation checks
+            // TODO suport top and right
             if(this.orientation === 'bottom'){
               var h = this.svg.attr('height') - this.margin.bottom - this.margin.top;
 
@@ -382,8 +383,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             // FIXME do we need to move the title group based on how many series we have
             for(var i = 0; i < this.chartData.length; i++){
               if(typeof(this.chartData[i]['axis']) === 'undefined' || this.chartData[i]['axis'] === '' || this.chartData[i]['axis'] === this.axisId){
-                var color = this.dataVisColors[this.seriesColorOrder[i]],
-                    id = this.chartData[i]['name'];//.split(' ').join('_');
+                var color = (typeof(this.chartData[i].seriesNumber) !== 'undefined') ? this.dataVisColors[this.seriesColorOrder[this.chartData[i].seriesNumber]] : this.dataVisColors[this.seriesColorOrder[i]],
+                    id = this.chartData[i]['name'];
                 this._drawBar(this._titleGroup,id,color,i);
               }
             }
