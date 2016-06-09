@@ -119,7 +119,7 @@ function runTests(){
       assert.equal(defaultThreshold.thresholdRect[0][0].getAttribute('y'),219);
     });
     test('defaultThreshold thresholdRect width', function() {
-      assert.equal(Math.round(defaultThreshold.thresholdRect[0][0].getAttribute('width')),27);
+      assert.equal(defaultThreshold.thresholdRect[0][0].getAttribute('width'),defaultThreshold.thresholdText[0][0].getBBox().width + 5);
     });
     test('defaultThreshold thresholdRect height', function() {
       assert.equal(defaultThreshold.thresholdRect[0][0].getAttribute('height'),18);
@@ -200,7 +200,7 @@ function runTests(){
       assert.equal(Math.round(defaultThreshold.thresholdRect[0][1].getAttribute('y')),38);
     });
     test('defaultThreshold thresholdRect width', function() {
-      assert.equal(Math.round(defaultThreshold.thresholdRect[0][1].getAttribute('width')),27);
+      assert.equal(defaultThreshold.thresholdRect[0][1].getAttribute('width'),defaultThreshold.thresholdText[0][1].getBBox().width + 5);
     });
     test('defaultThreshold thresholdRect height', function() {
       assert.equal(defaultThreshold.thresholdRect[0][1].getAttribute('height'),18);
