@@ -33,6 +33,7 @@ module.exports = {
     'test/px-vis-register-fixture.html',
     'test/px-vis-line-fixture.html',
     'test/px-vis-scatter-fixture.html',
-    'test/px-vis-event-fixture.html'
+    'test/px-vis-event-fixture.html',
+    'test/px-vis-threshold-fixture.html'
   ]
 };
