@@ -91,7 +91,7 @@ function runTests(){
       assert.equal(defaultThreshold.thresholdLine[0][0].getAttribute('stroke-width'),1);
     });
     test('defaultThreshold thresholdLine stroke dasharray', function() {
-      assert.equal(defaultThreshold.thresholdLine[0][0].getAttribute('stroke-dasharray'),'5,2');
+      assert.equal(defaultThreshold.thresholdLine[0][0].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
     });
     test('defaultThreshold thresholdLine x1', function() {
       assert.equal(defaultThreshold.thresholdLine[0][0].getAttribute('x1'),0);
@@ -172,7 +172,7 @@ function runTests(){
       assert.equal(defaultThreshold.thresholdLine[0][1].getAttribute('stroke-width'),1);
     });
     test('defaultThreshold thresholdLine stroke dasharray', function() {
-      assert.equal(defaultThreshold.thresholdLine[0][1].getAttribute('stroke-dasharray'),'5,2');
+      assert.equal(defaultThreshold.thresholdLine[0][1].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
     });
     test('defaultThreshold thresholdLine x1', function() {
       assert.equal(defaultThreshold.thresholdLine[0][1].getAttribute('x1'),0);
@@ -242,7 +242,7 @@ function runTests(){
       assert.equal(boxThreshold.thresholdLine[0][0].getAttribute('stroke-width'),1);
     });
     test('boxThreshold thresholdLine stroke dasharray', function() {
-      assert.equal(boxThreshold.thresholdLine[0][0].getAttribute('stroke-dasharray'),'5,2');
+      assert.equal(boxThreshold.thresholdLine[0][0].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
     });
     test('boxThreshold thresholdLine stroke', function() {
       assert.equal(boxThreshold.thresholdLine[0][0].getAttribute('stroke').split(' ').join(''),colorSet[colorOrder[0]]);
@@ -260,7 +260,7 @@ function runTests(){
       assert.equal(boxThreshold.thresholdLine[0][1].getAttribute('stroke-width'),1);
     });
     test('boxThreshold thresholdLine stroke dasharray', function() {
-      assert.equal(boxThreshold.thresholdLine[0][1].getAttribute('stroke-dasharray'),'5,2');
+      assert.equal(boxThreshold.thresholdLine[0][1].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
     });
     test('boxThreshold thresholdLine stroke', function() {
       assert.equal(boxThreshold.thresholdLine[0][1].getAttribute('stroke').split(' ').join(''),colors['grey8']);
