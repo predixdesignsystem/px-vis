@@ -92,7 +92,12 @@ function runTests(){
       assert.equal(baseXAxis._axisGroup.node().tagName,'g');
     });
     test('baseXAxis _axisGroup translation', function() {
-      assert.equal(baseXAxis._axisGroup.attr('transform'),'translate(0,240)');
+          re = new RegExp(/(\w+)\((-?\d+\.?\d*)[,\s](-?\d+\.?\d*)\)/),
+          s = baseXAxis._axisGroup.attr('transform'),
+          arr = re.exec(s);
+      assert.equal(arr[1],'translate');
+      assert.equal(parseFloat(arr[2]),0);
+      assert.equal(parseFloat(arr[3]),240);
     });
 
     suite('_axisGroup lines and path styles', function() {
@@ -139,10 +144,12 @@ function runTests(){
     });
 
     test('Title _titleGroup transform', function() {
-      var attr = baseXAxis._titleGroup.attr('transform');
-      var t = baseXAxis._titleGroup.attr('transform').split(',');
-      assert.equal(t[0],'translate(222.5');
-      assert.equal(parseInt(t[1]),278);
+      var attr = baseXAxis._titleGroup.attr('transform'),
+          re = new RegExp(/(\w+)\((-?\d+\.?\d*)[,\s](-?\d+\.?\d*)\)/),
+          arr = re.exec(attr);
+      assert.equal(arr[1],'translate');
+      assert.closeTo(parseFloat(arr[2]),222.5,6);
+      assert.closeTo(parseFloat(arr[3]),278,2);
     });
 
     test('Title _titleGroup text font-size', function() {
@@ -192,7 +199,7 @@ function runTests(){
       assert.equal(baseYAxis._axisGroup.node().tagName,'g');
     });
     test('baseYAxis _axisGroup translation', function() {
-      assert.equal(baseYAxis._axisGroup.attr('transform'),'translate(0,0)');
+      assert.isTrue(baseYAxis._axisGroup.attr('transform') === 'translate(0,0)' || baseYAxis._axisGroup.attr('transform') === 'translate(0)');
     });
 
     suite('_axisGroup lines and path styles', function() {
@@ -239,12 +246,12 @@ function runTests(){
     });
 
     test('Title _titleGroup transform', function() {
-      var attr = baseYAxis._titleGroup.attr('transform');
-      var t = baseYAxis._titleGroup.attr('transform').split(',');
-      var tx = t[0].split('(');
-      assert.equal(tx[0],'translate');
-      assert.equal(parseInt(tx[1]),-33);
-      assert.equal(t[1],'126)');
+      var attr = baseYAxis._titleGroup.attr('transform'),
+          re = new RegExp(/(\w+)\((-?\d+\.?\d*)[,\s](-?\d+\.?\d*)\)/),
+          arr = re.exec(attr);
+      assert.equal(arr[1],'translate');
+      assert.closeTo(parseFloat(arr[2]),-33,2);
+      assert.equal(parseFloat(arr[3]),126);
     });
 
     test('Title _titleGroup text font-size', function() {
@@ -277,10 +284,13 @@ function runTests(){
       assert.equal(bar.attr('series-bar-id'),'mySeries');
     });
     test('Title series bars translate', function() {
-      var bar = baseYAxis._titleGroup.select('rect');
-      var t = bar.attr('transform').split(' ').join('').split(',');
-      assert.equal(t[0],'translate(-12');
-      assert.equal(parseInt(t[1]),-55);
+      var bar = baseYAxis._titleGroup.select('rect'),
+          re = new RegExp(/(\w+)\((-?\d+\.?\d*)[,\s](-?\d+\.?\d*)\)/),
+          s = bar.attr('transform'),
+          arr = re.exec(s);
+      assert.equal(arr[1],'translate');
+      assert.equal(parseFloat(arr[2]),-12);
+      assert.closeTo(parseFloat(arr[3]),-55,2);
     });
   }); //suite
 
