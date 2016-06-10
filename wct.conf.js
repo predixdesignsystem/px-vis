@@ -35,6 +35,7 @@ module.exports = {
     'test/px-vis-scatter-fixture.html',
     'test/px-vis-event-fixture.html',
     'test/px-vis-threshold-fixture.html',
-    'test/px-vis-axis-fixture.html'
+    'test/px-vis-axis-fixture.html',
+    'test/px-vis-gridlines-fixture.html'
   ]
 };

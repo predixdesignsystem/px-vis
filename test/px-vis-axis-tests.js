@@ -81,7 +81,7 @@ function runTests(){
       assert.equal(baseXAxis._axis.outerTickSize(),0);
     });
     test('baseXAxis _axis innerTickSize', function() {
-      assert.equal(baseXAxis._axis.outerTickSize(),0);
+      assert.equal(baseXAxis._axis.innerTickSize(),6);
     });
 
     test('baseXAxis translateAmt', function() {
