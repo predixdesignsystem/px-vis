@@ -76,21 +76,31 @@ function runTests(){
     });
   });
 
-  suite('px-vis-gridlines basicXGrid works', function() {
+  suite('px-vis-clip-path baseClip works', function() {
     var baseSVG = document.getElementById('baseSVG'),
         baseClip = document.getElementById('baseClip');
+    var clipPath, rect;
+
+    suiteSetup(function(){
+      clipPath = baseSVG.svg.select('clipPath');
+      // Safari 8 cant seem to find it with d3 select... fallback
+      if(clipPath.node() === null){
+        clipPath = d3.select(document.getElementsByTagName('clipPath')[0]);
+      }
+      rect = clipPath.select('rect');
+    });
 
     test('baseClip ID is set', function() {
-      assert.equal(baseSVG.svg.select('clipPath').attr('id'),baseClip.clipPath);
+      assert.equal(clipPath.attr('id'),baseClip.clipPath);
     });
     test('baseClip y', function() {
-      assert.equal(baseSVG.svg.select('clipPath').select('rect').attr('y'),-10);
+      assert.equal(rect.attr('y'),-10);
     });
     test('baseClip width', function() {
-      assert.equal(baseSVG.svg.select('clipPath').select('rect').attr('width'),200);
+      assert.equal(rect.attr('width'),200);
     });
     test('baseClip height', function() {
-      assert.equal(baseSVG.svg.select('clipPath').select('rect').attr('height'),100);
+      assert.equal(rect.attr('height'),100);
     });
   }); //suite
 } //runTests
