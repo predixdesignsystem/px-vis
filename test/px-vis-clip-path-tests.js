@@ -47,7 +47,7 @@ function runTests(){
       baseScale.set('height',h);
       baseScale.set('margin',m);
       baseScale.set('chartData',d);
-      console.warn(baseLine);
+      
       baseLine.set('chartData',d[0]);
 
       baseClip.set('margin',m);
