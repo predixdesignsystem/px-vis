@@ -135,11 +135,13 @@ function runTests(){
         ttObj = evt.detail;
       });
 
+      var box = baseIS._rect.node().getBoundingClientRect();
+
       var e = new MouseEvent('mousemove',{
-        "screenX": 250,
-        "screenY": 100,
-        "clientX": 250,
-        "clientY": 100,
+        "screenX": box.left + box.width/2,
+        "screenY": box.top + box.height/2,
+        "clientX": box.left + box.width/2,
+        "clientY": box.top + box.height/2,
         "ctrlKey": false,
         "shiftKey": false,
         "altKey": false,
@@ -165,10 +167,13 @@ function runTests(){
       assert.equal(ttObj.method, 'set');
     });
     test('event data time', function() {
-      assert.equal(+ttObj.data.time, 1397158836000);
+      assert.equal(+ttObj.data.time, 1397163210000);
     });
     test('event data mousePos', function() {
-      assert.equal(JSON.stringify(ttObj.data.mouse), '[232,30.5625]');
+      var arr = ttObj.data.mouse;
+      // account for floating point rounding error
+      assert.closeTo(arr[0], 250, 1);
+      assert.closeTo(arr[1], 150, 1);
     });
     // maybe should be using 2 series data?
     test('event data xArr', function() {
