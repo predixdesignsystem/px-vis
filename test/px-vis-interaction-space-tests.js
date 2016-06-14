@@ -138,18 +138,10 @@ function runTests(){
       var box = baseIS._rect.node().getBoundingClientRect();
 
       var e = new MouseEvent('mousemove',{
-        "screenX": box.left + box.width/2,
-        "screenY": box.top + box.height/2,
         "clientX": box.left + box.width/2,
         "clientY": box.top + box.height/2,
-        "ctrlKey": false,
-        "shiftKey": false,
-        "altKey": false,
-        "metaKey": false,
-        "button": 0,
-        "buttons": 0,
-        "relatedTarget": null,
-        "region": null
+        "pageX": box.left + box.width/2,
+        "pageY": box.top + box.height/2,
       });
       baseIS._rect.node().dispatchEvent(e);
 
@@ -202,18 +194,8 @@ function runTests(){
       });
 
       var e = new MouseEvent('mouseout',{
-        "screenX": 250,
-        "screenY": 100,
         "clientX": 250,
-        "clientY": 100,
-        "ctrlKey": false,
-        "shiftKey": false,
-        "altKey": false,
-        "metaKey": false,
-        "button": 0,
-        "buttons": 0,
-        "relatedTarget": null,
-        "region": null
+        "clientY": 100
       });
       baseIS._rect.node().dispatchEvent(e);
 
