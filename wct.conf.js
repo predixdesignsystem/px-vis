@@ -38,8 +38,8 @@ module.exports = {
     'test/px-vis-axis-fixture.html',
     'test/px-vis-gridlines-fixture.html',
     'test/px-vis-clip-path-fixture.html',
-    'test/px-vis-data-fixture.html'
-    // 'test/px-vis-interaction-space-fixture.html'
-
+    'test/px-vis-data-fixture.html',
+    // 'test/px-vis-interaction-space-fixture.html',
+    'test/px-vis-zoom-fixture.html'
   ]
 };
