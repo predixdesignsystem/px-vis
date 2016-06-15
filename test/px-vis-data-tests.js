@@ -20,9 +20,9 @@ function runTests(){
           "type":"scatter",
           "name":"blahblah",
           "axis":"axis1",
-          "url":"/bower_components/px-demo-data/demo-data/aviation/delta-egt-cruise.json"
+          "url":"test_data/delta-egt-cruise.json"
         },{
-          "url":"/bower_components/px-demo-data/demo-data/aviation/hpt-acc-position-cruise.json",
+          "url":"test_data/hpt-acc-position-cruise.json",
         }
       ];
 
@@ -47,7 +47,7 @@ function runTests(){
     });
 
     test('appendAjax iron-ajax 1 url', function() {
-      assert.equal(ironAjax[0].url, "/bower_components/px-demo-data/demo-data/aviation/delta-egt-cruise.json");
+      assert.equal(ironAjax[0].url, "test_data/delta-egt-cruise.json");
     });
     test('appendAjax iron-ajax 1 type', function() {
       assert.equal(ironAjax[0].getAttribute('type'), "scatter");
@@ -63,7 +63,7 @@ function runTests(){
     });
 
     test('appendAjax iron-ajax 2 url', function() {
-      assert.equal(ironAjax[1].url, "/bower_components/px-demo-data/demo-data/aviation/hpt-acc-position-cruise.json");
+      assert.equal(ironAjax[1].url, "test_data/hpt-acc-position-cruise.json");
     });
     test('appendAjax iron-ajax 2 type', function() {
       assert.equal(ironAjax[1].getAttribute('type'), null);
@@ -146,9 +146,9 @@ function runTests(){
 
     suiteSetup(function(done){
       var d = [{
-        "url":"/bower_components/px-demo-data/demo-data/aviation/delta-egt-cruise-events.json"
+        "url":"test_data/delta-egt-cruise-events.json"
       },{
-        "url":"/bower_components/px-demo-data/demo-data/aviation/delta-egt-cruise-thresholds.json"
+        "url":"test_data/delta-egt-cruise-thresholds.json"
       }];
 
       document.addEventListener('px-vis-data-updated',function(evt){
@@ -172,7 +172,7 @@ function runTests(){
     });
 
     test('flatAjax iron-ajax 1 url', function() {
-      assert.equal(ironAjax[0].url, "/bower_components/px-demo-data/demo-data/aviation/delta-egt-cruise-events.json");
+      assert.equal(ironAjax[0].url, "test_data/delta-egt-cruise-events.json");
     });
     test('flatAjax iron-ajax 1 type', function() {
       assert.equal(ironAjax[0].getAttribute('type'), null);
@@ -188,7 +188,7 @@ function runTests(){
     });
 
     test('flatAjax iron-ajax 2 url', function() {
-      assert.equal(ironAjax[1].url, "../px-demo-data/demo-data/aviation/delta-egt-cruise-thresholds.json");
+      assert.equal(ironAjax[1].url, "test_data/delta-egt-cruise-thresholds.json");
     });
     test('flatAjax iron-ajax 2 type', function() {
       assert.equal(ironAjax[1].getAttribute('type'), null);
