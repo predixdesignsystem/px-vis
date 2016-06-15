@@ -35,7 +35,7 @@ function runTests(){
       setTimeout(function(){
         ironAjax = appendAjax.querySelectorAll('iron-ajax');
         done()
-      },100);
+      },1000);
       // done();
     });
 
@@ -160,7 +160,7 @@ function runTests(){
       setTimeout(function(){
         ironAjax = flatAjax.querySelectorAll('iron-ajax');
         done()
-      },100);
+      },1000);
       // done();
     });
 
