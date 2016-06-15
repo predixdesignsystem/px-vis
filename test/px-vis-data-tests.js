@@ -188,7 +188,7 @@ function runTests(){
     });
 
     test('flatAjax iron-ajax 2 url', function() {
-      assert.equal(ironAjax[1].url, "/bower_components/px-demo-data/demo-data/aviation/delta-egt-cruise-thresholds.json");
+      assert.equal(ironAjax[1].url, "../px-demo-data/demo-data/aviation/delta-egt-cruise-thresholds.json");
     });
     test('flatAjax iron-ajax 2 type', function() {
       assert.equal(ironAjax[1].getAttribute('type'), null);
