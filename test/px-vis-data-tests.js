@@ -29,7 +29,9 @@ function runTests(){
       document.addEventListener('px-vis-data-updated',function(evt){
         eventObj = evt.detail;
         // doh...ajax comes in async, so check that it matches the order we expect for our tests
-        if(eventObj.data[0].seriesNumber !== 0){
+        console.warn(eventObj.data[0].seriesNumber);
+        console.warn(typeof(eventObj.data[0].seriesNumber));
+        if(eventObj.data[0].seriesNumber !== '0'){
           eventObj.data.reverse();
         }
       });
