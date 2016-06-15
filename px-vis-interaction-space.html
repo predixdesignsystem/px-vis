@@ -94,6 +94,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       if(this.tooltipData && !this._isObjEmpty(this.tooltipData)){
         this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': this.tooltipData, 'method':'set' });
       }
+
     },
 
     /**
@@ -122,6 +123,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           .on("mousedown.action", this._drawActionBox.bind(this))
           .on("mousemove.action", this._updateActionBox.bind(this))
           .on("mouseup.action", this._finishActionBox.bind(this))
+          //.on("mouseleave", this._mouseLeave.bind(this))
           .style("cursor","crosshair");
 
           // TODO touchevents
@@ -132,6 +134,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         this._resetTooltipData();
       }  //if we have vars
     },  //drawElement
+    // _mouseLeave: function(evt) {
+    //   if (this.mouseDown) {
+    //     //this._finishActionBox();
+    //   }
+    // },
     /**
      * Helper function called on mouseover
      * Shows the tooltip elements
@@ -223,7 +230,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         // now we can set our data that we want to pass out
         this.set('tooltipData',dataObj);
         this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
-      },1)
+      },1);
     }, //mousemove
 
     /**
@@ -233,6 +240,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * @method _drawActionBox
      */
     _drawActionBox: function(){
+      this.mouseDown = true;
       var mousePos = d3.mouse(this._rect.node());
       // use original svg so it draws under the _rect and does not interfer with our mouse events
       this._actionArea = this.svg.append( "rect")
@@ -247,7 +255,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         .attr('height', 0)
         .attr('fill', this.colors.grey2)
         .attr('fill-opacity', 0.5)
-        .attr('stroke', this.colors.grey6)
+        .attr('stroke', this.colors.grey6);
     },
     /**
      * Helper function called on mousedown.action
@@ -277,7 +285,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           this._actionArea.attr("height", mousePos[1] - oy);
         } else {
           this._actionArea.attr("y", mousePos[1]);
-          this._actionArea.attr("height", oy - mousePos[1])
+          this._actionArea.attr("height", oy - mousePos[1]);
         }
       }
     },
@@ -289,6 +297,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * @method _finishActionBox
      */
     _finishActionBox: function() {
+      this.mouseDown = false;
       var extents = {};
 
       extents.x1 = parseInt(this._actionArea.attr("x"));

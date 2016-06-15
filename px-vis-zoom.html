@@ -40,7 +40,10 @@ Element providing solution to no problem in particular. As a simple, increments 
      * @type Object
      */
     properties: {
-
+      _zooooom: {
+        type: Boolean,
+        value: false
+      }
     },
 
     observers: [
@@ -48,19 +51,24 @@ Element providing solution to no problem in particular. As a simple, increments 
     ],
     attached: function(){
       // TODO generalize this
-      var rect = this.svg.node().getBoundingClientRect();
 
-      this.$.resetBtn.style.left = rect.right - 120 - this.margin.right + 'px';
-      // TODO if register top then add more....
-      this.$.resetBtn.style.top = rect.top + 10 + this.margin.top  + 'px';
     },
 
     zooooom: function(extentsData) {
+      if (!this._zooooom) {
+        var rect = this.svg.node().getBoundingClientRect();
+        this.$.resetBtn.style.left = rect.right - 120 - this.margin.right + 'px';
+        // TODO if register top then add more....
+        this.$.resetBtn.style.top = rect.top + 10 + this.margin.top  + 'px';
+        this._zooooom = true;
+      }
+
       this.set('selectedDomain', extentsData.eX);
       this.fire('px-vis-selected-domain-updated', { 'data':extentsData.eX, 'method': 'set', 'dataVar': 'selectedDomain' });
       this.toggleClass('hidden', false, this.$.resetBtn);
     },
     resetZoom: function(){
+      this._zooooom = false;
       this.set('selectedDomain', ['reset']);
       this.fire('px-vis-selected-domain-updated', { 'data':['reset'], 'method': 'set', 'dataVar': 'selectedDomain' });
       this.toggleClass('hidden', true, this.$.resetBtn);

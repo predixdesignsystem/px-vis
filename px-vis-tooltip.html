@@ -76,7 +76,7 @@ Element providing on-chart tooltip display
 
     observers: [
       '_updateTooltip(tooltipData.*)',
-      '_setRect(svg)'
+      //'_setRect(svg)'
      ],
     _setRect: function(){
       this.set('_rect', this.svg.node().getBoundingClientRect());
@@ -86,13 +86,14 @@ Element providing on-chart tooltip display
         this.toggleClass('hidden',true, this.$.tooltip);
       } else {
         this.toggleClass('hidden',false, this.$.tooltip);
+        this._setRect();
         this._moveTooltip();
       }
     },
     _moveTooltip: function() {
       // TODO allow spacing adjustment
-      this.$.tooltip.style.left = this._rect.left + 15 + this.tooltipData.mouse[0] + 'px';
-      this.$.tooltip.style.top =  this._rect.top + this.tooltipData.mouse[1]  + 'px';
+      this.$.tooltip.style.left = this._rect.left + 45 + this.tooltipData.mouse[0] + 'px';
+      this.$.tooltip.style.top =  this._rect.top + 25 + this.tooltipData.mouse[1]  + 'px';
     }
   });
 </script>
