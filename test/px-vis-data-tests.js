@@ -28,7 +28,8 @@ function runTests(){
 
       document.addEventListener('px-vis-data-updated',function(evt){
         eventObj = evt.detail;
-        if(eventObj.data[0].seriesNumber === 1){
+        console.log(eventObj.data[0].seriesNumber);
+        if(eventObj.data[0].seriesNumber !== 0){
           eventObj.data.reverse();
         }
       });
