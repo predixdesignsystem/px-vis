@@ -28,7 +28,7 @@ function runTests(){
 
       document.addEventListener('px-vis-data-updated',function(evt){
         eventObj = evt.detail;
-        console.log(eventObj.data[0].seriesNumber);
+        // doh...ajax comes in async, so check that it matches the order we expect for our tests
         if(eventObj.data[0].seriesNumber !== 0){
           eventObj.data.reverse();
         }
@@ -157,6 +157,10 @@ function runTests(){
 
       document.addEventListener('px-vis-data-updated',function(evt){
         eventObj = evt.detail;
+        // doh...ajax comes in async, so check that it matches the order we expect for our tests
+        if(eventObj.data[0]['id'] !== '123'){
+          eventObj.data.reverse();
+        }
       });
 
       flatAjax.set('requestData',d);
