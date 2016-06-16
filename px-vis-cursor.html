@@ -164,7 +164,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         // add circle to the line and hide it
         this._cursor = this.svg.append("g")
             .attr("display", "none");
-
+        // TODO add a cursor option for horizontal?
         if(this.horizontalLine !== 'none'){
           // append the x line
           this._hLines = this._cursor.selectAll('line.xline')
@@ -211,7 +211,12 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         }
       }  //if we have vars
     },  //drawElement
-
+    /**
+     * Function called by observer
+     * Determins if the cursor should be shown or hidden
+     *
+     * @method _cursorChange
+     */
     _cursorChange: function(){
       if(!this._isObjEmpty(this._cursor)){
         if(this.tooltipData.time === null){
@@ -264,7 +269,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       // move the horizontal lines into position
       if(this.horizontalLine === 'full'){
         this._hLines.attr("transform", function(d,i){
-          return "translate(" + 0 + "," + this.tooltipData.series[i]['coord'][1] + ")"
+          return "translate(0," + this.tooltipData.series[i]['coord'][1] + ")"
         }.bind(this));
       } else if(this.horizontalLine === 'left'){
         //slightly cheating; just pushing the line off the draw space.
@@ -287,7 +292,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         If top, take the highest
       */
       if(this.verticalLine === 'full'){
-        this._vLine.attr("transform","translate(" + this.tooltipData.mouse[0] + "," + 0 + ")");
+        this._vLine.attr("transform","translate(" + this.tooltipData.mouse[0] + ",0)");
       } else if(this.verticalLine === 'bottom'){
         var maxY = d3.max(this.tooltipData.yArr);
         this._vLine.attr("transform","translate(" + this.tooltipData.xArr[this.tooltipData.yArr.indexOf(maxY)] + "," + maxY + ")");

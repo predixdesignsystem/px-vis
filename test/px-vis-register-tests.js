@@ -32,7 +32,7 @@ function runTests(){
   suite('px-vis-register passing in a muteSeries applies muted class to the series', function() {
     var doesItMute = document.getElementById('doesItMute');
     var data;
-    setup(function(done) {
+    suiteSetup(function(done) {
       data = generateDataValues( generateEmptyData(5) );
       setData(doesItMute, data);
       setMutedSeries(doesItMute, data.series[1].name, done);
@@ -57,7 +57,7 @@ function runTests(){
         truncateShort = document.getElementById('truncateShort'),
         noTruncate = document.getElementById('noTruncate');
 
-    setup(function(done) {
+    suiteSetup(function(done) {
       var str = 'this_is_a_long_name';
       var data = generateDataValues( generateEmptyData(2,str) );
       // truncateShort.set('truncationLength',5)
@@ -112,7 +112,7 @@ function runTests(){
   suite('px-vis-register formats time correctly', function() {
     var datetimeFormat = document.getElementById('datetimeFormat');
 
-    setup(function(done) {
+    suiteSetup(function(done) {
       var data = generateDataValues( generateEmptyData(2) );
       setData(datetimeFormat, data,done);
     });
@@ -131,7 +131,7 @@ function runTests(){
   suite('px-vis-register add units', function() {
     var units = document.getElementById('units');
 
-    setup(function(done) {
+    suiteSetup(function(done) {
       var data = generateDataValues( generateEmptyData(2) );
       setData(units, data,done);
     });
@@ -151,7 +151,7 @@ function runTests(){
   suite('px-vis-register formats units', function() {
     var numberFormat = document.getElementById('numberFormat');
 
-    setup(function(done) {
+    suiteSetup(function(done) {
       var data = generateDataValues( generateEmptyData(2) );
       setData(numberFormat, data,done);
     });
@@ -170,7 +170,7 @@ function runTests(){
   suite('px-vis-register formats language units', function() {
     var numberFormatCulture = document.getElementById('numberFormatCulture');
 
-    setup(function(done) {
+    suiteSetup(function(done) {
       var data = generateDataValues( generateEmptyData(2) );
       setData(numberFormatCulture, data,done);
     });
@@ -192,7 +192,7 @@ function basicTests(registerID,dir){
 
   suite('px-vis-register ' + registerID + ' with 5 series -- simulating basic creation', function() {
     var data;
-    setup(function(done) {
+    suiteSetup(function(done) {
       data = generateEmptyData(5);
       setData(register, data, done);
     });
@@ -230,7 +230,7 @@ function basicTests(registerID,dir){
 
   suite('px-vis-register ' + registerID + ' update data on series  -- simulating on-chart-hover', function() {
     var data;
-    setup(function(done) {
+    suiteSetup(function(done) {
       data = generateDataValues( generateEmptyData(5) );
       setData(register, data, done);
     });
@@ -261,7 +261,7 @@ function basicTests(registerID,dir){
 
   suite('px-vis-register ' + registerID + ' remove data -- simulating off-chart-hover', function() {
     var data;
-    setup(function(done) {
+    suiteSetup(function(done) {
       data = generateEmptyData(5);
       setData(register, data, done);
     });
@@ -295,7 +295,7 @@ function basicTests(registerID,dir){
         series,
         seriesName,
         eventObj;
-    setup(function(done) {
+    suiteSetup(function(done) {
       data = generateEmptyData(5);
       document.addEventListener('px-vis-muted-series-updated',function(evt){
         eventObj = evt.detail;
