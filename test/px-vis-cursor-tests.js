@@ -170,16 +170,16 @@ function baseTests(elem,hLine,vLine,circle,hArr,yArr){
         assert.equal(cursor._circles.node().tagName,'circle');
       });
       test(elem + ' _circles[0] fill', function() {
-        assert.equal(cursor._circles[0][0].getAttribute('fill'),colorSet[colorOrder[0]]);
+        assert.equal(cursor._circles[0][0].getAttribute('fill').split(' ').join(''),colorSet[colorOrder[0]]);
       });
       test(elem + ' _circles[0] stroke', function() {
-        assert.equal(cursor._circles[0][0].getAttribute('stroke'),colorSet[colorOrder[0]]);
+        assert.equal(cursor._circles[0][0].getAttribute('stroke').split(' ').join(''),colorSet[colorOrder[0]]);
       });
       test(elem + ' _circles[1] fill', function() {
-        assert.equal(cursor._circles[0][1].getAttribute('fill'),colorSet[colorOrder[1]]);
+        assert.equal(cursor._circles[0][1].getAttribute('fill').split(' ').join(''),colorSet[colorOrder[1]]);
       });
       test(elem + ' _circles[0] stroke', function() {
-        assert.equal(cursor._circles[0][1].getAttribute('stroke'),colorSet[colorOrder[1]]);
+        assert.equal(cursor._circles[0][1].getAttribute('stroke').split(' ').join(''),colorSet[colorOrder[1]]);
       });
     }
   }); //suite
@@ -219,10 +219,10 @@ function addTooltipTests(elem,hLine,vLine,circle,hX2,hTransformArr,vTransform,cA
         assert.equal(cursor._hLines.attr('x2'),hX2);
       });
       test(elem + ' _hLines[0] transform', function() {
-        assert.equal(cursor._hLines[0][0].getAttribute('transform').split(" ").join(''),hTransformArr[0]);
+        assert.equal(cursor._hLines[0][0].getAttribute('transform').split(" ").join(','),hTransformArr[0]);
       });
       test(elem + ' _hLines[1] transform', function() {
-        assert.equal(cursor._hLines[0][1].getAttribute('transform').split(" ").join(''),hTransformArr[1]);
+        assert.equal(cursor._hLines[0][1].getAttribute('transform').split(" ").join(','),hTransformArr[1]);
       });
     }
 
