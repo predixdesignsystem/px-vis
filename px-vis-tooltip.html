@@ -9,20 +9,26 @@
 Element providing on-chart tooltip display
 - Consumes tooltipData property
 
-It is a recasting of the px-vis-register, but following the cursor over the chart
 
 ##### Usage
 
     <px-vis-tooltip
-          svg="[[svg]]"
-          width="250"
-          margin="[[margin]]"
-          chart-data="[[chartData]]"
-          tooltip-data="[[tooltipData]]">
-      </px-vis-tooltip>
+      svg="[[varFromSVGComponent]]"
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      chart-data="[[chartData]]"
+      x="[[varXFromScaleComponent]]"
+      y="[[varYFromScaleComponent]]"
+      vertical-line="full"
+      horizonal-line="none"
+      current-domain-x="[[varXDomainFromScaleComponent]]"
+      current-domain-y="[[varYDomainFromScaleComponent]]"
+      tooltip-data={{tooltipData}}>
+    </px-vis-tooltip>
 
 @element px-vis-tooltip
-@blurb Element providing on-chart tooltip display
+@blurb Element providing on-chart hover functionality to get data values near the mouse cursor.
 @homepage index.html
 @demo demo.html
 
@@ -63,12 +69,6 @@ It is a recasting of the px-vis-register, but following the cursor over the char
      * @type Object
      */
     properties: {
-      /**
-       * Holder for the svg g elem's client rect
-       *
-       * @property _rect
-       * @type Object
-       */
       _rect: {
         type: Object
       }
@@ -76,38 +76,23 @@ It is a recasting of the px-vis-register, but following the cursor over the char
 
     observers: [
       '_updateTooltip(tooltipData.*)',
-      '_setRect(svg)'
+      '_setRect(pxSvgElem)'
      ],
-     /**
-     * Sets _rect when svg is passed in
-     *
-     * @method _setRect
-     */
     _setRect: function(){
-      this.set('_rect', this.svg.node().getBoundingClientRect());
+      this.set('_rect', this.pxSvgElem.getBoundingClientRect());
     },
-    /**
-    * fired by observer and shows/hides the tooltip and moves it into the proper location
-    *
-    * @method _updateTooltip
-    */
     _updateTooltip: function(){
-      if(this.tooltipData.time === null){
-        this.toggleClass('hidden',true, this.$.tooltip);
-      } else {
+      if(this.tooltipData.time !== null){
         this.toggleClass('hidden',false, this.$.tooltip);
         this._moveTooltip();
+      } else {
+        this.toggleClass('hidden',true, this.$.tooltip);
       }
     },
-    /**
-    * calulates the correct position to move the tooltip to follow the mouse
-    *
-    * @method _updateTooltip
-    */
     _moveTooltip: function() {
       // TODO allow spacing adjustment
-      this.$.tooltip.style.left = this._rect.left + 15 + this.tooltipData.mouse[0] + 'px';
-      this.$.tooltip.style.top =  this._rect.top + 100 + this.tooltipData.mouse[1]  + 'px';
+      this.$.tooltip.style.left = this._rect.left + 60 + this.tooltipData.mouse[0] + 'px';
+      this.$.tooltip.style.top =  this._rect.top + 35 + this.tooltipData.mouse[1]  + 'px';
     }
   });
 </script>

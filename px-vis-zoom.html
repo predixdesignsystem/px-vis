@@ -9,13 +9,13 @@ Element providing an on-chart zoom.
 ##### Usage
 
     <px-vis-zoom
-        svg="[[svg]]"
         margin="[[margin]]"
         extents-data="[[extentsData]]"
-        selected-domain="{{selectedDomain}}">
+        selected-domain="{{selectedDomain}}"
+        px-svg-elem={{pxSvgElem}}>
     </px-vis-zoom>
 
-@element px-vis
+@element px-vis-zoom
 @blurb Element providing an on-chart zoom.
 @homepage index.html
 @demo demo.html
@@ -45,37 +45,21 @@ Element providing an on-chart zoom.
      * @type Object
      */
     properties: {
-      _zooooom: {
-        type: Boolean,
-        value: false
-      }
-    },
 
+    },
     observers: [
       'zooooom(extentsData)'
     ],
-    attached: function(){
-      // TODO generalize this
-
-    },
-
     zooooom: function(extentsData) {
-      //are we already zooooomed in?
-      if (!this._zooooom) {
-        //we're not! set the location of the button.
-        var rect = this.svg.node().getBoundingClientRect();
-        this.$.resetBtn.style.left = rect.right - 170 - this.margin.right + 'px';
-        // TODO if register top then add more....
-        this.$.resetBtn.style.top = rect.top + 20 + this.margin.top  + 'px';
-        this._zooooom = true;
-      }
+      var rect = this.pxSvgElem.getBoundingClientRect();
+      this.$.resetBtn.style.left = rect.right - 170 - this.margin.right + 'px';
+      this.$.resetBtn.style.top = rect.top + 20 + this.margin.top  + 'px';
 
       this.set('selectedDomain', extentsData.eX);
       this.fire('px-vis-selected-domain-updated', { 'data':extentsData.eX, 'method': 'set', 'dataVar': 'selectedDomain' });
       this.toggleClass('hidden', false, this.$.resetBtn);
     },
     resetZoom: function(){
-      this._zooooom = false;
       this.set('selectedDomain', ['reset']);
       this.fire('px-vis-selected-domain-updated', { 'data':['reset'], 'method': 'set', 'dataVar': 'selectedDomain' });
       this.toggleClass('hidden', true, this.$.resetBtn);

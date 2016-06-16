@@ -36,15 +36,25 @@ Element which creates an SVG element and sets up d3
 
         /****** EVENTS ******/
         /**
-         * Fired once d3 svg drawing element has been configured
+         * Fired once d3 svg drawing element has been configured.
          *
+         * Uses the px-vis-behavior-chart behavior, for listening and setting property, locally or globally.
          * Detail includes:
          *
          * ```
-         * { 'svg': svgElem }
+         * { 'data': d3.select('g') }
          * ```
          *
          * @event px-vis-svg-updated
+         */
+         /*
+         * Fired once the svg is configured, passes the svg element inside px-vis-svg.
+         *
+         * Uses the px-vis-behavior-chart behavior, for listening and setting property, locally or globally.
+         * ```
+         * {'data': this.$.chartSVG}
+         * ```
+         * @event px-vis-svg-element-updated
          */
 
         behaviors: [
@@ -100,14 +110,16 @@ Element which creates an SVG element and sets up d3
         // },
 
         /**
-        * when attached, re-fire set properties for precipitation pattern
+        * when attached, re-fire set properties for precipitation pattern, as well as the svg element that's inside px-svg.
         *
         * @method attached
         */
         attached: function(){
           if(this.svg && !this._isObjEmpty(this.svg)){
             this.fire('px-vis-svg-updated',{ 'data': this.svg, 'dataVar': 'svg', 'method': 'set' });
+            this.fire('px-vis-svg-element-updated', {'data': this.$.chartSVG, 'dataVar': 'pxSvgElem', 'method': 'set'});
           }
+
         },
 
         /**
@@ -128,6 +140,8 @@ Element which creates an SVG element and sets up d3
 
             this.notifyPath('svg',this.svg);
             this.fire('px-vis-svg-updated',{ 'data': this.svg, 'dataVar': 'svg', 'method': 'set' });
+            this.set('pxSvgElem', this.$.chartSVG);
+            this.fire('px-vis-svg-element-updated', {'data': this.$.chartSVG, 'dataVar': 'pxSvgElem', 'method': 'set'});
           }
         },
     });

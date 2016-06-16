@@ -55,6 +55,15 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehaviorD3.interaction,
       commonColors
     ],
+    /***EVENTS****
+    /*
+    * fires an update to the interaction svg
+    * @event px-vis-interaction-svg-updated
+    */
+    /*
+    * fires an update to the tooltip
+    * @event px-vis-tooltip-updated
+    */
 
     /**
      * Properties block, expose attribute values to the DOM via 'reflect'
@@ -73,11 +82,17 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         type:Object,
         value:{}
       },
+      /**
+       * an object that contains meta data for the area drawn by the user
+       *
+       * @property _actionArea
+       * @type Object
+       */
       _actionArea: {
         type: Object,
-        value: {}
+        value: function() {return {};}
       }
-    }, //properties
+    },
 
     observers: [
       'drawElement(currentDomainX,currentDomainY,chartData.*,svg)'
@@ -106,7 +121,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * @method drawElement
      */
     drawElement: function() {
-      if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && (this.chartData) && this._isObjEmpty(this._rect)){
+      if ( (typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && (this.chartData) && this._isObjEmpty(this._rect)) ) {
 
         // make sure the tooltip draws on top of everything; returns a set property interactionSvg
         this.cloneSVGElem(this.svg.node(),'interactionSvg');
@@ -164,9 +179,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         'mouse': null,
         'xArr': null,
         'yArr': null
-      };
+      },
+      len = this.chartData.length,
+      i;
 
-      for(var i = 0; i < this.chartData.length; i++){
+      for(i = 0; i < len; i++){
         ttD.series.push({'name':this.chartData[i]['name'],'value': [null,null] });
       }
 
@@ -182,39 +199,48 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      */
     _calcTooltipData:function(){
       //  d3.mouse: returns the x position on the screen of the mouse
-      var mousePos = d3.mouse(this._rect.node());
+      var mousePos = d3.mouse(this._rect.node()),
+          x0,
+          dataObj,
+          bisectDate,
+          xArr,
+          yArr,
+          len,
+          index,
+          d0,
+          d1,
+          d,
+          xCoord,
+          yCoord;
 
       this.debounce('move',function(){
         // invert: takes position on the screen and converts it into an equivalent date
-        var x0 = this.x.invert(mousePos[0]);
-
+        x0 = this.x.invert(mousePos[0]),
         // setup a holder for our data to pass out
-        var dataObj = {
+        dataObj = {
           'time': x0,
           'series': [],
           'mouse': mousePos,
           'xArr': null,
           'yArr': null
-        };
-
+        },
         /*
           d3.bisector returns index in our array that corresponds to the horizontal position of the mouse pointer.
           Specifically this returns the date that falls to the left of the mouse cursor.
         */
-        var bisectDate = d3.bisector(function(d) { return d[0]; }).left;
-
-        var xArr = [],
-            yArr = [];
-        for(var i = 0; i < this.chartData.length; i++){
+        bisectDate = d3.bisector(function(d) { return d[0]; }).left,
+        xArr = [],
+        yArr = [];
+        len  = this.chartData.length;
+        for(var i = 0; i < len; i++){
           // define vars
-          var index, d0, d1, d, xCoord, yCoord;
           // get the index number of the timestamp
           index = bisectDate(this.chartData[i]['series'], x0, 1);
           // get the data values around the index
           d0 = this.chartData[i]['series'][index - 1];
           d1 = (this.chartData[i]['series'][index]) ? this.chartData[i]['series'][index] : this.chartData[i]['series'][index - 1];
           // sets d as the closest date to the mouse
-          d = x0 - d0[0] > d1[0] - x0 ? d1 : d0;
+          d = (x0 - d0[0] > d1[0] - x0) ? d1 : d0;
 
           // get the pixel coords for that data
           xCoord = this.x(d[0]);
@@ -233,7 +259,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         this.set('tooltipData',dataObj);
         this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
       },1);
-    }, //mousemove
+    },
 
     /**
      * Helper function called on mousedown.action

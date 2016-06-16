@@ -132,7 +132,9 @@ This element sets the selectedDomain property based on the extents box. The sele
       'drawElement(currentDomain,svg,axis,height)',
       '_zoomBrush(chartDomain)'
     ],
-
+    detached: function() {
+      this.unlisten(window,'mouseup','_brushMouseUp');
+    },
     /**
      * Defines the svg for the brush, draws brush elements, and sets up listeners.
      *
@@ -292,8 +294,14 @@ This element sets the selectedDomain property based on the extents box. The sele
     _recenter: function(smooth) {
       var _this = this;
 
-      if (this._centering) return; // timer is active and already tweening
-      if (!smooth) return void _this.tween(1); // instantaneous jump
+      if (this._centering) {
+        return; // timer is active and already tweening
+      }
+
+      if (!smooth) {
+        return void _this.tween(1); // instantaneous jump
+      }
+
       this._centering = true;
 
       // sets up a timer to call tween
@@ -309,8 +317,10 @@ This element sets the selectedDomain property based on the extents box. The sele
      */
     tween:function (alpha) {
       var extent = this._brush.extent(),
-          size = +extent[1] - +extent[0],
-          center1 = this._center * alpha + ( +extent[0] + +extent[1]) / 2 * (1 - alpha);
+          extent1 = +extent[1],
+          extent0 = +extent[0],
+          size = extent1 - extent0,
+          center1 = this._center * alpha + ( extent0 + extent1) / 2 * (1 - alpha);
 
       // move the brush
       this._brushGroup
