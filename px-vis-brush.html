@@ -176,12 +176,18 @@ This element sets the selectedDomain property based on the extents box. The sele
           .attr("class", "brush")
           .call(this._brush);
 
-        // Style the brush overlay box
+        /* Style the brush overlay box
+           There are actually two boxes, .background and .extent:
+           I dont quite know the difference. .extent seems to be the one with the handles and that we interact with. Not applying these changes to background makes it such that you cannot click on the nav and have the selected area move.
+
+           Just apply to both for ease, though we could be more specific
+        */
         this._brushGroup.selectAll("rect")
           .attr("y", 0)
           .attr("height", this.height - heightOffset)
           .attr('stroke',this.colors.gray5)
           .attr('stroke-width',2)
+          .attr('fill',this.colors.black)
           .attr('fill-opacity','.10')
           .attr('shape-rendering','crispEdges');
 

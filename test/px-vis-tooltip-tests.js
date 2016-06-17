@@ -62,7 +62,6 @@ function runTests(){
 
     test('baseTooltip _rect is set', function() {
       var rect = baseSVG.pxSvgElem.getBoundingClientRect();
-      console.warn(rect)
       assert.equal(JSON.stringify(baseTooltip._rect),JSON.stringify(rect));
     });
   }); //suite
