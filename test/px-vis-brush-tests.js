@@ -239,14 +239,14 @@ function runTests(){
     suiteSetup(function(done){
       var box = baseBrush._handleGroup.node().getBoundingClientRect();
 
-      var e = new MouseEvent('mouseenter',{
-        "clientX": box.left + box.width/2,
-        "clientY": box.top + box.height/2,
-      });
+      var e = new MouseEvent('mouseenter');
+      // For stupid MS Edge
+      var e2 = new MouseEvent('mouseover');
 
       baseBrush._handleGroup.node().dispatchEvent(e);
+      baseBrush._handleGroup.node().dispatchEvent(e2);
 
-      setTimeout(function(){done()},100);
+      setTimeout(function(){done()},10);
       // done();
     });
 
@@ -268,15 +268,15 @@ function runTests(){
     suiteSetup(function(done){
       var box = baseBrush._handleGroup.node().getBoundingClientRect();
 
-      var e = new MouseEvent('mouseleave',{
-        "clientX": box.left + box.width * 2,
-        "clientY": box.top + box.height/2,
-      });
+      var e = new MouseEvent('mouseleave');
+      //for stupid MS Edge
+      var e2 = new MouseEvent('mouseout');
 
       baseBrush._handleGroup.node().dispatchEvent(e);
+      baseBrush._handleGroup.node().dispatchEvent(e2);
 
-      // setTimeout(function(){done()},1000);
-      done();
+      setTimeout(function(){done()},10);
+      // done();
     });
 
     test('baseBrush. handle rect stroke changes', function() {
