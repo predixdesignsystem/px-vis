@@ -236,7 +236,6 @@ function runTests(){
   suite('px-vis-brush handle mouseover ', function() {
     var colors = commonColors.properties.colors.value;
 
-
     suiteSetup(function(done){
       var box = baseBrush._handleGroup.node().getBoundingClientRect();
 
@@ -247,8 +246,8 @@ function runTests(){
 
       baseBrush._handleGroup.node().dispatchEvent(e);
 
-      // setTimeout(function(){done()},1000);
-      done();
+      setTimeout(function(){done()},100);
+      // done();
     });
 
     test('baseBrush._handleGroup rect stroke changes', function() {
