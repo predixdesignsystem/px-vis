@@ -95,7 +95,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     observers: [
-      'drawElement(currentDomainX,currentDomainY,chartData.*,svg)'
+      'drawElement(currentDomainX,currentDomainY,chartData.*,svg,width,height)'
      ],
 
     /**
@@ -121,7 +121,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * @method drawElement
      */
     drawElement: function() {
-      if ( (typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && (this.chartData) && this._isObjEmpty(this._rect)) ) {
+      if ( typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && (this.chartData) && this._isObjEmpty(this._rect) && this.width && this.height) {
 
         // make sure the tooltip draws on top of everything; returns a set property interactionSvg
         this.cloneSVGElem(this.svg.node(),'interactionSvg');
