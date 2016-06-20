@@ -36,7 +36,8 @@ PxVisBehavior.sizing = {
     *
     */
     margin:{
-      type:Object
+      type:Object,
+      value: function() {return{};}
     }
   }
 };
@@ -67,7 +68,7 @@ PxVisBehavior.formatting = {
      * @default 'en-US'
      */
     numberFormatCulture: {
-      value:String,
+      type:String,
       notify: true,
       value: 'en-US'
     },
@@ -83,7 +84,7 @@ PxVisBehavior.formatting = {
      * @default false
      */
     numberFormatIsCurrency: {
-      value:Boolean,
+      type :Boolean,
       notify: true,
       value: false
     },
@@ -99,7 +100,7 @@ PxVisBehavior.formatting = {
      * @default '$0,0.00'
      */
     numberFormatCurrency: {
-      value:String,
+      type: String,
       notify: true,
       value:'$0,0.00'
     },
@@ -115,7 +116,7 @@ PxVisBehavior.formatting = {
      * @default '0,0.0000'
      */
     numberFormatDefault: {
-      value:String,
+      type: String,
       notify: true,
       value: '0,0.0000'
     },
@@ -131,7 +132,7 @@ PxVisBehavior.formatting = {
      * @default '0,0.00'
      */
     numberFormat: {
-      value:String,
+      type: String,
       notify: true,
       value: '0,0.00'
     },
@@ -147,7 +148,7 @@ PxVisBehavior.formatting = {
      * @default '0,0.0000'
      */
     numberFormatUnformat: {
-      value:String,
+      type: String,
       notify: true,
       value: '0,0.0000'
     },
@@ -163,7 +164,7 @@ PxVisBehavior.formatting = {
      * @default ''
      */
     numberFormatZero: {
-      value:String,
+      type: String,
       notify: true,
       value:''
     }
@@ -270,7 +271,7 @@ PxVisBehavior.mutedSeries = {
     mutedSeries:{
       type:Object,
       notify: true,
-      value:function(){ return {} },
+      value:function(){ return {}; },
     },
   }
 };
@@ -361,6 +362,24 @@ PxVisBehavior.extentsData = {
       type:Object,
       notify:true
     }
+  }
+};
+
+PxVisBehavior.commonMethods = {
+  properties: {
+  },
+
+  /**
+   * Checks to see if an object is empty
+   *
+   * @param {object}
+   * @return {bool}
+   */
+  _isObjEmpty:function(obj){
+    if(typeof(obj) === 'undefined'){
+      return false;
+    }
+    return Object.keys(obj).length === 0;
   }
 };
 </script>

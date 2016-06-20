@@ -42,6 +42,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         behaviors: [
           PxVisBehaviorD3.svg,
           PxVisBehaviorD3.axis,
+          PxVisBehavior.commonMethods,
           commonColors
         ],
 
@@ -60,7 +61,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            */
           _axis:{
             type: Object,
-            value: {},
+            value: function() {return{};},
             notify: true
           },
           /**
@@ -71,7 +72,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            */
           _axisGroup:{
             type: Object,
-            value: {}
+            value: function() {return{};}
           },
           /**
            * A unique ID for the axis
@@ -131,7 +132,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            */
           labelTranslation:{
             type: Array,
-            value: [0,0],
+            value: function() {return [0,0];},
           },
           /**
            * Defines the base label type size
@@ -151,7 +152,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            * @type Array
            */
           series:{
-            type: Array
+            type: Array,
+            value: function() {return[];}
           },
           /**
            * An x,y amount to move the axis to allow for labels and titles
@@ -217,7 +219,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          */
         drawElement: function() {
           // console.log('draw axis');
-          if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.axis) && !this._isObjEmpty(this.margin) && this.currentDomain.length > 0){
+          if(!this._isObjEmpty(this.svg) && !this._isObjEmpty(this.axis) && !this._isObjEmpty(this.margin) && this.currentDomain.length > 0){
             this.defineAxis();
             // TODO unify my orientation checks
             // TODO suport top and right
@@ -290,7 +292,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               break;
           }
 
-          return label
+          return label;
         },
         /**
          * Sets the d3 attrs for the labels
@@ -310,7 +312,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               .attr("x", label.x)
               .attr("text-anchor", label.anchor)
               .style("text-anchor", label.anchor)
-              .attr('transform',"translate(" + this.labelTranslation.join(',') + ") rotate(" + this.labelRotation + ")")
+              .attr('transform',"translate(" + this.labelTranslation.join(',') + ") rotate(" + this.labelRotation + ")");
           }
         },
         /**
@@ -348,7 +350,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
             case 'left':
               x = (this.labelTypeSize + parseFloat(ext['width'])) * -1 + this.translateAmt[0];
-              y = parseFloat(ext['height']) / 2 + this.translateAmt[1]
+              y = parseFloat(ext['height']) / 2 + this.translateAmt[1];
               r = -90;
               break;
 

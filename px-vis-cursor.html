@@ -45,6 +45,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehaviorD3.svg,
       PxVisBehaviorD3.axes,
       PxVisBehavior.dataset,
+      PxVisBehavior.commonMethods,
       PxVisBehavior.tooltipData,
       commonColors
     ],
@@ -64,7 +65,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
        */
       _cursor:{
         type:Object,
-        value:{}
+        value: function() {return{};}
       },
       /**
        * Holder for the vertical line drawing object
@@ -74,7 +75,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
        */
       _vLine:{
         type:Object,
-        value:{}
+        value: function() {return{};}
       },
       /**
        * Holder for the horizonal line drawing objects
@@ -84,7 +85,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
        */
       _hLines:{
         type:Object,
-        value:{}
+        value: function() {return{};}
       },
       /**
        * Holder for the tooltip circle drawing objects
@@ -94,7 +95,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
        */
       _circles:{
         type:Object,
-        value:{}
+        value: function() {return{};}
       },
       /**
        * Draws a horizontal line through the point. Valid entries:
@@ -159,7 +160,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * @method drawElement
      */
     drawElement: function() {
-      if(typeof(this.svg) !== 'undefined' && this.chartData && this._isObjEmpty(this._cursor)){
+      if(!this._isObjEmpty(this.svg) && this.chartData && this._isObjEmpty(this._cursor)){
 
         // add circle to the line and hide it
         this._cursor = this.svg.append("g")
@@ -259,30 +260,30 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         // this._circles.attr("transform", function(d,i){
         //   return "translate(" + this.tooltipData.series[i]['coord'][0] + "," + this.tooltipData.series[i]['coord'][1] + ")"
         this._circles.attr("cx", function(d,i){
-          return this.tooltipData.series[i]['coord'][0]
+          return this.tooltipData.series[i]['coord'][0];
         }.bind(this))
         .attr("cy", function(d,i){
-         return this.tooltipData.series[i]['coord'][1]
+         return this.tooltipData.series[i]['coord'][1];
         }.bind(this));
       }
 
       // move the horizontal lines into position
       if(this.horizontalLine === 'full'){
         this._hLines.attr("transform", function(d,i){
-          return "translate(0," + this.tooltipData.series[i]['coord'][1] + ")"
+          return "translate(0," + this.tooltipData.series[i]['coord'][1] + ")";
         }.bind(this));
       } else if(this.horizontalLine === 'left'){
         //slightly cheating; just pushing the line off the draw space.
         // Could instead use domains to properly size the line
         this._hLines.attr("x2",-this.width)
           .attr("transform", function(d,i){
-            return "translate(" + this.tooltipData.series[i]['coord'][0] + "," + this.tooltipData.series[i]['coord'][1] + ")"
+            return "translate(" + this.tooltipData.series[i]['coord'][0] + "," + this.tooltipData.series[i]['coord'][1] + ")";
           }.bind(this));
       } else if(this.horizontalLine === 'right'){
         //slightly cheating; just pushing the line off the draw space.
         // Could instead use domains to properly size the line
         this._hLines.attr("transform", function(d,i){
-          return "translate(" + this.tooltipData.series[i]['coord'][0] + "," + this.tooltipData.series[i]['coord'][1] + ")"
+          return "translate(" + this.tooltipData.series[i]['coord'][0] + "," + this.tooltipData.series[i]['coord'][1] + ")";
         }.bind(this));
       }
 

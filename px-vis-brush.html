@@ -43,6 +43,7 @@ This element sets the selectedDomain property based on the extents box. The sele
       PxVisBehaviorD3.svg,
       PxVisBehaviorD3.axis,
       PxVisBehaviorD3.selectedDomain,
+      PxVisBehavior.commonMethods,
       commonColors
     ],
 
@@ -62,7 +63,8 @@ This element sets the selectedDomain property based on the extents box. The sele
        * @type Object
        */
       bushSvg:{
-        type: Object
+        type: Object,
+        value: function() {return{};}
       },
       /**
        * Holder for the d3.svg.brush() object
@@ -74,7 +76,7 @@ This element sets the selectedDomain property based on the extents box. The sele
        */
       _brush:{
         type: Object,
-        value: {},
+        value: function() {return{};}
       },
       /**
        * Holder for a SVG group of elements pertaining to the brush
@@ -84,7 +86,7 @@ This element sets the selectedDomain property based on the extents box. The sele
        */
       _brushGroup:{
         type: Object,
-        value: {},
+        value: function() {return{};}
       },
       /**
        * Holder for a SVG group of elements pertaining to the handles
@@ -94,7 +96,7 @@ This element sets the selectedDomain property based on the extents box. The sele
        */
       _handleGroup:{
         type: Object,
-        value: {},
+        value: function() {return{};}
       },
       /**
        * Holder for a calculated center of the extent box
@@ -104,6 +106,7 @@ This element sets the selectedDomain property based on the extents box. The sele
        */
       _center:{
         type:Object,
+        value: function() {return{};}
       },
       /**
        * A boolean to tell if the extents box is currently moving
@@ -123,7 +126,7 @@ This element sets the selectedDomain property based on the extents box. The sele
        */
       chartDomain: {
         type:Array,
-        value:[],
+        value: function() {return[];},
         notify:true
       },
     },
@@ -145,7 +148,7 @@ This element sets the selectedDomain property based on the extents box. The sele
      * @method drawElement
      */
     drawElement: function() {
-      if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.axis) && this.currentDomain.length > 0 && typeof(this.height) !== 'undefined' && this._isObjEmpty(this._brush)){
+      if(!this._isObjEmpty(this.svg) && !this._isObjEmpty(this.axis) && this.currentDomain.length > 0 && typeof(this.height) !== 'undefined' && this._isObjEmpty(this._brush)){
         var heightOffset = 6;
 
         // make sure the brush draws on top of everything; returns a set property brushSvg

@@ -42,6 +42,7 @@ Element which draws scatter series onto the chart
       PxVisBehaviorD3.axes,
       PxVisBehavior.dataset,
       PxVisBehavior.mutedSeries,
+      PxVisBehavior.commonMethods,
       PxVisBehaviorD3.clipPath,
       commonColors
     ],
@@ -91,7 +92,7 @@ Element which draws scatter series onto the chart
        */
       scatterGroup:{
         type:Object,
-        value:{}
+        value: function() {return{};}
       },
       /**
        * A holder object for the series objects
@@ -101,7 +102,7 @@ Element which draws scatter series onto the chart
        */
       scatterDots:{
         type:Object,
-        value:{}
+        value: function() {return{};}
       }
     },
 
@@ -125,7 +126,7 @@ Element which draws scatter series onto the chart
      * @method drawElement
      */
     drawElement: function() {
-      if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && (this.chartData)){
+      if(!this._isObjEmpty(this.svg) && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && (this.chartData)){
         var data = this.chartData.series;
 
         // checks to see if the group already exists. If not, create; if so, update
@@ -177,9 +178,9 @@ Element which draws scatter series onto the chart
       if(this.mutedSeries.hasOwnProperty(this.seriesId)){
         // if true, mute
         if(this.mutedSeries[this.seriesId]){
-          this._muteScatter()
+          this._muteScatter();
         } else {
-          this._colorScatter()
+          this._colorScatter();
         }
       }
     },

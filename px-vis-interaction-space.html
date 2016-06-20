@@ -52,6 +52,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehavior.dataset,
       PxVisBehavior.tooltipData,
       PxVisBehavior.extentsData,
+      PxVisBehavior.commonMethods,
       PxVisBehaviorD3.interaction,
       commonColors
     ],
@@ -80,7 +81,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
        */
       _rect:{
         type:Object,
-        value:{}
+        value: function() {return{};}
       },
       /**
        * an object that contains meta data for the area drawn by the user
@@ -121,7 +122,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * @method drawElement
      */
     drawElement: function() {
-      if ( (typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && (this.chartData) && this._isObjEmpty(this._rect)) ) {
+      if ( (!this._isObjEmpty(this.svg) && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && (this.chartData) && this._isObjEmpty(this._rect)) ) {
 
         // make sure the tooltip draws on top of everything; returns a set property interactionSvg
         this.cloneSVGElem(this.svg.node(),'interactionSvg');
@@ -174,14 +175,14 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      */
     _resetTooltipData: function() {
       var ttD = {
-        'time': null,
-        'series': [],
-        'mouse': null,
-        'xArr': null,
-        'yArr': null
-      },
-      len = this.chartData.length,
-      i;
+            'time': null,
+            'series': [],
+            'mouse': null,
+            'xArr': null,
+            'yArr': null
+          },
+          len = this.chartData.length,
+          i;
 
 
       for(i = 0; i < len; i++){
@@ -216,7 +217,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       this.debounce('move',function(){
         // invert: takes position on the screen and converts it into an equivalent date
-        x0 = this.x.invert(mousePos[0]),
+        x0 = this.x.invert(mousePos[0]);
         // setup a holder for our data to pass out
         dataObj = {
           'time': x0,
@@ -224,15 +225,16 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           'mouse': mousePos,
           'xArr': null,
           'yArr': null
-        },
+        };
         /*
           d3.bisector returns index in our array that corresponds to the horizontal position of the mouse pointer.
           Specifically this returns the date that falls to the left of the mouse cursor.
         */
-        bisectDate = d3.bisector(function(d) { return d[0]; }).left,
-        xArr = [],
+        bisectDate = d3.bisector(function(d) { return d[0]; }).left;
+        xArr = [];
         yArr = [];
         len  = this.chartData.length;
+
         for(var i = 0; i < len; i++){
           // define vars
           // get the index number of the timestamp

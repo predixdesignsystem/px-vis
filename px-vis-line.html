@@ -42,6 +42,7 @@ Element which draws lines series onto the chart
       PxVisBehaviorD3.axes,
       PxVisBehavior.dataset,
       PxVisBehavior.mutedSeries,
+      PxVisBehavior.commonMethods,
       PxVisBehaviorD3.clipPath,
       commonColors
     ],
@@ -80,7 +81,7 @@ Element which draws lines series onto the chart
        */
       linePath:{
         type:Object,
-        value:{}
+        value: function() {return{};}
       },
     },
 
@@ -105,7 +106,7 @@ Element which draws lines series onto the chart
      * @method drawElement
      */
     drawElement: function() {
-      if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && (this.chartData)){
+      if(!this._isObjEmpty(this.svg) && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && (this.chartData)){
         var data = this.chartData.series;
 
         var line = d3.svg.line()
@@ -156,9 +157,9 @@ Element which draws lines series onto the chart
       if(this.mutedSeries.hasOwnProperty(this.seriesId)){
         // if true, mute
         if(this.mutedSeries[this.seriesId]){
-          this._muteLine()
+          this._muteLine();
         } else {
-          this._colorLine()
+          this._colorLine();
         }
       }
     },

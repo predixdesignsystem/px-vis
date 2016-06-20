@@ -256,7 +256,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
      * @return {bool}
      */
     _typeEqualHorizontal: function(type){
-      return type === 'horizontal'
+      return type === 'horizontal';
     },
     /**
      * Function which takes an index and returns the appropriate dataVisColor
@@ -271,9 +271,11 @@ Formatting for the timestamps,the data values, and the series names can be contr
      */
     _returnItemColor:function(name){
       // TODO make data pass a separate data obj linking name and number
-      for(var i = 0; i < this.chartData.length; i++){
+      var i,
+          len = this.chartData.length;
+      for(i = 0; i < len; i++){
         if(this.chartData[i]["name"] === name){
-          return this.dataVisColors[ this.seriesColorOrder[ this.chartData[i]["seriesNumber"] ] ]
+          return this.dataVisColors[ this.seriesColorOrder[ this.chartData[i]["seriesNumber"] ] ];
         }
       }
     },
@@ -286,8 +288,8 @@ Formatting for the timestamps,the data values, and the series names can be contr
      */
     _formatDateTime:function(){
       if(this.tooltipData.time){
-        var momentObj1 = this.formatTimestamp(this.tooltipData.time,this.timezone,this.firstDateTimeFormat);
-        var momentObj2 = this.formatTimestamp(this.tooltipData.time,this.timezone,this.secondDateTimeFormat);
+        var momentObj1 = this.formatTimestamp(this.tooltipData.time,this.timezone,this.firstDateTimeFormat),
+            momentObj2 = this.formatTimestamp(this.tooltipData.time,this.timezone,this.secondDateTimeFormat);
 
         this.set('_firstDateTime', momentObj1);
         this.set('_secondDateTime', momentObj2);
@@ -308,8 +310,8 @@ Formatting for the timestamps,the data values, and the series names can be contr
      * @param {e} click event
      */
     _seriesClicked:function(e){
-      var ne = Polymer.dom(e);
-      var series = ne.rootTarget.getAttribute('name');
+      var ne = Polymer.dom(e),
+          series = ne.rootTarget.getAttribute('name');
 
       // if it doesnt exist, let's add it and set to true
       if( typeof(this.mutedSeries[series]) === 'undefined' ){
@@ -332,10 +334,14 @@ Formatting for the timestamps,the data values, and the series names can be contr
      */
     _toggleSeries: function(){
       // find all series with name and toggle class
-      var keys = Object.keys(this.mutedSeries);
-      for(var i = 0; i < keys.length; i++){
-        var series = this.$$('.series[name=' + keys[i] + ']');
-        this.toggleClass('muted', this.mutedSeries[keys[i]], series)
+      var keys = Object.keys(this.mutedSeries),
+          i,
+          len = keys.length,
+          series;
+
+      for(i = 0; i < len; i++){
+        series = this.$$('.series[name=' + keys[i] + ']');
+        this.toggleClass('muted', this.mutedSeries[keys[i]], series);
       }
     },
     /**
@@ -348,9 +354,9 @@ Formatting for the timestamps,the data values, and the series names can be contr
     _mutedToStart: function(name){
       var baseClasses = (this.type === 'horizontal') ? "series narrow flex flex--row" : "series wide flex flex--row";
       if(this.mutedSeries[name]){
-        return baseClasses + ' muted'
+        return baseClasses + ' muted';
       }
-      return baseClasses
+      return baseClasses;
     },
     /**
      * dom-if function for series names to decide if it was truncated. If so, add a tooltip showing full name
@@ -367,9 +373,9 @@ Formatting for the timestamps,the data values, and the series names can be contr
     },
     _returnVal: function(val){
       if(val){
-        return val[1]
+        return val[1];
       }
-      return null
+      return null;
     }
   });
 </script>

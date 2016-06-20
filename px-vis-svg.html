@@ -59,6 +59,7 @@ Element which creates an SVG element and sets up d3
 
         behaviors: [
           PxVisBehavior.sizing,
+          PxVisBehavior.commonMethods,
           PxVisBehaviorD3.svg
         ],
 
@@ -133,7 +134,7 @@ Element which creates an SVG element and sets up d3
               .attr('width',this.width)
               .attr('height',this.height);
 
-            this.svg = (typeof(this.svg) === 'undefined') ? svg.append('g') : this.svg;
+            this.svg = (this._isObjEmpty(this.svg)) ? svg.append('g') : this.svg;
             this.svg.attr('width',this.width)
               .attr('height',this.height)
               .attr("transform", "translate(" + this.margin.left + ',' + this.margin.top + ")");

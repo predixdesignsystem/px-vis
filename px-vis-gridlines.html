@@ -47,6 +47,7 @@ The gridlines still make use of the d3.axis object, just with different settings
 
         behaviors: [
           PxVisBehaviorD3.svg,
+          PxVisBehavior.commonMethods,
           PxVisBehaviorD3.axis,
           commonColors
         ],
@@ -66,7 +67,7 @@ The gridlines still make use of the d3.axis object, just with different settings
            */
           _grid:{
             type: Object,
-            value: {},
+            value: function() {return{};},
             notify: true
           },
           /**
@@ -77,7 +78,7 @@ The gridlines still make use of the d3.axis object, just with different settings
            */
           _gridGroup:{
             type: Object,
-            value: {}
+            value: function() {return{};}
           },
           /**
            * A unique ID for the grid
@@ -143,9 +144,9 @@ The gridlines still make use of the d3.axis object, just with different settings
          * @method _drawElement
          */
         drawElement: function() {
-          if(typeof(this.svg) !== 'undefined' && !this._isObjEmpty(this.axis)){
+          if(!this._isObjEmpty(this.svg) && !this._isObjEmpty(this.axis)){
 
-            this.defineGrid()
+            this.defineGrid();
             // this._grid.tickValues(this.axis.domain());
             if(this.orientation === 'bottom'){
               var h = this.svg.attr('height') - this.margin.bottom - this.margin.top;

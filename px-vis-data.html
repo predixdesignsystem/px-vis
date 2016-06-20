@@ -96,7 +96,8 @@ The 'method' is specified by whether data is returned asynchronously and therefo
        */
       responseData:{
         type: Array,
-        notify: true
+        notify: true,
+        value: function() {return[];}
       },
       /**
        * requestData is in the form or an Array of Objects and is used for generating the ajax request and formatting the data. At a minimum, it should specify a URL from which to fetch data. It may also include a chart type and a chart name. Default chart type is 'line' and default name is the json file name.
@@ -116,7 +117,8 @@ The 'method' is specified by whether data is returned asynchronously and therefo
        * @type Array
        */
       requestData:{
-        type:Array
+        type:Array,
+        value: function() {return[];}
       },
       /**
        * Array for processing the returned data.
@@ -127,7 +129,7 @@ The 'method' is specified by whether data is returned asynchronously and therefo
       _tempData:{
         type:Array,
         notify:true,
-        value:function(){ return [] }
+        value:function(){ return [];}
       },
       /**
        * Bool specifying whether response data should be returned asynchronously, or if all chart data should be processed and compiled before returning.
@@ -169,6 +171,7 @@ The 'method' is specified by whether data is returned asynchronously and therefo
        * @default append
        */
       lists:{
+        type: String,
         value:'append'
       },
       /**
@@ -241,19 +244,18 @@ The 'method' is specified by whether data is returned asynchronously and therefo
     _appendHandler:function(e){
       var ne = Polymer.dom(e),
           data = e.detail.response,
-          index = ne.rootTarget.attributes.index.value;
-          name;
-
-      // check if dev specified a type; otherwise default to line
-      var type = (typeof(ne.rootTarget.attributes.type)!== 'undefined') ? ne.rootTarget.attributes.type.value : 'line';
-
-      var axis = (typeof(ne.rootTarget.attributes.axis)!== 'undefined') ? ne.rootTarget.attributes.axis.value : '';
+          index = ne.rootTarget.attributes.index.value,
+          name,
+          n,
+          // check if dev specified a type; otherwise default to line
+          type = (typeof(ne.rootTarget.attributes.type)!== 'undefined') ? ne.rootTarget.attributes.type.value : 'line',
+          axis = (typeof(ne.rootTarget.attributes.axis)!== 'undefined') ? ne.rootTarget.attributes.axis.value : '';
 
       // check if dev specified a name; otherwise extract json name
       if(typeof(ne.rootTarget.attributes.name)!== 'undefined'){
         name = ne.rootTarget.attributes.name.value;
       } else {
-        var n = e.detail.url.split('/');
+        n = e.detail.url.split('/');
         name = n[n.length - 1].split('.')[0];
       }
       //set name and type in out data
@@ -279,15 +281,16 @@ The 'method' is specified by whether data is returned asynchronously and therefo
      * @private
      */
     _flatHandler: function(e){
-      var d = e.detail.response;
+      var d = e.detail.response,
+      data;
 
       // if we are async, append to out dataset immediately, else, stick it in our temp and trigger our promise
       if(this.isAsync){
-        var data = this.responseData.concat(d);
+        data = this.responseData.concat(d);
         this.set('responseData',data);
         this.fire('px-vis-data-updated', { 'data':data, 'method': 'set', 'dataVar': this.dataVar  });
       } else {
-        var data = this._tempData.concat(d);
+        data = this._tempData.concat(d);
         this.set('_tempData',data);
       }
     },
