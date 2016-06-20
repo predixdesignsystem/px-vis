@@ -141,7 +141,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           .on("mousedown.action", this._drawActionBox.bind(this))
           .on("mousemove.action", this._updateActionBox.bind(this))
           .on("mouseup.action", this._finishActionBox.bind(this))
-          //.on("mouseleave", this._mouseLeave.bind(this))
           .style("cursor","crosshair");
 
           // TODO touchevents
@@ -152,11 +151,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         this._resetTooltipData();
       }  //if we have vars
     },  //drawElement
-    // _mouseLeave: function(evt) {
-    //   if (this.mouseDown) {
-    //     //this._finishActionBox();
-    //   }
-    // },
     /**
      * Helper function called on mouseover
      * Shows the tooltip elements
@@ -263,7 +257,15 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
       },1);
     },
-
+    /**
+     * Helper function called on document.mouseup
+     * assumes the user wanted to "close" the action box, and calls _finishActionBox
+     *
+     * @method _mouseUpOutsideSvg
+     */
+    _mouseUpOutsideSvg: function() {
+      this._finishActionBox();
+    },
     /**
      * Helper function called on mousedown.action
      * Draws a rectangle on the chart
@@ -272,8 +274,12 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      */
     _drawActionBox: function(){
       this.mouseDown = true;
+      //in case the user clicks inside the chart, and mouses out, we are waiting for a mouseup, and closing our action box with the coordinates available on the mouseup.
+      d3.select(document).on('mouseup.action', this._mouseUpOutsideSvg.bind(this));
+
       var mousePos = d3.mouse(this._rect.node());
       // use original svg so it draws under the _rect and does not interfer with our mouse events
+
       this._actionArea = this.svg.append( "rect")
         .attr('class', "action-area")
         .attr('x', mousePos[0])
@@ -295,6 +301,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * @method _updateActionBox
      */
     _updateActionBox: function() {
+
       if(!this._isObjEmpty(this._actionArea)) {
         var mousePos = d3.mouse(this._rect.node()),
           // save somewhere else--> not as an attr, inefficient
@@ -329,6 +336,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * @method _finishActionBox
      */
     _finishActionBox: function() {
+      //since we are done drawing our action box, remove the listener from document using d3.
+      d3.select(document).on('mouseup.action', null);
       this.mouseDown = false;
       var extents = {};
 
