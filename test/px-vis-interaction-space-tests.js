@@ -101,7 +101,7 @@ function runTests(){
       assert.equal(ttObj.data.series[0]['name'], 'mySeries');
     });
     test('event data series.value', function() {
-      assert.equal(JSON.stringify(ttObj.data.series[0]['value']), '[null,null]');
+      assert.equal(JSON.stringify(ttObj.data.series[0]['value']), null);
     });
     test('event data series.coord', function() {
       assert.equal(ttObj.data.series[0]['coord'], null);
@@ -231,7 +231,7 @@ function runTests(){
       assert.equal(ttObj.data.series[0]['name'], 'mySeries');
     });
     test('event data series.value', function() {
-      assert.equal(JSON.stringify(ttObj.data.series[0]['value']), '[null,null]');
+      assert.equal(JSON.stringify(ttObj.data.series[0]['value']), null);
     });
     test('event data series.coord', function() {
       assert.equal(ttObj.data.series[0]['coord'], null);
