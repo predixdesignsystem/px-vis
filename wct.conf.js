@@ -39,8 +39,10 @@ module.exports = {
     'test/px-vis-gridlines-fixture.html',
     'test/px-vis-clip-path-fixture.html',
     'test/px-vis-data-fixture.html',
-    // 'test/px-vis-interaction-space-fixture.html',
+    'test/px-vis-interaction-space-fixture.html',
     'test/px-vis-zoom-fixture.html',
-    'test/px-vis-cursor-fixture.html'
+    'test/px-vis-cursor-fixture.html',
+    'test/px-vis-tooltip-fixture.html',
+    'test/px-vis-brush-fixture.html'
   ]
 };
