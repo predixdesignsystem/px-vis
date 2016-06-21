@@ -89,7 +89,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         type: String,
         value: 'ordinal',
         notify: true
-      },
+      }
     },
 
     observers: [
@@ -159,6 +159,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         return d3.scale.ordinal().rangePoints(range, 1);
       }
     },
+
     /**
      * Calculates and Sets the x and y domain after data loads
      *
@@ -173,34 +174,47 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         // TODO add dev set max and min
         // TODO What do we do if we have max/min Ys and not x, which is the case with our sample data?
 
-        // if we dont have max and min in our dataset, we need to chug through the data to get it into a usable form to find max and min
         // TODO more efficient algorithm
-        // Flatten our datasets into an array of series
-        var seriesArr = this.chartData.map(function(d) {
-              return d.series;
-            }),
-            // flatten our array of series into an array of value pairs
-            valuesArr = Array.prototype.concat.apply([],seriesArr),
-            // finally, flatten our arrays of value pairs into arrays of just x and just y
-            // TODO if in the form { x:1, y:2 }
-            xArr = valuesArr.map(function(d) {
-              return d[0];
-            }),
-            yArr = valuesArr.map(function(d) {
-              return d[1];
-            });
-
-        // set the domains
-        // x domain by looking at max and min of data
-        // TODO: dev set extents and dev set max or min
+        // TODO if in the form { x:1, y:2 }
         // [1420840060000,1425840060000]
-        // TODO check if data has extents
-        this.x.domain(d3.extent(xArr));
-        // y domain assumes 0 and then looks at max
         // TODO: make this declartive: min, max, set static or dynamic
         // TODO: multiple Y-Axis?
-        // TODO check if data has max and min (which demo data does)
-        this.y.domain([0, d3.max(yArr)]);
+        //TODO what if we dont want it to be the range of data and not 0 or visa versa...
+
+        //Chug through the data to max and min
+        var i,j,
+          iM = this.chartData.length,
+          exts = {
+            "x": [Infinity,-Infinity],
+            "y": [0,0]
+          };
+
+        //first, assume the dataset is sorted by x and save us some assignments.
+        exts.x[0] = this.chartData[0]['series'][0][0];
+        exts.x[1] = this.chartData[0]['series'][this.chartData[0]['series'].length - 1][0];
+
+        // go through each series
+        // TODO Can we make this async? 
+        for(i = 0; i < iM; i++){
+          var jM = this.chartData[i]['series'].length;
+          for(j = 0; j < jM; j++){
+            if(exts.x[0] > this.chartData[i]['series'][j][0]){
+              exts.x[0] = this.chartData[i]['series'][j][0];
+            }
+            if(exts.x[1] < this.chartData[i]['series'][j][0]){
+              exts.x[1] = this.chartData[i]['series'][j][0];
+            }
+            if(exts.y[0] > this.chartData[i]['series'][j][1]){
+              exts.y[0] = this.chartData[i]['series'][j][1];
+            }
+            if(exts.y[1] < this.chartData[i]['series'][j][1]){
+              exts.y[1] = this.chartData[i]['series'][j][1];
+            }
+          }
+        }
+
+        this.x.domain(exts.x);
+        this.y.domain(exts.y);
 
         // TODO Does currentDomain work if we just change type to ordinal or linear from time?
         // TODO would a bool be better? Flip when run?
@@ -213,6 +227,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
 
       }
     },
+
     /**
      * When the domain gets set via a user interaction, set the scale function to use the new domain
      *
