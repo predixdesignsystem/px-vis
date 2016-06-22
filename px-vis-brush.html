@@ -244,8 +244,8 @@ This element sets the selectedDomain property based on the extents box. The sele
       // circle.classed("selected", function(d) { return s[0] <= d && d <= s[1]; });
       this.debounce('brushed', function () {
         var newDomain = this._brush.empty() ? this.axis.domain() : this._brush.extent();
-        this.set('selectedDomain', newDomain);
-        this.fire('px-vis-selected-domain-updated', { 'data':newDomain, 'method': 'set', 'dataVar': 'selectedDomain' });
+        this.set('selectedDomain', [newDomain]);
+        this.fire('px-vis-selected-domain-updated', { 'data':[newDomain], 'method': 'set', 'dataVar': 'selectedDomain' });
       }, 10);
     },
     /**
@@ -497,7 +497,7 @@ This element sets the selectedDomain property based on the extents box. The sele
      */
     _zoomBrush: function(chartDomain){
       if(chartDomain.length > 0 && !this._isObjEmpty(this._brush)){
-        if(!((+this.selectedDomain[0] === +chartDomain[0]) && (+this.selectedDomain[1] === +chartDomain[1])) && !this._centering){
+        if(!((+this.selectedDomain[0][0] === +chartDomain[0]) && (+this.selectedDomain[0][1] === +chartDomain[1])) && !this._centering){
           this._brushGroup
             .call(this._brush.extent(this.chartDomain))
             .call(this._brush.event);
