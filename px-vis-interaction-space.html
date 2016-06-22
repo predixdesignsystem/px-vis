@@ -92,6 +92,19 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       _actionArea: {
         type: Object,
         value: function() {return {};}
+      },
+      /**
+       *
+       * The shape of selection the user can do. Can be:
+       * - 'rectangle': user can draw a rectangle freely
+       * - 'xAxis': user can select a range withing the X axis, the Y axis always
+       *   being entirely selected
+       * - 'YAxis': user can select a range withing the Y axis, the X axis always
+       *   being entirely selected
+       */
+      selectionType: {
+        type: String,
+        value: 'rectangle'
       }
     },
 
@@ -131,8 +144,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         // append the rectangle to capture mouse interactions
         this._rect = this.interactionSvg.append("rect")
           .attr('id',"mouseCapture")
-          .attr("width", this.width)
-          .attr("height", this.height)
+          .attr("width", this.width - this.margin.left - this.margin.right)
+          .attr("height", this.height - this.margin.bottom - this.margin.top)
           .attr("fill", "none")
           .attr("pointer-events", "all")
           .on("mouseover", this._mouseOver.bind(this))
@@ -280,12 +293,21 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       var mousePos = d3.mouse(this._rect.node());
       // use original svg so it draws under the _rect and does not interfer with our mouse events
 
+      var startX = mousePos[0],
+          startY = mousePos[1];
+
+      if(this.selectionType === 'xAxis') {
+        startY = 0;
+      } else if(this.selectionType === 'yAxis') {
+        startX = 0;
+      }
+
       this._actionArea = this.svg.append( "rect")
         .attr('class', "action-area")
-        .attr('x', mousePos[0])
-        .attr('y', mousePos[1])
-        .attr('ox', mousePos[0]) // save this original position for calcs
-        .attr('oy', mousePos[1]) // save this original position for calcs
+        .attr('x', startX)
+        .attr('y', startY)
+        .attr('ox', startX) // save this original position for calcs
+        .attr('oy', startY) // save this original position for calcs
         .attr('rx', 2)
         .attr('ry', 2)
         .attr('width', 0)
@@ -303,28 +325,37 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     _updateActionBox: function() {
 
       if(!this._isObjEmpty(this._actionArea)) {
+
         var mousePos = d3.mouse(this._rect.node()),
           // save somewhere else--> not as an attr, inefficient
             ox = parseInt(this._actionArea.attr("ox")),
-            oy = parseInt(this._actionArea.attr("oy"));
+            oy = parseInt(this._actionArea.attr("oy")),
+            newX = mousePos[0],
+            newY = mousePos[1];
 
-        // if current position is greater than the original position
-        if(mousePos[0] >= ox){
-          // set x to the original position to prevent some drift on crossover. width is equal to the difference between the x and current mouse position
-          this._actionArea.attr("x", ox);
-          this._actionArea.attr("width", mousePos[0] - ox);
-        } else {
-          // else, the x is the current pos (because we cant have negative width) and width is the difference
-          this._actionArea.attr("x", mousePos[0]);
-          this._actionArea.attr("width", ox - mousePos[0]);
+        if(this.selectionType === 'xAxis') {
+          newY = this._rect.attr('height');
+        } else if(this.selectionType === 'yAxis') {
+          newX = this._rect.attr('width');
         }
 
-        if(mousePos[1] >= oy){
-          this._actionArea.attr("y", oy);
-          this._actionArea.attr("height", mousePos[1] - oy);
+        // if current position is greater than the original position
+        if(newX >= ox){
+          // set x to the original position to prevent some drift on crossover. width is equal to the difference between the x and current mouse position
+          this._actionArea.attr("x", ox);
+          this._actionArea.attr("width", newX - ox);
         } else {
-          this._actionArea.attr("y", mousePos[1]);
-          this._actionArea.attr("height", oy - mousePos[1]);
+          // else, the x is the current pos (because we cant have negative width) and width is the difference
+          this._actionArea.attr("x", newX);
+          this._actionArea.attr("width", ox - newX);
+        }
+
+        if(newY >= oy){
+          this._actionArea.attr("y", oy);
+          this._actionArea.attr("height", newY - oy);
+        } else {
+          this._actionArea.attr("y", newY);
+          this._actionArea.attr("height", oy - newY);
         }
       }
     },
@@ -341,17 +372,21 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       this.mouseDown = false;
       var extents = {};
 
-      extents.x1 = parseInt(this._actionArea.attr("x"));
-      extents.y1 = parseInt(this._actionArea.attr("y"));
-      extents.w = parseInt(this._actionArea.attr("width"));
-      extents.h = parseInt(this._actionArea.attr("height"));
-      extents.x2 = extents.x1 + extents.w;
-      extents.y2 = extents.y1 + extents.h;
-      extents.eX = [this.x.invert(extents.x1), this.x.invert(extents.x2)];
-      extents.eY = [this.y.invert(extents.y1), this.y.invert(extents.y2)];
+      //make sure we have somthing selected
+      if(this._actionArea.attr("width") > 0 && this._actionArea.attr("height") > 0) {
+        extents.x1 = parseInt(this._actionArea.attr("x"));
+        extents.y1 = parseInt(this._actionArea.attr("y"));
+        extents.w = parseInt(this._actionArea.attr("width"));
+        extents.h = parseInt(this._actionArea.attr("height"));
+        extents.x2 = extents.x1 + extents.w;
+        extents.y2 = extents.y1 + extents.h;
+        extents.eX = [this.x.invert(extents.x1), this.x.invert(extents.x2)];
+        //Y axis is top to bottom
+        extents.eY = [this.y.invert(extents.y2), this.y.invert(extents.y1)];
 
-      this.set('extentsData', extents);
-      this.fire('px-vis-extents-data-updated', {'data': extents, 'dataVar': 'extentsData', 'method': 'set'});
+        this.set('extentsData', extents);
+        this.fire('px-vis-extents-data-updated', {'data': extents, 'dataVar': 'extentsData', 'method': 'set'});
+      }
       this._actionArea.remove();
     }
   });
