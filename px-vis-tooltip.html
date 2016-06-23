@@ -31,12 +31,14 @@ Element providing on-chart tooltip display
     <template>
       <px-vis-register
         id="tooltip"
-        class="hidden"
+        class="hidden u-pl u-pr u-pt u-pb"
         height="[[height]]"
         width="[[width]]"
         units="Hz"
         tooltip-data=[[tooltipData]]
-        chart-data="[[chartData]]">
+        chart-data="[[chartData]]"
+        x-axis-type="[[xAxisType]]"
+        y-axis-type="[[yAxisType]]">
       </px-vis-register>
     </template>
 </dom-module>
@@ -51,6 +53,7 @@ Element providing on-chart tooltip display
       PxVisBehaviorD3.svg,
       PxVisBehavior.dataset,
       PxVisBehavior.tooltipData,
+      PxVisBehavior.axisTypes,
       commonColors
     ],
 
@@ -75,7 +78,7 @@ Element providing on-chart tooltip display
       this.set('_rect', this.pxSvgElem.getBoundingClientRect());
     },
     _updateTooltip: function(){
-      if(this.tooltipData.time !== null){
+      if(this.tooltipData.mouse !== null){
         this.toggleClass('hidden',false, this.$.tooltip);
         this._moveTooltip();
       } else {

@@ -64,15 +64,17 @@ Formatting for the timestamps,the data values, and the series names can be contr
 <dom-module id="px-vis-register">
   <link rel="import" type="css" href="css/px-vis-register.css"/>
   <template>
-    <template is="dom-if" if="{{_typeEqualHorizontal(type)}}">
+
       <div
         id="registerWrap"
         class="inline--flex flex--col"
         style$="height:{{height}}px; width:[[width]]px">
-        <div id="dateTime">
-          <span id="firstDateTime">{{_firstDateTime}}</span> <span>{{_separator}}</span> <span id="secondDateTime">{{_secondDateTime}}</span>  &nbsp;
-        </div>
-        <div class="flex flex--row">
+        <template is="dom-if" if="{{_isOfType(xAxisType,'time')}}">
+          <div id="dateTime">
+            <span id="firstDateTime">{{_firstDateTime}}</span> <span>{{_separator}}</span> <span id="secondDateTime">{{_secondDateTime}}</span>  &nbsp;
+          </div>
+        </template>
+        <div class$="{{_getSeriesWrapperClass(type)}}">
           <template is="dom-repeat" items="{{tooltipData.series}}">
             <span class$="{{_mutedToStart(item.name)}}" name$="{{item.name}}" on-click="_seriesClicked">
                 <span
@@ -80,22 +82,49 @@ Formatting for the timestamps,the data values, and the series names can be contr
                   style$="background-color:{{_returnItemColor(item.name)}};"
                   name$="{{item.name}}"
                 >&nbsp;</span>
-                <span>
+                <span class$="{{_getWrapperClass(type)}}">
                   <div class="seriesName" name$="{{item.name}}">
-                    {{_truncateName(item.name,truncationLength)}}
+                    {{_truncateName(item.name,truncationLength)}}&nbsp;
                     <template is="dom-if" if="{{_didTruncate(item.name,truncationLength)}}">
                       <px-tooltip delay="500">{{item.name}}</px-tooltip>
                     </template>
                   </div>
+                  <!-- Display serie data differently depending on x and y axis types -->
                   <div class="seriesData" name$="{{item.name}}">
-                    <numbro-element
-                      value="[[_returnVal(item.value)]]"
-                      format="[[numberFormat]]"
-                      culture="[[numberFormatCulture]]"
-                      currency$="[[numberFormatIsCurrency]]"
-                      default-currency-format="[[numberFormatCurrency]]"
-                      zero-format="[[numberFormatZero]]">
-                    </numbro-element>
+                    <!-- if x axis is number format and show it -->
+                    <template is="dom-if" if="{{_isOfType(xAxisType, 'linear')}}">
+                      <numbro-element
+                        value="[[_returnVal(item.value, 0, '&nbsp;/&nbsp')]]"
+                        format="[[numberFormat]]"
+                        culture="[[numberFormatCulture]]"
+                        currency$="[[numberFormatIsCurrency]]"
+                        default-currency-format="[[numberFormatCurrency]]"
+                        zero-format="[[numberFormatZero]]">
+                      </numbro-element>
+                      <template is="dom-if" if="[[_returnVal(item.value, 0)]]">
+                        &nbsp;/&nbsp
+                      </template>
+                    </template>
+                    <!-- if x axis is ordinal just display it -->
+                    <template is="dom-if" if="{{_isOfType(xAxisType, 'ordinal')}}">
+                      <span>[[_returnVal(item.value, 0, '&nbsp;/&nbsp')]]</span>
+                    </template>
+                    <!-- if x axis is time don't display it -->
+                    <!-- if y axis is number format and show it -->
+                    <template is="dom-if" if="{{_isOfType(yAxisType, 'linear')}}">
+                      <numbro-element
+                        value="[[_returnVal(item.value, 1)]]"
+                        format="[[numberFormat]]"
+                        culture="[[numberFormatCulture]]"
+                        currency$="[[numberFormatIsCurrency]]"
+                        default-currency-format="[[numberFormatCurrency]]"
+                        zero-format="[[numberFormatZero]]">
+                      </numbro-element>
+                    </template>
+                    <!-- if y axis is ordinal just display it -->
+                    <template is="dom-if" if="{{_isOfType(yAxisType, 'ordinal')}}">
+                      <span>[[_returnVal(item.value, 1)]]</span>
+                    </template>
                     <template is="dom-if" if="{{item.value}}">{{units}}</template>
                   </div>
                 </span>
@@ -103,43 +132,6 @@ Formatting for the timestamps,the data values, and the series names can be contr
           </template>
         </div>
       </div>
-    </template>
-
-    <template is="dom-if" if="{{!_typeEqualHorizontal(type)}}">
-      <div
-        id="registerWrap"
-        class="inline--flex flex--col u-ml u-pr u-pt u-pb"
-        style$="height:{{height}}px; width:{{width}}px">
-        <div id="dateTime">
-          <span id="firstDateTime">{{_firstDateTime}}</span> <span>{{_separator}}</span> <span id="secondDateTime">{{_secondDateTime}}</span>  &nbsp;
-        </div>
-        <template is="dom-repeat" items="{{tooltipData.series}}">
-          <div class$="{{_mutedToStart(item.name)}}" name$="{{item.name}}" on-click="_seriesClicked">
-            <span
-              class="seriesMarker"
-              style$="background-color:{{_returnItemColor(item.name)}};"
-              name$="{{item.name}}"
-            >&nbsp;</span><span class="seriesName" name$="{{item.name}}">
-              {{_truncateName(item.name,truncationLength)}}
-              <template is="dom-if" if="{{_didTruncate(item.name,truncationLength)}}">
-                <px-tooltip delay="250">{{item.name}}</px-tooltip>
-              </template>
-            </span>
-            <span class="seriesData" name$="{{item.name}}">
-              <numbro-element
-                value="[[_returnVal(item.value)]]"
-                format="[[numberFormat]]"
-                culture="[[numberFormatCulture]]"
-                currency$="[[numberFormatIsCurrency]]"
-                default-currency-format="[[numberFormatCurrency]]"
-                zero-format="[[numberFormatZero]]">
-              </numbro-element>
-              <template is="dom-if" if="{{item.value}}">{{units}}</template>
-            </span>
-          </div>
-        </template>
-      </div>
-    </template>
 
   </template>
 </dom-module>
@@ -156,6 +148,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
       PxVisBehavior.mutedSeries,
       PxVisBehavior.tooltipData,
       PxVisBehavior.dataset,
+      PxVisBehavior.axisTypes,
       commonColors
     ],
 
@@ -237,13 +230,37 @@ Formatting for the timestamps,the data values, and the series names can be contr
       _separator:{
         type:String,
         notify:true
-      },
+      }
     },
 
     observers: [
       '_formatDateTime(tooltipData.*)',
       '_toggleSeries(mutedSeries.*)'
      ],
+
+     _getWrapperClass: function(type) {
+       var classList = 'flex ';
+
+       if(type === 'horizontal') {
+         classList += 'flex--col ';
+       } else {
+         classList += 'flex--row';
+       }
+
+       return classList;
+     },
+
+     _getSeriesWrapperClass: function(type) {
+       var classList = 'flex ';
+
+       if(type === 'horizontal') {
+         classList += 'flex--row ';
+       } else {
+         classList += 'flex--col';
+       }
+
+       return classList;
+     },
 
     /**
      * dom-if function for type property which returns true if type equals horizontal
@@ -372,11 +389,14 @@ Formatting for the timestamps,the data values, and the series names can be contr
       }
       return false;
     },
-    _returnVal: function(val){
-      if(val){
-        return val[1];
+    _returnVal: function(val, index, separator){
+      if(val && val[index]){
+        return val[index] + (separator ? separator : '');
       }
       return null;
+    },
+    _isOfType: function(toTest, type) {
+      return toTest === type;
     }
   });
 </script>
