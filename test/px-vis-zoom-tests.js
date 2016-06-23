@@ -45,7 +45,8 @@ function runTests(){
 
     suiteSetup(function(done){
       var d = {
-        "eX": [10, 52]
+        "eX": [10, 52],
+        "eY": [0, 10]
       };
 
       document.addEventListener('px-vis-selected-domain-updated',function(evt){
@@ -67,12 +68,18 @@ function runTests(){
     test('event method', function() {
       assert.equal(eventObj.method, 'set');
     });
-    test('event data exists and is an array', function() {
-      assert.isTrue(Array.isArray(eventObj.data));
+    test('event data exists and is an object', function() {
+      assert.equal(typeof(eventObj.data),'object');
+    });
+    test('event data.x exists and is an array', function() {
+      assert.isTrue(Array.isArray(eventObj.data.x));
+    });
+    test('event data.y exists and is an array', function() {
+      assert.isTrue(Array.isArray(eventObj.data.y));
     });
     test('event data exists and matches expected', function() {
-      assert.equal(eventObj.data[0],10);
-      assert.equal(eventObj.data[1],52);
+      assert.equal(eventObj.data.x[0],10);
+      assert.equal(eventObj.data.x[1],52);
     });
     test('reset button is shown', function() {
       assert.isFalse(baseZoom.$.resetBtn.classList.contains('hidden'));
@@ -116,11 +123,11 @@ function runTests(){
     test('event method', function() {
       assert.equal(eventObj.method, 'set');
     });
-    test('event data exists and is an array', function() {
-      assert.isTrue(Array.isArray(eventObj.data));
+    test('event data exists and is a string', function() {
+      assert.equal(typeof(eventObj.data),'string');
     });
     test('event data exists and matches expected', function() {
-      assert.equal(eventObj.data[0],'reset');
+      assert.equal(eventObj.data,'reset');
     });
     test('reset button is hidden', function() {
       assert.isTrue(baseZoom.$.resetBtn.classList.contains('hidden'));

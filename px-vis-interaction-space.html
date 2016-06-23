@@ -127,11 +127,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     * @method attached
     */
     attached: function(){
-      if(this.interactionSvg && !this._isObjEmpty(this.interactionSvg)){
+      if(this._isObjHaveValues(this.interactionSvg)){
         this.fire('px-vis-interaction-svg-updated', { 'dataVar': 'interactionSvg', 'data': this.interactionSvg, 'method':'set' });
       }
 
-      if(this.tooltipData && !this._isObjEmpty(this.tooltipData)){
+      if(this._isObjHaveValues(this.tooltipData)){
         this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': this.tooltipData, 'method':'set' });
       }
 
@@ -144,8 +144,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * @method drawElement
      */
     drawElement: function() {
-
-      if (!this._isObjEmpty(this.svg) && !this._isObjEmpty(this.x) && !this._isObjEmpty(this.y) && !this._isObjEmpty(this.chartData) && this._isObjEmpty(this._rect) && this.width && this.height ) {
+      if (this._isObjHaveValues(this.svg) && this._isObjHaveValues(this.x) && this._isObjHaveValues(this.y) && this._isObjHaveValues(this.chartData) && this._isObjEmpty(this._rect) && this.width && this.height ) {
         // make sure the tooltip draws on top of everything; returns a set property interactionSvg
         this.cloneSVGElem(this.svg.node(),'interactionSvg');
         this.fire('px-vis-interaction-svg-updated', { 'dataVar': 'interactionSvg', 'data': this.interactionSvg, 'method':'set' });
@@ -385,7 +384,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      */
     _updateActionBox: function() {
 
-      if(!this._isObjEmpty(this._actionArea)) {
+      if(this._isObjHaveValues(this._actionArea)) {
 
         var mousePos = d3.mouse(this._rect.node()),
           // save somewhere else--> not as an attr, inefficient

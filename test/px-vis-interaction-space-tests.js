@@ -117,10 +117,10 @@ function runTests(){
     });
 
     test('baseIs _rect width', function() {
-      assert.equal(baseIS._rect.attr('width'), 500);
+      assert.equal(baseIS._rect.attr('width'), 480);
     });
     test('baseIs _rect height', function() {
-      assert.equal(baseIS._rect.attr('height'), 300);
+      assert.equal(baseIS._rect.attr('height'), 280);
     });
     test('baseIs _rect fill', function() {
       assert.equal(baseIS._rect.attr('fill'), 'none');
