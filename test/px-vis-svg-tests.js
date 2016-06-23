@@ -21,7 +21,7 @@ function runTests(){
     });
 
     test('emptySVG does not set svg property', function() {
-      assert.isTrue(emptySVG._isObjEmpty(emptySVG.svg));
+      assert.isTrue(emptySVG._isVarUndefined(emptySVG.svg));
     });
   });
 
@@ -37,7 +37,7 @@ function runTests(){
     });
 
     test('missingHeight does not set svg property', function() {
-      assert.isTrue(missingHeight._isObjEmpty(missingHeight.svg));
+      assert.isTrue(missingHeight._isVarUndefined(missingHeight.svg));
     });
   });
 
