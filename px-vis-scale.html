@@ -237,16 +237,22 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      */
     _updateDomain:function(selectedDomain){
 
-      if(this._isObjHaveValues(selectedDomain)){
-        if(selectedDomain[0] === 'reset'){
-          this._currentDomain();
-        } else {
+      if(selectedDomain === 'reset'){
+        this._currentDomain();
+      } else {
+        //set new X domain if provided
+        if(selectedDomain.x.length > 0) {
 
-          this.x.domain(selectedDomain[0]);
-          this.y.domain(selectedDomain[1]);
+          this.x.domain(selectedDomain.x);
           this.set('currentDomainX', this.x.domain());
-          this.set('currentDomainY', this.y.domain());
           this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
+        }
+
+        //set new Y domain if provided
+        if(selectedDomain.y.length > 0) {
+
+          this.y.domain(selectedDomain.y);
+          this.set('currentDomainY', this.y.domain());
           this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
         }
       }
