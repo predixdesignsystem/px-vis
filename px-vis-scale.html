@@ -51,8 +51,10 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       PxVisBehavior.sizing,
       PxVisBehaviorD3.axes,
       PxVisBehavior.dataset,
+      PxVisBehavior.seriesConfig,
       PxVisBehavior.commonMethods,
-      PxVisBehaviorD3.selectedDomain
+      PxVisBehaviorD3.selectedDomain,
+      commonColors
     ],
 
     /**
@@ -89,13 +91,21 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         type: String,
         value: 'ordinal',
         notify: true
+      },
+      /**
+       * Holder for chart extents from the seriesConfig object
+       *
+       */
+      _extents: {
+        type: Array,
+        value: function(){ return [[],[]] }
       }
     },
 
     observers: [
       '_setXScale(width,margin)',
       '_setYScale(height,margin)',
-      '_currentDomain(chartData.*,x,y)',
+      '_currentDomain(chartData.*,x,y,seriesConfig.*)',
       '_updateDomain(selectedDomain)',
     ],
 
@@ -171,6 +181,10 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       data.forEach(function(data, index) {
         data['series'].forEach(function(value, jindex) {
 
+          //make sure we're dealing with numbers
+          xTemp = (typeof(value[0]) === 'string') ? parseFloat(value[0]) : value[0];
+          yTemp = (typeof(value[1]) === 'string') ? parseFloat(value[1]) : value[1];
+
           if(doX === true) {
             result.x[0] = Math.min(result.x[0], value[0]);
             result.x[1] = Math.max(result.x[1], value[0]);
@@ -220,9 +234,9 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      *
      * @method _currentDomain
      */
-    _currentDomain: function() {
+     _currentDomain: function() {
       // check to make sure there is data
-      if(this._isObjHaveValues(this.chartData) && this._isObjHaveValues(this.x) && this._isObjHaveValues(this.y)){
+      if(this._isObjHaveValues(this.chartData) && this._isObjHaveValues(this.x) && this._isObjHaveValues(this.y) && this._isObjHaveValues(this.seriesConfig)){
         // TODO check if dataset has max and min
         // TODO add dev set max and min
         // TODO What do we do if we have max/min Ys and not x, which is the case with our sample data?
@@ -234,8 +248,18 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         // TODO: multiple Y-Axis?
         //TODO what if we dont want it to be the range of data and not 0 or visa versa...
 
+        // if(this._isObjEmpty(this.seriesConfig)){
+        //   console.log('no series config');
+        //   //run normal
+        // }
+
+        //check seriesConfig
+        if(this._isObjHaveValues(this.seriesConfig)){
+          this._completeExistingSeriesConfig();
+        }
+
         //Chug through the data to max and min
-        var i,j,
+        var i,j,xTemp,yTemp
           iM = this.chartData.length,
           exts = {
             "x": [Infinity,-Infinity],
@@ -275,7 +299,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
             this._findMinMax(this.chartData, false, true, exts);
           }
         }
-
+        
         this.x.domain(exts.x);
         this.y.domain(exts.y);
 
@@ -286,7 +310,37 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
 
         this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
         this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
+      }
+    },
 
+    _completeExistingSeriesConfig: function(){
+      var k = Object.keys(this.seriesConfig),
+          kLen = k.length,
+          ki;
+
+      for(ki = 0; ki < kLen; ki++){
+        if(!this.seriesConfig[k[ki]]['type']){
+          this.seriesConfig[k[ki]]['type'] = this.defaultSeriesConfig['type'];
+        }
+        if(!this.seriesConfig[k[ki]]['name']){
+          this.seriesConfig[k[ki]]['name'] = k[ki];
+        }
+        if(!this.seriesConfig[k[ki]]['x']){
+          this.seriesConfig[k[ki]]['x'] = this.defaultSeriesConfig['x'];
+        }
+        if(this.seriesConfig[k[ki]]['xExt']){
+          this.push('_extents[0]',this.seriesConfig[k[ki]]['xExt'])
+        }
+        if(this.seriesConfig[k[ki]]['yExt']){
+          this.push('_extents[1]',this.seriesConfig[k[ki]]['yExt'])
+        }
+        if(!this.seriesConfig[k[ki]]['color']){
+          this.seriesConfig[k[ki]]['color'] = this.dataVisColors[this.seriesColorOrder[ki]];
+        }
+        if(this._isObjEmpty(this._extents[0])){
+
+        }
+        this.notifyPath('seriesConfig',this.seriesConfig);
       }
     },
 

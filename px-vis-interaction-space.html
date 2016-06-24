@@ -198,12 +198,13 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             'xArr': null,
             'yArr': null
           },
-          len = this.chartData.length,
+          keys = Object.keys(this.seriesConfig),
+          len = keys.length,
           i;
 
 
       for(i = 0; i < len; i++){
-        ttD.series.push({'name':this.chartData[i]['name'],'value': null });
+        ttD.series.push({'name':keys[i],'value': null });
       }
 
       this.set('tooltipData',ttD);
@@ -240,7 +241,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             result = [],
             xArr = [],
             yArr = [],
-            len  = this.chartData.length,
+            keys = Object.keys(this.seriesConfig),
+            len  = keys.length,
             d,
             x1 = this.x.invert(mousePos[0]),
             y1 = this.y.invert(mousePos[1]),
@@ -301,13 +303,12 @@ TODO implement a dev setting to choose between only showing data at that x, snap
               xArr.push(xCoord);
               yArr.push(yCoord);
 
-              dataObj.series.push({'name':this.chartData[i]['name'],'value': result, 'coord': [xCoord,yCoord] });
+              dataObj.series.push({'name':i,'value': result, 'coord': [xCoord,yCoord] });
             } //for
 
 
           dataObj['xArr'] = xArr;
           dataObj['yArr'] = yArr;
-
           // now we can set our data that we want to pass out
           this.set('tooltipData',dataObj);
           this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });

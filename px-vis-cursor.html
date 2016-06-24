@@ -47,6 +47,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehavior.dataset,
       PxVisBehavior.commonMethods,
       PxVisBehavior.tooltipData,
+      PxVisBehavior.seriesConfig,
       commonColors
     ],
 
@@ -149,7 +150,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     }, //properties
 
     observers: [
-      'drawElement(svg,chartData.*)',
+      'drawElement(svg,chartData.*,seriesConfig.*)',
       '_cursorChange(tooltipData.*,_cursor)'
      ],
 
@@ -160,8 +161,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * @method drawElement
      */
     drawElement: function() {
-      if(this._isObjHaveValues(this.svg) && this._isObjHaveValues(this.chartData) && this._isObjEmpty(this._cursor)){
-
+      if(this._isObjHaveValues(this.svg) && this._isObjHaveValues(this.chartData) && this._isObjHaveValues(this.seriesConfig) && this._isObjEmpty(this._cursor)){
         // add circle to the line and hide it
         this._cursor = this.svg.append("g")
             .attr("display", "none");
@@ -169,7 +169,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         if(this.horizontalLine !== 'none'){
           // append the x line
           this._hLines = this._cursor.selectAll('line.xline')
-            .data(this.chartData)
+            .data(Object.keys(this.seriesConfig))
             .enter()
             .append("line")
             .attr("class", "xline")
@@ -196,16 +196,16 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         if(this.circlePoint === "yes"){
           // append the circle
           this._circles = this._cursor.selectAll('cirlcle.tooltipPoint')
-            .data(this.chartData)
+            .data(Object.keys(this.seriesConfig))
             .enter()
             .append("circle")
             .attr("class", "tooltipPoint")
             .attr("fill", (function(d){
-              return this.dataVisColors[this.seriesColorOrder[d.seriesNumber]]
+              return this.seriesConfig[d]['color']
             }).bind(this))
             .attr("r", 3)
             .attr("stroke", (function(d){
-              return this.dataVisColors[this.seriesColorOrder[d.seriesNumber]]
+              return this.seriesConfig[d]['color']
             }).bind(this))
             .attr("stroke-width", 12)
             .attr("stroke-opacity", 0.3);

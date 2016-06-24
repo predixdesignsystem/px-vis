@@ -42,6 +42,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         behaviors: [
           PxVisBehaviorD3.svg,
           PxVisBehaviorD3.axis,
+          PxVisBehavior.seriesConfig,
           PxVisBehavior.commonMethods,
           commonColors
         ],
@@ -169,7 +170,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
         observers: [
           'drawElement(currentDomain,svg,axis,margin)',
-          'drawSeriesBars(chartData.*)',
+          'drawSeriesBars(seriesConfig.*)',
           '_muteSeriesBars(mutedSeries.*)'
         ],
 
@@ -380,14 +381,13 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * @method drawSeriesBars
          */
         drawSeriesBars:function(){
-          if(this.chartData && !this._isObjEmpty(this._axisGroup)){
+          if(this._isObjHaveValues(this.seriesConfig) && this._isObjHaveValues(this._axisGroup)){
             // FIXME do we need to move the title group based on how many series we have
-            for(var i = 0; i < this.chartData.length; i++){
-              if(typeof(this.chartData[i]['axis']) === 'undefined' || this.chartData[i]['axis'] === '' || this.chartData[i]['axis'] === this.axisId){
-                var color = (typeof(this.chartData[i].seriesNumber) !== 'undefined') ? this.dataVisColors[this.seriesColorOrder[this.chartData[i].seriesNumber]] : this.dataVisColors[this.seriesColorOrder[i]],
-                    id = this.chartData[i]['name'];
-                this._drawBar(this._titleGroup,id,color,i);
-              }
+            var keys = Object.keys(this.seriesConfig),
+                kLen = keys.length,
+                i;
+            for(i = 0; i < kLen; i++){
+              this._drawBar(this._titleGroup,keys[i],this.seriesConfig[keys[i]]['color'],keys[i]);
             }
           }
         },
@@ -399,7 +399,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         _muteSeriesBars:function(){
           var keys = Object.keys(this.mutedSeries);
           for(var i = 0; i < keys.length; i++){
-            var series = this._titleGroup.select('[series-bar-id=' + keys[i] + ']');
+            var series = this._titleGroup.select('[series-bar-id=bar_' + keys[i] + ']');
+            console.log(series)
             // if we want to mute it
             if(this.mutedSeries[keys[i]]){
               series.attr('opacity',0.5);
@@ -419,7 +420,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .attr('height',3)
             .attr('width',15)
             .attr('fill',color)
-            .attr('series-bar-id',sid)
+            .attr('series-bar-id','bar_' + sid)
             .attr('transform',"translate(-12," + (-w - 8 * index) + ")");
         }
     });
