@@ -105,7 +105,16 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       selectionType: {
         type: String,
         value: 'rectangle'
-      }
+      },
+      /**
+       * Whether the X axis data is time, as opposed to linear/ordinal
+       *
+       */
+      xAxisTime: {
+        type: Boolean,
+        value: false
+      },
+
     },
 
     observers: [
@@ -221,53 +230,105 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           xCoord,
           yCoord;
 
+
       this.debounce('move',function(){
+
         // invert: takes position on the screen and converts it into an equivalent date
-        x0 = this.x.invert(mousePos[0]);
-        // setup a holder for our data to pass out
-        dataObj = {
-          'time': x0,
-          'series': [],
-          'mouse': mousePos,
-          'xArr': null,
-          'yArr': null
-        };
-        /*
-          d3.bisector returns index in our array that corresponds to the horizontal position of the mouse pointer.
-          Specifically this returns the date that falls to the left of the mouse cursor.
-        */
-        bisectDate = d3.bisector(function(d) { return d[0]; }).left;
-        xArr = [];
-        yArr = [];
-        len  = this.chartData.length;
+        var minDist = Number.MAX_VALUE,
+            result = [],
+            xArr = [],
+            yArr = [],
+            len  = this.chartData.length,
+            d,
+            x1 = this.x.invert(mousePos[0]),
+            y1 = this.y.invert(mousePos[1]),
+            x2,
+            y2;
 
-        for(var i = 0; i < len; i++){
-          // define vars
-          // get the index number of the timestamp
-          index = bisectDate(this.chartData[i]['series'], x0, 1);
-          // get the data values around the index
-          d0 = this.chartData[i]['series'][index - 1];
-          d1 = (this.chartData[i]['series'][index]) ? this.chartData[i]['series'][index] : this.chartData[i]['series'][index - 1];
-          // sets d as the closest date to the mouse
-          d = (x0 - d0[0] > d1[0] - x0) ? d1 : d0;
+            // setup a holder for our data to pass out
+            var dataObj = {
+              'time': this.xAxisTime ? x1 : null,
+              'series': [],
+              'mouse': mousePos,
+              'xArr': null,
+              'yArr': null
+            };
 
-          // get the pixel coords for that data
-          xCoord = this.x(d[0]);
-          yCoord = this.y(d[1]);
+            for(var i = 0; i < len; i++) {
 
-          xArr.push(xCoord);
-          yArr.push(yCoord);
+              minDist = Number.MAX_VALUE;
+              result = [];
 
-          dataObj.series.push({'name':this.chartData[i]['name'],'value': d, 'coord': [xCoord,yCoord] });
-        } //for
+              //find closest point....
+              if(!this.xAxisTime) {
+                //non time based: iterate over points and find the closest
+                for(var j = 0; j < this.chartData[i].series.length; j++) {
 
-        dataObj['xArr'] = xArr;
-        dataObj['yArr'] = yArr;
+                  //get point coords
+                  x2 = this.chartData[i].series[j][0];
+                  y2 = this.chartData[i].series[j][1];
 
-        // now we can set our data that we want to pass out
-        this.set('tooltipData',dataObj);
-        this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
+                  //distance between the two points
+                  d = Math.sqrt( (x2-=x1)*x2 + (y2-=y1)*y2 );
+
+                  //keep the closest point
+                  if(d < minDist) {
+                    minDist = d;
+                    result = this.chartData[i].series[j];
+                  }
+                }
+              } else {
+                //time based X axis
+                /*
+                  d3.bisector returns index in our array that corresponds to the horizontal position of the mouse pointer.
+                  Specifically this returns the date that falls to the left of the mouse cursor.
+                */
+                var bisectDate = d3.bisector(function(d) { return d[0]; }).left,
+                    index = bisectDate(this.chartData[i].series, x1, 1);
+                // get the data values around the index
+                d0 = this.chartData[i].series[index - 1];
+                d1 = (this.chartData[i].series[index]) ? this.chartData[i].series[index] : this.chartData[i].series[index - 1];
+                // sets result as the closest date to the mouse
+                result = (x1 - d0[0] > d1[0] - x1) ? d1 : d0;
+              }
+
+              // get the pixel coords for that data
+              xCoord = this.x(result[0]);
+              yCoord = this.y(result[1]);
+
+              xArr.push(xCoord);
+              yArr.push(yCoord);
+
+              dataObj.series.push({'name':this.chartData[i]['name'],'value': result, 'coord': [xCoord,yCoord] });
+            } //for
+
+
+          dataObj['xArr'] = xArr;
+          dataObj['yArr'] = yArr;
+
+          // now we can set our data that we want to pass out
+          this.set('tooltipData',dataObj);
+          this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
       },1);
+    },
+
+    /**
+     * Sorts the series data from smaller to bigger
+     */
+    _getSortedSeriesData: function() {
+
+      var result = [],
+          len = this.chartData.length;
+
+      for(var i = 0; i < len; i++) {
+
+        //sort based on X, from smaller to bigger
+        result[i] = this.chartData[i].series.sort(function(a, b) {
+          return a[0]-b[0];
+        });
+      }
+
+      return result;
     },
     /**
      * Helper function called on document.mouseup
