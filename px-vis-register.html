@@ -76,21 +76,21 @@ Formatting for the timestamps,the data values, and the series names can be contr
         </template>
         <div class$="{{_getSeriesWrapperClass(type)}}">
           <template is="dom-repeat" items="{{tooltipData.series}}">
-            <span class$="{{_mutedToStart(item.name)}}" name$="{{item.name}}" on-click="_seriesClicked">
+            <span class$="{{_mutedToStart(item.name)}}" name$="R{{item.name}}" on-click="_seriesClicked">
                 <span
                   class="seriesMarker"
                   style$="background-color:{{_returnItemColor(item.name)}};"
-                  name$="{{item.name}}"
+                  name$="R{{item.name}}"
                 >&nbsp;</span>
                 <span class$="{{_getWrapperClass(type)}}">
-                  <div class="seriesName" name$="{{item.name}}">
-                    {{_truncateName(item.name,truncationLength)}}&nbsp;
+                  <div class="seriesName" name$="R{{item.name}}">
+                    {{_returnTruncatedName(item.name)}}&nbsp;
                     <template is="dom-if" if="{{_didTruncate(item.name,truncationLength)}}">
-                      <px-tooltip delay="500">{{item.name}}</px-tooltip>
+                      <px-tooltip delay="500">{{_getName(item.name)}}</px-tooltip>
                     </template>
                   </div>
                   <!-- Display serie data differently depending on x and y axis types -->
-                  <div class="seriesData" name$="{{item.name}}">
+                  <div class="seriesData" name$="R{{item.name}}">
                     <!-- if x axis is number format and show it -->
                     <template is="dom-if" if="{{_isOfType(xAxisType, 'linear')}}">
                       <numbro-element
@@ -288,14 +288,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
      * @return {rgb}
      */
     _returnItemColor:function(name){
-      // TODO make data pass a separate data obj linking name and number
-      var i,
-          len = this.chartData.length;
-      for(i = 0; i < len; i++){
-        if(this.chartData[i]["name"] === name){
-          return this.dataVisColors[ this.seriesColorOrder[ this.chartData[i]["seriesNumber"] ] ];
-        }
-      }
+      return this.seriesConfig[name]['color'];
     },
     /**
      * Function which takes the incoming datetime from tooltipData and formats it.
@@ -329,7 +322,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
      */
     _seriesClicked:function(e){
       var ne = Polymer.dom(e),
-          series = ne.rootTarget.getAttribute('name');
+          series = ne.rootTarget.getAttribute('name').substr(1);
 
       // if it doesnt exist, let's add it and set to true
       if( typeof(this.mutedSeries[series]) === 'undefined' ){
@@ -358,7 +351,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
           series;
 
       for(i = 0; i < len; i++){
-        series = this.$$('.series[name=' + keys[i] + ']');
+        series = this.$$('.series[name=R' + keys[i] + ']');
         this.toggleClass('muted', this.mutedSeries[keys[i]], series);
       }
     },
@@ -376,6 +369,12 @@ Formatting for the timestamps,the data values, and the series names can be contr
       }
       return baseClasses;
     },
+    _getName(name){
+      return this.seriesConfig[name]['name']
+    },
+    _returnTruncatedName(name){
+      return this._truncateName(this._getName(name),this.truncationLength)
+    },
     /**
      * dom-if function for series names to decide if it was truncated. If so, add a tooltip showing full name
      *
@@ -384,7 +383,8 @@ Formatting for the timestamps,the data values, and the series names can be contr
      * @param {len} the truncation length.
      */
     _didTruncate:function(str,len){
-      if(len > 2 && str.length > len){
+      var name = this._getName(str)
+      if(len > 2 && name.length > len){
         return true;
       }
       return false;
