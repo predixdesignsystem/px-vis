@@ -39,6 +39,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
       PxVisBehaviorD3.axes,
       PxVisBehavior.commonMethods,
       PxVisBehavior.dataset,
+      PxVisBehavior.seriesConfig,
       commonColors
     ],
 
@@ -154,7 +155,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
             .enter()
             .append("g")
             .attr('class','thresholds')
-            .attr('threshold-id',function(d,i){ return d.for + i; });
+            .attr('threshold-id',function(d){ return d.for });
 
           this.thresholdLine = this.thresholdGroup.append("line")
             .attr('stroke-width', '1')
@@ -199,18 +200,15 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
      * @method _setColors
      */
     _setColors: function(){
-      // FIXME Trigger this when the series are loaded
-      setTimeout(function(){
-        if(this.showThresholdBox){
-          this.thresholdRect.attr('fill', this._getColors.bind(this));
-          this.thresholdText.attr('fill',"white");
-        } else {
-          this.thresholdRect.attr('fill', 'none');
-          this.thresholdText.attr('fill',this._getColors.bind(this));
-        }
+      if(this.showThresholdBox){
+        this.thresholdRect.attr('fill', this._getColors.bind(this));
+        this.thresholdText.attr('fill',"white");
+      } else {
+        this.thresholdRect.attr('fill', 'none');
+        this.thresholdText.attr('fill',this._getColors.bind(this));
+      }
 
-        this.thresholdLine.attr('stroke', this._getColors.bind(this));
-      }.bind(this), 1);
+      this.thresholdLine.attr('stroke', this._getColors.bind(this));
     },
     /**
      * Returns the color of the associated series or returns the default color
@@ -218,16 +216,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
      * @method _getColors
      */
     _getColors: function(d,i){
-      var color = this.colors[this.defaultColor];
-      // TODO make more elegant
-      if(d.for){
-        var series = this.svg.select('[series-id=' + d.for + ']');
-        if(series.node()){
-          color = this.dataVisColors[this.seriesColorOrder[series.attr('series-number')]];
-        }
-      }
-
-      return color;
+      return (d.for) ? this.seriesConfig[d.for]['color'] : this.colors[this.defaultColor];
     },
     /**
      * Calculates a y-position for the text and rectangle

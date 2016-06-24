@@ -23,10 +23,9 @@ function runTests(){
           [1397160780000, 10],
           [1397189940000, 4],
           [1397219100000, 6]
-        ],
-        "name":'mySeries',
-        "seriesNumber":0
+        ]
         }],
+        seriesConfig = {"0":{"type":"line","name":"mySeries"}},
         w = 500,
         h = 300,
         m = {
@@ -42,6 +41,7 @@ function runTests(){
       baseScale.set('width',w);
       baseScale.set('height',h);
       baseScale.set('margin',m);
+      baseScale.set('seriesConfig',seriesConfig);
       baseScale.set('chartData',d);
 
       baseXAxis.set('margin',m);
@@ -281,7 +281,7 @@ function runTests(){
     });
     test('Title series bars id', function() {
       var bar = baseYAxis._titleGroup.select('rect');
-      assert.equal(bar.attr('series-bar-id'),'mySeries');
+      assert.equal(bar.attr('series-bar-id'),'bar_0');
     });
     test('Title series bars translate', function() {
       var bar = baseYAxis._titleGroup.select('rect'),
@@ -446,7 +446,7 @@ function runTests(){
 
     suiteSetup(function(){
       var mutedSeries = {
-        "mySeries":true
+        "0":true
       };
       baseYAxis.set('mutedSeries',mutedSeries);
     });
@@ -462,7 +462,7 @@ function runTests(){
 
     suiteSetup(function(done){
       var mutedSeries = {
-        "mySeries":false
+        "0":false
       };
       baseYAxis.set('mutedSeries',mutedSeries);
       setTimeout(function(){done()},100)
