@@ -51,8 +51,10 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       PxVisBehavior.sizing,
       PxVisBehaviorD3.axes,
       PxVisBehavior.dataset,
+      PxVisBehavior.seriesConfig,
       PxVisBehavior.commonMethods,
-      PxVisBehaviorD3.selectedDomain
+      PxVisBehaviorD3.selectedDomain,
+      commonColors
     ],
 
     /**
@@ -89,13 +91,21 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         type: String,
         value: 'ordinal',
         notify: true
+      },
+      /**
+       * Holder for chart extents from the seriesConfig object
+       *
+       */
+      _extents: {
+        type: Array,
+        value: function(){ return [[],[]] }
       }
     },
 
     observers: [
       '_setXScale(width,margin)',
       '_setYScale(height,margin)',
-      '_currentDomain(chartData.*,x,y)',
+      '_currentDomain(chartData.*,x,y,seriesConfig.*)',
       '_updateDomain(selectedDomain)',
     ],
 
@@ -167,9 +177,9 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      *
      * @method _currentDomain
      */
-    _currentDomain: function() {
+     _currentDomain: function() {
       // check to make sure there is data
-      if(this._isObjHaveValues(this.chartData) && this._isObjHaveValues(this.x) && this._isObjHaveValues(this.y)){
+      if(this._isObjHaveValues(this.chartData) && this._isObjHaveValues(this.x) && this._isObjHaveValues(this.y) && this._isObjHaveValues(this.seriesConfig)){
         // TODO check if dataset has max and min
         // TODO add dev set max and min
         // TODO What do we do if we have max/min Ys and not x, which is the case with our sample data?
@@ -181,38 +191,49 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         // TODO: multiple Y-Axis?
         //TODO what if we dont want it to be the range of data and not 0 or visa versa...
 
+        // if(this._isObjEmpty(this.seriesConfig)){
+        //   console.log('no series config');
+        //   //run normal
+        // }
+
+        //check seriesConfig
+        if(this._isObjHaveValues(this.seriesConfig)){
+          this._completeExistingSeriesConfig();
+        }
+
         //Chug through the data to max and min
-        var i,j,
+        var i,j,xTemp,yTemp
           iM = this.chartData.length,
           exts = {
             "x": [Infinity,-Infinity],
             "y": [0,0]
           };
-
         //first, assume the dataset is sorted by x and save us some assignments.
         exts.x[0] = this.chartData[0]['series'][0][0];
         exts.x[1] = this.chartData[0]['series'][this.chartData[0]['series'].length - 1][0];
-
         // go through each series
         // TODO Can we make this async?
         for(i = 0; i < iM; i++){
           var jM = this.chartData[i]['series'].length;
           for(j = 0; j < jM; j++){
-            if(exts.x[0] > this.chartData[i]['series'][j][0]){
-              exts.x[0] = this.chartData[i]['series'][j][0];
+            //  check that our numbers are numbers
+            xTemp = (typeof(this.chartData[i]['series'][j][0]) === 'string') ? parseFloat(this.chartData[i]['series'][j][0]) : this.chartData[i]['series'][j][0]
+            yTemp = (typeof(this.chartData[i]['series'][j][1]) === 'string') ? parseFloat(this.chartData[i]['series'][j][1]) : this.chartData[i]['series'][j][1]
+
+            if(exts.x[0] > xTemp){
+              exts.x[0] = xTemp;
             }
-            if(exts.x[1] < this.chartData[i]['series'][j][0]){
-              exts.x[1] = this.chartData[i]['series'][j][0];
+            if(exts.x[1] < xTemp){
+              exts.x[1] = xTemp;
             }
-            if(exts.y[0] > this.chartData[i]['series'][j][1]){
-              exts.y[0] = this.chartData[i]['series'][j][1];
+            if(exts.y[0] > yTemp){
+              exts.y[0] = yTemp;
             }
-            if(exts.y[1] < this.chartData[i]['series'][j][1]){
-              exts.y[1] = this.chartData[i]['series'][j][1];
+            if(exts.y[1] < yTemp){
+              exts.y[1] = yTemp;
             }
           }
         }
-
         this.x.domain(exts.x);
         this.y.domain(exts.y);
 
@@ -224,7 +245,37 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
 
         this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
         this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
+      }
+    },
 
+    _completeExistingSeriesConfig: function(){
+      var k = Object.keys(this.seriesConfig),
+          kLen = k.length,
+          ki;
+
+      for(ki = 0; ki < kLen; ki++){
+        if(!this.seriesConfig[k[ki]]['type']){
+          this.seriesConfig[k[ki]]['type'] = this.defaultSeriesConfig['type'];
+        }
+        if(!this.seriesConfig[k[ki]]['name']){
+          this.seriesConfig[k[ki]]['name'] = k[ki];
+        }
+        if(!this.seriesConfig[k[ki]]['x']){
+          this.seriesConfig[k[ki]]['x'] = this.defaultSeriesConfig['x'];
+        }
+        if(this.seriesConfig[k[ki]]['xExt']){
+          this.push('_extents[0]',this.seriesConfig[k[ki]]['xExt'])
+        }
+        if(this.seriesConfig[k[ki]]['yExt']){
+          this.push('_extents[1]',this.seriesConfig[k[ki]]['yExt'])
+        }
+        if(!this.seriesConfig[k[ki]]['color']){
+          this.seriesConfig[k[ki]]['color'] = this.dataVisColors[this.seriesColorOrder[ki]];
+        }
+        if(this._isObjEmpty(this._extents[0])){
+
+        }
+        this.notifyPath('seriesConfig',this.seriesConfig);
       }
     },
 

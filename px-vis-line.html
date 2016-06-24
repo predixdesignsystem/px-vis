@@ -44,6 +44,7 @@ Element which draws lines series onto the chart
       PxVisBehavior.mutedSeries,
       PxVisBehavior.commonMethods,
       PxVisBehaviorD3.clipPath,
+      PxVisBehavior.seriesConfig,
       commonColors
     ],
 
@@ -107,7 +108,7 @@ Element which draws lines series onto the chart
      */
     drawElement: function() {
       if(this._isObjHaveValues(this.svg) && this._isObjHaveValues(this.x) && this._isObjHaveValues(this.y) && this._isObjHaveValues(this.chartData)){
-        var data = this.chartData.series;
+        var data = this.chartData[this.seriesId].series;
 
         var line = d3.svg.line()
           .x(function(d) { return this.x(d[0]); }.bind(this))
@@ -119,8 +120,7 @@ Element which draws lines series onto the chart
           this.linePath = this.svg.append("path")
             .datum(data)
             .attr("class", "series-line")
-            .attr("series-id", this.seriesId)
-            .attr("series-number", this.seriesNumber)
+            .attr("series-id", 'line_' + this.seriesId)
             .attr('fill','none')
             .attr("d", line);
 
@@ -170,7 +170,7 @@ Element which draws lines series onto the chart
      */
     _colorLine:function(){
       var index = this.seriesNumber;
-      this.linePath.attr('stroke',this.dataVisColors[this.seriesColorOrder[index]])
+      this.linePath.attr('stroke',this.seriesConfig[this.seriesId]['color'])
         .attr('stroke-opacity',1);
     },
     /**
