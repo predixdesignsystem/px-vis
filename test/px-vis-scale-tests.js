@@ -388,5 +388,40 @@ function runTests(){
     });
   }); //suite
 
+  suite('px-vis-scale seriesConfig fills with defaults', function() {
+    var seriesConfig = document.getElementById('seriesConfig');
+    var colorOrder = commonColors.properties.seriesColorOrder.value;
+    var colorSet = commonColors.properties.dataVisColors.value;
+
+    test('seriesConfig fixture is created', function() {
+      assert.isTrue(seriesConfig !== null);
+    });
+
+    test('seriesConfig[0] type is default', function() {
+      assert.equal(seriesConfig.seriesConfig['0'].type, 'line');
+    });
+    test('seriesConfig[0] name is default', function() {
+      assert.equal(seriesConfig.seriesConfig['0'].name, '0');
+    });
+    test('seriesConfig[0] color is default', function() {
+      assert.equal(seriesConfig.seriesConfig['0'].color, colorSet[colorOrder[0]]);
+    });
+    test('seriesConfig[0] color is default', function() {
+      assert.equal(seriesConfig.seriesConfig['0'].x, '0');
+    });
+
+    test('seriesConfig[1] type is not overwritter', function() {
+      assert.equal(seriesConfig.seriesConfig['1'].type, 'scatter');
+    });
+    test('seriesConfig[1] name is not overwritter', function() {
+      assert.equal(seriesConfig.seriesConfig['1'].name, 'Tag2');
+    });
+    test('seriesConfig[1] color is not overwritter', function() {
+      assert.equal(seriesConfig.seriesConfig['1'].color, 'rgb(0,0,0)');
+    });
+    test('seriesConfig[1] color is not overwritter', function() {
+      assert.equal(seriesConfig.seriesConfig['1'].x, 'timestamp');
+    });
+  }); //suite
 
 } //runTests

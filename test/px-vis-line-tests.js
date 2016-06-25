@@ -26,6 +26,7 @@ function runTests(){
             [1397189940000, 4],
             [1397219100000, 6]
           ]}],
+          seriesConfig = {"0":{"type":"line","name":"mySeries"}},
           w = 500,
           h = 300,
           m = {
@@ -41,9 +42,10 @@ function runTests(){
       baseScale.set('width',w);
       baseScale.set('height',h);
       baseScale.set('margin',m);
+      baseScale.set('seriesConfig',seriesConfig);
       baseScale.set('chartData',d);
 
-      baseLine.set('chartData',d[0]);
+      baseLine.set('chartData',d);
 
     });
 
@@ -55,13 +57,8 @@ function runTests(){
       assert.equal(baseLine.linePath.node().tagName,'path');
     });
 
-    test('baseLine line series ID is random', function() {
-      assert.equal(baseLine.linePath.attr('series-id').length,15);
-      assert.equal(baseLine.linePath.attr('series-id').split('_')[0],'line');
-    });
-
-    test('baseLine line series number is 0', function() {
-      assert.equal(baseLine.linePath.attr('series-number'),0);
+    test('baseLine line series ID', function() {
+      assert.equal(baseLine.linePath.attr('series-id'),'line_0');
     });
 
     test('baseLine line series has the right color', function() {
@@ -98,6 +95,7 @@ function runTests(){
             [1397189940000, 10],
             [1397219100000, 27]
           ]}],
+          seriesConfig = {"0":{"type":"line","name":"mySeries1"},"1":{"type":"line","name":"mySeries2"}},
           w = 500,
           h = 300,
           m = {
@@ -114,15 +112,12 @@ function runTests(){
       mutedScale.set('width',w);
       mutedScale.set('height',h);
       mutedScale.set('margin',m);
+      mutedScale.set('seriesConfig',seriesConfig);
       mutedScale.set('chartData',d);
 
-      mutedLine1.set('seriesId','mySeries');
-      mutedLine1.set('seriesNumber',1);
-      mutedLine1.set('chartData',d[0]);
+      mutedLine1.set('chartData',d);
 
-      mutedLine2.set('seriesId','mySeries2');
-      mutedLine2.set('seriesNumber',2);
-      mutedLine2.set('chartData',d[1]);
+      mutedLine2.set('chartData',d);
       // setTimeout(function(){ done() }.bind(this),5000);
       done();
     });
@@ -138,16 +133,13 @@ function runTests(){
       assert.equal(mutedLine1.linePath.node().tagName,'path');
     });
     test('mutedLine1 line series ID is set', function() {
-      assert.equal(mutedLine1.linePath.attr('series-id'),'mySeries');
-    });
-    test('mutedLine1 line series number is 1', function() {
-      assert.equal(mutedLine1.linePath.attr('series-number'),1);
+      assert.equal(mutedLine1.linePath.attr('series-id'),'line_0');
     });
     test('mutedLine1 line series has the right stroke opacity', function() {
       assert.equal(mutedLine1.linePath.attr('stroke-opacity'),1);
     });
     test('mutedLine1 line series has the right color', function() {
-      assert.equal(mutedLine1.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
+      assert.equal(mutedLine1.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
     });
     test('mutedLine1 line d', function() {
       assert.equal(mutedLine1.linePath.attr('d').split(/[\s,]+/).join(''),'M0260L120210L240170L360230L480210');
@@ -157,16 +149,13 @@ function runTests(){
       assert.equal(mutedLine2.linePath.node().tagName,'path');
     });
     test('mutedLine2 line series ID is set', function() {
-      assert.equal(mutedLine2.linePath.attr('series-id'),'mySeries2');
-    });
-    test('mutedLine2 line series number is 2', function() {
-      assert.equal(mutedLine2.linePath.attr('series-number'),2);
+      assert.equal(mutedLine2.linePath.attr('series-id'),'line_1');
     });
     test('mutedLine1 line series has the right stroke opacity', function() {
       assert.equal(mutedLine2.linePath.attr('stroke-opacity'),1);
     });
     test('mutedLine2 line series has the right color', function() {
-      assert.equal(mutedLine2.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[2] ]);
+      assert.equal(mutedLine2.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
     });
     test('mutedLine2 line d', function() {
       assert.equal(mutedLine2.linePath.attr('d').split(/[\s,]+/).join(''),'M0260L12060L240240L360170L4800');
@@ -184,8 +173,8 @@ function runTests(){
 
     suiteSetup(function(done){
       var m = {
-        "mySeries1":false,
-        "mySeries2":true
+        "0":false,
+        "1":true
       };
       mutedLine1.set('mutedSeries',m);
       mutedLine2.set('mutedSeries',m);
@@ -197,14 +186,14 @@ function runTests(){
       assert.equal(mutedLine1.linePath.attr('stroke-opacity'),1);
     });
     test('mutedLine1 line series has the right color', function() {
-      assert.equal(mutedLine1.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
+      assert.equal(mutedLine1.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
     });
 
     test('mutedLine2 line series has the right stroke opacity', function() {
       assert.equal(mutedLine2.linePath.attr('stroke-opacity'),0.3);
     });
     test('mutedLine2 line series has the right color', function() {
-      assert.equal(mutedLine2.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[2] ]);
+      assert.equal(mutedLine2.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
     });
 
   }); //suite
@@ -220,8 +209,8 @@ function runTests(){
 
     suiteSetup(function(done){
       var m = {
-        "mySeries1":false,
-        "mySeries2":false
+        "0":false,
+        "1":false
       };
       mutedLine1.set('mutedSeries',m);
       mutedLine2.set('mutedSeries',m);
@@ -233,14 +222,14 @@ function runTests(){
       assert.equal(mutedLine1.linePath.attr('stroke-opacity'),1);
     });
     test('mutedLine1 line series has the right color', function() {
-      assert.equal(mutedLine1.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
+      assert.equal(mutedLine1.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
     });
 
     test('mutedLine2 line series has the right stroke opacity', function() {
       assert.equal(mutedLine2.linePath.attr('stroke-opacity'),1);
     });
     test('mutedLine2 line series has the right color', function() {
-      assert.equal(mutedLine2.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[2] ]);
+      assert.equal(mutedLine2.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
     });
 
   }); //suite

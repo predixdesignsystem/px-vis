@@ -12,7 +12,6 @@ function runTests(){
   suite('px-vis- threshold is instantiated', function() {
     var baseScale = document.getElementById('baseScale'),
         baseSVG = document.getElementById('baseSVG'),
-        baseLine = document.getElementById('baseLine'),
         defaultThreshold = document.getElementById('defaultThreshold'),
         boxThreshold = document.getElementById('boxThreshold');
 
@@ -33,12 +32,13 @@ function runTests(){
           [1397189940000, 4],
           [1397219100000, 6]
         ]}],
+        seriesConfig = {"0":{"type":"line","name":"mySeries"}},
         dT = [
-          { "for":"mySeries", "type":"max", "value":2 },
+          { "for":"0", "type":"max", "value":2 },
           { "for":"", "type":"mean", "value":8 }
         ],
         dTB = [
-          { "for":"mySeries", "type":"min", "value":4 },
+          { "for":"0", "type":"min", "value":4 },
           { "for":"", "type":"median", "value":6 }
         ];
 
@@ -49,9 +49,8 @@ function runTests(){
       baseScale.set('width',w);
       baseScale.set('height',h);
       baseScale.set('margin',m);
+      baseScale.set('seriesConfig',seriesConfig);
       baseScale.set('chartData',d);
-
-      baseLine.set('chartData',d[0]);
 
       defaultThreshold.set('chartData',dT);
       boxThreshold.set('chartData',dTB);
@@ -81,7 +80,7 @@ function runTests(){
       assert.equal(defaultThreshold.thresholdGroup.node().tagName,'g');
     });
     test('defaultThreshold thresholdGroup created', function() {
-      assert.equal(defaultThreshold.thresholdGroup[0][0].getAttribute('threshold-id'),'mySeries0');
+      assert.equal(defaultThreshold.thresholdGroup[0][0].getAttribute('threshold-id'),'0');
     });
 
     test('defaultThreshold thresholdLine created', function() {
@@ -162,7 +161,7 @@ function runTests(){
     });
 
     test('defaultThreshold thresholdGroup created', function() {
-      assert.equal(defaultThreshold.thresholdGroup[0][1].getAttribute('threshold-id'),'1');
+      assert.equal(defaultThreshold.thresholdGroup[0][1].getAttribute('threshold-id'),'');
     });
 
     test('defaultThreshold thresholdLine created', function() {

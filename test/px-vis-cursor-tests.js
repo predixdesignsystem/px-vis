@@ -10,6 +10,7 @@ function runTests(){
   });
   suite('px-vis-cursor setup SVG', function() {
     var baseSVG = document.getElementById('baseSVG');
+    var baseScale = document.getElementById('baseScale');
 
     suiteSetup(function(){
       var w = 500,
@@ -19,7 +20,22 @@ function runTests(){
           "right": 5,
           "bottom": 20,
           "left": 15
-        };
+        },
+        seriesConfig = {
+          "0":{
+            "type":"line",
+            "name":"mySeries1"
+            },
+            "1":{
+              "type":"line",
+              "name":"mySeries2"
+            }
+          };
+
+      baseScale.set('width',w);
+      baseScale.set('height',h);
+      baseScale.set('margin',m);
+      baseScale.set('seriesConfig',seriesConfig);
 
       baseSVG.set('width',w);
       baseSVG.set('height',h);
@@ -66,6 +82,7 @@ function runTests(){
 
 function baseTests(elem,hLine,vLine,circle,hArr,yArr){
   suite('px-vis-cursor ' + elem + ' setup works', function() {
+    var baseScale = document.getElementById('baseScale');
     var cursor = document.getElementById(elem),
         colorOrder = commonColors.properties.seriesColorOrder.value,
         colorSet = commonColors.properties.dataVisColors.value;
@@ -100,6 +117,8 @@ function baseTests(elem,hLine,vLine,circle,hArr,yArr){
           "bottom": 20,
           "left": 15
         };
+
+      baseScale.set('chartData',d);
 
       cursor.set('width',w);
       cursor.set('height',h);
