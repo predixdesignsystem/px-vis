@@ -23,9 +23,9 @@ function runTests(){
           [1397160780000, 10],
           [1397189940000, 4],
           [1397219100000, 6]
-        ],
-        "name":"mySeries"
+        ]
         }],
+        seriesConfig = {"0":{"type":"line","name":"mySeries"}},
         w = 500,
         h = 300,
         m = {
@@ -48,6 +48,7 @@ function runTests(){
       baseScale.set('width',w);
       baseScale.set('height',h);
       baseScale.set('margin',m);
+      baseScale.set('seriesConfig',seriesConfig);
       baseScale.set('chartData',d);
 
       baseIS.set('margin',m);
@@ -98,7 +99,7 @@ function runTests(){
       assert.equal(ttObj.data.yArr, null);
     });
     test('event data series.name', function() {
-      assert.equal(ttObj.data.series[0]['name'], 'mySeries');
+      assert.equal(ttObj.data.series[0]['name'], '0');
     });
     test('event data series.value', function() {
       assert.equal(JSON.stringify(ttObj.data.series[0]['value']), 'null');
@@ -228,7 +229,7 @@ function runTests(){
       assert.equal(ttObj.data.yArr, null);
     });
     test('event data series.name', function() {
-      assert.equal(ttObj.data.series[0]['name'], 'mySeries');
+      assert.equal(ttObj.data.series[0]['name'], '0');
     });
     test('event data series.value', function() {
       assert.equal(JSON.stringify(ttObj.data.series[0]['value']), 'null');

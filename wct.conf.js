@@ -42,7 +42,7 @@ module.exports = {
     'test/px-vis-interaction-space-fixture.html',
     'test/px-vis-zoom-fixture.html',
     'test/px-vis-cursor-fixture.html',
-    'test/px-vis-tooltip-fixture.html',
+    // 'test/px-vis-tooltip-fixture.html',
     'test/px-vis-brush-fixture.html'
   ]
 };

@@ -23,9 +23,9 @@ function runTests(){
           [1397160780000, 10],
           [1397189940000, 4],
           [1397219100000, 6]
-        ],
-        "name":"mySeries"
+        ]
         }],
+        seriesConfig = {"0":{"type":"line","name":"mySeries"}},
         w = 500,
         h = 300,
         m = {
@@ -42,6 +42,7 @@ function runTests(){
       baseScale.set('width',w);
       baseScale.set('height',h);
       baseScale.set('margin',m);
+      baseScale.set('seriesConfig',seriesConfig);
       baseScale.set('chartData',d);
 
       baseBrush.set('height',h);
