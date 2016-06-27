@@ -355,33 +355,39 @@ function basicTests(registerID,dir){
 }
 
 function generateEmptyData(num,str){
+  var colorOrder = commonColors.properties.seriesColorOrder.value;
+  var colorSet = commonColors.properties.dataVisColors.value;
   var str = str || 'series_';
   var chartData = [];
   var dataObj = {
     'time': null,
     'series': []
   };
+  var seriesConfig = {}
   for(var i = 0; i < num; i++){
     var name = str + i;
     dataObj.series.push({'name':name,'value': null,'seriesNumber': i });
+    seriesConfig[i]['name'] = name;
+    seriesConfig[i]['color'] = colorSet[colorOrder[i]];
   }
 
-  return dataObj;
+  return { 'data':dataObj,'seriesConfig':seriesConfig };
 }
 
 function generateDataValues(data){
-  data.time = new Date('Sat Dec 20 2014 00:37:47 GMT-0800 (PST)');
+  data.data.time = new Date('Sat Dec 20 2014 00:37:47 GMT-0800 (PST)');
 
-  for(var i = 0; i < data.series.length; i++){
-    data.series[i]['value'] = [ +data.time ,1015.2];
+  for(var i = 0; i < data.data.series.length; i++){
+    data.data.series[i]['value'] = [ +data.data.time ,1015.2];
   }
   return data;
 }
 
 function setData(series, data, done){
   series.set('tooltipData',{});
-  series.set('tooltipData',data);
-  series.set('chartData',data.series);
+  series.set('seriesConfig',data.seriesConfig);
+  series.set('tooltipData',data.data);
+  series.set('chartData',data.data.series);
 
   // pause and let the dom repeate chug away
   setTimeout(function(){
