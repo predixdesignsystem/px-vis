@@ -30,7 +30,7 @@ module.exports = {
   suites: [
     'test/px-vis-svg-fixture.html',
     'test/px-vis-scale-fixture.html',
-    // 'test/px-vis-register-fixture.html',
+    'test/px-vis-register-fixture.html',
     'test/px-vis-line-fixture.html',
     'test/px-vis-scatter-fixture.html',
     'test/px-vis-event-fixture.html',
@@ -42,7 +42,7 @@ module.exports = {
     'test/px-vis-interaction-space-fixture.html',
     'test/px-vis-zoom-fixture.html',
     'test/px-vis-cursor-fixture.html',
-    // 'test/px-vis-tooltip-fixture.html',
+    'test/px-vis-tooltip-fixture.html',
     'test/px-vis-brush-fixture.html'
   ]
 };
