@@ -172,6 +172,63 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
     },
 
     /**
+     *
+     * Find the min and max values in data, for X and/or Y axis
+     *
+     */
+    _findMinMax: function(data, doX, doY, result) {
+
+      //find x and y min and max
+      data.forEach(function(data, index) {
+        data['series'].forEach(function(value, jindex) {
+
+          //make sure we're dealing with numbers
+          xTemp = (typeof(value[0]) === 'string') ? parseFloat(value[0]) : value[0];
+          yTemp = (typeof(value[1]) === 'string') ? parseFloat(value[1]) : value[1];
+
+          if(doX === true) {
+            result.x[0] = Math.min(result.x[0], value[0]);
+            result.x[1] = Math.max(result.x[1], value[0]);
+          }
+          if(doY === true) {
+            result.y[0] = Math.min(result.y[0], value[1]);
+            result.y[1] = Math.max(result.y[1], value[1]);
+          }
+        });
+      });
+
+      return result;
+    },
+    /**
+     *
+     * Find all ordinal values, for X and/or Y axis
+     *
+     */
+    _findOrdinalValues: function(data, doX, doY, result) {
+
+      //make sure we're empty
+      if(doX) {
+        result.x = [];
+      }
+      if(doY) {
+        result.y = [];
+      }
+
+      data.forEach(function(data, index) {
+        data['series'].forEach(function(value, jindex) {
+          if(doX && result.x.indexOf(value[0]) === -1) {
+            result.x.push(value[0]);
+          }
+          if(doY && result.y.indexOf(value[1]) === -1) {
+            result.y.push(value[1]);
+          }
+        });
+      });
+
+      return result;
+    },
+
+    /**
      * Calculates and Sets the x and y domain after data loads
      *
      * https://github.com/mbostock/d3/wiki/API-Reference
@@ -209,36 +266,44 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
             "x": [Infinity,-Infinity],
             "y": [0,0]
           };
-        //first, assume the dataset is sorted by x and save us some assignments.
-        exts.x[0] = this.chartData[0]['series'][0][0];
-        exts.x[1] = this.chartData[0]['series'][this.chartData[0]['series'].length - 1][0];
-        // go through each series
-        // TODO Can we make this async?
-        for(i = 0; i < iM; i++){
-          var jM = this.chartData[i]['series'].length;
-          for(j = 0; j < jM; j++){
-            //  check that our numbers are numbers
-            xTemp = (typeof(this.chartData[i]['series'][j][0]) === 'string') ? parseFloat(this.chartData[i]['series'][j][0]) : this.chartData[i]['series'][j][0]
-            yTemp = (typeof(this.chartData[i]['series'][j][1]) === 'string') ? parseFloat(this.chartData[i]['series'][j][1]) : this.chartData[i]['series'][j][1]
 
-            if(exts.x[0] > xTemp){
-              exts.x[0] = xTemp;
-            }
-            if(exts.x[1] < xTemp){
-              exts.x[1] = xTemp;
-            }
-            if(exts.y[0] > yTemp){
-              exts.y[0] = yTemp;
-            }
-            if(exts.y[1] < yTemp){
-              exts.y[1] = yTemp;
-            }
+        //if we have the same scales
+        if(this.xScale === this.yScale) {
+          if(this.xScale === 'ordinal') {
+            //get all ordinal values
+            this._findOrdinalValues(this.chartData, true, true, exts);
+          } else {
+            //find both X and Y min and max
+            this._findMinMax(this.chartData, true, true, exts);
+          }
+        } else {
+          //deal with each scale individually
+          //X
+          if(this.xScale === 'time') {
+            //the dataset is sorted by x
+            exts.x[0] = this.chartData[0]['series'][0][0];
+            exts.x[1] = this.chartData[0]['series'][this.chartData[0]['series'].length - 1][0];
+          } else if(this.xScale === 'ordinal') {
+            //add every value
+            this._findOrdinalValues(this.chartData, true, false, exts);
+          } else {
+            //find X min max
+            this._findMinMax(this.chartData, true, false, exts);
+          }
+
+          //Y
+          if(this.YScale === 'ordinal') {
+            //add every value
+            this._findOrdinalValues(this.chartData, false, true, exts);
+          } else {
+            //find X min max
+            this._findMinMax(this.chartData, false, true, exts);
           }
         }
+        
         this.x.domain(exts.x);
         this.y.domain(exts.y);
 
-        // TODO Does currentDomain work if we just change type to ordinal or linear from time?
         // TODO would a bool be better? Flip when run?
         // Set the domains
         this.set('currentDomainX', this.x.domain());
