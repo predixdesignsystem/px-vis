@@ -18,7 +18,7 @@ function runTests(){
 
     test('emptyRegister has default properties', function() {
       assert.equal(emptyRegister.type, 'vertical');
-      assert.equal(Polymer.dom(emptyRegister.root).querySelector('#dateTime').textContent.trim(), '');
+      assert.isNull(Polymer.dom(emptyRegister.root).querySelector('#dateTime'));
     });
 
     test('emptyRegister has no series', function() {
@@ -35,7 +35,7 @@ function runTests(){
     suiteSetup(function(done) {
       data = generateDataValues( generateEmptyData(5) );
       setData(doesItMute, data);
-      setMutedSeries(doesItMute, data.series[1].name, done);
+      setMutedSeries(doesItMute, data.data.series[1].name, done);
     });
 
     test('doesItMute fixture is created', function() {
@@ -46,7 +46,7 @@ function runTests(){
       var ms = doesItMute.mutedSeries;
       var series = Polymer.dom(doesItMute.root).querySelectorAll('.series');
 
-      assert.isTrue(ms[data.series[1].name]);
+      assert.isTrue(ms[data.data.series[1].name]);
       assert.isTrue(series[1].classList.contains('muted'));
     });
 
@@ -163,7 +163,7 @@ function runTests(){
     test('numberFormat formated', function() {
       var series = Polymer.dom(numberFormat.root).querySelectorAll('.seriesData');
 
-      assert.equal(series[0].textContent.trim(),'1015.20000');
+      assert.equal(series[0].textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join(''),'1015.20000');
     });
   });
 
@@ -182,7 +182,57 @@ function runTests(){
     test('numberFormatCulture formated', function() {
       var series = Polymer.dom(numberFormatCulture.root).querySelectorAll('.seriesData');
 
-      assert.equal(series[0].textContent.trim(),'1.015,20');
+      assert.equal(series[0].textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join(''),'1.015,20');
+    });
+  });
+
+  suite('px-vis-register shows both values if x axis is not time based', function() {
+    var register = document.getElementById('nonTime');
+
+    suiteSetup(function(done) {
+      var data = generateDataValues( generateEmptyData(2) );
+      setData(register, data,done);
+    });
+
+    test('nonTime fixtures are created', function() {
+      assert.isTrue(register !== null);
+    });
+
+    test('nonTime doesnt show date', function() {
+      assert.isNull(Polymer.dom(register.root).querySelector('#dateTime'));
+    });
+
+    test('nonTime formated', function() {
+      var series = Polymer.dom(register.root).querySelectorAll('.seriesData'),
+          texts = series[0].textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join('').split('/');
+
+      assert.equal(texts[0].trim(),'1,419,064,667,000.00');
+      assert.equal(texts[1].trim(),'1,015.20');
+    });
+  });
+
+  suite('px-vis-register non time based by default', function() {
+    var register = document.getElementById('nonTimeDefault');
+
+    suiteSetup(function(done) {
+      var data = generateDataValues( generateEmptyData(2) );
+      setData(register, data,done);
+    });
+
+    test('nonTime fixtures are created', function() {
+      assert.isTrue(register !== null);
+    });
+
+    test('nonTime doesnt show date', function() {
+      assert.isNull(Polymer.dom(register.root).querySelector('#dateTime'));
+    });
+
+    test('nonTime formated', function() {
+      var series = Polymer.dom(register.root).querySelectorAll('.seriesData'),
+          texts = series[0].textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join('').split('/');
+
+      assert.equal(texts[0].trim(),'1,419,064,667,000.00');
+      assert.equal(texts[1].trim(),'1,015.20');
     });
   });
 }
@@ -213,7 +263,7 @@ function basicTests(registerID,dir){
     test(registerID + ' names match', function() {
       var series = Polymer.dom(register.root).querySelectorAll('.seriesName');
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].firstChild.textContent.trim(), data.series[i]['name']);
+        assert.equal(series[i].firstChild.textContent.trim(), data.seriesConfig[i]['name']);
       }
     });
 
@@ -247,7 +297,7 @@ function basicTests(registerID,dir){
     test(registerID + ' still names match', function() {
       var series = Polymer.dom(register.root).querySelectorAll('.seriesName');
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].firstChild.textContent.trim(), data.series[i]['name']);
+        assert.equal(series[i].firstChild.textContent.trim(), data.seriesConfig[i]['name']);
       }
     });
 
@@ -278,7 +328,7 @@ function basicTests(registerID,dir){
     test(registerID + ' still names match', function() {
       var series = Polymer.dom(register.root).querySelectorAll('.seriesName');
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].firstChild.textContent.trim(), data.series[i]['name']);
+        assert.equal(series[i].firstChild.textContent.trim(), data.seriesConfig[i]['name']);
       }
     });
 
@@ -310,8 +360,8 @@ function basicTests(registerID,dir){
 
       var ms = Object.keys(register.mutedSeries);
       assert.equal(ms.length, 1);
-      assert.equal(ms[0], seriesName.getAttribute('name'));
-      assert.equal(ms[0], data.series[1]['name']);
+      assert.equal(ms[0], seriesName.getAttribute('name').substr(1));
+      assert.equal(ms[0], Object.keys(register.seriesConfig)[1]);
       assert.equal(register.mutedSeries[ms[0]], true);
       assert.isTrue(series.classList.contains('muted'));
     });
@@ -322,8 +372,8 @@ function basicTests(registerID,dir){
     test(registerID + ' muted-series-updated method is set', function() {
       assert.equal(eventObj.method, 'set');
     });
-    test(registerID + ' muted-series-updated dataVar is mutedSeries.series_1', function() {
-      assert.equal(eventObj.dataVar, 'mutedSeries.series_1');
+    test(registerID + ' muted-series-updated dataVar is mutedSeries.1', function() {
+      assert.equal(eventObj.dataVar, 'mutedSeries.1');
     });
     test(registerID + ' muted-series-updated data is true', function() {
       assert.equal(eventObj.data, true);
@@ -334,8 +384,8 @@ function basicTests(registerID,dir){
 
       var ms = Object.keys(register.mutedSeries);
       assert.equal(ms.length, 1);
-      assert.equal(ms[0], seriesName.getAttribute('name'));
-      assert.equal(ms[0], data.series[1]['name']);
+      assert.equal(ms[0], seriesName.getAttribute('name').substr(1));
+      assert.equal(ms[0], Object.keys(register.seriesConfig)[1]);
       assert.equal(register.mutedSeries[ms[0]], false);
       assert.isTrue(!series.classList.contains('muted'));
     });
@@ -345,8 +395,8 @@ function basicTests(registerID,dir){
 
       var ms = Object.keys(register.mutedSeries);
       assert.equal(ms.length, 1);
-      assert.equal(ms[0], seriesName.getAttribute('name'));
-      assert.equal(ms[0], data.series[1]['name']);
+      assert.equal(ms[0], seriesName.getAttribute('name').substr(1));
+      assert.equal(ms[0], Object.keys(register.seriesConfig)[1]);
       assert.equal(register.mutedSeries[ms[0]], true);
       assert.isTrue(series.classList.contains('muted'));
     });
@@ -363,10 +413,11 @@ function generateEmptyData(num,str){
     'time': null,
     'series': []
   };
-  var seriesConfig = {}
+  var seriesConfig = {};
   for(var i = 0; i < num; i++){
+    seriesConfig[i] = {};
     var name = str + i;
-    dataObj.series.push({'name':name,'value': null,'seriesNumber': i });
+    dataObj.series.push({'name':i,'value': null,'seriesNumber': i });
     seriesConfig[i]['name'] = name;
     seriesConfig[i]['color'] = colorSet[colorOrder[i]];
   }

@@ -108,15 +108,25 @@ function runTests(){
       var d = {
         'time': null,
         'series': [
-          {'name':'mySeries1','coord': null },
-          {'name':'mySeries2','coord': null },
+          {'name':0,'coord': null },
+          {'name':1,'coord': null },
         ],
         'mouse': null,
         'xArr': null,
         'yArr': null
       };
-
+debugger
       baseTooltip.set('tooltipData',d);
+      baseTooltip.set('seriesConfig', {
+        "0":{
+          name:'mySeries1',
+          color: 'red'
+        },
+        "1":{
+          name:'mySeries2',
+          color: 'red'
+        }}
+      );
       // setTimeout(function(){ done(); },1000);
       done();
     });
