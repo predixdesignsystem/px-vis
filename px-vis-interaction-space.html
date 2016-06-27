@@ -54,6 +54,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehavior.extentsData,
       PxVisBehavior.commonMethods,
       PxVisBehaviorD3.interaction,
+      PxVisBehavior.axisTypes,
       commonColors
     ],
     /***EVENTS****
@@ -105,16 +106,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       selectionType: {
         type: String,
         value: 'rectangle'
-      },
-      /**
-       * Whether the X axis data is time, as opposed to linear/ordinal
-       *
-       */
-      xAxisTime: {
-        type: Boolean,
-        value: false
-      },
-
+      }
     },
 
     observers: [
@@ -150,25 +142,24 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         this.fire('px-vis-interaction-svg-updated', { 'dataVar': 'interactionSvg', 'data': this.interactionSvg, 'method':'set' });
 
 
-          // append the rectangle to capture mouse interactions
-          this._rect = this.interactionSvg.append("rect")
-            .attr('id',"mouseCapture")
-            .attr("width", this.width - this.margin.left - this.margin.right)
-            .attr("height", this.height - this.margin.bottom - this.margin.top)
-            .attr("fill", "none")
-            .attr("pointer-events", "all")
-            .on("mouseover", this._mouseOver.bind(this))
-            .on("mouseout.tooltip", this._resetTooltipData.bind(this))
-            .on("mousemove.tooltip",this._calcTooltipData.bind(this))
-            .on("mousedown.action", this._drawActionBox.bind(this))
-            .on("mousemove.action", this._updateActionBox.bind(this))
-            .on("mouseup.action", this._finishActionBox.bind(this))
-            .style("cursor","crosshair");
-        
+        // append the rectangle to capture mouse interactions
+        this._rect = this.interactionSvg.append("rect")
+          .attr('id',"mouseCapture")
+          .attr("width", this.width - this.margin.left - this.margin.right)
+          .attr("height", this.height - this.margin.bottom - this.margin.top)
+          .attr("fill", "none")
+          .attr("pointer-events", "all")
+          .on("mouseout.tooltip", this._resetTooltipData.bind(this))
+          .on("mousemove.tooltip",this._calcTooltipData.bind(this))
+          .on("mousedown.action", this._drawActionBox.bind(this))
+          .on("mousemove.action", this._updateActionBox.bind(this))
+          .on("mouseup.action", this._finishActionBox.bind(this))
+          .style("cursor","crosshair");
 
-          // TODO touchevents
-          // TODO if there is no register tooltip or cursor, set .tooltip listeners to null
-          // TODO if there is no zoom or action panel, set action listeners to null
+
+        // TODO touchevents
+        // TODO if there is no register tooltip or cursor, set .tooltip listeners to null
+        // TODO if there is no zoom or action panel, set action listeners to null
 
         // send the register etc an empty list of series
         this._resetTooltipData();
@@ -180,7 +171,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      *
      * @method _clearTooltip
      */
-    _mouseOver:function() {
+    _mouseOOver:function() {
       // trigger mouseover
     },
 
@@ -244,8 +235,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             keys = Object.keys(this.seriesConfig),
             len  = keys.length,
             d,
-            x1 = this.x.invert(mousePos[0]),
-            y1 = this.y.invert(mousePos[1]),
+            x1 = this.xAxisType !== 'ordinal' ? this.x.invert(mousePos[0]) : null,
+            y1 = this.yAxisType !== 'ordinal' ? this.y.invert(mousePos[1]) : null,
             x2,
             y2;
 
@@ -263,8 +254,43 @@ TODO implement a dev setting to choose between only showing data at that x, snap
               minDist = Number.MAX_VALUE;
               result = [];
 
+
+              //ordinal are specials...
+              if(this.xAxisType === 'ordinal') {
+                //find ordinal value for X
+                result[0] = this._getOrdinalValue(true, mousePos[0]);
+
+                //now get Y
+                if(this.yAxisType === 'ordinal') {
+                  result[1] = this._getOrdinalValue(false, mousePos[1]);
+                } else {
+                  result[1] = this._getClosestValue(false, y1, this.chartData[i]);
+                }
+              } else if(this.yAxisType === 'ordinal') {
+
+                result[1] = this._getOrdinalValue(false, mousePos[1]);
+                //now get X
+                if(this.yAxisType === 'ordinal') {
+                  result[0] = this._getOrdinalValue(true, mousePos[0]);
+                } else {
+                  result[0] = this._getClosestValue(true, x1, this.chartData[i]);
+                }
+              }
               //find closest point....
-              if(!this.xAxisTime) {
+              else if(this.xAxisType === 'time') {
+                //time based X axis
+                /*
+                  d3.bisector returns index in our array that corresponds to the horizontal position of the mouse pointer.
+                  Specifically this returns the date that falls to the left of the mouse cursor.
+                */
+                var bisectDate = d3.bisector(function(d) { return d[0]; }).left,
+                    index = bisectDate(this.chartData[i].series, x1, 1);
+                // get the data values around the index
+                d0 = this.chartData[i].series[index - 1];
+                d1 = (this.chartData[i].series[index]) ? this.chartData[i].series[index] : this.chartData[i].series[index - 1];
+                // sets result as the closest date to the mouse
+                result = (x1 - d0[0] > d1[0] - x1) ? d1 : d0;
+              } else {
                 //non time based: iterate over points and find the closest
                 for(var j = 0; j < this.chartData[i].series.length; j++) {
 
@@ -280,22 +306,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                     minDist = d;
                     result = this.chartData[i].series[j];
                   }
-                }
-              } else {
-                //time based X axis
-                /*
-                  d3.bisector returns index in our array that corresponds to the horizontal position of the mouse pointer.
-                  Specifically this returns the date that falls to the left of the mouse cursor.
-                */
-                var bisectDate = d3.bisector(function(d) { return d[0]; }).left,
-                    index = bisectDate(this.chartData[i].series, x1, 1);
-                // get the data values around the index
-                d0 = this.chartData[i].series[index - 1];
-                d1 = (this.chartData[i].series[index]) ? this.chartData[i].series[index] : this.chartData[i].series[index - 1];
-                // sets result as the closest date to the mouse
-                result = (x1 - d0[0] > d1[0] - x1) ? d1 : d0;
               }
 
+              }
               // get the pixel coords for that data
               xCoord = this.x(result[0]);
               yCoord = this.y(result[1]);
@@ -314,22 +327,40 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
       },1);
     },
-
     /**
-     * Sorts the series data from smaller to bigger
+     * Tries to find the ordinal value for the mouse position on the X (xAxis=true)
+     * or Y (xAxis=false) axis. If searching on X axis mousePos must be the X value,
+     * Y value if searching on the Y axis
+     *
      */
-    _getSortedSeriesData: function() {
-
-      var result = [],
-          len = this.chartData.length;
-
-      for(var i = 0; i < len; i++) {
-
-        //sort based on X, from smaller to bigger
-        result[i] = this.chartData[i].series.sort(function(a, b) {
-          return a[0]-b[0];
-        });
+    _getOrdinalValue: function(xAxis, mousePos) {
+      if(xAxis === true) {
+        return this.x.domain()[Math.max(d3.bisect(this.x.range(), mousePos) - 1, 0)];
+      } else {
+        return this.y.domain()[Math.max(d3.bisect(this.y.range(), mousePos) - 1, 0)];
       }
+    },
+    /**
+     * Gets the closest value on the X (xAxis=true) or Y axis (xAxis=false)
+     *
+     *
+     */
+    _getClosestValue: function(xAxis, value, data) {
+      var dataIndex = xAxis ? 0 : 1,
+          minDiff = Number.MAX_VALUE,
+          curr,
+          currDiff,
+          result;
+
+      data.series.forEach(function(point, index) {
+        curr = point[dataIndex];
+
+        currDiff = Math.abs(value - curr);
+        if(currDiff < minDiff) {
+          minDiff = currDiff;
+          result = curr;
+        }
+      });
 
       return result;
     },
