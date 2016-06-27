@@ -173,60 +173,95 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
 
     /**
      *
-     * Find the min and max values in data, for X and/or Y axis
+     * Find the min and max values or ordinal values in data, for X and/or Y axis
      *
      */
-    _findMinMax: function(data, doX, doY, result) {
+    _findMinMax: function(data, doX, doY, ordX, ordY, timeX, result, key) {
+      var j,xTemp,yTemp,
+        jLen = data.length,
+        x,y;
+
+      // TODO move 'x' out of each series config and into a chartConfig
+      if(typeof(key) === 'string'){
+        x = this.seriesConfig[key].x
+        y = key;
+      } else if(typeof(key) === 'number'){
+        x = this.seriesConfig[key].x
+        y = 1;
+      } else if(Array.isArray(key)){
+        x = this.seriesConfig[key[0]].x;
+        y = key[0]
+      }
+
+      if(timeX){
+        this._findTimeMM(result,data,jLen,x);
+      }
+      for(j = 0; j < jLen; j++){
+        //make sure we're dealing with numbers
+        xTemp = (typeof(data[j][x]) === 'string') ? parseFloat(data[j][x]) : data[j][x];
+        yTemp = (typeof(data[j][y]) === 'string') ? parseFloat(data[j][y]) : data[j][y];
+
+        if(doX === true) {
+          if(ordX && result.x.indexOf(data[j][x]) === -1) {
+            result.x.push(data[j][x]);
+          } else {
+            this._setMin(result.x,xTemp);
+            this._setMax(result.x,xTemp);
+          }
+        }
+        if(doY === true) {
+          if(ordY && result.y.indexOf(data[j][1]) === -1) {
+            result.y.push(data[j][y]);
+          } else {
+            this._setMin(result.y,yTemp);
+            this._setMax(result.y,yTemp);
+          }
+        }
+      };
+    },
+
+    _findSeriesMinMax(data, doX, doY, ordX, ordY, timeX, result){
+      var i,
+        iLen = data.length;
 
       //find x and y min and max
-      data.forEach(function(data, index) {
-        data['series'].forEach(function(value, jindex) {
-
-          //make sure we're dealing with numbers
-          xTemp = (typeof(value[0]) === 'string') ? parseFloat(value[0]) : value[0];
-          yTemp = (typeof(value[1]) === 'string') ? parseFloat(value[1]) : value[1];
-
-          if(doX === true) {
-            result.x[0] = Math.min(result.x[0], value[0]);
-            result.x[1] = Math.max(result.x[1], value[0]);
-          }
-          if(doY === true) {
-            result.y[0] = Math.min(result.y[0], value[1]);
-            result.y[1] = Math.max(result.y[1], value[1]);
-          }
-        });
-      });
-
-      return result;
-    },
-    /**
-     *
-     * Find all ordinal values, for X and/or Y axis
-     *
-     */
-    _findOrdinalValues: function(data, doX, doY, result) {
-
-      //make sure we're empty
-      if(doX) {
-        result.x = [];
+      for(i = 0; i < iLen; i++){
+        this._findMinMax(data[i]["series"], doX, doY, ordX, ordY, timeX, result,i)
       }
-      if(doY) {
-        result.y = [];
-      }
-
-      data.forEach(function(data, index) {
-        data['series'].forEach(function(value, jindex) {
-          if(doX && result.x.indexOf(value[0]) === -1) {
-            result.x.push(value[0]);
-          }
-          if(doY && result.y.indexOf(value[1]) === -1) {
-            result.y.push(value[1]);
-          }
-        });
-      });
-
-      return result;
     },
+
+    _findTimeMM: function(result,d,l,x){
+      console.log(d);
+      this._setMin(result.x,d[0][x]);
+      this._setMax(result.x,d[l-1][x]);
+    },
+
+    _setMin: function(r,d){
+      if(r[0] > d) {
+        r[0] = d;
+      }
+    },
+    _setMax: function(r,d){
+      if(r[1] < d) {
+        r[1] = d;
+      }
+    },
+
+    // _findDataStructure:function(data){
+    //   var type;
+    //   if(Array.isArray(data[0])){
+    //     console.log('type 1');
+    //     type = 1;
+    //   } else {
+    //     if(!data[0]['series']){
+    //       console.log('type 2');
+    //       type = 2
+    //     } else {
+    //       this._findDataStructure(data[0]['series']);
+    //     }
+    //   }
+    // },
+
 
     /**
      * Calculates and Sets the x and y domain after data loads
@@ -259,48 +294,28 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
           this._completeExistingSeriesConfig();
         }
 
+        var exts = {
+          "x": null,
+          "y": null
+          },
+          xOrd = this.xScale === 'ordinal',
+          yOrd = this.yScale === 'ordinal',
+          xTime = this.xScale === 'time',
+          doX = xTime ? false : true,
+          doY = true;
+        // check if seriesConfig has max and min.
+
+        // if not:
+        exts.x = xOrd ? [] : this.defaultSeriesConfig.xExt;
+        exts.y = yOrd ? [] : this.defaultSeriesConfig.yExt;
+
         //Chug through the data to max and min
-        var i,j,xTemp,yTemp
-          iM = this.chartData.length,
-          exts = {
-            "x": [Infinity,-Infinity],
-            "y": [0,0]
-          };
-
-        //if we have the same scales
-        if(this.xScale === this.yScale) {
-          if(this.xScale === 'ordinal') {
-            //get all ordinal values
-            this._findOrdinalValues(this.chartData, true, true, exts);
-          } else {
-            //find both X and Y min and max
-            this._findMinMax(this.chartData, true, true, exts);
-          }
+        if(this.chartData[0]['series']){
+          this._findSeriesMinMax(this.chartData, doX, doY, xOrd, yOrd, xTime, exts)
         } else {
-          //deal with each scale individually
-          //X
-          if(this.xScale === 'time') {
-            //the dataset is sorted by x
-            exts.x[0] = this.chartData[0]['series'][0][0];
-            exts.x[1] = this.chartData[0]['series'][this.chartData[0]['series'].length - 1][0];
-          } else if(this.xScale === 'ordinal') {
-            //add every value
-            this._findOrdinalValues(this.chartData, true, false, exts);
-          } else {
-            //find X min max
-            this._findMinMax(this.chartData, true, false, exts);
-          }
-
-          //Y
-          if(this.YScale === 'ordinal') {
-            //add every value
-            this._findOrdinalValues(this.chartData, false, true, exts);
-          } else {
-            //find X min max
-            this._findMinMax(this.chartData, false, true, exts);
-          }
+          this._findMinMax(this.chartData[0], doX, doY, xOrd, yOrd, xTime, exts, Object.keys(this.seriesConfig));
         }
-        
+        console.log(exts);
         this.x.domain(exts.x);
         this.y.domain(exts.y);
 
