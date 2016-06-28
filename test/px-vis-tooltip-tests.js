@@ -115,7 +115,7 @@ function runTests(){
         'xArr': null,
         'yArr': null
       };
-debugger
+
       baseTooltip.set('tooltipData',d);
       baseTooltip.set('seriesConfig', {
         "0":{

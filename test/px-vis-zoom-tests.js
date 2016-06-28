@@ -106,12 +106,13 @@ function runTests(){
         eventObj = evt.detail;
       });
 
-      var e = new MouseEvent('click');
+      //can't use new MouseEvent cause IE
+      var e = document.createEvent("MouseEvent");
+      e.initMouseEvent("click",true,true,window,0,0,0,0,0,false,false,false,false,0,null);
       baseZoom.$.resetBtn.dispatchEvent(e);
 
       // give event time to process and fire
       setTimeout(function(){ done(); },100);
-      // done();
     });
 
     test('event fired', function() {

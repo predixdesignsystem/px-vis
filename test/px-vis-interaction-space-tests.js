@@ -191,15 +191,16 @@ function runTests(){
   suite('px-vis-interaction-space baseIS mouseoff event', function() {
     var baseIS = document.getElementById('baseIS');
     var ttObj;
+
     suiteSetup(function(done){
       document.addEventListener('px-vis-tooltip-updated',function(evt){
         ttObj = evt.detail;
       });
 
-      var e = new MouseEvent('mouseout',{
-        "clientX": 250,
-        "clientY": 100
-      });
+      //can't use new MouseEvent cause IE
+      var e = document.createEvent("MouseEvent");
+      e.initMouseEvent("mouseout",true,true,window,0,0,0,250,100,false,false,false,false,0,null);
+
       baseIS._rect.node().dispatchEvent(e);
 
       // give event time to process and fire

@@ -188,10 +188,8 @@ function runTests(){
       var rect = baseBrush._brushGroup.select('rect.background').node(),
           box = rect.getBoundingClientRect();
 
-      var e = new MouseEvent('mousedown',{
-        "clientX": box.left,
-        "clientY": box.top + box.height/2,
-      });
+      var e = document.createEvent("MouseEvent");
+      e.initMouseEvent("mousedown",true,true,window,0,0,0,box.left,box.top + box.height/2,false,false,false,false,0,null);
 
       rect.dispatchEvent(e);
 
@@ -240,15 +238,16 @@ function runTests(){
     suiteSetup(function(done){
       var box = baseBrush._handleGroup.node().getBoundingClientRect();
 
-      var e = new MouseEvent('mouseenter');
+      var e = document.createEvent("MouseEvent");
+      e.initMouseEvent("mouseenter",true,true,window,0,0,0,0,0,false,false,false,false,0,null);
       // For stupid MS Edge
-      var e2 = new MouseEvent('mouseover');
+      var e2 = document.createEvent("MouseEvent");
+      e2.initMouseEvent("mouseover",true,true,window,0,0,0,0,0,false,false,false,false,0,null);
 
       baseBrush._handleGroup.node().dispatchEvent(e);
       baseBrush._handleGroup.node().dispatchEvent(e2);
 
       setTimeout(function(){done()},10);
-      // done();
     });
 
     test('baseBrush._handleGroup rect stroke changes', function() {
@@ -269,9 +268,11 @@ function runTests(){
     suiteSetup(function(done){
       var box = baseBrush._handleGroup.node().getBoundingClientRect();
 
-      var e = new MouseEvent('mouseleave');
-      //for stupid MS Edge
-      var e2 = new MouseEvent('mouseout');
+      var e = document.createEvent("MouseEvent");
+      e.initMouseEvent("mouseleave",true,true,window,0,0,0,0,0,false,false,false,false,0,null);
+      // For stupid MS Edge
+      var e2 = document.createEvent("MouseEvent");
+      e2.initMouseEvent("mouseout",true,true,window,0,0,0,0,0,false,false,false,false,0,null);
 
       baseBrush._handleGroup.node().dispatchEvent(e);
       baseBrush._handleGroup.node().dispatchEvent(e2);
@@ -297,14 +298,11 @@ function runTests(){
     suiteSetup(function(done){
       var box = baseBrush._handleGroup.node().getBoundingClientRect();
 
-      var e = new MouseEvent('mouseenter',{
-        "clientX": box.left + box.width/2,
-        "clientY": box.top + box.height/2,
-      });
-      var e2 = new MouseEvent('mousedown',{
-        "clientX": box.left + box.width/2,
-        "clientY": box.top + box.height/2,
-      });
+      var e = document.createEvent("MouseEvent");
+      e.initMouseEvent("mouseenter",true,true,window,0,0,0,box.left + box.width/2,box.top + box.height/2,false,false,false,false,0,null);
+      // For stupid MS Edge
+      var e2 = document.createEvent("MouseEvent");
+      e2.initMouseEvent("mousedown",true,true,window,0,0,0,box.left + box.width/2,box.top + box.height/2,false,false,false,false,0,null);
 
       baseBrush._handleGroup.node().dispatchEvent(e);
 
