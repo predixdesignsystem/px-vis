@@ -44,7 +44,7 @@ Element which draws lines series onto the chart
       PxVisBehavior.mutedSeries,
       PxVisBehavior.commonMethods,
       PxVisBehaviorD3.clipPath,
-      PxVisBehavior.seriesConfig,
+      PxVisBehavior.completeSeriesConfig,
       commonColors
     ],
 
@@ -121,12 +121,12 @@ Element which draws lines series onto the chart
           var data = [this.chartData[this.seriesId].series],
               y = 1;
         } else {
-          var data = this.chartData,
+          var data = [this.chartData],
               y = this.seriesId;
         }
 
         var line = d3.svg.line()
-          .x(function(d) { return this.x(d[this.seriesConfig[this.seriesId]['x']]); }.bind(this))
+          .x(function(d) { return this.x(d[this.completeSeriesConfig[this.seriesId]['x']]); }.bind(this))
           .y(function(d) { return this.y(d[y]); }.bind(this));
 
         // checks to see if the group already exists. If not, create; if so, update
@@ -187,7 +187,7 @@ Element which draws lines series onto the chart
      * @method _colorLine
      */
     _colorLine:function(){
-      this.linePath.attr('stroke',this.seriesConfig[this.seriesId]['color'])
+      this.linePath.attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
         .attr('stroke-opacity',1);
     },
     /**
@@ -197,7 +197,7 @@ Element which draws lines series onto the chart
      TODO add dev set color and opacity
      */
      _muteLine:function(){
-       this.linePath.attr('stroke',this.seriesConfig[this.seriesId]['color'])
+       this.linePath.attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
          .attr('stroke-opacity',0.3);
      },
   });

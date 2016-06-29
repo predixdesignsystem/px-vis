@@ -55,6 +55,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehavior.commonMethods,
       PxVisBehaviorD3.interaction,
       PxVisBehavior.axisTypes,
+      PxVisBehavior.completeSeriesConfig,
       commonColors
     ],
     /***EVENTS****
@@ -110,7 +111,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     observers: [
-      'drawElement(currentDomainX,currentDomainY,chartData.*,svg,width,height)'
+      'drawElement(currentDomainX,currentDomainY,chartData.*,svg,width,height)',
+      '_resetTooltipData(completeSeriesConfig.*)'
      ],
 
     /**
@@ -162,7 +164,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         // TODO if there is no zoom or action panel, set action listeners to null
 
         // send the register etc an empty list of series
-        this._resetTooltipData();
+        // this._resetTooltipData();
       }  //if we have vars
     },  //drawElement
     /**
@@ -189,7 +191,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             'xArr': null,
             'yArr': null
           },
-          keys = Object.keys(this.seriesConfig),
+          keys = Object.keys(this.completeSeriesConfig),
           len = keys.length,
           i;
 
@@ -226,13 +228,13 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
 
       this.debounce('move',function(){
-
+        // TODO Maybe this should be a option: return all val at x or closets vals at cursor
         // invert: takes position on the screen and converts it into an equivalent date
         var minDist = Number.MAX_VALUE,
             result = [],
             xArr = [],
             yArr = [],
-            keys = Object.keys(this.seriesConfig),
+            keys = Object.keys(this.completeSeriesConfig),
             len  = keys.length,
             d,
             x1 = this.xAxisType !== 'ordinal' ? this.x.invert(mousePos[0]) : null,
@@ -288,10 +290,12 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                 if(this.chartData[i]["series"]){
                   chartData  = this.chartData[i].series;
                 } else {
-                  chartData  = this.chartData[i];
+                  chartData  = this.chartData;
                 }
 
-                var bisectDate = d3.bisector(function(d) { return d[this.seriesConfig[keys[i]]['x']]; }.bind(this)).left,
+                var bisectDate = d3.bisector(function(d) {
+                  return d[this.completeSeriesConfig[keys[i]]['x']];
+                }.bind(this)).left,
                 index = bisectDate(chartData, x1, 1);
                 // get the data values around the index
                 d0 = chartData[index - 1];
@@ -322,7 +326,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                 xCoord = this.x(result[0]);
                 yCoord = this.y(result[1]);
               } else {
-                xCoord = this.x(result[this.seriesConfig[keys[i]]['x']]);
+                xCoord = this.x(result[this.completeSeriesConfig[keys[i]]['x']]);
                 yCoord = this.y(result[keys[i]]);
               }
 

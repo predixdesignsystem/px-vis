@@ -52,10 +52,11 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       PxVisBehavior.sizing,
       PxVisBehaviorD3.axes,
       PxVisBehavior.dataset,
-      PxVisBehavior.seriesConfig,
       PxVisBehavior.commonMethods,
       PxVisBehaviorD3.selectedDomain,
-      commonColors
+      commonColors,
+      PxVisBehavior.seriesConfig,
+      PxVisBehavior.completeSeriesConfig
     ],
 
     /**
@@ -106,8 +107,9 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
     observers: [
       '_setXScale(width,margin)',
       '_setYScale(height,margin)',
-      '_currentDomain(chartData.*,x,y,seriesConfig.*)',
+      '_currentDomain(chartData.*,x,y,completeSeriesConfig)',
       '_updateDomain(selectedDomain)',
+      '_completeExistingSeriesConfig(defaultSeriesConfig.*,chartData.*,seriesConfig.*)'
     ],
 
     /**
@@ -183,13 +185,13 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
 
       // TODO move 'x' out of each series config and into a chartConfig
       if(typeof(key) === 'string'){
-        x = this.seriesConfig[key].x
+        x = this.completeSeriesConfig[key].x
         y = key;
       } else if(typeof(key) === 'number'){
-        x = this.seriesConfig[key].x
+        x = this.completeSeriesConfig[key].x
         y = 1;
       } else if(Array.isArray(key)){
-        x = this.seriesConfig[key[0]].x;
+        x = this.completeSeriesConfig[key[0]].x;
         y = key[0]
       }
 
@@ -226,7 +228,9 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
 
       //find x and y min and max
       for(i = 0; i < iLen; i++){
-        this._findMinMax(data[i]["series"], doX, doY, ordX, ordY, timeX, result,i)
+        if(this.completeSeriesConfig[i]){
+          this._findMinMax(data[i]["series"], doX, doY, ordX, ordY, timeX, result,i)
+        }
       }
     },
 
@@ -246,22 +250,17 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       }
     },
 
-    // _findDataStructure:function(data){
-    //   var type;
-    //   if(Array.isArray(data[0])){
-    //     console.log('type 1');
-    //     type = 1;
-    //   } else {
-    //     if(!data[0]['series']){
-    //       console.log('type 2');
-    //       type = 2
-    //     } else {
-    //       this._findDataStructure(data[0]['series']);
-    //     }
-    //   }
-    // },
+    _calcDefaultExt(min,max,bool){
+      if(bool){
+        return [];
+      }
 
+      var e = [];
+      e[0] = (this.defaultSeriesConfig[min] === 'dynamic') ? Infinity : this.defaultSeriesConfig[min];
+      e[1] = (this.defaultSeriesConfig[max] === 'dynamic') ? -Infinity : this.defaultSeriesConfig[max];
 
+      return e
+    },
     /**
      * Calculates and Sets the x and y domain after data loads
      *
@@ -289,9 +288,9 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         // }
 
         //check seriesConfig
-        if(this._isObjHaveValues(this.seriesConfig)){
-          this._completeExistingSeriesConfig();
-        }
+        // if(this._isObjHaveValues(this.seriesConfig)){
+        //   this._completeExistingSeriesConfig();
+        // }
 
         var exts = {
           "x": null,
@@ -302,19 +301,18 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
           xTime = this.xScale === 'time',
           doX = xTime ? false : true,
           doY = true;
-        // check if seriesConfig has max and min.
+        // TODO check if seriesConfig has max and min.
 
         // if not:
-        exts.x = xOrd ? [] : this.defaultSeriesConfig.xExt;
-        exts.y = yOrd ? [] : this.defaultSeriesConfig.yExt;
+        exts.x = this._calcDefaultExt('xExtMin','xExtMax',xOrd);
+        exts.y = this._calcDefaultExt('yExtMin','yExtMax',yOrd);
 
         //Chug through the data to max and min
         if(this.chartData[0]['series']){
           this._findSeriesMinMax(this.chartData, doX, doY, xOrd, yOrd, xTime, exts)
         } else {
-          this._findMinMax(this.chartData[0], doX, doY, xOrd, yOrd, xTime, exts, Object.keys(this.seriesConfig));
+          this._findMinMax(this.chartData, doX, doY, xOrd, yOrd, xTime, exts, Object.keys(this.completeSeriesConfig));
         }
-        console.log(exts);
         this.x.domain(exts.x);
         this.y.domain(exts.y);
 
@@ -329,34 +327,45 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
     },
 
     _completeExistingSeriesConfig: function(){
-      var k = Object.keys(this.seriesConfig),
-          kLen = k.length,
-          ki;
+      if(this._isObjHaveValues(this.defaultSeriesConfig) && this._isObjHaveValues(this.chartData)){
 
-      for(ki = 0; ki < kLen; ki++){
-        if(!this.seriesConfig[k[ki]]['type']){
-          this.seriesConfig[k[ki]]['type'] = this.defaultSeriesConfig['type'];
-        }
-        if(!this.seriesConfig[k[ki]]['name']){
-          this.seriesConfig[k[ki]]['name'] = k[ki];
-        }
-        if(!this.seriesConfig[k[ki]]['x']){
-          this.seriesConfig[k[ki]]['x'] = this.defaultSeriesConfig['x'];
-        }
-        if(this.seriesConfig[k[ki]]['xExt']){
-          this.push('_extents[0]',this.seriesConfig[k[ki]]['xExt'])
-        }
-        if(this.seriesConfig[k[ki]]['yExt']){
-          this.push('_extents[1]',this.seriesConfig[k[ki]]['yExt'])
-        }
-        if(!this.seriesConfig[k[ki]]['color']){
-          this.seriesConfig[k[ki]]['color'] = this.dataVisColors[this.seriesColorOrder[ki]];
-        }
-        if(this._isObjEmpty(this._extents[0])){
+        var obj = (this.seriesConfig)? this.seriesConfig : {},
+            k = (this.includeAllSeries) ? Object.keys(this.chartData) : Object.keys(obj),
+            kLen = k.length,
+            ki;
 
+        if(k.length === 0){
+          console.warn("No series were added to the chart. Either add them in the seriesConfig or turn on includeAllSeries");
+
+          return;
         }
-        this.notifyPath('seriesConfig',this.seriesConfig);
+
+        for(ki = 0; ki < kLen; ki++){
+          if(!obj[k[ki]]){
+            obj[k[ki]] = {};
+          }
+          if(!obj[k[ki]]['type']){
+            obj[k[ki]]['type'] = this.defaultSeriesConfig['type'];
+          }
+          if(!obj[k[ki]]['name']){
+            obj[k[ki]]['name'] = k[ki];
+          }
+          if(!obj[k[ki]]['x']){
+            obj[k[ki]]['x'] = this.defaultSeriesConfig['x'];
+          }
+          if(obj[k[ki]]['xExt']){
+            this.push('_extents[0]',obj[k[ki]]['xExt'])
+          }
+          if(obj[k[ki]]['yExt']){
+            this.push('_extents[1]',obj[k[ki]]['yExt'])
+          }
+          if(!obj[k[ki]]['color']){
+            obj[k[ki]]['color'] = this.dataVisColors[this.seriesColorOrder[ki]];
+          }
+        }
       }
+      this.set('completeSeriesConfig',obj);
+      this.fire('px-vis-complete-series-config-updated', { 'dataVar': 'completeSeriesConfig', 'data': obj, 'method':'set' });
     },
 
     /**
