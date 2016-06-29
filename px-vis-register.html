@@ -113,7 +113,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
                     <!-- if y axis is number format and show it -->
                     <template is="dom-if" if="{{_isOfType(yAxisType, 'linear')}}">
                       <numbro-element
-                        value="[[_returnVal(item.value, 1)]]"
+                        value="[[_returnVal(item.value, item.name)]]"
                         format="[[numberFormat]]"
                         culture="[[numberFormatCulture]]"
                         currency$="[[numberFormatIsCurrency]]"
@@ -149,6 +149,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
       PxVisBehavior.tooltipData,
       PxVisBehavior.dataset,
       PxVisBehavior.axisTypes,
+      PxVisBehavior.completeSeriesConfig,
       commonColors
     ],
 
@@ -287,8 +288,8 @@ Formatting for the timestamps,the data values, and the series names can be contr
      * @param {i}
      * @return {rgb}
      */
-    _returnItemColor: function(name){
-      return this.seriesConfig[name]['color'];
+    _returnItemColor:function(name){
+      return this.completeSeriesConfig[name]['color'];
     },
     /**
      * Function which takes the incoming datetime from tooltipData and formats it.
@@ -369,11 +370,11 @@ Formatting for the timestamps,the data values, and the series names can be contr
       }
       return baseClasses;
     },
-    _getName: function(name){
-      return this.seriesConfig[name]['name']
+    _getName(name){
+      return this.completeSeriesConfig[name]['name'];
     },
     _returnTruncatedName: function(name){
-      return this._truncateName(this._getName(name),this.truncationLength)
+      return this._truncateName(this._getName(name),this.truncationLength);
     },
     /**
      * dom-if function for series names to decide if it was truncated. If so, add a tooltip showing full name
@@ -389,9 +390,11 @@ Formatting for the timestamps,the data values, and the series names can be contr
       }
       return false;
     },
-    _returnVal: function(val, index, separator){
-      if(val && val[index]){
-        return val[index] + (separator ? separator : '');
+    _returnVal: function(val, key, separator){
+      if(val && val[1]){
+        return val[1] + (separator ? separator : '');
+      } else if(val && val[key]){
+        return val[key] + (separator ? separator : '');
       }
       return null;
     },

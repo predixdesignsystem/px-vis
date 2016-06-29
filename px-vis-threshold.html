@@ -39,7 +39,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
       PxVisBehaviorD3.axes,
       PxVisBehavior.commonMethods,
       PxVisBehavior.dataset,
-      PxVisBehavior.seriesConfig,
+      PxVisBehavior.completeSeriesConfig,
       commonColors
     ],
 
@@ -127,6 +127,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
 
     observers: [
       'drawElement(svg,x,y,currentDomainX,currentDomainY,chartData.*)',
+      '_setColors(completeSeriesConfig.*,thresholdText)',
      ],
 
     ready:function(){
@@ -183,7 +184,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
             return this.thresholdText[0][i].getBBox().width + 5;  //should be 6 but 6 looks too big...
           }.bind(this));
 
-          this._setColors();
+          // this._setColors();
 
         } else {
           this.thresholdLine
@@ -216,7 +217,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
      * @method _getColors
      */
     _getColors: function(d,i){
-      return (d.for) ? this.seriesConfig[d.for]['color'] : this.colors[this.defaultColor];
+      return (d.for && this.completeSeriesConfig[d.for]) ? this.completeSeriesConfig[d.for]['color'] : this.colors[this.defaultColor];
     },
     /**
      * Calculates a y-position for the text and rectangle

@@ -42,7 +42,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         behaviors: [
           PxVisBehaviorD3.svg,
           PxVisBehaviorD3.axis,
-          PxVisBehavior.seriesConfig,
+          PxVisBehavior.completeSeriesConfig,
           PxVisBehavior.commonMethods,
           commonColors
         ],
@@ -170,7 +170,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
         observers: [
           'drawElement(currentDomain,svg,axis,margin)',
-          'drawSeriesBars(seriesConfig.*)',
+          'drawSeriesBars(completeSeriesConfig.*)',
           '_muteSeriesBars(mutedSeries.*)'
         ],
 
@@ -381,13 +381,13 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * @method drawSeriesBars
          */
         drawSeriesBars:function(){
-          if(this._isObjHaveValues(this.seriesConfig) && this._isObjHaveValues(this._axisGroup)){
+          if(this._isObjHaveValues(this.completeSeriesConfig) && this._isObjHaveValues(this._axisGroup)){
             // FIXME do we need to move the title group based on how many series we have
-            var keys = Object.keys(this.seriesConfig),
+            var keys = Object.keys(this.completeSeriesConfig),
                 kLen = keys.length,
                 i;
             for(i = 0; i < kLen; i++){
-              this._drawBar(this._titleGroup,keys[i],this.seriesConfig[keys[i]]['color'],keys[i]);
+              this._drawBar(this._titleGroup,keys[i],this.completeSeriesConfig[keys[i]]['color'],i);
             }
           }
         },

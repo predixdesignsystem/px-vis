@@ -41,6 +41,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
         height="[[height]]"
         margin="[[margin]]"
         series-config="[[seriesConfig]]"
+        complete-series-config="[[completeSeriesConfig]]"
         chart-data="[[chartData]]">
       </px-vis-scale>
       <px-vis-svg
@@ -49,13 +50,13 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
         margin="[[margin]]">
       </px-vis-svg>
 
-      <template is="dom-repeat" items="[[_returnKeys(seriesConfig)]]">
-        <template is="dom-if" if="[[_chartTypeLine(item,seriesConfig)]]">
+      <template is="dom-repeat" items="[[_returnKeys(completeSeriesConfig)]]">
+        <template is="dom-if" if="[[_chartTypeLine(item,completeSeriesConfig)]]">
           <px-vis-line
             svg="[[svg]]"
             series-id="[[item]]"
             chart-data="[[chartData]]"
-            series-config="[[seriesConfig]]"
+            complete-series-config="[[completeSeriesConfig]]"
             x="[[x]]"
             y="[[y]]"
             current-domain-x="[[currentDomainX]]"
@@ -64,12 +65,12 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
             muted-series="[[mutedSeries]]">
           </px-vis-line>
         </template>
-        <template is="dom-if" if="[[_chartTypeScatter(item,seriesConfig)]]">
+        <template is="dom-if" if="[[_chartTypeScatter(item,completeSeriesConfig)]]">
           <px-vis-scatter
             svg="[[svg]]"
             series-id="[[item]]"
             chart-data="[[chartData]]"
-            series-config="[[seriesConfig]]"
+            complete-series-config="[[completeSeriesConfig]]"
             marker-size="2"
             x="[[x]]"
             y="[[y]]"
@@ -117,6 +118,8 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           PxVisBehaviorD3.selectedDomain,
           PxVisBehavior.dataset,
           PxVisBehaviorChart.chartCommon,
+          PxVisBehavior.seriesConfig,
+          PxVisBehavior.completeSeriesConfig,
           commonColors
         ],
 

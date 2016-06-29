@@ -55,6 +55,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehavior.commonMethods,
       PxVisBehaviorD3.interaction,
       PxVisBehavior.axisTypes,
+      PxVisBehavior.completeSeriesConfig,
       commonColors
     ],
     /***EVENTS****
@@ -110,7 +111,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     observers: [
-      'drawElement(currentDomainX,currentDomainY,chartData.*,svg,width,height)'
+      'drawElement(currentDomainX,currentDomainY,chartData.*,svg,width,height)',
+      '_resetTooltipData(completeSeriesConfig.*)'
      ],
 
     /**
@@ -162,7 +164,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         // TODO if there is no zoom or action panel, set action listeners to null
 
         // send the register etc an empty list of series
-        this._resetTooltipData();
+        // this._resetTooltipData();
       }  //if we have vars
     },  //drawElement
     /**
@@ -189,7 +191,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             'xArr': null,
             'yArr': null
           },
-          keys = Object.keys(this.seriesConfig),
+          keys = Object.keys(this.completeSeriesConfig),
           len = keys.length,
           i;
 
@@ -226,23 +228,25 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
 
       this.debounce('move',function(){
-
+        // TODO Maybe this should be a option: return all val at x or closets vals at cursor
         // invert: takes position on the screen and converts it into an equivalent date
         var minDist = Number.MAX_VALUE,
             result = [],
             xArr = [],
             yArr = [],
-            keys = Object.keys(this.seriesConfig),
+            keys = Object.keys(this.completeSeriesConfig),
             len  = keys.length,
             d,
             x1 = this.xAxisType !== 'ordinal' ? this.x.invert(mousePos[0]) : null,
             y1 = this.yAxisType !== 'ordinal' ? this.y.invert(mousePos[1]) : null,
             x2,
-            y2;
+            y2,
+            chartData;
 
             // setup a holder for our data to pass out
             var dataObj = {
-              'time': this.xAxisTime ? x1 : null,
+              // FIXME does this still work with scatter?
+              'time':(this.xAxisType === 'linear') ? x1 : null,
               'series': [],
               'mouse': mousePos,
               'xArr': null,
@@ -277,17 +281,25 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                 }
               }
               //find closest point....
-              else if(this.xAxisType === 'time') {
+              else if(this.xAxisType === 'linear') {
                 //time based X axis
                 /*
                   d3.bisector returns index in our array that corresponds to the horizontal position of the mouse pointer.
                   Specifically this returns the date that falls to the left of the mouse cursor.
                 */
-                var bisectDate = d3.bisector(function(d) { return d[0]; }).left,
-                    index = bisectDate(this.chartData[i].series, x1, 1);
+                if(this.chartData[i]["series"]){
+                  chartData  = this.chartData[i].series;
+                } else {
+                  chartData  = this.chartData;
+                }
+
+                var bisectDate = d3.bisector(function(d) {
+                  return d[this.completeSeriesConfig[keys[i]]['x']];
+                }.bind(this)).left,
+                index = bisectDate(chartData, x1, 1);
                 // get the data values around the index
-                d0 = this.chartData[i].series[index - 1];
-                d1 = (this.chartData[i].series[index]) ? this.chartData[i].series[index] : this.chartData[i].series[index - 1];
+                d0 = chartData[index - 1];
+                d1 = (chartData[index]) ? chartData[index] : chartData[index - 1];
                 // sets result as the closest date to the mouse
                 result = (x1 - d0[0] > d1[0] - x1) ? d1 : d0;
               } else {
@@ -310,13 +322,18 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
               }
               // get the pixel coords for that data
-              xCoord = this.x(result[0]);
-              yCoord = this.y(result[1]);
+              if(Array.isArray(result)){
+                xCoord = this.x(result[0]);
+                yCoord = this.y(result[1]);
+              } else {
+                xCoord = this.x(result[this.completeSeriesConfig[keys[i]]['x']]);
+                yCoord = this.y(result[keys[i]]);
+              }
 
               xArr.push(xCoord);
               yArr.push(yCoord);
 
-              dataObj.series.push({'name':i,'value': result, 'coord': [xCoord,yCoord] });
+              dataObj.series.push({'name':keys[i],'value': result, 'coord': [xCoord,yCoord] });
             } //for
 
 
