@@ -218,7 +218,10 @@ function runTests(){
 
       baseBrush.set('chartDomain',d);
       // setTimeout(function(){done()},5000);
-      done();
+      flush(function() {
+        done();
+      });
+
     });
 
     test('baseBrush._brush extents are full', function() {

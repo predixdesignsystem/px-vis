@@ -1,0 +1,238 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
+<link rel="import" href="../px-colors-design/colors.html" />
+
+<!--
+Element which draws scatter series onto the chart
+
+##### Usage
+
+    <px-vis-pie
+        svg="[[svg]]"
+        clip-path="[[clipPath]]"
+        series-id="[[item.name]]"
+        series-number="[[index]]"
+        chart-data="[[item]]"
+        x="[[x]]"
+        y="[[y]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]"
+        muted-series="[[mutedSeries]]">
+    </px-vis-pie>
+
+@element px-vis-pie
+@blurb Element which draws lines series onto the chart
+@homepage index.html
+@demo demo.html
+-->
+<dom-module id="px-vis-pie">
+    <link rel="import" type="css" href="css/px-vis.css"/>
+    <template>
+
+    </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'px-vis-pie',
+
+    behaviors: [
+      PxVisBehaviorD3.svg,
+      PxVisBehavior.dataset,
+      PxVisBehavior.mutedSeries,
+      PxVisBehavior.commonMethods,
+      PxVisBehaviorD3.clipPath,
+      PxVisBehavior.sizing,
+      PxVisBehavior.dataset,
+      commonColors
+    ],
+
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      /**
+       * A unique ID for each line series
+       *
+       * @property seriesId
+       * @type String
+       */
+      seriesId:{
+        type:String
+      },
+      /**
+       * An index of the series used for calculating its color
+       *
+       * @property scatterNumber
+       * @type String
+       */
+      seriesNumber:{
+        type:Number,
+        value:0
+      },
+      /**
+       * Number between 0 and 1 defining how much of the inner pie should be cut.
+       * Typically at 0 this is a pie chart, at 0.5 a donut chart and at 1 all
+       * the chart is cut (=> not visible)
+       *
+       */
+      innerRadius: {
+        type: Number,
+        value: 0
+      },
+      /**
+       * A holder object for the series group
+       *
+       * @property scatterGroup
+       * @type Object
+       */
+      pieGroup:{
+        type:Object
+      },
+      /**
+       * A holder object for the series objects
+       *
+       * @property scatterDots
+       * @type Object
+       */
+      pieSlices:{
+        type:Object
+      },
+      /**
+       * A holder object for the series object
+       *
+       * @property linePath
+       * @type String
+       */
+      pieGroup:{
+        type:Object,
+        value: function() {return{};}
+      },
+      /**
+       * Radius of the pie chart
+       *
+       */
+      _radius: {
+        type: Number,
+        value: 1
+      }
+    },
+
+    observers: [
+      'drawElement(width,height,margin,svg,chartData.*)',
+      'isIdInMuted(mutedSeries.*)',
+      '_addClipPath(clipPath)'
+     ],
+
+    /**
+     * Draws or updates the pie element.
+     * Called from an observer watching for data and the necessary d3 objects
+     *
+     * @method drawElement
+     */
+    drawElement: function() {
+      if(this._isObjHaveValues(this.svg) && this._isObjHaveValues(this.chartData)){
+        //calculate data and radius
+        var data = this.chartData,
+            pie = d3.layout.pie().value(function(d){return d.value;})(data);
+
+        this._radius = Math.min(this.height - this.margin.bottom - this.margin.top,
+                        this.width - this.margin.left - this.margin.right)/2;
+
+        // checks to see if the group already exists. If not, create; if so, update
+        if(this._isObjEmpty(this.pieGroup)){
+          // draw the path and move it so the ie is centered
+          this.pieGroup = this.svg.append('g')
+            .attr('series-id', 'pie_' + this.seriesId)
+            .attr('class', 'pie-slice')
+            .attr('transform', 'translate(' + this._radius + ',' + this._radius + ')');
+        }
+
+        // declare an arc generator function
+        var arc = d3.svg.arc().outerRadius(this._radius).innerRadius(this.innerRadius * this._radius);
+
+        // select paths, use arc generator to draw
+        var arcs = this.pieGroup.selectAll('pie-slice')
+                                .data(pie)
+                                .enter()
+                                .append('svg:g')
+                                .attr('class', 'slice')
+                                .on('mousedown.action', this._centerOnSlice.bind(this))
+                                .on('mouseover', this._showTooltip.bind(this))
+        arcs.append('svg:path')
+            .attr('fill', function(d, i){
+                return commonColors.properties.dataVisColors.value[commonColors.properties.seriesColorOrder.value[i]];
+            })
+            .attr('d', function (d) {
+                return arc(d);
+            });
+      }
+    },
+    /**
+     * Function used to display a tooltip for a specific slice
+     *
+     */
+    _showTooltip: function(slice) {
+
+    },
+    /**
+     * Transforms the svg to show the slice at the top (12 o clock)
+     *
+     */
+    _centerOnSlice: function(slice) {
+      this.pieGroup
+          .transition()
+          .duration(750)
+          .attr('transform', 'translate(' + this._radius + ',' + this._radius
+                  + ') rotate(' + this._getRotationAngle(slice) + ')');
+    },
+    /**
+     * Converts rad to deg
+     *
+     */
+    _radToDeg: function(angle) {
+      return angle * 180 / Math.PI;
+    },
+    /**
+     * Calculates the approriate rotation angle for the slice to be displayed at 12 o clock
+     *
+     */
+    _getRotationAngle: function(slice) {
+      //get angle to middle of slice, then adjust rotation direction
+      var start = slice.startAngle,
+          end = slice.endAngle,
+          mid = start + (end - start)/2,
+          adjusted = mid < Math.PI ? -mid : Math.PI * 2 - mid;
+
+      return this._radToDeg(adjusted);
+    },
+    /**
+     * Helper to call addClipPath with the elem
+     *
+     * @method _addClipPath
+     */
+    _addClipPath: function(){
+      this.addClipPath(this.pieGroup);
+    },
+    /**
+     * Checks mutedSeries to see if this ID is in there
+     * Called from an observer watching mutedSeries
+     *
+     * @method isIdInMuted
+     */
+    isIdInMuted: function() {
+      if(this.mutedSeries.hasOwnProperty(this.seriesId)){
+        // if true, mute
+        if(this.mutedSeries[this.seriesId]){
+          this._muteScatter();
+        } else {
+          this._colorScatter();
+        }
+      }
+    },
+  });
+</script>
