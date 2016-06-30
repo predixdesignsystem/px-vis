@@ -1,0 +1,303 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="px-vis-behavior-common.html" />
+
+<!--
+Converts data from array form to object form.
+
+px-vis charts expect data in the following array of objects format:
+
+```
+[
+    {
+        x: 10,
+        y: 50
+    },{
+        x: 20,
+        y: 40
+    }
+]
+```
+
+Keys are flexible and multiple can be added to the same object:
+
+```
+[
+    {
+        timestamp: 1413930600000,
+        tag1: 15,
+        tag2: 16,
+        tag3: 11
+    },{
+        timestamp: 1414080000000,
+        tag1: 14,
+        tag2: 17,
+        tag3: 13
+    }
+]
+```
+
+This component accepts data in this format:
+
+```
+[{
+    "id":"myTagID",
+    "name":"My Favorite Tag",
+    "minValue":0,
+    "maxValue":293,
+    "data":[
+        [1464562720308,41],
+        [1464571360308,170]
+    ]
+},{
+    "id":"myOtherID",
+    "name":"My Least Favorite Tag",
+    "minValue":0,
+    "maxValue":150,
+    "data":[
+        [1464562720308,20],
+        [1464571360308,63]
+    ]
+}]
+```
+
+It will reformat the data into the object format and create a seriesConfig file.
+
+##### Usage
+
+    <px-vis-data-converter
+        original-data="[[originalData]]"
+        chart-data="{{chartData}}"
+        series-config="{{seriesConfig}}">
+    </px-vis-data-converter>
+
+@element px-vis-data-converter
+@blurb Converts data from array form to object form.
+@homepage index.html
+@demo demo.html
+-->
+<dom-module id="px-vis-data-converter">
+    <template>
+
+    </template>
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'px-vis-data-converter',
+
+    behaviors: [
+      PxVisBehavior.commonMethods
+    ],
+
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      /**
+      * The key for accessing the data array.
+      *
+      */
+      dataKey: {
+        type: String,
+        value: "data"
+      },
+      /**
+      * The key for accessing the data id.
+      *
+      */
+      idKey: {
+        type: String,
+        value: "id"
+      },
+      /**
+      * The key for accessing the data name.
+      *
+      */
+      nameKey: {
+        type: String,
+        value: "name"
+      },
+      /**
+      * An optional array of data IDs matching the order of the data array.
+      *
+      */
+      dataIds: {
+        type: Array,
+        value: function(){ return []; }
+      },
+      /**
+      * An optional array of data names matching the order of the data array.
+      *
+      */
+      dataNames: {
+        type: Array,
+        value: function(){ return []; }
+      },
+      /**
+      * An optional name for the x-key for chartData.
+      *
+      */
+      newXKey: {
+        type: String,
+        value: 'x'
+      },
+      /**
+      * A series configuration file computed from originalData.
+      *
+      */
+      originalData: {
+        type: Array,
+        notify: true
+      },
+      /**
+      * A series configuration file computed from originalData.
+      *
+      */
+      seriesConfig: {
+        type: Object,
+        notify: true,
+        readOnly: true,
+        computed: '_computeSeriesConfig(originalData.*)'
+      },
+      /**
+      * A series configuration file computed from originalData.
+      *
+      */
+      chartData: {
+        type: Array,
+        notify: true,
+        readOnly: true,
+        computed: '_computeChartData(originalData.*)'
+      }
+    },
+
+    /**
+    * when attached, re-fire set properties for precipitation pattern
+    *
+    * @method attached
+    */
+    attached: function(){
+      // if(this._doesObjHaveValues(this.x)){
+      //   this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
+      // }
+      //
+      // if(this._doesObjHaveValues(this.y)){
+      //   this.fire('px-vis-y-updated', { 'dataVar': 'y', 'data': this.y, 'method':'set' });
+      // }
+      //
+      // if(this._doesObjHaveValues(this.currentDomainX)){
+      //   this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
+      // }
+      //
+      // if(this._doesObjHaveValues(this.currentDomainY)){
+      //   this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
+      // }
+    },
+
+    _computeChartData: function() {
+      if(this.originalData.length > 0){
+        // put in check to see if we have sorted data or not
+
+        var chartData = [],
+            // how many arrays we have
+            numArrs = this.originalData.length,
+            // create starting index for each
+            indexes = Array(numArrs).fill(0),
+            longest = 0,
+            iter = 0,
+            id = Array.prototype.map.call(this.originalData,function(d,i){
+              // since we are iterating over the data...
+              // find longest array
+              longest = (longest < d[this.dataKey].length) ? d[this.dataKey].length : longest;
+              // add infinity to the end so we have a stop point
+              d[this.dataKey].push([Infinity,Infinity]);
+
+              // figure out if we should use user input ID or the series key
+              return (this.dataIds[i]) ? this.dataIds[i] : d[this.idKey];
+            }.bind(this));
+
+        while(iter < longest){
+          var lowest = Infinity,
+              obj = {},
+              indicies;
+
+          for(var i = 0; i < numArrs; i++){
+            if(this.originalData[i][this.dataKey][indexes[i]][0] < lowest){
+              // set our lowest for reference on the next pass
+              lowest = this.originalData[i][this.dataKey][indexes[i]][0];
+              // set our obj x value
+              obj[this.newXKey] = lowest;
+              // set our obj y value
+              obj[id[i]] = this.originalData[i][this.dataKey][indexes[i]][1];
+              // track in index we are at
+              indicies = [i];
+            } else if (this.originalData[i][this.dataKey][indexes[i]][0] === lowest){
+              // add our y val
+              obj[id[i]] = this.originalData[i][this.dataKey][indexes[i]][1];
+              // add our index
+              indicies.push(i);
+            }
+          }
+          // add our new object to our dataset
+          chartData.push(obj);
+          // increment out indexes
+          for(var j = 0; j < indicies.length; j++){
+            var k = indicies[j]
+            indexes[k] += 1;
+          }
+          iter += 1;
+        }
+
+        // for(var i = 0; i < this.originalData.length; i++){
+        //   id = (this.dataIds[i]) ? this.dataIds[i] : this.originalData[i][this.idKey];
+        //   for(var j = 0; j < this.originalData[i][this.dataKey].length; j++){
+        //     chartData.push({});
+        //     d = this.originalData[i][this.dataKey][j];
+        //     // if x key does not exist, add x and y
+        //     if(!chartData[j].hasOwnProperty(this.newXKey)) {
+        //       chartData[j][this.newXKey] = d[0];
+        //       chartData[j][id] = d[1];
+        //     }
+        //     //if it does exist and matches data x val, add the y
+        //     else if(chartData[j][this.newXKey] === d[0]){
+        //       chartData[j][id] = d[1];
+        //     } else {
+        //       console.warn("Hmm mismatch x key; now what?");
+        //     }
+        //   }
+        // }
+        // console.log(chartData);
+        return chartData;
+      }
+    },
+
+    _computeSeriesConfig: function(){
+      if(this.originalData.length > 0){
+        var seriesConfig = {},
+            id,
+            y1,
+            y2;
+        for(var i = 0; i < this.originalData.length; i++){
+          id = (this.dataIds[i]) ? this.dataIds[i] : this.originalData[i][this.idKey];
+          seriesConfig[id] = {};
+          seriesConfig[id]['name'] = this.dataNames[i] ? this.dataNames[i] : this.originalData[i]['name'];
+          seriesConfig[id]['x'] = this.newXKey;
+
+          if(this.originalData[i]['minValue']){
+            seriesConfig[id]['yExtMin'] = this.originalData[i]['minValue'];
+          }
+
+          if(this.originalData[i]['maxValue']){
+            seriesConfig[id]['yExtMax'] = this.originalData[i]['maxValue'];
+          }
+        }
+        // console.log(seriesConfig);
+        return seriesConfig;
+      }
+    }
+  });
+</script>

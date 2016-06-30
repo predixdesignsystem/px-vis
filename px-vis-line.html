@@ -117,17 +117,19 @@ Element which draws lines series onto the chart
      */
     drawElement: function() {
       if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.x) && this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.chartData) && this._doesObjHaveValues(this.completeSeriesConfig)){
-        if(this.chartData[this.seriesId] && this.chartData[this.seriesId]["series"]){
-          var data = [this.chartData[this.seriesId].series],
-              y = 1;
-        } else {
-          var data = [this.chartData],
-              y = this.seriesId;
-        }
+          var data = [this.chartData];
 
         var line = d3.svg.line()
-          .x(function(d) { return this.x(d[this.completeSeriesConfig[this.seriesId]['x']]); }.bind(this))
-          .y(function(d) { return this.y(d[y]); }.bind(this));
+          .x(function(d) {
+            if(d[this.seriesId]){
+              return this.x(d[this.completeSeriesConfig[this.seriesId]['x']]);
+            }
+          }.bind(this))
+          .y(function(d) {
+            if(d[this.seriesId]){
+              return this.y(d[this.seriesId]);
+            }
+          }.bind(this));
 
         // checks to see if the group already exists. If not, create; if so, update
         if(this._isObjEmpty(this.lineGroup)){
