@@ -101,10 +101,10 @@ PxVisBehaviorChart.chartCommon = {
 
 
     _setCompleteSeriesConfig: function(){
-      if(this._isObjHaveValues(this.defaultSeriesConfig) && this._isObjHaveValues(this.chartData)){
+      if(this._doesObjHaveValues(this.defaultSeriesConfig) && this._doesObjHaveValues(this.chartData)){
 
-        var obj = (this.seriesConfig) ? this.seriesConfig : {},
-            k = (this.includeAllSeries) ? Object.keys(this.chartData) : Object.keys(obj);
+        var fullConfig = (this.seriesConfig) ? this.seriesConfig : {},
+            k = (this.includeAllSeries) ? Object.keys(this.chartData) : Object.keys(fullConfig);
 
         if(k.length === 0){
           console.warn("No series were added to the chart. Either add them in the seriesConfig or turn on includeAllSeries");
@@ -112,38 +112,38 @@ PxVisBehaviorChart.chartCommon = {
         }
 
         for(var i = 0; i < k.length; i++) {
-          if(!obj[k[i]]){
-            obj[k[i]] = {};
+          if(!fullConfig[k[i]]){
+            fullConfig[k[i]] = {};
           }
-          if(!obj[k[i]]['type']) {
-            obj[k[i]]['type'] = this.defaultSeriesConfig['type'];
+          if(!fullConfig[k[i]]['type']) {
+            fullConfig[k[i]]['type'] = this.defaultSeriesConfig['type'];
           }
-          if(!obj[k[i]]['name']) {
-            obj[k[i]]['name'] = k[i];
+          if(!fullConfig[k[i]]['name']) {
+            fullConfig[k[i]]['name'] = k[i];
           }
-          if(!obj[k[i]]['x']) {
-            obj[k[i]]['x'] = this.defaultSeriesConfig['x'];
+          if(!fullConfig[k[i]]['x']) {
+            fullConfig[k[i]]['x'] = this.defaultSeriesConfig['x'];
           }
-          if(!obj[k[i]]['color']) {
-            obj[k[i]]['color'] = this.dataVisColors[this.seriesColorOrder[i]];
+          if(!fullConfig[k[i]]['color']) {
+            fullConfig[k[i]]['color'] = this.dataVisColors[this.seriesColorOrder[i]];
           }
-          if(!obj[k[i]]['xExtMin']) {
-            obj[k[i]]['xExtMin'] = this.defaultSeriesConfig['xExtMin']
+          if(!fullConfig[k[i]]['xExtMin']) {
+            fullConfig[k[i]]['xExtMin'] = this.defaultSeriesConfig['xExtMin']
           }
-          if(!obj[k[i]]['xExtMax']) {
-            obj[k[i]]['xExtMax'] = this.defaultSeriesConfig['xExtMax']
+          if(!fullConfig[k[i]]['xExtMax']) {
+            fullConfig[k[i]]['xExtMax'] = this.defaultSeriesConfig['xExtMax']
           }
-          if(!obj[k[i]]['yExtMin']) {
-            obj[k[i]]['yExtMin'] = this.defaultSeriesConfig['yExtMin']
+          if(!fullConfig[k[i]]['yExtMin']) {
+            fullConfig[k[i]]['yExtMin'] = this.defaultSeriesConfig['yExtMin']
           }
-          if(!obj[k[i]]['yExtMax']) {
-            obj[k[i]]['yExtMax'] = this.defaultSeriesConfig['yExtMax']
+          if(!fullConfig[k[i]]['yExtMax']) {
+            fullConfig[k[i]]['yExtMax'] = this.defaultSeriesConfig['yExtMax']
           }
         }
       }
-      this.set('completeSeriesConfig',obj);
+      this.set('completeSeriesConfig',fullConfig);
       // if we want to fire it out of this chart
-      this.fire('px-vis-complete-series-config', { 'dataVar': 'completeSeriesConfig', 'data': obj, 'method':'set' });
+      this.fire('px-vis-complete-series-config', { 'dataVar': 'completeSeriesConfig', 'data': fullConfig, 'method':'set' });
     },
 
     /**
