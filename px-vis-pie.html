@@ -2,6 +2,8 @@
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="../px-colors-design/colors.html" />
+<link rel="import" href="../px-tooltip/px-tooltip.html" />
+<link rel="import" href="../px-popover/px-popover.html" />
 
 <!--
 Element which draws scatter series onto the chart
@@ -29,7 +31,8 @@ Element which draws scatter series onto the chart
 <dom-module id="px-vis-pie">
     <link rel="import" type="css" href="css/px-vis.css"/>
     <template>
-
+      <px-tooltip id="tooltip" orientation="top" delay="10"></px-tooltip>
+      <px-popover id="popover" popover-title="addasasdas" orientation="top" for=""></px-popover>
     </template>
 </dom-module>
 
@@ -162,7 +165,17 @@ Element which draws scatter series onto the chart
                                 .append('svg:g')
                                 .attr('class', 'slice')
                                 .on('mousedown.action', this._centerOnSlice.bind(this))
-                                .on('mouseover', this._showTooltip.bind(this))
+                                .on('mouseover', this._showTooltip.bind(this));
+
+        //add a tooltip for each slice
+      /*  for(var i = 0; i < arcs.length; i++) {
+          var tt = document.createElement('px-tooltip');
+
+          tt.delay = 500;
+          arcs[0][i].appendChild(tt);
+        }*/
+
+
         arcs.append('svg:path')
             .attr('fill', function(d, i){
                 return commonColors.properties.dataVisColors.value[commonColors.properties.seriesColorOrder.value[i]];
@@ -176,8 +189,11 @@ Element which draws scatter series onto the chart
      * Function used to display a tooltip for a specific slice
      *
      */
-    _showTooltip: function(slice) {
+    _showTooltip: function(datum, index, group) {
 
+      //calculate center of path. store it. check if present
+      this.$.tooltip.for = d3.event.currentTarget;
+      this.$.tooltip.tooltipMessage = datum.data.label;
     },
     /**
      * Transforms the svg to show the slice at the top (12 o clock)
@@ -189,6 +205,15 @@ Element which draws scatter series onto the chart
           .duration(750)
           .attr('transform', 'translate(' + this._radius + ',' + this._radius
                   + ') rotate(' + this._getRotationAngle(slice) + ')');
+
+      var _this = this,
+          event = d3.event;
+
+      //display a popover after the rotation
+      setTimeout(function() {
+        _this.$.popover.popoverBody = 'test';
+        _this.$.popover.for = event.currentTarget;
+      }, 750);
     },
     /**
      * Converts rad to deg
