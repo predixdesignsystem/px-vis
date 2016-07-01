@@ -55,7 +55,6 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       PxVisBehavior.commonMethods,
       PxVisBehaviorD3.selectedDomain,
       commonColors,
-      PxVisBehavior.seriesConfig,
       PxVisBehavior.completeSeriesConfig
     ],
 
@@ -108,8 +107,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       '_setXScale(width,margin)',
       '_setYScale(height,margin)',
       '_currentDomain(chartData.*,x,y,completeSeriesConfig)',
-      '_updateDomain(selectedDomain)',
-      '_completeExistingSeriesConfig(defaultSeriesConfig.*,chartData.*,seriesConfig.*)'
+      '_updateDomain(selectedDomain)'
     ],
 
     /**
@@ -118,19 +116,19 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
     * @method attached
     */
     attached: function(){
-      if(this._isObjHaveValues(this.x)){
+      if(this._doesObjHaveValues(this.x)){
         this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
       }
 
-      if(this._isObjHaveValues(this.y)){
+      if(this._doesObjHaveValues(this.y)){
         this.fire('px-vis-y-updated', { 'dataVar': 'y', 'data': this.y, 'method':'set' });
       }
 
-      if(this._isObjHaveValues(this.currentDomainX)){
+      if(this._doesObjHaveValues(this.currentDomainX)){
         this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
       }
 
-      if(this._isObjHaveValues(this.currentDomainY)){
+      if(this._doesObjHaveValues(this.currentDomainY)){
         this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
       }
     },
@@ -240,13 +238,11 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
     },
 
     _setMin: function(r,d) {
-
      if(r[0] > d) {
         r[0] = d;
       }
     },
     _setMax: function(r,d) {
-
       if(r[1] < d) {
         r[1] = d;
       }
@@ -258,8 +254,9 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       }
 
       var e = [];
-      e[0] = (this.defaultSeriesConfig[min] === 'dynamic') ? Infinity : this.defaultSeriesConfig[min];
-      e[1] = (this.defaultSeriesConfig[max] === 'dynamic') ? -Infinity : this.defaultSeriesConfig[max];
+      // FIXME Make me dynamic
+      e[0] = (this.completeSeriesConfig['blahblah'][min] === 'dynamic') ? Infinity : this.completeSeriesConfig['blahblah'][min];
+      e[1] = (this.completeSeriesConfig['blahblah'][max] === 'dynamic') ? -Infinity : this.completeSeriesConfig['blahblah'][max];
 
       return e;
     },
@@ -272,7 +269,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      */
      _currentDomain: function() {
       // check to make sure there is data
-      if(this._isObjHaveValues(this.chartData) && this._isObjHaveValues(this.x) && this._isObjHaveValues(this.y) && this._isObjHaveValues(this.seriesConfig)){
+      if(this._doesObjHaveValues(this.chartData) && this._doesObjHaveValues(this.x) && this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.completeSeriesConfig)){
         // TODO check if dataset has max and min
         // TODO add dev set max and min
         // TODO What do we do if we have max/min Ys and not x, which is the case with our sample data?
@@ -290,7 +287,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         // }
 
         //check seriesConfig
-        // if(this._isObjHaveValues(this.seriesConfig)){
+        // if(this._doesObjHaveValues(this.seriesConfig)){
         //   this._completeExistingSeriesConfig();
         // }
 
@@ -311,8 +308,6 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         exts.y = this._calcDefaultExt('yExtMin','yExtMax',yOrd);
 
         //Chug through the data to max and min
-
-
         if(this.chartData[0]['series']){
           this._findSeriesMinMax(this.chartData, doX, doY, xOrd, yOrd, xTime, exts)
         } else {
@@ -331,48 +326,6 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
         this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
       }
-    },
-
-    _completeExistingSeriesConfig: function(){
-      if(this._isObjHaveValues(this.defaultSeriesConfig) && this._isObjHaveValues(this.chartData)){
-
-        var obj = (this.seriesConfig)? this.seriesConfig : {},
-            k = (this.includeAllSeries) ? Object.keys(this.chartData) : Object.keys(obj),
-            kLen = k.length,
-            ki;
-
-        if(k.length === 0){
-          console.warn("No series were added to the chart. Either add them in the seriesConfig or turn on includeAllSeries");
-
-          return;
-        }
-
-        for(ki = 0; ki < kLen; ki++) {
-          if(!obj[k[ki]]){
-            obj[k[ki]] = {};
-          }
-          if(!obj[k[ki]]['type']) {
-            obj[k[ki]]['type'] = this.defaultSeriesConfig['type'];
-          }
-          if(!obj[k[ki]]['name']) {
-            obj[k[ki]]['name'] = k[ki];
-          }
-          if(!obj[k[ki]]['x']) {
-            obj[k[ki]]['x'] = this.defaultSeriesConfig['x'];
-          }
-          if(obj[k[ki]]['xExt']) {
-            this.push('_extents[0]',obj[k[ki]]['xExt'])
-          }
-          if(obj[k[ki]]['yExt']) {
-            this.push('_extents[1]',obj[k[ki]]['yExt'])
-          }
-          if(!obj[k[ki]]['color']) {
-            obj[k[ki]]['color'] = this.dataVisColors[this.seriesColorOrder[ki]];
-          }
-        }
-      }
-      this.set('completeSeriesConfig',obj);
-      this.fire('px-vis-complete-series-config-updated', { 'dataVar': 'completeSeriesConfig', 'data': obj, 'method':'set' });
     },
 
     /**

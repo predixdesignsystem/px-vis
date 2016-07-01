@@ -1,3 +1,5 @@
+
+<link rel="import" href="../px-colors-design/colors.html" />
 <script>
 var PxVisBehaviorChart = PxVisBehaviorChart || {};
 
@@ -14,6 +16,66 @@ var PxVisBehaviorChart = PxVisBehaviorChart || {};
     @polymerBehavior PxVisBehaviorChart.chartCommon
 */
 PxVisBehaviorChart.chartCommon = {
+    behaviors: [
+      commonColors
+    ],
+
+    properties: {
+      /**
+      * A configuration file to associate series order, name, type, and colors.
+      *
+      * Association of name, type, and seriesNumber should be developer set. Color and axis are optional.
+      *
+      *```
+      *  {
+      *     "seriesKey": {  //seriesKey is either an index or an object key used to identify the series
+      *         "type": "line",  //line or scatter
+      *         "name": "My Series",  //human readable name
+      *         "x": 0,  //index or key name for independent variable
+      *         "xExt": [0,0],  //data extents for x
+      *         "yExt": [0,0],  //data extents for y
+      *         "color": "rgb(0,0,0)", //color you want the chart
+      *         "axis": "axis1"  //axis the chart should be on
+      *     }
+      *  }
+      *```
+      */
+      seriesConfig: {
+        type: Object,
+        notify: true,
+        value: function(){
+          return {}
+        }
+      },
+      /**
+      * A default configuration file. It fills in the missing parts of seriesConfig.
+      *
+      */
+      defaultSeriesConfig: {
+        type: Object,
+        notify: true,
+        value: function(){
+          return {
+            "type": "line",
+            "x": 0,
+            "xExtMin": "dynamic",
+            "xExtMax": "dynamic",
+            "yExtMin": 0,
+            "yExtMax": "dynamic"
+          }
+        }
+      },
+      /**
+      * A boolean flag on whether to include all the series in the data.
+      * - `false`: only series defined in the seriesConfig file will be drawn
+      * - `true`: All series in the dataset will be drawn. Defaults will be used for the seriesConfig
+      */
+      includeAllSeries: {
+        type: Boolean,
+        notify: true,
+        value: false
+      }
+    },
 
     listeners:{
       'px-vis-svg-updated'              : '_updateLocalProperty',
@@ -27,11 +89,60 @@ PxVisBehaviorChart.chartCommon = {
       'px-vis-extents-data-updated'     : '_updateLocalProperty',
       'px-vis-clip-path-updated'        : '_updateLocalProperty',
       'px-vis-svg-element-updated'      : '_updateLocalProperty',
-      'px-vis-complete-series-config-updated' : '_updateLocalProperty',
 
       'px-vis-muted-series-updated'     : '_updateGlobalProperty',
       'px-vis-selected-domain-updated'  : '_updateGlobalProperty'
 
+    },
+
+    observers: [
+      '_setCompleteSeriesConfig(defaultSeriesConfig.*,chartData.*,seriesConfig.*)'
+    ],
+
+
+    _setCompleteSeriesConfig: function(){
+      if(this._doesObjHaveValues(this.defaultSeriesConfig) && this._doesObjHaveValues(this.chartData)){
+        var fullConfig = (this.seriesConfig) ? this.seriesConfig : {},
+            k = (this.includeAllSeries) ? Object.keys(this.chartData[0]) : Object.keys(fullConfig);
+
+        if(k.length === 0){
+          console.warn("No series were added to the chart. Either add them in the seriesConfig or turn on includeAllSeries");
+          return;
+        }
+
+        for(var i = 0; i < k.length; i++) {
+          if(!fullConfig[k[i]]){
+            fullConfig[k[i]] = {};
+          }
+          if(!fullConfig[k[i]]['type']) {
+            fullConfig[k[i]]['type'] = this.defaultSeriesConfig['type'];
+          }
+          if(!fullConfig[k[i]]['name']) {
+            fullConfig[k[i]]['name'] = k[i];
+          }
+          if(!fullConfig[k[i]]['x']) {
+            fullConfig[k[i]]['x'] = this.defaultSeriesConfig['x'];
+          }
+          if(!fullConfig[k[i]]['color']) {
+            fullConfig[k[i]]['color'] = this.dataVisColors[this.seriesColorOrder[i]];
+          }
+          if(!fullConfig[k[i]]['xExtMin']) {
+            fullConfig[k[i]]['xExtMin'] = this.defaultSeriesConfig['xExtMin']
+          }
+          if(!fullConfig[k[i]]['xExtMax']) {
+            fullConfig[k[i]]['xExtMax'] = this.defaultSeriesConfig['xExtMax']
+          }
+          if(!fullConfig[k[i]]['yExtMin']) {
+            fullConfig[k[i]]['yExtMin'] = this.defaultSeriesConfig['yExtMin']
+          }
+          if(!fullConfig[k[i]]['yExtMax']) {
+            fullConfig[k[i]]['yExtMax'] = this.defaultSeriesConfig['yExtMax']
+          }
+        }
+      }
+      this.set('completeSeriesConfig',fullConfig);
+      // if we want to fire it out of this chart
+      this.fire('px-vis-complete-series-config', { 'dataVar': 'completeSeriesConfig', 'data': fullConfig, 'method':'set' });
     },
 
     /**

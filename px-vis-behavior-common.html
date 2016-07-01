@@ -255,64 +255,6 @@ PxVisBehavior.dataset = {
 
     @polymerBehavior PxVisBehavior.dataset
 */
-PxVisBehavior.seriesConfig = {
-    properties: {
-      /**
-       * A configuration file to associate series order, name, type, and colors.
-       *
-       * Association of name, type, and seriesNumber should be developer set. Color and axis are optional.
-       *
-       *```
-       *  {
-       *     "seriesKey": {  //seriesKey is either an index or an object key used to identify the series
-       *         "type": "line",  //line or scatter
-       *         "name": "My Series",  //human readable name
-       *         "x": 0,  //index or key name for independent variable
-       *         "xExt": [0,0],  //data extents for x
-       *         "yExt": [0,0],  //data extents for y
-       *         "color": "rgb(0,0,0)", //color you want the chart
-       *         "axis": "axis1"  //axis the chart should be on
-       *     }
-       *  }
-       *```
-       */
-       seriesConfig: {
-         type: Object,
-         notify: true,
-         value: function(){
-           return {}
-         }
-       },
-       /**
-        * A default configuration file. It fills in the missing parts of seriesConfig.
-        *
-        */
-        defaultSeriesConfig: {
-          type: Object,
-          notify: true,
-          value: function(){
-            return {
-              "type": "line",
-              "x": 0,
-              "xExtMin": "dynamic",
-              "xExtMax": "dynamic",
-              "yExtMin": 0,
-              "yExtMax": "dynamic"
-            }
-          }
-        },
-       /**
-        * A boolean flag on whether to include all the series in the data.
-        * - `false`: only series defined in the seriesConfig file will be drawn
-        * - `true`: All series in the dataset will be drawn. Defaults will be used for the seriesConfig
-        */
-        includeAllSeries: {
-          type: Boolean,
-          notify: true,
-          value: false
-        },
-    }
-};
 
 PxVisBehavior.completeSeriesConfig = {
     properties: {
@@ -478,7 +420,7 @@ PxVisBehavior.commonMethods = {
    * @param {object}
    * @return {bool}
    */
-  _isObjHaveValues:function(obj){
+  _doesObjHaveValues:function(obj){
     if(typeof(obj) === 'undefined'){
       return false;
     }
