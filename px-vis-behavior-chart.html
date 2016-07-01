@@ -99,21 +99,18 @@ PxVisBehaviorChart.chartCommon = [{
       '_setCompleteSeriesConfig(defaultSeriesConfig.*,chartData.*,seriesConfig.*)'
     ],
 
-    _getDefaultExt: function(axis,type, multi){
-      var exts;
-      // check if xScale / yScale are ordinal
-      if(this[axis + 'Scale'] === 'ordinal'){
-        exts = [];
-      } else {
-        exts = this.defaultSeriesConfig[axis+type] === 'dynamic' ? Infinity * multi: this.defaultSeriesConfig[axis+type];
-      }
-      return exts;
-    },
-
     _calcChartExts: function(mins,maxes,axis){
-      var min = mins.length > 0 ? Math.min.apply(null, mins) : this._getDefaultExt(axis,'Min',1);
-          max = maxes.length > 0 ? Math.max.apply(null, maxes) : this._getDefaultExt(axis,'Max',-1);
-      return [min,max];
+      if(this[axis + 'Scale'] === 'ordinal'){
+        // how should someone set the ordinal list? Differet key in seriesConfig?
+        return [];
+      }
+      var dMin = this.defaultSeriesConfig[axis+'Min'] === 'dynamic' ? Infinity: this.defaultSeriesConfig[axis+'Min'],
+          dMax = this.defaultSeriesConfig[axis+'Max'] === 'dynamic' ? -Infinity: this.defaultSeriesConfig[axis+'Max'];
+
+      mins.push(dMin);
+      maxes.push(dMax);
+
+      return [ Math.min.apply(null, mins) , Math.max.apply(null, maxes) ];
     },
 
     /**
