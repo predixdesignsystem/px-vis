@@ -158,7 +158,7 @@ Element which draws scatter series onto the chart
       if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.chartData)){
         //calculate data and radius
         var data = this.chartData,
-            pie = d3.layout.pie().value(function(d){return d.value;})(data);
+            pie = d3.layout.pie().value(function(d){return d['x'];})(data);
 
         // checks to see if the group already exists. If not, create; if so, update
         if(this._isObjEmpty(this.pieGroup)){
@@ -199,7 +199,7 @@ Element which draws scatter series onto the chart
     _showTooltip: function(datum, index, group) {
 
       //get label
-      this.$.tooltip.tooltipMessage = datum.data.label;
+      this.$.tooltip.tooltipMessage = datum.data['y'];
 
       //center tooltip
       //TODO: improve how we place the tooltip using the actual svg path?
@@ -244,7 +244,7 @@ Element which draws scatter series onto the chart
       //display a popover after the rotation
       setTimeout(function() {
 
-        _this.$.popover.popoverBody = datum.data.label;
+        _this.$.popover.popoverBody = datum.data['y'];
 
         //resimulate click so that popover can pick it up
         _this.$.popover.show();
