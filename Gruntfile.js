@@ -33,6 +33,12 @@ module.exports = function (grunt) {
                   'css/noprefix/px-vis-demo.css': 'sass/px-vis-demo-predix.scss',
                 }
             },
+            pxPie: {
+                files: {
+                  'css/noprefix/px-vis-pie-sketch.css': 'sass/px-vis-pie-sketch.scss',
+                  'css/noprefix/px-vis-pie.css': 'sass/px-vis-pie-predix.scss',
+                }
+            },
             pxRegister: {
                 files: {
                   'css/noprefix/px-vis-register-sketch.css': 'sass/px-vis-register-sketch.scss',
