@@ -31,8 +31,10 @@ Element which draws scatter series onto the chart
 <dom-module id="px-vis-pie">
     <link rel="import" type="css" href="css/px-vis.css"/>
     <template>
-      <px-tooltip id="tooltip" orientation="top" delay="10"></px-tooltip>
-      <px-popover id="popover" popover-title="addasasdas" orientation="top" for=""></px-popover>
+      <span id="tooltipAnchor" class="visuallyhidden"></span>
+      <span id="popoverAnchor" class="visuallyhidden"></span>
+      <px-tooltip id="tooltip" orientation="top" delay="10" for="tooltipAnchor"></px-tooltip>
+      <px-popover id="popover" popover-title="" orientation="top" hide-overlay class="popover" for="popoverAnchor"></px-popover>
     </template>
 </dom-module>
 
@@ -45,7 +47,6 @@ Element which draws scatter series onto the chart
       PxVisBehavior.dataset,
       PxVisBehavior.mutedSeries,
       PxVisBehavior.commonMethods,
-      PxVisBehaviorD3.clipPath,
       PxVisBehavior.sizing,
       PxVisBehavior.dataset,
       commonColors
@@ -121,16 +122,32 @@ Element which draws scatter series onto the chart
        */
       _radius: {
         type: Number,
-        value: 1
+        computed: '_computeRadius(width, height, margin)'
+      },
+      /**
+       * String representing the translation needed to center the pie on the
+       * svg
+       *
+       */
+      _translationString: {
+        type: String,
+        computed: '_computeTranslationString(_radius, margin)'
       }
     },
 
     observers: [
-      'drawElement(width,height,margin,svg,chartData.*)',
-      'isIdInMuted(mutedSeries.*)',
-      '_addClipPath(clipPath)'
+      'drawElement(width,height,margin,svg,chartData.*)'
      ],
 
+     attached: function() {
+
+      //position popover anchor, it won't move afterward
+      var curRect = this.pxSvgElem.getBoundingClientRect();
+
+      this.$.popoverAnchor.style.left =
+        (Number(curRect.left) + Number(this.margin.left) +  (this.width - this.margin.left - this.margin.right)/2) + "px";
+      this.$.popoverAnchor.style.top = (curRect.top + Number(this.margin.top)) + "px";
+     },
     /**
      * Draws or updates the pie element.
      * Called from an observer watching for data and the necessary d3 objects
@@ -143,16 +160,13 @@ Element which draws scatter series onto the chart
         var data = this.chartData,
             pie = d3.layout.pie().value(function(d){return d.value;})(data);
 
-        this._radius = Math.min(this.height - this.margin.bottom - this.margin.top,
-                        this.width - this.margin.left - this.margin.right)/2;
-
         // checks to see if the group already exists. If not, create; if so, update
         if(this._isObjEmpty(this.pieGroup)){
           // draw the path and move it so the ie is centered
           this.pieGroup = this.svg.append('g')
             .attr('series-id', 'pie_' + this.seriesId)
             .attr('class', 'pie-slice')
-            .attr('transform', 'translate(' + this._radius + ',' + this._radius + ')');
+            .attr('transform', this._translationString);
         }
 
         // declare an arc generator function
@@ -165,15 +179,8 @@ Element which draws scatter series onto the chart
                                 .append('svg:g')
                                 .attr('class', 'slice')
                                 .on('mousedown.action', this._centerOnSlice.bind(this))
-                                .on('mouseover', this._showTooltip.bind(this));
-
-        //add a tooltip for each slice
-      /*  for(var i = 0; i < arcs.length; i++) {
-          var tt = document.createElement('px-tooltip');
-
-          tt.delay = 500;
-          arcs[0][i].appendChild(tt);
-        }*/
+                                .on('mouseover', this._showTooltip.bind(this))
+                                .on("mouseout.tooltip", this._hideTooltip.bind(this));
 
 
         arcs.append('svg:path')
@@ -191,29 +198,70 @@ Element which draws scatter series onto the chart
      */
     _showTooltip: function(datum, index, group) {
 
-      //calculate center of path. store it. check if present
-      this.$.tooltip.for = d3.event.currentTarget;
+      //get label
       this.$.tooltip.tooltipMessage = datum.data.label;
+
+      //center tooltip
+      //TODO: improve how we place the tooltip using the actual svg path?
+      var rect = d3.event.currentTarget.getBoundingClientRect(),
+          scroll = document.documentElement.scrollTop || document.body.scrollTop;
+      this.$.tooltipAnchor.style.left = (rect.left + rect.width/2) + "px";
+      this.$.tooltipAnchor.style.top = (scroll + rect.top + rect.height/2) + "px";
+      this.$.tooltip._show();
+    },
+    _hideTooltip: function(datum, index, group) {
+
+      //close if we aren't moving over the tooltip
+      if(this.$.tooltip !== d3.event.relatedTarget) {
+
+        this.$.tooltip._hide();
+      } else {
+
+        //if we moved over our tooltip don't close it
+        //but make sure that if we leave the tooltip for something else it will close...
+        var _this = this;
+        var close = function() {
+          _this.$.tooltip.removeEventListener('mouseleave', close);
+          _this.$.tooltip._hide();
+        };
+        this.$.tooltip.addEventListener('mouseleave', close);
+      }
     },
     /**
      * Transforms the svg to show the slice at the top (12 o clock)
      *
      */
-    _centerOnSlice: function(slice) {
+    _centerOnSlice: function(datum, index, group) {
       this.pieGroup
           .transition()
           .duration(750)
-          .attr('transform', 'translate(' + this._radius + ',' + this._radius
-                  + ') rotate(' + this._getRotationAngle(slice) + ')');
+          .attr('transform', this._translationString + ' rotate(' + this._getRotationAngle(datum) + ')');
 
       var _this = this,
-          event = d3.event;
+          event = d3.event,
+          target = d3.event.currentTarget;
 
       //display a popover after the rotation
       setTimeout(function() {
-        _this.$.popover.popoverBody = 'test';
-        _this.$.popover.for = event.currentTarget;
+
+        _this.$.popover.popoverBody = datum.data.label;
+
+        //resimulate click so that popover can pick it up
+        _this.$.popover.show();
       }, 750);
+    },
+    /**
+     * Computes the translation string needed to center the pie
+     */
+    _computeTranslationString: function(_radius, margin) {
+      return 'translate(' + this._radius + ',' + this._radius + ')';
+    },
+    /**
+     * Computes the radius of the pie chart from size attributes
+     */
+    _computeRadius: function(width, height, margin) {
+      return Math.min(height - margin.bottom - margin.top,
+                      width - margin.left - margin.right)/2;
     },
     /**
      * Converts rad to deg
@@ -234,30 +282,6 @@ Element which draws scatter series onto the chart
           adjusted = mid < Math.PI ? -mid : Math.PI * 2 - mid;
 
       return this._radToDeg(adjusted);
-    },
-    /**
-     * Helper to call addClipPath with the elem
-     *
-     * @method _addClipPath
-     */
-    _addClipPath: function(){
-      this.addClipPath(this.pieGroup);
-    },
-    /**
-     * Checks mutedSeries to see if this ID is in there
-     * Called from an observer watching mutedSeries
-     *
-     * @method isIdInMuted
-     */
-    isIdInMuted: function() {
-      if(this.mutedSeries.hasOwnProperty(this.seriesId)){
-        // if true, mute
-        if(this.mutedSeries[this.seriesId]){
-          this._muteScatter();
-        } else {
-          this._colorScatter();
-        }
-      }
-    },
+    }
   });
 </script>
