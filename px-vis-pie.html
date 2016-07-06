@@ -220,7 +220,9 @@ Element which draws scatter series onto the chart
         //if we moved over our tooltip don't close it
         //but make sure that if we leave the tooltip for something else it will close...
         var _this = this;
-        var close = function() {
+            slice = d3.event.currentTarget;
+        var close = function(evt) {
+          //TODO: if we're moving back to the slice this is going to make the tooltip flicker
           _this.$.tooltip.removeEventListener('mouseleave', close);
           _this.$.tooltip._hide();
         };

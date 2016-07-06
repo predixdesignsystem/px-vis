@@ -130,6 +130,30 @@ Formatting for the timestamps,the data values, and the series names can be contr
                 </span>
             </span>
           </template>
+          <!-- For pie charts -->
+          <template is="dom-if" if="{{_isOfType(yAxisType, 'pie')}}">
+            <template is="dom-repeat" items="{{chartData}}">
+              <span class$="{{_mutedToStart(item.name)}}" name$="R{{item.name}}" on-click="_seriesClicked">
+                  <span
+                    class="seriesMarker"
+                    style$="background-color:{{_returnItemColor(item.name)}};"
+                    name$="R{{item.name}}"
+                  >&nbsp;</span>
+                  <span class$="{{_getWrapperClass(type)}}">
+                    <div class="seriesName" name$="R{{item.name}}">
+                      {{_returnTruncatedName(_returnVal(item, 1))}}&nbsp;
+                      <template is="dom-if" if="{{_didTruncate(item.name,truncationLength)}}">
+                        <px-tooltip delay="500">{{_getName(_returnVal(item, 1))}}</px-tooltip>
+                      </template>
+                    </div>
+                    <!-- Display serie data differently depending on x and y axis types -->
+                    <div class="seriesData" name$="R{{_returnVal(item, 1)}}">
+                      <span>[[_returnVal(item, 0, '&nbsp;/&nbsp')]]</span>
+                    </div>
+                  </span>
+              </span>
+            </template>
+          </template>
         </div>
       </div>
 
