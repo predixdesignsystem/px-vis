@@ -106,7 +106,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
     observers: [
       '_setXScale(width,margin)',
       '_setYScale(height,margin)',
-      '_currentDomain(chartData.*,x,y,completeSeriesConfig)',
+      '_currentDomain(chartData.*,x,y,completeSeriesConfig,chartExtents)',
       '_updateDomain(selectedDomain)'
     ],
 
@@ -171,6 +171,14 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       }
     },
 
+    _getDataExtents: function(d,y){
+      var a = [];
+      for(var i = 0; i < y.length; i++){
+        a.push(d[y[i]]);
+      }
+      return [ Math.min.apply(null,a),Math.max.apply(null,a) ];
+    },
+
     /**
      *
      * Find the min and max values or ordinal values in data, for X and/or Y axis
@@ -182,16 +190,8 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         x,y;
 
       // TODO move 'x' out of each series config and into a chartConfig
-      if(typeof(key) === 'string') {
-        x = this.completeSeriesConfig[key].x
-        y = key;
-      } else if(typeof(key) === 'number') {
-        x = this.completeSeriesConfig[key].x
-        y = 1;
-      } else if(Array.isArray(key)) {
         x = this.completeSeriesConfig[key[0]].x;
-        y = key[0]
-      }
+        y = key;
 
       if(timeX) {
         this._findTimeMM(result,data,jLen,x);
@@ -199,9 +199,9 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       for(j = 0; j < jLen; j++) {
         //make sure we're dealing with numbers
         xTemp = (typeof(data[j][x]) === 'string') ? parseFloat(data[j][x]) : data[j][x];
-        yTemp = (typeof(data[j][y]) === 'string') ? parseFloat(data[j][y]) : data[j][y];
+        yTemp = this._getDataExtents(data[j], y);
 
-        if(doX === true) {
+        if(doX) {
           if(ordX && result.x.indexOf(data[j][x]) === -1) {
             result.x.push(data[j][x]);
           } else {
@@ -209,27 +209,15 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
             this._setMax(result.x,xTemp);
           }
         }
-        if(doY === true) {
+        if(doY) {
           if(ordY && result.y.indexOf(data[j][1]) === -1) {
             result.y.push(data[j][y]);
           } else {
-            this._setMin(result.y,yTemp);
-            this._setMax(result.y,yTemp);
+            this._setMin(result.y,yTemp[0]);
+            this._setMax(result.y,yTemp[1]);
           }
         }
       };
-    },
-
-    _findSeriesMinMax(data, doX, doY, ordX, ordY, timeX, result){
-      var i,
-        iLen = data.length;
-
-      //find x and y min and max
-      for(i = 0; i < iLen; i++) {
-        if(this.completeSeriesConfig[i]) {
-          this._findMinMax(data[i]["series"], doX, doY, ordX, ordY, timeX, result,i)
-        }
-      }
     },
 
     _findTimeMM: function(result,d,l,x) {
@@ -247,18 +235,24 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         r[1] = d;
       }
     },
+    //
+    // _calcDefaultExt(min,max,bool){
+    //   if(bool){
+    //     return [];
+    //   }
+    //
+    //   var e = [];
+    //   // FIXME Make me dynamic
+    //   e[0] = (this.completeSeriesConfig['blahblah'][min] === 'dynamic') ? Infinity : this.completeSeriesConfig['blahblah'][min];
+    //   e[1] = (this.completeSeriesConfig['blahblah'][max] === 'dynamic') ? -Infinity : this.completeSeriesConfig['blahblah'][max];
+    //
+    //   return e;
+    // },
 
-    _calcDefaultExt(min,max,bool){
-      if(bool){
-        return [];
+    _checkForMaxMin: function(k){
+      for(var i =0; i < k.length; i++){
+
       }
-
-      var e = [];
-      // FIXME Make me dynamic
-      e[0] = (this.completeSeriesConfig['blahblah'][min] === 'dynamic') ? Infinity : this.completeSeriesConfig['blahblah'][min];
-      e[1] = (this.completeSeriesConfig['blahblah'][max] === 'dynamic') ? -Infinity : this.completeSeriesConfig['blahblah'][max];
-
-      return e;
     },
     /**
      * Calculates and Sets the x and y domain after data loads
@@ -269,7 +263,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      */
      _currentDomain: function() {
       // check to make sure there is data
-      if(this._doesObjHaveValues(this.chartData) && this._doesObjHaveValues(this.x) && this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.completeSeriesConfig)){
+      if(this._doesObjHaveValues(this.chartData) && this._doesObjHaveValues(this.x) && this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.completeSeriesConfig) && this._doesObjHaveValues(this.chartExtents)){
         // TODO check if dataset has max and min
         // TODO add dev set max and min
         // TODO What do we do if we have max/min Ys and not x, which is the case with our sample data?
@@ -292,28 +286,27 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         // }
 
         var exts = {
-          'x': null,
-          'y': null
-          },
+          'x': this.chartExtents['x'],
+          'y': this.chartExtents['y']
+        },
           xOrd = this.xScale === 'ordinal',
           yOrd = this.yScale === 'ordinal',
           xTime = this.xScale === 'time',
           doX = xTime ? false : true,
-          doY = true;
-        // TODO check if seriesConfig has max and min.
+          doY = true,
+          keys = Object.keys(this.completeSeriesConfig);
 
-
-        // if not:
-        exts.x = this._calcDefaultExt('xExtMin','xExtMax',xOrd);
-        exts.y = this._calcDefaultExt('yExtMin','yExtMax',yOrd);
-
-        //Chug through the data to max and min
-        if(this.chartData[0]['series']){
-          this._findSeriesMinMax(this.chartData, doX, doY, xOrd, yOrd, xTime, exts)
-        } else {
-          this._findMinMax(this.chartData, doX, doY, xOrd, yOrd, xTime, exts, Object.keys(this.completeSeriesConfig));
+        if(exts.x[0] !== Infinity && exts.x[1] !== -Infinity){
+          xTime = false;
+          doX = false;
+        }
+        if(exts.y[0] !== Infinity && exts.y[1] !== -Infinity){
+          yTime = false;
+          doY = false;
         }
 
+        //Chug through the data to max and min
+        this._findMinMax(this.chartData, doX, doY, xOrd, yOrd, xTime, exts, keys);
 
         this.x.domain(exts.x);
         this.y.domain(exts.y);

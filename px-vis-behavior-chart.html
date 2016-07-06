@@ -29,8 +29,10 @@ PxVisBehaviorChart.chartCommon = [{
       *         "type": "line",  //line or scatter
       *         "name": "My Series",  //human readable name
       *         "x": 0,  //index or key name for independent variable
-      *         "xExt": [0,0],  //data extents for x
-      *         "yExt": [0,0],  //data extents for y
+      *         "xMin": 0,  // minimum x value
+      *         "xMax": 100,  //maximum x value
+      *         "yMin": 5,  //minimum y value
+      *         "yMax": 50,  //maximum y value
       *         "color": "rgb(0,0,0)", //color you want the chart
       *         "axis": "axis1"  //axis the chart should be on
       *     }
@@ -52,13 +54,14 @@ PxVisBehaviorChart.chartCommon = [{
         type: Object,
         notify: true,
         value: function(){
+          // defaultSeriesConfig[xMin] cant be Infinity by default because then we cant assign it Infinity in json.
           return {
             "type": "line",
-            "x": 0,
-            "xExtMin": "dynamic",
-            "xExtMax": "dynamic",
-            "yExtMin": 0,
-            "yExtMax": "dynamic"
+            "x": 'x',
+            "xMin": "dynamic",
+            "xMax": "dynamic",
+            "yMin": 0,
+            "yMax": "dynamic"
           }
         }
       },
@@ -96,18 +99,59 @@ PxVisBehaviorChart.chartCommon = [{
       '_setCompleteSeriesConfig(defaultSeriesConfig.*,chartData.*,seriesConfig.*)'
     ],
 
+    _calcChartExts: function(mins,maxes,axis){
+      if(this[axis + 'Scale'] === 'ordinal'){
+        // how should someone set the ordinal list? Differet key in seriesConfig?
+        return [];
+      }
+      var dMin = this.defaultSeriesConfig[axis+'Min'] === 'dynamic' ? Infinity: this.defaultSeriesConfig[axis+'Min'],
+          dMax = this.defaultSeriesConfig[axis+'Max'] === 'dynamic' ? -Infinity: this.defaultSeriesConfig[axis+'Max'];
 
+      mins.push(dMin);
+      maxes.push(dMax);
+
+      return [ Math.min.apply(null, mins) , Math.max.apply(null, maxes) ];
+    },
+
+    /**
+    * Creates the real series confit object based on the default settings, the dev defined series config, and the includeAllSeries flag.
+    *
+    */
     _setCompleteSeriesConfig: function(){
       if(this._doesObjHaveValues(this.defaultSeriesConfig) && this._doesObjHaveValues(this.chartData)){
-        var fullConfig = (this.seriesConfig) ? this.seriesConfig : {},
-            k = (this.includeAllSeries) ? Object.keys(this.chartData[0]) : Object.keys(fullConfig);
+        var fullConfig = (this.seriesConfig) ? JSON.parse(JSON.stringify(this.seriesConfig)) : {},
+            k = (this.includeAllSeries) ? Object.keys(this.chartData[0]) : Object.keys(fullConfig),
+            xMins = [],
+            xMaxes = [],
+            yMins = [],
+            yMaxes = [],
+            chartExtents = {};
 
         if(k.length === 0){
           console.warn("No series were added to the chart. Either add them in the seriesConfig or turn on includeAllSeries");
           return;
         }
 
+        // TODO is there a better way?
+        if(this.includeAllSeries){
+          /*
+            to delete x from fullConfig, we need to know what the x key is. A seriesConfig might have it, otherwise try defaultSeriesConfig.
+
+            First, try the first elem in the obj and hope it itself is not the x; if that doesnt work, try the last one; if that doesnt work, assume (maybe not a safe assumption) that they didnt set any x override and use default.
+          */
+          var x;
+          if(this.seriesConfig && this.seriesConfig[k[0]]['x']){
+            x = this.seriesConfig[k[0]]['x'];
+          } else if(this.seriesConfig && this.seriesConfig[ k[ k.length -1 ]]['x']){
+            x = this.seriesConfig[ k[ k.length -1 ]]['x'];
+          } else {
+            x = this.defaultSeriesConfig['x'];
+          }
+          delete fullConfig[x];
+        }
+
         for(var i = 0; i < k.length; i++) {
+          // check our copied seriesConfig and see what is there
           if(!fullConfig[k[i]]){
             fullConfig[k[i]] = {};
           }
@@ -123,23 +167,39 @@ PxVisBehaviorChart.chartCommon = [{
           if(!fullConfig[k[i]]['color']) {
             fullConfig[k[i]]['color'] = this.dataVisColors[this.seriesColorOrder[i]];
           }
-          if(!fullConfig[k[i]]['xExtMin']) {
-            fullConfig[k[i]]['xExtMin'] = this.defaultSeriesConfig['xExtMin']
+
+          if(fullConfig[k[i]]['xMin']) {
+            xMins.push(fullConfig[k[i]]['xMin']);
           }
-          if(!fullConfig[k[i]]['xExtMax']) {
-            fullConfig[k[i]]['xExtMax'] = this.defaultSeriesConfig['xExtMax']
+          if(fullConfig[k[i]]['xMax']) {
+            xMaxes.push(fullConfig[k[i]]['xMax']);
           }
-          if(!fullConfig[k[i]]['yExtMin']) {
-            fullConfig[k[i]]['yExtMin'] = this.defaultSeriesConfig['yExtMin']
+          if(fullConfig[k[i]]['yMin']) {
+            yMins.push(fullConfig[k[i]]['yMin']);
           }
-          if(!fullConfig[k[i]]['yExtMax']) {
-            fullConfig[k[i]]['yExtMax'] = this.defaultSeriesConfig['yExtMax']
+          if(fullConfig[k[i]]['yMax']) {
+            yMaxes.push(fullConfig[k[i]]['yMax']);
           }
         }
+
+        if(!this.chartExtents){
+          chartExtents['x'] = this._calcChartExts(xMins,xMaxes,'x');
+          chartExtents['y'] = this._calcChartExts(yMins,yMaxes,'y');
+        } else {
+          if(!this.chartExtents.x){
+            chartExtents['x'] = this._calcChartExts(xMins,xMaxes,'x');
+          }
+          if(!this.chartExtents.y){
+            chartExtents['y'] = this._calcChartExts(yMins,yMaxes,'y');
+          }
+        }
+
+        this.set('chartExtents',chartExtents);
+        this.fire('px-vis-chart-extents', { 'dataVar': 'chartExtents', 'data': chartExtents, 'method':'set' });
+
+        this.set('completeSeriesConfig',fullConfig);
+        this.fire('px-vis-complete-series-config', { 'dataVar': 'completeSeriesConfig', 'data': fullConfig, 'method':'set' });
       }
-      this.set('completeSeriesConfig',fullConfig);
-      // if we want to fire it out of this chart
-      this.fire('px-vis-complete-series-config', { 'dataVar': 'completeSeriesConfig', 'data': fullConfig, 'method':'set' });
     },
 
     /**

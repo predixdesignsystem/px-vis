@@ -181,21 +181,13 @@ It will reformat the data into the object format and create a seriesConfig file.
     * @method attached
     */
     attached: function(){
-      // if(this._doesObjHaveValues(this.x)){
-      //   this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
-      // }
-      //
-      // if(this._doesObjHaveValues(this.y)){
-      //   this.fire('px-vis-y-updated', { 'dataVar': 'y', 'data': this.y, 'method':'set' });
-      // }
-      //
-      // if(this._doesObjHaveValues(this.currentDomainX)){
-      //   this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
-      // }
-      //
-      // if(this._doesObjHaveValues(this.currentDomainY)){
-      //   this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
-      // }
+      if(this._doesObjHaveValues(this.seriesConfig)){
+        this.fire('px-vis-series-config', { 'dataVar': 'seriesConfig', 'data': seriesConfig, 'method':'set' });
+      }
+
+      if(this._doesObjHaveValues(this.chartData)){
+        this.fire('px-vis-chart-data', { 'dataVar': 'chartData', 'data': chartData, 'method':'set' });
+      }
     },
 
     _computeChartData: function() {
@@ -271,6 +263,7 @@ It will reformat the data into the object format and create a seriesConfig file.
         //   }
         // }
         // console.log(chartData);
+        this.fire('px-vis-chart-data', { 'dataVar': 'chartData', 'data': chartData, 'method':'set' });
         return chartData;
       }
     },
@@ -287,15 +280,16 @@ It will reformat the data into the object format and create a seriesConfig file.
           seriesConfig[id]['name'] = this.dataNames[i] ? this.dataNames[i] : this.originalData[i]['name'];
           seriesConfig[id]['x'] = this.newXKey;
 
-          if(this.originalData[i]['minValue']){
-            seriesConfig[id]['yExtMin'] = this.originalData[i]['minValue'];
+          if(this.originalData[i]['min']){
+            seriesConfig[id]['yMin'] = this.originalData[i]['min'];
           }
 
-          if(this.originalData[i]['maxValue']){
-            seriesConfig[id]['yExtMax'] = this.originalData[i]['maxValue'];
+          if(this.originalData[i]['max']){
+            seriesConfig[id]['yMax'] = this.originalData[i]['max'];
           }
         }
         // console.log(seriesConfig);
+        this.fire('px-vis-series-config', { 'dataVar': 'seriesConfig', 'data': seriesConfig, 'method':'set' });
         return seriesConfig;
       }
     }
