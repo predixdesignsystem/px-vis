@@ -138,10 +138,10 @@ Formatting for the timestamps,the data values, and the series names can be contr
               <span class$="{{_mutedToStart(item.name)}}" name$="R{{item.name}}" on-click="_seriesClicked">
                   <span
                     class="seriesMarker"
-                    style$="background-color:{{_getPieColorForIndex(index)}};"
+                    style$="background-color:{{_getPieColorForIndex(index)}}"
                     name$="R{{item.name}}"
                   >&nbsp;</span>
-                  <span class$="{{_getWrapperClass(type)}}">
+                  <div class$="{{_getWrapperClass(type)}}">
                     <div class="seriesName" name$="R{{_getName(item)}}">
                       {{_returnTruncatedName(item)}}&nbsp;
                       <template is="dom-if" if="{{_didTruncate(item,truncationLength)}}">
@@ -152,7 +152,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
                     <div class="seriesData" name$="R{{_returnVal(item, 1)}}">
                       <span>[[_returnVal(item, completeSeriesConfig.x.name)]]</span>
                     </div>
-                  </span>
+                  </div>
               </span>
             </template>
           </template>
@@ -267,12 +267,12 @@ Formatting for the timestamps,the data values, and the series names can be contr
      ],
 
      _getWrapperClass: function(type) {
-       var classList = 'flex ';
+       var classList = 'flex flex--justify';
 
        if(type === 'horizontal') {
          classList += 'flex--col ';
        } else {
-         classList += 'flex--row';
+         classList += 'flex--row max-width';
        }
 
        return classList;
