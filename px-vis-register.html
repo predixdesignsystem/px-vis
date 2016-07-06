@@ -75,64 +75,8 @@ Formatting for the timestamps,the data values, and the series names can be contr
           </div>
         </template>
         <div class$="{{_getSeriesWrapperClass(type)}}">
-          <template is="dom-repeat" items="{{tooltipData.series}}">
-            <span class$="{{_mutedToStart(item.name)}}" name$="R{{item.name}}" on-click="_seriesClicked">
-                <span
-                  class="seriesMarker"
-                  style$="background-color:{{_returnItemColor(item.name)}};"
-                  name$="R{{item.name}}"
-                >&nbsp;</span>
-                <span class$="{{_getWrapperClass(type)}}">
-                  <div class="seriesName" name$="R{{item.name}}">
-                    {{_returnTruncatedName(item.name)}}&nbsp;
-                    <template is="dom-if" if="{{_didTruncate(item.name,truncationLength)}}">
-                      <px-tooltip delay="500">{{_getName(item.name)}}</px-tooltip>
-                    </template>
-                  </div>
-                  <!-- Display serie data differently depending on x and y axis types -->
-                  <div class="seriesData" name$="R{{item.name}}">
-                    <!-- if x axis is number format and show it -->
-                    <template is="dom-if" if="{{_isOfType(xAxisType, 'linear')}}">
-                      <numbro-element
-                        value="[[_returnVal(item.value, 0, '&nbsp;/&nbsp')]]"
-                        format="[[numberFormat]]"
-                        culture="[[numberFormatCulture]]"
-                        currency$="[[numberFormatIsCurrency]]"
-                        default-currency-format="[[numberFormatCurrency]]"
-                        zero-format="[[numberFormatZero]]">
-                      </numbro-element>
-                      <template is="dom-if" if="[[_returnVal(item.value, 0)]]">
-                        &nbsp;/&nbsp
-                      </template>
-                    </template>
-                    <!-- if x axis is ordinal just display it -->
-                    <template is="dom-if" if="{{_isOfType(xAxisType, 'ordinal')}}">
-                      <span>[[_returnVal(item.value, 0, '&nbsp;/&nbsp')]]</span>
-                    </template>
-                    <!-- if x axis is time don't display it -->
-                    <!-- if y axis is number format and show it -->
-                    <template is="dom-if" if="{{_isOfType(yAxisType, 'linear')}}">
-                      <numbro-element
-                        value="[[_returnVal(item.value, item.name)]]"
-                        format="[[numberFormat]]"
-                        culture="[[numberFormatCulture]]"
-                        currency$="[[numberFormatIsCurrency]]"
-                        default-currency-format="[[numberFormatCurrency]]"
-                        zero-format="[[numberFormatZero]]">
-                      </numbro-element>
-                    </template>
-                    <!-- if y axis is ordinal just display it -->
-                    <template is="dom-if" if="{{_isOfType(yAxisType, 'ordinal')}}">
-                      <span>[[_returnVal(item.value, 1)]]</span>
-                    </template>
-                    <template is="dom-if" if="{{item.value}}">{{units}}</template>
-                  </div>
-                </span>
-            </span>
-          </template>
-          <!-- For pie charts -->
-          <template is="dom-if" if="{{_isOfType(yAxisType, 'pie')}}">
-            <template is="dom-repeat" items="{{chartData}}">
+          <template is="dom-if" if="{{!_isOfType(xAxisType, 'pie')}}">
+            <template is="dom-repeat" items="{{tooltipData.series}}">
               <span class$="{{_mutedToStart(item.name)}}" name$="R{{item.name}}" on-click="_seriesClicked">
                   <span
                     class="seriesMarker"
@@ -141,14 +85,72 @@ Formatting for the timestamps,the data values, and the series names can be contr
                   >&nbsp;</span>
                   <span class$="{{_getWrapperClass(type)}}">
                     <div class="seriesName" name$="R{{item.name}}">
-                      {{_returnTruncatedName(_returnVal(item, 1))}}&nbsp;
+                      {{_returnTruncatedName(item.name)}}&nbsp;
                       <template is="dom-if" if="{{_didTruncate(item.name,truncationLength)}}">
-                        <px-tooltip delay="500">{{_getName(_returnVal(item, 1))}}</px-tooltip>
+                        <px-tooltip delay="500">{{_getName(item.name)}}</px-tooltip>
+                      </template>
+                    </div>
+                    <!-- Display serie data differently depending on x and y axis types -->
+                    <div class="seriesData" name$="R{{item.name}}">
+                      <!-- if x axis is number format and show it -->
+                      <template is="dom-if" if="{{_isOfType(xAxisType, 'linear')}}">
+                        <numbro-element
+                          value="[[_returnVal(item.value, 0, '&nbsp;/&nbsp')]]"
+                          format="[[numberFormat]]"
+                          culture="[[numberFormatCulture]]"
+                          currency$="[[numberFormatIsCurrency]]"
+                          default-currency-format="[[numberFormatCurrency]]"
+                          zero-format="[[numberFormatZero]]">
+                        </numbro-element>
+                        <template is="dom-if" if="[[_returnVal(item.value, 0)]]">
+                          &nbsp;/&nbsp
+                        </template>
+                      </template>
+                      <!-- if x axis is ordinal just display it -->
+                      <template is="dom-if" if="{{_isOfType(xAxisType, 'ordinal')}}">
+                        <span>[[_returnVal(item.value, 0, '&nbsp;/&nbsp')]]</span>
+                      </template>
+                      <!-- if x axis is time don't display it -->
+                      <!-- if y axis is number format and show it -->
+                      <template is="dom-if" if="{{_isOfType(yAxisType, 'linear')}}">
+                        <numbro-element
+                          value="[[_returnVal(item.value, item.name)]]"
+                          format="[[numberFormat]]"
+                          culture="[[numberFormatCulture]]"
+                          currency$="[[numberFormatIsCurrency]]"
+                          default-currency-format="[[numberFormatCurrency]]"
+                          zero-format="[[numberFormatZero]]">
+                        </numbro-element>
+                      </template>
+                      <!-- if y axis is ordinal just display it -->
+                      <template is="dom-if" if="{{_isOfType(yAxisType, 'ordinal')}}">
+                        <span>[[_returnVal(item.value, 1)]]</span>
+                      </template>
+                      <template is="dom-if" if="{{item.value}}">{{units}}</template>
+                    </div>
+                  </span>
+              </span>
+            </template>
+          </template>
+          <!-- For pie charts -->
+          <template is="dom-if" if="{{_isOfType(yAxisType, 'pie')}}">
+            <template is="dom-repeat" items="{{chartData}}">
+              <span class$="{{_mutedToStart(item.name)}}" name$="R{{item.name}}" on-click="_seriesClicked">
+                  <span
+                    class="seriesMarker"
+                    style$="background-color:{{_getPieColorForIndex(index)}};"
+                    name$="R{{item.name}}"
+                  >&nbsp;</span>
+                  <span class$="{{_getWrapperClass(type)}}">
+                    <div class="seriesName" name$="R{{_getName(item)}}">
+                      {{_returnTruncatedName(item)}}&nbsp;
+                      <template is="dom-if" if="{{_didTruncate(item,truncationLength)}}">
+                        <px-tooltip delay="500">{{_getName(item)}}</px-tooltip>
                       </template>
                     </div>
                     <!-- Display serie data differently depending on x and y axis types -->
                     <div class="seriesData" name$="R{{_returnVal(item, 1)}}">
-                      <span>[[_returnVal(item, 0, '&nbsp;/&nbsp')]]</span>
+                      <span>[[_returnVal(item, completeSeriesConfig.x.name)]]</span>
                     </div>
                   </span>
               </span>
@@ -174,6 +176,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
       PxVisBehavior.dataset,
       PxVisBehavior.axisTypes,
       PxVisBehavior.completeSeriesConfig,
+      PxVisBehavior.commonMethods,
       commonColors
     ],
 
@@ -395,7 +398,11 @@ Formatting for the timestamps,the data values, and the series names can be contr
       return baseClasses;
     },
     _getName(name){
-      return this.completeSeriesConfig[name]['name'];
+      if(this.xAxisType === 'pie') {
+        return name[this.completeSeriesConfig.y.name];
+      } else {
+        return this.completeSeriesConfig[name]['name'];
+      }
     },
     _returnTruncatedName: function(name){
       return this._truncateName(this._getName(name),this.truncationLength);

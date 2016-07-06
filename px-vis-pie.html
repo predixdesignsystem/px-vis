@@ -158,7 +158,8 @@ Element which draws scatter series onto the chart
       if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.chartData)){
         //calculate data and radius
         var data = this.chartData,
-            pie = d3.layout.pie().value(function(d){return d['x'];})(data);
+            pie = d3.layout.pie().value(function(d){return d['x'];})(data),
+            _this = this;
 
         // checks to see if the group already exists. If not, create; if so, update
         if(this._isObjEmpty(this.pieGroup)){
@@ -185,7 +186,7 @@ Element which draws scatter series onto the chart
 
         arcs.append('svg:path')
             .attr('fill', function(d, i){
-                return commonColors.properties.dataVisColors.value[commonColors.properties.seriesColorOrder.value[i]];
+                return _this._getPieColorForIndex(i);
             })
             .attr('d', function (d) {
                 return arc(d);
