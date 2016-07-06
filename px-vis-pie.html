@@ -33,8 +33,14 @@ Element which draws scatter series onto the chart
     <template>
       <span id="tooltipAnchor" class="visuallyhidden"></span>
       <span id="popoverAnchor" class="visuallyhidden"></span>
-      <px-tooltip id="tooltip" orientation="top" delay="10" for="tooltipAnchor"></px-tooltip>
-      <px-popover id="popover" popover-title="" orientation="top" hide-overlay class="popover" for="popoverAnchor"></px-popover>
+      <px-tooltip id="tooltip" orientation="top" delay="10" for="tooltipAnchor">
+        <div style="display:flex; flex-direction:column; align-items:center">
+          <span>{{_ttTitle}}</span>
+          <span>{{_ttMessage}}</span>
+        </div>
+      </px-tooltip>
+      <px-popover id="popover" popover-title="" orientation="top" hide-overlay class="popover" for="popoverAnchor">
+      </px-popover>
     </template>
 </dom-module>
 
@@ -49,6 +55,7 @@ Element which draws scatter series onto the chart
       PxVisBehavior.commonMethods,
       PxVisBehavior.sizing,
       PxVisBehavior.dataset,
+      PxVisBehavior.units,
       commonColors
     ],
 
@@ -132,6 +139,22 @@ Element which draws scatter series onto the chart
       _translationString: {
         type: String,
         computed: '_computeTranslationString(_radius, margin)'
+      },
+      /**
+       * Message used for tooltip and popover, containing info on current slice
+       *
+       */
+      _ttMessage: {
+        type: String,
+        value: ''
+      },
+      /**
+       * Title used for tooltip and popover, containing info on current slice
+       *
+       */
+      _ttTitle: {
+        type: String,
+        value: ''
       }
     },
 
@@ -200,7 +223,10 @@ Element which draws scatter series onto the chart
     _showTooltip: function(datum, index, group) {
 
       //get label
-      this.$.tooltip.tooltipMessage = datum.data['y'];
+      //this.$.tooltipMessage = 'TEST';
+      this.set('_ttTitle', datum.data['y']);
+      this.set('_ttMessage', datum.data['x'] + ' ' + this.units);
+
 
       //center tooltip
       //TODO: improve how we place the tooltip using the actual svg path?
@@ -247,7 +273,8 @@ Element which draws scatter series onto the chart
       //display a popover after the rotation
       setTimeout(function() {
 
-        _this.$.popover.popoverBody = datum.data['y'];
+        _this.$.popover.popoverTitle = datum.data['y'];
+        _this.$.popover.popoverBody = datum.data['x'] + ' ' + _this.units;
 
         //resimulate click so that popover can pick it up
         _this.$.popover.show();

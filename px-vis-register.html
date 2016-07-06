@@ -135,11 +135,11 @@ Formatting for the timestamps,the data values, and the series names can be contr
           <!-- For pie charts -->
           <template is="dom-if" if="{{_isOfType(yAxisType, 'pie')}}">
             <template is="dom-repeat" items="{{chartData}}">
-              <span class$="{{_mutedToStart(item.name)}}" name$="R{{item.name}}" on-click="_seriesClicked">
+              <span class$="{{_mutedToStart(item.name)}}" name$="R{{_returnVal(item, 'y')}}" on-click="_pieSeriesClicked">
                   <span
                     class="seriesMarker"
                     style$="background-color:{{_getPieColorForIndex(index)}}"
-                    name$="R{{item.name}}"
+                    name$="R{{_returnVal(item, 'y')}}"
                   >&nbsp;</span>
                   <div class$="{{_getWrapperClass(type)}}">
                     <div class="seriesName" name$="R{{_getName(item)}}">
@@ -149,8 +149,9 @@ Formatting for the timestamps,the data values, and the series names can be contr
                       </template>
                     </div>
                     <!-- Display serie data differently depending on x and y axis types -->
-                    <div class="seriesData" name$="R{{_returnVal(item, 1)}}">
-                      <span>[[_returnVal(item, completeSeriesConfig.x.name)]]</span>
+                    <div class="seriesData" name$="R{{_returnVal(item, 'y')}}">
+                      <span>[[_returnVal(item, 'x')]]</span>
+                      <template is="dom-if" if="{{_returnVal(item, 'x')}}">{{units}}</template>
                     </div>
                   </div>
               </span>
@@ -177,6 +178,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
       PxVisBehavior.axisTypes,
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.commonMethods,
+      PxVisBehavior.units,
       commonColors
     ],
 
@@ -187,17 +189,6 @@ Formatting for the timestamps,the data values, and the series names can be contr
      * @type Object
      */
     properties: {
-      /**
-       * The units of the data
-       *
-       * @property units
-       * @type String
-       * @default ''
-       */
-      units:{
-        type:String,
-        value:''
-      },
       /**
        * Defines if the register should be horizontal or vertical. Options are:
        *  - `vertical`
@@ -267,12 +258,12 @@ Formatting for the timestamps,the data values, and the series names can be contr
      ],
 
      _getWrapperClass: function(type) {
-       var classList = 'flex flex--justify';
+       var classList = 'flex ';
 
        if(type === 'horizontal') {
          classList += 'flex--col ';
        } else {
-         classList += 'flex--row max-width';
+         classList += 'flex--row flex--justify full-width';
        }
 
        return classList;
