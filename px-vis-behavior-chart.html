@@ -104,6 +104,7 @@ PxVisBehaviorChart.chartCommon = [{
         // how should someone set the ordinal list? Differet key in seriesConfig?
         return [];
       }
+
       var dMin = this.defaultSeriesConfig[axis+'Min'] === 'dynamic' ? Infinity: this.defaultSeriesConfig[axis+'Min'],
           dMax = this.defaultSeriesConfig[axis+'Max'] === 'dynamic' ? -Infinity: this.defaultSeriesConfig[axis+'Max'];
 
@@ -140,18 +141,21 @@ PxVisBehaviorChart.chartCommon = [{
             First, try the first elem in the obj and hope it itself is not the x; if that doesnt work, try the last one; if that doesnt work, assume (maybe not a safe assumption) that they didnt set any x override and use default.
           */
           var x;
-          console.log(this.seriesConfig);
-          if(this._doesObjHaveValues(this.seriesConfig) && this.seriesConfig[k[0]]['x']){
+
+          if(this._doesObjHaveValues(this.seriesConfig) && this.seriesConfig.hasOwnProperty(k[0]) && this.seriesConfig[k[0]]['x']){
             x = this.seriesConfig[k[0]]['x'];
-          } else if(this._doesObjHaveValues(this.seriesConfig) && this.seriesConfig[ k[ k.length -1 ]]['x']){
+          } else if(this._doesObjHaveValues(this.seriesConfig) && this.seriesConfig.hasOwnProperty(k[ k.length -1 ]) && this.seriesConfig[ k[ k.length -1 ]]['x']){
             x = this.seriesConfig[ k[ k.length -1 ]]['x'];
           } else {
             x = this.defaultSeriesConfig['x'];
           }
-          delete fullConfig[x];
         }
 
         for(var i = 0; i < k.length; i++) {
+          // TODO maybe delete the x key so we dont loose a color?
+          if(this.includeAllSeries && k[i] === x){
+            continue;
+          }
           // check our copied seriesConfig and see what is there
           if(!fullConfig[k[i]]){
             fullConfig[k[i]] = {};
@@ -194,6 +198,7 @@ PxVisBehaviorChart.chartCommon = [{
             chartExtents['y'] = this._calcChartExts(yMins,yMaxes,'y');
           }
         }
+
 
         this.set('chartExtents',chartExtents);
         this.fire('px-vis-chart-extents', { 'dataVar': 'chartExtents', 'data': chartExtents, 'method':'set' });
