@@ -518,18 +518,20 @@ PxVisBehavior.axisTypes = {
 */
 
 PxVisBehavior.zoomSelection = {
-  /**
-   *
-   * The shape of selection (zoom) the user can do. Can be:
-   * - 'xy': user can draw a rectangle freely
-   * - 'xAxis': user can select a range withing the X axis, the Y axis always
-   *   being entirely selected
-   * - 'YAxis': user can select a range withing the Y axis, the X axis always
-   *   being entirely selected
-   */
-  selectionType: {
-    type: String,
-    value: 'xy'
+  properties: {
+    /**
+     *
+     * The shape of selection (zoom) the user can do. Can be:
+     * - 'xy': user can draw a rectangle freely
+     * - 'xAxis': user can select a range withing the X axis, the Y axis always
+     *   being entirely selected
+     * - 'YAxis': user can select a range withing the Y axis, the X axis always
+     *   being entirely selected
+     */
+    selectionType: {
+      type: String,
+      value: 'xy'
+    }
   }
 };
 
@@ -546,16 +548,56 @@ PxVisBehavior.zoomSelection = {
     @polymerBehavior PxVisBehavior.units
 */
 PxVisBehavior.units = {
-  /**
-   * The units of the data
-   *
-   * @property units
-   * @type String
-   * @default ''
-   */
-  units:{
-    type:String,
-    value:''
+  properties: {
+    /**
+     * The units of the data
+     *
+     * @property units
+     * @type String
+     * @default ''
+     */
+    units:{
+      type:String,
+      value:''
+    }
   }
-}
+};
+
+/*
+     Name:
+    PxVisBehavior.chartExtents
+
+    Description:
+    Polymer behavior that provides a chartExtents object to components.
+
+
+    @polymerBehavior PxVisBehavior.chartExtents
+*/
+
+
+PxVisBehavior.chartExtents = {
+  properties: {
+    /**
+    *
+    *```
+    *  {
+    *      "x": [0,100],
+    *      "y": [5,50],
+    *  }
+    *```
+    *
+    * For an ordinal dataset, chart extents can be set like this:
+    *```
+    *  {
+    *      "x": ['low','medium','high'],
+    *      "y": [5,50],
+    *  }
+    *```
+    */
+    chartExtents: {
+      type: Object,
+      notify: true
+    }
+  }
+};
 </script>
