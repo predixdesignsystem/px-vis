@@ -234,7 +234,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             // setup a holder for our data to pass out
             var dataObj = {
               // FIXME does this still work with scatter?
-              'time':(this.xAxisType === 'linear') ? x1 : null,
+              'time':(this.xAxisType === 'time') ? x1 : null,
               'series': [],
               'mouse': mousePos,
               'xArr': null,
@@ -269,17 +269,13 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                 }
               }
               //find closest point....
-              else if(this.xAxisType === 'linear') {
+              else if(this.xAxisType === 'time') {
                 //time based X axis
                 /*
                   d3.bisector returns index in our array that corresponds to the horizontal position of the mouse pointer.
                   Specifically this returns the date that falls to the left of the mouse cursor.
                 */
-                if(this.chartData[i]["series"]){
-                  chartData  = this.chartData[i].series;
-                } else {
-                  chartData  = this.chartData;
-                }
+                chartData  = this.chartData;
 
                 var bisectDate = d3.bisector(function(d) {
                   return d[this.completeSeriesConfig[keys[i]]['x']];
@@ -292,11 +288,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                 result = (x1 - d0[0] > d1[0] - x1) ? d1 : d0;
               } else {
                 //non time based: iterate over points and find the closest
-                for(var j = 0; j < this.chartData[i].series.length; j++) {
+                for(var j = 0; j < this.chartData.length; j++) {
 
                   //get point coords
-                  x2 = this.chartData[i].series[j][0];
-                  y2 = this.chartData[i].series[j][1];
+                  x2 = this.chartData[j][keys[i]];
+                  y2 = this.chartData[j][keys[i]];
 
                   //distance between the two points
                   d = Math.sqrt( (x2-=x1)*x2 + (y2-=y1)*y2 );
@@ -304,19 +300,14 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                   //keep the closest point
                   if(d < minDist) {
                     minDist = d;
-                    result = this.chartData[i].series[j];
+                    result = this.chartData[j][keys[i]];
                   }
+                }
               }
 
-              }
               // get the pixel coords for that data
-              if(Array.isArray(result)){
-                xCoord = this.x(result[0]);
-                yCoord = this.y(result[1]);
-              } else {
-                xCoord = this.x(result[this.completeSeriesConfig[keys[i]]['x']]);
-                yCoord = this.y(result[keys[i]]);
-              }
+              xCoord = this.x(result[this.completeSeriesConfig[keys[i]]['x']]);
+              yCoord = this.y(result[keys[i]]);
 
               xArr.push(xCoord);
               yArr.push(yCoord);
