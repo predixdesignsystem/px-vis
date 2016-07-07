@@ -82,7 +82,6 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       '_currentDomain(chartData.*,x,y,completeSeriesConfig,chartExtents)',
       '_updateDomain(selectedDomain)'
     ],
-
     /**
     * when attached, re-fire set properties for precipitation pattern
     *
@@ -144,11 +143,11 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       }
     },
 
-    _getDataExtents: function(d,yArr){
+    _getDataExtents: function(d,yKeysArr){
       var a = [];
-      for(var i = 0; i < yArr.length; i++){
-        var k = yArr[i];
-        a.push(d[this.completeSeriesConfig[k]['y']]);
+      for(var i = 0; i < yKeysArr.length; i++){
+        var key = yKeysArr[i];
+        a.push(d[this.completeSeriesConfig[key]['y']]);
       }
       return [ Math.min.apply(null,a),Math.max.apply(null,a) ];
     },
@@ -158,13 +157,12 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * Find the min and max values or ordinal values in data, for X and/or Y axis
      *
      */
-    _findMinMax: function(data, doX, doY, ordX, ordY, timeX, result, key) {
+    _findMinMax: function(data, doX, doY, ordX, ordY, timeX, result, keys) {
       var j,xTemp,yTemp,
         jLen = data.length,
-        x,yArr;
+        x;
       // TODO move 'x' out of each series config and into a chartConfig
-        x = this.completeSeriesConfig[key[0]].x;
-        yArr = key;
+        x = this.completeSeriesConfig[keys[0]].x;
 
       if(timeX) {
         this._findTimeMM(result,data,jLen,x);
@@ -172,7 +170,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       for(j = 0; j < jLen; j++) {
         //make sure we're dealing with numbers
         xTemp = (typeof(data[j][x]) === 'string') ? parseFloat(data[j][x]) : data[j][x];
-        yTemp = this._getDataExtents(data[j], yArr);
+        yTemp = this._getDataExtents(data[j], keys);
 
         if(doX) {
           if(ordX && result.x.indexOf(data[j][x]) === -1) {
@@ -185,7 +183,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         if(doY) {
           if(ordY && result.y.indexOf(data[j][1]) === -1) {
             // FIXME yArr is now an array and not a value
-            result.y.push(data[j][yArr]);
+            result.y.push(data[j][keys]);
           } else {
             this._setMin(result.y,yTemp[0]);
             this._setMax(result.y,yTemp[1]);
@@ -258,6 +256,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         // if(this._doesObjHaveValues(this.seriesConfig)){
         //   this._completeExistingSeriesConfig();
         // }
+        debugger
         var exts = {
           'x': this.chartExtents['x'],
           'y': this.chartExtents['y']
