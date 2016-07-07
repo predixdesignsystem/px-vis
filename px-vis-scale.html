@@ -54,6 +54,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       PxVisBehavior.dataset,
       PxVisBehavior.commonMethods,
       PxVisBehaviorD3.selectedDomain,
+      PxVisBehavior.axisTypes,
       commonColors,
       PxVisBehavior.completeSeriesConfig
     ],
@@ -65,34 +66,6 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @type Object
      */
     properties: {
-      /**
-       * Sets the type of data for the x values
-       *
-       * Valid entries are:
-       * - `ordinal`: for discrete input domains, such as names or categories.
-       * - `time`: for time domains.
-       * - `linear`: for continuous input domains, such as numbers.
-       *
-       */
-      xScale: {
-        type: String,
-        value: 'ordinal',
-        notify: true
-      },
-      /**
-       * Sets the type of data for the y values
-       *
-       * Valid entries are:
-       * - `ordinal`: for discrete input domains, such as names or categories.
-       * - `time`: for time domains.
-       * - `linear`: for continuous input domains, such as numbers.
-       *
-       */
-      yScale: {
-        type: String,
-        value: 'ordinal',
-        notify: true
-      },
       /**
        * Holder for chart extents from the seriesConfig object
        *
@@ -140,7 +113,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      */
     _setXScale: function(width,margin){
       var w = width - margin.left - margin.right;
-      this.x = this._setScale(this.xScale,[0, w]);
+      this.x = this._setScale(this.xAxisType,[0, w]);
       this.notifyPath('x.range', this.x.range);
       this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
     },
@@ -151,7 +124,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      */
     _setYScale: function(height,margin){
       var h = height - margin.top - margin.bottom;
-      this.y = this._setScale(this.yScale,[h, 0]);
+      this.y = this._setScale(this.yAxisType,[h, 0]);
       this.notifyPath('y', this.y);
       this.fire('px-vis-y-updated', { 'dataVar': 'y', 'data': this.y, 'method':'set' });
     },
@@ -171,10 +144,11 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       }
     },
 
-    _getDataExtents: function(d,y){
+    _getDataExtents: function(d,yArr){
       var a = [];
-      for(var i = 0; i < y.length; i++){
-        a.push(d[y[i]]);
+      for(var i = 0; i < yArr.length; i++){
+        var k = yArr[i];
+        a.push(d[this.completeSeriesConfig[k]['y']]);
       }
       return [ Math.min.apply(null,a),Math.max.apply(null,a) ];
     },
@@ -187,7 +161,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
     _findMinMax: function(data, doX, doY, ordX, ordY, timeX, result, key) {
       var j,xTemp,yTemp,
         jLen = data.length,
-        x,y;
+        x,yArr;
 
       //make sure ordinal axis don't contain default values
       if(ordX) {
@@ -198,8 +172,8 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       }
 
       // TODO move 'x' out of each series config and into a chartConfig
-        x = this.completeSeriesConfig[key[0]].x;
-        y = key;
+      x = this.completeSeriesConfig[key[0]].x;
+      yArr = key;
 
       if(timeX) {
         this._findTimeMM(result,data,jLen,x);
@@ -207,7 +181,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       for(j = 0; j < jLen; j++) {
         //make sure we're dealing with numbers
         xTemp = (typeof(data[j][x]) === 'string') ? parseFloat(data[j][x]) : data[j][x];
-        yTemp = this._getDataExtents(data[j], y);
+        yTemp = this._getDataExtents(data[j], yArr);
 
         if(doX) {
           if(ordX && result.x.indexOf(data[j][x]) === -1) {
@@ -219,7 +193,8 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         }
         if(doY) {
           if(ordY && result.y.indexOf(data[j][1]) === -1) {
-            result.y.push(data[j][y]);
+            // FIXME yArr is now an array and not a value
+            result.y.push(data[j][yArr]);
           } else {
             this._setMin(result.y,yTemp[0]);
             this._setMax(result.y,yTemp[1]);
@@ -293,9 +268,9 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         //   this._completeExistingSeriesConfig();
         // }
 
-        var xOrd = this.xScale === 'ordinal',
-          yOrd = this.yScale === 'ordinal',
-          xTime = this.xScale === 'time',
+        var xOrd = this.xAxisType === 'ordinal',
+          yOrd = this.yAxisType === 'ordinal',
+          xTime = this.xAxisType === 'time',
           doX = xTime ? false : true,
           doY = true,
           keys = Object.keys(this.completeSeriesConfig),
@@ -314,7 +289,6 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         }
         //Chug through the data to max and min
         this._findMinMax(this.chartData, doX, doY, xOrd, yOrd, xTime, exts, keys);
-        console.log(exts);
 
         this.x.domain(exts.x);
         this.y.domain(exts.y);
