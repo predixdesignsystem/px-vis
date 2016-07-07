@@ -25,10 +25,11 @@ PxVisBehaviorChart.chartCommon = [{
       *
       *```
       *  {
-      *     "seriesKey": {  //seriesKey is either an index or an object key used to identify the series
+      *     "seriesKey": {  //seriesKey is a unique identifier for the configuration
       *         "type": "line",  //line or scatter
       *         "name": "My Series",  //human readable name
-      *         "x": 0,  //index or key name for independent variable
+      *         "x": "x",  //index or key name for independent variable
+      *         "y": "y",  //index or key name for independent variable
       *         "xMin": 0,  // minimum x value
       *         "xMax": 100,  //maximum x value
       *         "yMin": 5,  //minimum y value
@@ -100,7 +101,7 @@ PxVisBehaviorChart.chartCommon = [{
     ],
 
     _calcChartExts: function(mins,maxes,axis){
-      if(this[axis + 'Scale'] === 'ordinal'){
+      if(this[axis + 'AxisType'] === 'ordinal'){
         // how should someone set the ordinal list? Differet key in seriesConfig?
         return [];
       }
@@ -120,45 +121,37 @@ PxVisBehaviorChart.chartCommon = [{
     */
     _setCompleteSeriesConfig: function(){
       if(this._doesObjHaveValues(this.defaultSeriesConfig) && this._doesObjHaveValues(this.chartData)){
+        // FUTURE refactor: use MAPs and SETs instead of Objects when IE has support / is no longer supported by us
         var fullConfig = (this.seriesConfig) ? JSON.parse(JSON.stringify(this.seriesConfig)) : {},
-            k = (this.includeAllSeries) ? Object.keys(this.chartData[0]) : Object.keys(fullConfig),
+            k = Object.keys(fullConfig),
+            kLen = k.length,
+            // FIXME 0 elem might not have all keys. How do we actually find all keys?
+            allYs = (this.includeAllSeries) ? Object.keys(this.chartData[0]) : [],
+            // create a new object with the y keys as config keys
+            objYs = allYs.reduce(function(obj, item) {
+              obj[item] = {};
+              return obj;
+            }, {}),
             xMins = [],
             xMaxes = [],
             yMins = [],
             yMaxes = [],
-            chartExtents = {};
+            chartExtents = {},
+            missingYs,
+            x;
 
-        if(k.length === 0){
+        if(k.length === 0 && !this.includeAllSeries){
           console.warn("No series were added to the chart. Either add them in the seriesConfig or turn on includeAllSeries");
           return;
         }
 
-        // TODO is there a better way?
-        if(this.includeAllSeries){
-          /*
-            to delete x from fullConfig, we need to know what the x key is. A seriesConfig might have it, otherwise try defaultSeriesConfig.
-
-            First, try the first elem in the obj and hope it itself is not the x; if that doesnt work, try the last one; if that doesnt work, assume (maybe not a safe assumption) that they didnt set any x override and use default.
-          */
-          var x;
-          if(this._doesObjHaveValues(this.seriesConfig) && this.seriesConfig.hasOwnProperty(k[0]) && this.seriesConfig[k[0]]['x']){
-            x = this.seriesConfig[k[0]]['x'];
-          } else if(this._doesObjHaveValues(this.seriesConfig) && this.seriesConfig.hasOwnProperty(k[ k.length -1 ]) && this.seriesConfig[ k[ k.length -1 ]]['x']){
-            x = this.seriesConfig[ k[ k.length -1 ]]['x'];
-          } else {
-            x = this.defaultSeriesConfig['x'];
-          }
-        }
-
-        for(var i = 0; i < k.length; i++) {
-          // TODO maybe delete the x key so we dont loose a color?
-          if(this.includeAllSeries && k[i] === x){
+        // First, fill in the existing series.
+        for(var i = 0; i < kLen; i++) {
+          if(!fullConfig[k[i]].hasOwnProperty('y')){
+            console.warn("Configuration " + k[i] + " does not have a y-value associated with it.");
             continue;
           }
-          // check our copied seriesConfig and see what is there
-          if(!fullConfig[k[i]]){
-            fullConfig[k[i]] = {};
-          }
+
           if(!fullConfig[k[i]]['type']) {
             fullConfig[k[i]]['type'] = this.defaultSeriesConfig['type'];
           }
@@ -184,7 +177,30 @@ PxVisBehaviorChart.chartCommon = [{
           if(fullConfig[k[i]]['yMax']) {
             yMaxes.push(fullConfig[k[i]]['yMax']);
           }
+
+          // delete this y / key from objYs if includeAllSeries is on so we have a unique set
+          delete objYs[ fullConfig[k[i]]['y'] ];
         }
+
+        //figure out what x is, either a config value (assuming all x are the same) or the default
+        x = (k.length > 0) ? fullConfig[k[0]]['x'] : this.defaultSeriesConfig['x'];
+        // delete the 'x' key from our all y keys obj
+        delete objYs [x];
+
+        // create a new set of whatever Ys are left so we can iterate over it
+        missingYs = Object.keys(objYs);
+        // add the missing keys to our configuration, use y as the config key by default
+        for(var i = 0; i < missingYs.length; i++){
+          objYs[ missingYs[i] ]['type'] = this.defaultSeriesConfig['type'];
+          objYs[ missingYs[i] ]['name'] = missingYs[i];
+          objYs[ missingYs[i] ]['x'] = x;
+          objYs[ missingYs[i] ]['y'] = missingYs[i];
+          objYs[ missingYs[i] ]['color'] = this.dataVisColors[ this.seriesColorOrder[ kLen + i ] ];
+
+          // copy the obj to our config
+          fullConfig[ missingYs[i] ] = objYs[ missingYs[i] ];
+        }
+
         if(!this.chartExtents){
           chartExtents['x'] = this._calcChartExts(xMins,xMaxes,'x');
           chartExtents['y'] = this._calcChartExts(yMins,yMaxes,'y');
@@ -302,5 +318,5 @@ PxVisBehaviorChart.chartCommon = [{
       return Object.keys(obj);
     }
 
-}, commonColors, PxVisBehavior.commonMethods];
+}, commonColors, PxVisBehavior.commonMethods,PxVisBehavior.axisTypes];
 </script>
