@@ -189,6 +189,14 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         jLen = data.length,
         x,y;
 
+      //make sure ordinal axis don't contain default values
+      if(ordX) {
+        result.x = [];
+      }
+      if(ordY) {
+        result.y = [];
+      }
+
       // TODO move 'x' out of each series config and into a chartConfig
         x = this.completeSeriesConfig[key[0]].x;
         y = key;
@@ -285,16 +293,16 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         //   this._completeExistingSeriesConfig();
         // }
 
-        var exts = {
-          'x': this.chartExtents['x'],
-          'y': this.chartExtents['y']
-        },
-          xOrd = this.xScale === 'ordinal',
+        var xOrd = this.xScale === 'ordinal',
           yOrd = this.yScale === 'ordinal',
           xTime = this.xScale === 'time',
           doX = xTime ? false : true,
           doY = true,
-          keys = Object.keys(this.completeSeriesConfig);
+          keys = Object.keys(this.completeSeriesConfig),
+          exts = {
+            'x': this.chartExtents['x'],
+            'y': this.chartExtents['y']
+          };
 
         if(exts.x[0] !== Infinity && exts.x[1] !== -Infinity){
           xTime = false;

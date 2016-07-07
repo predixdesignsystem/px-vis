@@ -95,26 +95,26 @@ Formatting for the timestamps,the data values, and the series names can be contr
                       <!-- if x axis is number format and show it -->
                       <template is="dom-if" if="{{_isOfType(xAxisType, 'linear')}}">
                         <numbro-element
-                          value="[[_returnVal(item.value, 0, '&nbsp;/&nbsp')]]"
+                          value="[[_returnVal(item, 'x', '&nbsp;/&nbsp')]]"
                           format="[[numberFormat]]"
                           culture="[[numberFormatCulture]]"
                           currency$="[[numberFormatIsCurrency]]"
                           default-currency-format="[[numberFormatCurrency]]"
                           zero-format="[[numberFormatZero]]">
                         </numbro-element>
-                        <template is="dom-if" if="[[_returnVal(item.value, 0)]]">
+                        <template is="dom-if" if="[[_returnVal(item, 'x')]]">
                           &nbsp;/&nbsp
                         </template>
                       </template>
                       <!-- if x axis is ordinal just display it -->
                       <template is="dom-if" if="{{_isOfType(xAxisType, 'ordinal')}}">
-                        <span>[[_returnVal(item.value, 0, '&nbsp;/&nbsp')]]</span>
+                        <span>[[_returnVal(item, 'x', '&nbsp;/&nbsp')]]</span>
                       </template>
                       <!-- if x axis is time don't display it -->
                       <!-- if y axis is number format and show it -->
                       <template is="dom-if" if="{{_isOfType(yAxisType, 'linear')}}">
                         <numbro-element
-                          value="[[_returnVal(item.value, item.name)]]"
+                          value="[[_returnVal(item, 'y')]]"
                           format="[[numberFormat]]"
                           culture="[[numberFormatCulture]]"
                           currency$="[[numberFormatIsCurrency]]"
@@ -124,7 +124,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
                       </template>
                       <!-- if y axis is ordinal just display it -->
                       <template is="dom-if" if="{{_isOfType(yAxisType, 'ordinal')}}">
-                        <span>[[_returnVal(item.value, 1)]]</span>
+                        <span>[[_returnVal(item, 'y')]]</span>
                       </template>
                       <template is="dom-if" if="{{item.value}}">{{units}}</template>
                     </div>
@@ -135,11 +135,11 @@ Formatting for the timestamps,the data values, and the series names can be contr
           <!-- For pie charts -->
           <template is="dom-if" if="{{_isOfType(yAxisType, 'pie')}}">
             <template is="dom-repeat" items="{{chartData}}">
-              <span class$="{{_mutedToStart(item.name)}}" name$="R{{_returnVal(item, 'y')}}" on-click="_pieSeriesClicked">
+              <span class$="{{_mutedToStart(item.name)}}" name$="R{{_returnPieVal(item, 'y')}}" on-click="_pieSeriesClicked">
                   <span
                     class="seriesMarker"
                     style$="background-color:{{_getPieColorForIndex(index)}}"
-                    name$="R{{_returnVal(item, 'y')}}"
+                    name$="R{{_returnPieVal(item, 'y')}}"
                   >&nbsp;</span>
                   <div class$="{{_getWrapperClass(type)}}">
                     <div class="seriesName" name$="R{{_getName(item)}}">
@@ -149,9 +149,9 @@ Formatting for the timestamps,the data values, and the series names can be contr
                       </template>
                     </div>
                     <!-- Display serie data differently depending on x and y axis types -->
-                    <div class="seriesData" name$="R{{_returnVal(item, 'y')}}">
-                      <span>[[_returnVal(item, 'x')]]</span>
-                      <template is="dom-if" if="{{_returnVal(item, 'x')}}">{{units}}</template>
+                    <div class="seriesData" name$="R{{_returnPieVal(item, 'y')}}">
+                      <span>[[_returnPieVal(item, 'x')]]</span>
+                      <template is="dom-if" if="{{_returnPieVal(item, 'x')}}">{{units}}</template>
                     </div>
                   </div>
               </span>
@@ -256,7 +256,9 @@ Formatting for the timestamps,the data values, and the series names can be contr
       '_formatDateTime(tooltipData.*)',
       '_toggleSeries(mutedSeries.*)'
      ],
-
+_test: function(sdasd) {
+  return sdasd;
+},
      _getWrapperClass: function(type) {
        var classList = 'flex ';
 
@@ -292,7 +294,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
      * @param {type}
      * @return {bool}
      */
-    _typeEqualHorizontal: function(type){
+    _typeEqualHorizontal: function(type) {
       return type === 'horizontal';
     },
     /**
@@ -306,7 +308,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
      * @param {i}
      * @return {rgb}
      */
-    _returnItemColor:function(name){
+    _returnItemColor:function(name) {
       return this.completeSeriesConfig[name]['color'];
     },
     /**
@@ -316,8 +318,8 @@ Formatting for the timestamps,the data values, and the series names can be contr
      *
      * @method _formatDateTime
      */
-    _formatDateTime: function(){
-      if(this.tooltipData.time){
+    _formatDateTime: function() {
+      if(this.tooltipData.time) {
         var momentObj1 = this.formatTimestamp(this.tooltipData.time,this.timezone,this.firstDateTimeFormat),
             momentObj2 = this.formatTimestamp(this.tooltipData.time,this.timezone,this.secondDateTimeFormat);
 
@@ -339,12 +341,12 @@ Formatting for the timestamps,the data values, and the series names can be contr
      * @method _seriesClicked
      * @param {e} click event
      */
-    _seriesClicked: function(e){
+    _seriesClicked: function(e) {
       var ne = Polymer.dom(e),
           series = ne.rootTarget.getAttribute('name').substr(1);
 
       // if it doesnt exist, let's add it and set to true
-      if( typeof(this.mutedSeries[series]) === 'undefined' ){
+      if( typeof(this.mutedSeries[series]) === 'undefined' ) {
         this.set('mutedSeries.' + series, true);
       } else {
         //if does exist, flip the bit
@@ -362,14 +364,14 @@ Formatting for the timestamps,the data values, and the series names can be contr
      *
      * @method _toggleSeries
      */
-    _toggleSeries: function(){
+    _toggleSeries: function() {
       // find all series with name and toggle class
       var keys = Object.keys(this.mutedSeries),
           i,
           len = keys.length,
           series;
 
-      for(i = 0; i < len; i++){
+      for(i = 0; i < len; i++) {
         series = this.$$('.series[name=R' + keys[i] + ']');
         this.toggleClass('muted', this.mutedSeries[keys[i]], series);
       }
@@ -381,21 +383,21 @@ Formatting for the timestamps,the data values, and the series names can be contr
      *
      * @method _mutedToStart
      */
-    _mutedToStart: function(name){
+    _mutedToStart: function(name) {
       var baseClasses = (this.type === 'horizontal') ? "series narrow flex flex--row" : "series wide flex flex--row";
-      if(this.mutedSeries[name]){
+      if(this.mutedSeries[name]) {
         return baseClasses + ' muted';
       }
       return baseClasses;
     },
-    _getName(name){
+    _getName(name) {
       if(this.xAxisType === 'pie') {
         return name[this.completeSeriesConfig.y.name];
       } else {
         return this.completeSeriesConfig[name]['name'];
       }
     },
-    _returnTruncatedName: function(name){
+    _returnTruncatedName: function(name) {
       return this._truncateName(this._getName(name),this.truncationLength);
     },
     /**
@@ -405,18 +407,30 @@ Formatting for the timestamps,the data values, and the series names can be contr
      * @param {str} the original string.
      * @param {len} the truncation length.
      */
-    _didTruncate: function(str,len){
+    _didTruncate: function(str,len) {
       var name = this._getName(str)
-      if(len > 2 && name.length > len){
+      if(len > 2 && name.length > len) {
         return true;
       }
       return false;
     },
-    _returnVal: function(val, key, separator){
-      if(val && val[1]){
-        return val[1] + (separator ? separator : '');
-      } else if(val && val[key]){
-        return val[key] + (separator ? separator : '');
+    _returnVal: function(item, axis, separator) {
+
+      var key = axis === 'x' ? this.completeSeriesConfig[item.name]['x'] : item.name;
+
+      if(item.val && item.val[key]) {
+        return item.val[key] + (separator ? separator : '');
+      }
+      return null;
+    },
+    _returnPieVal: function(item, axis, separator) {
+
+      //pie should have only one config bit.
+      var key = Object.keys(this.completeSeriesConfig)[0],
+          axisKey = axis === 'x' ? this.completeSeriesConfig[key]['x'] : key;
+
+      if(item && item[axisKey]) {
+        return item[axisKey] + (separator ? separator : '');
       }
       return null;
     },
