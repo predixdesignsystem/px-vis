@@ -253,22 +253,22 @@ TODO implement a dev setting to choose between only showing data at that x, snap
               //ordinal are specials...
               if(this.xAxisType === 'ordinal') {
                 //find ordinal value for X
-                result[0] = this._getOrdinalValue(true, mousePos[0]);
+                result[xKey] = this._getOrdinalValue(true, mousePos[0]);
 
                 //now get Y
                 if(this.yAxisType === 'ordinal') {
-                  result[1] = this._getOrdinalValue(false, mousePos[1]);
+                  result[yKey] = this._getOrdinalValue(false, mousePos[1]);
                 } else {
-                  result[1] = this._getClosestValue(false, y1, this.chartData[i]);
+                  result[yKey] = this._getClosestValue(false, y1, this.chartData, xKey, yKey, result[xKey]);
                 }
               } else if(this.yAxisType === 'ordinal') {
 
-                result[1] = this._getOrdinalValue(false, mousePos[1]);
+                result[yKey] = this._getOrdinalValue(false, mousePos[1]);
                 //now get X
                 if(this.yAxisType === 'ordinal') {
-                  result[0] = this._getOrdinalValue(true, mousePos[0]);
+                  result[xKey] = this._getOrdinalValue(true, mousePos[0]);
                 } else {
-                  result[0] = this._getClosestValue(true, x1, this.chartData[i]);
+                  result[xKey] = this._getClosestValue(true, x1, this.chartData, xKey, yKey, result[yKey]);
                 }
               }
               //find closest point....
@@ -335,6 +335,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      *
      */
     _getOrdinalValue: function(xAxis, mousePos) {
+      //TODO: try getting the closest one rather than the one directly on the left
       if(xAxis === true) {
         return this.x.domain()[Math.max(d3.bisect(this.x.range(), mousePos) - 1, 0)];
       } else {
@@ -342,24 +343,48 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       }
     },
     /**
-     * Gets the closest value on the X (xAxis=true) or Y axis (xAxis=false)
-     *
+     * Gets the range of all ordinal values between from and to (both being values of the axis)
      *
      */
-    _getClosestValue: function(xAxis, value, data) {
-      var dataIndex = xAxis ? 0 : 1,
+    _getOrdinalRange: function(xAxis, from, to) {
+
+      //get the diferent values
+      var allValues = xAxis === true ? this.x.domain() : this.y.domain(),
+          fromVal = this._getOrdinalValue(xAxis, from),
+          toVal = this._getOrdinalValue(xAxis, to),
+          fromIndex = allValues.indexOf(fromVal),
+          toIndex = allValues.indexOf(toVal),
+          result  = [];
+
+      //now add everything between the two values, including those 2 values
+      for(var i=fromIndex; i<toIndex+1; i++) {
+        result.push(allValues[i]);
+      }
+      return result;
+    },
+    /**
+     * Gets the closest value on the X (xAxis=true) or Y axis (xAxis=false)
+     * for a specific ordinal value defined on the other axis
+     *
+     */
+    _getClosestValue: function(xAxis, value, data, xKey, yKey, ordValue) {
+      var dataIndex = xAxis ? xKey : yKey,
+          ordIndex = xAxis ? yKey : xKey,
           minDiff = Number.MAX_VALUE,
           curr,
           currDiff,
           result;
 
-      data.series.forEach(function(point, index) {
-        curr = point[dataIndex];
+      data.forEach(function(point, index) {
+        //only look at points that have the proper ordinal value
+        if(point[ordIndex] === ordValue) {
+          curr = point[dataIndex];
 
-        currDiff = Math.abs(value - curr);
-        if(currDiff < minDiff) {
-          minDiff = currDiff;
-          result = curr;
+          currDiff = Math.abs(value - curr);
+          if(currDiff < minDiff) {
+            minDiff = currDiff;
+            result = curr;
+          }
         }
       });
 
@@ -475,9 +500,20 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         extents.h = parseInt(this._actionArea.attr("height"));
         extents.x2 = extents.x1 + extents.w;
         extents.y2 = extents.y1 + extents.h;
-        extents.eX = [this.x.invert(extents.x1), this.x.invert(extents.x2)];
-        //Y axis is top to bottom
-        extents.eY = [this.y.invert(extents.y2), this.y.invert(extents.y1)];
+
+        if(this.xAxisType === 'ordinal') {
+          extents.eX = this._getOrdinalRange(true, extents.x1, extents.x2);
+        } else {
+          extents.eX = [this.x.invert(extents.x1), this.x.invert(extents.x2)];
+        }
+
+        if(this.yAxisType === 'ordinal') {
+          //Y axis is top to bottom
+          extents.eY = this._getOrdinalRange(false, extents.y2, extents.y1);
+        } else {
+          //Y axis is top to bottom
+          extents.eY = [this.y.invert(extents.y2), this.y.invert(extents.y1)];
+        }
 
         this.set('extentsData', extents);
         this.fire('px-vis-extents-data-updated', {'data': extents, 'dataVar': 'extentsData', 'method': 'set'});
