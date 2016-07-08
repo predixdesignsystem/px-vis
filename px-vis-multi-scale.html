@@ -1,0 +1,344 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="../px-colors-design/colors.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
+
+
+<!--
+Interpreter component which creates x & y interpreters.
+
+Interpreter components act as a converter, translating data points into their corresponding pixel coordinate. To do this, the interpreter needs to understand what type of data you have (xScale, yScale), the size of the drawing area you have (width, height, margin), and the extents of your data / domain (chartData, selectedDomain). It then returns the interpreter functions for `x` and `y` and arrays for the current domain those `x` and `y` functions are using.
+
+##### Usage
+
+    <px-vis-scale
+        x-scale="time"
+        y-scale="linear"
+        width="[[width]]"
+        height="[[height]]"
+        margin="[[margin]]"
+        chart-data="[[chartData]]"
+        selected-domain="[[selectedDomain]]"
+        x="{{x}}"
+        y="{{y}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}">
+    </px-vis-scale>
+
+##### d3 Reference
+https://github.com/d3/d3/wiki/Scales
+
+https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
+
+@element px-vis-scale
+@blurb Interpreter component which creates x & y interpreters.
+@homepage index.html
+@demo demo.html
+-->
+<dom-module id="px-vis-scale">
+    <template>
+
+      <content></content>
+    </template>
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'px-vis-scale',
+
+    behaviors: [
+      PxVisBehaviorD3.svg,
+      PxVisBehavior.sizing,
+      PxVisBehaviorD3.axes,
+      PxVisBehavior.dataset,
+      PxVisBehavior.commonMethods,
+      PxVisBehaviorD3.selectedDomain,
+      PxVisBehavior.axisTypes,
+      commonColors,
+      PxVisBehavior.completeSeriesConfig,
+      PxVisBehavior.chartExtents
+    ],
+
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      /**
+       * Holder for chart extents from the seriesConfig object
+       *
+       */
+      _extents: {
+        type: Array,
+        value: function(){ return [[],[]] }
+      },
+
+      parallelCoordinates: {
+        type: Boolean,
+        value: false
+      }
+    },
+
+    observers: [
+      '_setXScale(width,margin)',
+      '_setYScale(height,margin)',
+      '_currentDomain(chartData.*,x,y,completeSeriesConfig,chartExtents)',
+      '_updateDomain(selectedDomain)'
+    ],
+    /**
+    * when attached, re-fire set properties for precipitation pattern
+    *
+    * @method attached
+    */
+    attached: function(){
+      if(this._doesObjHaveValues(this.x)){
+        this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
+      }
+
+      if(this._doesObjHaveValues(this.y)){
+        this.fire('px-vis-y-updated', { 'dataVar': 'y', 'data': this.y, 'method':'set' });
+      }
+
+      if(this._doesObjHaveValues(this.currentDomainX)){
+        this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
+      }
+
+      if(this._doesObjHaveValues(this.currentDomainY)){
+        this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
+      }
+    },
+
+    /**
+     *  Sets the x scale
+     *
+     * @method _setXScale
+     */
+    _setXScale: function(width,margin){
+      var w = width - margin.left - margin.right;
+      this.x = this._setScale(this.xAxisType,[0, w]);
+      this.notifyPath('x.range', this.x.range);
+      this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
+    },
+    /**
+     * Sets the y scale
+     *
+     * @method _setYScale
+     */
+    _setYScale: function(height,margin){
+      var h = height - margin.top - margin.bottom;
+      this.y = this._setScale(this.yAxisType,[h, 0]);
+      this.notifyPath('y', this.y);
+      this.fire('px-vis-y-updated', { 'dataVar': 'y', 'data': this.y, 'method':'set' });
+    },
+    /**
+     *  Helper function to set the x and y based on scale type
+     *
+     * @method _setScale
+     */
+    _setScale: function(val, range){
+      // TODO support more types: log, quantile, etc
+      if(val === 'time'){
+        return d3.time.scale().nice().range(range);
+      } else if(val === 'linear'){
+        return d3.scale.linear().nice().range(range);
+      } else { //ordinal
+        return d3.scale.ordinal().rangePoints(range, 1);
+      }
+    },
+
+    _getDataExtents: function(d,yKeysArr){
+      var a = [];
+      for(var i = 0; i < yKeysArr.length; i++){
+        var key = yKeysArr[i];
+        a.push(d[this.completeSeriesConfig[key]['y']]);
+      }
+      return [ Math.min.apply(null,a),Math.max.apply(null,a) ];
+    },
+
+    /**
+     *
+     * Find the min and max values or ordinal values in data, for X and/or Y axis
+     *
+     */
+    _findMinMax: function(data, doX, doY, ordX, ordY, timeX, result, keys) {
+      console.log('_findMinMax');
+      var j,xTemp,yTemp,
+        jLen = data.length,
+        x;
+      // TODO move 'x' out of each series config and into a chartConfig
+        x = this.completeSeriesConfig[keys[0]].x;
+
+      if(timeX) {
+        this._findTimeMM(result,data,jLen,x);
+      }
+      if(doX || doY){
+        for(j = 0; j < jLen; j++) {
+          //make sure we're dealing with numbers
+          xTemp = (typeof(data[j][x]) === 'string') ? parseFloat(data[j][x]) : data[j][x];
+          yTemp = this._getDataExtents(data[j], keys);
+
+          if(doX) {
+            if(ordX && result.x.indexOf(data[j][x]) === -1) {
+              result.x.push(data[j][x]);
+            } else {
+              this._setMin(result.x,xTemp);
+              this._setMax(result.x,xTemp);
+            }
+          }
+          if(doY) {
+            if(ordY && result.y.indexOf(data[j][1]) === -1) {
+              // FIXME yArr is now an array and not a value
+              result.y.push(data[j][keys]);
+            } else {
+              this._setMin(result.y,yTemp[0]);
+              this._setMax(result.y,yTemp[1]);
+            }
+          }
+        };
+      }
+    },
+
+    _findTimeMM: function(result,d,l,x) {
+      this._setMin(result.x,d[0][x]);
+      this._setMax(result.x,d[l-1][x]);
+    },
+
+    _setMin: function(r,d) {
+     if(r[0] > d) {
+        r[0] = d;
+      }
+    },
+    _setMax: function(r,d) {
+      if(r[1] < d) {
+        r[1] = d;
+      }
+    },
+    //
+    // _calcDefaultExt(min,max,bool){
+    //   if(bool){
+    //     return [];
+    //   }
+    //
+    //   var e = [];
+    //   // FIXME Make me dynamic
+    //   e[0] = (this.completeSeriesConfig['blahblah'][min] === 'dynamic') ? Infinity : this.completeSeriesConfig['blahblah'][min];
+    //   e[1] = (this.completeSeriesConfig['blahblah'][max] === 'dynamic') ? -Infinity : this.completeSeriesConfig['blahblah'][max];
+    //
+    //   return e;
+    // },
+
+    _checkForMaxMin: function(k){
+      for(var i =0; i < k.length; i++){
+
+      }
+    },
+    /**
+     * Calculates and Sets the x and y domain after data loads
+     *
+     * https://github.com/mbostock/d3/wiki/API-Reference
+     *
+     * @method _currentDomain
+     */
+     _currentDomain: function() {
+      // check to make sure there is data
+      if(this._doesObjHaveValues(this.chartData) && this._doesObjHaveValues(this.x) && this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.completeSeriesConfig) && this._doesObjHaveValues(this.chartExtents)){
+        // TODO check if dataset has max and min
+        // TODO add dev set max and min
+        // TODO What do we do if we have max/min Ys and not x, which is the case with our sample data?
+
+        // TODO more efficient algorithm
+        // TODO if in the form { x:1, y:2 }
+        // [1420840060000,1425840060000]
+        // TODO: make this declartive: min, max, set static or dynamic
+        // TODO: multiple Y-Axis?
+        //TODO what if we dont want it to be the range of data and not 0 or visa versa...
+
+        // if(this._isObjEmpty(this.seriesConfig)){
+        //   console.log('no series config');
+        //   //run normal
+        // }
+
+        //check seriesConfig
+        // if(this._doesObjHaveValues(this.seriesConfig)){
+        //   this._completeExistingSeriesConfig();
+        // }
+
+        var xOrd = this.xAxisType === 'ordinal',
+          yOrd = this.yAxisType === 'ordinal',
+          xTime = this.xAxisType === 'time',
+          doX = xTime ? false : true,
+          doY = true,
+          keys = Object.keys(this.completeSeriesConfig),
+          exts = this.chartExtents;
+
+        if(exts.x.length > 0 && exts.x[0] !== Infinity && exts.x[1] !== -Infinity){
+          xTime = false;
+          doX = false;
+        }
+        if(exts.y.length > 0 && exts.y[0] !== Infinity && exts.y[1] !== -Infinity){
+          yTime = false;
+          doY = false;
+        }
+        if(doX || doY || xTime){
+          //Chug through the data to max and min
+          this._findMinMax(this.chartData, doX, doY, xOrd, yOrd, xTime, exts, keys);
+        }
+
+
+        this.x.domain(exts.x);
+
+        if(this.parallelCoordinates){
+          this.y = [];
+          var h = this.height - this.margin.top - this.margin.bottom;
+          for(var i = 0; i < this.completeSeriesConfig['*'].x.length; i++){
+            console.log(exts.y[this.dimensions]);
+            this.y.push(this._setScale(this.yAxisType,[h, 0]).domain(exts.y[i]));
+          }
+        } else {
+          this.y.domain(exts.y);
+        }
+
+        // TODO would a bool be better? Flip when run?
+        // Set the domains
+        this.set('currentDomainX', this.x.domain());
+        this.set('currentDomainY', this.y.domain());
+
+        this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
+        this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
+      }
+    },
+
+    /**
+     * When the domain gets set via a user interaction, set the scale function to use the new domain
+     *
+     * https://github.com/mbostock/d3/wiki/API-Reference
+     *
+     * @method _updateDomain
+     */
+    _updateDomain:function(selectedDomain){
+
+      if(selectedDomain === 'reset') {
+        this._currentDomain();
+      } else {
+        //set new X domain if provided
+        if(selectedDomain.x.length > 0) {
+
+          this.x.domain(selectedDomain.x);
+          this.set('currentDomainX', this.x.domain());
+          this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
+        }
+
+        //set new Y domain if provided
+        if(selectedDomain.y.length > 0) {
+
+          this.y.domain(selectedDomain.y);
+          this.set('currentDomainY', this.y.domain());
+          this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
+        }
+      }
+    }
+  });
+</script>

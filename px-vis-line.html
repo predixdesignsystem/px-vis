@@ -92,6 +92,11 @@ Element which draws lines series onto the chart
         type:Object,
         value: function() {return{};}
       },
+
+      parallelCoordinates: {
+        type: Boolean,
+        value: false
+      }
     },
 
     observers: [
@@ -116,18 +121,28 @@ Element which draws lines series onto the chart
      */
     drawElement: function() {
       if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.x) && this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.chartData) && this._doesObjHaveValues(this.completeSeriesConfig)){
-        var data = [this.chartData];
+        if(this.parallelCoordinates){
+          console.log('parallelCoordinates');
+          var data = this.chartData;
+          var path = d3.svg.line();
+          var x = this.x;
+          var y = this.y;
+          var line = function(d) { return path(dimensions.map(function(p) {return [x(p), y[p](d[p])]; })); }
+        } else {
+          var data = [this.chartData];
 
-        var line = d3.svg.line()
-          .x(function(d) {
-              return this.x(d[this.completeSeriesConfig[this.seriesId]['x']]);
-          }.bind(this))
-          .y(function(d) {
-              return this.y(d[this.completeSeriesConfig[this.seriesId]['y']]);
-          }.bind(this))
-          .defined(function(d) {
-            return !isNaN(d[this.completeSeriesConfig[this.seriesId]['y']])
-          }.bind(this));
+          var line = d3.svg.line()
+            .x(function(d) {
+                return this.x(d[this.completeSeriesConfig[this.seriesId]['x']]);
+            }.bind(this))
+            .y(function(d) {
+                return this.y(d[this.completeSeriesConfig[this.seriesId]['y']]);
+            }.bind(this))
+            .defined(function(d) {
+              return !isNaN(d[this.completeSeriesConfig[this.seriesId]['y']])
+            }.bind(this));
+        }
+
         // checks to see if the group already exists. If not, create; if so, update
         if(this._isObjEmpty(this.lineGroup)) {
           // draw the path
