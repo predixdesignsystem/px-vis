@@ -121,7 +121,8 @@ PxVisBehaviorChart.chartCommon = [{
     */
     _setCompleteSeriesConfig: function(){
       if(this._doesObjHaveValues(this.defaultSeriesConfig) && this._doesObjHaveValues(this.chartData)){
-        // FUTURE refactor: use MAPs and SETs instead of Objects when IE has support / is no longer supported by us
+        // FUTURE TODO refactor: use MAPs and SETs instead of Objects when IE has support / is no longer supported by us
+        // We could use d3 sets and maps... worth it?
         var fullConfig = (this.seriesConfig) ? JSON.parse(JSON.stringify(this.seriesConfig)) : {},
             k = Object.keys(fullConfig),
             kLen = k.length,
@@ -162,7 +163,7 @@ PxVisBehaviorChart.chartCommon = [{
             fullConfig[k[i]]['x'] = this.defaultSeriesConfig['x'];
           }
           if(!fullConfig[k[i]]['color']) {
-            fullConfig[k[i]]['color'] = this.dataVisColors[this.seriesColorOrder[i]];
+            fullConfig[k[i]]['color'] = this._getColor(i);
           }
 
           if(fullConfig[k[i]]['xMin']) {
@@ -195,7 +196,7 @@ PxVisBehaviorChart.chartCommon = [{
           objYs[ missingYs[i] ]['name'] = missingYs[i];
           objYs[ missingYs[i] ]['x'] = x;
           objYs[ missingYs[i] ]['y'] = missingYs[i];
-          objYs[ missingYs[i] ]['color'] = this.dataVisColors[ this.seriesColorOrder[ kLen + i ] ];
+          objYs[ missingYs[i] ]['color'] = this._getColor(kLen + i);
 
           // copy the obj to our config
           fullConfig[ missingYs[i] ] = objYs[ missingYs[i] ];
@@ -213,13 +214,26 @@ PxVisBehaviorChart.chartCommon = [{
           }
         }
 
-
-        this.set('chartExtents',chartExtents);
         this.fire('px-vis-chart-extents', { 'dataVar': 'chartExtents', 'data': chartExtents, 'method':'set' });
+        this.set('chartExtents',chartExtents);
 
-        this.set('completeSeriesConfig',fullConfig);
         this.fire('px-vis-complete-series-config', { 'dataVar': 'completeSeriesConfig', 'data': fullConfig, 'method':'set' });
+        this.set('completeSeriesConfig',fullConfig);
       }
+    },
+    /**
+     * Helper function to return the correct color for a particular index.
+     **/
+    _getColor: function(i){
+      var l = this.seriesColorOrder.length,
+          index = this._calcIndex(i,l);
+      return this.dataVisColors[this.seriesColorOrder[ index ]];
+    },
+    /**
+     * Helper function to calculate the index. When we run out of indcies, it loops back over valid indicies.
+     **/
+    _calcIndex: function(i,l){
+      return i < l ? i : this._calcIndex(i - l,l);
     },
 
     /**
