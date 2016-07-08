@@ -219,6 +219,8 @@ It will reformat the data into the object format and create a seriesConfig file.
 
           for(var i = 0; i < numArrs; i++){
             if(this.originalData[i][this.dataKey][indexes[i]][0] < lowest){
+              // reset obj
+              obj = {};
               // set our lowest for reference on the next pass
               lowest = this.originalData[i][this.dataKey][indexes[i]][0];
               // set our obj x value
@@ -279,6 +281,7 @@ It will reformat the data into the object format and create a seriesConfig file.
           seriesConfig[id] = {};
           seriesConfig[id]['name'] = this.dataNames[i] ? this.dataNames[i] : this.originalData[i]['name'];
           seriesConfig[id]['x'] = this.newXKey;
+          seriesConfig[id]['y'] = id;
 
           if(this.originalData[i]['min']){
             seriesConfig[id]['yMin'] = this.originalData[i]['min'];

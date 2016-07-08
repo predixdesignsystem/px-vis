@@ -97,7 +97,6 @@ Element which draws lines series onto the chart
     observers: [
       // TODO Investigate how to make chartData woth with pushing new data in...
       'drawElement(svg,x,y,currentDomainX,currentDomainY,chartData.*,completeSeriesConfig.*)',
-      // 'processData(mutedSeries.*)',
       'isIdInMuted(mutedSeries.*)',
       '_addClipPath(clipPath)'
      ],
@@ -117,20 +116,18 @@ Element which draws lines series onto the chart
      */
     drawElement: function() {
       if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.x) && this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.chartData) && this._doesObjHaveValues(this.completeSeriesConfig)){
-          var data = [this.chartData];
+        var data = [this.chartData];
 
         var line = d3.svg.line()
           .x(function(d) {
-            if(d[this.completeSeriesConfig[this.seriesId]['x']]){
               return this.x(d[this.completeSeriesConfig[this.seriesId]['x']]);
-            }
           }.bind(this))
           .y(function(d) {
-            if(d[this.completeSeriesConfig[this.seriesId]['y']]){
               return this.y(d[this.completeSeriesConfig[this.seriesId]['y']]);
-            }
+          }.bind(this))
+          .defined(function(d) {
+            return !isNaN(d[this.completeSeriesConfig[this.seriesId]['y']])
           }.bind(this));
-
         // checks to see if the group already exists. If not, create; if so, update
         if(this._isObjEmpty(this.lineGroup)) {
           // draw the path
