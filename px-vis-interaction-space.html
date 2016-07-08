@@ -259,7 +259,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                 if(this.yAxisType === 'ordinal') {
                   result[yKey] = this._getOrdinalValue(false, mousePos[1]);
                 } else {
-                  result[yKey] = this._getClosestValue(false, y1, this.chartData, xKey, yKey);
+                  result[yKey] = this._getClosestValue(false, y1, this.chartData, xKey, yKey, result[xKey]);
                 }
               } else if(this.yAxisType === 'ordinal') {
 
@@ -268,7 +268,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                 if(this.yAxisType === 'ordinal') {
                   result[xKey] = this._getOrdinalValue(true, mousePos[0]);
                 } else {
-                  result[xKey] = this._getClosestValue(true, x1, this.chartData, xKey, yKey);
+                  result[xKey] = this._getClosestValue(true, x1, this.chartData, xKey, yKey, result[yKey]);
                 }
               }
               //find closest point....
@@ -364,22 +364,27 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
     /**
      * Gets the closest value on the X (xAxis=true) or Y axis (xAxis=false)
+     * for a specific ordinal value defined on the other axis
      *
      */
-    _getClosestValue: function(xAxis, value, data, xKey, yKey) {
+    _getClosestValue: function(xAxis, value, data, xKey, yKey, ordValue) {
       var dataIndex = xAxis ? xKey : yKey,
+          ordIndex = xAxis ? yKey : xKey,
           minDiff = Number.MAX_VALUE,
           curr,
           currDiff,
           result;
 
       data.forEach(function(point, index) {
-        curr = point[dataIndex];
+        //only look at points that have the proper ordinal value
+        if(point[ordIndex] === ordValue) {
+          curr = point[dataIndex];
 
-        currDiff = Math.abs(value - curr);
-        if(currDiff < minDiff) {
-          minDiff = currDiff;
-          result = curr;
+          currDiff = Math.abs(value - curr);
+          if(currDiff < minDiff) {
+            minDiff = currDiff;
+            result = curr;
+          }
         }
       });
 
