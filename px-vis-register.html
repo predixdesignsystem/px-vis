@@ -416,10 +416,11 @@ _test: function(sdasd) {
     },
     _returnVal: function(item, axis, separator) {
 
-      var key = axis === 'x' ? this.completeSeriesConfig[item.name]['x'] : item.name;
+      var key = axis === 'x' ?
+        this.completeSeriesConfig[item.name]['x'] : this.completeSeriesConfig[item.name]['y'];
 
-      if(item.val && item.val[key]) {
-        return item.val[key] + (separator ? separator : '');
+      if(item.value && item.value[key]) {
+        return item.value[key] + (separator ? separator : '');
       }
       return null;
     },
@@ -427,7 +428,7 @@ _test: function(sdasd) {
 
       //pie should have only one config bit.
       var key = Object.keys(this.completeSeriesConfig)[0],
-          axisKey = axis === 'x' ? this.completeSeriesConfig[key]['x'] : key;
+          axisKey = axis === 'x' ? this.completeSeriesConfig[key]['x'] : this.completeSeriesConfig[key]['y'];
 
       if(item && item[axisKey]) {
         return item[axisKey] + (separator ? separator : '');

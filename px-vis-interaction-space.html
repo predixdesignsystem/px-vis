@@ -243,6 +243,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
             for(var i = 0; i < len; i++) {
 
+              var yKey = this.completeSeriesConfig[keys[i]]['y'],
+                  xKey = this.completeSeriesConfig[keys[i]]['x'];
+
               minDist = Number.MAX_VALUE;
               result = [];
 
@@ -288,11 +291,12 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                 result = (x1 - d0[0] > d1[0] - x1) ? d1 : d0;
               } else {
                 //non time based: iterate over points and find the closest
+
                 for(var j = 0; j < this.chartData.length; j++) {
 
                   //get point coords
-                  x2 = this.chartData[j][keys[i]];
-                  y2 = this.chartData[j][keys[i]];
+                  x2 = this.chartData[j][xKey];
+                  y2 = this.chartData[j][yKey];
 
                   //distance between the two points
                   d = Math.sqrt( (x2-=x1)*x2 + (y2-=y1)*y2 );
@@ -300,14 +304,15 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                   //keep the closest point
                   if(d < minDist) {
                     minDist = d;
-                    result = this.chartData[j][keys[i]];
+                    //store this point
+                    result = this.chartData[j];
                   }
                 }
               }
 
               // get the pixel coords for that data
-              xCoord = this.x(result[this.completeSeriesConfig[keys[i]]['x']]);
-              yCoord = this.y(result[keys[i]]);
+              xCoord = this.x(result[xKey]);
+              yCoord = this.y(result[yKey]);
 
               xArr.push(xCoord);
               yArr.push(yCoord);
