@@ -96,11 +96,6 @@ Element which draws lines series onto the chart
       parallelCoordinates: {
         type: Boolean,
         value: false
-      },
-
-      _drawing: {
-        type: Boolean,
-        value: false
       }
     },
 
@@ -128,11 +123,10 @@ Element which draws lines series onto the chart
       this.debounce('draw',function(){
         if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.currentDomainX) && this._doesObjHaveValues(this.currentDomainY) && this._doesObjHaveValues(this.chartData) && this._doesObjHaveValues(this.completeSeriesConfig)){
           if(this.parallelCoordinates){
-            console.log('parallelCoordinates');
             var data = this.chartData,
                 dims = this.completeSeriesConfig[this.seriesId]['x'],
                 path = d3.svg.line(),
-                line = function(d) { return path(dims.map(function(p) {return [this.x(p), this.y[p](d[p])]; }.bind(this))) }.bind(this);
+                line = function(d) { return path(dims.map(function(p) { return [this.x(p), this.y[p](d[p])]; }.bind(this))) }.bind(this);
           } else {
             var data = [this.chartData];
 
@@ -175,7 +169,7 @@ Element which draws lines series onto the chart
           this.linePath.exit().remove();
 
         }
-      });
+      },1);
     },
     /**
      * Helper to call addClipPath with the elem
