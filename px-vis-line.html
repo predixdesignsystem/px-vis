@@ -92,11 +92,16 @@ Element which draws lines series onto the chart
         type:Object,
         value: function() {return{};}
       },
+
+      parallelCoordinates: {
+        type: Boolean,
+        value: false
+      }
     },
 
     observers: [
       // TODO Investigate how to make chartData woth with pushing new data in...
-      'drawElement(svg,x,y,currentDomainX,currentDomainY,chartData.*,completeSeriesConfig.*)',
+      'drawElement(svg,currentDomainX,currentDomainY,chartData.*,completeSeriesConfig.*)',
       'isIdInMuted(mutedSeries.*)',
       '_addClipPath(clipPath)'
      ],
@@ -115,45 +120,56 @@ Element which draws lines series onto the chart
      * @method drawElement
      */
     drawElement: function() {
-      if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.x) && this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.chartData) && this._doesObjHaveValues(this.completeSeriesConfig)){
-        var data = [this.chartData];
+      this.debounce('draw',function(){
+        if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.currentDomainX) && this._doesObjHaveValues(this.currentDomainY) && this._doesObjHaveValues(this.chartData) && this._doesObjHaveValues(this.completeSeriesConfig)){
+          if(this.parallelCoordinates){
+            var data = this.chartData,
+                dims = this.completeSeriesConfig[this.seriesId]['x'],
+                path = d3.svg.line(),
+                line = function(d) { return path(dims.map(function(p) { return [this.x(p), this.y[p](d[p])]; }.bind(this))) }.bind(this);
+          } else {
+            var data = [this.chartData];
 
-        var line = d3.svg.line()
-          .x(function(d) {
-              return this.x(d[this.completeSeriesConfig[this.seriesId]['x']]);
-          }.bind(this))
-          .y(function(d) {
-              return this.y(d[this.completeSeriesConfig[this.seriesId]['y']]);
-          }.bind(this))
-          .defined(function(d) {
-            return !isNaN(d[this.completeSeriesConfig[this.seriesId]['y']])
-          }.bind(this));
-        // checks to see if the group already exists. If not, create; if so, update
-        if(this._isObjEmpty(this.lineGroup)) {
-          // draw the path
-          this.lineGroup = this.svg.append("g")
+            var line = d3.svg.line()
+              .x(function(d) {
+                  return this.x(d[this.completeSeriesConfig[this.seriesId]['x']]);
+              }.bind(this))
+              .y(function(d) {
+                  return this.y(d[this.completeSeriesConfig[this.seriesId]['y']]);
+              }.bind(this))
+              .defined(function(d) {
+                return !isNaN(d[this.completeSeriesConfig[this.seriesId]['y']])
+              }.bind(this));
+          }
+
+          // checks to see if the group already exists. If not, create; if so, update
+          if(this._isObjEmpty(this.lineGroup)) {
+            // draw the path
+            this.lineGroup = this.svg.append("g")
+              .attr("series-id", 'line_' + this.seriesId)
+              .attr("class", "series-line");
+          }
+
+          this.linePath = this.lineGroup.selectAll('path.series-line')
+            .data(data);
+
+          this.linePath.enter()
+            .append('path')
+            .attr("class", "series-line")
             .attr("series-id", 'line_' + this.seriesId)
-            .attr("class", "series-line");
+            .attr('fill','none');
+
+          this.linePath.attr("d", line);
+
+          // add color
+          this._colorLine();
+
+          this._addClipPath();
+
+          this.linePath.exit().remove();
+
         }
-
-        this.linePath = this.lineGroup.selectAll('path.series-line')
-          .data(data);
-
-        this.linePath.enter()
-          .append('path')
-          .attr("class", "series-line")
-          .attr("series-id", 'line_' + this.seriesId)
-          .attr('fill','none');
-
-        this.linePath.attr("d", line);
-
-        // add color
-        this._colorLine();
-
-        this._addClipPath();
-
-        this.linePath.exit().remove();
-      }
+      },1);
     },
     /**
      * Helper to call addClipPath with the elem
