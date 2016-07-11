@@ -29,16 +29,24 @@ Element which draws scatter series onto the chart
 @demo demo.html
 -->
 <dom-module id="px-vis-pie">
-    <link rel="import" type="css" href="css/px-vis.css"/>
+    <link rel="import" type="css" href="css/px-vis-pie.css"/>
     <template>
+      <!-- anchors for tooltip and popovers -->
       <span id="tooltipAnchor" class="visuallyhidden"></span>
       <span id="popoverAnchor" class="visuallyhidden"></span>
+      <!-- Title in the middle -->
+      <div id="title" class$="[[_getTitleClass(showTitle)]]">
+        <span id="totalTitle">Total</span>
+        <span id="totalValue">{{total}} {{units}}</span>
+      </div>
+      <!-- tooltip elem -->
       <px-tooltip id="tooltip" orientation="top" delay="10" for="tooltipAnchor">
         <div style="display:flex; flex-direction:column; align-items:center">
           <span>{{_ttTitle}}</span>
           <span>{{_ttMessage}}</span>
         </div>
       </px-tooltip>
+      <!-- popover elem -->
       <px-popover id="popover" popover-title="" orientation="top" hide-overlay class="popover" for="popoverAnchor">
       </px-popover>
     </template>
@@ -56,6 +64,7 @@ Element which draws scatter series onto the chart
       PxVisBehavior.sizing,
       PxVisBehavior.dataset,
       PxVisBehavior.units,
+      PxVisBehavior.completeSeriesConfig,
       commonColors
     ],
 
@@ -105,13 +114,12 @@ Element which draws scatter series onto the chart
         type:Object
       },
       /**
-       * A holder object for the series objects
-       *
-       * @property scatterDots
-       * @type Object
+       * Whether to show a title in the middle of the pie/donut with the total value.
+       * Meant to be used with a donut chart
        */
-      pieSlices:{
-        type:Object
+      showTitle: {
+        type: Boolean,
+        value: false
       },
       /**
        * A holder object for the series object
@@ -122,6 +130,13 @@ Element which draws scatter series onto the chart
       pieGroup:{
         type:Object,
         value: function() {return{};}
+      },
+      /**
+       * Total value of all slices
+       */
+      total: {
+        Type: Number,
+        value: 0
       },
       /**
        * Radius of the pie chart
@@ -159,17 +174,25 @@ Element which draws scatter series onto the chart
     },
 
     observers: [
-      'drawElement(width,height,margin,svg,chartData.*)'
+      'drawElement(width,height,margin,svg,chartData.*,completeSeriesConfig, seriesId)'
      ],
 
      attached: function() {
 
       //position popover anchor, it won't move afterward
-      var curRect = this.pxSvgElem.getBoundingClientRect();
+      var curRect = this.pxSvgElem.getBoundingClientRect(),
+          titleRect = this.$.title.getBoundingClientRect(),
+          halfPieWidth = (this.width - this.margin.left - this.margin.right)/2,
+          halfPieHeight = (this.height - this.margin.bottom - this.margin.top)/2,
+          leftMarg = Number(this.margin.left),
+          bottomMarg = Number(this.margin.bottom);
 
-      this.$.popoverAnchor.style.left =
-        (Number(curRect.left) + Number(this.margin.left) +  (this.width - this.margin.left - this.margin.right)/2) + "px";
-      this.$.popoverAnchor.style.top = (curRect.top + Number(this.margin.top)) + "px";
+      this.$.popoverAnchor.style.left = (Number(curRect.left) + leftMarg +  halfPieWidth) + 'px';
+      this.$.popoverAnchor.style.top = (curRect.top + Number(this.margin.top)) + 'px';
+
+      //position title div
+      this.$.title.style.left = (leftMarg + halfPieWidth - titleRect.width/2) + 'px';
+      this.$.title.style.top = -(bottomMarg + halfPieHeight + titleRect.height/2) + 'px';
      },
     /**
      * Draws or updates the pie element.
@@ -181,8 +204,7 @@ Element which draws scatter series onto the chart
       if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.chartData)){
         //calculate data and radius
         var data = this.chartData,
-            pie = d3.layout.pie().value(function(d){return d['x'];})(data),
-            _this = this;
+            pie = d3.layout.pie().value(function(d){return d['x'];})(data);
 
         // checks to see if the group already exists. If not, create; if so, update
         if(this._isObjEmpty(this.pieGroup)){
@@ -204,16 +226,25 @@ Element which draws scatter series onto the chart
                                 .attr('class', 'slice')
                                 .on('mousedown.action', this._centerOnSlice.bind(this))
                                 .on('mouseover', this._showTooltip.bind(this))
-                                .on("mouseout.tooltip", this._hideTooltip.bind(this));
-
+                                .on('mouseout.tooltip', this._hideTooltip.bind(this));
 
         arcs.append('svg:path')
             .attr('fill', function(d, i){
-                return _this._getPieColorForIndex(i);
-            })
+                return this._getPieColorForIndex(i);
+            }.bind(this))
             .attr('d', function (d) {
                 return arc(d);
             });
+      }
+    },
+    /**
+     * Return the cvalue or the slice datum depending on use of percentages
+     */
+    _getSliceValue: function(datum) {
+      if(this.usePercentage) {
+        return datum.data.percentage + this._internalUnits;
+      } else {
+        return datum.data[this.completeSeriesConfig[this.seriesId].x] + ' ' + this._internalUnits;
       }
     },
     /**
@@ -222,18 +253,17 @@ Element which draws scatter series onto the chart
      */
     _showTooltip: function(datum, index, group) {
 
-      //get label
-      //this.$.tooltipMessage = 'TEST';
-      this.set('_ttTitle', datum.data['y']);
-      this.set('_ttMessage', datum.data['x'] + ' ' + this.units);
+      //get label and value
+      this.set('_ttTitle', datum.data[this.completeSeriesConfig[this.seriesId].y]);
+      this.set('_ttMessage', this._getSliceValue(datum));
 
 
       //center tooltip
       //TODO: improve how we place the tooltip using the actual svg path?
       var rect = d3.event.currentTarget.getBoundingClientRect(),
           scroll = document.documentElement.scrollTop || document.body.scrollTop;
-      this.$.tooltipAnchor.style.left = (rect.left + rect.width/2) + "px";
-      this.$.tooltipAnchor.style.top = (scroll + rect.top + rect.height/2) + "px";
+      this.$.tooltipAnchor.style.left = (rect.left + rect.width/2) + 'px';
+      this.$.tooltipAnchor.style.top = (scroll + rect.top + rect.height/2) + 'px';
       this.$.tooltip._show();
     },
     _hideTooltip: function(datum, index, group) {
@@ -246,13 +276,11 @@ Element which draws scatter series onto the chart
 
         //if we moved over our tooltip don't close it
         //but make sure that if we leave the tooltip for something else it will close...
-        var _this = this;
-            slice = d3.event.currentTarget;
         var close = function(evt) {
           //TODO: if we're moving back to the slice this is going to make the tooltip flicker
-          _this.$.tooltip.removeEventListener('mouseleave', close);
-          _this.$.tooltip._hide();
-        };
+          this.$.tooltip.removeEventListener('mouseleave', close);
+          this.$.tooltip._hide();
+        }.bind(this);
         this.$.tooltip.addEventListener('mouseleave', close);
       }
     },
@@ -266,19 +294,15 @@ Element which draws scatter series onto the chart
           .duration(750)
           .attr('transform', this._translationString + ' rotate(' + this._getRotationAngle(datum) + ')');
 
-      var _this = this,
-          event = d3.event,
-          target = d3.event.currentTarget;
-
       //display a popover after the rotation
       setTimeout(function() {
 
-        _this.$.popover.popoverTitle = datum.data['y'];
-        _this.$.popover.popoverBody = datum.data['x'] + ' ' + _this.units;
+        this.$.popover.popoverTitle = datum.data[this.completeSeriesConfig[this.seriesId].y];
+        this.$.popover.popoverBody = this._getSliceValue(datum);
 
         //resimulate click so that popover can pick it up
-        _this.$.popover.show();
-      }, 750);
+        this.$.popover.show();
+      }.bind(this), 750);
     },
     /**
      * Computes the translation string needed to center the pie
@@ -312,6 +336,15 @@ Element which draws scatter series onto the chart
           adjusted = mid < Math.PI ? -mid : Math.PI * 2 - mid;
 
       return this._radToDeg(adjusted);
+    },
+    _getTitleClass: function(showTitle) {
+      var classList = 'title inline--flex flex--col flex--middle ';
+
+      if(!showTitle) {
+        classList += 'visuallyhidden ';
+      }
+
+      return classList;
     }
   });
 </script>

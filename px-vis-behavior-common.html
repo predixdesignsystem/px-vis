@@ -559,7 +559,25 @@ PxVisBehavior.units = {
     units:{
       type:String,
       value:''
-    }
+    },
+    /**
+     * Automatically uses percentages rather than the actual value
+     *
+     */
+    usePercentage: {
+      type: Boolean,
+      value: false
+    },
+    /**
+     * Computed value representing the units that will be used internally: normal units or %
+     */
+    _internalUnits: {
+      type: String,
+      computed: '_getInternalUnits(usePercentage, units)'
+    },
+  },
+  _getInternalUnits: function(usePercentage, units) {
+    return usePercentage ? '%' : units;
   }
 };
 
