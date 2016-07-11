@@ -65,15 +65,25 @@ Element which draws scatter series onto the chart
         type:String
       },
       /**
-       * Sets the size of the scatter marker
+       * Scales the size of the scatter marker
        *
-       * @property markerSize
-       * @type Number
-       * @default 8
        */
-      markerSize:{
-        type:Number,
-        value: 8
+      markerScale: {
+        type: Number,
+        value: 1
+      },
+      /**
+       * The symbol used for the marker. Supported symbols:
+       * - 'circle'
+       * - 'cross'
+       * - 'diamond'
+       * - 'square'
+       * - 'triangle-up'
+       * - 'triangle-down'
+       */
+      markerSymbol: {
+        type: String,
+        value: 'circle'
       },
       /**
        * An index of the series used for calculating its color
@@ -131,34 +141,27 @@ Element which draws scatter series onto the chart
         var data = this.chartData;
 
         // checks to see if the group already exists. If not, create; if so, update
-        if(this._isObjEmpty(this.scatterGroup)){
+        if(this._isObjEmpty(this.scatterGroup)) {
+
+          //override marker symbol if defined in serie config
+          this.markerSymbol = this.completeSeriesConfig[this.seriesId].markerSymbol ?
+                                this.completeSeriesConfig[this.seriesId].markerSymbol : this.markerSymbol;
+
           // draw the path
           this.scatterGroup = this.svg.append("g")
             .attr("series-id", 'scatter_' + this.seriesId)
             .attr("class", "series-scatter");
-        }
 
-        // TODO different shapes
         // TODO dev set FA icons & icons
-          this.scatterDots = this.scatterGroup.selectAll('circle.scatter-dot')
+          this.scatterDots = this.scatterGroup.selectAll(this.markerSymbol + '.scatter-dot')
             .data(data);
 
           this.scatterDots.enter()
-            .append('circle')
-            .attr("class", "scatter-dot")
-            .attr("r", this.markerSize/2);
+          .append("path")
+          .attr("class", this.markerSymbol)
+          .attr("d", d3.svg.symbol().type(this.markerSymbol));
 
-          this.scatterDots
-            .attr("cx", function(d) {
-              if(d[this.completeSeriesConfig[this.seriesId]['x']]){
-                return this.x(d[this.completeSeriesConfig[this.seriesId]['x']]);
-              }
-            }.bind(this))
-            .attr("cy", function(d) {
-              if(d[this.completeSeriesConfig[this.seriesId]['y']]){
-                return this.y(d[this.completeSeriesConfig[this.seriesId]['y']]);
-              }
-            }.bind(this));
+          this._applyTransform();
 
           // add color
           this._colorScatter();
@@ -166,6 +169,10 @@ Element which draws scatter series onto the chart
           this._addClipPath();
 
           this.scatterDots.exit().remove();
+        }
+        else {
+          this._applyTransform();
+        }
       }
     },
     /**
@@ -191,6 +198,31 @@ Element which draws scatter series onto the chart
           this._colorScatter();
         }
       }
+    },
+    /**
+     * Applies the necessary translate and scale to the scatterDots
+     *
+     */
+    _applyTransform: function() {
+      this.scatterDots
+      .attr("transform", function(d) {
+
+        var xTrans,
+            yTrans;
+
+        if(d[this.completeSeriesConfig[this.seriesId]['x']]){
+          xTrans = this.x(d[this.completeSeriesConfig[this.seriesId]['x']]);
+        }
+        if(d[this.completeSeriesConfig[this.seriesId]['y']]){
+          yTrans = this.y(d[this.completeSeriesConfig[this.seriesId]['y']]);
+        }
+
+        //make sure we have a value
+        xTrans = xTrans ? xTrans : 0;
+        yTrans = yTrans ? yTrans : 0;
+
+        return "translate(" + xTrans + "," + yTrans + ")" + ' scale(' + this.markerScale + ')';
+      }.bind(this));
     },
     /**
      * Adds full color to the scatters.
