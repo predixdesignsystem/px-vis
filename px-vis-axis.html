@@ -44,7 +44,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           PxVisBehaviorD3.axis,
           PxVisBehavior.completeSeriesConfig,
           PxVisBehavior.commonMethods,
-          PxVisBehavior.axisConfig,
+          PxVisBehaviorD3.axisConfig,
           commonColors
         ],
 
@@ -116,17 +116,20 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .orient(this.orientation);
 
           // change default (10) ticks
-          this._axis.ticks(10);
+          // this._axis.ticks(10);
           // change default ticks with specific time
           // this._axis.ticks(d3.time.months, 1);
           // this._axis.ticks(d3.time.days, 7);
           // this._axis.ticks(d3.time.minutes, 15);
+          if(this.tickValues && this.tickValues.length > 0){
+            this._axis.tickValues(this.tickValues);
+          }
 
           // controls the tick mark size for ticks with numbers
           // this._axis.innerTickSize(-1000);
           // this._axis.tickPadding(10);
           // controls the first and last ticks
-          this._axis.outerTickSize(0);
+          this._axis.outerTickSize(this.outerTickSize);
 
           // https://github.com/mbostock/d3/wiki/Formatting#d3_format
           // this._axis.tickFormat(d3.format(",.0f"));
@@ -246,9 +249,12 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          */
         _setLineStyles:function(elem,lines){
           elem.selectAll(lines)
-            .attr('fill','none')
-            .attr('stroke', this.colors.grey9)
-            .attr('shape-rendering','crispEdges');
+            .attr({
+              'fill':'none',
+              'stroke': this.colors.grey9,
+              'shape-rendering':'crispEdges',
+              "stroke-width": this.strokeWidth
+            });
         },
         /**
          * Draws the axis title

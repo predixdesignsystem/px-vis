@@ -41,7 +41,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           title-location='[[titleLocation]]'
           title-type-size="12"
           label-type-size="10"
-          current-domain="[[currentDomainY]]">
+          current-domain="[[currentDomainY]]"
+          stroke-width="[[strokeWidth]]"
+          outer-tick-size="[[outerTickSize]]"
+          tick-values="[[_calcTickVals(item)]]">
         </px-vis-axis>
       </template>
       <px-vis-axis-brush
@@ -61,6 +64,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         dimensions="[[dimensions]]"
         axis-groups="[[axisGroups]]"
         drag-behavior="{{dragBehavior}}"
+        redraw-series
         redraw-elems="[[redrawElems]]">
       </px-vis-axis-drag>
 
@@ -78,7 +82,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       PxVisBehaviorD3.axes,
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.commonMethods,
-      PxVisBehavior.axisConfig,
+      PxVisBehaviorD3.axisConfig,
       PxVisBehavior.dataset,
       PxVisBehavior.dimensions,
       PxVisBehavior.mutedSeries,
@@ -105,6 +109,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
       axisSvg: {
         type: Object
+      },
+
+      matchTicks: {
+        type: Boolean,
+        value: true
       }
     },
 
@@ -135,7 +144,30 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     },
 
     _returnY: function(item){
+      if(this.matchTicks){
+        var d = this.y[item].domain(),
+            min = Math.floor(d[0]/10)*10,
+            max = Math.ceil(d[1]/10)*10;
+
+        this.y[item].domain([min,max]);
+      }
       return this.y[item]
+    },
+
+    _calcTickVals: function(item){
+      if(this.matchTicks){
+        var d = this.y[item].domain(),
+            min = Math.floor(d[0]/10)*10,
+            max = Math.ceil(d[1]/10)*10,
+            diff = (max - min) / 10,
+            vals = [];
+
+        for(var i = 0; i < 11; i++){
+          vals.push(min + diff * i);
+        }
+        return vals
+      }
+      return null;
     },
 
   });
