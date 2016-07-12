@@ -72,14 +72,22 @@ https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath
       if(this._doesObjHaveValues(this.x) && this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.margin)){
 
         this.set('clipPath', this.generateRandomID('cp_'));
+        this.set('seriesClipPath', this.generateRandomID('cps_'));
         this.fire('px-vis-clip-path-updated', { 'dataVar': 'clipPath', 'data': this.clipPath, 'method':'set' });
-        // TODO make these measurements more robust
+        this.fire('px-vis-series-clip-path-updated', { 'dataVar': 'seriesClipPath', 'data': this.seriesClipPath, 'method':'set' });
+
         this.svg.append("clipPath")
           .attr("id",this.clipPath)
           .append("rect")
           .attr('y',-this.margin.top)
           .attr("width", this.width - this.margin.left)
           .attr("height", this.height - this.margin.bottom);
+
+        this.svg.append("clipPath")
+          .attr("id",this.seriesClipPath)
+          .append("rect")
+          .attr("width", this.width - this.margin.left - this.margin.right)
+          .attr("height", this.height - this.margin.bottom  - this.margin.top);
 
       }
     }
