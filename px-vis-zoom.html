@@ -51,13 +51,17 @@ Element providing an on-chart zoom.
       'zooooom(extentsData)'
     ],
     zooooom: function(extentsData) {
-      var rect = this.pxSvgElem.getBoundingClientRect();
-      this.$.resetBtn.style.left = rect.right - 170 - this.margin.right + 'px';
-      this.$.resetBtn.style.top = rect.top + 20 + this.margin.top  + 'px';
+      //make sure the button is visible so we can measure it
+      this.toggleClass('hidden', false, this.$.resetBtn);
+
+      var rect = this.pxSvgElem.getBoundingClientRect(),
+          btnRect = this.$.resetBtn.getBoundingClientRect();
+      this.$.resetBtn.style.left = rect.width - 170 - Number(this.margin.right) + 'px';
+      this.$.resetBtn.style.top =  (20 + Number(this.margin.top))  + 'px';
 
       this.set('selectedDomain', {x:extentsData.eX, y:extentsData.eY});
       this.fire('px-vis-selected-domain-updated', { 'data':{x:extentsData.eX, y:extentsData.eY}, 'method': 'set', 'dataVar': 'selectedDomain' });
-      this.toggleClass('hidden', false, this.$.resetBtn);
+
     },
     resetZoom: function(){
       this.set('selectedDomain', 'reset');
