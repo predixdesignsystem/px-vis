@@ -1,0 +1,117 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
+
+
+<!--
+Element providing user interaction on an axis.
+
+This element draw the box over the axis signifying the active area to mute the series outside that box.
+
+
+##### Usage
+
+    <px-vis-axis-drag
+        width="[[width]]"
+        axis="[[x]]"
+        current-domain="[[currentDomainX]]"
+        complete-series-config="{{completeSeriesConfig}}"
+        chart-data="[[chartData]]"
+        dimensions="[[dimensions]]"
+        axis-groups="[[axisGroups]]"
+        drag-behavior="{{dragBehavior}}"
+        redraw-series
+        redraw-funcs="[[redrawFuncs]]">
+    </px-vis-axis-drag>
+
+@element px-vis-axis-brush
+@blurb Element providing user interaction on an axis..
+@homepage index.html
+@demo demo.html
+-->
+<dom-module id="px-vis-axis-drag">
+    <link rel="import" type="css" href="css/px-vis.css"/>
+    <template>
+
+    </template>
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'px-vis-axis-drag',
+
+    behaviors: [
+      PxVisBehavior.sizing,
+      PxVisBehavior.dimensions,
+      PxVisBehavior.dataset,
+      PxVisBehavior.completeSeriesConfig,
+      PxVisBehaviorD3.redrawSeries,
+      PxVisBehaviorD3.axis,
+    ],
+
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      _dragging: {
+        type: Object,
+        value: function(){ return {}; }
+      },
+
+      dragBehavior: {
+        type: Object,
+        notify: true
+      }
+    },
+
+    ready:function(){
+      var _this = this;
+
+      this.dragBehavior = d3.behavior.drag()
+        .origin(function(d) { return { x: _this.axis(d)}; })
+        .on("dragstart", this._onDragStart.bind(this))
+        .on("drag", this._onDrag.bind(this))
+        .on("dragend", function(d) {
+          delete _this._dragging[d];
+          // make the axis snap into place
+          _this.transition(d3.select(this)).attr("transform", "translate(" + _this.axis(d) + ")");
+
+          if(_this.redrawSeries){
+            // redraw the lines
+            _this.set('completeSeriesConfig.*.x',_this.dimensions);
+            for(var i = 0; i < _this.redrawElems.length; i++){
+              _this.redrawElems[i].drawElement();
+            }
+          }
+        });
+      this.notifyPath('dragBehavior', this.dragBehavior);
+    },
+
+    _onDragStart: function(d) {
+      this._dragging[d] = this.axis(d);
+    },
+
+    _onDrag: function(d) {
+      this._dragging[d] = Math.min(this.width, Math.max(0, d3.event.x));
+      // TODO investigate how to make line dynamic
+      // foreground.attr("d", path);
+      this.dimensions.sort(function(a, b) { return this._position(a) - this._position(b); }.bind(this));
+      this.axis.domain(this.dimensions);
+      this.axisGroups.attr("transform", function(d) { return "translate(" + this._position(d) + ")"; }.bind(this))
+    },
+
+    _position: function(d) {
+      var v = this._dragging[d];
+      return v == null ? this.axis(d) : v;
+    },
+
+    transition: function(g) {
+      return g.transition().duration(500);
+    },
+
+  });
+</script>

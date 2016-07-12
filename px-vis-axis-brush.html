@@ -5,24 +5,24 @@
 
 
 <!--
-Element providing user interaction on the navigator.
+Element providing user interaction on an axis.
 
-This element draw the box over the navigator signifying the selected chart extents and provides the user interactions to resize and move the extent box.
+This element draw the box over the axis signifying the active area to mute the series outside that box.
 
-This element sets the selectedDomain property based on the extents box. The selectedDomain variable can then be consumed by the scale component to change the main chart extents.
 
 ##### Usage
 
-    <px-vis-brush
-      svg="[[varFromSVGComponent]]"
-      axis="[[varXFromScaleComponent]]"
-      height="[[height]]"
-      selected-domain="{{selectedDomain}}"
-      current-domain="[[varXDomainFromScaleComponent]]">
-    </px-vis-brush>
+    <px-vis-axis-brush
+        svg="[[axisGroups]]"
+        axis="[[y]]"
+        chart-data="[[chartData]]"
+        dimensions="[[dimensions]]"
+        series-key="[[seriesKey]]"
+        muted-series="{{mutedSeries}}">
+    </px-vis-axis-brush>
 
-@element px-vis-brush
-@blurb Element providing user interaction on the navigator.
+@element px-vis-axis-brush
+@blurb Element providing user interaction on an axis..
 @homepage index.html
 @demo demo.html
 -->
@@ -97,16 +97,15 @@ This element sets the selectedDomain property based on the extents box. The sele
         extents = brushedAxes.map(function(p) {
           return this.axis[p].brush.extent();
         }.bind(this)),
-        series = {};
-
+        series = {},
+        dim;
       for(var i = 0; i < this.chartData.length; i++){
-        brushedAxes.every(function(p, j) {
-          if(extents[j][0] <= this.chartData[i][p] && this.chartData[i][p] <= extents[j][1]){
-            series[this.chartData[i]["TimeStamp"]] = false;
-          } else {
-            series[this.chartData[i][["TimeStamp"]]] = true;
+        for(var j = 0; j < brushedAxes.length; j++){
+          dim = brushedAxes[j];
+          if(extents[j][0] > this.chartData[i][dim] || this.chartData[i][dim] > extents[j][1]){
+            series[this.chartData[i][this.seriesKey]] = true;
           }
-        }.bind(this));
+        }
       }
 
       this.set('mutedSeries',series);
