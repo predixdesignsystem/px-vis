@@ -618,4 +618,137 @@ PxVisBehavior.chartExtents = {
     }
   }
 };
+
+/*
+     Name:
+    PxVisBehavior.events
+
+    Description:
+    Polymer behavior that provides config and data to manage "events" (px-vis-event) on the chart
+
+
+    @polymerBehavior PxVisBehavior.events
+*/
+
+
+PxVisBehavior.events = {
+  properties: {
+    /**
+     * Configuration object to define what event should map to what icon and color.
+     * The object has a key being the event name, the value being a the configuration object for that event. The configuration object has four properties:
+     * - `color`: A valid color name found in the px-colors-design
+     * - `icon`: the reference to the icon; for Font Awesome, it can be a class or a unicode value; for an image, it is a path
+     * - `type`: 'fa', 'unicode', or 'image'. 'fa' and 'unicode' are font-awesome icons, 'fa' referring to the class ('fa-camera') and 'unicode' referring to the unicode value for the icon formatted as '\uf004'
+     * - `offset`: an 2 element array with the number of pixels to offset the icon. offset[0] is along the x-axis; offset[1] is along the y-axis; necessary for some icons to adjust their values to acheive a better alignment over the event line.
+     *
+     * ```
+     * Format: {
+     *   "Event-Name-A":{
+     *     "color": "a_valid_color_from_px-colors-design",
+     *     "icon": "font-awesome-class",
+     *     "type": "fa",
+     *     "offset":[0,0]
+     *   },
+     *   "Event-Name-B":{
+     *     "color": "a_valid_color_from_px-colors-design",
+     *     "icon": "unicode-of-the-font-character",
+     *     "type": "unicode",
+     *     "offset":[0,0]
+     *   },
+     *   "Event-Name-C":{
+     *     "color": "a_valid_color_from_px-colors-design",
+     *     "icon": "path-to-an-img",
+     *     "type": "image",
+     *     "offset":[0,0]
+     *   },
+     * }
+     * ```
+     *
+     * ```
+     * Example: {
+     *   "Recalibrate":{
+     *     "color": "blue",
+     *     "icon": "fa-camera",
+     *     "type": "fa",
+     *     "offset":[-3,0]
+     *   },
+     *   "Fan start":{
+     *     "color": "green",
+     *     "icon": "\uf015",
+     *     "type": "unicode",
+     *     "offset":[5,0]
+     *   },
+     *   "Fan stop":{
+     *     "icon": "Dancing_banana.gif",
+     *     "type": "image",
+     *     "offset":[-2,-20],
+     *     "size":"25"
+     *    }
+     * }
+     *```
+     *
+     * @property eventConfig
+     * @type Object
+     */
+    eventConfig: {
+      type: Object
+    },
+    /**
+     * Configuration object to define what the default icon should be. This gets used if a) no eventConfig is defined or b) the particular event is not defined in the eventConfig object.
+     *
+     *```
+     * Default: {
+     *   'color': 'grey7',
+     *   'icon': 'fa-circle',
+     *   'type': 'fa',
+     *   'offset': 0,
+     *   'size': '16'
+     * }
+     *```
+     *
+     * @property defaultEventConfig
+     * @type Object
+     */
+    defaultEventConfig: {
+      type: Object,
+      value: function() {
+        return {
+          'color': 'grey7',
+          'icon': 'fa-info-circle',
+          'type': 'fa',
+          'offset': [0,0],
+          'size':'16'
+        };
+      }
+    },
+    /**
+     * Data representing the events. Currently the X value has to be called "time". Example:
+     * [
+     *    {
+     *      "id": "123",
+     *      "time": 2,
+     *      "label": "Recalibrate"
+     *    },
+     *    {
+     *      "id": "456",
+     *      "time": 3,
+     *      "label": "Fan start"
+     *    },
+     *    {
+     *      "id": "789",
+     *      "time": 4,
+     *      "label": "Fan stop"
+     *    },
+     *    {
+     *      "id": "333",
+     *      "time": 8,
+     *      "label": "Default"
+     *    }
+     *  ]
+     */
+    eventData: {
+      type: Array
+    }
+  }
+};
 </script>

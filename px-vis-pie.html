@@ -182,17 +182,15 @@ Element which draws scatter series onto the chart
       //position popover anchor, it won't move afterward
       var curRect = this.pxSvgElem.getBoundingClientRect(),
           titleRect = this.$.title.getBoundingClientRect(),
-          halfPieWidth = (this.width - this.margin.left - this.margin.right)/2,
-          halfPieHeight = (this.height - this.margin.bottom - this.margin.top)/2,
           leftMarg = Number(this.margin.left),
           bottomMarg = Number(this.margin.bottom);
 
-      this.$.popoverAnchor.style.left = (Number(curRect.left) + leftMarg +  halfPieWidth) + 'px';
+      this.$.popoverAnchor.style.left = (Number(curRect.left) + leftMarg +  this._radius) + 'px';
       this.$.popoverAnchor.style.top = (curRect.top + Number(this.margin.top)) + 'px';
 
       //position title div
-      this.$.title.style.left = (leftMarg + halfPieWidth - titleRect.width/2) + 'px';
-      this.$.title.style.top = -(bottomMarg + halfPieHeight + titleRect.height/2) + 'px';
+      this.$.title.style.left = (leftMarg + this._radius - titleRect.width/2) + 'px';
+      this.$.title.style.top = -this.height + Number(this.margin.top) + this._radius - titleRect.height/2 + 'px';
      },
     /**
      * Draws or updates the pie element.

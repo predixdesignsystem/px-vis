@@ -60,9 +60,9 @@ The configureation object allows developers to set the icon used for each event 
         delay="10"
         orientation="[[tooltipOrientation]]">
         <span>
-          <b>Event</b>: [[chartData.label]] <br/>
-          <b>ID</b>: [[chartData.id]] <br/>
-          <b>Timestamp</b>: [[_formatDatetime(chartData.time, firstDateTimeFormat)]] [[separator]] [[_formatDatetime(chartData.time,secondDateTimeFormat)]]<br/>
+          <b>Event</b>: [[eventData.label]] <br/>
+          <b>ID</b>: [[eventData.id]] <br/>
+          <b>[[_getValueTitle(xAxisType)]]</b>[[_getValue(xAxisType, eventData)]]<br/>
         </span>
       </px-tooltip>
     </template>
@@ -76,10 +76,11 @@ The configureation object allows developers to set the icon used for each event 
     behaviors: [
       PxVisBehaviorD3.svg,
       PxVisBehaviorD3.axes,
-      PxVisBehavior.dataset,
+      PxVisBehavior.axisTypes,
       PxVisBehaviorTime.datetime,
       PxVisBehaviorD3.clipPath,
       PxVisBehavior.commonMethods,
+      PxVisBehavior.events,
       commonColors,
       faCodes
     ],
@@ -91,95 +92,6 @@ The configureation object allows developers to set the icon used for each event 
      * @type Object
      */
     properties: {
-      /**
-       * Configuration object to define what event should map to what icon and color.
-       * The object has a key being the event name, the value being a the configuration object for that event. The configuration object has four properties:
-       * - `color`: A valid color name found in the px-colors-design
-       * - `icon`: the reference to the icon; for Font Awesome, it can be a class or a unicode value; for an image, it is a path
-       * - `type`: 'fa', 'unicode', or 'image'. 'fa' and 'unicode' are font-awesome icons, 'fa' referring to the class ('fa-camera') and 'unicode' referring to the unicode value for the icon formatted as '\uf004'
-       * - `offset`: an 2 element array with the number of pixels to offset the icon. offset[0] is along the x-axis; offset[1] is along the y-axis; necessary for some icons to adjust their values to acheive a better alignment over the event line.
-       *
-       * ```
-       * Format: {
-       *   "Event-Name-A":{
-       *     "color": "a_valid_color_from_px-colors-design",
-       *     "icon": "font-awesome-class",
-       *     "type": "fa",
-       *     "offset":[0,0]
-       *   },
-       *   "Event-Name-B":{
-       *     "color": "a_valid_color_from_px-colors-design",
-       *     "icon": "unicode-of-the-font-character",
-       *     "type": "unicode",
-       *     "offset":[0,0]
-       *   },
-       *   "Event-Name-C":{
-       *     "color": "a_valid_color_from_px-colors-design",
-       *     "icon": "path-to-an-img",
-       *     "type": "image",
-       *     "offset":[0,0]
-       *   },
-       * }
-       * ```
-       *
-       * ```
-       * Example: {
-       *   "Recalibrate":{
-       *     "color": "blue",
-       *     "icon": "fa-camera",
-       *     "type": "fa",
-       *     "offset":[-3,0]
-       *   },
-       *   "Fan start":{
-       *     "color": "green",
-       *     "icon": "\uf015",
-       *     "type": "unicode",
-       *     "offset":[5,0]
-       *   },
-       *   "Fan stop":{
-       *     "icon": "Dancing_banana.gif",
-       *     "type": "image",
-       *     "offset":[-2,-20],
-       *     "size":"25"
-       *    }
-       * }
-       *```
-       *
-       * @property eventConfig
-       * @type Object
-       */
-      eventConfig:{
-        type:Object,
-        value: function() {return{};}
-      },
-      /**
-       * Configuration object to define what the default icon should be. This gets used if a) no eventConfig is defined or b) the particular event is not defined in the eventConfig object.
-       *
-       *```
-       * Default: {
-       *   'color': 'grey7',
-       *   'icon': 'fa-circle',
-       *   'type': 'fa',
-       *   'offset': 0,
-       *   'size': '16'
-       * }
-       *```
-       *
-       * @property defaultEventConfig
-       * @type Object
-       */
-      defaultEventConfig:{
-        type:Object,
-        value:function() {
-          return {
-            'color': 'grey7',
-            'icon': 'fa-info-circle',
-            'type': 'fa',
-            'offset': [0,0],
-            'size':'16'
-          };
-        }
-      },
       /**
        * Defines the color and weight styles for the event line.
        *
@@ -269,7 +181,7 @@ The configureation object allows developers to set the icon used for each event 
     },
 
     observers: [
-      'drawElement(svg,x,y,currentDomainX,currentDomainY,chartData.*)',
+      'drawElement(svg,x,y,currentDomainX,currentDomainY,eventData.*)',
       '_addClipPath(clipPath)'
      ],
 
@@ -288,7 +200,7 @@ The configureation object allows developers to set the icon used for each event 
      */
     drawElement: function() {
       // TODO remove this.x and this.y checks?
-      if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.x) && this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.chartData) && this._doesObjHaveValues(this.currentDomainX) && this._doesObjHaveValues(this.currentDomainY)){
+      if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.x) && this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.eventData) && this._doesObjHaveValues(this.currentDomainX) && this._doesObjHaveValues(this.currentDomainY)){
         this._processConfiguration();
 
         // checks to see if the axis already exists. If not, create; if so, update
@@ -355,12 +267,12 @@ The configureation object allows developers to set the icon used for each event 
      */
     _positionEvent: function(){
       this.eventLine
-        .attr("x1", this.x(this.chartData.time))
-        .attr("x2", this.x(this.chartData.time))
+        .attr("x1", this.x(this.eventData.time))
+        .attr("x2", this.x(this.eventData.time))
         .attr("y1", this.y(this.currentDomainY[0]))
         .attr("y2", this.y(this.currentDomainY[1]));
       this.eventIcon
-        .attr('x',this.x(this.chartData.time) - this._thisConfig.size/2 + this._thisConfig.offset[0])
+        .attr('x',this.x(this.eventData.time) - this._thisConfig.size/2 + this._thisConfig.offset[0])
         .attr("y", this.y(this.currentDomainY[1]) - 5 + this._thisConfig.offset[1]);
     },
     /**
@@ -370,7 +282,7 @@ The configureation object allows developers to set the icon used for each event 
      */
     _processConfiguration:function(){
       // is there a configuration object for this event type?
-      if(this.eventConfig[this.chartData.label]){
+      if(this.eventConfig[this.eventData.label]){
         /*
           check each key (icon, color, etc) of the defaultEventConfig and see if the eventConfig is overwriting that property. If so, set it, otherwise use default
         */
@@ -378,7 +290,7 @@ The configureation object allows developers to set the icon used for each event 
             i,
             len = k.length;
         for(i = 0; i < len; i++){
-          this._thisConfig[k[i]] =  this.eventConfig[this.chartData.label][k[i]] || this.defaultEventConfig[k[i]];
+          this._thisConfig[k[i]] =  this.eventConfig[this.eventData.label][k[i]] || this.defaultEventConfig[k[i]];
         }
       } else {
         // else, set everything to default
@@ -400,6 +312,21 @@ The configureation object allows developers to set the icon used for each event 
      */
     _formatDatetime: function(time,format){
       return this.formatTimestamp(time, this.timezone, format);
+    },
+    _getValueTitle: function(xAxisType) {
+      if(xAxisType === 'time') {
+        return 'Timestamp';
+      } else {
+        return 'X';
+      }
+    },
+    _getValue: function(xAxisType) {
+      if(xAxisType === 'time') {
+        return ': ' + this._formatDatetime(this.eventData.time, this.firstDateTimeFormat) +
+          ' ' + this.separator + this._formatDatetime(this.eventData.time, this.secondDateTimeFormat);
+      } else {
+        return ': ' + this.eventData.time;
+      }
     }
   });
 </script>

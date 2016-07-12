@@ -314,4 +314,76 @@ function runTests(){
 
   }); //suite
 
+  suite('marker symbols', function() {
+    var baseScale = document.getElementById('baseScale'),
+        baseSVG = document.getElementById('baseSVG'),
+        baseScatter = document.getElementById('baseScatter');
+
+    var colorOrder = commonColors.properties.seriesColorOrder.value;
+    var colorSet = commonColors.properties.dataVisColors.value;
+
+    suiteSetup(function(){
+      var d = [{
+            "series": [
+            [1397102460000, 1],
+            [1397131620000, 6],
+            [1397160780000, 10],
+            [1397189940000, 4],
+            [1397219100000, 6]
+          ]}],
+          seriesConfig = {"0":{"type":"scatter","name":"mySeries", "markerSymbol": "diamond"}},
+          w = 500,
+          h = 300,
+          m = {
+            "top": 10,
+            "right": 5,
+            "bottom": 20,
+            "left": 15
+          };
+
+      baseSVG.set('width',w);
+      baseSVG.set('height',h);
+      baseSVG.set('margin',m);
+
+      baseScale.set('width',w);
+      baseScale.set('height',h);
+      baseScale.set('margin',m);
+      baseScale.set('seriesConfig',seriesConfig);
+      baseScale.set('chartData',d);
+
+      baseScatter.set('chartData',d);
+
+    });
+
+    test('baseScatter fixture is created', function() {
+      assert.isTrue(baseScatter !== null);
+    });
+
+    test('baseScatter scatterGroup created', function() {
+      assert.equal(baseScatter.scatterGroup.node().tagName,'g');
+    });
+    test('baseScatter scatterDots created', function() {
+      assert.equal(baseScatter.scatterDots.node().tagName,'diamond');
+    });
+
+    test('baseScatter scatter series has the right color', function() {
+      assert.equal(baseScatter.scatterGroup.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+    });
+
+    test('baseScatter scatterDot0 cx', function() {
+      debugger
+      assert.isTrue(baseScatter.scatterDots[0][0].class.contains('diamond'));
+    });
+    test('baseScatter scatterDot0 cy', function() {
+      assert.equal(baseScatter.scatterDots[0][0].getAttribute('cy'),"243");
+    });
+
+    test('baseScatter scatterDot0 cx', function() {
+      assert.equal(baseScatter.scatterDots[0][4].getAttribute('cx'),"480");
+    });
+    test('baseScatter scatterDot0 cy', function() {
+      assert.equal(baseScatter.scatterDots[0][4].getAttribute('cy'),"108");
+    });
+  }); //suite
+
 } //runTests
