@@ -55,9 +55,9 @@ Element providing an on-chart zoom.
       this.toggleClass('hidden', false, this.$.resetBtn);
 
       var rect = this.pxSvgElem.getBoundingClientRect(),
-          btnRect = this.$.resetBtn.getBoundingClientRect();
+          topLeftRect = this.getBoundingClientRect();
       this.$.resetBtn.style.left = rect.width - 170 - Number(this.margin.right) + 'px';
-      this.$.resetBtn.style.top =  (20 + Number(this.margin.top))  + 'px';
+      this.$.resetBtn.style.top = (rect.top - topLeftRect.top) + Number(this.margin.top) + 'px';
 
       this.set('selectedDomain', {x:extentsData.eX, y:extentsData.eY});
       this.fire('px-vis-selected-domain-updated', { 'data':{x:extentsData.eX, y:extentsData.eY}, 'method': 'set', 'dataVar': 'selectedDomain' });

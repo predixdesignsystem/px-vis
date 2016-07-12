@@ -32,8 +32,8 @@ Element which draws scatter series onto the chart
     <link rel="import" type="css" href="css/px-vis-pie.css"/>
     <template>
       <!-- anchors for tooltip and popovers -->
-      <span id="tooltipAnchor" class="visuallyhidden"></span>
-      <span id="popoverAnchor" class="visuallyhidden"></span>
+      <span id="tooltipAnchor" class="visuallyhidden anchor"></span>
+      <span id="popoverAnchor" class="visuallyhidden anchor"></span>
       <!-- Title in the middle -->
       <div id="title" class$="[[_getTitleClass(showTitle)]]">
         <span id="totalTitle">Total</span>
@@ -103,6 +103,15 @@ Element which draws scatter series onto the chart
       innerRadius: {
         type: Number,
         value: 0
+      },
+      /**
+       * Whether the chart should be disaplyed as a donut rather than a pie.
+       * If displayed as a donut it will by default use 30px as the ring size.
+       * It can be overriden by using the "innerRadius" property (between 0 and 1)
+       */
+      donut: {
+        type: Boolean,
+        value: false
       },
       /**
        * A holder object for the series group
@@ -214,7 +223,11 @@ Element which draws scatter series onto the chart
         }
 
         // declare an arc generator function
-        var arc = d3.svg.arc().outerRadius(this._radius).innerRadius(this.innerRadius * this._radius);
+        var arc = d3.svg.arc().outerRadius(this._radius);
+        if(this.donut) {
+          var innerRadiusPx = this.innerRadius === 0 ? (this._radius - 30) : this.innerRadius * this._radius;
+          arc.innerRadius(innerRadiusPx);
+        }
 
         // select paths, use arc generator to draw
         var arcs = this.pieGroup.selectAll('pie-slice')
@@ -233,6 +246,11 @@ Element which draws scatter series onto the chart
             .attr('d', function (d) {
                 return arc(d);
             });
+
+        this.pieGroup
+            .transition()
+            .duration(1250)
+            .attr('transform', this._translationString + ' rotate(-180)');
       }
     },
     /**
