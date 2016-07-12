@@ -60,7 +60,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            * @property _axis
            * @type Object
            */
-          _axis:{
+          _axis: {
             type: Object,
             value: function() {return{};},
             notify: true
@@ -71,7 +71,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            * @property _axisGroup
            * @type Object
            */
-          _axisGroup:{
+          _axisGroup: {
             type: Object,
             value: function() {return{};}
           },
@@ -82,7 +82,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            * @type String
            * @default random string
            */
-          axisId:{
+          axisId: {
             type:String,
             value: '',
             notify: true,
@@ -95,7 +95,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            * @type String
            * @default ''
            */
-          title:{
+          title: {
             type:String,
             value: ''
           },
@@ -109,7 +109,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            * @type String
            * @default center
            */
-          labelPosition:{
+          labelPosition: {
             type: String,
             value: 'center',
           },
@@ -120,7 +120,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            * @type Number
            * @default 0
            */
-          labelRotation:{
+          labelRotation: {
             type: Number,
             value: 0,
           },
@@ -131,7 +131,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            * @type Array
            * @default [0,0]
            */
-          labelTranslation:{
+          labelTranslation: {
             type: Array,
             value: function() {return [0,0];},
           },
@@ -142,7 +142,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            * @type Number
            * @default 12
            */
-          labelTypeSize:{
+          labelTypeSize: {
             type: Number,
             value: 12,
           },
@@ -152,7 +152,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            * @property series
            * @type Array
            */
-          series:{
+          series: {
             type: Array,
             value: function() {return[];}
           },
@@ -162,9 +162,34 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            * @property translateAmt
            * @type Array
            */
-          translateAmt:{
+          translateAmt: {
             type: Array,
             value:function(){ return [0,0]; }
+          },
+          /**
+           * Optional object to specify placement of the title. If none is supplied, then it uses `orientation` to determine title location.
+           *
+           *```
+           *    {
+           *      x: Number, // a x number of pixels
+           *      y: Number, // a y number of pixels
+           *      r: Number, // a number of degrees to rotate
+           *      anchor: String, // middle, start, end
+           *    }
+           *```
+           */
+          titleLocation: {
+            type: Object,
+            value: function(){ return {} }
+          },
+
+          /**
+           * Defines the Title type size
+           *
+           */
+          titleTypeSize: {
+            type: Number,
+            value: 15,
           },
         },
 
@@ -193,7 +218,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .orient(this.orientation);
 
           // change default (10) ticks
-          // this._axis.ticks(5);
+          this._axis.ticks(10);
           // change default ticks with specific time
           // this._axis.ticks(d3.time.months, 1);
           // this._axis.ticks(d3.time.days, 7);
@@ -333,32 +358,45 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * @method drawTitle
          */
         drawTitle:function(){
-          var ext = this._axisGroup.node().getBBox();
-          var x,y,r;
+          var ext = this._axisGroup.node().getBBox(),
+              location = this._doesObjHaveValues(this.titleLocation) ? 'custom' : this.orientation,
+              x,y,r,anchor;
 
-          switch(this.orientation){
+
+          switch(location){
             case 'bottom':
               x = parseFloat(ext['width']) / 2 + this.translateAmt[0];
               y = this.labelTypeSize * 1.5 + parseFloat(ext['height']) + this.translateAmt[1];
               r = 0;
+              anchor = "middle";
               break;
 
             case 'top':
               x = parseFloat(ext['width']) / 2 + this.translateAmt[0];
-              y = (this.labelTypeSize * 1.5 + parseFloat(ext['height'])) * -1 + this.translateAmt[1];
+              y = this.translateAmt[1];
               r = 0;
+              anchor = "middle";
               break;
 
             case 'left':
               x = (this.labelTypeSize + parseFloat(ext['width'])) * -1 + this.translateAmt[0];
               y = parseFloat(ext['height']) / 2 + this.translateAmt[1];
               r = -90;
+              anchor = "middle";
               break;
 
             case 'right':
               x = this.labelTypeSize + parseFloat(ext['width']) + this.translateAmt[0];
               y = parseFloat(ext['height']) / 2 + this.translateAmt[1];
               r = 90;
+              anchor = "middle";
+              break;
+
+            case 'custom':
+              x = this.titleLocation.x;
+              y = this.titleLocation.y;
+              r = this.titleLocation.r;
+              anchor = this.titleLocation.anchor;
               break;
           }
 
@@ -369,11 +407,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
           this._titleGroup.append("text")
             .attr('class','axis-title')
-            .attr('font-size', (this.labelTypeSize * 1.25) + 'px')
+            .attr('font-size', this.titleTypeSize + 'px')
             .attr('font-style','GE Inspira Sans')
             .text(this.title)
-            .attr("text-anchor", 'middle')
-            .style("text-anchor", 'middle')
+            .attr("text-anchor", anchor)
+            .style("text-anchor", anchor)
             .attr('transform',"rotate(" + r + ")");
         },
         /**

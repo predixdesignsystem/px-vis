@@ -96,6 +96,11 @@ Element which draws lines series onto the chart
       parallelCoordinates: {
         type: Boolean,
         value: false
+      },
+
+      multiPath: {
+        type: Boolean,
+        value: false
       }
     },
 
@@ -126,7 +131,11 @@ Element which draws lines series onto the chart
             var data = this.chartData,
                 dims = this.completeSeriesConfig[this.seriesId]['x'],
                 path = d3.svg.line(),
-                line = function(d) { return path(dims.map(function(p) { return [this.x(p), this.y[p](d[p])]; }.bind(this))) }.bind(this);
+                line = function(d) {
+                  return path(dims.map(function(p) {
+                    return [this.x(p), this.y[p](d[p])];
+                  }.bind(this)));
+                }.bind(this);
           } else {
             var data = [this.chartData];
 
@@ -156,7 +165,9 @@ Element which draws lines series onto the chart
           this.linePath.enter()
             .append('path')
             .attr("class", "series-line")
-            .attr("series-id", 'line_' + this.seriesId)
+            .attr("series-id", function(d,i){
+              return this.multiPath ? 'line_' + d[this.seriesId] : 'line_' + this.seriesId
+            }.bind(this))
             .attr('fill','none');
 
           this.linePath.attr("d", line);
@@ -187,7 +198,11 @@ Element which draws lines series onto the chart
      * @method isIdInMuted
      */
     isIdInMuted: function() {
-      if(this.mutedSeries.hasOwnProperty(this.seriesId)){
+      if(this.multiPath && this._doesObjHaveValues(this.linePath)){
+        this.linePath.style("display", function(d) {
+          return this.mutedSeries[d[this.seriesId]] ? 'none' : null;
+        }.bind(this));
+      } else if(this.mutedSeries.hasOwnProperty(this.seriesId)){
         // if true, mute
         if(this.mutedSeries[this.seriesId]){
           this._muteLine();
