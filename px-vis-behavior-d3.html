@@ -293,16 +293,28 @@ PxVisBehaviorD3.clipPath = {
   }
 };
 
-PxVisBehaviorD3.redrawSeries = {
+PxVisBehaviorD3.dynamicRedraw = {
   properties: {
+    /**
+     * Boolean to specify if we should redraw the chart series when we move an axis. More of a chart type by chart type configuration rather than a developer configuration. IE, for charts such as multi-y timeseries, it is unnessary. For charts such as parallel coordinates, it is necessary.
+     */
     redrawSeries: {
       type: Boolean,
       value: false
     },
-
+    /**
+     * The accompanying array of series elements required to redraw.
+     */
     redrawElems: {
       type: Array,
       value: function() { return [] }
+    },
+    /**
+     * Boolean specifing if the axis should redraw as you move them or just at the end.
+     */
+    dynamicAxisRedraw: {
+      type: Boolean,
+      value: false
     }
   }
 };

@@ -46,7 +46,8 @@ This element draw the box over the axis signifying the active area to mute the s
       PxVisBehavior.dimensions,
       PxVisBehavior.dataset,
       PxVisBehavior.completeSeriesConfig,
-      PxVisBehaviorD3.redrawSeries,
+      PxVisBehaviorD3.dynamicRedraw,
+      PxVisBehavior.mutedSeries,
       PxVisBehaviorD3.axis,
     ],
 
@@ -76,6 +77,15 @@ This element draw the box over the axis signifying the active area to mute the s
         .on("dragstart", this._onDragStart.bind(this))
         .on("drag", this._onDrag.bind(this))
         .on("dragend", function(d) {
+
+          // if we have not been moving the axes as we went, move them all now
+          if(!_this.dynamicAxisRedraw){
+            _this.dimensions.sort(function(a, b) { return _this._position(a) - _this._position(b); });
+            _this.axis.domain(_this.dimensions);
+            _this.axisGroups.each(function(d,i){
+              _this.transition(d3.select(this)).attr("transform", function(d) { return "translate(" + _this._position(d) + ")"; });
+            });
+          }
           delete _this._dragging[d];
           // make the axis snap into place
           _this.transition(d3.select(this)).attr("transform", "translate(" + _this.axis(d) + ")");
@@ -83,25 +93,50 @@ This element draw the box over the axis signifying the active area to mute the s
           if(_this.redrawSeries){
             // redraw the lines
             _this.set('completeSeriesConfig.*.x',_this.dimensions);
+            _this.fire('px-vis-complete-series-config', { 'data': _this.dimensions, 'dataVar': 'completeSeriesConfig.*.x' ,'method': 'set' });
             for(var i = 0; i < _this.redrawElems.length; i++){
               _this.redrawElems[i].drawElement();
             }
+            _this.set('mutedSeries',{});
+            _this.fire('px-vis-muted-series-updated', { 'data': {}, 'dataVar': 'mutedSeries' ,'method': 'set' });
           }
         });
       this.notifyPath('dragBehavior', this.dragBehavior);
     },
 
     _onDragStart: function(d) {
+      if(this.redrawSeries && !this.dynamicAxisRedraw){
+        var series = {};
+        for(var i = 0; i < this.chartData.length; i++){
+          series[this.chartData[i][this.seriesKey]] = true;
+        }
+        this.set('mutedSeries',series);
+        this.fire('px-vis-muted-series-updated', { 'data': series, 'dataVar': 'mutedSeries' ,'method': 'set' });
+      }
       this._dragging[d] = this.axis(d);
     },
 
     _onDrag: function(d) {
-      this._dragging[d] = Math.min(this.width, Math.max(0, d3.event.x));
-      // TODO investigate how to make line dynamic
-      // foreground.attr("d", path);
-      this.dimensions.sort(function(a, b) { return this._position(a) - this._position(b); }.bind(this));
-      this.axis.domain(this.dimensions);
-      this.axisGroups.attr("transform", function(d) { return "translate(" + this._position(d) + ")"; }.bind(this))
+      this.debounce('drag', function(e){
+        this._dragging[d] = Math.min(this.width, Math.max(0, e));
+
+        // if we want them to reorder dynamically:
+        if(this.dynamicAxisRedraw){
+          this.dimensions.sort(function(a, b) { return this._position(a) - this._position(b); }.bind(this));
+          this.axis.domain(this.dimensions);
+
+          // redraw the lines
+          if(this.redrawSeries){
+            for(var i = 0; i < this.redrawElems.length; i++){
+              // TODO investigate how to make line dynamic
+              this.redrawElems[i].drawElement();
+            }
+          }
+        }
+
+        // move the currently grabed axis (and reorder the others if above is active)
+        this.axisGroups.attr("transform", function(d) { return "translate(" + this._position(d) + ")"; }.bind(this));
+      }.bind(this,d3.event.x),10);
     },
 
     _position: function(d) {

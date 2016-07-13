@@ -64,8 +64,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         dimensions="[[dimensions]]"
         axis-groups="[[axisGroups]]"
         drag-behavior="{{dragBehavior}}"
-        redraw-series
-        redraw-elems="[[redrawElems]]">
+        redraw-series="[[redrawSeries]]"
+        dynamic-axis-redraw="[[dynamicAxisRedraw]]"
+        redraw-elems="[[redrawElems]]"
+        series-key="[[seriesKey]]"
+        muted-series="{{mutedSeries}}">
       </px-vis-axis-drag>
 
     </template>
@@ -86,7 +89,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       PxVisBehavior.dataset,
       PxVisBehavior.dimensions,
       PxVisBehavior.mutedSeries,
-      PxVisBehaviorD3.redrawSeries
+      PxVisBehaviorD3.dynamicRedraw
     ],
 
     /**
@@ -120,7 +123,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     observers: [
       '_generateGs(dimensions,svg,currentDomainX)'
     ],
-
     _generateGs: function(dimensions,svg,currentDomainX){
       if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.currentDomainX) && this._doesObjHaveValues(this.dimensions) && this._isObjEmpty(this.axisGroups)){
 
