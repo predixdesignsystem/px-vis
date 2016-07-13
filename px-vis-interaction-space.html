@@ -99,7 +99,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     observers: [
-      'drawElement(currentDomainX,currentDomainY,chartData.*,svg,width,height)',
+      'drawElement(currentDomainX,currentDomainY,chartData.*,svg,width,height, completeSeriesConfig)',
       '_resetTooltipData(completeSeriesConfig.*)'
      ],
 
@@ -126,6 +126,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * @method drawElement
      */
     drawElement: function() {
+
       if (this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.x) && this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.chartData) && this._isObjEmpty(this._rect) && this.width && this.height ) {
         // make sure the tooltip draws on top of everything; returns a set property interactionSvg
         this.cloneSVGElem(this.svg.node(),'interactionSvg');
@@ -198,135 +199,149 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      *
      * @method _calcTooltipData
      */
-    _calcTooltipData:function(){
-      //  d3.mouse: returns the x position on the screen of the mouse
-      var mousePos = d3.mouse(this._rect.node()),
-          x0,
-          dataObj,
-          bisectDate,
-          xArr,
-          yArr,
-          len,
-          index,
-          d0,
-          d1,
-          d,
-          xCoord,
-          yCoord;
+    _calcTooltipData:function() {
 
-
-      this.debounce('move',function(){
-        // TODO Maybe this should be a option: return all val at x or closets vals at cursor
-        // invert: takes position on the screen and converts it into an equivalent date
-        var minDist = Number.MAX_VALUE,
-            result = [],
-            xArr = [],
-            yArr = [],
-            keys = Object.keys(this.completeSeriesConfig),
-            len  = keys.length,
+      if(!this.mouseDown) {
+        //  d3.mouse: returns the x position on the screen of the mouse
+        var mousePos = d3.mouse(this._rect.node()),
+            x0,
+            dataObj,
+            bisectDate,
+            xArr,
+            yArr,
+            len,
+            index,
+            d0,
+            d1,
             d,
-            x1 = this.xAxisType !== 'ordinal' ? this.x.invert(mousePos[0]) : null,
-            y1 = this.yAxisType !== 'ordinal' ? this.y.invert(mousePos[1]) : null,
-            x2,
-            y2,
-            chartData;
-
-            // setup a holder for our data to pass out
-            var dataObj = {
-              // FIXME does this still work with scatter?
-              'time':(this.xAxisType === 'time') ? x1 : null,
-              'series': [],
-              'mouse': mousePos,
-              'xArr': null,
-              'yArr': null
-            };
-
-            for(var i = 0; i < len; i++) {
-
-              var yKey = this.completeSeriesConfig[keys[i]]['y'],
-                  xKey = this.completeSeriesConfig[keys[i]]['x'];
-
-              minDist = Number.MAX_VALUE;
-              result = [];
+            xCoord,
+            yCoord;
 
 
-              //ordinal are specials...
-              if(this.xAxisType === 'ordinal') {
-                //find ordinal value for X
-                result[xKey] = this._getOrdinalValue(true, mousePos[0]);
+        this.debounce('move',function(){
+          // TODO Maybe this should be a option: return all val at x or closets vals at cursor
+          // invert: takes position on the screen and converts it into an equivalent date
+          var minDist = Number.MAX_VALUE,
+              result = [],
+              xArr = [],
+              yArr = [],
+              keys = Object.keys(this.completeSeriesConfig),
+              len  = keys.length,
+              d,
+              x1 = this.xAxisType !== 'ordinal' ? this.x.invert(mousePos[0]) : null,
+              y1 = this.yAxisType !== 'ordinal' ? this.y.invert(mousePos[1]) : null,
+              x2,
+              y2,
+              chartData;
 
-                //now get Y
-                if(this.yAxisType === 'ordinal') {
-                  result[yKey] = this._getOrdinalValue(false, mousePos[1]);
-                } else {
-                  result[yKey] = this._getClosestValue(false, y1, this.chartData, xKey, yKey, result[xKey]);
-                }
-              } else if(this.yAxisType === 'ordinal') {
+              // setup a holder for our data to pass out
+              var dataObj = {
+                'time':(this.xAxisType === 'time') ? x1 : null,
+                'series': [],
+                'mouse': mousePos,
+                'xArr': null,
+                'yArr': null
+              };
 
-                result[yKey] = this._getOrdinalValue(false, mousePos[1]);
-                //now get X
-                if(this.yAxisType === 'ordinal') {
+              for(var i = 0; i < len; i++) {
+
+                var yKey = this.completeSeriesConfig[keys[i]]['y'],
+                    xKey = this.completeSeriesConfig[keys[i]]['x'];
+
+                minDist = Number.MAX_VALUE;
+                result = [];
+
+
+                //ordinal are specials...
+                if(this.xAxisType === 'ordinal') {
+                  //find ordinal value for X
                   result[xKey] = this._getOrdinalValue(true, mousePos[0]);
-                } else {
-                  result[xKey] = this._getClosestValue(true, x1, this.chartData, xKey, yKey, result[yKey]);
-                }
-              }
-              //find closest point....
-              else if(this.xAxisType === 'time') {
-                //time based X axis
-                /*
-                  d3.bisector returns index in our array that corresponds to the horizontal position of the mouse pointer.
-                  Specifically this returns the date that falls to the left of the mouse cursor.
-                */
-                chartData  = this.chartData;
 
-                var bisectDate = d3.bisector(function(d) {
-                  return d[this.completeSeriesConfig[keys[i]]['x']];
-                }.bind(this)).left,
-                index = bisectDate(chartData, x1, 1);
-                // get the data values around the index
-                d0 = chartData[index - 1];
-                d1 = (chartData[index]) ? chartData[index] : chartData[index - 1];
-                // sets result as the closest date to the mouse
-                result = (x1 - d0[0] > d1[0] - x1) ? d1 : d0;
-              } else {
-                //non time based: iterate over points and find the closest
+                  //now get Y
+                  if(this.yAxisType === 'ordinal') {
+                    result[yKey] = this._getOrdinalValue(false, mousePos[1]);
+                  } else {
+                    result[yKey] = this._getClosestValue(false, y1, this.chartData, xKey, yKey, result[xKey]);
+                  }
+                } else if(this.yAxisType === 'ordinal') {
 
-                for(var j = 0; j < this.chartData.length; j++) {
-
-                  //get point coords
-                  x2 = this.chartData[j][xKey];
-                  y2 = this.chartData[j][yKey];
-
-                  //distance between the two points
-                  d = Math.sqrt( (x2-=x1)*x2 + (y2-=y1)*y2 );
-
-                  //keep the closest point
-                  if(d < minDist) {
-                    minDist = d;
-                    //store this point
-                    result = this.chartData[j];
+                  result[yKey] = this._getOrdinalValue(false, mousePos[1]);
+                  //now get X
+                  if(this.yAxisType === 'ordinal') {
+                    result[xKey] = this._getOrdinalValue(true, mousePos[0]);
+                  } else {
+                    result[xKey] = this._getClosestValue(true, x1, this.chartData, xKey, yKey, result[yKey]);
                   }
                 }
-              }
+                //find closest point....
+                else if(this.xAxisType === 'time') {
+                  //time based X axis
+                  /*
+                    d3.bisector returns index in our array that corresponds to the horizontal position of the mouse pointer.
+                    Specifically this returns the date that falls to the left of the mouse cursor.
+                  */
+                  chartData  = this.chartData;
 
-              // get the pixel coords for that data
-              xCoord = this.x(result[xKey]);
-              yCoord = this.y(result[yKey]);
+                  var bisectDate = d3.bisector(function(d) {
+                    return d[this.completeSeriesConfig[keys[i]]['x']];
+                  }.bind(this)).left,
+                  index = bisectDate(chartData, x1, 1);
+                  // get the data values around the index
+                  d0 = chartData[index - 1];
+                  d1 = (chartData[index]) ? chartData[index] : chartData[index - 1];
+                  // sets result as the closest date to the mouse
+                  result = (x1 - d0[0] > d1[0] - x1) ? d1 : d0;
+                } else {
+                  //non time based: iterate over points and find the closest
 
-              xArr.push(xCoord);
-              yArr.push(yCoord);
+                  for(var j = 0; j < this.chartData.length; j++) {
 
-              dataObj.series.push({'name':keys[i],'value': result, 'coord': [xCoord,yCoord] });
-            } //for
+                    //get point coords
+                    x2 = this.chartData[j][xKey];
+                    y2 = this.chartData[j][yKey];
 
+                    //distance between the two points
+                    d = Math.sqrt( (x2-=x1)*x2 + (y2-=y1)*y2 );
 
-          dataObj['xArr'] = xArr;
-          dataObj['yArr'] = yArr;
-          // now we can set our data that we want to pass out
-          this.set('tooltipData',dataObj);
-          this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
-      },1);
+                    //keep the closest point
+                    if(d < minDist) {
+                      minDist = d;
+                      //store this point
+                      result = this.chartData[j];
+                    }
+                  }
+                }
+
+                // get the pixel coords for that data
+                xCoord = this.x(result[xKey]);
+                yCoord = this.y(result[yKey]);
+
+                xArr.push(xCoord);
+                yArr.push(yCoord);
+
+                dataObj.series.push({'name':keys[i],'value': result, 'coord': [xCoord,yCoord] });
+              } //for
+
+            dataObj['xArr'] = xArr;
+            dataObj['yArr'] = yArr;
+            // now we can set our data that we want to pass out
+            this.set('tooltipData',dataObj);
+            this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
+        },1);
+      }
+      //this also resets registers, making it look bad
+      /*else {
+        //make sure tooltip is hidden
+        var dataObj = {
+          'time': null,
+          'series': [],
+          'mouse': null,
+          'xArr': null,
+          'yArr': null
+        };
+        this.set('tooltipData',dataObj);
+        this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
+      }*/
     },
     /**
      * Tries to find the ordinal value for the mouse position on the X (xAxis=true)
@@ -405,36 +420,40 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      *
      * @method _drawActionBox
      */
-    _drawActionBox: function(){
-      this.mouseDown = true;
-      //in case the user clicks inside the chart, and mouses out, we are waiting for a mouseup, and closing our action box with the coordinates available on the mouseup.
-      d3.select(document).on('mouseup.action', this._mouseUpOutsideSvg.bind(this));
+    _drawActionBox: function() {
 
-      var mousePos = d3.mouse(this._rect.node());
-      // use original svg so it draws under the _rect and does not interfer with our mouse events
+      //only allow left clicks
+      if(d3.event.button === 0) {
+        this.mouseDown = true;
+        //in case the user clicks inside the chart, and mouses out, we are waiting for a mouseup, and closing our action box with the coordinates available on the mouseup.
+        d3.select(document).on('mouseup.action', this._mouseUpOutsideSvg.bind(this));
 
-      var startX = mousePos[0],
-          startY = mousePos[1];
+        var mousePos = d3.mouse(this._rect.node());
+        // use original svg so it draws under the _rect and does not interfer with our mouse events
 
-      if(this.selectionType === 'xAxis') {
-        startY = 0;
-      } else if(this.selectionType === 'yAxis') {
-        startX = 0;
+        var startX = mousePos[0],
+            startY = mousePos[1];
+
+        if(this.selectionType === 'xAxis') {
+          startY = 0;
+        } else if(this.selectionType === 'yAxis') {
+          startX = 0;
+        }
+
+        this._actionArea = this.svg.append( "rect")
+          .attr('class', "action-area")
+          .attr('x', startX)
+          .attr('y', startY)
+          .attr('ox', startX) // save this original position for calcs
+          .attr('oy', startY) // save this original position for calcs
+          .attr('rx', 2)
+          .attr('ry', 2)
+          .attr('width', 0)
+          .attr('height', 0)
+          .attr('fill', this.colors.grey2)
+          .attr('fill-opacity', 0.5)
+          .attr('stroke', this.colors.grey6);
       }
-
-      this._actionArea = this.svg.append( "rect")
-        .attr('class', "action-area")
-        .attr('x', startX)
-        .attr('y', startY)
-        .attr('ox', startX) // save this original position for calcs
-        .attr('oy', startY) // save this original position for calcs
-        .attr('rx', 2)
-        .attr('ry', 2)
-        .attr('width', 0)
-        .attr('height', 0)
-        .attr('fill', this.colors.grey2)
-        .attr('fill-opacity', 0.5)
-        .attr('stroke', this.colors.grey6);
     },
     /**
      * Helper function called on mousedown.action

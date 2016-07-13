@@ -206,25 +206,26 @@ Element which draws scatter series onto the chart
      *
      */
     _applyTransform: function() {
+      var _this = this;
       this.scatterDots
-      .attr("transform", function(d) {
+        .attr("transform", function(d) {
 
-        var xTrans,
-            yTrans;
+          var xTrans,
+              yTrans;
 
-        if(d[this.completeSeriesConfig[this.seriesId]['x']]){
-          xTrans = this.x(d[this.completeSeriesConfig[this.seriesId]['x']]);
-        }
-        if(d[this.completeSeriesConfig[this.seriesId]['y']]){
-          yTrans = this.y(d[this.completeSeriesConfig[this.seriesId]['y']]);
-        }
+          if(d[_this.completeSeriesConfig[_this.seriesId]['x']]){
+            xTrans = _this.x(d[_this.completeSeriesConfig[_this.seriesId]['x']]);
+          }
+          if(d[_this.completeSeriesConfig[_this.seriesId]['y']]){
+            yTrans = _this.y(d[_this.completeSeriesConfig[_this.seriesId]['y']]);
+          }
 
-        //make sure we have a value
-        xTrans = xTrans ? xTrans : 0;
-        yTrans = yTrans ? yTrans : 0;
+          //make sure we have a value
+          xTrans = xTrans ? xTrans : 0;
+          yTrans = yTrans ? yTrans : 0;
 
-        return "translate(" + xTrans + "," + yTrans + ")" + ' scale(' + this.markerScale + ')';
-      }.bind(this));
+          return "translate(" + xTrans + "," + yTrans + ")" + ' scale(' + _this.markerScale + ')';
+        });
     },
     /**
      * Adds full color to the scatters.
