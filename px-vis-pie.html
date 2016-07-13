@@ -208,50 +208,48 @@ Element which draws scatter series onto the chart
      * @method drawElement
      */
     drawElement: function() {
-      if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.chartData)){
-        //calculate data and radius
-        var data = this.chartData,
-            pie = d3.layout.pie().value(function(d){return d['x'];})(data);
+      //calculate data and radius
+      var data = this.chartData,
+          pie = d3.layout.pie().value(function(d){return d['x'];})(data);
 
-        // checks to see if the group already exists. If not, create; if so, update
-        if(this._isObjEmpty(this.pieGroup)){
-          // draw the path and move it so the ie is centered
-          this.pieGroup = this.svg.append('g')
-            .attr('series-id', 'pie_' + this.seriesId)
-            .attr('class', 'pie-slice')
-            .attr('transform', this._translationString);
-        }
-
-        // declare an arc generator function
-        var arc = d3.svg.arc().outerRadius(this._radius);
-        if(this.donut) {
-          var innerRadiusPx = this.innerRadius === 0 ? (this._radius - 30) : this.innerRadius * this._radius;
-          arc.innerRadius(innerRadiusPx);
-        }
-
-        // select paths, use arc generator to draw
-        var arcs = this.pieGroup.selectAll('pie-slice')
-                                .data(pie)
-                                .enter()
-                                .append('svg:g')
-                                .attr('class', 'slice')
-                                .on('mousedown.action', this._centerOnSlice.bind(this))
-                                .on('mouseover', this._showTooltip.bind(this))
-                                .on('mouseout.tooltip', this._hideTooltip.bind(this));
-
-        arcs.append('svg:path')
-            .attr('fill', function(d, i){
-                return this._getPieColorForIndex(i);
-            }.bind(this))
-            .attr('d', function (d) {
-                return arc(d);
-            });
-
-        this.pieGroup
-            .transition()
-            .duration(1250)
-            .attr('transform', this._translationString + ' rotate(-180)');
+      // checks to see if the group already exists. If not, create; if so, update
+      if(this._isObjEmpty(this.pieGroup)){
+        // draw the path and move it so the ie is centered
+        this.pieGroup = this.svg.append('g')
+          .attr('series-id', 'pie_' + this.seriesId)
+          .attr('class', 'pie-slice')
+          .attr('transform', this._translationString);
       }
+
+      // declare an arc generator function
+      var arc = d3.svg.arc().outerRadius(this._radius);
+      if(this.donut) {
+        var innerRadiusPx = this.innerRadius === 0 ? (this._radius - 30) : this.innerRadius * this._radius;
+        arc.innerRadius(innerRadiusPx);
+      }
+
+      // select paths, use arc generator to draw
+      var arcs = this.pieGroup.selectAll('pie-slice')
+                              .data(pie)
+                              .enter()
+                              .append('svg:g')
+                              .attr('class', 'slice')
+                              .on('mousedown.action', this._centerOnSlice.bind(this))
+                              .on('mouseover', this._showTooltip.bind(this))
+                              .on('mouseout.tooltip', this._hideTooltip.bind(this));
+
+      arcs.append('svg:path')
+          .attr('fill', function(d, i){
+              return this._getPieColorForIndex(i);
+          }.bind(this))
+          .attr('d', function (d) {
+              return arc(d);
+          });
+
+      this.pieGroup
+          .transition()
+          .duration(1250)
+          .attr('transform', this._translationString + ' rotate(-180)');
     },
     /**
      * Return the cvalue or the slice datum depending on use of percentages

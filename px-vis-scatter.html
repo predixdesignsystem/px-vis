@@ -137,44 +137,42 @@ Element which draws scatter series onto the chart
      * @method drawElement
      */
     drawElement: function() {
-      if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.x) && this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.chartData) && this._doesObjHaveValues(this.completeSeriesConfig)){
-        var data = this.chartData;
+      var data = this.chartData;
 
-        // checks to see if the group already exists. If not, create; if so, update
-        if(this._isObjEmpty(this.scatterGroup)) {
+      // checks to see if the group already exists. If not, create; if so, update
+      if(this._isObjEmpty(this.scatterGroup)) {
 
-          //override marker symbol if defined in serie config
-          this.markerSymbol = this.completeSeriesConfig[this.seriesId].markerSymbol ?
-                                this.completeSeriesConfig[this.seriesId].markerSymbol : this.markerSymbol;
-          this.markerScale = this.completeSeriesConfig[this.seriesId].markerScale ?
-                                this.completeSeriesConfig[this.seriesId].markerScale : this.markerScale;
+        //override marker symbol if defined in serie config
+        this.markerSymbol = this.completeSeriesConfig[this.seriesId].markerSymbol ?
+                              this.completeSeriesConfig[this.seriesId].markerSymbol : this.markerSymbol;
+        this.markerScale = this.completeSeriesConfig[this.seriesId].markerScale ?
+                              this.completeSeriesConfig[this.seriesId].markerScale : this.markerScale;
 
-          // draw the path
-          this.scatterGroup = this.svg.append("g")
-            .attr("series-id", 'scatter_' + this.seriesId)
-            .attr("class", "series-scatter");
+        // draw the path
+        this.scatterGroup = this.svg.append("g")
+          .attr("series-id", 'scatter_' + this.seriesId)
+          .attr("class", "series-scatter");
 
-        // TODO dev set FA icons & icons
-          this.scatterDots = this.scatterGroup.selectAll(this.markerSymbol + '.scatter-dot')
-            .data(data);
+      // TODO dev set FA icons & icons
+        this.scatterDots = this.scatterGroup.selectAll(this.markerSymbol + '.scatter-dot')
+          .data(data);
 
-          this.scatterDots.enter()
-          .append("path")
-          .attr("class", this.markerSymbol)
-          .attr("d", d3.svg.symbol().type(this.markerSymbol));
+        this.scatterDots.enter()
+        .append("path")
+        .attr("class", this.markerSymbol)
+        .attr("d", d3.svg.symbol().type(this.markerSymbol));
 
-          this._applyTransform();
+        this._applyTransform();
 
-          // add color
-          this._colorScatter();
+        // add color
+        this._colorScatter();
 
-          this._addClipPath();
+        this._addClipPath();
 
-          this.scatterDots.exit().remove();
-        }
-        else {
-          this._applyTransform();
-        }
+        this.scatterDots.exit().remove();
+      }
+      else {
+        this._applyTransform();
       }
     },
     /**

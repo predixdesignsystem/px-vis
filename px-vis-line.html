@@ -125,62 +125,59 @@ Element which draws lines series onto the chart
       this.debounce('draw',function(){
         // console.log('start drawing');
 
-        var start = new Date().getTime();
-        if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.currentDomainX) &&
-            this._doesObjHaveValues(this.currentDomainY) && this._doesObjHaveValues(this.chartData) &&
-            this._doesObjHaveValues(this.completeSeriesConfig)){
+      //  var start = new Date().getTime();
 
-          if(this.parallelCoordinates) {
-            var data = this.chartData,
-                dims = this.completeSeriesConfig[this.seriesId]['x'],
-                path = d3.svg.line(),
-                line = function(d) { return path(dims.map(function(p) { return [~~this.x(p), ~~this.y[p](d[p])]; }.bind(this))) }.bind(this);
-          } else {
+        if(this.parallelCoordinates) {
+          var data = this.chartData,
+              dims = this.completeSeriesConfig[this.seriesId]['x'],
+              path = d3.svg.line(),
+              line = function(d) { return path(dims.map(function(p) { return [~~this.x(p), ~~this.y[p](d[p])]; }.bind(this))) }.bind(this);
+        } else {
 
-            var data = [this.chartData],
-                _this = this;
+          var data = [this.chartData],
+              _this = this;
 
-            //round pixels values to optimize svg perfs
-            var line = d3.svg.line()
-              .x(function(d) {
-                  return ~~_this.x(d[_this.completeSeriesConfig[_this.seriesId]['x']]);
-              })
-              .y(function(d) {
-                  return ~~_this.y(d[_this.completeSeriesConfig[_this.seriesId]['y']]);
-              })
-              .defined(function(d) {
-                //tests is equivalent to !isNaN but slightly faster
-                return d[_this.completeSeriesConfig[_this.seriesId]['y']] == d[_this.completeSeriesConfig[_this.seriesId]['y']];
-              });
-          }
-
-          // checks to see if the group already exists. If not, create; if so, update
-          if(this._isObjEmpty(this.lineGroup)) {
-            // draw the path
-            this.lineGroup = this.svg.append("g")
-              .attr("series-id", 'line_' + this.seriesId)
-              .attr("class", "series-line");
-          }
-
-          this.linePath = this.lineGroup.selectAll('path.series-line')
-            .data(data);
-
-          this.linePath.enter()
-            .append('path')
-            .attr("class", "series-line")
-            .attr("series-id", 'line_' + this.seriesId)
-            .attr('fill','none');
-
-          this.linePath.attr("d", line);
-
-          // add color
-          this._colorLine();
-
-          this._addClipPath();
-
-          this.linePath.exit().remove();
-
+          //round pixels values to optimize svg perfs
+          var line = d3.svg.line()
+            .x(function(d) {
+                return ~~_this.x(d[_this.completeSeriesConfig[_this.seriesId]['x']]);
+            })
+            .y(function(d) {
+                return ~~_this.y(d[_this.completeSeriesConfig[_this.seriesId]['y']]);
+            })
+            .defined(function(d) {
+              //tests is equivalent to !isNaN but slightly faster
+              return d[_this.completeSeriesConfig[_this.seriesId]['y']] == d[_this.completeSeriesConfig[_this.seriesId]['y']];
+            });
         }
+
+        // checks to see if the group already exists. If not, create; if so, update
+        if(this._isObjEmpty(this.lineGroup)) {
+          // draw the path
+          this.lineGroup = this.svg.append("g")
+            .attr("series-id", 'line_' + this.seriesId)
+            .attr("class", "series-line");
+        }
+
+        this.linePath = this.lineGroup.selectAll('path.series-line')
+          .data(data);
+
+        this.linePath.enter()
+          .append('path')
+          .attr("class", "series-line")
+          .attr("series-id", 'line_' + this.seriesId)
+          .attr('fill','none');
+
+        this.linePath.attr("d", line);
+
+        // add color
+        this._colorLine();
+
+        this._addClipPath();
+
+        this.linePath.exit().remove();
+
+
 //         var end = new Date().getTime();
 // var time = end - start;
 // console.log('drawing time: ' + time);

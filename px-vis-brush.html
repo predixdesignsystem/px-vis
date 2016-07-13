@@ -148,71 +148,69 @@ This element sets the selectedDomain property based on the extents box. The sele
      * @method drawElement
      */
     drawElement: function() {
-      if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.axis) && this._doesObjHaveValues(this.currentDomain) && this._isVarDefined(this.height) && this._isObjEmpty(this._brush)){
-        var heightOffset = 6;
+      var heightOffset = 6;
 
-        // make sure the brush draws on top of everything; returns a set property brushSvg
-        this.cloneSVGElem(this.svg.node(),'bushSvg');
+      // make sure the brush draws on top of everything; returns a set property brushSvg
+      this.cloneSVGElem(this.svg.node(),'bushSvg');
 
-        // first, define the brush using the axis
-        this._brush = d3.svg.brush()
-          .x(this.axis)
-          .extent(this.currentDomain)
-          // .on("brush", (this._brushed).bind(this));
-          .on("brushstart", this._brushstart.bind(this))
-          .on("brush", this._brushmove.bind(this))
-          .on("brushend", this._brushend.bind(this));
+      // first, define the brush using the axis
+      this._brush = d3.svg.brush()
+        .x(this.axis)
+        .extent(this.currentDomain)
+        // .on("brush", (this._brushed).bind(this));
+        .on("brushstart", this._brushstart.bind(this))
+        .on("brush", this._brushmove.bind(this))
+        .on("brushend", this._brushend.bind(this));
 
-        // // navigator outline
-        // this.bushSvg.append("rect")
-        //   .attr("x", 0)
-        //   .attr("y", 0)
-        //   .attr("height", this.height - heightOffset)
-        //   .attr("width", this.width - 41)
-        //   .attr('stroke',this.colors.gray5)
-        //   .attr('stroke-width',1)
-        //   .attr('fill','none')
-        //   .attr('shape-rendering','crispEdges');
+      // // navigator outline
+      // this.bushSvg.append("rect")
+      //   .attr("x", 0)
+      //   .attr("y", 0)
+      //   .attr("height", this.height - heightOffset)
+      //   .attr("width", this.width - 41)
+      //   .attr('stroke',this.colors.gray5)
+      //   .attr('stroke-width',1)
+      //   .attr('fill','none')
+      //   .attr('shape-rendering','crispEdges');
 
-        // now that we have our new g, proceed with drawing brush
-        this._brushGroup = this.bushSvg.append("g")
-          .attr("class", "brush")
-          .call(this._brush);
+      // now that we have our new g, proceed with drawing brush
+      this._brushGroup = this.bushSvg.append("g")
+        .attr("class", "brush")
+        .call(this._brush);
 
-        /* Style the brush overlay box
-           There are actually two boxes, .background and .extent:
-           I dont quite know the difference. .extent seems to be the one with the handles and that we interact with. Not applying these changes to background makes it such that you cannot click on the nav and have the selected area move.
+      /* Style the brush overlay box
+         There are actually two boxes, .background and .extent:
+         I dont quite know the difference. .extent seems to be the one with the handles and that we interact with. Not applying these changes to background makes it such that you cannot click on the nav and have the selected area move.
 
-           Just apply to both for ease, though we could be more specific
-        */
-        this._brushGroup.selectAll("rect")
-          .attr("y", 0)
-          .attr("height", this.height - heightOffset)
-          .attr('stroke',this.colors.gray5)
-          .attr('stroke-width',2)
-          .attr('fill',this.colors.black)
-          .attr('fill-opacity','.10')
-          .attr('shape-rendering','crispEdges');
+         Just apply to both for ease, though we could be more specific
+      */
+      this._brushGroup.selectAll("rect")
+        .attr("y", 0)
+        .attr("height", this.height - heightOffset)
+        .attr('stroke',this.colors.gray5)
+        .attr('stroke-width',2)
+        .attr('fill',this.colors.black)
+        .attr('fill-opacity','.10')
+        .attr('shape-rendering','crispEdges');
 
-        this._drawHandles(heightOffset);
+      this._drawHandles(heightOffset);
 
-        // Setup listeners for click on the navigator so the brush will jump instead of redraw
-        this._brushGroup.select(".background")
-          .on("mousedown.brush", this._brushcenter.bind(this))
-          .on("touchstart.brush", this._brushcenter.bind(this));
+      // Setup listeners for click on the navigator so the brush will jump instead of redraw
+      this._brushGroup.select(".background")
+        .on("mousedown.brush", this._brushcenter.bind(this))
+        .on("touchstart.brush", this._brushcenter.bind(this));
 
-        //if we want fancy color changes, etc, can use brushstart to prime those changes
-        // this._brushstart();
-        // this._brushmove();
-        // this._brush.extent(this.currentDomain);
-        //
-        // console.log(this._brushGroup.node().parentNode.childNodes);
-        // var nodes = this._brushGroup.node().parentNode.childNodes;
-        // console.log(nodes[nodes.length -1]);
-        // if(nodes[nodes.length -1] !== this._brushGroup.node()){
-        //   console.log("doesnt match");
-        // }
-      }
+      //if we want fancy color changes, etc, can use brushstart to prime those changes
+      // this._brushstart();
+      // this._brushmove();
+      // this._brush.extent(this.currentDomain);
+      //
+      // console.log(this._brushGroup.node().parentNode.childNodes);
+      // var nodes = this._brushGroup.node().parentNode.childNodes;
+      // console.log(nodes[nodes.length -1]);
+      // if(nodes[nodes.length -1] !== this._brushGroup.node()){
+      //   console.log("doesnt match");
+      // }
     },
     /**
      * Helper function to add class "selecting" to elems selected in the brush

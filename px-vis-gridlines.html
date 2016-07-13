@@ -144,47 +144,46 @@ The gridlines still make use of the d3.axis object, just with different settings
          * @method _drawElement
          */
         drawElement: function() {
-          if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.axis)){
 
-            this.defineGrid();
-            // this._grid.tickValues(this.axis.domain());
-            if(this.orientation === 'bottom'){
-              var h = this.svg.attr('height') - this.margin.bottom - this.margin.top;
-              this.translateAmt = [0,h];
-            } else if(this.orientation === 'left'){
-              this.translateAmt = [0,0];
-            }
+          this.defineGrid();
+          // this._grid.tickValues(this.axis.domain());
+          if(this.orientation === 'bottom'){
+            var h = this.svg.attr('height') - this.margin.bottom - this.margin.top;
+            this.translateAmt = [0,h];
+          } else if(this.orientation === 'left'){
+            this.translateAmt = [0,0];
+          }
 
-            // checks to see if the grid already exists. If not, create; if so, update
-            if(this._isObjEmpty(this._gridGroup)){
-              this._gridGroup = this.svg.append("g")
-                .attr("class", "grid")
-                .attr('grid-id',this.gridId)
-                .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
-                .call(this._grid);
-
-              this._removeUncessaryElems(this._gridGroup);
-              this._setLineStyles(this._gridGroup,'line');
-
-              // the first tick overlaps the x-axis path and is unnessary
-              // TODO make sure this doesnt get us in trouble in different min y values
-              // TODO What if there is no x-axis? How to do this better?
-              // this._gridGroup.select('line').remove();
-
-              //keep a reference for later
-              // this._gridGroup = this.svg.select('g.grid[grid-id=' + this.gridId + ']');
-
-            } else {
-              this._gridGroup
-              // .duration(750)
+          // checks to see if the grid already exists. If not, create; if so, update
+          if(this._isObjEmpty(this._gridGroup)){
+            this._gridGroup = this.svg.append("g")
+              .attr("class", "grid")
+              .attr('grid-id',this.gridId)
               .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
               .call(this._grid);
 
-              this._removeUncessaryElems(this._gridGroup);
-              this._setLineStyles(this._gridGroup,'line');
+            this._removeUncessaryElems(this._gridGroup);
+            this._setLineStyles(this._gridGroup,'line');
 
-            }
+            // the first tick overlaps the x-axis path and is unnessary
+            // TODO make sure this doesnt get us in trouble in different min y values
+            // TODO What if there is no x-axis? How to do this better?
+            // this._gridGroup.select('line').remove();
+
+            //keep a reference for later
+            // this._gridGroup = this.svg.select('g.grid[grid-id=' + this.gridId + ']');
+
+          } else {
+            this._gridGroup
+            // .duration(750)
+            .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
+            .call(this._grid);
+
+            this._removeUncessaryElems(this._gridGroup);
+            this._setLineStyles(this._gridGroup,'line');
+
           }
+
         },
         /**
          * Removes other axis elements which are duplicated with px-vis-axis
