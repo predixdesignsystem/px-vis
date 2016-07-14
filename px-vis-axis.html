@@ -44,6 +44,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           PxVisBehaviorD3.axis,
           PxVisBehavior.completeSeriesConfig,
           PxVisBehavior.commonMethods,
+          PxVisBehaviorD3.axisConfig,
           commonColors
         ],
 
@@ -60,7 +61,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            * @property _axis
            * @type Object
            */
-          _axis:{
+          _axis: {
             type: Object,
             value: function() {return{};},
             notify: true
@@ -71,7 +72,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            * @property _axisGroup
            * @type Object
            */
-          _axisGroup:{
+          _axisGroup: {
             type: Object,
             value: function() {return{};}
           },
@@ -82,90 +83,12 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            * @type String
            * @default random string
            */
-          axisId:{
+          axisId: {
             type:String,
             value: '',
             notify: true,
             reflectToAttribute: true
-          },
-          /**
-           * The displayed title for the axis
-           *
-           * @property title
-           * @type String
-           * @default ''
-           */
-          title:{
-            type:String,
-            value: ''
-          },
-          /**
-           * Defines on which side the tick mark the label should sit.
-           *  - 'center'
-           *  - 'before'
-           *  - 'after'
-           *
-           * @property labelPosition
-           * @type String
-           * @default center
-           */
-          labelPosition:{
-            type: String,
-            value: 'center',
-          },
-          /**
-           * Defines how the label should be rotated. Number is the degree of rotation
-           *
-           * @property labelRotation
-           * @type Number
-           * @default 0
-           */
-          labelRotation:{
-            type: Number,
-            value: 0,
-          },
-          /**
-           * Defines how the label should be moved in x,y. Array is an x,y pair and coresponds to the number of pixels to move the label
-           *
-           * @property labelTranslation
-           * @type Array
-           * @default [0,0]
-           */
-          labelTranslation:{
-            type: Array,
-            value: function() {return [0,0];},
-          },
-          /**
-           * Defines the base label type size
-           *
-           * @property labelTypeSize
-           * @type Number
-           * @default 12
-           */
-          labelTypeSize:{
-            type: Number,
-            value: 12,
-          },
-          /**
-           * Array of the series which belong to this axis
-           *
-           * @property series
-           * @type Array
-           */
-          series:{
-            type: Array,
-            value: function() {return[];}
-          },
-          /**
-           * An x,y amount to move the axis to allow for labels and titles
-           *
-           * @property translateAmt
-           * @type Array
-           */
-          translateAmt:{
-            type: Array,
-            value:function(){ return [0,0]; }
-          },
+          }
         },
 
         observers: [
@@ -193,17 +116,20 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .orient(this.orientation);
 
           // change default (10) ticks
-          // this._axis.ticks(5);
+          // this._axis.ticks(10);
           // change default ticks with specific time
           // this._axis.ticks(d3.time.months, 1);
           // this._axis.ticks(d3.time.days, 7);
           // this._axis.ticks(d3.time.minutes, 15);
+          if(this.tickValues && this.tickValues.length > 0){
+            this._axis.tickValues(this.tickValues);
+          }
 
           // controls the tick mark size for ticks with numbers
           // this._axis.innerTickSize(-1000);
           // this._axis.tickPadding(10);
           // controls the first and last ticks
-          this._axis.outerTickSize(0);
+          this._axis.outerTickSize(this.outerTickSize);
 
           // https://github.com/mbostock/d3/wiki/Formatting#d3_format
           // this._axis.tickFormat(d3.format(",.0f"));
@@ -323,9 +249,12 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          */
         _setLineStyles:function(elem,lines){
           elem.selectAll(lines)
-            .attr('fill','none')
-            .attr('stroke', this.colors.grey9)
-            .attr('shape-rendering','crispEdges');
+            .attr({
+              'fill':'none',
+              'stroke': this.colors.grey9,
+              'shape-rendering':'crispEdges',
+              "stroke-width": this.strokeWidth
+            });
         },
         /**
          * Draws the axis title
@@ -333,32 +262,45 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * @method drawTitle
          */
         drawTitle:function(){
-          var ext = this._axisGroup.node().getBBox();
-          var x,y,r;
+          var ext = this._axisGroup.node().getBBox(),
+              location = this._doesObjHaveValues(this.titleLocation) ? 'custom' : this.orientation,
+              x,y,r,anchor;
 
-          switch(this.orientation){
+
+          switch(location){
             case 'bottom':
               x = parseFloat(ext['width']) / 2 + this.translateAmt[0];
               y = this.labelTypeSize * 1.5 + parseFloat(ext['height']) + this.translateAmt[1];
               r = 0;
+              anchor = "middle";
               break;
 
             case 'top':
               x = parseFloat(ext['width']) / 2 + this.translateAmt[0];
-              y = (this.labelTypeSize * 1.5 + parseFloat(ext['height'])) * -1 + this.translateAmt[1];
+              y = this.translateAmt[1];
               r = 0;
+              anchor = "middle";
               break;
 
             case 'left':
               x = (this.labelTypeSize + parseFloat(ext['width'])) * -1 + this.translateAmt[0];
               y = parseFloat(ext['height']) / 2 + this.translateAmt[1];
               r = -90;
+              anchor = "middle";
               break;
 
             case 'right':
               x = this.labelTypeSize + parseFloat(ext['width']) + this.translateAmt[0];
               y = parseFloat(ext['height']) / 2 + this.translateAmt[1];
               r = 90;
+              anchor = "middle";
+              break;
+
+            case 'custom':
+              x = this.titleLocation.x;
+              y = this.titleLocation.y;
+              r = this.titleLocation.r;
+              anchor = this.titleLocation.anchor;
               break;
           }
 
@@ -369,11 +311,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
           this._titleGroup.append("text")
             .attr('class','axis-title')
-            .attr('font-size', (this.labelTypeSize * 1.25) + 'px')
+            .attr('font-size', this.titleTypeSize + 'px')
             .attr('font-style','GE Inspira Sans')
             .text(this.title)
-            .attr("text-anchor", 'middle')
-            .style("text-anchor", 'middle')
+            .attr("text-anchor", anchor)
+            .style("text-anchor", anchor)
             .attr('transform',"rotate(" + r + ")");
         },
         /**

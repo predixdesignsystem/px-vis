@@ -1,0 +1,115 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
+<link rel="import" href="../px-colors-design/colors.html" />
+
+
+<!--
+Element providing user interaction on an axis.
+
+This element draw the box over the axis signifying the active area to mute the series outside that box.
+
+
+##### Usage
+
+    <px-vis-axis-brush
+        svg="[[axisGroups]]"
+        axis="[[y]]"
+        chart-data="[[chartData]]"
+        dimensions="[[dimensions]]"
+        series-key="[[seriesKey]]"
+        muted-series="{{mutedSeries}}">
+    </px-vis-axis-brush>
+
+@element px-vis-axis-brush
+@blurb Element providing user interaction on an axis..
+@homepage index.html
+@demo demo.html
+-->
+<dom-module id="px-vis-axis-brush">
+    <link rel="import" type="css" href="css/px-vis.css"/>
+    <template>
+
+    </template>
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'px-vis-axis-brush',
+
+    behaviors: [
+      PxVisBehaviorD3.svg,
+      PxVisBehaviorD3.axis,
+      PxVisBehavior.commonMethods,
+      PxVisBehavior.dimensions,
+      PxVisBehavior.dataset,
+      PxVisBehavior.mutedSeries,
+      commonColors
+    ],
+
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+
+    },
+
+    observers: [
+      'drawElement(svg,axis)'
+    ],
+
+    drawElement: function(){
+      if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.axis)){
+        var _this = this;
+        // Add and store a brush for each axis.
+        this.svg.append("g")
+        .attr("class", "brush")
+        .each(function(d) {
+          d3.select(this).call(
+            _this.axis[d].brush = d3.svg.brush()
+              .y(_this.axis[d])
+              .on("brushstart", _this.brushstart.bind(_this))
+              .on("brushend", _this.brush.bind(_this)));
+        })
+        .selectAll("rect")
+        .attr({
+          "x":-8,
+          "width": 18,
+          "fill": this.colors.gray5
+        });
+      }
+    },
+
+    brushstart: function() {
+      d3.event.sourceEvent.stopPropagation();
+    },
+
+    // Handles a brush event, toggling the display of foreground lines.
+    brush: function() {
+      var brushedAxes = this.dimensions.filter(function(p) {
+          return !this.axis[p].brush.empty();
+        }.bind(this)),
+
+        extents = brushedAxes.map(function(p) {
+          return this.axis[p].brush.extent();
+        }.bind(this)),
+        series = {},
+        dim;
+      for(var i = 0; i < this.chartData.length; i++){
+        for(var j = 0; j < brushedAxes.length; j++){
+          dim = brushedAxes[j];
+          if(extents[j][0] > this.chartData[i][dim] || this.chartData[i][dim] > extents[j][1]){
+            series[this.chartData[i][this.seriesKey]] = true;
+          }
+        }
+      }
+      
+      this.set('mutedSeries',series);
+      this.fire('px-vis-muted-series-updated', { 'data': series, 'dataVar': 'mutedSeries' ,'method': 'set' });
+    }
+  });
+</script>

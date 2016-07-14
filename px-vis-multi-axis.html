@@ -1,0 +1,176 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
+<link rel="import" href="px-vis-axis.html"/>
+<link rel="import" href="px-vis-axis-brush.html"/>
+<link rel="import" href="px-vis-axis-drag.html"/>
+
+<!--
+d3 element creating an axis for the chart
+
+##### Usage
+
+    <px-vis-multi-axis
+        svg="[[svg]]"
+        axis="[[x]]"
+        margin="[[margin]]"
+        title="Date"
+        orientation="bottom"
+        label-position="center"
+        current-domain="[[currentDomainX]]">
+    </px-vis-multi-axis>
+
+##### d3 reference
+https://github.com/mbostock/d3/wiki/SVG-Axes
+
+@element px-vis-axis
+@blurb d3 element creating an axis for the chart
+@homepage index.html
+@demo demo.html
+-->
+<dom-module id="px-vis-multi-axis">
+    <link rel="import" type="css" href="css/px-vis.css"/>
+    <template>
+      <template is="dom-repeat" items="[[dimensions]]">
+        <px-vis-axis
+          svg="[[_returnGroup(index,axisGroups)]]"
+          axis="[[_returnY(item)]]"
+          margin="[[margin]]"
+          orientation="left"
+          title="[[item]]"
+          title-location='[[titleLocation]]'
+          title-type-size="12"
+          label-type-size="10"
+          current-domain="[[currentDomainY]]"
+          stroke-width="[[strokeWidth]]"
+          outer-tick-size="[[outerTickSize]]"
+          tick-values="[[_calcTickVals(item)]]">
+        </px-vis-axis>
+      </template>
+      <px-vis-axis-brush
+        svg="[[axisGroups]]"
+        axis="[[y]]"
+        chart-data="[[chartData]]"
+        dimensions="[[dimensions]]"
+        series-key="[[seriesKey]]"
+        muted-series="{{mutedSeries}}">
+      </px-vis-axis-brush>
+      <px-vis-axis-drag
+        width="[[width]]"
+        axis="[[x]]"
+        current-domain="[[currentDomainX]]"
+        complete-series-config="{{completeSeriesConfig}}"
+        chart-data="[[chartData]]"
+        dimensions="[[dimensions]]"
+        axis-groups="[[axisGroups]]"
+        drag-behavior="{{dragBehavior}}"
+        redraw-series="[[redrawSeries]]"
+        dynamic-axis-redraw="[[dynamicAxisRedraw]]"
+        redraw-elems="[[redrawElems]]"
+        series-key="[[seriesKey]]"
+        muted-series="{{mutedSeries}}">
+      </px-vis-axis-drag>
+
+    </template>
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'px-vis-multi-axis',
+
+    behaviors: [
+      PxVisBehaviorD3.svg,
+      PxVisBehavior.sizing,
+      PxVisBehaviorD3.axes,
+      PxVisBehavior.completeSeriesConfig,
+      PxVisBehavior.commonMethods,
+      PxVisBehaviorD3.axisConfig,
+      PxVisBehavior.dataset,
+      PxVisBehavior.dimensions,
+      PxVisBehavior.mutedSeries,
+      PxVisBehaviorD3.dynamicRedraw
+    ],
+
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      axisGroups: {
+        type: Object,
+        notify: true,
+        value: function(){ return {}; }
+      },
+
+      dragBehavior: {
+        type: Object,
+        notify: true
+      },
+
+      axisSvg: {
+        type: Object
+      },
+
+      matchTicks: {
+        type: Boolean,
+        value: true
+      }
+    },
+
+    observers: [
+      '_generateGs(dimensions,svg,currentDomainX)'
+    ],
+    _generateGs: function(dimensions,svg,currentDomainX){
+      if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.currentDomainX) && this._doesObjHaveValues(this.dimensions) && this._isObjEmpty(this.axisGroups)){
+
+        this.cloneSVGElem(this.svg.node(),'axisSvg');
+
+        var g = this.axisSvg.selectAll(".dimension")
+          .data(dimensions)
+          .enter()
+          .append("g")
+          .attr("class", "dimension")
+          .attr("transform", function(d) { return "translate(" + this.x(d) + ",0)"; }.bind(this))
+          .style("cursor","move")
+          .call(this.dragBehavior);
+
+        this.set('axisGroups', g);
+      }
+    },
+
+    _returnGroup: function(i){
+      return d3.select(this.axisGroups[0][i])
+    },
+
+    _returnY: function(item){
+      if(this.matchTicks){
+        var d = this.y[item].domain(),
+            min = Math.floor(d[0]/10)*10,
+            max = Math.ceil(d[1]/10)*10;
+
+        this.y[item].domain([min,max]);
+      }
+      return this.y[item]
+    },
+
+    _calcTickVals: function(item){
+      if(this.matchTicks){
+        var d = this.y[item].domain(),
+            min = Math.floor(d[0]/10)*10,
+            max = Math.ceil(d[1]/10)*10,
+            diff = (max - min) / 10,
+            vals = [];
+
+        for(var i = 0; i < 11; i++){
+          vals.push(min + diff * i);
+        }
+        return vals
+      }
+      return null;
+    },
+
+  });
+</script>
