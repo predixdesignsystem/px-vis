@@ -137,7 +137,6 @@ Element which draws lines series onto the chart
                 }.bind(this)));
               }.bind(this);
         } else {
-
           var data = [this.chartData],
               _this = this,
               xKey = _this.completeSeriesConfig[_this.seriesId]['x'],
@@ -169,23 +168,28 @@ Element which draws lines series onto the chart
         this.linePath = this.lineGroup.selectAll('path.series-line')
           .data(data);
 
+        this.linePath.exit().remove();
+
         this.linePath.enter()
           .append('path')
           .attr("class", "series-line")
           .attr("series-id", function(d,i){
             return this.multiPath ? 'line_' + d[this.seriesId] : 'line_' + this.seriesId
           }.bind(this))
-          .attr('fill','none');
+          .attr('fill','none')
+          .attr("d", line)
+          .attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
+          .attr('stroke-opacity',1);
+
 
         this.linePath.attr("d", line);
 
-        // add color
-        this._colorLine();
-
         this._addClipPath();
 
-        this.linePath.exit().remove();
       },10);
+    },
+    _test: function(){
+      this.linePath.attr('test','test');
     },
     /**
      * Helper to call addClipPath with the elem
@@ -193,7 +197,7 @@ Element which draws lines series onto the chart
      * @method _addClipPath
      */
     _addClipPath: function(){
-      this.addClipPath(this.linePath);
+      this.addClipPath(this.lineGroup);
     },
 
     /**

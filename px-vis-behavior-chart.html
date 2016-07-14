@@ -140,7 +140,6 @@ PxVisBehaviorChart.chartCommon = [{
             xMaxes = [],
             yMins = [],
             yMaxes = [],
-            chartExtents = {},
             missingYs,
             x;
         if(k.length === 0 && !this.includeAllSeries){
@@ -205,19 +204,20 @@ PxVisBehaviorChart.chartCommon = [{
         }
 
         if(!this.chartExtents){
-          chartExtents['x'] = this._calcChartExts(xMins,xMaxes,'x');
-          chartExtents['y'] = this._calcChartExts(yMins,yMaxes,'y');
+          this.chartExtents = {};
+          this.chartExtents['x'] = this._calcChartExts(xMins,xMaxes,'x');
+          this.chartExtents['y'] = this._calcChartExts(yMins,yMaxes,'y');
         } else {
           if(!this.chartExtents.x){
-            chartExtents['x'] = this._calcChartExts(xMins,xMaxes,'x');
+            this.chartExtents['x'] = this._calcChartExts(xMins,xMaxes,'x');
           }
           if(!this.chartExtents.y){
-            chartExtents['y'] = this._calcChartExts(yMins,yMaxes,'y');
+            this.chartExtents['y'] = this._calcChartExts(yMins,yMaxes,'y');
           }
         }
 
-        this.fire('px-vis-chart-extents', { 'dataVar': 'chartExtents', 'data': chartExtents, 'method':'set' });
-        this.set('chartExtents',chartExtents);
+        this.fire('px-vis-chart-extents', { 'dataVar': 'chartExtents', 'data': this.chartExtents, 'method':'set' });
+        this.notifyPath('chartExtents',this.chartExtents);
 
         this.fire('px-vis-complete-series-config', { 'dataVar': 'completeSeriesConfig', 'data': fullConfig, 'method':'set' });
         this.set('completeSeriesConfig',fullConfig);

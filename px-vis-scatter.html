@@ -152,28 +152,33 @@ Element which draws scatter series onto the chart
         this.scatterGroup = this.svg.append("g")
           .attr("series-id", 'scatter_' + this.seriesId)
           .attr("class", "series-scatter");
+      }
 
       // TODO dev set FA icons & icons
-        this.scatterDots = this.scatterGroup.selectAll(this.markerSymbol + '.scatter-dot')
-          .data(data);
+      this.scatterDots = this.scatterGroup.selectAll('path.' + this.markerSymbol)
+        .data(data);
 
-        this.scatterDots.enter()
+      this.scatterDots.exit().remove();
+
+
+      var _this = this;
+      this.scatterDots.enter()
         .append("path")
         .attr("class", this.markerSymbol)
-        .attr("d", d3.symbol().type(d3.symbolDiamond));
+        .attr("d", d3.symbol().type(d3.symbolDiamond))
+        .attr('fill',this.completeSeriesConfig[this.seriesId]['color'])
+        .attr('fill-opacity',0.6)
+        .attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
+        .attr('stroke-opacity',1)
+        .attr("transform", this._applyTransform.bind(this));
 
-        this._applyTransform();
 
-        // add color
-        this._colorScatter();
+      this.scatterDots.attr("transform", this._applyTransform.bind(this));
 
-        this._addClipPath();
+      // add color
+      // this._colorScatter();
 
-        this.scatterDots.exit().remove();
-      }
-      else {
-        this._applyTransform();
-      }
+      this._addClipPath();
     },
     /**
      * Helper to call addClipPath with the elem
@@ -203,27 +208,22 @@ Element which draws scatter series onto the chart
      * Applies the necessary translate and scale to the scatterDots
      *
      */
-    _applyTransform: function() {
-      var _this = this;
-      this.scatterDots
-        .attr("transform", function(d) {
+    _applyTransform: function(d) {
+      var xTrans,
+          yTrans;
 
-          var xTrans,
-              yTrans;
+      if(d[this.completeSeriesConfig[this.seriesId]['x']]){
+        xTrans = this.x(d[this.completeSeriesConfig[this.seriesId]['x']]);
+      }
+      if(d[this.completeSeriesConfig[this.seriesId]['y']]){
+        yTrans = this.y(d[this.completeSeriesConfig[this.seriesId]['y']]);
+      }
 
-          if(d[_this.completeSeriesConfig[_this.seriesId]['x']]){
-            xTrans = _this.x(d[_this.completeSeriesConfig[_this.seriesId]['x']]);
-          }
-          if(d[_this.completeSeriesConfig[_this.seriesId]['y']]){
-            yTrans = _this.y(d[_this.completeSeriesConfig[_this.seriesId]['y']]);
-          }
+      //make sure we have a value
+      xTrans = xTrans ? xTrans : 0;
+      yTrans = yTrans ? yTrans : 0;
 
-          //make sure we have a value
-          xTrans = xTrans ? xTrans : 0;
-          yTrans = yTrans ? yTrans : 0;
-
-          return "translate(" + xTrans + "," + yTrans + ")" + ' scale(' + _this.markerScale + ')';
-        });
+      return "translate(" + xTrans + "," + yTrans + ")" + ' scale(' + this.markerScale + ')';
     },
     /**
      * Adds full color to the scatters.
