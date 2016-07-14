@@ -232,62 +232,61 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @method _currentDomain
      */
      _currentDomain: function() {
-      // check to make sure there is data
-      if(this._doesObjHaveValues(this.chartData) && this._doesObjHaveValues(this.x) && this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.completeSeriesConfig) && this._doesObjHaveValues(this.chartExtents)){
-        // TODO check if dataset has max and min
-        // TODO add dev set max and min
-        // TODO What do we do if we have max/min Ys and not x, which is the case with our sample data?
 
-        // TODO more efficient algorithm
-        // TODO if in the form { x:1, y:2 }
-        // [1420840060000,1425840060000]
-        // TODO: make this declartive: min, max, set static or dynamic
-        // TODO: multiple Y-Axis?
-        //TODO what if we dont want it to be the range of data and not 0 or visa versa...
+      // TODO check if dataset has max and min
+      // TODO add dev set max and min
+      // TODO What do we do if we have max/min Ys and not x, which is the case with our sample data?
 
-        // if(this._isObjEmpty(this.seriesConfig)){
-        //   console.log('no series config');
-        //   //run normal
-        // }
+      // TODO more efficient algorithm
+      // TODO if in the form { x:1, y:2 }
+      // [1420840060000,1425840060000]
+      // TODO: make this declartive: min, max, set static or dynamic
+      // TODO: multiple Y-Axis?
+      //TODO what if we dont want it to be the range of data and not 0 or visa versa...
 
-        //check seriesConfig
-        // if(this._doesObjHaveValues(this.seriesConfig)){
-        //   this._completeExistingSeriesConfig();
-        // }
+      // if(this._isObjEmpty(this.seriesConfig)){
+      //   console.log('no series config');
+      //   //run normal
+      // }
 
-        var xOrd = this.xAxisType === 'ordinal',
-          yOrd = this.yAxisType === 'ordinal',
-          xTime = this.xAxisType === 'time',
-          doX = xTime ? false : true,
-          doY = true,
-          keys = Object.keys(this.completeSeriesConfig),
-          exts = {
-            'x': this.chartExtents['x'],
-            'y': this.chartExtents['y']
-          };
+      //check seriesConfig
+      // if(this._doesObjHaveValues(this.seriesConfig)){
+      //   this._completeExistingSeriesConfig();
+      // }
 
-        if(exts.x.length > 0 && exts.x[0] !== Infinity && exts.x[1] !== -Infinity){
-          xTime = false;
-          doX = false;
-        }
-        if(exts.y.length> 0 && exts.y[0] !== Infinity && exts.y[1] !== -Infinity){
-          yTime = false;
-          doY = false;
-        }
-        //Chug through the data to max and min
-        this._findMinMax(this.chartData, doX, doY, xOrd, yOrd, xTime, exts, keys);
+      var xOrd = this.xAxisType === 'ordinal',
+        yOrd = this.yAxisType === 'ordinal',
+        xTime = this.xAxisType === 'time',
+        doX = xTime ? false : true,
+        doY = true,
+        keys = Object.keys(this.completeSeriesConfig),
+        exts = {
+          'x': this.chartExtents['x'],
+          'y': this.chartExtents['y']
+        };
 
-        this.x.domain(exts.x);
-        this.y.domain(exts.y);
-
-        // TODO would a bool be better? Flip when run?
-        // Set the domains
-        this.set('currentDomainX', this.x.domain());
-        this.set('currentDomainY', this.y.domain());
-
-        this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
-        this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
+      if(exts.x.length > 0 && exts.x[0] !== Infinity && exts.x[1] !== -Infinity){
+        xTime = false;
+        doX = false;
       }
+      if(exts.y.length> 0 && exts.y[0] !== Infinity && exts.y[1] !== -Infinity){
+        yTime = false;
+        doY = false;
+      }
+      //Chug through the data to max and min
+      this._findMinMax(this.chartData, doX, doY, xOrd, yOrd, xTime, exts, keys);
+
+      this.x.domain(exts.x);
+      this.y.domain(exts.y);
+
+      // TODO would a bool be better? Flip when run?
+      // Set the domains
+      this.set('currentDomainX', this.x.domain());
+      this.set('currentDomainY', this.y.domain());
+
+      this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
+      this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
+
     },
 
     /**

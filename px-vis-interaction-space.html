@@ -127,34 +127,32 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      */
     drawElement: function() {
 
-      if (this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.x) && this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.chartData) && this._isObjEmpty(this._rect) && this.width && this.height ) {
-        // make sure the tooltip draws on top of everything; returns a set property interactionSvg
-        this.cloneSVGElem(this.svg.node(),'interactionSvg');
-        this.fire('px-vis-interaction-svg-updated', { 'dataVar': 'interactionSvg', 'data': this.interactionSvg, 'method':'set' });
+      // make sure the tooltip draws on top of everything; returns a set property interactionSvg
+      this.cloneSVGElem(this.svg.node(),'interactionSvg');
+      this.fire('px-vis-interaction-svg-updated', { 'dataVar': 'interactionSvg', 'data': this.interactionSvg, 'method':'set' });
 
 
-        // append the rectangle to capture mouse interactions
-        this._rect = this.interactionSvg.append("rect")
-          .attr('id',"mouseCapture")
-          .attr("width", this.width - this.margin.left - this.margin.right)
-          .attr("height", this.height - this.margin.bottom - this.margin.top)
-          .attr("fill", "none")
-          .attr("pointer-events", "all")
-          .on("mouseout.tooltip", this._resetTooltipData.bind(this))
-          .on("mousemove.tooltip",this._calcTooltipData.bind(this))
-          .on("mousedown.action", this._drawActionBox.bind(this))
-          .on("mousemove.action", this._updateActionBox.bind(this))
-          .on("mouseup.action", this._finishActionBox.bind(this))
-          .style("cursor","crosshair");
+      // append the rectangle to capture mouse interactions
+      this._rect = this.interactionSvg.append("rect")
+        .attr('id',"mouseCapture")
+        .attr("width", this.width - this.margin.left - this.margin.right)
+        .attr("height", this.height - this.margin.bottom - this.margin.top)
+        .attr("fill", "none")
+        .attr("pointer-events", "all")
+        .on("mouseout.tooltip", this._resetTooltipData.bind(this))
+        .on("mousemove.tooltip",this._calcTooltipData.bind(this))
+        .on("mousedown.action", this._drawActionBox.bind(this))
+        .on("mousemove.action", this._updateActionBox.bind(this))
+        .on("mouseup.action", this._finishActionBox.bind(this))
+        .style("cursor","crosshair");
 
 
-        // TODO touchevents
-        // TODO if there is no register tooltip or cursor, set .tooltip listeners to null
-        // TODO if there is no zoom or action panel, set action listeners to null
+      // TODO touchevents
+      // TODO if there is no register tooltip or cursor, set .tooltip listeners to null
+      // TODO if there is no zoom or action panel, set action listeners to null
 
-        // send the register etc an empty list of series
-        // this._resetTooltipData();
-      }  //if we have vars
+      // send the register etc an empty list of series
+      // this._resetTooltipData();
     },  //drawElement
     /**
      * Helper function called on mouseover

@@ -199,55 +199,53 @@ The configureation object allows developers to set the icon used for each event 
      * @method drawElement
      */
     drawElement: function() {
-      // TODO remove this.x and this.y checks?
-      if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.x) && this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.eventData) && this._doesObjHaveValues(this.currentDomainX) && this._doesObjHaveValues(this.currentDomainY)){
-        this._processConfiguration();
+      this._processConfiguration();
 
-        // checks to see if the axis already exists. If not, create; if so, update
-        if(this._isObjEmpty(this.eventGroup)){
-          this.eventGroup = this.svg.append('g')
-            .attr('class','event')
-            .attr('event-id',this.eventId)
-            .attr('id','event_'+this.eventId);
+      // checks to see if the axis already exists. If not, create; if so, update
+      if(this._isObjEmpty(this.eventGroup)){
+        this.eventGroup = this.svg.append('g')
+          .attr('class','event')
+          .attr('event-id',this.eventId)
+          .attr('id','event_'+this.eventId);
 
 
-          // draw the path
-          this.eventLine = this.eventGroup.append("line")
-            .attr('stroke',this.colors[this.lineConfig.color])
-            .attr('stroke-width',this.lineConfig.weight);
+        // draw the path
+        this.eventLine = this.eventGroup.append("line")
+          .attr('stroke',this.colors[this.lineConfig.color])
+          .attr('stroke-width',this.lineConfig.weight);
 
-          if(this._thisConfig.type === 'image'){
-            this.eventIcon = this.eventGroup.append("image")
-              .attr("xlink:href", this._thisConfig.icon)
-              .attr("width", this._thisConfig.size + 'px')
-              .attr("height", this._thisConfig.size + 'px');
-          } else if(this._thisConfig.type === 'unicode'){
-            this.eventIcon = this.eventGroup.append("text")
-              .attr('font-family', 'FontAwesome')
-              .attr('font-size', this._thisConfig.size + 'px')
-              .attr('fill', this.colors[this._thisConfig.color])
-              .text(this._thisConfig.icon);
-          } else if(this._thisConfig.type === 'fa'){
-            this.eventIcon = this.eventGroup.append("text")
-              .attr('font-family', 'FontAwesome')
-              .attr('font-size', this._thisConfig.size + 'px')
-              .attr('fill', this.colors[this._thisConfig.color])
-              .text(String.fromCharCode(parseInt(this.fa[this._thisConfig.icon],16)));
-          }
-
-          this.eventIcon
-            .style("cursor","pointer")
-            .attr('id','ei_' + this.eventId);
-
-          this._positionEvent();
-
-          this._addClipPath();
-        } else {
-          // update the path
-          this._positionEvent();
+        if(this._thisConfig.type === 'image'){
+          this.eventIcon = this.eventGroup.append("image")
+            .attr("xlink:href", this._thisConfig.icon)
+            .attr("width", this._thisConfig.size + 'px')
+            .attr("height", this._thisConfig.size + 'px');
+        } else if(this._thisConfig.type === 'unicode'){
+          this.eventIcon = this.eventGroup.append("text")
+            .attr('font-family', 'FontAwesome')
+            .attr('font-size', this._thisConfig.size + 'px')
+            .attr('fill', this.colors[this._thisConfig.color])
+            .text(this._thisConfig.icon);
+        } else if(this._thisConfig.type === 'fa'){
+          this.eventIcon = this.eventGroup.append("text")
+            .attr('font-family', 'FontAwesome')
+            .attr('font-size', this._thisConfig.size + 'px')
+            .attr('fill', this.colors[this._thisConfig.color])
+            .text(String.fromCharCode(parseInt(this.fa[this._thisConfig.icon],16)));
         }
-        this._addTooltip();
+
+        this.eventIcon
+          .style("cursor","pointer")
+          .attr('id','ei_' + this.eventId);
+
+        this._positionEvent();
+
+        this._addClipPath();
+      } else {
+        // update the path
+        this._positionEvent();
       }
+      this._addTooltip();
+
     },
 
     /**
