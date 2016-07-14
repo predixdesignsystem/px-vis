@@ -123,18 +123,32 @@ The gridlines still make use of the d3.axis object, just with different settings
          * @method _drawElement
          */
         defineGrid:function(){
-          this._grid = d3.svg.axis()
-            .scale(this.axis)
-            .orient(this.orientation);
+          switch(this.orientation){
+            case 'bottom':
+              this._grid = d3.axisBottom(this.axis);
+              break;
+
+            case 'top':
+              this._grid = d3.axisTop(this.axis);
+              break;
+
+            case 'right':
+              this._grid = d3.axisRight(this.axis);
+              break;
+
+            default: //case 'left':
+              this._grid = d3.axisLeft(this.axis);
+              break;
+          }
 
           // TODO dev set # of gridlines
           // TODO link to number of gridlines the axis has and dev set multiplier (2x)
           // change default (10) ticks
           // this._grid.ticks();
           if(this.orientation === 'bottom'){
-            this._grid.innerTickSize(this.margin.top + this.margin.bottom - this.length);
+            this._grid.tickSizeInner(this.margin.top + this.margin.bottom - this.length);
           } else if(this.orientation === 'left'){
-            this._grid.innerTickSize(this.margin.left + this.margin.right - this.length);
+            this._grid.tickSizeInner(this.margin.left + this.margin.right - this.length);
           }
         },
         /**

@@ -111,9 +111,23 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * @method defineAxis
          */
         defineAxis: function(){
-          this._axis = d3.svg.axis()
-            .scale(this.axis)
-            .orient(this.orientation);
+          switch(this.orientation){
+            case 'bottom':
+              this._axis = d3.axisBottom(this.axis);
+              break;
+
+            case 'top':
+              this._axis = d3.axisTop(this.axis);
+              break;
+
+            case 'right':
+              this._axis = d3.axisRight(this.axis);
+              break;
+
+            default: //case 'left':
+              this._axis = d3.axisLeft(this.axis);
+              break;
+          }
 
           // change default (10) ticks
           // this._axis.ticks(10);
@@ -129,13 +143,15 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           // this._axis.innerTickSize(-1000);
           // this._axis.tickPadding(10);
           // controls the first and last ticks
-          this._axis.outerTickSize(this.outerTickSize);
+          // TODO rename var names to match new d3
+          this._axis.tickSizeOuter(this.outerTickSize);
 
           // https://github.com/mbostock/d3/wiki/Formatting#d3_format
           // this._axis.tickFormat(d3.format(",.0f"));
-
+          
+          // TODO rename var names to match new d3
           if(this.labelPosition !== 'center'){
-            this._axis.innerTickSize(this.labelTypeSize);
+            this._axis.tickSizeInner(this.labelTypeSize);
           }
 
         },
