@@ -90,6 +90,8 @@
                   <px-vis-scale
                     x-scale="time"
                     y-scale="linear"
+                    complete-series-config="[[item.basic.seriesConfig]]"
+                    chart-extents="[[item.basic.chartExtents]]"
                     width="[[item.basic.width]]"
                     height="[[item.basic.height]]"
                     margin="[[item.basic.margin]]"
@@ -105,8 +107,8 @@
                   <px-vis-line
                     svg="[[svg]]"
                     series-id="mySeries"
-                    series-number="0"
-                    chart-data="[[item.basic.chartDataSeries]]"
+                    complete-series-config="[[item.basic.seriesConfig]]"
+                    chart-data="[[item.basic.chartData]]"
                     x="[[x]]"
                     y="[[y]]"
                     current-domain-x="[[currentDomainX]]"
@@ -118,8 +120,8 @@
                   <px-vis-scatter
                     svg="[[svg]]"
                     series-id="mySeries"
-                    series-number="0"
-                    chart-data="[[item.basic.chartDataSeries]]"
+                    complete-series-config="[[item.basic.seriesConfig]]"
+                    chart-data="[[item.basic.chartData]]"
                     x="[[x]]"
                     y="[[y]]"
                     current-domain-x="[[currentDomainX]]"
@@ -145,7 +147,7 @@
                     margin="[[item.basic.margin]]"
                     title="myTitle"
                     orientation="left"
-                    chart-data="[[item.basic.chartData]]"
+                    complete-series-config="[[item.basic.seriesConfig]]"
                     current-domain="[[currentDomainY]]">
                   </px-vis-axis>
                 </template>
@@ -176,7 +178,7 @@
                   <px-vis-event
                     svg="[[svg]]"
                     event-id="[[item.event1.id]]"
-                    chart-data="[[item.event1]]"
+                    event-data="[[item.event1]]"
                     x="[[x]]"
                     y="[[y]]"
                     event-config="[[item.eventConfig]]"
@@ -186,7 +188,7 @@
                   <px-vis-event
                     svg="[[svg]]"
                     event-id="[[item.event2.id]]"
-                    chart-data="[[item.event2]]"
+                    event-data="[[item.event2]]"
                     x="[[x]]"
                     y="[[y]]"
                     event-config="[[item.eventConfig]]"
@@ -196,7 +198,7 @@
                   <px-vis-event
                     svg="[[svg]]"
                     event-id="[[item.event3.id]]"
-                    chart-data="[[item.event3]]"
+                    event-data="[[item.event3]]"
                     x="[[x]]"
                     y="[[y]]"
                     event-config="[[item.eventConfig]]"
@@ -206,7 +208,7 @@
                   <px-vis-event
                     svg="[[svg]]"
                     event-id="[[item.event4.id]]"
-                    chart-data="[[item.event4]]"
+                    event-data="[[item.event4]]"
                     x="[[x]]"
                     y="[[y]]"
                     event-config="[[item.eventConfig]]"
@@ -218,6 +220,7 @@
                 <template is="dom-if" if="{{item.threshold}}">
                   <px-vis-threshold
                     svg="[[svg]]"
+                    complete-series-config="[[item.basic.seriesConfig]]"
                     chart-data="[[item.thresholdData]]"
                     x="[[x]]"
                     y="[[y]]"
@@ -242,6 +245,7 @@
                     width="[[item.basic.width]]"
                     height="[[item.basic.height]]"
                     margin="[[item.basic.margin]]"
+                    complete-series-config="[[item.basic.seriesConfig]]"
                     chart-data="[[item.basic.chartData]]"
                     tooltip-data={{tooltipData}}
                     extents-data={{extentsData}}
@@ -258,6 +262,7 @@
                     width="[[item.basic.width]]"
                     height="[[item.basic.height]]"
                     margin="[[item.basic.margin]]"
+                    complete-series-config="[[item.basic.seriesConfig]]"
                     chart-data="[[item.basic.chartData]]"
                     horizontal-line="full"
                     vertical-line="full"
@@ -271,8 +276,10 @@
                     height="50"
                     width="[[item.basic.width]]"
                     type="horizontal"
+                    complete-series-config="[[item.basic.seriesConfig]]"
                     chart-data=[[item.basic.chartData]]
-                    tooltip-data=[[item.tooltipData]]>
+                    tooltip-data=[[item.tooltipData]]
+                    x-axis-type="time">
                   </px-vis-register>
                 </template>
 
@@ -282,9 +289,11 @@
                     height="[[item.basic.height]]"
                     units="Hz"
                     type="vertical"
+                    complete-series-config="[[item.basic.seriesConfig]]"
                     chart-data=[[item.basic.chartData]]
                     tooltip-data=[[item.tooltipData]]
-                    muted-series="[[item.mutedSeries]]">
+                    muted-series="[[item.mutedSeries]]"
+                    x-axis-type="time">
                   </px-vis-register>
                 </template>
 
@@ -293,9 +302,11 @@
                     width="[[item.basic.width]]"
                     height="[[item.basic.height]]"
                     type="horizontal"
+                    complete-series-config="[[item.basic.seriesConfig]]"
                     chart-data=[[item.basic.chartData]]
                     tooltip-data=[[tooltipData]]
-                    muted-series="{{mutedSeries}}">
+                    muted-series="{{mutedSeries}}"
+                    x-axis-type="time">
                   </px-vis-register>
                 </template>
 
@@ -325,6 +336,7 @@
                     width="[[item.basic.width]]"
                     height="100"
                     margin="[[item.basic.margin]]"
+                    include-all-series
                     chart-data="[[item.basic.chartData]]">
                   </px-vis-chart-navigator>
                 </template>
@@ -354,32 +366,56 @@
             "left": 5\
           }',
           chartData : [{
-            "series": [
-              [1397102460000, 0.56],
-              [1397139660000, 0.4],
-              [1397177400000, 0.43],
-              [1397228040000, 0.33],
-              [1397248260000, 0.47],
-              [1397291280000, 0.41],
-              [1397318100000, 0.26],
-              [1397342100000, 0.42],
-              [1397390820000, 0.27],
-              [1397408100000, 0.38],
-              [1397458800000, 0.36],
-              [1397522940000, 0.32]
-            ],
-            "name": "mySeries",
-            "seriesNumber":0
+              'x': 1397102460000,
+              'y': 0.56
+            },{
+              'x': 1397139660000,
+              'y': 0.4
+            },{
+              'x': 1397177400000,
+              'y': 0.43
+            },{
+              'x': 1397228040000,
+              'y': 0.33
+            },{
+              'x': 1397248260000,
+              'y': 0.47
+            },{
+              'x': 1397291280000,
+              'y': 0.41
+            },{
+              'x': 1397318100000,
+              'y': 0.26
+            },{
+              'x': 1397342100000,
+              'y': 0.42
+            },{
+              'x': 1397390820000,
+              'y': 0.27
+            },{
+              'x': 1397408100000,
+              'y': 0.38
+            },{
+              'x': 1397458800000,
+              'y': 0.36
+            },{
+              'x': 1397522940000,
+              'y': 0.32
           }],
           chartDataCode : '[ {...} , {...} ]',
-          chartDataSeriesCode : '{ \
-            series: [ \
-              [1397102460000, 0.56],\
-              [1397139660000, 0.4], \
-              ...\
-            ] }'
-        };
-        basic.chartDataSeries = basic.chartData[0];
+          seriesConfig: {
+            'mySeries': {
+              "name":"My-Series",
+              "type": "line",
+              "x": 'x',
+              "y": 'y',
+              'color': 'rgb(100,50,250)'
+            }
+          },
+          chartExtents: {
+            "x": [Infinity,-Infinity],
+            "y": [0,-Infinity]
+          }};
 
 
         var demos = [];
@@ -437,7 +473,7 @@
             { 'name':'svg', 'value':"[[svg]]" },
             { 'name':'series-id', 'value':"mySeries" },
             { 'name':'series-number', 'value':"0" },
-            { 'name':'chart-data', 'value': basic.chartDataSeriesCode },
+            { 'name':'chart-data', 'value': basic.chartDataCode },
             { 'name':'x', 'value':"[[x]]" },
             { 'name':'y', 'value':"[[y]]" },
             { 'name':'current-domain-x', 'value':"[[currentDomainX]]" },
@@ -457,7 +493,7 @@
             { 'name':'svg', 'value':"[[svg]]" },
             { 'name':'series-id', 'value':"mySeries" },
             { 'name':'series-number', 'value':"0" },
-            { 'name':'chart-data', 'value': basic.chartDataSeriesCode },
+            { 'name':'chart-data', 'value': basic.chartDataCode },
             { 'name':'x', 'value':"[[x]]" },
             { 'name':'y', 'value':"[[y]]" },
             { 'name':'current-domain-x', 'value':"[[currentDomainX]]" },
@@ -762,7 +798,8 @@
               'seriesName2':false,
           }
         });
-        demos[demos.length-1]['basic']['chartData'].push({ "name":"seriesName1", "seriesNumber": 1},{ "name":"seriesName2", "seriesNumber": 2});
+        demos[demos.length-1]['basic']['seriesConfig']['seriesName1'] = {"name":"seriesName1","color":"rgb(230,21,75)"};
+        demos[demos.length-1]['basic']['seriesConfig']['seriesName2'] ={ "name":"seriesName2", "color":"rgb(100,210,75)"};
 
 // REGISTER side ###################################################################################
 
@@ -806,7 +843,8 @@
               'seriesName2':false,
           }
         });
-        demos[demos.length-1]['basic']['chartData'].push({ "name":"seriesName1", "seriesNumber": 1},{ "name":"seriesName2", "seriesNumber": 2});
+        demos[demos.length-1]['basic']['seriesConfig']['seriesName1'] = {"name":"seriesName1","color":"rgb(230,21,75)"};
+        demos[demos.length-1]['basic']['seriesConfig']['seriesName2'] ={ "name":"seriesName2", "color":"rgb(100,210,75)"};
 
 // REGISTER Dynamic ################################################################################
 
@@ -929,7 +967,6 @@
         var template = document.querySelector('#demo');
         // The dom-change event signifies when the template has stamped its DOM.
         template.addEventListener('dom-change', function() {
-          console.log("vv Do you see one 'Uncaught TypeError: Cannot read property 'length' of undefined' right here vv, that is normal. Just ignore it. kthxbai :)")
           this.demos = demos;
         });
       </script>
