@@ -139,7 +139,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       } else if(val === 'linear'){
         return d3.scaleLinear().nice().range(range);
       } else { //ordinal
-        return d3.scaleOrdinal().rangePoints(range, 1);
+        return d3.scalePoint().range(range).padding(0.5);
       }
     },
 
@@ -276,6 +276,14 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       //Chug through the data to max and min
       this._findMinMax(this.chartData, doX, doY, xOrd, yOrd, xTime, exts, keys);
 
+      //need to manually split the range for the domain values for ordinal
+/*      if(this.xAxisType === 'ordinal') {
+        this._processOrdinalRange(this.x, exts.x);
+      }
+      if(this.yAxisType === 'ordinal') {
+        this._processOrdinalRange(this.y, exts.y);
+      }*/
+
       this.x.domain(exts.x);
       this.y.domain(exts.y);
 
@@ -287,6 +295,19 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
       this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
 
+    },
+
+    _processOrdinalRange: function(axis, domainValues) {
+      var curRange = axis.range(),
+          total = curRange[1]-curRange[0],
+          increment = Math.floor(total/(domainValues.length-1)),
+          newRange = [];
+
+      for(var i=0; i< domainValues.length; i++) {
+        newRange.push((i)*increment);
+      }
+
+      axis.range(newRange);
     },
 
     /**
