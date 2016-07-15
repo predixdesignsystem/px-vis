@@ -162,7 +162,7 @@ Element which draws scatter series onto the chart
        */
       _translationString: {
         type: String,
-        computed: '_computeTranslationString(_radius, margin)'
+        computed: '_computeTranslationString(_radius)'
       },
       /**
        * Message used for tooltip and popover, containing info on current slice
@@ -179,6 +179,19 @@ Element which draws scatter series onto the chart
       _ttTitle: {
         type: String,
         value: ''
+      },
+      /**
+       * d3 arc function used to draw arcs
+       */
+      _arc: {
+        type: Object
+      },
+      /**
+       * How much the pie is currently rotated in rad
+       */
+      _currentRotationAngle: {
+        type:Number,
+        value:0
       }
     },
 
@@ -194,8 +207,8 @@ Element which draws scatter series onto the chart
           leftMarg = Number(this.margin.left),
           bottomMarg = Number(this.margin.bottom);
 
-      this.$.popoverAnchor.style.left = (Number(curRect.left) + leftMarg +  this._radius) + 'px';
-      this.$.popoverAnchor.style.top = (curRect.top + Number(this.margin.top)) + 'px';
+      this.$.popoverAnchor.style.left = (curRect.left + leftMarg +  this._radius) + 'px';
+      this.$.popoverAnchor.style.top = (curRect.top +  Number(this.margin.top)) + 'px';
 
       //position title div
       this.$.title.style.left = (leftMarg + this._radius - titleRect.width/2) + 'px';
@@ -210,7 +223,7 @@ Element which draws scatter series onto the chart
     drawElement: function() {
       //calculate data and radius
       var data = this.chartData,
-          pie = d3.layout.pie().value(function(d){return d['x'];})(data);
+          pie = d3.pie().value(function(d){return d['x'];})(data);
 
       // checks to see if the group already exists. If not, create; if so, update
       if(this._isObjEmpty(this.pieGroup)){
@@ -222,10 +235,12 @@ Element which draws scatter series onto the chart
       }
 
       // declare an arc generator function
-      var arc = d3.svg.arc().outerRadius(this._radius);
+      this._arc = d3.arc().outerRadius(this._radius);
       if(this.donut) {
         var innerRadiusPx = this.innerRadius === 0 ? (this._radius - 30) : this.innerRadius * this._radius;
-        arc.innerRadius(innerRadiusPx);
+        this._arc.innerRadius(innerRadiusPx);
+      } else {
+        this._arc.innerRadius(0);
       }
 
       // select paths, use arc generator to draw
@@ -243,13 +258,15 @@ Element which draws scatter series onto the chart
               return this._getPieColorForIndex(i);
           }.bind(this))
           .attr('d', function (d) {
-              return arc(d);
-          });
+              return this._arc(d);
+          }.bind(this));
 
       this.pieGroup
           .transition()
           .duration(1250)
           .attr('transform', this._translationString + ' rotate(-180)');
+
+      this.set('_currentRotationAngle', -Math.PI);
     },
     /**
      * Return the cvalue or the slice datum depending on use of percentages
@@ -273,11 +290,19 @@ Element which draws scatter series onto the chart
 
 
       //center tooltip
-      //TODO: improve how we place the tooltip using the actual svg path?
-      var rect = d3.event.currentTarget.getBoundingClientRect(),
-          scroll = document.documentElement.scrollTop || document.body.scrollTop;
-      this.$.tooltipAnchor.style.left = (rect.left + rect.width/2) + 'px';
-      this.$.tooltipAnchor.style.top = (scroll + rect.top + rect.height/2) + 'px';
+      //TODO: use something along  center = this._arc.centroid(datum);
+      //problem is how to take the rotation/translation into account
+      var rotatedDatum = {
+        startAngle: datum.startAngle + this._currentRotationAngle,
+        endAngle: datum.endAngle + this._currentRotationAngle
+      }
+
+      var rect = this.pxSvgElem.getBoundingClientRect(),
+        scroll = document.documentElement.scrollTop || document.body.scrollTop,
+        center = this._arc.centroid(rotatedDatum);
+
+      this.$.tooltipAnchor.style.left = (rect.left  + center[0] + this._radius + Number(this.margin.left)) + 'px';
+      this.$.tooltipAnchor.style.top = (rect.top + 5 + center[1] + Number(this.margin.top) + this._radius) + 'px';
       this.$.tooltip._show();
     },
     _hideTooltip: function(datum, index, group) {
@@ -303,10 +328,11 @@ Element which draws scatter series onto the chart
      *
      */
     _centerOnSlice: function(datum, index, group) {
+      this.set('_currentRotationAngle', this._getRotationAngle(datum));
       this.pieGroup
           .transition()
           .duration(750)
-          .attr('transform', this._translationString + ' rotate(' + this._getRotationAngle(datum) + ')');
+          .attr('transform', this._translationString + ' rotate(' + this._radToDeg(this._currentRotationAngle) + ')');
 
       //display a popover after the rotation
       setTimeout(function() {
@@ -321,7 +347,7 @@ Element which draws scatter series onto the chart
     /**
      * Computes the translation string needed to center the pie
      */
-    _computeTranslationString: function(_radius, margin) {
+    _computeTranslationString: function() {
       return 'translate(' + this._radius + ',' + this._radius + ')';
     },
     /**
@@ -349,7 +375,7 @@ Element which draws scatter series onto the chart
           mid = start + (end - start)/2,
           adjusted = mid < Math.PI ? -mid : Math.PI * 2 - mid;
 
-      return this._radToDeg(adjusted);
+      return adjusted;
     },
     _getTitleClass: function(showTitle) {
       var classList = 'title inline--flex flex--col flex--middle ';
