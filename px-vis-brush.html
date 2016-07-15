@@ -361,7 +361,6 @@ This element sets the selectedDomain property based on the extents box. The sele
         .on("mouseenter.handle", this._handleGroupMouseEnter.bind(this))
         .on("mouseleave.handle", this._handleGroupMouseLeave.bind(this));
 
-      console.log(this._handleGroup)
       // draw the handle rect / base
       this._handleGroup
         // .attr("x", -handleSize.w/2)
@@ -398,8 +397,7 @@ This element sets the selectedDomain property based on the extents box. The sele
      */
     _handleGroupMouseDown:function(d,i){
         var elem = d3.select(this._handleGroup.nodes()[i]);
-        console.log(elem);
-        console.log("mousedown");
+
         // disable changes on mouseleave because when a person drags, they can leave the elem bounds and we dont want to restyle yet.
         elem.on("mouseleave.handle", null);
 
@@ -416,7 +414,7 @@ This element sets the selectedDomain property based on the extents box. The sele
      * @method _handleGroupMouseUp
      */
     _handleGroupMouseUp:function(d,i){
-      console.log("_handleGroupMouseUp")
+
       var elem = d3.select(this._handleGroup.nodes()[i]);
 
       // reapply the mouseleave function and again, bind our index
@@ -436,7 +434,7 @@ This element sets the selectedDomain property based on the extents box. The sele
       var elem = d3.select(this._handleGroup.nodes()[i]);
       elem.attr('stroke', this.colors.gray5)
         .attr('fill', this.colors.white);
-      console.log("mouseleave")
+
       // elem.selectAll('line.handleLine')
       //   .attr('stroke', this.colors.gray5);
     },

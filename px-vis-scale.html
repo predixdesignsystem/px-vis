@@ -12,11 +12,13 @@ Interpreter components act as a converter, translating data points into their co
 ##### Usage
 
     <px-vis-scale
-        x-scale="time"
-        y-scale="linear"
+        x-axis-type="time"
+        y-axis-type="linear"
         width="[[width]]"
         height="[[height]]"
         margin="[[margin]]"
+        complete-series-config="[[completeSeriesConfig]]"
+        chart-extents="[[chartExtents]]"
         chart-data="[[chartData]]"
         selected-domain="[[selectedDomain]]"
         x="{{x}}"
@@ -56,7 +58,8 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       PxVisBehaviorD3.selectedDomain,
       PxVisBehavior.axisTypes,
       commonColors,
-      PxVisBehavior.completeSeriesConfig
+      PxVisBehavior.completeSeriesConfig,
+      PxVisBehavior.chartExtents
     ],
 
     /**
@@ -253,7 +256,6 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       // if(this._doesObjHaveValues(this.seriesConfig)){
       //   this._completeExistingSeriesConfig();
       // }
-
       var xOrd = this.xAxisType === 'ordinal',
         yOrd = this.yAxisType === 'ordinal',
         xTime = this.xAxisType === 'time',

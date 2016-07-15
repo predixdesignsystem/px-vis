@@ -16,16 +16,27 @@ function runTests(){
         baseYAxis = document.getElementById('baseYAxis');
 
     suiteSetup(function(done){
-      var d = [{
-        "series": [
-          [1397102460000, 1],
-          [1397131620000, 6],
-          [1397160780000, 10],
-          [1397189940000, 4],
-          [1397219100000, 6]
-        ]
-        }],
-        seriesConfig = {"0":{"type":"line","name":"mySeries"}},
+      var d = [
+          {
+            'x': 1397102460000,
+            'y' 1
+          },{
+            'x': 1397131620000,
+            'y' 6
+          },{
+            'x': 1397160780000,
+            'y' 10
+          },{
+            'x': 1397189940000,
+            'y' 4
+          },{
+            'x': 1397219100000,
+            'y' 6
+          }
+        ],
+        seriesConfig = {
+          "mySeries":{"type":"line","name":"mySeries",color:'rgb(123,123,123)'}
+        },
         w = 500,
         h = 300,
         m = {
