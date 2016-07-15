@@ -148,10 +148,11 @@ This element sets the selectedDomain property based on the extents box. The sele
      * @method drawElement
      */
     drawElement: function() {
-      var heightOffset = 6,
+      var heightOffset = 5,
+          h = this.height - this.margin.bottom - heightOffset,
           domain = [
             [this.axis(this.currentDomain[0]),0],
-            [this.axis(this.currentDomain[1]),this.height - heightOffset]
+            [this.axis(this.currentDomain[1]),h]
           ];
 
       // make sure the brush draws on top of everything; returns a set property brushSvg
@@ -167,7 +168,6 @@ This element sets the selectedDomain property based on the extents box. The sele
       // now that we have our new g, proceed with drawing brush
       this._brushGroup = this.bushSvg.append("g")
         .attr("class", "brush")
-        // .call(this._brush);
         .call(this._brush)
         .call(this._brush.move, this.axis.range());
 
@@ -219,8 +219,13 @@ This element sets the selectedDomain property based on the extents box. The sele
      * @method _brushend
      */
     _brushend: function () {
-      // console.log(d3.event.target);
-      // this.bushSvg.classed("selecting", !d3.event.target.empty());
+      // revert our handle style to normal
+      if(this._doesObjHaveValues(this._handleGroup)){
+        this._handleGroup.dispatch('brushmouseup');
+      }
+
+      // console.log(d3.event.selection);
+      this.bushSvg.classed("selecting", false);
     },
     /**
      * Helper function fired whtn the brush is moved / extents changed
@@ -330,6 +335,7 @@ This element sets the selectedDomain property based on the extents box. The sele
       // check if it has moved into position within a tolerance (based on overall size of the domain)
       this._centering = Math.abs((center1) - (this._center)) > size * 0.01;
     },
+
     /**
      * Helper function to draw the handle elements
      *
@@ -350,10 +356,12 @@ This element sets the selectedDomain property based on the extents box. The sele
       // this._handleGroup = this._brushGroup.selectAll(".handle")
       this._handleGroup = this._brushGroup.selectAll(".handle")
         // provide listeners for hover and press events
-        .on('mousedown',this._handleGroupMouseDown.bind(this))
-        .on("mouseenter", this._handleGroupMouseEnter.bind(this))
-        .on("mouseleave", this._handleGroupMouseLeave.bind(this));
-// this._brushGroup.select("rect.overlay").on("mouseup", this._brushMouseUp.bind(this));
+        .on('brushmouseup',this._handleGroupMouseUp.bind(this))
+        .on('mousedown.handle',this._handleGroupMouseDown.bind(this))
+        .on("mouseenter.handle", this._handleGroupMouseEnter.bind(this))
+        .on("mouseleave.handle", this._handleGroupMouseLeave.bind(this));
+
+      console.log(this._handleGroup)
       // draw the handle rect / base
       this._handleGroup
         // .attr("x", -handleSize.w/2)
@@ -382,15 +390,7 @@ This element sets the selectedDomain property based on the extents box. The sele
       //     .attr('fill','none')
       //     .attr('stroke',this.colors.gray5);
     },
-    /**
-     * Function which just fires a brushmouseup event
-     *
-     * @method _brushMouseUp
-     */
-    _brushMouseUp:function(){
-      console.log("fire")
-      this.fire('brushmouseup');
-    },
+
     /**
      * Function to restyle handles on mousedown event
      *
@@ -398,22 +398,10 @@ This element sets the selectedDomain property based on the extents box. The sele
      */
     _handleGroupMouseDown:function(d,i){
         var elem = d3.select(this._handleGroup.nodes()[i]);
-
+        console.log(elem);
+        console.log("mousedown");
         // disable changes on mouseleave because when a person drags, they can leave the elem bounds and we dont want to restyle yet.
-        elem.on("mouseleave", null);
-
-        /*
-          Mouseup is tricky. It lives on the Window rather than our elem.
-          If we just use a d3.select(window).on('mouseup',...) then it overwrites any other d3 mouseup listeners.
-          To be safe, use Polymer listen and fire another event for d3 to listen to
-        */
-        // this.listen(window,'mouseup','_brushMouseUp');
-        /*
-          Now we can safely listen for our mouseup without overwriting other listeners
-
-          For mouseup, we must bind 'd' and 'i' in order to pass our handle index down. Otherwise, it doesnt know which handle we are dealing with.
-        */
-        d3.select(window).on('brushmouseup',this._handleGroupMouseUp.bind(this,d,i));
+        elem.on("mouseleave.handle", null);
 
         // set the pressed styles
         elem.attr('stroke', this.colors.gray7)
@@ -428,15 +416,11 @@ This element sets the selectedDomain property based on the extents box. The sele
      * @method _handleGroupMouseUp
      */
     _handleGroupMouseUp:function(d,i){
+      console.log("_handleGroupMouseUp")
       var elem = d3.select(this._handleGroup.nodes()[i]);
-      console.log("up")
-      // clear the d3 mouseup listener
-      d3.select(window).on('brushmouseup',null);
-      // clear our Polymer helper listener
-      this.unlisten(window,'mouseup','_brushMouseUp');
 
       // reapply the mouseleave function and again, bind our index
-      elem.on("mouseleave", this._handleGroupMouseLeave.bind(this,d,i));
+      elem.on("mouseleave.handle", this._handleGroupMouseLeave.bind(this,d,i));
 
       elem.attr('stroke', this.colors.gray5)
         .attr('fill', this.colors.white);
