@@ -175,12 +175,12 @@ Element which draws scatter series onto the chart
 
       this.scatterDots.exit().remove();
 
-
       var _this = this;
       this.scatterDots.enter()
         .append("path")
         .attr("class", this.markerSymbol)
         .attr("d", d3.symbol().type(this._markerMapping[this.markerSymbol]))
+        .merge(this.scatterDots)
         .attr('fill',this.completeSeriesConfig[this.seriesId]['color'])
         .attr('fill-opacity',0.6)
         .attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
@@ -188,7 +188,6 @@ Element which draws scatter series onto the chart
         .attr("transform", this._applyTransform.bind(this));
 
 
-      this.scatterDots.attr("transform", this._applyTransform.bind(this));
 
       // add color
       // this._colorScatter();
