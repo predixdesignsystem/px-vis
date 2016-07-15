@@ -79,11 +79,26 @@ Element which draws scatter series onto the chart
        * - 'diamond'
        * - 'square'
        * - 'triangle-up'
-       * - 'triangle-down'
+       * - 'star'
+       * - 'wye'
+       * more info at https://github.com/d3/d3-shape/blob/master/README.md#symbols
        */
       markerSymbol: {
         type: String,
         value: 'circle'
+      },
+      _markerMapping: {
+        type: Object,
+        readOnly: true,
+        value: {
+          'circle': d3.symbolCircle,
+          'cross': d3.symbolCross,
+          'diamond': d3.symbolDiamond,
+          'square': d3.symbolSquare,
+          'triangle-up': d3.symbolTriangle,
+          'star': d3.symbolStar,
+          'wye': d3.symbolWye
+        }
       },
       /**
        * An index of the series used for calculating its color
@@ -165,7 +180,7 @@ Element which draws scatter series onto the chart
       this.scatterDots.enter()
         .append("path")
         .attr("class", this.markerSymbol)
-        .attr("d", d3.symbol().type(d3.symbolDiamond))
+        .attr("d", d3.symbol().type(this._markerMapping[this.markerSymbol]))
         .attr('fill',this.completeSeriesConfig[this.seriesId]['color'])
         .attr('fill-opacity',0.6)
         .attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
