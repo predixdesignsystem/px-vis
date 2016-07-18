@@ -100,6 +100,7 @@ function runTests(){
     test('impSVG eventObj has a method var', function() {
       assert.equal(eventObj.method , 'set');
     });
+
   });
 
   suite('px-vis-svg updates imperitively', function() {
@@ -167,4 +168,13 @@ function basicAttrs(elem, elemName, w,h,m){
   test(elemName + '.svg has correct translation', function() {
     assert.isTrue(elem.svg.attr('transform').trim() === "translate("+m.left+","+m.top+")" || elem.svg.attr('transform').trim() === "translate("+m.left+" "+m.top+")");
   });
+
+  test(elemName + ' pxSvgElem is set',function(){
+    assert.isDefined(elem.pxSvgElem);
+  });
+
+  test(elemName + ' pxSvgElem is the svg',function(){
+    assert.equal(elem.pxSvgElem.tagName, "svg");
+  });
+
 }

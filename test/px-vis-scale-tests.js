@@ -10,24 +10,24 @@ function runTests(){
   });
 
   suite('px-vis-scale scale with no properties does nothing', function() {
-    var emptyScale = document.getElementById('empty');
+    var emptyAxisType = document.getElementById('empty');
 
-    test('emptyScale fixture is created', function() {
-      assert.isTrue(emptyScale !== null);
-    });
-
-    test('emptyScale does not set x property', function() {
-      assert.equal(typeof(emptyScale.x), 'undefined');
-    });
-    test('emptyScale does not set y property', function() {
-      assert.equal(typeof(emptyScale.y), 'undefined');
+    test('emptyAxisType fixture is created', function() {
+      assert.isTrue(emptyAxisType !== null);
     });
 
-    test('emptyScale does sets default xscale property', function() {
-      assert.equal(emptyScale.xScale, 'ordinal');
+    test('emptyAxisType does not set x property', function() {
+      assert.isUndefined(emptyAxisType.x);
     });
-    test('emptyScale sets default yscale property', function() {
-      assert.equal(emptyScale.yScale, 'ordinal');
+    test('emptyAxisType does not set y property', function() {
+      assert.isUndefined(emptyAxisType.y);
+    });
+
+    test('emptyAxisType does sets default xAxisType property', function() {
+      assert.equal(emptyAxisType.xAxisType, 'linear');
+    });
+    test('emptyAxisType sets default yAxisType property', function() {
+      assert.equal(emptyAxisType.yAxisType, 'linear');
     });
   });
 
@@ -47,7 +47,7 @@ function runTests(){
     });
 
     test('missingHeight does not set currentDomainX', function() {
-      assert.lengthOf(missingHeight.currentDomainX,0);
+      assert.isUndefined(missingHeight.currentDomainX);
     });
   });
 
@@ -67,10 +67,10 @@ function runTests(){
     });
 
     test('missingData does not set currentDomainX', function() {
-      assert.lengthOf(missingData.currentDomainX,0);
+      assert.isUndefined(missingData.currentDomainX);
     });
     test('missingData does not set currentDomainY', function() {
-      assert.lengthOf(missingData.currentDomainY,0);
+      assert.isUndefined(missingData.currentDomainY);
     });
   });
 
@@ -82,11 +82,11 @@ function runTests(){
     });
 
     test('decTLScale sets x-scale', function() {
-      assert.equal(decTLScale.xScale, 'time');
+      assert.equal(decTLScale.xAxisType, 'time');
     });
 
     test('decTLScale sets y-scale', function() {
-      assert.equal(decTLScale.yScale, 'linear');
+      assert.equal(decTLScale.yAxisType, 'linear');
     });
 
     test('decTLScale creates an x', function() {
@@ -105,11 +105,11 @@ function runTests(){
     });
 
     test('decTLScale currentDomainX is correct', function() {
-      assert.equal( +decTLScale.currentDomainX[0], 1397102460000);
-      assert.equal( +decTLScale.currentDomainX[1], 1397291280000);
+      assert.equal( Number(decTLScale.currentDomainX[0]), 1397102460000);
+      assert.equal( Number(decTLScale.currentDomainX[1]), 1397219100000);
     });
     test('decTLScale currentDomainY is correct', function() {
-      assert.equal( JSON.stringify(decTLScale.currentDomainY), JSON.stringify([0,1.12]));
+      assert.equal( JSON.stringify(decTLScale.currentDomainY), JSON.stringify([0,10]));
     });
 
     test('decTLScale x returns correct value 1397102460000', function() {
@@ -117,23 +117,23 @@ function runTests(){
     });
 
     test('decTLScale x returns correct value 1397291280000', function() {
-      assert.equal( decTLScale.x(1397291280000), 480);
+      assert.equal( decTLScale.x(1397219100000), 480);
     });
 
-    test('decTLScale x returns correct value 1397196870000', function() {
-      assert.equal( decTLScale.x(1397196870000), 240);
+    test('decTLScale x returns correct value 1397160780000', function() {
+      assert.equal( decTLScale.x(1397160780000), 240);
     });
 
     test('decTLScale y returns correct value 0', function() {
       assert.equal( decTLScale.y(0), 270);
     });
 
-    test('decTLScale y returns correct value 1.12', function() {
-      assert.equal( decTLScale.y(1.12), 0);
+    test('decTLScale y returns correct value 10', function() {
+      assert.equal( decTLScale.y(10), 0);
     });
 
-    test('decTLScale y returns correct value 0.56', function() {
-      assert.equal( decTLScale.y(0.56), 135);
+    test('decTLScale y returns correct value 5', function() {
+      assert.equal( decTLScale.y(5), 135);
     });
   }); //suite
 
@@ -164,34 +164,11 @@ function runTests(){
       assert.isTrue(eventsScale !== null);
     });
 
-    test('eventsScale sets width', function() {
-      assert.equal(eventsScale.width, 500);
-    });
-
-    test('eventsScale sets height', function() {
-      assert.equal(eventsScale.height, 300);
-    });
-
-    test('eventsScale creates an x', function() {
-      assert.isDefined(eventsScale.x);
-    });
-
-    test('eventsScale creates an y', function() {
-      assert.isDefined(eventsScale.y);
-    });
-
-    test('eventsScale sets currentDomainX', function() {
-      assert.lengthOf(eventsScale.currentDomainX,2);
-    });
-    test('eventsScale sets currentDomainY', function() {
-      assert.lengthOf(eventsScale.currentDomainY,2);
-    });
-
     test('eventsScale fires x event', function() {
       assert.isDefined(eventX);
     });
     test('eventX eventObj has a data var', function() {
-      assert.equal(eventX.data(1397291280000), 480);
+      assert.equal(eventX.data(1397219100000), 480);
     });
     test('eventX eventObj has a dataVar var', function() {
       assert.equal(eventX.dataVar , 'x');
@@ -204,7 +181,7 @@ function runTests(){
       assert.isDefined(eventY);
     });
     test('eventY eventObj has a data var', function() {
-      assert.equal(eventY.data(0.56), 135);
+      assert.equal(eventY.data(5), 135);
     });
     test('eventY eventObj has a dataVar var', function() {
       assert.equal(eventY.dataVar , 'y');
@@ -217,8 +194,8 @@ function runTests(){
       assert.isDefined(eventCDX);
     });
     test('eventCDX eventObj has a data var', function() {
-      assert.equal( +eventCDX.data[0], 1397102460000);
-      assert.equal( +eventCDX.data[1], 1397291280000);
+      assert.equal( Number(eventCDX.data[0]), 1397102460000);
+      assert.equal( Number(eventCDX.data[1]), 1397219100000);
     });
     test('eventCDX eventObj has a dataVar var', function() {
       assert.equal(eventCDX.dataVar , 'currentDomainX');
@@ -231,7 +208,7 @@ function runTests(){
       assert.isDefined(eventCDY);
     });
     test('eventCDY eventObj has a data var', function() {
-      assert.equal( JSON.stringify(eventCDY.data), JSON.stringify([0,1.12]));
+      assert.equal( JSON.stringify(eventCDY.data), JSON.stringify([0,10]));
     });
     test('eventCDY eventObj has a dataVar var', function() {
       assert.equal(eventCDY.dataVar , 'currentDomainY');
@@ -241,22 +218,175 @@ function runTests(){
     });
   }); //suite
 
+
+  suite('px-vis-scale calcs extents', function() {
+    var findExtents = document.getElementById('findExtents');
+
+    suiteSetup(function(){
+      var ext = {
+        "x":[Infinity,-Infinity], "y": [0,-Infinity]
+        }
+      findExtents.set('chartExtents',ext);
+    });
+
+    test('findExtents fixture is created', function() {
+      assert.isTrue(findExtents !== null);
+    });
+
+    test('findExtents creates an x', function() {
+      assert.isDefined(findExtents.x);
+    });
+
+    test('findExtents creates an y', function() {
+      assert.isDefined(findExtents.y);
+    });
+
+    test('findExtents sets currentDomainX', function() {
+      assert.lengthOf(findExtents.currentDomainX,2);
+    });
+    test('findExtents sets currentDomainY', function() {
+      assert.lengthOf(findExtents.currentDomainY,2);
+    });
+
+    test('findExtents currentDomainX is correct', function() {
+      assert.equal( Number(findExtents.currentDomainX[0]), 1397102460000);
+      assert.equal( Number(findExtents.currentDomainX[1]), 1397219100000);
+    });
+    test('findExtents currentDomainY is correct', function() {
+      assert.equal( JSON.stringify(findExtents.currentDomainY), JSON.stringify([0,10]));
+    });
+
+    test('findExtents x returns correct value 1397102460000', function() {
+      assert.equal( findExtents.x(1397102460000), 0);
+    });
+
+    test('findExtents x returns correct value 1397219100000', function() {
+      assert.equal( findExtents.x(1397219100000), 480);
+    });
+
+    test('findExtents x returns correct value 1397160780000', function() {
+      assert.equal( findExtents.x(1397160780000), 240);
+    });
+
+    test('findExtents y returns correct value 0', function() {
+      assert.equal( findExtents.y(0), 270);
+    });
+
+    test('findExtents y returns correct value 10', function() {
+      assert.equal( findExtents.y(10), 0);
+    });
+
+    test('findExtents y returns correct value 5', function() {
+      assert.equal( findExtents.y(5), 135);
+    });
+  }); //suite
+
+
   suite('px-vis-scale updates data', function() {
     var updateData = document.getElementById('updateData');
 
     suiteSetup(function(){
+      var d = {
+        "x":1397219900000, "y": 15
+      },
+      ext = {
+        "x":[Infinity,-Infinity], "y": [0,-Infinity]
+        }
+      updateData.push('chartData',d);
+      updateData.set('chartExtents',ext);
+    });
+
+    test('updateData fixture is created', function() {
+      assert.isTrue(updateData !== null);
+    });
+
+    test('updateData creates an x', function() {
+      assert.isDefined(updateData.x);
+    });
+
+    test('updateData creates an y', function() {
+      assert.isDefined(updateData.y);
+    });
+
+    test('updateData sets currentDomainX', function() {
+      assert.lengthOf(updateData.currentDomainX,2);
+    });
+    test('updateData sets currentDomainY', function() {
+      assert.lengthOf(updateData.currentDomainY,2);
+    });
+
+    test('updateData currentDomainX is correct', function() {
+      assert.equal( Number(updateData.currentDomainX[0]), 1397102460000);
+      assert.equal( Number(updateData.currentDomainX[1]), 1397219900000);
+    });
+    test('updateData currentDomainY is correct', function() {
+      assert.equal( JSON.stringify(updateData.currentDomainY), JSON.stringify([0,15]));
+    });
+
+    test('updateData x returns correct value 1397102460000', function() {
+      assert.equal( updateData.x(1397102460000), 0);
+    });
+
+    test('updateData x returns correct value 1397219900000', function() {
+      assert.equal( updateData.x(1397219900000), 480);
+    });
+
+    test('updateData x returns correct value 1397196870000', function() {
+      var n = (1397219900000 - 1397102460000)/2 + 1397102460000
+      assert.equal( updateData.x(n), 240);
+    });
+
+    test('updateData y returns correct value 0', function() {
+      assert.equal( updateData.y(0), 270);
+    });
+
+    test('updateData y returns correct value 15', function() {
+      assert.equal( updateData.y(15), 0);
+    });
+
+    test('updateData y returns correct value 7.5', function() {
+      assert.equal( updateData.y(7.5), 135);
+    });
+  }); //suite
+
+  suite('px-vis-scale updates with additional series', function() {
+    var updateData = document.getElementById('updateData');
+
+    suiteSetup(function(){
       // updateData.chartData[0].series.push([1397351280000, 1.5])
-      var d = [{
-        "series": [
-        [1397102460000, 0.99],
-        [1397139660000, 0.92],
-        [1397177400000, 0.97],
-        [1397228040000, 1.12],
-        [1397248260000, 1.09],
-        [1397291280000, 1],
-        [1397351280000, 1.5]
-        ]}]
-      updateData.set('chartData',d);
+      var d = [
+          {
+            "x": 1397102460000,
+            "y": 1,
+            "y1": 5
+          },{
+            "x": 1397131620000,
+            "y": 6,
+            "y1": 1
+          },{
+            "x": 1397160780000,
+            "y": 10,
+            "y1": 11
+          },{
+            "x": 1397189940000,
+            "y": 4,
+            "y1": 20
+          },{
+            "x": 1397219100000,
+            "y": 6,
+            "y1": 16
+          }
+        ],
+        ext = {
+          "x":[Infinity,-Infinity], "y": [0,-Infinity]
+        },
+        c = {
+          "mySeries":{"type":"line","name":"mySeries","x":"x","y":"y"},
+          "mySeries2":{"type":"line","name":"mySeries2","x":"x","y":"y1"},
+        }
+        updateData.set('completeSeriesConfig',c);
+        updateData.set('chartData',d);
+        updateData.set('chartExtents',ext);
     });
 
     test('updateData fixture is created', function() {
@@ -280,99 +410,22 @@ function runTests(){
 
     test('updateData currentDomainX is correct', function() {
       assert.equal( +updateData.currentDomainX[0], 1397102460000);
-      assert.equal( +updateData.currentDomainX[1], 1397351280000);
+      assert.equal( +updateData.currentDomainX[1], 1397219100000);
     });
     test('updateData currentDomainY is correct', function() {
-      assert.equal( JSON.stringify(updateData.currentDomainY), JSON.stringify([0,1.5]));
+      assert.equal( JSON.stringify(updateData.currentDomainY), JSON.stringify([0,20]));
     });
 
     test('updateData x returns correct value 1397102460000', function() {
       assert.equal( updateData.x(1397102460000), 0);
     });
 
-    test('updateData x returns correct value 1397291280000', function() {
-      assert.equal( updateData.x(1397351280000), 480);
-    });
-
-    test('updateData x returns correct value 1397196870000', function() {
-      assert.equal( updateData.x(1397226870000), 240);
-    });
-
-    test('updateData y returns correct value 0', function() {
-      assert.equal( updateData.y(0), 270);
-    });
-
-    test('updateData y returns correct value 1.12', function() {
-      assert.equal( updateData.y(1.5), 0);
-    });
-
-    test('updateData y returns correct value 0.56', function() {
-      assert.equal( updateData.y(0.75), 135);
-    });
-  }); //suite
-
-  suite('px-vis-scale updates with additional series', function() {
-    var updateData = document.getElementById('updateData');
-
-    suiteSetup(function(){
-      // updateData.chartData[0].series.push([1397351280000, 1.5])
-      var d = [{
-        "series": [
-          [1397102460000, 0.99],
-          [1397139660000, 0.92],
-          [1397177400000, 0.97],
-          [1397228040000, 1.12],
-          [1397248260000, 1.09],
-          [1397291280000, 1],
-          [1397351280000, 1.5]
-        ]},{
-        "series": [
-          [1397101460000, 1],
-          [1397139660000, 1],
-          [1397177400000, 1],
-          [1397228040000, 1],
-          [1397248260000, 2],
-          [1397291280000, 2]
-        ]}];
-      updateData.set('chartData',d);
-    });
-
-    test('updateData fixture is created', function() {
-      assert.isTrue(updateData !== null);
-    });
-
-    test('updateData creates an x', function() {
-      assert.isDefined(updateData.x);
-    });
-
-    test('updateData creates an y', function() {
-      assert.isDefined(updateData.y);
-    });
-
-    test('updateData sets currentDomainX', function() {
-      assert.lengthOf(updateData.currentDomainX,2);
-    });
-    test('updateData sets currentDomainY', function() {
-      assert.lengthOf(updateData.currentDomainY,2);
-    });
-
-    test('updateData currentDomainX is correct', function() {
-      assert.equal( +updateData.currentDomainX[0], 1397101460000);
-      assert.equal( +updateData.currentDomainX[1], 1397351280000);
-    });
-    test('updateData currentDomainY is correct', function() {
-      assert.equal( JSON.stringify(updateData.currentDomainY), JSON.stringify([0,2]));
-    });
-
-    test('updateData x returns correct value 1397102460000', function() {
-      assert.equal( updateData.x(1397101460000), 0);
-    });
-
-    test('updateData x returns correct value 1397351280000', function() {
-      assert.equal( updateData.x(1397351280000), 480);
+    test('updateData x returns correct value 1397219100000', function() {
+      assert.equal( updateData.x(1397219100000), 480);
     });
     test('updateData x returns correct value 1397226370000', function() {
-      assert.equal( updateData.x(1397226370000), 240);
+      var n = (1397219100000 - 1397102460000)/2 + 1397102460000;
+      assert.equal( updateData.x(n), 240);
     });
 
     test('updateData y returns correct value 0', function() {
@@ -380,47 +433,288 @@ function runTests(){
     });
 
     test('updateData y returns correct value 2', function() {
-      assert.equal( updateData.y(2), 0);
+      assert.equal( updateData.y(20), 0);
     });
 
     test('updateData y returns correct value 1', function() {
-      assert.equal( updateData.y(1), 135);
+      assert.equal( updateData.y(10), 135);
     });
   }); //suite
 
-  suite('px-vis-scale seriesConfig fills with defaults', function() {
-    var seriesConfig = document.getElementById('seriesConfig');
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
 
-    test('seriesConfig fixture is created', function() {
-      assert.isTrue(seriesConfig !== null);
-    });
+  suite('px-vis-scale calcs x extents', function() {
+    var findXExtents = document.getElementById('findXExtents');
 
-    test('seriesConfig[0] type is default', function() {
-      assert.equal(seriesConfig.seriesConfig['0'].type, 'line');
-    });
-    test('seriesConfig[0] name is default', function() {
-      assert.equal(seriesConfig.seriesConfig['0'].name, '0');
-    });
-    test('seriesConfig[0] color is default', function() {
-      assert.equal(seriesConfig.seriesConfig['0'].color, colorSet[colorOrder[0]]);
-    });
-    test('seriesConfig[0] color is default', function() {
-      assert.equal(seriesConfig.seriesConfig['0'].x, '0');
+    suiteSetup(function(){
+      var ext = {
+        "x":[Infinity,-Infinity], "y": [0,100]
+        }
+      findXExtents.set('chartExtents',ext);
     });
 
-    test('seriesConfig[1] type is not overwritter', function() {
-      assert.equal(seriesConfig.seriesConfig['1'].type, 'scatter');
+    test('findXExtents fixture is created', function() {
+      assert.isTrue(findXExtents !== null);
     });
-    test('seriesConfig[1] name is not overwritter', function() {
-      assert.equal(seriesConfig.seriesConfig['1'].name, 'Tag2');
+
+    test('findXExtents creates an x', function() {
+      assert.isDefined(findXExtents.x);
     });
-    test('seriesConfig[1] color is not overwritter', function() {
-      assert.equal(seriesConfig.seriesConfig['1'].color, 'rgb(0,0,0)');
+
+    test('findXExtents creates an y', function() {
+      assert.isDefined(findXExtents.y);
     });
-    test('seriesConfig[1] color is not overwritter', function() {
-      assert.equal(seriesConfig.seriesConfig['1'].x, 'timestamp');
+
+    test('findXExtents sets currentDomainX', function() {
+      assert.lengthOf(findXExtents.currentDomainX,2);
+    });
+    test('findXExtents sets currentDomainY', function() {
+      assert.lengthOf(findXExtents.currentDomainY,2);
+    });
+
+    test('findXExtents currentDomainX is correct', function() {
+      assert.equal( Number(findXExtents.currentDomainX[0]), 1397102460000);
+      assert.equal( Number(findXExtents.currentDomainX[1]), 1397219100000);
+    });
+    test('findXExtents currentDomainY is correct', function() {
+      assert.equal( JSON.stringify(findXExtents.currentDomainY), JSON.stringify([0,100]));
+    });
+
+    test('findXExtents x returns correct value 1397102460000', function() {
+      assert.equal( findXExtents.x(1397102460000), 0);
+    });
+
+    test('findXExtents x returns correct value 1397219100000', function() {
+      assert.equal( findXExtents.x(1397219100000), 480);
+    });
+
+    test('findXExtents x returns correct value 1397160780000', function() {
+      assert.equal( findXExtents.x(1397160780000), 240);
+    });
+
+    test('findXExtents y returns correct value 0', function() {
+      assert.equal( findXExtents.y(0), 270);
+    });
+
+    test('findXExtents y returns correct value 10', function() {
+      assert.equal( findXExtents.y(100), 0);
+    });
+
+    test('findXExtents y returns correct value 5', function() {
+      assert.equal( findXExtents.y(50), 135);
+    });
+  }); //suite
+
+  suite('px-vis-scale calcs y extents', function() {
+    var findYExtents = document.getElementById('findYExtents');
+
+    suiteSetup(function(){
+      var ext = {
+        "x":[1397100000000,1397300000000], "y": [Infinity,-Infinity]
+        }
+      findYExtents.set('chartExtents',ext);
+    });
+
+    test('findYExtents fixture is created', function() {
+      assert.isTrue(findYExtents !== null);
+    });
+
+    test('findYExtents creates an x', function() {
+      assert.isDefined(findYExtents.x);
+    });
+
+    test('findYExtents creates an y', function() {
+      assert.isDefined(findYExtents.y);
+    });
+
+    test('findYExtents sets currentDomainX', function() {
+      assert.lengthOf(findYExtents.currentDomainX,2);
+    });
+    test('findYExtents sets currentDomainY', function() {
+      assert.lengthOf(findYExtents.currentDomainY,2);
+    });
+
+    test('findYExtents currentDomainX is correct', function() {
+      assert.equal( Number(findYExtents.currentDomainX[0]), 1397100000000);
+      assert.equal( Number(findYExtents.currentDomainX[1]), 1397300000000);
+    });
+    test('findYExtents currentDomainY is correct', function() {
+      assert.equal( JSON.stringify(findYExtents.currentDomainY), JSON.stringify([1,10]));
+    });
+
+    test('findYExtents x returns correct value 1397100000000', function() {
+      assert.equal( findYExtents.x(1397100000000), 0);
+    });
+
+    test('findYExtents x returns correct value 1397300000000', function() {
+      assert.equal( findYExtents.x(1397300000000), 480);
+    });
+
+    test('findYExtents x returns correct value 1397160780000', function() {
+      var n = (1397300000000 - 1397100000000)/2 + 1397100000000;
+      assert.equal( findYExtents.x(n), 240);
+    });
+
+    test('findYExtents y returns correct value 0', function() {
+      assert.equal( findYExtents.y(1), 270);
+    });
+
+    test('findYExtents y returns correct value 10', function() {
+      assert.equal( findYExtents.y(10), 0);
+    });
+
+    test('findYExtents y returns correct value 5', function() {
+      assert.equal( findYExtents.y(5.5), 135);
+    });
+  }); //suite
+
+  suite('px-vis-scale calcs linear x ext ', function() {
+    var findLinearX = document.getElementById('findLinearX');
+
+    suiteSetup(function(){
+      var ext = {
+        "x":[Infinity,-Infinity], "y": [Infinity,-Infinity]
+        }
+      findLinearX.set('chartExtents',ext);
+    });
+
+    test('findLinearX fixture is created', function() {
+      assert.isTrue(findLinearX !== null);
+    });
+
+    test('findLinearX creates an x', function() {
+      assert.isDefined(findLinearX.x);
+    });
+
+    test('findLinearX sets currentDomainX', function() {
+      assert.lengthOf(findLinearX.currentDomainX,2);
+    });
+    test('findLinearX sets currentDomainY', function() {
+      assert.lengthOf(findLinearX.currentDomainY,2);
+    });
+
+    test('findLinearX currentDomainX is correct', function() {
+      JSON.stringify(findLinearX.currentDomainX), JSON.stringify([1,10])
+    });
+
+    test('findLinearX x returns correct value 1397100000000', function() {
+      assert.equal( findLinearX.x(1), 0);
+    });
+
+    test('findLinearX x returns correct value 1397300000000', function() {
+      assert.equal( findLinearX.x(11), 480);
+    });
+
+    test('findLinearX x returns correct value 1397160780000', function() {
+      assert.equal( findLinearX.x(6), 240);
+    });
+  }); //suite
+
+  suite('px-vis-scale calcs x ordinal extents', function() {
+    var findOrdinalX = document.getElementById('findOrdinalX');
+
+    suiteSetup(function(){
+      var ext = {
+        "x":[], "y": [Infinity,-Infinity]
+        }
+      findOrdinalX.set('chartExtents',ext);
+    });
+
+    test('findOrdinalX fixture is created', function() {
+      assert.isTrue(findOrdinalX !== null);
+    });
+
+    test('findOrdinalX creates an x', function() {
+      assert.isDefined(findOrdinalX.x);
+    });
+
+    test('findOrdinalX creates an y', function() {
+      assert.isDefined(findOrdinalX.y);
+    });
+
+    test('findOrdinalX sets currentDomainX', function() {
+      assert.lengthOf(findOrdinalX.currentDomainX,3);
+    });
+    test('findOrdinalX sets currentDomainY', function() {
+      assert.lengthOf(findOrdinalX.currentDomainY,2);
+    });
+
+    test('findOrdinalX currentDomainX is correct', function() {
+      assert.equal( findOrdinalX.currentDomainX[0], 'a');
+      assert.equal( findOrdinalX.currentDomainX[1], 'c');
+      assert.equal( findOrdinalX.currentDomainX[2], 'b');
+    });
+    test('findOrdinalX currentDomainY is correct', function() {
+      assert.equal( JSON.stringify(findOrdinalX.currentDomainY), JSON.stringify([1,10]));
+    });
+
+    test('findOrdinalX x returns correct value a', function() {
+      assert.equal( findOrdinalX.x("a"), 80);
+    });
+
+    test('findOrdinalX x returns correct value c', function() {
+      assert.equal( findOrdinalX.x("c"), 240);
+    });
+
+    test('findOrdinalX x returns correct value b', function() {
+      assert.equal( findOrdinalX.x("b"), 400);
+    });
+
+    test('findOrdinalX y returns correct value 0', function() {
+      assert.equal( findOrdinalX.y(1), 270);
+    });
+
+    test('findOrdinalX y returns correct value 10', function() {
+      assert.equal( findOrdinalX.y(10), 0);
+    });
+
+    test('findOrdinalX y returns correct value 5', function() {
+      assert.equal( findOrdinalX.y(5.5), 135);
+    });
+  }); //suite
+
+  suite('px-vis-scale sets x ordinal extents', function() {
+    var setOrdinalX = document.getElementById('setOrdinalX');
+
+    suiteSetup(function(){
+      var ext = {
+        "x":["a","b","c","d"], "y": [0,10]
+        }
+      setOrdinalX.set('chartExtents',ext);
+    });
+
+    test('setOrdinalX fixture is created', function() {
+      assert.isTrue(setOrdinalX !== null);
+    });
+
+    test('setOrdinalX creates an x', function() {
+      assert.isDefined(setOrdinalX.x);
+    });
+
+    test('setOrdinalX sets currentDomainX', function() {
+      assert.lengthOf(setOrdinalX.currentDomainX,4);
+    });
+
+    test('setOrdinalX currentDomainX is correct', function() {
+      assert.equal( setOrdinalX.currentDomainX[0], 'a');
+      assert.equal( setOrdinalX.currentDomainX[1], 'b');
+      assert.equal( setOrdinalX.currentDomainX[2], 'c');
+      assert.equal( setOrdinalX.currentDomainX[3], 'd');
+    });
+
+    test('setOrdinalX x returns correct value a', function() {
+      assert.equal( setOrdinalX.x("a"), 60);
+    });
+
+    test('setOrdinalX x returns correct value c', function() {
+      assert.equal( setOrdinalX.x("b"), 180);
+    });
+
+    test('setOrdinalX x returns correct value b', function() {
+      assert.equal( setOrdinalX.x("c"), 300);
+    });
+
+    test('setOrdinalX x returns correct value b', function() {
+      assert.equal( setOrdinalX.x("d"), 420);
     });
   }); //suite
 

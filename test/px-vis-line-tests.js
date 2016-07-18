@@ -17,24 +17,34 @@ function runTests(){
     var colorOrder = commonColors.properties.seriesColorOrder.value;
     var colorSet = commonColors.properties.dataVisColors.value;
 
-    suiteSetup(function(){
+    suiteSetup(function(done){
       var d = [{
-            "series": [
-            [1397102460000, 1],
-            [1397131620000, 6],
-            [1397160780000, 10],
-            [1397189940000, 4],
-            [1397219100000, 6]
-          ]}],
-          seriesConfig = {"0":{"type":"line","name":"mySeries"}},
-          w = 500,
-          h = 300,
-          m = {
-            "top": 10,
-            "right": 5,
-            "bottom": 20,
-            "left": 15
-          };
+            "x": 1397102460000,
+            "y": 1
+          },{
+            "x": 1397131620000,
+            "y": 6
+          },{
+            "x": 1397160780000,
+            "y": 10
+          },{
+            "x": 1397189940000,
+            "y": 4
+          },{
+            "x": 1397219100000,
+            "y": 6
+          }
+        ],
+        completeSeriesConfig = {"mySeries":{"type":"line","name":"mySeries","x":"x","y":"y"}},
+        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        w = 500,
+        h = 300,
+        m = {
+          "top": 10,
+          "right": 5,
+          "bottom": 20,
+          "left": 15
+        };
       baseSVG.set('width',w);
       baseSVG.set('height',h);
       baseSVG.set('margin',m);
@@ -42,11 +52,18 @@ function runTests(){
       baseScale.set('width',w);
       baseScale.set('height',h);
       baseScale.set('margin',m);
-      baseScale.set('seriesConfig',seriesConfig);
+      baseScale.set('completeSeriesConfig',completeSeriesConfig);
+      baseScale.set('chartExtents',chartExtents);
       baseScale.set('chartData',d);
 
+      baseLine.set('completeSeriesConfig',completeSeriesConfig);
+      baseLine.set('seriesId',"mySeries");
       baseLine.set('chartData',d);
 
+      // needed for the debounce in line
+      setTimeout(function(){
+        done();
+      },100);
     });
 
     test('baseLine fixture is created', function() {
@@ -54,6 +71,8 @@ function runTests(){
     });
 
     test('baseLine linePath created', function() {
+      console.log(baseLine.linePath.nodes());
+      debugger
       assert.equal(baseLine.linePath.node().tagName,'path');
     });
 
