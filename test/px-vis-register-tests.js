@@ -263,7 +263,7 @@ function basicTests(registerID,dir){
     test(registerID + ' names match', function() {
       var series = Polymer.dom(register.root).querySelectorAll('.seriesName');
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].firstChild.textContent.trim(), data.seriesConfig[i]['name']);
+        assert.equal(series[i].firstChild.textContent.trim(), data.completeSeriesConfig['series_'+i]['name']);
       }
     });
 
@@ -297,13 +297,15 @@ function basicTests(registerID,dir){
     test(registerID + ' still names match', function() {
       var series = Polymer.dom(register.root).querySelectorAll('.seriesName');
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].firstChild.textContent.trim(), data.seriesConfig[i]['name']);
+        assert.equal(series[i].firstChild.textContent.trim(), data.completeSeriesConfig['series_'+i]['name']);
       }
     });
 
     test(registerID + ' values match', function() {
       var series = Polymer.dom(register.root).querySelectorAll('.seriesData');
       for(var i = 0; i < series.length; i++){
+        console.log(series[i]);
+        debugger
         assert.equal(series[i].textContent.trim(), '1,015.20');
       }
     });
@@ -328,7 +330,7 @@ function basicTests(registerID,dir){
     test(registerID + ' still names match', function() {
       var series = Polymer.dom(register.root).querySelectorAll('.seriesName');
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].firstChild.textContent.trim(), data.seriesConfig[i]['name']);
+        assert.equal(series[i].firstChild.textContent.trim(), data.completeSeriesConfig['series_'+i]['name']);
       }
     });
 
@@ -361,7 +363,7 @@ function basicTests(registerID,dir){
       var ms = Object.keys(register.mutedSeries);
       assert.equal(ms.length, 1);
       assert.equal(ms[0], seriesName.getAttribute('name').substr(1));
-      assert.equal(ms[0], Object.keys(register.seriesConfig)[1]);
+      assert.equal(ms[0], Object.keys(register.completeSeriesConfig)[1]);
       assert.equal(register.mutedSeries[ms[0]], true);
       assert.isTrue(series.classList.contains('muted'));
     });
@@ -373,7 +375,7 @@ function basicTests(registerID,dir){
       assert.equal(eventObj.method, 'set');
     });
     test(registerID + ' muted-series-updated dataVar is mutedSeries.1', function() {
-      assert.equal(eventObj.dataVar, 'mutedSeries.1');
+      assert.equal(eventObj.dataVar, 'mutedSeries.series_1');
     });
     test(registerID + ' muted-series-updated data is true', function() {
       assert.equal(eventObj.data, true);
@@ -385,7 +387,7 @@ function basicTests(registerID,dir){
       var ms = Object.keys(register.mutedSeries);
       assert.equal(ms.length, 1);
       assert.equal(ms[0], seriesName.getAttribute('name').substr(1));
-      assert.equal(ms[0], Object.keys(register.seriesConfig)[1]);
+      assert.equal(ms[0], Object.keys(register.completeSeriesConfig)[1]);
       assert.equal(register.mutedSeries[ms[0]], false);
       assert.isTrue(!series.classList.contains('muted'));
     });
@@ -396,7 +398,7 @@ function basicTests(registerID,dir){
       var ms = Object.keys(register.mutedSeries);
       assert.equal(ms.length, 1);
       assert.equal(ms[0], seriesName.getAttribute('name').substr(1));
-      assert.equal(ms[0], Object.keys(register.seriesConfig)[1]);
+      assert.equal(ms[0], Object.keys(register.completeSeriesConfig)[1]);
       assert.equal(register.mutedSeries[ms[0]], true);
       assert.isTrue(series.classList.contains('muted'));
     });
@@ -415,28 +417,38 @@ function generateEmptyData(num,str){
   };
   var seriesConfig = {};
   for(var i = 0; i < num; i++){
-    seriesConfig[i] = {};
     var name = str + i;
-    dataObj.series.push({'name':i,'value': null,'seriesNumber': i });
-    seriesConfig[i]['name'] = name;
-    seriesConfig[i]['color'] = colorSet[colorOrder[i]];
+    seriesConfig[name] = {
+      'name': name,
+      'color': colorSet[colorOrder[i]],
+      'x': 'x',
+      'y': 'y'
+    };
+
+    dataObj.series[i] = {
+      "name": name,
+      "value": null
+    };
   }
 
-  return { 'data':dataObj,'seriesConfig':seriesConfig };
+  return { 'data':dataObj,'completeSeriesConfig':seriesConfig };
 }
 
 function generateDataValues(data){
   data.data.time = new Date('Sat Dec 20 2014 00:37:47 GMT-0800 (PST)');
 
   for(var i = 0; i < data.data.series.length; i++){
-    data.data.series[i]['value'] = [ +data.data.time ,1015.2];
+    data.data.series[i]['value'] = {
+      "x": Number(data.data.time),
+      "y": 1015.2
+    };
   }
   return data;
 }
 
 function setData(series, data, done){
   series.set('tooltipData',{});
-  series.set('seriesConfig',data.seriesConfig);
+  series.set('completeSeriesConfig',data.completeSeriesConfig);
   series.set('tooltipData',data.data);
   series.set('chartData',data.data.series);
 
