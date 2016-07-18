@@ -157,7 +157,7 @@ This element sets the selectedDomain property based on the extents box. The sele
       // make sure the brush draws on top of everything; returns a set property brushSvg
       this.cloneSVGElem(this.svg.node(),'bushSvg');
       // first, define the brush using the axis
-      this._brush = d3.brushX()
+      this._brush = Px.d3.brushX()
         .extent(domain)
         .handleSize(6)
         .on("start", this._brushstart.bind(this))
@@ -233,7 +233,7 @@ This element sets the selectedDomain property based on the extents box. The sele
       // var s = d3.event.selection;
       // circle.classed("selected", function(d) { return s[0] <= d && d <= s[1]; });
       this.debounce('brushed', function () {
-        var newDomain = d3.brushSelection(this._brushGroup.node()).map(this.axis.invert, this.axis);
+        var newDomain = Px.d3.brushSelection(this._brushGroup.node()).map(this.axis.invert, this.axis);
         // var newDomain = s.map(this.axis.invert, this.axis);
         this.set('selectedDomain', {x:newDomain,y:[]});
         this.fire('px-vis-selected-domain-updated', { 'data':{x:newDomain,y:[]}, 'method': 'set', 'dataVar': 'selectedDomain' });
@@ -245,9 +245,9 @@ This element sets the selectedDomain property based on the extents box. The sele
      * @method _brushcenter
      */
     _brushcenter: function() {
-      var win = d3.select(window),   // window
-          target = d3.event.target,  //this._brushGroup
-          extent = d3.brushSelection(this._brushGroup.node()), //array of brush currect size in pixelspace
+      var win = Px.d3.select(window),   // window
+          target = Px.d3.event.target,  //this._brushGroup
+          extent = Px.d3.brushSelection(this._brushGroup.node()), //array of brush currect size in pixelspace
           size = extent[1] - extent[0],  //width in pixels
           range = this.axis.range(),  //overall extents in pixelspace
           x0 = range[0] + size / 2,
@@ -256,7 +256,7 @@ This element sets the selectedDomain property based on the extents box. The sele
       this._recenter(true);
       this._brushcentermove(target,x0,x1);
 
-      if (d3.event.changedTouches) {
+      if (Px.d3.event.changedTouches) {
         win.on("touchmove.brush", this._brushcentermove.bind(this,target,x0,x1))
           .on("touchend.brush", this._brushcenterend.bind(this));
       } else {
@@ -270,9 +270,9 @@ This element sets the selectedDomain property based on the extents box. The sele
      * @method _brushcentermove
      */
     _brushcentermove: function(target,x0,x1) {
-      d3.event.stopPropagation();
+      Px.d3.event.stopPropagation();
       // calc the center or pick an edge
-      this._center = Math.max(x0, Math.min(x1, d3.mouse(target)[0]));
+      this._center = Math.max(x0, Math.min(x1, Px.d3.mouse(target)[0]));
 
       this._recenter(false);
     },
@@ -283,7 +283,7 @@ This element sets the selectedDomain property based on the extents box. The sele
      */
     _brushcenterend: function() {
       this._brushmove();
-      d3.select(window).on(".brush", null);
+      Px.d3.select(window).on(".brush", null);
     },
     /**
      * Helper function to tween and calculate the brush move
@@ -304,7 +304,7 @@ This element sets the selectedDomain property based on the extents box. The sele
       this._centering = true;
 
       // sets up a timer to call tween
-      var timer = d3.timer(function() {
+      var timer = Px.d3.timer(function() {
         _this.tween(0.2);
         // stop the timer when we have centered
         if(!_this._centering){
@@ -319,7 +319,7 @@ This element sets the selectedDomain property based on the extents box. The sele
      * @private
      */
     tween:function (alpha) {
-      var extent = d3.brushSelection(this._brushGroup.node()), //recalc every time it moves
+      var extent = Px.d3.brushSelection(this._brushGroup.node()), //recalc every time it moves
           size = extent[1] - extent[0],
           center1 = this._center * alpha + ( extent[0] + extent[1]) / 2 * (1 - alpha);
       // move the brush
@@ -397,14 +397,14 @@ This element sets the selectedDomain property based on the extents box. The sele
      * @method _handleGroupMouseDown
      */
     _handleGroupMouseDown:function(d,i){
-        var elem = d3.select(this._handleGroup.nodes()[i]);
+        var elem = Px.d3.select(this._handleGroup.nodes()[i]);
 
         // disable changes on mouseleave because when a person drags, they can leave the elem bounds and we dont want to restyle yet.
         elem.on("mouseleave", null);
 
         /*
           Mouseup is tricky. It lives on the Window rather than our elem.
-          If we just use a d3.select(window).on('mouseup',...) then it overwrites any other d3 mouseup listeners.
+          If we just use a Px.d3.select(window).on('mouseup',...) then it overwrites any other d3 mouseup listeners.
           To be safe, use Polymer listen and fire another event for d3 to listen to
         */
         // this.listen(window,'mouseup','_brushMouseUp');
@@ -413,7 +413,7 @@ This element sets the selectedDomain property based on the extents box. The sele
 
           For mouseup, we must bind 'd' and 'i' in order to pass our handle index down. Otherwise, it doesnt know which handle we are dealing with.
         */
-        d3.select(window).on('brushmouseup',this._handleGroupMouseUp.bind(this,d,i));
+        Px.d3.select(window).on('brushmouseup',this._handleGroupMouseUp.bind(this,d,i));
 
         // set the pressed styles
         elem.attr('stroke', this.colors.gray7)
@@ -428,10 +428,10 @@ This element sets the selectedDomain property based on the extents box. The sele
      * @method _handleGroupMouseUp
      */
     _handleGroupMouseUp:function(d,i){
-      var elem = d3.select(this._handleGroup.nodes()[i]);
+      var elem = Px.d3.select(this._handleGroup.nodes()[i]);
       console.log("up")
       // clear the d3 mouseup listener
-      d3.select(window).on('brushmouseup',null);
+      Px.d3.select(window).on('brushmouseup',null);
       // clear our Polymer helper listener
       this.unlisten(window,'mouseup','_brushMouseUp');
 
@@ -449,7 +449,7 @@ This element sets the selectedDomain property based on the extents box. The sele
      * @method _handleGroupMouseLeave
      */
     _handleGroupMouseLeave:function(d,i){
-      var elem = d3.select(this._handleGroup.nodes()[i]);
+      var elem = Px.d3.select(this._handleGroup.nodes()[i]);
       elem.attr('stroke', this.colors.gray5)
         .attr('fill', this.colors.white);
       console.log("mouseleave")
@@ -462,7 +462,7 @@ This element sets the selectedDomain property based on the extents box. The sele
      * @method _handleGroupMouseEnter
      */
     _handleGroupMouseEnter:function(d,i){
-      var elem = d3.select(this._handleGroup.nodes()[i]);
+      var elem = Px.d3.select(this._handleGroup.nodes()[i]);
       elem.attr('stroke', this.colors.gray6)
         .attr('fill', this.colors.gray5);
       // elem.selectAll('line.handleLine')

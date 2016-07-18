@@ -69,8 +69,8 @@ This element draw the box over the axis signifying the active area to mute the s
         this.svg.append("g")
         .attr("class", "brush")
         .each(function(d) {
-          d3.select(this).call(
-            _this.axis[d].brush = d3.svg.brush()
+          Px.d3.select(this).call(
+            _this.axis[d].brush = Px.d3.svg.brush()
               .y(_this.axis[d])
               .on("brushstart", _this.brushstart.bind(_this))
               .on("brushend", _this.brush.bind(_this)));
@@ -85,7 +85,7 @@ This element draw the box over the axis signifying the active area to mute the s
     },
 
     brushstart: function() {
-      d3.event.sourceEvent.stopPropagation();
+      Px.d3.event.sourceEvent.stopPropagation();
     },
 
     // Handles a brush event, toggling the display of foreground lines.
@@ -107,7 +107,7 @@ This element draw the box over the axis signifying the active area to mute the s
           }
         }
       }
-      
+
       this.set('mutedSeries',series);
       this.fire('px-vis-muted-series-updated', { 'data': series, 'dataVar': 'mutedSeries' ,'method': 'set' });
     }

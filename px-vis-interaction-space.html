@@ -201,7 +201,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       if(!this.mouseDown) {
         //  d3.mouse: returns the x position on the screen of the mouse
-        var mousePos = d3.mouse(this._rect.node()),
+        var mousePos = Px.d3.mouse(this._rect.node()),
             x0,
             dataObj,
             bisectDate,
@@ -280,7 +280,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                   */
                   chartData  = this.chartData;
 
-                  var bisectDate = d3.bisector(function(d) {
+                  var bisectDate = Px.d3.bisector(function(d) {
                     return d[this.completeSeriesConfig[keys[i]]['x']];
                   }.bind(this)).left,
                   index = bisectDate(chartData, x1, 1);
@@ -350,9 +350,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     _getOrdinalValue: function(xAxis, mousePos) {
       //TODO: try getting the closest one rather than the one directly on the left
       if(xAxis === true) {
-        return this.x.domain()[Math.max(d3.bisect(this.x.range(), mousePos) - 1, 0)];
+        return this.x.domain()[Math.max(Px.d3.bisect(this.x.range(), mousePos) - 1, 0)];
       } else {
-        return this.y.domain()[Math.max(d3.bisect(this.y.range(), mousePos) - 1, 0)];
+        return this.y.domain()[Math.max(Px.d3.bisect(this.y.range(), mousePos) - 1, 0)];
       }
     },
     /**
@@ -421,12 +421,12 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     _drawActionBox: function() {
 
       //only allow left clicks
-      if(d3.event.button === 0) {
+      if(Px.d3.event.button === 0) {
         this.mouseDown = true;
         //in case the user clicks inside the chart, and mouses out, we are waiting for a mouseup, and closing our action box with the coordinates available on the mouseup.
-        d3.select(document).on('mouseup.action', this._mouseUpOutsideSvg.bind(this));
+        Px.d3.select(document).on('mouseup.action', this._mouseUpOutsideSvg.bind(this));
 
-        var mousePos = d3.mouse(this._rect.node());
+        var mousePos = Px.d3.mouse(this._rect.node());
         // use original svg so it draws under the _rect and does not interfer with our mouse events
 
         var startX = mousePos[0],
@@ -463,7 +463,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       if(this._doesObjHaveValues(this._actionArea)) {
 
-        var mousePos = d3.mouse(this._rect.node()),
+        var mousePos = Px.d3.mouse(this._rect.node()),
           // save somewhere else--> not as an attr, inefficient
             ox = parseInt(this._actionArea.attr("ox")),
             oy = parseInt(this._actionArea.attr("oy")),
@@ -505,7 +505,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      */
     _finishActionBox: function() {
       //since we are done drawing our action box, remove the listener from document using d3.
-      d3.select(document).on('mouseup.action', null);
+      Px.d3.select(document).on('mouseup.action', null);
       this.mouseDown = false;
       var extents = {};
 
