@@ -9,13 +9,10 @@ function runTests(){
     });
   });
 
-  suite('px-vis-line works', function() {
+  suite('px-vis-pie works', function() {
     var baseScale = document.getElementById('baseScale'),
         baseSVG = document.getElementById('baseSVG'),
         basePie = document.getElementById('baseLine');
-
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
 
     suiteSetup(function(){
       var d = [{"x":15,"y":"IPA","percentage":"26"},{"x":1,"y":"Pils","percentage":"2"},{"x":1,"y":"Lager","percentage":"2"},{"x":8,"y":"Lambic","percentage":"14"},{"x":12,"y":"Stout","percentage":"21"},{"x":7,"y":"Pale Ale","percentage":"12"},{"x":9,"y":"Porter","percentage":"16"},{"x":4,"y":"Heffeweisse","percentage":"7"}],
@@ -40,13 +37,90 @@ function runTests(){
 
     test('verify first slice path', function() {
       var slice = basePie.pieGroup._groups[0][0].children[0].children[0].attributes['d'];
-      assert.equal(slice.value,'M8.266365894244634e-15,-135A135,135,0,0,1,134.53890655590044,11.148211638764865L0,0Z');
+      assert.equal(slice.value,'M1.3164953090834047e-14,-215A215,215,0,0,1,214.26566599643402,17.754559276551454L0,0Z');
     });
 
-    test('pie has been translated and rotated by 180', function() {
-      var transform = basePie.pieGroup._groups[0][0].attributes['transform'].
-      assert.equal(basePie.linePath.attr('d').split(/[\s,]+/).join(''),'M1.0103336092965664e-14,-165A165,165,0,0,1,164.43644134610054,13.625592002934836L0,0Z');
+    test('pie has been initially translated by radius', function() {
+      var transform = basePie.pieGroup._groups[0][0].attributes['transform'].value;
+      assert.equal(transform,'translate(' + basePie._radius + ',' +  basePie._radius + ')');
     });
+
+    test('pie has been translated by radius and rotated after animation', function(done) {
+
+      setTimeout(function() {
+        var transform = basePie.pieGroup._groups[0][0].attributes['transform'].value;
+        assert.equal(transform,'translate(' + basePie._radius + ', ' +  basePie._radius + ') rotate(-180)');
+        assert.equal(basePie._currentRotationAngle, -Math.PI);
+        done();
+      }, 1500);
+    });
+
+    test('click on slice rotates pie', function(done) {
+      var slice = basePie.pieGroup._groups[0][0].children[0],
+          evt = new MouseEvent("tap"),
+          popover = Polymer.dom(basePie.root).querySelector('px-popover');
+
+      //popover hidden
+      assert.isFalse(popover.classList.contains('fadeFromHidden'));
+
+      //click
+      slice.dispatchEvent(evt);
+
+      setTimeout(function() {
+        var transform = basePie.pieGroup._groups[0][0].attributes['transform'].value;
+
+        assert.equal(parseFloat(basePie._radToDeg(basePie._currentRotationAngle)), -47.368421052631575);
+        //find actual rotation from transform...
+        var rot = transform.substr(transform.indexOf('rotate(')+7);
+        rot = rot.substr(0, rot.indexOf(')'));
+        rot = parseFloat(rot).toFixed(1);
+        assert.equal(rot, -47.4);
+
+        //popover should be shown
+        assert.isTrue(popover.classList.contains('fadeFromHidden'));
+
+        done();
+      }, 800);
+    });
+
+    test('hover shows tooltip', function(done) {
+      var slice = basePie.pieGroup._groups[0][0].children[0],
+          evt = new MouseEvent("mouseover"),
+          tooltip = Polymer.dom(basePie.root).querySelector('px-tooltip');
+
+      //tooltip hidden
+      assert.isFalse(tooltip.classList.contains('movedTooltip'));
+
+      //hover
+      slice.dispatchEvent(evt);
+
+      setTimeout(function() {
+
+        //tooltip should be shown
+        assert.isTrue(tooltip.classList.contains('movedTooltip'));
+        done();
+      }, 10);
+    });
+
+    test('mouseleave hides tooltip', function(done) {
+      var slice = basePie.pieGroup._groups[0][0].children[0],
+          evt = new MouseEvent("mouseleave"),
+          tooltip = Polymer.dom(basePie.root).querySelector('px-tooltip');
+
+      //tooltip shown
+      assert.isTrue(tooltip.classList.contains('movedTooltip'));
+
+      //hover
+      slice.dispatchEvent(evt);
+
+      setTimeout(function() {
+
+        //tooltip should be hidden
+        assert.isFalse(tooltip.classList.contains('movedTooltip'));
+        done();
+      }, 10);
+    });
+
   }); //suite
 
 

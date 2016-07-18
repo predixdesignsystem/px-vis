@@ -249,9 +249,9 @@ Element which draws scatter series onto the chart
                               .enter()
                               .append('svg:g')
                               .attr('class', 'slice')
-                              .on('mousedown.action', this._centerOnSlice.bind(this))
+                              .on('tap', this._centerOnSlice.bind(this))
                               .on('mouseover', this._showTooltip.bind(this))
-                              .on('mouseout.tooltip', this._hideTooltip.bind(this));
+                              .on('mouseleave', this._hideTooltip.bind(this));
 
       arcs.append('svg:path')
           .attr('fill', function(d, i){
@@ -269,7 +269,7 @@ Element which draws scatter series onto the chart
       this.set('_currentRotationAngle', -Math.PI);
     },
     /**
-     * Return the cvalue or the slice datum depending on use of percentages
+     * Return the value or the slice datum depending on use of percentages
      */
     _getSliceValue: function(datum) {
       if(this.usePercentage) {
@@ -290,8 +290,6 @@ Element which draws scatter series onto the chart
 
 
       //center tooltip
-      //TODO: use something along  center = this._arc.centroid(datum);
-      //problem is how to take the rotation/translation into account
       var rotatedDatum = {
         startAngle: datum.startAngle + this._currentRotationAngle,
         endAngle: datum.endAngle + this._currentRotationAngle
@@ -337,10 +335,16 @@ Element which draws scatter series onto the chart
       //display a popover after the rotation
       setTimeout(function() {
 
+        //position popover anchor
+        var curRect = this.pxSvgElem.getBoundingClientRect(),
+            leftMarg = Number(this.margin.left);
+
+        this.$.popoverAnchor.style.left = (curRect.left + leftMarg +  this._radius) + 'px';
+        this.$.popoverAnchor.style.top = (curRect.top +  Number(this.margin.top)) + 'px';
+
         this.$.popover.popoverTitle = datum.data[this.completeSeriesConfig[this.seriesId].y];
         this.$.popover.popoverBody = this._getSliceValue(datum);
 
-        //resimulate click so that popover can pick it up
         this.$.popover.show();
       }.bind(this), 750);
     },
