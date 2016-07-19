@@ -21,21 +21,25 @@ function runTests(){
           "bottom": 20,
           "left": 15
         },
-        seriesConfig = {
-          "0":{
-            "type":"line",
-            "name":"mySeries1"
-            },
-            "1":{
-              "type":"line",
-              "name":"mySeries2"
-            }
-          };
+        completeSeriesConfig = {"mySeries":{
+          "type":"line",
+          "name":"mySeries",
+          "x":"x",
+          "y":"y",
+          "color": "rgb(93,165,218)"
+        },
+        "mySeries2":{
+          "type":"line",
+          "name":"mySeries2",
+          "x":"x",
+          "y":"y2",
+          "color": "rgb(250,164,58)"
+        }};
 
       baseScale.set('width',w);
       baseScale.set('height',h);
       baseScale.set('margin',m);
-      baseScale.set('seriesConfig',seriesConfig);
+      baseScale.set('completeSeriesConfig',completeSeriesConfig);
 
       baseSVG.set('width',w);
       baseSVG.set('height',h);
@@ -89,26 +93,28 @@ function baseTests(elem,hLine,vLine,circle,hArr,yArr){
 
     suiteSetup(function(done){
       var d = [{
-          "series": [
-            [1397102460000, 1],
-            [1397131620000, 6],
-            [1397160780000, 10],
-            [1397189940000, 4],
-            [1397219100000, 6]
-          ],
-          "seriesNumber":0,
-          "name":"mySeries1"
-        },{
-          "series": [
-            [1397102460000, 1],
-            [1397131620000, 21],
-            [1397160780000, 3],
-            [1397189940000, 10],
-            [1397219100000, 27]
-          ],
-          "seriesNumber":1,
-          "name":"mySeries2"
-        }],
+            "x": 1397102460000,
+            "y": 1,
+            "y2": 3
+          },{
+            "x": 1397131620000,
+            "y": 6,
+            "y2": 4
+          },{
+            "x": 1397160780000,
+            "y": 10,
+            "y2": 3
+          },{
+            "x": 1397189940000,
+            "y": 4,
+            "y2": 3
+          },{
+            "x": 1397219100000,
+            "y": 6,
+            "y2": 3
+          }
+        ],
+        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
         h = 300,
         m = {
@@ -119,6 +125,7 @@ function baseTests(elem,hLine,vLine,circle,hArr,yArr){
         };
 
       baseScale.set('chartData',d);
+      baseScale.set('chartExtents',chartExtents);
 
       cursor.set('width',w);
       cursor.set('height',h);
@@ -154,7 +161,7 @@ function baseTests(elem,hLine,vLine,circle,hArr,yArr){
       });
     } else {
       test(elem + ' correct number of _hLines are created', function() {
-        assert.equal(cursor._hLines[0].length,2);
+        assert.equal(cursor._hLines.nodes().length,2);
       });
       test(elem + ' _hLines tag', function() {
         assert.equal(cursor._hLines.node().tagName,'line');
@@ -183,22 +190,22 @@ function baseTests(elem,hLine,vLine,circle,hArr,yArr){
 
     } else {
       test(elem + ' correct number of _circles are created', function() {
-        assert.equal(cursor._circles[0].length,2);
+        assert.equal(cursor._circles.nodes().length,2);
       });
       test(elem + ' _circles tag', function() {
         assert.equal(cursor._circles.node().tagName,'circle');
       });
       test(elem + ' _circles[0] fill', function() {
-        assert.equal(cursor._circles[0][0].getAttribute('fill').split(' ').join(''),colorSet[colorOrder[0]]);
+        assert.equal(cursor._circles.nodes()[0].getAttribute('fill').split(' ').join(''),colorSet[colorOrder[0]]);
       });
       test(elem + ' _circles[0] stroke', function() {
-        assert.equal(cursor._circles[0][0].getAttribute('stroke').split(' ').join(''),colorSet[colorOrder[0]]);
+        assert.equal(cursor._circles.nodes()[0].getAttribute('stroke').split(' ').join(''),colorSet[colorOrder[0]]);
       });
       test(elem + ' _circles[1] fill', function() {
-        assert.equal(cursor._circles[0][1].getAttribute('fill').split(' ').join(''),colorSet[colorOrder[1]]);
+        assert.equal(cursor._circles.nodes()[1].getAttribute('fill').split(' ').join(''),colorSet[colorOrder[1]]);
       });
       test(elem + ' _circles[0] stroke', function() {
-        assert.equal(cursor._circles[0][1].getAttribute('stroke').split(' ').join(''),colorSet[colorOrder[1]]);
+        assert.equal(cursor._circles.nodes()[1].getAttribute('stroke').split(' ').join(''),colorSet[colorOrder[1]]);
       });
     }
   }); //suite
@@ -238,10 +245,10 @@ function addTooltipTests(elem,hLine,vLine,circle,hX2,hTransformArr,vTransform,cA
         assert.equal(cursor._hLines.attr('x2'),hX2);
       });
       test(elem + ' _hLines[0] transform', function() {
-        assert.equal(cursor._hLines[0][0].getAttribute('transform').split(" ").join(','),hTransformArr[0]);
+        assert.equal(cursor._hLines.nodes()[0].getAttribute('transform').split(" ").join(','),hTransformArr[0]);
       });
       test(elem + ' _hLines[1] transform', function() {
-        assert.equal(cursor._hLines[0][1].getAttribute('transform').split(" ").join(','),hTransformArr[1]);
+        assert.equal(cursor._hLines.nodes()[1].getAttribute('transform').split(" ").join(','),hTransformArr[1]);
       });
     }
 
@@ -258,16 +265,16 @@ function addTooltipTests(elem,hLine,vLine,circle,hX2,hTransformArr,vTransform,cA
 
     if(circle){
       test(elem + ' _circles[0] cx', function() {
-        assert.equal(cursor._circles[0][0].getAttribute('cx'),cArr[0][0]);
+        assert.equal(cursor._circles.nodes()[0].getAttribute('cx'),cArr[0][0]);
       });
       test(elem + ' _circles[0] cy', function() {
-        assert.equal(cursor._circles[0][0].getAttribute('cy'),cArr[0][1]);
+        assert.equal(cursor._circles.nodes()[0].getAttribute('cy'),cArr[0][1]);
       });
       test(elem + ' _circles[1] cx', function() {
-        assert.equal(cursor._circles[0][1].getAttribute('cx'),cArr[1][0]);
+        assert.equal(cursor._circles.nodes()[1].getAttribute('cx'),cArr[1][0]);
       });
       test(elem + ' _circles[1] cy', function() {
-        assert.equal(cursor._circles[0][1].getAttribute('cy'),cArr[1][1]);
+        assert.equal(cursor._circles.nodes()[1].getAttribute('cy'),cArr[1][1]);
       });
     }
   }); //suite
