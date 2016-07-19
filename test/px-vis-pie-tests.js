@@ -32,16 +32,18 @@ function runTests(){
     });
 
     test('as many slices as data', function() {
-      assert.equal(basePie.chartData.length,  basePie.pieGroup._groups[0][0].children.length);
+
+      assert.equal(basePie.chartData.length,  basePie.pieGroup._groups[0][0].childNodes.length);
     });
 
     test('verify first slice path', function() {
-      var slice = basePie.pieGroup._groups[0][0].children[0].children[0].attributes['d'];
+      var slice = basePie.pieGroup._groups[0][0].firstChild.firstChild.attributes['d'];
       assert.equal(slice.value,'M1.3164953090834047e-14,-215A215,215,0,0,1,214.26566599643402,17.754559276551454L0,0Z');
     });
 
     test('pie has been initially translated by radius', function() {
       var transform = basePie.pieGroup._groups[0][0].attributes['transform'].value;
+      debugger
       assert.equal(transform,'translate(' + basePie._radius + ',' +  basePie._radius + ')');
     });
 
@@ -56,7 +58,7 @@ function runTests(){
     });
 
     test('click on slice rotates pie', function(done) {
-      var slice = basePie.pieGroup._groups[0][0].children[0],
+      var slice = basePie.pieGroup._groups[0][0].firstChild,
           evt = new MouseEvent("tap"),
           popover = Polymer.dom(basePie.root).querySelector('px-popover');
 
@@ -84,7 +86,7 @@ function runTests(){
     });
 
     test('hover shows tooltip', function(done) {
-      var slice = basePie.pieGroup._groups[0][0].children[0],
+      var slice = basePie.pieGroup._groups[0][0].firstChild,
           evt = new MouseEvent("mouseover"),
           tooltip = Polymer.dom(basePie.root).querySelector('px-tooltip');
 
@@ -103,7 +105,7 @@ function runTests(){
     });
 
     test('mouseleave hides tooltip', function(done) {
-      var slice = basePie.pieGroup._groups[0][0].children[0],
+      var slice = basePie.pieGroup._groups[0][0].firstChild,
           evt = new MouseEvent("mouseleave"),
           tooltip = Polymer.dom(basePie.root).querySelector('px-tooltip');
 
