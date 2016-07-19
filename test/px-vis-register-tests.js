@@ -304,8 +304,6 @@ function basicTests(registerID,dir){
     test(registerID + ' values match', function() {
       var series = Polymer.dom(register.root).querySelectorAll('.seriesData');
       for(var i = 0; i < series.length; i++){
-        console.log(series[i]);
-        debugger
         assert.equal(series[i].textContent.trim(), '1,015.20');
       }
     });
