@@ -235,6 +235,40 @@ function runTests(){
       assert.equal(texts[1].trim(),'1,015.20');
     });
   });
+
+  suite('px-vis-register for pie', function() {
+    var register = document.getElementById('pie');
+
+    suiteSetup(function(done) {
+      var data = generatePieDataValues( generateEmptyData(2) );
+      setData(register, data,done);
+      register.units = "pint";
+    });
+
+    test('pie doesnt show date', function() {
+      assert.isNull(Polymer.dom(register.root).querySelector('#dateTime'));
+    });
+
+    test('pie formated with unit', function() {
+      var series = Polymer.dom(register.root).querySelectorAll('.seriesData'),
+          texts = series[0].textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join('').split('/');
+
+      assert.equal(texts,'1015.2pint');
+    });
+
+    test('pie formated with percentage', function(done) {
+
+      register.usePercentage = true;
+
+      flush(function(){
+        var series = Polymer.dom(register.root).querySelectorAll('.seriesData'),
+            texts = series[0].textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join('').split('/');
+
+        assert.equal(texts,'12%');
+        done();
+      });
+    });
+  });
 }
 
 function basicTests(registerID,dir){
@@ -305,7 +339,6 @@ function basicTests(registerID,dir){
       var series = Polymer.dom(register.root).querySelectorAll('.seriesData');
       for(var i = 0; i < series.length; i++){
         console.log(series[i]);
-        debugger
         assert.equal(series[i].textContent.trim(), '1,015.20');
       }
     });
@@ -441,6 +474,18 @@ function generateDataValues(data){
     data.data.series[i]['value'] = {
       "x": Number(data.data.time),
       "y": 1015.2
+    };
+  }
+  return data;
+}
+
+function generatePieDataValues(data){
+
+  for(var i = 0; i < data.data.series.length; i++){
+    data.data.series[i] = {
+      "x":  1015.2,
+      "y": "somestring",
+      "percentage": 12
     };
   }
   return data;
