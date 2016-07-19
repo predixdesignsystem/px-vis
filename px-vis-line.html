@@ -65,22 +65,19 @@ Element which draws lines series onto the chart
         type:String
       },
       /**
-       * An index of the series used for calculating its color
+       * A holder object for the series object
        *
-       * @property seriesNumber
-       * @type String
        */
-      seriesNumber:{
-        type:Number,
-        value:0
+      linePath:{
+        type:Object
       },
       /**
-       * A holder object for the series object
+       * A holder object for the series builder
        *
        * @property linePath
        * @type String
        */
-      linePath:{
+      lineBuilder:{
         type:Object,
         value: function() {return{};}
       },
@@ -92,7 +89,6 @@ Element which draws lines series onto the chart
         type:Object,
         value: function() {return{};}
       },
-
       parallelCoordinates: {
         type: Boolean,
         value: false
@@ -165,32 +161,30 @@ Element which draws lines series onto the chart
             .attr("class", "series-line");
         }
 
-        this.linePath = this.lineGroup.selectAll('path.series-line')
+        this.lineBuilder = this.lineGroup.selectAll('path.series-line')
           .data(data);
 
-        this.linePath.exit().remove();
+        this.lineBuilder.exit().remove();
 
-        this.linePath.enter()
+        this.lineBuilder.enter()
           .append('path')
           .attr("class", "series-line")
           .attr("series-id", function(d,i){
             return this.multiPath ? 'line_' + d[this.seriesId] : 'line_' + this.seriesId
           }.bind(this))
           .attr('fill','none')
-        .merge(this.linePath)
+        .merge(this.lineBuilder)
           .attr("d", line)
           .attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
           .attr('stroke-opacity',1);
 
-        this._addClipPath();
+        this.linePath = this.lineGroup.selectAll('path.series-line');
 
-        console.warn(this.linePath)
+        this._addClipPath();
 
       },10);
     },
-    _test: function(){
-      this.linePath.attr('test','test');
-    },
+
     /**
      * Helper to call addClipPath with the elem
      *
