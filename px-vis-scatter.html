@@ -123,12 +123,16 @@ Element which draws scatter series onto the chart
       /**
        * A holder object for the series objects
        *
-       * @property scatterDots
-       * @type Object
        */
       scatterDots:{
-        type:Object,
-        value: function() {return{};}
+        type:Object
+      },
+      /**
+       * A holder object for the series builder
+       *
+       */
+      scatterBuilder:{
+        type:Object
       }
     },
 
@@ -168,29 +172,32 @@ Element which draws scatter series onto the chart
           .attr("series-id", 'scatter_' + this.seriesId)
           .attr("class", "series-scatter");
       }
+      var _this = this;
 
-      // TODO dev set FA icons & icons
-      this.scatterDots = this.scatterGroup.selectAll('path.' + this.markerSymbol)
+      this.scatterBuilder = this.scatterGroup.selectAll('path.' + this.markerSymbol)
         .data(data);
 
-      this.scatterDots.exit().remove();
 
-      var _this = this;
-      this.scatterDots.enter()
+      this.scatterBuilder.exit().remove();
+
+      this.scatterBuilder.enter()
         .append("path")
-        .attr("class", this.markerSymbol)
+        .attr("class", function(d,i){
+          // if this series is missing a datapoint, remove that point
+          if(isNaN(d[_this.completeSeriesConfig[_this.seriesId]['y']])){
+            return this.remove();
+          }
+          return _this.markerSymbol;
+        })
         .attr("d", Px.d3.symbol().type(this._markerMapping[this.markerSymbol]))
-        .merge(this.scatterDots)
+      .merge(this.scatterBuilder)
         .attr('fill',this.completeSeriesConfig[this.seriesId]['color'])
         .attr('fill-opacity',0.6)
         .attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
         .attr('stroke-opacity',1)
         .attr("transform", this._applyTransform.bind(this));
 
-
-
-      // add color
-      // this._colorScatter();
+      this.scatterDots = this.scatterGroup.selectAll('path.' + this.markerSymbol);
 
       this._addClipPath();
     },
@@ -246,7 +253,7 @@ Element which draws scatter series onto the chart
      */
     _colorScatter:function(){
       var index = this.seriesNumber;
-      this.scatterGroup
+      this.scatterDots
         .attr('fill',this.completeSeriesConfig[this.seriesId]['color'])
         .attr('fill-opacity',0.6)
         .attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
@@ -259,8 +266,8 @@ Element which draws scatter series onto the chart
      TODO add dev set color and opacity
      */
      _muteScatter:function(){
-       this.scatterGroup.attr('fill-opacity',0.3);
-       this.scatterGroup.attr('stroke-opacity',0);
+       this.scatterDots.attr('fill-opacity',0.3);
+       this.scatterDots.attr('stroke-opacity',0);
      }
   });
 </script>

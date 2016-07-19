@@ -17,14 +17,30 @@ function runTests(){
 
     suiteSetup(function(done){
       var d = [{
-        "series": [
-          [1397102460000, 1],
-          [1397131620000, 6],
-          [1397160780000, 10],
-          [1397189940000, 4],
-          [1397219100000, 6]
-        ]
-        }],
+            "x": 1397102460000,
+            "y": 1
+          },{
+            "x": 1397131620000,
+            "y": 6
+          },{
+            "x": 1397160780000,
+            "y": 10
+          },{
+            "x": 1397189940000,
+            "y": 4
+          },{
+            "x": 1397219100000,
+            "y": 6
+          }
+        ],
+        completeSeriesConfig = {"mySeries":{
+          "type":"line",
+          "name":"mySeries",
+          "x":"x",
+          "y":"y",
+          "color": "rgb(93,165,218)"
+        }},
+        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
         h = 300,
         m = {
@@ -40,6 +56,8 @@ function runTests(){
       baseScale.set('width',w);
       baseScale.set('height',h);
       baseScale.set('margin',m);
+      baseScale.set('completeSeriesConfig',completeSeriesConfig);
+      baseScale.set('chartExtents',chartExtents);
       baseScale.set('chartData',d);
 
       baseXGrid.set('margin',m);
@@ -107,28 +125,28 @@ function runTests(){
       //   assert.equal(lines[0].length,11);
       // });
       test('correct number of paths', function() {
-        assert.equal(path[0].length,0);
+        assert.equal(path.nodes().length,0);
       });
 
       test('line0 has correct fill', function() {
-        assert.equal(lines[0][0].getAttribute('fill'),'none');
+        assert.equal(lines.nodes()[0].getAttribute('fill'),'none');
       });
       test('line0 has correct stroke', function() {
-        assert.equal(lines[0][0].getAttribute('stroke').split(' ').join(''),colors['grey3']);
+        assert.equal(lines.nodes()[0].getAttribute('stroke').split(' ').join(''),colors['grey3']);
       });
 
       test('line3 has correct fill', function() {
-        assert.equal(lines[0][3].getAttribute('fill'),'none');
+        assert.equal(lines.nodes()[3].getAttribute('fill'),'none');
       });
       test('line3 has correct stroke', function() {
-        assert.equal(lines[0][3].getAttribute('stroke').split(' ').join(''),colors['grey3']);
+        assert.equal(lines.nodes()[3].getAttribute('stroke').split(' ').join(''),colors['grey3']);
       });
 
       test('line9 has correct fill', function() {
-        assert.equal(lines[0][9].getAttribute('fill'),'none');
+        assert.equal(lines.nodes()[9].getAttribute('fill'),'none');
       });
       test('line3 has correct stroke', function() {
-        assert.equal(lines[0][9].getAttribute('stroke').split(' ').join(''),colors['grey3']);
+        assert.equal(lines.nodes()[9].getAttribute('stroke').split(' ').join(''),colors['grey3']);
       });
     });
   }); //suite
@@ -176,28 +194,28 @@ function runTests(){
       //   assert.equal(lines[0].length,11);
       // });
       test('correct number of paths', function() {
-        assert.equal(path[0].length,0);
+        assert.equal(path.nodes().length,0);
       });
 
       test('line0 has correct fill', function() {
-        assert.equal(lines[0][0].getAttribute('fill'),'none');
+        assert.equal(lines.nodes()[0].getAttribute('fill'),'none');
       });
       test('line0 has correct stroke', function() {
-        assert.equal(lines[0][0].getAttribute('stroke').split(' ').join(''),colors['grey3']);
+        assert.equal(lines.nodes()[0].getAttribute('stroke').split(' ').join(''),colors['grey3']);
       });
 
       test('line3 has correct fill', function() {
-        assert.equal(lines[0][3].getAttribute('fill'),'none');
+        assert.equal(lines.nodes()[3].getAttribute('fill'),'none');
       });
       test('line3 has correct stroke', function() {
-        assert.equal(lines[0][3].getAttribute('stroke').split(' ').join(''),colors['grey3']);
+        assert.equal(lines.nodes()[3].getAttribute('stroke').split(' ').join(''),colors['grey3']);
       });
 
       test('line9 has correct fill', function() {
-        assert.equal(lines[0][9].getAttribute('fill'),'none');
+        assert.equal(lines.nodes()[9].getAttribute('fill'),'none');
       });
       test('line3 has correct stroke', function() {
-        assert.equal(lines[0][9].getAttribute('stroke').split(' ').join(''),colors['grey3']);
+        assert.equal(lines.nodes()[9].getAttribute('stroke').split(' ').join(''),colors['grey3']);
       });
     });
   }); //suite

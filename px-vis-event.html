@@ -13,6 +13,7 @@ d3 element which draws a line and icon on the chart representing an event.
 
     <px-vis-event
         svg="[[svg]]"
+        x-axis-type="[[xAxisType]]"
         clip-path="[[clipPath]]"
         event-id="[[item.id]]"
         chart-data="[[item]]"
@@ -206,8 +207,7 @@ The configureation object allows developers to set the icon used for each event 
         this.eventGroup = this.svg.append('g')
           .attr('class','event')
           .attr('event-id',this.eventId)
-          .attr('id','event_'+this.eventId);
-
+          .attr('id','event_' + this.eventId);
 
         // draw the path
         this.eventLine = this.eventGroup.append("line")
@@ -321,7 +321,7 @@ The configureation object allows developers to set the icon used for each event 
     _getValue: function(xAxisType) {
       if(xAxisType === 'time') {
         return ': ' + this._formatDatetime(this.eventData.time, this.firstDateTimeFormat) +
-          ' ' + this.separator + this._formatDatetime(this.eventData.time, this.secondDateTimeFormat);
+          ' ' + this.separator + ' ' + this._formatDatetime(this.eventData.time, this.secondDateTimeFormat);
       } else {
         return ': ' + this.eventData.time;
       }

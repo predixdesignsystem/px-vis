@@ -29,13 +29,30 @@ function runTests(){
           "left": 15
         },
         d = [{
-        "series": [
-          [1397102460000, 1],
-          [1397131620000, 6],
-          [1397160780000, 10],
-          [1397189940000, 4],
-          [1397219100000, 6]
-        ]}],
+              "x": 1397102460000,
+              "y": 1
+            },{
+              "x": 1397131620000,
+              "y": 6
+            },{
+              "x": 1397160780000,
+              "y": 10
+            },{
+              "x": 1397189940000,
+              "y": 4
+            },{
+              "x": 1397219100000,
+              "y": 6
+            }
+          ],
+          completeSeriesConfig = {"mySeries":{
+            "type":"line",
+            "name":"mySeries",
+            "x":"x",
+            "y":"y",
+            "color": "rgb(93,165,218)"
+          }},
+          chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         dE = [{
           "id": "123",
           "time": 1397131620000,
@@ -94,6 +111,8 @@ function runTests(){
       baseScale.set('width',w);
       baseScale.set('height',h);
       baseScale.set('margin',m);
+      baseScale.set('completeSeriesConfig',completeSeriesConfig);
+      baseScale.set('chartExtents',chartExtents);
       baseScale.set('chartData',d);
 
       defaultEvent.set('eventConfig',eventConfig);
@@ -104,12 +123,12 @@ function runTests(){
       noLabelEvent.set('eventConfig',eventConfig);
       offsetEvent.set('eventConfig',eventConfig);
 
-      defaultEvent.set('chartData',dE[3]);
-      faEvent.set('chartData',dE[2]);
-      uniEvent.set('chartData',dE[1]);
-      imgEvent.set('chartData',dE[0]);
-      noLabelEvent.set('chartData',dE[4]);
-      offsetEvent.set('chartData',dE[5]);
+      defaultEvent.set('eventData',dE[3]);
+      faEvent.set('eventData',dE[2]);
+      uniEvent.set('eventData',dE[1]);
+      imgEvent.set('eventData',dE[0]);
+      noLabelEvent.set('eventData',dE[4]);
+      offsetEvent.set('eventData',dE[5]);
 
       // setTimeout(function(){ done() }.bind(this),5000);
       done();
