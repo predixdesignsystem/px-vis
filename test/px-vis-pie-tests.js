@@ -37,21 +37,26 @@ function runTests(){
     });
 
     test('verify first slice path', function() {
-      var slice = basePie.pieGroup._groups[0][0].firstChild.firstChild.attributes['d'];
-      assert.equal(slice.value,'M1.3164953090834047e-14,-215A215,215,0,0,1,214.26566599643402,17.754559276551454L0,0Z');
+      var slicePath = basePie.pieGroup._groups[0][0].firstChild.firstChild.attributes['d'].value.split(/[\s,]+/).join(''),
+          normalPath = 'M1.3164953090834047e-14-215A215215001214.2656659964340217.754559276551454L00Z',
+          iePath = 'M1.3165e-014-215A215215001214.26617.7546L00Z';
+      assert.isTrue(slicePath === normalPath || slicePath === iePath);
     });
 
     test('pie has been initially translated by radius', function() {
-      var transform = basePie.pieGroup._groups[0][0].attributes['transform'].value;
-      debugger
-      assert.equal(transform,'translate(' + basePie._radius + ',' +  basePie._radius + ')');
+      var transform = basePie.pieGroup._groups[0][0].attributes['transform'].value.replace(',','').split(" ").join('');
+      assert.isTrue(transform.indexOf('translate(' + basePie._radius + basePie._radius + ')') !== -1);
     });
 
     test('pie has been translated by radius and rotated after animation', function(done) {
 
       setTimeout(function() {
-        var transform = basePie.pieGroup._groups[0][0].attributes['transform'].value;
-        assert.equal(transform,'translate(' + basePie._radius + ', ' +  basePie._radius + ') rotate(-180)');
+        var transform = basePie.pieGroup._groups[0][0].attributes['transform'].value.replace('scale(1)','').replace(',','').split(" ").join(''),
+            expected = 'translate(' + basePie._radius +  basePie._radius + ')rotate(-180)',
+            expectedIe = 'translate(' + basePie._radius +  basePie._radius + ')rotate(180)';
+
+        //opposite rotation for IE....
+        assert.isTrue(transform === expected || transform === expectedIe);
         assert.equal(basePie._currentRotationAngle, -Math.PI);
         done();
       }, 1500);
@@ -59,8 +64,10 @@ function runTests(){
 
     test('click on slice rotates pie', function(done) {
       var slice = basePie.pieGroup._groups[0][0].firstChild,
-          evt = new MouseEvent("tap"),
+          evt = document.createEvent("MouseEvent"),
           popover = Polymer.dom(basePie.root).querySelector('px-popover');
+
+      evt.initMouseEvent("tap",true,true,window,0,0,0,0,0,false,false,false,false,0,null);
 
       //popover hidden
       assert.isFalse(popover.classList.contains('fadeFromHidden'));
@@ -69,14 +76,16 @@ function runTests(){
       slice.dispatchEvent(evt);
 
       setTimeout(function() {
-        var transform = basePie.pieGroup._groups[0][0].attributes['transform'].value;
+        var transform = basePie.pieGroup._groups[0][0].attributes['transform'].value.split(' ').join('');
 
         assert.equal(parseFloat(basePie._radToDeg(basePie._currentRotationAngle)), -47.368421052631575);
         //find actual rotation from transform...
         var rot = transform.substr(transform.indexOf('rotate(')+7);
         rot = rot.substr(0, rot.indexOf(')'));
-        rot = parseFloat(rot).toFixed(1);
-        assert.equal(rot, -47.4);
+        rot = parseFloat(parseFloat(rot).toFixed(1));
+
+        //IE uses opposite
+        assert.isTrue(rot === -47.4 || rot === (360-47.4));
 
         //popover should be shown
         assert.isTrue(popover.classList.contains('fadeFromHidden'));
@@ -87,8 +96,10 @@ function runTests(){
 
     test('hover shows tooltip', function(done) {
       var slice = basePie.pieGroup._groups[0][0].firstChild,
-          evt = new MouseEvent("mouseover"),
+          evt = document.createEvent("MouseEvent"),
           tooltip = Polymer.dom(basePie.root).querySelector('px-tooltip');
+
+      evt.initMouseEvent("mouseover",true,true,window,0,0,0,0,0,false,false,false,false,0,null);
 
       //tooltip hidden
       assert.isFalse(tooltip.classList.contains('movedTooltip'));
@@ -106,8 +117,10 @@ function runTests(){
 
     test('mouseleave hides tooltip', function(done) {
       var slice = basePie.pieGroup._groups[0][0].firstChild,
-          evt = new MouseEvent("mouseleave"),
+          evt = document.createEvent("MouseEvent"),
           tooltip = Polymer.dom(basePie.root).querySelector('px-tooltip');
+
+      evt.initMouseEvent("mouseleave",true,true,window,0,0,0,0,0,false,false,false,false,0,null);
 
       //tooltip shown
       assert.isTrue(tooltip.classList.contains('movedTooltip'));
