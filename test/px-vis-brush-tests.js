@@ -17,15 +17,30 @@ function runTests(){
 
     suiteSetup(function(done){
       var d = [{
-        "series": [
-          [1397102460000, 1],
-          [1397131620000, 6],
-          [1397160780000, 10],
-          [1397189940000, 4],
-          [1397219100000, 6]
-        ]
-        }],
-        seriesConfig = {"0":{"type":"line","name":"mySeries"}},
+            "x": 1397102460000,
+            "y": 1
+          },{
+            "x": 1397131620000,
+            "y": 6
+          },{
+            "x": 1397160780000,
+            "y": 10
+          },{
+            "x": 1397189940000,
+            "y": 4
+          },{
+            "x": 1397219100000,
+            "y": 6
+          }
+        ],
+        completeSeriesConfig = {"mySeries":{
+          "type":"line",
+          "name":"mySeries",
+          "x":"x",
+          "y":"y",
+          "color": "rgb(93,165,218)"
+        }},
+        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
         h = 300,
         m = {
@@ -42,7 +57,8 @@ function runTests(){
       baseScale.set('width',w);
       baseScale.set('height',h);
       baseScale.set('margin',m);
-      baseScale.set('seriesConfig',seriesConfig);
+      baseScale.set('completeSeriesConfig',completeSeriesConfig);
+      baseScale.set('chartExtents',chartExtents);
       baseScale.set('chartData',d);
 
       baseBrush.set('height',h);
@@ -59,10 +75,9 @@ function runTests(){
       assert.isTrue(baseBrush._brush !== null);
     });
     test('baseBrush._brush extents are full', function() {
-      assert.deepEqual(baseBrush._brush.extent(),baseScale.currentDomainX);
-    });
-    test('baseBrush._brush x is correct', function() {
-      assert.deepEqual(baseBrush._brush.x(),baseScale.x);
+      var x1 = baseScale.x(baseScale.currentDomainX[0]),
+          x2 = baseScale.x(baseScale.currentDomainX[1]);
+      assert.deepEqual(Px.d3.brushSelection(baseBrush._brushGroup.node()),[x1,x2]);
     });
 
     test('baseBrush._brushGroup fixture is created', function() {
@@ -70,94 +85,91 @@ function runTests(){
     });
 
     test('baseBrush._brushGroup.rect fixture is created', function() {
-      assert.equal(baseBrush._brushGroup.select('rect').node().tagName, 'rect');
+      assert.equal(baseBrush._brushGroup.select('rect.selection').node().tagName, 'rect');
     });
     test('baseBrush._brushGroup.rect attr y', function() {
-      assert.equal(baseBrush._brushGroup.select('rect').attr('y'), 0);
+      assert.equal(baseBrush._brushGroup.select('rect.selection').attr('y'), 0);
     });
     test('baseBrush._brushGroup.rect attr height', function() {
-      assert.equal(baseBrush._brushGroup.select('rect').attr('height'), 294);
+      assert.equal(baseBrush._brushGroup.select('rect.selection').attr('height'), 295);
     });
     test('baseBrush._brushGroup.rect attr stroke', function() {
-      assert.equal(baseBrush._brushGroup.select('rect').attr('stroke').split(" ").join(''), colors.gray5);
+      assert.equal(baseBrush._brushGroup.select('rect.selection').attr('stroke').split(" ").join(''), colors.gray5);
     });
     test('baseBrush._brushGroup.rect attr fill', function() {
-      assert.equal(baseBrush._brushGroup.select('rect').attr('fill').split(" ").join(''), colors.black);
+      assert.equal(baseBrush._brushGroup.select('rect.selection').attr('fill').split(" ").join(''), colors.black);
     });
     test('baseBrush._brushGroup.rect attr fill-opacity', function() {
-      assert.equal(baseBrush._brushGroup.select('rect').attr('fill-opacity'), 0.1);
+      assert.equal(baseBrush._brushGroup.select('rect.selection').attr('fill-opacity'), 0.1);
     });
     test('baseBrush._brushGroup.rect attr x', function() {
-      assert.equal(baseBrush._brushGroup.select('rect').attr('x'), 0);
+      assert.equal(baseBrush._brushGroup.select('rect.selection').attr('x'), 0);
     });
     test('baseBrush._brushGroup.rect attr width', function() {
-      assert.equal(baseBrush._brushGroup.select('rect').attr('width'), 480);
+      assert.equal(baseBrush._brushGroup.select('rect.selection').attr('width'), 480);
     });
 
-    test('baseBrush._handleGroup is created', function() {
-      assert.equal(baseBrush._handleGroup.node().tagName,'g');
+    test('baseBrush._handleGroup is the rects', function() {
+      assert.equal(baseBrush._handleGroup.node().tagName,'rect');
     });
     test('baseBrush._handleGroup has correct number of handles', function() {
-      assert.equal(baseBrush._handleGroup[0].length,2);
+      assert.equal(baseBrush._handleGroup.nodes().length,2);
     });
 
-    test('baseBrush._handleGroup.rect is created', function() {
-      assert.equal(baseBrush._handleGroup.select('rect').node().tagName,'rect');
-    });
-    test('baseBrush._handleGroup.rect has correct x', function() {
-      assert.equal(baseBrush._handleGroup.select('rect').attr('x'),-4.5);
-    });
-    test('baseBrush._handleGroup.rect has correct y', function() {
-      assert.equal(baseBrush._handleGroup.select('rect').attr('y'),128);
-    });
-    test('baseBrush._handleGroup.rect has correct height', function() {
-      assert.equal(baseBrush._handleGroup.select('rect').attr('height'),32);
-    });
-    test('baseBrush._handleGroup.rect has correct width', function() {
-      assert.equal(baseBrush._handleGroup.select('rect').attr('width'),9);
-    });
+    // test('baseBrush._handleGroup.rect has correct x', function() {
+    //   assert.equal(baseBrush._handleGroup.select('rect').attr('x'),-4.5);
+    // });
+    // test('baseBrush._handleGroup.rect has correct y', function() {
+    //   assert.equal(baseBrush._handleGroup.select('rect').attr('y'),128);
+    // });
+    // test('baseBrush._handleGroup.rect has correct height', function() {
+    //   assert.equal(baseBrush._handleGroup.select('rect').attr('height'),32);
+    // });
+    // test('baseBrush._handleGroup.rect has correct width', function() {
+    //   assert.equal(baseBrush._handleGroup.select('rect').attr('width'),9);
+    // });
     test('baseBrush._handleGroup.rect has correct stroke', function() {
-      assert.equal(baseBrush._handleGroup.select('rect').attr('stroke').split(" ").join(''),colors.gray5);
+      assert.equal(baseBrush._handleGroup.attr('stroke').split(" ").join(''),colors.gray5);
     });
     test('baseBrush._handleGroup.rect has correct fill', function() {
-      assert.equal(baseBrush._handleGroup.select('rect').attr('fill').split(" ").join(''),colors.white);
+      assert.equal(baseBrush._handleGroup.attr('fill').split(" ").join(''),colors.white);
     });
 
-    test('baseBrush._handleGroup.lines are created', function() {
-      assert.equal(baseBrush._handleGroup.selectAll('line')[0].length,2);
-    });
-    test('baseBrush._handleGroup.lines[0] have correct x vals', function() {
-      assert.equal(baseBrush._handleGroup.selectAll('line')[0][0].getAttribute('x1'),1.5);
-      assert.equal(baseBrush._handleGroup.selectAll('line')[0][0].getAttribute('x2'),1.5);
-    });
-    test('baseBrush._handleGroup.lines[0] have correct y1 val', function() {
-      assert.equal(baseBrush._handleGroup.selectAll('line')[0][0].getAttribute('y1'),137);
-    });
-    test('baseBrush._handleGroup.lines[0] have correct y2 val', function() {
-      assert.equal(baseBrush._handleGroup.selectAll('line')[0][0].getAttribute('y2'),151);
-    });
-    test('baseBrush._handleGroup.lines[0] fill', function() {
-      assert.equal(baseBrush._handleGroup.selectAll('line')[0][0].getAttribute('fill'),'none');
-    });
-    test('baseBrush._handleGroup.lines[0] stroke', function() {
-      assert.equal(baseBrush._handleGroup.selectAll('line')[0][0].getAttribute('stroke').split(' ').join(''),colors.gray5);
-    });
-    test('baseBrush._handleGroup.lines[1] have correct x vals', function() {
-      assert.equal(baseBrush._handleGroup.selectAll('line')[0][1].getAttribute('x1'),-1.5);
-      assert.equal(baseBrush._handleGroup.selectAll('line')[0][1].getAttribute('x2'),-1.5);
-    });
-    test('baseBrush._handleGroup.lines[1] have correct y1 val', function() {
-      assert.equal(baseBrush._handleGroup.selectAll('line')[0][1].getAttribute('y1'),137);
-    });
-    test('baseBrush._handleGroup.lines[1] have correct y2 val', function() {
-      assert.equal(baseBrush._handleGroup.selectAll('line')[0][1].getAttribute('y2'),151);
-    });
-    test('baseBrush._handleGroup.lines[1] fill', function() {
-      assert.equal(baseBrush._handleGroup.selectAll('line')[0][1].getAttribute('fill'),'none');
-    });
-    test('baseBrush._handleGroup.lines[1] stroke', function() {
-      assert.equal(baseBrush._handleGroup.selectAll('line')[0][1].getAttribute('stroke').split(' ').join(''),colors.gray5);
-    });
+    // test('baseBrush._handleGroup.lines are created', function() {
+    //   assert.equal(baseBrush._handleGroup.selectAll('line')[0].length,2);
+    // });
+    // test('baseBrush._handleGroup.lines[0] have correct x vals', function() {
+    //   assert.equal(baseBrush._handleGroup.selectAll('line')[0][0].getAttribute('x1'),1.5);
+    //   assert.equal(baseBrush._handleGroup.selectAll('line')[0][0].getAttribute('x2'),1.5);
+    // });
+    // test('baseBrush._handleGroup.lines[0] have correct y1 val', function() {
+    //   assert.equal(baseBrush._handleGroup.selectAll('line')[0][0].getAttribute('y1'),137);
+    // });
+    // test('baseBrush._handleGroup.lines[0] have correct y2 val', function() {
+    //   assert.equal(baseBrush._handleGroup.selectAll('line')[0][0].getAttribute('y2'),151);
+    // });
+    // test('baseBrush._handleGroup.lines[0] fill', function() {
+    //   assert.equal(baseBrush._handleGroup.selectAll('line')[0][0].getAttribute('fill'),'none');
+    // });
+    // test('baseBrush._handleGroup.lines[0] stroke', function() {
+    //   assert.equal(baseBrush._handleGroup.selectAll('line')[0][0].getAttribute('stroke').split(' ').join(''),colors.gray5);
+    // });
+    // test('baseBrush._handleGroup.lines[1] have correct x vals', function() {
+    //   assert.equal(baseBrush._handleGroup.selectAll('line')[0][1].getAttribute('x1'),-1.5);
+    //   assert.equal(baseBrush._handleGroup.selectAll('line')[0][1].getAttribute('x2'),-1.5);
+    // });
+    // test('baseBrush._handleGroup.lines[1] have correct y1 val', function() {
+    //   assert.equal(baseBrush._handleGroup.selectAll('line')[0][1].getAttribute('y1'),137);
+    // });
+    // test('baseBrush._handleGroup.lines[1] have correct y2 val', function() {
+    //   assert.equal(baseBrush._handleGroup.selectAll('line')[0][1].getAttribute('y2'),151);
+    // });
+    // test('baseBrush._handleGroup.lines[1] fill', function() {
+    //   assert.equal(baseBrush._handleGroup.selectAll('line')[0][1].getAttribute('fill'),'none');
+    // });
+    // test('baseBrush._handleGroup.lines[1] stroke', function() {
+    //   assert.equal(baseBrush._handleGroup.selectAll('line')[0][1].getAttribute('stroke').split(' ').join(''),colors.gray5);
+    // });
   });
 
   suite('px-vis-brush brush resizes to the inputed domain', function() {
@@ -172,20 +184,22 @@ function runTests(){
     });
 
     test('baseBrush._brush extents match', function() {
-      assert.deepEqual(baseBrush._brush.extent(),[1397131620000,1397189940000]);
+      var x1 = baseScale.x(1397131620000),
+          x2 = baseScale.x(1397189940000);
+      assert.deepEqual(Px.d3.brushSelection(baseBrush._brushGroup.node()),[x1,x2]);
     });
     test('baseBrush._brushGroup.rect attr x', function() {
-      assert.equal(baseBrush._brushGroup.select('rect.extent').attr('x'), 120);
+      assert.equal(baseBrush._brushGroup.select('rect.selection').attr('x'), 120);
     });
     test('baseBrush._brushGroup.rect attr width', function() {
-      assert.equal(baseBrush._brushGroup.select('rect.extent').attr('width'), 240);
+      assert.equal(baseBrush._brushGroup.select('rect.selection').attr('width'), 240);
     });
   });
 
   suite('px-vis-brush click on navigator and the extent box should move to that point', function() {
     var baseBrush = document.getElementById('baseBrush');
     suiteSetup(function(done){
-      var rect = baseBrush._brushGroup.select('rect.background').node(),
+      var rect = baseBrush._brushGroup.select('rect.overlay').node(),
           box = rect.getBoundingClientRect();
 
       var e = document.createEvent("MouseEvent");
@@ -197,16 +211,18 @@ function runTests(){
     });
 
     test('baseBrush._brush extents match', function() {
-      var ext = baseBrush._brush.extent();
-      // giving it roughly 16.5 min margin or error
-      assert.closeTo(ext[0],1397102460000,1000000);
-      assert.closeTo(ext[1],1397160780000,1000000);
+      var ext = Px.d3.brushSelection(baseBrush._brushGroup.node()),
+          x1 = baseScale.x(1397102460000),
+          x2 = baseScale.x(1397160780000);
+
+      assert.closeTo(ext[0],x1,5);
+      assert.closeTo(ext[1],x2,5);
     });
     test('baseBrush._brushGroup.rect attr x', function() {
-      assert.closeTo(parseInt(baseBrush._brushGroup.select('rect.extent').attr('x')), 0, 5);
+      assert.closeTo(parseInt(baseBrush._brushGroup.select('rect.selection').attr('x')), 0, 5);
     });
     test('baseBrush._brushGroup.rect attr width', function() {
-      assert.equal(parseInt(baseBrush._brushGroup.select('rect.extent').attr('width')), 240);
+      assert.equal(parseInt(baseBrush._brushGroup.select('rect.selection').attr('width')), 240);
     });
   });
 
@@ -225,13 +241,15 @@ function runTests(){
     });
 
     test('baseBrush._brush extents are full', function() {
-      assert.deepEqual(baseBrush._brush.extent(),[1397102460000,1397219100000]);
+      var x1 = baseScale.x(1397102460000),
+          x2 = baseScale.x(1397219100000);
+      assert.deepEqual(Px.d3.brushSelection(baseBrush._brushGroup.node()),[x1,x2]);
     });
     test('baseBrush._brushGroup.rect attr x', function() {
-      assert.equal(baseBrush._brushGroup.select('rect.extent').attr('x'), 0);
+      assert.equal(baseBrush._brushGroup.select('rect.selection').attr('x'), 0);
     });
     test('baseBrush._brushGroup.rect attr width', function() {
-      assert.equal(baseBrush._brushGroup.select('rect.extent').attr('width'), 480);
+      assert.equal(baseBrush._brushGroup.select('rect.selection').attr('width'), 480);
     });
   });
 
@@ -254,14 +272,14 @@ function runTests(){
     });
 
     test('baseBrush._handleGroup rect stroke changes', function() {
-      assert.equal(baseBrush._handleGroup.select('rect.base').attr('stroke').split(' ').join(''), colors.gray6);
+      assert.equal(baseBrush._handleGroup.attr('stroke').split(' ').join(''), colors.gray6);
     });
     test('baseBrush._handleGroup rect fill changes', function() {
-      assert.equal(baseBrush._handleGroup.select('rect.base').attr('fill').split(' ').join(''), colors.gray5);
+      assert.equal(baseBrush._handleGroup.attr('fill').split(' ').join(''), colors.gray5);
     });
-    test('baseBrush._handleGroup lines stroke changes', function() {
-      assert.equal(baseBrush._handleGroup.select('line.handleLine').attr('stroke').split(' ').join(''), colors.gray6);
-    });
+    // test('baseBrush._handleGroup lines stroke changes', function() {
+    //   assert.equal(baseBrush._handleGroup.select('line.handleLine').attr('stroke').split(' ').join(''), colors.gray6);
+    // });
   });
 
   suite('px-vis-brush handle mouseleave ', function() {
@@ -285,14 +303,14 @@ function runTests(){
     });
 
     test('baseBrush. handle rect stroke changes', function() {
-      assert.equal(baseBrush._handleGroup.select('rect.base').attr('stroke').split(' ').join(''), colors.gray5);
+      assert.equal(baseBrush._handleGroup.attr('stroke').split(' ').join(''), colors.gray5);
     });
     test('baseBrush. handle rect fill changes', function() {
-      assert.equal(baseBrush._handleGroup.select('rect.base').attr('fill').split(' ').join(''), colors.white);
+      assert.equal(baseBrush._handleGroup.attr('fill').split(' ').join(''), colors.white);
     });
-    test('baseBrush. handle lines stroke changes', function() {
-      assert.equal(baseBrush._handleGroup.select('line.handleLine').attr('stroke').split(' ').join(''), colors.gray5);
-    });
+    // test('baseBrush. handle lines stroke changes', function() {
+    //   assert.equal(baseBrush._handleGroup.select('line.handleLine').attr('stroke').split(' ').join(''), colors.gray5);
+    // });
   });
 
   suite('px-vis-brush handle press ', function() {
@@ -317,14 +335,14 @@ function runTests(){
     });
 
     test('baseBrush._handleGroup rect stroke changes', function() {
-      assert.equal(baseBrush._handleGroup.select('rect.base').attr('stroke').split(' ').join(''), colors.gray7);
+      assert.equal(baseBrush._handleGroup.attr('stroke').split(' ').join(''), colors.gray7);
     });
     test('baseBrush._handleGroup rect fill changes', function() {
-      assert.equal(baseBrush._handleGroup.select('rect.base').attr('fill').split(' ').join(''), colors.gray6);
+      assert.equal(baseBrush._handleGroup.attr('fill').split(' ').join(''), colors.gray6);
     });
-    test('baseBrush._handleGroup lines stroke changes', function() {
-      assert.equal(baseBrush._handleGroup.select('line.handleLine').attr('stroke').split(' ').join(''), colors.gray7);
-    });
+    // test('baseBrush._handleGroup lines stroke changes', function() {
+    //   assert.equal(baseBrush._handleGroup.select('line.handleLine').attr('stroke').split(' ').join(''), colors.gray7);
+    // });
   });
 // TODO figure out how to test the brush events...
   // suite('px-vis-brush handle move ', function() {

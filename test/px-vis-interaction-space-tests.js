@@ -17,15 +17,30 @@ function runTests(){
 
     suiteSetup(function(done){
       var d = [{
-        "series": [
-          [1397102460000, 1],
-          [1397131620000, 6],
-          [1397160780000, 10],
-          [1397189940000, 4],
-          [1397219100000, 6]
-        ]
-        }],
-        seriesConfig = {"0":{"type":"line","name":"mySeries"}},
+            "x": 1397102460000,
+            "y": 1
+          },{
+            "x": 1397131620000,
+            "y": 6
+          },{
+            "x": 1397160780000,
+            "y": 10
+          },{
+            "x": 1397189940000,
+            "y": 4
+          },{
+            "x": 1397219100000,
+            "y": 6
+          }
+        ],
+        completeSeriesConfig = {"mySeries":{
+          "type":"line",
+          "name":"mySeries",
+          "x":"x",
+          "y":"y",
+          "color": "rgb(93,165,218)"
+        }},
+        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
         h = 300,
         m = {
@@ -48,12 +63,14 @@ function runTests(){
       baseScale.set('width',w);
       baseScale.set('height',h);
       baseScale.set('margin',m);
-      baseScale.set('seriesConfig',seriesConfig);
+      baseScale.set('completeSeriesConfig',completeSeriesConfig);
+      baseScale.set('chartExtents',chartExtents);
       baseScale.set('chartData',d);
 
       baseIS.set('margin',m);
       baseIS.set('width',w);
       baseIS.set('height',h);
+      baseIS.set('completeSeriesConfig',completeSeriesConfig);
       baseIS.set('chartData',d);
 
       // setTimeout(function(){done()},5000);
@@ -99,7 +116,7 @@ function runTests(){
       assert.equal(ttObj.data.yArr, null);
     });
     test('event data series.name', function() {
-      assert.equal(ttObj.data.series[0]['name'], '0');
+      assert.equal(ttObj.data.series[0]['name'], 'mySeries');
     });
     test('event data series.value', function() {
       assert.equal(JSON.stringify(ttObj.data.series[0]['value']), 'null');
@@ -129,7 +146,7 @@ function runTests(){
   }); //suite
 
   // TODO Figure out how to make this work in Edge
-
+  // 
   // suite('px-vis-interaction-space baseIS mouseover event', function() {
   //   var baseIS = document.getElementById('baseIS');
   //   var ttObj;
@@ -162,13 +179,13 @@ function runTests(){
   //     assert.equal(ttObj.method, 'set');
   //   });
   //   test('event data time', function() {
-  //     assert.equal(+ttObj.data.time, 1397163210000);
+  //     assert.equal(Number(ttObj.data.time), 1397160780000);
   //   });
   //   test('event data mousePos', function() {
   //     var arr = ttObj.data.mouse;
   //     // account for floating point rounding error
-  //     assert.closeTo(arr[0], 250, 1);
-  //     assert.closeTo(arr[1], 150, 1);
+  //     assert.closeTo(arr[0], 240, 1);
+  //     assert.closeTo(arr[1], 140, 1);
   //   });
   //   // maybe should be using 2 series data?
   //   test('event data xArr', function() {
@@ -181,7 +198,7 @@ function runTests(){
   //     assert.equal(ttObj.data.series[0]['name'], 'mySeries');
   //   });
   //   test('event data series.value', function() {
-  //     assert.equal(JSON.stringify(ttObj.data.series[0]['value']), '[1397160780000,10]');
+  //     assert.equal(JSON.stringify(ttObj.data.series[0]['value']), '{"x":1397160780000,"y":10}');
   //   });
   //   test('event data series.coord', function() {
   //     assert.equal(JSON.stringify(ttObj.data.series[0]['coord']), '[240,0]');
@@ -230,7 +247,7 @@ function runTests(){
       assert.equal(ttObj.data.yArr, null);
     });
     test('event data series.name', function() {
-      assert.equal(ttObj.data.series[0]['name'], '0');
+      assert.equal(ttObj.data.series[0]['name'], 'mySeries');
     });
     test('event data series.value', function() {
       assert.equal(JSON.stringify(ttObj.data.series[0]['value']), 'null');

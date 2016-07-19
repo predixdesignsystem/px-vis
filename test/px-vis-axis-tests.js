@@ -16,27 +16,31 @@ function runTests(){
         baseYAxis = document.getElementById('baseYAxis');
 
     suiteSetup(function(done){
-      var d = [
-          {
-            'x': 1397102460000,
-            'y' 1
+      var d = [{
+            "x": 1397102460000,
+            "y": 1
           },{
-            'x': 1397131620000,
-            'y' 6
+            "x": 1397131620000,
+            "y": 6
           },{
-            'x': 1397160780000,
-            'y' 10
+            "x": 1397160780000,
+            "y": 10
           },{
-            'x': 1397189940000,
-            'y' 4
+            "x": 1397189940000,
+            "y": 4
           },{
-            'x': 1397219100000,
-            'y' 6
+            "x": 1397219100000,
+            "y": 6
           }
         ],
-        seriesConfig = {
-          "mySeries":{"type":"line","name":"mySeries",color:'rgb(123,123,123)'}
-        },
+        completeSeriesConfig = {"mySeries":{
+          "type":"line",
+          "name":"mySeries",
+          "x":"x",
+          "y":"y",
+          "color": "rgb(93,165,218)"
+        }},
+        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
         h = 300,
         m = {
@@ -52,12 +56,14 @@ function runTests(){
       baseScale.set('width',w);
       baseScale.set('height',h);
       baseScale.set('margin',m);
-      baseScale.set('seriesConfig',seriesConfig);
+      baseScale.set('completeSeriesConfig',completeSeriesConfig);
+      baseScale.set('chartExtents',chartExtents);
       baseScale.set('chartData',d);
 
       baseXAxis.set('margin',m);
 
       baseYAxis.set('margin',m);
+      baseYAxis.set('completeSeriesConfig',completeSeriesConfig);
       baseYAxis.set('chartData',d);
       // setTimeout(function(){done()},5000);
       done();
@@ -85,14 +91,14 @@ function runTests(){
       assert.equal(baseXAxis.axisId.split('_')[0],'axis');
     });
 
-    test('baseXAxis _axis orientation', function() {
-      assert.equal(baseXAxis._axis.orient(),'bottom');
+    // test('baseXAxis _axis orientation', function() {
+    //   assert.equal(baseXAxis._axis.orient(),'bottom');
+    // });
+    test('baseXAxis _axis tickSizeOuter', function() {
+      assert.equal(baseXAxis._axis.tickSizeOuter(),0);
     });
-    test('baseXAxis _axis outerTickSize', function() {
-      assert.equal(baseXAxis._axis.outerTickSize(),0);
-    });
-    test('baseXAxis _axis innerTickSize', function() {
-      assert.equal(baseXAxis._axis.innerTickSize(),6);
+    test('baseXAxis _axis tickSizeInner', function() {
+      assert.equal(baseXAxis._axis.tickSizeInner(),6);
     });
 
     test('baseXAxis translateAmt', function() {
@@ -122,7 +128,7 @@ function runTests(){
       //   assert.equal(lines[0].length,11);
       // });
       test('correct number of paths', function() {
-        assert.equal(path[0].length,1);
+        assert.equal(path.nodes().length,1);
       });
 
       test('path has correct fill', function() {
@@ -133,24 +139,24 @@ function runTests(){
       });
 
       test('line0 has correct fill', function() {
-        assert.equal(lines[0][0].getAttribute('fill'),'none');
+        assert.equal(lines.nodes()[0].getAttribute('fill'),'none');
       });
       test('line0 has correct stroke', function() {
-        assert.equal(lines[0][0].getAttribute('stroke').split(' ').join(''),colors['grey9']);
+        assert.equal(lines.nodes()[0].getAttribute('stroke').split(' ').join(''),colors['grey9']);
       });
 
       test('line3 has correct fill', function() {
-        assert.equal(lines[0][3].getAttribute('fill'),'none');
+        assert.equal(lines.nodes()[3].getAttribute('fill'),'none');
       });
       test('line3 has correct stroke', function() {
-        assert.equal(lines[0][3].getAttribute('stroke').split(' ').join(''),colors['grey9']);
+        assert.equal(lines.nodes()[3].getAttribute('stroke').split(' ').join(''),colors['grey9']);
       });
 
       test('line9 has correct fill', function() {
-        assert.equal(lines[0][9].getAttribute('fill'),'none');
+        assert.equal(lines.nodes()[9].getAttribute('fill'),'none');
       });
       test('line3 has correct stroke', function() {
-        assert.equal(lines[0][9].getAttribute('stroke').split(' ').join(''),colors['grey9']);
+        assert.equal(lines.nodes()[9].getAttribute('stroke').split(' ').join(''),colors['grey9']);
       });
     });
 
@@ -192,14 +198,14 @@ function runTests(){
       assert.equal(baseYAxis.axisId.split('_')[0],'axis');
     });
 
-    test('baseYAxis _axis orientation', function() {
-      assert.equal(baseYAxis._axis.orient(),'left');
+    // test('baseYAxis _axis orientation', function() {
+    //   assert.equal(baseYAxis._axis.orient(),'left');
+    // });
+    test('baseYAxis _axis tickSizeOuter', function() {
+      assert.equal(baseYAxis._axis.tickSizeOuter(),0);
     });
-    test('baseYAxis _axis outerTickSize', function() {
-      assert.equal(baseYAxis._axis.outerTickSize(),0);
-    });
-    test('baseYAxis _axis innerTickSize', function() {
-      assert.equal(baseYAxis._axis.outerTickSize(),0);
+    test('baseYAxis _axis tickSizeInner', function() {
+      assert.equal(baseYAxis._axis.tickSizeInner(),6);
     });
 
     test('baseYAxis translateAmt', function() {
@@ -221,10 +227,10 @@ function runTests(){
       })
 
       test('correct number of lines', function() {
-        assert.equal(lines[0].length,11);
+        assert.equal(lines.nodes().length,11);
       });
       test('correct number of paths', function() {
-        assert.equal(path[0].length,1);
+        assert.equal(path.nodes().length,1);
       });
 
       test('path has correct fill', function() {
@@ -235,24 +241,24 @@ function runTests(){
       });
 
       test('line0 has correct fill', function() {
-        assert.equal(lines[0][0].getAttribute('fill'),'none');
+        assert.equal(lines.nodes()[0].getAttribute('fill'),'none');
       });
       test('line0 has correct stroke', function() {
-        assert.equal(lines[0][0].getAttribute('stroke').split(' ').join(''),colors['grey9']);
+        assert.equal(lines.nodes()[0].getAttribute('stroke').split(' ').join(''),colors['grey9']);
       });
 
       test('line3 has correct fill', function() {
-        assert.equal(lines[0][3].getAttribute('fill'),'none');
+        assert.equal(lines.nodes()[3].getAttribute('fill'),'none');
       });
       test('line3 has correct stroke', function() {
-        assert.equal(lines[0][3].getAttribute('stroke').split(' ').join(''),colors['grey9']);
+        assert.equal(lines.nodes()[3].getAttribute('stroke').split(' ').join(''),colors['grey9']);
       });
 
       test('line9 has correct fill', function() {
-        assert.equal(lines[0][9].getAttribute('fill'),'none');
+        assert.equal(lines.nodes()[9].getAttribute('fill'),'none');
       });
       test('line3 has correct stroke', function() {
-        assert.equal(lines[0][9].getAttribute('stroke').split(' ').join(''),colors['grey9']);
+        assert.equal(lines.nodes()[9].getAttribute('stroke').split(' ').join(''),colors['grey9']);
       });
     });
 
@@ -280,7 +286,7 @@ function runTests(){
 
     test('Title series bars draw', function() {
       var bar = baseYAxis._titleGroup.select('rect');
-      assert.equal(bar[0].length,1);
+      assert.equal(bar.nodes().length,1);
     });
     test('Title series bars fill', function() {
       var bar = baseYAxis._titleGroup.select('rect');
@@ -292,7 +298,7 @@ function runTests(){
     });
     test('Title series bars id', function() {
       var bar = baseYAxis._titleGroup.select('rect');
-      assert.equal(bar.attr('series-bar-id'),'bar_0');
+      assert.equal(bar.attr('series-bar-id'),'bar_mySeries');
     });
     test('Title series bars translate', function() {
       var bar = baseYAxis._titleGroup.select('rect'),
@@ -457,7 +463,7 @@ function runTests(){
 
     suiteSetup(function(){
       var mutedSeries = {
-        "0":true
+        "mySeries":true
       };
       baseYAxis.set('mutedSeries',mutedSeries);
     });
@@ -473,7 +479,7 @@ function runTests(){
 
     suiteSetup(function(done){
       var mutedSeries = {
-        "0":false
+        "mySeries":false
       };
       baseYAxis.set('mutedSeries',mutedSeries);
       setTimeout(function(){done()},100)
