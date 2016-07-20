@@ -50,6 +50,7 @@
           <template is="dom-bind" item="[[item]]">
             <div class="layout u-ml u-mr">
               <h3>[[item.title]]</h3>
+
             </div>
             <div class="layout u-ml u-mr u-mb+">
               <div class="layout__item u-ml u-mr u-mb+">
@@ -88,10 +89,10 @@
                     px-svg-elem="{{pxSvgElem}}">
                   </px-vis-svg>
                   <px-vis-scale
-                    x-scale="time"
-                    y-scale="linear"
+                    x-axis-type="time"
+                    y-axis-type="linear"
                     complete-series-config="[[item.basic.seriesConfig]]"
-                    chart-extents="[[item.basic.chartExtents]]"
+                    chart-extents="[[item.chartExtents]]"
                     width="[[item.basic.width]]"
                     height="[[item.basic.height]]"
                     margin="[[item.basic.margin]]"
@@ -177,6 +178,7 @@
                 <template is="dom-if" if="{{item.event}}">
                   <px-vis-event
                     svg="[[svg]]"
+                    x-axis-type="time"
                     event-id="[[item.event1.id]]"
                     event-data="[[item.event1]]"
                     x="[[x]]"
@@ -187,6 +189,7 @@
                   </px-vis-event>
                   <px-vis-event
                     svg="[[svg]]"
+                    x-axis-type="time"
                     event-id="[[item.event2.id]]"
                     event-data="[[item.event2]]"
                     x="[[x]]"
@@ -197,6 +200,7 @@
                   </px-vis-event>
                   <px-vis-event
                     svg="[[svg]]"
+                    x-axis-type="time"
                     event-id="[[item.event3.id]]"
                     event-data="[[item.event3]]"
                     x="[[x]]"
@@ -207,6 +211,7 @@
                   </px-vis-event>
                   <px-vis-event
                     svg="[[svg]]"
+                    x-axis-type="time"
                     event-id="[[item.event4.id]]"
                     event-data="[[item.event4]]"
                     x="[[x]]"
@@ -241,6 +246,7 @@
 
                 <template is="dom-if" if="{{item.interaction}}">
                   <px-vis-interaction-space
+                    x-axis-type="time"
                     svg="[[svg]]"
                     width="[[item.basic.width]]"
                     height="[[item.basic.height]]"
@@ -277,7 +283,6 @@
                     width="[[item.basic.width]]"
                     type="horizontal"
                     complete-series-config="[[item.basic.seriesConfig]]"
-                    chart-data=[[item.basic.chartData]]
                     tooltip-data=[[item.tooltipData]]
                     x-axis-type="time">
                   </px-vis-register>
@@ -290,7 +295,6 @@
                     units="Hz"
                     type="vertical"
                     complete-series-config="[[item.basic.seriesConfig]]"
-                    chart-data=[[item.basic.chartData]]
                     tooltip-data=[[item.tooltipData]]
                     muted-series="[[item.mutedSeries]]"
                     x-axis-type="time">
@@ -303,7 +307,6 @@
                     height="[[item.basic.height]]"
                     type="horizontal"
                     complete-series-config="[[item.basic.seriesConfig]]"
-                    chart-data=[[item.basic.chartData]]
                     tooltip-data=[[tooltipData]]
                     muted-series="{{mutedSeries}}"
                     x-axis-type="time">
@@ -331,8 +334,8 @@
 
                 <template is="dom-if" if="{{item.navigator}}">
                   <px-vis-chart-navigator
-                    x-scale="time"
-                    y-scale="linear"
+                    x-axis-type="time"
+                    y-axis-type="linear"
                     width="[[item.basic.width]]"
                     height="100"
                     margin="[[item.basic.margin]]"
@@ -409,14 +412,14 @@
               "type": "line",
               "x": 'x',
               "y": 'y',
-              'color': 'rgb(100,50,250)'
+              'color': 'rgb(93,165,218)'
             }
-          },
-          chartExtents: {
-            "x": [Infinity,-Infinity],
-            "y": [0,-Infinity]
-          }};
-
+          }
+        };
+        var chartExtents = {
+          "x": [Infinity,-Infinity],
+          "y": [0,-Infinity]
+        };
 
         var demos = [];
 // SVG #############################################################################################
@@ -436,6 +439,7 @@
             { 'name':'margin', 'value':basic.marginCode }
           ],
           "basic":basic,
+          "chartExtents":chartExtents,
           "outline":"outline"
         });
 
@@ -459,6 +463,7 @@
             { 'name':'chart-data', 'value':basic.chartDataCode }
           ],
           "basic":basic,
+          "chartExtents":chartExtents,
           "outline":"outline"
         });
 
@@ -479,7 +484,8 @@
             { 'name':'current-domain-x', 'value':"[[currentDomainX]]" },
             { 'name':'current-domain-y', 'value':"[[currentDomainY]]" }
           ],
-          "basic":basic
+          "basic":basic,
+          "chartExtents":chartExtents
         });
 
 // Scatter #########################################################################################
@@ -499,6 +505,7 @@
             { 'name':'current-domain-x', 'value':"[[currentDomainX]]" },
             { 'name':'current-domain-y', 'value':"[[currentDomainY]]" }
           ],
+          "chartExtents":chartExtents,
           "basic":basic
         });
 
@@ -526,6 +533,7 @@
             { 'name':'label-position', 'value': "after" },
             { 'name':'current-domain', 'value':"[[currentDomainX]]" }
           ],
+          "chartExtents":chartExtents,
           "basic":JSON.parse(JSON.stringify(basic))
         });
         demos[demos.length-1]['basic']['margin']['bottom'] = 40;
@@ -554,6 +562,7 @@
             { 'name':'chart-data', 'value': basic.chartDataCode },
             { 'name':'current-domain', 'value':"[[currentDomainY]]" }
           ],
+          "chartExtents":chartExtents,
           "basic":JSON.parse(JSON.stringify(basic))
         });
         demos[demos.length-1]['basic']['margin']['left'] = 60;
@@ -575,6 +584,7 @@
             { 'name':'orientation', 'value': "bottom" },
             { 'name':'current-domain', 'value':"[[currentDomainX]]" }
           ],
+          "chartExtents":chartExtents,
           "basic":basic
         });
 
@@ -595,6 +605,7 @@
             { 'name':'orientation', 'value': "left" },
             { 'name':'current-domain', 'value':"[[currentDomainY]]" }
           ],
+          "chartExtents":chartExtents,
           "basic":basic
         });
 
@@ -632,6 +643,7 @@
             { 'name':'current-domain-x', 'value':"[[currentDomainX]]" },
             { 'name':'current-domain-y', 'value':"[[currentDomainY]]" }
           ],
+          "chartExtents":chartExtents,
           "basic":JSON.parse(JSON.stringify(basic)),
           "event1": {
             "id": "123",
@@ -697,6 +709,7 @@
             { 'name':'current-domain-x', 'value':"[[currentDomainX]]" },
             { 'name':'current-domain-y', 'value':"[[currentDomainY]]" }
           ],
+          "chartExtents":chartExtents,
           "basic":basic,
           'thresholdData':[
             { "for":"mySeries", "type":"mean", "value":0.5 },
@@ -725,6 +738,7 @@
             { 'name':'chart-data', 'value': basic.chartDataCode },
             { 'name':'tooltip-data', 'value': "{{tooltipData}}" }
           ],
+          "chartExtents":chartExtents,
           "basic":basic,
           "outline":"outline"
         });
@@ -752,12 +766,13 @@
             { 'name':'tooltip-data', 'value': "{\
                 'time': timestamp,\
                 'series': [ \
-                  {'name':'seriesName0','value': [1464730597421,10.0] }, \
-                  {'name':'seriesName1','value': [1464730597421,12.2] }, \
-                  {'name':'seriesName2','value': [1464730597421,8.7] }, \
+                  {'name':'mySeries','coords': [100,50] }, \
+                  {'name':'seriesName1','coords': [100,30] }, \
+                  {'name':'seriesName2','coords': [100,41] }, \
                 ]}"
             }
           ],
+          "chartExtents":chartExtents,
           "basic":basic,
           "outline":"outline"
         });
@@ -778,19 +793,20 @@
             { 'name':'tooltip-data', 'value': "{\
                 'time': timestamp,\
                 'series': [ \
-                  {'name':'mySeries','value': [1464730597421,10.0] }, \
-                  {'name':'seriesName1','value': [1464730597421,12.2] }, \
-                  {'name':'seriesName2','value': [1464730597421,8.7] }, \
+                  {'name':'mySeries','value': {'x': 1464730597421,'y': 10.0} }, \
+                  {'name':'seriesName1','value': {'x': 1464730597421,'y': 12.2} }, \
+                  {'name':'seriesName2','value': {'x':1464730597421,'y': 8.7} }, \
                 ]}"
             }
           ],
+          "chartExtents":chartExtents,
           "basic":JSON.parse(JSON.stringify(basic)),
           "tooltipData": {
             'time': moment().format(),
             'series': [
-              {'name':'mySeries','value': [1464730597421,10.0] },
-              {'name':'seriesName1','value': [1464730597421,12.2] },
-              {'name':'seriesName2','value': [1464730597421,8.7] },
+              {'name':'mySeries','value': {"x": 1464730597421,"y": 10.0} },
+              {'name':'seriesName1','value': {"x": 1464730597421,"y": 12.2} },
+              {'name':'seriesName2','value': {"x":1464730597421,"y": 8.7} },
             ]
           },
           "mutedSeries": {
@@ -798,8 +814,8 @@
               'seriesName2':false,
           }
         });
-        demos[demos.length-1]['basic']['seriesConfig']['seriesName1'] = {"name":"seriesName1","color":"rgb(230,21,75)"};
-        demos[demos.length-1]['basic']['seriesConfig']['seriesName2'] ={ "name":"seriesName2", "color":"rgb(100,210,75)"};
+        demos[demos.length-1]['basic']['seriesConfig']['seriesName1'] = {"name":"seriesName1","color":"rgb(250,164,58)","y":"y"};
+        demos[demos.length-1]['basic']['seriesConfig']['seriesName2'] ={ "name":"seriesName2", "color":"rgb(100,210,75)","y":"y"};
 
 // REGISTER side ###################################################################################
 
@@ -818,9 +834,9 @@
             { 'name':'tooltip-data', 'value': "{\
                 'time': timestamp,\
                 'series': [ \
-                  {'name':'mySeries','value': [1464730597421,10.0] }, \
-                  {'name':'seriesName1','value': [1464730597421,12.2] }, \
-                  {'name':'seriesName2','value': [1464730597421,8.7] }, \
+                  {'name':'mySeries','value': {'x': 1464730597421,'y': 10.0} }, \
+                  {'name':'seriesName1','value': {'x': 1464730597421,'y': 12.2} }, \
+                  {'name':'seriesName2','value': {'x':1464730597421,'y': 8.7} }, \
                 ]}"
             },
             { 'name':'muted-series', 'value': "{\
@@ -829,13 +845,14 @@
               }"
             }
           ],
+          "chartExtents":chartExtents,
           "basic":JSON.parse(JSON.stringify(basic)),
           "tooltipData": {
             'time': moment().format(),
             'series': [
-                {'name':'mySeries','value': [1464730597421,10.0] },
-                {'name':'seriesName1','value': [1464730597421,12.2] },
-                {'name':'seriesName2','value': [1464730597421,8.7] },
+              {'name':'mySeries','value': {"x": 1464730597421,"y": 10.0} },
+              {'name':'seriesName1','value': {"x": 1464730597421,"y": 12.2} },
+              {'name':'seriesName2','value': {"x":1464730597421,"y": 8.7} },
             ]
           },
           "mutedSeries": {
@@ -843,8 +860,9 @@
               'seriesName2':false,
           }
         });
-        demos[demos.length-1]['basic']['seriesConfig']['seriesName1'] = {"name":"seriesName1","color":"rgb(230,21,75)"};
-        demos[demos.length-1]['basic']['seriesConfig']['seriesName2'] ={ "name":"seriesName2", "color":"rgb(100,210,75)"};
+        demos[demos.length-1]['basic']['seriesConfig']['seriesName1'] = {"name":"seriesName1","color":"rgb(250,164,58)","y":"y"};
+        demos[demos.length-1]['basic']['seriesConfig']['seriesName2'] ={ "name":"seriesName2", "color":"rgb(100,210,75)","y":"y"};
+
 
 // REGISTER Dynamic ################################################################################
 
@@ -867,42 +885,44 @@
             { 'name':'muted-series', 'value': "{{mutedSeries}}"
             }
           ],
+          "chartExtents":chartExtents,
           "basic":basic
         });
 
 // TOOLTIP #########################################################################################
 
-        demos.push({
-          "title": "px-vis-tooltip",
-          "descriptionText" : [
-            "The tooltip provides similar data display functionality to the register, but on chart and without the user interaction."
-          ],
-          "elemType" : "register",
-          "svg": true,
-          "interaction": true,
-          "line": true,
-          "tooltip" : true,
-          "config" : [
-            { 'name':'width', 'value':basic.width },
-            { 'name':'height', 'value':50 },
-            { 'name':'type', 'value':'vertical' },
-            { 'name':'units', 'value':"Hz" },
-            { 'name':'tooltip-data', 'value': "{\
-                'time': timestamp,\
-                'series': [ \
-                  {'name':'seriesName0','value': [1464730597421,10.0] }, \
-                  {'name':'seriesName1','value': [1464730597421,12.2] }, \
-                  {'name':'seriesName2','value': [1464730597421,8.7] }, \
-                ]}"
-            },
-            { 'name':'muted-series', 'value': "{\
-              'seriesName1':true, \
-              'seriesName2':false, \
-              }"
-            }
-          ],
-          "basic":basic
-        });
+        // demos.push({
+        //   "title": "px-vis-tooltip",
+        //   "descriptionText" : [
+        //     "The tooltip provides similar data display functionality to the register, but on chart and without the user interaction."
+        //   ],
+        //   "elemType" : "register",
+        //   "svg": true,
+        //   "interaction": true,
+        //   "line": true,
+        //   "tooltip" : true,
+        //   "config" : [
+        //     { 'name':'width', 'value':basic.width },
+        //     { 'name':'height', 'value':50 },
+        //     { 'name':'type', 'value':'vertical' },
+        //     { 'name':'units', 'value':"Hz" },
+        //     { 'name':'tooltip-data', 'value': "{\
+        //         'time': timestamp,\
+        //         'series': [ \
+        //           {'name':'seriesName0','value': [1464730597421,10.0] }, \
+        //           {'name':'seriesName1','value': [1464730597421,12.2] }, \
+        //           {'name':'seriesName2','value': [1464730597421,8.7] }, \
+        //         ]}"
+        //     },
+        //     { 'name':'muted-series', 'value': "{\
+        //       'seriesName1':true, \
+        //       'seriesName2':false, \
+        //       }"
+        //     }
+        //   ],
+        //   "chartExtents":chartExtents,
+        //   "basic":basic
+        // });
 
 // ZOOM ############################################################################################
 
@@ -935,6 +955,7 @@
               }"
             }
           ],
+          "chartExtents":chartExtents,
           "basic":basic
         });
 
@@ -956,10 +977,9 @@
             { 'name':'chart-domain-x', 'value':"[[currentDomainX]]" },
             { 'name':'chart-domain-y', 'value':"[[currentDomainY]]" }
           ],
-          "basic":JSON.parse(JSON.stringify(basic))
+          "chartExtents":chartExtents,
+          "basic":basic
         });
-        demos[demos.length-1]['basic']['chartData'][0]['type'] = "line";
-        demos[demos.length-1]['basic']['chartData'][0]['seriesNumber'] = 0;
 
 
 // FIN ############################################################################################
