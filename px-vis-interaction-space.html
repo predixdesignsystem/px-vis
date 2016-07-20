@@ -355,11 +355,27 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      */
     _getOrdinalValue: function(xAxis, mousePos) {
       //TODO: try getting the closest one rather than the one directly on the left
-      if(xAxis === true) {
-        return this.x.domain()[Math.max(Px.d3.bisect(this.x.range(), mousePos) - 1, 0)];
-      } else {
-        return this.y.domain()[Math.max(Px.d3.bisect(this.y.range(), mousePos) - 1, 0)];
+      var domain = xAxis ? this.x.domain() : this.y.domain(),
+          range = xAxis ? this.x.range() : this.y.range();
+
+      rangeInterval = (range[1] - range[0])/domain.length;
+
+      var axisPos = 0,
+          distance = Number.MAX_VALUE,
+          minDistance = Number.MAX_VALUE,
+          result = -1;
+      for(var index=0; index<domain.length; index++) {
+
+        axisPos = (index+0.5)*rangeInterval;
+        distance = Math.abs(axisPos - mousePos);
+
+        if(distance < minDistance) {
+          minDistance = distance;
+          result = index;
+        }
       }
+
+      return domain[result];
     },
     /**
      * Gets the range of all ordinal values between from and to (both being values of the axis)
