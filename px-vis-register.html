@@ -16,7 +16,7 @@ You can turn series on the chart off by clicking on that series in the register.
 
     <px-vis-register
         height="50"
-        units="[[units]]"
+        use-percentage="true"
         width="[[width]]"
         type="horizontal"
         tooltip-data=[[tooltipData]]
@@ -106,15 +106,16 @@ Formatting for the timestamps,the data values, and the series names can be contr
                           default-currency-format="[[numberFormatCurrency]]"
                           zero-format="[[numberFormatZero]]">
                         </numbro-element>
-                        <template is="dom-if" if="[[_returnVal(item, 'x')]]">
-                          &nbsp;/&nbsp
-                        </template>
                       </template>
                       <!-- if x axis is ordinal just display it -->
                       <template is="dom-if" if="{{_isOfType(xAxisType, 'ordinal')}}">
-                        <span>[[_returnVal(item, 'x', '&nbsp;/&nbsp')]]</span>
+                        <span>[[_returnVal(item, 'x')]]</span>
                       </template>
                       <!-- if x axis is time don't display it -->
+                      <template is="dom-if" if="{{_returnVal(item, 'x')}}">{{_getXUnit(item, completeSeriesConfig)}}</template>
+                      <template is="dom-if" if="[[_returnVal(item, 'x')]]">
+                        &nbsp;/&nbsp
+                      </template>
                       <!-- if y axis is number format and show it -->
                       <template is="dom-if" if="{{_isOfType(yAxisType, 'linear')}}">
                         <numbro-element
@@ -130,7 +131,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
                       <template is="dom-if" if="{{_isOfType(yAxisType, 'ordinal')}}">
                         <span>[[_returnVal(item, 'y')]]</span>
                       </template>
-                      <template is="dom-if" if="{{item.value}}">{{units}}</template>
+                      <template is="dom-if" if="{{_returnVal(item, 'y')}}">{{_getYUnit(item, completeSeriesConfig)}}</template>
                     </div>
                   </span>
               </span>
@@ -155,7 +156,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
                     <!-- Display serie data differently depending on x and y axis types -->
                     <div class="seriesData" name$="R{{_returnPieVal(item, 'y', '', usePercentage)}}">
                       <span>[[_returnPieVal(item, 'x', '', usePercentage)]]</span>
-                      <template is="dom-if" if="{{_returnPieVal(item, 'x', '', usePercentage)}}">{{_internalUnits}}</template>
+                      <template is="dom-if" if="{{_returnPieVal(item, 'x', '', usePercentage)}}">{{_getPieUnit(usePercentage)}}</template>
                     </div>
                   </div>
               </span>
@@ -182,7 +183,6 @@ Formatting for the timestamps,the data values, and the series names can be contr
       PxVisBehavior.axisTypes,
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.commonMethods,
-      PxVisBehavior.units,
       commonColors
     ],
 
@@ -253,6 +253,13 @@ Formatting for the timestamps,the data values, and the series names can be contr
       _separator:{
         type:String,
         notify:true
+      },
+      /**
+       * For pie charts whether the values should be displayed in %
+       */
+      usePercentage: {
+        type: Boolean,
+        value: false
       }
     },
 
@@ -440,6 +447,18 @@ Formatting for the timestamps,the data values, and the series names can be contr
     },
     _isOfType: function(toTest, type) {
       return toTest === type;
+    },
+    _getXUnit: function(item, completeSeriesConfig) {
+      return completeSeriesConfig[item.name].xAxisUnit ? completeSeriesConfig[item.name].xAxisUnit : '';
+    },
+    _getYUnit: function(item, completeSeriesConfig) {
+      return completeSeriesConfig[item.name].yAxisUnit ? completeSeriesConfig[item.name].yAxisUnit : '';
+    },
+    _getPieUnit: function(usePercentage) {
+      //pie should have only one config bit.
+      var key = Object.keys(this.completeSeriesConfig)[0],
+          unit = this.completeSeriesConfig[key].xAxisUnit;
+      return usePercentage ? '%' : unit;
     }
   });
 </script>
