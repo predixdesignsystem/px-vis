@@ -308,8 +308,10 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                     if(d < minDist) {
                       minDist = d;
                       //store this point
-                      result[xKey] = x2;
-                      result[yKey] = y2;
+                      //Warning: You can't reuse x2 and y2! their values are changed
+                      //during the calculation, hence needing to refetch from array
+                      result[xKey] = this.chartData[j][xKey];
+                      result[yKey] = this.chartData[j][yKey];
                     }
                   }
                 }

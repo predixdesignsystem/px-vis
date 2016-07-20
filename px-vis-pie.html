@@ -37,7 +37,7 @@ Element which draws scatter series onto the chart
       <!-- Title in the middle -->
       <div id="title" class$="[[_getTitleClass(showTitle)]]">
         <span id="totalTitle">Total</span>
-        <span id="totalValue">{{total}} {{units}}</span>
+        <span id="totalValue">{{total}} {{_getUnit(completeSeriesConfig, seriesId)}}</span>
       </div>
       <!-- tooltip elem -->
       <px-tooltip id="tooltip" orientation="top" delay="10" for="tooltipAnchor">
@@ -63,7 +63,6 @@ Element which draws scatter series onto the chart
       PxVisBehavior.commonMethods,
       PxVisBehavior.sizing,
       PxVisBehavior.dataset,
-      PxVisBehavior.units,
       PxVisBehavior.completeSeriesConfig,
       commonColors
     ],
@@ -192,6 +191,20 @@ Element which draws scatter series onto the chart
       _currentRotationAngle: {
         type:Number,
         value:0
+      },
+      /**
+       * whether the values should be displayed in %
+       */
+      usePercentage: {
+        type: Boolean,
+        value: false
+      },
+      /**
+       * Unit currently in use: unit or %
+       */
+      _internalUnits: {
+        type: String,
+        computed: '_computeInternalUnits(completeSeriesConfig, seriesId, usePercentage)'
       }
     },
 
@@ -389,6 +402,12 @@ Element which draws scatter series onto the chart
       }
 
       return classList;
+    },
+    _getUnit: function(completeSeriesConfig, seriesId) {
+      return completeSeriesConfig[seriesId].xAxisUnit;
+    },
+    _computeInternalUnits: function(completeSeriesConfig, seriesId, usePercentage) {
+      return usePercentage ? '%' : this._getUnit(completeSeriesConfig, seriesId);
     }
   });
 </script>

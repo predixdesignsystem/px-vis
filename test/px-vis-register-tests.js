@@ -211,6 +211,49 @@ function runTests(){
     });
   });
 
+  suite('px-vis-register shows both values if x axis is ordinal', function() {
+    var register = document.getElementById('ordinal');
+
+    suiteSetup(function(done) {
+      var data = generateOrdinalDataValues( generateEmptyData(2) );
+      setData(register, data,done);
+    });
+
+    test('ordinal fixtures are created', function() {
+      assert.isTrue(register !== null);
+    });
+
+    test('ordinal doesnt show date', function() {
+      assert.isNull(Polymer.dom(register.root).querySelector('#dateTime'));
+    });
+
+    test('ordinal formated', function() {
+      var series = Polymer.dom(register.root).querySelectorAll('.seriesData'),
+          texts = series[0].textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join('').split('/');
+
+      assert.equal(texts[0].trim(),'StringyString');
+      assert.equal(texts[1].trim(),'1,015.20');
+    });
+  });
+
+  suite('px-vis-register X ordinal with units', function() {
+    var register = document.getElementById('ordinal');
+
+    suiteSetup(function(done) {
+      var data = generateOrdinalDataValues( generateEmptyData(2) );
+      setData(register, data,done);
+    });
+
+    test('ordinal formated', function() {
+      var series = Polymer.dom(register.root).querySelectorAll('.seriesData'),
+          texts = series[0].textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join('').split('/');
+debugger
+      assert.equal(texts[0].trim(),'StringyString');
+      assert.equal(texts[1].trim(),'1,015.20');
+      assert.equal(texts[2].trim(),'pwet');
+    });
+  });
+
   suite('px-vis-register non time based by default', function() {
     var register = document.getElementById('nonTimeDefault');
 
@@ -472,6 +515,17 @@ function generateDataValues(data){
   for(var i = 0; i < data.data.series.length; i++){
     data.data.series[i]['value'] = {
       "x": Number(data.data.time),
+      "y": 1015.2
+    };
+  }
+  return data;
+}
+
+function generateOrdinalDataValues(data){
+
+  for(var i = 0; i < data.data.series.length; i++){
+    data.data.series[i]['value'] = {
+      "x": "StringyString",
       "y": 1015.2
     };
   }
