@@ -91,11 +91,11 @@ function runTests(){
       assert.equal(baseXGrid.gridId.split('_')[0],'grid');
     });
 
-    test('baseXGrid _grid orientation', function() {
-      assert.equal(baseXGrid._grid.orient(),'bottom');
-    });
-    test('baseXGrid _grid innerTickSize', function() {
-      assert.equal(baseXGrid._grid.innerTickSize(),-240);
+    // test('baseXGrid _grid orientation', function() {
+    //   assert.equal(baseXGrid._grid.orient(),'bottom');
+    // });
+    test('baseXGrid _grid tickSizeInner', function() {
+      assert.equal(baseXGrid._grid.tickSizeInner(),-240);
     });
 
     test('baseXGrid translateAmt', function() {
@@ -165,11 +165,11 @@ function runTests(){
       assert.equal(baseYGrid.gridId.split('_')[0],'grid');
     });
 
-    test('baseYGrid _grid orientation', function() {
-      assert.equal(baseYGrid._grid.orient(),'left');
-    });
-    test('baseYGrid _grid innerTickSize', function() {
-      assert.equal(baseYGrid._grid.innerTickSize(),-445);
+    // test('baseYGrid _grid orientation', function() {
+    //   assert.equal(baseYGrid._grid.orient(),'left');
+    // });
+    test('baseYGrid _grid tickSizeInner', function() {
+      assert.equal(baseYGrid._grid.tickSizeInner(),-445);
     });
 
     test('baseYGrid translateAmt', function() {
