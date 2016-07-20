@@ -17,9 +17,6 @@ function runTests(){
     suiteSetup(function(done){
       var d = [
         {
-          "type":"scatter",
-          "name":"blahblah",
-          "axis":"axis1",
           "url":"test_data/delta-egt-cruise.json"
         },{
           "url":"test_data/hpt-acc-position-cruise.json",
@@ -53,33 +50,9 @@ function runTests(){
     test('appendAjax iron-ajax 1 url', function() {
       assert.equal(ironAjax[0].url, "test_data/delta-egt-cruise.json");
     });
-    test('appendAjax iron-ajax 1 type', function() {
-      assert.equal(ironAjax[0].getAttribute('type'), "scatter");
-    });
-    test('appendAjax iron-ajax 1 name', function() {
-      assert.equal(ironAjax[0].getAttribute('name'), "blahblah");
-    });
-    test('appendAjax iron-ajax 1 axis', function() {
-      assert.equal(ironAjax[0].getAttribute('axis'), "axis1");
-    });
-    test('appendAjax iron-ajax 1 index', function() {
-      assert.equal(ironAjax[0].getAttribute('index'), 0);
-    });
 
     test('appendAjax iron-ajax 2 url', function() {
       assert.equal(ironAjax[1].url, "test_data/hpt-acc-position-cruise.json");
-    });
-    test('appendAjax iron-ajax 2 type', function() {
-      assert.equal(ironAjax[1].getAttribute('type'), null);
-    });
-    test('appendAjax iron-ajax 2 name', function() {
-      assert.equal(ironAjax[1].getAttribute('name'), null);
-    });
-    test('appendAjax iron-ajax 2 axis', function() {
-      assert.equal(ironAjax[1].getAttribute('axis'), null);
-    });
-    test('appendAjax iron-ajax 2 index', function() {
-      assert.equal(ironAjax[1].getAttribute('index'), 1);
     });
 
     test('event fired', function() {
@@ -98,18 +71,6 @@ function runTests(){
       assert.equal(eventObj.data.length,2);
     });
 
-    test('event data 1 name', function() {
-      assert.equal(eventObj.data[0].name, 'blahblah');
-    });
-    test('event data 1 type', function() {
-      assert.equal(eventObj.data[0].type, 'scatter');
-    });
-    test('event data 1 seriesNumber', function() {
-      assert.equal(eventObj.data[0].seriesNumber, 0);
-    });
-    test('event data 1 axis', function() {
-      assert.equal(eventObj.data[0]['axis'], 'axis1');
-    });
     test('event data 1 series is array', function() {
       assert.isTrue(Array.isArray(eventObj.data[0].series));
     });
@@ -120,18 +81,6 @@ function runTests(){
       assert.equal(JSON.stringify(eventObj.data[0].series[0]),'[1397102460000,11.4403]');
     });
 
-    test('event data 2 name is default', function() {
-      assert.equal(eventObj.data[1].name, 'hpt-acc-position-cruise');
-    });
-    test('event data 2 type is default', function() {
-      assert.equal(eventObj.data[1].type, 'line');
-    });
-    test('event data 2 seriesNumber', function() {
-      assert.equal(eventObj.data[1].seriesNumber, 1);
-    });
-    test('event data 2 axis is default', function() {
-      assert.equal(eventObj.data[1]['axis'], '');
-    });
     test('event data 2 series is array', function() {
       assert.isTrue(Array.isArray(eventObj.data[1].series));
     });
@@ -182,33 +131,9 @@ function runTests(){
     test('flatAjax iron-ajax 1 url', function() {
       assert.equal(ironAjax[0].url, "test_data/delta-egt-cruise-events.json");
     });
-    test('flatAjax iron-ajax 1 type', function() {
-      assert.equal(ironAjax[0].getAttribute('type'), null);
-    });
-    test('flatAjax iron-ajax 1 name', function() {
-      assert.equal(ironAjax[0].getAttribute('name'), null);
-    });
-    test('flatAjax iron-ajax 1 axis', function() {
-      assert.equal(ironAjax[0].getAttribute('axis'), null);
-    });
-    test('flatAjax iron-ajax 1 index', function() {
-      assert.equal(ironAjax[0].getAttribute('index'), 0);
-    });
 
     test('flatAjax iron-ajax 2 url', function() {
       assert.equal(ironAjax[1].url, "test_data/delta-egt-cruise-thresholds.json");
-    });
-    test('flatAjax iron-ajax 2 type', function() {
-      assert.equal(ironAjax[1].getAttribute('type'), null);
-    });
-    test('flatAjax iron-ajax 2 name', function() {
-      assert.equal(ironAjax[1].getAttribute('name'), null);
-    });
-    test('flatAjax iron-ajax 2 axis', function() {
-      assert.equal(ironAjax[1].getAttribute('axis'), null);
-    });
-    test('flatAjax iron-ajax 2 index', function() {
-      assert.equal(ironAjax[1].getAttribute('index'), 1);
     });
 
     test('event fired', function() {

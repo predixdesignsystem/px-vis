@@ -178,6 +178,14 @@ The configureation object allows developers to set the icon used for each event 
         type: String,
         value: 'left',
         notify:true
+      },
+      /**
+       * Specifies the x key for the event data
+       *
+       */
+      xKey: {
+        type: String,
+        value: 'x'
       }
     },
 
@@ -265,12 +273,12 @@ The configureation object allows developers to set the icon used for each event 
      */
     _positionEvent: function(){
       this.eventLine
-        .attr("x1", this.x(this.eventData.x))
-        .attr("x2", this.x(this.eventData.x))
+        .attr("x1", this.x(this.eventData[this.xKey]))
+        .attr("x2", this.x(this.eventData[this.xKey]))
         .attr("y1", this.y(this.currentDomainY[0]))
         .attr("y2", this.y(this.currentDomainY[1]));
       this.eventIcon
-        .attr('x',this.x(this.eventData.x) - this._thisConfig.size/2 + this._thisConfig.offset[0])
+        .attr('x',this.x(this.eventData[this.xKey]) - this._thisConfig.size/2 + this._thisConfig.offset[0])
         .attr("y", this.y(this.currentDomainY[1]) - 5 + this._thisConfig.offset[1]);
     },
     /**
@@ -320,10 +328,10 @@ The configureation object allows developers to set the icon used for each event 
     },
     _getValue: function(xAxisType) {
       if(xAxisType === 'time') {
-        return ': ' + this._formatDatetime(this.eventData.x, this.firstDateTimeFormat) +
-          ' ' + this.separator + ' ' + this._formatDatetime(this.eventData.x, this.secondDateTimeFormat);
+        return ': ' + this._formatDatetime(this.eventData[this.xKey], this.firstDateTimeFormat) +
+          ' ' + this.separator + ' ' + this._formatDatetime(this.eventData[this.xKey], this.secondDateTimeFormat);
       } else {
-        return ': ' + this.eventData.x;
+        return ': ' + this.eventData[this.xKey];
       }
     }
   });
