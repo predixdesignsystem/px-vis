@@ -165,7 +165,7 @@ function runTests(){
           re = new RegExp(/(\w+)\((-?\d+\.?\d*)[,\s](-?\d+\.?\d*)\)/),
           arr = re.exec(attr);
       assert.equal(arr[1],'translate');
-      assert.closeTo(parseFloat(arr[2]),222.5,6);
+      assert.closeTo(parseFloat(arr[2]),222.5,7);
       assert.closeTo(parseFloat(arr[3]),278,2);
     });
 
