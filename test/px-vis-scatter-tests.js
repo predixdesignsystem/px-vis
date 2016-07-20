@@ -268,10 +268,11 @@ function runTests(){
 
     test('mutedScatter2 scatterDot4 x & y', function() {
       var t = mutedScatter2.scatterDots.nodes()[4].getAttribute('transform');
-      var re = new RegExp(/translate\((\d+)\s?,?\s?(\d+)\)/);
+      var re = new RegExp(/(translate\((\d+)\s?,?\s?(\d+)?\))/);
       var x = re.exec(t);
-      assert.equal(x[1],"480");
-      assert.equal(x[2],"0");
+      assert.equal(x[2],"480");
+      if(typeof(x[3]) === 'undefined') { assert.equal(x[1] , 'translate(480)'); }
+      else { assert.equal(x[3] , "0"); }
     });
   }); //suite
 

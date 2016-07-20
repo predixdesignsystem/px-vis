@@ -65,6 +65,8 @@ It will reformat the data into the object format and create a seriesConfig file.
 ##### Usage
 
     <px-vis-data-converter
+        data-key = "[[dataKey]]"
+        id-key = "[[idKey]]"
         original-data="[[originalData]]"
         chart-data="{{chartData}}"
         series-config="{{seriesConfig}}">
@@ -190,6 +192,16 @@ It will reformat the data into the object format and create a seriesConfig file.
       }
     },
 
+    _calcId: function(d,i){
+      if(this.dataIds[i]){
+        return this.dataIds[i];
+      } else if(d[this.idKey]){
+        return d[this.idKey];
+      } else {
+        return 'y' + i;
+      }
+    },
+
     _computeChartData: function() {
       if(this.originalData.length > 0){
         // put in check to see if we have sorted data or not
@@ -199,23 +211,22 @@ It will reformat the data into the object format and create a seriesConfig file.
             numArrs = this.originalData.length,
             // create starting index for each
             indexes = Array(numArrs).fill(0),
-            longest = 0,
             iter = 0,
             id = Array.prototype.map.call(this.originalData,function(d,i){
               // since we are iterating over the data...
-              // find longest array
-              longest = (longest < d[this.dataKey].length) ? d[this.dataKey].length : longest;
               // add infinity to the end so we have a stop point
               d[this.dataKey].push([Infinity,Infinity]);
 
               // figure out if we should use user input ID or the series key
-              return (this.dataIds[i]) ? this.dataIds[i] : d[this.idKey];
+              return this._calcId(d,i);
             }.bind(this));
 
-        while(iter < longest){
+        // keep going until we reach the end of each series
+        while(iter < numArrs){
           var lowest = Infinity,
               obj = {},
-              indicies = [];
+              indicies = [],
+              iter = 0;
 
           for(var i = 0; i < numArrs; i++){
             if(this.originalData[i][this.dataKey][indexes[i]][0] < lowest){
@@ -239,32 +250,18 @@ It will reformat the data into the object format and create a seriesConfig file.
           // add our new object to our dataset
           chartData.push(obj);
           // increment out indexes
-          for(var j = 0; j < indicies.length; j++){
+          for(var j = 0; j < numArrs; j++){
+            // increase the index for any series we merged
             var k = indicies[j]
             indexes[k] += 1;
+
+            // check to see we hit the end of each series, increment iter if we do
+            if(this.originalData[j][this.dataKey][indexes[j]][0] === Infinity){
+              iter += 1;
+            }
           }
-          iter += 1;
         }
 
-        // for(var i = 0; i < this.originalData.length; i++){
-        //   id = (this.dataIds[i]) ? this.dataIds[i] : this.originalData[i][this.idKey];
-        //   for(var j = 0; j < this.originalData[i][this.dataKey].length; j++){
-        //     chartData.push({});
-        //     d = this.originalData[i][this.dataKey][j];
-        //     // if x key does not exist, add x and y
-        //     if(!chartData[j].hasOwnProperty(this.newXKey)) {
-        //       chartData[j][this.newXKey] = d[0];
-        //       chartData[j][id] = d[1];
-        //     }
-        //     //if it does exist and matches data x val, add the y
-        //     else if(chartData[j][this.newXKey] === d[0]){
-        //       chartData[j][id] = d[1];
-        //     } else {
-        //       console.warn("Hmm mismatch x key; now what?");
-        //     }
-        //   }
-        // }
-        // console.log(chartData);
         this.fire('px-vis-chart-data', { 'dataVar': 'chartData', 'data': chartData, 'method':'set' });
         return chartData;
       }
@@ -277,9 +274,9 @@ It will reformat the data into the object format and create a seriesConfig file.
             y1,
             y2;
         for(var i = 0; i < this.originalData.length; i++){
-          id = (this.dataIds[i]) ? this.dataIds[i] : this.originalData[i][this.idKey];
+          id = this._calcId(this.originalData[i],i);
           seriesConfig[id] = {};
-          seriesConfig[id]['name'] = this.dataNames[i] ? this.dataNames[i] : this.originalData[i]['name'];
+          seriesConfig[id]['name'] = this.dataNames[i] ? this.dataNames[i] : this.originalData[i][this.nameKey] ? this.originalData[i][this.nameKey] : id;
           seriesConfig[id]['x'] = this.newXKey;
           seriesConfig[id]['y'] = id;
 
@@ -291,7 +288,7 @@ It will reformat the data into the object format and create a seriesConfig file.
             seriesConfig[id]['yMax'] = this.originalData[i]['max'];
           }
         }
-        // console.log(seriesConfig);
+
         this.fire('px-vis-series-config', { 'dataVar': 'seriesConfig', 'data': seriesConfig, 'method':'set' });
         return seriesConfig;
       }

@@ -11,11 +11,9 @@ Element providing iron-ajax requests and data formating.
         lists="flat">
     </px-vis-data>
 
-requestData is in the form or an Array of Objects and is used for generating the ajax request and formatting the data. At a minimum, it should specify a URL from which to fetch data. It may also include a chart type and a chart name. Default chart type is 'line' and default name is the json file name.
+requestData is in the form or an Array of Objects and is used for generating the ajax request and formatting the data. At a minimum, it should specify a URL from which to fetch data.
 
     series = [{
-        "type":"line",
-        "name":"delta-egt-cruise",
         "url":"/bower_components/px-demo-data/demo-data/aviation/delta-egt-cruise.json"
      },{
          "url":"/bower_components/px-demo-data/demo-data/aviation/hpt-acc-position-cruise.json"
@@ -42,15 +40,9 @@ The 'method' is specified by whether data is returned asynchronously and therefo
     <template is="dom-repeat" items="{{requestData}}">
       <iron-ajax
         url="{{item.url}}"
-        type$="{{item.type}}"
-        name$="{{item.name}}"
-        axis$="{{item.axis}}"
-        index$={{index}}
         on-response="responseHandler"
         auto>
       </iron-ajax>
-      <!--  on-request="requestHandler"
-      on-error="errorHandler"-->
     </template>
   </template>
 </dom-module>
@@ -133,14 +125,11 @@ The 'method' is specified by whether data is returned asynchronously and therefo
       },
       /**
        * Bool specifying whether response data should be returned asynchronously, or if all chart data should be processed and compiled before returning.
-       *
-       * @property isAsync
-       * @type Boolean
-       * @default false
+       *@private
        */
       isAsync:{
         type:Boolean,
-        value:false
+        value:false,
       },
       /**
        * String specifying if response data should be flattened in the formatted data or just appneded.
@@ -197,27 +186,6 @@ The 'method' is specified by whether data is returned asynchronously and therefo
     observers: [
         '_promiseData(_tempData.*)'
     ],
-    // TODO figure out why casting req as an array does not work
-    // _checkRequest: function(requestData){
-    //   if(Array.isArray(requestData)){
-    //     console.log("Array");
-    //     console.log(requestData);
-    //     return requestData
-    //   } else if(typeof(requestData) === 'object'){
-    //     console.log("Obj");
-    //     var o =[{
-    //       "type":"line",
-    //        "url":"/bower_components/px-demo-data/demo-data/aviation/delta-egt-cruise.json"
-    //      },{
-    //        "url":"/bower_components/px-demo-data/demo-data/aviation/hpt-acc-position-cruise.json"
-    //      }]
-    //     console.log(o);
-    //     this.set('requestData',o);
-    //     return []
-    //   } else {
-    //     console.warn("Invalid Series!!")
-    //   }
-    // },
 
     /**
      * Handler called on iron-ajax repsonse
@@ -243,26 +211,7 @@ The 'method' is specified by whether data is returned asynchronously and therefo
      */
     _appendHandler:function(e){
       var ne = Polymer.dom(e),
-          data = e.detail.response,
-          index = ne.rootTarget.attributes.index.value,
-          name,
-          n,
-          // check if dev specified a type; otherwise default to line
-          type = (typeof(ne.rootTarget.attributes.type)!== 'undefined') ? ne.rootTarget.attributes.type.value : 'line',
-          axis = (typeof(ne.rootTarget.attributes.axis)!== 'undefined') ? ne.rootTarget.attributes.axis.value : '';
-
-      // check if dev specified a name; otherwise extract json name
-      if(typeof(ne.rootTarget.attributes.name)!== 'undefined'){
-        name = ne.rootTarget.attributes.name.value;
-      } else {
-        n = e.detail.url.split('/');
-        name = n[n.length - 1].split('.')[0];
-      }
-      //set name and type in out data
-      data['axis'] = axis;
-      data['name'] = name;
-      data['type'] = type;
-      data['seriesNumber'] = index;
+          data = e.detail.response;
 
       // if we are async, append to out dataset immediately, else, stick it in our temp and trigger our promise
       if(this.isAsync){
@@ -294,18 +243,6 @@ The 'method' is specified by whether data is returned asynchronously and therefo
         this.set('_tempData',data);
       }
     },
-
-    // errorHandler:function(e, resp){
-    //   console.log("error");
-    //   console.log(e);
-    //   console.log(resp);
-    // },
-    // requestHandler:function(e, resp){
-    //   console.log("request");
-    //   console.log(this.request);
-    //   // console.log(e);
-    //   console.log(resp);
-    // },
 
     /**
      * Observer checking if we have all our requests and can set our data
