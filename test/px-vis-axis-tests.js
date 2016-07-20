@@ -267,8 +267,8 @@ function runTests(){
           re = new RegExp(/(\w+)\((-?\d+\.?\d*)[,\s](-?\d+\.?\d*)\)/),
           arr = re.exec(attr);
       assert.equal(arr[1],'translate');
-      assert.closeTo(parseFloat(arr[2]),-33,3);
-      assert.closeTo(parseFloat(arr[3]),126,3);
+      assert.closeTo(parseFloat(arr[2]),-33,4.5);
+      assert.closeTo(parseFloat(arr[3]),126,4.5);
     });
 
     test('Title _titleGroup text font-size', function() {
@@ -307,7 +307,7 @@ function runTests(){
           arr = re.exec(s);
       assert.equal(arr[1],'translate');
       assert.equal(parseFloat(arr[2]),-12);
-      assert.closeTo(parseFloat(arr[3]),-55,6);
+      assert.closeTo(parseFloat(arr[3]),-55,7);
     });
   }); //suite
 

@@ -20,7 +20,8 @@ function runTests(){
             "type":"line",
             "y": "y",
             "x": "x",
-            "name":"mySeries"}};
+            "name":"mySeries",
+            "xAxisUnit":"pint"}};
 
       basePie.set('chartData',d);
       basePie.set('completeSeriesConfig',seriesConfig);

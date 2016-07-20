@@ -50,6 +50,10 @@ function runTests(){
 
       baseTooltip.set('margin',m);
       baseTooltip.set('chartData',d);
+
+    });
+    test('baseTooltip _rect is set', function() {
+      assert.isNotNull(baseTooltip._rect);
     });
 
     test('baseTooltip fixture is created', function() {
@@ -58,11 +62,6 @@ function runTests(){
 
     test('baseTooltip is hidden', function() {
       assert.isTrue(baseTooltip.$.tooltip.classList.contains('hidden'));
-    });
-
-    test('baseTooltip _rect is set', function() {
-      var rect = baseSVG.pxSvgElem.getBoundingClientRect();
-      assert.equal(JSON.stringify(baseTooltip._rect),JSON.stringify(rect));
     });
   }); //suite
 
