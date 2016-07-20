@@ -106,16 +106,21 @@ Formatting for the timestamps,the data values, and the series names can be contr
                           default-currency-format="[[numberFormatCurrency]]"
                           zero-format="[[numberFormatZero]]">
                         </numbro-element>
+                        <template is="dom-if" if="{{_returnVal(item, 'x')}}">{{_getXUnit(item, completeSeriesConfig)}}</template>
+                        <template is="dom-if" if="[[_returnVal(item, 'x')]]">
+                          &nbsp;/&nbsp
+                        </template>
                       </template>
                       <!-- if x axis is ordinal just display it -->
                       <template is="dom-if" if="{{_isOfType(xAxisType, 'ordinal')}}">
                         <span>[[_returnVal(item, 'x')]]</span>
+                        <template is="dom-if" if="{{_returnVal(item, 'x')}}">{{_getXUnit(item, completeSeriesConfig)}}</template>
+                        <template is="dom-if" if="[[_returnVal(item, 'x')]]">
+                          &nbsp;/&nbsp
+                        </template>
                       </template>
                       <!-- if x axis is time don't display it -->
-                      <template is="dom-if" if="{{_returnVal(item, 'x')}}">{{_getXUnit(item, completeSeriesConfig)}}</template>
-                      <template is="dom-if" if="[[_returnVal(item, 'x')]]">
-                        &nbsp;/&nbsp
-                      </template>
+
                       <!-- if y axis is number format and show it -->
                       <template is="dom-if" if="{{_isOfType(yAxisType, 'linear')}}">
                         <numbro-element

@@ -128,26 +128,6 @@ function runTests(){
     });
   });
 
-  suite('px-vis-register add units', function() {
-    var units = document.getElementById('units');
-
-    suiteSetup(function(done) {
-      var data = generateDataValues( generateEmptyData(2) );
-      setData(units, data,done);
-    });
-
-    test('units fixtures are created', function() {
-      assert.isTrue(units !== null);
-    });
-
-    test('Added units', function() {
-      var series = Polymer.dom(units.root).querySelectorAll('.seriesData');
-
-      assert.equal(series[0].textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join(''),'1,015.20Hz');
-      assert.equal(series[1].textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join(''),'1,015.20Hz');
-    });
-  });
-
   suite('px-vis-register formats units', function() {
     var numberFormat = document.getElementById('numberFormat');
 
@@ -163,7 +143,7 @@ function runTests(){
     test('numberFormat formated', function() {
       var series = Polymer.dom(numberFormat.root).querySelectorAll('.seriesData');
 
-      assert.equal(series[0].textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join(''),'1015.20000');
+      assert.equal(series[0].textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join(''),'1015.20000yUnit');
     });
   });
 
@@ -182,7 +162,7 @@ function runTests(){
     test('numberFormatCulture formated', function() {
       var series = Polymer.dom(numberFormatCulture.root).querySelectorAll('.seriesData');
 
-      assert.equal(series[0].textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join(''),'1.015,20');
+      assert.equal(series[0].textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join(''),'1.015,20yUnit');
     });
   });
 
@@ -206,8 +186,8 @@ function runTests(){
       var series = Polymer.dom(register.root).querySelectorAll('.seriesData'),
           texts = series[0].textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join('').split('/');
 
-      assert.equal(texts[0].trim(),'1,419,064,667,000.00');
-      assert.equal(texts[1].trim(),'1,015.20');
+      assert.equal(texts[0].trim(),'1,419,064,667,000.00xUnit');
+      assert.equal(texts[1].trim(),'1,015.20yUnit');
     });
   });
 
@@ -231,26 +211,8 @@ function runTests(){
       var series = Polymer.dom(register.root).querySelectorAll('.seriesData'),
           texts = series[0].textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join('').split('/');
 
-      assert.equal(texts[0].trim(),'StringyString');
-      assert.equal(texts[1].trim(),'1,015.20');
-    });
-  });
-
-  suite('px-vis-register X ordinal with units', function() {
-    var register = document.getElementById('ordinal');
-
-    suiteSetup(function(done) {
-      var data = generateOrdinalDataValues( generateEmptyData(2) );
-      setData(register, data,done);
-    });
-
-    test('ordinal formated', function() {
-      var series = Polymer.dom(register.root).querySelectorAll('.seriesData'),
-          texts = series[0].textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join('').split('/');
-debugger
-      assert.equal(texts[0].trim(),'StringyString');
-      assert.equal(texts[1].trim(),'1,015.20');
-      assert.equal(texts[2].trim(),'pwet');
+      assert.equal(texts[0].trim(),'StringyStringxUnit');
+      assert.equal(texts[1].trim(),'1,015.20yUnit');
     });
   });
 
@@ -274,8 +236,8 @@ debugger
       var series = Polymer.dom(register.root).querySelectorAll('.seriesData'),
           texts = series[0].textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join('').split('/');
 
-      assert.equal(texts[0].trim(),'1,419,064,667,000.00');
-      assert.equal(texts[1].trim(),'1,015.20');
+      assert.equal(texts[0].trim(),'1,419,064,667,000.00xUnit');
+      assert.equal(texts[1].trim(),'1,015.20yUnit');
     });
   });
 
@@ -285,7 +247,6 @@ debugger
     suiteSetup(function(done) {
       var data = generatePieDataValues( generateEmptyData(2) );
       setData(register, data,done);
-      register.units = "pint";
     });
 
     test('pie doesnt show date', function() {
@@ -296,7 +257,7 @@ debugger
       var series = Polymer.dom(register.root).querySelectorAll('.seriesData'),
           texts = series[0].textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join('').split('/');
 
-      assert.equal(texts,'1015.2pint');
+      assert.equal(texts,'1015.2xUnit');
     });
 
     test('pie formated with percentage', function(done) {
@@ -381,7 +342,7 @@ function basicTests(registerID,dir){
     test(registerID + ' values match', function() {
       var series = Polymer.dom(register.root).querySelectorAll('.seriesData');
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].textContent.trim(), '1,015.20');
+        assert.equal(series[i].textContent.replace(/\r?\n|\r/g, "").split(' ').join('').trim(), '1,015.20yUnit');
       }
     });
   });
@@ -497,7 +458,9 @@ function generateEmptyData(num,str){
       'name': name,
       'color': colorSet[colorOrder[i]],
       'x': 'x',
-      'y': 'y'
+      'y': 'y',
+      'xAxisUnit': 'xUnit',
+      'yAxisUnit': 'yUnit'
     };
 
     dataObj.series[i] = {

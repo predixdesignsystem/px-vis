@@ -11,13 +11,17 @@ function runTests(){
 
   suite('px-vis-event is instantiated', function() {
     var baseScale = document.getElementById('baseScale'),
+        linearScale = document.getElementById('linearScale'),
+        ordinalScale = document.getElementById('ordinalScale'),
         baseSVG = document.getElementById('baseSVG'),
         defaultEvent = document.getElementById('defaultEvent'),
         faEvent = document.getElementById('faEvent'),
         uniEvent = document.getElementById('uniEvent'),
         imgEvent = document.getElementById('imgEvent'),
         noLabelEvent = document.getElementById('noLabelEvent'),
-        offsetEvent = document.getElementById('offsetEvent');
+        offsetEvent = document.getElementById('offsetEvent'),
+        linearEvent = document.getElementById('linearEvent'),
+        ordinalEvent = document.getElementById('ordinalEvent');
 
     suiteSetup(function(done){
       var w = 500,
@@ -45,6 +49,40 @@ function runTests(){
               "y": 6
             }
           ],
+        linearD = [{
+              "x": 2,
+              "y": 1
+            },{
+              "x": 4,
+              "y": 6
+            },{
+              "x": 5,
+              "y": 10
+            },{
+              "x": 6,
+              "y": 4
+            },{
+              "x": 7,
+              "y": 6
+            }
+        ],
+        ordinalD = [{
+              "x": "low",
+              "y": 1
+            },{
+              "x": "low",
+              "y": 6
+            },{
+              "x": "medium",
+              "y": 10
+            },{
+              "x": "medium",
+              "y": 4
+            },{
+              "x": "high",
+              "y": 6
+            }
+        ],
           completeSeriesConfig = {"mySeries":{
             "type":"line",
             "name":"mySeries",
@@ -53,30 +91,40 @@ function runTests(){
             "color": "rgb(93,165,218)"
           }},
           chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+          linearChartExtents = {"x":[0,10],"y":[0,10]},
+          ordinalChartExtents = {"x":["low","medium", "high"],"y":[0,10]},
         dE = [{
           "id": "123",
-          "time": 1397131620000,
+          "x": 1397131620000,
           "label": "image"
         },{
           "id": "456",
-          "time": 1397102460000,
+          "x": 1397102460000,
           "label": "unicode"
         },{
           "id": "789",
-          "time": 1397189940000,
+          "x": 1397189940000,
           "label": "font awesome"
         },{
           "id": "333",
-          "time": 1397160780000,
+          "x": 1397160780000,
           "label": "Default"
         },{
           "id": "42",
-          "time": 1397111451000
+          "x": 1397111451000
         },{
           "id": "444",
-          "time": 1397170014000,
+          "x": 1397170014000,
           "label": "offset"
-        }]
+        },{
+          "id": "666",
+          "x": 3,
+          "label": "linear"
+        },{
+          "id": "6666",
+          "x": "low",
+          "label": "ordinal"
+        }],
         eventConfig =  {
           "font awesome":{
             "color": "blue",
@@ -115,6 +163,20 @@ function runTests(){
       baseScale.set('chartExtents',chartExtents);
       baseScale.set('chartData',d);
 
+      linearScale.set('width',w);
+      linearScale.set('height',h);
+      linearScale.set('margin',m);
+      linearScale.set('completeSeriesConfig',completeSeriesConfig);
+      linearScale.set('chartExtents',linearChartExtents);
+      linearScale.set('chartData',linearD);
+
+      ordinalScale.set('width',w);
+      ordinalScale.set('height',h);
+      ordinalScale.set('margin',m);
+      ordinalScale.set('completeSeriesConfig',completeSeriesConfig);
+      ordinalScale.set('chartExtents',ordinalChartExtents);
+      ordinalScale.set('chartData',ordinalD);
+
       defaultEvent.set('eventConfig',eventConfig);
       faEvent.set('eventConfig',eventConfig);
       uniEvent.set('eventConfig',eventConfig);
@@ -122,6 +184,8 @@ function runTests(){
       noLabelEvent.set('eventConfig',eventConfig);
       noLabelEvent.set('eventConfig',eventConfig);
       offsetEvent.set('eventConfig',eventConfig);
+      linearEvent.set('eventConfig',eventConfig);
+      ordinalEvent.set('eventConfig',eventConfig);
 
       defaultEvent.set('eventData',dE[3]);
       faEvent.set('eventData',dE[2]);
@@ -129,6 +193,8 @@ function runTests(){
       imgEvent.set('eventData',dE[0]);
       noLabelEvent.set('eventData',dE[4]);
       offsetEvent.set('eventData',dE[5]);
+      linearEvent.set('eventData',dE[6]);
+      ordinalEvent.set('eventData',dE[7]);
 
       // setTimeout(function(){ done() }.bind(this),5000);
       done();
@@ -610,6 +676,123 @@ function runTests(){
     });
     test('tooltip content is correct', function() {
       assert.equal(offsetEvent.$.eventTooltip.$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: offsetID: 444Timestamp: 10:46:54 +0000 | 10 Apr 2014');
+    });
+  }); //suite
+
+
+  suite('px-vis-event with linear scale', function() {
+    var baseScale = document.getElementById('linearScale'),
+        baseSVG = document.getElementById('baseSVG'),
+        linearEvent = document.getElementById('linearEvent');
+
+    var colors = commonColors.properties.colors.value;
+
+    test('linearEvent eventGroup created', function() {
+      assert.equal(linearEvent.eventGroup.node().tagName,'g');
+    });
+    test('linearEvent eventGroup has class', function() {
+      assert.equal(linearEvent.eventGroup.attr('class'),'event');
+    });
+    test('linearEvent has random event-id', function() {
+      assert.equal(linearEvent.eventId.length,16);
+    });
+    test('linearEvent has random event-id', function() {
+      assert.equal(linearEvent.eventId.split('_')[0],'event');
+    });
+    test('linearEvent eventGroup set event-id', function() {
+      assert.equal(linearEvent.eventGroup.attr('event-id'),linearEvent.eventId);
+    });
+    test('linearEvent eventGroup set id', function() {
+      assert.equal(linearEvent.eventGroup.attr('id'),'event_' + linearEvent.eventId);
+    });
+
+    test('linearEvent eventIcon created', function() {
+      assert.equal(linearEvent.eventIcon.node().tagName,'text');
+    });
+
+    test('linearEvent eventLine created', function() {
+      assert.equal(linearEvent.eventLine.node().tagName,'line');
+    });
+    test('linearEvent eventLine stroke color', function() {
+      assert.equal(linearEvent.eventLine.attr('stroke').split(' ').join(''),colors['grey9']);
+    });
+
+    test('linearEvent eventLine x1', function() {
+      assert.equal(linearEvent.eventLine.attr('x1'),144);
+    });
+    test('linearEvent eventLine x2', function() {
+      assert.equal(linearEvent.eventLine.attr('x2'),144);
+    });
+    test('linearEvent eventLine y1', function() {
+      assert.equal(linearEvent.eventLine.attr('y1'),255);
+    });
+    test('linearEvent eventLine y2', function() {
+      assert.equal(linearEvent.eventLine.attr('y2'),0);
+    });
+
+    test('tooltip exists', function() {
+      assert.isTrue(linearEvent.$.eventTooltip !== null);
+    });
+    test('tooltip content is correct', function() {
+      assert.equal(linearEvent.$.eventTooltip.$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: linearID: 666X: 3');
+    });
+  }); //suite
+
+  suite('px-vis-event with ordinal scale', function() {
+    var baseScale = document.getElementById('ordinalScale'),
+        baseSVG = document.getElementById('baseSVG'),
+        ordinalEvent = document.getElementById('ordinalEvent');
+
+    var colors = commonColors.properties.colors.value;
+
+    test('ordinalEvent eventGroup created', function() {
+      assert.equal(ordinalEvent.eventGroup.node().tagName,'g');
+    });
+    test('ordinalEvent eventGroup has class', function() {
+      assert.equal(ordinalEvent.eventGroup.attr('class'),'event');
+    });
+    test('ordinalEvent has random event-id', function() {
+      assert.equal(ordinalEvent.eventId.length,16);
+    });
+    test('ordinalEvent has random event-id', function() {
+      assert.equal(ordinalEvent.eventId.split('_')[0],'event');
+    });
+    test('ordinalEvent eventGroup set event-id', function() {
+      assert.equal(ordinalEvent.eventGroup.attr('event-id'),ordinalEvent.eventId);
+    });
+    test('ordinalEvent eventGroup set id', function() {
+      assert.equal(ordinalEvent.eventGroup.attr('id'),'event_' + ordinalEvent.eventId);
+    });
+
+    test('ordinalEvent eventIcon created', function() {
+      assert.equal(ordinalEvent.eventIcon.node().tagName,'text');
+    });
+
+    test('ordinalEvent eventLine created', function() {
+      assert.equal(ordinalEvent.eventLine.node().tagName,'line');
+    });
+    test('ordinalEvent eventLine stroke color', function() {
+      assert.equal(ordinalEvent.eventLine.attr('stroke').split(' ').join(''),colors['grey9']);
+    });
+
+    test('ordinalEvent eventLine x1', function() {
+      assert.equal(ordinalEvent.eventLine.attr('x1'),80);
+    });
+    test('ordinalEvent eventLine x2', function() {
+      assert.equal(ordinalEvent.eventLine.attr('x2'),80);
+    });
+    test('ordinalEvent eventLine y1', function() {
+      assert.equal(ordinalEvent.eventLine.attr('y1'),255);
+    });
+    test('ordinalEvent eventLine y2', function() {
+      assert.equal(ordinalEvent.eventLine.attr('y2'),0);
+    });
+
+    test('tooltip exists', function() {
+      assert.isTrue(ordinalEvent.$.eventTooltip !== null);
+    });
+    test('tooltip content is correct', function() {
+      assert.equal(ordinalEvent.$.eventTooltip.$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: ordinalID: 6666X: low');
     });
   }); //suite
 } //runTests
