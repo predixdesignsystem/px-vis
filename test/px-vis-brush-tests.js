@@ -207,7 +207,7 @@ function runTests(){
 
       rect.dispatchEvent(e);
 
-      setTimeout(function(){done()},500);
+      setTimeout(function(){done()},1000);
     });
 
     test('baseBrush._brush extents match', function() {
