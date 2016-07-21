@@ -1,5 +1,3 @@
-# THIS COMPONENT IS NOT YET RELEASED
-
 Px-Vis
 -----------------------------------------------
 
