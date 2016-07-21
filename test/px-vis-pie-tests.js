@@ -95,12 +95,12 @@ function runTests(){
       }, 800);
     });
 
-    test('tooltip starts hidden', function(done) {
+    test('tooltip starts hidden', function() {
       var tooltip = Polymer.dom(basePie.root).querySelector('px-tooltip');
       //tooltip hidden
       assert.isFalse(tooltip._isShowing);
     });
-    
+
     test('hover shows tooltip', function(done) {
       var slice = basePie.pieGroup._groups[0][0].firstChild,
           evt = document.createEvent("MouseEvent"),
