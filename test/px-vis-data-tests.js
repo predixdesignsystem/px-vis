@@ -75,20 +75,20 @@ function runTests(){
       assert.isTrue(Array.isArray(eventObj.data[0].series));
     });
     test('event data 1 series length', function() {
-      assert.equal(eventObj.data[0].series.length,646);
+      assert.include([646,694],eventObj.data[0].series.length);
     });
     test('event data 1 series[0]', function() {
-      assert.equal(JSON.stringify(eventObj.data[0].series[0]),'[1397102460000,11.4403]');
+      assert.include(['[1397102460000,11.4403]','[1397102460000,96.5]'],JSON.stringify(eventObj.data[0].series[0]));
     });
 
     test('event data 2 series is array', function() {
       assert.isTrue(Array.isArray(eventObj.data[1].series));
     });
     test('event data 2 series length', function() {
-      assert.equal(eventObj.data[1].series.length,694);
+      assert.include([646,694],eventObj.data[1].series.length);
     });
     test('event data 2 series[0]', function() {
-      assert.equal(JSON.stringify(eventObj.data[1].series[0]),'[1397102460000,96.5]');
+      assert.include(['[1397102460000,11.4403]','[1397102460000,96.5]'],JSON.stringify(eventObj.data[1].series[0]));
     });
   }); //suite
 

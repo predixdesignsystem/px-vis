@@ -517,49 +517,49 @@ function runTests(){
       assert.equal(markerCircle.scatterDots.nodes().length, 1);
     });
     test('marker is a circle', function() {
-      assert.isTrue(markerCircle.scatterDots.node().classList.contains('circle'));
+      assert.equal(markerCircle.scatterDots.node().getAttribute('class'),'circle');
     });
 
     test('correct number of circles', function() {
       assert.equal(markerCross.scatterDots.nodes().length, 1);
     });
     test('marker is a cross', function() {
-      assert.isTrue(markerCross.scatterDots.node().classList.contains('cross'));
+      assert.equal(markerCross.scatterDots.node().getAttribute('class'), 'cross');
     });
 
     test('correct number of circles', function() {
       assert.equal(markerDiamond.scatterDots.nodes().length, 1);
     });
     test('marker is a diamond', function() {
-      assert.isTrue(markerDiamond.scatterDots.node().classList.contains('diamond'));
+      assert.equal(markerDiamond.scatterDots.node().getAttribute('class'),'diamond');
     });
 
     test('correct number of circles', function() {
       assert.equal(markerSquare.scatterDots.nodes().length, 1);
     });
     test('marker is a square', function() {
-      assert.isTrue(markerSquare.scatterDots.node().classList.contains('square'));
+      assert.equal(markerSquare.scatterDots.node().getAttribute('class'),'square');
     });
 
     test('correct number of circles', function() {
       assert.equal(markerTriangle.scatterDots.nodes().length, 1);
     });
     test('marker is a triangle', function() {
-      assert.isTrue(markerTriangle.scatterDots.node().classList.contains('triangle-up'));
+      assert.equal(markerTriangle.scatterDots.node().getAttribute('class'),'triangle-up');
     });
 
     test('correct number of circles', function() {
       assert.equal(markerStar.scatterDots.nodes().length, 1);
     });
     test('marker is a star', function() {
-      assert.isTrue(markerStar.scatterDots.node().classList.contains('star'));
+      assert.equal(markerStar.scatterDots.node().getAttribute('class'),'star');
     });
 
     test('correct number of circles', function() {
       assert.equal(markerWye.scatterDots.nodes().length, 1);
     });
     test('marker is a wye', function() {
-      assert.isTrue(markerWye.scatterDots.node().classList.contains('wye'));
+      assert.equal(markerWye.scatterDots.node().getAttribute('class'),'wye');
     });
 
   }); //suite
