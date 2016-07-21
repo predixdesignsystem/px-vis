@@ -103,7 +103,7 @@ function runTests(){
       evt.initMouseEvent("mouseover",true,true,window,0,0,0,0,0,false,false,false,false,0,null);
 
       //tooltip hidden
-      assert.isFalse(tooltip.classList.contains('movedTooltip'));
+      assert.isFalse(tooltip._isShowing);
 
       //hover
       slice.dispatchEvent(evt);
@@ -111,7 +111,7 @@ function runTests(){
       setTimeout(function() {
 
         //tooltip should be shown
-        assert.isTrue(tooltip.classList.contains('movedTooltip'));
+        assert.isTrue(tooltip._isShowing);
         done();
       }, 100);
     });
@@ -124,7 +124,7 @@ function runTests(){
       evt.initMouseEvent("mouseleave",true,true,window,0,0,0,0,0,false,false,false,false,0,null);
 
       //tooltip shown
-      assert.isTrue(tooltip.classList.contains('movedTooltip'));
+      assert.isTrue(tooltip._isShowing);
 
       //hover
       slice.dispatchEvent(evt);
@@ -132,7 +132,7 @@ function runTests(){
       setTimeout(function() {
 
         //tooltip should be hidden
-        assert.isFalse(tooltip.classList.contains('movedTooltip'));
+        assert.isFalse(tooltip._isShowing);
         done();
       }, 10);
     });
