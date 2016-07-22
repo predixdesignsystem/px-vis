@@ -32,8 +32,8 @@ Element which draws scatter series onto the chart
     <link rel="import" type="css" href="css/px-vis-pie.css"/>
     <template>
       <!-- anchors for tooltip and popovers -->
-      <span id="tooltipAnchor" class="visuallyhidden anchor"></span>
-      <span id="popoverAnchor" class="visuallyhidden anchor"></span>
+      <span id="tooltipAnchor" class=" anchor"></span>
+
       <!-- Title in the middle -->
       <div id="title" class$="[[_getTitleClass(showTitle)]]">
         <span id="totalTitle">Total</span>
@@ -47,8 +47,11 @@ Element which draws scatter series onto the chart
         </div>
       </px-tooltip>
       <!-- popover elem -->
-      <px-popover id="popover" popover-title="" orientation="top" hide-overlay class="popover" for="popoverAnchor">
+      <div id="popover2" class="anchor">
+      <span id="popoverAnchor" class=" anchor"></span>
+      <px-popover id="popover" position="relative" popover-title="" orientation="top" hide-overlay class="popover" for="popoverAnchor" style="position:relative">
       </px-popover>
+    </div>
     </template>
 </dom-module>
 
@@ -182,8 +185,14 @@ Element which draws scatter series onto the chart
       /**
        * d3 arc function used to draw arcs
        */
-      _arc: {
+      _arcGenerator: {
         type: Object
+      },
+      /**
+       * the current arcs
+       */
+      _arcs: {
+        Object
       },
       /**
        * How much the pie is currently rotated in rad
@@ -209,7 +218,7 @@ Element which draws scatter series onto the chart
     },
 
     observers: [
-      'drawElement(width,height,margin,svg,chartData.*,completeSeriesConfig, seriesId, usePercentage)'
+      'drawElement(width,height,margin,svg,chartData.*,completeSeriesConfig, seriesId, usePercentage, donut, innerRadius, showTitle)'
      ],
 
      attached: function() {
@@ -222,10 +231,14 @@ Element which draws scatter series onto the chart
 
       this.$.popoverAnchor.style.left = (curRect.left + leftMarg +  this._radius) + 'px';
       this.$.popoverAnchor.style.top = (curRect.top +  Number(this.margin.top)) + 'px';
+     },
+     _repositionTitle: function() {
+       var titleRect = this.$.title.getBoundingClientRect(),
+           leftMarg = Number(this.margin.left);
 
-      //position title div
-      this.$.title.style.left = (leftMarg + this._radius - titleRect.width/2) + 'px';
-      this.$.title.style.top = -this.height + Number(this.margin.top) + this._radius - titleRect.height/2 + 'px';
+       //position title div
+       this.$.title.style.left = (leftMarg + this._radius - titleRect.width/2) + 'px';
+       this.$.title.style.top = -this.height + Number(this.margin.top) + this._radius - titleRect.height/2 + 'px';
      },
     /**
      * Draws or updates the pie element.
@@ -248,38 +261,50 @@ Element which draws scatter series onto the chart
       }
 
       // declare an arc generator function
-      this._arc = Px.d3.arc().outerRadius(this._radius);
+      this._arcGenerator = Px.d3.arc().outerRadius(this._radius);
       if(this.donut) {
         var innerRadiusPx = this.innerRadius === 0 ? (this._radius - 30) : this.innerRadius * this._radius;
-        this._arc.innerRadius(innerRadiusPx);
+        this._arcGenerator.innerRadius(innerRadiusPx);
       } else {
-        this._arc.innerRadius(0);
+        this._arcGenerator.innerRadius(0);
       }
 
-      // select paths, use arc generator to draw
-      var arcs = this.pieGroup.selectAll('pie-slice')
-                              .data(pie)
-                              .enter()
-                              .append('svg:g')
-                              .attr('class', 'slice')
-                              .on('tap', this._centerOnSlice.bind(this))
-                              .on('mouseover', this._showTooltip.bind(this))
-                              .on('mouseleave', this._hideTooltip.bind(this));
+        if(!this._arcs) {
+        // select paths, use arc generator to draw
+        this._arcs = this.pieGroup.selectAll('pie-slice')
+                                .data(pie)
+                                .enter()
+                                .append('svg:g')
+                                .attr('class', 'slice')
+                                .on('tap', this._centerOnSlice.bind(this))
+                                .on('mouseover', this._showTooltip.bind(this))
+                                .on('mouseleave', this._hideTooltip.bind(this));
 
-      arcs.append('svg:path')
-          .attr('fill', function(d, i){
-              return this._getPieColorForIndex(i);
-          }.bind(this))
-          .attr('d', function (d) {
-              return this._arc(d);
-          }.bind(this));
+        this._arcs.append('svg:path')
+            .attr('fill', function(d, i){
+                return this._getPieColorForIndex(i);
+            }.bind(this))
+            .attr('d', function (d) {
+                return this._arcGenerator(d);
+            }.bind(this));
 
-      this.pieGroup
+        this.set('_currentRotationAngle', -Math.PI);
+        this._positionChart(1250);
+      } else {
+
+        //update slices
+        this._arcs.selectAll('path')
           .transition()
-          .duration(1250)
-          .attr('transform', this._translationString + ' rotate(-180)');
+          .duration(750)
+          .attr('d', function (d) {
+            return this._arcGenerator(d);
+        }.bind(this));
 
-      this.set('_currentRotationAngle', -Math.PI);
+        //make sure we're in the right pos
+        this._positionChart(150);
+      }
+
+      this._repositionTitle();
     },
     /**
      * Return the value or the slice datum depending on use of percentages
@@ -306,14 +331,11 @@ Element which draws scatter series onto the chart
       var rotatedDatum = {
         startAngle: datum.startAngle + this._currentRotationAngle,
         endAngle: datum.endAngle + this._currentRotationAngle
-      }
+      },
+          center = this._arcGenerator.centroid(rotatedDatum);
 
-      var rect = this.pxSvgElem.getBoundingClientRect(),
-        scroll = document.documentElement.scrollTop || document.body.scrollTop,
-        center = this._arc.centroid(rotatedDatum);
-
-      this.$.tooltipAnchor.style.left = (rect.left  + center[0] + this._radius + Number(this.margin.left)) + 'px';
-      this.$.tooltipAnchor.style.top = (rect.top + 5 + center[1] + Number(this.margin.top) + this._radius) + 'px';
+      this.$.tooltipAnchor.style.left = (center[0] +  this._radius + Number(this.margin.left)) + 'px';
+      this.$.tooltipAnchor.style.top =  (center[1] - Number(this.margin.bottom) - this._radius) + 'px';
       this.$.tooltip._show();
     },
     _hideTooltip: function(datum, index, group) {
@@ -335,25 +357,31 @@ Element which draws scatter series onto the chart
       }
     },
     /**
+     * Position the chart given the current translation string and rotation angle
+     */
+    _positionChart: function(transitionTime) {
+      this.pieGroup
+          .transition()
+          .duration(transitionTime)
+          .attr('transform', this._translationString + ' rotate(' + this._radToDeg(this._currentRotationAngle) + ')');
+    },
+    /**
      * Transforms the svg to show the slice at the top (12 o clock)
      *
      */
     _centerOnSlice: function(datum, index, group) {
       this.set('_currentRotationAngle', this._getRotationAngle(datum));
-      this.pieGroup
-          .transition()
-          .duration(750)
-          .attr('transform', this._translationString + ' rotate(' + this._radToDeg(this._currentRotationAngle) + ')');
-
+      this._positionChart(750);
       //display a popover after the rotation
       setTimeout(function() {
 
         //position popover anchor
         var curRect = this.pxSvgElem.getBoundingClientRect(),
-            leftMarg = Number(this.margin.left);
+            leftMarg = Number(this.margin.left),
+            fuck = this.$.popoverAnchor.getBoundingClientRect();
 
-        this.$.popoverAnchor.style.left = (curRect.left + leftMarg +  this._radius) + 'px';
-        this.$.popoverAnchor.style.top = (curRect.top +  Number(this.margin.top)) + 'px';
+        this.$.popover2.style.left =  (leftMarg +  this._radius) + 'px';
+        this.$.popover2.style.top = /*- Number(this.margin.bottom) - this._radius*2 + */'0px';
 
         this.$.popover.popoverTitle = datum.data[this.completeSeriesConfig[this.seriesId].y];
         this.$.popover.popoverBody = this._getSliceValue(datum);
