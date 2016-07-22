@@ -31,6 +31,11 @@ Element which draws scatter series onto the chart
 <dom-module id="px-vis-pie">
     <link rel="import" type="css" href="css/px-vis-pie.css"/>
     <template>
+    <div id="popoverWrapper" class="anchor">
+      <span id="popoverAnchor" class="anchor"></span>
+      <px-popover id="popover" position="relative" popover-title="" orientation="top" hide-overlay class="popover" for="popoverAnchor" style="position:relative">
+      </px-popover>
+    </div>
       <!-- anchors for tooltip and popovers -->
       <span id="tooltipAnchor" class=" anchor"></span>
 
@@ -47,11 +52,7 @@ Element which draws scatter series onto the chart
         </div>
       </px-tooltip>
       <!-- popover elem -->
-      <div id="popover2" class="anchor">
-      <span id="popoverAnchor" class=" anchor"></span>
-      <px-popover id="popover" position="relative" popover-title="" orientation="top" hide-overlay class="popover" for="popoverAnchor" style="position:relative">
-      </px-popover>
-    </div>
+
     </template>
 </dom-module>
 
@@ -341,7 +342,7 @@ Element which draws scatter series onto the chart
     _hideTooltip: function(datum, index, group) {
 
       //close if we aren't moving over the tooltip
-      if(this.$.tooltip !== Px.d3.event.relatedTarget) {
+      if(this.$.tooltip !== Px.d3.event.relatedTarget && Px.d3.event.relatedTarget.offsetParent !== this.$.tooltip) {
 
         this.$.tooltip._hide();
       } else {
@@ -376,12 +377,8 @@ Element which draws scatter series onto the chart
       setTimeout(function() {
 
         //position popover anchor
-        var curRect = this.pxSvgElem.getBoundingClientRect(),
-            leftMarg = Number(this.margin.left),
-            fuck = this.$.popoverAnchor.getBoundingClientRect();
-
-        this.$.popover2.style.left =  (leftMarg +  this._radius) + 'px';
-        this.$.popover2.style.top = /*- Number(this.margin.bottom) - this._radius*2 + */'0px';
+        this.$.popoverWrapper.style.left =  (Number(this.margin.left) +  this._radius) + 'px';
+        this.$.popoverWrapper.style.top = - Number(this.margin.bottom) - this._radius*2 + 'px';
 
         this.$.popover.popoverTitle = datum.data[this.completeSeriesConfig[this.seriesId].y];
         this.$.popover.popoverBody = this._getSliceValue(datum);
