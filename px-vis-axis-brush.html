@@ -55,7 +55,9 @@ This element draw the box over the axis signifying the active area to mute the s
      * @type Object
      */
     properties: {
-
+      _brushes: {
+        type: Object
+      }
     },
 
     observers: [
@@ -67,20 +69,29 @@ This element draw the box over the axis signifying the active area to mute the s
         var _this = this;
         // Add and store a brush for each axis.
         this.svg.append("g")
-        .attr("class", "brush")
-        .each(function(d) {
-          Px.d3.select(this).call(
-            _this.axis[d].brush = Px.d3.svg.brush()
-              .y(_this.axis[d])
-              .on("brushstart", _this.brushstart.bind(_this))
-              .on("brushend", _this.brush.bind(_this)));
-        })
-        .selectAll("rect")
-        .attr({
-          "x":-8,
-          "width": 18,
-          "fill": this.colors.gray5
-        });
+          .attr("class", "brush")
+          .each(function(d) {
+            var domain = [
+              [-10,0],
+              [+10,500]
+            ];
+
+            Px.d3.select(this).call(
+              Px.d3.brushY()
+                .extent(domain)
+                .on("start.brush", _this.brushstart.bind(_this))
+                .on("end.brush", _this.brush.bind(_this))
+            );
+          })
+          .selectAll("rect")
+          .attr({
+            "x":-8,
+            "width": 18,
+            "fill": this.colors.gray5
+          });
+
+        // save these brushes for access in brush()
+        this.set('_brushes',this.svg.selectAll('g.brush'));
       }
     },
 
@@ -90,24 +101,27 @@ This element draw the box over the axis signifying the active area to mute the s
 
     // Handles a brush event, toggling the display of foreground lines.
     brush: function() {
-      var brushedAxes = this.dimensions.filter(function(p) {
-          return !this.axis[p].brush.empty();
-        }.bind(this)),
-
-        extents = brushedAxes.map(function(p) {
-          return this.axis[p].brush.extent();
-        }.bind(this)),
+      var extents = [],
         series = {},
-        dim;
+        dim,y0,y1;
+
+      // for each brush, figure out if it was brushed and build an array of obj with the extents and the dimension
+      this._brushes.each(function(d) {
+        if(Px.d3.brushSelection(this)){
+          extents.push({ "extent": Px.d3.brushSelection(this), "index": d });
+        }
+      });
+
       for(var i = 0; i < this.chartData.length; i++){
-        for(var j = 0; j < brushedAxes.length; j++){
-          dim = brushedAxes[j];
-          if(extents[j][0] > this.chartData[i][dim] || this.chartData[i][dim] > extents[j][1]){
+        for(var j = 0; j < extents.length; j++){
+          dim = extents[j]['index'];
+          y0 = this.axis[dim].invert(extents[j]["extent"][1]);
+          y1 = this.axis[dim].invert(extents[j]["extent"][0]);
+          if(y0 > this.chartData[i][dim] || this.chartData[i][dim] > y1){
             series[this.chartData[i][this.seriesKey]] = true;
           }
         }
       }
-
       this.set('mutedSeries',series);
       this.fire('px-vis-muted-series-updated', { 'data': series, 'dataVar': 'mutedSeries' ,'method': 'set' });
     }

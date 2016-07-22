@@ -39,6 +39,7 @@ Element which draws lines series onto the chart
 
     behaviors: [
       PxVisBehaviorD3.svg,
+      PxVisBehaviorD3.canvas,
       PxVisBehaviorD3.axes,
       PxVisBehavior.dataset,
       PxVisBehavior.mutedSeries,
@@ -97,11 +98,15 @@ Element which draws lines series onto the chart
       multiPath: {
         type: Boolean,
         value: false
+      },
+
+      line: {
+        type: Object
       }
     },
 
     observers: [
-      // TODO Investigate how to make chartData woth with pushing new data in...
+      'drawCanvas(canvasContext,currentDomainX,currentDomainY,chartData.*,completeSeriesConfig.*)',
       'drawElement(svg,currentDomainX,currentDomainY,chartData.*,completeSeriesConfig.*)',
       'isIdInMuted(mutedSeries.*)',
       '_addClipPath(clipPath)'
@@ -114,32 +119,12 @@ Element which draws lines series onto the chart
       }
     },
 
-    /**
-     * Draws or updates the line element.
-     * Called from an observer watching for data and the necessary d3 objects
-     *
-     * @method drawElement
-     */
-    drawElement: function() {
-      this.debounce('draw',function(){
-        if(this.parallelCoordinates) {
-          var data = this.chartData,
-              dims = this.completeSeriesConfig[this.seriesId]['x'],
-              path = Px.d3.line(),
-
-              line = function(d) {
-                return path(dims.map(function(p) {
-                  return [~~this.x(p), ~~this.y[p](d[p])];
-                }.bind(this)));
-              }.bind(this);
-        } else {
-          var data = [this.chartData],
-              _this = this,
-              xKey = _this.completeSeriesConfig[_this.seriesId]['x'],
-              yKey = _this.completeSeriesConfig[_this.seriesId]['y'];
-
-          //round pixels values to optimize svg perfs
-          var line = Px.d3.line()
+    _defineSingleLine: function(){
+      //round pixels values to optimize svg perfs
+      var _this = this,
+          xKey = _this.completeSeriesConfig[_this.seriesId]['x'],
+          yKey = _this.completeSeriesConfig[_this.seriesId]['y'],
+          line = Px.d3.line()
             .x(function(d) {
                 return ~~_this.x(d[xKey]);
             })
@@ -151,6 +136,43 @@ Element which draws lines series onto the chart
               return !isNaN(d[yKey]);
               // return d[yKey] === d[yKey];
             });
+
+      if(this.renderToCanvas){
+        line.context(this.canvasContext);
+      }
+
+      this.set('line',line);
+    },
+
+    _defineMultiLine: function(){
+      var dims = this.completeSeriesConfig[this.seriesId]['x'],
+          path = Px.d3.line(),
+          line = function(d) {
+            return path(dims.map(function(p) {
+              return [~~this.x(p), ~~this.y[p](d[p])];
+            }.bind(this)));
+          }.bind(this);
+
+      if(this.renderToCanvas){
+        path.context(this.canvasContext);
+      }
+
+      this.set('line',line);
+    },
+    /**
+     * Draws or updates the line element.
+     * Called from an observer watching for data and the necessary d3 objects
+     *
+     * @method drawElement
+     */
+    drawElement: function() {
+      this.debounce('draw',function(){
+        if(this.parallelCoordinates) {
+          var data = this.chartData;
+          this._defineMultiLine();
+        } else {
+          var data = [this.chartData];
+          this._defineSingleLine();
         }
 
         // checks to see if the group already exists. If not, create; if so, update
@@ -174,7 +196,7 @@ Element which draws lines series onto the chart
           }.bind(this))
           .attr('fill','none')
         .merge(this.lineBuilder)
-          .attr("d", line)
+          .attr("d", this.line)
           .attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
           .attr('stroke-opacity',1);
 
@@ -182,6 +204,31 @@ Element which draws lines series onto the chart
 
         this._addClipPath();
 
+        this.isIdInMuted();
+      },10);
+    },
+
+    /**
+     * Draws or updates the line element.
+     * Called from an observer watching for data and the necessary d3 objects
+     *
+     * @method drawElement
+     */
+    drawCanvas: function() {
+      this.debounce('drawCanvas',function(){
+        var data = this.chartData;
+        if(this.parallelCoordinates) {
+          this._defineMultiLine();
+        } else {
+          this._defineSingleLine();
+        }
+
+        console.log(this.canvasContext);
+        this.canvasContext.beginPath();
+        this.line(data);
+        this.canvasContext.lineWidth = 1.5;
+        this.canvasContext.strokeStyle = this.completeSeriesConfig[this.seriesId]['color'];
+        this.canvasContext.stroke();
       },10);
     },
 
