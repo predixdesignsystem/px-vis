@@ -29,15 +29,17 @@ Element providing on-chart tooltip display
 <dom-module id="px-vis-tooltip">
     <link rel="import" type="css" href="css/px-vis-tooltip.css"/>
     <template>
-      <px-vis-register
-        id="tooltip"
-        class="hidden u-pl u-pr u-pt u-pb"
-        tooltip-data=[[tooltipData]]
-        chart-data="[[chartData]]"
-        x-axis-type="[[xAxisType]]"
-        y-axis-type="[[yAxisType]]"
-        complete-series-config="[[completeSeriesConfig]]">
-      </px-vis-register>
+      <div style="position:relative">
+        <px-vis-register
+          id="tooltip"
+          class="hidden u-pl u-pr u-pt u-pb"
+          tooltip-data=[[tooltipData]]
+          chart-data="[[chartData]]"
+          x-axis-type="[[xAxisType]]"
+          y-axis-type="[[yAxisType]]"
+          complete-series-config="[[completeSeriesConfig]]">
+        </px-vis-register>
+      </div>
     </template>
 </dom-module>
 
@@ -74,6 +76,7 @@ Element providing on-chart tooltip display
      ],
      attached: function() {
        this.set('_rect', this.pxSvgElem.getBoundingClientRect());
+       this.first = false;
      },
     _updateTooltip: function(){
       if(this.tooltipData.mouse !== null){
@@ -85,8 +88,21 @@ Element providing on-chart tooltip display
     },
     _moveTooltip: function() {
       // TODO allow spacing adjustment
-      this.$.tooltip.style.left = this._rect.left + Number(this.margin.left) + 15 + this.tooltipData.mouse[0] + 'px';
-      this.$.tooltip.style.top = this._rect.top + Number(this.margin.top) + 5 + this.tooltipData.mouse[1]  + 'px';
+//       if(!this.first) {
+//         //this.set('_rect', this.pxSvgElem.getBoundingClientRect());
+//         var hack = this.pxSvgElem.getBoundingClientRect();
+//         var doc = document.documentElement;
+// var left = (window.pageXOffset || doc.scrollLeft) - (doc.clientLeft || 0);
+// var top = (window.pageYOffset || doc.scrollTop)  - (doc.clientTop || 0);
+//
+//         this.left = left;
+//         this.top = top;
+//         this.first = true;
+//       }
+    //
+//this.set('_rect', this.pxSvgElem.getBoundingClientRect());
+      this.$.tooltip.style.left =Number(this.margin.left) + 15 + this.tooltipData.mouse[0] + 'px';
+      this.$.tooltip.style.top = Number(this.margin.top) + 5 + this.tooltipData.mouse[1]  + 'px';
     }
   });
 </script>

@@ -1,3 +1,7 @@
+v0.0.7
+==================
+* Fix tooltip positioning
+
 v0.0.6
 ==================
 * fix positioning for pies
