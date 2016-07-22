@@ -1,3 +1,7 @@
+v0.0.6
+==================
+* fix positioning for pies
+
 v0.0.5
 ==================
 * behavior documentation fixes
