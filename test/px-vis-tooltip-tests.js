@@ -91,12 +91,12 @@ function runTests(){
     });
     test('baseTooltip style left', function() {
       var num = parseInt(baseTooltip.$.tooltip.style.left),
-          expected = baseTooltip._rect.left + Number(baseTooltip.margin.left) + 15 + baseTooltip.tooltipData.mouse[0];
+          expected = Number(baseTooltip.margin.left) + 15 + baseTooltip.tooltipData.mouse[0];
       assert.equal(num,expected);
     });
     test('baseTooltip style top', function() {
       var num = parseInt(baseTooltip.$.tooltip.style.top),
-          expected = baseTooltip._rect.top + Number(baseTooltip.margin.top) + 5 + baseTooltip.tooltipData.mouse[1];
+          expected = Number(baseTooltip.margin.top) + 5 + baseTooltip.tooltipData.mouse[1];
       assert.closeTo(num,expected,1);
     });
   }); //suite
