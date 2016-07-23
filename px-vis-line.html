@@ -221,7 +221,7 @@ Element which draws lines series onto the chart
           .merge(this.lineBuilder)
             .attr("d", this.line)
             .attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
-            .attr('stroke-opacity',this._opacityLine.bind(this));
+            .attr('stroke-opacity',this._svgLine.bind(this));
 
           this.linePath = this.lineGroup.selectAll('path.series-line');
 
@@ -261,17 +261,30 @@ Element which draws lines series onto the chart
           this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
         }
 
-        this.canvasContext.beginPath();
-        for(var i = 0; i < data.length; i++){
-          // if the series is not listed or it is false, draw it
-          if(!this.mutedSeries[data[i][this.seriesId]]){
-            this.canvasContext.beginPath();
-            this.canvasContext.strokeStyle = this._canvasLineColor(data[i]);
-            this.canvasContext.lineWidth = 1;
-            this.line(data[i]);
-            this.canvasContext.stroke();
+        if(this.gradientLine){
+          for(var i = 0; i < data.length; i++){
+            // if the series is not listed or it is false, draw it
+            if(!this.mutedSeries[data[i][this.seriesId]]){
+              this.canvasContext.beginPath();
+              this.canvasContext.strokeStyle = this._canvasLineColor(data[i]);
+              this.canvasContext.lineWidth = 1;
+              this.line(data[i]);
+              this.canvasContext.stroke();
+            }
           }
+        } else { //not gradientLine
+          this.canvasContext.beginPath();
+          for(var i = 0; i < data.length; i++){
+            // if the series is not listed or it is false, draw it
+            if(!this.mutedSeries[data[i][this.seriesId]]){
+              this.line(data[i]);
+            }
+          }
+          this.canvasContext.strokeStyle = this.completeSeriesConfig[this.seriesId]['color'];
+          this.canvasContext.lineWidth = 1;
+          this.canvasContext.stroke();
         }
+
         this.canvasContext.clearRect(0, -1, -50, this.canvasContext.canvas.height);
         this.canvasContext._pxLinesRedraw += 1;
         console.timeEnd('draw');
@@ -318,32 +331,30 @@ Element which draws lines series onto the chart
      */
     _colorLine:function(){
       this.linePath.attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
-        .attr('stroke-opacity', this._opacityLine.bind(this));
+        .attr('stroke-opacity', this._svgLine.bind(this));
+    },
+
+    _svgLine: function(d){
+      if(this.gradientLine){
+        return this._opacityLine(d);
+      }
+      return 1
     },
     /**
      * Returns the correct opacity to use for the line.
      *
      */
     _opacityLine:function(d){
-      if(this.gradientLine){
-        if(this.gradientRange.length === 0){
-          this.gradientRange[0] = Number(this.chartData[0][this.seriesId]);
-          this.gradientRange[1] = Number(this.chartData[this.chartData.length - 1][this.seriesId]);
-        }
-        var n = (this.gradientRange[1] - d[this.seriesId]) / (this.gradientRange[1] - this.gradientRange[0]);
-        return 1 - n * 0.8;
+      if(this.gradientRange.length === 0){
+        this.gradientRange[0] = Number(this.chartData[0][this.seriesId]);
+        this.gradientRange[1] = Number(this.chartData[this.chartData.length - 1][this.seriesId]);
       }
-      return 1;
+      var n = (this.gradientRange[1] - d[this.seriesId]) / (this.gradientRange[1] - this.gradientRange[0]);
+      return 1 - n * 0.8;
     },
     _canvasLineColor:function(d){
-      // if we need a gradient, we need to convert to rgba, else return rgb
-      if(this.gradientLine){
-        var n = this._opacityLine(d);
-        // var c ='rgba(' + this._colorArr[0] + ',' + this._colorArr[1] + ',' + this._colorArr[2] + ',0.2)';
-        var c ='rgba(' + this._colorArr[0] + ',' + this._colorArr[1] + ',' + this._colorArr[2] + ',' + n + ')';
-        return c;
-      }
-      return this.completeSeriesConfig[this.seriesId]['color'];
+      return 'rgba(' + this._colorArr[0] + ',' + this._colorArr[1] + ',' + this._colorArr[2] + ',' + this._opacityLine(d) + ')';
+      ;
     },
     /**
      * Adds muted color to the line.
