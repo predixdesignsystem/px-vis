@@ -95,6 +95,7 @@ PxVisBehaviorChart.chartCommon = [{
       'px-vis-clip-path-updated'        : '_updateLocalProperty',
       'px-vis-series-clip-path-updated' : '_updateLocalProperty',
       'px-vis-svg-element-updated'      : '_updateLocalProperty',
+      'px-vis-canvas-context-updated'   : '_updateGlobalProperty',
 
       'px-vis-muted-series-updated'     : '_updateGlobalProperty',
       'px-vis-selected-domain-updated'  : '_updateGlobalProperty'
@@ -104,7 +105,9 @@ PxVisBehaviorChart.chartCommon = [{
     observers: [
       '_setCompleteSeriesConfig(defaultSeriesConfig.*,chartData.*,seriesConfig.*)'
     ],
-
+    _test: function(e){
+      console.log(e)
+    },
     _calcChartExts: function(mins,maxes,axis){
       if(this[axis + 'AxisType'] === 'ordinal'){
         // how should someone set the ordinal list? Differet key in seriesConfig?
@@ -265,6 +268,7 @@ PxVisBehaviorChart.chartCommon = [{
     _updateLocalProperty: function(evt){
       var detail = evt.detail;
       var ne = Polymer.dom(evt);
+      //check that the event is fired from a child and not another decendant.
       if(ne.rootTarget.dataHost === this){
         this._updateProperty(detail);
       }
@@ -345,4 +349,8 @@ PxVisBehaviorChart.chartCommon = [{
     }
 
 }, commonColors, PxVisBehavior.commonMethods,PxVisBehavior.axisTypes];
+
+PxVisBehaviorChart.precipitationPattern = {
+
+};
 </script>

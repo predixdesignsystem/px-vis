@@ -216,19 +216,36 @@ Element which draws lines series onto the chart
      */
     drawCanvas: function() {
       this.debounce('drawCanvas',function(){
-        var data = this.chartData;
+        var data;
+
         if(this.parallelCoordinates) {
           this._defineMultiLine();
+          data = this.chartData;
         } else {
           this._defineSingleLine();
+          data = [this.chartData];
         }
 
-        console.log(this.canvasContext);
+        if(!this.canvasContext._pxLinesSeries[this.seriesId]){
+          this.canvasContext._pxLinesSeries[this.seriesId] = true;
+          this.canvasContext._pxLinesTotal += 1;
+        }
+
+        if(this.canvasContext._pxLinesRedraw === this.canvasContext._pxLinesTotal){
+          this.canvasContext._pxLinesRedraw = 0;
+          // (x1,y1,x2,y2) : for some reason, we need y1 to be -1 or it leaves a pixel....
+          this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+        }
+
         this.canvasContext.beginPath();
-        this.line(data);
-        this.canvasContext.lineWidth = 1.5;
+        for(var i = 0; i < data.length; i++){
+          this.line(data[i]);
+        }
+        this.canvasContext.lineWidth = 1;
         this.canvasContext.strokeStyle = this.completeSeriesConfig[this.seriesId]['color'];
         this.canvasContext.stroke();
+        this.canvasContext.clearRect(0, -1, -50, this.canvasContext.canvas.height);
+        this.canvasContext._pxLinesRedraw += 1;
       },10);
     },
 
