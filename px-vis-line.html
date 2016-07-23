@@ -239,7 +239,10 @@ Element which draws lines series onto the chart
 
         this.canvasContext.beginPath();
         for(var i = 0; i < data.length; i++){
-          this.line(data[i]);
+          // if the series is not listed or it is false, draw it
+          if(!this.mutedSeries[data[i][this.seriesId]]){
+            this.line(data[i]);
+          }
         }
         this.canvasContext.lineWidth = 1;
         this.canvasContext.strokeStyle = this.completeSeriesConfig[this.seriesId]['color'];
@@ -265,16 +268,20 @@ Element which draws lines series onto the chart
      * @method isIdInMuted
      */
     isIdInMuted: function() {
-      if(this.multiPath && this._doesObjHaveValues(this.linePath)){
-        this.linePath.style("display", function(d) {
-          return this.mutedSeries[d[this.seriesId]] ? 'none' : null;
-        }.bind(this));
-      } else if(this.mutedSeries.hasOwnProperty(this.seriesId)){
-        // if true, mute
-        if(this.mutedSeries[this.seriesId]){
-          this._muteLine();
-        } else {
-          this._colorLine();
+      if(this.renderToCanvas){
+        this.drawCanvas();
+      } else {
+        if(this.multiPath && this._doesObjHaveValues(this.linePath)){
+          this.linePath.style("display", function(d) {
+            return this.mutedSeries[d[this.seriesId]] ? 'none' : null;
+          }.bind(this));
+        } else if(this.mutedSeries.hasOwnProperty(this.seriesId)){
+          // if true, mute
+          if(this.mutedSeries[this.seriesId]){
+            this._muteLine();
+          } else {
+            this._colorLine();
+          }
         }
       }
     },
