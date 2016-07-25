@@ -1,3 +1,7 @@
+v0.1.3
+==================
+* improve pie transitioning
+
 v0.1.2
 ==================
 * Fixed line seriesID bug
