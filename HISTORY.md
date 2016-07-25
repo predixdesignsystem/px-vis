@@ -1,3 +1,7 @@
+v0.1.2
+==================
+* Fixed line seriesID bug
+
 v0.1.1
 ==================
 * Upgraded navigator to add precipitationPattern behavior

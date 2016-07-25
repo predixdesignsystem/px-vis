@@ -63,8 +63,8 @@ function runTests(){
       baseScale.set('chartExtents',chartExtents);
       baseScale.set('chartData',d);
 
-      baseLine.set('completeSeriesConfig',completeSeriesConfig);
       baseLine.set('seriesId',"mySeries");
+      baseLine.set('completeSeriesConfig',completeSeriesConfig);
       baseLine.set('chartData',d);
 
       // needed for the debounce in line
