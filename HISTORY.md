@@ -1,3 +1,7 @@
+v0.1.1
+==================
+* Upgraded navigator to add precipitationPattern behavior
+
 v0.1.0
 ==================
 * Added canvas support: canvas element and ability to render lines to canvas.
