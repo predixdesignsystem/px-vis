@@ -1,3 +1,8 @@
+v0.1.0
+==================
+* Added canvas support: canvas element and ability to render lines to canvas.
+* Added ability to gives lines a gradient opacity.
+
 v0.0.7
 ==================
 * Fix tooltip positioning
