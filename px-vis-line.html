@@ -102,7 +102,20 @@ Element which draws lines series onto the chart
 
       line: {
         type: Object
-      }
+      },
+
+      gradientLine: {
+        type: Boolean,
+        value: false
+      },
+       gradientRange: {
+         type: Array,
+         value: []
+       },
+       _colorArr: {
+         type: Array,
+         computed: '_computeColorArr(completeSeriesConfig,seriesId)'
+       }
     },
 
     observers: [
@@ -117,6 +130,15 @@ Element which draws lines series onto the chart
       if(!this.seriesId){
         this.set('seriesId', this.generateRandomID('line_'));
       }
+    },
+
+    _computeColorArr: function(){
+      var c = this.completeSeriesConfig[this.seriesId]['color'].split('(')[1].split(',');
+      return [
+        Number(c[0]),
+        Number(c[1]),
+        Number(c[2].split(')')[0])
+      ];
     },
 
     _defineSingleLine: function(){
@@ -167,44 +189,46 @@ Element which draws lines series onto the chart
      */
     drawElement: function() {
       this.debounce('draw',function(){
-        if(this.parallelCoordinates) {
-          var data = this.chartData;
-          this._defineMultiLine();
-        } else {
-          var data = [this.chartData];
-          this._defineSingleLine();
+        if(!this.renderToCanvas){
+          if(this.parallelCoordinates) {
+            var data = this.chartData;
+            this._defineMultiLine();
+          } else {
+            var data = [this.chartData];
+            this._defineSingleLine();
+          }
+
+          // checks to see if the group already exists. If not, create; if so, update
+          if(this._isObjEmpty(this.lineGroup)) {
+            // draw the path
+            this.lineGroup = this.svg.append("g")
+              .attr("series-id", 'line_' + this.seriesId)
+              .attr("class", "series-line");
+          }
+
+          this.lineBuilder = this.lineGroup.selectAll('path.series-line')
+            .data(data);
+
+          this.lineBuilder.exit().remove();
+
+          this.lineBuilder.enter()
+            .append('path')
+            .attr("class", "series-line")
+            .attr("series-id", function(d,i){
+              return this.multiPath ? 'line_' + d[this.seriesId] : 'line_' + this.seriesId
+            }.bind(this))
+            .attr('fill','none')
+          .merge(this.lineBuilder)
+            .attr("d", this.line)
+            .attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
+            .attr('stroke-opacity',this._svgLine.bind(this));
+
+          this.linePath = this.lineGroup.selectAll('path.series-line');
+
+          this._addClipPath();
+
+          this.isIdInMuted();
         }
-
-        // checks to see if the group already exists. If not, create; if so, update
-        if(this._isObjEmpty(this.lineGroup)) {
-          // draw the path
-          this.lineGroup = this.svg.append("g")
-            .attr("series-id", 'line_' + this.seriesId)
-            .attr("class", "series-line");
-        }
-
-        this.lineBuilder = this.lineGroup.selectAll('path.series-line')
-          .data(data);
-
-        this.lineBuilder.exit().remove();
-
-        this.lineBuilder.enter()
-          .append('path')
-          .attr("class", "series-line")
-          .attr("series-id", function(d,i){
-            return this.multiPath ? 'line_' + d[this.seriesId] : 'line_' + this.seriesId
-          }.bind(this))
-          .attr('fill','none')
-        .merge(this.lineBuilder)
-          .attr("d", this.line)
-          .attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
-          .attr('stroke-opacity',1);
-
-        this.linePath = this.lineGroup.selectAll('path.series-line');
-
-        this._addClipPath();
-
-        this.isIdInMuted();
       },10);
     },
 
@@ -237,18 +261,41 @@ Element which draws lines series onto the chart
           this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
         }
 
-        this.canvasContext.beginPath();
-        for(var i = 0; i < data.length; i++){
-          // if the series is not listed or it is false, draw it
-          if(!this.mutedSeries[data[i][this.seriesId]]){
-            this.line(data[i]);
+        if(this.gradientLine){
+          for(var i = 0; i < data.length; i++){
+            // if the series is not listed or it is false, draw it
+            if(!this.mutedSeries[data[i][this.seriesId]]){
+              // TODO wrap for in a settimeout and go by 1000s?
+              // setTimeout(function(d){
+              //   this.canvasContext.beginPath();
+              //   this.canvasContext.strokeStyle = this._canvasLineColor(d);
+              //   this.canvasContext.lineWidth = 1;
+              //   this.line(d);
+              //   this.canvasContext.stroke();
+              // }.bind(this,data[i]),1);
+              this.canvasContext.beginPath();
+              this.canvasContext.strokeStyle = this._canvasLineColor(data[i]);
+              this.canvasContext.lineWidth = 1;
+              this.line(data[i]);
+              this.canvasContext.stroke();
+            }
           }
+        } else { //not gradientLine
+          this.canvasContext.beginPath();
+          for(var i = 0; i < data.length; i++){
+            // if the series is not listed or it is false, draw it
+            if(!this.mutedSeries[data[i][this.seriesId]]){
+              this.line(data[i]);
+            }
+          }
+          this.canvasContext.strokeStyle = this.completeSeriesConfig[this.seriesId]['color'];
+          this.canvasContext.lineWidth = 1;
+          this.canvasContext.stroke();
         }
-        this.canvasContext.lineWidth = 1;
-        this.canvasContext.strokeStyle = this.completeSeriesConfig[this.seriesId]['color'];
-        this.canvasContext.stroke();
+
         this.canvasContext.clearRect(0, -1, -50, this.canvasContext.canvas.height);
         this.canvasContext._pxLinesRedraw += 1;
+        console.timeEnd('draw');
       },10);
     },
 
@@ -292,7 +339,30 @@ Element which draws lines series onto the chart
      */
     _colorLine:function(){
       this.linePath.attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
-        .attr('stroke-opacity',1);
+        .attr('stroke-opacity', this._svgLine.bind(this));
+    },
+
+    _svgLine: function(d){
+      if(this.gradientLine){
+        return this._opacityLine(d);
+      }
+      return 1
+    },
+    /**
+     * Returns the correct opacity to use for the line.
+     *
+     */
+    _opacityLine:function(d){
+      if(this.gradientRange.length === 0){
+        this.gradientRange[0] = Number(this.chartData[0][this.seriesId]);
+        this.gradientRange[1] = Number(this.chartData[this.chartData.length - 1][this.seriesId]);
+      }
+      var n = (this.gradientRange[1] - d[this.seriesId]) / (this.gradientRange[1] - this.gradientRange[0]);
+      return 1 - n * 0.8;
+    },
+    _canvasLineColor:function(d){
+      return 'rgba(' + this._colorArr[0] + ',' + this._colorArr[1] + ',' + this._colorArr[2] + ',' + this._opacityLine(d) + ')';
+      ;
     },
     /**
      * Adds muted color to the line.

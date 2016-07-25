@@ -111,18 +111,16 @@ This element draw the box over the axis signifying the active area to mute the s
       this.debounce('drag', function(e){
         this._dragging[d] = Math.min(this.width, Math.max(0, e));
 
-        // if we want them to reorder dynamically:
-        if(this.dynamicAxisRedraw){
-          this.dimensions.sort(function(a, b) { return this._position(a) - this._position(b); }.bind(this));
-          this.axis.domain(this.dimensions);
+        // reorder dynamically:
+        this.dimensions.sort(function(a, b) { return this._position(a) - this._position(b); }.bind(this));
+        this.axis.domain(this.dimensions);
 
-          // redraw the lines
-          if(this.redrawSeries){
-            for(var i = 0; i < this.redrawElems.length; i++){
-              // TODO investigate how to make line dynamic
-              this.redrawElems[i].drawElement();
-              this.redrawElems[i].drawCanvas();
-            }
+        // redraw the lines
+        if(this.redrawSeries & this.dynamicRedraw){
+          for(var i = 0; i < this.redrawElems.length; i++){
+            // TODO investigate how to make line dynamic
+            this.redrawElems[i].drawElement();
+            this.redrawElems[i].drawCanvas();
           }
         }
 
