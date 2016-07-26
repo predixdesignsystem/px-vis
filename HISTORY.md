@@ -1,3 +1,7 @@
+v0.1.4
+==================
+* fixed navSeriesLimit in navigator
+
 v0.1.3
 ==================
 * improve pie transitioning
