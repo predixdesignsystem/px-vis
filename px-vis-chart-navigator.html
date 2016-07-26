@@ -51,34 +51,36 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
       </px-vis-svg>
 
       <template is="dom-repeat" items="[[_returnKeys(completeSeriesConfig)]]">
-        <template is="dom-if" if="[[_chartTypeLine(item,completeSeriesConfig)]]">
-          <px-vis-line
-            svg="[[svg]]"
-            series-id="[[item]]"
-            chart-data="[[chartData]]"
-            complete-series-config="[[completeSeriesConfig]]"
-            x="[[x]]"
-            y="[[y]]"
-            current-domain-x="[[currentDomainX]]"
-            current-domain-y="[[currentDomainY]]"
-            clip-path="[[clipPath]]"
-            muted-series="[[mutedSeries]]">
-          </px-vis-line>
-        </template>
-        <template is="dom-if" if="[[_chartTypeScatter(item,completeSeriesConfig)]]">
-          <px-vis-scatter
-            svg="[[svg]]"
-            series-id="[[item]]"
-            chart-data="[[chartData]]"
-            complete-series-config="[[completeSeriesConfig]]"
-            marker-size="2"
-            x="[[x]]"
-            y="[[y]]"
-            current-domain-x="[[currentDomainX]]"
-            current-domain-y="[[currentDomainY]]"
-            clip-path="[[clipPath]]"
-            muted-series="[[mutedSeries]]">
-          </px-vis-scatter>
+        <template is="dom-if" if="[[_limitSeries(index)]]">
+          <template is="dom-if" if="[[_chartTypeLine(item,completeSeriesConfig)]]">
+            <px-vis-line
+              svg="[[svg]]"
+              series-id="[[item]]"
+              chart-data="[[chartData]]"
+              complete-series-config="[[completeSeriesConfig]]"
+              x="[[x]]"
+              y="[[y]]"
+              current-domain-x="[[currentDomainX]]"
+              current-domain-y="[[currentDomainY]]"
+              clip-path="[[clipPath]]"
+              muted-series="[[mutedSeries]]">
+            </px-vis-line>
+          </template>
+          <template is="dom-if" if="[[_chartTypeScatter(item,completeSeriesConfig)]]">
+            <px-vis-scatter
+              svg="[[svg]]"
+              series-id="[[item]]"
+              chart-data="[[chartData]]"
+              complete-series-config="[[completeSeriesConfig]]"
+              marker-size="2"
+              x="[[x]]"
+              y="[[y]]"
+              current-domain-x="[[currentDomainX]]"
+              current-domain-y="[[currentDomainY]]"
+              clip-path="[[clipPath]]"
+              muted-series="[[mutedSeries]]">
+            </px-vis-scatter>
+          </template>
         </template>
       </template>
 
@@ -135,11 +137,11 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           /**
            * Number of series to display on the navigator
            *
-           * TODO how to just show all? 'All', INFINITY?
            * @default 1
            */
           navSeriesLimit:{
-            type:Number
+            type:Number,
+            value: Infinity
           },
           xAxisLocation:{
             type:String,
@@ -177,17 +179,8 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           },
         },
 
-        _limitSeries: function(limit){
-          if (!limit) {
-            // set filter to null to disable filtering
-            return null;
-          } else {
-            // return a filter function for the current search
-            return function(chartData) {
-              // seriesNumber is 0 index, so < limit
-              return chartData.seriesNumber < limit;
-            };
-          }
+        _limitSeries: function(i){
+          return i < this.navSeriesLimit;
         }
     });
 </script>
