@@ -16,9 +16,12 @@ This element sets the selectedDomain property based on the extents box. The sele
     <px-vis-brush
       svg="[[varFromSVGComponent]]"
       axis="[[varXFromScaleComponent]]"
+      width="[[width]]"
       height="[[height]]"
-      selected-domain="{{selectedDomain}}"
-      current-domain="[[varXDomainFromScaleComponent]]">
+      margin="[[margin]]"
+      chart-domain=[[chartDomainX]]
+      current-domain="[[varXDomainFromScaleComponent]]"
+      selected-domain="{{selectedDomain}}">
     </px-vis-brush>
 
 @element px-vis-brush
@@ -76,7 +79,7 @@ This element sets the selectedDomain property based on the extents box. The sele
        */
       _brush:{
         type: Object,
-        value: function() {return{};}
+        value: function() { return{}; }
       },
       /**
        * Holder for a SVG group of elements pertaining to the brush
@@ -119,6 +122,14 @@ This element sets the selectedDomain property based on the extents box. The sele
         value:false
       },
       /**
+       * A boolean to tell if a handle is currently moving
+       *
+       */
+      _brushing:{
+        type:Boolean,
+        value:false
+      },
+      /**
        * The parent chart's extents
        *
        * @property chartDomain
@@ -148,83 +159,86 @@ This element sets the selectedDomain property based on the extents box. The sele
      * @method drawElement
      */
     drawElement: function() {
-      var heightOffset = 5,
-          h = this.height - this.margin.bottom - heightOffset,
-          domain = [
-            [this.axis(this.currentDomain[0]),0],
-            [this.axis(this.currentDomain[1]),h]
-          ];
+      if(this._isObjEmpty(this._brush)){
+        var heightOffset = 5,
+            h = this.height - this.margin.bottom - heightOffset,
+            domain = [
+              [this.axis(this.currentDomain[0]),0],
+              [this.axis(this.currentDomain[1]),h]
+            ];
 
-      // make sure the brush draws on top of everything; returns a set property brushSvg
-      this.cloneSVGElem(this.svg.node(),'bushSvg');
-      // first, define the brush using the axis
-      this._brush = Px.d3.brushX()
-        .extent(domain)
-        .handleSize(6)
-        .on("start", this._brushstart.bind(this))
-        .on("brush", this._brushmove.bind(this))
-        .on("end", this._brushend.bind(this));
+        // make sure the brush draws on top of everything; returns a set property brushSvg
+        this.cloneSVGElem(this.svg.node(),'bushSvg');
+        // first, define the brush using the axis
+        this._brush = Px.d3.brushX()
+          .extent(domain)
+          .handleSize(6)
+          .on("start", this._brushstart.bind(this))
+          .on("brush", this._brushmove.bind(this))
+          .on("end", this._brushend.bind(this));
 
-      // now that we have our new g, proceed with drawing brush
-      this._brushGroup = this.bushSvg.append("g")
-        .attr("class", "brush")
-        .call(this._brush)
-        .call(this._brush.move, this.axis.range());
+        // now that we have our new g, proceed with drawing brush
+        this._brushGroup = this.bushSvg.append("g")
+          .attr("class", "brush")
+          .call(this._brush)
+          .call(this._brush.move, this.axis.range());
 
-      /* Style the brush overlay box
-         There are actually two boxes, .selection and .overlay:
-         overlay captures the mouse events; selection is what is visible
-      */
-      this._brushGroup.select("rect.selection")
-        .attr("y", 0)
-        .attr("height", this.height - heightOffset)
-        .attr('stroke',this.colors.gray5)
-        .attr('stroke-width',2)
-        .attr('fill',this.colors.black)
-        .attr('fill-opacity','.10')
-        .attr('shape-rendering','crispEdges');
+        /* Style the brush overlay box
+           There are actually two boxes, .selection and .overlay:
+           overlay captures the mouse events; selection is what is visible
+        */
+        this._brushGroup.select("rect.selection")
+          .attr("y", 0)
+          .attr('stroke',this.colors.gray5)
+          .attr('stroke-width',2)
+          .attr('fill',this.colors.black)
+          .attr('fill-opacity','.10')
+          .attr('shape-rendering','crispEdges');
 
-      this._drawHandles(heightOffset);
+        this._drawHandles(heightOffset);
 
-      // // Setup listeners for click on the navigator so the brush will jump instead of redraw
-      this._brushGroup.select("rect.overlay")
-        .on("mousedown.brush", this._brushcenter.bind(this))
-        .on("touchstart.brush", this._brushcenter.bind(this));
+        // // Setup listeners for click on the navigator so the brush will jump instead of redraw
+        this._brushGroup.select("rect.overlay")
+          .on("mousedown.brush", this._brushcenter.bind(this))
+          .on("touchstart.brush", this._brushcenter.bind(this));
 
-      //if we want fancy color changes, etc, can use brushstart to prime those changes
-      // this._brushstart();
-      // this._brushmove();
-      // this._brush.extent(this.currentDomain);
-      //
-      // console.log(this._brushGroup.node().parentNode.childNodes);
-      // var nodes = this._brushGroup.node().parentNode.childNodes;
-      // console.log(nodes[nodes.length -1]);
-      // if(nodes[nodes.length -1] !== this._brushGroup.node()){
-      //   console.log("doesnt match");
-      // }
+        //if we want fancy color changes, etc, can use brushstart to prime those changes
+        // this._brushstart();
+        // this._brushmove();
+        // this._brush.extent(this.currentDomain);
+        //
+        // console.log(this._brushGroup.node().parentNode.childNodes);
+        // var nodes = this._brushGroup.node().parentNode.childNodes;
+        // console.log(nodes[nodes.length -1]);
+        // if(nodes[nodes.length -1] !== this._brushGroup.node()){
+        //   console.log("doesnt match");
+        // }
+      }
     },
     /**
      * Helper function to add class "selecting" to elems selected in the brush
-     * TODO do we want to issue a color change? if not, delete/ comment out
      *
      * @method _brushstart
      */
     _brushstart: function() {
+      this.set("_brushing", true);
+      //TODO do we want to issue a color change? if not, delete/ comment out
       this.bushSvg.classed("selecting", true);
     },
     /**
      * Helper function to remove class "selecting" to elems not selected in the brush
-     * TODO do we want to issue a color change? if not, delete/ comment out
      *
      * @method _brushend
      */
     _brushend: function () {
+      this.set("_brushing", false);
       // revert our handle style to normal
       if(this._doesObjHaveValues(this._handleGroup)){
         this._handleGroup.dispatch('brushmouseup');
       }
 
       // console.log(d3.event.selection);
+      //TODO do we want to issue a color change? if not, delete/ comment out
       this.bushSvg.classed("selecting", false);
     },
     /**
@@ -456,12 +470,12 @@ This element sets the selectedDomain property based on the extents box. The sele
      * @method _zoomBrush
      */
     _zoomBrush: function(chartDomain){
-      if(chartDomain.length > 0 && !this._isObjEmpty(this._brush)){
-        if(!((Number(this.selectedDomain.x[0]) === Number(chartDomain[0])) && (Number(this.selectedDomain.x[1]) === Number(chartDomain[1]))) && !this._centering){
-          var domain = [this.axis(this.chartDomain[0]),this.axis(this.chartDomain[1])];
+      if(!this._brushing && !this._centering && chartDomain.length > 0 && !this._isObjEmpty(this._brush)){
+        var extent = Px.d3.brushSelection(this._brushGroup.node()),
+            domain = [this.axis(this.chartDomain[0]),this.axis(this.chartDomain[1])];
+        if(!(extent[0] === domain[0] && extent[1] === domain[1]) && !this._centering){
           this._brushGroup
             .call(this._brush.move,domain)
-            // .call(this._brush.event);
         }
       }
     },
