@@ -83,8 +83,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
        * @type Object
        */
       _rect:{
-        type:Object,
-        value: function() {return{};}
+        type:Object
       },
       /**
        * an object that contains meta data for the area drawn by the user
@@ -128,23 +127,32 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     drawElement: function() {
 
       // make sure the tooltip draws on top of everything; returns a set property interactionSvg
-      this.cloneSVGElem(this.svg.node(),'interactionSvg');
-      this.fire('px-vis-interaction-svg-updated', { 'dataVar': 'interactionSvg', 'data': this.interactionSvg, 'method':'set' });
+      if(!this.interactionSvg) {
+        this.cloneSVGElem(this.svg.node(),'interactionSvg');
+        this.fire('px-vis-interaction-svg-updated', { 'dataVar': 'interactionSvg', 'data': this.interactionSvg, 'method':'set' });
+      }
 
 
       // append the rectangle to capture mouse interactions
-      this._rect = this.interactionSvg.append("rect")
-        .attr('id',"mouseCapture")
-        .attr("width", this.width - this.margin.left - this.margin.right)
-        .attr("height", this.height - this.margin.bottom - this.margin.top)
-        .attr("fill", "none")
-        .attr("pointer-events", "all")
-        .on("mouseout.tooltip", this._resetTooltipData.bind(this))
-        .on("mousemove.tooltip",this._calcTooltipData.bind(this))
-        .on("mousedown.action", this._drawActionBox.bind(this))
-        .on("mousemove.action", this._updateActionBox.bind(this))
-        .on("mouseup.action", this._finishActionBox.bind(this))
-        .style("cursor","crosshair");
+      if(!this._rect) {
+        this._rect = this.interactionSvg.append("rect")
+          .attr('id',"mouseCapture")
+          .attr("width", this.width - this.margin.left - this.margin.right)
+          .attr("height", this.height - this.margin.bottom - this.margin.top)
+          .attr("fill", "none")
+          .attr("pointer-events", "all")
+          .on("mouseout.tooltip", this._resetTooltipData.bind(this))
+          .on("mousemove.tooltip",this._calcTooltipData.bind(this))
+          .on("mousedown.action", this._drawActionBox.bind(this))
+          .on("mousemove.action", this._updateActionBox.bind(this))
+          .on("mouseup.action", this._finishActionBox.bind(this))
+          .style("cursor","crosshair");
+      } else {
+        this._rect.attr("width", this.width - this.margin.left - this.margin.right)
+        .attr("height", this.height - this.margin.bottom - this.margin.top);
+      }
+
+
 
 
       // TODO touchevents

@@ -65,8 +65,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
        * @type Object
        */
       _cursor:{
-        type:Object,
-        value: function() {return{};}
+        type:Object
       },
       /**
        * Holder for the vertical line drawing object
@@ -75,8 +74,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
        * @type Object
        */
       _vLine:{
-        type:Object,
-        value: function() {return{};}
+        type:Object
       },
       /**
        * Holder for the horizonal line drawing objects
@@ -85,8 +83,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
        * @type Object
        */
       _hLines:{
-        type:Object,
-        value: function() {return{};}
+        type:Object
       },
       /**
        * Holder for the tooltip circle drawing objects
@@ -95,8 +92,19 @@ TODO implement a dev setting to choose between only showing data at that x, snap
        * @type Object
        */
       _circles:{
-        type:Object,
-        value: function() {return{};}
+        type:Object
+      },
+      /**
+       * Object used to build the horizontal lines
+       */
+      _hLinesBuilder: {
+        type: Object
+      },
+      /**
+       * object used to build the vertical line
+       */
+      _vLineBuilder: {
+
       },
       /**
        * Draws a horizontal line through the point. Valid entries:
@@ -162,13 +170,20 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      */
     drawElement: function() {
       // add circle to the line and hide it
-      this._cursor = this.svg.append("g")
-          .attr("display", "none");
+      if(!this._cursor) {
+        this._cursor = this.svg.append("g")
+            .attr("display", "none");
+      }
+
       // TODO add a cursor option for horizontal?
       if(this.horizontalLine !== 'none'){
         // append the x line
-        this._hLines = this._cursor.selectAll('line.xline')
-          .data(Object.keys(this.completeSeriesConfig))
+        this._hLinesBuilder = this._cursor.selectAll('line.xline')
+          .data(Object.keys(this.completeSeriesConfig));
+
+        this._hLinesBuilder.exit().remove();
+
+        this._hLines = this._hLinesBuilder
           .enter()
           .append("line")
           .attr("class", "xline")
@@ -176,6 +191,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           .attr("stroke-dasharray", "3,3")
           .attr("opacity", 1)
           .attr("x1", 0)
+          .merge(this._hLinesBuilder)
           .attr("x2", this.width);
       }
 
@@ -188,11 +204,12 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           .attr("stroke-dasharray", "3,3")
           .attr("opacity", 1)
           .attr("y1", 0)
+          .merge(this._cursor)
           .attr("y2", this.height);
       }
 
       // if we have multi-series then we need multiple circles...
-      if(this.circlePoint === "yes"){
+      if(this.circlePoint === "yes" && !this._circles){
         // append the circle
         this._circles = this._cursor.selectAll('cirlcle.tooltipPoint')
           .data(Object.keys(this.completeSeriesConfig))

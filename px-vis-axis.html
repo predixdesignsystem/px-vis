@@ -92,7 +92,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         },
 
         observers: [
-          'drawElement(currentDomain,svg,axis,margin)',
+          'drawElement(currentDomain,svg,axis,margin, height)',
           'drawSeriesBars(completeSeriesConfig.*)',
           '_muteSeriesBars(mutedSeries.*)'
         ],
@@ -166,7 +166,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             // TODO unify my orientation checks
             // TODO suport top and right
             if(this.orientation === 'bottom'){
-              var h = this.svg.attr('height') - this.margin.bottom - this.margin.top;
+              var h = this.height - this.margin.bottom - this.margin.top;
 
               this.translateAmt = [0,h];
             } else if(this.orientation === 'left'){
@@ -185,7 +185,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               this._setLineStyles(this._axisGroup,'line,path');
               this._setLabelStyles(this._axisGroup);
 
-              if(this.title){
+              if(this.title) {
                 this.drawTitle();
               }
 
@@ -199,6 +199,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
               this._setLineStyles(this._axisGroup,'line');
               this._setLabelStyles(this._axisGroup);
+
+              if(this.title) {
+                this.drawTitle();
+              }
+              this.drawSeriesBars();
             }
           }
         },
@@ -319,6 +324,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               break;
           }
 
+
+          if(!this._titleGroup) {
+
+
           this._titleGroup = this.svg.append("g")
             .attr('class','title-group')
             .attr('for', this.axisId)
@@ -332,6 +341,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .attr("text-anchor", anchor)
             .style("text-anchor", anchor)
             .attr('transform',"rotate(" + r + ")");
+          } else {
+
+            this.svg.select('g.title-group[for=' + this.axisId + ']').attr('transform',"translate(" + x + ',' + y + ")");
+          }
         },
         /**
          * Draws the color bars for each series

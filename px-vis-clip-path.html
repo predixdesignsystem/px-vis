@@ -55,7 +55,12 @@ https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath
      * @type Object
      */
     properties: {
-
+      _clipPathSvg: {
+        type: Object
+      },
+      _seriesClipPathSvg: {
+        type: Object
+      }
     },
 
     observers: [
@@ -69,21 +74,37 @@ https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath
      */
     _drawElement: function() {
 
-      this.set('clipPath', this.generateRandomID('cp_'));
-      this.set('seriesClipPath', this.generateRandomID('cps_'));
-      this.fire('px-vis-clip-path-updated', { 'dataVar': 'clipPath', 'data': this.clipPath, 'method':'set' });
-      this.fire('px-vis-series-clip-path-updated', { 'dataVar': 'seriesClipPath', 'data': this.seriesClipPath, 'method':'set' });
 
-      this.svg.append("clipPath")
-        .attr("id",this.clipPath)
-        .append("rect")
+      if(!this._clipPathSvg) {
+
+        this.set('clipPath', this.generateRandomID('cp_'));
+        this.fire('px-vis-clip-path-updated', { 'dataVar': 'clipPath', 'data': this.clipPath, 'method':'set' });
+
+        this.svg
+          .append("clipPath")
+          .attr("id",this.clipPath)
+          .append("rect");
+
+        this._clipPathSvg = this.svg.select('clipPath#'+this.clipPath+" rect");
+      }
+      this._clipPathSvg
         .attr('y',-this.margin.top)
         .attr("width", this.width - this.margin.left)
         .attr("height", this.height - this.margin.bottom);
 
-      this.svg.append("clipPath")
-        .attr("id",this.seriesClipPath)
-        .append("rect")
+      if(!this._seriesClipPathSvg) {
+
+        this.set('seriesClipPath', this.generateRandomID('cps_'));
+        this.fire('px-vis-series-clip-path-updated', { 'dataVar': 'seriesClipPath', 'data': this.seriesClipPath, 'method':'set' });
+
+        this.svg
+          .append("clipPath")
+          .attr("id",this.seriesClipPath)
+          .append("rect");
+
+        this._seriesClipPathSvg = this.svg.select('clipPath#'+this.seriesClipPath + ' rect');
+      }
+      this._seriesClipPathSvg
         .attr("width", this.width - this.margin.left - this.margin.right)
         .attr("height", this.height - this.margin.bottom  - this.margin.top);
 
