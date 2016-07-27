@@ -61,8 +61,10 @@ function runTests(){
       baseScale.set('chartData',d);
 
       baseXAxis.set('margin',m);
+      baseXAxis.set('height',h);
 
       baseYAxis.set('margin',m);
+      baseYAxis.set('height',h);
       baseYAxis.set('completeSeriesConfig',completeSeriesConfig);
       baseYAxis.set('chartData',d);
       // setTimeout(function(){done()},5000);
