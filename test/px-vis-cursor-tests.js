@@ -157,7 +157,7 @@ function baseTests(elem,hLine,vLine,circle,hArr,yArr){
 
     if(hLine === 'none'){
       test(elem + ' no horizontal lines are created', function() {
-        assert.equal(JSON.stringify(cursor._hLines),'{}');
+        assert.isUndefined(cursor._hLines);
       });
     } else {
       test(elem + ' correct number of _hLines are created', function() {
