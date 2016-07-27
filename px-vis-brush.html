@@ -132,19 +132,16 @@ This element sets the selectedDomain property based on the extents box. The sele
       /**
        * The parent chart's extents
        *
-       * @property chartDomain
-       * @type Array
        */
       chartDomain: {
-        type:Array,
-        value: function() {return[];},
+        type:Object,
         notify:true
-      },
+      }
     },
 
     observers: [
       'drawElement(currentDomain,svg,axis,height)',
-      '_zoomBrush(chartDomain)'
+      '_zoomBrush(chartDomain.*)'
     ],
     detached: function() {
       this.unlisten(window,'mouseup','_brushMouseUp');
@@ -470,10 +467,10 @@ This element sets the selectedDomain property based on the extents box. The sele
      * @method _zoomBrush
      */
     _zoomBrush: function(chartDomain){
-      if(!this._brushing && !this._centering && chartDomain.length > 0 && !this._isObjEmpty(this._brush)){
+      if(!this._brushing && !this._centering && this.chartDomain.length > 0 && this._doesObjHaveValues(this._brush)){
         var extent = Px.d3.brushSelection(this._brushGroup.node()),
             domain = [this.axis(this.chartDomain[0]),this.axis(this.chartDomain[1])];
-        if(!(extent[0] === domain[0] && extent[1] === domain[1]) && !this._centering){
+        if(!(extent[0] === domain[0] && extent[1] === domain[1])){
           this._brushGroup
             .call(this._brush.move,domain)
         }
