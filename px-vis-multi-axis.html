@@ -35,6 +35,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         <px-vis-axis
           svg="[[_returnGroup(index,axisGroups)]]"
           axis="[[_returnY(item)]]"
+          height="[[height]]"
           margin="[[margin]]"
           orientation="left"
           title="[[item]]"
@@ -100,30 +101,57 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
      * @type Object
      */
     properties: {
+      /**
+       * A dictionary of g elems for each dimension
+       *
+       */
       axisGroups: {
         type: Object,
         notify: true,
         value: function(){ return {}; }
       },
-
+      /**
+       * A holder for the drag behavior
+       *
+       */
       dragBehavior: {
         type: Object,
         notify: true
       },
-
+      /**
+       * A clone svg group to draw the axis to in order to ensure they are on top
+       *
+       */
       axisSvg: {
         type: Object
       },
-
+      /**
+       * A boolean to specify if the axis ticks should align or each have their own ranges
+       *
+       */
       matchTicks: {
         type: Boolean,
         value: false
+      },
+      /**
+       * If matchTicks, generate the ticks so they match too
+       *
+       */
+      gridTicks: {
+        type: Object,
+        notify: true,
+        computed: '_calcGridTicks(dimensions,y.*)'
       }
     },
 
     observers: [
       '_generateGs(dimensions,svg,currentDomainX)'
     ],
+
+    /**
+     * Generates a group elem for each dimension and moves it into the correct x coordinate
+     *
+     */
     _generateGs: function(dimensions,svg,currentDomainX){
       if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.currentDomainX) && this._doesObjHaveValues(this.dimensions) && this._isObjEmpty(this.axisGroups)){
 
@@ -139,14 +167,22 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           .style("cursor","move")
           .call(this.dragBehavior);
 
+        // TODO When we support muting an axes, might want to be able to access the above g and change the transform
+
         this.set('axisGroups', g);
       }
     },
-
+    /**
+     * Returns an indivdual d3 selected element
+     *
+     */
     _returnGroup: function(i){
       return Px.d3.select(this.axisGroups.nodes()[i])
     },
-
+    /**
+     * returns the appropriate scale for a dimension and sets the domain
+     *
+     */
     _returnY: function(item){
       if(this.matchTicks){
         var d = this.y[item].domain(),
@@ -157,7 +193,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       }
       return this.y[item]
     },
-
+    /**
+     * In order to make the ticks align, we iterate through and generate some round numbers for each axis
+     *
+     */
     _calcTickVals: function(item){
       if(this.matchTicks){
         var d = this.y[item].domain(),
@@ -165,14 +204,22 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             max = Math.ceil(d[1]/10)*10,
             diff = (max - min) / 10,
             vals = [];
+        console.log(d);
 
         for(var i = 0; i < 11; i++){
           vals.push(min + diff * i);
         }
-        return vals
+        return vals;
       }
       return null;
     },
+    /**
+     * Do the same thing for gridlines once
+     *
+     */
+    _calcGridTicks: function(dim){
+      return this._calcTickVals(dim[0]);
+    }
 
   });
 </script>
