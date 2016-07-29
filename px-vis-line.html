@@ -90,28 +90,48 @@ Element which draws lines series onto the chart
         type:Object,
         value: function() {return{};}
       },
+      /**
+       * A dev set boolean specifying if the chart is for a parallel coordinates chart
+       *
+       */
       parallelCoordinates: {
         type: Boolean,
         value: false
       },
-
-      multiPath: {
+      /**
+       * A boolean spcifying if multiple paths get drawn by the line
+       *
+       */
+      multiPath: { //FIXME I dont remember what this is for....
         type: Boolean,
         value: false
       },
-
+      /**
+       * A holder object for the line generator
+       *
+       */
       line: {
         type: Object
       },
-
+      /**
+       * A boolean spceifying if a opacity gradient should get applied to the line
+       *
+       */
       gradientLine: {
         type: Boolean,
         value: false
       },
+      /**
+       * Calculated range values for the gradient scale
+       *
+       */
        gradientRange: {
-         type: Array,
-         value: []
+         type: Array
        },
+       /**
+        * Gets and saves the rgb so we can make an rgba to apply to the line
+        *
+        */
        _colorArr: {
          type: Array,
          computed: '_computeColorArr(completeSeriesConfig,seriesId)'
@@ -119,6 +139,7 @@ Element which draws lines series onto the chart
     },
 
     observers: [
+      '_computeGradientRange(chartData.*)',
       'drawCanvas(canvasContext,currentDomainX,currentDomainY,chartData.*,completeSeriesConfig.*)',
       'drawElement(svg,currentDomainX,currentDomainY,chartData.*,completeSeriesConfig.*)',
       'isIdInMuted(mutedSeries.*)',
@@ -126,48 +147,63 @@ Element which draws lines series onto the chart
      ],
 
     _computeColorArr: function(){
+      //start with the RGB value and split it
       var c = this.completeSeriesConfig[this.seriesId]['color'].split('(')[1].split(',');
+      //save each individually for use later
       return [
         Number(c[0]),
         Number(c[1]),
         Number(c[2].split(')')[0])
       ];
     },
-
+    /**
+     * Defines the d3 line generator and its attrs
+     *
+     */
     _defineSingleLine: function(){
-      //round pixels values to optimize svg perfs
       var _this = this,
           xKey = _this.completeSeriesConfig[_this.seriesId]['x'],
           yKey = _this.completeSeriesConfig[_this.seriesId]['y'],
           line = Px.d3.line()
             .x(function(d) {
+                // ~~ --> round pixels values to optimize svg perfs
                 return ~~_this.x(d[xKey]);
             })
             .y(function(d) {
                 return ~~_this.y(d[yKey]);
             })
             .defined(function(d) {
-              //tests is equivalent to !isNaN but slightly faster
               return !isNaN(d[yKey]);
+              //tests is equivalent to !isNaN but slightly faster
               // return d[yKey] === d[yKey];
             });
 
+      // If using canvas, tell it the context to draw to.
       if(this.renderToCanvas){
         line.context(this.canvasContext);
       }
 
       this.set('line',line);
     },
-
+    /**
+     * Defines a multi-scale d3 line generator and its attrs
+     *
+     */
     _defineMultiLine: function(){
+      //get our dimensions
+      // FIXME for some reason, this runs when completeSeriesConfig is undefined; doesnt make sense....
       var dims = this.completeSeriesConfig[this.seriesId]['x'],
+          //define a normal d3 line generator
           path = Px.d3.line(),
+          //be sneaky: iterate through the data like normal
           line = function(d) {
+            //for each datapoint, iterate through the dimensions
             return path(dims.map(function(p) {
+              //return [x,y]: x is ordinal based on dim; get the y-scale for the dim and use that particular scale on the data
               return [~~this.x(p), ~~this.y[p](d[p])];
             }.bind(this)));
           }.bind(this);
-
+      // add the canvas context if relevant
       if(this.renderToCanvas){
         path.context(this.canvasContext);
       }
@@ -183,6 +219,7 @@ Element which draws lines series onto the chart
     drawElement: function() {
       this.debounce('draw',function(){
         if(!this.renderToCanvas){
+          // we need to wrap the data differently depending on if we are drawing many lines or just one line
           if(this.parallelCoordinates) {
             var data = this.chartData;
             this._defineMultiLine();
@@ -198,12 +235,14 @@ Element which draws lines series onto the chart
               .attr("series-id", 'line_' + this.seriesId)
               .attr("class", "series-line");
           }
-
+          // set our data
           this.lineBuilder = this.lineGroup.selectAll('path.series-line')
             .data(data);
 
+          // When datapoints disappear from our data, remove them
           this.lineBuilder.exit().remove();
 
+          // When datapoints are added to our data, add stuff
           this.lineBuilder.enter()
             .append('path')
             .attr("class", "series-line")
@@ -211,11 +250,13 @@ Element which draws lines series onto the chart
               return this.multiPath ? 'line_' + d[this.seriesId] : 'line_' + this.seriesId
             }.bind(this))
             .attr('fill','none')
+          // When datapoints are added OR this funtion is run, draw stuff
           .merge(this.lineBuilder)
             .attr("d", this.line)
             .attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
             .attr('stroke-opacity',this._svgLine.bind(this));
 
+          // Make it easy to get our lines again
           this.linePath = this.lineGroup.selectAll('path.series-line');
 
           this._addClipPath();
@@ -234,7 +275,7 @@ Element which draws lines series onto the chart
     drawCanvas: function() {
       this.debounce('drawCanvas',function(){
         var data;
-
+        // we need to wrap the data differently depending on if we are drawing many lines or just one line
         if(this.parallelCoordinates) {
           this._defineMultiLine();
           data = this.chartData;
@@ -243,21 +284,33 @@ Element which draws lines series onto the chart
           data = [this.chartData];
         }
 
+        // We need to track which lines we have drawn and which we want to draw.
+        // If a line is not currently in our list, add it
         if(!this.canvasContext._pxLinesSeries[this.seriesId]){
           this.canvasContext._pxLinesSeries[this.seriesId] = true;
           this.canvasContext._pxLinesTotal += 1;
         }
 
+        // if we have previously drawn the same number of lines as series, then let's start over; Clear the drawing canvas
         if(this.canvasContext._pxLinesRedraw === this.canvasContext._pxLinesTotal){
           this.canvasContext._pxLinesRedraw = 0;
           // (x1,y1,x2,y2) : for some reason, we need y1 to be -1 or it leaves a pixel....
           this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
         }
 
+        // For efficiency, we should draw the lines dfferently if they need a gradient or not.
         if(this.gradientLine){
+          // Iterate over our data:
           for(var i = 0; i < data.length; i++){
-            // if the series is not listed or it is false, draw it
+            // Check to see if it is "muted"; if not, draw a line
             if(!this.mutedSeries[data[i][this.seriesId]]){
+/*
+  This was an experiement to do progressive rendering; it works, just is very slow. Uncomment the code and comment out the regular line drawing code.
+
+  Best would be if we could break our data into chunks and draw n lines per setTimeout
+
+  I was thinking this might not be necessary for the initial draw, but could be quite nice when moving axes as the delay if more noticible when the user is interacting with the chart vs understanding that the chart is loading.
+*/
               // TODO wrap for in a settimeout and go by 1000s?
               // setTimeout(function(d){
               //   this.canvasContext.beginPath();
@@ -266,26 +319,34 @@ Element which draws lines series onto the chart
               //   this.line(d);
               //   this.canvasContext.stroke();
               // }.bind(this,data[i]),1);
+
+              // start a path and reset the styles for this one path
               this.canvasContext.beginPath();
               this.canvasContext.strokeStyle = this._canvasLineColor(data[i]);
               this.canvasContext.lineWidth = 1;
+              // use the line generator to create the line
               this.line(data[i]);
+              // draw it to the canvas; cant wait until the end or else they all have the same style
               this.canvasContext.stroke();
             }
           }
         } else { //not gradientLine
+          // start the path
           this.canvasContext.beginPath();
+          // iterate through the data
           for(var i = 0; i < data.length; i++){
             // if the series is not listed or it is false, draw it
             if(!this.mutedSeries[data[i][this.seriesId]]){
               this.line(data[i]);
             }
           }
+          // Apply our styles and draw all the lines to the canvas
           this.canvasContext.strokeStyle = this.completeSeriesConfig[this.seriesId]['color'];
           this.canvasContext.lineWidth = 1;
           this.canvasContext.stroke();
         }
 
+        // make sure they are only drawn to the chart area and not the rest of the frame: equivalent to the clipPath for SVG
         this.canvasContext.clearRect(0, -1, -50, this.canvasContext.canvas.height);
         this.canvasContext._pxLinesRedraw += 1;
         console.timeEnd('draw');
@@ -308,11 +369,13 @@ Element which draws lines series onto the chart
      * @method isIdInMuted
      */
     isIdInMuted: function() {
+      // if we are going to render to canvas, then we need to redraw everything
       if(this.renderToCanvas){
         this.drawCanvas();
       } else {
         if(this.multiPath && this._doesObjHaveValues(this.linePath)){
           this.linePath.style("display", function(d) {
+            // if we have multiPaths, then just hide them; might want to changes this but need to check with design
             return this.mutedSeries[d[this.seriesId]] ? 'none' : null;
           }.bind(this));
         } else if(this.mutedSeries.hasOwnProperty(this.seriesId)){
@@ -326,15 +389,17 @@ Element which draws lines series onto the chart
       }
     },
     /**
-     * Adds full color to the line.
+     * Adds full color to the SVG line.
      *
-     * @method _colorLine
      */
     _colorLine:function(){
       this.linePath.attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
-        .attr('stroke-opacity', this._svgLine.bind(this));
+          .attr('stroke-opacity', this._svgLine.bind(this));
     },
-
+    /**
+     * Returns the opacity for the SVG line
+     *
+     */
     _svgLine: function(d){
       if(this.gradientLine){
         return this._opacityLine(d);
@@ -342,20 +407,33 @@ Element which draws lines series onto the chart
       return 1
     },
     /**
-     * Returns the correct opacity to use for the line.
+     * Returns the correct opacity to use for all lines.
      *
      */
     _opacityLine:function(d){
-      if(this.gradientRange.length === 0){
-        this.gradientRange[0] = Number(this.chartData[0][this.seriesId]);
-        this.gradientRange[1] = Number(this.chartData[this.chartData.length - 1][this.seriesId]);
-      }
+      // calulate the percentage through the dataset
       var n = (this.gradientRange[1] - d[this.seriesId]) / (this.gradientRange[1] - this.gradientRange[0]);
+      // scale the gradient by that resulting in a gradient from 20% - 100%
       return 1 - n * 0.8;
     },
+    /**
+     * Returns the correct rgba to use for the canvas line.
+     *
+     */
     _canvasLineColor:function(d){
       return 'rgba(' + this._colorArr[0] + ',' + this._colorArr[1] + ',' + this._colorArr[2] + ',' + this._opacityLine(d) + ')';
       ;
+    },
+    /**
+     * Computes the data range.
+     *
+     */
+    _computeGradientRange: function(){
+      if(this.chartData.length > 0){
+        var x1 = Number(this.chartData[0][this.seriesId]),
+            x2 = Number(this.chartData[this.chartData.length - 1][this.seriesId]);
+        this.set('gradientRange', [x1,x2]);
+      }
     },
     /**
      * Adds muted color to the line.

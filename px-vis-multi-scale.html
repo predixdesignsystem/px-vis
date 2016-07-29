@@ -99,7 +99,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
     },
 
     /**
-     *  Sets the x scale
+     *  Sets the x scale to a single ordinal scale
      *
      * @method _setXScale
      */
@@ -111,16 +111,17 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
     },
     /**
-     * Sets the y scale
+     * Sets the y scale to multiple linear scales
      *
      * @method _setYScale
      */
     _setYScale: function(height,margin,dimensions){
       var h = height - margin.top - margin.bottom,
           range = [h, 0];
-
+      // y is an object with multiple scales
       this.y = {};
 
+      // iterate through the dimensions and create a scale for each; set them in the y obj with the dimensions as keys so we can easily access them again later
       for(var i = 0; i < dimensions.length; i++){
         this.y[dimensions[i]] = Px.d3.scaleLinear().nice().range(range);
       }
@@ -143,59 +144,59 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * Find the min and max values or ordinal values in data, for X and/or Y axis
      *
      */
-    _findMinMax: function(data, doX, doY, ordX, ordY, timeX, result, keys) {
-      console.log('_findMinMax');
-      var j,xTemp,yTemp,
-        jLen = data.length,
-        x;
-      // TODO move 'x' out of each series config and into a chartConfig
-        x = this.completeSeriesConfig[keys[0]].x;
-
-      if(timeX) {
-        this._findTimeMM(result,data,jLen,x);
-      }
-      if(doX || doY){
-        for(j = 0; j < jLen; j++) {
-          //make sure we're dealing with numbers
-          xTemp = (typeof(data[j][x]) === 'string') ? parseFloat(data[j][x]) : data[j][x];
-          yTemp = this._getDataExtents(data[j], keys);
-
-          if(doX) {
-            if(ordX && result.x.indexOf(data[j][x]) === -1) {
-              result.x.push(data[j][x]);
-            } else {
-              this._setMin(result.x,xTemp);
-              this._setMax(result.x,xTemp);
-            }
-          }
-          if(doY) {
-            if(ordY && result.y.indexOf(data[j][1]) === -1) {
-              // FIXME yArr is now an array and not a value
-              result.y.push(data[j][keys]);
-            } else {
-              this._setMin(result.y,yTemp[0]);
-              this._setMax(result.y,yTemp[1]);
-            }
-          }
-        };
-      }
-    },
-
-    _findTimeMM: function(result,d,l,x) {
-      this._setMin(result.x,d[0][x]);
-      this._setMax(result.x,d[l-1][x]);
-    },
-
-    _setMin: function(r,d) {
-     if(r[0] > d) {
-        r[0] = d;
-      }
-    },
-    _setMax: function(r,d) {
-      if(r[1] < d) {
-        r[1] = d;
-      }
-    },
+    // _findMinMax: function(data, doX, doY, ordX, ordY, timeX, result, keys) {
+    //   console.log('_findMinMax');
+    //   var j,xTemp,yTemp,
+    //     jLen = data.length,
+    //     x;
+    //   // TODO move 'x' out of each series config and into a chartConfig
+    //     x = this.completeSeriesConfig[keys[0]].x;
+    //
+    //   if(timeX) {
+    //     this._findTimeMM(result,data,jLen,x);
+    //   }
+    //   if(doX || doY){
+    //     for(j = 0; j < jLen; j++) {
+    //       //make sure we're dealing with numbers
+    //       xTemp = (typeof(data[j][x]) === 'string') ? parseFloat(data[j][x]) : data[j][x];
+    //       yTemp = this._getDataExtents(data[j], keys);
+    //
+    //       if(doX) {
+    //         if(ordX && result.x.indexOf(data[j][x]) === -1) {
+    //           result.x.push(data[j][x]);
+    //         } else {
+    //           this._setMin(result.x,xTemp);
+    //           this._setMax(result.x,xTemp);
+    //         }
+    //       }
+    //       if(doY) {
+    //         if(ordY && result.y.indexOf(data[j][1]) === -1) {
+    //           // FIXME yArr is now an array and not a value
+    //           result.y.push(data[j][keys]);
+    //         } else {
+    //           this._setMin(result.y,yTemp[0]);
+    //           this._setMax(result.y,yTemp[1]);
+    //         }
+    //       }
+    //     };
+    //   }
+    // },
+    //
+    // _findTimeMM: function(result,d,l,x) {
+    //   this._setMin(result.x,d[0][x]);
+    //   this._setMax(result.x,d[l-1][x]);
+    // },
+    //
+    // _setMin: function(r,d) {
+    //  if(r[0] > d) {
+    //     r[0] = d;
+    //   }
+    // },
+    // _setMax: function(r,d) {
+    //   if(r[1] < d) {
+    //     r[1] = d;
+    //   }
+    // },
 
     /**
      * Calculates and Sets the x and y domain after data loads
