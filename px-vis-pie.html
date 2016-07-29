@@ -108,13 +108,6 @@ Element which draws scatter series onto the chart
         value: 0
       },
       /**
-       * The actual inner radius value in pixels which will be used internally to draw the chart
-       */
-      _innerRadiusPx: {
-        type: Number,
-        computed: '_calcInnerRadiusPx(innerRadius, _radius, donut)'
-      },
-      /**
        * Whether the chart should be disaplyed as a donut rather than a pie.
        * If displayed as a donut it will by default use 30px as the ring size.
        * It can be overriden by using the "innerRadius" property (between 0 and 1)
@@ -228,11 +221,24 @@ Element which draws scatter series onto the chart
     observers: [
       'drawElement(width,height,margin,svg,chartData.*,completeSeriesConfig, seriesId, usePercentage, donut, innerRadius, showTitle)'
      ],
+
+     attached: function() {
+
+      //position popover anchor, it won't move afterward
+      var curRect = this.pxSvgElem.getBoundingClientRect(),
+          titleRect = this.$.title.getBoundingClientRect(),
+          leftMarg = Number(this.margin.left),
+          bottomMarg = Number(this.margin.bottom);
+
+      this.$.popoverAnchor.style.left = (curRect.left + leftMarg +  this._radius) + 'px';
+      this.$.popoverAnchor.style.top = (curRect.top +  Number(this.margin.top)) + 'px';
+     },
      _repositionTitle: function() {
        var titleRect = this.$.title.getBoundingClientRect(),
            leftMarg = Number(this.margin.left);
 
        //position title div
+       debugger;
        this.$.title.style.left = (leftMarg + this._radius - titleRect.width/2) + 'px';
        this.$.title.style.top = -this.height + Number(this.margin.top) + this._radius - titleRect.height/2 + 'px';
      },
@@ -245,8 +251,10 @@ Element which draws scatter series onto the chart
     drawElement: function() {
       //calculate data and radius
       var data = this.chartData,
-          xKey = this.completeSeriesConfig[this.seriesId].x;
-          pie = Px.d3.pie().value(function(d){return d[xKey];})(data);
+          pie = Px.d3.pie().value(function(d){return d['x'];})(data);
+        if (data.length==1 && data[0].x==0){
+          pie[0].endAngle=6.283185307179586;
+        }
 
       // checks to see if the group already exists. If not, create; if so, update
       if(this._isObjEmpty(this.pieGroup)){
@@ -257,21 +265,17 @@ Element which draws scatter series onto the chart
           .attr('transform', this._translationString);
       }
 
+      // declare an arc generator function
+      this._arcGenerator = Px.d3.arc().outerRadius(this._radius);
+      if(this.donut) {
+        var innerRadiusPx = this.innerRadius === 0 ? (this._radius - 30) : this.innerRadius * this._radius;
+        this._arcGenerator.innerRadius(innerRadiusPx);
+      } else {
+        this._arcGenerator.innerRadius(0);
+      }
 
-
-      if(!this._arcs) {
-
-        //store current inner and outer radius
-        for(var i=0; i<pie.length; i++) {
-          pie[i].innerRadius = this._innerRadiusPx,
-          pie[i].outerRadius = this._radius;
-        }
-
-        // declare an arc generator function
-        this._arcGenerator = Px.d3.arc();
-
+        if(!this._arcs) {
         // select paths, use arc generator to draw
-        //TODO: merge and exit
         this._arcs = this.pieGroup.selectAll('pie-slice')
                                 .data(pie)
                                 .enter()
@@ -283,7 +287,13 @@ Element which draws scatter series onto the chart
 
         this._arcs.append('svg:path')
             .attr('fill', function(d, i){
+              debugger;
+              if (data.length==1 && data[0].x==0){
+                return "#D3D3D3";
+              }
+              else{
                 return this._getPieColorForIndex(i);
+              }
             }.bind(this))
             .attr('d', function (d) {
                 return this._arcGenerator(d);
@@ -293,30 +303,13 @@ Element which draws scatter series onto the chart
         this._positionChart(1250);
       } else {
 
-        var _this = this;
-        var tweenArc = function tweenArc(b) {
-          return function(a, i) {
-            var d = b.call(this, a, i), i = d3.interpolateObject(d, a);
-            for (var k in d) a[k] = d[k]; // update data
-            return function(t) {
-              return _this._arcGenerator(i(1 - t));
-            };
-          };
-        };
-
         //update slices
-        //TODO: this only deals with radius changes. We need to add
-        //angle changes (equivalent to data changed). Need to store previous angle.
         this._arcs.selectAll('path')
           .transition()
           .duration(750)
-          .attrTween('d', tweenArc(function(d, i) {
-
-            return {
-              innerRadius: _this._innerRadiusPx,
-              outerRadius: _this._radius
-            };
-          }));
+          .attr('d', function (d) {
+            return this._arcGenerator(d);
+        }.bind(this));
 
         //make sure we're in the right pos
         this._positionChart(150);
@@ -348,16 +341,12 @@ Element which draws scatter series onto the chart
       //center tooltip
       var rotatedDatum = {
         startAngle: datum.startAngle + this._currentRotationAngle,
-        endAngle: datum.endAngle + this._currentRotationAngle,
-        innerRadius: datum.innerRadius,
-        outerRadius: datum.outerRadius
+        endAngle: datum.endAngle + this._currentRotationAngle
       },
           center = this._arcGenerator.centroid(rotatedDatum);
 
-      var rect = this.pxSvgElem.getBoundingClientRect();
-
       this.$.tooltipAnchor.style.left = (center[0] +  this._radius + Number(this.margin.left)) + 'px';
-      this.$.tooltipAnchor.style.top =  (center[1] - rect.height + Number(this.margin.top) + this._radius) + 'px';
+      this.$.tooltipAnchor.style.top =  (center[1] - Number(this.margin.bottom) - this._radius) + 'px';
       this.$.tooltip._show();
     },
     _hideTooltip: function(datum, index, group) {
@@ -397,11 +386,9 @@ Element which draws scatter series onto the chart
       //display a popover after the rotation
       setTimeout(function() {
 
-        var rect = this.pxSvgElem.getBoundingClientRect();
-
         //position popover anchor
         this.$.popoverWrapper.style.left =  (Number(this.margin.left) +  this._radius) + 'px';
-        this.$.popoverWrapper.style.top = -rect.height + Number(this.margin.top) + 'px';
+        this.$.popoverWrapper.style.top = - Number(this.margin.bottom) - this._radius*2 + 'px';
 
         this.$.popover.popoverTitle = datum.data[this.completeSeriesConfig[this.seriesId].y];
         this.$.popover.popoverBody = this._getSliceValue(datum);
@@ -456,15 +443,6 @@ Element which draws scatter series onto the chart
     },
     _computeInternalUnits: function(completeSeriesConfig, seriesId, usePercentage) {
       return usePercentage ? '%' : this._getUnit(completeSeriesConfig, seriesId);
-    },
-    _calcInnerRadiusPx: function() {
-      if(this.donut) {
-        //if no inner radius defined used 30px by default
-        return this.innerRadius === 0 ? (this._radius - 30) : this.innerRadius * this._radius;
-      } else {
-        //no donut
-        return 0;
-      }
     }
   });
 </script>
