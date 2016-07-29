@@ -86,10 +86,10 @@ function runTests(){
     suiteSetup(function(){
       clipPath = baseSVG.svg.select('clipPath');
       // Safari 8 cant seem to find it with d3 select... fallback
-      if(clipPath.node() === null){
+      if(clipPath.node() === null) {
         clipPath = d3.select(document.getElementsByTagName('clipPath')[0]);
       }
-      rect = clipPath.select('rect');
+      rect = baseClip._clipPathSvg;
     });
 
     test('baseClip ID is set', function() {
