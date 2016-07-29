@@ -439,13 +439,14 @@ Formatting for the timestamps,the data values, and the series names can be contr
       return null;
     },
     _returnPieVal: function(item, axis, separator, usePercentage) {
+      debugger;
 
       //pie should have only one config bit.
       var key = Object.keys(this.completeSeriesConfig)[0],
           axisKey = axis === 'x' ? this.completeSeriesConfig[key]['x'] : this.completeSeriesConfig[key]['y'],
           axisKey = usePercentage ? 'percentage' : axisKey;
 
-      if(item && item[axisKey]) {
+      if(item && (item[axisKey]==0 || item[axisKey])) {
         return item[axisKey] + (separator ? separator : '');
       }
       return null;
