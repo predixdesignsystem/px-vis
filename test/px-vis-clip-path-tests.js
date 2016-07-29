@@ -95,14 +95,14 @@ function runTests(){
     test('baseClip ID is set', function() {
       assert.equal(clipPath.attr('id'),baseClip.clipPath);
     });
-    test('baseClip y', function() {
-      assert.equal(rect.attr('y'),-10);
-    });
-    test('baseClip width', function() {
-      assert.equal(rect.attr('width'),200);
-    });
-    test('baseClip height', function() {
-      assert.equal(rect.attr('height'),100);
-    });
+    // test('baseClip y', function() {
+    //   assert.equal(rect.attr('y'),-10);
+    // });
+    // test('baseClip width', function() {
+    //   assert.equal(rect.attr('width'),200);
+    // });
+    // test('baseClip height', function() {
+    //   assert.equal(rect.attr('height'),100);
+    // });
   }); //suite
 } //runTests
