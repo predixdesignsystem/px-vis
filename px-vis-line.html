@@ -46,6 +46,7 @@ Element which draws lines series onto the chart
       PxVisBehavior.commonMethods,
       PxVisBehaviorD3.clipPath,
       PxVisBehavior.completeSeriesConfig,
+      PxVisBehavior.categories,
       commonColors
     ],
 
@@ -102,7 +103,7 @@ Element which draws lines series onto the chart
        * A boolean spcifying if multiple paths get drawn by the line
        *
        */
-      multiPath: { //FIXME I dont remember what this is for....
+      multiPath: {
         type: Boolean,
         value: false
       },
@@ -148,13 +149,29 @@ Element which draws lines series onto the chart
 
     _computeColorArr: function(){
       //start with the RGB value and split it
-      var c = this.completeSeriesConfig[this.seriesId]['color'].split('(')[1].split(',');
-      //save each individually for use later
-      return [
-        Number(c[0]),
-        Number(c[1]),
-        Number(c[2].split(')')[0])
-      ];
+      var c = this.completeSeriesConfig[this.seriesId]['color'].split('(')[1].split(','),
+          colors = {};
+
+      //save each color individually for use later
+      colors[this.seriesId] = {
+        "r": Number(c[0]),
+        "g": Number(c[1]),
+        "b": Number(c[2].split(')')[0])
+      };
+
+      // if coloring by category
+      if(this.categories){
+        for(var i = 0; i < this.categories.length; i++){
+          c = this.completeSeriesConfig[this.categories[i]]['color'].split('(')[1].split(',');
+          colors[this.categories[i]] = {
+            "r": Number(c[0]),
+            "g": Number(c[1]),
+            "b": Number(c[2].split(')')[0])
+          };
+        }
+      }
+
+      return colors;
     },
     /**
      * Defines the d3 line generator and its attrs
@@ -253,7 +270,13 @@ Element which draws lines series onto the chart
           // When datapoints are added OR this funtion is run, draw stuff
           .merge(this.lineBuilder)
             .attr("d", this.line)
-            .attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
+            // TODO add ability to color by category
+            .attr('stroke',function(d,i){
+              if(this.categoryKey){
+                return this.completeSeriesConfig[d[this.categoryKey]]['color']
+              }
+              return this.completeSeriesConfig[this.seriesId]['color'];
+            }.bind(this))
             .attr('stroke-opacity',this._svgLine.bind(this));
 
           // Make it easy to get our lines again
@@ -347,6 +370,7 @@ Element which draws lines series onto the chart
         }
 
         // make sure they are only drawn to the chart area and not the rest of the frame: equivalent to the clipPath for SVG
+        // TODO fix -50 to margin size
         this.canvasContext.clearRect(0, -1, -50, this.canvasContext.canvas.height);
         this.canvasContext._pxLinesRedraw += 1;
         console.timeEnd('draw');
@@ -421,8 +445,14 @@ Element which draws lines series onto the chart
      *
      */
     _canvasLineColor:function(d){
-      return 'rgba(' + this._colorArr[0] + ',' + this._colorArr[1] + ',' + this._colorArr[2] + ',' + this._opacityLine(d) + ')';
-      ;
+      // figure out if we are using a category or the seriesID
+      var key = this.categoryKey ? d[this.categoryKey] : this.seriesId;
+      // check that we want to draw that category
+      if(this._colorArr[key]){
+        // return the appropriate rgba
+        return 'rgba(' + this._colorArr[key]['r'] + ',' + this._colorArr[key]['g'] + ',' + this._colorArr[key]['b'] + ',' + this._opacityLine(d) + ')';
+      }
+      return null;
     },
     /**
      * Computes the data range.
