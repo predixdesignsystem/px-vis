@@ -140,7 +140,16 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       gridTicks: {
         type: Object,
         notify: true,
-        computed: '_calcGridTicks(dimensions,y.*)'
+        computed: '_calcGridTicks(dimensions,y,currentDomainY.*)'
+      },
+      /**
+       * If matchTicks, generate the ticks so they match too
+       *
+       */
+      gridAxis: {
+        type: Object,
+        notify: true,
+        computed: '_calcGridAxis(dimensions,y,currentDomainY.*)'
       }
     },
 
@@ -204,7 +213,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             max = Math.ceil(d[1]/10)*10,
             diff = (max - min) / 10,
             vals = [];
-        console.log(d);
+        // console.log(d);
 
         for(var i = 0; i < 11; i++){
           vals.push(min + diff * i);
@@ -219,6 +228,13 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
      */
     _calcGridTicks: function(dim){
       return this._calcTickVals(dim[0]);
+    },
+    /**
+     * Do the same thing for gridlines axis
+     *
+     */
+    _calcGridAxis: function(dim){
+      return this._returnY(dim[0]);
     }
 
   });
