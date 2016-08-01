@@ -1,3 +1,7 @@
+v0.1.6
+==================
+* Improve data handling by pie slices, allow empty data as well
+
 v0.1.5
 ==================
 * Added vulcanize index and demo
