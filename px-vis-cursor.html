@@ -101,12 +101,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         type: Object
       },
       /**
-       * object used to build the vertical line
-       */
-      _vLineBuilder: {
-
-      },
-      /**
        * Draws a horizontal line through the point. Valid entries:
        * - full
        * - none
@@ -197,15 +191,20 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       if(this.verticalLine !== 'none'){
         // append the y line
-        this._vLine = this._cursor
-          .append("line")
-          .attr("class", "yline")
-          .attr("stroke", this.colors.gray5)
-          .attr("stroke-dasharray", "3,3")
-          .attr("opacity", 1)
-          .attr("y1", 0)
-          .merge(this._cursor)
-          .attr("y2", this.height);
+        if(!this._vLine) {
+          this._vLine = this._cursor
+            .append("line")
+            .attr("class", "yline")
+            .attr("stroke", this.colors.gray5)
+            .attr("stroke-dasharray", "3,3")
+            .attr("opacity", 1)
+            .attr("y1", 0)
+            .attr("y2", this.height);
+        } else {
+          //just update the size
+          this._vLine.attr("y2", this.height);
+        }
+        
       }
 
       // if we have multi-series then we need multiple circles...

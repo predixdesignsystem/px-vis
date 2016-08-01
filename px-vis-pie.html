@@ -228,18 +228,6 @@ Element which draws scatter series onto the chart
     observers: [
       'drawElement(width,height,margin,svg,chartData.*,completeSeriesConfig, seriesId, usePercentage, donut, innerRadius, showTitle)'
      ],
-
-     attached: function() {
-
-      //position popover anchor, it won't move afterward
-      var curRect = this.pxSvgElem.getBoundingClientRect(),
-          titleRect = this.$.title.getBoundingClientRect(),
-          leftMarg = Number(this.margin.left),
-          bottomMarg = Number(this.margin.bottom);
-
-      this.$.popoverAnchor.style.left = (curRect.left + leftMarg +  this._radius) + 'px';
-      this.$.popoverAnchor.style.top = (curRect.top +  Number(this.margin.top)) + 'px';
-     },
      _repositionTitle: function() {
        var titleRect = this.$.title.getBoundingClientRect(),
            leftMarg = Number(this.margin.left);
@@ -366,8 +354,10 @@ Element which draws scatter series onto the chart
       },
           center = this._arcGenerator.centroid(rotatedDatum);
 
+      var rect = this.pxSvgElem.getBoundingClientRect();
+
       this.$.tooltipAnchor.style.left = (center[0] +  this._radius + Number(this.margin.left)) + 'px';
-      this.$.tooltipAnchor.style.top =  (center[1] - Number(this.margin.bottom) - this._radius) + 'px';
+      this.$.tooltipAnchor.style.top =  (center[1] - rect.height + Number(this.margin.top) + this._radius) + 'px';
       this.$.tooltip._show();
     },
     _hideTooltip: function(datum, index, group) {
@@ -407,9 +397,11 @@ Element which draws scatter series onto the chart
       //display a popover after the rotation
       setTimeout(function() {
 
+        var rect = this.pxSvgElem.getBoundingClientRect();
+
         //position popover anchor
         this.$.popoverWrapper.style.left =  (Number(this.margin.left) +  this._radius) + 'px';
-        this.$.popoverWrapper.style.top = - Number(this.margin.bottom) - this._radius*2 + 'px';
+        this.$.popoverWrapper.style.top = -rect.height + Number(this.margin.top) + 'px';
 
         this.$.popover.popoverTitle = datum.data[this.completeSeriesConfig[this.seriesId].y];
         this.$.popover.popoverBody = this._getSliceValue(datum);
