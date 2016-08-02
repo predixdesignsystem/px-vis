@@ -4,6 +4,7 @@
 <link rel="import" href="px-vis-axis.html"/>
 <link rel="import" href="px-vis-axis-brush.html"/>
 <link rel="import" href="px-vis-axis-drag.html"/>
+<link rel="import" href="../px-colors-design/colors.html" />
 
 <!--
 d3 element creating an axis for the chart
@@ -34,7 +35,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       <template is="dom-repeat" items="[[dimensions]]">
         <px-vis-axis
           svg="[[_returnGroup(index,axisGroups)]]"
-          axis="[[_returnY(item)]]"
+          axis="[[_returnY(item,currentDomainY)]]"
           height="[[height]]"
           margin="[[margin]]"
           orientation="left"
@@ -44,8 +45,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           label-type-size="10"
           current-domain="[[currentDomainY]]"
           stroke-width="[[strokeWidth]]"
-          outer-tick-size="[[outerTickSize]]"
-          tick-values="[[_calcTickVals(item)]]">
+          outer-tick-size="0"
+          tick-values="[[_calcTickVals(item,currentDomainY)]]">
         </px-vis-axis>
       </template>
       <px-vis-axis-brush
@@ -91,7 +92,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       PxVisBehavior.dataset,
       PxVisBehavior.dimensions,
       PxVisBehavior.mutedSeries,
-      PxVisBehaviorD3.dynamicRedraw
+      PxVisBehaviorD3.dynamicRedraw,
+      PxVisBehavior.commonAxis,
+      commonColors
     ],
 
     /**
@@ -154,8 +157,13 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     },
 
     observers: [
-      '_generateGs(dimensions,svg,currentDomainX)'
+      '_generateGs(dimensions,svg,currentDomainX)',
+      // '_setAxisStyles(commonAxis)'
     ],
+
+    listeners:{
+      'px-axis-done': '_setAxisStyles'
+    },
 
     /**
      * Generates a group elem for each dimension and moves it into the correct x coordinate
@@ -213,7 +221,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             max = Math.ceil(d[1]/10)*10,
             diff = (max - min) / 10,
             vals = [];
-        // console.log(d);
 
         for(var i = 0; i < 11; i++){
           vals.push(min + diff * i);
@@ -235,7 +242,28 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
      */
     _calcGridAxis: function(dim){
       return this._returnY(dim[0]);
-    }
+    },
+
+    _setAxisStyles: function(e){
+      if(this._doesObjHaveValues(this.axisGroups)){
+        var _this = this;
+
+        if(this.commonAxis){
+          this.axisGroups.filter(":not(:first-child)").selectAll('g.tick text').classed('hideCommon',true);
+          this.axisGroups.selectAll('.hideCommon').style('display','none');
+          this.axisGroups.on('mouseover',function(){
+            d3.select(this).selectAll('.hideCommon').style('display',null)
+            d3.select(this).selectAll('.hideCommon').style('fill',_this.colors.grey3)
+          }).on('mouseleave',function(){
+            d3.select(this).selectAll('.hideCommon').style('display','none')
+            d3.select(this).selectAll('.hideCommon').style('fill',"black")
+          });
+        } else {
+          this.axisGroups.selectAll('.hideCommon').style('display',null);
+          this.axisGroups.selectAll('.hideCommon').classed('hideCommon',false);
+        }
+      }
+    },
 
   });
 </script>

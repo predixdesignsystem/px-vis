@@ -92,7 +92,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         },
 
         observers: [
-          'drawElement(currentDomain,svg,axis,margin, height)',
+          'drawElement(currentDomain,svg,axis,margin,height)',
+          'updateTicks(tickValues.*)',
           'drawSeriesBars(completeSeriesConfig.*)',
           '_muteSeriesBars(mutedSeries.*)'
         ],
@@ -105,10 +106,16 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           }
         },
 
+        attached: function(){
+          if(this._doesObjHaveValues(this._axisGroup)){
+            // alert parents that we are done drawing the axis
+            this.fire("px-axis-done");
+          }
+        },
+
         /**
          * sets up this._axis as a d3 axis object.
          *
-         * @method defineAxis
          */
         defineAxis: function(){
           switch(this.orientation){
@@ -161,7 +168,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * @method drawElement
          */
         drawElement: function() {
-          if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.axis) && this._doesObjHaveValues(this.margin) && this._doesObjHaveValues(this.currentDomain)){
+          // if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.axis) && this._doesObjHaveValues(this.margin) && this._doesObjHaveValues(this.currentDomain)){
             this.defineAxis();
             // TODO unify my orientation checks
             // TODO suport top and right
@@ -191,22 +198,51 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
               this.drawSeriesBars();
 
+              // alert parents that we are done drawing the axis
+              this.fire("px-axis-done");
             } else {
-              this._axisGroup
-              // .duration(750)
-              .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
-              .call(this._axis);
-
-              this._setLineStyles(this._axisGroup,'line');
-              this._setLabelStyles(this._axisGroup);
-
-              if(this.title) {
-                this.drawTitle();
+              // if we have tickValues, we'll update another way
+              if(!this.tickValues || this.tickValues.length === 0){
+                this._updateAxis();
               }
-              this.drawSeriesBars();
             }
+          // }
+        },
+        /**
+         * Updates the axis
+         *
+         */
+        _updateAxis: function(){
+          this._axisGroup
+          // .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
+          .call(this._axis);
+
+          this._setLineStyles(this._axisGroup,'line');
+          this._setLabelStyles(this._axisGroup);
+
+          // if(this.title) {
+          //   this.drawTitle();
+          // }
+          this.drawSeriesBars();
+
+          // alert parents that we are done drawing the axis
+          this.fire("px-axis-done");
+        },
+
+        /**
+         * Method to update tickValues and recall the axis
+         *
+         */
+        updateTicks: function(){
+          if(this._doesObjHaveValues(this._axis) && this._doesObjHaveValues(this._axisGroup) && this._doesObjHaveValues(this.tickValues)){
+              this._axis.tickValues(this.tickValues);
+              //beats me why we need a timeout... some kind of nonsensical race condition.
+              setTimeout(function(){
+                this._updateAxis();
+              }.bind(this),1);
           }
         },
+
         /**
          * Calculates the dimensions for the label.
          *
