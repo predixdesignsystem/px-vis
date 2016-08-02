@@ -154,7 +154,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     },
 
     observers: [
-      '_generateGs(dimensions,svg,currentDomainX)'
+      '_generateGs(dimensions,svg,currentDomainX)',
+      '_reDraw(axisGroups, x, y)'
     ],
 
     /**
@@ -235,6 +236,16 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
      */
     _calcGridAxis: function(dim){
       return this._returnY(dim[0]);
+    },
+    _reDraw: function() {
+
+      this.debounce('redraw', function() {
+        if(this._doesObjHaveValues(this.axisGroups)) {
+          this.axisGroups.attr("transform", function(d) { 
+            return "translate(" + this.x(d) + ")"; 
+          }.bind(this));
+        }
+      }.bind(this), 10);
     }
 
   });
