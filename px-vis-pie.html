@@ -84,8 +84,16 @@ Element which draws scatter series onto the chart
        * @property seriesId
        * @type String
        */
-      seriesId:{
+      seriesId: {
         type:String
+      },
+      /**
+       * allows to draw an empty pie chart when data is empty/null
+       */
+      empty: {
+        type: Boolean,
+        value: false,
+        observer: '_emptyChanged'
       },
       /**
        * An index of the series used for calculating its color
@@ -138,7 +146,8 @@ Element which draws scatter series onto the chart
        */
       showTitle: {
         type: Boolean,
-        value: false
+        value: false,
+        observer: '_showTitleChanged'
       },
       /**
        * A holder object for the series object
@@ -191,12 +200,6 @@ Element which draws scatter series onto the chart
         value: ''
       },
       /**
-       * d3 arc function used to draw arcs
-       */
-      _arcGenerator: {
-        type: Object
-      },
-      /**
        * the current arcs
        */
       _arcs: {
@@ -243,11 +246,18 @@ Element which draws scatter series onto the chart
      * @method drawElement
      */
     drawElement: function() {
-      //calculate data and radius
-      var data = this.chartData,
-          xKey = this.completeSeriesConfig[this.seriesId].x;
-          pie = Px.d3.pie().value(function(d){return d[xKey];})(data);
+      
+      this._checkInitialGroupCreation();
 
+      this._updateDrawing();
+
+      this._repositionTitle();
+    },
+    /**
+     * Checks whether the group holding all slices has been created and creates it
+     * if needed
+     */
+    _checkInitialGroupCreation: function() {
       // checks to see if the group already exists. If not, create; if so, update
       if(this._isObjEmpty(this.pieGroup)){
         // draw the path and move it so the ie is centered
@@ -255,74 +265,111 @@ Element which draws scatter series onto the chart
           .attr('series-id', 'pie_' + this.seriesId)
           .attr('class', 'pie-slice')
           .attr('transform', this._translationString);
+
+          this.set('_currentRotationAngle', -Math.PI);
       }
+    },
+    /**
+     * all subsequent drawings when adding, removing or updating data
+     */
+    _updateDrawing: function() {
+          
+        var _this = this,
+            data = this.chartData,
+            isFirstDrawing = this._arcs ? false : true;
+            xKey = this.empty ? '' : this.completeSeriesConfig[this.seriesId].x;
 
-
-
-      if(!this._arcs) {
-
-        //store current inner and outer radius
-        for(var i=0; i<pie.length; i++) {
-          pie[i].innerRadius = this._innerRadiusPx,
-          pie[i].outerRadius = this._radius;
+        this._pie = this.empty ? Px.d3.pie()([1]) 
+                                  : Px.d3.pie().value(function(d){return d[xKey];})(data);
+        this._arcs = this.pieGroup.selectAll('.slice')
+                                .data(this._pie);
+        
+        for(var i=0; i<this._pie.length; i++) {
+          this._pie[i].innerRadius = this._innerRadiusPx,
+          this._pie[i].outerRadius = this._radius;
         }
 
-        // declare an arc generator function
-        this._arcGenerator = Px.d3.arc();
-
-        // select paths, use arc generator to draw
-        //TODO: merge and exit
-        this._arcs = this.pieGroup.selectAll('pie-slice')
-                                .data(pie)
-                                .enter()
-                                .append('svg:g')
-                                .attr('class', 'slice')
-                                .on('tap', this._centerOnSlice.bind(this))
-                                .on('mouseover', this._showTooltip.bind(this))
-                                .on('mouseleave', this._hideTooltip.bind(this));
-
-        this._arcs.append('svg:path')
-            .attr('fill', function(d, i){
-                return this._getPieColorForIndex(i);
-            }.bind(this))
-            .attr('d', function (d) {
-                return this._arcGenerator(d);
-            }.bind(this));
-
-        this.set('_currentRotationAngle', -Math.PI);
-        this._positionChart(1250);
-      } else {
-
-        var _this = this;
+        //function used to interpolate values between initial and final state. Used during
+        //transitioning
         var tweenArc = function tweenArc(b) {
           return function(a, i) {
+            //create function allowing us to interpolate values for data being updated
             var d = b.call(this, a, i), i = d3.interpolateObject(d, a);
             for (var k in d) a[k] = d[k]; // update data
             return function(t) {
-              return _this._arcGenerator(i(1 - t));
+              return Px.d3.arc()(i(1 - t));
             };
           };
         };
 
-        //update slices
-        //TODO: this only deals with radius changes. We need to add
-        //angle changes (equivalent to data changed). Need to store previous angle.
+        //existing data, update slices
+        //returned values are the one desired at the end of the transition.
+        //they will be interpolated during transition in arcTween.
+        //we manage angles and radius changes
         this._arcs.selectAll('path')
           .transition()
           .duration(750)
-          .attrTween('d', tweenArc(function(d, i) {
+          .attrTween('d', tweenArc(function(d, i, newData, oldData) {
+
+            //find new data, full circle if empty
+            var newData  = {
+                'startAngle': 0,
+                'endAngle': 6.29
+              },
+                xKey = _this.completeSeriesConfig[_this.seriesId].x,
+                yKey = _this.completeSeriesConfig[_this.seriesId].y;
+
+            //if we're not empty find the new value and use it
+            if(!this.empty) {
+              for(var j=0; j<_this._pie.length; j++) {
+                if(_this._pie[j].data[xKey] === d.data[xKey] && _this._pie[j].data[yKey] === d.data[yKey]) {
+                  newData = _this._pie[j];
+                  break;
+                }
+              }
+            }
 
             return {
               innerRadius: _this._innerRadiusPx,
-              outerRadius: _this._radius
+              outerRadius: _this._radius,
+              startAngle: newData.startAngle,
+              endAngle: newData.endAngle
             };
-          }));
+          }))
+          .attr('opacity', this.empty ? 0.5 : 1);
+
+        //apply color and opacity depending on the chart "emptiness"
+        if(this.empty) {
+          this._arcs.selectAll('path')
+            .attr('fill', this.dataVisColors['dv-light-gray']);
+        } else {
+          this._arcs
+            .attr('fill', function(d, i) {
+                  return this._getPieColorForIndex(i);
+              }.bind(this));
+        }
+
+        //removed data, delete slices
+        this._arcs.exit().remove();
+
+        //new data, create new slices
+        this._arcs.enter()
+                  .append('svg:g')
+                  .attr('class', 'slice')
+                  .on('tap', this._centerOnSlice.bind(this))
+                  .on('mouseover', this._showTooltip.bind(this))
+                  .on('mouseleave', this._hideTooltip.bind(this))
+                  .append('svg:path')
+                    .attr('fill', function(d, i) {
+                        d.innerRadius = this._innerRadiusPx;
+                        d.outerRadius = this._radius;
+                        return this.empty ? this.dataVisColors['dv-light-gray'] : this._getPieColorForIndex(i);
+                    }.bind(this))
+                    .attr('d', Px.d3.arc())
+                    .attr('opacity', this.empty ? 0.5 : 1);
 
         //make sure we're in the right pos
-        this._positionChart(150);
-      }
-
-      this._repositionTitle();
+        this._positionChart(isFirstDrawing ? 1250 : 0);
     },
     /**
      * Return the value or the slice datum depending on use of percentages
@@ -341,18 +388,22 @@ Element which draws scatter series onto the chart
     _showTooltip: function(datum, index, group) {
 
       //get label and value
-      this.set('_ttTitle', datum.data[this.completeSeriesConfig[this.seriesId].y]);
-      this.set('_ttMessage', this._getSliceValue(datum));
-
+      if(this.empty) {
+        this.set('_ttTitle', 'Empty');
+        this.set('_ttMessage', '');
+      } else {
+        this.set('_ttTitle', datum.data[this.completeSeriesConfig[this.seriesId].y]);
+        this.set('_ttMessage', this._getSliceValue(datum));
+      }
 
       //center tooltip
       var rotatedDatum = {
         startAngle: datum.startAngle + this._currentRotationAngle,
         endAngle: datum.endAngle + this._currentRotationAngle,
-        innerRadius: datum.innerRadius,
-        outerRadius: datum.outerRadius
+        innerRadius: this._innerRadiusPx,
+        outerRadius: this._radius
       },
-          center = this._arcGenerator.centroid(rotatedDatum);
+          center = Px.d3.arc().centroid(rotatedDatum);
 
       var rect = this.pxSvgElem.getBoundingClientRect();
 
@@ -382,6 +433,8 @@ Element which draws scatter series onto the chart
      * Position the chart given the current translation string and rotation angle
      */
     _positionChart: function(transitionTime) {
+
+      //then add rotation
       this.pieGroup
           .transition()
           .duration(transitionTime)
@@ -392,22 +445,24 @@ Element which draws scatter series onto the chart
      *
      */
     _centerOnSlice: function(datum, index, group) {
-      this.set('_currentRotationAngle', this._getRotationAngle(datum));
-      this._positionChart(750);
-      //display a popover after the rotation
-      setTimeout(function() {
+      if(!this.empty) {
+        this.set('_currentRotationAngle', this._getRotationAngle(datum));
+        this._positionChart(750);
+        //display a popover after the rotation
+        setTimeout(function() {
 
-        var rect = this.pxSvgElem.getBoundingClientRect();
+          var rect = this.pxSvgElem.getBoundingClientRect();
 
-        //position popover anchor
-        this.$.popoverWrapper.style.left =  (Number(this.margin.left) +  this._radius) + 'px';
-        this.$.popoverWrapper.style.top = -rect.height + Number(this.margin.top) + 'px';
+          //position popover anchor
+          this.$.popoverWrapper.style.left =  (Number(this.margin.left) +  this._radius) + 'px';
+          this.$.popoverWrapper.style.top = -rect.height + Number(this.margin.top) + 'px';
 
-        this.$.popover.popoverTitle = datum.data[this.completeSeriesConfig[this.seriesId].y];
-        this.$.popover.popoverBody = this._getSliceValue(datum);
+          this.$.popover.popoverTitle = datum.data[this.completeSeriesConfig[this.seriesId].y];
+          this.$.popover.popoverBody = this._getSliceValue(datum);
 
-        this.$.popover.show();
-      }.bind(this), 750);
+          this.$.popover.show();
+        }.bind(this), 750);
+      }
     },
     /**
      * Computes the translation string needed to center the pie
@@ -465,6 +520,14 @@ Element which draws scatter series onto the chart
         //no donut
         return 0;
       }
+    },
+    _emptyChanged: function() {
+      if(this.empty) {
+        this.drawElement();
+      }
+    },
+    _showTitleChanged: function() {
+      this._repositionTitle();
     }
   });
 </script>
