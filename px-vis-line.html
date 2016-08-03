@@ -211,12 +211,19 @@ Element which draws lines series onto the chart
       // FIXME for some reason, this runs when completeSeriesConfig is undefined; doesnt make sense....
       var dims = this.completeSeriesConfig[this.seriesId]['x'],
           //define a normal d3 line generator
-          path = Px.d3.line(),
+          path = Px.d3.line().defined(function(d) {
+            //only draw a line through the axis if we have data
+            return d;
+          }),
           //be sneaky: iterate through the data like normal
           line = function(d) {
             //for each datapoint, iterate through the dimensions
             return path(dims.map(function(p) {
-              //return [x,y]: x is ordinal based on dim; get the y-scale for the dim and use that particular scale on the data
+              //check that we have data; if not, return false so it doesnt draw a line
+              if(!d[p]){
+                return false
+              }
+              //return [x,y] to path: x is ordinal based on dim; get the y-scale for the dim and use that particular scale on the data
               return [~~this.x(p), ~~this.y[p](d[p])];
             }.bind(this)));
           }.bind(this);
