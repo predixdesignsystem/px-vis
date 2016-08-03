@@ -47,6 +47,7 @@ Element which draws lines series onto the chart
       PxVisBehaviorD3.clipPath,
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.categories,
+      PxVisBehaviorD3.selectedDomain,
       commonColors
     ],
 
@@ -140,7 +141,7 @@ Element which draws lines series onto the chart
     },
 
     observers: [
-      '_computeGradientRange(chartData.*)',
+      '_computeGradientRange(chartData.*,selectedDomain.*)',
       'drawCanvas(canvasContext,currentDomainX,currentDomainY,chartData.*,completeSeriesConfig.*)',
       'drawElement(svg,currentDomainX,currentDomainY,chartData.*,completeSeriesConfig.*)',
       'isIdInMuted(mutedSeries.*)',
@@ -467,8 +468,14 @@ Element which draws lines series onto the chart
      */
     _computeGradientRange: function(){
       if(this.chartData.length > 0){
-        var x1 = Number(this.chartData[0][this.seriesId]),
-            x2 = Number(this.chartData[this.chartData.length - 1][this.seriesId]);
+        var x1,x2;
+        if(this.selectedDomain.x.length > 0){
+          x1 = Number(this.selectedDomain.x[0]);
+          x2 = Number(this.selectedDomain.x[1]);
+        } else {
+          x1 = Number(this.chartData[0][this.seriesId]);
+          x2 = Number(this.chartData[this.chartData.length - 1][this.seriesId]);
+        }
         this.set('gradientRange', [x1,x2]);
       }
     },

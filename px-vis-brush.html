@@ -136,6 +136,14 @@ This element sets the selectedDomain property based on the extents box. The sele
       chartDomain: {
         type:Object,
         notify:true
+      },
+      /**
+       * Boolean specifying if the rectangle overlay should have a gradient applied
+       *
+       */
+      gradientOverlay: {
+        type: Boolean,
+        value: false
       }
     },
 
@@ -184,13 +192,33 @@ This element sets the selectedDomain property based on the extents box. The sele
            There are actually two boxes, .selection and .overlay:
            overlay captures the mouse events; selection is what is visible
         */
-        this._brushGroup.select("rect.selection")
+        var overlay = this._brushGroup.select("rect.selection")
           .attr("y", 0)
           .attr('stroke',this.colors.gray5)
           .attr('stroke-width',2)
-          .attr('fill',this.colors.black)
-          .attr('fill-opacity','.10')
           .attr('shape-rendering','crispEdges');
+
+        if(this.gradientOverlay){
+          var gradient = this.bushSvg.append("defs")
+            .append("linearGradient")
+            .attr("id", "overlayGradient");
+
+          gradient.append("stop")
+            .attr("offset", "0%")
+            .attr("stop-color", this.colors.grey5)
+            .attr("stop-opacity", 0.2);
+
+          gradient.append("stop")
+            .attr("offset", "100%")
+            .attr("stop-color", this.colors.grey5)
+            .attr("stop-opacity", 0.8);
+
+          overlay.attr('fill','url(#overlayGradient)')
+            .attr('fill-opacity','1.0');
+        } else {
+          overlay.attr('fill',this.colors.black)
+            .attr('fill-opacity','.10')
+        }
 
         this._drawHandles(heightOffset);
 

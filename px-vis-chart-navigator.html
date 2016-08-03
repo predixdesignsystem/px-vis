@@ -51,7 +51,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
       </px-vis-svg>
 
       <template is="dom-repeat" items="[[_returnKeys(completeSeriesConfig)]]">
-        <template is="dom-if" if="[[_limitSeries(index)]]">
+        <template is="dom-if" if="[[_limitSeries(index,navSeriesLimit)]]">
           <template is="dom-if" if="[[_chartTypeLine(item,completeSeriesConfig)]]">
             <px-vis-line
               svg="[[svg]]"
@@ -62,7 +62,6 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
               y="[[y]]"
               current-domain-x="[[currentDomainX]]"
               current-domain-y="[[currentDomainY]]"
-              clip-path="[[clipPath]]"
               muted-series="[[mutedSeries]]">
             </px-vis-line>
           </template>
@@ -77,7 +76,6 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
               y="[[y]]"
               current-domain-x="[[currentDomainX]]"
               current-domain-y="[[currentDomainY]]"
-              clip-path="[[clipPath]]"
               muted-series="[[mutedSeries]]">
             </px-vis-scatter>
           </template>
@@ -88,6 +86,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
         svg="[[svg]]"
         axis="[[x]]"
         axis-id="x"
+        height="[[height]]"
         margin="[[margin]]"
         orientation="bottom"
         current-domain="[[currentDomainX]]">
@@ -100,7 +99,8 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
         margin="[[margin]]"
         current-domain="[[currentDomainX]]"
         chart-domain=[[chartDomainX]]
-        selected-domain="[[selectedDomain]]">
+        selected-domain="[[selectedDomain]]"
+        gradient-overlay="[[gradientOverlay]]">
       </px-vis-brush>
 
     </template>
@@ -137,11 +137,11 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           /**
            * Number of series to display on the navigator
            *
-           * @default 1
            */
           navSeriesLimit:{
             type:Number,
-            value: Infinity
+            value: Infinity,
+            notify: true
           },
           xAxisLocation:{
             type:String,
@@ -157,8 +157,6 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           /**
            * The parent chart's extents
            *
-           * @property chartDomainX
-           * @type Array
            */
           chartDomainX: {
             type:Array,
@@ -167,12 +165,18 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           /**
            * The parent chart's extents
            *
-           * @property chartDomainY
-           * @type Array
            */
           chartDomainY: {
             type:Array,
             notify:true
+          },
+          /**
+           * Boolean specifying if the rectangle overlay should have a gradient applied
+           *
+           */
+          gradientOverlay: {
+            type: Boolean,
+            value: false
           }
         },
 
