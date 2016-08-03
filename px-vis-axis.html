@@ -161,50 +161,56 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * @method drawElement
          */
         drawElement: function() {
+
           if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.axis) && this._doesObjHaveValues(this.margin) && this._doesObjHaveValues(this.currentDomain)){
-            this.defineAxis();
-            // TODO unify my orientation checks
-            // TODO suport top and right
-            if(this.orientation === 'bottom'){
-              var h = this.height - this.margin.bottom - this.margin.top;
+            this.debounce('drawAxis', function() {
 
-              this.translateAmt = [0,h];
-            } else if(this.orientation === 'left'){
-              this.translateAmt = [0,0];
-            }
+            
+              this.defineAxis();
+              // TODO unify my orientation checks
+              // TODO suport top and right
+              if(this.orientation === 'bottom'){
+                var h = this.height - this.margin.bottom - this.margin.top;
 
-            // checks to see if the axis already exists. If not, create; if so, update
-            if(this._isObjEmpty(this._axisGroup)) {
-              this._axisGroup = this.svg.append("g")
-                .attr("class", "axis")
-                .attr('axis-id',this.axisId)
+                this.translateAmt = [0,h];
+              } else if(this.orientation === 'left'){
+                this.translateAmt = [0,0];
+              }
+
+              // checks to see if the axis already exists. If not, create; if so, update
+              if(this._isObjEmpty(this._axisGroup)) {
+                this._axisGroup = this.svg.append("g")
+                  .attr("class", "axis")
+                  .attr('axis-id',this.axisId)
+                  .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
+                  .call(this._axis);
+                  // .each(function(d) { d3.select(this).call(_this._axis.scale(_this.axis[d])); })
+
+                this._setLineStyles(this._axisGroup,'line,path');
+                this._setLabelStyles(this._axisGroup);
+
+                if(this.title) {
+                  this.drawTitle();
+                }
+
+                this.drawSeriesBars();
+
+              } else {
+                
+                this._axisGroup
+                // .duration(750)
                 .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
                 .call(this._axis);
-                // .each(function(d) { d3.select(this).call(_this._axis.scale(_this.axis[d])); })
 
-              this._setLineStyles(this._axisGroup,'line,path');
-              this._setLabelStyles(this._axisGroup);
+                this._setLineStyles(this._axisGroup,'line');
+                this._setLabelStyles(this._axisGroup);
 
-              if(this.title) {
-                this.drawTitle();
+                if(this.title) {
+                  this.drawTitle();
+                }
+                this.drawSeriesBars();
               }
-
-              this.drawSeriesBars();
-
-            } else {
-              this._axisGroup
-              // .duration(750)
-              .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
-              .call(this._axis);
-
-              this._setLineStyles(this._axisGroup,'line');
-              this._setLabelStyles(this._axisGroup);
-
-              if(this.title) {
-                this.drawTitle();
-              }
-              this.drawSeriesBars();
-            }
+            }.bind(this), 1);
           }
         },
         /**
