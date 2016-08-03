@@ -1,3 +1,7 @@
+v0.1.7
+==================
+* Added demo link to README
+
 v0.1.6
 ==================
 * Improve data handling by pie slices, allow empty data as well

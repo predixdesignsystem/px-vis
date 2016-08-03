@@ -1,6 +1,8 @@
 Px-Vis
 -----------------------------------------------
 
+[px-vis demo](https://predixdev.github.io/px-vis)
+
 ## Overview
 
 Px-Vis is a Predix Experience ('Px') component
