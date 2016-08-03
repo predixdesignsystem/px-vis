@@ -1,3 +1,7 @@
+v0.1.8
+==================
+* Make auto resize work for multi axis/scale/brush
+
 v0.1.7
 ==================
 * Added demo link to README
