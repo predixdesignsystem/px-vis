@@ -35,7 +35,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       <template is="dom-repeat" items="[[dimensions]]">
         <px-vis-axis
           svg="[[_returnGroup(index,axisGroups)]]"
-          axis="[[_returnY(item,currentDomainY)]]"
+          axis="[[_returnY(item,currentDomainY, y)]]"
           height="[[height]]"
           margin="[[margin]]"
           orientation="left"
@@ -46,7 +46,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           current-domain="[[currentDomainY]]"
           stroke-width="[[strokeWidth]]"
           outer-tick-size="0"
-          tick-values="[[_calcTickVals(item,currentDomainY)]]">
+          tick-values="[[_calcTickVals(item,currentDomainY, height)]]">
         </px-vis-axis>
       </template>
       <px-vis-axis-brush
@@ -158,7 +158,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
     observers: [
       '_generateGs(dimensions,svg,currentDomainX)',
-      // '_setAxisStyles(commonAxis)'
+      '_reDraw(axisGroups, x, y)'
     ],
 
     listeners:{
@@ -243,7 +243,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     _calcGridAxis: function(dim){
       return this._returnY(dim[0]);
     },
-
     _setAxisStyles: function(e){
       if(this._doesObjHaveValues(this.axisGroups)){
         var _this = this;
@@ -264,6 +263,16 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         }
       }
     },
+    _reDraw: function() {
+
+      this.debounce('redraw', function() {
+        if(this._doesObjHaveValues(this.axisGroups)) {
+          this.axisGroups.attr("transform", function(d) { 
+            return "translate(" + this.x(d) + ")"; 
+          }.bind(this));
+        }
+      }.bind(this), 10);
+    }
 
   });
 </script>
