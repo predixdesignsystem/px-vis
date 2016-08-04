@@ -1,3 +1,7 @@
+v0.1.9
+==================
+* Improving tests and bug fixes
+
 v0.1.8
 ==================
 * Make auto resize work for multi axis/scale/brush
