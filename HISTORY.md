@@ -1,3 +1,7 @@
+v0.1.10
+==================
+* bug fix
+
 v0.1.9
 ==================
 * Improving tests and bug fixes
