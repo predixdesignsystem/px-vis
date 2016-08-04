@@ -103,31 +103,42 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      *
      * @method _setXScale
      */
-    _setXScale: function(width,margin){
-      var w = width - margin.left - margin.right,
-          range = [0, w];
-      this.x = Px.d3.scalePoint().range(range).padding(0.5);
-      this.notifyPath('x.range', this.x.range);
-      this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
+    _setXScale: function(width,margin) {
+      this.debounce('setXScale', function() {
+
+        var w = width - margin.left - margin.right,
+            range = [0, w];
+        
+        if(this.x) {
+          var oldDomain = this.x.domain();
+          this.x = Px.d3.scalePoint().range(range).domain(oldDomain).padding(0.5);
+        } else {
+          this.x = Px.d3.scalePoint().range(range).padding(0.5);
+        }
+        
+        this.notifyPath('x.range', this.x.range);
+        this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
+      }.bind(this), 5);
     },
     /**
      * Sets the y scale to multiple linear scales
      *
      * @method _setYScale
      */
-    _setYScale: function(height,margin,dimensions){
-      var h = height - margin.top - margin.bottom,
-          range = [h, 0];
-      // y is an object with multiple scales
-      this.y = {};
+    _setYScale: function(height,margin,dimensions) {
+      this.debounce('setYScale', function() {
+        var h = height - margin.top - margin.bottom,
+            range = [h, 0],
+            newY = {};// y is an object with multiple scales
 
-      // iterate through the dimensions and create a scale for each; set them in the y obj with the dimensions as keys so we can easily access them again later
-      for(var i = 0; i < dimensions.length; i++){
-        this.y[dimensions[i]] = Px.d3.scaleLinear().nice().range(range);
-      }
+        // iterate through the dimensions and create a scale for each; set them in the y obj with the dimensions as keys so we can easily access them again later
+        for(var i = 0; i < dimensions.length; i++){
+          newY[dimensions[i]] = Px.d3.scaleLinear().nice().range(range);
+        }
 
-      this.notifyPath('y', this.y);
-      this.fire('px-vis-y-updated', { 'dataVar': 'y', 'data': this.y, 'method':'set' });
+        this.set('y', newY);
+        this.fire('px-vis-y-updated', { 'dataVar': 'y', 'data': this.y, 'method':'set' });
+      }.bind(this), 5);
     },
 
     _getDataExtents: function(d,yKeysArr){

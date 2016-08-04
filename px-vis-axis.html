@@ -73,8 +73,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            * @type Object
            */
           _axisGroup: {
-            type: Object,
-            value: function() {return{};}
+            type: Object
           },
           /**
            * A unique ID for the axis
@@ -92,7 +91,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         },
 
         observers: [
-          'drawElement(currentDomain,svg,axis,margin,height)',
+          'drawElement(currentDomain,svg,axis,margin)',
           'updateTicks(tickValues.*)',
           'drawSeriesBars(completeSeriesConfig.*)',
           '_muteSeriesBars(mutedSeries.*)'
@@ -107,7 +106,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         },
 
         attached: function(){
-          if(this._doesObjHaveValues(this._axisGroup)){
+          if(this._axisGroup){
             // alert parents that we are done drawing the axis
             this.fire("px-axis-done");
           }
@@ -168,7 +167,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * @method drawElement
          */
         drawElement: function() {
-          // if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.axis) && this._doesObjHaveValues(this.margin) && this._doesObjHaveValues(this.currentDomain)){
+          this.debounce('drawAxis', function() {
+
             this.defineAxis();
             // TODO unify my orientation checks
             // TODO suport top and right
@@ -181,7 +181,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             }
 
             // checks to see if the axis already exists. If not, create; if so, update
-            if(this._isObjEmpty(this._axisGroup)) {
+            if(!this._axisGroup) {
               this._axisGroup = this.svg.append("g")
                 .attr("class", "axis")
                 .attr('axis-id',this.axisId)
@@ -201,12 +201,13 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               // alert parents that we are done drawing the axis
               this.fire("px-axis-done");
             } else {
+
               // if we have tickValues, we'll update another way
               if(!this.tickValues || this.tickValues.length === 0){
                 this._updateAxis();
               }
             }
-          // }
+          }.bind(this), 5);
         },
         /**
          * Updates the axis
@@ -214,16 +215,18 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          */
         _updateAxis: function(){
           this._axisGroup
-          // .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
+          .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
           .call(this._axis);
 
-          this._setLineStyles(this._axisGroup,'line');
+         // this._setLineStyles(this._axisGroup,'line');
           this._setLabelStyles(this._axisGroup);
-
-          // if(this.title) {
-          //   this.drawTitle();
-          // }
+	        
+          if(this.title) {
+            this.drawTitle();
+          }
           this.drawSeriesBars();
+
+          
 
           // alert parents that we are done drawing the axis
           this.fire("px-axis-done");
@@ -234,12 +237,12 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          *
          */
         updateTicks: function(){
-          if(this._doesObjHaveValues(this._axis) && this._doesObjHaveValues(this._axisGroup) && this._doesObjHaveValues(this.tickValues)){
+          if(this._doesObjHaveValues(this._axis) && this._axisGroup && this._doesObjHaveValues(this.tickValues)){
               this._axis.tickValues(this.tickValues);
               //beats me why we need a timeout... some kind of nonsensical race condition.
               setTimeout(function(){
                 this._updateAxis();
-              }.bind(this),1);
+              }.bind(this),5);
           }
         },
 
@@ -360,9 +363,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               break;
           }
 
-
           if(!this._titleGroup) {
-
 
           this._titleGroup = this.svg.append("g")
             .attr('class','title-group')
@@ -379,7 +380,12 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .attr('transform',"rotate(" + r + ")");
           } else {
 
-            this.svg.select('g.title-group[for=' + this.axisId + ']').attr('transform',"translate(" + x + ',' + y + ")");
+            this.svg.select('g.title-group[for=' + this.axisId + ']')
+              .attr('transform',"translate(" + x + ',' + y + ")");
+            this.svg.select('g.title-group[for=' + this.axisId + '] text')
+              .attr("text-anchor", anchor)
+              .style("text-anchor", anchor)
+              .attr('transform',"rotate(" + r + ")");
           }
         },
         /**
@@ -388,7 +394,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * @method drawSeriesBars
          */
         drawSeriesBars:function(){
-          if(this._doesObjHaveValues(this.completeSeriesConfig) && this._doesObjHaveValues(this._axisGroup)){
+          if(this._doesObjHaveValues(this.completeSeriesConfig) && this._axisGroup){
             // FIXME do we need to move the title group based on how many series we have
             var keys = Object.keys(this.completeSeriesConfig),
                 kLen = keys.length,

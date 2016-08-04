@@ -151,7 +151,7 @@ Element which draws lines series onto the chart
       '_computeGradientRange(chartData.*,selectedDomain.*)',
       'drawElement(svg,currentDomainX,currentDomainY,chartData.*,completeSeriesConfig.*)',
       'drawCanvas(canvasContext,currentDomainX,currentDomainY,chartData.*,completeSeriesConfig.*,_canvasRedraw)',
-      'isIdInMuted(mutedSeries.*)',
+      'isIdInMuted(mutedSeries.*, completeSeriesConfig)',
       '_addClipPath(clipPath)',
       '_computeColorArr(categories,completeSeriesConfig,seriesId)'
      ],
@@ -218,6 +218,7 @@ Element which draws lines series onto the chart
     _defineMultiLine: function(){
       //get our dimensions
       // FIXME for some reason, this runs when completeSeriesConfig is undefined; doesnt make sense....
+
       var dims = this.completeSeriesConfig[this.seriesId]['x'],
           //define a normal d3 line generator
           path = Px.d3.line().defined(function(d) {
@@ -236,6 +237,7 @@ Element which draws lines series onto the chart
               return [~~this.x(p), ~~this.y[p](d[p])];
             }.bind(this)));
           }.bind(this);
+
       // add the canvas context if relevant
       if(this.renderToCanvas){
         path.context(this.canvasContext);
@@ -396,24 +398,24 @@ Element which draws lines series onto the chart
               if(!this.mutedSeries[data[i][this.seriesId]]){
                 this.line(data[i]);
               }
+              // Apply our styles and draw all the lines to the canvas
+              this.canvasContext.strokeStyle = this.completeSeriesConfig[this.seriesId]['color'];
+              this.canvasContext.lineWidth = 1;
+              this.canvasContext.stroke();
             }
-            // Apply our styles and draw all the lines to the canvas
-            this.canvasContext.strokeStyle = this.completeSeriesConfig[this.seriesId]['color'];
-            this.canvasContext.lineWidth = 1;
-            this.canvasContext.stroke();
-          }
 
-          // make sure they are only drawn to the chart area and not the rest of the frame: equivalent to the clipPath for SVG
-          // TODO fix -50 to margin size
-          this.canvasContext.clearRect(0, -1, -50, this.canvasContext.canvas.height);
-          this.canvasContext._pxLinesRedraw += 1;
+            // make sure they are only drawn to the chart area and not the rest of the frame: equivalent to the clipPath for SVG
+            // TODO fix -50 to margin size
+            this.canvasContext.clearRect(0, -1, -50, this.canvasContext.canvas.height);
+            this.canvasContext._pxLinesRedraw += 1;
+          }
+          console.timeEnd('draw');
         }
-        console.timeEnd('draw');
       },10);
     },
 
     /**
-     * Helper to call addClipPath with the elem
+     * Helper to call adClipPath with the elem
      *
      * @method _addClipPath
      */

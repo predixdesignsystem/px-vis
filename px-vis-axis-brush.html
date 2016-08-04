@@ -61,26 +61,29 @@ This element draw the box over the axis signifying the active area to mute the s
     },
 
     observers: [
-      'drawElement(svg,axis)'
+      'drawElement(svg,axis, height)'
     ],
 
     drawElement: function(){
-      if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.axis)){
-        var _this = this;
-        // Add and store a brush for each axis.
-        this.svg.append("g")
-          .attr("class", "brush")
-          .each(function(d) {
-            var domain = [
-              [-10,0],
-              [+10,500]
-            ];
+      if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.axis)) {
+        
+        if(!this._brushes) {
+          console.log(this.height)
+          var _this = this;
+          // Add and store a brush for each axis.
+          this.svg.append("g")
+            .attr("class", "brush")
+            .each(function(d) {
+              var domain = [
+                [-10,0],
+                [0,_this.height]
+              ];
 
-            Px.d3.select(this).call(
-              Px.d3.brushY()
-                .extent(domain)
-                .on("start.brush", _this.brushstart.bind(_this))
-                .on("end.brush", _this.brush.bind(_this))
+          Px.d3.select(this).call(
+            Px.d3.brushY()
+              .extent(domain)
+              .on("start.brush", _this.brushstart.bind(_this))
+              .on("end.brush", _this.brush.bind(_this))
             );
           })
           .selectAll("rect")
@@ -90,8 +93,26 @@ This element draw the box over the axis signifying the active area to mute the s
             "fill": this.colors.gray5
           });
 
-        // save these brushes for access in brush()
-        this.set('_brushes',this.svg.selectAll('g.brush'));
+          // save these brushes for access in brush()
+          this.set('_brushes',this.svg.selectAll('g.brush'));
+        } else {
+          var _this = this;
+          //update brushes domain
+          this._brushes.each(function(d) {
+
+            var domain = [
+                [-10,0],
+                [+10,_this.height]
+              ];
+
+            Px.d3.select(this).call(
+              Px.d3.brushY()
+                .extent(domain)
+                .on("start.brush", _this.brushstart.bind(_this))
+                .on("end.brush", _this.brush.bind(_this))
+              );
+            });
+        }
       }
     },
 

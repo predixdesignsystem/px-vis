@@ -35,7 +35,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       <template is="dom-repeat" items="[[dimensions]]">
         <px-vis-axis
           svg="[[_returnGroup(index,axisGroups)]]"
-          axis="[[_returnY(item,currentDomainY)]]"
+          axis="[[_returnY(item,currentDomainY, y)]]"
           height="[[height]]"
           margin="[[margin]]"
           orientation="left"
@@ -46,7 +46,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           current-domain="[[currentDomainY]]"
           stroke-width="[[strokeWidth]]"
           outer-tick-size="0"
-          tick-values="[[_calcTickVals(item,currentDomainY)]]">
+          tick-values="[[_calcTickVals(item,currentDomainY, height)]]">
         </px-vis-axis>
       </template>
       <px-vis-axis-brush
@@ -110,8 +110,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
        */
       axisGroups: {
         type: Object,
-        notify: true,
-        value: function(){ return {}; }
+        notify: true
       },
       /**
        * A holder for the drag behavior
@@ -157,8 +156,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     },
 
     observers: [
-      '_generateGs(dimensions,svg,currentDomainX)',
-      // '_setAxisStyles(commonAxis)'
+      '_generateGs(dimensions,svg,currentDomainX, margin)',
+      '_reDraw(axisGroups, x, y)'
     ],
 
     listeners:{
@@ -170,23 +169,36 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
      *
      */
     _generateGs: function(dimensions,svg,currentDomainX){
-      if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.currentDomainX) && this._doesObjHaveValues(this.dimensions) && this._isObjEmpty(this.axisGroups)){
+      if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.currentDomainX) 
+          && this._doesObjHaveValues(this.dimensions) 
+          && this._doesObjHaveValues(this.margin)) {
 
-        this.cloneSVGElem(this.svg.node(),'axisSvg');
+        if(!this.axisGroups) {
+          this.cloneSVGElem(this.svg.node(),'axisSvg');
 
-        // generate axis based on the dimentions and bind the dimension to it for easy access later :D
-        var g = this.axisSvg.selectAll(".dimension")
-          .data(dimensions)
-          .enter()
-          .append("g")
-          .attr("class", "dimension")
-          .attr("transform", function(d) { return "translate(" + this.x(d) + ",0)"; }.bind(this))
-          .style("cursor","move")
-          .call(this.dragBehavior);
+          // generate axis based on the dimentions and bind the dimension to it for easy access later :D
+          var g = this.axisSvg.selectAll(".dimension")
+            .data(dimensions)
+            .enter()
+            .append("g")
+            .attr("class", "dimension")
+            .attr("transform", function(d) { 
+              return "translate(" + this.x(d) + "," + this.margin.top + ")"; 
+            }.bind(this))
+            .style("cursor","move")
+            .call(this.dragBehavior);
 
-        // TODO When we support muting an axes, might want to be able to access the above g and change the transform
+          // TODO When we support muting an axes, might want to be able to access the above g and change the transform
+          this.set('axisGroups', g);
+        } else {
 
-        this.set('axisGroups', g);
+          //update
+       /*   this.axisGroups
+          .attr("transform", function(d) { 
+            return "translate(" + this.x(d) + "," + this.margin.top + ")"; 
+          }.bind(this))
+        }*/
+        }
       }
     },
     /**
@@ -243,9 +255,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     _calcGridAxis: function(dim){
       return this._returnY(dim[0]);
     },
-
     _setAxisStyles: function(e){
-      if(this._doesObjHaveValues(this.axisGroups)){
+      if(this.axisGroups){
         var _this = this;
 
         if(this.commonAxis){
@@ -264,6 +275,16 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         }
       }
     },
+    _reDraw: function() {
+
+      this.debounce('redraw', function() {
+        if(this.axisGroups) {
+          this.axisGroups.attr("transform", function(d) { 
+            return "translate(" + this.x(d) + ")"; 
+          }.bind(this));
+        }
+      }.bind(this), 10);
+    }
 
   });
 </script>
