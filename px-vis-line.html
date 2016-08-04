@@ -259,7 +259,7 @@ Element which draws lines series onto the chart
             var data = this.chartData;
             this._defineMultiLine();
           } else {
-            var data = [this.chartData];
+            var data = this.chartData;
             this._defineSingleLine();
           }
 
@@ -340,77 +340,16 @@ Element which draws lines series onto the chart
             this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
           }
 
-          // For efficiency, we should draw the lines dfferently if they need a gradient or not.
-          if(this.gradientLine){  //if gradient, regardless of category or not
-            // Iterate over our data:
-            for(var i = 0; i < data.length; i++){
-              // Check to see if it is "muted"; if not, draw a line
-              if(!this.mutedSeries[data[i][this.seriesId]]){
-  /*
-    This was an experiement to do progressive rendering; it works, just is very slow. Uncomment the code and comment out the regular line drawing code.
+          //Render data progressively
+          this.canvasContext.lineWidth = 1;
 
-    Best would be if we could break our data into chunks and draw n lines per setTimeout
-
-    I was thinking this might not be necessary for the initial draw, but could be quite nice when moving axes as the delay if more noticible when the user is interacting with the chart vs understanding that the chart is loading.
-  */
-                // TODO wrap for in a settimeout and go by 1000s?
-                // setTimeout(function(d){
-                //   this.canvasContext.beginPath();
-                //   this.canvasContext.strokeStyle = this._canvasLineColor(d);
-                //   this.canvasContext.lineWidth = 1;
-                //   this.line(d);
-                //   this.canvasContext.stroke();
-                // }.bind(this,data[i]),1);
-
-                // start a path and reset the styles for this one path
-                this.canvasContext.beginPath();
-                this.canvasContext.strokeStyle = this._canvasLineColor(data[i],this._opacityLine(data[i]));
-                this.canvasContext.lineWidth = 1;
-                // use the line generator to create the line
-                this.line(data[i]);
-                // draw it to the canvas; cant wait until the end or else they all have the same style
-                this.canvasContext.stroke();
-              }
-            }
-          // if categoryKey and no gradient
-          } else if(this.categoryKey){
-            // Yes, this repeates the if above but I dont really want it checking an if 20k times to see if it should apply a gradient or not.
-            // Iterate over our data:
-            for(var i = 0; i < data.length; i++){
-              // Check to see if it is "muted"; if not, draw a line
-              if(!this.mutedSeries[data[i][this.seriesId]]){
-                // start a path and reset the styles for this one path
-                this.canvasContext.beginPath();
-                this.canvasContext.strokeStyle = this._canvasLineColor(data[i],1);
-                this.canvasContext.lineWidth = 1;
-                // use the line generator to create the line
-                this.line(data[i]);
-                // draw it to the canvas; cant wait until the end or else they all have the same style
-                this.canvasContext.stroke();
-              }
-            }
-          } else { //not gradientLine and not category
-            // start the path
-            this.canvasContext.beginPath();
-            // iterate through the data
-            for(var i = 0; i < data.length; i++){
-              // if the series is not listed or it is false, draw it
-              if(!this.mutedSeries[data[i][this.seriesId]]){
-                this.line(data[i]);
-              }
-              // Apply our styles and draw all the lines to the canvas
-              this.canvasContext.strokeStyle = this.completeSeriesConfig[this.seriesId]['color'];
-              this.canvasContext.lineWidth = 1;
-              this.canvasContext.stroke();
-            }
-          }
+          //TODO: choose number of frames depending on data size? First render in 1 frame?
+          this._renderProgressively(data, 5);
+          
           // make sure they are only drawn to the chart area and not the rest of the frame: equivalent to the clipPath for SVG
-          // TODO fix -50 to margin size
-          this.canvasContext.clearRect(0, -1, -50, this.canvasContext.canvas.height);
           this.canvasContext._pxLinesRedraw += 1;
-          console.timeEnd('draw');
         }
-      },10);
+      },20);
     },
 
     /**
@@ -420,6 +359,100 @@ Element which draws lines series onto the chart
      */
     _addClipPath: function(){
       this.addClipPath(this.lineGroup);
+    },
+
+    /**
+     * Renders data in a specific number of frames, splitting the batch
+     * 
+     */
+    _renderProgressively: function(data, numberOfFrames) {
+      //split data in 10 batches
+        var batches = [],
+            currentIndex = 0,
+            j = 0,
+            _this = this,
+            size = Math.floor(data.length/numberOfFrames),
+            timer = window.requestAnimationFrame
+              || window.webkitRequestAnimationFrame
+              || window.mozRequestAnimationFrame
+              || window.oRequestAnimationFrame
+              || window.msRequestAnimationFrame
+              || function(callback) { setTimeout(callback, 17); },
+            getColorValue,
+            processFunction;
+      
+      //split the data in the number of frames desired
+      for(j=0; j<numberOfFrames; j++) {
+        batches.push(data.slice(j*size, (j+1)*size));
+      }
+      //push last slice
+      batches.push(data.slice((j)*size, data.length));
+
+      //PROCESSING FUNCTIONS
+      //because of the color/gradient we have 1 stroke per line
+      var processColoredDataSlice = function() {
+
+        var d = batches[currentIndex];
+        for(var i = 0; i < d.length; i++) {
+          if(!_this.mutedSeries[d[i][_this.seriesId]]) {
+            _this.canvasContext.beginPath();
+            _this.canvasContext.strokeStyle = getColorValue(d[i]);
+            _this.line(d[i]);
+            _this.canvasContext.stroke();
+          }
+        }
+
+        currentIndex++;
+        if(currentIndex < numberOfFrames) {
+          timer(processColoredDataSlice);
+        }
+      };
+
+      //all  lines in 1 stroke
+      var processGenericDataSlice = function() {
+
+        var d = batches[currentIndex];
+        _this.canvasContext.beginPath();
+        for(var i = 0; i < d.length; i++) {
+          if(!_this.mutedSeries[d[i][_this.seriesId]]) {
+            
+            _this.line(d[i]);
+          }
+        }
+        _this.canvasContext.strokeStyle = _this.completeSeriesConfig[_this.seriesId]['color'];
+        _this.canvasContext.stroke();
+
+        currentIndex++;
+        if(currentIndex < numberOfFrames) {
+          timer(processGenericDataSlice);
+        } else {
+          //TODO: fix properly so we use some kind of margin
+          _this.canvasContext.clearRect(0, -1, _this.canvasContext.canvas.width, -30);
+          _this.canvasContext.clearRect(0, _this.canvasContext.canvas.height - 65, _this.canvasContext.canvas.width, 65);
+          _this.canvasContext.clearRect(0, -30, -50, _this.canvasContext.canvas.height + 30);
+        }
+      };
+      //END PROCESSING FUNCTIONS
+
+      //render differently depending on the type of line
+      if(this.gradientLine) {
+        //gradient line
+        getColorValue = function(d) {
+          return _this._canvasLineColor(d, _this._opacityLine(d));
+        };
+        processFunction = processColoredDataSlice;
+      } else if(this.categoryKey) {
+        //category color line
+        getColorValue = function(d) {
+          return _this._canvasLineColor(d, 1);
+        };
+        processFunction = processColoredDataSlice;
+      } else {
+        //"normal" color line
+        processFunction = processGenericDataSlice;
+      }
+      
+      timer(processFunction);
     },
 
     /**
