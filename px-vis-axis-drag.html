@@ -83,12 +83,15 @@ This element draw the box over the axis signifying the active area to mute the s
             _this.dimensions.sort(function(a, b) { return _this._position(a) - _this._position(b); });
             _this.axis.domain(_this.dimensions);
             _this.axisGroups.each(function(d,i){
-              _this.transition(Px.d3.select(this)).attr("transform", function(d) { return "translate(" + _this._position(d) + ")"; });
+              _this.transition(Px.d3.select(this)).attr("transform", function(d) { 
+                return "translate(" + _this._position(d) + "," + _this.margin.top + ")"; 
+              });
             });
           }
           delete _this._dragging[d];
           // make the axis snap into place
-          _this.transition(Px.d3.select(this)).attr("transform", "translate(" + _this.axis(d) + ")");
+          _this.transition(Px.d3.select(this))
+            .attr("transform", "translate(" + _this.axis(d) + "," + _this.margin.top + ")");
 
           if(_this.redrawSeries){
             // redraw the lines
@@ -128,7 +131,9 @@ This element draw the box over the axis signifying the active area to mute the s
         }
 
         // move the currently grabed axis (and reorder the others if above is active)
-        this.axisGroups.attr("transform", function(d) { return "translate(" + this._position(d) + ")"; }.bind(this));
+        this.axisGroups.attr("transform", function(d) { 
+          return "translate(" + this._position(d) + "," + this.margin.top + ")"; 
+        }.bind(this));
       }.bind(this,Px.d3.event.x),10);
     },
 
