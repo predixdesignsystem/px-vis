@@ -156,8 +156,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     },
 
     observers: [
-      '_generateGs(dimensions,svg,currentDomainX, margin)',
-      '_reDraw(axisGroups, x, y)'
+      '_generateGs(dimensions,svg,currentDomainX, margin, x, y)'
     ],
 
     listeners:{
@@ -193,11 +192,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         } else {
 
           //update
-       /*   this.axisGroups
-          .attr("transform", function(d) { 
-            return "translate(" + this.x(d) + "," + this.margin.top + ")"; 
-          }.bind(this))
-        }*/
+          this.axisGroups
+            .attr("transform", function(d) { 
+              return "translate(" + this.x(d) + "," + this.margin.top + ")"; 
+            }.bind(this))
+        
         }
       }
     },
@@ -274,16 +273,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           this.axisGroups.selectAll('.hideCommon').classed('hideCommon',false);
         }
       }
-    },
-    _reDraw: function() {
-
-      this.debounce('redraw', function() {
-        if(this.axisGroups) {
-          this.axisGroups.attr("transform", function(d) { 
-            return "translate(" + this.x(d) + ")"; 
-          }.bind(this));
-        }
-      }.bind(this), 10);
     }
 
   });
