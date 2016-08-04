@@ -379,4 +379,117 @@ function runTests(){
   //     assert.equal(baseBrush._brushGroup.select('rect.extent').attr('width'), 240);
   //   });
   // });
+
+  suite('px-vis-brush gradient overlay', function() {
+    var gradientScale = document.getElementById('gradientScale'),
+        gradientSVG = document.getElementById('gradientSVG'),
+        gradientBrush = document.getElementById('gradientBrush');
+    var colors = commonColors.properties.colors.value;
+
+    suiteSetup(function(done){
+      var d = [{
+            "x": 1397102460000,
+            "y": 1
+          },{
+            "x": 1397131620000,
+            "y": 6
+          },{
+            "x": 1397160780000,
+            "y": 10
+          },{
+            "x": 1397189940000,
+            "y": 4
+          },{
+            "x": 1397219100000,
+            "y": 6
+          }
+        ],
+        completeSeriesConfig = {"mySeries":{
+          "type":"line",
+          "name":"mySeries",
+          "x":"x",
+          "y":"y",
+          "color": "rgb(93,165,218)"
+        }},
+        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        w = 500,
+        h = 300,
+        m = {
+          "top": 10,
+          "right": 10,
+          "bottom": 10,
+          "left": 10
+        };
+
+      gradientSVG.set('width',w);
+      gradientSVG.set('height',h);
+      gradientSVG.set('margin',m);
+
+      gradientScale.set('width',w);
+      gradientScale.set('height',h);
+      gradientScale.set('margin',m);
+      gradientScale.set('completeSeriesConfig',completeSeriesConfig);
+      gradientScale.set('chartExtents',chartExtents);
+      gradientScale.set('chartData',d);
+
+      gradientBrush.set('height',h);
+
+      // setTimeout(function(){done()},5000);
+      done();
+    });
+
+    test('gradientBrush fixture is created', function() {
+      assert.isTrue(gradientBrush !== null);
+    });
+
+    test('gradientBrush._brush fixture is created', function() {
+      assert.isTrue(gradientBrush._brush !== null);
+    });
+
+    test('gradientBrush._brushGroup fixture is created', function() {
+      assert.equal(gradientBrush._brushGroup.node().tagName, 'g');
+    });
+
+    test('gradientBrush._brushGroup.rect fixture is created', function() {
+      assert.equal(gradientBrush._brushGroup.select('rect.selection').node().tagName, 'rect');
+    });
+
+    test('gradientBrush._brushGroup.rect attr stroke', function() {
+      assert.equal(gradientBrush._brushGroup.select('rect.selection').attr('stroke').split(" ").join(''), colors.gray5);
+    });
+    test('gradientBrush._brushGroup.rect attr fill', function() {
+      assert.equal(gradientBrush._brushGroup.select('rect.selection').attr('fill'), "url(#overlayGradient)");
+    });
+    test('gradientBrush._brushGroup.rect attr fill-opacity', function() {
+      assert.equal(gradientBrush._brushGroup.select('rect.selection').attr('fill-opacity'), 1);
+    });
+
+    test('def is created', function() {
+      assert.equal(gradientBrush.brushSvg.select('defs').node().tagName, 'defs');
+    });
+    test('linearGradient is created', function() {
+      assert.equal(gradientBrush.brushSvg.select('defs').select('linearGradient').node().tagName, 'linearGradient');
+    });
+    test('linearGradient has correct id', function() {
+      assert.equal(gradientBrush.brushSvg.select('defs').select('linearGradient').attr('id'), 'overlayGradient');
+    });
+    test('linearGradient stops are created', function() {
+      var stops = gradientBrush.brushSvg.select('defs').select('linearGradient').selectAll('stop').nodes();
+      assert.equal(stops.length, 2);
+      assert.equal(stops[0].tagName, 'stop');
+      assert.equal(stops[1].tagName, 'stop');
+    });
+    test('linearGradient stop[0] is correct', function() {
+      var stop = d3.select(gradientBrush.brushSvg.select('defs').select('linearGradient').selectAll('stop').nodes()[0]);
+      assert.equal(stop.attr('offset'), '0%');
+      assert.equal(stop.attr('stop-color').split(" ").join(''), colors.gray5);
+      assert.equal(stop.attr('stop-opacity'), 0.2);
+    });
+    test('linearGradient stop[1] is correct', function() {
+      var stop = d3.select(gradientBrush.brushSvg.select('defs').select('linearGradient').selectAll('stop').nodes()[1]);
+      assert.equal(stop.attr('offset'), '100%');
+      assert.equal(stop.attr('stop-color').split(" ").join(''), colors.gray5);
+      assert.equal(stop.attr('stop-opacity'), 0.8);
+    });
+  });
 } //runTests
