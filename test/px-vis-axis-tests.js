@@ -67,8 +67,8 @@ function runTests(){
       baseYAxis.set('height',h);
       baseYAxis.set('completeSeriesConfig',completeSeriesConfig);
       baseYAxis.set('chartData',d);
-      // setTimeout(function(){done()},5000);
-      done();
+      setTimeout(function(){done()},500);
+     // done();
     });
 
     test('baseXAxis fixture is created', function() {
