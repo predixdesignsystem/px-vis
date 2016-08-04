@@ -29,6 +29,8 @@ module.exports = {
   },
   suites: [
     'test/px-vis-svg-fixture.html',
+    'test/px-vis-canvas-fixture.html',
+    'test/px-vis-svg-canvas-fixture.html',
     'test/px-vis-scale-fixture.html',
     'test/px-vis-register-fixture.html',
     'test/px-vis-line-fixture.html',
