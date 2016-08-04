@@ -1,3 +1,7 @@
+v0.1.11
+==================
+* bug fixes, progressive rendering for canvas
+
 v0.1.10
 ==================
 * bug fix
