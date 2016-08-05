@@ -217,7 +217,6 @@ Element which draws lines series onto the chart
      */
     _defineMultiLine: function(){
       //get our dimensions
-      // FIXME for some reason, this runs when completeSeriesConfig is undefined; doesnt make sense....
 
       var dims = this.completeSeriesConfig[this.seriesId]['x'],
           //define a normal d3 line generator
@@ -253,7 +252,7 @@ Element which draws lines series onto the chart
      */
     drawElement: function() {
       this.debounce('draw',function(){
-        if(!this.renderToCanvas){
+        if(!this.renderToCanvas) {
           // we need to wrap the data differently depending on if we are drawing many lines or just one line
           if(this.parallelCoordinates) {
             var data = this.chartData;
@@ -381,12 +380,21 @@ Element which draws lines series onto the chart
             getColorValue,
             processFunction;
       
-      //split the data in the number of frames desired
-      for(j=0; j<numberOfFrames; j++) {
-        batches.push(data.slice(j*size, (j+1)*size));
+      if(this.parallelCoordinates) {
+        //split the data in the number of frames desired
+        for(j=0; j<numberOfFrames; j++) {
+          batches.push(data.slice(j*size, (j+1)*size));
+        }
+        //push last slice
+        batches.push(data.slice(j*size, data.length));
+      } else {
+
+        for(j=0; j<numberOfFrames; j++) {
+          batches.push([data.slice(j*size, (j+1)*size)]);
+        }
+        //push last slice
+        batches.push([data.slice(j*size, data.length)]);
       }
-      //push last slice
-      batches.push(data.slice((j)*size, data.length));
 
       //PROCESSING FUNCTIONS
       //because of the color/gradient we have 1 stroke per line
@@ -555,7 +563,7 @@ Element which draws lines series onto the chart
      */
      _muteLine:function(){
        this.linePath.attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
-         .attr('stroke-opacity',0.3);
+         .attr('stroke-opacity',0);
      },
   });
 </script>
