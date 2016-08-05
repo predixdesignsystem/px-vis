@@ -8,6 +8,7 @@
 <link rel="import" href="px-vis-axis.html"/>
 <link rel="import" href="px-vis-brush.html"/>
 <link rel="import" href="px-vis-scale.html"/>
+<link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html" />
 
 <!--
 Provides an interactive chart navigator with a brush to adjust the chart domain
@@ -33,76 +34,77 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
 <dom-module id="px-vis-chart-navigator">
     <link rel="import" type="css" href="css/px-vis.css"/>
     <template>
-      <px-vis-scale
-        svg="[[svg]]"
-        x-axis-type="[[xAxisType]]"
-        y-axis-type="[[yAxisType]]"
-        width="[[width]]"
-        height="[[height]]"
-        margin="[[margin]]"
-        chart-extents="[[chartExtents]]"
-        complete-series-config="[[completeSeriesConfig]]"
-        chart-data="[[chartData]]">
-      </px-vis-scale>
-      <px-vis-svg
-        width="[[width]]"
-        height="[[height]]"
-        margin="[[margin]]">
-      </px-vis-svg>
+      <div id="wrapper" style="height:100%;width:100%">
+        <px-vis-scale
+          svg="[[svg]]"
+          x-axis-type="[[xAxisType]]"
+          y-axis-type="[[yAxisType]]"
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          chart-extents="[[chartExtents]]"
+          complete-series-config="[[completeSeriesConfig]]"
+          chart-data="[[chartData]]">
+        </px-vis-scale>
+        <px-vis-svg
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]">
+        </px-vis-svg>
 
-      <template is="dom-repeat" items="[[_returnKeys(completeSeriesConfig)]]">
-        <template is="dom-if" if="[[_limitSeries(index,navSeriesLimit)]]">
-          <template is="dom-if" if="[[_chartTypeLine(item,completeSeriesConfig)]]">
-            <px-vis-line
-              svg="[[svg]]"
-              series-id="[[item]]"
-              chart-data="[[chartData]]"
-              complete-series-config="[[completeSeriesConfig]]"
-              x="[[x]]"
-              y="[[y]]"
-              current-domain-x="[[currentDomainX]]"
-              current-domain-y="[[currentDomainY]]"
-              muted-series="[[mutedSeries]]">
-            </px-vis-line>
-          </template>
-          <template is="dom-if" if="[[_chartTypeScatter(item,completeSeriesConfig)]]">
-            <px-vis-scatter
-              svg="[[svg]]"
-              series-id="[[item]]"
-              chart-data="[[chartData]]"
-              complete-series-config="[[completeSeriesConfig]]"
-              marker-size="2"
-              x="[[x]]"
-              y="[[y]]"
-              current-domain-x="[[currentDomainX]]"
-              current-domain-y="[[currentDomainY]]"
-              muted-series="[[mutedSeries]]">
-            </px-vis-scatter>
+        <template is="dom-repeat" items="[[_returnKeys(completeSeriesConfig)]]">
+          <template is="dom-if" if="[[_limitSeries(index,navSeriesLimit)]]">
+            <template is="dom-if" if="[[_chartTypeLine(item,completeSeriesConfig)]]">
+              <px-vis-line
+                svg="[[svg]]"
+                series-id="[[item]]"
+                chart-data="[[chartData]]"
+                complete-series-config="[[completeSeriesConfig]]"
+                x="[[x]]"
+                y="[[y]]"
+                current-domain-x="[[currentDomainX]]"
+                current-domain-y="[[currentDomainY]]"
+                muted-series="[[mutedSeries]]">
+              </px-vis-line>
+            </template>
+            <template is="dom-if" if="[[_chartTypeScatter(item,completeSeriesConfig)]]">
+              <px-vis-scatter
+                svg="[[svg]]"
+                series-id="[[item]]"
+                chart-data="[[chartData]]"
+                complete-series-config="[[completeSeriesConfig]]"
+                marker-size="2"
+                x="[[x]]"
+                y="[[y]]"
+                current-domain-x="[[currentDomainX]]"
+                current-domain-y="[[currentDomainY]]"
+                muted-series="[[mutedSeries]]">
+              </px-vis-scatter>
+            </template>
           </template>
         </template>
-      </template>
 
-      <px-vis-axis
-        svg="[[svg]]"
-        axis="[[x]]"
-        axis-id="x"
-        height="[[height]]"
-        margin="[[margin]]"
-        orientation="bottom"
-        current-domain="[[currentDomainX]]">
-      </px-vis-axis>
-      <px-vis-brush
-        svg="[[svg]]"
-        axis="[[x]]"
-        height="[[height]]"
-        width="[[width]]"
-        margin="[[margin]]"
-        current-domain="[[currentDomainX]]"
-        chart-domain=[[chartDomainX]]
-        selected-domain="[[selectedDomain]]"
-        gradient-overlay="[[gradientOverlay]]">
-      </px-vis-brush>
-
+        <px-vis-axis
+          svg="[[svg]]"
+          axis="[[x]]"
+          axis-id="x"
+          height="[[height]]"
+          margin="[[margin]]"
+          orientation="bottom"
+          current-domain="[[currentDomainX]]">
+        </px-vis-axis>
+        <px-vis-brush
+          svg="[[svg]]"
+          axis="[[x]]"
+          height="[[height]]"
+          width="[[width]]"
+          margin="[[margin]]"
+          current-domain="[[currentDomainX]]"
+          chart-domain=[[chartDomainX]]
+          selected-domain="[[selectedDomain]]"
+          gradient-overlay="[[gradientOverlay]]">
+        </px-vis-brush>
+      </div>
     </template>
 </dom-module>
 
@@ -124,7 +126,8 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           PxVisBehavior.commonMethods,
           PxVisBehavior.axisTypes,
           PxVisBehaviorChart.chartCommon,
-          PxVisBehaviorChart.precipitationPattern
+          PxVisBehaviorChart.precipitationPattern,
+          Polymer.IronResizableBehavior
         ],
 
         /**
@@ -179,9 +182,22 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
             value: false
           }
         },
-
-        _limitSeries: function(i){
+        listeners: {
+          'iron-resize': '_onIronResize'
+        },
+        attached: function() {
+          this._onIronResize();
+        },
+        _limitSeries: function(i){ 
           return i < this.navSeriesLimit;
+        },
+        _onIronResize: function() {
+          this.debounce('ironresize', function() {
+            var wrapperRect = this.$.wrapper.getBoundingClientRect();
+
+            this.set('width', wrapperRect.width);
+            this.set('height', wrapperRect.height);
+          },100);
         }
     });
 </script>

@@ -144,6 +144,13 @@ This element sets the selectedDomain property based on the extents box. The sele
       gradientOverlay: {
         type: Boolean,
         value: false
+      },
+      /**
+       * Allows to prevent changes to selectedDomain
+       */
+      _preventDomainChange: {
+        type: Boolean,
+        value: false
       }
     },
 
@@ -164,13 +171,13 @@ This element sets the selectedDomain property based on the extents box. The sele
      * @method drawElement
      */
     drawElement: function() {
-      if(this._isObjEmpty(this._brush)){
-        var heightOffset = 5,
+      var heightOffset = 5,
             h = this.height - this.margin.bottom - heightOffset,
             domain = [
               [this.axis(this.currentDomain[0]),0],
               [this.axis(this.currentDomain[1]),h]
             ];
+      if(this._isObjEmpty(this._brush)) {
 
         // make sure the brush draws on top of everything; returns a set property brushSvg
         this.cloneSVGElem(this.svg.node(),'brushSvg');
@@ -238,6 +245,20 @@ This element sets the selectedDomain property based on the extents box. The sele
         // if(nodes[nodes.length -1] !== this._brushGroup.node()){
         //   console.log("doesnt match");
         // }
+      } else {
+        //make sure brush has the right size
+        // this._brush.extent(domain)
+        //   .handleSize(6)
+        //   .on("start", this._brushstart.bind(this))
+        //   .on("brush", this._brushmove.bind(this))
+        //   .on("end", this._brushend.bind(this));
+
+        // //redraw the brush in the right place, but make sure we don't fire a change of domain
+        // this._preventDomainChange = true;
+        // this._brushGroup 
+        //   .call(this._brush)
+        //   .call(this._brush.move, [this.axis(this.selectedDomain.x[0]), this.axis(this.selectedDomain.x[1])]);
+        // this._preventDomainChange = false;
       }
     },
     /**
@@ -279,9 +300,11 @@ This element sets the selectedDomain property based on the extents box. The sele
       this.debounce('brushed', function () {
         var newDomain = Px.d3.brushSelection(this._brushGroup.node()).map(this.axis.invert, this.axis);
         // var newDomain = s.map(this.axis.invert, this.axis);
-        this.set('selectedDomain', {x:newDomain,y:[]});
-        this.fire('px-vis-selected-domain-updated', { 'data':{x:newDomain,y:[]}, 'method': 'set', 'dataVar': 'selectedDomain' });
-      }, 10);
+        if(!this._preventDomainChange) {
+          this.set('selectedDomain', {x:newDomain,y:[]});
+          this.fire('px-vis-selected-domain-updated', { 'data':{x:newDomain,y:[]}, 'method': 'set', 'dataVar': 'selectedDomain' });
+        }
+    }, 10);
     },
     /**
      * Helper function fired whtn the navigator is clicked on
