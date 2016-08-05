@@ -247,18 +247,20 @@ This element sets the selectedDomain property based on the extents box. The sele
         // }
       } else {
         //make sure brush has the right size
-        // this._brush.extent(domain)
-        //   .handleSize(6)
-        //   .on("start", this._brushstart.bind(this))
-        //   .on("brush", this._brushmove.bind(this))
-        //   .on("end", this._brushend.bind(this));
+        this._brush.extent(domain)
+          .handleSize(6)
+          .on("start", this._brushstart.bind(this))
+          .on("brush", this._brushmove.bind(this))
+          .on("end", this._brushend.bind(this));
 
-        // //redraw the brush in the right place, but make sure we don't fire a change of domain
-        // this._preventDomainChange = true;
-        // this._brushGroup 
-        //   .call(this._brush)
-        //   .call(this._brush.move, [this.axis(this.selectedDomain.x[0]), this.axis(this.selectedDomain.x[1])]);
-        // this._preventDomainChange = false;
+        if(this.selectedDomain && this.selectedDomain.x.length > 0) {
+          //redraw the brush in the right place, but make sure we don't fire a change of domain
+          this._preventDomainChange = true;
+          this._brushGroup 
+            .call(this._brush)
+            .call(this._brush.move, [this.axis(this.selectedDomain.x[0]), this.axis(this.selectedDomain.x[1])]);
+          this._preventDomainChange = false;
+        }
       }
     },
     /**
