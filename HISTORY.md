@@ -1,3 +1,7 @@
+v0.1.13
+==================
+* Fix brush and axis-brush for dynamic sizing
+
 v0.1.12
 ==================
 * auto resize on chart navigator
