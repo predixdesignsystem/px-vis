@@ -1,3 +1,7 @@
+v0.1.12
+==================
+* auto resize on chart navigator
+
 v0.1.11
 ==================
 * bug fixes, progressive rendering for canvas
