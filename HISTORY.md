@@ -1,3 +1,7 @@
+v0.1.15
+==================
+* Fix racing conditions with rangepicker
+
 v0.1.14
 ==================
 * Make sure rangepicker can be used in combination with time based charts

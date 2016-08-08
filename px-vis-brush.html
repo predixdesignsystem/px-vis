@@ -302,7 +302,8 @@ This element sets the selectedDomain property based on the extents box. The sele
       this.debounce('brushed', function () {
         var newDomain = Px.d3.brushSelection(this._brushGroup.node()).map(this.axis.invert, this.axis);
         //make sure this is an actual update
-        var changed = newDomain[0].toString() !== this.selectedDomain.x[0].toString() || 
+        var changed = this.selectedDomain.x.length < 2 || 
+                        newDomain[0].toString() !== this.selectedDomain.x[0].toString() || 
                         newDomain[1].toString() !== this.selectedDomain.x[1].toString();
 
         if(!this._preventDomainChange && changed) {

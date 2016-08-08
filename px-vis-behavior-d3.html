@@ -336,8 +336,11 @@ PxVisBehaviorD3.selectedTimeDomain = [{
   },
   observers: ['_rangeChanged(range)',
             '_selectedDomainChanged(selectedDomain)'],
+  attached: function() {
+    this._isAttached = true;
+  },
   _rangeChanged: function(range) {
-    if(!this._preventRangeUpdate) {
+    if(this._isAttached && !this._preventRangeUpdate) {
       //update selectedDomain with those new values
       //make sure we don't trigger a domain update when changing it from here
       this._preventDomainUpdate = true;
@@ -355,7 +358,7 @@ PxVisBehaviorD3.selectedTimeDomain = [{
 
   },
   _selectedDomainChanged: function(selectedDomain) {
-    if(!this._preventDomainUpdate) {
+    if(this._isAttached && !this._preventDomainUpdate) {
       //update selectedDomain with those new values
       //make sure we don't trigger a domain update when changing it from here
       this._preventRangeUpdate = true;
