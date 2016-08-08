@@ -1,3 +1,7 @@
+v0.1.14
+==================
+* Make sure rangepicker can be used in combination with time based charts
+
 v0.1.13
 ==================
 * Fix brush and axis-brush for dynamic sizing
