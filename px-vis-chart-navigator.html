@@ -8,6 +8,7 @@
 <link rel="import" href="px-vis-axis.html"/>
 <link rel="import" href="px-vis-brush.html"/>
 <link rel="import" href="px-vis-scale.html"/>
+<link rel="import" href="../px-datetime-common/px-datetime-imports.html"/>
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html" />
 
 <!--
@@ -180,6 +181,23 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           gradientOverlay: {
             type: Boolean,
             value: false
+          },
+          /**
+           * Can be set to override the time span shown by the navigator. Allows to use
+           * the navigator without data.
+           * 
+           * * Format ISO8601 strings
+           * ```
+           * {
+           *    "from": "2013-01-07T22:44:30.652Z",
+           *    "to" : "2013-02-04T22:44:30.652Z"
+           * }
+           * ```
+           * 
+           */
+          range: {
+            type: Object,
+            observer: '_rangeChanged'
           }
         },
         listeners: {
@@ -198,6 +216,59 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
             this.set('width', wrapperRect.width);
             this.set('height', wrapperRect.height);
           },100);
+        },
+        _rangeChanged: function() {
+          
+          var newXRange = [Px.moment(this.range.from),Px.moment(this.range.to)];
+              
+          //if we don't have data create 'empty' datra with new range
+          if(!this.chartData || this.chartData.length === 0) {
+
+            if(!this.seriesConfig || !this._doesObjHaveValues(this.seriesConfig)) {
+              this.set('seriesConfig', {
+               dummy: {
+                  "type": "line",
+                  "name": "dummy",
+                  "x":"x",
+                  "y":"y"
+                }
+              });
+            }
+            
+            this._updateDummyData(newXRange);
+
+            this.set('chartExtents', {
+              "x":newXRange,
+              "y":[Infinity,-Infinity]});
+
+          } else {
+
+            //if we're using dummy data make sure it reflects the new range
+            if(this.chartData.length === 2 && this.chartData[0][config.y] === 0 && 
+              this.chartData[1][config.y] === 0) {
+              this._updateDummyData();
+            }
+            
+            //set range in the data
+            this.set('chartExtents', {
+              "x":newXRange,
+              "y":[this.chartExtents.y[0],this.chartExtents.y[1]]});
+
+            var newDomain = {x: [newXRange[0].valueOf(), newXRange[1].valueOf()], 
+                            y: this.selectedDomain.y};
+            this.set('selectedDomain', newDomain);
+          }
+        },
+        _updateDummyData: function(newXRange) {
+          var config = this.seriesConfig[Object.keys(this.seriesConfig)[0]],
+            newData1 = {},
+            newData2 = {};
+
+            newData1[config.x] = newXRange[0];
+            newData1[config.y] = 0;
+            newData2[config.x] = newXRange[1];
+            newData2[config.y] = 0;
+            this.set('chartData', [newData1, newData2]);
         }
     });
 </script>

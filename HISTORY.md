@@ -1,3 +1,7 @@
+v0.1.16
+==================
+* Allow chart navigator to be used without data and/or driven by a "range" attribute
+
 v0.1.15
 ==================
 * Fix racing conditions with rangepicker

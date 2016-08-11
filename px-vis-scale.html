@@ -76,6 +76,10 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       _extents: {
         type: Array,
         value: function(){ return [[],[]] }
+      },
+      _chartDataHasChanged: {
+        type: Boolean,
+        value: false
       }
     },
 
@@ -83,7 +87,8 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       '_setXScale(width,margin)',
       '_setYScale(height,margin)',
       '_currentDomain(chartData.*,x,y,completeSeriesConfig,chartExtents)',
-      '_updateDomain(selectedDomain)'
+      '_updateDomain(selectedDomain)',
+      '_chartDataChanged(chartData.*)'
     ],
     /**
     * when attached, re-fire set properties for precipitation pattern
@@ -113,7 +118,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      *
      * @method _setXScale
      */
-    _setXScale: function(width,margin){
+    _setXScale: function(width,margin) {
       var w = width - margin.left - margin.right;
       this.x = this._setScale(this.xAxisType,[0, w]);
       this.notifyPath('x.range', this.x.range);
@@ -124,7 +129,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      *
      * @method _setYScale
      */
-    _setYScale: function(height,margin){
+    _setYScale: function(height,margin) {
       var h = height - margin.top - margin.bottom;
       this.y = this._setScale(this.yAxisType,[h, 0]);
       this.notifyPath('y', this.y);
@@ -221,12 +226,6 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
     //
     //   return e;
     // },
-
-    _checkForMaxMin: function(k){
-      for(var i =0; i < k.length; i++){
-
-      }
-    },
     /**
      * Calculates and Sets the x and y domain after data loads
      *
@@ -267,14 +266,15 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
           'y': this.chartExtents['y']
         };
 
-      if(exts.x.length > 0 && exts.x[0] !== Infinity && exts.x[1] !== -Infinity){
+      if(!this._chartDataHasChanged && exts.x.length > 0 && exts.x[0] !== Infinity && exts.x[1] !== -Infinity){
         xTime = false;
         doX = false;
       }
-      if(exts.y.length> 0 && exts.y[0] !== Infinity && exts.y[1] !== -Infinity){
+      if(!this._chartDataHasChanged && exts.y.length> 0 && exts.y[0] !== Infinity && exts.y[1] !== -Infinity){
         yTime = false;
         doY = false;
       }
+
       //Chug through the data to max and min
       this._findMinMax(this.chartData, doX, doY, xOrd, yOrd, xTime, exts, keys);
 
@@ -285,6 +285,8 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       if(this.yAxisType === 'ordinal') {
         this._processOrdinalRange(this.y, exts.y);
       }*/
+
+      this.set('_chartDataHasChanged', false);
 
       this.x.domain(exts.x);
       this.y.domain(exts.y);
@@ -340,6 +342,10 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
           this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
         }
       }
+    },
+    _chartDataChanged: function() {
+
+      this.set('_chartDataHasChanged', true);
     }
   });
 </script>
