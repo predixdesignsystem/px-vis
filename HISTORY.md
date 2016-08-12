@@ -1,3 +1,7 @@
+v0.1.19
+==================
+* Fixing color issue in pie
+
 v0.1.18
 ==================
 * Adding support to export chart components to images
