@@ -285,8 +285,9 @@ Element which draws scatter series onto the chart
                                 .data(this._pie);
         
         for(var i=0; i<this._pie.length; i++) {
-          this._pie[i].innerRadius = this._innerRadiusPx,
+          this._pie[i].innerRadius = this._innerRadiusPx;
           this._pie[i].outerRadius = this._radius;
+          this._pie[i].pxIndex = i;
         }
 
         //function used to interpolate values between initial and final state. Used during
@@ -338,17 +339,6 @@ Element which draws scatter series onto the chart
           }))
           .attr('opacity', this.empty ? 0.5 : 1);
 
-        //apply color and opacity depending on the chart "emptiness"
-        if(this.empty) {
-          this._arcs.selectAll('path')
-            .attr('fill', this.dataVisColors['dv-light-gray']);
-        } else {
-          this._arcs
-            .attr('fill', function(d, i) {
-                  return this._getPieColorForIndex(i);
-              }.bind(this));
-        }
-
         //removed data, delete slices
         this._arcs.exit().remove();
 
@@ -363,10 +353,21 @@ Element which draws scatter series onto the chart
                     .attr('fill', function(d, i) {
                         d.innerRadius = this._innerRadiusPx;
                         d.outerRadius = this._radius;
-                        return this.empty ? this.dataVisColors['dv-light-gray'] : this._getPieColorForIndex(i);
+                        return this.empty ? this.dataVisColors['dv-light-gray'] : this._getPieColorForIndex(d.pxIndex);
                     }.bind(this))
                     .attr('d', Px.d3.arc())
                     .attr('opacity', this.empty ? 0.5 : 1);
+
+        //apply color depending on the chart "emptiness"
+        if(this.empty) {
+          this._arcs.selectAll('path')
+            .attr('fill', this.dataVisColors['dv-light-gray']);
+        } else {
+          this._arcs.selectAll('path')
+            .attr('fill', function(d, i) {
+                  return this._getPieColorForIndex(d.pxIndex);
+              }.bind(this));
+        }
 
         //make sure we're in the right pos
         this._positionChart(isFirstDrawing ? 1250 : 0);
