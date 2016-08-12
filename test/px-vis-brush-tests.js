@@ -179,8 +179,8 @@ function runTests(){
       var d = [1397131620000,1397189940000];
 
       baseBrush.set('chartDomain',d);
-      // setTimeout(function(){done()},5000);
-      done();
+       setTimeout(function(){done()},200);
+      //done();
     });
 
     test('baseBrush._brush extents match', function() {
@@ -192,7 +192,7 @@ function runTests(){
       assert.equal(baseBrush._brushGroup.select('rect.selection').attr('x'), 120);
     });
     test('baseBrush._brushGroup.rect attr width', function() {
-      assert.equal(baseBrush._brushGroup.select('rect.selection').attr('width'), 240);
+      assert.closeTo(Number(baseBrush._brushGroup.select('rect.selection').attr('width')), 240,1);
     });
   });
 
@@ -222,7 +222,8 @@ function runTests(){
       assert.closeTo(parseInt(baseBrush._brushGroup.select('rect.selection').attr('x')), 0, 6);
     });
     test('baseBrush._brushGroup.rect attr width', function() {
-      assert.equal(parseInt(baseBrush._brushGroup.select('rect.selection').attr('width')), 240);
+
+      assert.closeTo(parseInt(baseBrush._brushGroup.select('rect.selection').attr('width')), 240,1);
     });
   });
 

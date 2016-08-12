@@ -247,7 +247,7 @@ function runTests(){
     });
 
     test('mutedLine2 line series has the right stroke opacity', function() {
-      assert.equal(mutedLine2.linePath.attr('stroke-opacity'),0.3);
+      assert.equal(mutedLine2.linePath.attr('stroke-opacity'),0);
     });
     test('mutedLine2 line series has the right color', function() {
       assert.equal(mutedLine2.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
