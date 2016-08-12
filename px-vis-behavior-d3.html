@@ -1,4 +1,5 @@
 <link rel="import" href="px-vis-d3.html" />
+<link rel="import" href="px-vis-imports.html" />
 <script>
 /*
   Polyfill to add .remove() for IE11.
@@ -95,6 +96,92 @@ PxVisBehaviorD3.svg = {
     tempSVG.parentNode.appendChild(clone);
 
     this.set(prop,Px.d3.select(clone));
+  },
+
+  /**
+   * Draws the current svg into a canvas
+   */
+  _drawSVGOnCanvas: function(canvas, callback) {
+    var svgData = this.pxSvgElem.outerHTML;
+
+    //stupid IE can't get outerHTML of svg even though it's now a W3C spec
+    if(!svgData) {
+      svgData = this._getSVGOuterHtml(this.pxSvgElem);
+    }
+    
+    //this would be the "native" way to do it. Axes are rendered slightly sharper,
+    //but labels seem to be slightly cut off. Not investigating it for now and
+    //falling back on canvg because of IE anyway
+    // var DOMURL = window.URL || window.webkitURL || window,
+    //     img = new Image(),
+    //     blob,
+    //     url;
+    // blob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'}),
+    // url = DOMURL.createObjectURL(blob);
+
+    // img.crossOrigin="Anonymous";
+    // img.onload = function() {
+    //     context.drawImage(img, 0, 0);
+    //     DOMURL.revokeObjectURL(blob);
+    // }
+    // img.src = url;
+
+    //because IE 10/11 automatically taints any canvas where an SVG image has been
+    //drawn we need to use a third party to interprete the image in javascript
+    //instructions for the canvas
+    canvg(canvas, svgData, {ignoreDimensions: true, 
+                            ignoreClear: true, 
+                            renderCallback: callback,
+                            resultCanvas: canvas});
+  },
+
+  _getSVGOuterHtml: function(svg) {
+    var serializeXML = function(node, output) {
+      var nodeType = node.nodeType;
+      if (nodeType == 3) { // TEXT nodes.
+        // Replace special XML characters with their entities.
+        output.push(node.textContent.replace(/&/, '&amp;').replace(/</, '&lt;').replace('>', '&gt;'));
+      } else if (nodeType == 1) { // ELEMENT nodes.
+        // Serialize Element nodes.
+        output.push('<', node.tagName);
+        if (node.hasAttributes()) {
+          var attrMap = node.attributes;
+          for (var i = 0, len = attrMap.length; i < len; ++i) {
+            var attrNode = attrMap.item(i);
+            output.push(' ', attrNode.name, '=\'', attrNode.value, '\'');
+          }
+        }
+        if (node.hasChildNodes()) {
+          output.push('>');
+          var childNodes = node.childNodes;
+          for (var i = 0, len = childNodes.length; i < len; ++i) {
+            serializeXML(childNodes.item(i), output);
+          }
+          output.push('</', node.tagName, '>');
+        } else {
+          output.push('/>');
+        }
+      } else if (nodeType == 8) {
+        // TODO(codedread): Replace special characters with XML entities?
+        output.push('<!--', node.nodeValue, '-->');
+      } else {
+        // TODO: Handle CDATA nodes.
+        // TODO: Handle ENTITY nodes.
+        // TODO: Handle DOCUMENT nodes.
+        throw 'Error serializing XML. Unhandled node of type: ' + nodeType;
+      }
+    }
+
+    var output = [];
+    var childNode = svg.firstChild;
+    while (childNode) {
+      serializeXML(childNode, output);
+      childNode = childNode.nextSibling;
+    }
+
+    return '<svg xmlns="' + svg.attributes.xmlns.value + '" width="' + 
+      svg.attributes.width.value + '" height="' + svg.attributes.height.value +
+      '">' + output.join('') + '</svg>';
   }
 };
 

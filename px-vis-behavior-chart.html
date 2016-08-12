@@ -265,10 +265,56 @@ PxVisBehaviorChart.chartCommon = [{
     _returnKeys: function(obj){
       return Object.keys(obj);
     }
-
 }, commonColors, PxVisBehavior.commonMethods,PxVisBehavior.axisTypes];
 
+/*
+    Name:
+    PxVisBehaviorChart.saveImage
 
+    Description:
+    Polymer behavior that allows the chart to return an image of itself based on 
+    its canvas and/or SVG
+
+    @polymerBehavior PxVisBehaviorChart.saveImage
+*/
+PxVisBehaviorChart.saveImage = {
+    /**
+     * Takes a graphic "snapshot" of the component and pass results through a callback:
+     * - a canvas containing the graphical snapshot
+     * - a png base 64 data uri
+     * 
+     * callback object:
+     * {
+     *  canvas: theCanvasObject
+     *  image: "data:image/png;base64;iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACN..."
+     * }
+     * 
+     * the data uri can be used to save the image and the canvas object to do 
+     * further processing, such as combining different elements snapshot into one image
+     * 
+     */
+    getImage: function(callback) {
+      //create a new canvas to render both the canvas and svg elements on it
+      var canvas = document.createElement('canvas'),
+          context,
+          result,
+          svgData;
+      canvas.width = this.width;
+      canvas.height = this.height;
+      context = canvas.getContext('2d');
+
+      if(this.canvasContext) {
+        //draw current canvas on new canvas
+        context.drawImage(this.canvasContext.canvas, 0, 0);
+      }
+
+      if(this.pxSvgElem) {
+        this._drawSVGOnCanvas(canvas, function() {
+          callback({canvas: this.resultCanvas, image: this.resultCanvas.toDataURL()});
+        });
+      }
+    }
+}
 /*
     Name:
     PxVisBehaviorChart.precipitationPattern
