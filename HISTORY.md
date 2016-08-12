@@ -1,3 +1,7 @@
+v0.1.18
+==================
+* Adding support to export chart components to images
+
 v0.1.17
 ==================
 * Fix missing type in px-vis-pie _arcs
