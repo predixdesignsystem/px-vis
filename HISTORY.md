@@ -1,3 +1,7 @@
+v0.1.20
+==================
+* Fix bug in empty navigator
+
 v0.1.19
 ==================
 * Fixing color issue in pie
