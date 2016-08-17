@@ -316,7 +316,7 @@ Element which draws lines series onto the chart
     drawCanvas: function() {
       this.debounce('drawCanvas',function(){
         if(this.renderToCanvas){
-
+console.time('draw')
           var data;
           // we need to wrap the data differently depending on if we are drawing many lines or just one line
           if(this.parallelCoordinates) {
@@ -354,6 +354,7 @@ Element which draws lines series onto the chart
           
           // make sure they are only drawn to the chart area and not the rest of the frame: equivalent to the clipPath for SVG
           this.canvasContext._pxLinesRedraw += 1;
+          console.timeEnd('draw')
         }
       },20);
     },
@@ -420,8 +421,9 @@ Element which draws lines series onto the chart
           // Apply our styles and draw all the lines to the canvas
           this.canvasContext.strokeStyle = this.completeSeriesConfig[this.seriesId]['color'];
           this.canvasContext.lineWidth = 1;
-          this.canvasContext.stroke();
+          
         }
+        this.canvasContext.stroke();
         //clean up drawing
         this._clearCanvasMargins();
       }
