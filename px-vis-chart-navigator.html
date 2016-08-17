@@ -129,7 +129,8 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           PxVisBehaviorChart.chartCommon,
           PxVisBehaviorChart.precipitationPattern,
           Polymer.IronResizableBehavior,
-          PxVisBehaviorChart.saveImage
+          PxVisBehaviorChart.saveImage,
+          PxVisBehaviorChart.chartAutoResize
         ],
 
         /**
@@ -212,10 +213,12 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
         },
         _onIronResize: function() {
           this.debounce('ironresize', function() {
-            var wrapperRect = this.$.wrapper.getBoundingClientRect();
+            if(!this.preventResize) {
+              var wrapperRect = this.$.wrapper.getBoundingClientRect();
 
-            this.set('width', wrapperRect.width);
-            this.set('height', wrapperRect.height);
+              this.set('width', wrapperRect.width);
+              this.set('height', wrapperRect.height);
+            }
           },100);
         },
         _rangeChanged: function() {

@@ -101,38 +101,89 @@ PxVisBehaviorD3.svg = {
   /**
    * Draws the current svg into a canvas
    */
-  _drawSVGOnCanvas: function(canvas, callback) {
+  _drawSVGOnCanvas: function(canvas, callback, x, y) {
     var svgData = this.pxSvgElem.outerHTML;
+    x = x ? x : 0;
+    y = y ? y : 0;
 
     //stupid IE can't get outerHTML of svg even though it's now a W3C spec
     if(!svgData) {
       svgData = this._getSVGOuterHtml(this.pxSvgElem);
     }
-    
-    //this would be the "native" way to do it. Axes are rendered slightly sharper,
-    //but labels seem to be slightly cut off. Not investigating it for now and
-    //falling back on canvg because of IE anyway
-    // var DOMURL = window.URL || window.webkitURL || window,
-    //     img = new Image(),
-    //     blob,
-    //     url;
-    // blob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'}),
-    // url = DOMURL.createObjectURL(blob);
 
-    // img.crossOrigin="Anonymous";
-    // img.onload = function() {
-    //     context.drawImage(img, 0, 0);
-    //     DOMURL.revokeObjectURL(blob);
-    // }
-    // img.src = url;
+    //check if drawing an svg on canvas is ok
+    var smallSvg = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><div></div></svg>',
+        testCanvas = document.createElement('canvas'),
+        successLoadImage,
+        failureLoadImage;
 
-    //because IE 10/11 automatically taints any canvas where an SVG image has been
-    //drawn we need to use a third party to interprete the image in javascript
-    //instructions for the canvas
-    canvg(canvas, svgData, {ignoreDimensions: true, 
-                            ignoreClear: true, 
-                            renderCallback: callback,
-                            resultCanvas: canvas});
+    failureLoadImage = function() {
+
+      //fallback on canvg
+      this._drawCanvg(canvas, svgData, x, y, function() {
+        callback(this.resultCanvas);
+      });
+    }.bind(this);
+
+    successLoadImage = function(testedCanvas) {
+
+      //image has been loaded successfully on canvas, now test if it has been tainted
+      try {
+        testedCanvas.toDataURL();
+
+        //ok no error were thrown, we can proceed
+        this._nativeDrawSvgOnCanvas(canvas, svgData, x, y, function() {
+          callback(canvas);
+        });
+      } catch(err) {
+
+        //fallback on canvg
+        this._drawCanvg(canvas, svgData, x, y, function() {
+          callback(this.resultCanvas);
+        });
+      }
+    }.bind(this);
+
+    this._nativeDrawSvgOnCanvas(testCanvas, smallSvg, x, y, successLoadImage, failureLoadImage);
+  },
+  /**
+   * Uses canvg third party to "translate" svg to javascript instructions
+   * for the canvas, and draw on the canvas
+   */
+  _drawCanvg: function(canvas, svgData, x, y, callback) {
+    var options = {ignoreDimensions: true, 
+                  ignoreClear: true, 
+                  renderCallback: callback,
+                  offsetX: x,
+                  offsetY: y,
+                  resultCanvas: canvas};
+    canvg(canvas, svgData, options);
+  },
+  /**
+   * 
+   */
+  _nativeDrawSvgOnCanvas: function(canvas, svgData, x, y, sucessCallback, failureCallback) {
+    //detect canvas tainting failures
+
+      var DOMURL = window.URL || window.webkitURL || window,
+          blob = new Blob([svgData], {type: 'image/svg+xml;charset=utf-8'}),
+          url = DOMURL.createObjectURL(blob),
+          img = new Image();
+
+      //once svg has been loaded
+      img.onload = function() {
+        canvas.getContext('2d').drawImage(img, x, y);
+        DOMURL.revokeObjectURL(url);
+
+        sucessCallback(canvas);
+      };
+
+      //Safari...
+      img.onerror = function(err) {
+        failureCallback(canvas);
+      }.bind(this);
+
+      img.src = url;
   },
 
   _getSVGOuterHtml: function(svg) {

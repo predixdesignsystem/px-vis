@@ -48,6 +48,7 @@ Element which draws lines series onto the chart
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.categories,
       PxVisBehaviorD3.selectedDomain,
+      PxVisBehavior.progressiveRendering,
       commonColors
     ],
 
@@ -144,7 +145,7 @@ Element which draws lines series onto the chart
        _canvasRedraw: {
          type: Boolean,
          value: false
-       },
+       }
     },
 
     observers: [
@@ -229,7 +230,7 @@ Element which draws lines series onto the chart
             //for each datapoint, iterate through the dimensions
             return path(dims.map(function(p) {
               //check that we have data; if not, return false so it doesnt draw a line
-              if(!d[p]){
+              if(!d[p]) {
                 return false
               }
               //return [x,y] to path: x is ordinal based on dim; get the y-scale for the dim and use that particular scale on the data
@@ -315,6 +316,7 @@ Element which draws lines series onto the chart
     drawCanvas: function() {
       this.debounce('drawCanvas',function(){
         if(this.renderToCanvas){
+
           var data;
           // we need to wrap the data differently depending on if we are drawing many lines or just one line
           if(this.parallelCoordinates) {
@@ -342,8 +344,13 @@ Element which draws lines series onto the chart
           //Render data progressively
           this.canvasContext.lineWidth = 1;
 
-          //TODO: choose number of frames depending on data size? First render in 1 frame?
-          this._renderProgressively(data, 5);
+          if(this.noCanvasProgressiveRendering) {
+            this._renderAtOnce(data);
+          } else {
+            //render 1000 points at a time or 5 frames min
+            var frames = Math.max(data.length/1000, 5);
+            this._renderProgressively(data, frames);
+          }
           
           // make sure they are only drawn to the chart area and not the rest of the frame: equivalent to the clipPath for SVG
           this.canvasContext._pxLinesRedraw += 1;
@@ -358,6 +365,66 @@ Element which draws lines series onto the chart
      */
     _addClipPath: function(){
       this.addClipPath(this.lineGroup);
+    },
+
+    _renderAtOnce: function(data) {
+
+      //data format
+      if(!this.parallelCoordinates) {
+        data = [data];
+      }
+
+      if(this.gradientLine) {  
+        //if gradient, regardless of category or not
+        // Iterate over our data:
+        for(var i = 0; i < data.length; i++) {
+          // Check to see if it is "muted"; if not, draw a line
+          if(!this.mutedSeries[data[i][this.seriesId]]) {
+
+            // start a path and reset the styles for this one path
+            this.canvasContext.beginPath();
+            this.canvasContext.strokeStyle = this._canvasLineColor(data[i],this._opacityLine(data[i]));
+            this.canvasContext.lineWidth = 1;
+            // use the line generator to create the line
+            this.line(data[i]);
+            // draw it to the canvas; cant wait until the end or else they all have the same style
+            this.canvasContext.stroke();
+          }
+        }
+      // if categoryKey and no gradient
+      } else if(this.categoryKey) {
+        // Yes, this repeates the if above but I dont really want it checking an if 20k times to see if it should apply a gradient or not.
+        // Iterate over our data:
+        for(var i = 0; i < data.length; i++){
+          // Check to see if it is "muted"; if not, draw a line
+          if(!this.mutedSeries[data[i][this.seriesId]]){
+            // start a path and reset the styles for this one path
+            this.canvasContext.beginPath();
+            this.canvasContext.strokeStyle = this._canvasLineColor(data[i],1);
+            this.canvasContext.lineWidth = 1;
+            // use the line generator to create the line
+            this.line(data[i]);
+            // draw it to the canvas; cant wait until the end or else they all have the same style
+            this.canvasContext.stroke();
+          }
+        }
+      } else { //not gradientLine and not category
+        // start the path
+        this.canvasContext.beginPath();
+        // iterate through the data
+        for(var i = 0; i < data.length; i++){
+          // if the series is not listed or it is false, draw it
+          if(!this.mutedSeries[data[i][this.seriesId]]){
+            this.line(data[i]);
+          }
+          // Apply our styles and draw all the lines to the canvas
+          this.canvasContext.strokeStyle = this.completeSeriesConfig[this.seriesId]['color'];
+          this.canvasContext.lineWidth = 1;
+          this.canvasContext.stroke();
+        }
+        //clean up drawing
+        this._clearCanvasMargins();
+      }
     },
 
     /**
@@ -434,10 +501,8 @@ Element which draws lines series onto the chart
         if(currentIndex < numberOfFrames) {
           timer(processGenericDataSlice);
         } else {
-          //TODO: fix properly so we use some kind of margin
-          _this.canvasContext.clearRect(0, -1, _this.canvasContext.canvas.width, -30);
-          _this.canvasContext.clearRect(0, _this.canvasContext.canvas.height - 65, _this.canvasContext.canvas.width, 65);
-          _this.canvasContext.clearRect(0, -30, -50, _this.canvasContext.canvas.height + 30);
+          //end, clean up
+          _this._clearCanvasMargins();
         }
       };
       //END PROCESSING FUNCTIONS
@@ -462,7 +527,16 @@ Element which draws lines series onto the chart
       
       timer(processFunction);
     },
-
+    /**
+     * Used to 'clear' the canvas fater drawing in case we drew outside our limits. 
+     * We might want to consider using a clippath instead
+     */
+    _clearCanvasMargins: function() {
+      //TODO: fix properly so we use some kind of margin
+      this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, -30);
+      this.canvasContext.clearRect(0, this.canvasContext.canvas.height - 65, this.canvasContext.canvas.width, 65);
+      this.canvasContext.clearRect(0, -30, -50, this.canvasContext.canvas.height + 30);
+    },
     /**
      * Checks mutedSeries to see if this ID is in there
      * Called from an observer watching mutedSeries

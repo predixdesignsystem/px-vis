@@ -1,3 +1,9 @@
+v0.1.21
+==================
+* Added preventResize option for chart auto resize. 
+* Added option to prevent progressive rendering for canvas (preventCanvasProgressiveRendering)
+* Make export to png dynamically choose between native and canvg (hence fixing it on edge)
+
 v0.1.20
 ==================
 * Fix bug in empty navigator

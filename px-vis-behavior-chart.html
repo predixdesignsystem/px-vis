@@ -309,12 +309,12 @@ PxVisBehaviorChart.saveImage = {
       }
 
       if(this.pxSvgElem) {
-        this._drawSVGOnCanvas(canvas, function() {
-          callback({canvas: this.resultCanvas, image: this.resultCanvas.toDataURL()});
+        this._drawSVGOnCanvas(canvas, function(resultCanvas) {
+          callback({canvas: resultCanvas, image: resultCanvas.toDataURL()});
         });
       }
     }
-}
+};
 /*
     Name:
     PxVisBehaviorChart.precipitationPattern
@@ -409,5 +409,29 @@ PxVisBehaviorChart.precipitationPattern = {
     }
   }
 
+};
+
+/**
+    Name:
+    PxVisBehaviorChart.chartAutoResize
+
+    Description:
+    Polymer behavior that provides auto resize options for charts
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorChart.chartAutoResize
+*/
+PxVisBehaviorChart.chartAutoResize = {
+    properties: {
+      /**
+      * Prevents the chart from automatically resizing to fit its container
+      */
+      preventResize: {
+        type: Boolean,
+        value: false
+      }
+    }
 };
 </script>
