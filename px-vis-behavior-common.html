@@ -51,6 +51,72 @@ PxVisBehavior.sizing = {
 
 /*
     Name:
+    PxVisBehavior.truncating
+
+    Description:
+    Polymer behavior that provides the string truncation method
+
+    @polymerBehavior PxVisBehavior.truncating
+*/
+PxVisBehavior.truncating = {
+  properties: {
+    /**
+     * Defines if the label should get truncated and to how many characters.
+     *
+     * Default length is 10 characters, not including the ellipsis which gets inserted.
+     *
+     * The length must be at least 2.
+     *
+     * To disable truncation, set the value to -1
+     *
+     * @property truncationLength
+     * @type Number
+     * @default 10
+    */
+    truncationLength: { 
+      type: Number,
+      value: 10
+    },
+  },
+  /**
+   * _truncateName takes a string and string length [optional].
+   * Returns a truncated string with the middle replaced by an ellipsis. The ellipsis does not count towards the total character count.
+   * Follows these truncation principles: http://www.gesdh.com/predix/product/principles/truncation/
+   * Example: LNG_BAH_HOT_EFFECTIVENESS_CORE8 --> LNG_B...CORE8
+   *
+   * Length cannot be less than 2 characters.
+   * Default length is 10 characters.
+   *
+   * If the string is less than or equal to the length or the length is invalid, returns the original string.
+   *
+   * @param {String} name, {Integer} len
+   * @return {String} truncatedString
+  */
+  _truncateName:function(name,len) {
+    var len = len || this.truncationLength;
+
+    // make sure length is legit
+    if(len < 2) {
+      return name;
+    }
+
+    //check that name is greater than length; if not, return it
+    if(name.length <= len) {
+      return name;
+    }
+
+    // truncate
+    var frontLen = Math.ceil(len / 2),
+        backLen = Math.floor(len / 2),
+        front = name.slice(0,frontLen),
+        back = name.slice(-backLen);
+
+    return front + '...' + back;
+  }
+};
+
+/*
+    Name:
     PxVisBehavior.formatting
 
     Description:
@@ -61,7 +127,7 @@ PxVisBehavior.sizing = {
 
     @polymerBehavior PxVisBehavior.formatting
 */
-PxVisBehavior.formatting = {
+PxVisBehavior.formatting = [{
   properties: {
     /**
      * Defines how a display number should be formatted:
@@ -175,44 +241,8 @@ PxVisBehavior.formatting = {
       notify: true,
       value:''
     }
-
-  },
-  /**
-   * _truncateName takes a string and string length [optional].
-   * Returns a truncated string with the middle replaced by an ellipsis. The ellipsis does not count towards the total character count.
-   * Follows these truncation principles: http://www.gesdh.com/predix/product/principles/truncation/
-   * Example: LNG_BAH_HOT_EFFECTIVENESS_CORE8 --> LNG_B...CORE8
-   *
-   * Length cannot be less than 2 characters.
-   * Default length is 10 characters.
-   *
-   * If the string is less than or equal to the length or the length is invalid, returns the original string.
-   *
-   * @param {String} name, {Integer} len
-   * @return {String} truncatedString
-  */
-  _truncateName:function(name,len){
-    var len = len || 10;
-
-    // make sure length is legit
-    if(len < 2) {
-      return name;
-    }
-
-    //check that name is greater than length; if not, return it
-    if(name.length <= len){
-      return name;
-    }
-
-    // truncate
-    var frontLen = Math.ceil(len / 2),
-        backLen = Math.floor(len / 2),
-        front = name.slice(0,frontLen),
-        back = name.slice(-backLen);
-
-    return front + '...' + back;
   }
-};
+}, PxVisBehavior.truncating];
 
 /*
     Name:
