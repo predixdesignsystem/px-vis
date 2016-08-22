@@ -1,3 +1,7 @@
+v0.1.22
+==================
+* Make sure progressive rendering is cancelled on new drawing request
+
 v0.1.21
 ==================
 * Added preventResize option for chart auto resize. 
