@@ -94,7 +94,21 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            */
           _truncatedTitle: {
             type: String,
-            computed: '_truncateTitle(title, truncationLength)'
+            computed: '_truncateTitle(title, truncationLength, appendUnitInTitle, completeSeriesConfig)'
+          },
+          /**
+           * Whether to append unit (if existing in config) in the title
+           */
+          appendUnitInTitle: {
+            type: Boolean,
+            value: false
+          },
+          /**
+           * Used to not draw series bar
+           */
+          preventSeriesBar: {
+            type: Boolean,
+            value: false
           }
         },
 
@@ -398,7 +412,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * @method drawSeriesBars
          */
         drawSeriesBars:function() {
-          if(this._doesObjHaveValues(this.completeSeriesConfig) && this._axisGroup) {
+          if(!this.preventSeriesBar && this._doesObjHaveValues(this.completeSeriesConfig) && this._axisGroup) {
             // FIXME do we need to move the title group based on how many series we have
             var keys = Object.keys(this.completeSeriesConfig),
                 kLen = keys.length,
@@ -442,8 +456,15 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         /**
          * truncates the title label appropriately
          */
-        _truncateTitle: function(title, truncationLength) {
-          return this._truncateName(title, truncationLength);
+        _truncateTitle: function(title, truncationLength, appendUnitInTitle) {
+          var unit = '';
+
+          if(appendUnitInTitle && this.completeSeriesConfig[this.title]
+              && this.completeSeriesConfig[this.title].yAxisUnit) {
+            unit = ' [' + this.completeSeriesConfig[this.title].yAxisUnit + ']';
+          }
+
+          return this._truncateName(title, truncationLength) + unit;
         },
         _titleChanged: function(_truncatedTitle) {
           this.drawTitle();
