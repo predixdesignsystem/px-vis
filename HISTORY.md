@@ -1,3 +1,7 @@
+v0.1.24
+==================
+* Fixed bug in axis brush where the array declaration is wrong
+
 v0.1.23
 ==================
 * Adding truncation to axis labels
@@ -8,7 +12,7 @@ v0.1.22
 
 v0.1.21
 ==================
-* Added preventResize option for chart auto resize. 
+* Added preventResize option for chart auto resize.
 * Added option to prevent progressive rendering for canvas (preventCanvasProgressiveRendering)
 * Make export to png dynamically choose between native and canvg (hence fixing it on edge)
 
