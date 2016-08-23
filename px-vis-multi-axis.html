@@ -166,6 +166,16 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       appendUnitInTitle: {
         type: Boolean,
         value: false
+      },
+      /**
+       * Array representing the actual displayed titles for each axis
+       */
+      displayedValues: {
+        type: Object,
+        notify: true,
+        value: function() {
+          return {};
+        }
       }
     },
 
@@ -174,7 +184,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     ],
 
     listeners:{
-      'px-axis-done': '_setAxisStyles'
+      'px-axis-done': '_setAxisStyles',
+      'px-vis-axis-displayed-title-changed': '_displayedTitleChanged'
     },
 
     /**
@@ -286,6 +297,13 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           this.axisGroups.selectAll('.hideCommon').classed('hideCommon',false);
         }
       }
+    },
+    _displayedTitleChanged: function(evt) {
+
+      this.set('displayedValues.' + evt.detail.title, evt.detail.displayedTitle);
+
+      evt.stopPropagation();
+      evt.stopImmediatePropagation();
     }
 
   });
