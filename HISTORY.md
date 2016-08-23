@@ -1,3 +1,7 @@
+v0.1.23
+==================
+* Adding truncation to axis labels
+
 v0.1.22
 ==================
 * Make sure progressive rendering is cancelled on new drawing request
