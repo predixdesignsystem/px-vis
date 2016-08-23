@@ -92,9 +92,23 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           /**
            * The truncated title
            */
-          _truncatedTitle: {
+          displayedTitle: {
             type: String,
-            computed: '_truncateTitle(title, truncationLength)'
+            computed: '_truncateTitle(title, truncationLength, appendUnitInTitle, completeSeriesConfig)'
+          },
+          /**
+           * Whether to append unit (if existing in config) in the title
+           */
+          appendUnitInTitle: {
+            type: Boolean,
+            value: false
+          },
+          /**
+           * Used to not draw series bar
+           */
+          preventSeriesBar: {
+            type: Boolean,
+            value: false
           },
           /**
            * A boolean specifying if the axis should be completely redrawn every time
@@ -103,7 +117,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           forceRefresh: {
             type: Boolean,
             value: false
-          }
+          },
         },
 
         observers: [
@@ -111,7 +125,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           // 'updateTicks(tickValues.*)',
           'drawSeriesBars(completeSeriesConfig.*)',
           '_muteSeriesBars(mutedSeries.*)',
-          '_titleChanged(_truncatedTitle, _axisGroup, titleLocation)',
+          '_titleChanged(displayedTitle, _axisGroup, titleLocation)'
         ],
 
         ready: function(){
@@ -398,7 +412,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               .attr('class','axis-title')
               .attr('font-size', this.titleTypeSize + 'px')
               .attr('font-style','GE Inspira Sans')
-              .text(this._truncatedTitle)
+              .text(this.displayedTitle)
               .attr("text-anchor", anchor)
               .style("text-anchor", anchor)
               .attr('transform',"rotate(" + r + ")");
@@ -410,7 +424,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               this.svg.select('g.title-group[for=' + this.axisId + '] text')
                 .attr("text-anchor", anchor)
                 .style("text-anchor", anchor)
-                .text(this._truncatedTitle)
+                .text(this.displayedTitle)
                 .attr('transform',"rotate(" + r + ")");
             }
           }.bind(this), 5);
@@ -446,7 +460,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * @method drawSeriesBars
          */
         drawSeriesBars:function() {
-          if(this._doesObjHaveValues(this.completeSeriesConfig) && this._axisGroup) {
+          if(!this.preventSeriesBar && this._doesObjHaveValues(this.completeSeriesConfig) && this._axisGroup) {
             // FIXME do we need to move the title group based on how many series we have
             var keys = Object.keys(this.completeSeriesConfig),
                 kLen = keys.length,
@@ -490,10 +504,25 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         /**
          * truncates the title label appropriately
          */
-        _truncateTitle: function(title, truncationLength) {
-          return this._truncateName(title, truncationLength);
+        _truncateTitle: function(title, truncationLength, appendUnitInTitle) {
+          var oldTitle = this._truncatedTitle,
+              unit = '',
+              newTitle;
+
+          if(appendUnitInTitle && this.completeSeriesConfig[this.title]
+              && this.completeSeriesConfig[this.title].yAxisUnit) {
+            unit = ' [' + this.completeSeriesConfig[this.title].yAxisUnit + ']';
+          }
+
+          newTitle = this._truncateName(title, truncationLength) + unit;
+
+          if(newTitle !== oldTitle) {
+            this.fire('px-vis-axis-displayed-title-changed', {displayedTitle: newTitle, title: this.title});
+          }
+
+          return newTitle;
         },
-        _titleChanged: function(_truncatedTitle) {
+        _titleChanged: function(displayedTitle) {
           if(this._doesObjHaveValues(this._axisGroup)) {
             this.drawTitle();
           }

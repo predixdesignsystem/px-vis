@@ -1,6 +1,10 @@
-v0.1.25
+v0.1.26
 ==================
 * Many changes associated with enabling mute / unmute on parallel coords
+
+v0.1.25
+==================
+* Added support for units in axis labels
 
 v0.1.24
 ==================

@@ -49,7 +49,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           stroke-width="[[strokeWidth]]"
           outer-tick-size="0"
           force-refresh
-          tick-values="[[_calcTickVals(item,currentDomainY, height)]]">
+          tick-values="[[_calcTickVals(item,currentDomainY, height)]]"
+          truncation-length="[[truncationLength]]"
+          complete-series-config="[[completeSeriesConfig]]"
+          append-unit-in-title="[[appendUnitInTitle]]"
+          prevent-series-bar>
         </px-vis-axis>
       </template>
       <px-vis-axis-brush
@@ -157,6 +161,23 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         type: Object,
         notify: true,
         computed: '_calcGridAxis(dimensions,y,currentDomainY.*)'
+      },
+      /**
+       * Whether to append unit in brackets in axis title. e.g [Hz]
+       */
+      appendUnitInTitle: {
+        type: Boolean,
+        value: false
+      },
+      /**
+       * Array representing the actual displayed titles for each axis
+       */
+      displayedValues: {
+        type: Object,
+        notify: true,
+        value: function() {
+          return {};
+        }
       }
     },
 
@@ -165,7 +186,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     ],
 
     listeners:{
-      'px-axis-done': '_setAxisStyles'
+      'px-axis-done': '_setAxisStyles',
+      'px-vis-axis-displayed-title-changed': '_displayedTitleChanged'
     },
 
     /**
@@ -268,7 +290,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     _calcGridAxis: function(dim){
       return this._returnY(dim[0]);
     },
-    _setAxisStyles: function(e){
+    _setAxisStyles: function(e) {
       if(this.axisGroups){
         var _this = this;
 
@@ -288,9 +310,15 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         }
       }
     },
-    _createAxisID: function(item){
+    _createAxisID: function(item) {
       return 'axis_' + item;
-    }
+    },
+    _displayedTitleChanged: function(evt) {
 
+      this.set('displayedValues.' + evt.detail.title, evt.detail.displayedTitle);
+
+      evt.stopPropagation();
+      evt.stopImmediatePropagation();
+    }
   });
 </script>
