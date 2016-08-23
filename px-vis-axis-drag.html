@@ -80,18 +80,18 @@ This element draw the box over the axis signifying the active area to mute the s
 
           // if we have not been moving the axes as we went, move them all now
           if(!_this.dynamicAxisRedraw){
-            _this.dimensions.sort(function(a, b) { return _this._position(a) - _this._position(b); });
+            _this.axes.sort(function(a, b) { return _this._position(a) - _this._position(b); });
             _this.axis.domain(_this.dimensions);
             _this.axisGroups.each(function(d,i){
-              _this.transition(Px.d3.select(this)).attr("transform", function(d) { 
-                return "translate(" + _this._position(d) + "," + _this.margin.top + ")"; 
+              _this.transition(Px.d3.select(this)).attr("transform", function(d) {
+                return "translate(" + _this._position(d) + ",0)";
               });
             });
           }
           delete _this._dragging[d];
           // make the axis snap into place
           _this.transition(Px.d3.select(this))
-            .attr("transform", "translate(" + _this.axis(d) + "," + _this.margin.top + ")");
+            .attr("transform", "translate(" + _this.axis(d) + ",0)");
 
           if(_this.redrawSeries){
             // redraw the lines
@@ -118,6 +118,7 @@ This element draw the box over the axis signifying the active area to mute the s
         this._dragging[d] = Math.min(this.width, Math.max(0, e));
 
         // reorder dynamically:
+        this.axes.sort(function(a, b) { return this._position(a) - this._position(b); }.bind(this));
         this.dimensions.sort(function(a, b) { return this._position(a) - this._position(b); }.bind(this));
         this.axis.domain(this.dimensions);
 
@@ -131,8 +132,8 @@ This element draw the box over the axis signifying the active area to mute the s
         }
 
         // move the currently grabed axis (and reorder the others if above is active)
-        this.axisGroups.attr("transform", function(d) { 
-          return "translate(" + this._position(d) + "," + this.margin.top + ")"; 
+        this.axisGroups.attr("transform", function(d) {
+          return "translate(" + this._position(d) + ",0)";
         }.bind(this));
       }.bind(this,Px.d3.event.x),10);
     },

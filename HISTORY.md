@@ -1,3 +1,7 @@
+v0.1.25
+==================
+* Many changes associated with enabling mute / unmute on parallel coords
+
 v0.1.24
 ==================
 * Fixed bug in axis brush where the array declaration is wrong

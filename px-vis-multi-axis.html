@@ -34,6 +34,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     <template>
       <template is="dom-repeat" items="[[dimensions]]">
         <px-vis-axis
+          id=[[_createAxisID(item)]]
+          axis-id=[[_createAxisID(item)]]
           svg="[[_returnGroup(index,axisGroups)]]"
           axis="[[_returnY(item,currentDomainY, y)]]"
           height="[[height]]"
@@ -46,8 +48,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           current-domain="[[currentDomainY]]"
           stroke-width="[[strokeWidth]]"
           outer-tick-size="0"
-          tick-values="[[_calcTickVals(item,currentDomainY, height)]]"
-          truncation-length="[[truncationLength]]">
+          force-refresh
+          tick-values="[[_calcTickVals(item,currentDomainY, height)]]">
         </px-vis-axis>
       </template>
       <px-vis-axis-brush
@@ -67,6 +69,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         current-domain="[[currentDomainX]]"
         complete-series-config="{{completeSeriesConfig}}"
         chart-data="[[chartData]]"
+        axes="[[axes]]"
         dimensions="[[dimensions]]"
         axis-groups="[[axisGroups]]"
         drag-behavior="{{dragBehavior}}"
@@ -88,7 +91,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     behaviors: [
       PxVisBehaviorD3.svg,
       PxVisBehavior.sizing,
-      PxVisBehaviorD3.axes,
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.commonMethods,
       PxVisBehaviorD3.axisConfig,
@@ -97,7 +99,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       PxVisBehavior.mutedSeries,
       PxVisBehaviorD3.dynamicRedraw,
       PxVisBehavior.commonAxis,
-      PxVisBehavior.truncating,
       commonColors
     ],
 
@@ -160,7 +161,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     },
 
     observers: [
-      '_generateGs(dimensions,svg,currentDomainX, margin, x, y)'
+      '_generateGs(svg,currentDomainX,margin.*)'
     ],
 
     listeners:{
@@ -171,37 +172,47 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
      * Generates a group elem for each dimension and moves it into the correct x coordinate
      *
      */
-    _generateGs: function(dimensions,svg,currentDomainX){
-      if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.currentDomainX) 
-          && this._doesObjHaveValues(this.dimensions) 
-          && this._doesObjHaveValues(this.margin)) {
+    _generateGs: function(svg,currentDomainX,margin){
+      this.debounce('axisG',function(){
+        if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.currentDomainX)
+            && this._doesObjHaveValues(this.dimensions)
+            && this._doesObjHaveValues(this.margin)) {
 
-        if(!this.axisGroups) {
-          this.cloneSVGElem(this.svg.node(),'axisSvg');
+          if(!this.axisSvg) {
+            this.cloneSVGElem(this.svg.node(),'axisSvg');
+          }
 
-          // generate axis based on the dimentions and bind the dimension to it for easy access later :D
+          //make sure it is translated properly and we are not running into a race condition
+          this.axisSvg.attr("transform", "translate(0," + this.margin.top + ")");
+
+          // generate axis based on the dimensions
           var g = this.axisSvg.selectAll(".dimension")
-            .data(dimensions)
-            .enter()
+            .data(this.dimensions, function(d) { return d; });
+
+          g.exit().remove();
+          g.enter()
+            // .each(function(d){
+            //   var n = this.$$('#axis_' + d);
+            //   if(this._doesObjHaveValues(n) && n._axisGroup && n._axisGroup.node()){
+            //     n._axisGroup.remove();
+            //     n._titleGroup.remove();
+            //     n._axisGroup = null;
+            //     n._titleGroup = null;
+            //   }
+            // }.bind(this))
             .append("g")
             .attr("class", "dimension")
-            .attr("transform", function(d) { 
-              return "translate(" + this.x(d) + "," + this.margin.top + ")"; 
-            }.bind(this))
             .style("cursor","move")
-            .call(this.dragBehavior);
+            .call(this.dragBehavior)
+          .merge(g)
+            .attr("transform", function(d) {
+              return "translate(" + this.x(d) + ",0)";
+            }.bind(this));
 
           // TODO When we support muting an axes, might want to be able to access the above g and change the transform
-          this.set('axisGroups', g);
-        } else {
-
-          //update
-          this.axisGroups
-            .attr("transform", function(d) { 
-              return "translate(" + this.x(d) + "," + this.margin.top + ")"; 
-            }.bind(this));
+          this.set('axisGroups', this.axisSvg.selectAll(".dimension"));
         }
-      }
+      },10)
     },
     /**
      * Returns an indivdual d3 selected element
@@ -276,6 +287,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           this.axisGroups.selectAll('.hideCommon').classed('hideCommon',false);
         }
       }
+    },
+    _createAxisID: function(item){
+      return 'axis_' + item;
     }
 
   });

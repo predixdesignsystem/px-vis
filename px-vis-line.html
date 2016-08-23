@@ -225,7 +225,6 @@ Element which draws lines series onto the chart
      */
     _defineMultiLine: function(){
       //get our dimensions
-
       var dims = this.completeSeriesConfig[this.seriesId]['x'],
           //define a normal d3 line generator
           path = Px.d3.line().defined(function(d) {
@@ -325,6 +324,7 @@ Element which draws lines series onto the chart
         if(this.renderToCanvas){
           var data;
           // we need to wrap the data differently depending on if we are drawing many lines or just one line
+
           if(this.parallelCoordinates) {
             this._defineMultiLine();
             data = this.chartData;
@@ -357,7 +357,7 @@ Element which draws lines series onto the chart
             var frames = Math.max(data.length/1000, 5);
             this._renderProgressively(data, frames);
           }
-          
+          // make sure they are only drawn to the chart area and not the rest of the frame: equivalent to the clipPath for SVG
           this.canvasContext._pxLinesRedraw += 1;
         }
       },20);
@@ -379,7 +379,7 @@ Element which draws lines series onto the chart
         data = [data];
       }
 
-      if(this.gradientLine) {  
+      if(this.gradientLine) {
         //if gradient, regardless of category or not
         // Iterate over our data:
         for(var i = 0; i < data.length; i++) {
@@ -422,7 +422,7 @@ Element which draws lines series onto the chart
           }
           // Apply our styles and draw all the lines to the canvas
           this.canvasContext.strokeStyle = this.completeSeriesConfig[this.seriesId]['color'];
-          
+
         }
         this.canvasContext.stroke();
         //clean up drawing
@@ -432,7 +432,7 @@ Element which draws lines series onto the chart
 
     /**
      * Renders data in a specific number of frames, splitting the batch
-     * 
+     *
      */
     _renderProgressively: function(data, numberOfFrames) {
 
@@ -450,14 +450,14 @@ Element which draws lines series onto the chart
             getColorValue,
             processFunction,
             currentRenderingCounter;
-      
+
       //new request
       this._progressiveRenderingCounter++;
       currentRenderingCounter = this._progressiveRenderingCounter;
 
       //make sure canvas is clean
       this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
-      
+
       if(this.parallelCoordinates) {
         //split the data in the number of frames desired
         for(j=0; j<numberOfFrames; j++) {
@@ -479,10 +479,10 @@ Element which draws lines series onto the chart
       var processColoredDataSlice = function() {
 
         if(currentRenderingCounter !== _this._progressiveRenderingCounter) {
-          //new request came in, cancel this drawing. Don't reset the counter as we want 
+          //new request came in, cancel this drawing. Don't reset the counter as we want
           //the new request to finish
           return;
-        } 
+        }
 
         var d = batches[currentIndex];
         for(var i = 0; i < d.length; i++) {
@@ -509,7 +509,7 @@ Element which draws lines series onto the chart
       var processGenericDataSlice = function() {
 
         if(currentRenderingCounter !== _this._progressiveRenderingCounter) {
-          //new request came in, cancel this drawing. Don't reset the counter as we want 
+          //new request came in, cancel this drawing. Don't reset the counter as we want
           //the new request to finish
           return;
         }
@@ -518,7 +518,7 @@ Element which draws lines series onto the chart
         _this.canvasContext.beginPath();
         for(var i = 0; i < d.length; i++) {
           if(!_this.mutedSeries[d[i][_this.seriesId]]) {
-            
+
             _this.line(d[i]);
           }
         }
@@ -555,11 +555,11 @@ Element which draws lines series onto the chart
         //"normal" color line
         processFunction = processGenericDataSlice;
       }
-      
+
       timer(processFunction);
     },
     /**
-     * Used to 'clear' the canvas fater drawing in case we drew outside our limits. 
+     * Used to 'clear' the canvas fater drawing in case we drew outside our limits.
      * We might want to consider using a clippath instead
      */
     _clearCanvasMargins: function() {

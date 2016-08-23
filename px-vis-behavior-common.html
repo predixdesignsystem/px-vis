@@ -20,7 +20,8 @@ PxVisBehavior.sizing = {
     *
     */
     width: {
-      type: Number
+      type: Number,
+      notify: true
     },
 
     /**
@@ -29,6 +30,7 @@ PxVisBehavior.sizing = {
     */
     height: {
       type: Number,
+      notify: true
     },
 
     /**
@@ -37,6 +39,7 @@ PxVisBehavior.sizing = {
     */
     margin:{
       type:Object,
+      notify: true,
       value: function() {
         return {
           left: 0,
@@ -73,7 +76,7 @@ PxVisBehavior.truncating = {
      * @type Number
      * @default 10
     */
-    truncationLength: { 
+    truncationLength: {
       type: Number,
       value: 10
     },
@@ -355,7 +358,7 @@ PxVisBehavior.progressiveRendering = {
   properties: {
     /**
     * By default the lines are rendered progressively for a better user experience.
-    * However this can have a performance impact, minimal on chrome (+15% rendering 
+    * However this can have a performance impact, minimal on chrome (+15% rendering
     * time) but important on IE (+200% rendering time...)
     * Use this to prevent progressive rendering if you plan rendering a lot fo <datalist>
     * and using IE
@@ -480,7 +483,7 @@ PxVisBehavior.commonMethods = {
    * @return {bool}
    */
   _isObjEmpty:function(obj){
-    if(typeof(obj) === 'undefined'){
+    if(typeof(obj) === 'undefined') {
       return false;
     }
     return Object.keys(obj).length === 0;
@@ -492,7 +495,7 @@ PxVisBehavior.commonMethods = {
    * @return {bool}
    */
   _doesObjHaveValues:function(obj){
-    if(typeof(obj) === 'undefined'){
+    if(typeof(obj) === 'undefined' || obj === null) {
       return false;
     }
     return Object.keys(obj).length > 0;
@@ -790,8 +793,16 @@ PxVisBehavior.events = {
 PxVisBehavior.dimensions = {
   properties: {
     /**
+     * An optional dev set array to specify which dimensions to plot
+     *
+     */
+    axes: {
+      type: Array,
+      notify: true
+    },
+    /**
     * An array of dimensions which the chart uses.
-    *
+    * @private
     */
     dimensions: {
       type: Array,
