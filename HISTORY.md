@@ -1,3 +1,7 @@
+v0.1.27
+==================
+* Fixing multi scale issue on adding axes through chart data
+
 v0.1.26
 ==================
 * Many changes associated with enabling mute / unmute on parallel coords

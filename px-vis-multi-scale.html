@@ -73,7 +73,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
     observers: [
       '_setXScale(width,margin)',
       '_setYScale(height,margin,axes)',
-      '_currentDomain(chartData.*,x,y,completeSeriesConfig,chartExtents)'
+      '_currentDomain(x,y,chartExtents)'
     ],
     /**
     * when attached, re-fire set properties for precipitation pattern
@@ -218,35 +218,20 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      */
      _currentDomain: function() {
       // check to make sure there is data
-      if(this._doesObjHaveValues(this.chartData) && this._doesObjHaveValues(this.x) && this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.completeSeriesConfig) && this._doesObjHaveValues(this.chartExtents)){
-        // var xOrd = this.xAxisType === 'ordinal',
-        //   yOrd = this.yAxisType === 'ordinal',
-        //   xTime = this.xAxisType === 'time',
-        //   doX = xTime ? false : true,
-        //   doY = true,
-        //   keys = Object.keys(this.completeSeriesConfig),
+      if(this._doesObjHaveValues(this.x) && 
+      this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.chartExtents)){
+
         var dims = this.dimensions
             exts = this.chartExtents;
-        //
-        // if(exts.x.length > 0 && exts.x[0] !== Infinity && exts.x[1] !== -Infinity){
-        //   xTime = false;
-        //   doX = false;
-        // }
-        // if(exts.y.length > 0 && exts.y[0] !== Infinity && exts.y[1] !== -Infinity){
-        //   yTime = false;
-        //   doY = false;
-        // }
-        // if(doX || doY || xTime){
-        //   //Chug through the data to max and min
-        //   this._findMinMax(this.chartData, doX, doY, xOrd, yOrd, xTime, exts, keys);
-        // }
         
         for(var i = 0; i < dims.length; i++){
+          if(!this.y[dims[i]]) {
+            return;
+          }
           this.y[dims[i]].domain(exts.y[dims[i]]);
         }
         this.x.domain(exts.x);
 
-        // TODO would a bool be better? Flip when run?
         // Set the domains
         this.set('currentDomainX', this.x.domain());
         this.set('currentDomainY', this.y[dims[0]].domain());
