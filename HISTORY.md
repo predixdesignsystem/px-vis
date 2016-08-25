@@ -1,3 +1,7 @@
+v0.1.27
+==================
+* documentation updates
+
 v0.1.26
 ==================
 * Many changes associated with enabling mute / unmute on parallel coords
