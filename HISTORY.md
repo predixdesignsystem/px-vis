@@ -1,6 +1,10 @@
-v0.1.27
+v0.1.28
 ==================
 * documentation updates
+
+v0.1.27
+==================
+* Fixing multi scale issue on adding axes through chart data
 
 v0.1.26
 ==================
