@@ -1,6 +1,19 @@
+v0.1.30
+==================
+* mute / unmute issues
+* changed the axis id
+* enabled redraw of chart through removing data
+* events fire on progressive rendering
+* added px-tooltip on axis label
+* enabled min size to axis brush
+* fixed font issues
+* fixed axis brush color
+
 v0.1.29
 ==================
-* documentation updates
+* fixed bug with axes brush and new axes
+* fixed grid alignment issues
+* enabled axis name in series config
 
 v0.1.28
 ==================
