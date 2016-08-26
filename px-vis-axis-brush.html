@@ -66,6 +66,9 @@ This element draw the box over the axis signifying the active area to mute the s
        */
       _previousDomain: {
         type: Array
+      },
+      _brush: {
+        type: Object
       }
     },
 
@@ -73,7 +76,9 @@ This element draw the box over the axis signifying the active area to mute the s
       'drawElement(svg)'
       // 'drawElement(svg, axis, height, margin)'
     ],
-
+    /**
+     * Creates the brushes
+     */
     drawElement: function() {
       this.debounce('drawBrushAxis', function(){
         var _this = this,
@@ -122,43 +127,92 @@ This element draw the box over the axis signifying the active area to mute the s
             Px.d3.select(this).append("g")
             .attr("class", "brush")
             .call(
-              Px.d3.brushY()
+              _this._brush = Px.d3.brushY()
                 .extent(_this._previousDomain)
                 .on("start.brush", _this.brushstart.bind(_this))
-                .on("end.brush", _this.brush.bind(_this))
+                // .on("brush.brush", _this.brush.bind(_this))
+                .on("end.brush", _this.brushEnd.bind(_this))
             );
+
+            // TODO make a flag so brushing is dynamic instead of just at the end
           }
-        })
-        .selectAll("rect")
-        .attr({
-          "x":-8,
-          "width": 18,
-          "fill": this.colors.gray5,
-          "stroke": this.colors["primary-blue"]
         });
 
+        var b = this.svg.selectAll('g.brush');
+
+        b.selectAll("rect.selection")
+          .attr("fill", _this.colors.black)
+          .attr("fill-opacity", 0.15)
+          .attr("stroke", _this.colors["primary-blue"])
+
         // save these brushes for access in brush()
-        this.set('_brushes',this.svg.selectAll('g.brush'));
+        this.set('_brushes', b);
         this.set('_previousDomain', domain);
       }.bind(this),5);
     },
 
+    /**
+     * Stops event propagation on a brush start event
+     */
     brushstart: function() {
-      if(Px.d3.event.sourceEvent) {
+      if(Px.d3.event.sourceEvent && Px.d3.event.sourceEvent.type !== 'end') {
       	Px.d3.event.sourceEvent.stopPropagation();
       }
     },
 
-    // Handles a brush event, toggling the display of foreground lines.
+    /**
+     * Update brush on a brush event
+     */
     brush: function() {
       var extents = [],
         series = {},
         dim,y0,y1;
-      console.log(this._brushes)
+
       // for each brush, figure out if it was brushed and build an array of obj with the extents and the dimension
       this._brushes.each(function(d) {
         if(Px.d3.brushSelection(this)){
           extents.push({ "extent": Px.d3.brushSelection(this), "index": d });
+        }
+      });
+
+      for(var i = 0; i < this.chartData.length; i++){
+        for(var j = 0; j < extents.length; j++){
+          dim = extents[j]['index'];
+          y0 = this.axis[dim].invert(extents[j]["extent"][1]);
+          y1 = this.axis[dim].invert(extents[j]["extent"][0]);
+          if(y0 > this.chartData[i][dim] || this.chartData[i][dim] > y1){
+            series[this.chartData[i][this.seriesKey]] = true;
+          }
+        }
+      }
+      this.set('mutedSeries',series);
+      this.fire('px-vis-muted-series-updated', { 'data': series, 'dataVar': 'mutedSeries' ,'method': 'set' });
+    },
+
+    /**
+     * Final update on a brush end event
+     */
+    brushEnd: function() {
+      var  _this = this,
+        extents = [],
+        series = {},
+        dim,y0,y1;
+
+      // for each brush, figure out if it was brushed and build an array of obj with the extents and the dimension
+      this._brushes.each(function(d) {
+        if(Px.d3.brushSelection(this)) {
+          var sel = Px.d3.brushSelection(this),
+              ext,size;
+          //check the size of the box and make sure it is some min
+          if((sel[1] - sel[0]) < 4) {
+            // increase size of extents while checking if we hit the top
+            ext = (sel[0] - 4) < 0 ? [ sel[0] , sel[1] + 4 ] : [ sel[0] -4 , sel[1] ];
+            // increase size of box
+            Px.d3.select(this).call(_this._brush.move, ext);
+          } else {
+            ext = sel;
+          }
+          extents.push({ "extent": ext, "index": d });
         }
       });
 
