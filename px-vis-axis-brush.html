@@ -55,68 +55,52 @@ This element draw the box over the axis signifying the active area to mute the s
      * @type Object
      */
     properties: {
+      /**
+       * Holder object for the brushes
+       */
       _brushes: {
         type: Object
       },
+      /**
+       * holder for the original domain
+       */
       _previousDomain: {
         type: Array
       }
     },
 
     observers: [
-      'drawElement(svg,axis, height, margin)'
+      'drawElement(svg)'
+      // 'drawElement(svg, axis, height, margin)'
     ],
 
     drawElement: function() {
       this.debounce('drawBrushAxis', function(){
+        var _this = this,
+            domain = [
+              [-10,0],
+              [_this.margin.top,_this.height - _this.margin.top - _this.margin.bottom]
+            ];
 
-        if(this._doesObjHaveValues(this.svg) && this._doesObjHaveValues(this.axis) && this._doesObjHaveValues(this.margin) ) {
+        if(!this._previousDomain){
+          this._previousDomain = [
+            [-10,0],
+            [_this.margin.top,_this.height- _this.margin.top - _this.margin.bottom]
+          ];
+        }
 
-          if(!this._brushes) {
-            var _this = this;
-            this._previousDomain = [
-                  [-10,0],
-                  [_this.margin.top,_this.height- _this.margin.top - _this.margin.bottom]
-                ];
-
-            // Add and store a brush for each axis.
-            this.svg.append("g")
-              .attr("class", "brush")
-              .each(function(d) {
-
-            Px.d3.select(this).call(
-              Px.d3.brushY()
-                .extent(_this._previousDomain)
-                .on("start.brush", _this.brushstart.bind(_this))
-                .on("end.brush", _this.brush.bind(_this))
-              );
-            })
-            .selectAll("rect")
-            .attr({
-              "x":-8,
-              "width": 18,
-              "fill": this.colors.gray5
-            });
-
-            // save these brushes for access in brush()
-            this.set('_brushes',this.svg.selectAll('g.brush'));
-          } else {
-            //Update brushes
-            var _this = this,
-                domain = [
-                  [-10,0],
-                  [_this.margin.top,_this.height - _this.margin.top - _this.margin.bottom]
-                ];
-            //go through each brush
-            this._brushes.each(function(d) {
-
-              var curBrush,
-                  curSelection = Px.d3.brushSelection(this);
+        // Add and store a brush for each axis.
+        this.svg.each(function(d) {
+          if(Px.d3.select(this).select('g.brush').node()){
+            //update the brush when resize occurs
+              var brsh = Px.d3.select(this).select('g.brush'),
+                  curBrush,
+                  curSelection = Px.d3.brushSelection(brsh.node());
 
               //set appropriate domain
-              Px.d3.select(this).call(
+              brsh.call(
                 curBrush = Px.d3.brushY().extent(domain)
-                );
+              );
 
               //if currently active (=drawn) make sure we redraw the brush with appropriate
               //size and position
@@ -126,19 +110,36 @@ This element draw the box over the axis signifying the active area to mute the s
                     totPreviousDomain = Math.abs(_this._previousDomain[1][1] - _this._previousDomain[1][0]),
                     startPercentage = curSelection[0]/totPreviousDomain,
                     stopPercentage = curSelection[1]/totPreviousDomain;
-                //set it
-                Px.d3.select(this)
-                  .call(curBrush.move, [totDomain * startPercentage, totDomain * stopPercentage]);
-              }
 
+                //set it
+                brsh.call(curBrush.move, [totDomain * startPercentage, totDomain * stopPercentage]);
+              }
               //now restore brushing functions
               curBrush.on("start.brush", _this.brushstart.bind(_this))
-                  .on("end.brush", _this.brush.bind(_this));
-            });
-
-            this.set('_previousDomain', domain);
+                      .on("end.brush", _this.brush.bind(_this));
+          } else {
+            // create a new brush
+            Px.d3.select(this).append("g")
+            .attr("class", "brush")
+            .call(
+              Px.d3.brushY()
+                .extent(_this._previousDomain)
+                .on("start.brush", _this.brushstart.bind(_this))
+                .on("end.brush", _this.brush.bind(_this))
+            );
           }
-        }
+        })
+        .selectAll("rect")
+        .attr({
+          "x":-8,
+          "width": 18,
+          "fill": this.colors.gray5,
+          "stroke": this.colors["primary-blue"]
+        });
+
+        // save these brushes for access in brush()
+        this.set('_brushes',this.svg.selectAll('g.brush'));
+        this.set('_previousDomain', domain);
       }.bind(this),5);
     },
 
@@ -153,7 +154,7 @@ This element draw the box over the axis signifying the active area to mute the s
       var extents = [],
         series = {},
         dim,y0,y1;
-
+      console.log(this._brushes)
       // for each brush, figure out if it was brushed and build an array of obj with the extents and the dimension
       this._brushes.each(function(d) {
         if(Px.d3.brushSelection(this)){
