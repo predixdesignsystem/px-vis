@@ -1,3 +1,7 @@
+v0.1.29
+==================
+* documentation updates
+
 v0.1.28
 ==================
 * documentation updates
