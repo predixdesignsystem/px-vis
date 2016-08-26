@@ -2,6 +2,7 @@
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="../px-colors-design/colors.html" />
+<link rel="import" href="../px-tooltip/px-tooltip.html" />
 
 
 <!--
@@ -31,7 +32,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 <dom-module id="px-vis-axis">
     <link rel="import" type="css" href="css/px-vis.css"/>
     <template>
-
+      <px-tooltip id="tooltip" delay=500>{{title}} {{_currentUnits}}</px-tooltip>
     </template>
 </dom-module>
 
@@ -113,6 +114,19 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             type: Boolean,
             value: false
           },
+          /**
+           * The series ID this axis refers to, used to look in the config
+           */
+          seriesId: {
+            type: String
+          },
+          /**
+           * the text reprensenting the units of the axis
+           */
+          _currentUnits: {
+            type: String,
+            computed: '_computeUnits(appendUnitInTitle, completeSeriesConfig, title)'
+          }
         },
 
         observers: [
@@ -236,6 +250,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           var g = this.svg.append("g")
             .attr("class", "axis")
             .attr('axis-id',this.axisId)
+         //   .attr('debug-id',this.title)
             .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
             .call(this._axis);
             // .each(function(d) { d3.select(this).call(_this._axis.scale(_this.axis[d])); })
@@ -245,7 +260,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           this._setLineStyles(this._axisGroup,'line,path');
           this._setLabelStyles(this._axisGroup);
 
-          this.drawSeriesBars();
+         // this.drawSeriesBars();
         },
         /**
          * Updates the axis
@@ -258,8 +273,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
          // this._setLineStyles(this._axisGroup,'line');
           this._setLabelStyles(this._axisGroup);
-
-          this.drawSeriesBars();
 
           // alert parents that we are done drawing the axis
           this.fire("px-axis-done");
@@ -424,6 +437,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
                 .style("text-anchor", anchor)
                 .text(this.displayedTitle)
                 .attr('transform',"rotate(" + r + ")");
+
               }
           }
 
@@ -451,6 +465,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           //   .style("text-anchor", anchor)
           //   .attr('transform',"rotate(" + r + ")");
 
+          this._processTooltip();
+          this.drawSeriesBars();
         },
         /**
          * Draws the color bars for each series
@@ -499,6 +515,16 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .attr('series-bar-id','bar_' + sid)
             .attr('transform',"translate(-12," + (-w - 8 * index) + ")");
         },
+        _computeUnits: function(appendUnitInTitle, completeSeriesConfig, title) {
+          var result = '';
+
+          if(appendUnitInTitle && this.completeSeriesConfig[this.seriesId]
+                && this.completeSeriesConfig[this.seriesId].yAxisUnit) {
+              result = ' [' + this.completeSeriesConfig[this.seriesId].yAxisUnit + ']';
+          }
+
+          return result;
+        },
         /**
          * truncates the title label appropriately
          */
@@ -507,15 +533,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           this.debounce('_truncateTitle', function() {
 
             var oldTitle = this._truncatedTitle,
-                unit = '',
                 newTitle;
 
-            if(appendUnitInTitle && this.completeSeriesConfig[this.title]
-                && this.completeSeriesConfig[this.title].yAxisUnit) {
-              unit = ' [' + this.completeSeriesConfig[this.title].yAxisUnit + ']';
-            }
-
-            newTitle = this._truncateName(title, truncationLength) + unit;
+            newTitle = this._truncateName(title, truncationLength) + this._currentUnits;
 
             if(newTitle !== oldTitle) {
               this.fire('px-vis-axis-displayed-title-changed', {displayedTitle: newTitle, title: this.title});
@@ -531,6 +551,21 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               this.drawTitle();
             }
           }.bind(this), 5);
+        },
+        /**
+         * checks it the label needs a tooltip an appropriately add or remove it
+         */
+        _processTooltip: function() {
+          var isTruncated = this.title.length > 2 && this.title.length > this.truncationLength,
+              containsTooltip = this._axisGroup.node().contains(this.$.tooltip);
+
+          if(!isTruncated && containsTooltip) {
+            //not needed anymore, remove
+            this._axisGroup.node().removeChild(this.$.tooltip);
+          } else if(isTruncated && !containsTooltip) {
+            this._axisGroup.node().appendChild(this.$.tooltip);
+            this.$.tooltip.for = this._titleGroup.node();
+          }
         }
     });
 </script>

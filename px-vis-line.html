@@ -53,6 +53,26 @@ Element which draws lines series onto the chart
     ],
 
     /**
+     * px-vis-progressive-rendering-started, fired when a canvas with progressive rendering
+     * enabled starts rendering
+     * evt.details contains:
+     * { numberOfFrames: the number of frames that will be used to render,
+     * }
+     * 
+     * @event px-vis-progressive-rendering-started
+     */
+
+    /**
+     * px-vis-progressive-rendering-ended, fired when a canvas with progressive rendering
+     * enabled has finished rendering
+     * evt.details contains:
+     * { numberOfFrames: the number of frames that have been used to render,
+     * }
+     *
+     * @event px-vis-progressive-rendering-ended
+     */
+
+    /**
      * Properties block, expose attribute values to the DOM via 'reflect'
      *
      * @property properties
@@ -436,6 +456,8 @@ Element which draws lines series onto the chart
      */
     _renderProgressively: function(data, numberOfFrames) {
 
+      this.fire('px-vis-line-progressive-rendering-started', {numberOfFrames: numberOfFrames});
+
         var batches = [],
             currentIndex = 0,
             j = 0,
@@ -502,6 +524,7 @@ Element which draws lines series onto the chart
         } else {
           //finished drawing, reset drawing request counter
           _this._progressiveRenderingCounter = 0;
+          _this.fire('px-vis-line-progressive-rendering-ended', {numberOfFrames: numberOfFrames});
         }
       };
 
@@ -533,7 +556,8 @@ Element which draws lines series onto the chart
         } else {
           //end, clean up
           _this._clearCanvasMargins();
-          this._progressiveRenderingCounter = 0;
+          _this._progressiveRenderingCounter = 0;
+          _this.fire('px-vis-line-progressive-rendering-ended', {numberOfFrames: numberOfFrames});
         }
       };
       //END PROCESSING FUNCTIONS
