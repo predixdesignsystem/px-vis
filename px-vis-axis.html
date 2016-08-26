@@ -94,7 +94,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            */
           displayedTitle: {
             type: String,
-            computed: '_truncateTitle(title, truncationLength, appendUnitInTitle, completeSeriesConfig)'
+            value: ''
           },
           /**
            * Whether to append unit (if existing in config) in the title
@@ -125,7 +125,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           // 'updateTicks(tickValues.*)',
           'drawSeriesBars(completeSeriesConfig.*)',
           '_muteSeriesBars(mutedSeries.*)',
-          '_titleChanged(displayedTitle, _axisGroup, titleLocation)'
+          '_titleChanged(displayedTitle, _axisGroup, titleLocation)',
+          '_truncateTitle(title, truncationLength, appendUnitInTitle, completeSeriesConfig)'
         ],
 
         ready: function(){
@@ -505,22 +506,27 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * truncates the title label appropriately
          */
         _truncateTitle: function(title, truncationLength, appendUnitInTitle) {
-          var oldTitle = this._truncatedTitle,
-              unit = '',
-              newTitle;
 
-          if(appendUnitInTitle && this.completeSeriesConfig[this.title]
-              && this.completeSeriesConfig[this.title].yAxisUnit) {
-            unit = ' [' + this.completeSeriesConfig[this.title].yAxisUnit + ']';
-          }
+          this.debounce('_truncateTitle', function() {
 
-          newTitle = this._truncateName(title, truncationLength) + unit;
+            var oldTitle = this._truncatedTitle,
+                unit = '',
+                newTitle;
 
-          if(newTitle !== oldTitle) {
-            this.fire('px-vis-axis-displayed-title-changed', {displayedTitle: newTitle, title: this.title});
-          }
+            if(appendUnitInTitle && this.completeSeriesConfig[this.title]
+                && this.completeSeriesConfig[this.title].yAxisUnit) {
+              unit = ' [' + this.completeSeriesConfig[this.title].yAxisUnit + ']';
+            }
 
-          return newTitle;
+            newTitle = this._truncateName(title, truncationLength) + unit;
+
+            if(newTitle !== oldTitle) {
+              this.fire('px-vis-axis-displayed-title-changed', {displayedTitle: newTitle, title: this.title});
+            }
+
+            //return newTitle;
+            this.set('displayedTitle', newTitle);
+           }, 5);
         },
         _titleChanged: function(displayedTitle) {
           if(this._doesObjHaveValues(this._axisGroup)) {
