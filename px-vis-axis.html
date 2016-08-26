@@ -215,8 +215,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
                 if(this.forceRefresh){
                   this._axisGroup.remove();
                   this._axisGroup = null;
-                  this._titleGroup.remove();
-                  this._titleGroup = null;
+                  // this._titleGroup.remove();
+                  // this._titleGroup = null;
                   this.drawElement();
                 } else {
                   // if we have tickValues, we'll update another way
@@ -354,67 +354,69 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * @method drawTitle
          */
         drawTitle:function() {
-          this.debounce('drawTitle', function() {
-            var ext = this._axisGroup.node().getBBox(),
-                location = this._doesObjHaveValues(this.titleLocation) ? 'custom' : this.orientation,
-                x,y,r,anchor;
+          var ext = this._axisGroup.node().getBBox(),
+              location = this._doesObjHaveValues(this.titleLocation) ? 'custom' : this.orientation,
+              x,y,r,anchor;
 
+          switch(location) {
+            case 'bottom':
+              x = parseFloat(ext['width']) / 2 + this.translateAmt[0];
+              y = this.labelTypeSize * 1.5 + parseFloat(ext['height']) + this.translateAmt[1];
+              r = 0;
+              anchor = "middle";
+              break;
 
-            switch(location) {
-              case 'bottom':
-                x = parseFloat(ext['width']) / 2 + this.translateAmt[0];
-                y = this.labelTypeSize * 1.5 + parseFloat(ext['height']) + this.translateAmt[1];
-                r = 0;
-                anchor = "middle";
-                break;
+            case 'top':
+              x = parseFloat(ext['width']) / 2 + this.translateAmt[0];
+              y = this.translateAmt[1];
+              r = 0;
+              anchor = "middle";
+              break;
 
-              case 'top':
-                x = parseFloat(ext['width']) / 2 + this.translateAmt[0];
-                y = this.translateAmt[1];
-                r = 0;
-                anchor = "middle";
-                break;
+            case 'left':
+              x = (this.labelTypeSize + parseFloat(ext['width'])) * -1 + this.translateAmt[0];
+              y = parseFloat(ext['height']) / 2 + this.translateAmt[1];
+              r = -90;
+              anchor = "middle";
+              break;
 
-              case 'left':
-                x = (this.labelTypeSize + parseFloat(ext['width'])) * -1 + this.translateAmt[0];
-                y = parseFloat(ext['height']) / 2 + this.translateAmt[1];
-                r = -90;
-                anchor = "middle";
-                break;
+            case 'right':
+              x = this.labelTypeSize + parseFloat(ext['width']) + this.translateAmt[0];
+              y = parseFloat(ext['height']) / 2 + this.translateAmt[1];
+              r = 90;
+              anchor = "middle";
+              break;
 
-              case 'right':
-                x = this.labelTypeSize + parseFloat(ext['width']) + this.translateAmt[0];
-                y = parseFloat(ext['height']) / 2 + this.translateAmt[1];
-                r = 90;
-                anchor = "middle";
-                break;
+            case 'custom':
+              x = this.titleLocation.x;
+              y = this.titleLocation.y;
+              r = this.titleLocation.r;
+              anchor = this.titleLocation.anchor;
+              break;
+          }
 
-              case 'custom':
-                x = this.titleLocation.x;
-                y = this.titleLocation.y;
-                r = this.titleLocation.r;
-                anchor = this.titleLocation.anchor;
-                break;
-            }
+        if(!this._titleGroup) {
 
-          if(!this._titleGroup) {
+          this._titleGroup = this.svg.append("g")
+            .attr('class','title-group')
+            .attr('for', this.axisId)
+            .attr('transform',"translate(" + x + ',' + y + ")");
 
-            this._titleGroup = this.svg.append("g")
-              .attr('class','title-group')
-              .attr('for', this.axisId)
-              .attr('transform',"translate(" + x + ',' + y + ")");
+          this._titleGroup.append("text")
+            .attr('class','axis-title')
+            .attr('font-size', this.titleTypeSize + 'px')
+            .attr('font-style','GE Inspira Sans')
+            .text(this.displayedTitle)
+            .attr("text-anchor", anchor)
+            .style("text-anchor", anchor)
+            .attr('transform',"rotate(" + r + ")");
 
-            this._titleGroup.append("text")
-              .attr('class','axis-title')
-              .attr('font-size', this.titleTypeSize + 'px')
-              .attr('font-style','GE Inspira Sans')
-              .text(this.displayedTitle)
-              .attr("text-anchor", anchor)
-              .style("text-anchor", anchor)
-              .attr('transform',"rotate(" + r + ")");
-
+          } else {
+            if(this.forceRefresh){
+              this._titleGroup.remove();
+              this._titleGroup = null;
+              this.drawTitle()
             } else {
-
               this.svg.select('g.title-group[for=' + this.axisId + ']')
                 .attr('transform',"translate(" + x + ',' + y + ")");
               this.svg.select('g.title-group[for=' + this.axisId + '] text')
@@ -422,8 +424,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
                 .style("text-anchor", anchor)
                 .text(this.displayedTitle)
                 .attr('transform',"rotate(" + r + ")");
-            }
-          }.bind(this), 5);
+              }
+          }
 
           // console.log(this._titleGroup)
           // this._titleGroup = this.svg.selectAll("g.title-group")
@@ -524,9 +526,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            }, 5);
         },
         _titleChanged: function(displayedTitle) {
-          if(this._doesObjHaveValues(this._axisGroup)) {
-            this.drawTitle();
-          }
+          this.debounce('drawTitle', function() {
+            if(this._doesObjHaveValues(this._axisGroup) && this._axisGroup.node() !== null && this._axisGroup.node().ownerSVGElement !== null) {
+              this.drawTitle();
+            }
+          }.bind(this), 5);
         }
     });
 </script>
