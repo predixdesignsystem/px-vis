@@ -222,6 +222,12 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
               // checks to see if the axis already exists. If not, create; if so, update
               if(!this._axisGroup) {
+                //beats me: sometimes the axis doesnt get removed from the last axis, so make sure it goes away
+                if(this.svg.selectAll('g.axis').nodes().length > 0){
+                  this.svg.selectAll('g.axis').each(function(d){
+                    Px.d3.select(this).remove();
+                  });
+                }
                 this._buildAxis();
                 // alert parents that we are done drawing the axis
                 this.fire("px-axis-done");
@@ -229,6 +235,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
                 if(this.forceRefresh){
                   this._axisGroup.remove();
                   this._axisGroup = null;
+
                   this.drawElement();
                 } else {
                   // if we have tickValues, we'll update another way
@@ -245,6 +252,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          *
          */
         _buildAxis: function(){
+          if(this.title === 'TTXD1_30'){
+            console.log("build")
+            console.log(this.svg.selectAll('g.axis').nodes());
+          }
           var g = this.svg.append("g")
             .attr("class", "axis")
             .attr('axis-id',this.axisId)
@@ -257,6 +268,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
           this._setLineStyles(this._axisGroup,'line,path');
           this._setLabelStyles(this._axisGroup);
+          if(this.title === 'TTXD1_30'){
+            console.log(this.svg.selectAll('g.axis').nodes());
+          }
 
          // this.drawSeriesBars();
         },
@@ -408,6 +422,12 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           }
 
         if(!this._titleGroup) {
+          //beats me: sometimes the axis doesnt get removed from the last axis, so make sure it goes away
+          if(this.svg.selectAll('g.title-group').nodes().length > 0){
+            this.svg.selectAll('g.title-group').each(function(d){
+              Px.d3.select(this).remove();
+            });
+          }
 
           this._titleGroup = this.svg.append("g")
             .attr('class','title-group')
