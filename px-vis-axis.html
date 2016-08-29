@@ -90,6 +90,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            */
           displayedTitle: {
             type: String,
+            notify: true,
             value: ''
           },
           /**
@@ -131,7 +132,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
         observers: [
           'drawElement(currentDomain,svg,axis,margin)',
-          // 'updateTicks(tickValues.*)',
           'drawSeriesBars(completeSeriesConfig.*)',
           '_muteSeriesBars(mutedSeries.*)',
           '_titleChanged(displayedTitle, _axisGroup, titleLocation)',
@@ -532,17 +532,18 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
           this.debounce('_truncateTitle', function() {
 
-            var oldTitle = this._truncatedTitle,
+            var oldTitle = this.displayedTitle,
                 newTitle;
 
             newTitle = this._truncateName(title, truncationLength) + this._currentUnits;
 
             if(newTitle !== oldTitle) {
               this.fire('px-vis-axis-displayed-title-changed', {displayedTitle: newTitle, title: this.title});
+              this.set('displayedTitle', newTitle);
             }
 
             //return newTitle;
-            this.set('displayedTitle', newTitle);
+            
            }, 5);
         },
         _titleChanged: function(displayedTitle) {

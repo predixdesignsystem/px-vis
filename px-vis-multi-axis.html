@@ -35,7 +35,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       <template is="dom-repeat" items="[[_internalDimensions]]">
         <px-vis-axis
           svg="[[_returnGroup(index,axisGroups)]]"
-          axis="[[_returnY(item,currentDomainY, y)]]"
+          axis="[[_returnY(item, domainChanged)]]"
           series-id="[[item]]"
           height="[[height]]"
           margin="[[margin]]"
@@ -48,7 +48,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           stroke-width="[[strokeWidth]]"
           outer-tick-size="0"
           force-refresh
-          tick-values="[[_calcTickVals(item,currentDomainY, height)]]"
+          tick-values="[[_calcTickVals(item, domainChanged)]]"
           truncation-length="[[truncationLength]]"
           complete-series-config="[[completeSeriesConfig]]"
           append-unit-in-title="[[appendUnitInTitle]]"
@@ -102,6 +102,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       PxVisBehavior.mutedSeries,
       PxVisBehaviorD3.dynamicRedraw,
       PxVisBehavior.commonAxis,
+      PxVisBehaviorD3.domainUpdate,
       commonColors
     ],
 
@@ -150,7 +151,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       gridTicks: {
         type: Object,
         notify: true,
-        computed: '_calcGridTicks(_internalDimensions, currentDomainY.*)'
+        computed: '_calcGridTicks(_internalDimensions, domainChanged)'
       },
       /**
        * If matchTicks, generate the ticks so they match too
@@ -159,7 +160,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       gridAxis: {
         type: Object,
         notify: true,
-        computed: '_calcGridAxis(_internalDimensions, currentDomainY.*)'
+        computed: '_calcGridAxis(_internalDimensions, domainChanged)'
       },
       /**
        * Whether to append unit in brackets in axis title. e.g [Hz]
@@ -188,7 +189,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
     observers: [
       '_generateGs(svg,currentDomainX,margin.*)',
-      '_computedInternalDimensions(y.*)'
+      '_computedInternalDimensions(domainChanged)'
     ],
 
     listeners:{
@@ -267,6 +268,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
      *
      */
     _calcTickVals: function(item){
+
       if(this.matchTicks){
         var d = this.y[item].domain(),
             min = Math.floor(d[0]/10)*10,
@@ -325,9 +327,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       evt.stopPropagation();
       evt.stopImmediatePropagation();
     },
-    _computedInternalDimensions: function(dimensions, currentDomainY) {
-
-        this.set('_internalDimensions', this.dimensions);
+    _computedInternalDimensions: function() {
+console.log('compute internal dims')
+      //make sure we rebuilt the displayed title from scratch
+      this.displayedValues = {};
+      this.set('_internalDimensions', this.dimensions);
     },
     _getTitle: function(item) {
       if(this.completeSeriesConfig[item] && this.completeSeriesConfig[item].title) {

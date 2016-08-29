@@ -58,7 +58,8 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       commonColors,
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.chartExtents,
-      PxVisBehavior.dimensions
+      PxVisBehavior.dimensions,
+      PxVisBehaviorD3.domainUpdate
     ],
 
     /**
@@ -104,8 +105,9 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @method _setXScale
      */
     _setXScale: function(width,margin) {
-      this.debounce('setXScale', function() {
-
+    //  this.debounce('setXScale', function() {
+console.log('set x scale')
+console.trace()
         var w = width - margin.left - margin.right,
             range = [0, w];
 
@@ -118,7 +120,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
 
         this.notifyPath('x.range', this.x.range);
         this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
-      }.bind(this), 5);
+     // }.bind(this), 5);
     },
     /**
      * Sets the y scale to multiple linear scales
@@ -126,7 +128,9 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @method _setYScale
      */
     _setYScale: function(height,margin,axes) {
-      this.debounce('setYScale', function() {
+   //   this.debounce('setYScale', function() {
+     console.log('set y scale')
+     console.trace()
         var h = height - margin.top - margin.bottom,
             range = [h, 0],
             newY = {};// y is an object with multiple scales
@@ -138,7 +142,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
 
         this.set('y', newY);
         this.fire('px-vis-y-updated', { 'dataVar': 'y', 'data': this.y, 'method':'set' });
-      }.bind(this), 5);
+  //    }.bind(this), 5);
     },
 
     _getDataExtents: function(d,yKeysArr){
@@ -231,10 +235,14 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
           this.y[dims[i]].domain(exts.y[dims[i]]);
         }
         this.x.domain(exts.x);
-
+console.log('generate CurrentDOmainX')
+console.trace()
         // Set the domains
         this.set('currentDomainX', this.x.domain());
+        console.log('generate CurrentDomainY')
+        console.trace()
         this.set('currentDomainY', this.y[dims[0]].domain());
+        this.set('domainChanged', !this.domainChanged);
 
         this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
         this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
