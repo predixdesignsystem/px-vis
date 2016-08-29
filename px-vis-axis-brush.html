@@ -165,8 +165,8 @@ This element draw the box over the axis signifying the active area to mute the s
      */
     brush: function() {
       var extents = [],
-        series = {},
-        dim,y0,y1;
+          series = {},
+          dim,y0,y1;
 
       // for each brush, figure out if it was brushed and build an array of obj with the extents and the dimension
       this._brushes.each(function(d) {
@@ -193,10 +193,10 @@ This element draw the box over the axis signifying the active area to mute the s
      * Final update on a brush end event
      */
     brushEnd: function() {
-      var  _this = this,
-        extents = [],
-        series = {},
-        dim,y0,y1;
+      var _this = this,
+          extents = [],
+          series = {},
+          dim,y0,y1;
 
       // for each brush, figure out if it was brushed and build an array of obj with the extents and the dimension
       this._brushes.each(function(d) {
@@ -228,6 +228,18 @@ This element draw the box over the axis signifying the active area to mute the s
       }
       this.set('mutedSeries',series);
       this.fire('px-vis-muted-series-updated', { 'data': series, 'dataVar': 'mutedSeries' ,'method': 'set' });
+    },
+    /**
+     * Final update on a brush end event
+     */
+    clearBrush: function(bid){
+      var _this = this;
+      // for each brush, figure out if it was is being removed and has a brush and clear the brush if so
+      this._brushes.each(function(d) {
+        if(d === bid && Px.d3.brushSelection(this)) {
+          Px.d3.select(this).call(_this._brush.move, null);
+        }
+      });
     }
   });
 </script>

@@ -56,6 +56,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         </px-vis-axis>
       </template>
       <px-vis-axis-brush
+        id="axisBrush"
         svg="[[axisGroups]]"
         height="[[height]]"
         axis="[[y]]"
@@ -216,7 +217,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           var g = this.axisSvg.selectAll(".dimension")
             .data(this.dimensions, function(d) { return d; });
 
-          g.exit().remove();
+          g.exit()
+            .each(function(d){
+              this.$.axisBrush.clearBrush(d);
+            }.bind(this)).remove();
           g.enter()
             // .each(function(d){
             //   var n = this.$$('#axis_' + d);
@@ -295,6 +299,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     _calcGridAxis: function(dim){
       return this._returnY(dim[0]);
     },
+    /*
+     * Sets styles and on hover for common axis
+     *
+     */
     _setAxisStyles: function(e) {
       if(this.axisGroups){
         var _this = this;
@@ -315,9 +323,17 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         }
       }
     },
+    /*
+     * returns 'axis_' + axis id
+     *
+     */
     _createAxisID: function(item) {
       return 'axis_' + item;
     },
+    /*
+     * sets the displayed value of the title including truncation
+     *
+     */
     _displayedTitleChanged: function(evt) {
 
       this.set('displayedValues.' + evt.detail.title, evt.detail.displayedTitle);
@@ -325,10 +341,17 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       evt.stopPropagation();
       evt.stopImmediatePropagation();
     },
+    /*
+     * Sets _internalDimensions to the value of dimensions but trigged AFTER the scale has been set. Avoids an annoying race condition where dimensions triggers a chart refresh but the new scale has yet to be triggered
+     *
+     */
     _computedInternalDimensions: function(dimensions, currentDomainY) {
-
         this.set('_internalDimensions', this.dimensions);
     },
+    /*
+     * Checks if there is a title specified in the series config and returns it; otherwise returns the axis id
+     *
+     */
     _getTitle: function(item) {
       if(this.completeSeriesConfig[item] && this.completeSeriesConfig[item].title) {
         return this.completeSeriesConfig[item].title;

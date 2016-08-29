@@ -1,3 +1,7 @@
+v0.1.31
+==================
+* clears an axis brush if that axis is removed
+
 v0.1.30
 ==================
 * mute / unmute issues
