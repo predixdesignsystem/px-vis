@@ -208,7 +208,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * @method drawElement
          */
         drawElement: function() {
-       //   this.debounce('drawAxis', function() {
+        //  this.debounce('drawAxis', function() {
             if(this.svg.node() && this._doesObjHaveValues(this.currentDomain)){
 
               this.defineAxis();
@@ -222,33 +222,31 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
                 this.translateAmt = [0,0];
               }
 
+              if(this.forceRefresh && this._axisGroup){
+                this._axisGroup.remove();
+                this._axisGroup = null;
+              }
+
               // checks to see if the axis already exists. If not, create; if so, update
               if(!this._axisGroup) {
-                //beats me: sometimes the axis doesnt get removed from the last axis, so make sure it goes away
-                if(this.forceRefresh && this.svg.selectAll('g.axis').nodes().length > 0){
-                  console.log("Remove")
-                  this.svg.selectAll('g.axis').each(function(d){
-                    Px.d3.select(this).remove();
-                  });
-                }
                 this._buildAxis();
                 // alert parents that we are done drawing the axis
                 this.fire("px-axis-done");
               } else {
-                if(this.forceRefresh){
-                  this._axisGroup.remove();
-                  this._axisGroup = null;
-
-                  this.drawElement();
-                } else {
+                // if(this.forceRefresh){
+                //   this._axisGroup.remove();
+                //   this._axisGroup = null;
+                //
+                //   this.drawElement();
+                // } else {
                   // if we have tickValues, we'll update another way
                   if(!this.tickValues || this.tickValues.length === 0){
                     this._updateAxis();
                   }
-                }
+                // }
               }
             }
-          //}, 5);
+          // }, 5);
         },
         /**
          * builds axis
@@ -262,6 +260,14 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
             .call(this._axis);
             // .each(function(d) { d3.select(this).call(_this._axis.scale(_this.axis[d])); })
+
+          //beats me: sometimes the axis doesnt get removed from the last axis, so make sure it goes away
+          if(this.forceRefresh && this.svg.selectAll('g.axis').nodes().length > 1){
+            this.svg.selectAll('g.axis').each(function(d){
+              Px.d3.select(this).remove();
+            });
+            this.drawElement();
+          }
 
           this.set('_axisGroup',g);
 
@@ -419,7 +425,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         if(!this._titleGroup) {
           //beats me: sometimes the axis doesnt get removed from the last axis, so make sure it goes away
           if(this.forceRefresh && this.svg.selectAll('g.title-group').nodes().length > 0){
-            console.log("remove")
             this.svg.selectAll('g.title-group').each(function(d){
               Px.d3.select(this).remove();
             });
