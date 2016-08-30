@@ -48,6 +48,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           PxVisBehavior.commonMethods,
           PxVisBehaviorD3.axisConfig,
           PxVisBehavior.truncating,
+          PxVisBehaviorD3.domainUpdate,
           commonColors
         ],
 
@@ -131,7 +132,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         },
 
         observers: [
-          'drawElement(currentDomain,svg,axis,margin)',
+          'drawElement(domainChanged,svg,axis,margin)',
           'drawSeriesBars(completeSeriesConfig.*)',
           '_muteSeriesBars(mutedSeries.*)',
           '_titleChanged(displayedTitle, _axisGroup, titleLocation)',
@@ -207,8 +208,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * @method drawElement
          */
         drawElement: function() {
-          this.debounce('drawAxis', function() {
-            if(this.svg.node()){
+       //   this.debounce('drawAxis', function() {
+         
+            if(this.svg.node() && this._doesObjHaveValues(this.currentDomain)){
+              console.log('DRAW AXIS')
               this.defineAxis();
               // TODO unify my orientation checks
               // TODO suport top and right
@@ -245,17 +248,14 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
                 }
               }
             }
-          }, 5);
+          //}, 5);
         },
         /**
          * builds axis
          *
          */
         _buildAxis: function(){
-          if(this.title === 'TTXD1_30'){
-            console.log("build")
-            console.log(this.svg.selectAll('g.axis').nodes());
-          }
+
           var g = this.svg.append("g")
             .attr("class", "axis")
             .attr('axis-id',this.axisId)
@@ -268,11 +268,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
           this._setLineStyles(this._axisGroup,'line,path');
           this._setLabelStyles(this._axisGroup);
-          if(this.title === 'TTXD1_30'){
-            console.log(this.svg.selectAll('g.axis').nodes());
-          }
-
-         // this.drawSeriesBars();
         },
         /**
          * Updates the axis
@@ -283,7 +278,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
           .call(this._axis);
 
-         // this._setLineStyles(this._axisGroup,'line');
           this._setLabelStyles(this._axisGroup);
 
           // alert parents that we are done drawing the axis

@@ -35,7 +35,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       <template is="dom-repeat" items="[[_internalDimensions]]">
         <px-vis-axis
           svg="[[_returnGroup(index,axisGroups)]]"
-          axis="[[_returnY(item, domainChanged)]]"
+          axis="[[_returnY(item)]]"
           series-id="[[item]]"
           height="[[height]]"
           margin="[[margin]]"
@@ -48,11 +48,12 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           stroke-width="[[strokeWidth]]"
           outer-tick-size="0"
           force-refresh
-          tick-values="[[_calcTickVals(item, domainChanged)]]"
+          tick-values="[[_calcTickVals(item)]]"
           truncation-length="[[truncationLength]]"
           complete-series-config="[[completeSeriesConfig]]"
           append-unit-in-title="[[appendUnitInTitle]]"
-          prevent-series-bar>
+          prevent-series-bar
+          domain-changed="[[_internalDimensionsChanged]]">
         </px-vis-axis>
       </template>
       <px-vis-axis-brush
@@ -185,6 +186,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
        */
       _internalDimensions: {
         type: Array
+      },
+      _internalDimensionsChanged: {
+        type: Boolean,
+        value: false
       }
     },
 
@@ -350,11 +355,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
      *
      */
     _computedInternalDimensions: function() {
-console.log('compute internal dims')
-      //make sure we rebuilt the displayed title from scratch
-      this.displayedValues = {};
+
       this.set('_internalDimensions', this.dimensions);
-    }
+      this.set('_internalDimensionsChanged', !this._internalDimensionsChanged);
+    },
     /*
      * Checks if there is a title specified in the series config and returns it; otherwise returns the axis id
      *
