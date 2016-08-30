@@ -62,6 +62,7 @@ function runTests(){
 
       baseXAxis.set('margin',m);
       baseXAxis.set('height',h);
+      baseXAxis.set('completeSeriesConfig',completeSeriesConfig);
 
       baseYAxis.set('margin',m);
       baseYAxis.set('height',h);

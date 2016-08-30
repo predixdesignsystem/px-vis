@@ -71,7 +71,7 @@ function runTests(){
       setTimeout(function(){
         linePath =  baseLine.lineGroup.select('path.series-line');
         done();
-      },100);
+      },100);;
     });
 
     test('baseLine fixture is created', function() {
@@ -176,7 +176,7 @@ function runTests(){
         linePath1 = mutedLine1.lineGroup.select('path.series-line');
         linePath2 = mutedLine2.lineGroup.select('path.series-line');
         done();
-      },100);
+      },100);;
     });
 
     test('mutedLine1 fixture is created', function() {
@@ -247,7 +247,7 @@ function runTests(){
     });
 
     test('mutedLine2 line series has the right stroke opacity', function() {
-      assert.equal(mutedLine2.linePath.attr('stroke-opacity'),0);
+      assert.equal(mutedLine2.linePath.attr('stroke-opacity'),0.3);
     });
     test('mutedLine2 line series has the right color', function() {
       assert.equal(mutedLine2.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
@@ -370,7 +370,7 @@ function runTests(){
         linePath1 = missingDataPointLine1.lineGroup.select('path.series-line');
         linePath2 = missingDataPointLine2.lineGroup.select('path.series-line');
         done();
-      },100);
+      },100);;
     });
 
     test('missingDataPointLine1 fixture is created', function() {
@@ -470,7 +470,7 @@ function runTests(){
         linePath1 = canvasLine1.lineGroup;
         linePath2 = canvasLine2.lineGroup;
         done();
-      },100);
+      },100);;
     });
 
     test('canvasLine1 fixture is created', function() {
@@ -566,6 +566,7 @@ function runTests(){
       parallelScale.set('margin',m);
       parallelScale.set('completeSeriesConfig',completeSeriesConfig);
       parallelScale.set('chartExtents',chartExtents);
+      parallelScale.set('axes',dim);
       parallelScale.set('dimensions',dim);
       parallelScale.set('chartData',d);
 
@@ -576,7 +577,7 @@ function runTests(){
       setTimeout(function(){
         linePath = parallelLine.lineGroup.selectAll('path.series-line');
         done();
-      },100);
+      },1000);;
     });
 
     test('parallelLine fixture is created', function() {
@@ -686,6 +687,7 @@ function runTests(){
       parallelGradientScale.set('margin',m);
       parallelGradientScale.set('completeSeriesConfig',completeSeriesConfig);
       parallelGradientScale.set('chartExtents',chartExtents);
+      parallelGradientScale.set('axes',dim);
       parallelGradientScale.set('dimensions',dim);
       parallelGradientScale.set('chartData',d);
 
@@ -696,7 +698,7 @@ function runTests(){
       setTimeout(function(){
         linePath = parallelGradientLine.lineGroup.selectAll('path.series-line');
         done();
-      },100);
+      },1000);;
     });
 
     test('parallelLine fixture is created', function() {
@@ -838,6 +840,7 @@ function runTests(){
       parallelCategoryScale.set('margin',m);
       parallelCategoryScale.set('completeSeriesConfig',completeSeriesConfig);
       parallelCategoryScale.set('chartExtents',chartExtents);
+      parallelCategoryScale.set('axes',dim);
       parallelCategoryScale.set('dimensions',dim);
       parallelCategoryScale.set('chartData',d);
 
@@ -850,7 +853,7 @@ function runTests(){
       setTimeout(function(){
         linePath = parallelCategoryLine.lineGroup.selectAll('path.series-line');
         done();
-      },100);
+      },1000);;
     });
 
     test('parallelLine fixture is created', function() {
@@ -984,6 +987,7 @@ function runTests(){
       parallelCategoryGradientScale.set('margin',m);
       parallelCategoryGradientScale.set('completeSeriesConfig',completeSeriesConfig);
       parallelCategoryGradientScale.set('chartExtents',chartExtents);
+      parallelCategoryGradientScale.set('axes',dim);
       parallelCategoryGradientScale.set('dimensions',dim);
       parallelCategoryGradientScale.set('chartData',d);
 
@@ -996,7 +1000,7 @@ function runTests(){
       setTimeout(function(){
         linePath = parallelCategoryGradientLine.lineGroup.selectAll('path.series-line');
         done();
-      },100);
+      },1000);
     });
 
     test('parallelLine fixture is created', function() {
@@ -1079,7 +1083,7 @@ function runTests(){
       setTimeout(function(){
         linePath = parallelCategoryGradientLine.lineGroup.selectAll('path.series-line');
         done();
-      },100);
+      },1000);
     });
 
     test('baseLine line series has the right color', function() {
@@ -1124,7 +1128,7 @@ function runTests(){
       setTimeout(function(){
         linePath = parallelCategoryGradientLine.lineGroup.selectAll('path.series-line');
         done();
-      },100);
+      },1000);;
     });
 
     test('baseLine line series has the right color', function() {
@@ -1214,6 +1218,7 @@ function runTests(){
       parallelCanvasScale.set('margin',m);
       parallelCanvasScale.set('completeSeriesConfig',completeSeriesConfig);
       parallelCanvasScale.set('chartExtents',chartExtents);
+      parallelCanvasScale.set('axes',dim);
       parallelCanvasScale.set('dimensions',dim);
       parallelCanvasScale.set('chartData',d);
 
@@ -1224,7 +1229,7 @@ function runTests(){
       setTimeout(function(){
         linePath1 = parallelCanvasLine.lineGroup;
         done();
-      },100);
+      },1000);;
     });
 
     test('parallelCanvasLine fixture is created', function() {
@@ -1311,6 +1316,7 @@ function runTests(){
       parallelGradientCanvasScale.set('margin',m);
       parallelGradientCanvasScale.set('completeSeriesConfig',completeSeriesConfig);
       parallelGradientCanvasScale.set('chartExtents',chartExtents);
+      parallelGradientCanvasScale.set('axes',dim);
       parallelGradientCanvasScale.set('dimensions',dim);
       parallelGradientCanvasScale.set('chartData',d);
 
@@ -1321,7 +1327,7 @@ function runTests(){
       setTimeout(function(){
         linePath1 = parallelGradientCanvasLine.lineGroup;
         done();
-      },100);
+      },1000);;
     });
 
     test('parallelCanvasLine fixture is created', function() {
@@ -1428,6 +1434,7 @@ function runTests(){
       parallelCategoryCanvasScale.set('margin',m);
       parallelCategoryCanvasScale.set('completeSeriesConfig',completeSeriesConfig);
       parallelCategoryCanvasScale.set('chartExtents',chartExtents);
+      parallelCategoryCanvasScale.set('axes',dim);
       parallelCategoryCanvasScale.set('dimensions',dim);
       parallelCategoryCanvasScale.set('chartData',d);
 
@@ -1440,7 +1447,7 @@ function runTests(){
       setTimeout(function(){
         linePath1 = parallelCategoryCanvasLine.lineGroup;
         done();
-      },100);
+      },1000);;
     });
 
     test('parallelCanvasLine fixture is created', function() {
@@ -1547,6 +1554,7 @@ function runTests(){
       parallelCategoryGradientCanvasScale.set('margin',m);
       parallelCategoryGradientCanvasScale.set('completeSeriesConfig',completeSeriesConfig);
       parallelCategoryGradientCanvasScale.set('chartExtents',chartExtents);
+      parallelCategoryGradientCanvasScale.set('axes',dim);
       parallelCategoryGradientCanvasScale.set('dimensions',dim);
       parallelCategoryGradientCanvasScale.set('chartData',d);
 
@@ -1559,7 +1567,7 @@ function runTests(){
       setTimeout(function(){
         linePath1 = parallelCategoryGradientCanvasLine.lineGroup;
         done();
-      },100);
+      },1000);
     });
 
     test('parallelCanvasLine fixture is created', function() {

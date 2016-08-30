@@ -225,7 +225,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               // checks to see if the axis already exists. If not, create; if so, update
               if(!this._axisGroup) {
                 //beats me: sometimes the axis doesnt get removed from the last axis, so make sure it goes away
-                if(this.svg.selectAll('g.axis').nodes().length > 0){
+                if(this.forceRefresh && this.svg.selectAll('g.axis').nodes().length > 0){
+                  console.log("Remove")
                   this.svg.selectAll('g.axis').each(function(d){
                     Px.d3.select(this).remove();
                   });
@@ -254,8 +255,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          *
          */
         _buildAxis: function(){
-          console.log(this.axis.domain())
-          
           var g = this.svg.append("g")
             .attr("class", "axis")
             .attr('axis-id',this.axisId)
@@ -268,6 +267,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
           this._setLineStyles(this._axisGroup,'line,path');
           this._setLabelStyles(this._axisGroup);
+
+         // this.drawSeriesBars();
         },
         /**
          * Updates the axis
@@ -417,7 +418,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
         if(!this._titleGroup) {
           //beats me: sometimes the axis doesnt get removed from the last axis, so make sure it goes away
-          if(this.svg.selectAll('g.title-group').nodes().length > 0){
+          if(this.forceRefresh && this.svg.selectAll('g.title-group').nodes().length > 0){
+            console.log("remove")
             this.svg.selectAll('g.title-group').each(function(d){
               Px.d3.select(this).remove();
             });
@@ -452,7 +454,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
                 .text(this.displayedTitle)
                 .attr('transform',"rotate(" + r + ")");
 
-              }
+            }
           }
 
           // console.log(this._titleGroup)
