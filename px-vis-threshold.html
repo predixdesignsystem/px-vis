@@ -184,10 +184,18 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
 
       } else {
         this.thresholdLine
+          .attr('x1', this.x(this.currentDomainX[0]))
+          .attr('x2', this.x(this.currentDomainX[1]))
           .attr('y1', function(d){ return this.y(d.value); }.bind(this))
           .attr('y2', function(d){ return this.y(d.value); }.bind(this));
-        this.thresholdRect.attr('y', this._calcYPos.bind(this));
-        this.thresholdText.attr('y', function(d,i){ return this._calcYPos(d,i,13); }.bind(this) );
+        this.thresholdRect.attr('x', this.x(this.currentDomainX[0]) + 5)
+                          .attr('y', this._calcYPos.bind(this));
+
+        this.thresholdText.attr('x', this.x(this.currentDomainX[0]) + 5 + 3)
+                          .attr('y', function(d,i) { 
+                              return this._calcYPos(d,i,13); 
+                            }.bind(this) );
+                          
       }
 
     },
