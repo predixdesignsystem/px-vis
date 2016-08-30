@@ -1,6 +1,7 @@
 v0.1.32
 ==================
 * multiaxis mouse listeners
+* update tests
 
 v0.1.31
 ==================
