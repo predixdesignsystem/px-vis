@@ -579,7 +579,17 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          */
         _processTooltip: function() {
           var isTruncated = this.title.length > 2 && this.title.length > this.truncationLength,
-              containsTooltip = this._axisGroup.node().contains(this.$.tooltip);
+              containsTooltip = false,
+              children = this._axisGroup.node().childNodes;
+
+          //can't use "contains" function on the node cause it's an SVG 
+          //element and IE doesn't support it
+          for(var i=0; i<children.length; i++) {
+            if(children === this.$.tooltip) {
+              containsTooltip = true;
+              break;
+            }
+          }
 
           if(!isTruncated && containsTooltip) {
             //not needed anymore, remove

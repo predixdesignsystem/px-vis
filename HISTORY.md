@@ -1,3 +1,7 @@
+v0.1.33
+==================
+* Fix 'contains' issue on IE for label tooltip
+
 v0.1.32
 ==================
 * multiaxis mouse listeners
