@@ -135,7 +135,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           'drawElement(domainChanged,svg,axis,margin)',
           'drawSeriesBars(completeSeriesConfig.*)',
           '_muteSeriesBars(mutedSeries.*)',
-          '_titleChanged(displayedTitle, _axisGroup, titleLocation)',
+          '_titleChanged(displayedTitle, _axisGroup, titleLocation.*)',
           '_truncateTitle(title, truncationLength, appendUnitInTitle, completeSeriesConfig)'
         ],
 
@@ -151,6 +151,15 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             // alert parents that we are done drawing the axis
             this.fire("px-axis-done");
           }
+        },
+
+        detached: function(){
+          // this.svg.selectAll('g').each(function(d){
+          //   Px.d3.select(this).remove();
+          // });
+          // // this.svg.remove();
+          // this._axisGroup.remove();
+          // this._axisGroup = null;
         },
 
         /**
@@ -210,7 +219,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         drawElement: function() {
         //  this.debounce('drawAxis', function() {
             if(this.svg.node() && this._doesObjHaveValues(this.currentDomain)){
-
               this.defineAxis();
               // TODO unify my orientation checks
               // TODO suport top and right
@@ -222,29 +230,13 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
                 this.translateAmt = [0,0];
               }
 
-              if(this.forceRefresh && this._axisGroup){
-                this._axisGroup.remove();
-                this._axisGroup = null;
-              }
-
               // checks to see if the axis already exists. If not, create; if so, update
               if(!this._axisGroup) {
-                //beats me: sometimes the axis doesnt get removed from the last axis, so make sure it goes away
                 this._buildAxis();
                 // alert parents that we are done drawing the axis
                 this.fire("px-axis-done");
               } else {
-                // if(this.forceRefresh){
-                //   this._axisGroup.remove();
-                //   this._axisGroup = null;
-                //
-                //   this.drawElement();
-                // } else {
-                  // if we have tickValues, we'll update another way
-                  if(!this.tickValues || this.tickValues.length === 0){
-                    this._updateAxis();
-                  }
-                // }
+                this._updateAxis();
               }
             }
           // }, 5);
@@ -262,19 +254,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .call(this._axis);
             // .each(function(d) { d3.select(this).call(_this._axis.scale(_this.axis[d])); })
 
-          if(this.forceRefresh && this.svg.selectAll('g.axis').nodes().length > 1){
-            this.svg.selectAll('g.axis').each(function(d){
-              Px.d3.select(this).remove();
-            });
-            this.drawElement();
-          }
-
           this.set('_axisGroup',g);
 
           this._setLineStyles(this._axisGroup,'line,path');
           this._setLabelStyles(this._axisGroup);
-
-         // this.drawSeriesBars();
         },
         /**
          * Updates the axis
@@ -423,13 +406,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           }
 
         if(!this._titleGroup) {
-          //beats me: sometimes the axis doesnt get removed from the last axis, so make sure it goes away
-          if(this.forceRefresh && this.svg.selectAll('g.title-group').nodes().length > 0){
-            this.svg.selectAll('g.title-group').each(function(d){
-              Px.d3.select(this).remove();
-            });
-          }
-
           this._titleGroup = this.svg.append("g")
             .attr('class','title-group')
             .attr('for', this.axisId)
@@ -446,11 +422,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .attr('transform',"rotate(" + r + ")");
 
           } else {
-            if(this.forceRefresh){
-              this._titleGroup.remove();
-              this._titleGroup = null;
-              this.drawTitle()
-            } else {
               this.svg.select('g.title-group[for=' + this.axisId + ']')
                 .attr('transform',"translate(" + x + ',' + y + ")");
               this.svg.select('g.title-group[for=' + this.axisId + '] text')
@@ -458,8 +429,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
                 .style("text-anchor", anchor)
                 .text(this.displayedTitle)
                 .attr('transform',"rotate(" + r + ")");
-
-            }
           }
 
           // console.log(this._titleGroup)
@@ -566,7 +535,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         },
         _titleChanged: function(displayedTitle) {
           this.debounce('drawTitle', function() {
+
             if(this._doesObjHaveValues(this._axisGroup) && this._axisGroup.node() !== null && this._axisGroup.node().ownerSVGElement !== null) {
+            // if(this._doesObjHaveValues(this._axisGroup) && this._axisGroup.node() !== null && this._axisGroup.node().ownerSVGElement !== null) {
               this.drawTitle();
             }
           }.bind(this), 5);
@@ -579,7 +550,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               containsTooltip = false,
               children = this._axisGroup.node().childNodes;
 
-          //can't use "contains" function on the node cause it's an SVG 
+          //can't use "contains" function on the node cause it's an SVG
           //element and IE doesn't support it
           for(var i=0; i<children.length; i++) {
             if(children === this.$.tooltip) {

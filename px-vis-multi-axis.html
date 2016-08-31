@@ -216,15 +216,29 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             this.cloneSVGElem(this.svg.node(),'axisSvg');
           }
 
-          var _this = this;
+          var _this = this,
+              resetTitles = false,
+              removed = this.axisSvg.selectAll(".dimension").data().filter(function(d){
+                if(_this.dimensions.indexOf(d) === -1){
+                  _this.$.axisBrush.clearBrush(d);
+                  delete _this.displayedValues[d];
+                  resetTitles = true;
+                  return true
+                }
+                return false
+              });
+
 
           // generate axis based on the dimensions
           var g = this.axisSvg.selectAll(".dimension")
-            .data(this.dimensions, function(d) { return d; });
+            .data(this.dimensions);
+            // .data(this.dimensions, function(d) { return d; });
 
           g.exit()
             .each(function(d){
               this.$.axisBrush.clearBrush(d);
+              delete this.displayedValues[d];
+              resetTitles = true;
             }.bind(this)).remove();
           g.enter()
             .append("g")
@@ -257,8 +271,16 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               return "translate(" + this.x(d) + ",0)";
             }.bind(this));
 
+            // if we removed titles from the array make sure we notify
+            if(resetTitles) {
+              var newValues = this.displayedValues;
+              this.displayedValues = {};
+              this.set('displayedValues', newValues);
+            }
+
           // TODO When we support muting an axes, might want to be able to access the above g and change the transform
           this.set('axisGroups', this.axisSvg.selectAll(".dimension"));
+
         }
       // },10)
     },

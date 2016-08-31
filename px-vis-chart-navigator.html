@@ -187,7 +187,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           /**
            * Can be set to override the time span shown by the navigator. Allows to use
            * the navigator without data.
-           * 
+           *
            * * Format ISO8601 strings
            * ```
            * {
@@ -195,7 +195,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
            *    "to" : "2013-02-04T22:44:30.652Z"
            * }
            * ```
-           * 
+           *
            */
           range: {
             type: Object,
@@ -208,9 +208,19 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
         attached: function() {
           this._onIronResize();
         },
-        _limitSeries: function(i){ 
+        _limitSeries: function(i){
           return i < this.navSeriesLimit;
         },
+        /**
+         * Forces the chart to resize and redraw
+         */
+        resizeChart: function() {
+          this._onIronResize();
+        },
+
+        /**
+         * Resizes the chart based on a container resize if prevent-resize is false (default)
+         */
         _onIronResize: function() {
           this.debounce('ironresize', function() {
             if(!this.preventResize) {
@@ -222,9 +232,9 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           },100);
         },
         _rangeChanged: function() {
-          
+
           var newXRange = [Px.moment(this.range.from),Px.moment(this.range.to)];
-              
+
           //if we don't have data create 'empty' datra with new range
           if(!this.chartData || this.chartData.length === 0) {
 
@@ -238,7 +248,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
                 }
               });
             }
-            
+
             this._updateDummyData(newXRange);
 
             this.set('chartExtents', {
@@ -248,17 +258,17 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           } else {
             var config = this.seriesConfig[Object.keys(this.seriesConfig)[0]];
             //if we're using dummy data make sure it reflects the new range
-            if(this.chartData.length === 2 && this.chartData[0][config.y] === 0 && 
+            if(this.chartData.length === 2 && this.chartData[0][config.y] === 0 &&
               this.chartData[1][config.y] === 0) {
               this._updateDummyData(newXRange);
             }
-            
+
             //set range in the data
             this.set('chartExtents', {
               "x":newXRange,
               "y":[this.chartExtents.y[0],this.chartExtents.y[1]]});
 
-            var newDomain = {x: [newXRange[0].valueOf(), newXRange[1].valueOf()], 
+            var newDomain = {x: [newXRange[0].valueOf(), newXRange[1].valueOf()],
                             y: this.selectedDomain.y};
             this.set('selectedDomain', newDomain);
           }
