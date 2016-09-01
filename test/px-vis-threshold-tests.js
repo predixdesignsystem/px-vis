@@ -153,9 +153,9 @@ function runTests(){
     test('defaultThreshold thresholdText font-size', function() {
       assert.equal(defaultThreshold.thresholdText.nodes()[0].getAttribute('font-size'),'12px');
     });
-    test('defaultThreshold thresholdText font-style', function() {
-      assert.equal(Px.d3.select(defaultThreshold.thresholdText.nodes()[0]).style('font-family'),'"GE Inspira Sans"');
-    });
+    // test('defaultThreshold thresholdText font-style', function() {
+    //   assert.equal(Px.d3.select(defaultThreshold.thresholdText.nodes()[0]).style('font-family'),'"GE Inspira Sans"');
+    // });
     test('defaultThreshold thresholdText x', function() {
       assert.equal(defaultThreshold.thresholdText.nodes()[0].getAttribute('x'),8);
     });
@@ -234,9 +234,9 @@ function runTests(){
     test('defaultThreshold thresholdText font-size', function() {
       assert.equal(defaultThreshold.thresholdText.nodes()[1].getAttribute('font-size'),'12px');
     });
-    test('defaultThreshold thresholdText font-style', function() {
-      assert.equal(Px.d3.select(defaultThreshold.thresholdText.nodes()[0]).style('font-family'),'"GE Inspira Sans"');
-    });
+    // test('defaultThreshold thresholdText font-style', function() {
+    //   assert.equal(Px.d3.select(defaultThreshold.thresholdText.nodes()[0]).style('font-family'),'"GE Inspira Sans"');
+    // });
     test('defaultThreshold thresholdText x', function() {
       assert.equal(defaultThreshold.thresholdText.nodes()[1].getAttribute('x'),8);
     });

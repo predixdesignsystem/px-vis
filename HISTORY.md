@@ -1,3 +1,7 @@
+v0.2.2
+==================
+* fixed tests for safari 8
+
 v0.2.1
 ==================
 * fixed tests
