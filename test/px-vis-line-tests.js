@@ -566,8 +566,8 @@ function runTests(){
       parallelScale.set('margin',m);
       parallelScale.set('completeSeriesConfig',completeSeriesConfig);
       parallelScale.set('chartExtents',chartExtents);
-      parallelScale.set('axes',dim);
       parallelScale.set('dimensions',dim);
+      parallelScale.set('axes',dim);
       parallelScale.set('chartData',d);
 
       parallelLine.set('completeSeriesConfig',completeSeriesConfig);
@@ -687,8 +687,8 @@ function runTests(){
       parallelGradientScale.set('margin',m);
       parallelGradientScale.set('completeSeriesConfig',completeSeriesConfig);
       parallelGradientScale.set('chartExtents',chartExtents);
-      parallelGradientScale.set('axes',dim);
       parallelGradientScale.set('dimensions',dim);
+      parallelGradientScale.set('axes',dim);
       parallelGradientScale.set('chartData',d);
 
       parallelGradientLine.set('completeSeriesConfig',completeSeriesConfig);
@@ -840,8 +840,8 @@ function runTests(){
       parallelCategoryScale.set('margin',m);
       parallelCategoryScale.set('completeSeriesConfig',completeSeriesConfig);
       parallelCategoryScale.set('chartExtents',chartExtents);
-      parallelCategoryScale.set('axes',dim);
       parallelCategoryScale.set('dimensions',dim);
+      parallelCategoryScale.set('axes',dim);
       parallelCategoryScale.set('chartData',d);
 
       parallelCategoryLine.set('completeSeriesConfig',completeSeriesConfig);
@@ -987,8 +987,8 @@ function runTests(){
       parallelCategoryGradientScale.set('margin',m);
       parallelCategoryGradientScale.set('completeSeriesConfig',completeSeriesConfig);
       parallelCategoryGradientScale.set('chartExtents',chartExtents);
-      parallelCategoryGradientScale.set('axes',dim);
       parallelCategoryGradientScale.set('dimensions',dim);
+      parallelCategoryGradientScale.set('axes',dim);
       parallelCategoryGradientScale.set('chartData',d);
 
       parallelCategoryGradientLine.set('completeSeriesConfig',completeSeriesConfig);
@@ -1218,8 +1218,8 @@ function runTests(){
       parallelCanvasScale.set('margin',m);
       parallelCanvasScale.set('completeSeriesConfig',completeSeriesConfig);
       parallelCanvasScale.set('chartExtents',chartExtents);
-      parallelCanvasScale.set('axes',dim);
       parallelCanvasScale.set('dimensions',dim);
+      parallelCanvasScale.set('axes',dim);
       parallelCanvasScale.set('chartData',d);
 
       parallelCanvasLine.set('completeSeriesConfig',completeSeriesConfig);
@@ -1316,8 +1316,8 @@ function runTests(){
       parallelGradientCanvasScale.set('margin',m);
       parallelGradientCanvasScale.set('completeSeriesConfig',completeSeriesConfig);
       parallelGradientCanvasScale.set('chartExtents',chartExtents);
-      parallelGradientCanvasScale.set('axes',dim);
       parallelGradientCanvasScale.set('dimensions',dim);
+      parallelGradientCanvasScale.set('axes',dim);
       parallelGradientCanvasScale.set('chartData',d);
 
       parallelGradientCanvasLine.set('completeSeriesConfig',completeSeriesConfig);
@@ -1434,8 +1434,8 @@ function runTests(){
       parallelCategoryCanvasScale.set('margin',m);
       parallelCategoryCanvasScale.set('completeSeriesConfig',completeSeriesConfig);
       parallelCategoryCanvasScale.set('chartExtents',chartExtents);
-      parallelCategoryCanvasScale.set('axes',dim);
       parallelCategoryCanvasScale.set('dimensions',dim);
+      parallelCategoryCanvasScale.set('axes',dim);
       parallelCategoryCanvasScale.set('chartData',d);
 
       parallelCategoryCanvasLine.set('completeSeriesConfig',completeSeriesConfig);
@@ -1554,8 +1554,8 @@ function runTests(){
       parallelCategoryGradientCanvasScale.set('margin',m);
       parallelCategoryGradientCanvasScale.set('completeSeriesConfig',completeSeriesConfig);
       parallelCategoryGradientCanvasScale.set('chartExtents',chartExtents);
-      parallelCategoryGradientCanvasScale.set('axes',dim);
       parallelCategoryGradientCanvasScale.set('dimensions',dim);
+      parallelCategoryGradientCanvasScale.set('axes',dim);
       parallelCategoryGradientCanvasScale.set('chartData',d);
 
       parallelCategoryGradientCanvasLine.set('completeSeriesConfig',completeSeriesConfig);

@@ -65,8 +65,7 @@ function runTests(){
 
       baseYGrid.set('margin',m);
       baseYGrid.set('length',w);
-      // setTimeout(function(){done()},5000);
-      done();
+      setTimeout(function(){ done() },100);
     });
 
     test('baseXGrid fixture is created', function() {

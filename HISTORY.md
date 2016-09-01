@@ -1,3 +1,7 @@
+v0.2.1
+==================
+* fixed tests
+
 v0.2.0
 ==================
 * Large refactor to deal with many timing issues and other bug fixes
