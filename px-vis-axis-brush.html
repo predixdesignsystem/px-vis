@@ -45,6 +45,7 @@ This element draw the box over the axis signifying the active area to mute the s
       PxVisBehavior.dimensions,
       PxVisBehavior.dataset,
       PxVisBehavior.mutedSeries,
+      PxVisBehaviorD3.selectedDomain,
       commonColors
     ],
 
@@ -73,8 +74,8 @@ This element draw the box over the axis signifying the active area to mute the s
     },
 
     observers: [
-      'drawElement(svg)'
-      // 'drawElement(svg, axis, height, margin)'
+      'drawElement(svg)',
+      'domainChanged(selectedDomain)'
     ],
     /**
      * Creates the brushes
@@ -240,6 +241,12 @@ This element draw the box over the axis signifying the active area to mute the s
           Px.d3.select(this).call(_this._brush.move, null);
         }
       });
+    },
+
+    domainChanged: function(){
+      if(this._brushes){
+        this.brushEnd();
+      }
     }
   });
 </script>
