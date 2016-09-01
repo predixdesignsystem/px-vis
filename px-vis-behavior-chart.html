@@ -85,7 +85,7 @@ PxVisBehaviorChart.chartCommon = [{
     observers: [
       '_setCompleteSeriesConfig(defaultSeriesConfig.*,chartData.*,seriesConfig.*)'
     ],
-    
+
     _calcChartExts: function(mins,maxes,axis){
       if(this[axis + 'AxisType'] === 'ordinal'){
         // how should someone set the ordinal list? Differet key in seriesConfig?
@@ -272,7 +272,7 @@ PxVisBehaviorChart.chartCommon = [{
     PxVisBehaviorChart.saveImage
 
     Description:
-    Polymer behavior that allows the chart to return an image of itself based on 
+    Polymer behavior that allows the chart to return an image of itself based on
     its canvas and/or SVG
 
     @polymerBehavior PxVisBehaviorChart.saveImage
@@ -282,16 +282,16 @@ PxVisBehaviorChart.saveImage = {
      * Takes a graphic "snapshot" of the component and pass results through a callback:
      * - a canvas containing the graphical snapshot
      * - a png base 64 data uri
-     * 
+     *
      * callback object:
      * {
      *  canvas: theCanvasObject
      *  image: "data:image/png;base64;iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACN..."
      * }
-     * 
-     * the data uri can be used to save the image and the canvas object to do 
+     *
+     * the data uri can be used to save the image and the canvas object to do
      * further processing, such as combining different elements snapshot into one image
-     * 
+     *
      */
     getImage: function(callback) {
       //create a new canvas to render both the canvas and svg elements on it
@@ -341,8 +341,9 @@ PxVisBehaviorChart.precipitationPattern = {
     'px-vis-clip-path-updated'        : '_updateLocalProperty',
     'px-vis-series-clip-path-updated' : '_updateLocalProperty',
     'px-vis-svg-element-updated'      : '_updateLocalProperty',
-    'px-vis-canvas-context-updated'   : '_updateGlobalProperty',
+    'px-vis-domain-changed-updated'   : '_updateLocalProperty',
 
+    'px-vis-canvas-context-updated'   : '_updateGlobalProperty',
     'px-vis-muted-series-updated'     : '_updateGlobalProperty',
     'px-vis-selected-domain-updated'  : '_updateGlobalProperty'
 
@@ -433,5 +434,42 @@ PxVisBehaviorChart.chartAutoResize = {
         value: false
       }
     }
+};
+
+/**
+    Name:
+    PxVisBehaviorChart.subConfiguration
+
+    Description:
+    Polymer behavior that provides subConfiguration for elements such as axes, register, etc.
+
+    Dependencies:
+
+    @polymerBehavior PxVisBehaviorChart.subConfiguration
+*/
+PxVisBehaviorChart.subConfiguration = {
+    properties: {
+    },
+    /**
+     * Applies the config object to the element. Each key in the config object
+     * is the name of the property to be applied
+     *
+     */
+    _applyConfigToElement: function(config, element) {
+      if(typeof(config) !== 'object') {
+        console.error('Configuration object must be valid JSON: ' + config);
+        return;
+      }
+      if(!element) {
+        console.error('Cannot apply config to undefined element');
+        return;
+      }
+
+      var keys = Object.keys(config);
+      for(var i = 0; i < keys.length; i++){
+        var key = keys[i];
+        element.set(key, config[key])
+      }
+    },
 };
 </script>

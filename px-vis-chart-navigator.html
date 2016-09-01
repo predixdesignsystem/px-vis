@@ -92,6 +92,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           height="[[height]]"
           margin="[[margin]]"
           orientation="bottom"
+          domain-changed="[[domainChanged]]"
           current-domain="[[currentDomainX]]">
         </px-vis-axis>
         <px-vis-brush
@@ -130,7 +131,8 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           PxVisBehaviorChart.precipitationPattern,
           Polymer.IronResizableBehavior,
           PxVisBehaviorChart.saveImage,
-          PxVisBehaviorChart.chartAutoResize
+          PxVisBehaviorChart.chartAutoResize,
+          PxVisBehaviorD3.domainUpdate
         ],
 
         /**
@@ -200,7 +202,15 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           range: {
             type: Object,
             observer: '_rangeChanged'
-          }
+          },
+          /**
+           * Boolean specifying if the navigator should be allowed to render empty or not
+           *
+           */
+          disableEmptyRender: {
+            type: Boolean,
+            value: false
+          },
         },
         listeners: {
           'iron-resize': '_onIronResize'
@@ -232,11 +242,11 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           },100);
         },
         _rangeChanged: function() {
-
           var newXRange = [Px.moment(this.range.from),Px.moment(this.range.to)];
 
           //if we don't have data create 'empty' datra with new range
-          if(!this.chartData || this.chartData.length === 0) {
+          if(!this.disableEmptyRender && (!this.chartData || this.chartData.length === 0)) {
+            console.log("if")
 
             if(!this.seriesConfig || !this._doesObjHaveValues(this.seriesConfig)) {
               this.set('seriesConfig', {
@@ -255,21 +265,26 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
               "x":newXRange,
               "y":[Infinity,-Infinity]});
 
-          } else {
-            var config = this.seriesConfig[Object.keys(this.seriesConfig)[0]];
-            //if we're using dummy data make sure it reflects the new range
-            if(this.chartData.length === 2 && this.chartData[0][config.y] === 0 &&
-              this.chartData[1][config.y] === 0) {
-              this._updateDummyData(newXRange);
+          } else if(this._doesObjHaveValues(this.chartExtents) && this._doesObjHaveValues(this.chartExtents.x) && this._doesObjHaveValues(this.chartExtents.x)){
+            if(!this.disableEmptyRender){
+              var config = this.seriesConfig[Object.keys(this.seriesConfig)[0]];
+              //if we're using dummy data make sure it reflects the new range
+              if(this.chartData.length === 2 && this.chartData[0][config.y] === 0 &&
+                this.chartData[1][config.y] === 0) {
+                this._updateDummyData(newXRange);
+              }
             }
 
             //set range in the data
             this.set('chartExtents', {
-              "x":newXRange,
-              "y":[this.chartExtents.y[0],this.chartExtents.y[1]]});
+              "x": newXRange,
+              "y": [this.chartExtents.y[0],this.chartExtents.y[1]]
+            });
 
-            var newDomain = {x: [newXRange[0].valueOf(), newXRange[1].valueOf()],
-                            y: this.selectedDomain.y};
+            var newDomain = {
+              'x': [newXRange[0].valueOf(), newXRange[1].valueOf()],
+              'y': this.selectedDomain.y
+            };
             this.set('selectedDomain', newDomain);
           }
         },

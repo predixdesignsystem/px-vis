@@ -109,12 +109,12 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             value: false
           },
           /**
-           * A boolean specifying if the axis should be completely redrawn every time
+           * A boolean specifying if the axis title has been drawn
            *
            */
-          forceRefresh: {
+          titleDrawn: {
             type: Boolean,
-            value: false
+            value: null
           },
           /**
            * The series ID this axis refers to, used to look in the config
@@ -128,12 +128,20 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           _currentUnits: {
             type: String,
             computed: '_computeUnits(appendUnitInTitle, completeSeriesConfig, title)'
+          },
+          /**
+           * A boolean specifying if the axis title should truncate if too long
+           *
+           */
+          titleTruncation: {
+            type: Boolean,
+            value: false
           }
         },
 
         observers: [
-          'drawElement(domainChanged,svg,axis,margin)',
-          'drawSeriesBars(completeSeriesConfig.*)',
+          'drawElement(domainChanged,svg,axis,margin,height)',
+          'drawSeriesBars(completeSeriesConfig.*, titleDrawn)',
           '_muteSeriesBars(mutedSeries.*)',
           '_titleChanged(displayedTitle, _axisGroup, titleLocation.*)',
           '_truncateTitle(title, truncationLength, appendUnitInTitle, completeSeriesConfig)'
@@ -218,7 +226,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          */
         drawElement: function() {
         //  this.debounce('drawAxis', function() {
-            if(this.svg.node() && this._doesObjHaveValues(this.currentDomain)){
+            if(this.svg.node() && this.domainChanged !== null){
               this.defineAxis();
               // TODO unify my orientation checks
               // TODO suport top and right
@@ -456,7 +464,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           //   .attr('transform',"rotate(" + r + ")");
 
           this._processTooltip();
-          this.drawSeriesBars();
+          this.set('titleDrawn', (this.titleDrawn === null) ? true : !this.titleDrawn);
         },
         /**
          * Draws the color bars for each series
@@ -464,7 +472,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * @method drawSeriesBars
          */
         drawSeriesBars:function() {
-          if(!this.preventSeriesBar && this._doesObjHaveValues(this.completeSeriesConfig) && this._axisGroup) {
+          if(!this.preventSeriesBar && this._doesObjHaveValues(this.completeSeriesConfig) && this._axisGroup && this.displayedTitle) {
+
             // FIXME do we need to move the title group based on how many series we have
             var keys = Object.keys(this.completeSeriesConfig),
                 kLen = keys.length,
@@ -519,18 +528,19 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * truncates the title label appropriately
          */
         _truncateTitle: function(title, truncationLength, appendUnitInTitle) {
-
           this.debounce('_truncateTitle', function() {
 
-            var oldTitle = this.displayedTitle,
-                newTitle;
-
-            newTitle = this._truncateName(title, truncationLength) + this._currentUnits;
-
-            if(newTitle !== oldTitle) {
-              this.fire('px-vis-axis-displayed-title-changed', {displayedTitle: newTitle, title: this.title, id: this.seriesId});
-              this.set('displayedTitle', newTitle);
-            }
+              var oldTitle = this.displayedTitle,
+                  newTitle;
+              if(this.titleTruncation){
+                newTitle = this._truncateName(title, truncationLength) + this._currentUnits;
+              } else {
+                newTitle = title;
+              }
+              if(newTitle !== oldTitle) {
+                this.fire('px-vis-axis-displayed-title-changed', {displayedTitle: newTitle, title: this.title, id: this.seriesId});
+                this.set('displayedTitle', newTitle);
+              }
            }, 5);
         },
         _titleChanged: function(displayedTitle) {

@@ -1,3 +1,7 @@
+v0.2.0
+==================
+* Large refactor to deal with many timing issues and other bug fixes
+
 v0.1.33
 ==================
 * Fix 'contains' issue on IE for label tooltip
