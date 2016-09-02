@@ -1,3 +1,7 @@
+v0.2.4
+==================
+* fixed title rotation when id has a .
+
 v0.2.3
 ==================
 * added axis brush update on domainchange
