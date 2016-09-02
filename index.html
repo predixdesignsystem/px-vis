@@ -1,13 +1,344 @@
 <!doctype html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>px-vis API</title>
-        <script src="../webcomponentsjs/webcomponents-lite.min.js"></script>
-        <link rel="import" href="../iron-component-page/iron-component-page.html"/>
-    </head>
-    <body>
-        <iron-component-page src="px-vis.html" active="px-vis"></iron-component-page>
-    </body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>px-vis</title>
+  <link rel="stylesheet" type="text/css" href="css/px-vis-demo.css"/>
+  <!-- Import custom element. Note: see comment about relative paths to dependencies in the *.html file referenced below -->
+  <script src="../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../px-theme/px-theme.html"/>
+  <link rel="icon" href="favicon.ico" type="image/x-icon"/>
+  <link rel="import" href="../px-demo-snippet/px-demo-snippet.html"/>
+  <link rel="import" href="../px-polymer-font-awesome/polymer-font-awesome.html" />
+  <link rel="import" href="../px-datetime-common/px-datetime-imports.html">
+
+  <link rel="import" href="px-vis-axis.html">
+  <link rel="import" href="px-vis-brush.html">
+  <link rel="import" href="px-vis-chart-navigator.html">
+  <link rel="import" href="px-vis-cursor.html">
+  <link rel="import" href="px-vis-data.html">
+  <link rel="import" href="px-vis-event.html">
+  <link rel="import" href="px-vis-gridlines.html">
+  <link rel="import" href="px-vis-interaction-space.html">
+  <link rel="import" href="px-vis-line.html">
+  <link rel="import" href="px-vis-register.html">
+  <link rel="import" href="px-vis-scale.html">
+  <link rel="import" href="px-vis-scatter.html">
+  <link rel="import" href="px-vis-svg.html">
+  <link rel="import" href="px-vis-threshold.html">
+  <link rel="import" href="px-vis-tooltip.html">
+  <link rel="import" href="px-vis-zoom.html">
+  </head>
+  <style>
+    .grabContent {
+      margin-right: 10px;
+    }
+    .outline svg{
+      border:1px dotted #cccccc;
+    }
+    .demo__discription{
+      /*width: 300px;*/
+    }
+    .demo__title{
+      color: #525156;
+    }
+  </style>
+<body>
+
+  <!-- Wrap elements with auto-binding template to -->
+  <!-- allow use of Polymer bindings in main document -->
+  <template id="demo" is="dom-bind">
+
+    <!-- discription -->
+    <div class="hero u-p++ text--shadow">
+      <a class="actionable flex flex--right flex--middle" href="https://github.com/PredixDev/px-vis" target="_blank"><iron-icon class="menu__open" icon="fa:fa-github"></iron-icon>View on Github</a>
+  		<h1 class="delta">px-vis</h1>
+      <div class="description-text">
+    		<p>
+          discription text
+        </p>
+      </div>
+  		<div class="flex">
+  			<img class="u-mr--" src="https://img.shields.io/travis/PredixDev/px-vis.svg?style=flat-square" alt="Travis"/>
+  			<img class="u-mr--" src="https://img.shields.io/bower/v/px-vis.svg?style=flat-square" alt="Bower"/>
+  			<img class="u-mr--" src="https://img.shields.io/github/issues-raw/PredixDev/px-vis.svg?style=flat-square" alt="Issues"/>
+  		</div>
+  	</div>
+
+    <!-- mega demo -->
+    <div class="mega-demo u-p++">
+
+      <!-- scale -->
+      <p class="epsilon demo__title">px-vis-svg</p>
+      <div class="demo u-p+ flex">
+        <div>
+          <template id='svg' is="dom-bind">
+            <px-vis-svg
+              class="outline"
+              width="[[basic.width]]"
+              height="[[basic.height]]"
+              margin="[[basic.margin]]"
+              svg="{{svg}}">
+            </px-vis-svg>
+            <px-vis-scale
+              x-axis-type="time"
+              y-axis-type="linear"
+              complete-series-config="[[basic.seriesConfig]]"
+              chart-extents="[[chartExtents]]"
+              width="[[basic.width]]"
+              height="[[basic.height]]"
+              margin="[[basic.margin]]"
+              chart-data={{basic.chartData}}
+              x="{{x}}"
+              y="{{y}}"
+              current-domain-x="{{currentDomainX}}"
+              current-domain-y="{{currentDomainY}}"
+              selected-domain="[[selectedDomain]]">
+            </px-vis-scale>
+          </template>
+        </div>
+        <div class="demo__discription u-pl+">
+          <p class="u-mt0">All charts need a drawing space SVG component. These cannot be seen but provide the basic framework for drawing objects to be displayed.</p>
+          <p>The svg component provides the drawing space and d3 instantiated drawing object.</p>
+          <p>The svg component returns an 'svg' variable to be passed into drawing components.</p>
+          <p style="oblique">Note: All the subsequent charts will have this component, but they will not be shown in the code snippet.</p>
+        </div>
+      </div>
+      <div>
+        <px-demo-snippet
+          element-properties="[[elempropScale]]"
+          element-name="px-vis-scale">
+        </px-demo-snippet>
+      </div>
+
+      <!-- scale -->
+      <p class="epsilon demo__title">px-vis-scale</p>
+      <div class="demo u-p+ flex">
+        <div>
+          <template id='scale' is="dom-bind">
+            <px-vis-svg
+              class="outline"
+              width="[[basic.width]]"
+              height="[[basic.height]]"
+              margin="[[basic.margin]]"
+              svg="{{svg}}">
+            </px-vis-svg>
+            <px-vis-scale
+              x-axis-type="time"
+              y-axis-type="linear"
+              complete-series-config="[[basic.seriesConfig]]"
+              chart-extents="[[chartExtents]]"
+              width="[[basic.width]]"
+              height="[[basic.height]]"
+              margin="[[basic.margin]]"
+              chart-data={{basic.chartData}}
+              x="{{x}}"
+              y="{{y}}"
+              current-domain-x="{{currentDomainX}}"
+              current-domain-y="{{currentDomainY}}"
+              selected-domain="[[selectedDomain]]">
+            </px-vis-scale>
+          </template>
+        </div>
+        <div class="demo__discription u-pl+">
+          <p class="u-mt0">All charts need an interpretor component. These cannot be seen but provide the basic framework for drawing objects to be displayed.</p>
+          <p>Interpretor components convert data into drawing space coordinates.</p>
+          <p>The scale component creates 'x' & 'y' and 'currentDomainX' & 'currentDomainY' variables which can be passed into drawing components.</p>
+          <p style="oblique">Note: All the subsequent charts will have this component, but they will not be shown in the code snippet.</p>
+        </div>
+      </div>
+      <div>
+        <px-demo-snippet
+          element-properties="[[elempropScale]]"
+          element-name="px-vis-scale">
+        </px-demo-snippet>
+      </div>
+
+      <!-- Line -->
+      <p class="epsilon demo__title">px-vis-line</p>
+      <div class="demo u-p+ flex">
+        <div>
+          <template id='line' is="dom-bind">
+            <px-vis-svg
+              class="outline"
+              width="[[basic.width]]"
+              height="[[basic.height]]"
+              margin="[[basic.margin]]"
+              svg="{{svg}}">
+            </px-vis-svg>
+            <px-vis-scale
+              x-axis-type="time"
+              y-axis-type="linear"
+              complete-series-config="[[basic.seriesConfig]]"
+              chart-extents="[[chartExtents]]"
+              width="[[basic.width]]"
+              height="[[basic.height]]"
+              margin="[[basic.margin]]"
+              chart-data={{basic.chartData}}
+              x="{{x}}"
+              y="{{y}}"
+              current-domain-x="{{currentDomainX}}"
+              current-domain-y="{{currentDomainY}}"
+              selected-domain="[[selectedDomain]]">
+            </px-vis-scale>
+            <px-vis-line
+              svg="[[svg]]"
+              series-id="mySeries"
+              complete-series-config="[[basic.seriesConfig]]"
+              chart-data="[[basic.chartData]]"
+              x="[[x]]"
+              y="[[y]]"
+              current-domain-x="[[currentDomainX]]"
+              current-domain-y="[[currentDomainY]]">
+            </px-vis-line>
+          </template>
+        </div>
+        <div class="demo__discription u-pl+">
+          <p class="u-mt0">Example of a line drawing object. Bound elements are set from other components, such as px-vis-svg and px-vis-scale, and passed into px-vis-line.</p>
+        </div>
+      </div>
+      <div>
+        <px-demo-snippet
+          element-properties="[[elempropLine]]"
+          element-name="px-vis-line">
+        </px-demo-snippet>
+      </div>
+
+
+    </div>
+    <footer class="footer flex flex--center">
+      <div class="footer__container u-pv++">
+        <div>
+          <a href="https://ge.com/digital" >
+            <img src="monogram-wdmk.png" alt="GE Monogram" class="footer__img">
+          </a>
+        </div>
+        <div class="footer__list">
+          <ul class="list-inline list-inline--delimited">
+            <li>
+              <a href="http://predix.io/legal" class="footer__list--lnk">Legal</a>
+            </li>
+            <li>
+              <a href="mailto:info@predix.io" class="footer__list--lnk">Contact Us</a>
+            </li>
+            <li>Copyright &copy; 2016 General Electric Company. All rights reserved.</li>
+          </ul>
+        </div>
+      </div>
+    </footer>
+  </template>
+  <script>
+    window.addEventListener('WebComponentsReady', function() {
+          basic = {
+            width : 300,
+            height : 200,
+            margin : {
+              "top": 5,
+              "right": 5,
+              "bottom": 5,
+              "left": 5
+            },
+            marginCode : '{ \
+              "top": 5,\
+              "right": 5,\
+              "bottom": 5,\
+              "left": 5\
+            }',
+            chartData : [{
+                'x': 1397102460000,
+                'y': 0.56
+              },{
+                'x': 1397139660000,
+                'y': 0.4
+              },{
+                'x': 1397177400000,
+                'y': 0.43
+              },{
+                'x': 1397228040000,
+                'y': 0.33
+              },{
+                'x': 1397248260000,
+                'y': 0.47
+              },{
+                'x': 1397291280000,
+                'y': 0.41
+              },{
+                'x': 1397318100000,
+                'y': 0.26
+              },{
+                'x': 1397342100000,
+                'y': 0.42
+              },{
+                'x': 1397390820000,
+                'y': 0.27
+              },{
+                'x': 1397408100000,
+                'y': 0.38
+              },{
+                'x': 1397458800000,
+                'y': 0.36
+              },{
+                'x': 1397522940000,
+                'y': 0.32
+            }],
+            chartDataCode : '[ {...} , {...} ]',
+            seriesConfig: {
+              'mySeries': {
+                "name":"My-Series",
+                "type": "line",
+                "x": 'x',
+                "y": 'y',
+                'color': 'rgb(93,165,218)'
+              }
+            }
+          },
+          chartExtents = {
+            "x": [Infinity,-Infinity],
+            "y": [0,-Infinity]
+          };
+
+      var templateSvg = document.querySelector('#svg');
+          templateSvg.basic = basic;
+          templateSvg.chartExtents = chartExtents;
+      var templateScale = document.querySelector('#scale');
+          templateScale.basic = basic;
+          templateScale.chartExtents = chartExtents;
+      var templateLine = document.querySelector('#line');
+          templateLine.basic = basic;
+          templateLine.chartExtents = chartExtents;
+
+
+      var templateDemo = document.querySelector('#demo'),
+          elempropScale = {
+            "xAxisType":"time",
+            "yAxisType":"linear",
+            "completeSeriesConfig":"[[basic.seriesConfig]]",
+            "chartExtents":"[[chartExtents]]",
+            "width":"[[basic.width]]",
+            "height":"[[basic.height]]",
+            "margin":"[[basic.margin]]",
+            "chartData":"{{basic.chartData}}",
+            "x":"{{x}}",
+            "y":"{{y}}",
+            "currentDomainX":"{{currentDomainX}}",
+            "currentDomainY":"{{currentDomainY}}",
+            "selectedDomain":"[[selectedDomain]]"
+          },
+          elempropLine = {
+            "svg":"[[svg]]",
+            "seriesId":"mySeries",
+            "completeSeriesConfig":"[[basic.seriesConfig]]",
+            "chartData":"[[basic.chartData]]",
+            "x":"[[x]]",
+            "y":"[[y]]",
+            "currentDomainX":"[[currentDomainX]]",
+            "currentDomainY":"[[currentDomainY]]"
+          };
+          templateDemo.elempropScale = elempropScale;
+          templateDemo.elempropLine = elempropLine;
+
+      });
+  </script>
+</body>
 </html>
