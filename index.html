@@ -99,7 +99,7 @@
           </template>
         </div>
         <div class="demo__discription u-pl+">
-          <p class="u-mt0">All charts need a drawing space SVG component. These cannot be seen but provide the basic framework for drawing objects to be displayed.</p>
+          <p class="u-mt0"><strong>All charts need a drawing space SVG component.</strong> These cannot be seen but provide the basic framework for drawing objects to be displayed.</p>
           <p>The svg component provides the drawing space and d3 instantiated drawing object.</p>
           <p>The svg component returns an 'svg' variable to be passed into drawing components.</p>
           <p style="oblique">Note: All the subsequent charts will have this component, but they will not be shown in the code snippet.</p>
@@ -107,10 +107,11 @@
       </div>
       <div>
         <px-demo-snippet
-          element-properties="[[elempropScale]]"
-          element-name="px-vis-scale">
+          element-properties="[[elempropSvg]]"
+          element-name="px-vis-svg">
         </px-demo-snippet>
       </div>
+      </br>
 
       <!-- scale -->
       <p class="epsilon demo__title">px-vis-scale</p>
@@ -142,7 +143,7 @@
           </template>
         </div>
         <div class="demo__discription u-pl+">
-          <p class="u-mt0">All charts need an interpretor component. These cannot be seen but provide the basic framework for drawing objects to be displayed.</p>
+          <p class="u-mt0"><strong>All charts need an interpretor component.</strong> These cannot be seen but provide the basic framework for drawing objects to be displayed.</p>
           <p>Interpretor components convert data into drawing space coordinates.</p>
           <p>The scale component creates 'x' & 'y' and 'currentDomainX' & 'currentDomainY' variables which can be passed into drawing components.</p>
           <p style="oblique">Note: All the subsequent charts will have this component, but they will not be shown in the code snippet.</p>
@@ -154,6 +155,7 @@
           element-name="px-vis-scale">
         </px-demo-snippet>
       </div>
+      </br>
 
       <!-- Line -->
       <p class="epsilon demo__title">px-vis-line</p>
@@ -204,7 +206,114 @@
           element-name="px-vis-line">
         </px-demo-snippet>
       </div>
+      </br>
 
+      <!-- Scatter -->
+      <p class="epsilon demo__title">px-vis-scatter</p>
+      <div class="demo u-p+ flex">
+        <div>
+          <template id='scatter' is="dom-bind">
+            <px-vis-svg
+              class="outline"
+              width="[[basic.width]]"
+              height="[[basic.height]]"
+              margin="[[basic.margin]]"
+              svg="{{svg}}">
+            </px-vis-svg>
+            <px-vis-scale
+              x-axis-type="time"
+              y-axis-type="linear"
+              complete-series-config="[[basic.seriesConfig]]"
+              chart-extents="[[chartExtents]]"
+              width="[[basic.width]]"
+              height="[[basic.height]]"
+              margin="[[basic.margin]]"
+              chart-data={{basic.chartData}}
+              x="{{x}}"
+              y="{{y}}"
+              current-domain-x="{{currentDomainX}}"
+              current-domain-y="{{currentDomainY}}"
+              selected-domain="[[selectedDomain]]">
+            </px-vis-scale>
+            <px-vis-scatter
+              svg="[[svg]]"
+              series-id="mySeries"
+              complete-series-config="[[basic.seriesConfig]]"
+              chart-data="[[basic.chartData]]"
+              x="[[x]]"
+              y="[[y]]"
+              current-domain-x="[[currentDomainX]]"
+              current-domain-y="[[currentDomainY]]">
+            </px-vis-scatter>
+          </template>
+        </div>
+        <div class="demo__discription u-pl+">
+          <p class="u-mt0">Example of a scatter drawing object. Very similar configuration to px-vis-line.</p>
+        </div>
+      </div>
+      <div>
+        <px-demo-snippet
+          element-properties="[[elempropScatter]]"
+          element-name="px-vis-scatter">
+        </px-demo-snippet>
+      </div>
+      </br>
+
+      <!-- AxisX -->
+      <p class="epsilon demo__title">px-vis-axis: x-axis</p>
+      <div class="demo u-p+ flex">
+        <div>
+          <template id='axisX' is="dom-bind">
+            <px-vis-svg
+              class="outline"
+              width="[[basic.width]]"
+              height="[[basic.height]]"
+              margin="[[basic.margin]]"
+              svg="{{svg}}">
+            </px-vis-svg>
+            <px-vis-scale
+              x-axis-type="time"
+              y-axis-type="linear"
+              complete-series-config="[[basic.seriesConfig]]"
+              chart-extents="[[chartExtents]]"
+              width="[[basic.width]]"
+              height="[[basic.height]]"
+              margin="[[basic.margin]]"
+              chart-data={{basic.chartData}}
+              x="{{x}}"
+              y="{{y}}"
+              domain-changed='{{domainChanged}}'
+              current-domain-x="{{currentDomainX}}"
+              current-domain-y="{{currentDomainY}}"
+              selected-domain="[[selectedDomain]]">
+            </px-vis-scale>
+            <px-vis-axis
+              id="xAxis"
+              svg="[[svg]]"
+              axis="[[x]]"
+              margin="[[basic.lMargin]]"
+              height="[[basic.height]]"
+              title="myTitle"
+              orientation="bottom"
+              label-position="after"
+              complete-series-config="[[basic.seriesConfig]]"
+              prevent-series-bar
+              domain-changed="[[domainChanged]]"
+              current-domain="[[currentDomainX]]">
+            </px-vis-axis>
+          </template>
+        </div>
+        <div class="demo__discription u-pl+">
+          <p class="u-mt0">Example of an axis drawing object. </p>
+          <p>The axis drawing object can draw both x and y axis. This example draws an x-axis.</p>
+        </div>
+      </div>
+      <div>
+        <px-demo-snippet
+          element-properties="[[elempropAxisX]]"
+          element-name="px-vis-axis">
+        </px-demo-snippet>
+      </div>
 
     </div>
     <footer class="footer flex flex--center">
@@ -231,12 +340,18 @@
   <script>
     window.addEventListener('WebComponentsReady', function() {
           basic = {
-            width : 300,
+            width : 500,
             height : 200,
             margin : {
               "top": 5,
               "right": 5,
               "bottom": 5,
+              "left": 5
+            },
+            lMargin : {
+              "top": 5,
+              "right": 5,
+              "bottom": 50,
               "left": 5
             },
             marginCode : '{ \
@@ -289,7 +404,7 @@
                 "type": "line",
                 "x": 'x',
                 "y": 'y',
-                'color': 'rgb(93,165,218)'
+                'color': "rgb(93,165,218)"
               }
             }
           },
@@ -307,9 +422,22 @@
       var templateLine = document.querySelector('#line');
           templateLine.basic = basic;
           templateLine.chartExtents = chartExtents;
+      var templateScatter = document.querySelector('#scatter');
+          templateScatter.basic = basic;
+          templateScatter.chartExtents = chartExtents;
+      var templateAxisX = document.querySelector('#axisX');
+          templateAxisX.basic = basic;
+          templateAxisX.chartExtents = chartExtents;
 
 
       var templateDemo = document.querySelector('#demo'),
+          elempropSvg = {
+            "class":"outline",
+            "width":"[[basic.width]]",
+            "height":"[[basic.height]]",
+            "margin":"[[basic.margin]]",
+            "svg":"{{svg}}"
+          },
           elempropScale = {
             "xAxisType":"time",
             "yAxisType":"linear",
@@ -334,9 +462,35 @@
             "y":"[[y]]",
             "currentDomainX":"[[currentDomainX]]",
             "currentDomainY":"[[currentDomainY]]"
-          };
+          },
+          elempropScatter = {
+            "svg":"[[svg]]",
+            "series-id":"mySeries",
+            "complete-series-config":"[[basic.seriesConfig]]",
+            "chart-data":"[[basic.chartData]]",
+            "x":"[[x]]",
+            "y":"[[y]]",
+            "current-domain-x":"[[currentDomainX]]",
+            "current-domain-y":"[[currentDomainY]]"
+          },
+          elempropAxisX = {
+            "svg":"[[svg]]",
+            "axis":"[[x]]",
+            "margin":"[[item.basic.margin]]",
+            "title":"myTitle",
+            "orientation":"bottom",
+            "label-position":"after",
+            "current-domain":"[[currentDomainX]]"
+          }
+          // elempropScatter = {
+          //
+          // }
+          ;
+          templateDemo.elempropSvg = elempropSvg;
           templateDemo.elempropScale = elempropScale;
           templateDemo.elempropLine = elempropLine;
+          templateDemo.elempropScatter = elempropScatter;
+          templateDemo.elempropAxisX = elempropAxisX;
 
       });
   </script>
