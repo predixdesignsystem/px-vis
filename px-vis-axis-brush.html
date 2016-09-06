@@ -46,6 +46,7 @@ This element draw the box over the axis signifying the active area to mute the s
       PxVisBehavior.dataset,
       PxVisBehavior.mutedSeries,
       PxVisBehaviorD3.selectedDomain,
+      PxVisBehaviorD3.domainUpdate,
       commonColors
     ],
 
@@ -75,7 +76,7 @@ This element draw the box over the axis signifying the active area to mute the s
 
     observers: [
       'drawElement(svg)',
-      'domainChanged(selectedDomain)'
+      'recalcBrush(domainChanged)'
     ],
     /**
      * Creates the brushes
@@ -243,9 +244,74 @@ This element draw the box over the axis signifying the active area to mute the s
       });
     },
 
-    domainChanged: function(){
+    recalcBrush: function(){
       if(this._brushes){
-        this.brushEnd();
+        var _this = this,
+            extents = [],
+            series = {},
+            dim,y0,y1;
+
+        // for each brush, figure out if it was brushed and build an array of obj with the extents and the dimension
+        this._brushes.each(function(d) {
+          if(Px.d3.brushSelection(this)) {
+            //if the axis doesnt exist anymore
+            if(!_this.axis[d]){
+              // delete the brush
+              Px.d3.select(this).call(_this._brush.move, null);
+              return
+            }
+
+            // if the axis exists, then lets check out the extents
+            var oldBrushRange = Px.d3.brushSelection(this),
+                oldBrushDomain = [ _this.axis[d].invert(oldBrushRange[0]) , _this.axis[d].invert(oldBrushRange[1]) ],
+                newAxisDomain = _this.axis[d].domain();
+
+            console.log(oldBrushRange);
+            console.log(oldBrushDomain);
+            console.log(newAxisDomain);
+
+            // if the brushExts fall within the new axis domain
+            if(newAxisDomain[0] < oldBrushDomain[0] && newAxisDomain[1] > oldBrushDomain[1]){
+              // resize brush
+
+            //bottom of brush isbelow new domain, top is within
+            } else if(newAxisDomain[0] > oldBrushDomain[0] && newAxisDomain[1] > oldBrushDomain[1]) {
+              //move bottom to the min newAxisDomain
+
+            //bottom of brush within new domain, top is out
+            } else if(newAxisDomain[0] > oldBrushDomain[0] && newAxisDomain[1] > oldBrushDomain[1]) {
+              //move top to the max newAxisDomain
+            } else {
+              //delete
+              Px.d3.select(this).call(_this._brush.move, null);
+            }
+
+
+            // //check the size of the box and make sure it is some min
+            // if((sel[1] - sel[0]) < 4) {
+            //   // increase size of extents while checking if we hit the top
+            //   ext = (sel[0] - 4) < 0 ? [ sel[0] , sel[1] + 4 ] : [ sel[0] -4 , sel[1] ];
+            //   // increase size of box
+            //   Px.d3.select(this).call(_this._brush.move, ext);
+            // } else {
+            //   ext = sel;
+            // }
+            // extents.push({ "extent": ext, "index": d });
+          }
+        });
+
+        // for(var i = 0; i < this.chartData.length; i++){
+        //   for(var j = 0; j < extents.length; j++){
+        //     dim = extents[j]['index'];
+        //     y0 = this.axis[dim].invert(extents[j]["extent"][1]);
+        //     y1 = this.axis[dim].invert(extents[j]["extent"][0]);
+        //     if(y0 > this.chartData[i][dim] || this.chartData[i][dim] > y1){
+        //       series[this.chartData[i][this.seriesKey]] = true;
+        //     }
+        //   }
+        // }
+        // this.set('mutedSeries',series);
+        // this.fire('px-vis-muted-series-updated', { 'data': series, 'dataVar': 'mutedSeries' ,'method': 'set' });
       }
     }
   });
