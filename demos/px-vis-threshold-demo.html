@@ -1,0 +1,169 @@
+  <script src="../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../px-theme/px-theme.html"/>
+
+  <link rel="import" href="../px-vis-scale.html">
+  <link rel="import" href="../px-vis-svg.html">
+  <link rel="import" href="../px-vis-threshold.html">
+
+<dom-module id="px-vis-threshold-demo">
+  <template>
+    <template id="demoThreshold" is="dom-bind">
+      <p class="epsilon demo__title">px-vis-threshold</p>
+      <div class="demo u-p+ flex">
+        <div>
+
+          <!-- need for threshold -->
+          <template id="visThreshold" is="dom-bind">
+            <px-vis-svg
+              class="outline"
+              width="[[basic.width]]"
+              height="[[basic.height]]"
+              margin="[[basic.margin]]"
+              svg="{{svg}}">
+            </px-vis-svg>
+            <px-vis-scale
+              x-axis-type="time"
+              y-axis-type="linear"
+              complete-series-config="[[basic.seriesConfig]]"
+              chart-extents="[[chartExtents]]"
+              width="[[basic.width]]"
+              height="[[basic.height]]"
+              margin="[[basic.margin]]"
+              chart-data={{basic.chartData}}
+              x="{{x}}"
+              y="{{y}}"
+              domain-changed='{{domainChanged}}'
+              current-domain-x="{{currentDomainX}}"
+              current-domain-y="{{currentDomainY}}"
+              selected-domain="[[selectedDomain]]">
+            </px-vis-scale>
+            <!-- <px-vis-line
+              svg="[[svg]]"
+              series-id="mySeries"
+              series-number="0"
+              chart-data="[]"
+              x="[[x]]"
+              y="[[y]]"
+              current-domain-x="[[currentDomainX]]"
+              current-domain-y="[[currentDomainY]]">
+            </px-vis-line> -->
+            <px-vis-threshold
+              svg="[[svg]]"
+              complete-series-config="[[basic.seriesConfig]]"
+              chart-data="[[thresholdData]]"
+              x="[[x]]"
+              y="[[y]]"
+              current-domain-x="[[currentDomainX]]"
+              current-domain-y="[[currentDomainY]]">
+            </px-vis-threshold>
+
+          </template>
+
+        </div>
+        <div class="demo__discription u-pl+">
+          <p class="u-mt0">Chart threshold provide horizonal lines across the chart.</p>
+          <p>A default color is used if no 'color' is specified (or if the color does not match a series name). When a valid 'color' is given the threshold color will match that of the series.</p>
+          <p>The demo chart shows both, one threshold with a valid 'color' and one with no 'color'.</p>
+        </div>
+      </div>
+      <div>
+        <px-demo-snippet
+          element-properties="[[elempropThreshold]]"
+          element-name="px-vis-threshold">
+        </px-demo-snippet>
+      </div>
+
+    </template>
+  </template>
+  <script>
+    Polymer({
+        is: "px-vis-threshold-demo"
+      });
+
+    window.addEventListener('WebComponentsReady', function() {
+      // content for the vis components
+      basic = {
+        width : 500,
+        height : 200,
+        margin : {
+          "top": 10,
+          "right": 10,
+          "bottom": 10,
+          "left": 10
+        },
+        chartData : [{
+            'x': 1397102460000,
+            'y': 0.56
+          },{
+            'x': 1397139660000,
+            'y': 0.4
+          },{
+            'x': 1397177400000,
+            'y': 0.43
+          },{
+            'x': 1397228040000,
+            'y': 0.33
+          },{
+            'x': 1397248260000,
+            'y': 0.47
+          },{
+            'x': 1397291280000,
+            'y': 0.41
+          },{
+            'x': 1397318100000,
+            'y': 0.26
+          },{
+            'x': 1397342100000,
+            'y': 0.42
+          },{
+            'x': 1397390820000,
+            'y': 0.27
+          },{
+            'x': 1397408100000,
+            'y': 0.38
+          },{
+            'x': 1397458800000,
+            'y': 0.36
+          },{
+            'x': 1397522940000,
+            'y': 0.32
+        }],
+        seriesConfig: {
+          'mySeries': {
+            "name":"My-Series",
+            "type": "line",
+            "x": 'x',
+            "y": 'y',
+            'color': "rgb(93,165,218)"
+          }
+        }
+      },
+      chartExtents = {
+        "x": [Infinity,-Infinity],
+        "y": [0,-Infinity]
+      },
+      thresholdData = [
+        { "for":"mySeries", "type":"mean", "value":0.5 },
+        { "type":"mine", "value":0.25 }
+      ];
+
+      var templateThreshold = document.querySelector('#visThreshold');
+          templateThreshold.basic = basic;
+          templateThreshold.chartExtents = chartExtents;
+          templateThreshold.thresholdData = thresholdData;
+
+      // content for demo snippet
+      var templateDemo = document.querySelector('#demoThreshold'),
+          elempropThreshold = {
+            "svg":"[[svg]]",
+            "complete-series-config":"[[basic.seriesConfig]]",
+            "chart-data":"[[thresholdData]]",
+            "x":"[[x]]",
+            "y":"[[y]]",
+            "current-domain-x":"[[currentDomainX]]",
+            "current-domain-y":"[[currentDomainY]]"
+          };
+          templateDemo.elempropThreshold = elempropThreshold;
+      });
+  </script>
+</dom-module>
