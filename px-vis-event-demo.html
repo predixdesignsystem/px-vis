@@ -1,10 +1,4 @@
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>px-vis</title>
-  <link rel="stylesheet" type="text/css" href="css/px-vis-demo.css"/>
+
   <!-- Import custom element. Note: see comment about relative paths to dependencies in the *.html file referenced below -->
   <script src="../webcomponentsjs/webcomponents-lite.js"></script>
   <link rel="import" href="../px-theme/px-theme.html"/>
@@ -13,24 +7,13 @@
   <link rel="import" href="../px-polymer-font-awesome/polymer-font-awesome.html" />
   <link rel="import" href="../px-datetime-common/px-datetime-imports.html">
 
-  <link rel="import" href="px-vis-axis.html">
-  <link rel="import" href="px-vis-brush.html">
-  <link rel="import" href="px-vis-chart-navigator.html">
-  <link rel="import" href="px-vis-cursor.html">
-  <link rel="import" href="px-vis-data.html">
   <link rel="import" href="px-vis-event.html">
-  <link rel="import" href="px-vis-gridlines.html">
-  <link rel="import" href="px-vis-interaction-space.html">
-  <link rel="import" href="px-vis-line.html">
-  <link rel="import" href="px-vis-register.html">
   <link rel="import" href="px-vis-scale.html">
-  <link rel="import" href="px-vis-scatter.html">
   <link rel="import" href="px-vis-svg.html">
-  <link rel="import" href="px-vis-threshold.html">
-  <link rel="import" href="px-vis-tooltip.html">
-  <link rel="import" href="px-vis-zoom.html">
 
-  </head>
+
+<dom-module id="px-vis-event-demo">
+  <template>
   <style>
     .grabContent {
       margin-right: 10px;
@@ -45,36 +28,9 @@
       color: #525156;
     }
   </style>
-<body>
+  <link rel="stylesheet" type="text/css" href="css/px-vis-demo.css"/>
 
-  <!-- Wrap elements with auto-binding template to -->
-  <!-- allow use of Polymer bindings in main document -->
-  <template id="demo" is="dom-bind">
-
-    <!-- discription -->
-    <div class="hero u-p++ text--shadow">
-      <a class="actionable flex flex--right flex--middle" href="https://github.com/PredixDev/px-vis" target="_blank"><iron-icon class="menu__open" icon="fa:fa-github"></iron-icon>View on Github</a>
-  		<h1 class="delta">px-vis</h1>
-      <div class="description-text">
-    		<p>
-          discription text
-        </p>
-      </div>
-  		<div class="flex">
-  			<img class="u-mr--" src="https://img.shields.io/travis/PredixDev/px-vis.svg?style=flat-square" alt="Travis" onerror="this.style.display='none'"/>
-  			<img class="u-mr--" src="https://img.shields.io/bower/v/px-vis.svg?style=flat-square" alt="Bower" onerror="this.style.display='none'"/>
-  			<img class="u-mr--" src="https://img.shields.io/github/issues-raw/PredixDev/px-vis.svg?style=flat-square" alt="Issues" onerror="this.style.display='none'"/>
-  		</div>
-  	</div>
-
-
-
-    <!-- mega demo -->
-    <div class="mega-demo u-p++">
-
-
-
-      <!-- gridlinesY -->
+      <!-- visEvent -->
       <p class="epsilon demo__title">px-vis-event</p>
       <div class="demo u-p+ flex">
         <div>
@@ -83,7 +39,7 @@
               class="outline"
               width="[[basic.width]]"
               height="[[basic.height]]"
-              margin="[[basic.marginTop]]"
+              margin="[[basic.margin]]"
               svg="{{svg}}">
             </px-vis-svg>
             <px-vis-scale
@@ -93,7 +49,7 @@
               chart-extents="[[chartExtents]]"
               width="[[basic.width]]"
               height="[[basic.height]]"
-              margin="[[basic.marginTop]]"
+              margin="[[basic.margin]]"
               chart-data={{basic.chartData}}
               x="{{x}}"
               y="{{y}}"
@@ -168,64 +124,23 @@
         </px-demo-snippet>
       </div>
 
-
-    </div>
-    <footer class="footer flex flex--center">
-      <div class="footer__container u-pv++">
-        <div>
-          <a href="https://ge.com/digital" >
-            <img src="monogram-wdmk.png" alt="GE Monogram" class="footer__img">
-          </a>
-        </div>
-        <div class="footer__list">
-          <ul class="list-inline list-inline--delimited">
-            <li>
-              <a href="http://predix.io/legal" class="footer__list--lnk">Legal</a>
-            </li>
-            <li>
-              <a href="mailto:info@predix.io" class="footer__list--lnk">Contact Us</a>
-            </li>
-            <li>Copyright &copy; 2016 General Electric Company. All rights reserved.</li>
-          </ul>
-        </div>
-      </div>
-    </footer>
   </template>
+</dom-module>
+
   <script>
+    Polymer({
+      is: 'px-vis-event-demo'
+    });
     window.addEventListener('WebComponentsReady', function() {
           basic = {
             width : 500,
             height : 200,
             margin : {
-              "top": 10,
+              "top": 600,
               "right": 10,
               "bottom": 10,
               "left": 10
             },
-            marginTop : {
-              "top": 50,
-              "right": 10,
-              "bottom": 10,
-              "left": 10
-            },
-            MarginBottom : {
-              "top": 10,
-              "right": 20,
-              "bottom": 50,
-              "left": 10
-            },
-            MarginLeft : {
-              "top": 10,
-              "right": 10,
-              "bottom": 15,
-              "left": 70
-            },
-            marginCode : '{ \
-              "top": 5,\
-              "right": 5,\
-              "bottom": 5,\
-              "left": 5\
-            }',
             chartData : [{
                 'x': 1397102460000,
                 'y': 0.56
@@ -263,7 +178,6 @@
                 'x': 1397522940000,
                 'y': 0.32
             }],
-            chartDataCode : '[ {...} , {...} ]',
             seriesConfig: {
               'mySeries': {
                 "name":"My-Series",
@@ -328,21 +242,15 @@
           templateVisEvent.chartExtents = chartExtents;
 
 
-      var templateDemo = document.querySelector('#demo'),
-
-          visEvent = {
-            "svg":"[[svg]]",
-            "axis":"[[y]]",
-            "margin":"[[basic.margin]]",
-            "length":"[[basic.height]]",
-            "orientation":"left",
-            "current-domain":"[[currentDomainY]]"
-          }
-          ;
-
-          templateDemo.visEvent = visEvent;
-
+      // var templateDemo = document.querySelector('#devent'),
+      //     visEvent = {
+      //       "svg":"[[svg]]",
+      //       "axis":"[[y]]",
+      //       "margin":"[[basic.margin]]",
+      //       "length":"[[basic.height]]",
+      //       "orientation":"left",
+      //       "current-domain":"[[currentDomainY]]"
+      //     };
+      //     templateDemo.visEvent = visEvent;
       });
   </script>
-</body>
-</html>
