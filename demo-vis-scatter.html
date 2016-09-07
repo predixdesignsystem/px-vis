@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>px-vis</title>
+  <!-- Import custom element. Note: see comment about relative paths to dependencies in the *.html file referenced below -->
+  <script src="../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../px-theme/px-theme.html"/>
+
+  <link rel="import" href="px-vis-scale.html">
+  <link rel="import" href="px-vis-scatter.html">
+  <link rel="import" href="px-vis-svg.html">
+
+  </head>
+  <style>
+    .outline svg{
+      border:1px dotted #cccccc;
+    }
+  </style>
+<body>
+
+  <template id='scatter' is="dom-bind">
+    <px-vis-svg
+      class="outline"
+      width="[[basic.width]]"
+      height="[[basic.height]]"
+      margin="[[basic.margin]]"
+      svg="{{svg}}">
+    </px-vis-svg>
+    <px-vis-scale
+      x-axis-type="time"
+      y-axis-type="linear"
+      complete-series-config="[[basic.seriesConfig]]"
+      chart-extents="[[chartExtents]]"
+      width="[[basic.width]]"
+      height="[[basic.height]]"
+      margin="[[basic.margin]]"
+      chart-data={{basic.chartData}}
+      x="{{x}}"
+      y="{{y}}"
+      current-domain-x="{{currentDomainX}}"
+      current-domain-y="{{currentDomainY}}"
+      selected-domain="[[selectedDomain]]">
+    </px-vis-scale>
+    <px-vis-scatter
+      svg="[[svg]]"
+      series-id="mySeries"
+      complete-series-config="[[basic.seriesConfig]]"
+      chart-data="[[basic.chartData]]"
+      x="[[x]]"
+      y="[[y]]"
+      current-domain-x="[[currentDomainX]]"
+      current-domain-y="[[currentDomainY]]">
+    </px-vis-scatter>
+  </template>
+
+
+  <script>
+    window.addEventListener('WebComponentsReady', function() {
+          basic = {
+            width : 500,
+            height : 200,
+            margin : {
+              "top": 10,
+              "right": 10,
+              "bottom": 10,
+              "left": 10
+            },
+            chartData : [{
+                'x': 1397102460000,
+                'y': 0.56
+              },{
+                'x': 1397139660000,
+                'y': 0.4
+              },{
+                'x': 1397177400000,
+                'y': 0.43
+              },{
+                'x': 1397228040000,
+                'y': 0.33
+              },{
+                'x': 1397248260000,
+                'y': 0.47
+              },{
+                'x': 1397291280000,
+                'y': 0.41
+              },{
+                'x': 1397318100000,
+                'y': 0.26
+              },{
+                'x': 1397342100000,
+                'y': 0.42
+              },{
+                'x': 1397390820000,
+                'y': 0.27
+              },{
+                'x': 1397408100000,
+                'y': 0.38
+              },{
+                'x': 1397458800000,
+                'y': 0.36
+              },{
+                'x': 1397522940000,
+                'y': 0.32
+            }],
+            seriesConfig: {
+              'mySeries': {
+                "name":"My-Series",
+                "type": "line",
+                "x": 'x',
+                "y": 'y',
+                'color': "rgb(93,165,218)"
+              }
+            }
+          },
+          chartExtents = {
+            "x": [Infinity,-Infinity],
+            "y": [0,-Infinity]
+          };
+
+          var templateScatter = document.querySelector('#scatter');
+              templateScatter.basic = basic;
+              templateScatter.chartExtents = chartExtents;
+
+      });
+  </script>
+</body>
+</html>
