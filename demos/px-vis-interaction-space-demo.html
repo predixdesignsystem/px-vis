@@ -3,17 +3,17 @@
 
   <link rel="import" href="../px-vis-scale.html">
   <link rel="import" href="../px-vis-svg.html">
-  <link rel="import" href="../px-vis-scatter.html">
+  <link rel="import" href="../px-vis-interaction-space.html">
 
-<dom-module id="px-vis-scatter-demo">
+<dom-module id="px-vis-interaction-space-demo">
   <template>
-    <template id="demoScatter" is="dom-bind">
-      <p class="epsilon demo__title">px-vis-scatter</p>
+    <template id="demoInteractionSpace" is="dom-bind">
+      <p class="epsilon demo__title">px-vis-interaction-space</p>
       <div class="demo u-p+ flex">
         <div>
 
-          <!-- need for scatter -->
-          <template id="visScatter" is="dom-bind">
+          <!-- need for InteractionSpace -->
+          <template id="visInteractionSpace" is="dom-bind">
 
             <px-vis-svg
               class="outline"
@@ -37,27 +37,32 @@
               current-domain-y="{{currentDomainY}}"
               selected-domain="[[selectedDomain]]">
             </px-vis-scale>
-            <px-vis-scatter
+            <px-vis-interaction-space
+              x-axis-type="time"
               svg="[[svg]]"
-              series-id="mySeries"
+              width="[[basic.width]]"
+              height="[[basic.height]]"
+              margin="[[basic.margin]]"
               complete-series-config="[[basic.seriesConfig]]"
               chart-data="[[basic.chartData]]"
+              tooltip-data={{tooltipData}}
+              extents-data={{extentsData}}
               x="[[x]]"
               y="[[y]]"
               current-domain-x="[[currentDomainX]]"
               current-domain-y="[[currentDomainY]]">
-            </px-vis-scatter>
+            </px-vis-interaction-space>
           </template>
 
         </div>
         <div class="demo__discription u-pl+">
-          <p class="u-mt0">Example of a scatter drawing object. Very similar configuration to px-vis-line.</p>
+          <p class="u-mt0">The interaction-space provides the basis for all on-chart interaction. It detects mouseovers on the chart and builds the data objects which other components then consume.</p>
         </div>
       </div>
       <div>
         <px-demo-snippet
-          element-properties="[[elempropScatter]]"
-          element-name="px-vis-scatter">
+          element-properties="[[elempropInteractionSpace]]"
+          element-name="px-vis-interaction-space">
         </px-demo-snippet>
       </div>
 
@@ -65,7 +70,7 @@
   </template>
   <script>
     Polymer({
-        is: "px-vis-scatter-demo"
+        is: "px-vis-interaction-space-demo"
       });
 
     window.addEventListener('WebComponentsReady', function() {
@@ -131,13 +136,13 @@
         "y": [0,-Infinity]
       };
 
-      var templateScatter = document.querySelector('#visScatter');
-          templateScatter.basic = basic;
-          templateScatter.chartExtents = chartExtents;
+      var templateInteractionSpace = document.querySelector('#visInteractionSpace');
+          templateInteractionSpace.basic = basic;
+          templateInteractionSpace.chartExtents = chartExtents;
 
       // content for demo snippet
-      var templateDemo = document.querySelector('#demoScatter'),
-          elempropScatter = {
+      var templateDemo = document.querySelector('#demoInteractionSpace'),
+          elempropInteractionSpace = {
             "svg":"[[svg]]",
             "series-id":"mySeries",
             "complete-series-config":"[[basic.seriesConfig]]",
@@ -147,7 +152,7 @@
             "current-domain-x":"[[currentDomainX]]",
             "current-domain-y":"[[currentDomainY]]"
           };
-          templateDemo.elempropScatter = elempropScatter;
+          templateDemo.elempropInteractionSpace = elempropInteractionSpace;
       });
   </script>
 </dom-module>
