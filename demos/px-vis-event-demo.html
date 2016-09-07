@@ -1,40 +1,19 @@
-
-  <!-- Import custom element. Note: see comment about relative paths to dependencies in the *.html file referenced below -->
   <script src="../webcomponentsjs/webcomponents-lite.js"></script>
   <link rel="import" href="../px-theme/px-theme.html"/>
-  <link rel="icon" href="favicon.ico" type="image/x-icon"/>
-  <link rel="import" href="../px-demo-snippet/px-demo-snippet.html"/>
-  <link rel="import" href="../px-polymer-font-awesome/polymer-font-awesome.html" />
-  <link rel="import" href="../px-datetime-common/px-datetime-imports.html">
 
-  <link rel="import" href="px-vis-event.html">
-  <link rel="import" href="px-vis-scale.html">
-  <link rel="import" href="px-vis-svg.html">
-
+  <link rel="import" href="../px-vis-scale.html">
+  <link rel="import" href="../px-vis-svg.html">
+  <link rel="import" href="../px-vis-event.html">
 
 <dom-module id="px-vis-event-demo">
   <template>
-  <style>
-    .grabContent {
-      margin-right: 10px;
-    }
-    .outline svg{
-      border:1px dotted #cccccc;
-    }
-    .demo__discription{
-      /*width: 300px;*/
-    }
-    .demo__title{
-      color: #525156;
-    }
-  </style>
-  <link rel="stylesheet" type="text/css" href="css/px-vis-demo.css"/>
-
-      <!-- visEvent -->
+    <template id="demoEvent" is="dom-bind">
       <p class="epsilon demo__title">px-vis-event</p>
       <div class="demo u-p+ flex">
         <div>
-          <template id='visEvent' is="dom-bind">
+
+          <!-- need for event -->
+          <template id="visEvent" is="dom-bind">
             <px-vis-svg
               class="outline"
               width="[[basic.width]]"
@@ -103,6 +82,7 @@
               current-domain-y="[[currentDomainY]]">
             </px-vis-event>
           </template>
+
         </div>
         <div class="demo__discription u-pl+">
           <p class="u-mt0">Chart events use their own dataset. A vertical line is drawn at the x-coordinate and an icon above.</p>
@@ -119,121 +99,122 @@
       </div>
       <div>
         <px-demo-snippet
-          element-properties="[[visEvent]]"
+          element-properties="[[elempropEvent]]"
           element-name="px-vis-event">
         </px-demo-snippet>
       </div>
 
+    </template>
   </template>
-</dom-module>
-
   <script>
     Polymer({
-      is: 'px-vis-event-demo'
-    });
+        is: "px-vis-event-demo"
+      });
+
     window.addEventListener('WebComponentsReady', function() {
-          basic = {
-            width : 500,
-            height : 200,
-            margin : {
-              "top": 600,
-              "right": 10,
-              "bottom": 10,
-              "left": 10
-            },
-            chartData : [{
-                'x': 1397102460000,
-                'y': 0.56
-              },{
-                'x': 1397139660000,
-                'y': 0.4
-              },{
-                'x': 1397177400000,
-                'y': 0.43
-              },{
-                'x': 1397228040000,
-                'y': 0.33
-              },{
-                'x': 1397248260000,
-                'y': 0.47
-              },{
-                'x': 1397291280000,
-                'y': 0.41
-              },{
-                'x': 1397318100000,
-                'y': 0.26
-              },{
-                'x': 1397342100000,
-                'y': 0.42
-              },{
-                'x': 1397390820000,
-                'y': 0.27
-              },{
-                'x': 1397408100000,
-                'y': 0.38
-              },{
-                'x': 1397458800000,
-                'y': 0.36
-              },{
-                'x': 1397522940000,
-                'y': 0.32
-            }],
-            seriesConfig: {
-              'mySeries': {
-                "name":"My-Series",
-                "type": "line",
-                "x": 'x',
-                "y": 'y',
-                'color': "rgb(93,165,218)"
-              }
-            }
-          },
-          eventData = {
-            "event1": {
-              "id": "123",
-              "x": 1397139660000,
-              "label": "Default"
-            },
-            "event2": {
-              "id": "456",
-              "x": 1397248260000,
-              "label": "Font Awesome"
-            },
-            "event3": {
-              "id": "789",
-              "x": 1397342100000,
-              "label": "Unicode"
-            },
-            "event4": {
-              "id": "333",
-              "x": 1397458800000,
-              "label": "Image"
-            }
-          },
-          eventConfig = {
-            "Font Awesome":{
-              "color": "blue",
-              "icon": "fa-camera",
-              "type": "fa",
-              "offset":[0,0]
-            },
-            "Unicode":{
-              "color": "green",
-              "icon": "\uf015",
-              "type": "unicode",
-              "offset":[1,0]
-            },
-            "Image":{
-              "icon": "ge_logo.png",
-              "type": "image",
-              "offset":[0,-20],
-              "size":"20"
-            }
-          },
-          chartExtents = {
-            "x": [Infinity,-Infinity],
-            "y": [0,-Infinity]
-          };
+      // content for the vis components
+      basic = {
+        width : 500,
+        height : 200,
+        margin : {
+          "top": 50,
+          "right": 10,
+          "bottom": 10,
+          "left": 10
+        },
+        chartData : [{
+            'x': 1397102460000,
+            'y': 0.56
+          },{
+            'x': 1397139660000,
+            'y': 0.4
+          },{
+            'x': 1397177400000,
+            'y': 0.43
+          },{
+            'x': 1397228040000,
+            'y': 0.33
+          },{
+            'x': 1397248260000,
+            'y': 0.47
+          },{
+            'x': 1397291280000,
+            'y': 0.41
+          },{
+            'x': 1397318100000,
+            'y': 0.26
+          },{
+            'x': 1397342100000,
+            'y': 0.42
+          },{
+            'x': 1397390820000,
+            'y': 0.27
+          },{
+            'x': 1397408100000,
+            'y': 0.38
+          },{
+            'x': 1397458800000,
+            'y': 0.36
+          },{
+            'x': 1397522940000,
+            'y': 0.32
+        }],
+        seriesConfig: {
+          'mySeries': {
+            "name":"My-Series",
+            "type": "line",
+            "x": 'x',
+            "y": 'y',
+            'color': "rgb(93,165,218)"
+          }
+        }
+      },
+      chartExtents = {
+        "x": [Infinity,-Infinity],
+        "y": [0,-Infinity]
+      },
+      eventData = {
+        "event1": {
+          "id": "123",
+          "x": 1397139660000,
+          "label": "Default"
+        },
+        "event2": {
+          "id": "456",
+          "x": 1397248260000,
+          "label": "Font Awesome"
+        },
+        "event3": {
+          "id": "789",
+          "x": 1397342100000,
+          "label": "Unicode"
+        },
+        "event4": {
+          "id": "333",
+          "x": 1397458800000,
+          "label": "Image"
+        }
+      },
+      eventConfig = {
+        "Font Awesome":{
+          "color": "blue",
+          "icon": "fa-camera",
+          "type": "fa",
+          "offset":[0,0]
+        },
+        "Unicode":{
+          "color": "green",
+          "icon": "\uf015",
+          "type": "unicode",
+          "offset":[1,0]
+        },
+        "Image":{
+          "icon": "ge_logo.png",
+          "type": "image",
+          "offset":[0,-20],
+          "size":"20"
+        }
+      };
 
       var templateVisEvent = document.querySelector('#visEvent');
           templateVisEvent.basic = basic;
@@ -241,16 +222,17 @@
           templateVisEvent.eventConfig = eventConfig;
           templateVisEvent.chartExtents = chartExtents;
 
-
-      // var templateDemo = document.querySelector('#devent'),
-      //     visEvent = {
-      //       "svg":"[[svg]]",
-      //       "axis":"[[y]]",
-      //       "margin":"[[basic.margin]]",
-      //       "length":"[[basic.height]]",
-      //       "orientation":"left",
-      //       "current-domain":"[[currentDomainY]]"
-      //     };
-      //     templateDemo.visEvent = visEvent;
+      // content for demo snippet
+      var templateDemo = document.querySelector('#demoEvent'),
+          elempropEvent = {
+            "svg":"[[svg]]",
+            "axis":"[[y]]",
+            "margin":"[[basic.margin]]",
+            "length":"[[basic.height]]",
+            "orientation":"left",
+            "current-domain":"[[currentDomainY]]"
+          };
+          templateDemo.elempropEvent = elempropEvent;
       });
   </script>
+</dom-module>
