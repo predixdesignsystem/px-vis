@@ -1,0 +1,179 @@
+  <script src="../webcomponentsjs/webcomponents-lite.js"></script>
+  <link rel="import" href="../../px-theme/px-theme.html"/>
+  <link rel="import" href="../../px-datetime-common/px-datetime-imports.html">
+
+  <link rel="import" href="../px-vis-scale.html">
+  <link rel="import" href="../px-vis-svg.html">
+  <link rel="import" href="../px-vis-register.html">
+
+<dom-module id="px-vis-register-dynamic-demo">
+  <template>
+    <template id="demoRegisterDynamic" is="dom-bind">
+      <p class="epsilon demo__title">px-vis-register-dynamic</p>
+      <div class="demo u-p+ flex">
+        <div>
+
+          <!-- need for register-dynamic -->
+          <template id="visRegisterDynamic" is="dom-bind">
+            <px-vis-register
+              width="[[basic.width]]"
+              height="[[basic.height]]"
+              type="horizontal"
+              complete-series-config="[[basic.seriesConfig]]"
+              tooltip-data=[[tooltipData]]
+              muted-series="{{mutedSeries}}"
+              x-axis-type="time">
+            </px-vis-register>
+            <px-vis-svg
+              class="outline"
+              width="[[basic.width]]"
+              height="[[basic.height]]"
+              margin="[[basic.margin]]"
+              svg="{{svg}}">
+            </px-vis-svg>
+            <px-vis-scale
+              x-axis-type="time"
+              y-axis-type="linear"
+              complete-series-config="[[basic.seriesConfig]]"
+              chart-extents="[[chartExtents]]"
+              width="[[basic.width]]"
+              height="[[basic.height]]"
+              margin="[[basic.margin]]"
+              chart-data={{basic.chartData}}
+              x="{{x}}"
+              y="{{y}}"
+              current-domain-x="{{currentDomainX}}"
+              current-domain-y="{{currentDomainY}}"
+              selected-domain="[[selectedDomain]]">
+            </px-vis-scale>
+            <px-vis-interaction-space
+              x-axis-type="time"
+              svg="[[svg]]"
+              width="[[basic.width]]"
+              height="[[basic.height]]"
+              margin="[[basic.margin]]"
+              complete-series-config="[[basic.seriesConfig]]"
+              chart-data="[[basic.chartData]]"
+              tooltip-data={{tooltipData}}
+              extents-data={{extentsData}}
+              x="[[x]]"
+              y="[[y]]"
+              current-domain-x="[[currentDomainX]]"
+              current-domain-y="[[currentDomainY]]">
+            </px-vis-interaction-space>
+            <px-vis-line
+              svg="[[svg]]"
+              series-id="mySeries"
+              complete-series-config="[[basic.seriesConfig]]"
+              chart-data="[[basic.chartData]]"
+              x="[[x]]"
+              y="[[y]]"
+              current-domain-x="[[currentDomainX]]"
+              current-domain-y="[[currentDomainY]]"
+              muted-series="[[mutedSeries]]">
+            </px-vis-line>
+
+          </template>
+
+        </div>
+        <div class="demo__discription u-pl+">
+          <p class="u-mt0">Example of a live register tied to an interaction-space. Hover over the chart to see values update. Click the series name to see the line mute.</p>
+        </div>
+      </div>
+      <div>
+        <px-demo-snippet
+          element-properties="[[elempropRegisterDynamic]]"
+          element-name="px-vis-register-dynamic">
+        </px-demo-snippet>
+      </div>
+
+    </template>
+  </template>
+  <script>
+    Polymer({
+        is: "px-vis-register-dynamic-demo"
+      });
+
+    window.addEventListener('WebComponentsReady', function() {
+      // content for the vis components
+      basic = {
+        width : 500,
+        height : 100,
+        margin : {
+          "top": 10,
+          "right": 10,
+          "bottom": 10,
+          "left": 10
+        },
+        chartData : [{
+            'x': 1397102460000,
+            'y': 0.56
+          },{
+            'x': 1397139660000,
+            'y': 0.4
+          },{
+            'x': 1397177400000,
+            'y': 0.43
+          },{
+            'x': 1397228040000,
+            'y': 0.33
+          },{
+            'x': 1397248260000,
+            'y': 0.47
+          },{
+            'x': 1397291280000,
+            'y': 0.41
+          },{
+            'x': 1397318100000,
+            'y': 0.26
+          },{
+            'x': 1397342100000,
+            'y': 0.42
+          },{
+            'x': 1397390820000,
+            'y': 0.27
+          },{
+            'x': 1397408100000,
+            'y': 0.38
+          },{
+            'x': 1397458800000,
+            'y': 0.36
+          },{
+            'x': 1397522940000,
+            'y': 0.32
+        }],
+        seriesConfig: {
+          'mySeries': {
+            "name":"My-Series",
+            "type": "line",
+            "x": 'x',
+            "y": 'y',
+            'color': "rgb(93,165,218)"
+          }
+        }
+      },
+      chartExtents = {
+        "x": [Infinity,-Infinity],
+        "y": [0,-Infinity]
+      };
+
+      var templateRegisterDynamic = document.querySelector('#visRegisterDynamic');
+          templateRegisterDynamic.basic = basic;
+          templateRegisterDynamic.chartExtents = chartExtents;
+
+      // content for demo snippet
+      var templateDemo = document.querySelector('#demoRegisterDynamic'),
+          elempropRegisterDynamic = {
+            "height":"75",
+            "width":"[[basic.width]]",
+            "type":"horizontal",
+            "complete-series-config":"[[basic.seriesConfig]]",
+            "tooltip-data":"[[tooltipData]]",
+            "chart-data":"[[basic.chartData]]",
+            "muted-series":"[[mutedSeries]]",
+            "x-axis-type":"time"
+          };
+          templateDemo.elempropRegisterDynamic = elempropRegisterDynamic;
+      });
+  </script>
+</dom-module>
