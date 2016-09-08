@@ -3,19 +3,25 @@
 
   <link rel="import" href="../px-vis-scale.html">
   <link rel="import" href="../px-vis-svg.html">
-  <link rel="import" href="../px-vis-cursor.html">
-  <link rel="import" href="../px-vis-interaction-space.html">
+  <link rel="import" href="../px-vis-register.html">
 
-<dom-module id="px-vis-cursor-demo">
+<dom-module id="px-vis-register-horizontal-demo">
   <template>
-    <template id="demoCursor" is="dom-bind">
-      <p class="epsilon demo__title">px-vis-cursor</p>
+    <template id="demoRegisterHorizontal" is="dom-bind">
+      <p class="epsilon demo__title">px-vis-register-horizontal</p>
       <div class="demo u-p+ flex">
         <div>
 
-          <!-- need for cursor -->
-          <template id="visCursor" is="dom-bind">
-
+          <!-- need for register-horizontal -->
+          <template id="visRegisterHorizontal" is="dom-bind">
+            <px-vis-register
+              height="75"
+              width="[[basic.width]]"
+              type="horizontal"
+              complete-series-config="[[basic.seriesConfig]]"
+              tooltip-data=[[tooltipData]]
+              x-axis-type="time">
+            </px-vis-register>
             <px-vis-svg
               class="outline"
               width="[[basic.width]]"
@@ -53,29 +59,18 @@
               current-domain-x="[[currentDomainX]]"
               current-domain-y="[[currentDomainY]]">
             </px-vis-interaction-space>
-            <px-vis-cursor
-              svg="[[svg]]"
-              width="[[basic.width]]"
-              height="[[basic.height]]"
-              margin="[[basic.margin]]"
-              complete-series-config="[[basic.seriesConfig]]"
-              chart-data="[[basic.chartData]]"
-              horizontal-line="full"
-              vertical-line="full"
-              circle-point="yes"
-              tooltip-data="[[tooltipData]]">
-            </px-vis-cursor>
+
           </template>
 
         </div>
         <div class="demo__discription u-pl+">
-          <p class="u-mt0">The cursor provides an on-chart reticule on-hover. Hover your mouse over the chart to see it in action. Cursor requires a <strong>px-vis-interaction-space</strong> which provides the mouseover data.</p>
+          <p class="u-mt0">The register displays data from the chart on mouseover. There are two options, a horizontal version for placement above or below the chart, or a vertical version for placement to the right or left of the chart. It must be paired with <strong>px-vis-interaction-space</strong> which provides the mouseover capabilities. Clicking on a series name on the register adds that series to the mutedSeries property. Series on the chart can listen to this property to toggle series on and off.</p>
         </div>
       </div>
       <div>
         <px-demo-snippet
-          element-properties="[[elempropCursor]]"
-          element-name="px-vis-cursor">
+          element-properties="[[elempropRegisterHorizontal]]"
+          element-name="px-vis-register-horizontal">
         </px-demo-snippet>
       </div>
 
@@ -83,14 +78,14 @@
   </template>
   <script>
     Polymer({
-        is: "px-vis-cursor-demo"
+        is: "px-vis-register-horizontal-demo"
       });
 
     window.addEventListener('WebComponentsReady', function() {
       // content for the vis components
       basic = {
         width : 500,
-        height : 200,
+        height : 100,
         margin : {
           "top": 10,
           "right": 10,
@@ -147,27 +142,29 @@
       chartExtents = {
         "x": [Infinity,-Infinity],
         "y": [0,-Infinity]
+      },
+      tooltipData = {
+        'time': moment().format(),
+        'series': [
+          {'name':'mySeries','value': {"x": 1464730597421,"y": 10.0} },
+          {'name':'seriesName1','value': {"x": 1464730597421,"y": 12.2} },
+          {'name':'seriesName2','value': {"x":1464730597421,"y": 8.7} },
+        ]
+      },
+      mutedSeries = {
+          'seriesName1':true,
+          'seriesName2':false,
       };
 
-      var templateCursor = document.querySelector('#visCursor');
-          templateCursor.basic = basic;
-          templateCursor.chartExtents = chartExtents;
+      var templateRegisterHorizontal = document.querySelector('#visRegisterHorizontal');
+          templateRegisterHorizontal.basic = basic;
+          templateRegisterHorizontal.chartExtents = chartExtents;
 
       // content for demo snippet
-      var templateDemo = document.querySelector('#demoCursor'),
-          elempropCursor = {
-            "svg":"[[svg]]",
-            "width":"[[basic.width]]",
-            "height":"[[basic.height]]",
-            "margin":"[[basic.margin]]",
-            "complete-series-config":"[[basic.seriesConfig]]",
-            "chart-data":"[[basic.chartData]]",
-            "horizontal-line":"full",
-            "vertical-line":"full",
-            "circle-point":"yes",
-            "tooltip-data":"[[tooltipData]]"
+      var templateDemo = document.querySelector('#demoRegisterHorizontal'),
+          elempropRegisterHorizontal = {
           };
-          templateDemo.elempropCursor = elempropCursor;
+          templateDemo.elempropRegisterHorizontal = elempropRegisterHorizontal;
       });
   </script>
 </dom-module>
