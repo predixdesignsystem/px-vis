@@ -1,3 +1,7 @@
+v0.2.5
+==================
+* fixed maintaining axis brushes on data change
+
 v0.2.4
 ==================
 * fixed title rotation when id has a .
