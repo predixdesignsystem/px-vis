@@ -200,7 +200,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           // this._axis.ticks(d3.time.days, 7);
           // this._axis.ticks(d3.time.minutes, 15);
           if(this.tickValues && this.tickValues.length > 0){
-            this._axis.tickValues(this.tickValues);
+            if(!isNaN(this.axis.domain()[0]) && !isNaN(this.axis.domain()[1])){
+              this._axis.tickValues(this.tickValues);
+            }
           }
 
           // controls the tick mark size for ticks with numbers
