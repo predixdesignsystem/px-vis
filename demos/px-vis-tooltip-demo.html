@@ -1,29 +1,28 @@
   <script src="../webcomponentsjs/webcomponents-lite.js"></script>
-  <link rel="import" href="../../px-theme/px-theme.html"/>
-  <link rel="import" href="../../px-datetime-common/px-datetime-imports.html">
+  <link rel="import" href="../px-theme/px-theme.html"/>
 
   <link rel="import" href="../px-vis-scale.html">
   <link rel="import" href="../px-vis-svg.html">
-  <link rel="import" href="../px-vis-register.html">
+  <link rel="import" href="../px-vis-tooltip.html">
 
-<dom-module id="px-vis-register-dynamic-demo">
+<dom-module id="px-vis-tooltip-demo">
   <template>
-    <template id="demoRegisterDynamic" is="dom-bind">
-      <p class="epsilon demo__title">px-vis-register-dynamic</p>
+    <template id="demoTooltip" is="dom-bind">
+      <p class="epsilon demo__title">px-vis-tooltip</p>
       <div class="demo u-p+ flex">
         <div>
 
-          <!-- need for register-dynamic -->
-          <template id="visRegisterDynamic" is="dom-bind">
-            <px-vis-register
-              width="[[basic.width]]"
-              height="[[basic.height]]"
-              type="horizontal"
+          <!-- need for tooltip -->
+          <template id="visTooltip" is="dom-bind">
+            <px-vis-tooltip
+              px-svg-elem="[[pxSvgElem]]"
+              width="250"
+              margin="[[basic.margin]]"
+              x-axis-type="time"
               complete-series-config="[[basic.seriesConfig]]"
-              tooltip-data=[[tooltipData]]
-              muted-series="{{mutedSeries}}"
-              x-axis-type="time">
-            </px-vis-register>
+              chart-data="[[basic.chartData]]"
+              tooltip-data="[[tooltipData]]">
+            </px-vis-tooltip>
             <px-vis-svg
               class="outline"
               width="[[basic.width]]"
@@ -71,17 +70,18 @@
               current-domain-x="[[currentDomainX]]"
               current-domain-y="[[currentDomainY]]">
             </px-vis-line>
+
           </template>
 
         </div>
         <div class="demo__discription u-pl+">
-          <p class="u-mt0">The register displays data from the chart on mouseover. There are two options, a horizontal version for placement above or below the chart, or a vertical version for placement to the right or left of the chart. It must be paired with <strong>px-vis-interaction-space</strong> which provides the mouseover capabilities. Clicking on a series name on the register adds that series to the mutedSeries property. Series on the chart can listen to this property to toggle series on and off.</p>
+          <p class="u-mt0">The tooltip provides similar data display functionality to the register, but on chart and without the user interaction.</p>
         </div>
       </div>
       <div>
         <px-demo-snippet
-          element-properties="[[elempropRegisterDynamic]]"
-          element-name="px-vis-register-dynamic">
+          element-properties="[[elempropTooltip]]"
+          element-name="px-vis-tooltip">
         </px-demo-snippet>
       </div>
 
@@ -89,14 +89,14 @@
   </template>
   <script>
     Polymer({
-        is: "px-vis-register-dynamic-demo"
+        is: "px-vis-tooltip-demo"
       });
 
     window.addEventListener('WebComponentsReady', function() {
       // content for the vis components
       basic = {
         width : 500,
-        height : 100,
+        height : 200,
         margin : {
           "top": 10,
           "right": 10,
@@ -155,23 +155,23 @@
         "y": [0,-Infinity]
       };
 
-      var templateRegisterDynamic = document.querySelector('#visRegisterDynamic');
-          templateRegisterDynamic.basic = basic;
-          templateRegisterDynamic.chartExtents = chartExtents;
+      var templateTooltip = document.querySelector('#visTooltip');
+          templateTooltip.basic = basic;
+          templateTooltip.chartExtents = chartExtents;
 
       // content for demo snippet
-      var templateDemo = document.querySelector('#demoRegisterDynamic'),
-          elempropRegisterDynamic = {
-            "height":"75",
-            "width":"[[basic.width]]",
-            "type":"horizontal",
+      var templateDemo = document.querySelector('#demoTooltip'),
+          elempropTooltip = {
+            "svg":"[[svg]]",
+            "series-id":"mySeries",
             "complete-series-config":"[[basic.seriesConfig]]",
-            "tooltip-data":"[[tooltipData]]",
             "chart-data":"[[basic.chartData]]",
-            "muted-series":"[[mutedSeries]]",
-            "x-axis-type":"time"
+            "x":"[[x]]",
+            "y":"[[y]]",
+            "current-domain-x":"[[currentDomainX]]",
+            "current-domain-y":"[[currentDomainY]]"
           };
-          templateDemo.elempropRegisterDynamic = elempropRegisterDynamic;
+          templateDemo.elempropTooltip = elempropTooltip;
       });
   </script>
 </dom-module>
