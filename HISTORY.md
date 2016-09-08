@@ -1,3 +1,7 @@
+v0.2.6
+==================
+* added to data converter so it outputs a set of empty datasets
+
 v0.2.5
 ==================
 * fixed maintaining axis brushes on data change

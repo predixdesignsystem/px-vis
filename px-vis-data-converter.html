@@ -220,6 +220,16 @@ It will reformat the data into the object format and create a seriesConfig file.
         notify: true,
         readOnly: true,
         computed: '_computeChartData(originalData.*)'
+      },
+      /**
+      * A list of the empty datasets
+      *
+      */
+      emptySets: {
+        type: Object,
+        notify: true,
+        readOnly: true,
+        value: function(){ return {} }
       }
     },
 
@@ -260,6 +270,11 @@ It will reformat the data into the object format and create a seriesConfig file.
             iter = 0,
             id = Array.prototype.map.call(this.originalData,function(d,i){
               // since we are iterating over the data...
+              if(d[this.dataKey].length === 0){
+                var id = this._calcId(this.originalData[i],i);
+                this.emptySets[id] = true;
+                this.fire('px-vis-data-converter-empty-data', { "id": id });
+              }
               // add infinity to the end so we have a stop point
               d[this.dataKey].push([Infinity,Infinity]);
 
@@ -308,6 +323,8 @@ It will reformat the data into the object format and create a seriesConfig file.
           }
         }
 
+        this.fire('px-vis-empty-sets', { 'dataVar': 'emptySets', 'data': this.emptySets, 'method':'set' });
+        console.log(this.emptySets)
         this.fire('px-vis-chart-data', { 'dataVar': 'chartData', 'data': chartData, 'method':'set' });
         return chartData;
       }
