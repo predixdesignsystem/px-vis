@@ -1,27 +1,28 @@
   <script src="../webcomponentsjs/webcomponents-lite.js"></script>
-  <link rel="import" href="../../px-theme/px-theme.html"/>
-  <link rel="import" href="../../px-datetime-common/px-datetime-imports.html">
+  <link rel="import" href="../px-theme/px-theme.html"/>
 
   <link rel="import" href="../px-vis-scale.html">
   <link rel="import" href="../px-vis-svg.html">
   <link rel="import" href="../px-vis-register.html">
 
-<dom-module id="px-vis-register-horizontal-demo">
+<dom-module id="px-vis-register-vertical-demo">
   <template>
-    <template id="demoRegisterHorizontal" is="dom-bind">
-      <p class="epsilon demo__title">px-vis-register-horizontal</p>
+    <template id="demoRegisterVertical" is="dom-bind">
+      <p class="epsilon demo__title">px-vis-register-vertical</p>
       <div class="demo u-p+ flex">
         <div>
 
-          <!-- need for register-horizontal -->
-          <template id="visRegisterHorizontal" is="dom-bind">
+          <!-- need for register-vertical -->
+          <template id="visRegisterVertical" is="dom-bind">
             <px-vis-register
-              height="75"
               width="[[basic.width]]"
-              type="horizontal"
+              height="[[basic.height]]"
+              use-percentage="true"
+              chart-data="[[chartData]]"
+              units="Hz"
+              type="vertical"
               complete-series-config="[[basic.seriesConfig]]"
               tooltip-data="[[tooltipData]]"
-              chart-data="[[basic.chartData]]"
               muted-series="[[mutedSeries]]"
               x-axis-type="time">
             </px-vis-register>
@@ -67,13 +68,13 @@
 
         </div>
         <div class="demo__discription u-pl+">
-          <p class="u-mt0">The register displays data from the chart on mouseover. There are two options, a horizontal version for placement above or below the chart, or a vertical version for placement to the right or left of the chart. It must be paired with <strong>px-vis-interaction-space</strong> which provides the mouseover capabilities. Clicking on a series name on the register adds that series to the mutedSeries property. Series on the chart can listen to this property to toggle series on and off.</p>
+          <p class="u-mt0">The register displays data from the chart on mouseover. There are two options, a horizonal version for placement above or below the chart, or a vertical version for placement to the right or left of the chart. It must be paired with <strong>px-vis-interaction-space</strong> which provides the mouseover capabilities. Clicking on a series name on the register adds that series to the mutedSeries property. Series on the chart can listen to this property to toggle series on and off.</p>
         </div>
       </div>
       <div>
         <px-demo-snippet
-          element-properties="[[elempropRegisterHorizontal]]"
-          element-name="px-vis-register-horizontal">
+          element-properties="[[elempropRegisterVertical]]"
+          element-name="px-vis-register-vertical">
         </px-demo-snippet>
       </div>
 
@@ -81,7 +82,7 @@
   </template>
   <script>
     Polymer({
-        is: "px-vis-register-horizontal-demo"
+        is: "px-vis-register-vertical-demo"
       });
 
     window.addEventListener('WebComponentsReady', function() {
@@ -169,23 +170,25 @@
           'seriesName2':false,
       };
 
-      var templateRegisterHorizontal = document.querySelector('#visRegisterHorizontal');
-          templateRegisterHorizontal.basic = basic;
-          templateRegisterHorizontal.chartExtents = chartExtents;
+      var templateRegisterVertical = document.querySelector('#visRegisterVertical');
+          templateRegisterVertical.basic = basic;
+          templateRegisterVertical.chartExtents = chartExtents;
 
       // content for demo snippet
-      var templateDemo = document.querySelector('#demoRegisterHorizontal'),
-          elempropRegisterHorizontal = {
-            "height":"75",
+      var templateDemo = document.querySelector('#demoRegisterVertical'),
+          elempropRegisterVertical = {
             "width":"[[basic.width]]",
-            "type":"horizontal",
+            "height":"[[basic.height]]",
+            "use-percentage":"true",
+            "chart-data":"[[chartData]]",
+            "units":"Hz",
+            "type":"vertical",
             "complete-series-config":"[[basic.seriesConfig]]",
             "tooltip-data":"[[tooltipData]]",
-            "chart-data":"[[basic.chartData]]",
             "muted-series":"[[mutedSeries]]",
             "x-axis-type":"time"
           };
-          templateDemo.elempropRegisterHorizontal = elempropRegisterHorizontal;
+          templateDemo.elempropRegisterVertical = elempropRegisterVertical;
       });
   </script>
 </dom-module>
