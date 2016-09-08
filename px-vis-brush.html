@@ -29,9 +29,13 @@ This element sets the selectedDomain property based on the extents box. The sele
 @homepage index.html
 @demo demo.html
 -->
+
+<link rel="import" href="css/px-vis-styles.html">
+
 <dom-module id="px-vis-brush">
-    <link rel="import" type="css" href="css/px-vis.css"/>
     <template>
+      <style include="px-vis-styles"></style>
+      <style include="px-theme-styles"></style>
 
     </template>
 </dom-module>
@@ -256,7 +260,7 @@ This element sets the selectedDomain property based on the extents box. The sele
         if(this.selectedDomain && this.selectedDomain.x.length > 0) {
           //redraw the brush in the right place, but make sure we don't fire a change of domain
           this._preventDomainChange = true;
-          this._brushGroup 
+          this._brushGroup
             .call(this._brush)
             .call(this._brush.move, [this.axis(this.selectedDomain.x[0]), this.axis(this.selectedDomain.x[1])]);
           this._preventDomainChange = false;
@@ -302,14 +306,14 @@ This element sets the selectedDomain property based on the extents box. The sele
       this.debounce('brushed', function () {
         var newDomain = Px.d3.brushSelection(this._brushGroup.node()).map(this.axis.invert, this.axis);
         //make sure this is an actual update
-        var changed = this.selectedDomain.x.length < 2 || 
-                        newDomain[0].toString() !== this.selectedDomain.x[0].toString() || 
+        var changed = this.selectedDomain.x.length < 2 ||
+                        newDomain[0].toString() !== this.selectedDomain.x[0].toString() ||
                         newDomain[1].toString() !== this.selectedDomain.x[1].toString();
 
         if(!this._preventDomainChange && changed) {
           this.set('selectedDomain', {x:newDomain,y:[]});
-          this.fire('px-vis-selected-domain-updated', { 
-            'data':{x:newDomain,y:[]}, 'method': 'set', 'dataVar': 'selectedDomain' 
+          this.fire('px-vis-selected-domain-updated', {
+            'data':{x:newDomain,y:[]}, 'method': 'set', 'dataVar': 'selectedDomain'
           });
         }
     }, 10);
