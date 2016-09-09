@@ -1,3 +1,7 @@
+v0.2.7
+==================
+* modified grid so it can remove itself on detach
+
 v0.2.6
 ==================
 * added to data converter so it outputs a set of empty datasets
