@@ -1,3 +1,7 @@
+v0.3.4
+==================
+* fixing NaN on axis issue
+
 v0.3.2
 ==================
 * fixed data converter with empty datasets
