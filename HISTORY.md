@@ -1,3 +1,7 @@
+v0.3.2
+==================
+* fixed data converter with empty datasets
+
 v0.3.1
 ==================
 * changed tooltip targets in multi axis
