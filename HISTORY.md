@@ -1,3 +1,7 @@
+v0.3.5
+==================
+* fixed margin in multi axis
+
 v0.3.4
 ==================
 * fixing NaN on axis issue
