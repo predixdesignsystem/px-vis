@@ -1,3 +1,7 @@
+v0.3.1
+==================
+* changed tooltip targets in multi axis
+
 v0.3.0
 ==================
 * tooltip now uses px-tooltip
