@@ -106,7 +106,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
                           default-currency-format="[[numberFormatCurrency]]"
                           zero-format="[[numberFormatZero]]">
                         </numbro-element>
-                        <template is="dom-if" if="{{_returnVal(item, 'x')}}">{{_getXUnit(item, completeSeriesConfig)}}</template>
+                        <template is="dom-if" if="{{_returnVal(item, 'x')}}">{{_getXUnit(item, completeSeriesConfig.*)}}</template>
                         <template is="dom-if" if="[[_returnVal(item, 'x')]]">
                           &nbsp;/&nbsp
                         </template>
@@ -114,7 +114,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
                       <!-- if x axis is ordinal just display it -->
                       <template is="dom-if" if="{{_isOfType(xAxisType, 'ordinal')}}">
                         <span>[[_returnVal(item, 'x')]]</span>
-                        <template is="dom-if" if="{{_returnVal(item, 'x')}}">{{_getXUnit(item, completeSeriesConfig)}}</template>
+                        <template is="dom-if" if="{{_returnVal(item, 'x')}}">{{_getXUnit(item, completeSeriesConfig.*)}}</template>
                         <template is="dom-if" if="[[_returnVal(item, 'x')]]">
                           &nbsp;/&nbsp
                         </template>
@@ -136,7 +136,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
                       <template is="dom-if" if="{{_isOfType(yAxisType, 'ordinal')}}">
                         <span>[[_returnVal(item, 'y')]]</span>
                       </template>
-                      <template is="dom-if" if="{{_returnVal(item, 'y')}}">{{_getYUnit(item, completeSeriesConfig)}}</template>
+                      <template is="dom-if" if="{{_returnVal(item, 'y')}}">{{_getYUnit(item, completeSeriesConfig.*)}}</template>
                     </div>
                   </span>
               </span>
@@ -437,10 +437,10 @@ Formatting for the timestamps,the data values, and the series names can be contr
       return toTest === type;
     },
     _getXUnit: function(item, completeSeriesConfig) {
-      return completeSeriesConfig[item.name].xAxisUnit ? completeSeriesConfig[item.name].xAxisUnit : '';
+      return this.completeSeriesConfig[item.name].xAxisUnit ? this.completeSeriesConfig[item.name].xAxisUnit : '';
     },
     _getYUnit: function(item, completeSeriesConfig) {
-      return completeSeriesConfig[item.name].yAxisUnit ? completeSeriesConfig[item.name].yAxisUnit : '';
+      return this.completeSeriesConfig[item.name] && this.completeSeriesConfig[item.name].yAxisUnit ? this.completeSeriesConfig[item.name].yAxisUnit : '';
     },
     _getPieUnit: function(usePercentage) {
       //pie should have only one config bit.

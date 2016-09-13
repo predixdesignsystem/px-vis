@@ -46,7 +46,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           label-type-size="10"
           current-domain="[[currentDomainY]]"
           stroke-width="[[strokeWidth]]"
-          outer-tick-size="0"g
+          outer-tick-size="0"
           tick-values="[[_calcTickVals(item, _internalDimensionsChanged)]]"
           truncation-length="[[truncationLength]]"
           complete-series-config="[[completeSeriesConfig]]"
@@ -124,6 +124,14 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
        *
        */
       axisGroups: {
+        type: Object,
+        notify: true
+      },
+      /**
+       * A dictionary of g elems for each dimension
+       *
+       */
+      axisElems: {
         type: Object,
         notify: true
       },
@@ -251,11 +259,13 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               // TODO add a check that we want it to fire these events?
 
               // Dont know why, but need to do this calc before the debounce
-              var m = Px.d3.mouse(this);
+              var m = Px.d3.mouse(this),
+                  elem = this;
 
               _this.debounce('axisMouseMove', function() {
                 var deets = {
                   'axis': d,
+                  'elem': elem,
                   'mousePos': m
                 }
                 _this.fire('px-vis-multi-axis-mousemove', deets);
@@ -264,6 +274,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .on('mouseleave',function(d){
               var deets = {
                 'axis': d,
+                'elem': this,
                 'mousePos': Px.d3.mouse(this)
               }
               _this.fire('px-vis-multi-axis-mouseleave', deets);
@@ -285,6 +296,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
           // TODO When we support muting an axes, might want to be able to access the above g and change the transform
           this.set('axisGroups', this.axisSvg.selectAll(".dimension"));
+          this.set('axisElems', this.axisSvg.selectAll(".dimension").nodes());
 
         }
       // },10)

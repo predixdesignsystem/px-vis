@@ -1,3 +1,8 @@
+v0.3.0
+==================
+* tooltip now uses px-tooltip
+* associated changes to support that
+
 v0.2.7
 ==================
 * modified grid so it can remove itself on detach

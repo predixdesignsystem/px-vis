@@ -136,7 +136,28 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           titleTruncation: {
             type: Boolean,
             value: false
+          },
+          /**
+          * An String that specifies the format of the ticks
+          *
+          * https://github.com/d3/d3-time-format
+          */
+          tickFormat: {
+            type: String
           }
+          /**
+          * An object that specifies the interval and format of the ticks
+          *
+          * https://github.com/d3/d3-time-format
+          *
+          *     {
+          *         "interval": Number,
+          *         "format": String per https://github.com/d3/d3-time-format
+          *     }
+          */
+          // ticks: {
+          //   type: Object
+          // }
         },
 
         observers: [
@@ -197,8 +218,17 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           // this._axis.ticks(10);
           // change default ticks with specific time
           // this._axis.ticks(d3.time.months, 1);
-          // this._axis.ticks(d3.time.days, 7);
-          // this._axis.ticks(d3.time.minutes, 15);
+          // this._axis.ticks(Px.d3.time.days, 7);
+          //
+
+          // if(this.ticks && this._doesObjHaveValues(ticks)){
+          //   this._axis.ticks(this.ticks.interval, this.ticks.format);
+          // }
+          // https://github.com/mbostock/d3/wiki/Formatting#d3_format
+          if(this.tickFormat){
+            this._axis.tickFormat(Px.d3.timeFormat(this.tickFormat));
+          }
+
           if(this.tickValues && this.tickValues.length > 0){
             this._axis.tickValues(this.tickValues);
           }
@@ -209,9 +239,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           // controls the first and last ticks
           // TODO rename var names to match new d3
           this._axis.tickSizeOuter(this.outerTickSize);
-
-          // https://github.com/mbostock/d3/wiki/Formatting#d3_format
-          // this._axis.tickFormat(d3.format(",.0f"));
 
           // TODO rename var names to match new d3
           if(this.labelPosition !== 'center'){
