@@ -1,3 +1,7 @@
+v0.3.9
+==================
+* fixed tests
+
 v0.3.8
 ==================
 * tooltip design fixes
