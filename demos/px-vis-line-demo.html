@@ -3,14 +3,15 @@
 
   <link rel="import" href="../px-vis-scale.html">
   <link rel="import" href="../px-vis-svg.html">
+  <link rel="import" href="../px-vis-line.html">
 
-<dom-module id="px-vis-scale-demo">
+<dom-module id="px-vis-line-demo">
   <template>
-    <p class="epsilon demo__title">px-vis-scale</p>
+    <p class="epsilon demo__title">px-vis-line</p>
     <div class="demo u-p+ flex">
       <div>
 
-      <!-- need for scale -->
+      <!-- need for line -->
         <px-vis-svg
           class="outline"
           width="[[width]]"
@@ -33,26 +34,33 @@
           current-domain-y="{{currentDomainY}}"
           selected-domain="[[selectedDomain]]">
         </px-vis-scale>
+        <px-vis-line
+          svg="[[svg]]"
+          series-id="mySeries"
+          complete-series-config="[[seriesConfig]]"
+          chart-data="[[chartData]]"
+          x="[[x]]"
+          y="[[y]]"
+          current-domain-x="[[currentDomainX]]"
+          current-domain-y="[[currentDomainY]]">
+        </px-vis-line>
 
       </div>
       <div class="demo__discription u-pl+">
-        <p class="u-mt0"><strong>All charts need an interpretor component.</strong> These cannot be seen but provide the basic framework for drawing objects to be displayed.</p>
-        <p>Interpretor components convert data into drawing space coordinates.</p>
-        <p>The scale component creates 'x' & 'y' and 'currentDomainX' & 'currentDomainY' variables which can be passed into drawing components.</p>
-        <p style="oblique">Note: All the subsequent charts will have this component, but they will not be shown in the code snippet.</p>
+        <p class="u-mt0">Example of a line drawing object. Bound elements are set from other components, such as px-vis-svg and px-vis-scale, and passed into px-vis-line.</p>
       </div>
     </div>
     <div>
       <px-demo-snippet
-        element-properties="[[elempropScale]]"
-        element-name="px-vis-scale">
+        element-properties="[[elempropLine]]"
+        element-name="px-vis-line">
       </px-demo-snippet>
     </div>
 
   </template>
   <script>
     Polymer({
-      is: "px-vis-scale-demo",
+      is: "px-vis-line-demo",
       properties:{
         //basics
         width: {
@@ -133,22 +141,17 @@
           }
         },
         // demo snippet
-        elempropScale:{
+        elempropLine:{
           type : Object,
           value:{
-            "xAxisType":"time",
-            "yAxisType":"linear",
+            "svg":"[[svg]]",
+            "seriesId":"mySeries",
             "completeSeriesConfig":"[[seriesConfig]]",
-            "chartExtents":"[[chartExtents]]",
-            "width":"[[width]]",
-            "height":"[[height]]",
-            "margin":"[[margin]]",
-            "chartData":"{{chartData}}",
-            "x":"{{x}}",
-            "y":"{{y}}",
-            "currentDomainX":"{{currentDomainX}}",
-            "currentDomainY":"{{currentDomainY}}",
-            "selectedDomain":"[[selectedDomain]]"
+            "chartData":"[[chartData]]",
+            "x":"[[x]]",
+            "y":"[[y]]",
+            "currentDomainX":"[[currentDomainX]]",
+            "currentDomainY":"[[currentDomainY]]"
           }
         }
       }
