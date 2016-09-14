@@ -1,3 +1,8 @@
+v0.3.8
+==================
+* tooltip design fixes
+* fixed brushes with muting and unmuting
+
 v0.3.7
 ==================
 * changed default date format to 24hour clock
