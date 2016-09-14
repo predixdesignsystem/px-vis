@@ -6,114 +6,120 @@
 
 <dom-module id="px-vis-chart-navigator-demo">
   <template>
-    <template id="demoChartNavigator" is="dom-bind">
-      <p class="epsilon demo__title">px-vis-chart-navigator</p>
-      <div class="demo u-p+ flex">
-        <div>
-
-          <!-- need for chart-navigator -->
-          <template id="visChartNavigator" is="dom-bind">
-
-            <px-vis-chart-navigator
-              x-axis-type="time"
-              y-axis-type="linear"
-              width="[[basic.width]]"
-              height="100"
-              margin="[[basic.margin]]"
-              include-all-series
-              chart-data="[[basic.chartData]]">
-            </px-vis-chart-navigator>
-          </template>
-
-        </div>
-        <div class="demo__discription u-pl+">
-          <p class="u-mt0">Example of a chart-navigator drawing object. Very similar configuration to px-vis-line.</p>
-        </div>
-      </div>
+    <p class="epsilon demo__title">px-vis-chart-navigator</p>
+    <div class="demo u-p+ flex">
       <div>
-        <px-demo-snippet
-          element-properties="[[elempropChartNavigator]]"
-          element-name="px-vis-chart-navigator">
-        </px-demo-snippet>
-      </div>
 
-    </template>
+      <!-- need for chart-navigator -->
+        <px-vis-chart-navigator
+          x-axis-type="time"
+          y-axis-type="linear"
+          width="[[width]]"
+          height="100"
+          margin="[[margin]]"
+          include-all-series
+          chart-data="[[chartData]]">
+        </px-vis-chart-navigator>
+
+      </div>
+      <div class="demo__discription u-pl+">
+        <p class="u-mt0">Example of a chart-navigator drawing object. Very similar configuration to px-vis-line.</p>
+      </div>
+    </div>
+    <div>
+      <px-demo-snippet
+        element-properties="[[elempropChartNavigator]]"
+        element-name="px-vis-chart-navigator">
+      </px-demo-snippet>
+    </div>
+
   </template>
   <script>
     Polymer({
-        is: "px-vis-chart-navigator-demo"
-      });
-
-    window.addEventListener('WebComponentsReady', function() {
-      // content for the vis components
-      basic = {
-        width : 500,
-        height : 100,
-        margin : {
-          "top": 10,
-          "right": 10,
-          "bottom": 10,
-          "left": 10
+      is: "px-vis-chart-navigator-demo",
+      properties:{
+        //basics
+        width: {
+          type : Number,
+          value : 500
         },
-        chartData : [{
-            'x': 1397102460000,
-            'y': 0.56
-          },{
-            'x': 1397139660000,
-            'y': 0.4
-          },{
-            'x': 1397177400000,
-            'y': 0.43
-          },{
-            'x': 1397228040000,
-            'y': 0.33
-          },{
-            'x': 1397248260000,
-            'y': 0.47
-          },{
-            'x': 1397291280000,
-            'y': 0.41
-          },{
-            'x': 1397318100000,
-            'y': 0.26
-          },{
-            'x': 1397342100000,
-            'y': 0.42
-          },{
-            'x': 1397390820000,
-            'y': 0.27
-          },{
-            'x': 1397408100000,
-            'y': 0.38
-          },{
-            'x': 1397458800000,
-            'y': 0.36
-          },{
-            'x': 1397522940000,
-            'y': 0.32
-        }],
-        seriesConfig: {
-          'mySeries': {
-            "name":"My-Series",
-            "type": "line",
-            "x": 'x',
-            "y": 'y',
-            'color': "rgb(93,165,218)"
+        height:{
+          type : Number,
+          value : 100
+        },
+        margin:{
+          type : Object,
+          value : {
+            "top": 10,
+            "right": 10,
+            "bottom": 10,
+            "left": 10
           }
-        }
-      },
-      chartExtents = {
-        "x": [Infinity,-Infinity],
-        "y": [0,-Infinity]
-      };
-
-      var templateChartNavigator = document.querySelector('#visChartNavigator');
-          templateChartNavigator.basic = basic;
-          templateChartNavigator.chartExtents = chartExtents;
-
-      // content for demo snippet
-      var templateDemo = document.querySelector('#demoChartNavigator'),
-          elempropChartNavigator = {
+        },
+        chartData:{
+          type : Array,
+          value : [{
+              'x': 1397102460000,
+              'y': 0.56
+            },{
+              'x': 1397139660000,
+              'y': 0.4
+            },{
+              'x': 1397177400000,
+              'y': 0.43
+            },{
+              'x': 1397228040000,
+              'y': 0.33
+            },{
+              'x': 1397248260000,
+              'y': 0.47
+            },{
+              'x': 1397291280000,
+              'y': 0.41
+            },{
+              'x': 1397318100000,
+              'y': 0.26
+            },{
+              'x': 1397342100000,
+              'y': 0.42
+            },{
+              'x': 1397390820000,
+              'y': 0.27
+            },{
+              'x': 1397408100000,
+              'y': 0.38
+            },{
+              'x': 1397458800000,
+              'y': 0.36
+            },{
+              'x': 1397522940000,
+              'y': 0.32
+          }]
+        },
+        seriesConfig:{
+          type : Object,
+          value: {
+            'mySeries': {
+              "name":"My-Series",
+              "type": "line",
+              "x": 'x',
+              "y": 'y',
+              'color': "rgb(93,165,218)"
+            }
+          }
+        },
+        //chartExtents
+        chartExtents:{
+          type : Object,
+          value: {
+            "x": [Infinity,-Infinity],
+            "y": [0,-Infinity]
+          }
+        },
+        // demo snippet
+        elempropChartNavigator:{
+          type : Object,
+          value:{
             "svg":"[[svg]]",
             "series-id":"mySeries",
             "complete-series-config":"[[basic.seriesConfig]]",
@@ -122,8 +128,91 @@
             "y":"[[y]]",
             "current-domain-x":"[[currentDomainX]]",
             "current-domain-y":"[[currentDomainY]]"
-          };
-          templateDemo.elempropChartNavigator = elempropChartNavigator;
-      });
+          }
+        }
+      }
+    });
+
+    // window.addEventListener('WebComponentsReady', function() {
+    //   // content for the vis components
+    //   basic = {
+    //     width : 500,
+    //     height : 100,
+    //     margin : {
+    //       "top": 10,
+    //       "right": 10,
+    //       "bottom": 10,
+    //       "left": 10
+    //     },
+    //     chartData : [{
+    //         'x': 1397102460000,
+    //         'y': 0.56
+    //       },{
+    //         'x': 1397139660000,
+    //         'y': 0.4
+    //       },{
+    //         'x': 1397177400000,
+    //         'y': 0.43
+    //       },{
+    //         'x': 1397228040000,
+    //         'y': 0.33
+    //       },{
+    //         'x': 1397248260000,
+    //         'y': 0.47
+    //       },{
+    //         'x': 1397291280000,
+    //         'y': 0.41
+    //       },{
+    //         'x': 1397318100000,
+    //         'y': 0.26
+    //       },{
+    //         'x': 1397342100000,
+    //         'y': 0.42
+    //       },{
+    //         'x': 1397390820000,
+    //         'y': 0.27
+    //       },{
+    //         'x': 1397408100000,
+    //         'y': 0.38
+    //       },{
+    //         'x': 1397458800000,
+    //         'y': 0.36
+    //       },{
+    //         'x': 1397522940000,
+    //         'y': 0.32
+    //     }],
+    //     seriesConfig: {
+    //       'mySeries': {
+    //         "name":"My-Series",
+    //         "type": "line",
+    //         "x": 'x',
+    //         "y": 'y',
+    //         'color': "rgb(93,165,218)"
+    //       }
+    //     }
+    //   },
+    //   chartExtents = {
+    //     "x": [Infinity,-Infinity],
+    //     "y": [0,-Infinity]
+    //   };
+    //
+    //   var templateChartNavigator = document.querySelector('#visChartNavigator');
+    //       templateChartNavigator.basic = basic;
+    //       templateChartNavigator.chartExtents = chartExtents;
+    //
+    //   // content for demo snippet
+    //   var templateDemo = document.querySelector('#demoChartNavigator'),
+    //       elempropChartNavigator = {
+    //         "svg":"[[svg]]",
+    //         "series-id":"mySeries",
+    //         "complete-series-config":"[[basic.seriesConfig]]",
+    //         "chart-data":"[[basic.chartData]]",
+    //         "x":"[[x]]",
+    //         "y":"[[y]]",
+    //         "current-domain-x":"[[currentDomainX]]",
+    //         "current-domain-y":"[[currentDomainY]]"
+    //       };
+    //       templateDemo.elempropChartNavigator = elempropChartNavigator;
+    //   });
   </script>
 </dom-module>

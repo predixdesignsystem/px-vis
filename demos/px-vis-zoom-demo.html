@@ -9,244 +9,170 @@
 
 <dom-module id="px-vis-zoom-demo">
   <template>
-      <p class="epsilon demo__title">px-vis-zoom</p>
-      <div class="demo u-p+ flex">
-        <div>
-
-          <!-- need for zoom -->
-            <px-vis-zoom
-              px-svg-elem="[[pxSvgElem]]"
-              margin="[[margin]]"
-              extents-data="[[extentsData]]"
-              selected-domain="{{selectedDomain}}">
-            </px-vis-zoom>
-            <px-vis-svg
-              px-svg-elem="{{pxSvgElem}}"
-              class="outline"
-              width="[[width]]"
-              height="[[height]]"
-              margin="[[margin]]"
-              svg="{{svg}}">
-            </px-vis-svg>
-            <px-vis-scale
-              x-axis-type="time"
-              y-axis-type="linear"
-              complete-series-config="[[seriesConfig]]"
-              chart-extents="[[chartExtents]]"
-              width="[[width]]"
-              height="[[height]]"
-              margin="[[margin]]"
-              chart-data={{chartData}}
-              x="{{x}}"
-              y="{{y}}"
-              current-domain-x="{{currentDomainX}}"
-              current-domain-y="{{currentDomainY}}"
-              selected-domain="[[selectedDomain]]"
-              chart-data="[[chartData]]">
-            </px-vis-scale>
-            <px-vis-interaction-space
-              x-axis-type="time"
-              svg="[[svg]]"
-              width="[[width]]"
-              height="[[height]]"
-              margin="[[margin]]"
-              complete-series-config="[[seriesConfig]]"
-              chart-data="[[chartData]]"
-              tooltip-data={{tooltipData}}
-              extents-data={{extentsData}}
-              x="[[x]]"
-              y="[[y]]"
-              current-domain-x="[[currentDomainX]]"
-              current-domain-y="[[currentDomainY]]">
-            </px-vis-interaction-space>
-            <px-vis-line
-              svg="[[svg]]"
-              series-id="mySeries"
-              complete-series-config="[[seriesConfig]]"
-              chart-data="[[chartData]]"
-              x="[[x]]"
-              y="[[y]]"
-              current-domain-x="[[currentDomainX]]"
-              current-domain-y="[[currentDomainY]]">
-            </px-vis-line>
-
-
-        </div>
-        <div class="demo__discription u-pl+">
-          <p class="u-mt0">The on-chart zoom action. It requires the px-vis-interaction-space. Click and drag on the chart to see.</p>
-        </div>
-      </div>
+    <p class="epsilon demo__title">px-vis-zoom</p>
+    <div class="demo u-p+ flex">
       <div>
-        <px-demo-snippet
-          element-properties="[[elempropZoom]]"
-          element-name="px-vis-zoom">
-        </px-demo-snippet>
+
+      <!-- need for zoom -->
+        <px-vis-zoom
+          px-svg-elem="[[pxSvgElem]]"
+          margin="[[margin]]"
+          extents-data="[[extentsData]]"
+          selected-domain="{{selectedDomain}}">
+        </px-vis-zoom>
+        <px-vis-svg
+          px-svg-elem="{{pxSvgElem}}"
+          class="outline"
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          svg="{{svg}}">
+        </px-vis-svg>
+        <px-vis-scale
+          x-axis-type="time"
+          y-axis-type="linear"
+          complete-series-config="[[seriesConfig]]"
+          chart-extents="[[chartExtents]]"
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          chart-data={{chartData}}
+          x="{{x}}"
+          y="{{y}}"
+          current-domain-x="{{currentDomainX}}"
+          current-domain-y="{{currentDomainY}}"
+          selected-domain="[[selectedDomain]]"
+          chart-data="[[chartData]]">
+        </px-vis-scale>
+        <px-vis-interaction-space
+          x-axis-type="time"
+          svg="[[svg]]"
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          complete-series-config="[[seriesConfig]]"
+          chart-data="[[chartData]]"
+          tooltip-data={{tooltipData}}
+          extents-data={{extentsData}}
+          x="[[x]]"
+          y="[[y]]"
+          current-domain-x="[[currentDomainX]]"
+          current-domain-y="[[currentDomainY]]">
+        </px-vis-interaction-space>
+        <px-vis-line
+          svg="[[svg]]"
+          series-id="mySeries"
+          complete-series-config="[[seriesConfig]]"
+          chart-data="[[chartData]]"
+          x="[[x]]"
+          y="[[y]]"
+          current-domain-x="[[currentDomainX]]"
+          current-domain-y="[[currentDomainY]]">
+        </px-vis-line>
+
       </div>
+      <div class="demo__discription u-pl+">
+        <p class="u-mt0">The on-chart zoom action. It requires the px-vis-interaction-space. Click and drag on the chart to see.</p>
+      </div>
+    </div>
+    <div>
+      <px-demo-snippet
+        element-properties="[[elempropZoom]]"
+        element-name="px-vis-zoom">
+      </px-demo-snippet>
+    </div>
 
   </template>
   <script>
     Polymer({
-        is: "px-vis-zoom-demo",
-        properties:{
-          //basics
-          width: {
-            type : Number,
-            value : 500
-          },
-          height:{
-            type : Number,
-            value : 200
-          },
-          margin:{
-            type : Object,
-            value : {
-              "top": 10,
-              "right": 10,
-              "bottom": 10,
-              "left": 10
+      is: "px-vis-zoom-demo",
+      properties:{
+        //basics
+        width: {
+          type : Number,
+          value : 500
+        },
+        height:{
+          type : Number,
+          value : 200
+        },
+        margin:{
+          type : Object,
+          value : {
+            "top": 10,
+            "right": 10,
+            "bottom": 10,
+            "left": 10
+          }
+        },
+        chartData:{
+          type : Array,
+          value : [{
+              'x': 1397102460000,
+              'y': 0.56
+            },{
+              'x': 1397139660000,
+              'y': 0.4
+            },{
+              'x': 1397177400000,
+              'y': 0.43
+            },{
+              'x': 1397228040000,
+              'y': 0.33
+            },{
+              'x': 1397248260000,
+              'y': 0.47
+            },{
+              'x': 1397291280000,
+              'y': 0.41
+            },{
+              'x': 1397318100000,
+              'y': 0.26
+            },{
+              'x': 1397342100000,
+              'y': 0.42
+            },{
+              'x': 1397390820000,
+              'y': 0.27
+            },{
+              'x': 1397408100000,
+              'y': 0.38
+            },{
+              'x': 1397458800000,
+              'y': 0.36
+            },{
+              'x': 1397522940000,
+              'y': 0.32
+          }]
+        },
+        seriesConfig:{
+          type : Object,
+          value: {
+            'mySeries': {
+              "name":"My-Series",
+              "type": "line",
+              "x": 'x',
+              "y": 'y',
+              'color': "rgb(93,165,218)"
             }
-          },
-          chartData:{
-            type : Array,
-            value : [{
-                'x': 1397102460000,
-                'y': 0.56
-              },{
-                'x': 1397139660000,
-                'y': 0.4
-              },{
-                'x': 1397177400000,
-                'y': 0.43
-              },{
-                'x': 1397228040000,
-                'y': 0.33
-              },{
-                'x': 1397248260000,
-                'y': 0.47
-              },{
-                'x': 1397291280000,
-                'y': 0.41
-              },{
-                'x': 1397318100000,
-                'y': 0.26
-              },{
-                'x': 1397342100000,
-                'y': 0.42
-              },{
-                'x': 1397390820000,
-                'y': 0.27
-              },{
-                'x': 1397408100000,
-                'y': 0.38
-              },{
-                'x': 1397458800000,
-                'y': 0.36
-              },{
-                'x': 1397522940000,
-                'y': 0.32
-            }]
-          },
-          seriesConfig:{
-            type : Object,
-            value: {
-              'mySeries': {
-                "name":"My-Series",
-                "type": "line",
-                "x": 'x',
-                "y": 'y',
-                'color': "rgb(93,165,218)"
-              }
-            }
-          },
-          //chartExtents
-          chartExtents:{
-            type : Object,
-            value: {
-              "x": [Infinity,-Infinity],
-              "y": [0,-Infinity]
-            }
-          },
-          // demo snippet
-          elempropZoom:{
-            type : Object,
-            value:''
+          }
+        },
+        //chartExtents
+        chartExtents:{
+          type : Object,
+          value: {
+            "x": [Infinity,-Infinity],
+            "y": [0,-Infinity]
+          }
+        },
+        // demo snippet
+        elempropZoom:{
+          type : Object,
+          value:{
+
           }
         }
-      });
-
-    // window.addEventListener('WebComponentsReady', function() {
-    //   // content for the vis components
-    //   basic = {
-    //     width : 500,
-    //     height : 200,
-    //     margin : {
-    //       "top": 10,
-    //       "right": 10,
-    //       "bottom": 10,
-    //       "left": 10
-    //     },
-    //     chartData : [{
-    //         'x': 1397102460000,
-    //         'y': 0.56
-    //       },{
-    //         'x': 1397139660000,
-    //         'y': 0.4
-    //       },{
-    //         'x': 1397177400000,
-    //         'y': 0.43
-    //       },{
-    //         'x': 1397228040000,
-    //         'y': 0.33
-    //       },{
-    //         'x': 1397248260000,
-    //         'y': 0.47
-    //       },{
-    //         'x': 1397291280000,
-    //         'y': 0.41
-    //       },{
-    //         'x': 1397318100000,
-    //         'y': 0.26
-    //       },{
-    //         'x': 1397342100000,
-    //         'y': 0.42
-    //       },{
-    //         'x': 1397390820000,
-    //         'y': 0.27
-    //       },{
-    //         'x': 1397408100000,
-    //         'y': 0.38
-    //       },{
-    //         'x': 1397458800000,
-    //         'y': 0.36
-    //       },{
-    //         'x': 1397522940000,
-    //         'y': 0.32
-    //     }],
-    //     seriesConfig: {
-    //       'mySeries': {
-    //         "name":"My-Series",
-    //         "type": "line",
-    //         "x": 'x',
-    //         "y": 'y',
-    //         'color': "rgb(93,165,218)"
-    //       }
-    //     }
-    //   },
-    //   chartExtents = {
-    //     "x": [Infinity,-Infinity],
-    //     "y": [0,-Infinity]
-    //   };
-    //
-    //   var templateZoom = document.querySelector('#visZoom');
-    //       templateZoom.basic = basic;
-    //       templateZoom.chartExtents = chartExtents;
-    //
-    //   // content for demo snippet
-    //   var templateDemo = document.querySelector('#demoZoom'),
-    //       elempropZoom = {
-    //
-    //       };
-    //       templateDemo.elempropZoom = elempropZoom;
-    //   });
+      }
+    });
   </script>
 </dom-module>

@@ -1,5 +1,5 @@
   <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-   
+
 
   <link rel="import" href="../px-vis-scale.html">
   <link rel="import" href="../px-vis-svg.html">
@@ -7,137 +7,143 @@
 
 <dom-module id="px-vis-scatter-demo">
   <template>
-    <template id="demoScatter" is="dom-bind">
-      <p class="epsilon demo__title">px-vis-scatter</p>
-      <div class="demo u-p+ flex">
-        <div>
-
-          <!-- need for scatter -->
-          <template id="visScatter" is="dom-bind">
-
-            <px-vis-svg
-              class="outline"
-              width="[[basic.width]]"
-              height="[[basic.height]]"
-              margin="[[basic.margin]]"
-              svg="{{svg}}">
-            </px-vis-svg>
-            <px-vis-scale
-              x-axis-type="time"
-              y-axis-type="linear"
-              complete-series-config="[[basic.seriesConfig]]"
-              chart-extents="[[chartExtents]]"
-              width="[[basic.width]]"
-              height="[[basic.height]]"
-              margin="[[basic.margin]]"
-              chart-data={{basic.chartData}}
-              x="{{x}}"
-              y="{{y}}"
-              current-domain-x="{{currentDomainX}}"
-              current-domain-y="{{currentDomainY}}"
-              selected-domain="[[selectedDomain]]">
-            </px-vis-scale>
-            <px-vis-scatter
-              svg="[[svg]]"
-              series-id="mySeries"
-              complete-series-config="[[basic.seriesConfig]]"
-              chart-data="[[basic.chartData]]"
-              x="[[x]]"
-              y="[[y]]"
-              current-domain-x="[[currentDomainX]]"
-              current-domain-y="[[currentDomainY]]">
-            </px-vis-scatter>
-          </template>
-
-        </div>
-        <div class="demo__discription u-pl+">
-          <p class="u-mt0">Example of a scatter drawing object. Very similar configuration to px-vis-line.</p>
-        </div>
-      </div>
+    <p class="epsilon demo__title">px-vis-scatter</p>
+    <div class="demo u-p+ flex">
       <div>
-        <px-demo-snippet
-          element-properties="[[elempropScatter]]"
-          element-name="px-vis-scatter">
-        </px-demo-snippet>
-      </div>
 
-    </template>
+      <!-- need for scatter -->
+        <px-vis-svg
+          class="outline"
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          svg="{{svg}}">
+        </px-vis-svg>
+        <px-vis-scale
+          x-axis-type="time"
+          y-axis-type="linear"
+          complete-series-config="[[seriesConfig]]"
+          chart-extents="[[chartExtents]]"
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          chart-data={{chartData}}
+          x="{{x}}"
+          y="{{y}}"
+          current-domain-x="{{currentDomainX}}"
+          current-domain-y="{{currentDomainY}}"
+          selected-domain="[[selectedDomain]]">
+        </px-vis-scale>
+        <px-vis-scatter
+          svg="[[svg]]"
+          series-id="mySeries"
+          complete-series-config="[[seriesConfig]]"
+          chart-data="[[chartData]]"
+          x="[[x]]"
+          y="[[y]]"
+          current-domain-x="[[currentDomainX]]"
+          current-domain-y="[[currentDomainY]]">
+        </px-vis-scatter>
+
+      </div>
+      <div class="demo__discription u-pl+">
+        <p class="u-mt0">Example of a scatter drawing object. Very similar configuration to px-vis-line.</p>
+      </div>
+    </div>
+    <div>
+      <px-demo-snippet
+        element-properties="[[elempropScatter]]"
+        element-name="px-vis-scatter">
+      </px-demo-snippet>
+    </div>
+
   </template>
   <script>
     Polymer({
-        is: "px-vis-scatter-demo"
-      });
-
-    window.addEventListener('WebComponentsReady', function() {
-      // content for the vis components
-      basic = {
-        width : 500,
-        height : 200,
-        margin : {
-          "top": 10,
-          "right": 10,
-          "bottom": 10,
-          "left": 10
+      is: "px-vis-scatter-demo",
+      properties:{
+        //basics
+        width: {
+          type : Number,
+          value : 500
         },
-        chartData : [{
-            'x': 1397102460000,
-            'y': 0.56
-          },{
-            'x': 1397139660000,
-            'y': 0.4
-          },{
-            'x': 1397177400000,
-            'y': 0.43
-          },{
-            'x': 1397228040000,
-            'y': 0.33
-          },{
-            'x': 1397248260000,
-            'y': 0.47
-          },{
-            'x': 1397291280000,
-            'y': 0.41
-          },{
-            'x': 1397318100000,
-            'y': 0.26
-          },{
-            'x': 1397342100000,
-            'y': 0.42
-          },{
-            'x': 1397390820000,
-            'y': 0.27
-          },{
-            'x': 1397408100000,
-            'y': 0.38
-          },{
-            'x': 1397458800000,
-            'y': 0.36
-          },{
-            'x': 1397522940000,
-            'y': 0.32
-        }],
-        seriesConfig: {
-          'mySeries': {
-            "name":"My-Series",
-            "type": "line",
-            "x": 'x',
-            "y": 'y',
-            'color': "rgb(93,165,218)"
+        height:{
+          type : Number,
+          value : 200
+        },
+        margin:{
+          type : Object,
+          value : {
+            "top": 10,
+            "right": 10,
+            "bottom": 10,
+            "left": 10
           }
-        }
-      },
-      chartExtents = {
-        "x": [Infinity,-Infinity],
-        "y": [0,-Infinity]
-      };
-
-      var templateScatter = document.querySelector('#visScatter');
-          templateScatter.basic = basic;
-          templateScatter.chartExtents = chartExtents;
-
-      // content for demo snippet
-      var templateDemo = document.querySelector('#demoScatter'),
-          elempropScatter = {
+        },
+        chartData:{
+          type : Array,
+          value : [{
+              'x': 1397102460000,
+              'y': 0.56
+            },{
+              'x': 1397139660000,
+              'y': 0.4
+            },{
+              'x': 1397177400000,
+              'y': 0.43
+            },{
+              'x': 1397228040000,
+              'y': 0.33
+            },{
+              'x': 1397248260000,
+              'y': 0.47
+            },{
+              'x': 1397291280000,
+              'y': 0.41
+            },{
+              'x': 1397318100000,
+              'y': 0.26
+            },{
+              'x': 1397342100000,
+              'y': 0.42
+            },{
+              'x': 1397390820000,
+              'y': 0.27
+            },{
+              'x': 1397408100000,
+              'y': 0.38
+            },{
+              'x': 1397458800000,
+              'y': 0.36
+            },{
+              'x': 1397522940000,
+              'y': 0.32
+          }]
+        },
+        seriesConfig:{
+          type : Object,
+          value: {
+            'mySeries': {
+              "name":"My-Series",
+              "type": "line",
+              "x": 'x',
+              "y": 'y',
+              'color': "rgb(93,165,218)"
+            }
+          }
+        },
+        //chartExtents
+        chartExtents:{
+          type : Object,
+          value: {
+            "x": [Infinity,-Infinity],
+            "y": [0,-Infinity]
+          }
+        },
+        // demo snippet
+        elempropScatter:{
+          type : Object,
+          value:{
             "svg":"[[svg]]",
             "series-id":"mySeries",
             "complete-series-config":"[[basic.seriesConfig]]",
@@ -146,8 +152,90 @@
             "y":"[[y]]",
             "current-domain-x":"[[currentDomainX]]",
             "current-domain-y":"[[currentDomainY]]"
-          };
-          templateDemo.elempropScatter = elempropScatter;
-      });
+          }
+        }
+      }
+    });
+    // window.addEventListener('WebComponentsReady', function() {
+    //   // content for the vis components
+    //   basic = {
+    //     width : 500,
+    //     height : 200,
+    //     margin : {
+    //       "top": 10,
+    //       "right": 10,
+    //       "bottom": 10,
+    //       "left": 10
+    //     },
+    //     chartData : [{
+    //         'x': 1397102460000,
+    //         'y': 0.56
+    //       },{
+    //         'x': 1397139660000,
+    //         'y': 0.4
+    //       },{
+    //         'x': 1397177400000,
+    //         'y': 0.43
+    //       },{
+    //         'x': 1397228040000,
+    //         'y': 0.33
+    //       },{
+    //         'x': 1397248260000,
+    //         'y': 0.47
+    //       },{
+    //         'x': 1397291280000,
+    //         'y': 0.41
+    //       },{
+    //         'x': 1397318100000,
+    //         'y': 0.26
+    //       },{
+    //         'x': 1397342100000,
+    //         'y': 0.42
+    //       },{
+    //         'x': 1397390820000,
+    //         'y': 0.27
+    //       },{
+    //         'x': 1397408100000,
+    //         'y': 0.38
+    //       },{
+    //         'x': 1397458800000,
+    //         'y': 0.36
+    //       },{
+    //         'x': 1397522940000,
+    //         'y': 0.32
+    //     }],
+    //     seriesConfig: {
+    //       'mySeries': {
+    //         "name":"My-Series",
+    //         "type": "line",
+    //         "x": 'x',
+    //         "y": 'y',
+    //         'color': "rgb(93,165,218)"
+    //       }
+    //     }
+    //   },
+    //   chartExtents = {
+    //     "x": [Infinity,-Infinity],
+    //     "y": [0,-Infinity]
+    //   };
+    //
+    //   var templateScatter = document.querySelector('#visScatter');
+    //       templateScatter.basic = basic;
+    //       templateScatter.chartExtents = chartExtents;
+    //
+    //   // content for demo snippet
+    //   var templateDemo = document.querySelector('#demoScatter'),
+    //       elempropScatter = {
+    //         "svg":"[[svg]]",
+    //         "series-id":"mySeries",
+    //         "complete-series-config":"[[basic.seriesConfig]]",
+    //         "chart-data":"[[basic.chartData]]",
+    //         "x":"[[x]]",
+    //         "y":"[[y]]",
+    //         "current-domain-x":"[[currentDomainX]]",
+    //         "current-domain-y":"[[currentDomainY]]"
+    //       };
+    //       templateDemo.elempropScatter = elempropScatter;
+    //   });
   </script>
 </dom-module>
