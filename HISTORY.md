@@ -1,3 +1,7 @@
+v0.3.7
+==================
+* changed default date format to 24hour clock
+
 v0.3.6
 ==================
 * fixed axis label format so it can accept linear or time
