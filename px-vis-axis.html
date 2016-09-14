@@ -144,20 +144,16 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           */
           tickFormat: {
             type: String
-          }
+          },
           /**
-          * An object that specifies the interval and format of the ticks
-          *
-          * https://github.com/d3/d3-time-format
-          *
-          *     {
-          *         "interval": Number,
-          *         "format": String per https://github.com/d3/d3-time-format
-          *     }
+          * A string specifying the type of axis. Used only for tick formating. Valid entries are:
+          * - `time`
+          * - `linear`
           */
-          // ticks: {
-          //   type: Object
-          // }
+          axisType: {
+            type: String,
+            value: "linear"
+          }
         },
 
         observers: [
@@ -226,7 +222,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           // }
           // https://github.com/mbostock/d3/wiki/Formatting#d3_format
           if(this.tickFormat){
-            this._axis.tickFormat(Px.d3.timeFormat(this.tickFormat));
+            if(this.axisType === 'time'){
+              this._axis.tickFormat(Px.d3.timeFormat(this.tickFormat));
+            } else if(this.axisType === 'linear'){
+              this._axis.tickFormat(Px.d3.format(this.tickFormat));
+            }
           }
 
           if(this.tickValues && this.tickValues.length > 0){
@@ -564,7 +564,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               if(this.titleTruncation){
                 newTitle = this._truncateName(title, truncationLength) + this._currentUnits;
               } else {
-                newTitle = title;
+                newTitle = title + this._currentUnits;
               }
               if(newTitle !== oldTitle) {
                 this.fire('px-vis-axis-displayed-title-changed', {displayedTitle: newTitle, title: this.title, id: this.seriesId});

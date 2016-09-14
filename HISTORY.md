@@ -1,3 +1,9 @@
+v0.3.6
+==================
+* fixed axis label format so it can accept linear or time
+* added am/pm to default time format
+* update axis tests
+
 v0.3.5
 ==================
 * fixed margin in multi axis
