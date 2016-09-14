@@ -1,63 +1,39 @@
-  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
-   
+<script src="../../webcomponentsjs/webcomponents-lite.js"></script>
 
   <link rel="import" href="../px-vis-scale.html">
   <link rel="import" href="../px-vis-svg.html">
-  <link rel="import" href="../px-vis-scatter.html">
+  <link rel="import" href="../px-vis-chart-navigator.html">
 
-<dom-module id="px-vis-scatter-demo">
+<dom-module id="px-vis-chart-navigator-demo">
   <template>
-    <template id="demoScatter" is="dom-bind">
-      <p class="epsilon demo__title">px-vis-scatter</p>
+    <template id="demoChartNavigator" is="dom-bind">
+      <p class="epsilon demo__title">px-vis-chart-navigator</p>
       <div class="demo u-p+ flex">
         <div>
 
-          <!-- need for scatter -->
-          <template id="visScatter" is="dom-bind">
+          <!-- need for chart-navigator -->
+          <template id="visChartNavigator" is="dom-bind">
 
-            <px-vis-svg
-              class="outline"
-              width="[[basic.width]]"
-              height="[[basic.height]]"
-              margin="[[basic.margin]]"
-              svg="{{svg}}">
-            </px-vis-svg>
-            <px-vis-scale
+            <px-vis-chart-navigator
               x-axis-type="time"
               y-axis-type="linear"
-              complete-series-config="[[basic.seriesConfig]]"
-              chart-extents="[[chartExtents]]"
               width="[[basic.width]]"
-              height="[[basic.height]]"
+              height="100"
               margin="[[basic.margin]]"
-              chart-data={{basic.chartData}}
-              x="{{x}}"
-              y="{{y}}"
-              current-domain-x="{{currentDomainX}}"
-              current-domain-y="{{currentDomainY}}"
-              selected-domain="[[selectedDomain]]">
-            </px-vis-scale>
-            <px-vis-scatter
-              svg="[[svg]]"
-              series-id="mySeries"
-              complete-series-config="[[basic.seriesConfig]]"
-              chart-data="[[basic.chartData]]"
-              x="[[x]]"
-              y="[[y]]"
-              current-domain-x="[[currentDomainX]]"
-              current-domain-y="[[currentDomainY]]">
-            </px-vis-scatter>
+              include-all-series
+              chart-data="[[basic.chartData]]">
+            </px-vis-chart-navigator>
           </template>
 
         </div>
         <div class="demo__discription u-pl+">
-          <p class="u-mt0">Example of a scatter drawing object. Very similar configuration to px-vis-line.</p>
+          <p class="u-mt0">Example of a chart-navigator drawing object. Very similar configuration to px-vis-line.</p>
         </div>
       </div>
       <div>
         <px-demo-snippet
-          element-properties="[[elempropScatter]]"
-          element-name="px-vis-scatter">
+          element-properties="[[elempropChartNavigator]]"
+          element-name="px-vis-chart-navigator">
         </px-demo-snippet>
       </div>
 
@@ -65,14 +41,14 @@
   </template>
   <script>
     Polymer({
-        is: "px-vis-scatter-demo"
+        is: "px-vis-chart-navigator-demo"
       });
 
     window.addEventListener('WebComponentsReady', function() {
       // content for the vis components
       basic = {
         width : 500,
-        height : 200,
+        height : 100,
         margin : {
           "top": 10,
           "right": 10,
@@ -131,13 +107,13 @@
         "y": [0,-Infinity]
       };
 
-      var templateScatter = document.querySelector('#visScatter');
-          templateScatter.basic = basic;
-          templateScatter.chartExtents = chartExtents;
+      var templateChartNavigator = document.querySelector('#visChartNavigator');
+          templateChartNavigator.basic = basic;
+          templateChartNavigator.chartExtents = chartExtents;
 
       // content for demo snippet
-      var templateDemo = document.querySelector('#demoScatter'),
-          elempropScatter = {
+      var templateDemo = document.querySelector('#demoChartNavigator'),
+          elempropChartNavigator = {
             "svg":"[[svg]]",
             "series-id":"mySeries",
             "complete-series-config":"[[basic.seriesConfig]]",
@@ -147,7 +123,7 @@
             "current-domain-x":"[[currentDomainX]]",
             "current-domain-y":"[[currentDomainY]]"
           };
-          templateDemo.elempropScatter = elempropScatter;
+          templateDemo.elempropChartNavigator = elempropChartNavigator;
       });
   </script>
 </dom-module>
