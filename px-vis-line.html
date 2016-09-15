@@ -172,7 +172,14 @@ Element which draws lines series onto the chart
        _progressiveRenderingCounter: {
          type: Number,
          value: 0
-       }
+       },
+
+       /**
+        * Counter to track progressive rendering requests and only draw the latest one
+        */
+        interpolationFunction: {
+          type: Object
+        }
     },
 
     observers: [
@@ -232,6 +239,10 @@ Element which draws lines series onto the chart
               // return d[yKey] === d[yKey];
             });
 
+      if(this.interpolationFunction){
+        line.curve(this.interpolationFunction);
+      }
+
       // If using canvas, tell it the context to draw to.
       if(this.renderToCanvas){
         line.context(this.canvasContext);
@@ -263,6 +274,10 @@ Element which draws lines series onto the chart
               return [~~this.x(p), ~~this.y[p](d[p])];
             }.bind(this)));
           }.bind(this);
+
+      if(this.interpolationFunction){
+        path.curve(this.interpolationFunction);
+      }
 
       // add the canvas context if relevant
       if(this.renderToCanvas){
