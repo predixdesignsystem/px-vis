@@ -39,7 +39,7 @@ Element which draws lines series onto the chart
 
     behaviors: [
       PxVisBehaviorD3.svg,
-      PxVisBehaviorD3.canvas,
+      PxVisBehaviorD3.lineShared,
       PxVisBehaviorD3.axes,
       PxVisBehavior.dataset,
       PxVisBehavior.mutedSeries,
@@ -48,7 +48,6 @@ Element which draws lines series onto the chart
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.categories,
       PxVisBehaviorD3.selectedDomain,
-      PxVisBehavior.progressiveRendering,
       commonColors
     ],
 
@@ -79,15 +78,6 @@ Element which draws lines series onto the chart
      * @type Object
      */
     properties: {
-      /**
-       * A unique ID for each line series
-       *
-       * @property seriesId
-       * @type String
-       */
-      seriesId:{
-        type:String
-      },
       /**
        * A holder object for the series object
        *
@@ -128,164 +118,15 @@ Element which draws lines series onto the chart
       multiPath: {
         type: Boolean,
         value: false
-      },
-      /**
-       * A holder object for the line generator
-       *
-       */
-      line: {
-        type: Object
-      },
-      /**
-       * A boolean spceifying if a opacity gradient should get applied to the line
-       *
-       */
-      gradientLine: {
-        type: Boolean,
-        value: false
-      },
-      /**
-       * Calculated range values for the gradient scale
-       *
-       */
-       gradientRange: {
-         type: Array
-       },
-       /**
-        * Gets and saves the rgb so we can make an rgba to apply to the line
-        *
-        */
-       _colorArr: {
-         type: Array
-       },
-       /**
-        * Boolean to trigger a redraw of the canvas
-        *
-        */
-       _canvasRedraw: {
-         type: Boolean,
-         value: false
-       },
-       /**
-        * Counter to track progressive rendering requests and only draw the latest one
-        */
-       _progressiveRenderingCounter: {
-         type: Number,
-         value: 0
-       },
-
-       /**
-        * Counter to track progressive rendering requests and only draw the latest one
-        */
-        interpolationFunction: {
-          type: Object
-        }
+      }
     },
 
     observers: [
-      '_computeGradientRange(chartData.*,selectedDomain.*)',
       'drawElement(svg,currentDomainX,currentDomainY,chartData.*,completeSeriesConfig.*)',
-      'drawCanvas(canvasContext,currentDomainX,currentDomainY,chartData.*,completeSeriesConfig.*,_canvasRedraw)',
       'isIdInMuted(mutedSeries.*, completeSeriesConfig)',
-      '_addClipPath(clipPath)',
-      '_computeColorArr(categories,completeSeriesConfig,seriesId)'
+      '_addClipPath(clipPath)'
      ],
 
-    _computeColorArr: function(){
-      //start with the RGB value and split it
-      var c = this.completeSeriesConfig[this.seriesId]['color'].split('(')[1].split(','),
-          colors = {};
-
-      //save each color individually for use later
-      colors[this.seriesId] = {
-        "r": Number(c[0]),
-        "g": Number(c[1]),
-        "b": Number(c[2].split(')')[0])
-      };
-
-      // if coloring by category
-      if(this.categories.length > 0){
-        for(var i = 0; i < this.categories.length; i++){
-          c = this.completeSeriesConfig[this.categories[i]]['color'].split('(')[1].split(',');
-          colors[this.categories[i]] = {
-            "r": Number(c[0]),
-            "g": Number(c[1]),
-            "b": Number(c[2].split(')')[0])
-          };
-        }
-      }
-
-      this.set('_colorArr', colors);
-    },
-    /**
-     * Defines the d3 line generator and its attrs
-     *
-     */
-    _defineSingleLine: function(){
-      var _this = this,
-          xKey = _this.completeSeriesConfig[_this.seriesId]['x'],
-          yKey = _this.completeSeriesConfig[_this.seriesId]['y'],
-          line = Px.d3.line()
-            .x(function(d) {
-                // ~~ --> round pixels values to optimize svg perfs
-                return ~~_this.x(d[xKey]);
-            })
-            .y(function(d) {
-                return ~~_this.y(d[yKey]);
-            })
-            .defined(function(d) {
-              return !isNaN(d[yKey]);
-              //tests is equivalent to !isNaN but slightly faster
-              // return d[yKey] === d[yKey];
-            });
-
-      if(this.interpolationFunction){
-        line.curve(this.interpolationFunction);
-      }
-
-      // If using canvas, tell it the context to draw to.
-      if(this.renderToCanvas){
-        line.context(this.canvasContext);
-      }
-
-      this.set('line',line);
-    },
-    /**
-     * Defines a multi-scale d3 line generator and its attrs
-     *
-     */
-    _defineMultiLine: function(){
-      //get our dimensions
-      var dims = this.completeSeriesConfig[this.seriesId]['x'],
-          //define a normal d3 line generator
-          path = Px.d3.line().defined(function(d) {
-            //only draw a line through the axis if we have data
-            return d;
-          }),
-          //be sneaky: iterate through the data like normal
-          line = function(d) {
-            //for each datapoint, iterate through the dimensions
-            return path(dims.map(function(p) {
-              //check that we have data; if not, return false so it doesnt draw a line
-              if(!d[p]) {
-                return false
-              }
-              //return [x,y] to path: x is ordinal based on dim; get the y-scale for the dim and use that particular scale on the data
-              return [~~this.x(p), ~~this.y[p](d[p])];
-            }.bind(this)));
-          }.bind(this);
-
-      if(this.interpolationFunction){
-        path.curve(this.interpolationFunction);
-      }
-
-      // add the canvas context if relevant
-      if(this.renderToCanvas){
-        path.context(this.canvasContext);
-      }
-
-      this.set('line',line);
-    },
     /**
      * Draws or updates the line element.
      * Called from an observer watching for data and the necessary d3 objects
@@ -350,55 +191,6 @@ Element which draws lines series onto the chart
     },
 
     /**
-     * Draws or updates the line element.
-     * Called from an observer watching for data and the necessary d3 objects
-     *
-     * @method drawElement
-     */
-    drawCanvas: function() {
-      this.debounce('drawCanvas',function(){
-        if(this.renderToCanvas){
-          var data;
-          // we need to wrap the data differently depending on if we are drawing many lines or just one line
-
-          if(this.parallelCoordinates) {
-            this._defineMultiLine();
-            data = this.chartData;
-          } else {
-            this._defineSingleLine();
-            data = this.chartData;
-          }
-
-          // We need to track which lines we have drawn and which we want to draw.
-          // If a line is not currently in our list, add it
-          if(!this.canvasContext._pxLinesSeries[this.seriesId]){
-            this.canvasContext._pxLinesSeries[this.seriesId] = true;
-            this.canvasContext._pxLinesTotal += 1;
-          }
-
-          // if we have previously drawn the same number of lines as series, then let's start over; Clear the drawing canvas
-          if(this.canvasContext._pxLinesRedraw === this.canvasContext._pxLinesTotal){
-            this.canvasContext._pxLinesRedraw = 0;
-            // (x1,y1,x2,y2) : for some reason, we need y1 to be -1 or it leaves a pixel....
-            this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
-          }
-
-          //Render data progressively
-          this.canvasContext.lineWidth = 1;
-          if(this.noCanvasProgressiveRendering) {
-            this._renderAtOnce(data);
-          } else {
-            //render 1000 points at a time or 5 frames min
-            var frames = Math.max(data.length/1000, 5);
-            this._renderProgressively(data, frames);
-          }
-          // make sure they are only drawn to the chart area and not the rest of the frame: equivalent to the clipPath for SVG
-          this.canvasContext._pxLinesRedraw += 1;
-        }
-      },20);
-    },
-
-    /**
      * Helper to call adClipPath with the elem
      *
      * @method _addClipPath
@@ -407,206 +199,6 @@ Element which draws lines series onto the chart
       this.addClipPath(this.lineGroup);
     },
 
-    _renderAtOnce: function(data) {
-
-      //data format
-      if(!this.parallelCoordinates) {
-        data = [data];
-      }
-
-      if(this.gradientLine) {
-        //if gradient, regardless of category or not
-        // Iterate over our data:
-        for(var i = 0; i < data.length; i++) {
-          // Check to see if it is "muted"; if not, draw a line
-          if(!this.mutedSeries[data[i][this.seriesId]]) {
-
-            // start a path and reset the styles for this one path
-            this.canvasContext.beginPath();
-            this.canvasContext.strokeStyle = this._canvasLineColor(data[i],this._opacityLine(data[i]));
-            // use the line generator to create the line
-            this.line(data[i]);
-            // draw it to the canvas; cant wait until the end or else they all have the same style
-            this.canvasContext.stroke();
-          }
-        }
-      // if categoryKey and no gradient
-      } else if(this.categoryKey) {
-        // Yes, this repeates the if above but I dont really want it checking an if 20k times to see if it should apply a gradient or not.
-        // Iterate over our data:
-        for(var i = 0; i < data.length; i++){
-          // Check to see if it is "muted"; if not, draw a line
-          if(!this.mutedSeries[data[i][this.seriesId]]){
-            // start a path and reset the styles for this one path
-            this.canvasContext.beginPath();
-            this.canvasContext.strokeStyle = this._canvasLineColor(data[i],1);
-            // use the line generator to create the line
-            this.line(data[i]);
-            // draw it to the canvas; cant wait until the end or else they all have the same style
-            this.canvasContext.stroke();
-          }
-        }
-      } else { //not gradientLine and not category
-        // start the path
-        this.canvasContext.beginPath();
-        // iterate through the data
-        for(var i = 0; i < data.length; i++){
-          // if the series is not listed or it is false, draw it
-          if(!this.mutedSeries[data[i][this.seriesId]]){
-            this.line(data[i]);
-          }
-          // Apply our styles and draw all the lines to the canvas
-          this.canvasContext.strokeStyle = this.completeSeriesConfig[this.seriesId]['color'];
-
-        }
-        this.canvasContext.stroke();
-        //clean up drawing
-        this._clearCanvasMargins();
-      }
-    },
-
-    /**
-     * Renders data in a specific number of frames, splitting the batch
-     *
-     */
-    _renderProgressively: function(data, numberOfFrames) {
-
-      this.fire('px-vis-line-progressive-rendering-started', {numberOfFrames: numberOfFrames});
-
-        var batches = [],
-            currentIndex = 0,
-            j = 0,
-            _this = this,
-            size = Math.floor(data.length/numberOfFrames),
-            timer = window.requestAnimationFrame
-              || window.webkitRequestAnimationFrame
-              || window.mozRequestAnimationFrame
-              || window.oRequestAnimationFrame
-              || window.msRequestAnimationFrame
-              || function(callback) { setTimeout(callback, 17); },
-            getColorValue,
-            processFunction,
-            currentRenderingCounter;
-
-      //new request
-      this._progressiveRenderingCounter++;
-      currentRenderingCounter = this._progressiveRenderingCounter;
-
-      //make sure canvas is clean
-      this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
-
-      if(this.parallelCoordinates) {
-        //split the data in the number of frames desired
-        for(j=0; j<numberOfFrames; j++) {
-          batches.push(data.slice(j*size, (j+1)*size));
-        }
-        //push last slice
-        batches.push(data.slice(j*size, data.length));
-      } else {
-
-        for(j=0; j<numberOfFrames; j++) {
-          batches.push([data.slice(j*size, (j+1)*size)]);
-        }
-        //push last slice
-        batches.push([data.slice(j*size, data.length)]);
-      }
-
-      //PROCESSING FUNCTIONS
-      //because of the color/gradient we have 1 stroke per line
-      var processColoredDataSlice = function() {
-
-        if(currentRenderingCounter !== _this._progressiveRenderingCounter) {
-          //new request came in, cancel this drawing. Don't reset the counter as we want
-          //the new request to finish
-          return;
-        }
-
-        var d = batches[currentIndex];
-        for(var i = 0; i < d.length; i++) {
-          if(!_this.mutedSeries[d[i][_this.seriesId]]) {
-            _this.canvasContext.beginPath();
-            _this.canvasContext.strokeStyle = getColorValue(d[i]);
-            _this.line(d[i]);
-            _this.canvasContext.stroke();
-          }
-        }
-
-        currentIndex++;
-
-        if(currentIndex < numberOfFrames) {
-          //continue processing
-          timer(processColoredDataSlice);
-        } else {
-          //finished drawing, reset drawing request counter
-          _this._progressiveRenderingCounter = 0;
-          _this.fire('px-vis-line-progressive-rendering-ended', {numberOfFrames: numberOfFrames});
-        }
-      };
-
-      //all  lines in 1 stroke
-      var processGenericDataSlice = function() {
-
-        if(currentRenderingCounter !== _this._progressiveRenderingCounter) {
-          //new request came in, cancel this drawing. Don't reset the counter as we want
-          //the new request to finish
-          return;
-        }
-
-        var d = batches[currentIndex];
-        _this.canvasContext.beginPath();
-        for(var i = 0; i < d.length; i++) {
-          if(!_this.mutedSeries[d[i][_this.seriesId]]) {
-
-            _this.line(d[i]);
-          }
-        }
-        _this.canvasContext.strokeStyle = _this.completeSeriesConfig[_this.seriesId]['color'];
-        _this.canvasContext.stroke();
-
-        currentIndex++;
-
-        if(currentIndex < numberOfFrames) {
-          //continue processing
-          timer(processGenericDataSlice);
-        } else {
-          //end, clean up
-          _this._clearCanvasMargins();
-          _this._progressiveRenderingCounter = 0;
-          _this.fire('px-vis-line-progressive-rendering-ended', {numberOfFrames: numberOfFrames});
-        }
-      };
-      //END PROCESSING FUNCTIONS
-
-      //render differently depending on the type of line
-      if(this.gradientLine) {
-        //gradient line
-        getColorValue = function(d) {
-          return _this._canvasLineColor(d, _this._opacityLine(d));
-        };
-        processFunction = processColoredDataSlice;
-      } else if(this.categoryKey) {
-        //category color line
-        getColorValue = function(d) {
-          return _this._canvasLineColor(d, 1);
-        };
-        processFunction = processColoredDataSlice;
-      } else {
-        //"normal" color line
-        processFunction = processGenericDataSlice;
-      }
-
-      timer(processFunction);
-    },
-    /**
-     * Used to 'clear' the canvas fater drawing in case we drew outside our limits.
-     * We might want to consider using a clippath instead
-     */
-    _clearCanvasMargins: function() {
-      //TODO: fix properly so we use some kind of margin
-      this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, -30);
-      this.canvasContext.clearRect(0, this.canvasContext.canvas.height - 65, this.canvasContext.canvas.width, 65);
-      this.canvasContext.clearRect(0, -30, -50, this.canvasContext.canvas.height + 30);
-    },
     /**
      * Checks mutedSeries to see if this ID is in there
      * Called from an observer watching mutedSeries
@@ -614,24 +206,18 @@ Element which draws lines series onto the chart
      * @method isIdInMuted
      */
     isIdInMuted: function() {
-      // if we are going to render to canvas, then we need to redraw everything
-      if(this.renderToCanvas){
-        // trigger the canvas to redraw
-        this.set('_canvasRedraw', !this._canvasRedraw);
-      } else {
-        if(this.multiPath && this._doesObjHaveValues(this.linePath)){
-          this.linePath.style("display", function(d) {
-            // if we have multiPaths, then just hide them; might want to changes this but need to check with design
-            return this.mutedSeries[d[this.seriesId]] ? 'none' : null;
-          }.bind(this));
+      if(this.multiPath && this._doesObjHaveValues(this.linePath)){
+        this.linePath.style("display", function(d) {
+          // if we have multiPaths, then just hide them; might want to changes this but need to check with design
+          return this.mutedSeries[d[this.seriesId]] ? 'none' : null;
+        }.bind(this));
+        this._colorLine();
+      } else if(this.mutedSeries.hasOwnProperty(this.seriesId)){
+        // if true, mute
+        if(this.mutedSeries[this.seriesId]){
+          this._muteLine();
+        } else {
           this._colorLine();
-        } else if(this.mutedSeries.hasOwnProperty(this.seriesId)){
-          // if true, mute
-          if(this.mutedSeries[this.seriesId]){
-            this._muteLine();
-          } else {
-            this._colorLine();
-          }
         }
       }
     },
@@ -658,51 +244,10 @@ Element which draws lines series onto the chart
       }
       return 1
     },
-    /**
-     * Returns the correct opacity to use for all lines.
-     *
-     */
-    _opacityLine:function(d){
-      // calulate the percentage through the dataset
-      var n = (this.gradientRange[1] - d[this.seriesId]) / (this.gradientRange[1] - this.gradientRange[0]);
-      // scale the gradient by that resulting in a gradient from 20% - 100%
-      return 1 - n * 0.8;
-    },
-    /**
-     * Returns the correct rgba to use for the canvas line.
-     *
-     */
-    _canvasLineColor:function(d,opacity){
-      // figure out if we are using a category or the seriesID
-      var key = this.categoryKey ? d[this.categoryKey] : this.seriesId;
-      // check that we want to draw that category
-      if(this._colorArr[key]){
-        // return the appropriate rgba
-        return 'rgba(' + this._colorArr[key]['r'] + ',' + this._colorArr[key]['g'] + ',' + this._colorArr[key]['b'] + ',' + opacity + ')';
-      }
-      return null;
-    },
-    /**
-     * Computes the data range.
-     *
-     */
-    _computeGradientRange: function(){
-      if(this.chartData.length > 0){
-        var x1,x2;
-        if(this.selectedDomain.x.length > 0){
-          x1 = Number(this.selectedDomain.x[0]);
-          x2 = Number(this.selectedDomain.x[1]);
-        } else {
-          x1 = Number(this.chartData[0][this.seriesId]);
-          x2 = Number(this.chartData[this.chartData.length - 1][this.seriesId]);
-        }
-        this.set('gradientRange', [x1,x2]);
-      }
-    },
+
     /**
      * Adds muted color to the line.
      *
-     * @method muteElements
      TODO add dev set color and opacity
      */
      _muteLine:function(){

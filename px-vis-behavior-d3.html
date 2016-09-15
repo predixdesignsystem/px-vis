@@ -792,4 +792,201 @@ PxVisBehaviorD3.axisConfig = {
   }
 };
 
+/*
+    Name:
+    PxVisBehaviorD3.lineShared
+
+    Description:
+    Polymer behavior that provides shared behaviors for line elements.
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorD3.lineShared
+*/
+PxVisBehaviorD3.lineShared = {
+  properties: {
+    /**
+    * A unique ID for each line series
+    *
+    */
+    seriesId:{
+      type:String
+    },
+    /**
+    * A dev set boolean specifying if the chart is for a parallel coordinates chart
+    *
+    */
+    parallelCoordinates: {
+      type: Boolean,
+      value: false
+    },
+    /**
+    * A holder object for the line generator
+    *
+    */
+    line: {
+      type: Object
+    },
+    /**
+    * A boolean spceifying if a opacity gradient should get applied to the line
+    *
+    */
+    gradientLine: {
+      type: Boolean,
+      value: false
+    },
+    /**
+    * Calculated range values for the gradient scale
+    *
+    */
+    gradientRange: {
+      type: Array,
+      computed: '_computeGradientRange(chartData.*,selectedDomain.*,seriesId)'
+    },
+    /**
+    * Gets and saves the rgb so we can make an rgba to apply to the line
+    *
+    */
+    _colorArr: {
+      type: Array,
+      computed: '_computeColorArr(categories,completeSeriesConfig,seriesId)'
+    },
+    /**
+    * Counter to track progressive rendering requests and only draw the latest one
+    */
+    interpolationFunction: {
+      type: Object
+    }
+  },
+
+  _computeColorArr: function(categories,completeSeriesConfig,seriesId){
+    //start with the RGB value and split it
+    var c = completeSeriesConfig[seriesId]['color'].split('(')[1].split(','),
+        colors = {};
+
+    //save each color individually for use later
+    colors[seriesId] = {
+      "r": Number(c[0]),
+      "g": Number(c[1]),
+      "b": Number(c[2].split(')')[0])
+    };
+
+    // if coloring by category
+    if(categories.length > 0){
+      for(var i = 0; i < categories.length; i++){
+        c = completeSeriesConfig[categories[i]]['color'].split('(')[1].split(',');
+        colors[categories[i]] = {
+          "r": Number(c[0]),
+          "g": Number(c[1]),
+          "b": Number(c[2].split(')')[0])
+        };
+      }
+    }
+
+    return colors;
+  },
+
+  /**
+   * Returns the correct opacity to use for all lines.
+   *
+   */
+  _opacityLine:function(d){
+    // calulate the percentage through the dataset
+    var n = (this.gradientRange[1] - d[this.seriesId]) / (this.gradientRange[1] - this.gradientRange[0]);
+    // scale the gradient by that resulting in a gradient from 20% - 100%
+    return 1 - n * 0.8;
+  },
+
+  /**
+   * Computes the data range.
+   *
+   */
+  _computeGradientRange: function(chartData, selectedDomain,seriesId){
+    if(chartData.value.length > 0){
+      var x1,x2;
+      if(selectedDomain.value.x.length > 0){
+        x1 = Number(selectedDomain.value.x[0]);
+        x2 = Number(selectedDomain.value.x[1]);
+      } else {
+        x1 = Number(chartData.value[0][seriesId]);
+        x2 = Number(chartData.value[chartData.value.length - 1][seriesId]);
+      }
+      return [x1,x2];
+    }
+  },
+
+  /**
+   * Defines the d3 line generator and its attrs
+   *
+   */
+  _defineSingleLine: function(toCanvas){
+    var _this = this,
+        renderToCanvas = (typeof(toCanvas) !== 'undefined') ? toCanvas : false,
+        xKey = _this.completeSeriesConfig[_this.seriesId]['x'],
+        yKey = _this.completeSeriesConfig[_this.seriesId]['y'],
+        line = Px.d3.line()
+          .x(function(d) {
+              // ~~ --> round pixels values to optimize svg perfs
+              return ~~_this.x(d[xKey]);
+          })
+          .y(function(d) {
+              return ~~_this.y(d[yKey]);
+          })
+          .defined(function(d) {
+            return !isNaN(d[yKey]);
+            //tests is equivalent to !isNaN but slightly faster
+            // return d[yKey] === d[yKey];
+          });
+
+    if(this.interpolationFunction){
+      line.curve(this.interpolationFunction);
+    }
+
+    // If using canvas, tell it the context to draw to.
+    if(renderToCanvas){
+      line.context(this.canvasContext);
+    }
+
+    this.set('line',line);
+  },
+  /**
+   * Defines a multi-scale d3 line generator and its attrs
+   *
+   */
+  _defineMultiLine: function(toCanvas){
+    //get our dimensions
+    var renderToCanvas = (typeof(toCanvas) !== 'undefined') ? toCanvas : false,
+        dims = this.completeSeriesConfig[this.seriesId]['x'],
+        //define a normal d3 line generator
+        path = Px.d3.line().defined(function(d) {
+          //only draw a line through the axis if we have data
+          return d;
+        }),
+        //be sneaky: iterate through the data like normal
+        line = function(d) {
+          //for each datapoint, iterate through the dimensions
+          return path(dims.map(function(p) {
+            //check that we have data; if not, return false so it doesnt draw a line
+            if(!d[p]) {
+              return false
+            }
+            //return [x,y] to path: x is ordinal based on dim; get the y-scale for the dim and use that particular scale on the data
+            return [~~this.x(p), ~~this.y[p](d[p])];
+          }.bind(this)));
+        }.bind(this);
+
+    if(this.interpolationFunction){
+      path.curve(this.interpolationFunction);
+    }
+
+    // add the canvas context if relevant
+    if(renderToCanvas){
+      path.context(this.canvasContext);
+    }
+
+    this.set('line',line);
+  },
+};
+
 </script>
