@@ -1,3 +1,7 @@
+v0.3.10
+==================
+* added units to data converter series config
+
 v0.3.9
 ==================
 * fixed tests
