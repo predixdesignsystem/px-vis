@@ -283,29 +283,31 @@ This element draw the box over the axis signifying the active area to mute the s
      * calc muted series based on the extents
      */
     _calcMutedSeries: function(extents){
-      var series = {},
-          domains = {},
-          keys = Object.keys(extents),
-          dim,y0,y1;
+      if(this.chartData && this.chartData.length > 0){
+        var series = {},
+            domains = {},
+            keys = Object.keys(extents),
+            dim,y0,y1;
 
-        for(var j = 0; j < keys.length; j++){
-          dim = keys[j];
+          for(var j = 0; j < keys.length; j++){
+            dim = keys[j];
 
-          y0 = this.axis[dim].invert(extents[dim][1]);
-          y1 = this.axis[dim].invert(extents[dim][0]);
+            y0 = this.axis[dim].invert(extents[dim][1]);
+            y1 = this.axis[dim].invert(extents[dim][0]);
 
-          for(var i = 0; i < this.chartData.length; i++){
-            if(y0 > this.chartData[i][dim] || this.chartData[i][dim] > y1){
-              series[this.chartData[i][this.seriesKey]] = true;
+            for(var i = 0; i < this.chartData.length; i++){
+              if(y0 > this.chartData[i][dim] || this.chartData[i][dim] > y1){
+                series[this.chartData[i][this.seriesKey]] = true;
+              }
             }
+            domains[dim] = [y0,y1];
           }
-          domains[dim] = [y0,y1];
-        }
 
-      this.set('_brushDomains',domains);
+        this.set('_brushDomains',domains);
 
-      this.set('mutedSeries',series);
-      this.fire('px-vis-muted-series-updated', { 'data': series, 'dataVar': 'mutedSeries' ,'method': 'set' });
+        this.set('mutedSeries',series);
+        this.fire('px-vis-muted-series-updated', { 'data': series, 'dataVar': 'mutedSeries' ,'method': 'set' });
+      }
     },
 
     deleteBrush: function(elem) {
