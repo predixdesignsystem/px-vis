@@ -1,3 +1,7 @@
+v0.3.12
+==================
+* added deleteAllBrushes method to axis brush
+
 v0.3.11
 ==================
 * added check in axis brush for chartData

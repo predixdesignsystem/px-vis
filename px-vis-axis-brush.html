@@ -373,6 +373,19 @@ This element draw the box over the axis signifying the active area to mute the s
       }
 
       return newBrushRange;
+    },
+
+    deleteAllBrushes: function(){
+      if(this._brushes){
+        var _this = this;
+
+        // for each brush, figure out if it was brushed and build an array of obj with the extents and the dimension
+        this._brushes.each(function(d) {
+          //first, delete all brushes and start over
+          _this.deleteBrush(Px.d3.select(this));
+        });
+        this._calcMutedSeries({});
+      }
     }
   });
 </script>
