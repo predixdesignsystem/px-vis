@@ -95,7 +95,7 @@ Element which draws lines series onto the chart
     },
 
     observers: [
-      'drawCanvas(canvasContext,currentDomainX,currentDomainY,chartData.*,completeSeriesConfig.*,_canvasRedraw)',
+      'drawCanvas(canvasContext,domainChanged,chartData.*,completeSeriesConfig.*,_canvasRedraw)',
       'isIdInMuted(mutedSeries.*, completeSeriesConfig)'
      ],
 
@@ -112,6 +112,9 @@ Element which draws lines series onto the chart
 
         if(this.parallelCoordinates) {
           this._defineMultiLine(true);
+          data = this.chartData;
+        } else if(this.radialLine) {
+          this._defineRadialLine(true);
           data = this.chartData;
         } else {
           this._defineSingleLine(true);
