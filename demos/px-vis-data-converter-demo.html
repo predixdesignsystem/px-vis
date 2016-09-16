@@ -1,0 +1,184 @@
+  <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+
+
+  <link rel="import" href="../px-vis-scale.html">
+  <link rel="import" href="../px-vis-svg.html">
+  <link rel="import" href="../px-vis-data.html">
+  <link rel="import" href="../px-vis-data-converter.html">
+
+<dom-module id="px-vis-data-converter-demo">
+  <template>
+    <p class="epsilon demo__title">px-vis-data-converter</p>
+    <div class="demo u-p+ ">
+
+      <!-- need for data-converter -->
+        <px-vis-data
+          request-data = '[{
+            "type":"line",
+            "name":"mySeries",
+              "url":"../demo-data/delta-egt-cruise.json"
+            },{
+              "type":"line",
+              "url":"../demo-data/hpt-acc-position-cruise.json"
+          }]'
+          data-var="originalData"
+          lists="append"
+          response-data="{{originalData}}">
+        </px-vis-data>
+        <px-vis-data-converter
+          data-key = "series"
+          id-key = "id"
+          name-key="name"
+          original-data = "[[originalData]]"
+          series-config="{{seriesConfig}}"
+          chart-data="{{chartData}}"
+          series-config="{{chartData}}">
+        </px-vis-data-converter>
+
+        <div class="demo__discription">
+          <p class="u-mt0 u-pb">
+            px-vis-data-converter converts data from the timeseries service to the schema required by the vis framework.
+          </p>
+        </div>
+        <div class="flex flex--wrap">
+          <div style="padding-right:40px">
+            <strong>original-data</strong>
+            <pre>[[_formatName(originalData)]]</pre>
+          </div>
+
+          <div style="padding-right:40px">
+            <strong>chart-data</strong>
+            <pre>[[_formatName(chartData)]]</pre>
+          </div>
+
+          <div class="">
+            <strong>series-config</strong>
+            <pre>[[_formatName(seriesConfig)]]</pre>
+          </div>
+        </div>
+
+
+    </div>
+    <div>
+      <px-demo-snippet
+        element-properties="[[elempropDataConverter]]"
+        element-name="px-vis-data-converter">
+      </px-demo-snippet>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: "px-vis-data-converter-demo",
+      properties:{
+        //basics
+        width: {
+          type : Number,
+          value : 500
+        },
+        height:{
+          type : Number,
+          value : 200
+        },
+        margin:{
+          type : Object,
+          value : {
+            "top": 10,
+            "right": 10,
+            "bottom": 10,
+            "left": 10
+          }
+        },
+        chartData:{
+          type : Array,
+          value : [{
+              'x': 1397102460000,
+              'y': 0.56
+            },{
+              'x': 1397139660000,
+              'y': 0.4
+            },{
+              'x': 1397177400000,
+              'y': 0.43
+            },{
+              'x': 1397228040000,
+              'y': 0.33
+            },{
+              'x': 1397248260000,
+              'y': 0.47
+            },{
+              'x': 1397291280000,
+              'y': 0.41
+            },{
+              'x': 1397318100000,
+              'y': 0.26
+            },{
+              'x': 1397342100000,
+              'y': 0.42
+            },{
+              'x': 1397390820000,
+              'y': 0.27
+            },{
+              'x': 1397408100000,
+              'y': 0.38
+            },{
+              'x': 1397458800000,
+              'y': 0.36
+            },{
+              'x': 1397522940000,
+              'y': 0.32
+          }]
+        },
+        seriesConfig:{
+          type : Object,
+          value: {
+            'mySeries': {
+              "name":"My-Series",
+              "type": "line",
+              "x": 'x',
+              "y": 'y',
+              'color': "rgb(93,165,218)"
+            }
+          }
+        },
+        originalDataDemo:{
+          type : Array,
+          value: [
+            {
+              'x': 1397102460000,
+              'y': 0.56
+            },{
+              'x': 1397139660000,
+              'y': 0.4
+            }
+          ]
+        },
+        //chartExtents
+        chartExtents:{
+          type : Object,
+          value: {
+            "x": [Infinity,-Infinity],
+            "y": [0,-Infinity]
+          }
+        },
+        // demo snippet
+        elempropDataConverter:{
+          type : Object,
+          value:{
+            "data-key":"series",
+            "id-key":"name",
+            "original-data":"[[originalData]]",
+            "series-config":"{{seriesConfig}}",
+            "chart-data":"{{chartData}}",
+            "series-config":"{{chartData}}",
+          }
+        }
+      }, //end properties
+
+      _formatName: function(data) {
+          var  demoDataCode = JSON.stringify(data, null, ' ');
+          return demoDataCode;
+      }
+    });
+  </script>
+</dom-module>
