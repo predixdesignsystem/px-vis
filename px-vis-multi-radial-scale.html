@@ -68,18 +68,11 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @type Object
      */
     properties: {
-      _minDim: {
-        type: Number
-      },
-      _maxDim: {
-        type: Number
-      }
     },
 
     observers: [
-      '_pickMinMaxDim(width,height,margin)',
-      '_setXScale(_minDim)',
-      '_setYScale(_minDim,axes)',
+      '_setXScale(width)',
+      '_setYScale(width,axes)',
       '_currentDomain(x,y,chartExtents)'
     ],
     /**
@@ -110,26 +103,6 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
     },
 
     /**
-    * when attached, re-fire set properties for precipitation pattern
-    *
-    */
-    _pickMinMaxDim: function(width,height,margin){
-      var w = width - margin.left - margin.right,
-          h = height - margin.top - margin.bottom,
-          min,max;
-
-      if(w < h){
-        min = w;
-        max = h;
-      } else {
-        min = h;
-        max = w;
-      }
-      this.set('_maxDim', max);
-      this.set('_minDim', min);
-    },
-
-    /**
      *  Sets the x scale to a single ordinal, radial scale
      *
      * @method _setXScale
@@ -155,10 +128,10 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      *
      * @method _setYScale
      */
-    _setYScale: function(minDim,axes) {
+    _setYScale: function(width,axes) {
     //  this.debounce('setYScale', function() {
 
-        var range = [20, minDim/2 - 20],
+        var range = [20, width - 20],
             newY = {};// y is an object with multiple scales
 
         // iterate through the axes and create a scale for each; set them in the y obj with the axes as keys so we can easily access them again later

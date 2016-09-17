@@ -931,7 +931,6 @@ PxVisBehaviorD3.lineShared = {
   _defineSingleLine: function(toCanvas){
     var _this = this,
         renderToCanvas = (typeof(toCanvas) !== 'undefined') ? toCanvas : false,
-        radialLine = (typeof(radial) !== 'undefined') ? radial : false,
         xKey = _this.completeSeriesConfig[_this.seriesId]['x'],
         yKey = _this.completeSeriesConfig[_this.seriesId]['y'],
         line = Px.d3.line()
@@ -966,7 +965,6 @@ PxVisBehaviorD3.lineShared = {
   _defineMultiLine: function(toCanvas){
     //get our dimensions
     var renderToCanvas = (typeof(toCanvas) !== 'undefined') ? toCanvas : false,
-        radialLine = (typeof(radial) !== 'undefined') ? radial : false,
         dims = this.completeSeriesConfig[this.seriesId]['x'],
         //define a normal d3 line generator
         path = Px.d3.line().defined(function(d) {
@@ -1001,25 +999,55 @@ PxVisBehaviorD3.lineShared = {
    * Defines a multi-scale d3 line generator and its attrs
    *
    */
-  _defineRadialLine: function(toCanvas,radial){
+  _defineRadialLine: function(toCanvas){
     //get our dimensions
-    var renderToCanvas = (typeof(toCanvas) !== 'undefined') ? toCanvas : false,
-        radialLine = (typeof(radial) !== 'undefined') ? radial : false,
+    var _this = this,
+        renderToCanvas = (typeof(toCanvas) !== 'undefined') ? toCanvas : false,
         dims = this.completeSeriesConfig[this.seriesId]['x'],
         //define a normal d3 line generator
-        line = Px.d3.line()
-          .angle(function(d) {
-            // ~~ --> round pixels values to optimize svg perfs
-            return ~~_this.x(d[xKey]);
-          })
-          .radius(function(d) {
-              return ~~_this.y(d[yKey]);
-          })
-          .defined(function(d) {
-            return !isNaN(d[yKey]);
-            //tests is equivalent to !isNaN but slightly faster
-            // return d[yKey] === d[yKey];
-          });
+    //     line = Px.d3.radialLine()
+    //       .angle(function(d) {
+    //         // ~~ --> round pixels values to optimize svg perfs
+    //         return ~~_this.x(d['TimeStamp']);
+    //       })
+    //       .radius(function(d) {
+    //           return ~~_this.y['DWATT'](d['DWATT']);
+    //       })
+    //       .defined(function(d) {
+    //         return !isNaN(d['DWATT']);
+    //         //tests is equivalent to !isNaN but slightly faster
+    //         // return d[yKey] === d[yKey];
+    //       });
+    //
+    // if(this.interpolationFunction){
+    //   line.curve(this.interpolationFunction);
+    // }
+    //
+    // // add the canvas context if relevant
+    // if(renderToCanvas){
+    //   line.context(this.canvasContext);
+    // }
+    //
+
+    path = Px.d3.radialLine().defined(function(d) {
+      //only draw a line through the axis if we have data
+      return d;
+    }),
+    //be sneaky: iterate through the data like normal
+    line = function(d) {
+      //for each datapoint, iterate through the dimensions
+      return path(dims.map(function(p) {
+        //check that we have data; if not, return false so it doesnt draw a line
+        if(!d[p]) {
+          return false
+        }
+        //return [x,y] to path: x is ordinal based on dim; get the y-scale for the dim and use that particular scale on the data
+        if(d["TimeStamp"] === 1466623920000){
+          console.log([this.x(p), ~~this.y[p](d[p])])
+        }
+        return [this.x(p), ~~this.y[p](d[p])];
+      }.bind(this)));
+    }.bind(this);
 
     if(this.interpolationFunction){
       path.curve(this.interpolationFunction);
@@ -1029,7 +1057,6 @@ PxVisBehaviorD3.lineShared = {
     if(renderToCanvas){
       path.context(this.canvasContext);
     }
-
     this.set('line',line);
   }
 };

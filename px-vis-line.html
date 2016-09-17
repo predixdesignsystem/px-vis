@@ -122,7 +122,7 @@ Element which draws lines series onto the chart
     },
 
     observers: [
-      'drawElement(svg,currentDomainX,currentDomainY,chartData.*,completeSeriesConfig.*)',
+      'drawElement(svg,domainChanged,chartData.*,completeSeriesConfig.*)',
       'isIdInMuted(mutedSeries.*, completeSeriesConfig)',
       '_addClipPath(clipPath)'
      ],
@@ -135,58 +135,58 @@ Element which draws lines series onto the chart
      */
     drawElement: function() {
       this.debounce('draw',function(){
-        if(!this.renderToCanvas) {
-
-          // we need to wrap the data differently depending on if we are drawing many lines or just one line
-          if(this.parallelCoordinates) {
-            var data = this.chartData;
-            this._defineMultiLine(false,this.radialLine);
-          } else {
-            var data = [this.chartData];
-            this._defineSingleLine(false,this.radialLine);
-          }
-          // checks to see if the group already exists. If not, create; if so, update
-          if(this._isObjEmpty(this.lineGroup)) {
-            // draw the path
-            this.lineGroup = this.svg.append("g")
-              .attr("series-id", 'line_' + this.seriesId)
-              .attr("class", "series-line");
-          }
-
-          // set our data
-           var lineBuilder = this.lineGroup.selectAll('path.series-line')
-            .data(data);
-
-          // When datapoints disappear from our data, remove them
-          lineBuilder.exit().remove();
-
-          // When datapoints are added to our data, add stuff
-          lineBuilder.enter()
-            .append('path')
-            .attr("class", "series-line")
-            .attr("series-id", function(d,i){
-              return this.multiPath ? 'line_' + d[this.seriesId] : 'line_' + this.seriesId
-            }.bind(this))
-            .attr('fill','none')
-          // When datapoints are added OR this funtion is run, draw stuff
-          .merge(lineBuilder)
-            .attr("d", this.line)
-            // TODO add ability to color by category
-            .attr('stroke',function(d,i){
-              if(this.categoryKey){
-                return this.completeSeriesConfig[d[this.categoryKey]]['color']
-              }
-              return this.completeSeriesConfig[this.seriesId]['color'];
-            }.bind(this))
-            .attr('stroke-opacity',this._svgLine.bind(this));
-
-          // Make it easy to get our lines again
-          this.linePath = this.lineGroup.selectAll('path.series-line');
-
-          this._addClipPath();
-
-          this.isIdInMuted();
+        // we need to wrap the data differently depending on if we are drawing many lines or just one line
+        if(this.parallelCoordinates) {
+          var data = this.chartData;
+          this._defineMultiLine(false,this.radialLine);
+        }  else if(this.radialLine) {
+          this._defineRadialLine(true);
+          data = this.chartData;
+        } else {
+          var data = [this.chartData];
+          this._defineSingleLine(false,this.radialLine);
         }
+        // checks to see if the group already exists. If not, create; if so, update
+        if(this._isObjEmpty(this.lineGroup)) {
+          // draw the path
+          this.lineGroup = this.svg.append("g")
+            .attr("series-id", 'line_' + this.seriesId)
+            .attr("class", "series-line");
+        }
+
+        // set our data
+         var lineBuilder = this.lineGroup.selectAll('path.series-line')
+          .data(data);
+
+        // When datapoints disappear from our data, remove them
+        lineBuilder.exit().remove();
+
+        // When datapoints are added to our data, add stuff
+        lineBuilder.enter()
+          .append('path')
+          .attr("class", "series-line")
+          .attr("series-id", function(d,i){
+            return this.multiPath ? 'line_' + d[this.seriesId] : 'line_' + this.seriesId
+          }.bind(this))
+          .attr('fill','none')
+        // When datapoints are added OR this funtion is run, draw stuff
+        .merge(lineBuilder)
+          .attr("d", this.line)
+          // TODO add ability to color by category
+          .attr('stroke',function(d,i){
+            if(this.categoryKey){
+              return this.completeSeriesConfig[d[this.categoryKey]]['color']
+            }
+            return this.completeSeriesConfig[this.seriesId]['color'];
+          }.bind(this))
+          .attr('stroke-opacity',this._svgLine.bind(this));
+
+        // Make it easy to get our lines again
+        this.linePath = this.lineGroup.selectAll('path.series-line');
+
+        this._addClipPath();
+
+        this.isIdInMuted();
       },10);
     },
 

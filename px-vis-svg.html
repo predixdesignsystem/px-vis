@@ -70,19 +70,10 @@ Element which creates an SVG element and sets up d3
          * @type Object
          */
         properties: {
-          /**
-           * A list of sub elements should we need to know our children
-           *
-           *
-           */
-          // _childElems:{
-          //   type:Array,
-          //   value:[]
-          // }
         },
 
         observers: [
-          '_setSVG(width,height,margin)'
+          '_setSVG(width,height,margin,offset.*)'
         ],
 
 
@@ -137,7 +128,7 @@ Element which creates an SVG element and sets up d3
             this.svg = (this._isVarUndefined(this.svg)) ? svg.append('g') : this.svg;
             this.svg.attr('width',this.width)
               .attr('height',this.height)
-              .attr("transform", "translate(" + this.margin.left + ',' + this.margin.top + ")");
+              .attr("transform", "translate(" + (this.margin.left + this.offset[0]) + ',' + (this.margin.top + this.offset[1]) + ")");
 
             this.notifyPath('svg',this.svg);
             this.fire('px-vis-svg-updated',{ 'data': this.svg, 'dataVar': 'svg', 'method': 'set' });
