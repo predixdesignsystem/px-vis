@@ -1,3 +1,7 @@
+v0.3.14
+==================
+* add check for data in line
+
 v0.3.13
 ==================
 * added notify true to mouseRect in interaction space
