@@ -485,12 +485,614 @@ function runTests(){
         "mySeries":false
       };
       baseYAxis.set('mutedSeries',mutedSeries);
-      setTimeout(function(){done()},100)
+      setTimeout(function(){done()},500)
     });
 
     test('baseYAxis series box mutes', function() {
       var bar = baseYAxis._titleGroup.select('rect');
       assert.equal(bar.attr('opacity'),1);
+    });
+  });
+
+
+  suite('px-vis-axis parallel coordinates axis works', function() {
+    var pcAxisSVG = document.getElementById('pcAxisSVG'),
+        pcAxisScale = document.getElementById('pcAxisScale'),
+        pcYAxis = document.getElementById('pcYAxis');
+
+    suiteSetup(function(done){
+      var d = [{
+            "x": 1397102460000,
+            "y": 1
+          },{
+            "x": 1397131620000,
+            "y": 6
+          },{
+            "x": 1397160780000,
+            "y": 10
+          },{
+            "x": 1397189940000,
+            "y": 4
+          },{
+            "x": 1397219100000,
+            "y": 6
+          }
+        ],
+        completeSeriesConfig = {"mySeries":{
+          "type":"line",
+          "name":"mySeries",
+          "x":"x",
+          "y":"y",
+          "color": "rgb(93,165,218)",
+          "yAxisUnit": "BoF"
+        }},
+        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        w = 500,
+        h = 300,
+        m = {
+          "top": 10,
+          "right": 5,
+          "bottom": 50,
+          "left": 50
+        };
+      pcAxisSVG.set('width',w);
+      pcAxisSVG.set('height',h);
+      pcAxisSVG.set('margin',m);
+
+      pcAxisScale.set('width',w);
+      pcAxisScale.set('height',h);
+      pcAxisScale.set('margin',m);
+      pcAxisScale.set('completeSeriesConfig',completeSeriesConfig);
+      pcAxisScale.set('chartExtents',chartExtents);
+      pcAxisScale.set('chartData',d);
+
+      pcYAxis.set('margin',m);
+      pcYAxis.set('height',h);
+      pcYAxis.set('completeSeriesConfig',completeSeriesConfig);
+      pcYAxis.set('chartData',d);
+      setTimeout(function(){done()},500);
+     // done();
+    });
+
+    test('pcYAxis fixture is created', function() {
+      assert.isTrue(pcYAxis !== null);
+    });
+
+    test('Title _titleGroup transform', function() {
+      var attr = pcYAxis._titleGroup.attr('transform'),
+          re = new RegExp(/(\w+)\((-?\d+\.?\d*)[,\s](-?\d+\.?\d*)\)/),
+          arr = re.exec(attr);
+      assert.equal(arr[1],'translate');
+      assert.closeTo(parseFloat(arr[2]),0,7);
+      assert.closeTo(parseFloat(arr[3]),260,2);
+    });
+
+    test('Title _titleGroup text font-size', function() {
+      var text = pcYAxis._titleGroup.select('text.axis-title');
+      assert.equal(text.attr('font-size'),'12px');
+    });
+    test('Title _titleGroup text rotate', function() {
+      var text = pcYAxis._titleGroup.select('text.axis-title');
+      assert.equal(text.attr('transform'),'rotate(0)');
+    });
+    test('Title _titleGroup text text', function() {
+      var text = pcYAxis._titleGroup.select('text.axis-title');
+      assert.equal(text.text(),'myTitle');
+    });
+  });
+
+  suite('px-vis-axis axis with units works', function() {
+    var pcUnitAxisSVG = document.getElementById('pcUnitAxisSVG'),
+        pcUnitAxisScale = document.getElementById('pcUnitAxisScale'),
+        pcUnitYAxis = document.getElementById('pcUnitYAxis');
+
+    suiteSetup(function(done){
+      var d = [{
+            "x": 1397102460000,
+            "y": 1
+          },{
+            "x": 1397131620000,
+            "y": 6
+          },{
+            "x": 1397160780000,
+            "y": 10
+          },{
+            "x": 1397189940000,
+            "y": 4
+          },{
+            "x": 1397219100000,
+            "y": 6
+          }
+        ],
+        completeSeriesConfig = {"mySeries":{
+          "type":"line",
+          "name":"mySeries",
+          "x":"x",
+          "y":"y",
+          "color": "rgb(93,165,218)",
+          "yAxisUnit": "BoF"
+        }},
+        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        w = 500,
+        h = 300,
+        m = {
+          "top": 10,
+          "right": 5,
+          "bottom": 50,
+          "left": 50
+        };
+      pcUnitAxisSVG.set('width',w);
+      pcUnitAxisSVG.set('height',h);
+      pcUnitAxisSVG.set('margin',m);
+
+      pcUnitAxisScale.set('width',w);
+      pcUnitAxisScale.set('height',h);
+      pcUnitAxisScale.set('margin',m);
+      pcUnitAxisScale.set('completeSeriesConfig',completeSeriesConfig);
+      pcUnitAxisScale.set('chartExtents',chartExtents);
+      pcUnitAxisScale.set('chartData',d);
+
+      pcUnitYAxis.set('margin',m);
+      pcUnitYAxis.set('height',h);
+      pcUnitYAxis.set('completeSeriesConfig',completeSeriesConfig);
+      pcUnitYAxis.set('chartData',d);
+      setTimeout(function(){done()},500);
+     // done();
+    });
+
+    test('pcUnitYAxis fixture is created', function() {
+      assert.isTrue(pcUnitYAxis !== null);
+    });
+
+    test('Title _titleGroup transform', function() {
+      var attr = pcUnitYAxis._titleGroup.attr('transform'),
+          re = new RegExp(/(\w+)\((-?\d+\.?\d*)[,\s](-?\d+\.?\d*)\)/),
+          arr = re.exec(attr);
+      assert.equal(arr[1],'translate');
+      assert.closeTo(parseFloat(arr[2]),0,7);
+      assert.closeTo(parseFloat(arr[3]),260,2);
+    });
+
+    test('Title _titleGroup text font-size', function() {
+      var text = pcUnitYAxis._titleGroup.select('text.axis-title');
+      assert.equal(text.attr('font-size'),'12px');
+    });
+    test('Title _titleGroup text rotate', function() {
+      var text = pcUnitYAxis._titleGroup.select('text.axis-title');
+      assert.equal(text.attr('transform'),'rotate(0)');
+    });
+    test('Title _titleGroup text text', function() {
+      var text = pcUnitYAxis._titleGroup.select('text.axis-title');
+      assert.equal(text.text(),'myTitle [BoF]');
+    });
+  });
+
+  suite('px-vis-axis title truncation works', function() {
+    var pcTruncAxisSVG = document.getElementById('pcTruncAxisSVG'),
+        pcTruncAxisScale = document.getElementById('pcTruncAxisScale'),
+        pcTruncYAxis = document.getElementById('pcTruncYAxis');
+
+    suiteSetup(function(done){
+      var d = [{
+            "x": 1397102460000,
+            "y": 1
+          },{
+            "x": 1397131620000,
+            "y": 6
+          },{
+            "x": 1397160780000,
+            "y": 10
+          },{
+            "x": 1397189940000,
+            "y": 4
+          },{
+            "x": 1397219100000,
+            "y": 6
+          }
+        ],
+        completeSeriesConfig = {"mySeries":{
+          "type":"line",
+          "name":"mySeries",
+          "x":"x",
+          "y":"y",
+          "color": "rgb(93,165,218)",
+          "yAxisUnit": "BoF"
+        }},
+        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        w = 500,
+        h = 300,
+        m = {
+          "top": 10,
+          "right": 5,
+          "bottom": 50,
+          "left": 50
+        };
+      pcTruncAxisSVG.set('width',w);
+      pcTruncAxisSVG.set('height',h);
+      pcTruncAxisSVG.set('margin',m);
+
+      pcTruncAxisScale.set('width',w);
+      pcTruncAxisScale.set('height',h);
+      pcTruncAxisScale.set('margin',m);
+      pcTruncAxisScale.set('completeSeriesConfig',completeSeriesConfig);
+      pcTruncAxisScale.set('chartExtents',chartExtents);
+      pcTruncAxisScale.set('chartData',d);
+
+      pcTruncYAxis.set('margin',m);
+      pcTruncYAxis.set('height',h);
+      pcTruncYAxis.set('completeSeriesConfig',completeSeriesConfig);
+      pcTruncYAxis.set('chartData',d);
+      setTimeout(function(){done()},500);
+     // done();
+    });
+
+    test('pcTruncYAxis fixture is created', function() {
+      assert.isTrue(pcTruncYAxis !== null);
+    });
+
+    test('Title _titleGroup transform', function() {
+      var attr = pcTruncYAxis._titleGroup.attr('transform'),
+          re = new RegExp(/(\w+)\((-?\d+\.?\d*)[,\s](-?\d+\.?\d*)\)/),
+          arr = re.exec(attr);
+      assert.equal(arr[1],'translate');
+      assert.closeTo(parseFloat(arr[2]),0,7);
+      assert.closeTo(parseFloat(arr[3]),260,2);
+    });
+
+    test('Title _titleGroup text font-size', function() {
+      var text = pcTruncYAxis._titleGroup.select('text.axis-title');
+      assert.equal(text.attr('font-size'),'12px');
+    });
+    test('Title _titleGroup text rotate', function() {
+      var text = pcTruncYAxis._titleGroup.select('text.axis-title');
+      assert.equal(text.attr('transform'),'rotate(0)');
+    });
+    test('Title _titleGroup text text', function() {
+      var text = pcTruncYAxis._titleGroup.select('text.axis-title');
+      assert.equal(text.text(),'my...le');
+    });
+  });
+
+  suite('px-vis-axis title truncation with units works', function() {
+    var pcTruncUnitAxisSVG = document.getElementById('pcTruncUnitAxisSVG'),
+        pcTruncUnitAxisScale = document.getElementById('pcTruncUnitAxisScale'),
+        pcTruncUnitYAxis = document.getElementById('pcTruncUnitYAxis');
+
+    suiteSetup(function(done){
+      var d = [{
+            "x": 1397102460000,
+            "y": 1
+          },{
+            "x": 1397131620000,
+            "y": 6
+          },{
+            "x": 1397160780000,
+            "y": 10
+          },{
+            "x": 1397189940000,
+            "y": 4
+          },{
+            "x": 1397219100000,
+            "y": 6
+          }
+        ],
+        completeSeriesConfig = {"mySeries":{
+          "type":"line",
+          "name":"mySeries",
+          "x":"x",
+          "y":"y",
+          "color": "rgb(93,165,218)",
+          "yAxisUnit": "BoF"
+        }},
+        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        w = 500,
+        h = 300,
+        m = {
+          "top": 10,
+          "right": 5,
+          "bottom": 50,
+          "left": 50
+        };
+      pcTruncUnitAxisSVG.set('width',w);
+      pcTruncUnitAxisSVG.set('height',h);
+      pcTruncUnitAxisSVG.set('margin',m);
+
+      pcTruncUnitAxisScale.set('width',w);
+      pcTruncUnitAxisScale.set('height',h);
+      pcTruncUnitAxisScale.set('margin',m);
+      pcTruncUnitAxisScale.set('completeSeriesConfig',completeSeriesConfig);
+      pcTruncUnitAxisScale.set('chartExtents',chartExtents);
+      pcTruncUnitAxisScale.set('chartData',d);
+
+      pcTruncUnitYAxis.set('margin',m);
+      pcTruncUnitYAxis.set('height',h);
+      pcTruncUnitYAxis.set('completeSeriesConfig',completeSeriesConfig);
+      pcTruncUnitYAxis.set('chartData',d);
+      setTimeout(function(){done()},500);
+     // done();
+    });
+
+    test('pcTruncUnitYAxis fixture is created', function() {
+      assert.isTrue(pcTruncUnitYAxis !== null);
+    });
+
+    test('Title _titleGroup transform', function() {
+      var attr = pcTruncUnitYAxis._titleGroup.attr('transform'),
+          re = new RegExp(/(\w+)\((-?\d+\.?\d*)[,\s](-?\d+\.?\d*)\)/),
+          arr = re.exec(attr);
+      assert.equal(arr[1],'translate');
+      assert.closeTo(parseFloat(arr[2]),0,7);
+      assert.closeTo(parseFloat(arr[3]),260,2);
+    });
+
+    test('Title _titleGroup text font-size', function() {
+      var text = pcTruncUnitYAxis._titleGroup.select('text.axis-title');
+      assert.equal(text.attr('font-size'),'12px');
+    });
+    test('Title _titleGroup text rotate', function() {
+      var text = pcTruncUnitYAxis._titleGroup.select('text.axis-title');
+      assert.equal(text.attr('transform'),'rotate(0)');
+    });
+    test('Title _titleGroup text text', function() {
+      var text = pcTruncUnitYAxis._titleGroup.select('text.axis-title');
+      assert.equal(text.text(),'my...le [BoF]');
+    });
+  });
+
+  suite('px-vis-axis title rotation works', function() {
+    var pcRotateAxisSVG = document.getElementById('pcRotateAxisSVG'),
+        pcRotateAxisScale = document.getElementById('pcRotateAxisScale'),
+        pcRotateYAxis = document.getElementById('pcRotateYAxis');
+
+    suiteSetup(function(done){
+      var d = [{
+            "x": 1397102460000,
+            "y": 1
+          },{
+            "x": 1397131620000,
+            "y": 6
+          },{
+            "x": 1397160780000,
+            "y": 10
+          },{
+            "x": 1397189940000,
+            "y": 4
+          },{
+            "x": 1397219100000,
+            "y": 6
+          }
+        ],
+        completeSeriesConfig = {"mySeries":{
+          "type":"line",
+          "name":"mySeries",
+          "x":"x",
+          "y":"y",
+          "color": "rgb(93,165,218)",
+          "yAxisUnit": "BoF"
+        }},
+        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        w = 500,
+        h = 300,
+        m = {
+          "top": 10,
+          "right": 5,
+          "bottom": 110,
+          "left": 50
+        };
+      pcRotateAxisSVG.set('width',w);
+      pcRotateAxisSVG.set('height',h);
+      pcRotateAxisSVG.set('margin',m);
+
+      pcRotateAxisScale.set('width',w);
+      pcRotateAxisScale.set('height',h);
+      pcRotateAxisScale.set('margin',m);
+      pcRotateAxisScale.set('completeSeriesConfig',completeSeriesConfig);
+      pcRotateAxisScale.set('chartExtents',chartExtents);
+      pcRotateAxisScale.set('chartData',d);
+
+      pcRotateYAxis.set('margin',m);
+      pcRotateYAxis.set('height',h);
+      pcRotateYAxis.set('completeSeriesConfig',completeSeriesConfig);
+      pcRotateYAxis.set('chartData',d);
+      setTimeout(function(){done()},500);
+     // done();
+    });
+
+    test('pcRotateYAxis fixture is created', function() {
+      assert.isTrue(pcRotateYAxis !== null);
+    });
+
+    test('Title _titleGroup transform', function() {
+      var attr = pcRotateYAxis._titleGroup.attr('transform'),
+          re = new RegExp(/(\w+)\((-?\d+\.?\d*)[,\s](-?\d+\.?\d*)\)/),
+          arr = re.exec(attr);
+      assert.equal(arr[1],'translate');
+      assert.closeTo(parseFloat(arr[2]),0,7);
+      assert.closeTo(parseFloat(arr[3]),200,2);
+    });
+
+    test('Title _titleGroup text font-size', function() {
+      var text = pcRotateYAxis._titleGroup.select('text.axis-title');
+      assert.equal(text.attr('font-size'),'12px');
+    });
+    test('Title _titleGroup text rotate', function() {
+      var text = pcRotateYAxis._titleGroup.select('text.axis-title');
+      assert.equal(text.attr('transform'),'rotate(-90)');
+    });
+    test('Title _titleGroup text text', function() {
+      var text = pcRotateYAxis._titleGroup.select('text.axis-title');
+      assert.equal(text.text(),'my...le [BoF]');
+    });
+  });
+
+  suite('px-vis-axis tick values works', function() {
+    var tickScale = document.getElementById('tickScale'),
+        tickSVG = document.getElementById('tickSVG'),
+        tickAxis = document.getElementById('tickAxis');
+
+    suiteSetup(function(done){
+      var d = [{
+            "x": 1397102460000,
+            "y": 1
+          },{
+            "x": 1397131620000,
+            "y": 6
+          },{
+            "x": 1397160780000,
+            "y": 10
+          },{
+            "x": 1397189940000,
+            "y": 4
+          },{
+            "x": 1397219100000,
+            "y": 6
+          }
+        ],
+        completeSeriesConfig = {"mySeries":{
+          "type":"line",
+          "name":"mySeries",
+          "x":"x",
+          "y":"y",
+          "color": "rgb(93,165,218)"
+        }},
+        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        w = 500,
+        h = 300,
+        m = {
+          "top": 10,
+          "right": 5,
+          "bottom": 50,
+          "left": 50
+        },
+        tickValues = [2,4,6,8,10];
+
+      tickSVG.set('width',w);
+      tickSVG.set('height',h);
+      tickSVG.set('margin',m);
+
+      tickScale.set('width',w);
+      tickScale.set('height',h);
+      tickScale.set('margin',m);
+      tickScale.set('completeSeriesConfig',completeSeriesConfig);
+      tickScale.set('chartExtents',chartExtents);
+      tickScale.set('chartData',d);
+
+      tickAxis.set('tickValues',tickValues);
+      tickAxis.set('margin',m);
+      tickAxis.set('height',h);
+      tickAxis.set('completeSeriesConfig',completeSeriesConfig);
+      tickAxis.set('chartData',d);
+      setTimeout(function(){done()},500);
+     // done();
+    });
+
+    test('tickAxis fixture is created', function() {
+      assert.isTrue(tickAxis !== null);
+    });
+
+    suite('_axisGroup has correct number of ticks', function() {
+      var lines,path;
+      suiteSetup(function(){
+        lines = tickAxis._axisGroup.selectAll('line');
+        path = tickAxis._axisGroup.selectAll('path');
+      })
+
+      test('correct number of paths', function() {
+        assert.equal(path.nodes().length,1);
+      });
+
+      test('correct number of lines', function() {
+        assert.equal(lines.nodes().length,5);
+      });
+    });
+  });
+
+  suite('px-vis-axis tick format works', function() {
+    var tickFormatScale = document.getElementById('tickFormatScale'),
+        tickFormatSVG = document.getElementById('tickFormatSVG'),
+        tickFormatXAxis = document.getElementById('tickFormatXAxis'),
+        tickFormatYAxis = document.getElementById('tickFormatYAxis');
+
+    suiteSetup(function(done){
+      var d = [{
+            "x": 1397102460000,
+            "y": 1
+          },{
+            "x": 1397131620000,
+            "y": 6
+          },{
+            "x": 1397160780000,
+            "y": 10
+          },{
+            "x": 1397189940000,
+            "y": 4
+          },{
+            "x": 1397219100000,
+            "y": 6
+          }
+        ],
+        completeSeriesConfig = {"mySeries":{
+          "type":"line",
+          "name":"mySeries",
+          "x":"x",
+          "y":"y",
+          "color": "rgb(93,165,218)"
+        }},
+        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        w = 500,
+        h = 300,
+        m = {
+          "top": 10,
+          "right": 5,
+          "bottom": 50,
+          "left": 50
+        },
+        tickValues = [2,4,6,8,10];
+
+      tickFormatSVG.set('width',w);
+      tickFormatSVG.set('height',h);
+      tickFormatSVG.set('margin',m);
+
+      tickFormatScale.set('width',w);
+      tickFormatScale.set('height',h);
+      tickFormatScale.set('margin',m);
+      tickFormatScale.set('completeSeriesConfig',completeSeriesConfig);
+      tickFormatScale.set('chartExtents',chartExtents);
+      tickFormatScale.set('chartData',d);
+
+      tickFormatXAxis.set('margin',m);
+      tickFormatXAxis.set('height',h);
+      tickFormatXAxis.set('completeSeriesConfig',completeSeriesConfig);
+
+      tickFormatYAxis.set('margin',m);
+      tickFormatYAxis.set('height',h);
+      tickFormatYAxis.set('completeSeriesConfig',completeSeriesConfig);
+      tickFormatYAxis.set('chartData',d);
+      setTimeout(function(){done()},500);
+     // done();
+    });
+
+    test('tickFormatXAxis fixture is created', function() {
+      assert.isTrue(tickFormatXAxis !== null);
+    });
+    test('tickFormatYAxis fixture is created', function() {
+      assert.isTrue(tickFormatYAxis !== null);
+    });
+
+    suite('_axisGroup has correct number of ticks', function() {
+      var lines,path;
+      suiteSetup(function(){
+        xLabels = tickFormatXAxis._axisGroup.selectAll('text');
+        yLabels = tickFormatYAxis._axisGroup.selectAll('text');
+      })
+
+      test('xAxis labels correct format ', function() {
+        assert.equal(xLabels.nodes()[3].textContent,"09 AM");
+      });
+
+      test('yAxis labels correct format', function() {
+        assert.equal(yLabels.nodes()[3].textContent,"3.0");
+      });
     });
   });
 

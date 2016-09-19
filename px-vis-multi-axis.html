@@ -47,25 +47,27 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           current-domain="[[currentDomainY]]"
           stroke-width="[[strokeWidth]]"
           outer-tick-size="0"
-          force-refresh
           tick-values="[[_calcTickVals(item, _internalDimensionsChanged)]]"
           truncation-length="[[truncationLength]]"
           complete-series-config="[[completeSeriesConfig]]"
           append-unit-in-title="[[appendUnitInTitle]]"
           prevent-series-bar
           domain-changed="[[_internalDimensionsChanged]]"
+          selected-domain="[[selectedDomain]]"
           title-truncation>
         </px-vis-axis>
       </template>
       <px-vis-axis-brush
         id="axisBrush"
         svg="[[axisGroups]]"
+        parent-svg="[[svg]]"
         height="[[height]]"
         axis="[[y]]"
         margin="[[margin]]"
         chart-data="[[chartData]]"
         dimensions="[[dimensions]]"
         series-key="[[seriesKey]]"
+        domain-changed="[[_internalDimensionsChanged]]"
         muted-series="{{mutedSeries}}">
       </px-vis-axis-brush>
       <px-vis-axis-drag
@@ -106,6 +108,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       PxVisBehaviorD3.dynamicRedraw,
       PxVisBehavior.commonAxis,
       PxVisBehaviorD3.domainUpdate,
+      PxVisBehaviorD3.selectedDomain,
       commonColors
     ],
 
@@ -121,6 +124,14 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
        *
        */
       axisGroups: {
+        type: Object,
+        notify: true
+      },
+      /**
+       * A dictionary of g elems for each dimension
+       *
+       */
+      brushElems: {
         type: Object,
         notify: true
       },
@@ -203,7 +214,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     },
     _moveAxisGroup: function(margin,axisSvg){
       //make sure it is translated properly and we are not running into a race condition
-      this.axisSvg.attr("transform", "translate(0," + this.margin.top + ")");
+      this.axisSvg.attr("transform", "translate(" + this.margin.left + "," + this.margin.top + ")");
     },
     /**
      * Generates a group elem for each dimension and moves it into the correct x coordinate
@@ -221,7 +232,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               resetTitles = false,
               removed = this.axisSvg.selectAll(".dimension").data().filter(function(d){
                 if(_this.dimensions.indexOf(d) === -1){
-                  _this.$.axisBrush.clearBrush(d);
+                  // _this.$.axisBrush.clearBrush(d);
                   delete _this.displayedValues[d];
                   resetTitles = true;
                   return true
@@ -237,7 +248,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
           g.exit()
             .each(function(d){
-              this.$.axisBrush.clearBrush(d);
+              // this.$.axisBrush.clearBrush(d);
               delete this.displayedValues[d];
               resetTitles = true;
             }.bind(this)).remove();
@@ -248,11 +259,13 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               // TODO add a check that we want it to fire these events?
 
               // Dont know why, but need to do this calc before the debounce
-              var m = Px.d3.mouse(this);
+              var m = Px.d3.mouse(this),
+                  elem = this;
 
               _this.debounce('axisMouseMove', function() {
                 var deets = {
                   'axis': d,
+                  'elem': elem,
                   'mousePos': m
                 }
                 _this.fire('px-vis-multi-axis-mousemove', deets);
@@ -261,6 +274,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .on('mouseleave',function(d){
               var deets = {
                 'axis': d,
+                'elem': this,
                 'mousePos': Px.d3.mouse(this)
               }
               _this.fire('px-vis-multi-axis-mouseleave', deets);
@@ -268,6 +282,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .style("cursor","move")
             .call(this.dragBehavior)
           .merge(g)
+            .attr("dimension", function(d) { return d })
             .attr("transform", function(d) {
               return "translate(" + this.x(d) + ",0)";
             }.bind(this));
@@ -281,6 +296,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
           // TODO When we support muting an axes, might want to be able to access the above g and change the transform
           this.set('axisGroups', this.axisSvg.selectAll(".dimension"));
+          this.set('brushElems', this.axisGroups.selectAll('g.brush').nodes());
 
         }
       // },10)
@@ -293,17 +309,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       return Px.d3.select(this.axisGroups.nodes()[i])
     },
     /**
-     * returns the appropriate scale for a dimension and sets the domain
+     * returns the appropriate scale for a dimension
      *
      */
     _returnY: function(item){
-      if(this.matchTicks){
-        var d = this.y[item].domain(),
-            min = Math.floor(d[0]/10)*10,
-            max = Math.ceil(d[1]/10)*10;
-
-        this.y[item].domain([min,max]);
-      }
       return this.y[item]
     },
     /**
@@ -376,8 +385,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
      *
      */
     _displayedTitleChanged: function(evt) {
-
-      this.set('displayedValues.' + evt.detail.id, evt.detail.displayedTitle);
+      var vals = this.displayedValues;
+      this.displayedValues = {};
+      vals[evt.detail.id] = evt.detail.displayedTitle;
+      this.set('displayedValues', vals);
 
       evt.stopPropagation();
       evt.stopImmediatePropagation();
@@ -391,9 +402,23 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     _computedInternalDimensions: function() {
       if(this.dimensions) {
 
+        //if match ticks, make sure the domains can be aligned
+        if(this.matchTicks){
+          for(var i = 0; i < this.dimensions.length; i++){
+            var dim = this.dimensions[i],
+                d = this.y[dim].domain(),
+                min = Math.floor(d[0]/10)*10,
+                max = Math.ceil(d[1]/10)*10;
+
+            this.y[dim].domain([min,max]);
+          }
+        }
+
         this._generateGs();
+
         var notFirst = this._internalDimensions ? true : false;
         this.set('_internalDimensions', this.dimensions);
+
         if(notFirst){
           this.$.bof.render();
         }
@@ -432,6 +457,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       } else {
         return item;
       }
+    },
+
+    deleteAllBrushes: function(){
+      this.$.axisBrush.deleteAllBrushes();
     }
   });
 </script>

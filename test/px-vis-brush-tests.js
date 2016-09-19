@@ -469,25 +469,25 @@ function runTests(){
       assert.equal(gradientBrush.brushSvg.select('defs').node().tagName, 'defs');
     });
     test('linearGradient is created', function() {
-      assert.equal(gradientBrush.brushSvg.select('defs').select('linearGradient').node().tagName, 'linearGradient');
+      assert.equal(gradientBrush.brushSvg.select('defs').select('#overlayGradient').node().tagName, 'linearGradient');
     });
     test('linearGradient has correct id', function() {
-      assert.equal(gradientBrush.brushSvg.select('defs').select('linearGradient').attr('id'), 'overlayGradient');
+      assert.equal(gradientBrush.brushSvg.select('defs').select('#overlayGradient').attr('id'), 'overlayGradient');
     });
     test('linearGradient stops are created', function() {
-      var stops = gradientBrush.brushSvg.select('defs').select('linearGradient').selectAll('stop').nodes();
+      var stops = gradientBrush.brushSvg.select('defs').select('#overlayGradient').selectAll('stop').nodes();
       assert.equal(stops.length, 2);
       assert.equal(stops[0].tagName, 'stop');
       assert.equal(stops[1].tagName, 'stop');
     });
     test('linearGradient stop[0] is correct', function() {
-      var stop = d3.select(gradientBrush.brushSvg.select('defs').select('linearGradient').selectAll('stop').nodes()[0]);
+      var stop = d3.select(gradientBrush.brushSvg.select('defs').select('#overlayGradient').selectAll('stop').nodes()[0]);
       assert.equal(stop.attr('offset'), '0%');
       assert.equal(stop.attr('stop-color').split(" ").join(''), colors.gray5);
       assert.equal(stop.attr('stop-opacity'), 0.2);
     });
     test('linearGradient stop[1] is correct', function() {
-      var stop = d3.select(gradientBrush.brushSvg.select('defs').select('linearGradient').selectAll('stop').nodes()[1]);
+      var stop = d3.select(gradientBrush.brushSvg.select('defs').select('#overlayGradient').selectAll('stop').nodes()[1]);
       assert.equal(stop.attr('offset'), '100%');
       assert.equal(stop.attr('stop-color').split(" ").join(''), colors.gray5);
       assert.equal(stop.attr('stop-opacity'), 0.8);
