@@ -1,3 +1,7 @@
+v0.3.13
+==================
+* added notify true to mouseRect in interaction space
+
 v0.3.12
 ==================
 * added deleteAllBrushes method to axis brush
