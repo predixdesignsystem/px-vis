@@ -1052,13 +1052,10 @@ PxVisBehaviorD3.lineShared = {
     path = Px.d3.radialLine()
       .angle(function(d) {
         // ~~ --> round pixels values to optimize svg perfs
-        console.log(d[0])
-        console.log(_this.x(d[0]))
         return _this.x(d[0]);
       })
       .radius(function(d) {
-        console.log(~~_this.y['DWATT'](d[1]));
-          return ~~_this.y['DWATT'](d[1]);
+          return ~~_this.y(Number(d[1]));
       }),
     //be sneaky: iterate through the data like normal
     line = function(d) {

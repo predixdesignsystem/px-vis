@@ -204,6 +204,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       radial: {
         type: Boolean,
         value: false
+      },
+      singleDomain: {
+        type: Boolean,
+        value: false
       }
     },
 
@@ -320,7 +324,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
      *
      */
     _returnY: function(item){
-      return this.y[item]
+      return this.singleDomain ? this.y : this.y[item]
     },
     /**
      * In order to make the ticks align, we iterate through and generate some round numbers for each axis
@@ -328,7 +332,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
      */
     _calcTickVals: function(item){
 
-      if(this.matchTicks){
+      if(this.matchTicks && !this.singleDomain) {
         var d = this.y[item].domain(),
             min = Math.floor(d[0]/10)*10,
             max = Math.ceil(d[1]/10)*10,
@@ -408,10 +412,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
      */
     _computedInternalDimensions: function() {
       if(this.dimensions) {
-
         //if match ticks, make sure the domains can be aligned
-        if(this.matchTicks){
-          for(var i = 0; i < this.dimensions.length; i++){
+        if(this.matchTicks && !this.singleDomain) {
+          for(var i = 0; i < this.dimensions.length; i++) {
             var dim = this.dimensions[i],
                 d = this.y[dim].domain(),
                 min = Math.floor(d[0]/10)*10,
