@@ -1004,61 +1004,17 @@ PxVisBehaviorD3.lineShared = {
     var _this = this,
         renderToCanvas = (typeof(toCanvas) !== 'undefined') ? toCanvas : false,
         dims = this.completeSeriesConfig[this.seriesId]['x'],
-    //     define a normal d3 line generator
-    //     line = Px.d3.radialLine()
-    //       .angle(function(d) {
-    //         // ~~ --> round pixels values to optimize svg perfs
-    //         return _this.x(d['TimeStamp']);
-    //       })
-    //       .radius(function(d) {
-    //           return ~~_this.y['DWATT'](d[]);
-    //       })
-    //       .defined(function(d) {
-    //         return !isNaN(d['DWATT']);
-    //         //tests is equivalent to !isNaN but slightly faster
-    //         // return d[yKey] === d[yKey];
-    //       });
-    //
-    // if(this.interpolationFunction){
-    //   line.curve(this.interpolationFunction);
-    // }
-    //
-    // // add the canvas context if relevant
-    // if(renderToCanvas){
-    //   line.context(this.canvasContext);
-    // }
-
-
-    // path = Px.d3.radialLine().defined(function(d) {
-    //   //only draw a line through the axis if we have data
-    //   return d;
-    // }),
-    // //be sneaky: iterate through the data like normal
-    // line = function(d) {
-    //   //for each datapoint, iterate through the dimensions
-    //   return path(dims.map(function(p) {
-    //     //check that we have data; if not, return false so it doesnt draw a line
-    //     if(!d[p]) {
-    //       return false
-    //     }
-    //     //return [x,y] to path: x is ordinal based on dim; get the y-scale for the dim and use that particular scale on the data
-    //     if(d["TimeStamp"] === 1466623920000){
-    //       console.log([this.x(p), ~~this.y[p](d[p])])
-    //     }
-    //     return [this.x(p), ~~this.y[p](d[p])];
-    //   }.bind(this)));
-    // }.bind(this);
-
+        
     path = Px.d3.radialLine()
       .angle(function(d) {
-        // ~~ --> round pixels values to optimize svg perfs
         return _this.x(d[0]);
       })
       .radius(function(d) {
-          return ~~_this.y(Number(d[1]));
-      }),
+          // ~~ --> round pixels values to optimize svg perfs
+        return ~~_this.y(Number(d[1]));
+      });
     //be sneaky: iterate through the data like normal
-    line = function(d) {
+    var line = function(d) {
       //for each datapoint, iterate through the dimensions
       return path(dims.map(function(p) {
         //check that we have data; if not, return false so it doesnt draw a line
@@ -1067,8 +1023,8 @@ PxVisBehaviorD3.lineShared = {
         }
         //return [x,y] to path: x is ordinal based on dim; get the y-scale for the dim and use that particular scale on the data
         return [p,d[p]];
-      }.bind(this)));
-    }.bind(this);
+      }));
+    };
 
     if(this.interpolationFunction){
       path.curve(this.interpolationFunction);
