@@ -138,13 +138,13 @@ Element which draws lines series onto the chart
         // we need to wrap the data differently depending on if we are drawing many lines or just one line
         if(this.parallelCoordinates) {
           var data = this.chartData;
-          this._defineMultiLine(false,this.radialLine);
+          this._defineMultiLine(false);
         }  else if(this.radialLine) {
-          this._defineRadialLine(true);
+          this._defineRadialLine(false);
           data = this.chartData;
         } else {
           var data = [this.chartData];
-          this._defineSingleLine(false,this.radialLine);
+          this._defineSingleLine(false);
         }
         // checks to see if the group already exists. If not, create; if so, update
         if(this._isObjEmpty(this.lineGroup)) {
@@ -171,7 +171,9 @@ Element which draws lines series onto the chart
           .attr('fill','none')
         // When datapoints are added OR this funtion is run, draw stuff
         .merge(lineBuilder)
-          .attr("d", this.line)
+          .attr("d", function(d) {
+            return this.line(d);
+          }.bind(this))
           // TODO add ability to color by category
           .attr('stroke',function(d,i){
             if(this.categoryKey){
