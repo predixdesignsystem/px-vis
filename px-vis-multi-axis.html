@@ -47,6 +47,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           current-domain="[[currentDomainY]]"
           stroke-width="[[strokeWidth]]"
           outer-tick-size="0"
+          inner-tick-size="0"
           tick-values="[[_calcTickVals(item, _internalDimensionsChanged)]]"
           truncation-length="[[truncationLength]]"
           complete-series-config="[[completeSeriesConfig]]"
@@ -54,7 +55,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           prevent-series-bar
           domain-changed="[[_internalDimensionsChanged]]"
           selected-domain="[[selectedDomain]]"
-          title-truncation>
+          title-truncation
+          disable-ticks="[[_calcDisableTicks(index)]]"
+          inline-axis-ticks="[[inlineAxisTicks]]">
         </px-vis-axis>
       </template>
       <px-vis-axis-brush
@@ -208,6 +211,18 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       singleDomain: {
         type: Boolean,
         value: false
+      },
+      labelOneAxis:{
+        type: Boolean,
+        value: false
+      },
+      /**
+       * A boolean specifying if the axis ticks should appear next to or on the axis
+       *
+       */
+      inlineAxisTicks: {
+        type: Boolean,
+        value: false
       }
     },
 
@@ -345,6 +360,16 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         return vals;
       }
       return null;
+    },
+    /**
+     * Do the same thing for gridlines once
+     *
+     */
+    _calcDisableTicks: function(index) {
+      if(this.labelOneAxis) {
+        return index === 0 ? false : true;
+      }
+      return false;
     },
     /**
      * Do the same thing for gridlines once

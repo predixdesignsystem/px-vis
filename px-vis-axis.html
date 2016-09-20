@@ -153,6 +153,22 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           axisType: {
             type: String,
             value: "linear"
+          },
+          /**
+           * A boolean specifying if the axis should have ticks or not
+           *
+           */
+          disableTicks: {
+            type: Boolean,
+            value: false
+          },
+          /**
+           * A boolean specifying if the axis ticks should appear next to or on the axis
+           *
+           */
+          inlineAxisTicks: {
+            type: Boolean,
+            value: false
           }
         },
 
@@ -236,11 +252,20 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           }
 
           // controls the tick mark size for ticks with numbers
-          // this._axis.innerTickSize(-1000);
+          // this._axis.tickSizeInner(this.innerTickSize);
           // this._axis.tickPadding(10);
           // controls the first and last ticks
           // TODO rename var names to match new d3
           this._axis.tickSizeOuter(this.outerTickSize);
+
+
+          if(this.disableTicks) {
+            this._axis.tickValues([]);
+          }
+
+          if(this.inlineAxisTicks){
+            this._axis.tickSizeInner(0);
+          }
 
           // TODO rename var names to match new d3
           if(this.labelPosition !== 'center'){
