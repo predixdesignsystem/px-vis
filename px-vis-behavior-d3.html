@@ -780,14 +780,46 @@ PxVisBehaviorD3.axisConfig = {
       type: Number,
       value: 1
     },
-
+    /**
+     * Defines the axis outerTickSize. Default is to hide them
+     *
+     * See: https://github.com/d3/d3-axis#axis_tickSizeOuter
+     */
     outerTickSize: {
       type: Number,
       value: 0
     },
-
+    /**
+     * Defines the what values the axis should use
+     *
+     * See: https://github.com/d3/d3-axis#axis_tickValues
+     */
     tickValues: {
       type: Array
+    },
+    /**
+     * Defines the tick number and format
+     *
+     * See: https://github.com/d3/d3-axis#axis_ticks
+     *
+     * Can be either a Number or an Object
+     *
+     * Obj format:
+     * ```
+     *    {
+     *         "interval": Number,
+     *         "format": String or d3 object,
+     *    }
+     * ```
+     */
+    ticks: {},  //yes, this doesnt have a type because both Number and Object are valid
+    /**
+     * Defines the color for axis lines, ticks, labels, and title
+     *
+     */
+    axisColor: {
+      type: String,
+      value: "grey9"
     }
   }
 };
@@ -1004,7 +1036,7 @@ PxVisBehaviorD3.lineShared = {
     var _this = this,
         renderToCanvas = (typeof(toCanvas) !== 'undefined') ? toCanvas : false,
         dims = this.completeSeriesConfig[this.seriesId]['x'],
-        
+
     path = Px.d3.radialLine()
       .angle(function(d) {
         return _this.x(d[0]);

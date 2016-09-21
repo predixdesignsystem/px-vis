@@ -113,7 +113,6 @@ Element which draws lines series onto the chart
           this._defineMultiLine(true);
           data = this.chartData;
         } else if(this.radialLine) {
-          console.log("Radial");
           this._defineRadialLine(true);
           data = this.chartData;
         } else {
@@ -152,7 +151,7 @@ Element which draws lines series onto the chart
     _renderAtOnce: function(data) {
 
       //data format
-      if(!this.parallelCoordinates) {
+      if(!this.parallelCoordinates && !this.radialLine) {
         data = [data];
       }
 
@@ -237,7 +236,7 @@ Element which draws lines series onto the chart
       //make sure canvas is clean
       this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
 
-      if(this.parallelCoordinates) {
+      if(this.parallelCoordinates || this.radialLine) {
         //split the data in the number of frames desired
         for(j=0; j<numberOfFrames; j++) {
           batches.push(data.slice(j*size, (j+1)*size));
