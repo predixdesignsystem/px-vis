@@ -130,8 +130,9 @@ Element which draws lines series onto the chart
         // if we have previously drawn the same number of lines as series, then let's start over; Clear the drawing canvas
         if(this.canvasContext._pxLinesRedraw === this.canvasContext._pxLinesTotal){
           this.canvasContext._pxLinesRedraw = 0;
-          // (x1,y1,x2,y2) : for some reason, we need y1 to be -1 or it leaves a pixel....
-          this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+          // (x1,y1,x2,y2)
+          this.canvasContext.clearRect(-this.canvasContext._translation[0], -this.canvasContext._translation[1] , this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+          // this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
         }
 
         //Render data progressively
