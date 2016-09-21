@@ -72,7 +72,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
 
     observers: [
       '_setXScale(width)',
-      '_setYScale(width,axes)',
+      '_setYScale(width,margin)',
       '_currentDomain(x,y,chartExtents)'
     ],
     /**
@@ -125,8 +125,10 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      *
      * @method _setYScale
      */
-    _setYScale: function(width,axes) {
-        var range = [100, width - 100];
+    _setYScale: function(width,margin) {
+        var scaled = width * 0.2,
+            center = scaled < 75 ? scaled : 75,
+            range = [75, width];
 
         this.y = Px.d3.scaleLinear().nice().range(range);
 

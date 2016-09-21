@@ -37,17 +37,16 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           svg="[[_returnGroup(index, _internalDimensionsChanged)]]"
           axis="[[_returnY(item, _internalDimensionsChanged)]]"
           series-id="[[item]]"
-          height="[[height]]"
+          height="[[_h]]"
           margin="[[margin]]"
           orientation="left"
           title="[[_getTitle(item)]]"
-          title-location='[[titleLocation]]'
+          title-location='[[_computeTitleLocation(item,titleLocation)]]'
           title-type-size="12"
           label-type-size="10"
           current-domain="[[currentDomainY]]"
           stroke-width="[[strokeWidth]]"
           outer-tick-size="0"
-          inner-tick-size="0"
           tick-values="[[_calcTickVals(item, _internalDimensionsChanged)]]"
           truncation-length="[[truncationLength]]"
           complete-series-config="[[completeSeriesConfig]]"
@@ -57,7 +56,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           selected-domain="[[selectedDomain]]"
           title-truncation
           disable-ticks="[[_calcDisableTicks(index)]]"
-          inline-axis-ticks="[[inlineAxisTicks]]">
+          label-position="[[labelPosition]]"
+          axis-color="[[axisColor]]"
+          ticks="[[ticks]]">
         </px-vis-axis>
       </template>
       <px-vis-axis-brush
@@ -216,13 +217,13 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         type: Boolean,
         value: false
       },
-      /**
-       * A boolean specifying if the axis ticks should appear next to or on the axis
-       *
-       */
-      inlineAxisTicks: {
-        type: Boolean,
-        value: false
+      length: {
+        type: Number,
+        value: null
+      },
+      _h: {
+        type: Number,
+        computed: '_calcH(height,length)'
       }
     },
 
@@ -235,6 +236,45 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       'px-axis-done': '_setAxisStyles',
       'px-vis-axis-displayed-title-changed': '_displayedTitleChanged'
     },
+
+    /**
+     * At ready, set the margin and titleLocation objects
+     *
+     */
+    _computeTitleLocation: function(item, titleLocation) {
+      if(this.radial) {
+        var r = (this.x(item) * 180 / Math.PI),
+            attrs = {
+            'x': 0,
+            'y': null,
+            'r': (r + 180) * -1,  //we rotate each group so we have to un-rotate each title
+            'anchor': null
+          };
+        if(r > 45 && r < 135) {
+          attrs.anchor = 'start';
+          attrs.y = this.length + 10;
+        } else if(r > 225 && r < 315){
+          attrs.anchor = 'end';
+          attrs.y = this.length + 10;
+        } else if(r >= 135 && r <= 225){
+          attrs.anchor = 'middle';
+          attrs.y = this.length + 10 + 12 ; //text size plus spacer
+        } else {
+          attrs.anchor = 'middle';
+          attrs.y = this.length + 10; 
+        }
+        return attrs;
+      }
+      return titleLocation;
+    },
+
+    _calcH: function(height,length) {
+      if(length){
+        return length;
+      }
+      return height
+    },
+
     _moveAxisGroup: function(margin,axisSvg){
       //make sure it is translated properly and we are not running into a race condition
       this.axisSvg.attr("transform", "translate(" + (this.margin.left + this.offset[0]) + "," + (this.margin.top + this.offset[1]) + ")");
@@ -308,7 +348,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .attr("dimension", function(d) { return d })
             .attr("transform", function(d) {
               if(this.radial){
-                return "rotate(" + (this.x(d) * 180 / Math.PI) + ")"
+                return "rotate(" + (this.x(d) * 180 / Math.PI + 180) + ")"
               }
               return "translate(" + this.x(d) + ",0)";
             }.bind(this));

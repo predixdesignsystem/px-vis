@@ -161,14 +161,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           disableTicks: {
             type: Boolean,
             value: false
-          },
-          /**
-           * A boolean specifying if the axis ticks should appear next to or on the axis
-           *
-           */
-          inlineAxisTicks: {
-            type: Boolean,
-            value: false
           }
         },
 
@@ -226,16 +218,35 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               break;
           }
 
-          // change default (10) ticks
-          // this._axis.ticks(10);
-          // change default ticks with specific time
-          // this._axis.ticks(d3.time.months, 1);
-          // this._axis.ticks(Px.d3.time.days, 7);
-          //
+          //support for general ticks setting
+          // https://github.com/d3/d3-axis#axis_ticks
+          if(this.ticks){
+            if(typeof(this.ticks) === "number" || !isNaN(parseInt(this.ticks))) {
 
-          // if(this.ticks && this._doesObjHaveValues(ticks)){
-          //   this._axis.ticks(this.ticks.interval, this.ticks.format);
-          // }
+              this._axis.ticks(this.ticks);
+
+            } else if(typeof(this.ticks) === 'object' && this.ticks.interval && this.ticks.format) {
+
+              if(this.axisType === 'time'){
+                this._axis.ticks(this.ticks.format, this.ticks.interval);
+              } else {
+                this._axis.ticks(this.ticks.interval, this.ticks.format);
+              }
+
+            } else if(typeof(this.ticks) === 'object' && this.ticks.interval && this.axisType !== 'time') {
+
+              this._axis.ticks(this.ticks.interval);
+
+            } else if(typeof(this.ticks) === 'object' && this.ticks.format && this.axisType === 'time') {
+
+              this._axis.ticks(this.ticks.format);
+
+            } else {
+              console.error("Cannot interpret axis ticks")
+            }
+          }
+
+          //support for tick format
           // https://github.com/mbostock/d3/wiki/Formatting#d3_format
           if(this.tickFormat){
             if(this.axisType === 'time'){
@@ -258,17 +269,16 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           // TODO rename var names to match new d3
           this._axis.tickSizeOuter(this.outerTickSize);
 
-
+          //if we want to turn off ticks and labels
           if(this.disableTicks) {
-            this._axis.tickValues([]);
+            this._axis.ticks(0);
+            // this._axis.tickValues([]);
           }
 
-          if(this.inlineAxisTicks){
+          //if we want our labels to be in a specific position
+          if(this.labelPosition === 'inline') {
             this._axis.tickSizeInner(0);
-          }
-
-          // TODO rename var names to match new d3
-          if(this.labelPosition !== 'center'){
+          } else if(this.labelPosition !== 'center') {
             this._axis.tickSizeInner(this.labelTypeSize);
           }
 
@@ -357,6 +367,16 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          */
         setLabelDims: function() {
           var label = {};
+
+          //for radial charts. TODO make it work with other charts?
+          if(this.labelPosition === 'inline'){
+            label.x = 0;
+            label.y = (this.labelPosition === 'after') ? this.labelTypeSize * -2/3 : this.labelTypeSize * 2/3;
+            label.anchor = 'middle';
+
+            return label;
+          }
+
           switch(this.orientation) {
             case 'bottom':
               label.x = this.labelTypeSize / 4;
@@ -400,11 +420,31 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             var label = this.setLabelDims();
 
             elem.selectAll('text')
+              .attr("fill",this.colors[this.axisColor])
               .attr("y", label.y)
               .attr("x", label.x)
               .attr("text-anchor", label.anchor)
               .style("text-anchor", label.anchor)
               .attr('transform',"translate(" + this.labelTranslation.join(',') + ") rotate(" + this.labelRotation + ")");
+          }
+
+          if(this.labelPosition === "inline"){
+            var gTick = elem.selectAll('g.tick'),
+                tickText = gTick.select("text");
+
+            gTick.insert("rect","text")
+              .attr('x',function(d,i) {
+                return tickText.nodes()[i].getBoundingClientRect().width / -2 - 3
+              })
+              .attr('y', 0)
+              .attr('width',function(d,i){
+                return tickText.nodes()[i].getBoundingClientRect().width + 6
+              })
+              .attr('height', this.labelTypeSize + 3)
+              .attr("fill",this.colors[this.axisColor]);
+
+              tickText.attr("fill",this.colors["white"]);
+
           }
         },
         /**
@@ -416,7 +456,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           elem.selectAll(lines)
             .attr('test','test')
             .attr('fill','none')
-            .attr('stroke', this.colors.grey9)
+            .attr('stroke', this.colors[this.axisColor])
             .attr('shape-rendering', 'crispEdges')
             .attr("stroke-width", this.strokeWidth);
         },
@@ -475,6 +515,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
           this._titleGroup.append("text")
             .attr('class','axis-title')
+            .attr("fill",this.colors[this.axisColor])
             .attr('font-size', this.titleTypeSize + 'px')
             .style('font-family','GE Inspira Sans')
             // .attr('font-style','GE Inspira Sans')
