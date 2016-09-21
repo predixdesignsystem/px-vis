@@ -37,7 +37,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           svg="[[_returnGroup(index, _internalDimensionsChanged)]]"
           axis="[[_returnY(item, _internalDimensionsChanged)]]"
           series-id="[[item]]"
-          height="[[_h]]"
+          height="[[_heightOrLen]]"
           margin="[[margin]]"
           orientation="left"
           title="[[_getTitle(item)]]"
@@ -67,14 +67,16 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         id="axisBrush"
         svg="[[axisGroups]]"
         parent-svg="[[svg]]"
-        height="[[height]]"
+        height="[[_heightOrLen]]"
         axis="[[y]]"
         margin="[[margin]]"
         chart-data="[[chartData]]"
         dimensions="[[dimensions]]"
         series-key="[[seriesKey]]"
         domain-changed="[[_internalDimensionsChanged]]"
-        muted-series="{{mutedSeries}}">
+        muted-series="{{mutedSeries}}"
+        radial="[[radial]]"
+        brush-to-remove="[[brushToRemove]]">
       </px-vis-axis-brush>
       <px-vis-axis-drag
         width="[[width]]"
@@ -223,9 +225,13 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         type: Number,
         value: null
       },
-      _h: {
+      _heightOrLen: {
         type: Number,
         computed: '_calcH(height,length)'
+      },
+      brushToRemove: {
+        type: Boolean,
+        value: false
       }
     },
 
