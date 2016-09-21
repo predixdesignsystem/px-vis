@@ -1,6 +1,14 @@
-v0.3.13
+v0.3.15
 ==================
 * fixed errors when muting all axes
+
+v0.3.14
+==================
+* add check for data in line
+
+v0.3.13
+==================
+* added notify true to mouseRect in interaction space
 
 v0.3.12
 ==================
