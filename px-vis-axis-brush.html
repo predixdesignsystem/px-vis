@@ -84,6 +84,10 @@ This element draw the box over the axis signifying the active area to mute the s
        },
        parentSvg: {
          type: Object
+       },
+       brushToRemove: {
+         type: Boolean,
+         value: false
        }
     },
 
@@ -97,16 +101,18 @@ This element draw the box over the axis signifying the active area to mute the s
     drawElement: function() {
       this.debounce('drawBrushAxis', function(){
         var _this = this,
-            domain = [
+            domain = this.radial ? // [ [x1,y1] , [x2,y2] ]
+            [
+              [-10,74],
+              [10,_this.height]
+            ] :
+            [
               [-10,0],
               [_this.margin.top,_this.height - _this.margin.top - _this.margin.bottom]
             ];
 
         if(!this._previousDomain){
-          this._previousDomain = [
-            [-10,0],
-            [_this.margin.top,_this.height- _this.margin.top - _this.margin.bottom]
-          ];
+          this._previousDomain = domain;
         }
 
         // Add and store a brush for each axis.
@@ -160,7 +166,7 @@ This element draw the box over the axis signifying the active area to mute the s
         b.selectAll("rect.selection")
           .attr("fill", _this.colors.black)
           .attr("fill-opacity", 0.15)
-          .attr("stroke", _this.colors["primary-blue"])
+          .attr("stroke", _this.colors["primary-blue"]);
 
         // save these brushes for access in brush()
         this.set('_brushes', b);
@@ -175,6 +181,8 @@ This element draw the box over the axis signifying the active area to mute the s
       if(Px.d3.event.sourceEvent && Px.d3.event.sourceEvent.type !== 'end') {
       	Px.d3.event.sourceEvent.stopPropagation();
       }
+      Px.d3.select(this).select("rect.selection")
+      .attr("width", 20);
     },
 
     /**
@@ -203,9 +211,9 @@ This element draw the box over the axis signifying the active area to mute the s
       // for each brush, figure out if it was brushed and build an array of obj with the extents and the dimension
       this._brushes.each(function(d) {
         if(Px.d3.brushSelection(this)) {
-
           var ext = _this._checkMinSize(Px.d3.brushSelection(this),Px.d3.select(this));
           extents[d] = ext;
+
         }
       });
       this._calcMutedSeries(extents);
@@ -286,17 +294,35 @@ This element draw the box over the axis signifying the active area to mute the s
       var series = {},
           domains = {},
           keys = Object.keys(extents),
+          lower = 1,
+          upper = 0,
           dim,y0,y1;
+
+        if(this.radial){
+          lower = 0;
+          upper = 1
+        }
 
         for(var j = 0; j < keys.length; j++){
           dim = keys[j];
 
-          y0 = this.axis[dim].invert(extents[dim][1]);
-          y1 = this.axis[dim].invert(extents[dim][0]);
+          if(typeof(this.axis) === 'object'){
+            y0 = this.axis[dim].invert(extents[dim][lower]);
+            y1 = this.axis[dim].invert(extents[dim][upper]);
+          } else {
+            y0 = this.axis.invert(extents[dim][lower]);
+            y1 = this.axis.invert(extents[dim][upper]);
+          }
 
           for(var i = 0; i < this.chartData.length; i++){
-            if(y0 > this.chartData[i][dim] || this.chartData[i][dim] > y1){
-              series[this.chartData[i][this.seriesKey]] = true;
+            if(this.brushToRemove){
+              if(y0 < this.chartData[i][dim] && this.chartData[i][dim] < y1){
+                series[this.chartData[i][this.seriesKey]] = true;
+              }
+            } else {
+              if(y0 > this.chartData[i][dim] || this.chartData[i][dim] > y1){
+                series[this.chartData[i][this.seriesKey]] = true;
+              }
             }
           }
           domains[dim] = [y0,y1];

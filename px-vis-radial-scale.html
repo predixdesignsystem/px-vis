@@ -68,6 +68,10 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @type Object
      */
     properties: {
+      centerOffset: {
+        type: Boolean,
+        value: false
+      }
     },
 
     observers: [
@@ -126,9 +130,14 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @method _setYScale
      */
     _setYScale: function(width,margin) {
+      var range = [0, width];
+
+      if(this.centerOffset) {
         var scaled = width * 0.2,
-            center = scaled < 75 ? scaled : 75,
+            center = scaled < 75 ? scaled : 75;
+
             range = [75, width];
+      }
 
         this.y = Px.d3.scaleLinear().nice().range(range);
 
