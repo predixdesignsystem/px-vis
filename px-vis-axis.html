@@ -152,7 +152,20 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           */
           axisType: {
             type: String,
-            value: "linear"
+            value: 'linear'
+          },
+          /**
+           * rotation to apply to the axis, in degrees
+           */
+          rotation: {
+            type: Number
+          },
+          /**
+           * translation offset to apply to the axis
+           */
+          offset: {
+            type: Array,
+            value: [0,0]
           }
         },
 
@@ -174,7 +187,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         attached: function(){
           if(this._axisGroup){
             // alert parents that we are done drawing the axis
-            this.fire("px-axis-done");
+            this.fire('px-axis-done');
           }
         },
 
@@ -192,6 +205,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          *
          */
         defineAxis: function(){
+
           switch(this.orientation){
             case 'bottom':
               this._axis = Px.d3.axisBottom(this.axis);
@@ -222,9 +236,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           // }
           // https://github.com/mbostock/d3/wiki/Formatting#d3_format
           if(this.tickFormat){
-            if(this.axisType === 'time'){
+            if(this.axisType === 'time') {
               this._axis.tickFormat(Px.d3.timeFormat(this.tickFormat));
-            } else if(this.axisType === 'linear'){
+            } else if(this.axisType === 'linear') {
               this._axis.tickFormat(Px.d3.format(this.tickFormat));
             }
           }
@@ -257,14 +271,17 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         //  this.debounce('drawAxis', function() {
             if(this.svg.node() && this.domainChanged !== null){
               this.defineAxis();
+
               // TODO unify my orientation checks
               // TODO suport top and right
               if(this.orientation === 'bottom'){
                 var h = this.height - this.margin.bottom - this.margin.top;
 
-                this.translateAmt = [0,h];
+                this.translateAmt = [this.offset[0],this.offset[1] + h];
               } else if(this.orientation === 'left'){
-                this.translateAmt = [0,0];
+                this.translateAmt = [this.offset[0],this.offset[1]];
+              } else {
+                this.translateAmt = [this.offset[0],this.offset[1]];
               }
 
               // checks to see if the axis already exists. If not, create; if so, update
@@ -287,7 +304,13 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .attr("class", "axis")
             .attr('axis-id',this.axisId)
          //   .attr('debug-id',this.title)
-            .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
+            .attr("transform", function() {
+              if(this.rotation) {
+                return 'translate(' + this.translateAmt.join(',') + ')' + 'rotate(' + (Number(this.rotation)) + ')';
+              } else {
+                return 'translate(' + this.translateAmt.join(',') + ')';
+              }
+            }.bind(this))
             .call(this._axis);
             // .each(function(d) { d3.select(this).call(_this._axis.scale(_this.axis[d])); })
 
@@ -302,7 +325,13 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          */
         _updateAxis: function() {
           this._axisGroup
-          .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
+          .attr("transform", function() {
+            if(this.rotation) {
+              return 'translate(' + this.translateAmt.join(',') + ')' + 'rotate(' + (Number(this.rotation)) + ')';
+            } else {
+              return 'translate(' + this.translateAmt.join(',') + ')';
+            }
+          }.bind(this))
           .call(this._axis);
 
           this._setLabelStyles(this._axisGroup);
