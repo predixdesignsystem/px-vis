@@ -232,12 +232,16 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       brushToRemove: {
         type: Boolean,
         value: false
+      },
+      _lastDomainChanged: {
+        type: Boolean,
+        value: null
       }
     },
 
     observers: [
-      '_computedInternalDimensions(domainChanged)',
-      '_moveAxisGroup(margin.*,axisSvg)'
+      '_computedInternalDimensions(domainChanged.*,dimensions.*)',
+      '_moveAxisGroup(margin.*,axisSvg,offset.*)'
     ],
 
     listeners:{
@@ -483,8 +487,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
      * chart refresh but the new scale has yet to be triggered
      *
      */
-    _computedInternalDimensions: function() {
-      if(this.dimensions) {
+    _computedInternalDimensions: function(dC, dim) {
+      console.log(dC)
+      if(this._lastDomainChanged !== this.domainChanged) {
+        console.log("insdie")
+        this._lastDomainChanged = this.domainChanged;
         //if match ticks, make sure the domains can be aligned
         if(this.matchTicks && !this.singleDomain) {
           for(var i = 0; i < this.dimensions.length; i++) {
@@ -535,11 +542,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
      *
      */
     _getTitle: function(item) {
-      if(this.completeSeriesConfig[item] && this.completeSeriesConfig[item].title) {
-        return this.completeSeriesConfig[item].title;
-      } else {
+      // if(this.completeSeriesConfig[item] && this.completeSeriesConfig[item].title) {
+      //   return this.completeSeriesConfig[item].title;
+      // } else {
         return item;
-      }
+      // }
     }
   });
 </script>

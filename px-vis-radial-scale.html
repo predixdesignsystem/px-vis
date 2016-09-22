@@ -48,8 +48,8 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
 
     behaviors: [
       PxVisBehaviorD3.svg,
-      PxVisBehavior.sizing,
       PxVisBehaviorD3.axes,
+      PxVisBehavior.sizing,
       PxVisBehavior.dataset,
       PxVisBehavior.commonMethods,
       PxVisBehaviorD3.selectedDomain,
@@ -57,7 +57,6 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       commonColors,
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.chartExtents,
-      PxVisBehavior.dimensions,
       PxVisBehaviorD3.domainUpdate
     ],
 
@@ -71,13 +70,18 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       centerOffset: {
         type: Boolean,
         value: false
+      },
+      amplitudeKeys: {
+        type: Array,
+        notify: true
       }
     },
 
     observers: [
       '_setXScale(width)',
       '_setYScale(width,margin)',
-      '_currentDomain(x,y,chartExtents)'
+      '_generateChartExtents(chartData.*, amplitudeKeys)',
+      '_currentDomain(x, y, chartExtents)'
     ],
     /**
     * when attached, re-fire set properties for precipitation pattern
@@ -112,16 +116,18 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @method _setXScale
      */
     _setXScale: function() {
-        var range = [0, 2 * Math.PI];
+        var range = [0, 2 * Math.PI],
+            x;
 
         if(this.x) {
           var oldDomain = this.x.domain();
-          this.x = Px.d3.scalePoint().range(range).domain(oldDomain).padding(0.5);
+          x = Px.d3.scalePoint().range(range).domain(oldDomain).padding(0.5);
         } else {
-          this.x = Px.d3.scalePoint().range(range).padding(0.5);
+          x = Px.d3.scalePoint().range(range).padding(0.5);
         }
 
-        this.notifyPath('x.range', this.x.range);
+        this.set('x',x);
+        this.notifyPath('x.range', x.range);
         this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
     },
     /**
@@ -130,7 +136,8 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @method _setYScale
      */
     _setYScale: function(width,margin) {
-      var range = [0, width];
+      var range = [0, width],
+          y;
 
       if(this.centerOffset) {
         var scaled = width * 0.2,
@@ -139,19 +146,45 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
             range = [75, width];
       }
 
-        this.y = Px.d3.scaleLinear().nice().range(range);
+        y = Px.d3.scaleLinear().nice().range(range);
 
-        this.notifyPath('y.range', this.y.range);
+        this.set('y',y);
+        this.notifyPath('y.range', y.range);
         this.fire('px-vis-y-updated', { 'dataVar': 'y', 'data': this.y, 'method':'set' });
     },
 
-    _getDataExtents: function(d,yKeysArr){
-      var a = [];
-      for(var i = 0; i < yKeysArr.length; i++){
-        var key = yKeysArr[i];
-        a.push(d[this.completeSeriesConfig[key]['y']]);
+    /**
+     * Find overall data max and min
+     *
+     */
+    _generateChartExtents: function(){
+      var ext = {
+              "x": this.amplitudeKeys,
+              "y": null
+            },
+          min = Number.MAX_VALUE,
+          max = Number.MIN_VALUE;
+
+      // go through all data and find min and max
+      for(var i = 0; i < this.amplitudeKeys.length; i++){
+        for(var j = 0; j < this.chartData.length; j++){
+          min = Math.min(min, this.chartData[j][this.amplitudeKeys[i]]);
+          max = Math.max(max, this.chartData[j][this.amplitudeKeys[i]]);
+        }
       }
-      return [ Math.min.apply(null,a),Math.max.apply(null,a) ];
+
+      // if all data is the same value, add 1 so we still get a range
+      if(min === max){
+        max += 1;
+      }
+
+      // add a buffer for the center
+      // buffer = (max - min) * 0.2;
+      // min = min - buffer;
+
+      ext.y = [min,max];
+
+      this.set('chartExtents',ext);
     },
 
     /**
@@ -163,8 +196,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      */
      _currentDomain: function() {
       // check to make sure there is data
-      if(this._doesObjHaveValues(this.x) &&
-      this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.chartExtents)){
+      if(this._doesObjHaveValues(this.x) && this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.chartExtents)){
 
         var exts = this.chartExtents;
 
