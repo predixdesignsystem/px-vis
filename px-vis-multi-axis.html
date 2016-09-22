@@ -60,7 +60,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           axis-color="[[axisColor]]"
           ticks="[[ticks]]"
           label-rotation="[[labelRotation]]"
-          label-translation="[[labelTranslation]]">
+          label-translation="[[labelTranslation]]"
+          drawn-tick-values={{drawnTickValues}}>
         </px-vis-axis>
       </template>
       <px-vis-axis-brush
@@ -488,9 +489,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
      *
      */
     _computedInternalDimensions: function(dC, dim) {
-      console.log(dC)
       if(this._lastDomainChanged !== this.domainChanged) {
-        console.log("insdie")
         this._lastDomainChanged = this.domainChanged;
         //if match ticks, make sure the domains can be aligned
         if(this.matchTicks && !this.singleDomain) {
@@ -542,11 +541,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
      *
      */
     _getTitle: function(item) {
-      // if(this.completeSeriesConfig[item] && this.completeSeriesConfig[item].title) {
-      //   return this.completeSeriesConfig[item].title;
-      // } else {
+      if(this.completeSeriesConfig[item] && this.completeSeriesConfig[item].title) {
+        return this.completeSeriesConfig[item].title;
+      } else {
         return item;
-      // }
+      }
     }
   });
 </script>

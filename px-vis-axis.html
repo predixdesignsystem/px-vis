@@ -330,6 +330,12 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
           this._setLineStyles(this._axisGroup,'line,path');
           this._setLabelStyles(this._axisGroup);
+
+          if(this.ticks){
+            this.set('drawnTickValues', this._axis.scale().ticks(this.ticks));
+          } else {
+            this.set('drawnTickValues', this._axis.scale().ticks());
+          }
         },
         /**
          * Updates the axis
@@ -371,7 +377,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           //for radial charts. TODO make it work with other charts?
           if(this.labelPosition === 'inline'){
             label.x = 0;
-            label.y = (this.labelPosition === 'after') ? this.labelTypeSize * -2/3 : this.labelTypeSize * 2/3;
+            label.y = this.labelTypeSize * 1.5;
             label.anchor = 'middle';
 
             return label;
@@ -436,11 +442,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               .attr('x',function(d,i) {
                 return tickText.nodes()[i].getBoundingClientRect().width / -2 - 3
               })
-              .attr('y', 0)
+              .attr('y', 1 - this.labelTypeSize)
               .attr('width',function(d,i){
                 return tickText.nodes()[i].getBoundingClientRect().width + 6
               })
-              .attr('height', this.labelTypeSize + 3)
+              .attr('height', this.labelTypeSize + 4)
               .attr("fill",this.colors[this.axisColor]);
 
               tickText.attr("fill",this.colors["white"]);
