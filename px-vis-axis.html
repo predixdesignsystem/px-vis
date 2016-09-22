@@ -140,6 +140,23 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           titleTruncation: {
             type: Boolean,
             value: false
+          },
+          /**
+          * An String that specifies the format of the ticks
+          *
+          * https://github.com/d3/d3-time-format
+          */
+          tickFormat: {
+            type: String
+          },
+          /**
+          * A string specifying the type of axis. Used only for tick formating. Valid entries are:
+          * - `time`
+          * - `linear`
+          */
+          axisType: {
+            type: String,
+            value: "linear"
           }
         },
 
@@ -201,10 +218,25 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           // this._axis.ticks(10);
           // change default ticks with specific time
           // this._axis.ticks(d3.time.months, 1);
-          // this._axis.ticks(d3.time.days, 7);
-          // this._axis.ticks(d3.time.minutes, 15);
+          // this._axis.ticks(Px.d3.time.days, 7);
+          //
+
+          // if(this.ticks && this._doesObjHaveValues(ticks)){
+          //   this._axis.ticks(this.ticks.interval, this.ticks.format);
+          // }
+          // https://github.com/mbostock/d3/wiki/Formatting#d3_format
+          if(this.tickFormat){
+            if(this.axisType === 'time'){
+              this._axis.tickFormat(Px.d3.timeFormat(this.tickFormat));
+            } else if(this.axisType === 'linear'){
+              this._axis.tickFormat(Px.d3.format(this.tickFormat));
+            }
+          }
+
           if(this.tickValues && this.tickValues.length > 0){
-            this._axis.tickValues(this.tickValues);
+            if(!isNaN(this.axis.domain()[0]) && !isNaN(this.axis.domain()[1])){
+              this._axis.tickValues(this.tickValues);
+            }
           }
 
           // controls the tick mark size for ticks with numbers
@@ -213,9 +245,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           // controls the first and last ticks
           // TODO rename var names to match new d3
           this._axis.tickSizeOuter(this.outerTickSize);
-
-          // https://github.com/mbostock/d3/wiki/Formatting#d3_format
-          // this._axis.tickFormat(d3.format(",.0f"));
 
           // TODO rename var names to match new d3
           if(this.labelPosition !== 'center'){
@@ -539,7 +568,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               if(this.titleTruncation){
                 newTitle = this._truncateName(title, truncationLength) + this._currentUnits;
               } else {
-                newTitle = title;
+                newTitle = title + this._currentUnits;
               }
               if(newTitle !== oldTitle) {
                 this.fire('px-vis-axis-displayed-title-changed', {displayedTitle: newTitle, title: this.title, id: this.seriesId});

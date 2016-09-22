@@ -194,6 +194,22 @@ It will reformat the data into the object format and create a seriesConfig file.
         value: 'x'
       },
       /**
+      * An optional key for the x axis units for chartData.
+      *
+      */
+      xUnitKey: {
+        type: String,
+        value: 'xAxisUnit'
+      },
+      /**
+      * An optional key for the y axis units for chartData.
+      *
+      */
+      yUnitKey: {
+        type: String,
+        value: 'units'
+      },
+      /**
       * A series configuration file computed from originalData.
       *
       */
@@ -240,11 +256,11 @@ It will reformat the data into the object format and create a seriesConfig file.
     */
     attached: function(){
       if(this._doesObjHaveValues(this.seriesConfig)){
-        this.fire('px-vis-series-config', { 'dataVar': 'seriesConfig', 'data': seriesConfig, 'method':'set' });
+        this.fire('px-vis-series-config', { 'dataVar': 'seriesConfig', 'data': this.seriesConfig, 'method':'set' });
       }
 
       if(this._doesObjHaveValues(this.chartData)){
-        this.fire('px-vis-chart-data', { 'dataVar': 'chartData', 'data': chartData, 'method':'set' });
+        this.fire('px-vis-chart-data', { 'dataVar': 'chartData', 'data': this.chartData, 'method':'set' });
       }
     },
 
@@ -261,13 +277,10 @@ It will reformat the data into the object format and create a seriesConfig file.
     _computeChartData: function() {
       if(this.originalData.length > 0){
         // put in check to see if we have sorted data or not
-
         var chartData = [],
-            // how many arrays we have
-            numArrs = this.originalData.length,
-            // create starting index for each
-            indexes = Array(numArrs).fill(0),
-            iter = 0,
+            numArrs = this.originalData.length, // how many arrays we have
+            indexes = Array(numArrs).fill(0), // create starting index for each
+            iter = 0, // how many series we have reached the end
             id = Array.prototype.map.call(this.originalData,function(d,i){
               // since we are iterating over the data...
               if(d[this.dataKey].length === 0){
@@ -284,10 +297,10 @@ It will reformat the data into the object format and create a seriesConfig file.
 
         // keep going until we reach the end of each series
         while(iter < numArrs){
-          var lowest = Infinity,
-              obj = {},
-              indicies = [],
-              iter = 0;
+          var lowest = Number.MAX_VALUE,  //Number.MAX_VALUE < Infinity
+              obj = {},       //our new merged data unit
+              indicies = [],  //which indexes got incremented
+              iter = 0;       //reset iter with each pass
 
           for(var i = 0; i < numArrs; i++){
             if(this.originalData[i][this.dataKey][indexes[i]][0] < lowest){
@@ -324,7 +337,6 @@ It will reformat the data into the object format and create a seriesConfig file.
         }
 
         this.fire('px-vis-empty-sets', { 'dataVar': 'emptySets', 'data': this.emptySets, 'method':'set' });
-        console.log(this.emptySets)
         this.fire('px-vis-chart-data', { 'dataVar': 'chartData', 'data': chartData, 'method':'set' });
         return chartData;
       }
@@ -349,6 +361,14 @@ It will reformat the data into the object format and create a seriesConfig file.
 
           if(this.originalData[i]['max']){
             seriesConfig[id]['yMax'] = this.originalData[i]['max'];
+          }
+
+          if(this.originalData[i][this.yUnitKey]){
+            seriesConfig[id]['yAxisUnit'] = this.originalData[i][this.yUnitKey];
+          }
+
+          if(this.originalData[i][this.xUnitKey]){
+            seriesConfig[id]['xAxisUnit'] = this.originalData[i][this.xUnitKey];
           }
         }
 

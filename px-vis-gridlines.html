@@ -82,7 +82,7 @@ The gridlines still make use of the d3.axis object, just with different settings
            */
           _gridGroup: {
             type: Object,
-            value: function() {return{};}
+            value: function() { return{}; }
           },
           /**
            * A unique ID for the grid
@@ -107,6 +107,11 @@ The gridlines still make use of the d3.axis object, just with different settings
             type: Array,
             value:function() { return [0,0]; }
           },
+
+          _drawGrid:  {
+            type: Boolean,
+            value: true
+          }
         },
 
         observers: [
@@ -119,6 +124,16 @@ The gridlines still make use of the d3.axis object, just with different settings
           if(!this.gridId) {
             this.set('gridId', this.generateRandomID('grid_'));
           }
+        },
+
+        detached: function() {
+          if(this._doesObjHaveValues(this._gridGroup)){
+            this._gridGroup.remove();
+            this._gridGroup = {};
+          }
+
+          this._drawGrid = false;
+
         },
 
         /**
@@ -166,7 +181,7 @@ The gridlines still make use of the d3.axis object, just with different settings
          */
         drawElement: function() {
           this.debounce('draw_grid', function() {
-            if(this._doesObjHaveValues(this.currentDomain)) {
+            if(this._doesObjHaveValues(this.currentDomain) && this._drawGrid && this.axis && this.axis.domain()) {
               this.defineGrid();
               // this._grid.tickValues(this.axis.domain());
               if(this.orientation === 'bottom') {
@@ -186,7 +201,6 @@ The gridlines still make use of the d3.axis object, just with different settings
 
                 this._removeUncessaryElems(this._gridGroup);
                 this._setLineStyles(this._gridGroup,'line');
-
                 // the first tick overlaps the x-axis path and is unnessary
                 // TODO make sure this doesnt get us in trouble in different min y values
                 // TODO What if there is no x-axis? How to do this better?

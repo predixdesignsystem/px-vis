@@ -1,5 +1,6 @@
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="../px-colors-design/colors.html" />
+<link rel="import" href="../px-tooltip/px-tooltip.html" />
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="px-vis-register.html" />
@@ -26,25 +27,28 @@ Element providing on-chart tooltip display
 @demo demo.html
 
 -->
-
-<link rel="import" href="css/px-vis-tooltip-styles.html">
-
 <dom-module id="px-vis-tooltip">
-  <template>
-    <style include="px-vis-tooltip-styles"></style>
-    <style include="px-theme-styles"></style>
-    <div style="position:relative">
-      <px-vis-register
+    <link rel="import" type="css" href="css/px-vis-tooltip.css"/>
+    <template>
+      <px-tooltip
         id="tooltip"
-        class="hidden u-pl u-pr u-pt u-pb"
-        tooltip-data=[[tooltipData]]
-        chart-data="[[chartData]]"
-        x-axis-type="[[xAxisType]]"
-        y-axis-type="[[yAxisType]]"
-        complete-series-config="[[completeSeriesConfig]]">
-      </px-vis-register>
-    </div>
-  </template>
+        tooltip-style="[[tooltipStyle]]"
+        for="[[hoverTarget]]"
+        delay="50"
+        follow-mouse
+        mouse-coords="[[mousePosition]]">
+          <px-vis-register
+            id="register"
+            truncation-length="100"
+            tooltip-data=[[tooltipData]]
+            chart-data="[[chartData]]"
+            x-axis-type="[[xAxisType]]"
+            y-axis-type="[[yAxisType]]"
+            complete-series-config="[[completeSeriesConfig]]">
+          </px-vis-register>
+
+      </px-tooltip>
+    </template>
 </dom-module>
 
 <script>
@@ -53,8 +57,6 @@ Element providing on-chart tooltip display
     is: 'px-vis-tooltip',
 
     behaviors: [
-      PxVisBehavior.sizing,
-      PxVisBehaviorD3.svg,
       PxVisBehavior.dataset,
       PxVisBehavior.tooltipData,
       PxVisBehavior.axisTypes,
@@ -69,24 +71,24 @@ Element providing on-chart tooltip display
      * @type Object
      */
     properties: {
+      hoverTarget: {
+        type: Object
+      },
+      mousePosition:{
+        type: Array
+      },
+      tooltipStyle: {
+        type: String,
+        value: "dark"
+      },
+      tooltipElem: {
+        type: Object
+      }
 
     }, //properties
 
-    observers: [
-      '_updateTooltip(tooltipData.*)'
-     ],
-    _updateTooltip: function(){
-      if(this.tooltipData.mouse !== null){
-        this.toggleClass('hidden',false, this.$.tooltip);
-        this._moveTooltip();
-      } else {
-        this.toggleClass('hidden',true, this.$.tooltip);
-      }
-    },
-    _moveTooltip: function() {
-
-      this.$.tooltip.style.left = Number(this.margin.left) + 15 + this.tooltipData.mouse[0] + 'px';
-      this.$.tooltip.style.top = Number(this.margin.top) + 5 + this.tooltipData.mouse[1]  + 'px';
+    ready: function(){
+      this.set('tooltipElem', this.$.tooltip);
     }
   });
 </script>

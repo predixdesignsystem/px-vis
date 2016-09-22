@@ -292,7 +292,7 @@ function runTests(){
       assert.isTrue(defaultEvent.$.eventTooltip !== null);
     });
     test('tooltip content is correct', function() {
-      assert.equal(defaultEvent.$.eventTooltip.$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: DefaultID: 333Timestamp: 08:13:00 +0000 | 10 Apr 2014');
+      assert.equal(defaultEvent.$.eventTooltip.$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: DefaultID: 333Timestamp: 20:13:00 +0000 | 10 Apr 2014');
     });
   }); //suite
 
@@ -675,7 +675,7 @@ function runTests(){
       assert.isTrue(offsetEvent.$.eventTooltip !== null);
     });
     test('tooltip content is correct', function() {
-      assert.equal(offsetEvent.$.eventTooltip.$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: offsetID: 444Timestamp: 10:46:54 +0000 | 10 Apr 2014');
+      assert.equal(offsetEvent.$.eventTooltip.$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: offsetID: 444Timestamp: 22:46:54 +0000 | 10 Apr 2014');
     });
   }); //suite
 

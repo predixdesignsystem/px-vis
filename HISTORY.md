@@ -1,3 +1,71 @@
+v0.3.15
+==================
+* fixed errors when muting all axes
+
+v0.3.14
+==================
+* add check for data in line
+
+v0.3.13
+==================
+* added notify true to mouseRect in interaction space
+
+v0.3.12
+==================
+* added deleteAllBrushes method to axis brush
+
+v0.3.11
+==================
+* added check in axis brush for chartData
+
+v0.3.10
+==================
+* added units to data converter series config
+
+v0.3.9
+==================
+* fixed tests
+
+v0.3.8
+==================
+* tooltip design fixes
+* fixed brushes with muting and unmuting
+
+v0.3.7
+==================
+* changed default date format to 24hour clock
+
+v0.3.6
+==================
+* fixed axis label format so it can accept linear or time
+* added am/pm to default time format
+* update axis tests
+
+v0.3.5
+==================
+* fixed margin in multi axis
+
+v0.3.4
+==================
+* fixing NaN on axis issue
+
+v0.3.2
+==================
+* fixed data converter with empty datasets
+
+v0.3.1
+==================
+* changed tooltip targets in multi axis
+
+v0.3.0
+==================
+* tooltip now uses px-tooltip
+* associated changes to support that
+
+v0.2.7
+==================
+* modified grid so it can remove itself on detach
+
 v0.2.6
 ==================
 * added to data converter so it outputs a set of empty datasets

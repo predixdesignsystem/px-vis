@@ -237,88 +237,28 @@ This element draw the box over the axis signifying the active area to mute the s
 
         // for each brush, figure out if it was brushed and build an array of obj with the extents and the dimension
         this._brushes.each(function(d) {
-          if(_this._brushDomains[d]) {
-            //if the axis doesnt exist anymore
-            if(!_this.axis[d]){
-              // delete the brush
-
-              //clear listeners
-              Px.d3.select(this).call(_this._brush
-                .on("start.brush", null)
-                .on("end.brush", null));
-              //delete
-              Px.d3.select(this).call(_this._brush.move, null);
-              return
-            }
+          //first, delete all brushes and start over
+          _this.deleteBrush(Px.d3.select(this));
+          //if there is a brush and the axis still exists draw a new one
+          if(_this._brushDomains[d] && _this.dimensions.indexOf(d) !== -1) {
+            console.log(_this._brushDomains);
 
             // if the axis exists, then lets check out the extents
             var oldBrushDomain = _this._brushDomains[d],
                 newAxisDomain = _this.axis[d].domain(),
-                newBrushRange = [],
+                newBrushRange,
                 elem;
 
-            //if the axis we are keeping has become detached, find the new axis
-            if(this.ownerSVGElement === null){
-              var index = _this.svg.data().indexOf(d);
-              elem = Px.d3.select(_this.svg.nodes()[index]).select('g.brush');
-            } else {
-              elem = Px.d3.select(this);
-            }
+            //find the axis
+            var index = _this.svg.data().indexOf(d);
+            elem = Px.d3.select(_this.svg.nodes()[index]).select('g.brush');
 
-            // if the brushExts fall within the new axis domain
-            if(newAxisDomain[0] <= oldBrushDomain[0] && newAxisDomain[1] >= oldBrushDomain[1]){
-              // resize brush
+            newBrushRange = _this._checkBrushSize(d,newAxisDomain,oldBrushDomain,elem,this);
 
-              newBrushRange[0] = _this.axis[d](oldBrushDomain[1]);
-              newBrushRange[1] = _this.axis[d](oldBrushDomain[0]);
-
-              //clear listeners
-              elem.call(_this._brush
-                .on("start.brush", null)
-                .on("end.brush", null));
-              //move the brush / create the brush
-              elem.call(_this._brush.move, newBrushRange);
-
-              //check that it still meets our min size req
-              newBrushRange = _this._checkMinSize(newBrushRange,elem);
-
-            //bottom of brush is below new domain, top is within
-            } else if(newAxisDomain[0] > oldBrushDomain[0] && newAxisDomain[0] < oldBrushDomain[1] && newAxisDomain[1] >= oldBrushDomain[1]) {
-              //move bottom to the min newAxisRange
-
-              newBrushRange[0] = _this.axis[d](oldBrushDomain[1]);
-              newBrushRange[1] = _this.axis[d](newAxisDomain[0]);
-
-              elem.call(_this._brush
-                .on("start.brush", null)
-                .on("end.brush", null));
-              elem.call(_this._brush.move, newBrushRange);
-
-              newBrushRange = _this._checkMinSize(newBrushRange,elem);
-
-            //bottom of brush within new domain, top is out
-            } else if(newAxisDomain[0] <= oldBrushDomain[0] && newAxisDomain[1] < oldBrushDomain[1] && newAxisDomain[1] > oldBrushDomain[0]) {
-              //move top to the max newAxisRange
-
-              newBrushRange[0] = _this.axis[d](newAxisDomain[1]);
-              newBrushRange[1] = _this.axis[d](oldBrushDomain[0]);
-
-              elem.call(_this._brush
-                .on("start.brush", null)
-                .on("end.brush", null));
-              elem.call(_this._brush.move, newBrushRange);
-
-              newBrushRange = _this._checkMinSize(newBrushRange,elem);
-
-            } else {
-              //delete and move on to the next brush
-              Px.d3.select(this).call(_this._brush
-                .on("start.brush", null)
-                .on("end.brush", null));
-              Px.d3.select(this).call(_this._brush.move, null);
+            //if the range is out of the axis range, dont draw anything
+            if(!newBrushRange){
               return
             }
-
             // save extents from a valid brush
             extents[d] = newBrushRange;
           }
@@ -327,26 +267,27 @@ This element draw the box over the axis signifying the active area to mute the s
         this._calcMutedSeries(extents);
       }
     },
-      /**
-       * check the min size of the brush and resize if necessary
-       */
-      _checkMinSize: function(sel,elem){
-        //check the size of the box and make sure it is some min
-        if((sel[1] - sel[0]) < 4) {
-          // increase size of extents while checking if we hit the top
-          var ext = (sel[0] - 4) < 0 ? [ sel[0] , sel[1] + 4 ] : [ sel[0] -4 , sel[1] ];
-          // increase size of box
-          elem.call(this._brush.move, ext);
+    /**
+     * check the min size of the brush and resize if necessary
+     */
+    _checkMinSize: function(sel,elem){
+      //check the size of the box and make sure it is some min
+      if((sel[1] - sel[0]) < 4) {
+        // increase size of extents while checking if we hit the top
+        var ext = (sel[0] - 4) < 0 ? [ sel[0] , sel[1] + 4 ] : [ sel[0] -4 , sel[1] ];
+        // increase size of box
+        elem.call(this._brush.move, ext);
 
-          return ext;
-        } else {
-          return sel;
-        }
-      },
-      /**
-       * calc muted series based on the extents
-       */
-      _calcMutedSeries: function(extents){
+        return ext;
+      } else {
+        return sel;
+      }
+    },
+    /**
+     * calc muted series based on the extents
+     */
+    _calcMutedSeries: function(extents){
+      if(this.chartData && this.chartData.length > 0){
         var series = {},
             domains = {},
             keys = Object.keys(extents),
@@ -371,5 +312,84 @@ This element draw the box over the axis signifying the active area to mute the s
         this.set('mutedSeries',series);
         this.fire('px-vis-muted-series-updated', { 'data': series, 'dataVar': 'mutedSeries' ,'method': 'set' });
       }
+    },
+
+    deleteBrush: function(elem) {
+      //clear listeners
+      elem.call(this._brush
+        .on("start.brush", null)
+        .on("end.brush", null));
+      //delete
+      elem.call(this._brush.move, null);
+    },
+
+    _checkBrushSize: function(d,newAxisDomain,oldBrushDomain,elem, brushThis) {
+      var newBrushRange = [];
+      // if the brushExts fall within the new axis domain
+      if(newAxisDomain[0] <= oldBrushDomain[0] && newAxisDomain[1] >= oldBrushDomain[1]){
+        // resize brush
+
+        newBrushRange[0] = this.axis[d](oldBrushDomain[1]);
+        newBrushRange[1] = this.axis[d](oldBrushDomain[0]);
+
+        //clear listeners
+        elem.call(this._brush
+          .on("start.brush", null)
+          .on("end.brush", null));
+        //move the brush / create the brush
+        elem.call(this._brush.move, newBrushRange);
+
+        //check that it still meets our min size req
+        newBrushRange = this._checkMinSize(newBrushRange,elem);
+
+      //bottom of brush is below new domain, top is within
+      } else if(newAxisDomain[0] > oldBrushDomain[0] && newAxisDomain[0] < oldBrushDomain[1] && newAxisDomain[1] >= oldBrushDomain[1]) {
+        //move bottom to the min newAxisRange
+
+        newBrushRange[0] = this.axis[d](oldBrushDomain[1]);
+        newBrushRange[1] = this.axis[d](newAxisDomain[0]);
+
+        elem.call(this._brush
+          .on("start.brush", null)
+          .on("end.brush", null));
+        elem.call(this._brush.move, newBrushRange);
+
+        newBrushRange = this._checkMinSize(newBrushRange,elem);
+
+      //bottom of brush within new domain, top is out
+      } else if(newAxisDomain[0] <= oldBrushDomain[0] && newAxisDomain[1] < oldBrushDomain[1] && newAxisDomain[1] > oldBrushDomain[0]) {
+        //move top to the max newAxisRange
+
+        newBrushRange[0] = this.axis[d](newAxisDomain[1]);
+        newBrushRange[1] = this.axis[d](oldBrushDomain[0]);
+
+        elem.call(this._brush
+          .on("start.brush", null)
+          .on("end.brush", null));
+        elem.call(this._brush.move, newBrushRange);
+
+        newBrushRange = _this._checkMinSize(newBrushRange,elem);
+
+      } else {
+        //delete and move on to the next brush
+        _this.deleteBrush(Px.d3.select(brushThis));
+        return null
+      }
+
+      return newBrushRange;
+    },
+
+    deleteAllBrushes: function(){
+      if(this._brushes){
+        var _this = this;
+
+        // for each brush, figure out if it was brushed and build an array of obj with the extents and the dimension
+        this._brushes.each(function(d) {
+          //first, delete all brushes and start over
+          _this.deleteBrush(Px.d3.select(this));
+        });
+        this._calcMutedSeries({});
+      }
+    }
   });
 </script>
