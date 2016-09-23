@@ -406,9 +406,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           //for radial charts. TODO make it work with other charts?
           if(this.labelPosition === 'inline'){
             label.x = 0;
-            label.y = this.labelTypeSize * 0.25;
+            label.y = 0;
             label.anchor = 'middle';
-
+            console.log(Math.cos(this.labelRotation /180 * Math.PI))
             return label;
           }
 
@@ -471,7 +471,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               .attr('x',function(d,i) {
                 return tickText.nodes()[i].getBoundingClientRect().width / -2 - 3
               })
-              .attr('y', 1 - this.labelTypeSize)
+              .attr('y', this.labelTypeSize * -0.5 - 2)
               .attr('width',function(d,i){
                 return tickText.nodes()[i].getBoundingClientRect().width + 6
               })
