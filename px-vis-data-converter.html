@@ -194,6 +194,22 @@ It will reformat the data into the object format and create a seriesConfig file.
         value: 'x'
       },
       /**
+      * An optional key for the x axis units for chartData.
+      *
+      */
+      xUnitKey: {
+        type: String,
+        value: 'xAxisUnit'
+      },
+      /**
+      * An optional key for the y axis units for chartData.
+      *
+      */
+      yUnitKey: {
+        type: String,
+        value: 'units'
+      },
+      /**
       * A series configuration file computed from originalData.
       *
       */
@@ -345,6 +361,14 @@ It will reformat the data into the object format and create a seriesConfig file.
 
           if(this.originalData[i]['max']){
             seriesConfig[id]['yMax'] = this.originalData[i]['max'];
+          }
+
+          if(this.originalData[i][this.yUnitKey]){
+            seriesConfig[id]['yAxisUnit'] = this.originalData[i][this.yUnitKey];
+          }
+
+          if(this.originalData[i][this.xUnitKey]){
+            seriesConfig[id]['xAxisUnit'] = this.originalData[i][this.xUnitKey];
           }
         }
 

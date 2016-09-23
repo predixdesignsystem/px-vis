@@ -180,12 +180,23 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         this.x.domain(exts.x);
 
         // Set the domains
-        this.set('currentDomainX', this.x.domain());
-        this.set('currentDomainY', this.y[dims[0]].domain());
-        this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+        if(this.x.domain().length > 0 && dims.length > 0){
+          this.set('currentDomainX', this.x.domain());
+          this.set('currentDomainY', this.y[dims[0]].domain());
 
-        this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
-        this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
+          this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
+          this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
+
+        } else {
+          
+          this.set('currentDomainX', []);
+          this.set('currentDomainY', []);
+
+          this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
+          this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
+        }
+
+        this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
         this.fire('px-vis-domain-changed-updated', { 'dataVar': 'domainChanged', 'data': this.domainChanged, 'method':'set' });
       }
     }

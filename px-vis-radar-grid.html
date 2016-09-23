@@ -21,9 +21,12 @@ Element which draws lines series onto the chart
 @homepage index.html
 @demo demo.html
 -->
+<link rel="import" href="css/px-vis-styles.html">
+
 <dom-module id="px-vis-radar-grid">
-  <link rel="import" type="css" href="css/px-vis.css"/>
   <template>
+    <style include="px-vis-styles"></style>
+    <style include="px-theme-styles"></style>
     <px-vis-line
       id="line"
       radial-line
@@ -99,13 +102,13 @@ Element which draws lines series onto the chart
 
     createGridData: function() {
       this.debounce('radarGrids', function(){
-        if(this.tickValues && this.dimensions && this.tickValues.length > 0 && this.dimensions.length > 0){
+        if(this.tickValues && this.dimensions && this.tickValues.length > 0 && this.dimensions.length > 0) {
           var data = [],
               config = {};
 
-          for(var i = 0; i < this.tickValues.length; i++){
+          for(var i = 0; i < this.tickValues.length; i++) {
             data.push({});
-            for(var j = 0; j < this.dimensions.length; j++){
+            for(var j = 0; j < this.dimensions.length; j++) {
               data[i][this.dimensions[j]] = this.tickValues[i];
             }
           }
@@ -114,7 +117,7 @@ Element which draws lines series onto the chart
             "color" : this.colors[this.axisColor],
             'x' : this.dimensions
           };
-          
+
           this.set('_completeSeriesConfig', config);
           this.set('_gridData', data);
         }
