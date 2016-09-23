@@ -1,3 +1,27 @@
+v0.3.15
+==================
+* fixed errors when muting all axes
+
+v0.3.14
+==================
+* add check for data in line
+
+v0.3.13
+==================
+* added notify true to mouseRect in interaction space
+
+v0.3.12
+==================
+* added deleteAllBrushes method to axis brush
+
+v0.3.11
+==================
+* added check in axis brush for chartData
+
+v0.3.10
+==================
+* added units to data converter series config
+
 v0.3.9
 ==================
 * fixed tests

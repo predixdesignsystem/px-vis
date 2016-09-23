@@ -291,12 +291,13 @@ This element draw the box over the axis signifying the active area to mute the s
      * calc muted series based on the extents
      */
     _calcMutedSeries: function(extents){
-      var series = {},
-          domains = {},
-          keys = Object.keys(extents),
-          lower = 1,
-          upper = 0,
-          dim,y0,y1;
+      if(this.chartData && this.chartData.length > 0){
+        var series = {},
+            domains = {},
+            keys = Object.keys(extents),
+            lower = 1,
+            upper = 0,
+            dim,y0,y1;
 
         if(this.radial){
           lower = 0;
@@ -324,14 +325,15 @@ This element draw the box over the axis signifying the active area to mute the s
                 series[this.chartData[i][this.seriesKey]] = true;
               }
             }
+            domains[dim] = [y0,y1];
           }
-          domains[dim] = [y0,y1];
+
+          this.set('_brushDomains',domains);
+
+          this.set('mutedSeries',series);
+          this.fire('px-vis-muted-series-updated', { 'data': series, 'dataVar': 'mutedSeries' ,'method': 'set' });
         }
-
-      this.set('_brushDomains',domains);
-
-      this.set('mutedSeries',series);
-      this.fire('px-vis-muted-series-updated', { 'data': series, 'dataVar': 'mutedSeries' ,'method': 'set' });
+      }
     },
 
     deleteBrush: function(elem) {
@@ -397,6 +399,19 @@ This element draw the box over the axis signifying the active area to mute the s
       }
 
       return newBrushRange;
+    },
+
+    deleteAllBrushes: function(){
+      if(this._brushes){
+        var _this = this;
+
+        // for each brush, figure out if it was brushed and build an array of obj with the extents and the dimension
+        this._brushes.each(function(d) {
+          //first, delete all brushes and start over
+          _this.deleteBrush(Px.d3.select(this));
+        });
+        this._calcMutedSeries({});
+      }
     }
   });
 </script>
