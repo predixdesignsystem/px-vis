@@ -98,25 +98,27 @@ Element which draws lines series onto the chart
     ],
 
     createGridData: function() {
-      if(this.tickValues && this.dimensions && this.tickValues.length > 0 && this.dimensions.length > 0){
-        var data = [],
-            config = {};
+      this.debounce('radarGrids', function(){
+        if(this.tickValues && this.dimensions && this.tickValues.length > 0 && this.dimensions.length > 0){
+          var data = [],
+              config = {};
 
-        for(var i = 0; i < this.tickValues.length; i++){
-          data.push({});
-          for(var j = 0; j < this.dimensions.length; j++){
-            data[i][this.dimensions[j]] = this.tickValues[i];
+          for(var i = 0; i < this.tickValues.length; i++){
+            data.push({});
+            for(var j = 0; j < this.dimensions.length; j++){
+              data[i][this.dimensions[j]] = this.tickValues[i];
+            }
           }
-        }
 
-        config[this._seriesKey] = {
-          "color" : this.colors[this.axisColor],
-          'x' : this.dimensions
-        };
-        console.log(data)
-        this.set('_completeSeriesConfig', config);
-        this.set('_gridData', data);
-      }
+          config[this._seriesKey] = {
+            "color" : this.colors[this.axisColor],
+            'x' : this.dimensions
+          };
+          console.log(data)
+          this.set('_completeSeriesConfig', config);
+          this.set('_gridData', data);
+        }
+      },10);
     },
 
     _returnInterpolation: function(){
