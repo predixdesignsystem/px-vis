@@ -173,17 +173,34 @@ The gridlines still make use of the d3.axis object, just with different settings
           this.debounce('draw_grid', function() {
 
             var radius = this.axis.range()[1] - this.axis.range()[0];
-            var ga = this.svg.append("g")
-                .attr("class", "a axis")
-                .attr("stroke", "grey4")
-                .attr("stroke-width", "1")
-            .selectAll("g")
-                .data([30,60,120,150,210,240,310,340])
-            .enter().append("g")
-                .attr("transform", function(d) { return "rotate(" + -d + ")"; });
 
-            ga.append("line")
-                .attr("x2", radius);
+            //draw the lines
+            var ga = this.svg.append('g')
+                .attr('class', 'a axis')
+                .attr('stroke', this.colors.grey4)
+                .attr('stroke-width', '1')
+            .selectAll('g')
+                .data([30,60,120,150,210,240,310,340])
+            .enter().append('g')
+                .attr('transform', function(d) { return 'rotate(' + -d + ')'; });
+
+            ga.append('line')
+                .attr('x2', radius);
+
+            //draw the circles
+            var r = Px.d3.scaleLinear()
+                            .domain([0, .5])
+                            .range([0, radius]),
+                gr = this.svg.append('g')
+                .attr('class', 'r axis')
+                .attr('fill', 'none')
+                .attr('stroke', this.colors.grey4)
+            .selectAll('g')
+                .data(r.ticks(5).slice(1))
+            .enter().append('g');
+
+            gr.append('circle')
+                .attr('r', r);
 
             // if(this._doesObjHaveValues(this.currentDomain) && this._drawGrid) {
             //   this.defineGrid();
