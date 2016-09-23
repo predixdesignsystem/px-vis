@@ -140,8 +140,9 @@ Element which draws lines series onto the chart
           var data = this.chartData;
           this._defineMultiLine(false);
         }  else if(this.radialLine) {
-          this._defineRadialLine(false);
-          data = this.chartData;
+          var multiLine = Object.keys(this.completeSeriesConfig).length > 1;
+          this._defineRadialLine(false, multiLine);
+          data = multiLine ? this.chartData : [this.chartData];
         } else {
           var data = [this.chartData];
           this._defineSingleLine(false);
