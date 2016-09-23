@@ -28,14 +28,18 @@ Element which draws scatter series onto the chart
 @homepage index.html
 @demo demo.html
 -->
+
+<link rel="import" href="css/px-vis-pie-styles.html">
+
 <dom-module id="px-vis-pie">
-    <link rel="import" type="css" href="css/px-vis-pie.css"/>
     <template>
-    <div id="popoverWrapper" class="anchor wrapper">
-      <span id="popoverAnchor" class="anchor"></span>
-      <px-popover id="popover" position="relative" popover-title="" orientation="top" hide-overlay class="popover" for="popoverAnchor" style="position:relative">
-      </px-popover>
-    </div>
+      <style include="px-vis-pie-styles"></style>
+      <style include="px-theme-styles"></style>
+      <div id="popoverWrapper" class="anchor wrapper">
+        <span id="popoverAnchor" class="anchor"></span>
+        <px-popover id="popover" position="relative" popover-title="" orientation="top" hide-overlay class="popover" for="popoverAnchor" style="position:relative">
+        </px-popover>
+      </div>
       <!-- anchors for tooltip and popovers -->
       <span id="tooltipAnchor" class=" anchor"></span>
 
@@ -246,7 +250,7 @@ Element which draws scatter series onto the chart
      * @method drawElement
      */
     drawElement: function() {
-      
+
       this._checkInitialGroupCreation();
 
       this._updateDrawing();
@@ -273,17 +277,17 @@ Element which draws scatter series onto the chart
      * all subsequent drawings when adding, removing or updating data
      */
     _updateDrawing: function() {
-          
+
         var _this = this,
             data = this.chartData,
             isFirstDrawing = this._arcs ? false : true;
             xKey = this.empty ? '' : this.completeSeriesConfig[this.seriesId].x;
 
-        this._pie = this.empty ? Px.d3.pie()([1]) 
+        this._pie = this.empty ? Px.d3.pie()([1])
                                   : Px.d3.pie().value(function(d){return d[xKey];})(data);
         this._arcs = this.pieGroup.selectAll('.slice')
                                 .data(this._pie);
-        
+
         for(var i=0; i<this._pie.length; i++) {
           this._pie[i].innerRadius = this._innerRadiusPx;
           this._pie[i].outerRadius = this._radius;
