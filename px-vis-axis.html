@@ -1,8 +1,8 @@
-<link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="px-vis-behavior-common.html" />
-<link rel="import" href="px-vis-behavior-d3.html" />
-<link rel="import" href="../px-colors-design/colors.html" />
-<link rel="import" href="../px-tooltip/px-tooltip.html" />
+<link rel='import' href='../polymer/polymer.html'/>
+<link rel='import' href='px-vis-behavior-common.html' />
+<link rel='import' href='px-vis-behavior-d3.html' />
+<link rel='import' href='../px-colors-design/colors.html' />
+<link rel='import' href='../px-tooltip/px-tooltip.html' />
 
 
 <!--
@@ -11,14 +11,14 @@ d3 element creating an axis for the chart
 ##### Usage
 
     <px-vis-axis
-        svg="[[svg]]"
-        axis="[[x]]"
-        height="[[height]]"
-        margin="[[margin]]"
-        title="[[Title]]"
-        orientation="bottom"
-        label-position="center"
-        current-domain="[[currentDomainX]]">
+        svg='[[svg]]'
+        axis='[[x]]'
+        height='[[height]]'
+        margin='[[margin]]'
+        title='[[Title]]'
+        orientation='bottom'
+        label-position='center'
+        current-domain='[[currentDomainX]]'>
     </px-vis-axis>
 
 ##### d3 reference
@@ -29,10 +29,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 @homepage index.html
 @demo demo.html
 -->
-<dom-module id="px-vis-axis">
-    <link rel="import" type="css" href="css/px-vis.css"/>
+<dom-module id='px-vis-axis'>
+    <link rel='import' type='css' href='css/px-vis.css'/>
     <template>
-      <px-tooltip id="tooltip" delay=500>{{title}} {{_currentUnits}}</px-tooltip>
+      <px-tooltip id='tooltip' delay=500>{{title}} {{_currentUnits}}</px-tooltip>
     </template>
 </dom-module>
 
@@ -235,7 +235,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           //support for general ticks setting
           // https://github.com/d3/d3-axis#axis_ticks
           if(this.ticks){
-            if(typeof(this.ticks) === "number" || !isNaN(parseInt(this.ticks))) {
+            if(typeof(this.ticks) === 'number' || !isNaN(parseInt(this.ticks))) {
 
               this._axis.ticks(this.ticks);
 
@@ -256,7 +256,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               this._axis.ticks(this.ticks.format);
 
             } else {
-              console.error("Cannot interpret axis ticks")
+              console.error('Cannot interpret axis ticks')
             }
           }
 
@@ -323,7 +323,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               if(!this._axisGroup) {
                 this._buildAxis();
                 // alert parents that we are done drawing the axis
-                this.fire("px-axis-done");
+                this.fire('px-axis-done');
               } else {
                 this._updateAxis();
               }
@@ -335,11 +335,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          *
          */
         _buildAxis: function(){
-          var g = this.svg.append("g")
-            .attr("class", "axis")
+          var g = this.svg.append('g')
+            .attr('class', 'axis')
             .attr('axis-id',this.axisId)
          //   .attr('debug-id',this.title)
-            .attr("transform", function() {
+            .attr('transform', function() {
               if(this.rotation) {
                 return 'rotate(' + (Number(this.rotation)) + ') translate(' + this.translateAmt.join(',') + ')';
               } else {
@@ -366,7 +366,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          */
         _updateAxis: function() {
           this._axisGroup
-          .attr("transform", function() {
+          .attr('transform', function() {
             if(this.rotation) {
               return 'rotate(' + (Number(this.rotation)) + ') translate(' + this.translateAmt.join(',') + ')';
             } else {
@@ -378,7 +378,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           this._setLabelStyles(this._axisGroup);
 
           // alert parents that we are done drawing the axis
-          this.fire("px-axis-done");
+          this.fire('px-axis-done');
         },
 
         /**
@@ -408,7 +408,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             label.x = 0;
             label.y = 0;
             label.anchor = 'middle';
-            console.log(Math.cos(this.labelRotation /180 * Math.PI))
+
             return label;
           }
 
@@ -455,19 +455,19 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             var label = this.setLabelDims();
 
             elem.selectAll('text')
-              .attr("fill",this.colors[this.axisColor])
-              .attr("y", label.y)
-              .attr("x", label.x)
-              .attr("text-anchor", label.anchor)
-              .style("text-anchor", label.anchor)
-              .attr('transform',"rotate(" + this.labelRotation + ") translate(" + this.labelTranslation.join(',') + ")");
+              .attr('fill',this.colors[this.axisColor])
+              .attr('y', label.y)
+              .attr('x', label.x)
+              .attr('text-anchor', label.anchor)
+              .style('text-anchor', label.anchor)
+              .attr('transform','rotate(' + this.labelRotation + ') translate(' + this.labelTranslation.join(',') + ')');
           }
 
-          if(this.labelPosition === "inline"){
+          if(this.labelPosition === 'inline'){
             var gTick = elem.selectAll('g.tick'),
-                tickText = gTick.select("text");
+                tickText = gTick.select('text');
 
-            gTick.insert("rect","text")
+            gTick.insert('rect','text')
               .attr('x',function(d,i) {
                 return tickText.nodes()[i].getBoundingClientRect().width / -2 - 3
               })
@@ -476,10 +476,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
                 return tickText.nodes()[i].getBoundingClientRect().width + 6
               })
               .attr('height', this.labelTypeSize + 4)
-              .attr("fill",this.colors[this.axisColor])
-              // .attr('transform',"rotate(" + this.labelRotation + ") translate(" + this.labelTranslation.join(',') + ")");
+              .attr('fill',this.colors[this.axisColor])
+              .attr('transform','rotate(' + this.labelRotation + ')');
 
-              tickText.attr("fill",this.colors["white"]);
+              tickText.attr('fill',this.colors['white']);
 
           }
         },
@@ -494,7 +494,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .attr('fill','none')
             .attr('stroke', this.colors[this.axisColor])
             .attr('shape-rendering', 'crispEdges')
-            .attr("stroke-width", this.strokeWidth);
+            .attr('stroke-width', this.strokeWidth);
         },
         /**
          * Draws the axis title
@@ -511,28 +511,28 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               x = parseFloat(ext['width']) / 2 + this.translateAmt[0];
               y = this.labelTypeSize * 1.5 + parseFloat(ext['height']) + this.translateAmt[1];
               r = 0;
-              anchor = "middle";
+              anchor = 'middle';
               break;
 
             case 'top':
               x = parseFloat(ext['width']) / 2 + this.translateAmt[0];
               y = this.translateAmt[1];
               r = 0;
-              anchor = "middle";
+              anchor = 'middle';
               break;
 
             case 'left':
               x = (this.labelTypeSize + parseFloat(ext['width'])) * -1 + this.translateAmt[0];
               y = parseFloat(ext['height']) / 2 + this.translateAmt[1];
               r = -90;
-              anchor = "middle";
+              anchor = 'middle';
               break;
 
             case 'right':
               x = this.labelTypeSize + parseFloat(ext['width']) + this.translateAmt[0];
               y = parseFloat(ext['height']) / 2 + this.translateAmt[1];
               r = 90;
-              anchor = "middle";
+              anchor = 'middle';
               break;
 
             case 'custom':
@@ -544,55 +544,55 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           }
 
         if(!this._titleGroup) {
-          this._titleGroup = this.svg.append("g")
+          this._titleGroup = this.svg.append('g')
             .attr('class','title-group')
             .attr('for', this.axisId)
-            .attr('transform',"translate(" + x + ',' + y + ")");
+            .attr('transform','translate(' + x + ',' + y + ')');
 
-          this._titleGroup.append("text")
+          this._titleGroup.append('text')
             .attr('class','axis-title')
-            .attr("fill",this.colors[this.axisColor])
+            .attr('fill',this.colors[this.axisColor])
             .attr('font-size', this.titleTypeSize + 'px')
             .style('font-family','GE Inspira Sans')
             // .attr('font-style','GE Inspira Sans')
             .text(this.displayedTitle)
-            .attr("text-anchor", anchor)
-            .style("text-anchor", anchor)
-            .attr('transform',"rotate(" + r + ")");
+            .attr('text-anchor', anchor)
+            .style('text-anchor', anchor)
+            .attr('transform','rotate(' + r + ')');
 
           } else {
               this.svg.select('g.title-group[for=' + this.axisId + ']')
-                .attr('transform',"translate(" + x + ',' + y + ")");
+                .attr('transform','translate(' + x + ',' + y + ')');
               this.svg.select('g.title-group[for=' + this.axisId + '] text')
-                .attr("text-anchor", anchor)
-                .style("text-anchor", anchor)
+                .attr('text-anchor', anchor)
+                .style('text-anchor', anchor)
                 .text(this.displayedTitle)
-                .attr('transform',"rotate(" + r + ")");
+                .attr('transform','rotate(' + r + ')');
           }
 
           // console.log(this._titleGroup)
-          // this._titleGroup = this.svg.selectAll("g.title-group")
+          // this._titleGroup = this.svg.selectAll('g.title-group')
           //   .data([this.title]);
           // console.log(this._titleGroup)
           //
           // this._titleGroup.exit().remove();
           //
           // this._titleGroup.enter()
-          //   .append("g")
+          //   .append('g')
           //   .attr('class','title-group')
           //   .attr('for', this.axisId)
-          //   .append("text")
+          //   .append('text')
           //   .attr('class','axis-title')
           //   .attr('font-size', this.titleTypeSize + 'px')
           //   .attr('font-style','GE Inspira Sans')
           //
           // this._titleGroup.merge(this._titleGroup)
-          //   .attr('transform',"translate(" + x + ',' + y + ")")
+          //   .attr('transform','translate(' + x + ',' + y + ')')
           //   .select('.axis-title')
           //   .text(this.title)
-          //   .attr("text-anchor", anchor)
-          //   .style("text-anchor", anchor)
-          //   .attr('transform',"rotate(" + r + ")");
+          //   .attr('text-anchor', anchor)
+          //   .style('text-anchor', anchor)
+          //   .attr('transform','rotate(' + r + ')');
 
           this._processTooltip();
           this.set('titleDrawn', (this.titleDrawn === null) ? true : !this.titleDrawn);
@@ -638,12 +638,12 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          */
         _drawBar:function(elem,sid,color,index) {
           var w = elem.select('.axis-title').node().getBoundingClientRect()['height'];
-          elem.append("rect")
+          elem.append('rect')
             .attr('height',3)
             .attr('width',15)
             .attr('fill',color)
             .attr('series-bar-id','bar_' + sid)
-            .attr('transform',"translate(-12," + (-w - 8 * index) + ")");
+            .attr('transform','translate(-12,' + (-w - 8 * index) + ')');
         },
         _computeUnits: function(appendUnitInTitle, completeSeriesConfig, title) {
           var result = '';
@@ -691,7 +691,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               containsTooltip = false,
               children = this._axisGroup.node().childNodes;
 
-          //can't use "contains" function on the node cause it's an SVG
+          //can't use 'contains' function on the node cause it's an SVG
           //element and IE doesn't support it
           for(var i=0; i<children.length; i++) {
             if(children === this.$.tooltip) {
