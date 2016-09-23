@@ -1039,13 +1039,16 @@ PxVisBehaviorD3.lineShared = {
    * Defines a multi-scale d3 line generator and its attrs
    *
    */
-  _defineRadialLine: function(toCanvas){
+  _defineRadialLine: function(toCanvas, multiLine){
     //get our dimensions
     var _this = this,
         renderToCanvas = (typeof(toCanvas) !== 'undefined') ? toCanvas : false,
         dims = this.completeSeriesConfig[this.seriesId]['x'],
+    path,
+    line;
 
-    path = Px.d3.radialLine()
+    if(multiLine) {
+      path = Px.d3.radialLine()
       .angle(function(d) {
         return _this.x(d[0]);
       })
@@ -1053,18 +1056,36 @@ PxVisBehaviorD3.lineShared = {
           // ~~ --> round pixels values to optimize svg perfs
         return ~~_this.y(Number(d[1]));
       });
-    //be sneaky: iterate through the data like normal
-    var line = function(d) {
-      //for each datapoint, iterate through the dimensions
-      return path(dims.map(function(p) {
-        //check that we have data; if not, return false so it doesnt draw a line
-        if(!d[p]) {
-          return false
-        }
-        //return [x,y] to path: x is ordinal based on dim; get the y-scale for the dim and use that particular scale on the data
-        return [p,d[p]];
-      }));
-    };
+
+      //be sneaky: iterate through the data like normal
+      line = function(d) {
+        //for each datapoint, iterate through the dimensions
+        return path(dims.map(function(p) {
+          //check that we have data; if not, return false so it doesnt draw a line
+          if(!d[p]) {
+            return false
+          }
+          //return [x,y] to path: x is ordinal based on dim; get the y-scale for the dim and use that particular scale on the data
+          return [p,d[p]];
+        }));
+      };
+    } else {
+      var xId = this.completeSeriesConfig[this.seriesId]['x'],
+          yId = this.completeSeriesConfig[this.seriesId]['y'];
+
+      path = Px.d3.radialLine()
+      .angle(function(d) {
+
+        return d[xId]/180 * Math.PI;
+      })
+      .radius(function(d) {
+        return _this.y(d[yId]);
+      });
+
+      line = function(d) {
+        return path(d);
+      }
+    }
 
     if(this.interpolationFunction){
       path.curve(this.interpolationFunction);
@@ -1074,7 +1095,7 @@ PxVisBehaviorD3.lineShared = {
     if(renderToCanvas){
       path.context(this.canvasContext);
     }
-    this.set('line',line);
+    this.set('line', line);
   }
 };
 
