@@ -57,6 +57,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       commonColors,
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.chartExtents,
+      PxVisBehaviorD3.radialAxisConfig,
       PxVisBehaviorD3.domainUpdate
     ],
 
@@ -67,10 +68,6 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @type Object
      */
     properties: {
-      centerOffset: {
-        type: Boolean,
-        value: false
-      },
       amplitudeKeys: {
         type: Array,
         notify: true
@@ -79,7 +76,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
 
     observers: [
       '_setXScale(width)',
-      '_setYScale(width,margin)',
+      '_setYScale(width,margin,centerOffset)',
       '_generateChartExtents(chartData.*, amplitudeKeys)',
       '_currentDomain(x, y, chartExtents)'
     ],
@@ -135,18 +132,9 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      *
      * @method _setYScale
      */
-    _setYScale: function(width,margin) {
-      var range = [0, width],
-          y;
-
-      if(this.centerOffset) {
-        var scaled = width * 0.2,
-            center = scaled < 75 ? scaled : 75;
-
-            range = [75, width];
-      }
-
-        y = Px.d3.scaleLinear().nice().range(range);
+    _setYScale: function(width,margin,centerOffset) {
+      var range = [centerOffset, width],
+          y = Px.d3.scaleLinear().nice().range(range);
 
         this.set('y',y);
         this.notifyPath('y.range', y.range);
