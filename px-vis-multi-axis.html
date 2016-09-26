@@ -44,7 +44,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           height="[[_heightOrLen]]"
           margin="[[margin]]"
           orientation="left"
-          title="[[_getTitle(item)]]"
+          title="[[_getTitle(item,completeSeriesConfig)]]"
           title-location='[[_computeTitleLocation(item,titleLocation)]]'
           title-type-size="12"
           label-type-size="10"
@@ -262,22 +262,35 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       if(this.radial) {
         var r = (this.x(item) * 180 / Math.PI),
             attrs = {
-            'x': 0,
+            'x': null,
             'y': null,
             'r': (r + 180) * -1,  //we rotate each group so we have to un-rotate each title
             'anchor': null
           };
-        if(r > 45 && r < 135) {
+
+        if(r > 10 && r <= 100) {
           attrs.anchor = 'start';
+          attrs.x = 0;
           attrs.y = this.length + 10;
-        } else if(r > 225 && r < 315){
-          attrs.anchor = 'end';
-          attrs.y = this.length + 10;
-        } else if(r >= 135 && r <= 225){
+        } else if(r > 100 && r < 170) {
+          attrs.anchor = 'start';
+          attrs.x = -12 * Math.sin(Math.PI - this.x(item));
+          attrs.y = this.length + 10 + 12 * Math.cos(Math.PI - this.x(item));
+        } else if(r >= 170 && r <= 190){
           attrs.anchor = 'middle';
+          attrs.x = -12 * Math.sin(Math.PI - this.x(item));
           attrs.y = this.length + 10 + 12 ; //text size plus spacer
+        } else if(r > 190 && r < 260){
+          attrs.anchor = 'end';
+          attrs.x = -12 * Math.sin(Math.PI - this.x(item));
+          attrs.y = this.length + 10 + 12 * Math.cos(Math.PI - this.x(item));
+        } else if(r >= 260 && r < 355){
+          attrs.anchor = 'end';
+          attrs.x = 0;
+          attrs.y = this.length + 10;
         } else {
           attrs.anchor = 'middle';
+          attrs.x = -12 * Math.sin(Math.PI - this.x(item));
           attrs.y = this.length + 10;
         }
         return attrs;
@@ -546,10 +559,12 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
      *
      */
     _getTitle: function(item) {
-      if(this.completeSeriesConfig[item] && this.completeSeriesConfig[item].title) {
-        return this.completeSeriesConfig[item].title;
-      } else {
-        return item;
+      if(this.completeSeriesConfig){
+        if(this.completeSeriesConfig[item] && this.completeSeriesConfig[item].title) {
+          return this.completeSeriesConfig[item].title;
+        } else {
+          return item;
+        }
       }
     },
 
