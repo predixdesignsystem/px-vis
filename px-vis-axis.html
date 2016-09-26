@@ -357,11 +357,14 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           this._setLineStyles(this._axisGroup,'line,path');
           this._setLabelStyles(this._axisGroup);
 
-          if(this.ticks){
-            this.set('drawnTickValues', this._axis.scale().ticks(this.ticks));
-          } else {
-            this.set('drawnTickValues', this._axis.scale().ticks());
-          }
+          //apparently we need to give ourselves a bit of time to ensure the axis draws and it can clac this
+          this.debounce("drawnTicks", function(){
+            if(this.ticks){
+              this.set('drawnTickValues', this._axis.scale().ticks(this.ticks));
+            } else {
+              this.set('drawnTickValues', this._axis.scale().ticks());
+            }
+          },1)
         },
         /**
          * Updates the axis
