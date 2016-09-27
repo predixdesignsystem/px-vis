@@ -87,20 +87,12 @@ This element draw the box over the axis signifying the active area to mute the s
         .on("drag.drag", this._onDrag.bind(this))
         .on("end.drag", function(d) {
 
-          // if we have not been moving the axes as we went, move them all now
-          if(!_this.dynamicAxisRedraw){
-            _this.axes.sort(function(a, b) { return _this._position(a) - _this._position(b); });
-            _this.x.domain(_this.dimensions);
-            _this.axisGroups.each(function(d,i){
-              _this.transition(Px.d3.select(this))
-                .attr("transform",_this._radialOrLinear.bind(_this));
-            });
-          }
-          delete _this._dragging[d];
+          _this._dragging = {};
+
           // make the axis snap into place
           _this.transition(Px.d3.select(this))
-            .attr("transform", function(d) {
-              return _this.radial ? "rotate(" + (_this.x(d) * 180 / Math.PI + 180) + ")" : "translate(" + _this.x(d) + ",0)";
+            .attr("transform", function(a) {
+              return _this.radial ? "rotate(" + (_this.x(a) * 180 / Math.PI + 180) + ")" : "translate(" + _this.x(a) + ",0)";
             });
 
           if(_this.redrawSeries){
@@ -118,6 +110,7 @@ This element draw the box over the axis signifying the active area to mute the s
     },
 
     _onDragStart: function(d) {
+      this._dragging = {};
       this._dragging[d] = this.x(d);
     },
 
@@ -128,32 +121,25 @@ This element draw the box over the axis signifying the active area to mute the s
           var angle = Math.atan2(e.y,e.x) + Math.PI / 2,
               //arctan also gives us angle from -pi to pi; we want 0 to 2pi
               angle_2PI = angle < 0 ? angle + 2 * Math.PI : angle;
-              if(angle_2PI < 0.01) {
-                angle_2PI= -0.011;
-              }
-              if(angle_2PI > Math.PI * 2 - 0.01) {
-                angle_2PI= 0.011;
-              }
+
           this._dragging[d] = angle_2PI;
 
+          this.axes = this._radialSort(this.axes, d, angle_2PI);
+          this.dimensions = this._radialSort(this.dimensions, d, angle_2PI);
         } else {
           //get the x coordinate bounded by our chart extents
           this._dragging[d] = Math.min(this.width, Math.max(0, e.x));
-        }
 
         // reorder dynamically:
-        this.axes.sort(function(a, b) {
-          return this._position(a) - this._position(b);
-        }.bind(this) );
-        this.dimensions.sort(function(a, b) { return this._position(a) - this._position(b); }.bind(this));
+          this.axes.sort(function(a, b) { return this._position(a) - this._position(b); }.bind(this) );
+          this.dimensions.sort(function(a, b) { return this._position(a) - this._position(b); }.bind(this));
+        }
+
         this.x.domain(this.dimensions);
 
         // redraw the lines
         if(this.redrawSeries & this.dynamicRedraw){
-          for(var i = 0; i < this.redrawElems.length; i++){
             _this.fire('px-vis-redraw-lines');
-
-          }
         }
 
         // move the currently grabed axis (and reorder the others if above is active)
@@ -166,6 +152,58 @@ This element draw the box over the axis signifying the active area to mute the s
     _position: function(d) {
       var v = this._dragging[d];
       return v == null ? this.x(d) : v;
+    },
+
+    _radialSort: function(dims, d, angle){
+      var len = dims.length - 1,
+          index = dims.indexOf(d),
+          left_index = index === 0 ? len : index - 1,
+          right_index = index === len ? 0 : index + 1;
+
+      //if we are moving the center elem
+      if(index === 0){
+        //make sure it is bounded by two axes
+        if(angle > this.x(dims[right_index]) && angle < this.x(dims[right_index+1])) {
+          dims[index] = dims[right_index];
+          dims[right_index] = d;
+        } else if(angle < this.x(dims[left_index]) && angle > this.x(dims[left_index-1])) {
+          dims[index] = dims[left_index];
+          dims[left_index] = d;
+        }
+      }
+      //if the left index is 0, then we need to see if the axis angle passes 2pi
+      else if(left_index === 0){
+        //if our angle is greater than our last element, then we have passed 0
+        if(angle > this.x(dims[len])) {
+          dims[index] = dims[left_index];
+          dims[left_index] = d;
+        } else if(angle > this.x(dims[right_index])) {
+          dims[index] = dims[right_index];
+          dims[right_index] = d;
+        }
+      }
+      //if our right is 0, then we need to check when angle passes 2pi and restarts at 0
+      else if(right_index === 0 ){
+        //see if angle is > 0 and bounded by the first axis
+        if(angle <= this.x(dims[1])) {
+          dims[index] = dims[right_index];
+          dims[right_index] = d;
+        } else if(angle < this.x(dims[left_index])) {
+          dims[index] = dims[left_index];
+          dims[left_index] = d;
+        }
+      }
+      //else, just flip axes as normal
+      else {
+        if(angle < this.x(dims[left_index])) {
+          dims[index] = dims[left_index];
+          dims[left_index] = d;
+        } else if(angle > this.x(dims[right_index])) {
+          dims[index] = dims[right_index];
+          dims[right_index] = d;
+        }
+      }
+      return dims;
     },
 
     _radialOrLinear: function(d){
