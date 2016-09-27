@@ -1,3 +1,11 @@
+v0.4.2
+==================
+* added check to parse JSON for configuration objects
+
+v0.4.0
+==================
+* Converted to Gulp
+
 v0.3.15
 ==================
 * fixed errors when muting all axes
