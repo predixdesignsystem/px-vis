@@ -122,6 +122,10 @@ Element which draws lines series onto the chart
       multiPath: {
         type: Boolean,
         value: false
+      },
+      strokeWidth: {
+        type: Number,
+        value: 1
       }
     },
 
@@ -180,7 +184,7 @@ Element which draws lines series onto the chart
           .attr("d", function(d) {
             return this.line(d);
           }.bind(this))
-          // TODO add ability to color by category
+          .attr('stroke-width',this.strokeWidth)
           .attr('stroke',function(d,i){
             if(this.categoryKey){
               return this.completeSeriesConfig[d[this.categoryKey]]['color']
