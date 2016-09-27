@@ -68,32 +68,8 @@ The gridlines still make use of the d3.axis object, just with different settings
            * @property _grid
            * @type Object
            */
-          _grid: {
-            type: Object,
-            notify: true
-          },
-          /**
-           * Holder for the grid drawing
-           *
-           * @property _gridGroup
-           * @type Object
-           */
-          _gridGroup: {
-            type: Object,
-            value: function() { return{}; }
-          },
-          /**
-           * A unique ID for the grid
-           *
-           * @property gridId
-           * @type String
-           * @default random string
-           */
-          gridId: {
-            type:String,
-            value: '',
-            notify: true,
-            reflectToAttribute: true
+          gridSvg: {
+            type: Object
           },
           /**
            * An x,y amount to move the grid to allow for labels and titles
@@ -103,12 +79,16 @@ The gridlines still make use of the d3.axis object, just with different settings
            */
           translateAmt: {
             type: Array,
-            value:function() { return [0,0]; }
+            value: function() { return [0,0]; }
           },
+          tickValues: {
+              type: Array,
+              value: []
+          }
         },
 
         observers: [
-          'drawElement(domainChanged,axis,margin,svg)'
+          'drawElement(domainChanged, axis, margin, svg, tickValues)'
         ],
 
 
@@ -119,51 +99,6 @@ The gridlines still make use of the d3.axis object, just with different settings
           }
         },
 
-        detached: function() {
-          if(this._doesObjHaveValues(this._gridGroup)){
-            this._gridGroup.remove();
-            this._gridGroup = {};
-          }
-
-          this._drawGrid = false;
-
-        },
-
-        /**
-         * Defines basics of the d3.axis.
-         *
-         * @method _drawElement
-         */
-        defineGrid:function() {
-          switch(this.orientation) {
-            case 'bottom':
-              this._grid = Px.d3.axisBottom(this.axis);
-              break;
-
-            case 'top':
-              this._grid = Px.d3.axisTop(this.axis);
-              break;
-
-            case 'right':
-              this._grid = Px.d3.axisRight(this.axis);
-              break;
-
-            default: //case 'left':
-              this._grid = Px.d3.axisLeft(this.axis);
-              break;
-          }
-
-          if(this.tickValues && this.tickValues.length > 0) {
-            this._grid.tickValues(this.tickValues);
-          }
-
-          // TODO dev set # of gridlines
-          // TODO link to number of gridlines the axis has and dev set multiplier (2x)
-          // change default (10) ticks
-          // this._grid.ticks();
-        this._grid.tickSizeInner(10);
-
-        },
         /**
          * Method fired via observer which draws the gridlines
          *
@@ -172,10 +107,22 @@ The gridlines still make use of the d3.axis object, just with different settings
         drawElement: function() {
           this.debounce('draw_grid', function() {
 
+         //   if(!this.gridSvg) {
+             if(this.gridSvg) {
+                 this.gridSvg.node().remove();
+             }
+                this.cloneSVGElem(this.svg.node(), 'gridSvg', true);
+          /*  } else {
+                this.gridSvg.selectAll('*').remove();
+                //make sure the grid svg is being kept in sync...
+                this.gridSvg.width = this.svg.width;
+                this.gridSvg.
+            }*/
+
             var radius = this.axis.range()[1] - this.axis.range()[0];
 
             //draw the lines
-            var ga = this.svg.append('g')
+            var ga = this.gridSvg.append('g')
                 .attr('class', 'a axis')
                 .attr('stroke', this.colors.grey4)
                 .attr('stroke-width', '1')
@@ -189,71 +136,19 @@ The gridlines still make use of the d3.axis object, just with different settings
 
             //draw the circles
             var r = Px.d3.scaleLinear()
-                            .domain([0, .5])
-                            .range([0, radius]),
-                gr = this.svg.append('g')
+                            .domain(this.axis.domain())
+                            .range(this.axis.range()),
+                gr = this.gridSvg.append('g')
                 .attr('class', 'r axis')
                 .attr('fill', 'none')
                 .attr('stroke', this.colors.grey4)
             .selectAll('g')
-                .data(r.ticks(5).slice(1))
+                .data(this.tickValues.length > 0 ? this.tickValues : r.ticks(5).slice(1))
             .enter().append('g');
 
             gr.append('circle')
                 .attr('r', r);
-
-            // if(this._doesObjHaveValues(this.currentDomain) && this._drawGrid) {
-            //   this.defineGrid();
-
-            //   // checks to see if the grid already exists. If not, create; if so, update
-            //   if(this._isObjEmpty(this._gridGroup)) {
-            //     this._gridGroup = this.svg.append("g")
-            //       .attr("class", "grid")
-            //       .attr('grid-id',this.gridId)
-            //       .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
-            //       .call(this._grid);
-
-            //     this._removeUncessaryElems(this._gridGroup);
-            //     this._setLineStyles(this._gridGroup,'line');
-            //     // the first tick overlaps the x-axis path and is unnessary
-            //     // TODO make sure this doesnt get us in trouble in different min y values
-            //     // TODO What if there is no x-axis? How to do this better?
-            //     // this._gridGroup.select('line').remove();
-
-            //     //keep a reference for later
-            //     // this._gridGroup = this.svg.select('g.grid[grid-id=' + this.gridId + ']');
-
-            //   } else {
-            //     this._gridGroup
-            //     // .duration(750)
-            //     .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
-            //     .call(this._grid);
-
-            //     this._removeUncessaryElems(this._gridGroup);
-            //     this._setLineStyles(this._gridGroup,'line');
-            //   }
-            // }
           },5);
-        },
-        /**
-         * Removes other axis elements which are duplicated with px-vis-axis
-         *
-         * @method _drawElement
-         */
-        _removeUncessaryElems:function(elem) {
-          elem.selectAll('text').remove();
-          elem.selectAll('path').remove();
-        },
-        /**
-         * Sets the gridline lines styles
-         *
-         * @method _drawElement
-         */
-        _setLineStyles:function(elem,lines) {
-          elem.selectAll(lines)
-            .attr('fill','none')
-            .attr('stroke', this.colors.grey3)
-            .attr('shape-rendering','crispEdges');
         }
     });
 </script>
