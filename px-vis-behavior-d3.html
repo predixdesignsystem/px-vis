@@ -89,12 +89,17 @@ PxVisBehaviorD3.svg = {
    * @param {element}
    * @param {string}
   */
-  cloneSVGElem: function(svg,prop) {
+  cloneSVGElem: function(svg,prop,onBottom) {
     var tempSVG = svg,
         clone = tempSVG.cloneNode();
 
-    tempSVG.parentNode.appendChild(clone);
+    if(!onBottom || tempSVG.parentNode.childNodes.length === 0) {
+      tempSVG.parentNode.appendChild(clone);
+    } else {
 
+      tempSVG.parentNode.insertBefore(clone, tempSVG.parentNode.firstChild );
+    }
+    
     this.set(prop,Px.d3.select(clone));
   },
 

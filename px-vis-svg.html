@@ -127,14 +127,15 @@ Element which creates an SVG element and sets up d3
           if(this.width && this.height && this._doesObjHaveValues(this.margin)){
             var svg = Px.d3.select(this.$$("svg"))
               .attr('width',this.width)
-              .attr('height',this.height);
+              .attr('height',this.height),
+            newSvg;
 
-            this.svg = (this._isVarUndefined(this.svg)) ? svg.append('g') : this.svg;
-            this.svg.attr('width',this.width)
+            newSvg = (this._isVarUndefined(this.svg)) ? svg.append('g') : this.svg;
+            newSvg.attr('width',this.width)
               .attr('height',this.height)
               .attr('transform', 'translate(' + (Number(this.margin.left) + Number(this.offset[0])) + ',' + (Number(this.margin.top) + Number(this.offset[1])) + ')');
 
-            this.notifyPath('svg',this.svg);
+            this.set('svg',newSvg);
             this.fire('px-vis-svg-updated',{ 'data': this.svg, 'dataVar': 'svg', 'method': 'set' });
             this.set('pxSvgElem', this.$.chartSVG);
             this.fire('px-vis-svg-element-updated', {'data': this.$.chartSVG, 'dataVar': 'pxSvgElem', 'method': 'set'});
