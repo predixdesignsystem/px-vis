@@ -45,7 +45,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           margin="[[margin]]"
           orientation="left"
           title="[[_getTitle(item,completeSeriesConfig)]]"
-          title-location='[[_computeTitleLocation(item,titleLocation)]]'
+          title-location='[[_computeTitleLocation(item,titleLocation, _pokeTitleLocation)]]'
           title-type-size="12"
           label-type-size="10"
           current-domain="[[currentDomainY]]"
@@ -86,7 +86,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       </px-vis-axis-brush>
       <px-vis-axis-drag
         width="[[width]]"
-        axis="[[x]]"
+        x="[[x]]"
+        y="[[y]]"
         margin="[[margin]]"
         current-domain="[[currentDomainX]]"
         complete-series-config="{{completeSeriesConfig}}"
@@ -96,8 +97,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         axis-groups="[[axisGroups]]"
         drag-behavior="{{dragBehavior}}"
         redraw-series="[[redrawSeries]]"
-        dynamic-axis-redraw="[[dynamicAxisRedraw]]"
         redraw-elems="[[redrawElems]]"
+        radial="[[radial]]"
         series-key="[[seriesKey]]"
         muted-series="{{mutedSeries}}">
       </px-vis-axis-drag>
@@ -243,17 +244,23 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       _lastDomainChanged: {
         type: Boolean,
         value: null
+      },
+      _pokeTitleLocation: {
+        type: Boolean,
+        value: false
       }
     },
 
     observers: [
       '_computedInternalDimensions(domainChanged.*,dimensions.*)',
-      '_moveAxisGroup(margin.*,axisSvg,offset.*)'
+      '_moveAxisGroup(margin.*,axisSvg,offset.*)',
+      '_toggleTitleLocation(length)'
     ],
 
     listeners:{
       'px-axis-done': '_setAxisStyles',
-      'px-vis-axis-displayed-title-changed': '_displayedTitleChanged'
+      'px-vis-axis-displayed-title-changed': '_displayedTitleChanged',
+      'px-vis-recalc-title-location' : '_toggleTitleLocation'
     },
 
     /**
@@ -298,6 +305,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         return attrs;
       }
       return titleLocation;
+    },
+
+    _toggleTitleLocation: function() {
+      this.set('_pokeTitleLocation' , !this._pokeTitleLocation);
     },
 
     _calcH: function(height,length) {
@@ -399,6 +410,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         }
       // },10)
     },
+
     /**
      * Returns an indivdual d3 selected element
      *
