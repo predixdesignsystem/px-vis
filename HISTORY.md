@@ -1,3 +1,7 @@
+v0.4.3
+==================
+* fixing px-d3 issue
+
 v0.4.2
 ==================
 * added check to parse JSON for configuration objects
