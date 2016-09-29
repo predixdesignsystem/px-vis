@@ -126,11 +126,18 @@ Element which draws lines series onto the chart
       strokeWidth: {
         type: Number,
         value: 1
-      }
+      },
+      /**
+       * whether the polar data should be interepreted clockwise or counter-clockwise
+       */
+      clockwise: {
+        type: Boolean,
+        value: false
+      },
     },
 
     observers: [
-      'drawElement(svg,domainChanged,chartData.*,completeSeriesConfig.*)',
+      'drawElement(svg,domainChanged,chartData.*,completeSeriesConfig.*, clockwise)',
       'isIdInMuted(mutedSeries.*, completeSeriesConfig)',
       '_addClipPath(clipPath)'
      ],
@@ -149,8 +156,8 @@ Element which draws lines series onto the chart
           this._defineMultiLine(false);
         }  else if(this.radialLine) {
           // var multiLine = Object.keys(this.completeSeriesConfig).length > 1;
-          this._defineRadialLine(false, this.multiPath);
-          data = this.multiPath ? this.chartData : [this.chartData];
+          this._defineRadialLine(false, this.multiPath, this.clockwise);
+          data = this.multiLine ? this.chartData : [this.chartData];
         } else {
           var data = [this.chartData];
           this._defineSingleLine(false);
@@ -159,9 +166,9 @@ Element which draws lines series onto the chart
         // checks to see if the group already exists. If not, create; if so, update
         if(this._isObjEmpty(this.lineGroup)) {
           // draw the path
-          this.lineGroup = this.svg.append("g")
-            .attr("series-id", 'line_' + this.seriesId)
-            .attr("class", "series-line");
+          this.lineGroup = this.svg.append('g')
+            .attr('series-id', 'line_' + this.seriesId)
+            .attr('class', 'series-line');
         }
 
         // set our data
@@ -174,14 +181,14 @@ Element which draws lines series onto the chart
         // When datapoints are added to our data, add stuff
         lineBuilder.enter()
           .append('path')
-          .attr("class", "series-line")
-          .attr("series-id", function(d,i){
+          .attr('class', 'series-line')
+          .attr('series-id', function(d,i){
             return this.multiPath ? 'line_' + d[this.seriesId] : 'line_' + this.seriesId
           }.bind(this))
           .attr('fill','none')
         // When datapoints are added OR this funtion is run, draw stuff
         .merge(lineBuilder)
-          .attr("d", function(d) {
+          .attr('d', function(d) {
             return this.line(d);
           }.bind(this))
           .attr('stroke-width',this.strokeWidth)
@@ -195,6 +202,21 @@ Element which draws lines series onto the chart
 
         // Make it easy to get our lines again
         this.linePath = this.lineGroup.selectAll('path.series-line');
+
+       /* if(true) {
+          this.lineGroup.selectAll('point')
+            .data(this.chartData)
+            .enter()
+            .append('circle')
+            .attr('class', 'point')
+            .attr('transform', function(d) {
+              // use the line function and parse out the coordinates
+
+              var coors = this.line([d]).slice(1).slice(0, -1);
+              return 'translate(' + coors + ')';
+            }.bind(this))
+            .attr('r', 8);
+        }*/
 
         this._addClipPath();
 
@@ -219,7 +241,7 @@ Element which draws lines series onto the chart
      */
     isIdInMuted: function() {
       if(this.multiPath && this._doesObjHaveValues(this.linePath)){
-        this.linePath.style("display", function(d) {
+        this.linePath.style('display', function(d) {
           // if we have multiPaths, then just hide them; might want to changes this but need to check with design
           return this.mutedSeries[d[this.seriesId]] ? 'none' : null;
         }.bind(this));
