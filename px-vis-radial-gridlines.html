@@ -108,10 +108,13 @@ The gridlines still make use of the d3.axis object, just with different settings
           this.debounce('draw_grid', function() {
 
          //   if(!this.gridSvg) {
-             if(this.gridSvg) {
-                 this.gridSvg.node().remove();
-             }
-                this.cloneSVGElem(this.svg.node(), 'gridSvg', true);
+             
+             //clean the svg
+            var node = this.svg.node();
+            while (node.firstChild) {
+                node.removeChild(node.firstChild);
+            }
+             
           /*  } else {
                 this.gridSvg.selectAll('*').remove();
                 //make sure the grid svg is being kept in sync...
@@ -122,7 +125,7 @@ The gridlines still make use of the d3.axis object, just with different settings
             var radius = this.axis.range()[1] - this.axis.range()[0];
 
             //draw the lines
-            var ga = this.gridSvg.append('g')
+            var ga = this.svg.append('g')
                 .attr('class', 'a axis')
                 .attr('stroke', this.colors.grey4)
                 .attr('stroke-width', '1')
@@ -138,7 +141,7 @@ The gridlines still make use of the d3.axis object, just with different settings
             var r = Px.d3.scaleLinear()
                             .domain(this.axis.domain())
                             .range(this.axis.range()),
-                gr = this.gridSvg.append('g')
+                gr = this.svg.append('g')
                 .attr('class', 'r axis')
                 .attr('fill', 'none')
                 .attr('stroke', this.colors.grey4)

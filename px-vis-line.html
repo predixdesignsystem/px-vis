@@ -120,16 +120,16 @@ Element which draws lines series onto the chart
         value: 1
       },
       /**
-       * whether the polar data should be interepreted clockwise or counter-clockwise
+       * whether the polar data should be interpreted clockwise or counter-clockwise
        */
-      clockwise: {
+      counterClockwise: {
         type: Boolean,
         value: false
       },
     },
 
     observers: [
-      'drawElement(svg,domainChanged,chartData.*,completeSeriesConfig.*, clockwise)',
+      'drawElement(svg,domainChanged,chartData.*,completeSeriesConfig.*, counterClockwise)',
       'isIdInMuted(mutedSeries.*, completeSeriesConfig)',
       '_addClipPath(clipPath)'
      ],
@@ -147,7 +147,7 @@ Element which draws lines series onto the chart
           var data = this.chartData;
           this._defineMultiLine(false);
         }  else if(this.radialLine) {
-          this._defineRadialLine(false, this.multiPath,  this.clockwise);
+          this._defineRadialLine(false, this.multiPath,  this.counterClockwise);
           data = this.multiPath ? this.chartData : [this.chartData];
         } else {
           var data = [this.chartData];

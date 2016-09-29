@@ -888,14 +888,14 @@ PxVisBehaviorD3.radialLineGenerator = [{
    * Defines a multi-scale d3 line generator and its attrs
    *
    */
-  _defineRadialLine: function(toCanvas, multiLine, clockwise){
+  _defineRadialLine: function(toCanvas, multiLine, counterClockwise) {
     //get our dimensions
     var _this = this,
         renderToCanvas = (typeof(toCanvas) !== 'undefined') ? toCanvas : false,
         dims = this.completeSeriesConfig[this.seriesId]['x'],
     path,
     line,
-    clockwiseFactor = clockwise ? 1 : -1;
+    clockwiseFactor = counterClockwise ? -1 : 1;
 
     if(multiLine) {
       path = Px.d3.radialLine()
@@ -937,12 +937,12 @@ PxVisBehaviorD3.radialLineGenerator = [{
       }
     }
 
-    if(this.interpolationFunction){
+    if(this.interpolationFunction) {
       path.curve(this.interpolationFunction);
     }
 
     // add the canvas context if relevant
-    if(renderToCanvas){
+    if(renderToCanvas) {
       path.context(this.canvasContext);
     }
     this.set('line', line);
@@ -1152,68 +1152,6 @@ PxVisBehaviorD3.lineShared = [{
     }
 
     this.set('line',line);
-  },
-  /**
-   * Defines a multi-scale d3 line generator and its attrs
-   *
-   */
-  _defineRadialLine: function(toCanvas, isMultiLine) {
-    //get our dimensions
-    var _this = this,
-        renderToCanvas = (typeof(toCanvas) !== 'undefined') ? toCanvas : false,
-        multiLine = (typeof(isMultiLine) !== 'undefined') ? isMultiLine : false,
-        dims = this.completeSeriesConfig[this.seriesId]['x'],
-        path,
-        line;
-
-    if(multiLine) {
-      path = Px.d3.radialLine()
-      .angle(function(d) {
-        return _this.x(d[0]);
-      })
-      .radius(function(d) {
-          // ~~ --> round pixels values to optimize svg perfs
-        return ~~_this.y(Number(d[1]));
-      });
-
-      //be sneaky: iterate through the data like normal
-      line = function(d) {
-        //for each datapoint, iterate through the dimensions
-        return path(dims.map(function(p) {
-          //check that we have data; if not, return false so it doesnt draw a line
-          if(typeof(d[p]) === 'undefined' || d[p] === null) {
-            return false
-          }
-          //return [x,y] to path: x is ordinal based on dim; get the y-scale for the dim and use that particular scale on the data
-          return [p,d[p]];
-        }));
-      };
-    } else {
-      var xId = this.completeSeriesConfig[this.seriesId]['x'],
-          yId = this.completeSeriesConfig[this.seriesId]['y'];
-
-      path = Px.d3.radialLine()
-      .angle(function(d) {
-        return d[xId]/180 * Math.PI;
-      })
-      .radius(function(d) {
-        return _this.y(d[yId]);
-      });
-
-      line = function(d) {
-        return path(d);
-      }
-    }
-
-    if(this.interpolationFunction){
-      path.curve(this.interpolationFunction);
-    }
-
-    // add the canvas context if relevant
-    if(renderToCanvas){
-      path.context(this.canvasContext);
-    }
-    this.set('line', line);
   }
 },PxVisBehaviorD3.radialLineGenerator];
 

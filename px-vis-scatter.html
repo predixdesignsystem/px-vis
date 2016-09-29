@@ -151,14 +151,14 @@ Element which draws scatter series onto the chart
       /**
        * whether the polar data should be interepreted clockwise or counter-clockwise
        */
-      clockwise: {
+      counterClockwise: {
         type: Boolean,
         value: false
       },
     },
 
     observers: [
-      'drawElement(svg, domainChanged, chartData.*, completeSeriesConfig.*, radial, clockwise)',
+      'drawElement(svg, domainChanged, chartData.*, completeSeriesConfig.*, radial, counterClockwise)',
       'isIdInMuted(mutedSeries.*)',
       '_addClipPath(clipPath)'
      ],
@@ -195,7 +195,7 @@ Element which draws scatter series onto the chart
       }
 
       if(this.radial) {
-        this._defineRadialLine(false, this.multiPath, this.clockwise);
+        this._defineRadialLine(false, this.multiPath, this.counterClockwise);
       }
 
       var _this = this;
@@ -290,7 +290,7 @@ Element which draws scatter series onto the chart
       if(this.radial) { 
 
         var coors = this.line([d]).slice(1).slice(0, -1);
-        return 'translate(' + coors + ')';
+        return 'translate(' + coors + ')' + ' scale(' + this.markerScale + ')';
       } else {
 
         var xTrans,
