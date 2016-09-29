@@ -391,6 +391,17 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .attr("dimension", function(d) { return d })
             .attr("transform", function(d) {
               if(this.radial){
+              /*
+              +180 to flip orientation of axes to start at top (which matches where lines start)
+                   180                        0
+                  ____                       ____
+                .'    `.                   .'    `.
+               /        \                 /        \
+            90|          | 270  -->  270 |          |90
+               \        /                 \        /
+                `.____.'                   `.____.'
+                   0                          180
+              */
                 return "rotate(" + (this.x(d) * 180 / Math.PI + 180) + ")"
               }
               return "translate(" + this.x(d) + ",0)";
