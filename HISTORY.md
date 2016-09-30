@@ -1,3 +1,7 @@
+v0.4.5
+==================
+* adding check for Px.d3
+
 v0.4.3
 ==================
 * fixing px-d3 issue
