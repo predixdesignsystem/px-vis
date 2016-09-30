@@ -418,6 +418,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           this.set('axisGroups', this.axisSvg.selectAll(".dimension"));
           this.set('brushElems', this.axisGroups.selectAll('g.brush').nodes());
 
+          //sometime after draw (doesnt entirely matter when since it is for an interaction piece), move the brushes on top of everything so they dont get interrupted by other things drawn on top
+          setTimeout(function(){
+            this.axisGroups.selectAll('g.brush').raise();
+          }.bind(this),200);
         }
       // },10)
     },

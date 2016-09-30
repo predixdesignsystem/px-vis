@@ -97,14 +97,14 @@ This element draw the box over the axis signifying the active area to mute the s
     },
 
     observers: [
-      'drawElement(svg)',
+      'drawElement(svg, margin.* , height)',
       'recalcBrush(domainChanged)'
     ],
     /**
      * Creates the brushes
      */
     drawElement: function() {
-      this.debounce('drawBrushAxis', function(){
+      if(this.domainChanged !== null && this.svg) {
         var _this = this,
             domain = this.radial ? // [ [x1,y1] , [x2,y2] ]
             [
@@ -122,7 +122,7 @@ This element draw the box over the axis signifying the active area to mute the s
 
         // Add and store a brush for each axis.
         this.svg.each(function(d) {
-          if(Px.d3.select(this).select('g.brush').node()){
+          if(Px.d3.select(this).select('g.brush').node()) {
             // now handled in recalcBrush...
 
             // //update the brush when resize occurs
@@ -176,7 +176,7 @@ This element draw the box over the axis signifying the active area to mute the s
         // save these brushes for access in brush()
         this.set('_brushes', b);
         this.set('_previousDomain', domain);
-      }.bind(this),5);
+      }
     },
 
     /**
@@ -238,11 +238,10 @@ This element draw the box over the axis signifying the active area to mute the s
     /**
      * when new data is added or the chart is resized, recalc the brush and resize
      */
-    recalcBrush: function(){
-      if(this._brushes){
+    recalcBrush: function() {
+      if(this._brushes) {
         var _this = this,
             extents = {};
-
 
         // for each brush, figure out if it was brushed and build an array of obj with the extents and the dimension
         this._brushes.each(function(d) {
@@ -250,7 +249,6 @@ This element draw the box over the axis signifying the active area to mute the s
           _this.deleteBrush(Px.d3.select(this));
           //if there is a brush and the axis still exists draw a new one
           if(_this._brushDomains[d] && _this.dimensions.indexOf(d) !== -1) {
-            console.log(_this._brushDomains);
 
             // if the axis exists, then lets check out the extents
             var oldBrushDomain = _this._brushDomains[d],
@@ -272,6 +270,8 @@ This element draw the box over the axis signifying the active area to mute the s
             extents[d] = newBrushRange;
           }
         });
+        //reapply the brushes
+        this.drawElement();
         //create the muted list
         this._calcMutedSeries(extents);
       }
