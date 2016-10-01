@@ -51,10 +51,7 @@ bower install ${REPO_NAME} --force
 cd ${REPO_NAME} #go into the component folder
 npm install vulcanize
 vulcanize index.html -o index.vulacanized.html --inline-scripts --inline-css --strip-comments
-vulcanize demo.html -o demo.vulacanized.html --inline-scripts --inline-css --strip-comments
 yes | cp index.vulacanized.html index.html
-yes | cp demo.vulacanized.html demo.html
-rm demo.vulacanized.html
 rm index.vulcanized.html
 cd ../ #remember to exit out of the component before you do any git stuff
 
