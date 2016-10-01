@@ -152,6 +152,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           * A string specifying the type of axis. Used only for tick formating. Valid entries are:
           * - `time`
           * - `linear`
+          * - `ordinal`
           */
           axisType: {
             type: String,
@@ -237,7 +238,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
           //support for general ticks setting
           // https://github.com/d3/d3-axis#axis_ticks
-          if(this.ticks){
+          if(this.ticks && this.axisType !== 'ordinal') {
             if(typeof(this.ticks) === 'number' || !isNaN(parseInt(this.ticks))) {
 
               this._axis.ticks(this.ticks);
@@ -265,7 +266,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
           //support for tick format
           // https://github.com/mbostock/d3/wiki/Formatting#d3_format
-          if(this.tickFormat){
+          if(this.tickFormat && this.axisType !== 'ordinal'){
             if(this.axisType === 'time') {
               this._axis.tickFormat(Px.d3.timeFormat(this.tickFormat));
             } else if(this.axisType === 'linear') {
@@ -273,7 +274,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             }
           }
 
-          if(this.tickValues && this.tickValues.length > 0){
+          if(this.tickValues && this.tickValues.length > 0 && this.axisType !== 'ordinal'){
             if(!isNaN(this.axis.domain()[0]) && !isNaN(this.axis.domain()[1])){
               this._axis.tickValues(this.tickValues);
             }
@@ -357,14 +358,17 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           this._setLineStyles(this._axisGroup,'line,path');
           this._setLabelStyles(this._axisGroup);
 
-          //apparently we need to give ourselves a bit of time to ensure the axis draws and it can clac this
-          this.debounce("drawnTicks", function(){
-            if(this.ticks){
-              this.set('drawnTickValues', this._axis.scale().ticks(this.ticks));
-            } else {
-              this.set('drawnTickValues', this._axis.scale().ticks());
-            }
-          },1)
+          if(this.axisType !== 'ordinal') {
+
+            //apparently we need to give ourselves a bit of time to ensure the axis draws and it can clac this
+            this.debounce("drawnTicks", function(){
+              if(this.ticks){
+                this.set('drawnTickValues', this._axis.scale().ticks(this.ticks));
+              } else {
+                this.set('drawnTickValues', this._axis.scale().ticks());
+              }
+            },1)
+          }
         },
         /**
          * Updates the axis
