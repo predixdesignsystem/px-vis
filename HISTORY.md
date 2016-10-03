@@ -1,3 +1,7 @@
+v0.5.1
+==================
+* Fixed navigator line
+
 v0.5.0
 ==================
 * Added support for radial charts (polar chart and radar chart)
