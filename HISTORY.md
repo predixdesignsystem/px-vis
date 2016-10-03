@@ -1,3 +1,11 @@
+v0.4.8
+==================
+* fixed vulcanized spelling mistake in ghp
+
+v0.4.7
+==================
+* removed extra demo link in the ghp script
+
 v0.4.6
 ==================
 * adding polygit imports for codepen
