@@ -109,6 +109,13 @@ Element which draws scatter series onto the chart
         type: Number,
         value: 1
       },
+      /**
+       * the opacity value of the fill to be used when muting a serie (stroke is not drawn on mute)
+       */
+      mutedOpacity: {
+        type: Number,
+        value: 0.3
+      },
       _markerMapping: {
         type: Object,
         readOnly: true,
@@ -206,6 +213,8 @@ Element which draws scatter series onto the chart
                               this.completeSeriesConfig[this.seriesId].markerFillOpacity : this.fillOpacity;
         this.strokeOpacity = this.completeSeriesConfig[this.seriesId].markerStrokeOpacity ?
                               this.completeSeriesConfig[this.seriesId].markerStrokeOpacity : this.strokeOpacity;
+        this.mutedOpacity = this.completeSeriesConfig[this.seriesId].mutedOpacity ?
+                              this.completeSeriesConfig[this.seriesId].mutedOpacity : this.mutedOpacity;
 
         // draw the path
         this.scatterGroup = this.svg.append('g')
@@ -354,7 +363,7 @@ Element which draws scatter series onto the chart
      TODO add dev set color and opacity
      */
      _muteScatter:function(){
-       this.scatterDots.attr('fill-opacity',0.3);
+       this.scatterDots.attr('fill-opacity', this.mutedOpacity);
        this.scatterDots.attr('stroke-opacity',0);
      }
   });

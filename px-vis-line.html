@@ -119,7 +119,14 @@ Element which draws lines series onto the chart
       strokeWidth: {
         type: Number,
         value: 1
-      }
+      },
+      /**
+       * the opacity value of the fill to be used when muting a serie (stroke is not drawn on mute)
+       */
+      mutedOpacity: {
+        type: Number,
+        value: 0.3
+      },
     },
 
     observers: [
@@ -147,6 +154,10 @@ Element which draws lines series onto the chart
           var data = [this.chartData];
           this._defineSingleLine(false);
         }
+
+        //make sure we have the right muted opacity
+        this.mutedOpacity = this.completeSeriesConfig[this.seriesId].mutedOpacity ?
+                              this.completeSeriesConfig[this.seriesId].mutedOpacity : this.mutedOpacity;
 
         // checks to see if the group already exists. If not, create; if so, update
         if(this._isObjEmpty(this.lineGroup)) {
@@ -187,21 +198,6 @@ Element which draws lines series onto the chart
 
         // Make it easy to get our lines again
         this.linePath = this.lineGroup.selectAll('path.series-line');
-
-       /* if(true) {
-          this.lineGroup.selectAll('point')
-            .data(this.chartData)
-            .enter()
-            .append('circle')
-            .attr('class', 'point')
-            .attr('transform', function(d) {
-              // use the line function and parse out the coordinates
-
-              var coors = this.line([d]).slice(1).slice(0, -1);
-              return 'translate(' + coors + ')';
-            }.bind(this))
-            .attr('r', 8);
-        }*/
 
         this._addClipPath();
 
@@ -271,7 +267,7 @@ Element which draws lines series onto the chart
      */
      _muteLine:function(){
        this.linePath.attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
-         .attr('stroke-opacity',0.3);
+         .attr('stroke-opacity', this.mutedOpacity);
      },
   });
 </script>
