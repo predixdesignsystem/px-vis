@@ -1,3 +1,11 @@
+v0.5.0
+==================
+* Added support for radial charts (polar chart and radar chart)
+* Separated line into svg and canvas lines
+* Various bug fixes
+* Various new features
+* Improved demos
+
 v0.4.8
 ==================
 * fixed vulcanized spelling mistake in ghp
