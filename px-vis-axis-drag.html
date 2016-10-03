@@ -117,9 +117,20 @@ This element draw the box over the axis signifying the active area to mute the s
     _onDrag: function(d) {
       this.debounce('drag', function(e){
         if(this.radial){
-          //arctan gives us our angle, but 0 at 3 o'clock and our chart 0 is at 12. So add pi/2
+          /*
+            arctan gives us our angle, but 0 at 3 o'clock and our chart 0 is at 12. So add pi/2
+
+              -pi/2                         0
+               ____                        ____
+             .'    `.                    .'    `.
+            /        \                  /        \
+        pi |          | 0   -->  3pi/2 |          | pi/2
+            \        /                  \        /
+             `.____.'                    `.____.'
+               pi/2                         pi
+          */
           var angle = Math.atan2(e.y,e.x) + Math.PI / 2,
-              //arctan also gives us angle from -pi to pi; we want 0 to 2pi
+              //arctan also gives us angle from -pi to pi; we want 0 to 2pi, so check if it is still negative
               angle_2PI = angle < 0 ? angle + 2 * Math.PI : angle;
 
           this._dragging[d] = angle_2PI;
