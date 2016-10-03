@@ -1,3 +1,7 @@
+v0.5.2
+==================
+* fixed ordinal data parsing
+
 v0.5.1
 ==================
 * Fixed navigator line
