@@ -52,6 +52,7 @@ Element which draws lines series onto the chart
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.categories,
       PxVisBehaviorD3.selectedDomain,
+      PxVisBehaviorChart.polarData,
       commonColors
     ],
 
@@ -118,14 +119,7 @@ Element which draws lines series onto the chart
       strokeWidth: {
         type: Number,
         value: 1
-      },
-      /**
-       * whether the polar data should be interpreted clockwise or counter-clockwise
-       */
-      counterClockwise: {
-        type: Boolean,
-        value: false
-      },
+      }
     },
 
     observers: [
@@ -147,7 +141,7 @@ Element which draws lines series onto the chart
           var data = this.chartData;
           this._defineMultiLine(false);
         }  else if(this.radialLine) {
-          this._defineRadialLine(false, this.multiPath,  this.counterClockwise);
+          this._defineRadialLine(false, this.multiPath, this.counterClockwise, this.useDegrees);
           data = this.multiPath ? this.chartData : [this.chartData];
         } else {
           var data = [this.chartData];

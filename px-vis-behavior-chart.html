@@ -29,6 +29,8 @@ PxVisBehaviorChart.chartCommon = [{
       *         "type": "line",  //line or scatter
       *         "markerSymbol": "diamond" //if using scatter different markerSymbol can be used. See "markerSymbol" in px-vis-scatter
       *         "markerScale": "2" //if using scatter allows to scale the size of markers
+      *         "markerFillOpacity": "0.5" //if using scatter allows to specify the opacity of the inside of the marker
+      *         "markerStrokeOpacity": "1" //if using scatter allows to specify the opacity of the outside of the marker
       *         "name": "My Series",  //human readable name
       *         "x": "x",  //index or key name for independent variable
       *         "y": "y",  //index or key name for dependent variable
@@ -52,7 +54,9 @@ PxVisBehaviorChart.chartCommon = [{
         }
       },
       /**
-      * A default configuration file. It fills in the missing parts of seriesConfig.
+      * A default configuration file. It fills in the missing parts of seriesConfig. Any options from seriesConfig
+      * can be specified in the defaultSeriesConfig and will be automatically used if not defined in 
+      * the seriesConfig
       *
       */
       defaultSeriesConfig: {
@@ -119,6 +123,7 @@ PxVisBehaviorChart.chartCommon = [{
               obj[item] = {};
               return obj;
             }, {}),
+            defaultConfigProps = Object.keys(this.defaultSeriesConfig),
             xMins = [],
             xMaxes = [],
             yMins = [],
@@ -137,25 +142,20 @@ PxVisBehaviorChart.chartCommon = [{
             continue;
           }
 
-          if(!fullConfig[k[i]]['type']) {
-            fullConfig[k[i]]['type'] = this.defaultSeriesConfig['type'];
-          }
           if(!fullConfig[k[i]]['name']) {
             fullConfig[k[i]]['name'] = k[i];
-          }
-          if(!fullConfig[k[i]]['x']) {
-            fullConfig[k[i]]['x'] = this.defaultSeriesConfig['x'];
           }
           if(!fullConfig[k[i]]['color']) {
             fullConfig[k[i]]['color'] = this._getColor(i);
           }
 
-          //fill in units if they're not defined and defined in default config
-          if(!fullConfig[k[i]]['xAxisUnit'] && this.defaultSeriesConfig['xAxisUnit']) {
-            fullConfig[k[i]]['xAxisUnit'] = this.defaultSeriesConfig['xAxisUnit'];
-          }
-          if(!fullConfig[k[i]]['yAxisUnit'] && this.defaultSeriesConfig['yAxisUnit']) {
-            fullConfig[k[i]]['yAxisUnit'] = this.defaultSeriesConfig['yAxisUnit'];
+          //copy values from default config if needed
+          for(var j=0; j<defaultConfigProps.length; j++) {
+            var property = defaultConfigProps[j];
+
+            if(!fullConfig[k[i]][property] && this.defaultSeriesConfig[property]) {
+              fullConfig[k[i]][property] = this.defaultSeriesConfig[property];
+            }
           }
 
           if(fullConfig[k[i]]['xMin']) {
@@ -473,4 +473,67 @@ PxVisBehaviorChart.subConfiguration = {
       }
     },
 };
+
+PxVisBehaviorChart.polarData = {
+  properties: {
+    /**
+     * whether the polar data should be interpreted clockwise or counter-clockwise
+     */
+    counterClockwise: {
+      type: Boolean,
+      value: false
+    },
+    /**
+     * Whether the angle data should be processed as degrees, as opposed to be processed as radians
+     */
+    useDegrees: {
+      type: Boolean,
+      value: false
+    }
+  }
+};
+
+PxVisBehaviorChart.timeFiltering = [{
+  properties: {
+    /**
+     * Can be used to define a time domain to be used, typically to restrain/filter the amount
+     * of data displayed. Can be used in combination with a px-vis-chart-navigator
+     */
+    timeDomain: {
+      type: Array,
+      value: function() {
+        return [];
+      }
+    },
+    /**
+     * Name of the variable holding the time stamp in the data
+     */
+    timeData: {
+      type: String,
+      value: 'Timestamp'
+    },
+    /**
+     * Data that has been time filtered
+     */
+    _filteredData: {
+      type: Object,
+      computed: '_filterData(chartData, timeDomain, timeData)'
+    }
+  },
+  _filterData: function(chartData, timeDomain, timeData) {
+
+    if(timeDomain.x && timeDomain.x.length === 2) {
+      var min = Number(timeDomain.x[0]),
+          max = Number(timeDomain.x[1]);
+      return chartData.filter(function(val) {
+                var timeVal = Number(val[timeData]);
+                return timeVal >= min && timeVal <= max;
+              });
+    } else {
+      return chartData;
+    }
+  }
+}, PxVisBehavior.dataset];
+
+      
 </script>

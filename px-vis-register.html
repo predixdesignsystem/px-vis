@@ -75,7 +75,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
         id="registerWrap"
         class="inline--flex flex--col"
         style$="height:{{height}}px; width:[[width]]px">
-        <template is="dom-if" if="{{_isOfType(xAxisType,'time')}}">
+        <template is="dom-if" if="{{_displayDateTime(forceDateTimeDisplay, xAxisType)}}">
           <div id="dateTime">
             <span id="firstDateTime">{{_firstDateTime}}</span> <span>{{_separator}}</span> <span id="secondDateTime">{{_secondDateTime}}</span>  &nbsp;
           </div>
@@ -250,6 +250,13 @@ Formatting for the timestamps,the data values, and the series names can be contr
       usePercentage: {
         type: Boolean,
         value: false
+      },
+      /**
+       * Forces the use of the timestamp at the top
+       */
+      forceDateTimeDisplay: {
+        type: Boolean,
+        value: false
       }
     },
 
@@ -257,6 +264,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
       '_formatDateTime(tooltipData.*)',
       '_toggleSeries(mutedSeries.*)'
      ],
+
      _getWrapperClass: function(type) {
        var classList = 'flex ';
 
@@ -418,7 +426,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
     _returnVal: function(item, axis, separator) {
       var key = axis === 'x' ?
         this.completeSeriesConfig[item.name]['x'] : this.completeSeriesConfig[item.name]['y'];
-      if(item.value && item.value[key]) {
+      if(item.value && (item.value[key] || item.value[key] === 0)) {
         return item.value[key] + (separator ? separator : '');
       }
       return null;
@@ -430,7 +438,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
           axisKey = axis === 'x' ? this.completeSeriesConfig[key]['x'] : this.completeSeriesConfig[key]['y'],
           axisKey = usePercentage ? 'percentage' : axisKey;
 
-      if(item && item[axisKey]) {
+      if(item && (item[axisKey] || item[axisKey] === 0)) {
         return item[axisKey] + (separator ? separator : '');
       }
       return null;
@@ -452,6 +460,9 @@ Formatting for the timestamps,the data values, and the series names can be contr
     },
     _getPieBackColor: function(item, index) {
       return item.backgroundColor ? item.backgroundColor : this._getPieColorForIndex(index);
+    },
+    _displayDateTime: function(forceDateTimeDisplay, xAxisType) {
+      return forceDateTimeDisplay || this._isOfType(xAxisType,'time');
     }
   });
 </script>

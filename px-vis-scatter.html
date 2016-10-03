@@ -52,6 +52,7 @@ Element which draws scatter series onto the chart
       PxVisBehaviorD3.radialLineGenerator,
       PxVisBehavior.tooltipData,
       PxVisBehaviorD3.domainUpdate,
+      PxVisBehaviorChart.polarData,
       commonColors
     ],
 
@@ -93,6 +94,20 @@ Element which draws scatter series onto the chart
       markerSymbol: {
         type: String,
         value: 'circle'
+      },
+      /**
+       * The opacity of the fill (inside) of the marker
+       */
+      fillOpacity: {
+        type: Number,
+        value: 0.5
+      },
+      /**
+       * The opacity of the stroke (outside) of the marker
+       */
+      strokeOpacity: {
+        type: Number,
+        value: 1
       },
       _markerMapping: {
         type: Object,
@@ -149,11 +164,11 @@ Element which draws scatter series onto the chart
         value: false
       },
       /**
-       * whether the polar data should be interepreted clockwise or counter-clockwise
+       * Name of the variable holding the time stamp in the data. Used for non timeseries charts
        */
-      counterClockwise: {
-        type: Boolean,
-        value: false
+      timeData: {
+        type: String,
+        value: 'Timestamp'
       },
     },
 
@@ -187,6 +202,10 @@ Element which draws scatter series onto the chart
                               this.completeSeriesConfig[this.seriesId].markerSymbol : this.markerSymbol;
         this.markerScale = this.completeSeriesConfig[this.seriesId].markerScale ?
                               this.completeSeriesConfig[this.seriesId].markerScale : this.markerScale;
+        this.fillOpacity = this.completeSeriesConfig[this.seriesId].markerFillOpacity ?
+                              this.completeSeriesConfig[this.seriesId].markerFillOpacity : this.fillOpacity;
+        this.strokeOpacity = this.completeSeriesConfig[this.seriesId].markerStrokeOpacity ?
+                              this.completeSeriesConfig[this.seriesId].markerStrokeOpacity : this.strokeOpacity;
 
         // draw the path
         this.scatterGroup = this.svg.append('g')
@@ -195,7 +214,7 @@ Element which draws scatter series onto the chart
       }
 
       if(this.radial) {
-        this._defineRadialLine(false, this.multiPath, this.counterClockwise);
+        this._defineRadialLine(false, this.multiPath, this.counterClockwise, this.useDegrees);
       }
 
       var _this = this;
@@ -207,22 +226,22 @@ Element which draws scatter series onto the chart
 
       this.scatterBuilder.enter()
         .append('path')
+        .attr('d', Px.d3.symbol().type(this._markerMapping[this.markerSymbol]))
+        .on('mouseover', this._showTooltip.bind(this))
+        .on('mouseleave', this._hideTooltip.bind(this))
+      .merge(this.scatterBuilder)
+        .attr('fill',this.completeSeriesConfig[this.seriesId]['color'])
+        .attr('fill-opacity',this.fillOpacity)
+        .attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
+        .attr('stroke-opacity',this.strokeOpacity)
+        .attr('transform', this._applyTransform.bind(this))
         .attr('class', function(d,i){
           // if this series is missing a datapoint, remove that point
           if(isNaN(d[_this.completeSeriesConfig[_this.seriesId]['y']])){
             return this.remove();
           }
           return _this.markerSymbol;
-        })
-        .attr('d', Px.d3.symbol().type(this._markerMapping[this.markerSymbol]))
-        .on('mouseover', this._showTooltip.bind(this))
-        .on('mouseleave', this._hideTooltip.bind(this))
-      .merge(this.scatterBuilder)
-        .attr('fill',this.completeSeriesConfig[this.seriesId]['color'])
-        .attr('fill-opacity',0.6)
-        .attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
-        .attr('stroke-opacity',1)
-        .attr('transform', this._applyTransform.bind(this));
+        });
 
       this.scatterDots = this.scatterGroup.selectAll('path.' + this.markerSymbol);
 
@@ -233,7 +252,7 @@ Element which draws scatter series onto the chart
 
       // setup a holder for our data to pass out
       var dataObj = {
-        'time': null,
+        'time': d[this.timeData],
         'series': [],
         'mouse': [],
         'xArr': null,
@@ -243,8 +262,9 @@ Element which draws scatter series onto the chart
       xKey = this.completeSeriesConfig[this.seriesId].x,
       yKey = this.completeSeriesConfig[this.seriesId].y,
       box = paths[i].getBoundingClientRect(),
-      center = [box.left + box.width/2, box.top + box.height/2];;
+      center = [window.pageXOffset + box.left + box.width/2, window.pageYOffset + box.top + box.height/2];
 
+      //TODO: boolean to convert this to radians if someone wants radians in their tooltip
       values[xKey] = d[xKey];
       values[yKey] = d[yKey];
 
@@ -286,6 +306,10 @@ Element which draws scatter series onto the chart
      *
      */
     _applyTransform: function(d) {
+
+      if(isNaN(d[this.completeSeriesConfig[this.seriesId]['y']])){
+        return '';
+      }
 
       if(this.radial) { 
 
