@@ -100,14 +100,16 @@ Formatting for the timestamps,the data values, and the series names can be contr
                     <div class="seriesData" name$="R{{item.name}}">
                       <!-- if x axis is number format and show it -->
                       <template is="dom-if" if="{{_isOfType(xAxisType, 'linear')}}">
-                        <numbro-element
-                          value="[[_returnVal(item, 'x', '&nbsp;/&nbsp')]]"
-                          format="[[numberFormat]]"
-                          culture="[[numberFormatCulture]]"
-                          currency$="[[numberFormatIsCurrency]]"
-                          default-currency-format="[[numberFormatCurrency]]"
-                          zero-format="[[numberFormatZero]]">
-                        </numbro-element>
+                        <template is="dom-if" if="{{_returnVal(item, 'x')}}">
+                          <numbro-element
+                            value="[[_returnVal(item, 'x', '&nbsp;/&nbsp')]]"
+                            format="[[numberFormat]]"
+                            culture="[[numberFormatCulture]]"
+                            currency$="[[numberFormatIsCurrency]]"
+                            default-currency-format="[[numberFormatCurrency]]"
+                            zero-format="[[numberFormatZero]]">
+                          </numbro-element>
+                        </template>
                         <template is="dom-if" if="{{_returnVal(item, 'x')}}">{{_getXUnit(item, completeSeriesConfig.*)}}</template>
                         <template is="dom-if" if="[[_returnVal(item, 'x')]]">
                           &nbsp;/&nbsp
@@ -125,14 +127,16 @@ Formatting for the timestamps,the data values, and the series names can be contr
 
                       <!-- if y axis is number format and show it -->
                       <template is="dom-if" if="{{_isOfType(yAxisType, 'linear')}}">
-                        <numbro-element
-                          value="[[_returnVal(item, 'y')]]"
-                          format="[[numberFormat]]"
-                          culture="[[numberFormatCulture]]"
-                          currency$="[[numberFormatIsCurrency]]"
-                          default-currency-format="[[numberFormatCurrency]]"
-                          zero-format="[[numberFormatZero]]">
-                        </numbro-element>
+                        <template is="dom-if" if="{{_returnVal(item, 'x')}}">
+                          <numbro-element
+                            value="[[_returnVal(item, 'y')]]"
+                            format="[[numberFormat]]"
+                            culture="[[numberFormatCulture]]"
+                            currency$="[[numberFormatIsCurrency]]"
+                            default-currency-format="[[numberFormatCurrency]]"
+                            zero-format="[[numberFormatZero]]">
+                          </numbro-element>
+                        </template>
                       </template>
                       <!-- if y axis is ordinal just display it -->
                       <template is="dom-if" if="{{_isOfType(yAxisType, 'ordinal')}}">
