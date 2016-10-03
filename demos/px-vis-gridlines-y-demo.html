@@ -1,0 +1,156 @@
+<link rel="import" href="../../polymer/polymer.html">
+
+<link rel="import" href="../px-vis-scale.html">
+<link rel="import" href="../px-vis-svg.html">
+<link rel="import" href="../px-vis-gridlines.html">
+
+<dom-module id="px-vis-gridlines-y-demo">
+  <link rel="import" type="css" href="../css/px-vis-demo.css"/>
+  <template>
+    <p class="epsilon demo__title">px-vis-gridlines-y</p>
+    <div class="demo u-p+">
+      <div class="outline">
+
+      <!-- need for gridlines-y -->
+        <px-vis-svg
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          svg="{{svg}}">
+        </px-vis-svg>
+        <px-vis-scale
+          x-axis-type="time"
+          y-axis-type="linear"
+          complete-series-config="[[seriesConfig]]"
+          chart-extents="[[chartExtents]]"
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          chart-data={{chartData}}
+          x="{{x}}"
+          y="{{y}}"
+          domain-changed='{{domainChanged}}'
+          current-domain-x="{{currentDomainX}}"
+          current-domain-y="{{currentDomainY}}"
+          selected-domain="[[selectedDomain]]">
+        </px-vis-scale>
+        <px-vis-gridlines
+          svg="[[svg]]"
+          axis="[[y]]"
+          margin="[[margin]]"
+          length="[[width]]"
+          orientation="left"
+          current-domain="[[currentDomainY]]">
+        </px-vis-gridlines>
+
+      </div>
+      <div class="demo__discription">
+        <p class="u-mt0">Chart gridlines can be added to either the x or the y axis  </p>
+      </div>
+    </div>
+    <div>
+      <px-demo-snippet
+        element-properties="[[elempropGridlinesY]]"
+        element-name="px-vis-gridlines">
+      </px-demo-snippet>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: "px-vis-gridlines-y-demo",
+      properties:{
+        //basics
+        width: {
+          type : Number,
+          value : 500
+        },
+        height:{
+          type : Number,
+          value : 200
+        },
+        margin:{
+          type : Object,
+          value : {
+            "top": 10,
+            "right": 10,
+            "bottom": 10,
+            "left": 10
+          }
+        },
+        chartData:{
+          type : Array,
+          value : [{
+              'x': 1397102460000,
+              'y': 0.56
+            },{
+              'x': 1397139660000,
+              'y': 0.4
+            },{
+              'x': 1397177400000,
+              'y': 0.43
+            },{
+              'x': 1397228040000,
+              'y': 0.33
+            },{
+              'x': 1397248260000,
+              'y': 0.47
+            },{
+              'x': 1397291280000,
+              'y': 0.41
+            },{
+              'x': 1397318100000,
+              'y': 0.26
+            },{
+              'x': 1397342100000,
+              'y': 0.42
+            },{
+              'x': 1397390820000,
+              'y': 0.27
+            },{
+              'x': 1397408100000,
+              'y': 0.38
+            },{
+              'x': 1397458800000,
+              'y': 0.36
+            },{
+              'x': 1397522940000,
+              'y': 0.32
+          }]
+        },
+        seriesConfig:{
+          type : Object,
+          value: {
+            'mySeries': {
+              "name":"My-Series",
+              "type": "line",
+              "x": 'x',
+              "y": 'y',
+              'color': "rgb(93,165,218)"
+            }
+          }
+        },
+        //chartExtents
+        chartExtents:{
+          type : Object,
+          value: {
+            "x": [Infinity,-Infinity],
+            "y": [0,-Infinity]
+          }
+        },
+        // demo snippet
+        elempropGridlinesY:{
+          type : Object,
+          value:{
+            "svg":"[[svg]]",
+            "axis":"[[y]]",
+            "margin":"[[margin]]",
+            "length":"[[width]]",
+            "orientation":"left",
+            "currentDomain":"[[currentDomainY]]"
+          }
+        }
+      }
+    });
+  </script>
+</dom-module>

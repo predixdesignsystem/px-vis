@@ -1,13 +1,135 @@
 <!doctype html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>px-vis API</title>
-        <script src="../webcomponentsjs/webcomponents-lite.min.js"></script>
-        <link rel="import" href="../iron-component-page/iron-component-page.html"/>
-    </head>
-    <body>
-        <iron-component-page src="px-vis.html" active="px-vis"></iron-component-page>
-    </body>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>px-vis</title>
+  <link rel="stylesheet" type="text/css" href="css/px-vis-demo.css"/>
+  <!-- Import custom element. Note: see comment about relative paths to dependencies in the *.html file referenced below -->
+  <script src="../webcomponentsjs/webcomponents-lite.js"></script>
+
+  <link rel="import" href="../px-theme/px-theme-styles.html">
+  <style include="px-theme-styles" is="custom-style"></style>
+
+  <link rel="icon" href="favicon.ico" type="image/x-icon"/>
+  <link rel="import" href="../px-demo-snippet/px-demo-snippet.html"/>
+  <link rel="import" href="../px-polymer-font-awesome/polymer-font-awesome.html" />
+  <link rel="import" href="../px-datetime-common/px-datetime-imports.html">
+  <link rel="import" href="../px-api-viewer/px-api-viewer.html" />
+
+  <link rel="import" href="demos/px-vis-svg-demo.html">
+  <link rel="import" href="demos/px-vis-scale-demo.html">
+  <link rel="import" href="demos/px-vis-line-demo.html">
+  <link rel="import" href="demos/px-vis-scatter-demo.html">
+  <link rel="import" href="demos/px-vis-axis-x-demo.html">
+  <link rel="import" href="demos/px-vis-axis-y-demo.html">
+  <link rel="import" href="demos/px-vis-gridlines-x-demo.html">
+  <link rel="import" href="demos/px-vis-gridlines-y-demo.html">
+  <link rel="import" href="demos/px-vis-event-demo.html">
+  <link rel="import" href="demos/px-vis-threshold-demo.html">
+  <link rel="import" href="demos/px-vis-interaction-space-demo.html">
+  <link rel="import" href="demos/px-vis-cursor-demo.html">
+  <link rel="import" href="demos/px-vis-register-horizontal-demo.html">
+  <link rel="import" href="demos/px-vis-register-vertical-demo.html">
+  <link rel="import" href="demos/px-vis-register-dynamic-demo.html">
+  <link rel="import" href="demos/px-vis-tooltip-demo.html">
+  <link rel="import" href="demos/px-vis-zoom-demo.html">
+  <link rel="import" href="demos/px-vis-chart-navigator-demo.html">
+  <link rel="import" href="demos/px-vis-data-converter-demo.html">
+
+  </head>
+<body>
+  <!-- Wrap elements with auto-binding template to -->
+  <!-- allow use of Polymer bindings in main document -->
+
+    <!-- discription -->
+    <div class="hero u-p++ text--shadow">
+      <a class="actionable flex flex--right flex--middle" href="https://github.com/PredixDev/px-vis" target="_blank"><iron-icon class="menu__open" icon="fa:fa-github"></iron-icon>View on Github</a>
+  		<h1 class="delta">px-vis</h1>
+      <div class="description-text">
+    		<p>
+          px-vis is a visualzation framework.
+        </p>
+        <p>It is a set of base components to provide the ability to create charts. These components come "wrapped" into charts in px-vis-[[chartType]] repos. These base components can be used to create custom chart types and/or mixed with standard d3 methods.</p>
+        <p>At a very least, all charts need an svg component, an interpretor component, such as scale, and a drawing component.</p>
+        <p>All components are built to support the Precipitation Pattern. Declarative bindings also work.</p>
+      </div>
+  		<div class="flex">
+  			<img class="u-mr--" src="https://img.shields.io/travis/PredixDev/px-vis.svg?style=flat-square" alt="Travis" onerror="this.style.display='none'"/>
+  			<img class="u-mr--" src="https://img.shields.io/bower/v/px-vis.svg?style=flat-square" alt="Bower" onerror="this.style.display='none'"/>
+  			<img class="u-mr--" src="https://img.shields.io/github/issues-raw/PredixDev/px-vis.svg?style=flat-square" alt="Issues" onerror="this.style.display='none'"/>
+  		</div>
+  	</div>
+
+    <!-- mega demo -->
+    <div class="mega-demo u-p++">
+
+      <px-vis-svg-demo></px-vis-svg-demo>
+      <br/>
+      <px-vis-scale-demo></px-vis-scale-demo>
+      <br/>
+      <px-vis-line-demo></px-vis-line-demo>
+      <br/>
+      <px-vis-scatter-demo></px-vis-scatter-demo>
+      <br/>
+      <px-vis-axis-x-demo></px-vis-axis-x-demo>
+      <br/>
+      <px-vis-axis-y-demo></px-vis-axis-y-demo>
+      <br/>
+      <px-vis-gridlines-y-demo></px-vis-gridlines-y-demo>
+      <br/>
+      <px-vis-gridlines-x-demo></px-vis-gridlines-x-demo>
+      <br/>
+      <px-vis-event-demo></px-vis-event-demo>
+      <br/>
+      <px-vis-threshold-demo></px-vis-threshold-demo>
+      <br/>
+      <px-vis-interaction-space-demo></px-vis-interaction-space-demo>
+      <br/>
+      <px-vis-cursor-demo></px-vis-cursor-demo>
+      <br/>
+      <px-vis-register-horizontal-demo></px-vis-register-horizontal-demo>
+      <br/>
+      <px-vis-register-vertical-demo></px-vis-register-vertical-demo>
+      <br/>
+      <px-vis-register-dynamic-demo></px-vis-register-dynamic-demo>
+      <br/>
+      <px-vis-tooltip-demo></px-vis-tooltip-demo>
+      <br/>
+      <px-vis-zoom-demo></px-vis-zoom-demo>
+      <br/>
+      <px-vis-chart-navigator-demo></px-vis-chart-navigator-demo>
+      <br/>
+      <px-vis-data-converter-demo></px-vis-data-converter-demo>
+      <br/>
+
+    </div>
+    <div class="apiContainer">
+      <div class="flex flex--col api u-mt++" >
+        <div>
+          <px-api-viewer source="px-vis"></px-api-viewer>
+        </div>
+      </div>
+    </div>
+    <footer class="footer flex flex--center">
+      <div class="footer__container u-pv++">
+        <div>
+          <a href="https://ge.com/digital" >
+            <img src="monogram-wdmk.png" alt="GE Monogram" class="footer__img">
+          </a>
+        </div>
+        <div class="footer__list">
+          <ul class="list-inline list-inline--delimited">
+            <li>
+              <a href="http://predix.io/legal" class="footer__list--lnk">Legal</a>
+            </li>
+            <li>
+              <a href="mailto:info@predix.io" class="footer__list--lnk">Contact Us</a>
+            </li>
+            <li>Copyright &copy; 2016 General Electric Company. All rights reserved.</li>
+          </ul>
+        </div>
+      </div>
+    </footer>
+</body>
 </html>

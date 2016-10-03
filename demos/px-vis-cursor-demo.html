@@ -1,0 +1,179 @@
+<link rel="import" href="../../polymer/polymer.html">
+
+<link rel="import" href="../px-vis-scale.html">
+<link rel="import" href="../px-vis-svg.html">
+<link rel="import" href="../px-vis-cursor.html">
+<link rel="import" href="../px-vis-interaction-space.html">
+
+<dom-module id="px-vis-cursor-demo">
+  <link rel="import" type="css" href="../css/px-vis-demo.css"/>
+  <template>
+    <p class="epsilon demo__title">px-vis-cursor</p>
+    <div class="demo u-p+">
+      <div class="outline">
+
+        <!-- need for cursor -->
+        <px-vis-svg
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          svg="{{svg}}">
+        </px-vis-svg>
+        <px-vis-scale
+          x-axis-type="time"
+          y-axis-type="linear"
+          complete-series-config="[[seriesConfig]]"
+          chart-extents="[[chartExtents]]"
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          chart-data={{chartData}}
+          x="{{x}}"
+          y="{{y}}"
+          current-domain-x="{{currentDomainX}}"
+          current-domain-y="{{currentDomainY}}"
+          selected-domain="[[selectedDomain]]">
+        </px-vis-scale>
+        <px-vis-interaction-space
+          x-axis-type="time"
+          svg="[[svg]]"
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          complete-series-config="[[seriesConfig]]"
+          chart-data="[[chartData]]"
+          tooltip-data={{tooltipData}}
+          extents-data={{extentsData}}
+          x="[[x]]"
+          y="[[y]]"
+          current-domain-x="[[currentDomainX]]"
+          current-domain-y="[[currentDomainY]]">
+        </px-vis-interaction-space>
+        <px-vis-cursor
+          svg="[[svg]]"
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          complete-series-config="[[seriesConfig]]"
+          chart-data="[[chartData]]"
+          horizontal-line="full"
+          vertical-line="full"
+          circle-point="yes"
+          tooltip-data="[[tooltipData]]">
+        </px-vis-cursor>
+
+      </div>
+      <div class="demo__discription">
+        <p class="u-mt0">The cursor provides an on-chart reticule on-hover. Hover your mouse over the chart to see it in action. Cursor requires a <strong>px-vis-interaction-space</strong> which provides the mouseover data.</p>
+      </div>
+    </div>
+    <div>
+      <px-demo-snippet
+        element-properties="[[elempropCursor]]"
+        element-name="px-vis-cursor">
+      </px-demo-snippet>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: "px-vis-cursor-demo",
+      properties:{
+        //basics
+        width: {
+          type : Number,
+          value : 500
+        },
+        height:{
+          type : Number,
+          value : 200
+        },
+        margin:{
+          type : Object,
+          value : {
+            "top": 10,
+            "right": 10,
+            "bottom": 10,
+            "left": 10
+          }
+        },
+        chartData:{
+          type : Array,
+          value : [{
+              'x': 1397102460000,
+              'y': 0.56
+            },{
+              'x': 1397139660000,
+              'y': 0.4
+            },{
+              'x': 1397177400000,
+              'y': 0.43
+            },{
+              'x': 1397228040000,
+              'y': 0.33
+            },{
+              'x': 1397248260000,
+              'y': 0.47
+            },{
+              'x': 1397291280000,
+              'y': 0.41
+            },{
+              'x': 1397318100000,
+              'y': 0.26
+            },{
+              'x': 1397342100000,
+              'y': 0.42
+            },{
+              'x': 1397390820000,
+              'y': 0.27
+            },{
+              'x': 1397408100000,
+              'y': 0.38
+            },{
+              'x': 1397458800000,
+              'y': 0.36
+            },{
+              'x': 1397522940000,
+              'y': 0.32
+          }]
+        },
+        seriesConfig:{
+          type : Object,
+          value: {
+            'mySeries': {
+              "name":"My-Series",
+              "type": "line",
+              "x": 'x',
+              "y": 'y',
+              'color': "rgb(93,165,218)"
+            }
+          }
+        },
+        //chartExtents
+        chartExtents:{
+          type : Object,
+          value: {
+            "x": [Infinity,-Infinity],
+            "y": [0,-Infinity]
+          }
+        },
+        // demo snippet
+        elempropCursor:{
+          type : Object,
+          value:{
+            "svg":"[[svg]]",
+            "width":"[[width]]",
+            "height":"[[height]]",
+            "margin":"[[margin]]",
+            "completeSeriesConfig":"[[seriesConfig]]",
+            "chartData":"[[chartData]]",
+            "horizontalLine":"full",
+            "verticalLine":"full",
+            "circlePoint":"yes",
+            "tooltipData":"[[tooltipData]]"
+          }
+        }
+      }
+    });
+  </script>
+</dom-module>

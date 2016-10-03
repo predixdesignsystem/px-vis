@@ -1,0 +1,167 @@
+<link rel="import" href="../../polymer/polymer.html">
+
+<link rel="import" href="../px-vis-scale.html">
+<link rel="import" href="../px-vis-svg.html">
+<link rel="import" href="../px-vis-axis.html">
+
+<dom-module id="px-vis-axis-x-demo">
+  <link rel="import" type="css" href="../css/px-vis-demo.css"/>
+  <template>
+    <p class="epsilon demo__title">px-vis-axis: x-axis</p>
+    <div class="demo u-p+">
+      <div class="outline">
+
+      <!-- need for axis-x -->
+        <px-vis-svg
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          svg="{{svg}}">
+        </px-vis-svg>
+        <px-vis-scale
+          x-axis-type="time"
+          y-axis-type="linear"
+          complete-series-config="[[seriesConfig]]"
+          chart-extents="[[chartExtents]]"
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          chart-data={{chartData}}
+          x="{{x}}"
+          y="{{y}}"
+          domain-changed="{{domainChanged}}"
+          current-domain-x="{{currentDomainX}}"
+          current-domain-y="{{currentDomainY}}"
+          selected-domain="[[selectedDomain]]">
+        </px-vis-scale>
+        <px-vis-axis
+          svg="[[svg]]"
+          axis="[[x]]"
+          margin="[[margin]]"
+          height="[[height]]"
+          title="myTitle"
+          orientation="bottom"
+          label-position="after"
+          complete-series-config="[[seriesConfig]]"
+          prevent-series-bar
+          domain-changed="[[domainChanged]]"
+          current-domain="[[currentDomainX]]">
+        </px-vis-axis>
+
+      </div>
+      <div class="demo__discription">
+        <p class="u-mt0">Example of an axis drawing object. </p>
+        <p>The axis drawing object can draw both x and y axis. This example draws an x-axis.</p>
+      </div>
+    </div>
+    <div>
+      <px-demo-snippet
+        element-properties="[[elempropAxisX]]"
+        element-name="px-vis-axis-x">
+      </px-demo-snippet>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: "px-vis-axis-x-demo",
+      properties:{
+        //basics
+        width: {
+          type : Number,
+          value : 500
+        },
+        height:{
+          type : Number,
+          value : 200
+        },
+        margin:{
+          type : Object,
+          value : {
+            "top": 10,
+            "right": 20,
+            "bottom": 50,
+            "left": 10
+          }
+        },
+        chartData:{
+          type : Array,
+          value : [{
+              'x': 1397102460000,
+              'y': 0.56
+            },{
+              'x': 1397139660000,
+              'y': 0.4
+            },{
+              'x': 1397177400000,
+              'y': 0.43
+            },{
+              'x': 1397228040000,
+              'y': 0.33
+            },{
+              'x': 1397248260000,
+              'y': 0.47
+            },{
+              'x': 1397291280000,
+              'y': 0.41
+            },{
+              'x': 1397318100000,
+              'y': 0.26
+            },{
+              'x': 1397342100000,
+              'y': 0.42
+            },{
+              'x': 1397390820000,
+              'y': 0.27
+            },{
+              'x': 1397408100000,
+              'y': 0.38
+            },{
+              'x': 1397458800000,
+              'y': 0.36
+            },{
+              'x': 1397522940000,
+              'y': 0.32
+          }]
+        },
+        seriesConfig:{
+          type : Object,
+          value: {
+            'mySeries': {
+              "name":"My-Series",
+              "type": "line",
+              "x": 'x',
+              "y": 'y',
+              'color': "rgb(93,165,218)"
+            }
+          }
+        },
+        //chartExtents
+        chartExtents:{
+          type : Object,
+          value: {
+            "x": [Infinity,-Infinity],
+            "y": [0,-Infinity]
+          }
+        },
+        // demo snippet
+        elempropAxisX:{
+          type : Object,
+          value:{
+            "svg":"[[svg]]",
+            "axis":"[[x]]",
+            "margin":"[[margin]]",
+            "height":"[[height]]",
+            "title":"myTitle",
+            "orientation":"bottom",
+            "labelPosition":"after",
+            "completeSeriesConfig":"[[seriesConfig]]",
+            "preventSeriesBar":"true",
+            "domainChanged":"[[domainChanged]]",
+            "currentDomain":"[[currentDomainX]]",
+          }
+        }
+      }
+    });
+  </script>
+</dom-module>
