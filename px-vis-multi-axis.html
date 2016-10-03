@@ -59,7 +59,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           domain-changed="[[_internalDimensionsChanged]]"
           selected-domain="[[selectedDomain]]"
           title-truncation
-          disable-ticks="[[_calcDisableTicks(index)]]"
+          disable-ticks="[[_calcDisableTicks(item,recalcTicks)]]"
           label-position="[[labelPosition]]"
           axis-color="[[axisColor]]"
           ticks="[[ticks]]"
@@ -246,6 +246,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         value: null
       },
       _pokeTitleLocation: {
+        type: Boolean,
+        value: false
+      },
+      recalcTicks: {
         type: Boolean,
         value: false
       }
@@ -465,9 +469,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
      * Do the same thing for gridlines once
      *
      */
-    _calcDisableTicks: function(index) {
+    _calcDisableTicks: function(item) {
       if(this.labelOneAxis) {
-        return index === 0 ? false : true;
+        //check index of dimentions so it still works when we drag an axis
+        return this.dimensions.indexOf(item) === 0 ? false : true;
       }
       return false;
     },
@@ -507,6 +512,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           this.axisGroups.selectAll('.hideCommon').style('display',null);
           this.axisGroups.selectAll('.hideCommon').classed('hideCommon',false);
         }
+
+        this.set('recalcTicks', !this.recalcTicks);
       }
     },
     /*

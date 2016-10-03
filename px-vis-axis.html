@@ -182,7 +182,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         },
 
         observers: [
-          'drawElement(domainChanged,svg,axis,margin,height)',
+          'drawElement(domainChanged,svg,axis,margin,height,disableTicks)',
           'drawSeriesBars(completeSeriesConfig.*, titleDrawn)',
           '_muteSeriesBars(mutedSeries.*)',
           '_titleChanged(displayedTitle, _axisGroup, titleLocation.*)',
@@ -308,7 +308,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          */
         drawElement: function() {
         //  this.debounce('drawAxis', function() {
-            if(this.svg.node() && this.domainChanged !== null){
+            if(this.svg.node() && this.domainChanged !== null) {
+              console.log(this.disableTicks)
               this.defineAxis();
 
               // TODO unify my orientation checks
