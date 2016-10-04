@@ -220,6 +220,9 @@ Element which draws scatter series onto the chart
         this.scatterGroup = this.svg.append('g')
           .attr('series-id', 'scatter_' + this.seriesId)
           .attr('class', 'series-scatter');
+
+        //send empty tooltip data so the register shows up
+        this._hideTooltip();
       }
 
       if(this.radial) {
@@ -284,6 +287,15 @@ Element which draws scatter series onto the chart
       this.fire('px-vis-scatter-request-tooltip', {'show': true, 'mouseCoords': center});
     },
     _hideTooltip: function(d) {
+      var dataObj = {
+        'time': null,
+        'series': [{'name': this.seriesId, 'value':null}],
+        'mouse': [],
+        'xArr': null,
+        'yArr': null
+      };
+      this.set('tooltipData',dataObj);
+      this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
       this.fire('px-vis-scatter-request-tooltip', {'show': false});
     },
     /**
