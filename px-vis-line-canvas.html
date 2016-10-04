@@ -93,12 +93,19 @@ Element which draws lines series onto the chart
        _progressiveRenderingCounter: {
          type: Number,
          value: 0
-       }
+       },
+       /**
+       * the opacity value of the fill to be used when muting a serie (stroke is not drawn on mute)
+       */
+      mutedOpacity: {
+        type: Number,
+        value: 0.3
+      }
     },
 
     observers: [
       'drawCanvas(canvasContext,domainChanged,chartData.*,completeSeriesConfig.*,_canvasRedraw)',
-      'isIdInMuted(mutedSeries.*, completeSeriesConfig)'
+      'mutedChanged(mutedSeries.*, completeSeriesConfig)'
      ],
 
     /**
@@ -121,6 +128,10 @@ Element which draws lines series onto the chart
           this._defineSingleLine(true);
           data = this.chartData;
         }
+
+        //make sure we have the right muted opacity
+        this.mutedOpacity = this.completeSeriesConfig[this.seriesId].mutedOpacity ?
+                              this.completeSeriesConfig[this.seriesId].mutedOpacity : this.mutedOpacity;
 
         // We need to track which lines we have drawn and which we want to draw.
         // If a line is not currently in our list, add it
@@ -162,12 +173,12 @@ Element which draws lines series onto the chart
         //if gradient, regardless of category or not
         // Iterate over our data:
         for(var i = 0; i < data.length; i++) {
-          // Check to see if it is "muted"; if not, draw a line
-          if(!this.mutedSeries[data[i][this.seriesId]]) {
 
+          var opacity = this._isSerieMuted(data[i]) ? this.mutedOpacity : this._opacityLine(data[i]);
+          if(opacity !== 0) {
             // start a path and reset the styles for this one path
             this.canvasContext.beginPath();
-            this.canvasContext.strokeStyle = this._canvasLineColor(data[i],this._opacityLine(data[i]));
+            this.canvasContext.strokeStyle = this._canvasLineColor(data[i],opacity);
             // use the line generator to create the line
             this.line(data[i]);
             // draw it to the canvas; cant wait until the end or else they all have the same style
@@ -179,11 +190,12 @@ Element which draws lines series onto the chart
         // Yes, this repeates the if above but I dont really want it checking an if 20k times to see if it should apply a gradient or not.
         // Iterate over our data:
         for(var i = 0; i < data.length; i++){
+          var opacity = this._isSerieMuted(data[i]) ? this.mutedOpacity : 1;
           // Check to see if it is "muted"; if not, draw a line
-          if(!this.mutedSeries[data[i][this.seriesId]]){
+          if(opacity !== 0) {
             // start a path and reset the styles for this one path
             this.canvasContext.beginPath();
-            this.canvasContext.strokeStyle = this._canvasLineColor(data[i],1);
+            this.canvasContext.strokeStyle = this._canvasLineColor(data[i],opacity);
             // use the line generator to create the line
             this.line(data[i]);
             // draw it to the canvas; cant wait until the end or else they all have the same style
@@ -195,12 +207,13 @@ Element which draws lines series onto the chart
         this.canvasContext.beginPath();
         // iterate through the data
         for(var i = 0; i < data.length; i++){
-          // if the series is not listed or it is false, draw it
-          if(!this.mutedSeries[data[i][this.seriesId]]){
+          var opacity = this._isSerieMuted(data[i]) ? this.mutedOpacity : 1;
+          // Check to see if it is "muted"; if not, draw a line
+          if(opacity !== 0) {
             this.line(data[i]);
           }
           // Apply our styles and draw all the lines to the canvas
-          this.canvasContext.strokeStyle = this.completeSeriesConfig[this.seriesId]['color'];
+          this.canvasContext.strokeStyle = this.rgbToRgba(this.completeSeriesConfig[this.seriesId]['color'], opacity);
 
         }
         this.canvasContext.stroke();
@@ -265,11 +278,13 @@ Element which draws lines series onto the chart
           return;
         }
 
-        var d = batches[currentIndex];
+        var d = batches[currentIndex],
+            color;
         for(var i = 0; i < d.length; i++) {
-          if(!_this.mutedSeries[d[i][_this.seriesId]]) {
+          color = getColorValue(d[i]);
+          if(color) {
             _this.canvasContext.beginPath();
-            _this.canvasContext.strokeStyle = getColorValue(d[i]);
+            _this.canvasContext.strokeStyle = color;
             _this.line(d[i]);
             _this.canvasContext.stroke();
           }
@@ -287,7 +302,7 @@ Element which draws lines series onto the chart
         }
       };
 
-      //all  lines in 1 stroke
+      //1 stroke per serie
       var processGenericDataSlice = function() {
 
         if(currentRenderingCounter !== _this._progressiveRenderingCounter) {
@@ -296,14 +311,19 @@ Element which draws lines series onto the chart
           return;
         }
 
-        var d = batches[currentIndex];
+        var d = batches[currentIndex],
+            opacity;
         _this.canvasContext.beginPath();
+        
         for(var i = 0; i < d.length; i++) {
-          if(!_this.mutedSeries[d[i][_this.seriesId]]) {
+          
+          opacity = _this._isSerieMuted(d) ? _this.mutedOpacity : 1;
+          if(opacity !== 0) {
             _this.line(d[i]);
           }
         }
-        _this.canvasContext.strokeStyle = _this.completeSeriesConfig[_this.seriesId]['color'];
+
+        _this.canvasContext.strokeStyle = _this.rgbToRgba(_this.completeSeriesConfig[_this.seriesId]['color'], opacity);
         _this.canvasContext.stroke();
 
         currentIndex++;
@@ -324,13 +344,23 @@ Element which draws lines series onto the chart
       if(this.gradientLine) {
         //gradient line
         getColorValue = function(d) {
-          return _this._canvasLineColor(d, _this._opacityLine(d));
+          var opacity = _this._isSerieMuted(d) ? _this.mutedOpacity : _this._opacityLine(d);
+          if(opacity !== 0) {
+            return _this._canvasLineColor(d, opacity);
+          } else {
+            return null;
+          }
         };
         processFunction = processColoredDataSlice;
       } else if(this.categoryKey) {
         //category color line
         getColorValue = function(d) {
-          return _this._canvasLineColor(d, 1);
+          var opacity = _this._isSerieMuted(d) ? _this.mutedOpacity : 1;
+          if(opacity !== 0) {
+            return _this._canvasLineColor(d, opacity);
+          } else {
+            return null;
+          }
         };
         processFunction = processColoredDataSlice;
       } else {
@@ -354,12 +384,18 @@ Element which draws lines series onto the chart
      * Checks mutedSeries to see if this ID is in there
      * Called from an observer watching mutedSeries
      *
-     * @method isIdInMuted
+     * @method mutedChanged
      */
-    isIdInMuted: function() {
+    mutedChanged: function() {
       this.set('_canvasRedraw', !this._canvasRedraw);
     },
-
+    _isSerieMuted(d) {
+      if(this.multiPath) {
+        return this.mutedSeries[d[this.seriesId]] ? true : false;
+      } else {
+        return this.mutedSeries[this.seriesId] ? true : false;
+      }
+    },
     /**
      * Returns the correct rgba to use for the canvas line.
      *
@@ -373,6 +409,14 @@ Element which draws lines series onto the chart
         return 'rgba(' + this._colorArr[key]['r'] + ',' + this._colorArr[key]['g'] + ',' + this._colorArr[key]['b'] + ',' + opacity + ')';
       }
       return null;
+    },
+    rgbToRgba(rgb, opacity) {
+      //assuming rgb is correctly formatted...
+      //remove ')'
+      var result = rgb.slice(0,rgb.length-1);
+      //add 'a' for 'rgba'
+      result = 'rgba' + result.slice(3);
+      return result + ',' + opacity + ')';
     }
   });
 </script>
