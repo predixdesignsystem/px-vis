@@ -283,7 +283,7 @@ This element draw the box over the axis signifying the active area to mute the s
       //check the size of the box and make sure it is some min
       if((sel[1] - sel[0]) < 4) {
         // increase size of extents while checking if we hit the top
-        var ext = (sel[0] - 4) < 0 ? [ sel[0] , sel[1] + 4 ] : [ sel[0] -4 , sel[1] ];
+        var ext = (sel[0] - 4 - this.centerOffset) < 0 ? [ sel[0] , sel[1] + 4 ] : [ sel[0] -4 , sel[1] ];
         // increase size of box
         elem.call(this._brush.move, ext);
 
@@ -322,11 +322,11 @@ This element draw the box over the axis signifying the active area to mute the s
 
           for(var i = 0; i < this.chartData.length; i++){
             if(this.brushToRemove){
-              if(y0 < this.chartData[i][dim] && this.chartData[i][dim] < y1){
+              if(y0 <= this.chartData[i][dim] && this.chartData[i][dim] <= y1){
                 series[this.chartData[i][this.seriesKey]] = true;
               }
             } else {
-              if(y0 > this.chartData[i][dim] || this.chartData[i][dim] > y1){
+              if(y0 >= this.chartData[i][dim] || this.chartData[i][dim] >= y1){
                 series[this.chartData[i][this.seriesKey]] = true;
               }
             }
