@@ -1,3 +1,7 @@
+v0.5.4
+==================
+* Fix for reordering axes on radial with 3 axes
+
 v0.5.3
 ==================
 * exposed mutedOpacity in seriesConfig and ensure muting wors in all scenarios (canvas, svg, progressive rendering...)
