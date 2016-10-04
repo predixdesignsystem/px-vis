@@ -1,3 +1,12 @@
+v0.5.4
+==================
+* Fix register mutedSeries when ID has a '.'
+* Changed series config in chart behavior so it doesnt require x and y
+
+v0.5.4
+==================
+* Fix for reordering axes on radial with 3 axes
+
 v0.5.3
 ==================
 * exposed mutedOpacity in seriesConfig and ensure muting wors in all scenarios (canvas, svg, progressive rendering...)
