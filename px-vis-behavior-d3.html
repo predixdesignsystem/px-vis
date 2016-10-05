@@ -900,6 +900,12 @@ PxVisBehaviorD3.radialLineGenerator = [{
 
       var processAngle;
 
+      if(this.interpolationFunction === 'bofCompleteManually') {
+        //manually complete the circle.
+        // if we use a d3 interpolator, it adds 'Z' to the path which cause all broken paths to complete. We want to keep broken paths broken
+        dims.push(dims[0]);
+      }
+
       path = Px.d3.radialLine()
       .angle(function(d) {
         return _this.x(d[0]) * clockwiseFactor;
@@ -953,7 +959,7 @@ PxVisBehaviorD3.radialLineGenerator = [{
       }
     }
 
-    if(this.interpolationFunction) {
+    if(typeof this.interpolationFunction === 'function') {
       path.curve(this.interpolationFunction);
     }
 
