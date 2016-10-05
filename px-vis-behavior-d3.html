@@ -873,7 +873,7 @@ PxVisBehaviorD3.radialAxisConfig = {
     @polymerBehavior PxVisBehaviorD3.radialLineGenerator
 */
 PxVisBehaviorD3.radialLineGenerator = [{
-  
+
   properties: {
     /**
     * A holder object for the line generator
@@ -892,9 +892,9 @@ PxVisBehaviorD3.radialLineGenerator = [{
     var _this = this,
         renderToCanvas = (typeof(toCanvas) !== 'undefined') ? toCanvas : false,
         dims = this.completeSeriesConfig[this.seriesId]['x'],
-    path,
-    line,
-    clockwiseFactor = counterClockwise ? -1 : 1;
+        path,
+        line,
+        clockwiseFactor = counterClockwise ? -1 : 1;
 
     if(multiLine) {
 
@@ -908,7 +908,7 @@ PxVisBehaviorD3.radialLineGenerator = [{
           // ~~ --> round pixels values to optimize svg perfs
         return ~~_this.y(Number(d[1]));
       }).defined(function(d) {
-        return d;
+        return !isNaN(_this.x(d[0])) && !isNaN(_this.y(Number(d[1])));
       });
 
       //be sneaky: iterate through the data like normal
@@ -927,7 +927,7 @@ PxVisBehaviorD3.radialLineGenerator = [{
       var xId = this.completeSeriesConfig[this.seriesId]['x'],
           yId = this.completeSeriesConfig[this.seriesId]['y'],
           processAngle;
-      
+
       if(useDegrees) {
         processAngle = function(d) {
           return d[xId] * clockwiseFactor;
@@ -940,7 +940,6 @@ PxVisBehaviorD3.radialLineGenerator = [{
 
       path = Px.d3.radialLine()
       .angle(function(d) {
-
         return processAngle(d);
       })
       .radius(function(d) {

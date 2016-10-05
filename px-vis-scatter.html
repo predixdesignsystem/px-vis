@@ -1,5 +1,5 @@
 <link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-chart.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="../px-colors-design/colors.html" />
 
@@ -94,6 +94,13 @@ Element which draws scatter series onto the chart
       markerSymbol: {
         type: String,
         value: 'circle'
+      },
+      /**
+       * the size of the markers
+       */
+      markerSize: {
+        type: Number,
+        value: 64
       },
       /**
        * The opacity of the fill (inside) of the marker
@@ -220,6 +227,9 @@ Element which draws scatter series onto the chart
         this.scatterGroup = this.svg.append('g')
           .attr('series-id', 'scatter_' + this.seriesId)
           .attr('class', 'series-scatter');
+
+        //send empty tooltip data so the register shows up
+        this._hideTooltip();
       }
 
       if(this.radial) {
@@ -284,6 +294,15 @@ Element which draws scatter series onto the chart
       this.fire('px-vis-scatter-request-tooltip', {'show': true, 'mouseCoords': center});
     },
     _hideTooltip: function(d) {
+      var dataObj = {
+        'time': null,
+        'series': [{'name': this.seriesId, 'value':null}],
+        'mouse': [],
+        'xArr': null,
+        'yArr': null
+      };
+      this.set('tooltipData',dataObj);
+      this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
       this.fire('px-vis-scatter-request-tooltip', {'show': false});
     },
     /**

@@ -60,6 +60,13 @@ https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath
       },
       _seriesClipPathSvg: {
         type: Object
+      },
+      /**
+       * top offset to be applied to the series clip path
+       */
+      seriesClipPathYOffset: {
+        type: Number,
+        value: 0
       }
     },
 
@@ -81,16 +88,16 @@ https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath
         this.fire('px-vis-clip-path-updated', { 'dataVar': 'clipPath', 'data': this.clipPath, 'method':'set' });
 
         this.svg
-          .append("clipPath")
-          .attr("id",this.clipPath)
-          .append("rect");
+          .append('clipPath')
+          .attr('id',this.clipPath)
+          .append('rect');
 
-        this._clipPathSvg = this.svg.select('clipPath#'+this.clipPath+" rect");
+        this._clipPathSvg = this.svg.select('clipPath#'+this.clipPath+' rect');
       }
       this._clipPathSvg
         .attr('y',-this.margin.top)
-        .attr("width", this.width - this.margin.left)
-        .attr("height", this.height - this.margin.bottom);
+        .attr('width', this.width - this.margin.left)
+        .attr('height', this.height - this.margin.bottom);
 
       if(!this._seriesClipPathSvg) {
 
@@ -98,15 +105,17 @@ https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath
         this.fire('px-vis-series-clip-path-updated', { 'dataVar': 'seriesClipPath', 'data': this.seriesClipPath, 'method':'set' });
 
         this.svg
-          .append("clipPath")
-          .attr("id",this.seriesClipPath)
-          .append("rect");
+          .append('clipPath')
+          .attr('id',this.seriesClipPath)
+          .append('rect');
 
         this._seriesClipPathSvg = this.svg.select('clipPath#'+this.seriesClipPath + ' rect');
       }
       this._seriesClipPathSvg
-        .attr("width", this.width - this.margin.left - this.margin.right)
-        .attr("height", this.height - this.margin.bottom  - this.margin.top);
+        .attr('y', this.seriesClipPathYOffset)
+        .attr('width', this.width - this.margin.left - this.margin.right)
+        .attr('height', this.height - this.margin.bottom  - 
+                        this.margin.top - this.seriesClipPathYOffset);
 
     }
   });

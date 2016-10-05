@@ -56,7 +56,7 @@ PxVisBehaviorChart.chartCommon = [{
       },
       /**
       * A default configuration file. It fills in the missing parts of seriesConfig. Any options from seriesConfig
-      * can be specified in the defaultSeriesConfig and will be automatically used if not defined in 
+      * can be specified in the defaultSeriesConfig and will be automatically used if not defined in
       * the seriesConfig
       *
       */
@@ -136,11 +136,16 @@ PxVisBehaviorChart.chartCommon = [{
           return;
         }
 
-        // First, fill in the existing series.
+        // First, fill in the series specified in seriesConfig.
         for(var i = 0; i < kLen; i++) {
           if(!fullConfig[k[i]].hasOwnProperty('y')){
-            console.warn("Configuration " + k[i] + " does not have a y-value associated with it.");
-            continue;
+            console.warn("Configuration " + k[i] + " does not have a y-value associated with it. Falling back to ID");
+            fullConfig[k[i]]['y'] = k[i];
+          }
+
+          if(!fullConfig[k[i]].hasOwnProperty('x')){
+            console.warn("Configuration " + k[i] + " does not have a x-value associated with it. Falling back to default");
+            fullConfig[k[i]]['x'] = this.defaultSeriesConfig['x'];
           }
 
           if(!fullConfig[k[i]]['name']) {
@@ -176,9 +181,10 @@ PxVisBehaviorChart.chartCommon = [{
           delete objYs[ fullConfig[k[i]]['y'] ];
         }
 
+        // delete the 'x' key from our all y keys obj
+
         //figure out what x is, either a config value (assuming all x are the same) or the default
         x = (k.length > 0) ? fullConfig[k[0]]['x'] : this.defaultSeriesConfig['x'];
-        // delete the 'x' key from our all y keys obj
         delete objYs [x];
 
         // create a new set of whatever Ys are left so we can iterate over it
@@ -539,5 +545,5 @@ PxVisBehaviorChart.timeFiltering = [{
   }
 }, PxVisBehavior.dataset];
 
-      
+
 </script>
