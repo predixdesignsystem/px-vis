@@ -1,4 +1,16 @@
-v0.5.4
+v0.5.7
+==================
+* scale now notifies on x axis creation
+* move polarData behavior to common
+* fix demo
+
+v0.5.6
+==================
+* Adding offset in series clippath
+* Fix padding on axis series bar title
+* Fix axis title not redrawn on resize
+
+v0.5.5
 ==================
 * Fix register mutedSeries when ID has a '.'
 * Changed series config in chart behavior so it doesnt require x and y

@@ -125,8 +125,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      */
     _setXScale: function(width,margin) {
       var w = width - margin.left - margin.right;
-      this.x = this._setScale(this.xAxisType,[0, w]);
-      this.notifyPath('x.range', this.x.range);
+      this.set('x', this._setScale(this.xAxisType,[0, w]));
       this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
     },
     /**
@@ -136,8 +135,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      */
     _setYScale: function(height,margin) {
       var h = height - margin.top - margin.bottom;
-      this.y = this._setScale(this.yAxisType,[h, 0]);
-      this.notifyPath('y', this.y);
+      this.set('y', this._setScale(this.yAxisType,[h, 0]));
       this.fire('px-vis-y-updated', { 'dataVar': 'y', 'data': this.y, 'method':'set' });
     },
     /**

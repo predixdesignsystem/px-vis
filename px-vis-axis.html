@@ -178,6 +178,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           disableTicks: {
             type: Boolean,
             value: false
+          },
+          _titleGroup: {
+            type: Object
           }
         },
 
@@ -185,7 +188,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           'drawElement(domainChanged,svg,axis,margin,height,disableTicks)',
           'drawSeriesBars(completeSeriesConfig.*, titleDrawn)',
           '_muteSeriesBars(mutedSeries.*)',
-          '_titleChanged(displayedTitle, _axisGroup, titleLocation.*)',
+          '_titleChanged(displayedTitle, _axisGroup, titleLocation.*, height, width)',
           '_truncateTitle(title, truncationLength, appendUnitInTitle, completeSeriesConfig)'
         ],
 
@@ -585,30 +588,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
                 .attr('transform','rotate(' + r + ')');
           }
 
-          // console.log(this._titleGroup)
-          // this._titleGroup = this.svg.selectAll('g.title-group')
-          //   .data([this.title]);
-          // console.log(this._titleGroup)
-          //
-          // this._titleGroup.exit().remove();
-          //
-          // this._titleGroup.enter()
-          //   .append('g')
-          //   .attr('class','title-group')
-          //   .attr('for', this.axisId)
-          //   .append('text')
-          //   .attr('class','axis-title')
-          //   .attr('font-size', this.titleTypeSize + 'px')
-          //   .attr('font-style','GE Inspira Sans')
-          //
-          // this._titleGroup.merge(this._titleGroup)
-          //   .attr('transform','translate(' + x + ',' + y + ')')
-          //   .select('.axis-title')
-          //   .text(this.title)
-          //   .attr('text-anchor', anchor)
-          //   .style('text-anchor', anchor)
-          //   .attr('transform','rotate(' + r + ')');
-
           this._processTooltip();
           this.set('titleDrawn', (this.titleDrawn === null) ? true : !this.titleDrawn);
         },
@@ -658,7 +637,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .attr('width',15)
             .attr('fill',color)
             .attr('series-bar-id','bar_' + sid)
-            .attr('transform','translate(-12,' + (-w - 8 * index) + ')');
+            .attr('transform','translate(-12,' + (-3 -w - 8 * index) + ')');
         },
         _computeUnits: function(appendUnitInTitle, completeSeriesConfig, title) {
           var result = '';
@@ -691,9 +670,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         },
         _titleChanged: function(displayedTitle) {
           this.debounce('drawTitle', function() {
-
             if(this._doesObjHaveValues(this._axisGroup) && this._axisGroup.node() !== null && this._axisGroup.node().ownerSVGElement !== null) {
-            // if(this._doesObjHaveValues(this._axisGroup) && this._axisGroup.node() !== null && this._axisGroup.node().ownerSVGElement !== null) {
+
               this.drawTitle();
             }
           }.bind(this), 5);
