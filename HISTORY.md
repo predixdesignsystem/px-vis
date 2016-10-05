@@ -1,3 +1,9 @@
+v0.5.7
+==================
+* scale now notifies on x axis creation
+* move polarData behavior to common
+* fix demo
+
 v0.5.6
 ==================
 * Adding offset in series clippath

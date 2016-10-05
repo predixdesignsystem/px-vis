@@ -480,14 +480,6 @@ function runTests(){
       assert.isTrue(canvasLine2 !== null);
     });
 
-    test('canvasLine1 linePath not created', function() {
-      assert.equal(JSON.stringify(linePath1), '{}');
-    });
-
-    test('canvasLine2 linePath not created', function() {
-      assert.equal(JSON.stringify(linePath2), '{}');
-    });
-
     test('context has correct total lines ', function() {
       assert.equal(canvasSVG.canvasContext._pxLinesTotal, 2);
     });
@@ -1236,10 +1228,6 @@ function runTests(){
       assert.isTrue(parallelCanvasLine !== null);
     });
 
-    test('parallelCanvasLine linePath not created', function() {
-      assert.equal(JSON.stringify(linePath1), '{}');
-    });
-
     test('context has correct total lines ', function() {
       assert.equal(parallelCanvasSVG.canvasContext._pxLinesTotal, 1);
     });
@@ -1332,10 +1320,6 @@ function runTests(){
 
     test('parallelCanvasLine fixture is created', function() {
       assert.isTrue(parallelGradientCanvasLine !== null);
-    });
-
-    test('parallelCanvasLine linePath not created', function() {
-      assert.equal(JSON.stringify(linePath1), '{}');
     });
 
     test('context has correct total lines ', function() {
@@ -1454,10 +1438,6 @@ function runTests(){
       assert.isTrue(parallelCategoryCanvasLine !== null);
     });
 
-    test('parallelCanvasLine linePath not created', function() {
-      assert.equal(JSON.stringify(linePath1), '{}');
-    });
-
     test('context has correct total lines ', function() {
       assert.equal(parallelCategoryCanvasSVG.canvasContext._pxLinesTotal, 1);
     });
@@ -1572,10 +1552,6 @@ function runTests(){
 
     test('parallelCanvasLine fixture is created', function() {
       assert.isTrue(parallelCategoryGradientCanvasLine !== null);
-    });
-
-    test('parallelCanvasLine linePath not created', function() {
-      assert.equal(JSON.stringify(linePath1), '{}');
     });
 
     test('context has correct total lines ', function() {

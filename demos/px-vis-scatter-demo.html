@@ -3,6 +3,10 @@
 <link rel="import" href="../px-vis-scale.html">
 <link rel="import" href="../px-vis-svg.html">
 <link rel="import" href="../px-vis-scatter.html">
+<link rel="import" href="../px-vis-behavior-chart.html">
+<link rel="import" href="../px-vis-behavior-common.html">
+<link rel="import" href="../px-vis-behavior-d3.html">
+
 
 <dom-module id="px-vis-scatter-demo">
   <link rel="import" type="css" href="../css/px-vis-demo.css"/>
@@ -12,21 +16,15 @@
       <div class="outline">
 
       <!-- need for scatter -->
-        <px-vis-svg
-          width="[[width]]"
-          height="[[height]]"
-          margin="[[margin]]"
-          svg="{{svg}}">
-        </px-vis-svg>
-        <px-vis-scale
+      <px-vis-scale
           x-axis-type="time"
           y-axis-type="linear"
-          complete-series-config="[[seriesConfig]]"
+          complete-series-config="[[completeSeriesConfig]]"
           chart-extents="[[chartExtents]]"
           width="[[width]]"
           height="[[height]]"
           margin="[[margin]]"
-          chart-data={{chartData}}
+          chart-data="{{chartData}}"
           x="{{x}}"
           y="{{y}}"
           current-domain-x="{{currentDomainX}}"
@@ -34,10 +32,16 @@
           domain-changed="{{domainChanged}}"
           selected-domain="[[selectedDomain]]">
         </px-vis-scale>
+        <px-vis-svg
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          svg="{{svg}}">
+        </px-vis-svg>
         <px-vis-scatter
           svg="[[svg]]"
           series-id="mySeries"
-          complete-series-config="[[seriesConfig]]"
+          complete-series-config="[[completeSeriesConfig]]"
           chart-data="[[chartData]]"
           x="[[x]]"
           y="[[y]]"
@@ -59,110 +63,114 @@
     </div>
 
   </template>
+  </dom-module>
   <script>
     Polymer({
       is: "px-vis-scatter-demo",
+      behaviors: [
+        PxVisBehaviorD3.svg,
+        PxVisBehaviorD3.axes,
+        PxVisBehaviorD3.selectedDomain,
+        PxVisBehavior.dataset,
+        PxVisBehavior.sizing,
+        PxVisBehavior.extentsData,
+        PxVisBehavior.completeSeriesConfig,
+        PxVisBehaviorChart.chartCommon,
+        PxVisBehaviorD3.domainUpdate
+      ],
       properties: {
-        x: {
-          type:Object,
-          notify: true
-        },
         //basics
-        width: {
-          type: Number,
-          value: 500
-        },
-        height: {
-          type: Number,
-          value: 200
-        },
-        margin: {
-          type: Object,
-          value: {
-            "top": 10,
-            "right": 10,
-            "bottom": 10,
-            "left": 10
-          }
-        },
-        domainChanged:{
-          type: Boolean
-        },
-        chartData: {
-          type: Array,
-          value: [{
-            'x': 1397102460000,
-            'y': 0.56
-          }, {
-            'x': 1397139660000,
-            'y': 0.4
-          }, {
-            'x': 1397177400000,
-            'y': 0.43
-          }, {
-            'x': 1397228040000,
-            'y': 0.33
-          }, {
-            'x': 1397248260000,
-            'y': 0.47
-          }, {
-            'x': 1397291280000,
-            'y': 0.41
-          }, {
-            'x': 1397318100000,
-            'y': 0.26
-          }, {
-            'x': 1397342100000,
-            'y': 0.42
-          }, {
-            'x': 1397390820000,
-            'y': 0.27
-          }, {
-            'x': 1397408100000,
-            'y': 0.38
-          }, {
-            'x': 1397458800000,
-            'y': 0.36
-          }, {
-            'x': 1397522940000,
-            'y': 0.32
-          }]
-        },
-        seriesConfig: {
-          type: Object,
-          value: {
-            'mySeries': {
-              "name": "My-Series",
-              "type": "line",
-              "x": 'x',
-              "y": 'y',
-              'color': "rgb(93,165,218)"
-            }
-          }
-        },
-        //chartExtents
-        chartExtents: {
-          type: Object,
-          value: {
-            "x": [Infinity, -Infinity],
-            "y": [0, -Infinity]
-          }
-        },
+        // width: {
+        //   type: Number,
+        //   value: 500
+        // },
+        // height: {
+        //   type: Number,
+        //   value: 200
+        // },
+        // margin: {
+        //   type: Object,
+        //   value: {
+        //     "top": 10,
+        //     "right": 10,
+        //     "bottom": 10,
+        //     "left": 10
+        //   }
+        // },
+        // chartData: {
+        //   type: Array,
+        //   value: [{
+        //     'x': 1397102460000,
+        //     'y': 0.56
+        //   }, {
+        //     'x': 1397139660000,
+        //     'y': 0.4
+        //   }, {
+        //     'x': 1397177400000,
+        //     'y': 0.43
+        //   }, {
+        //     'x': 1397228040000,
+        //     'y': 0.33
+        //   }, {
+        //     'x': 1397248260000,
+        //     'y': 0.47
+        //   }, {
+        //     'x': 1397291280000,
+        //     'y': 0.41
+        //   }, {
+        //     'x': 1397318100000,
+        //     'y': 0.26
+        //   }, {
+        //     'x': 1397342100000,
+        //     'y': 0.42
+        //   }, {
+        //     'x': 1397390820000,
+        //     'y': 0.27
+        //   }, {
+        //     'x': 1397408100000,
+        //     'y': 0.38
+        //   }, {
+        //     'x': 1397458800000,
+        //     'y': 0.36
+        //   }, {
+        //     'x': 1397522940000,
+        //     'y': 0.32
+        //   }]
+        // },
+        // seriesConfig: {
+        //   type: Object,
+        //   value: {
+        //     'mySeries': {
+        //       "name": "My-Series",
+        //       "type": "line",
+        //       "x": 'x',
+        //       "y": 'y',
+        //       'color': "rgb(93,165,218)"
+        //     }
+        //   }
+        // },
+        // //chartExtents
+        // chartExtents: {
+        //   type: Object,
+        //   value: {
+        //     "x": [Infinity, -Infinity],
+        //     "y": [0, -Infinity]
+        //   }
+        // },
         // demo snippet
-        elempropScatter: {
-          type: Object,
-          value: {
-            "svg": "[[svg]]",
-            "seriesId": "mySeries",
-            "completeSeriesConfig": "[[seriesConfig]]",
-            "chartData": "[[chartData]]",
-            "x": "[[x]]",
-            "y": "[[y]]",
-            "currentDomainX": "[[currentDomainX]]",
-            "currentDomainY": "[[currentDomainY]]"
-          }
-        }
+        // elempropScatter: {
+        //   type: Object,
+        //   value: {
+        //     "svg": "[[svg]]",
+        //     "seriesId": "mySeries",
+        //     "completeSeriesConfig": "[[seriesConfig]]",
+        //     "chartData": "[[chartData]]",
+        //     "x": "[[x]]",
+        //     "y": "[[y]]",
+        //     "currentDomainX": "[[currentDomainX]]",
+        //     "currentDomainY": "[[currentDomainY]]"
+        //   }
+        // }
       }
     });
   </script>
-</dom-module>
