@@ -358,17 +358,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           this._setLineStyles(this._axisGroup,'line,path');
           this._setLabelStyles(this._axisGroup);
 
-          if(this.axisType !== 'ordinal') {
-
-            //apparently we need to give ourselves a bit of time to ensure the axis draws and it can clac this
-            this.debounce("drawnTicks", function(){
-              if(this.ticks){
-                this.set('drawnTickValues', this._axis.scale().ticks(this.ticks));
-              } else {
-                this.set('drawnTickValues', this._axis.scale().ticks());
-              }
-            },1)
-          }
+          this._calcDrawnTicks();
         },
         /**
          * Updates the axis
@@ -387,8 +377,23 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
           this._setLabelStyles(this._axisGroup);
 
+          this._calcDrawnTicks();
+
           // alert parents that we are done drawing the axis
           this.fire('px-axis-done');
+        },
+
+        _calcDrawnTicks: function() {
+          if(this.axisType !== 'ordinal') {
+            //apparently we need to give ourselves a bit of time to ensure the axis draws and it can clac this
+            this.debounce("drawnTicks", function(){
+              if(this.ticks){
+                this.set('drawnTickValues', this._axis.scale().ticks(this.ticks));
+              } else {
+                this.set('drawnTickValues', this._axis.scale().ticks());
+              }
+            },1)
+          }
         },
 
         /**
