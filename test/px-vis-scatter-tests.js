@@ -211,7 +211,7 @@ function runTests(){
       assert.equal(mutedScatter1.scatterDots.attr('stroke-opacity'),1);
     });
     test('mutedScatter1 scatter series has the right fill opacity', function() {
-      assert.equal(mutedScatter1.scatterDots.attr('fill-opacity'),0.6);
+      assert.equal(mutedScatter1.scatterDots.attr('fill-opacity'),0.5);
     });
     test('mutedScatter1 scatter series has the right color', function() {
       assert.equal(mutedScatter1.scatterDots.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
@@ -249,7 +249,7 @@ function runTests(){
       assert.equal(mutedScatter2.scatterDots.attr('stroke-opacity'),1);
     });
     test('mutedScatter2 scatter series has the right fill opacity', function() {
-      assert.equal(mutedScatter2.scatterDots.attr('fill-opacity'),0.6);
+      assert.equal(mutedScatter2.scatterDots.attr('fill-opacity'),0.5);
     });
     test('mutedScatter2 scatter series has the right color', function() {
       assert.equal(mutedScatter2.scatterDots.attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);

@@ -373,7 +373,7 @@ function basicTests(registerID,dir){
     test(registerID + ' values are blank', function() {
       var series = Polymer.dom(register.root).querySelectorAll('.seriesData');
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].textContent.trim(), '');
+        assert.equal(series[i].innerText.trim(), '');
       }
     });
   });
