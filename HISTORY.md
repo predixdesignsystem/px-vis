@@ -2,7 +2,7 @@ v0.5.7
 ==================
 * scale now notifies on x axis creation
 * move polarData behavior to common
-* improve demo
+* fix demo
 
 v0.5.6
 ==================
