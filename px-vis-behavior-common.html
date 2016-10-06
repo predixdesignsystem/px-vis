@@ -981,5 +981,81 @@ PxVisBehavior.polarData = {
   }
 };
 
+/*
+    Name:
+    PxVisBehavior.seriesId
+
+    Description:
+    Polymer behavior that provides seriesId property
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehavior.seriesId
+*/
+PxVisBehavior.seriesId = {
+  properties: {
+  /**
+    * A unique ID for each line series
+    *
+    */
+    seriesId:{
+      type:String
+    }
+  }
+};
+
+/*
+    Name:
+    PxVisBehavior.dynamicConfigProperties
+
+    Description:
+    Polymer behavior that allows the dynamic creation of properties that will be 
+    searched for in the completeSeriesConfig
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehavior.dynamicConfigProperties
+*/
+PxVisBehavior.dynamicConfigProperties = [{
+  properties: {
+    _dynamicProperties: {
+      type: Array,
+      value: function() {
+        return [];
+      }
+    }
+  },
+  observers: ['_processConfig(completeSeriesConfig.*)'],
+
+  _computeValue: function(configValue, def) {
+    return (typeof configValue !== 'undefined' && configValue !== null) ?
+                              configValue : def;
+  },
+
+  _processConfig: function(completeSeriesConfig, seriesId) {
+
+    var conf = this.completeSeriesConfig[this.seriesId],
+        name;
+    for(var i=0; i<this._dynamicProperties.length; i++) {
+      name = this._dynamicProperties[i];
+      this.set(name, this._computeValue(conf[name], this['_default' + name]));
+    }
+  },
+
+  _watchConfigProperty: function(name, defValue) {
+    this.push('_dynamicProperties', name);
+    this['_default' + name] = defValue;
+
+    //if we have the config compute value now. If we don't it will be processed
+    //when the config comes in
+    if(this.completeSeriesConfig && this.seriesId) {
+      var conf = this.completeSeriesConfig[this.seriesId]
+      this[name] = this._computeValue(conf[name], defValue);
+    }
+  }
+  
+},PxVisBehavior.completeSeriesConfig, PxVisBehavior.seriesId];
 
 </script>

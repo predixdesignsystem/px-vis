@@ -793,6 +793,12 @@ function runTests(){
           "bottom": 50,
           "left": 50
         };
+
+      //make sure we found the elements, cause IE...
+      pcTruncUnitAxisSVG = document.getElementById('pcTruncUnitAxisSVG');
+      pcTruncUnitAxisScale = document.getElementById('pcTruncUnitAxisScale');
+      pcTruncUnitYAxis = document.getElementById('pcTruncUnitYAxis');
+
       pcTruncUnitAxisSVG.set('width',w);
       pcTruncUnitAxisSVG.set('height',h);
       pcTruncUnitAxisSVG.set('margin',m);
@@ -879,6 +885,12 @@ function runTests(){
           "bottom": 110,
           "left": 50
         };
+
+      //make sure we found the elements, cause IE...
+      pcRotateAxisSVG = document.getElementById('pcRotateAxisSVG');
+      pcRotateAxisScale = document.getElementById('pcRotateAxisScale');
+      pcRotateYAxis = document.getElementById('pcRotateYAxis');
+
       pcRotateAxisSVG.set('width',w);
       pcRotateAxisSVG.set('height',h);
       pcRotateAxisSVG.set('margin',m);
@@ -966,6 +978,11 @@ function runTests(){
         },
         tickValues = [2,4,6,8,10];
 
+      //make sure we found the elements, cause IE...
+      tickScale = document.getElementById('tickScale');
+      tickSVG = document.getElementById('tickSVG');
+      tickAxis = document.getElementById('tickAxis');
+
       tickSVG.set('width',w);
       tickSVG.set('height',h);
       tickSVG.set('margin',m);
@@ -1048,6 +1065,12 @@ function runTests(){
           "left": 50
         },
         tickValues = [2,4,6,8,10];
+
+      //make sure we found the elements, cause IE...
+      tickFormatScale = document.getElementById('tickFormatScale');
+      tickFormatSVG = document.getElementById('tickFormatSVG');
+      tickFormatXAxis = document.getElementById('tickFormatXAxis');
+      tickFormatYAxis = document.getElementById('tickFormatYAxis');
 
       tickFormatSVG.set('width',w);
       tickFormatSVG.set('height',h);
