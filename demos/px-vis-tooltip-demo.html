@@ -11,7 +11,7 @@
   <template>
     <p id="px-vis-tooltip-anchor" class="epsilon demo__title">px-vis-tooltip</p>
     <div class="demo u-p+">
-      <div class="outline">
+      <div class="outline" on-mousemove="_calcMousePos">
 
       <!-- need for tooltip -->
         <px-vis-tooltip
@@ -59,7 +59,8 @@
           x="[[x]]"
           y="[[y]]"
           current-domain-x="[[currentDomainX]]"
-          current-domain-y="[[currentDomainY]]">
+          current-domain-y="[[currentDomainY]]"
+          mouse-rect={{mouseRect}}>
         </px-vis-interaction-space>
         <px-vis-line
           svg="[[svg]]"
@@ -172,6 +173,11 @@
             "y": [0,-Infinity]
           }
         },
+        mousePosition:{
+          type: Array
+        },
+
+
         // demo snippet
         elempropTooltip:{
           type : Object,
@@ -185,6 +191,9 @@
             "tooltipData":"[[tooltipData]]"
           }
         }
+      },
+      _calcMousePos: function(evt) {
+        this.set('mousePosition',[evt.pageX,evt.pageY]);
       }
     });
   </script>
