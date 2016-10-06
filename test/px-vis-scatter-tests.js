@@ -77,7 +77,7 @@ function runTests(){
       assert.equal(baseScatter.scatterGroup.node().tagName,'g');
     });
     test('baseScatter scatterDots created', function() {
-      assert.equal(baseScatter.scatterDots.node().getAttribute("class"),'circle');
+      assert.equal(baseScatter.scatterDots.node().getAttribute("class"),'symbol');
     });
 
     test('baseScatter scatter series ID is random', function() {
@@ -202,7 +202,7 @@ function runTests(){
       assert.equal(mutedScatter1.scatterGroup.node().tagName,'g');
     });
     test('mutedScatter1 scatterDots created', function() {
-      assert.equal(mutedScatter1.scatterDots.node().getAttribute("class"),'circle');
+      assert.equal(mutedScatter1.scatterDots.node().getAttribute("class"),'symbol');
     });
     test('mutedScatter1 scatter series ID is set', function() {
       assert.equal(mutedScatter1.scatterGroup.attr('series-id'),'scatter_mySeries');
@@ -211,13 +211,13 @@ function runTests(){
       assert.equal(mutedScatter1.scatterDots.attr('stroke-opacity'),1);
     });
     test('mutedScatter1 scatter series has the right fill opacity', function() {
-      assert.equal(mutedScatter1.scatterDots.attr('fill-opacity'),0.5);
+      assert.equal(mutedScatter1.scatterDots.attr('fill-opacity'),'0.6');
     });
     test('mutedScatter1 scatter series has the right color', function() {
       assert.equal(mutedScatter1.scatterDots.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
     });
     test('mutedScatter1 scatterDots markerSize is correct', function() {
-      assert.equal(mutedScatter1.scatterDots.attr('transform').split('scale')[1],'(0.5)');
+      assert.equal(mutedScatter1.scatterDots.attr('transform').split('scale')[1],'(1)');
     });
 
     test('mutedScatter1 scatterDot0 x & y', function() {
@@ -240,7 +240,7 @@ function runTests(){
       assert.equal(mutedScatter2.scatterGroup.node().tagName,'g');
     });
     test('mutedScatter2 scatterDots created', function() {
-      assert.equal(mutedScatter2.scatterDots.node().getAttribute("class"),'circle');
+      assert.equal(mutedScatter2.scatterDots.node().getAttribute("class"),'symbol');
     });
     test('mutedScatter2 scatter series ID is set', function() {
       assert.equal(mutedScatter2.scatterGroup.attr('series-id'),'scatter_mySeries2');
@@ -249,13 +249,13 @@ function runTests(){
       assert.equal(mutedScatter2.scatterDots.attr('stroke-opacity'),1);
     });
     test('mutedScatter2 scatter series has the right fill opacity', function() {
-      assert.equal(mutedScatter2.scatterDots.attr('fill-opacity'),0.5);
+      assert.equal(mutedScatter2.scatterDots.attr('fill-opacity'),0.6);
     });
     test('mutedScatter2 scatter series has the right color', function() {
       assert.equal(mutedScatter2.scatterDots.attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
     });
     test('mutedScatter2 scatterDots markerSize is correct', function() {
-      assert.equal(mutedScatter2.scatterDots.attr('transform').split('scale')[1],'(2)');
+      assert.equal(mutedScatter2.scatterDots.attr('transform').split('scale')[1],'(1)');
     });
 
     test('mutedScatter2 scatterDot0 x & y', function() {
@@ -517,49 +517,49 @@ function runTests(){
       assert.equal(markerCircle.scatterDots.nodes().length, 1);
     });
     test('marker is a circle', function() {
-      assert.equal(markerCircle.scatterDots.node().getAttribute('class'),'circle');
+      assert.equal(markerCircle.scatterDots.node().getAttribute('class'),'symbol');
     });
 
     test('correct number of circles', function() {
       assert.equal(markerCross.scatterDots.nodes().length, 1);
     });
     test('marker is a cross', function() {
-      assert.equal(markerCross.scatterDots.node().getAttribute('class'), 'cross');
+      assert.equal(markerCross.scatterDots.node().getAttribute('class'), 'symbol');
     });
 
     test('correct number of circles', function() {
       assert.equal(markerDiamond.scatterDots.nodes().length, 1);
     });
     test('marker is a diamond', function() {
-      assert.equal(markerDiamond.scatterDots.node().getAttribute('class'),'diamond');
+      assert.equal(markerDiamond.scatterDots.node().getAttribute('class'),'symbol');
     });
 
     test('correct number of circles', function() {
       assert.equal(markerSquare.scatterDots.nodes().length, 1);
     });
     test('marker is a square', function() {
-      assert.equal(markerSquare.scatterDots.node().getAttribute('class'),'square');
+      assert.equal(markerSquare.scatterDots.node().getAttribute('class'),'symbol');
     });
 
     test('correct number of circles', function() {
       assert.equal(markerTriangle.scatterDots.nodes().length, 1);
     });
     test('marker is a triangle', function() {
-      assert.equal(markerTriangle.scatterDots.node().getAttribute('class'),'triangle-up');
+      assert.equal(markerTriangle.scatterDots.node().getAttribute('class'),'symbol');
     });
 
     test('correct number of circles', function() {
       assert.equal(markerStar.scatterDots.nodes().length, 1);
     });
     test('marker is a star', function() {
-      assert.equal(markerStar.scatterDots.node().getAttribute('class'),'star');
+      assert.equal(markerStar.scatterDots.node().getAttribute('class'),'symbol');
     });
 
     test('correct number of circles', function() {
       assert.equal(markerWye.scatterDots.nodes().length, 1);
     });
     test('marker is a wye', function() {
-      assert.equal(markerWye.scatterDots.node().getAttribute('class'),'wye');
+      assert.equal(markerWye.scatterDots.node().getAttribute('class'),'symbol');
     });
 
   }); //suite
