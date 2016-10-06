@@ -188,7 +188,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
       PxVisBehavior.sizing,
       PxVisBehavior.formatting,
       PxVisBehaviorTime.datetime,
-      PxVisBehavior.mutedSeries,
+      PxVisBehavior.muteUnmuteSeries,
       PxVisBehavior.tooltipData,
       PxVisBehavior.dataset,
       PxVisBehavior.axisTypes,
@@ -355,24 +355,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
       var ne = Polymer.dom(e),
           series = ne.rootTarget.getAttribute('name').substr(1);
 
-      //TODO Polymer 2.0: fix this
-      // make sure we are not dealing with APM's IDs
-      if(series.indexOf('.') === -1) {
-        // if it doesnt exist, let's add it and set to true
-        if( typeof(this.mutedSeries[series]) === 'undefined' ) {
-          this.set('mutedSeries.' + series, true);
-        } else {
-          //if does exist, flip the bit
-          this.set('mutedSeries.' + series, !this.mutedSeries[series]);
-        }
-      } else {
-        var muted = this.mutedSeries;
-        this.mutedSeries = [];
-        muted[series] = typeof(muted[series]) === 'undefined' ? true : !muted[series];
-        this.set('mutedSeries', muted);
-      }
-
-      this.fire('px-vis-muted-series-updated', { 'data': this.mutedSeries[series], 'dataVar': ('mutedSeries.'+series) ,'method': 'set' });
+      this.muteUnmuteSeries(series);
 
       e.stopPropagation();
     },

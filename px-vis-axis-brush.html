@@ -252,7 +252,7 @@ This element draw the box over the axis signifying the active area to mute the s
 
             // if the axis exists, then lets check out the extents
             var oldBrushDomain = _this._brushDomains[d],
-                newAxisDomain = _this.axis[d].domain(),
+                newAxisDomain = typeof _this.axis === 'object' ? _this.axis[d].domain() : _this.axis.domain(),
                 newBrushRange,
                 elem;
 
@@ -354,10 +354,9 @@ This element draw the box over the axis signifying the active area to mute the s
       var newBrushRange = [];
       // if the brushExts fall within the new axis domain
       if(newAxisDomain[0] <= oldBrushDomain[0] && newAxisDomain[1] >= oldBrushDomain[1]){
-        // resize brush
 
-        newBrushRange[0] = this.axis[d](oldBrushDomain[1]);
-        newBrushRange[1] = this.axis[d](oldBrushDomain[0]);
+        // resize brush
+        newBrushRange = this._getNewBrushRange(oldBrushDomain[1],oldBrushDomain[0]);
 
         //clear listeners
         elem.call(this._brush
@@ -371,10 +370,9 @@ This element draw the box over the axis signifying the active area to mute the s
 
       //bottom of brush is below new domain, top is within
       } else if(newAxisDomain[0] > oldBrushDomain[0] && newAxisDomain[0] < oldBrushDomain[1] && newAxisDomain[1] >= oldBrushDomain[1]) {
-        //move bottom to the min newAxisRange
 
-        newBrushRange[0] = this.axis[d](oldBrushDomain[1]);
-        newBrushRange[1] = this.axis[d](newAxisDomain[0]);
+        //move bottom to the min newAxisRange
+        newBrushRange = this._getNewBrushRange(oldBrushDomain[1],newAxisDomain[0]);
 
         elem.call(this._brush
           .on("start.brush", null)
@@ -385,25 +383,46 @@ This element draw the box over the axis signifying the active area to mute the s
 
       //bottom of brush within new domain, top is out
       } else if(newAxisDomain[0] <= oldBrushDomain[0] && newAxisDomain[1] < oldBrushDomain[1] && newAxisDomain[1] > oldBrushDomain[0]) {
-        //move top to the max newAxisRange
 
-        newBrushRange[0] = this.axis[d](newAxisDomain[1]);
-        newBrushRange[1] = this.axis[d](oldBrushDomain[0]);
+        //move top to the max newAxisRange
+        newBrushRange = this._getNewBrushRange(newAxisDomain[1],oldBrushDomain[0]);
 
         elem.call(this._brush
           .on("start.brush", null)
           .on("end.brush", null));
         elem.call(this._brush.move, newBrushRange);
 
-        newBrushRange = _this._checkMinSize(newBrushRange,elem);
+        newBrushRange = this._checkMinSize(newBrushRange,elem);
 
       } else {
         //delete and move on to the next brush
-        _this.deleteBrush(Px.d3.select(brushThis));
+        this.deleteBrush(Px.d3.select(brushThis));
         return null
       }
 
       return newBrushRange;
+    },
+
+    _getNewBrushRange: function(d1, d2) {
+      var newRange = [],
+          domain1, domain2;
+      // if radial, we need to flip our order
+      if(this.radial){
+        domain1 = d2;
+        domain2 = d1;
+      } else {
+        domain1 = d1;
+        domain2 = d2;
+      }
+
+      if(typeof(this.axis) === 'object'){
+        newRange[0] = this.axis[d](domain1);
+        newRange[1] = this.axis[d](domain2);
+      } else {
+        newRange[0] = this.axis(domain1);
+        newRange[1] = this.axis(domain2);
+      }
+      return newRange;
     },
 
     deleteAllBrushes: function(){
