@@ -19,7 +19,7 @@
         <px-vis-scale
           x-axis-type="time"
           y-axis-type="linear"
-          complete-series-config="[[completeSeriesConfig]]"
+          complete-series-config="[[seriesConfig]]"
           chart-extents="[[chartExtents]]"
           width="[[width]]"
           height="[[height]]"
@@ -41,7 +41,7 @@
         <px-vis-scatter
           svg="[[svg]]"
           series-id="mySeries"
-          complete-series-config="[[completeSeriesConfig]]"
+          complete-series-config="[[seriesConfig]]"
           chart-data="[[chartData]]"
           x="[[x]]"
           y="[[y]]"
@@ -59,7 +59,7 @@
       <px-demo-snippet
         element-properties="[[elempropScatter]]"
         element-name="px-vis-scatter"
-        code-link="http://codepen.io/menkhakl/pen/amEGav?editors=1010">
+        code-link="http://codepen.io/menkhakl/pen/jrYKOo">
       </px-demo-snippet>
     </div>
 
@@ -68,97 +68,90 @@
   <script>
     Polymer({
       is: "px-vis-scatter-demo",
-      behaviors: [
-        PxVisBehaviorD3.svg,
-        PxVisBehaviorD3.axes,
-        PxVisBehaviorD3.selectedDomain,
-        PxVisBehavior.dataset,
-        PxVisBehavior.sizing,
-        PxVisBehavior.extentsData,
-        PxVisBehavior.completeSeriesConfig,
-        PxVisBehaviorChart.chartCommon,
-        PxVisBehaviorD3.domainUpdate
-      ],
       properties: {
         //basics
-        // width: {
-        //   type: Number,
-        //   value: 500
-        // },
-        // height: {
-        //   type: Number,
-        //   value: 200
-        // },
-        // margin: {
-        //   type: Object,
-        //   value: {
-        //     "top": 10,
-        //     "right": 10,
-        //     "bottom": 10,
-        //     "left": 10
-        //   }
-        // },
-        // chartData: {
-        //   type: Array,
-        //   value: [{
-        //     'x': 1397102460000,
-        //     'y': 0.56
-        //   }, {
-        //     'x': 1397139660000,
-        //     'y': 0.4
-        //   }, {
-        //     'x': 1397177400000,
-        //     'y': 0.43
-        //   }, {
-        //     'x': 1397228040000,
-        //     'y': 0.33
-        //   }, {
-        //     'x': 1397248260000,
-        //     'y': 0.47
-        //   }, {
-        //     'x': 1397291280000,
-        //     'y': 0.41
-        //   }, {
-        //     'x': 1397318100000,
-        //     'y': 0.26
-        //   }, {
-        //     'x': 1397342100000,
-        //     'y': 0.42
-        //   }, {
-        //     'x': 1397390820000,
-        //     'y': 0.27
-        //   }, {
-        //     'x': 1397408100000,
-        //     'y': 0.38
-        //   }, {
-        //     'x': 1397458800000,
-        //     'y': 0.36
-        //   }, {
-        //     'x': 1397522940000,
-        //     'y': 0.32
-        //   }]
-        // },
-        // seriesConfig: {
-        //   type: Object,
-        //   value: {
-        //     'mySeries': {
-        //       "name": "My-Series",
-        //       "type": "line",
-        //       "x": 'x',
-        //       "y": 'y',
-        //       'color': "rgb(93,165,218)"
-        //     }
-        //   }
-        // },
-        // //chartExtents
-        // chartExtents: {
-        //   type: Object,
-        //   value: {
-        //     "x": [Infinity, -Infinity],
-        //     "y": [0, -Infinity]
-        //   }
-        // },
-        
+        width: {
+          type: Number,
+          value: 500
+        },
+        height: {
+          type: Number,
+          value: 200
+        },
+        margin: {
+          type: Object,
+          value: {
+            "top": 10,
+            "right": 10,
+            "bottom": 10,
+            "left": 10
+          }
+        },
+        domainChanged:{
+          type: Boolean,
+          value: false
+        },
+        chartData: {
+          type: Array,
+          value: [{
+            'x': 1397102460000,
+            'y': 0.56
+          }, {
+            'x': 1397139660000,
+            'y': 0.4
+          }, {
+            'x': 1397177400000,
+            'y': 0.43
+          }, {
+            'x': 1397228040000,
+            'y': 0.33
+          }, {
+            'x': 1397248260000,
+            'y': 0.47
+          }, {
+            'x': 1397291280000,
+            'y': 0.41
+          }, {
+            'x': 1397318100000,
+            'y': 0.26
+          }, {
+            'x': 1397342100000,
+            'y': 0.42
+          }, {
+            'x': 1397390820000,
+            'y': 0.27
+          }, {
+            'x': 1397408100000,
+            'y': 0.38
+          }, {
+            'x': 1397458800000,
+            'y': 0.36
+          }, {
+            'x': 1397522940000,
+            'y': 0.32
+          }]
+        },
+        seriesConfig: {
+          type: Object,
+          value: {
+            'mySeries': {
+              "name": "My-Series",
+              "type": "line",
+              "x": 'x',
+              "y": 'y',
+              'color': "rgb(93,165,218)"
+            }
+          }
+        },
+        //chartExtents
+        chartExtents: {
+          type: Object,
+          value: {
+            "x": [Infinity, -Infinity],
+            "y": [0, -Infinity]
+          }
+        },
+
 
         // demo snippet
         elempropScatter: {
