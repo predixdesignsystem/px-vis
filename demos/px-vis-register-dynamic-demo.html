@@ -6,13 +6,15 @@
 <link rel="import" href="../px-vis-scale.html">
 <link rel="import" href="../px-vis-svg.html">
 <link rel="import" href="../px-vis-register.html">
+<link rel="import" href="../px-vis-interaction-space.html">
+<link rel="import" href="../px-vis-line.html">
 
 <dom-module id="px-vis-register-dynamic-demo">
   <link rel="import" type="css" href="../css/px-vis-demo.css"/>
   <template>
-    <p id="px-vis-register-dynamic-anchor" class="epsilon demo__title">px-vis-register-dynamic</p>
+    <p id="px-vis-register-dynamic-anchor" class="epsilon demo__title">px-vis-register: dynamic</p>
     <div class="demo u-p+">
-      <div class="outline">
+       <div ><!--class="outline" -->
 
       <!-- need for register-dynamic -->
         <px-vis-register
@@ -68,8 +70,7 @@
           x="[[x]]"
           y="[[y]]"
           muted-series="[[mutedSeries]]"
-          current-domain-x="[[currentDomainX]]"
-          current-domain-y="[[currentDomainY]]">
+          domain-changed="[[domainChanged]]">
         </px-vis-line>
 
       </div>
@@ -83,7 +84,8 @@
     <div>
       <px-demo-snippet
         element-properties="[[elempropRegisterDynamic]]"
-        element-name="px-vis-register-dynamic">
+        element-name="px-vis-register-dynamic"
+        code-link="http://codepen.io/menkhakl/pen/EgoREX">
       </px-demo-snippet>
     </div>
 
@@ -104,7 +106,6 @@
         heightRegister:{
           type : Number,
           value : 75
-
         },
         margin:{
           type : Object,
@@ -114,6 +115,10 @@
             "bottom": 10,
             "left": 10
           }
+        },
+        domainChanged:{
+          type: Boolean,
+          value: false
         },
         chartData:{
           type : Array,
