@@ -96,8 +96,8 @@ https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath
       }
       this._clipPathSvg
         .attr('y',-this.margin.top)
-        .attr('width', this.width - this.margin.left)
-        .attr('height', this.height - this.margin.bottom);
+        .attr('width', Math.max(this.width - this.margin.left, 0))
+        .attr('height', Math.max(this.height - this.margin.bottom, 0));
 
       if(!this._seriesClipPathSvg) {
 
@@ -113,9 +113,9 @@ https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath
       }
       this._seriesClipPathSvg
         .attr('y', this.seriesClipPathYOffset)
-        .attr('width', this.width - this.margin.left - this.margin.right)
-        .attr('height', this.height - this.margin.bottom  - 
-                        this.margin.top - this.seriesClipPathYOffset);
+        .attr('width', Math.max(this.width - this.margin.left - this.margin.right,0))
+        .attr('height', Math.max(this.height - this.margin.bottom  - 
+                        this.margin.top - this.seriesClipPathYOffset,0));
 
     }
   });

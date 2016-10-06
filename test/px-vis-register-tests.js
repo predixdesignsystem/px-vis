@@ -371,9 +371,11 @@ function basicTests(registerID,dir){
     });
 
     test(registerID + ' values are blank', function() {
-      var series = Polymer.dom(register.root).querySelectorAll('.seriesData');
+      var series = Polymer.dom(register.root).querySelectorAll('.seriesData'),
+          numbroElem;
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].innerText.trim(), '');
+        numbroElem = Polymer.dom(series[i]).querySelectorAll('numbro-element')[0];
+        assert.equal(numbroElem.style['display'], 'none');
       }
     });
   });
