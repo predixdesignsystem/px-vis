@@ -881,6 +881,10 @@ PxVisBehaviorD3.radialLineGenerator = [{
     */
     line: {
       type: Object
+    },
+
+    lineRadiusLimit: {
+      type: Number
     }
   },
   /**
@@ -891,6 +895,7 @@ PxVisBehaviorD3.radialLineGenerator = [{
     //get our dimensions
     var _this = this,
         renderToCanvas = (typeof(toCanvas) !== 'undefined') ? toCanvas : false,
+        //omg; need to make a copy or else completing the circle breaks dragging.
         dims = JSON.parse(JSON.stringify(this.completeSeriesConfig[this.seriesId]['x'])),
         path,
         line,
@@ -911,8 +916,13 @@ PxVisBehaviorD3.radialLineGenerator = [{
         return _this.x(d[0]) * clockwiseFactor;
       })
       .radius(function(d) {
-          // ~~ --> round pixels values to optimize svg perfs
-        return ~~_this.y(Number(d[1]));
+        // ~~ --> round pixels values to optimize svg perfs
+        var radius = ~~_this.y(Number(d[1]));
+
+        if(typeof _this.lineRadiusLimit === 'number' && radius < _this.lineRadiusLimit) {
+          return _this.lineRadiusLimit;
+        }
+        return radius
       }).defined(function(d) {
         return !isNaN(_this.x(d[0])) && !isNaN(_this.y(Number(d[1])));
       });
