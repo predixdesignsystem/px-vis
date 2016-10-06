@@ -3,6 +3,8 @@
 <link rel="import" href="../px-vis-scale.html">
 <link rel="import" href="../px-vis-svg.html">
 <link rel="import" href="../px-vis-tooltip.html">
+<link rel="import" href="../px-vis-interaction-space.html">
+<link rel="import" href="../px-vis-line.html">
 
 <dom-module id="px-vis-tooltip-demo">
   <link rel="import" type="css" href="../css/px-vis-demo.css"/>
@@ -13,13 +15,15 @@
 
       <!-- need for tooltip -->
         <px-vis-tooltip
-          px-svg-elem="[[pxSvgElem]]"
+          hover-target=[[mouseRect]]
+          mouse-position="[[mousePosition]]"
           width="250"
           margin="[[margin]]"
-          x-axis-type="time"
-          complete-series-config="[[seriesConfig]]"
           chart-data="[[chartData]]"
-          tooltip-data="[[tooltipData]]">
+          tooltip-data="[[tooltipData]]"
+          complete-series-config="[[seriesConfig]]"
+          x-axis-type="time"
+          tooltip-style="light">
         </px-vis-tooltip>
         <px-vis-svg
           width="[[width]]"
@@ -64,8 +68,7 @@
           chart-data="[[chartData]]"
           x="[[x]]"
           y="[[y]]"
-          current-domain-x="[[currentDomainX]]"
-          current-domain-y="[[currentDomainY]]">
+          domain-changed="[[domainChanged]]">
         </px-vis-line>
 
 
@@ -77,7 +80,8 @@
     <div>
       <px-demo-snippet
         element-properties="[[elempropTooltip]]"
-        element-name="px-vis-tooltip">
+        element-name="px-vis-tooltip"
+        code-link="http://codepen.io/menkhakl/pen/xEpzBY">
       </px-demo-snippet>
     </div>
 
@@ -103,6 +107,10 @@
             "bottom": 10,
             "left": 10
           }
+        },
+        domainChanged:{
+          type: Boolean,
+          value: false
         },
         chartData:{
           type : Array,
