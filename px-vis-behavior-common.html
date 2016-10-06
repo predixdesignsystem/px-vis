@@ -341,17 +341,55 @@ PxVisBehavior.mutedSeries = {
      *
      * In this example, seriesId1 is muted. seriesId2 was muted, but has been turned back on.
      *
-     * @property mutedSeries
-     * @type Object
-     * @default []
      */
     mutedSeries:{
       type:Object,
       notify: true,
       value:function(){ return {}; },
-    },
+    }
   }
 };
+
+/*
+    Name:
+    PxVisBehavior.muteUnmuteSeries
+
+    Description:
+    Polymer behavior that provides the mutedSeries property and methods to mute/unmute series for px-vis components.
+
+    Dependencies:
+    -
+
+    @polymerBehavior PxVisBehavior.muteUnmuteSeries
+*/
+PxVisBehavior.muteUnmuteSeries = [{
+  properties: {},
+
+  /**
+   * Method to mute or umute
+   *
+   */
+  muteUnmuteSeries: function(series) {
+    //TODO Polymer 2.0: fix this
+    // make sure we are not dealing with APM's IDs
+    if(series.indexOf('.') === -1) {
+      // if it doesnt exist, let's add it and set to true
+      if( typeof(this.mutedSeries[series]) === 'undefined' ) {
+        this.set('mutedSeries.' + series, true);
+      } else {
+        //if does exist, flip the bit
+        this.set('mutedSeries.' + series, !this.mutedSeries[series]);
+      }
+    } else {
+      var muted = this.mutedSeries;
+      this.mutedSeries = [];
+      muted[series] = typeof(muted[series]) === 'undefined' ? true : !muted[series];
+      this.set('mutedSeries', muted);
+    }
+
+    this.fire('px-vis-muted-series-updated', { 'data': this.mutedSeries[series], 'dataVar': ('mutedSeries.'+series) ,'method': 'set' });
+  }
+}, PxVisBehavior.mutedSeries];
 
 /*
     Name:
@@ -369,7 +407,7 @@ PxVisBehavior.progressiveRendering = {
   properties: {
     /**
     * By default the lines are rendered progressively for a better user experience.
-    * Use this to prevent progressive rendering 
+    * Use this to prevent progressive rendering
     */
     noCanvasProgressiveRendering: {
       type: Boolean,

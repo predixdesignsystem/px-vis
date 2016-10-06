@@ -882,6 +882,10 @@ PxVisBehaviorD3.radialLineGenerator = [{
     */
     line: {
       type: Object
+    },
+
+    lineRadiusLimit: {
+      type: Number
     }
   },
   /**
@@ -892,7 +896,8 @@ PxVisBehaviorD3.radialLineGenerator = [{
     //get our dimensions
     var _this = this,
         renderToCanvas = (typeof(toCanvas) !== 'undefined') ? toCanvas : false,
-        dims = this.completeSeriesConfig[this.seriesId]['x'],
+        //omg; need to make a copy or else completing the circle breaks dragging.
+        dims = JSON.parse(JSON.stringify(this.completeSeriesConfig[this.seriesId]['x'])),
         path,
         line,
         clockwiseFactor = counterClockwise ? -1 : 1;
@@ -901,13 +906,24 @@ PxVisBehaviorD3.radialLineGenerator = [{
 
       var processAngle;
 
+      if(this.interpolationFunction === 'bofCompleteManually') {
+        //manually complete the circle.
+        // if we use a d3 interpolator, it adds 'Z' to the path which cause all broken paths to complete. We want to keep broken paths broken
+        dims.push(dims[0]);
+      }
+
       path = Px.d3.radialLine()
       .angle(function(d) {
         return _this.x(d[0]) * clockwiseFactor;
       })
       .radius(function(d) {
-          // ~~ --> round pixels values to optimize svg perfs
-        return ~~_this.y(Number(d[1]));
+        // ~~ --> round pixels values to optimize svg perfs
+        var radius = ~~_this.y(Number(d[1]));
+
+        if(typeof _this.lineRadiusLimit === 'number' && radius < _this.lineRadiusLimit) {
+          return _this.lineRadiusLimit;
+        }
+        return radius
       }).defined(function(d) {
         return !isNaN(_this.x(d[0])) && !isNaN(_this.y(Number(d[1])));
       });
@@ -954,7 +970,7 @@ PxVisBehaviorD3.radialLineGenerator = [{
       }
     }
 
-    if(this.interpolationFunction) {
+    if(typeof this.interpolationFunction === 'function') {
       path.curve(this.interpolationFunction);
     }
 
