@@ -1,3 +1,9 @@
+v0.5.8
+==================
+* added ability to set domain with radial scale
+* added limit radius to radial line
+* fixed brushing with raidal axes
+
 v0.5.7
 ==================
 * scale now notifies on x axis creation
