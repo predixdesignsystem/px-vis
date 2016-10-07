@@ -350,7 +350,7 @@ Element which draws scatter series onto the chart
         this._arcs.enter()
                   .append('svg:g')
                   .attr('class', 'slice')
-                  .on('tap', this._centerOnSlice.bind(this))
+                  .on('tap', this._onSliceClick.bind(this))
                   .on('mouseover', this._showTooltip.bind(this))
                   .on('mouseleave', this._hideTooltip.bind(this))
                   .append('svg:path')
@@ -444,6 +444,14 @@ Element which draws scatter series onto the chart
           .transition()
           .duration(transitionTime)
           .attr('transform', this._translationString + ' rotate(' + this._radToDeg(this._currentRotationAngle) + ')');
+    },
+    /**
+     * Emits px-vis-pie-slice-clicked event with selected slice data
+     *
+     */
+    _onSliceClick: function (datum, index, group) {
+      this.fire('px-vis-pie-slice-clicked', datum);
+      this._centerOnSlice(datum, index, group);
     },
     /**
      * Transforms the svg to show the slice at the top (12 o clock)
