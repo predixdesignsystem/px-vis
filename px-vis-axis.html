@@ -189,6 +189,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           'drawElement(domainChanged,svg,axis,margin,height,disableTicks)',
           'drawSeriesBars(completeSeriesConfig.*, titleDrawn)',
           '_muteSeriesBars(mutedSeries.*)',
+          '_updateTicks(ticks)',
           '_titleChanged(displayedTitle, _axisGroup, titleLocation.*, height, width)',
           '_truncateTitle(title, truncationLength, appendUnitInTitle, completeSeriesConfig)'
         ],
@@ -205,15 +206,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             // alert parents that we are done drawing the axis
             this.fire('px-axis-done');
           }
-        },
-
-        detached: function(){
-          // this.svg.selectAll('g').each(function(d){
-          //   Px.d3.select(this).remove();
-          // });
-          // // this.svg.remove();
-          // this._axisGroup.remove();
-          // this._axisGroup = null;
         },
 
         /**
@@ -240,6 +232,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               break;
           }
 
+          this._processTicks();
+        },
+
+        _processTicks: function() {
           //support for general ticks setting
           // https://github.com/d3/d3-axis#axis_ticks
           if(this.ticks && this.axisType !== 'ordinal') {
@@ -303,8 +299,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           } else if(this.labelPosition !== 'center') {
             this._axis.tickSizeInner(this.labelTypeSize);
           }
-
         },
+
         /**
          * Draws the axis
          *
@@ -387,11 +383,19 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           this.fire('px-axis-done');
         },
 
+
+        _updateTicks: function() {
+          if(this.axis && this.margin && this.height && typeof this.disableTicks !== 'undefined') {
+            this.drawElement();
+          }
+        },
+
         _calcDrawnTicks: function() {
           if(this.axisType !== 'ordinal') {
             //apparently we need to give ourselves a bit of time to ensure the axis draws and it can clac this
             this.debounce("drawnTicks", function(){
               if(this.ticks){
+                console.log('tick values: ' + this._axis.scale().ticks(this.ticks))
                 this.set('drawnTickValues', this._axis.scale().ticks(this.ticks));
               } else {
                 this.set('drawnTickValues', this._axis.scale().ticks());
