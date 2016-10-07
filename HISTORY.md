@@ -1,3 +1,9 @@
+v0.5.11
+==================
+* Fixed vis demo
+* all demos and demo snippets are up to date and working
+* added codepen links
+
 v0.5.10
 ==================
 * redraw axis on tick change
