@@ -1,3 +1,7 @@
+v0.5.10
+==================
+* redraw axis on tick change
+
 v0.5.9
 ==================
 * make sure we observe seriesId for dynamic properties
