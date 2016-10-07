@@ -1,3 +1,7 @@
+v0.5.11
+==================
+* draw max value in radial gridlines
+
 v0.5.10
 ==================
 * redraw axis on tick change

@@ -84,11 +84,15 @@ The gridlines still make use of the d3.axis object, just with different settings
           tickValues: {
               type: Array,
               value: []
+          },
+          currentDomainY: {
+              type: Array,
+              value: []
           }
         },
 
         observers: [
-          'drawElement(domainChanged, axis, margin, svg, tickValues)'
+          'drawElement(domainChanged, axis, margin, svg, tickValues, currentDomainY)'
         ],
 
 
@@ -115,12 +119,6 @@ The gridlines still make use of the d3.axis object, just with different settings
                 node.removeChild(node.firstChild);
             }
              
-          /*  } else {
-                this.gridSvg.selectAll('*').remove();
-                //make sure the grid svg is being kept in sync...
-                this.gridSvg.width = this.svg.width;
-                this.gridSvg.
-            }*/
 
             var radius = this.axis.range()[1] - this.axis.range()[0];
 
@@ -141,6 +139,14 @@ The gridlines still make use of the d3.axis object, just with different settings
             var r = Px.d3.scaleLinear()
                             .domain(this.axis.domain())
                             .range(this.axis.range()),
+                tickValues = this.tickValues.length > 0 ? this.tickValues : r.ticks(5).slice(1),
+                gr;
+
+                //make sure we have the last circle.
+                if(this.currentDomainY.length > 1) {
+                    tickValues.push(this.currentDomainY[1]);
+                }
+
                 gr = this.svg.append('g')
                 .attr('class', 'r axis')
                 .attr('fill', 'none')
