@@ -1,5 +1,6 @@
 <link rel="import" href="px-vis-d3.html" />
 <link rel="import" href="px-vis-imports.html" />
+<link rel="import" href="px-vis-behavior-common.html" />
 <script>
 /*
   Polyfill to add .remove() for IE11.
@@ -881,6 +882,10 @@ PxVisBehaviorD3.radialLineGenerator = [{
     */
     line: {
       type: Object
+    },
+
+    lineRadiusLimit: {
+      type: Number
     }
   },
   /**
@@ -891,7 +896,8 @@ PxVisBehaviorD3.radialLineGenerator = [{
     //get our dimensions
     var _this = this,
         renderToCanvas = (typeof(toCanvas) !== 'undefined') ? toCanvas : false,
-        dims = this.completeSeriesConfig[this.seriesId]['x'],
+        //omg; need to make a copy or else completing the circle breaks dragging.
+        dims = JSON.parse(JSON.stringify(this.completeSeriesConfig[this.seriesId]['x'])),
         path,
         line,
         clockwiseFactor = counterClockwise ? -1 : 1;
@@ -911,8 +917,13 @@ PxVisBehaviorD3.radialLineGenerator = [{
         return _this.x(d[0]) * clockwiseFactor;
       })
       .radius(function(d) {
-          // ~~ --> round pixels values to optimize svg perfs
-        return ~~_this.y(Number(d[1]));
+        // ~~ --> round pixels values to optimize svg perfs
+        var radius = ~~_this.y(Number(d[1]));
+
+        if(typeof _this.lineRadiusLimit === 'number' && radius < _this.lineRadiusLimit) {
+          return _this.lineRadiusLimit;
+        }
+        return radius
       }).defined(function(d) {
         return !isNaN(_this.x(d[0])) && !isNaN(_this.y(Number(d[1])));
       });
@@ -985,13 +996,6 @@ PxVisBehaviorD3.radialLineGenerator = [{
 */
 PxVisBehaviorD3.lineShared = [{
   properties: {
-    /**
-    * A unique ID for each line series
-    *
-    */
-    seriesId:{
-      type:String
-    },
     /**
     * A dev set boolean specifying if the chart is for a parallel coordinates chart
     *
@@ -1173,6 +1177,6 @@ PxVisBehaviorD3.lineShared = [{
 
     this.set('line',line);
   }
-},PxVisBehaviorD3.radialLineGenerator];
+},PxVisBehaviorD3.radialLineGenerator, PxVisBehavior.seriesId];
 
 </script>

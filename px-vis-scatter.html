@@ -39,6 +39,7 @@ Element which draws scatter series onto the chart
 
 <script>
   Polymer({
+
     is: 'px-vis-scatter',
 
     behaviors: [
@@ -53,6 +54,8 @@ Element which draws scatter series onto the chart
       PxVisBehavior.tooltipData,
       PxVisBehaviorD3.domainUpdate,
       PxVisBehavior.polarData,
+      PxVisBehavior.seriesId,
+      PxVisBehavior.dynamicConfigProperties,
       commonColors
     ],
 
@@ -64,64 +67,14 @@ Element which draws scatter series onto the chart
      */
     properties: {
       /**
-       * A unique ID for each line series
+       * An index of the series used for calculating its color
        *
-       * @property seriesId
+       * @property scatterNumber
        * @type String
        */
-      seriesId:{
-        type:String
-      },
-      /**
-       * Scales the size of the scatter marker
-       *
-       */
-      markerScale: {
-        type: Number,
-        value: 1
-      },
-      /**
-       * The symbol used for the marker. Supported symbols:
-       * - 'circle'
-       * - 'cross'
-       * - 'diamond'
-       * - 'square'
-       * - 'triangle-up'
-       * - 'star'
-       * - 'wye'
-       * more info at https://github.com/d3/d3-shape/blob/master/README.md#symbols
-       */
-      markerSymbol: {
-        type: String,
-        value: 'circle'
-      },
-      /**
-       * the size of the markers
-       */
-      markerSize: {
-        type: Number,
-        value: 64
-      },
-      /**
-       * The opacity of the fill (inside) of the marker
-       */
-      fillOpacity: {
-        type: Number,
-        value: 0.5
-      },
-      /**
-       * The opacity of the stroke (outside) of the marker
-       */
-      strokeOpacity: {
-        type: Number,
-        value: 1
-      },
-      /**
-       * the opacity value of the fill to be used when muting a serie (stroke is not drawn on mute)
-       */
-      mutedOpacity: {
-        type: Number,
-        value: 0.3
+      seriesNumber:{
+        type:Number,
+        value:0
       },
       _markerMapping: {
         type: Object,
@@ -134,17 +87,57 @@ Element which draws scatter series onto the chart
           'triangle-up': Px.d3.symbolTriangle,
           'star': Px.d3.symbolStar,
           'wye': Px.d3.symbolWye
-        }
-      },
-      /**
-       * An index of the series used for calculating its color
-       *
-       * @property scatterNumber
-       * @type String
-       */
-      seriesNumber:{
-        type:Number,
-        value:0
+        },
+        /**
+         * The symbol used for the marker. Supported symbols:
+         * - 'circle'
+         * - 'cross'
+         * - 'diamond'
+         * - 'square'
+         * - 'triangle-up'
+         * - 'star'
+         * - 'wye'
+         * more info at https://github.com/d3/d3-shape/blob/master/README.md#symbols
+         * This property will be read from the completeSeriesConfig
+         */
+        markerSymbol: {
+          type: String
+        },
+        /**
+         * Scales the size of the scatter marker
+         * This property will be read from the completeSeriesConfig
+         */
+        markerScale: {
+          type: Number
+        },
+        /**
+         * the size of the markers
+         * This property will be read from the completeSeriesConfig
+         */
+        markerSize: {
+          type: Number
+        },
+        /**
+         * The opacity of the fill (inside) of the marker
+         * This property will be read from the completeSeriesConfig
+         */
+        markerFillOpacity: {
+          type: Number
+        },
+        /**
+         * The opacity of the stroke (outside) of the marker
+         * This property will be read from the completeSeriesConfig
+         */
+        markerStrokeOpacity: {
+          type: Number
+        },
+        /**
+         * the opacity value of the fill to be used when muting a serie (stroke is not drawn on mute)
+         * This property will be read from the completeSeriesConfig
+         */
+        mutedOpacity: {
+          type: Number
+        },
       },
       /**
        * A holder object for the series group
@@ -187,16 +180,19 @@ Element which draws scatter series onto the chart
     },
 
     observers: [
-      'drawElement(svg, domainChanged, chartData.*, completeSeriesConfig.*, radial, counterClockwise)',
+      'drawElement(svg, domainChanged, chartData.*, completeSeriesConfig.*, radial, counterClockwise,markerSymbol, markerScale, markerSize, markerFillOpacity, markerStrokeOpacity)',
       'isIdInMuted(mutedSeries.*)',
       '_addClipPath(clipPath)'
      ],
 
-    ready:function(){
-      // if there is no dev set unique ID, generate one
-      if(!this.seriesId){
-        this.set('seriesId', this.generateRandomID('scatter_'));
-      }
+    ready:function() {
+      //generate properties dynamically
+      this._watchConfigProperty('markerSymbol', 'circle');
+      this._watchConfigProperty('markerScale', 1);
+      this._watchConfigProperty('markerSize', 64);
+      this._watchConfigProperty('markerFillOpacity', 0.6);
+      this._watchConfigProperty('markerStrokeOpacity', 1);
+      this._watchConfigProperty('mutedOpacity', 0.3);
     },
 
     /**
@@ -210,18 +206,6 @@ Element which draws scatter series onto the chart
 
       // checks to see if the group already exists. If not, create; if so, update
       if(this._isObjEmpty(this.scatterGroup)) {
-
-        //override marker symbol if defined in serie config
-        this.markerSymbol = this.completeSeriesConfig[this.seriesId].markerSymbol ?
-                              this.completeSeriesConfig[this.seriesId].markerSymbol : this.markerSymbol;
-        this.markerScale = this.completeSeriesConfig[this.seriesId].markerScale ?
-                              this.completeSeriesConfig[this.seriesId].markerScale : this.markerScale;
-        this.fillOpacity = this.completeSeriesConfig[this.seriesId].markerFillOpacity ?
-                              this.completeSeriesConfig[this.seriesId].markerFillOpacity : this.fillOpacity;
-        this.strokeOpacity = this.completeSeriesConfig[this.seriesId].markerStrokeOpacity ?
-                              this.completeSeriesConfig[this.seriesId].markerStrokeOpacity : this.strokeOpacity;
-        this.mutedOpacity = this.completeSeriesConfig[this.seriesId].mutedOpacity ?
-                              this.completeSeriesConfig[this.seriesId].mutedOpacity : this.mutedOpacity;
 
         // draw the path
         this.scatterGroup = this.svg.append('g')
@@ -238,31 +222,29 @@ Element which draws scatter series onto the chart
 
       var _this = this;
 
-      this.scatterBuilder = this.scatterGroup.selectAll('path.' + this.markerSymbol)
+      this.scatterBuilder = this.scatterGroup.selectAll('path.symbol')
         .data(data);
 
       this.scatterBuilder.exit().remove();
 
       this.scatterBuilder.enter()
         .append('path')
-        .attr('d', Px.d3.symbol().type(this._markerMapping[this.markerSymbol]))
+        .attr('class', 'symbol')
         .on('mouseover', this._showTooltip.bind(this))
         .on('mouseleave', this._hideTooltip.bind(this))
       .merge(this.scatterBuilder)
-        .attr('fill',this.completeSeriesConfig[this.seriesId]['color'])
-        .attr('fill-opacity',this.fillOpacity)
-        .attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
-        .attr('stroke-opacity',this.strokeOpacity)
+        .attr('d', Px.d3.symbol().type(this._markerMapping[this.markerSymbol]).size(this.markerSize))
         .attr('transform', this._applyTransform.bind(this))
-        .attr('class', function(d,i){
+        .each(function(d,i) {
           // if this series is missing a datapoint, remove that point
           if(isNaN(d[_this.completeSeriesConfig[_this.seriesId]['y']])){
-            return this.remove();
+            this.remove();
           }
-          return _this.markerSymbol;
         });
 
-      this.scatterDots = this.scatterGroup.selectAll('path.' + this.markerSymbol);
+      this.scatterDots = this.scatterGroup.selectAll('path.symbol');
+
+      this._colorScatter();
 
       this._addClipPath();
     },
@@ -321,12 +303,8 @@ Element which draws scatter series onto the chart
      */
     isIdInMuted: function() {
       if(this.mutedSeries.hasOwnProperty(this.seriesId)){
-        // if true, mute
-        if(this.mutedSeries[this.seriesId]){
-          this._muteScatter();
-        } else {
-          this._colorScatter();
-        }
+       
+        this._colorScatter();
       }
     },
     /**
@@ -368,22 +346,13 @@ Element which draws scatter series onto the chart
      * @method _colorScatter
      */
     _colorScatter:function(){
-      var index = this.seriesNumber;
+      var index = this.seriesNumber,
+          muted = this.mutedSeries[this.seriesId];
       this.scatterDots
         .attr('fill',this.completeSeriesConfig[this.seriesId]['color'])
-        .attr('fill-opacity',0.6)
+        .attr('fill-opacity', muted ? this.mutedOpacity : this.markerFillOpacity)
         .attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
-        .attr('stroke-opacity',1);
-    },
-    /**
-     * Adds muted color to the scatters.
-     *
-     * @method _muteScatter
-     TODO add dev set color and opacity
-     */
-     _muteScatter:function(){
-       this.scatterDots.attr('fill-opacity', this.mutedOpacity);
-       this.scatterDots.attr('stroke-opacity',0);
-     }
+        .attr('stroke-opacity', muted ? 0 : this.markerStrokeOpacity);
+    }
   });
 </script>

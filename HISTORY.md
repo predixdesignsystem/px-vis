@@ -1,3 +1,16 @@
+v0.5.9
+==================
+* make sure we observe seriesId for dynamic properties
+
+v0.5.8
+==================
+* added ability to set domain with radial scale
+* added limit radius to radial line
+* fixed brushing with raidal axes
+* added behavior for dynamically watching properties tied to completeSeriesConfig
+* fixed how we expose some properties in completeSeriesConfig
+* bug fixing
+
 v0.5.7
 ==================
 * scale now notifies on x axis creation
