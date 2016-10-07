@@ -1,3 +1,7 @@
+v0.5.9
+==================
+* make sure we observe seriesId for dynamic properties
+
 v0.5.8
 ==================
 * added ability to set domain with radial scale
