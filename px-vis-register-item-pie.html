@@ -1,4 +1,5 @@
 <link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="px-vis-behavior-register.html"/>
 
 <!--
 Element providing a display and interaction space for series in your chart.
@@ -17,30 +18,34 @@ Element providing a display and interaction space for series in your chart.
 
 <dom-module id="px-vis-register-item-pie">
 
-  <template is="dom-repeat" items="{{chartData}}">
+  <template>
     <style include="px-vis-register-styles"></style>
     <style include="px-theme-styles"></style>
 
-    <span class$="{{_mutedToStart(item.name)}}" name$="R{{_returnPieVal(item, 'y', '', usePercentage)}}" on-click="_pieSeriesClicked">
-        <span
-          class="seriesMarker"
-          style$="background-color:{{_getPieBackColor(item, index)}}"
-          name$="R{{_returnPieVal(item, 'y', '', usePercentage)}}"
-        >&nbsp;</span>
-        <div class$="{{_getWrapperClass(type)}}">
-          <div class="seriesName" name$="R{{_getName(item)}}">
-            {{_returnTruncatedName(item)}}&nbsp;
-            <template is="dom-if" if="{{_didTruncate(item,truncationLength)}}">
-              <px-tooltip delay="500">{{_getName(item)}}</px-tooltip>
-            </template>
+      <span
+        id="pieItem"
+        class$="{{_baseClasses()}}"
+        name$="R{{_returnPieVal(item, 'y', '', usePercentage, completeSeriesConfig)}}">
+          <span
+            class="seriesMarker"
+            style$="background-color:{{_getPieBackColor(item, itemIndex)}}"
+            name$="R{{_returnPieVal(item, 'y', '', usePercentage, completeSeriesConfig)}}"
+          >&nbsp;</span>
+          <div class$="{{_getWrapperClass(type)}}">
+            <div class="seriesName" name$="R{{_configName}}">
+              {{_truncatedName}}&nbsp;
+              <template is="dom-if" if="{{_didTruncate}}">
+                <px-tooltip delay="500">{{_configName}}</px-tooltip>
+              </template>
+            </div>
+            <!-- Display serie data differently depending on x and y axis types -->
+            <div class="seriesData" name$="R{{_returnPieVal(item, 'y', '', usePercentage, completeSeriesConfig)}}">
+              <span>[[_returnPieVal(item, 'x', '', usePercentage, completeSeriesConfig)]]</span>
+              <template is="dom-if" if="{{_returnPieVal(item, 'x', '', usePercentage, completeSeriesConfig)}}">{{_getPieUnit(usePercentage)}}</template>
+            </div>
           </div>
-          <!-- Display serie data differently depending on x and y axis types -->
-          <div class="seriesData" name$="R{{_returnPieVal(item, 'y', '', usePercentage)}}">
-            <span>[[_returnPieVal(item, 'x', '', usePercentage)]]</span>
-            <template is="dom-if" if="{{_returnPieVal(item, 'x', '', usePercentage)}}">{{_getPieUnit(usePercentage)}}</template>
-          </div>
-        </div>
-    </span>
+      </span>
+    </template>
   </template>
 
 </dom-module>
@@ -48,8 +53,47 @@ Element providing a display and interaction space for series in your chart.
 <script>
   Polymer({
     is: 'px-vis-register-item-pie',
-    properties: {
 
-    }
+    behaviors: [
+      PxVisBehavior.dataset,
+      PxVisBehavior.formatting,
+      PxVisBehavior.completeSeriesConfig,
+      PxVisBehavior.truncating,
+      PxVisBehavior.axisTypes,
+      PxVisBehavior.commonMethods,
+      PxVisBehaviorRegister.register,
+      PxVisBehaviorRegister.pie,
+      PxVisBehaviorRegister.itemShared,
+      commonColors
+    ],
+
+    properties: {
+      itemIndex: {
+        type: Number
+      }
+    },
+
+    _returnPieVal: function(item, axis, separator, usePercentage) {
+      //pie should have only one config bit.
+      var key = Object.keys(this.completeSeriesConfig)[0],
+          axisKey = axis === 'x' ? this.completeSeriesConfig[key]['x'] : this.completeSeriesConfig[key]['y'],
+          axisKey = usePercentage ? 'percentage' : axisKey;
+
+      if(item && item[axisKey]) {
+        return item[axisKey] + (separator ? separator : '');
+      }
+      return null;
+    },
+
+    _getPieUnit: function(usePercentage) {
+      //pie should have only one config bit.
+      var key = Object.keys(this.completeSeriesConfig)[0];
+      var unit = this.completeSeriesConfig[key].xAxisUnit;
+      return usePercentage ? '%' : unit;
+    },
+
+    _getPieBackColor: function(item, index) {
+      return item.backgroundColor ? item.backgroundColor : this._getPieColorForIndex(index);
+    },
   });
 </script>

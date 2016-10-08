@@ -4,6 +4,7 @@
 <link rel="import" href="px-vis-behavior-register.html"/>
 <link rel="import" href="px-vis-behavior-datetime.html"/>
 <link rel="import" href="px-vis-register-item.html"/>
+<link rel="import" href="px-vis-register-item-pie.html"/>
 <link rel="import" href="px-vis-register-datetime.html"/>
 <link rel="import" href="../numbro-element/numbro-element.html" />
 <link rel="import" href="../px-tooltip/px-tooltip.html"/>
@@ -23,6 +24,7 @@ You can turn series on the chart off by clicking on that series in the register.
         width="[[width]]"
         type="horizontal"
         tooltip-data=[[tooltipData]]
+        chart-data=[[chartData]]
         muted-series="[[mutedSeries]]"
         complete-series-config="[[completeSeriesConfig]]"
         x-axis-type="time"
@@ -93,7 +95,6 @@ Formatting for the timestamps,the data values, and the series names can be contr
             <px-vis-register-item
               item="[[item]]"
               complete-series-config="[[completeSeriesConfig]]"
-              chart-data="[[chartData]]"
               type="[[type]]"
               x-axis-type="[[xAxisType]]"
               y-axis-type="[[yAxisType]]"
@@ -103,11 +104,18 @@ Formatting for the timestamps,the data values, and the series names can be contr
         </template>
         <!-- For pie charts -->
         <template is="dom-if" if="{{_isOfType(yAxisType, 'pie')}}">
-          <h1>PIE</h1>
-          <!--
-          <px-vis-register-item-pie>
-          </px-vis-register-item-pie>
-          -->
+          <template is="dom-repeat" items="{{chartData}}">
+            <px-vis-register-item-pie
+              item="[[item]]"
+              item-index="[[index]]"
+              complete-series-config="[[completeSeriesConfig]]"
+              chart-data="[[chartData]]"
+              type="[[type]]"
+              x-axis-type="[[xAxisType]]"
+              y-axis-type="[[yAxisType]]"
+              use-percentage="[[usePercentage]]">
+            </px-vis-register-item-pie>
+          </template>
         </template>
       </div>
     </div>
@@ -131,6 +139,8 @@ Formatting for the timestamps,the data values, and the series names can be contr
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.commonMethods,
       PxVisBehaviorRegister.register,
+      PxVisBehaviorRegister.pie,
+      PxVisBehaviorRegister.datetime,
       commonColors
     ],
     /**
@@ -160,43 +170,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
         computed: '_computeSeries(tooltipData)'
       },
 
-      /**
-       * Holder for the formated first datetime string
-       *
-       * @property _firstDateTime
-       * @type string
-      */
-      _firstDateTime:{
-        type:String,
-        notify:true
-      },
-      /**
-       * Holder for the formated second datetime string
-       *
-       * @property _secondDateTime
-       * @type string
-      */
-      _secondDateTime:{
-        type:String,
-        notify:true
-      },
-      /**
-       * Holder for the formated separator character
-       *
-       * @property _separator
-       * @type string
-      */
-      _separator:{
-        type:String,
-        notify:true
-      },
-      /**
-       * For pie charts whether the values should be displayed in %
-       */
-      usePercentage: {
-        type: Boolean,
-        value: false
-      }
+
     },
 
     observers: [
@@ -248,28 +222,6 @@ Formatting for the timestamps,the data values, and the series names can be contr
       }
     },
 
-
-    _returnPieVal: function(item, axis, separator, usePercentage) {
-      //pie should have only one config bit.
-      var key = Object.keys(this.completeSeriesConfig)[0],
-          axisKey = axis === 'x' ? this.completeSeriesConfig[key]['x'] : this.completeSeriesConfig[key]['y'],
-          axisKey = usePercentage ? 'percentage' : axisKey;
-
-      if(item && item[axisKey]) {
-        return item[axisKey] + (separator ? separator : '');
-      }
-      return null;
-    },
-
-    _getPieUnit: function(usePercentage) {
-      //pie should have only one config bit.
-      var key = Object.keys(this.completeSeriesConfig)[0];
-      var unit = this.completeSeriesConfig[key].xAxisUnit;
-      return usePercentage ? '%' : unit;
-    },
-    _getPieBackColor: function(item, index) {
-      return item.backgroundColor ? item.backgroundColor : this._getPieColorForIndex(index);
-    },
     _computeSeries: function() {
       return this.tooltipData.series;
     }

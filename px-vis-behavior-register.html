@@ -18,45 +18,21 @@ PxVisBehaviorRegister.itemShared = {
     item: {
       type: Object
     },
-    _itemColor: {
+    _wrapperClass: {
       type: String,
-      computed: '_computeItemColor(item, completeSeriesConfig)'
-    },
-    _itemX: {
-      type: String,
-      computed: '_computeItemX(item, completeSeriesConfig)'
-    },
-    _itemY: {
-      type: String,
-      computed: '_computeItemY(item, completeSeriesConfig)'
-    },
-    _itemMutedToStart: {
-      type: String,
-      computed: '_computeItemMutedToStart(item, completeSeriesConfig)'
-    },
-    _truncatedName: {
-      type: String,
-      computed: '_computeTruncatedName(item, completeSeriesConfig)'
-    },
-    _didTruncate: {
-      type: Boolean,
-      computed: '_computeDidTruncate(item, completeSeriesConfig)'
+      computed: '_getWrapperClass(item, completeSeriesConfig)'
     },
     _configName: {
       type: String,
       computed: '_computeConfigName(item, completeSeriesConfig)'
     },
-    _wrapperClass: {
+    _truncatedName: {
       type: String,
-      computed: '_getWrapperClass(item, completeSeriesConfig)'
+      computed: '_computeTruncatedName(_configName, completeSeriesConfig)'
     },
-    _xUnit: {
-      type: String,
-      computed: '_computeXUnit(item, completeSeriesConfig.*)'
-    },
-    _yUnit: {
-      type: String,
-      computed: '_computeYUnit(item, completeSeriesConfig.*)'
+    _didTruncate: {
+      type: Boolean,
+      computed: '_computeDidTruncate(_configName, completeSeriesConfig)'
     },
 
     /**
@@ -75,26 +51,38 @@ PxVisBehaviorRegister.itemShared = {
     }
   },
 
-  _computeItemY: function() {
-    return this._returnVal(this.item, 'y', '&nbsp;/&nbsp');
+  _getWrapperClass: function() {
+    var classList = 'flex ';
+    if(this.type === 'horizontal') {
+      classList += 'flex--col ';
+    } else {
+      classList += 'flex--row flex--justify';
+    }
+    return classList;
   },
-  _computeItemX: function() {
-    return this._returnVal(this.item, 'x', '&nbsp;/&nbsp');
-  },
-  _computeItemMutedToStart: function() {
-    return this._mutedToStart(this.item.name);
-  },
+
   _computeConfigName: function() {
     return this._getConfigName(this.item.name);
   },
-  _computeTruncatedName: function() {
-    return this._truncateName(this._getConfigName(this.item.name), this.truncationLength);
+  _computeTruncatedName: function(_configName) {
+    return this._truncateName(_configName, this.truncationLength);
   },
-  _computeXUnit : function(item, completeSeriesConfig) {
-    return this.completeSeriesConfig[item.name]['xAxisUnit'] ? this.completeSeriesConfig[item.name]['xAxisUnit'] : '';
+
+  /**
+   * dom-if function for series names to decide if it was truncated. If so, add a tooltip showing full name
+   *
+   */
+  _computeDidTruncate: function(str,len) {
+    var len = this.truncationLength;
+    return len > 2 && str.length > len ? true : false;
   },
-  _computeYUnit : function(item, completeSeriesConfig) {
-    return this.completeSeriesConfig[item.name]['yAxisUnit'] ? this.completeSeriesConfig[item.name]['yAxisUnit'] : '';
+
+  _getConfigName: function(name) {
+    if(this.xAxisType === 'pie') {
+      return this.item.y;
+    } else {
+      return this.completeSeriesConfig[this.item.name]['name'];
+    }
   },
 
   /**
@@ -104,12 +92,222 @@ PxVisBehaviorRegister.itemShared = {
    *
    * @method _mutedToStart
    */
-  _mutedToStart: function() {
+  _baseClasses: function() {
     var baseClasses = (this.type === 'horizontal') ? "series narrow flex flex--row" : "series wide flex flex--row";
-    if(this.mutedSeries[this.name]) {
-      return baseClasses + ' muted';
-    }
     return baseClasses;
+  },
+};
+
+/*
+    Name:
+    PxVisBehavior.register
+
+    Description:
+    Polymer behavior that provides the basic properties and methods for px-vis register.
+
+    Dependencies:
+    - none
+
+    @polymerBehavior PxVisBehavior.register
+*/
+PxVisBehaviorRegister.register = {
+  properties: {
+    /**
+     * For pie charts whether the values should be displayed in %
+     */
+    usePercentage: {
+      type: Boolean,
+      value: false
+    }
+  },
+
+  _getSeriesWrapperClass: function(type) {
+    var classList = 'flex ';
+
+    if(type === 'horizontal') {
+      classList += 'flex--row ';
+    } else {
+      classList += 'flex--col';
+    }
+
+    return classList;
+  },
+
+  _isOfType: function(toTest, type) {
+    return toTest === type;
+  }
+};
+
+/*
+    Name:
+    PxVisBehavior.pie
+
+    Description:
+    Polymer behavior that provides the basic properties and methods for px-vis register.
+
+    Dependencies:
+    - none
+
+    @polymerBehavior PxVisBehavior.pie
+*/
+PxVisBehaviorRegister.pie = {
+  properties: {
+    /**
+     * For pie charts whether the values should be displayed in %
+     */
+    usePercentage: {
+      type: Boolean,
+      value: false
+    }
+  }
+};
+
+/*
+    Name:
+    PxVisBehavior.datetime
+
+    Description:
+    Polymer behavior that provides the basic properties and methods for px-vis register.
+
+    Dependencies:
+    - none
+
+    @polymerBehavior PxVisBehavior.datetime
+*/
+PxVisBehaviorRegister.datetime = {
+  properties: {
+
+    /**
+     * Holder for the formated first datetime string
+     *
+     * @property _firstDateTime
+     * @type string
+    */
+    _firstDateTime:{
+      type:String,
+      notify:true
+    },
+    /**
+     * Holder for the formated second datetime string
+     *
+     * @property _secondDateTime
+     * @type string
+    */
+    _secondDateTime:{
+      type:String,
+      notify:true
+    },
+    /**
+     * Holder for the formated separator character
+     *
+     * @property _separator
+     * @type string
+    */
+    _separator:{
+      type:String,
+      notify:true
+    }
+  }
+};
+
+/*
+    Name:
+    PxVisBehavior.muteableItem
+
+    Description:
+    Polymer behavior that provides the muting properties.
+
+    Dependencies:
+    - none
+
+    @polymerBehavior PxVisBehavior.muteableItem
+*/
+PxVisBehaviorRegister.nonPieItem = {
+  properties: {
+    _xUnit: {
+      type: String,
+      computed: '_computeXUnit(item, completeSeriesConfig.*)'
+    },
+    _yUnit: {
+      type: String,
+      computed: '_computeYUnit(item, completeSeriesConfig.*)'
+    },
+    _itemMutedToStart: {
+      type: String,
+      computed: '_computeItemMutedToStart(item, completeSeriesConfig)'
+    },
+    _itemColor: {
+      type: String,
+      computed: '_computeItemColor(item, completeSeriesConfig)'
+    },
+    _itemX: {
+      type: String,
+      computed: '_computeItemX(item, completeSeriesConfig)'
+    },
+    _itemY: {
+      type: String,
+      computed: '_computeItemY(item, completeSeriesConfig)'
+    },
+  },
+
+  _computeXUnit : function(item, completeSeriesConfig) {
+    return this.completeSeriesConfig[item.name]['xAxisUnit'] ? this.completeSeriesConfig[item.name]['xAxisUnit'] : '';
+  },
+  _computeYUnit : function(item, completeSeriesConfig) {
+    return this.completeSeriesConfig[item.name]['yAxisUnit'] ? this.completeSeriesConfig[item.name]['yAxisUnit'] : '';
+  },
+  _computeItemMutedToStart: function() {
+    return this._mutedToStart(this.item.name);
+  },
+  _computeItemY: function() {
+    return this._returnVal(this.item, 'y', '&nbsp;/&nbsp');
+  },
+  _computeItemX: function() {
+    return this._returnVal(this.item, 'x', '&nbsp;/&nbsp');
+  },
+
+  /**
+   * Function which takes an index and returns the appropriate dataVisColor
+   *
+   * `i` is a series index number
+   *
+   * `rgb(r,g,b)` return the appropriate rgb values based in the series index
+   *
+   * @method _returnItemColor
+   * @param {i}
+   * @return {rgb}
+   */
+  _computeItemColor: function() {
+    return this.completeSeriesConfig[this.item.name]['color'];
+  },
+
+  /**
+   * helper function to set initial classes
+   *
+   * Adds or removes muted class to those series in the register and sets base classes.
+   *
+   * @method _mutedToStart
+   */
+  _mutedToStart: function(type) {
+    var classes = this._baseClasses(type);
+
+    if(this.mutedSeries[this.name]) {
+      return classes + ' muted';
+    }
+    return classes;
+  },
+
+  _returnVal: function(item, axis, separator) {
+    var key = (axis === 'x') ? this.completeSeriesConfig[item.name]['x'] : this.completeSeriesConfig[item.name]['y'];
+
+    if(item.value && (item.value[key] || item.value[key] === 0)) {
+      return item.value[key] + (separator ? separator : '');
+    }
+    return null;
+  },
+
+  _getYUnit: function(item, completeSeriesConfig) {
+    return this.completeSeriesConfig[item.name] && this.completeSeriesConfig[item.name].yAxisUnit ? this.completeSeriesConfig[item.name].yAxisUnit : '';
   },
 
   /**
@@ -139,57 +337,6 @@ PxVisBehaviorRegister.itemShared = {
   },
 
   /**
-   * Function which takes an index and returns the appropriate dataVisColor
-   *
-   * `i` is a series index number
-   *
-   * `rgb(r,g,b)` return the appropriate rgb values based in the series index
-   *
-   * @method _returnItemColor
-   * @param {i}
-   * @return {rgb}
-   */
-  _computeItemColor: function() {
-    return this.completeSeriesConfig[this.item.name]['color'];
-  },
-
-  _returnVal: function(item, axis, separator) {
-    var key = (axis === 'x') ? this.completeSeriesConfig[item.name]['x'] : this.completeSeriesConfig[item.name]['y'];
-
-    if(item.value && (item.value[key] || item.value[key] === 0)) {
-      return item.value[key] + (separator ? separator : '');
-    }
-    return null;
-  },
-
-  /**
-   * dom-if function for series names to decide if it was truncated. If so, add a tooltip showing full name
-   *
-   * @method _didTruncate
-   * @param {str} the original string.
-   * @param {len} the truncation length.
-   */
-  _computeDidTruncate: function(str,len) {
-    var name = this._getConfigName(this.item.name)
-    var len = this.truncationLength;
-    return len > 2 && name.length > len ? true : false;
-  },
-
-  _getConfigName: function(name) {
-    if(this.xAxisType === 'pie') {
-      //pie should have only one config bit.
-      var key = Object.keys(this.completeSeriesConfig)[0];
-      return name[this.completeSeriesConfig[key].y];
-    } else {
-      return this.completeSeriesConfig[this.item.name]['name'];
-    }
-  },
-
-  _getYUnit: function(item, completeSeriesConfig) {
-    return this.completeSeriesConfig[item.name] && this.completeSeriesConfig[item.name].yAxisUnit ? this.completeSeriesConfig[item.name].yAxisUnit : '';
-  },
-
-  /**
    * observer function which is fired when the mutedSeries property is changed.
    *
    * Adds or removes muted class to those series in the register.
@@ -202,49 +349,7 @@ PxVisBehaviorRegister.itemShared = {
       this.toggleClass('muted', this.mutedSeries[item.name], this.$$.regItem);
     }
   }
-
 };
 
-/*
-    Name:
-    PxVisBehavior.register
-
-    Description:
-    Polymer behavior that provides the basic properties and methods for px-vis register.
-
-    Dependencies:
-    - none
-
-    @polymerBehavior PxVisBehavior.register
-*/
-PxVisBehaviorRegister.register = {
-  properties: {},
-
-  _getWrapperClass: function() {
-    var classList = 'flex ';
-    if(this.type === 'horizontal') {
-      classList += 'flex--col ';
-    } else {
-      classList += 'flex--row flex--justify';
-    }
-    return classList;
-  },
-
-  _getSeriesWrapperClass: function(type) {
-    var classList = 'flex ';
-
-    if(type === 'horizontal') {
-      classList += 'flex--row ';
-    } else {
-      classList += 'flex--col';
-    }
-
-    return classList;
-  },
-
-  _isOfType: function(toTest, type) {
-    return toTest === type;
-  },
-};
 
 </script>
