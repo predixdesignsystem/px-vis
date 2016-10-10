@@ -47,8 +47,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           orientation="left"
           title="[[_getTitle(item,completeSeriesConfig)]]"
           title-location='[[_computeTitleLocation(item,titleLocation, _pokeTitleLocation)]]'
-          title-type-size="12"
-          label-type-size="10"
+          title-type-size="[titleTypeSize]"
+          label-type-size="[[labelTypeSize]]"
           current-domain="[[currentDomainY]]"
           stroke-width="[[strokeWidth]]"
           outer-tick-size="0"
@@ -257,7 +257,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     },
 
     observers: [
-      '_computedInternalDimensions(domainChanged.*,dimensions.*)',
+      '_computedInternalDimensions(domainChanged.*,dimensions.*,svg)',
       '_moveAxisGroup(margin.*,axisSvg,offset.*)',
       '_toggleTitleLocation(length)'
     ],
@@ -560,7 +560,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             this.y[dim].domain([min,max]);
           }
         }
-
+        
         this._generateGs();
 
         var notFirst = this._internalDimensions ? true : false;
