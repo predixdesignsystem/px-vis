@@ -1,3 +1,7 @@
+v0.5.13
+==================
+* Merged reigster refactor
+
 v0.5.12
 ==================
 * Fixed vis demo
