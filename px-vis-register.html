@@ -1,9 +1,13 @@
 <link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="../px-colors-design/colors.html" />
-<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="../px-colors-design/colors.html"/>
+<link rel="import" href="px-vis-behavior-common.html"/>
+<link rel="import" href="px-vis-behavior-register.html"/>
 <link rel="import" href="px-vis-behavior-datetime.html"/>
+<link rel="import" href="px-vis-register-item.html"/>
+<link rel="import" href="px-vis-register-item-pie.html"/>
+<link rel="import" href="px-vis-register-datetime.html"/>
 <link rel="import" href="../numbro-element/numbro-element.html" />
-<link rel="import" href="../px-tooltip/px-tooltip.html" />
+<link rel="import" href="../px-tooltip/px-tooltip.html"/>
 
 <!--
 Element providing a display and interaction space for series in your chart.
@@ -20,9 +24,9 @@ You can turn series on the chart off by clicking on that series in the register.
         width="[[width]]"
         type="horizontal"
         tooltip-data=[[tooltipData]]
+        chart-data=[[chartData]]
         muted-series="[[mutedSeries]]"
         complete-series-config="[[completeSeriesConfig]]"
-        chart-data="[[chartData]]"
         x-axis-type="time"
         muted-series="{{mutedSeries}}">
     </px-vis-register>
@@ -71,110 +75,50 @@ Formatting for the timestamps,the data values, and the series names can be contr
   <template>
     <style include="px-vis-register-styles"></style>
     <style include="px-theme-styles"></style>
-      <div
-        id="registerWrap"
-        class="inline--flex flex--col"
-        style$="height:{{height}}px; width:[[width]]px">
-        <template is="dom-if" if="{{_displayDateTime(forceDateTimeDisplay, xAxisType)}}">
-          <div id="dateTime">
-            <span id="firstDateTime">{{_firstDateTime}}</span> <span>{{_separator}}</span> <span id="secondDateTime">{{_secondDateTime}}</span>  &nbsp;
-          </div>
-        </template>
-        <div class$="{{_getSeriesWrapperClass(type)}}">
-          <template is="dom-if" if="{{!_isOfType(xAxisType, 'pie')}}">
-            <template is="dom-repeat" items="{{tooltipData.series}}">
-              <span class$="{{_mutedToStart(item.name)}}" name$="R{{item.name}}" on-click="_seriesClicked">
-                  <span
-                    class="seriesMarker"
-                    style$="background-color:{{_returnItemColor(item.name)}};"
-                    name$="R{{item.name}}"
-                  >&nbsp;</span>
-                  <span class$="{{_getWrapperClass(type)}}">
-                    <div class="seriesName" name$="R{{item.name}}">
-                      {{_returnTruncatedName(item.name)}}&nbsp;
-                      <template is="dom-if" if="{{_didTruncate(item.name,truncationLength)}}">
-                        <px-tooltip delay="500">{{_getName(item.name)}}</px-tooltip>
-                      </template>
-                    </div>
-                    <!-- Display serie data differently depending on x and y axis types -->
-                    <div class="seriesData" name$="R{{item.name}}">
-                      <!-- if x axis is number format and show it -->
-                      <template is="dom-if" if="{{_isOfType(xAxisType, 'linear')}}">
-                        <template is="dom-if" if="{{_returnVal(item, 'x')}}">
-                          <numbro-element
-                            value="[[_returnVal(item, 'x', '&nbsp;/&nbsp')]]"
-                            format="[[numberFormat]]"
-                            culture="[[numberFormatCulture]]"
-                            currency$="[[numberFormatIsCurrency]]"
-                            default-currency-format="[[numberFormatCurrency]]"
-                            zero-format="[[numberFormatZero]]">
-                          </numbro-element>
-                        </template>
-                        <template is="dom-if" if="{{_returnVal(item, 'x')}}">{{_getXUnit(item, completeSeriesConfig.*)}}</template>
-                        <template is="dom-if" if="[[_returnVal(item, 'x')]]">
-                          &nbsp;/&nbsp
-                        </template>
-                      </template>
-                      <!-- if x axis is ordinal just display it -->
-                      <template is="dom-if" if="{{_isOfType(xAxisType, 'ordinal')}}">
-                        <span>[[_returnVal(item, 'x')]]</span>
-                        <template is="dom-if" if="{{_returnVal(item, 'x')}}">{{_getXUnit(item, completeSeriesConfig.*)}}</template>
-                        <template is="dom-if" if="[[_returnVal(item, 'x')]]">
-                          &nbsp;/&nbsp
-                        </template>
-                      </template>
-                      <!-- if x axis is time don't display it -->
+    <div
+      id="registerWrap"
+      class="inline--flex flex--col"
+      style$="height:{{height}}px; width:[[width]]px">
 
-                      <!-- if y axis is number format and show it -->
-                      <template is="dom-if" if="{{_isOfType(yAxisType, 'linear')}}">
-                        <template is="dom-if" if="{{_returnVal(item, 'x')}}">
-                          <numbro-element
-                            value="[[_returnVal(item, 'y')]]"
-                            format="[[numberFormat]]"
-                            culture="[[numberFormatCulture]]"
-                            currency$="[[numberFormatIsCurrency]]"
-                            default-currency-format="[[numberFormatCurrency]]"
-                            zero-format="[[numberFormatZero]]">
-                          </numbro-element>
-                        </template>
-                      </template>
-                      <!-- if y axis is ordinal just display it -->
-                      <template is="dom-if" if="{{_isOfType(yAxisType, 'ordinal')}}">
-                        <span>[[_returnVal(item, 'y')]]</span>
-                      </template>
-                      <template is="dom-if" if="{{_returnVal(item, 'y')}}">{{_getYUnit(item, completeSeriesConfig.*)}}</template>
-                    </div>
-                  </span>
-              </span>
-            </template>
+      <template is="dom-if" if="{{_isOfType(xAxisType,'time')}}">
+        <px-vis-register-datetime
+          first-date-time="[[_firstDateTime]]"
+          second-date-time="[[_secondDateTime]]"
+          separator="[[_separator]]"
+          x-axis-type="[[xAxisType]]"
+        ></px-vis-register-datetime>
+      </template>
+
+      <div class$="{{_getSeriesWrapperClass(type)}}">
+        <template is="dom-if" if="{{!_isOfType(xAxisType, 'pie')}}">
+          <template is="dom-repeat" items="{{_series}}">
+            <px-vis-register-item
+              item="[[item]]"
+              complete-series-config="[[completeSeriesConfig]]"
+              type="[[type]]"
+              x-axis-type="[[xAxisType]]"
+              y-axis-type="[[yAxisType]]"
+              muted-series="{{mutedSeries}}">
+            </px-vis-register-item>
           </template>
-          <!-- For pie charts -->
-          <template is="dom-if" if="{{_isOfType(yAxisType, 'pie')}}">
-            <template is="dom-repeat" items="{{chartData}}">
-              <span class$="{{_mutedToStart(item.name)}}" name$="R{{_returnPieVal(item, 'y', '', usePercentage)}}" on-click="_pieSeriesClicked">
-                  <span
-                    class="seriesMarker"
-                    style$="background-color:{{_getPieBackColor(item, index)}}"
-                    name$="R{{_returnPieVal(item, 'y', '', usePercentage)}}"
-                  >&nbsp;</span>
-                  <div class$="{{_getWrapperClass(type)}}">
-                    <div class="seriesName" name$="R{{_getName(item)}}">
-                      {{_returnTruncatedName(item)}}&nbsp;
-                      <template is="dom-if" if="{{_didTruncate(item,truncationLength)}}">
-                        <px-tooltip delay="500">{{_getName(item)}}</px-tooltip>
-                      </template>
-                    </div>
-                    <!-- Display serie data differently depending on x and y axis types -->
-                    <div class="seriesData" name$="R{{_returnPieVal(item, 'y', '', usePercentage)}}">
-                      <span>[[_returnPieVal(item, 'x', '', usePercentage)]]</span>
-                      <template is="dom-if" if="{{_returnPieVal(item, 'x', '', usePercentage)}}">{{_getPieUnit(usePercentage)}}</template>
-                    </div>
-                  </div>
-              </span>
-            </template>
+        </template>
+        <!-- For pie charts -->
+        <template is="dom-if" if="{{_isOfType(yAxisType, 'pie')}}">
+          <template is="dom-repeat" items="{{chartData}}">
+            <px-vis-register-item-pie
+              item="[[item]]"
+              item-index="[[index]]"
+              complete-series-config="[[completeSeriesConfig]]"
+              chart-data="[[chartData]]"
+              type="[[type]]"
+              x-axis-type="[[xAxisType]]"
+              y-axis-type="[[yAxisType]]"
+              use-percentage="[[usePercentage]]">
+            </px-vis-register-item-pie>
           </template>
-        </div>
+        </template>
       </div>
+    </div>
 
   </template>
 </dom-module>
@@ -188,15 +132,17 @@ Formatting for the timestamps,the data values, and the series names can be contr
       PxVisBehavior.sizing,
       PxVisBehavior.formatting,
       PxVisBehaviorTime.datetime,
-      PxVisBehavior.muteUnmuteSeries,
+      PxVisBehavior.mutedSeries,
       PxVisBehavior.tooltipData,
       PxVisBehavior.dataset,
       PxVisBehavior.axisTypes,
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.commonMethods,
+      PxVisBehaviorRegister.register,
+      PxVisBehaviorRegister.pie,
+      PxVisBehaviorRegister.datetime,
       commonColors
     ],
-
     /**
      * Properties block, expose attribute values to the DOM via 'reflect'
      *
@@ -218,80 +164,18 @@ Formatting for the timestamps,the data values, and the series names can be contr
        value:"vertical",
        notify: true
       },
-      /**
-       * Holder for the formated first datetime string
-       *
-       * @property _firstDateTime
-       * @type string
-      */
-      _firstDateTime:{
-        type:String,
-        notify:true
+
+      _series: {
+        type: Array,
+        computed: '_computeSeries(tooltipData)'
       },
-      /**
-       * Holder for the formated second datetime string
-       *
-       * @property _secondDateTime
-       * @type string
-      */
-      _secondDateTime:{
-        type:String,
-        notify:true
-      },
-      /**
-       * Holder for the formated separator character
-       *
-       * @property _separator
-       * @type string
-      */
-      _separator:{
-        type:String,
-        notify:true
-      },
-      /**
-       * For pie charts whether the values should be displayed in %
-       */
-      usePercentage: {
-        type: Boolean,
-        value: false
-      },
-      /**
-       * Forces the use of the timestamp at the top
-       */
-      forceDateTimeDisplay: {
-        type: Boolean,
-        value: false
-      }
+
+
     },
 
     observers: [
-      '_formatDateTime(tooltipData.*)',
-      '_toggleSeries(mutedSeries.*)'
+      '_formatDateTime(tooltipData.*)'
      ],
-
-     _getWrapperClass: function(type) {
-       var classList = 'flex ';
-
-       if(type === 'horizontal') {
-         classList += 'flex--col ';
-       } else {
-         classList += 'flex--row flex--justify';
-       }
-
-       return classList;
-     },
-
-     _getSeriesWrapperClass: function(type) {
-       var classList = 'flex ';
-
-       if(type === 'horizontal') {
-         classList += 'flex--row ';
-       } else {
-         classList += 'flex--col';
-       }
-
-       return classList;
-     },
 
     /**
      * dom-if function for type property which returns true if type equals horizontal
@@ -307,20 +191,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
     _typeEqualHorizontal: function(type) {
       return type === 'horizontal';
     },
-    /**
-     * Function which takes an index and returns the appropriate dataVisColor
-     *
-     * `i` is a series index number
-     *
-     * `rgb(r,g,b)` return the appropriate rgb values based in the series index
-     *
-     * @method _returnItemColor
-     * @param {i}
-     * @return {rgb}
-     */
-    _returnItemColor:function(name) {
-      return this.completeSeriesConfig[name]['color'];
-    },
+
     /**
      * Function which takes the incoming datetime from tooltipData and formats it.
      *
@@ -330,9 +201,16 @@ Formatting for the timestamps,the data values, and the series names can be contr
      */
     _formatDateTime: function() {
       if(this.tooltipData.time) {
-        var momentObj1 = this.formatTimestamp(this.tooltipData.time,this.timezone,this.firstDateTimeFormat),
-            momentObj2 = this.formatTimestamp(this.tooltipData.time,this.timezone,this.secondDateTimeFormat);
-
+        var momentObj1 = this.formatTimestamp(
+          this.tooltipData.time,
+          this.timezone,
+          this.firstDateTimeFormat
+        );
+        var momentObj2 = this.formatTimestamp(
+          this.tooltipData.time,
+          this.timezone,
+          this.secondDateTimeFormat
+        );
         this.set('_firstDateTime', momentObj1);
         this.set('_secondDateTime', momentObj2);
         this.set('_separator', this.separator);
@@ -343,122 +221,9 @@ Formatting for the timestamps,the data values, and the series names can be contr
         this.set('_separator', '');
       }
     },
-    /**
-     * Event function which is fired when a series is clicked.
-     *
-     * Adds series to mutedSeries property or toggles that key's boolean.
-     *
-     * @method _seriesClicked
-     * @param {e} click event
-     */
-    _seriesClicked: function(e) {
-      var ne = Polymer.dom(e),
-          series = ne.rootTarget.getAttribute('name').substr(1);
 
-      this.muteUnmuteSeries(series);
-
-      e.stopPropagation();
-    },
-    /**
-     * observer function which is fired when the mutedSeries property is changed.
-     *
-     * Adds or removes muted class to those series in the register.
-     *
-     * @method _toggleSeries
-     */
-    _toggleSeries: function() {
-      // find all series with name and toggle class
-      var keys = Object.keys(this.mutedSeries),
-          i,
-          len = keys.length,
-          series;
-
-      for(i = 0; i < len; i++) {
-        series = this.$$('.series[name=R' + keys[i] + ']');
-        this.toggleClass('muted', this.mutedSeries[keys[i]], series);
-      }
-    },
-    /**
-     * helper function to set initial classes
-     *
-     * Adds or removes muted class to those series in the register and sets base classes.
-     *
-     * @method _mutedToStart
-     */
-    _mutedToStart: function(name) {
-      var baseClasses = (this.type === 'horizontal') ? "series narrow flex flex--row" : "series wide flex flex--row";
-      if(this.mutedSeries[name]) {
-        return baseClasses + ' muted';
-      }
-      return baseClasses;
-    },
-    _getName: function(name) {
-      if(this.xAxisType === 'pie') {
-        //pie should have only one config bit.
-        var key = Object.keys(this.completeSeriesConfig)[0];
-        return name[this.completeSeriesConfig[key].y];
-      } else {
-        return this.completeSeriesConfig[name]['name'];
-      }
-    },
-    _returnTruncatedName: function(name) {
-
-      return this._truncateName(this._getName(name),this.truncationLength);
-    },
-    /**
-     * dom-if function for series names to decide if it was truncated. If so, add a tooltip showing full name
-     *
-     * @method _didTruncate
-     * @param {str} the original string.
-     * @param {len} the truncation length.
-     */
-    _didTruncate: function(str,len) {
-      var name = this._getName(str)
-      if(len > 2 && name.length > len) {
-        return true;
-      }
-      return false;
-    },
-    _returnVal: function(item, axis, separator) {
-      var key = axis === 'x' ?
-        this.completeSeriesConfig[item.name]['x'] : this.completeSeriesConfig[item.name]['y'];
-      if(item.value && (item.value[key] || item.value[key] === 0)) {
-        return item.value[key] + (separator ? separator : '');
-      }
-      return null;
-    },
-    _returnPieVal: function(item, axis, separator, usePercentage) {
-
-      //pie should have only one config bit.
-      var key = Object.keys(this.completeSeriesConfig)[0],
-          axisKey = axis === 'x' ? this.completeSeriesConfig[key]['x'] : this.completeSeriesConfig[key]['y'],
-          axisKey = usePercentage ? 'percentage' : axisKey;
-
-      if(item && (item[axisKey] || item[axisKey] === 0)) {
-        return item[axisKey] + (separator ? separator : '');
-      }
-      return null;
-    },
-    _isOfType: function(toTest, type) {
-      return toTest === type;
-    },
-    _getXUnit: function(item, completeSeriesConfig) {
-      return this.completeSeriesConfig[item.name].xAxisUnit ? this.completeSeriesConfig[item.name].xAxisUnit : '';
-    },
-    _getYUnit: function(item, completeSeriesConfig) {
-      return this.completeSeriesConfig[item.name] && this.completeSeriesConfig[item.name].yAxisUnit ? this.completeSeriesConfig[item.name].yAxisUnit : '';
-    },
-    _getPieUnit: function(usePercentage) {
-      //pie should have only one config bit.
-      var key = Object.keys(this.completeSeriesConfig)[0],
-          unit = this.completeSeriesConfig[key].xAxisUnit;
-      return usePercentage ? '%' : unit;
-    },
-    _getPieBackColor: function(item, index) {
-      return item.backgroundColor ? item.backgroundColor : this._getPieColorForIndex(index);
-    },
-    _displayDateTime: function(forceDateTimeDisplay, xAxisType) {
-      return forceDateTimeDisplay || this._isOfType(xAxisType,'time');
+    _computeSeries: function() {
+      return this.tooltipData.series;
     }
   });
-</script>
+  </script>

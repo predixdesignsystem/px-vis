@@ -1,0 +1,355 @@
+<script>
+var PxVisBehaviorRegister = PxVisBehaviorRegister || {};
+
+/*
+    Name:
+    PxVisBehavior.itemShared
+
+    Description:
+    Polymer behavior that provides the basic properties and methods for px-vis register items.
+
+    Dependencies:
+    - none
+
+    @polymerBehavior PxVisBehavior.itemShared
+*/
+PxVisBehaviorRegister.itemShared = {
+  properties: {
+    item: {
+      type: Object
+    },
+    _wrapperClass: {
+      type: String,
+      computed: '_getWrapperClass(item, completeSeriesConfig)'
+    },
+    _configName: {
+      type: String,
+      computed: '_computeConfigName(item, completeSeriesConfig)'
+    },
+    _truncatedName: {
+      type: String,
+      computed: '_computeTruncatedName(_configName, completeSeriesConfig)'
+    },
+    _didTruncate: {
+      type: Boolean,
+      computed: '_computeDidTruncate(_configName, completeSeriesConfig)'
+    },
+
+    /**
+     * Defines if the register should be horizontal or vertical. Options are:
+     *  - `vertical`
+     *  - `horizontal`
+     *
+     * @property type
+     * @type string
+     * @default vertical
+    */
+    type: {
+     type: String,
+     value: "vertical",
+     notify: true
+    }
+  },
+
+  _getWrapperClass: function() {
+    var classList = 'flex ';
+    if(this.type === 'horizontal') {
+      classList += 'flex--col ';
+    } else {
+      classList += 'flex--row flex--justify';
+    }
+    return classList;
+  },
+
+  _computeConfigName: function() {
+    return this._getConfigName(this.item.name);
+  },
+  _computeTruncatedName: function(_configName) {
+    return this._truncateName(_configName, this.truncationLength);
+  },
+
+  /**
+   * dom-if function for series names to decide if it was truncated. If so, add a tooltip showing full name
+   *
+   */
+  _computeDidTruncate: function(str,len) {
+    var len = this.truncationLength;
+    return len > 2 && str.length > len ? true : false;
+  },
+
+  _getConfigName: function(name) {
+    if(this.xAxisType === 'pie') {
+      return this.item.y;
+    } else {
+      return this.completeSeriesConfig[this.item.name]['name'];
+    }
+  },
+
+  /**
+   * helper function to set initial classes
+   *
+   * Adds or removes muted class to those series in the register and sets base classes.
+   *
+   * @method _mutedToStart
+   */
+  _baseClasses: function() {
+    var baseClasses = (this.type === 'horizontal') ? "series narrow flex flex--row" : "series wide flex flex--row";
+    return baseClasses;
+  },
+};
+
+/*
+    Name:
+    PxVisBehavior.register
+
+    Description:
+    Polymer behavior that provides the basic properties and methods for px-vis register.
+
+    Dependencies:
+    - none
+
+    @polymerBehavior PxVisBehavior.register
+*/
+PxVisBehaviorRegister.register = {
+  properties: {
+    /**
+     * For pie charts whether the values should be displayed in %
+     */
+    usePercentage: {
+      type: Boolean,
+      value: false
+    }
+  },
+
+  _getSeriesWrapperClass: function(type) {
+    var classList = 'flex ';
+
+    if(type === 'horizontal') {
+      classList += 'flex--row ';
+    } else {
+      classList += 'flex--col';
+    }
+
+    return classList;
+  },
+
+  _isOfType: function(toTest, type) {
+    return toTest === type;
+  }
+};
+
+/*
+    Name:
+    PxVisBehavior.pie
+
+    Description:
+    Polymer behavior that provides the basic properties and methods for px-vis register.
+
+    Dependencies:
+    - none
+
+    @polymerBehavior PxVisBehavior.pie
+*/
+PxVisBehaviorRegister.pie = {
+  properties: {
+    /**
+     * For pie charts whether the values should be displayed in %
+     */
+    usePercentage: {
+      type: Boolean,
+      value: false
+    }
+  }
+};
+
+/*
+    Name:
+    PxVisBehavior.datetime
+
+    Description:
+    Polymer behavior that provides the basic properties and methods for px-vis register.
+
+    Dependencies:
+    - none
+
+    @polymerBehavior PxVisBehavior.datetime
+*/
+PxVisBehaviorRegister.datetime = {
+  properties: {
+
+    /**
+     * Holder for the formated first datetime string
+     *
+     * @property _firstDateTime
+     * @type string
+    */
+    _firstDateTime:{
+      type:String,
+      notify:true
+    },
+    /**
+     * Holder for the formated second datetime string
+     *
+     * @property _secondDateTime
+     * @type string
+    */
+    _secondDateTime:{
+      type:String,
+      notify:true
+    },
+    /**
+     * Holder for the formated separator character
+     *
+     * @property _separator
+     * @type string
+    */
+    _separator:{
+      type:String,
+      notify:true
+    }
+  }
+};
+
+/*
+    Name:
+    PxVisBehavior.muteableItem
+
+    Description:
+    Polymer behavior that provides the muting properties.
+
+    Dependencies:
+    - none
+
+    @polymerBehavior PxVisBehavior.muteableItem
+*/
+PxVisBehaviorRegister.nonPieItem = {
+  properties: {
+    _xUnit: {
+      type: String,
+      computed: '_computeXUnit(item, completeSeriesConfig.*)'
+    },
+    _yUnit: {
+      type: String,
+      computed: '_computeYUnit(item, completeSeriesConfig.*)'
+    },
+    _itemMutedToStart: {
+      type: String,
+      computed: '_computeItemMutedToStart(item, completeSeriesConfig)'
+    },
+    _itemColor: {
+      type: String,
+      computed: '_computeItemColor(item, completeSeriesConfig)'
+    },
+    _itemX: {
+      type: String,
+      computed: '_computeItemX(item, completeSeriesConfig)'
+    },
+    _itemY: {
+      type: String,
+      computed: '_computeItemY(item, completeSeriesConfig)'
+    },
+  },
+
+  _computeXUnit : function(item, completeSeriesConfig) {
+    return this.completeSeriesConfig[item.name]['xAxisUnit'] ? this.completeSeriesConfig[item.name]['xAxisUnit'] : '';
+  },
+  _computeYUnit : function(item, completeSeriesConfig) {
+    return this.completeSeriesConfig[item.name]['yAxisUnit'] ? this.completeSeriesConfig[item.name]['yAxisUnit'] : '';
+  },
+  _computeItemMutedToStart: function() {
+    return this._mutedToStart(this.item.name);
+  },
+  _computeItemY: function() {
+    return this._returnVal(this.item, 'y', '&nbsp;/&nbsp');
+  },
+  _computeItemX: function() {
+    return this._returnVal(this.item, 'x', '&nbsp;/&nbsp');
+  },
+
+  /**
+   * Function which takes an index and returns the appropriate dataVisColor
+   *
+   * `i` is a series index number
+   *
+   * `rgb(r,g,b)` return the appropriate rgb values based in the series index
+   *
+   * @method _returnItemColor
+   * @param {i}
+   * @return {rgb}
+   */
+  _computeItemColor: function() {
+    return this.completeSeriesConfig[this.item.name]['color'];
+  },
+
+  /**
+   * helper function to set initial classes
+   *
+   * Adds or removes muted class to those series in the register and sets base classes.
+   *
+   * @method _mutedToStart
+   */
+  _mutedToStart: function() {
+    var classes = this._baseClasses();
+
+    if(this.mutedSeries[this.name]) {
+      return classes + ' muted';
+    }
+    return classes;
+  },
+
+  _returnVal: function(item, axis, separator) {
+    var key = (axis === 'x') ? this.completeSeriesConfig[item.name]['x'] : this.completeSeriesConfig[item.name]['y'];
+
+    if(item.value && (item.value[key] || item.value[key] === 0)) {
+      return item.value[key] + (separator ? separator : '');
+    }
+    return null;
+  },
+
+  _getYUnit: function(item, completeSeriesConfig) {
+    return this.completeSeriesConfig[item.name] && this.completeSeriesConfig[item.name].yAxisUnit ? this.completeSeriesConfig[item.name].yAxisUnit : '';
+  },
+
+  /**
+   * Event function which is fired when a series is clicked.
+   *
+   * Adds series to mutedSeries property or toggles that key's boolean.
+   *
+   * @method _seriesClicked
+   * @param {e} click event
+   */
+  _seriesClicked: function(e) {
+    var ne = Polymer.dom(e),
+        series = ne.rootTarget.getAttribute('name').substr(1);
+    // if it doesnt exist, let's add it and set to true
+    if( typeof(this.mutedSeries[series]) === 'undefined' ) {
+      this.set('mutedSeries.' + series, true);
+    } else {
+      //if does exist, flip the bit
+      this.set('mutedSeries.' + series, !this.mutedSeries[series]);
+    }
+    this.fire('px-vis-muted-series-updated',
+      { 'data': this.mutedSeries[series],
+        'dataVar': ('mutedSeries.'+series),
+        'method': 'set'
+      });
+    e.stopPropagation();
+  },
+
+  /**
+   * observer function which is fired when the mutedSeries property is changed.
+   *
+   * Adds or removes muted class to those series in the register.
+   *
+   * @method _toggleSeries
+   */
+  _toggleSeries: function(item) {
+    //if it is a bool, we have something.
+    if(typeof this.mutedSeries[item.name] === 'boolean') {
+      this.toggleClass('muted', this.mutedSeries[item.name], this.$$.regItem);
+    }
+  }
+};
+
+
+</script>
