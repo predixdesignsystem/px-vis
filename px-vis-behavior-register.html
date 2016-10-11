@@ -78,10 +78,12 @@ PxVisBehaviorRegister.itemShared = {
   },
 
   _getConfigName: function(name) {
-    if(this.xAxisType === 'pie') {
-      return this.item.y;
-    } else {
-      return this.completeSeriesConfig[this.item.name]['name'];
+    if(this.completeSeriesConfig[this.item.name]) {
+      if(this.xAxisType === 'pie') {
+        return this.item.y;
+      } else {
+        return this.completeSeriesConfig[this.item.name]['name'];
+      }
     }
   },
 
@@ -234,27 +236,27 @@ PxVisBehaviorRegister.nonPieItem = {
     },
     _itemMutedToStart: {
       type: String,
-      computed: '_computeItemMutedToStart(item, completeSeriesConfig)'
+      computed: '_computeItemMutedToStart(item, completeSeriesConfig.*)'
     },
     _itemColor: {
       type: String,
-      computed: '_computeItemColor(item, completeSeriesConfig)'
+      computed: '_computeItemColor(item, completeSeriesConfig.*)'
     },
     _itemX: {
       type: String,
-      computed: '_computeItemX(item, completeSeriesConfig)'
+      computed: '_computeItemX(item, completeSeriesConfig.*)'
     },
     _itemY: {
       type: String,
-      computed: '_computeItemY(item, completeSeriesConfig)'
+      computed: '_computeItemY(item, completeSeriesConfig.*)'
     },
   },
 
   _computeXUnit : function(item, completeSeriesConfig) {
-    return this.completeSeriesConfig[item.name]['xAxisUnit'] ? this.completeSeriesConfig[item.name]['xAxisUnit'] : '';
+    return this.completeSeriesConfig[item.name] && this.completeSeriesConfig[item.name]['xAxisUnit'] ? this.completeSeriesConfig[item.name]['xAxisUnit'] : '';
   },
   _computeYUnit : function(item, completeSeriesConfig) {
-    return this.completeSeriesConfig[item.name]['yAxisUnit'] ? this.completeSeriesConfig[item.name]['yAxisUnit'] : '';
+    return this.completeSeriesConfig[item.name] && this.completeSeriesConfig[item.name]['yAxisUnit'] ? this.completeSeriesConfig[item.name]['yAxisUnit'] : '';
   },
   _computeItemMutedToStart: function() {
     return this._mutedToStart(this.item.name);
@@ -278,7 +280,7 @@ PxVisBehaviorRegister.nonPieItem = {
    * @return {rgb}
    */
   _computeItemColor: function() {
-    return this.completeSeriesConfig[this.item.name]['color'];
+    return this.completeSeriesConfig[this.item.name] ? this.completeSeriesConfig[this.item.name]['color'] : '';
   },
 
   /**
@@ -298,10 +300,12 @@ PxVisBehaviorRegister.nonPieItem = {
   },
 
   _returnVal: function(item, axis, separator) {
-    var key = (axis === 'x') ? this.completeSeriesConfig[item.name]['x'] : this.completeSeriesConfig[item.name]['y'];
+    if(this.completeSeriesConfig[item.name]) {
+      var key = (axis === 'x') ? this.completeSeriesConfig[item.name]['x'] : this.completeSeriesConfig[item.name]['y'];
 
-    if(item.value && (item.value[key] || item.value[key] === 0)) {
-      return item.value[key] + (separator ? separator : '');
+      if(item.value && (item.value[key] || item.value[key] === 0)) {
+        return item.value[key] + (separator ? separator : '');
+      }
     }
     return null;
   },
