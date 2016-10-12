@@ -7,6 +7,9 @@ v0.6.0
 * fixed d3 console errors
 * refactored navigator initialization
 * exclude 'null' data point from line and scatter
+* added clip path to canvas
+* fixed bugs with the new register
+* fixed area clip path to work with iron resize
 
 v0.5.13
 ==================
