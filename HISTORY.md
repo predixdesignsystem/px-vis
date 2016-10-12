@@ -1,3 +1,8 @@
+v0.6.1
+==================
+* ensure brush initializes
+* ensure multi axis passes the font size down
+
 v0.6.0
 ==================
 * exposed number formatting in register and tooltip
