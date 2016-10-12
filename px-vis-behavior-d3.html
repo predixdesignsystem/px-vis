@@ -888,6 +888,7 @@ PxVisBehaviorD3.radialLineGenerator = [{
       type: Number
     }
   },
+  
   /**
    * Defines a multi-scale d3 line generator and its attrs
    *
@@ -925,7 +926,7 @@ PxVisBehaviorD3.radialLineGenerator = [{
         }
         return radius
       }).defined(function(d) {
-        return !isNaN(_this.x(d[0])) && !isNaN(_this.y(Number(d[1])));
+        return _this._isValidData(_this.x(d[0])) && _this._isValidData(_this.y(Number(d[1])));
       });
 
       //be sneaky: iterate through the data like normal
@@ -962,7 +963,7 @@ PxVisBehaviorD3.radialLineGenerator = [{
       .radius(function(d) {
         return _this.y(d[yId]);
       }).defined( function(d) {
-        return !isNaN(d[xId]) && !isNaN(d[yId]);
+        return _this._isValidData(d[xId]) && _this._isValidData(d[yId]);
       });
 
       line = function(d) {
@@ -980,7 +981,7 @@ PxVisBehaviorD3.radialLineGenerator = [{
     }
     this.set('line', line);
   }
-}, PxVisBehavior.completeSeriesConfig];
+}, PxVisBehavior.completeSeriesConfig, PxVisBehavior.dataset];
 
 /*
     Name:
@@ -1126,7 +1127,7 @@ PxVisBehaviorD3.lineShared = [{
               return ~~_this.y(d[yKey]);
           })
           .defined(function(d) {
-            return !isNaN(d[yKey]);
+            return _this._isValidData(d[yKey]);
           });
 
     if(this.interpolationFunction){

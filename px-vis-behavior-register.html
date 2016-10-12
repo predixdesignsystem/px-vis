@@ -222,7 +222,7 @@ PxVisBehaviorRegister.datetime = {
 
     @polymerBehavior PxVisBehavior.muteableItem
 */
-PxVisBehaviorRegister.nonPieItem = {
+PxVisBehaviorRegister.nonPieItem = [{
   properties: {
     _xUnit: {
       type: String,
@@ -321,18 +321,8 @@ PxVisBehaviorRegister.nonPieItem = {
   _seriesClicked: function(e) {
     var ne = Polymer.dom(e),
         series = ne.rootTarget.getAttribute('name').substr(1);
-    // if it doesnt exist, let's add it and set to true
-    if( typeof(this.mutedSeries[series]) === 'undefined' ) {
-      this.set('mutedSeries.' + series, true);
-    } else {
-      //if does exist, flip the bit
-      this.set('mutedSeries.' + series, !this.mutedSeries[series]);
-    }
-    this.fire('px-vis-muted-series-updated',
-      { 'data': this.mutedSeries[series],
-        'dataVar': ('mutedSeries.'+series),
-        'method': 'set'
-      });
+    
+    this.muteUnmuteSeries(series);
     e.stopPropagation();
   },
 
@@ -349,7 +339,7 @@ PxVisBehaviorRegister.nonPieItem = {
       this.toggleClass('muted', this.mutedSeries[item.name], this.$$.regItem);
     }
   }
-};
+}, PxVisBehavior.muteUnmuteSeries];
 
 
 </script>

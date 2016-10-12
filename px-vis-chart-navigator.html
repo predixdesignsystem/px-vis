@@ -47,14 +47,21 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           width="[[width]]"
           height="[[height]]"
           margin="[[margin]]"
+          x="{{x}}"
+          y="{{y}}"
           chart-extents="[[chartExtents]]"
           complete-series-config="[[completeSeriesConfig]]"
-          chart-data="[[chartData]]">
+          chart-data="[[chartData]]"
+          domain-changed="{{domainChanged}}"
+          current-domain-x="{{currentDomainX}}"
+          current-domain-y="{{currentDomainY}}">
         </px-vis-scale>
         <px-vis-svg
           width="[[width]]"
           height="[[height]]"
-          margin="[[margin]]">
+          margin="[[margin]]"
+          svg="{{svg}}"
+          px-svg-elem="{{pxSvgElem}}">
         </px-vis-svg>
 
         <template is="dom-repeat" items="[[_returnKeys(completeSeriesConfig)]]">
@@ -67,6 +74,8 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
                 complete-series-config="[[completeSeriesConfig]]"
                 x="[[x]]"
                 y="[[y]]"
+                current-domain-x="[[currentDomainX]]"
+                current-domain-y="[[currentDomainY]]"
                 domain-changed="[[domainChanged]]"
                 muted-series="[[mutedSeries]]">
               </px-vis-line>
@@ -80,6 +89,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
                 marker-size="2"
                 x="[[x]]"
                 y="[[y]]"
+                domain-changed="[[domainChanged]]"
                 current-domain-x="[[currentDomainX]]"
                 current-domain-y="[[currentDomainY]]"
                 muted-series="[[mutedSeries]]">
@@ -93,8 +103,10 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           axis="[[x]]"
           axis-id="x"
           height="[[height]]"
+          width="[[width]]"
           margin="[[margin]]"
           orientation="bottom"
+          complete-series-config="[[completeSeriesConfig]]"
           domain-changed="[[domainChanged]]"
           current-domain="[[currentDomainX]]">
         </px-vis-axis>
@@ -106,7 +118,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           margin="[[margin]]"
           current-domain="[[currentDomainX]]"
           chart-domain=[[chartDomainX]]
-          selected-domain="[[selectedDomain]]"
+          selected-domain="{{selectedDomain}}"
           gradient-overlay="[[gradientOverlay]]">
         </px-vis-brush>
       </div>
@@ -131,7 +143,6 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           PxVisBehavior.commonMethods,
           PxVisBehavior.axisTypes,
           PxVisBehaviorChart.chartCommon,
-          PxVisBehaviorChart.precipitationPattern,
           Polymer.IronResizableBehavior,
           PxVisBehaviorChart.saveImage,
           PxVisBehaviorChart.chartAutoResize,
