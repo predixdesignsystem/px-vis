@@ -8,17 +8,53 @@
 <!--
 d3 element creating an axis for the chart
 
-##### Usage
+##### Minimal instantiation
 
     <px-vis-axis
-        svg='[[svg]]'
-        axis='[[x]]'
-        height='[[height]]'
-        margin='[[margin]]'
-        title='[[Title]]'
-        orientation='bottom'
-        label-position='center'
-        current-domain='[[currentDomainX]]'>
+        svg="[[svg]]"
+        axis="[[x]]"
+        axis-type="time"
+        margin="[[margin]]"
+        width="[[width]]"
+        height="[[height]]"
+        orientation="bottom"
+        complete-series-config="[[completeSeriesConfig]]"
+        domain-changed="[[domainChanged]]"
+        current-domain="[[currentDomain]]">
+    </px-vis-axis>
+
+##### Larger configuratoin example
+
+    <px-vis-axis
+        svg="[[svg`]]"
+        axis="[[axis]]"
+        series-id="[[seriesId]]"
+        height="[[height]]"
+        width="[[width]]"
+        margin="[[margin]]"
+        orientation="left"
+        title="[[title]]"
+        title-location='[[titleLocation]]'
+        title-type-size="[[titleTypeSize]]"
+        label-type-size="[[labelTypeSize]]"
+        current-domain="[[currentDomainY]]"
+        stroke-width="[[strokeWidth]]"
+        outer-tick-size="[[outerTickSize]]"
+        tick-values="[[tickValues]]"
+        truncation-length="[[truncationLength]]"
+        complete-series-config="[[completeSeriesConfig]]"
+        append-unit-in-title="[[appendUnitInTitle]]"
+        prevent-series-bar
+        domain-changed="[[domainChanged]]"
+        selected-domain="[[selectedDomain]]"
+        title-truncation
+        disable-ticks
+        label-position="[[labelPosition]]"
+        axis-color="[[axisColor]]"
+        ticks="[[ticks]]"
+        label-rotation="[[labelRotation]]"
+        label-translation="[[labelTranslation]]"
+        drawn-tick-values={{drawnTickValues}}>
     </px-vis-axis>
 
 ##### d3 reference
@@ -180,6 +216,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             type: Boolean,
             value: false
           },
+          /**
+           * Holder for the title g
+           *
+           */
           _titleGroup: {
             type: Object
           }
@@ -194,15 +234,15 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           '_truncateTitle(title, truncationLength, appendUnitInTitle, completeSeriesConfig)'
         ],
 
-        ready: function(){
+        ready: function() {
           // if there is no dev set unique ID, generate one
-          if(!this.axisId){
+          if(!this.axisId) {
             this.set('axisId', this.generateRandomID('axis_'));
           }
         },
 
-        attached: function(){
-          if(this._axisGroup){
+        attached: function() {
+          if(this._axisGroup) {
             // alert parents that we are done drawing the axis
             this.fire('px-axis-done');
           }
@@ -212,9 +252,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * sets up this._axis as a d3 axis object.
          *
          */
-        defineAxis: function(){
+        defineAxis: function() {
 
-          switch(this.orientation){
+          switch(this.orientation) {
             case 'bottom':
               this._axis = Px.d3.axisBottom(this.axis);
               break;

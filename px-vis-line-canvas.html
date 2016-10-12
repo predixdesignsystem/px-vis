@@ -199,21 +199,10 @@ Element which draws lines series onto the chart
       //clear it (need to recent to 0,0 for clearing)
       this.canvasContext.clearRect(-this.canvasContext.canvas.width / 2, -this.canvasContext.canvas.height/ 2, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
       this.canvasContext.beginPath();
-      this.line(this._clipData[1]);
-      this.canvasContext.clip();
-
-    },
-
-    _clearInside: function() {
-      this.canvasContext.save();
-
-      this.canvasContext.beginPath();
       this.line(this._clipData[0]);
-      this.canvasContext.clip();
+      this.line(this._clipData[1]);
+      this.canvasContext.clip("evenodd");
 
-      this.canvasContext.clearRect(-this.canvasContext.canvas.width / 2, -this.canvasContext.canvas.height/ 2, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
-
-      this.canvasContext.restore();
     },
 
     _generateRadialClipData: function() {
@@ -222,7 +211,7 @@ Element which draws lines series onto the chart
          clipData[0][ this.completeSeriesConfig[this.seriesId]['x'][i] ] = this.currentDomainY[0];
          clipData[1][ this.completeSeriesConfig[this.seriesId]['x'][i] ] = this.currentDomainY[1];
        }
-       
+
        this.set('_clipData' , clipData);
      },
 
@@ -440,9 +429,6 @@ Element which draws lines series onto the chart
     _renderingEnded: function(progressive,numberOfFrames) {
       //restore our context for safety
       this.canvasContext.restore();
-      if(this.clipPath){
-        this._clearInside();
-      }
 
       if(progressive){
         this._progressiveRenderingCounter = 0;
