@@ -42,6 +42,7 @@ Element which draws lines series onto the chart
       PxVisBehaviorD3.canvas,
       PxVisBehaviorD3.lineShared,
       PxVisBehaviorD3.axes,
+      PxVisBehavior.sizing,
       PxVisBehavior.dataset,
       PxVisBehavior.mutedSeries,
       PxVisBehavior.commonMethods,
@@ -187,7 +188,7 @@ Element which draws lines series onto the chart
         this._drawRadialClipPath();
       } else {
         //draw a box
-
+        this._drawRectClipPath();
       }
     },
 
@@ -203,6 +204,19 @@ Element which draws lines series onto the chart
       this.line(this._clipData[1]);
       this.canvasContext.clip("evenodd");
 
+    },
+
+    _drawRectClipPath: function() {
+      this.canvasContext.save();
+      //clear it (need to recent to 0,0 for clearing)
+      this.canvasContext.clearRect(-1, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+      this.canvasContext.beginPath();
+
+      var w = this.width - this.margin.left - this.margin.right,
+          h = this.height - this.margin.top - this.margin.bottom;
+
+      this.canvasContext.rect(0, 0, w, h);
+      this.canvasContext.clip();
     },
 
     _generateRadialClipData: function() {
