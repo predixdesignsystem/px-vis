@@ -1,3 +1,7 @@
+v0.6.2
+==================
+* ensure brushing works when resizing
+
 v0.6.1
 ==================
 * ensure brush initializes
