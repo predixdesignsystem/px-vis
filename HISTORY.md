@@ -1,3 +1,13 @@
+v0.6.0
+==================
+* exposed number formatting in register and tooltip
+* changed opacity on hover in scatter-radial
+* fixed axis series bar opacity on drawing
+* fixed muting a series with a '.' in the id when clicking register
+* fixed d3 console errors
+* refactored navigator initialization
+* exclude 'null' data point from line and scatter
+
 v0.5.13
 ==================
 * Merged reigster refactor

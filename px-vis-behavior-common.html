@@ -284,7 +284,14 @@ PxVisBehavior.dataset = {
         type: Array,
         notify: true
       }
-    }
+    },
+    /**
+     * returns true if the data is valid: non NaN, null or undefined
+     */
+    _isValidData: function(d) {
+      //false and "" will return false, which is fine as they're not valid data
+      return d || d === 0;
+    },
 };
 
 /*
@@ -576,6 +583,12 @@ PxVisBehavior.commonMethods = {
    */
   _getPieColorForIndex: function(index) {
     return commonColors.properties.dataVisColors.value[commonColors.properties.seriesColorOrder.value[index]];
+  },
+  /**
+   * escapes '.' in css selectors so that we can appropriately select stuff with dots in thei ids
+   */
+  _escapeCssSelector: function(selector) {
+    return selector.replace('.', '\\.');
   }
 };
 
