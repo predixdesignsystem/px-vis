@@ -10,18 +10,22 @@ This element draw the box over the axis signifying the active area to mute the s
 
 
 ##### Usage
-
     <px-vis-axis-drag
         width="[[width]]"
-        axis="[[x]]"
+        x="[[x]]"
+        y="[[y]]"
+        margin="[[margin]]"
         current-domain="[[currentDomainX]]"
         complete-series-config="{{completeSeriesConfig}}"
         chart-data="[[chartData]]"
+        axes="[[axes]]"
         dimensions="[[dimensions]]"
         axis-groups="[[axisGroups]]"
         drag-behavior="{{dragBehavior}}"
-        redraw-series
-        redraw-funcs="[[redrawFuncs]]">
+        redraw-series="[[redrawSeries]]"
+        radial="[[radial]]"
+        series-key="[[seriesKey]]"
+        muted-series="{{mutedSeries}}">
     </px-vis-axis-drag>
 
 @element px-vis-axis-brush
@@ -53,6 +57,7 @@ This element draw the box over the axis signifying the active area to mute the s
       PxVisBehaviorD3.dynamicRedraw,
       PxVisBehavior.mutedSeries,
       PxVisBehaviorD3.axes,
+      PxVisBehavior.radial
     ],
 
     /**
@@ -62,16 +67,18 @@ This element draw the box over the axis signifying the active area to mute the s
      * @type Object
      */
     properties: {
-      radial: {
-        type: Boolean,
-        value: false
-      },
-
+      /**
+       * Holder for the axis currently being dragged
+       *
+       */
       _dragging: {
         type: Object,
         value: function(){ return {}; }
       },
-
+      /**
+       * Holder for the drag behavior
+       *
+       */
       dragBehavior: {
         type: Object,
         notify: true
@@ -108,12 +115,20 @@ This element draw the box over the axis signifying the active area to mute the s
         });
       this.notifyPath('dragBehavior', this.dragBehavior);
     },
-
+    /**
+     * When an axis starts being dragged
+     *
+     */
     _onDragStart: function(d) {
+      //reset dragging var
       this._dragging = {};
+      //set equal to our axis
       this._dragging[d] = this.x(d);
     },
-
+    /**
+     * When an axis is dragged
+     *
+     */
     _onDrag: function(d) {
       this.debounce('drag', function(e){
         if(this.radial){
@@ -146,11 +161,12 @@ This element draw the box over the axis signifying the active area to mute the s
           this.dimensions.sort(function(a, b) { return this._position(a) - this._position(b); }.bind(this));
         }
 
+        //reset the domain
         this.x.domain(this.dimensions);
 
         // redraw the lines
         if(this.redrawSeries & this.dynamicRedraw){
-            _this.fire('px-vis-redraw-lines');
+          _this.fire('px-vis-redraw-lines');
         }
 
         // move the currently grabed axis (and reorder the others if above is active)
@@ -159,13 +175,20 @@ This element draw the box over the axis signifying the active area to mute the s
         this.fire('px-vis-recalc-title-location');
       }.bind(this,Px.d3.event),10);
     },
-
+    /**
+     * helper function to calc the position of an axis
+     *
+     */
     _position: function(d) {
       var v = this._dragging[d];
       return v == null ? this.x(d) : v;
     },
-
+    /**
+     * Sorting function for polar in a cartesian space
+     *
+     */
     _radialSort: function(dims, d, angle){
+      //first, figure out if our axis is or is near 0/2pi which requires special handling
       var len = dims.length - 1,
           index = dims.indexOf(d),
           left_index = index === 0 ? len : index - 1,
@@ -223,11 +246,17 @@ This element draw the box over the axis signifying the active area to mute the s
       }
       return dims;
     },
-
+    /**
+     * Helper function to return either a rotate transform or translate transform
+     *
+     */
     _radialOrLinear: function(d){
       return this.radial ? "rotate(" + (this._position(d) * 180 / Math.PI + 180) + ")" : "translate(" + this._position(d) + ",0)";
     },
-
+    /**
+     * Defines our transition for axis snapping
+     *
+     */
     transition: function(g) {
       return g.transition().duration(500);
     },

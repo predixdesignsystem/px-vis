@@ -11,14 +11,20 @@ This element draw the box over the axis signifying the active area to mute the s
 
 
 ##### Usage
-
     <px-vis-axis-brush
         svg="[[axisGroups]]"
+        parent-svg="[[svg]]"
+        height="[[_heightOrLen]]"
         axis="[[y]]"
+        margin="[[margin]]"
         chart-data="[[chartData]]"
         dimensions="[[dimensions]]"
         series-key="[[seriesKey]]"
-        muted-series="{{mutedSeries}}">
+        domain-changed="[[domainChanged]]"
+        muted-series="{{mutedSeries}}"
+        radial="[[radial]]"
+        center-offset="[[centerOffset]]"
+        brush-to-remove="[[brushToRemove]]">
     </px-vis-axis-brush>
 
 @element px-vis-axis-brush
@@ -340,7 +346,9 @@ This element draw the box over the axis signifying the active area to mute the s
         this.fire('px-vis-muted-series-updated', { 'data': series, 'dataVar': 'mutedSeries' ,'method': 'set' });
       }
     },
-
+    /**
+     * deletes a brush
+     */
     deleteBrush: function(elem) {
       //clear listeners
       elem.call(this._brush
@@ -349,7 +357,9 @@ This element draw the box over the axis signifying the active area to mute the s
       //delete
       elem.call(this._brush.move, null);
     },
-
+    /**
+     * Checks that the brush size is valid and within the domain
+     */
     _checkBrushSize: function(d,newAxisDomain,oldBrushDomain,elem, brushThis) {
       var newBrushRange = [];
       // if the brushExts fall within the new axis domain
@@ -402,7 +412,9 @@ This element draw the box over the axis signifying the active area to mute the s
 
       return newBrushRange;
     },
-
+    /**
+     * On a resize or change, returns the new valid range for the brush
+     */
     _getNewBrushRange: function(d1, d2, axisName) {
       var newRange = [],
           domain1, domain2;
@@ -414,17 +426,19 @@ This element draw the box over the axis signifying the active area to mute the s
         domain1 = d1;
         domain2 = d2;
       }
-
+      //decide if we are using parallel coordinates style or regular
       if(typeof(this.axis) === 'object'){
         newRange[0] = this.axis[axisName](domain1);
         newRange[1] = this.axis[axisName](domain2);
-      } else {
+      } else { //functio
         newRange[0] = this.axis(domain1);
         newRange[1] = this.axis(domain2);
       }
       return newRange;
     },
-
+    /**
+     * Remmves all brushes from the axes
+     */
     deleteAllBrushes: function(){
       if(this._brushes){
         var _this = this;
