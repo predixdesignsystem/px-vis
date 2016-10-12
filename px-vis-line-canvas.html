@@ -100,7 +100,22 @@ Element which draws lines series onto the chart
       mutedOpacity: {
         type: Number,
         value: 0.3
-      }
+      },
+      /**
+       * Holder for our data for clipPath
+       *
+       */
+      _clipData: {
+        type: Array
+      },
+      /**
+       * Holder for our data for clipPath
+       *
+       */
+      clipPath: {
+        type: Boolean,
+        value: false
+      },
     },
 
     observers: [
@@ -148,6 +163,10 @@ Element which draws lines series onto the chart
           // this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
         }
 
+        if(this.clipPath) {
+          this.drawClipPath();
+        }
+
         //Render data progressively
         this.canvasContext.lineWidth = 1;
         if(this.noCanvasProgressiveRendering) {
@@ -161,6 +180,51 @@ Element which draws lines series onto the chart
         this.canvasContext._pxLinesRedraw += 1;
       },20);
     },
+
+    drawClipPath: function() {
+
+      if(this.radialLine) {
+        this._drawRadialClipPath();
+      } else {
+        //draw a box
+
+      }
+    },
+
+    _drawRadialClipPath: function() {
+      //start off resetting our saved canvas
+      this._generateRadialClipData();
+      //save our empty state
+      this.canvasContext.save();
+      //clear it (need to recent to 0,0 for clearing)
+      this.canvasContext.clearRect(-this.canvasContext.canvas.width / 2, -this.canvasContext.canvas.height/ 2, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+      this.canvasContext.beginPath();
+      this.line(this._clipData[1]);
+      this.canvasContext.clip();
+
+    },
+
+    _clearInside: function() {
+      this.canvasContext.save();
+
+      this.canvasContext.beginPath();
+      this.line(this._clipData[0]);
+      this.canvasContext.clip();
+
+      this.canvasContext.clearRect(-this.canvasContext.canvas.width / 2, -this.canvasContext.canvas.height/ 2, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+
+      this.canvasContext.restore();
+    },
+
+    _generateRadialClipData: function() {
+       var clipData = [{},{}];
+       for(var i = 0; i < this.completeSeriesConfig[this.seriesId]['x'].length; i++) {
+         clipData[0][ this.completeSeriesConfig[this.seriesId]['x'][i] ] = this.currentDomainY[0];
+         clipData[1][ this.completeSeriesConfig[this.seriesId]['x'][i] ] = this.currentDomainY[1];
+       }
+       
+       this.set('_clipData' , clipData);
+     },
 
     _renderAtOnce: function(data) {
 
@@ -218,7 +282,7 @@ Element which draws lines series onto the chart
         }
         this.canvasContext.stroke();
         //clean up drawing
-        this._clearCanvasMargins();
+        this._renderingEnded(false);
       }
     },
 
@@ -294,11 +358,11 @@ Element which draws lines series onto the chart
 
         if(currentIndex < numberOfFrames) {
           //continue processing
+          _this.fire('px-vis-line-canvas-progressive-batch', { "numberOfFrames": numberOfFrames, "currentFrame":currentIndex });
           timer(processColoredDataSlice);
         } else {
           //finished drawing, reset drawing request counter
-          _this._progressiveRenderingCounter = 0;
-          _this.fire('px-vis-line-progressive-rendering-ended', {numberOfFrames: numberOfFrames});
+          _this._renderingEnded(true, numberOfFrames);
         }
       };
 
@@ -314,9 +378,9 @@ Element which draws lines series onto the chart
         var d = batches[currentIndex],
             opacity;
         _this.canvasContext.beginPath();
-        
+
         for(var i = 0; i < d.length; i++) {
-          
+
           opacity = _this._isSerieMuted(d) ? _this.mutedOpacity : 1;
           if(opacity !== 0) {
             _this.line(d[i]);
@@ -330,12 +394,11 @@ Element which draws lines series onto the chart
 
         if(currentIndex < numberOfFrames) {
           //continue processing
+          _this.fire('px-vis-line-canvas-progressive-batch', { "numberOfFrames": numberOfFrames, "currentFrame":currentIndex });
           timer(processGenericDataSlice);
         } else {
           //end, clean up
-          _this._clearCanvasMargins();
-          _this._progressiveRenderingCounter = 0;
-          _this.fire('px-vis-line-progressive-rendering-ended', {numberOfFrames: numberOfFrames});
+          _this._renderingEnded(true, numberOfFrames);
         }
       };
       //END PROCESSING FUNCTIONS
@@ -374,11 +437,19 @@ Element which draws lines series onto the chart
      * Used to 'clear' the canvas fater drawing in case we drew outside our limits.
      * We might want to consider using a clippath instead
      */
-    _clearCanvasMargins: function() {
-      //TODO: fix properly so we use some kind of margin
-      this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, -30);
-      this.canvasContext.clearRect(0, this.canvasContext.canvas.height - 65, this.canvasContext.canvas.width, 65);
-      this.canvasContext.clearRect(0, -30, -50, this.canvasContext.canvas.height + 30);
+    _renderingEnded: function(progressive,numberOfFrames) {
+      //restore our context for safety
+      this.canvasContext.restore();
+      if(this.clipPath){
+        this._clearInside();
+      }
+
+      if(progressive){
+        this._progressiveRenderingCounter = 0;
+        this.fire('px-vis-line-progressive-rendering-ended', {"numberOfFrames": numberOfFrames });
+      }
+
+      this.fire('px-vis-line-canvas-rendering-ended', { "progressiveRending": progressive });
     },
     /**
      * Checks mutedSeries to see if this ID is in there
