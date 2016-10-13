@@ -366,7 +366,7 @@ This element draw the box over the axis signifying the active area to mute the s
       if(newAxisDomain[0] <= oldBrushDomain[0] && newAxisDomain[1] >= oldBrushDomain[1]){
 
         // resize brush
-        newBrushRange = this._getNewBrushRange(oldBrushDomain[1],oldBrushDomain[0]);
+        newBrushRange = this._getNewBrushRange(oldBrushDomain[1],oldBrushDomain[0], d);
 
         //clear listeners
         elem.call(this._brush
@@ -382,7 +382,7 @@ This element draw the box over the axis signifying the active area to mute the s
       } else if(newAxisDomain[0] > oldBrushDomain[0] && newAxisDomain[0] < oldBrushDomain[1] && newAxisDomain[1] >= oldBrushDomain[1]) {
 
         //move bottom to the min newAxisRange
-        newBrushRange = this._getNewBrushRange(oldBrushDomain[1],newAxisDomain[0]);
+        newBrushRange = this._getNewBrushRange(oldBrushDomain[1],newAxisDomain[0], d);
 
         elem.call(this._brush
           .on("start.brush", null)
@@ -395,7 +395,7 @@ This element draw the box over the axis signifying the active area to mute the s
       } else if(newAxisDomain[0] <= oldBrushDomain[0] && newAxisDomain[1] < oldBrushDomain[1] && newAxisDomain[1] > oldBrushDomain[0]) {
 
         //move top to the max newAxisRange
-        newBrushRange = this._getNewBrushRange(newAxisDomain[1],oldBrushDomain[0]);
+        newBrushRange = this._getNewBrushRange(newAxisDomain[1],oldBrushDomain[0], d);
 
         elem.call(this._brush
           .on("start.brush", null)
@@ -415,7 +415,7 @@ This element draw the box over the axis signifying the active area to mute the s
     /**
      * On a resize or change, returns the new valid range for the brush
      */
-    _getNewBrushRange: function(d1, d2) {
+    _getNewBrushRange: function(d1, d2, axisName) {
       var newRange = [],
           domain1, domain2;
       // if radial, we need to flip our order
@@ -428,9 +428,9 @@ This element draw the box over the axis signifying the active area to mute the s
       }
       //decide if we are using parallel coordinates style or regular
       if(typeof(this.axis) === 'object'){
-        newRange[0] = this.axis[d](domain1);
-        newRange[1] = this.axis[d](domain2);
-      } else { //function
+        newRange[0] = this.axis[axisName](domain1);
+        newRange[1] = this.axis[axisName](domain2);
+      } else { //functio
         newRange[0] = this.axis(domain1);
         newRange[1] = this.axis(domain2);
       }

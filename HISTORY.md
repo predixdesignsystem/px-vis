@@ -1,6 +1,10 @@
-v0.6.3
+v0.6.4
 ==================
 * Updated docs across all components
+
+v0.6.3
+==================
+* ensure brushing works when resizing
 
 v0.6.2
 ==================
