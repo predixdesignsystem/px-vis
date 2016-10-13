@@ -10,11 +10,11 @@ Interpreter component which creates x & y interpreters.
 Interpreter components act as a converter, translating data points into their corresponding pixel coordinate. To do this, the interpreter needs to understand what type of data you have (xScale, yScale), the size of the drawing area you have (width, height, margin), and the extents of your data / domain (chartData, selectedDomain). It then returns the interpreter functions for `x` and `y` and arrays for the current domain those `x` and `y` functions are using.
 
 ##### Usage
-
     <px-vis-multi-scale
         width="[[width]]"
         height="[[height]]"
         margin="[[margin]]"
+        axes="[[axes]]"
         dimensions="[[dimensions]]"
         chart-data="[[chartData]]"
         complete-series-config="[[completeSeriesConfig]]"
@@ -22,8 +22,10 @@ Interpreter components act as a converter, translating data points into their co
         x="{{x}}"
         y="{{y}}"
         current-domain-x="{{currentDomainX}}"
-        current-domain-y="{{currentDomainY}}">
+        current-domain-y="{{currentDomainY}}"
+        domain-changed="{{domainChanged}}">
     </px-vis-multi-scale>
+
 
 ##### d3 Reference
 https://github.com/d3/d3/wiki/Scales
@@ -109,51 +111,37 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @method _setXScale
      */
     _setXScale: function(width,margin) {
-    //  this.debounce('setXScale', function() {
+      var w = width - margin.left - margin.right,
+          range = [0, w];
 
-        var w = width - margin.left - margin.right,
-            range = [0, w];
+      if(this.x) {
+        var oldDomain = this.x.domain();
+        this.x = Px.d3.scalePoint().range(range).domain(oldDomain).padding(0.5);
+      } else {
+        this.x = Px.d3.scalePoint().range(range).padding(0.5);
+      }
 
-        if(this.x) {
-          var oldDomain = this.x.domain();
-          this.x = Px.d3.scalePoint().range(range).domain(oldDomain).padding(0.5);
-        } else {
-          this.x = Px.d3.scalePoint().range(range).padding(0.5);
-        }
-
-        this.notifyPath('x.range', this.x.range);
-        this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
-  //    }.bind(this), 5);
+      this.notifyPath('x.range', this.x.range);
+      this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
     },
+
     /**
      * Sets the y scale to multiple linear scales
      *
      * @method _setYScale
      */
     _setYScale: function(height,margin,axes) {
-    //  this.debounce('setYScale', function() {
+      var h = height - margin.top - margin.bottom,
+          range = [h, 0],
+          newY = {};// y is an object with multiple scales
 
-        var h = height - margin.top - margin.bottom,
-            range = [h, 0],
-            newY = {};// y is an object with multiple scales
-
-        // iterate through the axes and create a scale for each; set them in the y obj with the axes as keys so we can easily access them again later
-        for(var i = 0; i < axes.length; i++){
-          newY[axes[i]] = Px.d3.scaleLinear().nice().range(range);
-        }
-
-        this.set('y', newY);
-        this.fire('px-vis-y-updated', { 'dataVar': 'y', 'data': this.y, 'method':'set' });
-   //   }.bind(this), 5);
-    },
-
-    _getDataExtents: function(d,yKeysArr){
-      var a = [];
-      for(var i = 0; i < yKeysArr.length; i++){
-        var key = yKeysArr[i];
-        a.push(d[this.completeSeriesConfig[key]['y']]);
+      // iterate through the axes and create a scale for each; set them in the y obj with the axes as keys so we can easily access them again later
+      for(var i = 0; i < axes.length; i++){
+        newY[axes[i]] = Px.d3.scaleLinear().nice().range(range);
       }
-      return [ Math.min.apply(null,a),Math.max.apply(null,a) ];
+
+      this.set('y', newY);
+      this.fire('px-vis-y-updated', { 'dataVar': 'y', 'data': this.y, 'method':'set' });
     },
 
     /**
@@ -188,7 +176,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
           this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
 
         } else {
-          
+
           this.set('currentDomainX', []);
           this.set('currentDomainY', []);
 

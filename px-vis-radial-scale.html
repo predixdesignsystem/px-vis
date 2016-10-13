@@ -11,19 +11,19 @@ Interpreter components act as a converter, translating data points into their co
 
 ##### Usage
 
-    <px-vis-multi-radial-scale
-        width="[[width]]"
-        height="[[height]]"
+    <px-vis-radial-scale
+        width="[[_minDim]]"
         margin="[[margin]]"
-        dimensions="[[dimensions]]"
+        amplitude-keys="[[dimensions]]"
         chart-data="[[chartData]]"
         complete-series-config="[[completeSeriesConfig]]"
         chart-extents="[[chartExtents]]"
         x="{{x}}"
         y="{{y}}"
         current-domain-x="{{currentDomainX}}"
-        current-domain-y="{{currentDomainY}}">
-    </px-vis-multi-radial-scale>
+        current-domain-y="{{currentDomainY}}"
+        center-offset="[[centerOffset]]">
+    </px-vis-radial-scale>
 
 ##### d3 Reference
 https://github.com/d3/d3/wiki/Scales
@@ -68,10 +68,18 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @type Object
      */
     properties: {
+      /**
+      * Array of the amplitude keys
+      *
+      */
       amplitudeKeys: {
         type: Array,
         notify: true
       },
+      /**
+      * Holder for the calculated extents
+      *
+      */
       _calculatedExtents: {
         type: Object,
         notify: true
@@ -175,7 +183,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
 
           ext.y = [min,max];
         }
-        
+
         this.set('_calculatedExtents',ext);
       }
     },

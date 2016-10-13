@@ -274,7 +274,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
           this._processTicks();
         },
-
+        /**
+         * Examines what tick configs we have and applies them if relevant
+         *
+         */
         _processTicks: function() {
           //support for general ticks setting
           // https://github.com/d3/d3-axis#axis_ticks
@@ -314,7 +317,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             }
           }
 
+          //support for tick values
+          // https://github.com/d3/d3-axis/blob/master/README.md#axis_tickValues
           if(this.tickValues && this.tickValues.length > 0 && this.axisType !== 'ordinal'){
+            //dont run if our domain is NaN. Otherwise raises errors
             if(!isNaN(this.axis.domain()[0]) && !isNaN(this.axis.domain()[1])){
               this._axis.tickValues(this.tickValues);
             }
@@ -324,7 +330,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           // this._axis.tickSizeInner(this.innerTickSize);
           // this._axis.tickPadding(10);
           // controls the first and last ticks
-          // TODO rename var names to match new d3
+          // TODO rename var names to match new d3?
           this._axis.tickSizeOuter(this.outerTickSize);
 
           //if we want to turn off ticks and labels
@@ -424,17 +430,25 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           this.fire('px-axis-done');
         },
 
-
+        /**
+         * Updates our ticks
+         *
+         */
         _updateTicks: function() {
           if(this.axis && this.margin && this.height && typeof this.disableTicks !== 'undefined') {
             this.drawElement();
           }
         },
 
+        /**
+         * return the drawn tick values
+         *
+         */
         _calcDrawnTicks: function() {
           if(this.axisType !== 'ordinal') {
             //apparently we need to give ourselves a bit of time to ensure the axis draws and it can clac this
             this.debounce("drawnTicks", function(){
+              // FIXME Only works if ticks is a Number; need to support other formats for ticks
               if(this.ticks){
                 this.set('drawnTickValues', this._axis.scale().ticks(this.ticks));
               } else {
@@ -450,11 +464,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          */
         updateTicks: function(){
           if(this._doesObjHaveValues(this._axis) && this._axisGroup && this._doesObjHaveValues(this.tickValues)){
-              this._axis.tickValues(this.tickValues);
-              //beats me why we need a timeout... some kind of nonsensical race condition.
-              setTimeout(function(){
-                this._updateAxis();
-              }.bind(this),5);
+            this._axis.tickValues(this.tickValues);
+            //beats me why we need a timeout... some kind of nonsensical race condition.
+            setTimeout(function(){
+              this._updateAxis();
+            }.bind(this),5);
           }
         },
 
@@ -505,7 +519,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         /**
          * Sets the d3 attrs for the labels
          *
-         * @method _setLabelStyles
          */
         _setLabelStyles:function(elem) {
           elem.selectAll('text')
@@ -549,7 +562,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         /**
          * Sets the axis line styles
          *
-         * @method _setLineStyles
          */
         _setLineStyles:function(elem,lines) {
           elem.selectAll(lines)
@@ -562,7 +574,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         /**
          * Draws the axis title
          *
-         * @method drawTitle
          */
         drawTitle:function() {
           var ext = this._axisGroup.node().getBBox(),
@@ -606,33 +617,33 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               break;
           }
 
-        if(!this._titleGroup) {
-          this._titleGroup = this.svg.append('g')
-            .attr('class','title-group')
-            .attr('for', this.axisId)
-            .attr('transform','translate(' + x + ',' + y + ')');
+          if(!this._titleGroup) {
+            this._titleGroup = this.svg.append('g')
+              .attr('class','title-group')
+              .attr('for', this.axisId)
+              .attr('transform','translate(' + x + ',' + y + ')');
 
-          this._titleGroup.append('text')
-            .attr('class','axis-title')
-            .attr('fill',this.colors[this.axisColor])
-            .attr('font-size', this.titleTypeSize + 'px')
-            .style('font-family','GE Inspira Sans')
-            // .attr('font-style','GE Inspira Sans')
-            .text(this.displayedTitle)
-            .attr('text-anchor', anchor)
-            .style('text-anchor', anchor)
-            .attr('transform','rotate(' + r + ')');
+            this._titleGroup.append('text')
+              .attr('class','axis-title')
+              .attr('fill',this.colors[this.axisColor])
+              .attr('font-size', this.titleTypeSize + 'px')
+              .style('font-family','GE Inspira Sans')
+              // .attr('font-style','GE Inspira Sans')
+              .text(this.displayedTitle)
+              .attr('text-anchor', anchor)
+              .style('text-anchor', anchor)
+              .attr('transform','rotate(' + r + ')');
 
           } else {
-              this.svg.select('g.title-group[for=' + this.axisId + ']')
-                .attr('transform','translate(' + x + ',' + y + ')');
-              this.svg.select('g.title-group[for=' + this.axisId + '] text')
-                .attr('text-anchor', anchor)
-                .style('text-anchor', anchor)
-                .attr('fill',this.colors[this.axisColor])
-                .attr('font-size', this.titleTypeSize + 'px')
-                .text(this.displayedTitle)
-                .attr('transform','rotate(' + r + ')');
+            this.svg.select('g.title-group[for=' + this.axisId + ']')
+              .attr('transform','translate(' + x + ',' + y + ')');
+            this.svg.select('g.title-group[for=' + this.axisId + '] text')
+              .attr('text-anchor', anchor)
+              .style('text-anchor', anchor)
+              .attr('fill',this.colors[this.axisColor])
+              .attr('font-size', this.titleTypeSize + 'px')
+              .text(this.displayedTitle)
+              .attr('transform','rotate(' + r + ')');
           }
 
           this._processTooltip();
@@ -641,7 +652,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         /**
          * Draws the color bars for each series
          *
-         * @method drawSeriesBars
          */
         drawSeriesBars:function() {
           if(!this.preventSeriesBar && this._doesObjHaveValues(this.completeSeriesConfig) && this._axisGroup && this.displayedTitle) {
@@ -658,7 +668,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         /**
          * Mutes and unmutes the color bars for each series
          *
-         * @method muteSeriesBars
          */
         _muteSeriesBars:function() {
           var keys = Object.keys(this.mutedSeries);
@@ -675,7 +684,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         /**
          * Helper function to draw the series color bar
          *
-         * @method drawSeriesBars
          */
         _drawBar:function(elem,sid,color,index) {
           var w = elem.select('.axis-title').node().getBoundingClientRect()['height'];
@@ -686,6 +694,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .attr('series-bar-id','bar_' + sid)
             .attr('transform','translate(-12,' + (-3 -w - 8 * index) + ')');
         },
+
+        /**
+         * Helper function to append units to the title
+         *
+         */
         _computeUnits: function(appendUnitInTitle, completeSeriesConfig, title) {
           var result = '';
 
@@ -696,6 +709,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
           return result;
         },
+
         /**
          * truncates the title label appropriately
          */
@@ -715,6 +729,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               }
            }, 5);
         },
+
+        /**
+         * redraws title on change
+         */
         _titleChanged: function(displayedTitle) {
           this.debounce('drawTitle', function() {
             if(this._doesObjHaveValues(this._axisGroup) && this._axisGroup.node() !== null && this._axisGroup.node().ownerSVGElement !== null) {
@@ -723,6 +741,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             }
           }.bind(this), 5);
         },
+        
         /**
          * checks it the label needs a tooltip an appropriately add or remove it
          */

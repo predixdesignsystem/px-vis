@@ -10,6 +10,7 @@ Element which creates an SVG element and sets up d3
 
     <px-vis-svg
         svg="{{svg}}"
+        pxSvgElem="{{pxSvgElem}}"
         width="[[width]]"
         height="[[height]]"
         margin="[[margin]]">
@@ -73,37 +74,11 @@ Element which creates an SVG element and sets up d3
          * @property properties
          * @type Object
          */
-        properties: {
-        },
+        properties: {},
 
         observers: [
           '_setSVG(width,height,margin,offset.*)'
         ],
-
-
-
-        /**
-         *  When ready, let's find out who our children are
-         */
-        // ready: function() {
-        //   // Polymer.dom(this).observeNodes(this._onEffectiveDomUpdated.bind(this));
-        // },
-        // created: function(){
-        // },
-        // attached: function() {
-        // },
-
-        // _onEffectiveDomUpdated: function (info) {
-        //   this.async(function () {
-        //     info.addedNodes.forEach(this._onNodeAdded.bind(this));
-        //   });
-        // },
-        // _onNodeAdded: function (node) {
-        //   if (!(node instanceof Text)) {
-        //     node.__map = this.map;
-        //     this._childElems.push(node);
-        //   }
-        // },
 
         /**
         * when attached, re-fire set properties for precipitation pattern, as well as the svg element that's inside px-svg.
@@ -115,7 +90,6 @@ Element which creates an SVG element and sets up d3
             this.fire('px-vis-svg-updated',{ 'data': this.svg, 'dataVar': 'svg', 'method': 'set' });
             this.fire('px-vis-svg-element-updated', {'data': this.$.chartSVG, 'dataVar': 'pxSvgElem', 'method': 'set'});
           }
-
         },
 
         /**

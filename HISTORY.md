@@ -1,3 +1,7 @@
+v0.6.3
+==================
+* Updated docs across all components
+
 v0.6.2
 ==================
 * added rect clip path for canvas

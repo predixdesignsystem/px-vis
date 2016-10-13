@@ -8,12 +8,13 @@
 
 Ostensibly, the clipping path gets applied to drawing components to prevent them from drawing on certain parts of the chart, such stopping a line series drawing where the axis is drawn.
 
-To use, specfify the sizing, svg, and interpreters as specified in the example. It will return an ID for the clipping path which can be passed to other drawing objects.
+To use, specfify the sizing, svg, and interpreters as specified in the example. It will return an ID for the clipping path which can be passed to other drawing objects. This component returns TWO different clip path IDs. clipPath includes the margin on top and seriesClipPath excludes it.
 
 ##### Usage
 
     <px-vis-clip-path
         clip-path="{{clipPath}}"
+        series-clip-path="{{serieClipPath}}"
         svg="[[svg]]"
         x="[[x]]"
         y="[[y]]"
@@ -55,9 +56,15 @@ https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath
      * @type Object
      */
     properties: {
+      /**
+       * Holder for the bigger clip path intended for other chart objects such as events
+       */
       _clipPathSvg: {
         type: Object
       },
+      /**
+       * holder for smaller clip path intended for the chart series
+       */
       _seriesClipPathSvg: {
         type: Object
       },
@@ -75,13 +82,13 @@ https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath
     ],
 
     /**
-     * Creates and sets a clipping path
+     * Creates and sets two clipping paths.
      *
      * @method _drawElement
      */
     _drawElement: function() {
 
-
+      //if the clip path has not been set, create it
       if(!this._clipPathSvg) {
 
         this.set('clipPath', this.generateRandomID('cp_'));
@@ -94,11 +101,13 @@ https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath
 
         this._clipPathSvg = this.svg.select('clipPath#'+this.clipPath+' rect');
       }
+      //update the clip path
       this._clipPathSvg
         .attr('y',-this.margin.top)
         .attr('width', Math.max(this.width - this.margin.left, 0))
         .attr('height', Math.max(this.height - this.margin.bottom, 0));
 
+      //if the second clip path has not been set, create it
       if(!this._seriesClipPathSvg) {
 
         this.set('seriesClipPath', this.generateRandomID('cps_'));
@@ -111,10 +120,11 @@ https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath
 
         this._seriesClipPathSvg = this.svg.select('clipPath#'+this.seriesClipPath + ' rect');
       }
+      //update the second clip path
       this._seriesClipPathSvg
         .attr('y', this.seriesClipPathYOffset)
         .attr('width', Math.max(this.width - this.margin.left - this.margin.right,0))
-        .attr('height', Math.max(this.height - this.margin.bottom  - 
+        .attr('height', Math.max(this.height - this.margin.bottom  -
                         this.margin.top - this.seriesClipPathYOffset,0));
 
     }

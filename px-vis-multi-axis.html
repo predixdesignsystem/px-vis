@@ -13,12 +13,45 @@ d3 element creating an axis for the chart
 
     <px-vis-multi-axis
         svg="[[svg]]"
-        axis="[[x]]"
+        width="[[width]]"
+        height="[[height]]"
         margin="[[margin]]"
-        title="Date"
-        orientation="bottom"
-        label-position="center"
-        current-domain="[[currentDomainX]]">
+        offset="[[_offset]]"
+        length="[[_minDim]]"
+        x="[[x]]"
+        y="[[y]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]"
+        complete-series-config="{{completeSeriesConfig}}"
+        series-key="[[seriesKey]]"
+        chart-data="[[chartData]]"
+        dimensions="[[dimensions]]"
+        axes="[[axes]]"
+        muted-series="{{mutedSeriesBrush}}"
+        redraw-series="true"
+        stroke-width="2"
+        match-ticks="[[matchTicks]]"
+        grid-ticks="{{gridTicks}}"
+        grid-axis="{{gridAxis}}"
+        common-axis="[[commonAxis]]"
+        truncation-length="[[truncationLength]]"
+        displayed-values="{{displayedValues}}"
+        append-unit-in-title
+        domain-changed="[[domainChanged]]"
+        axis-groups="{{axisGroups}}"
+        brush-elems="{{brushElems}}"
+        radial
+        single-domain
+        label-position="inline"
+        label-one-axis
+        axis-color="grey4"
+        ticks="[[ticks]]"
+        label-rotation="180"
+        brush-to-remove="[[brushToRemove]]"
+        center-offset="[[centerOffset]]"
+        drawn-tick-values="{{drawnTickValues}}"
+        title-type-size="15"
+        label-type-size="12">
     </px-vis-multi-axis>
 
 ##### d3 reference
@@ -214,38 +247,65 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       _internalDimensions: {
         type: Array
       },
+      /**
+       * internal dimensions boolean to defeat race conditions
+       */
       _internalDimensionsChanged: {
         type: Boolean,
         value: false
       },
+      /**
+       * whether the scales are using a single scale or multi scale
+       */
       singleDomain: {
         type: Boolean,
         value: false
       },
+      /**
+       * Boolean to decide if all axes should get ticks or just one
+       */
       labelOneAxis:{
         type: Boolean,
         value: false
       },
+      /**
+       * Length of the axis
+       */
       length: {
         type: Number,
         value: null
       },
+      /**
+       * Computed on if it should use the height or the length for axis length
+       */
       _heightOrLen: {
         type: Number,
         computed: '_calcH(height,length)'
       },
+      /**
+       * Boolean controling if brushing should retain or delete series
+       */
       brushToRemove: {
         type: Boolean,
         value: false
       },
+      /**
+       * Boolean to decide if domainChanged changed or if something else triggered the observer
+       */
       _lastDomainChanged: {
         type: Boolean,
         value: null
       },
+      /**
+       * Force a redraw for titleLocation
+       */
       _pokeTitleLocation: {
         type: Boolean,
         value: false
       },
+      /**
+       * Force a redraw if ticks
+       */
       recalcTicks: {
         type: Boolean,
         value: false
@@ -308,10 +368,18 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       return titleLocation;
     },
 
+    /**
+     * Forces a redraw of the titleLocation
+     *
+     */
     _toggleTitleLocation: function() {
       this.set('_pokeTitleLocation' , !this._pokeTitleLocation);
     },
 
+    /**
+     * returns length if it exists, otherwise returns height
+     *
+     */
     _calcH: function(height,length) {
       if(length) {
         return length;
@@ -319,10 +387,15 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       return height
     },
 
-    _moveAxisGroup: function(margin,axisSvg){
+    /**
+     * translates the axis svg to its proper place in case it isnt
+     *
+     */
+     _moveAxisGroup: function(margin,axisSvg){
       //make sure it is translated properly and we are not running into a race condition
       this.axisSvg.attr("transform", "translate(" + (this.margin.left + this.offset[0]) + "," + (this.margin.top + this.offset[1]) + ")");
     },
+
     /**
      * Generates a group elem for each dimension and moves it into the correct x coordinate
      *
@@ -571,25 +644,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
         this.set('_internalDimensionsChanged', !this._internalDimensionsChanged);
 
-        // //make sure that axis that have been removed are also
-        // //removed from the array tracking titles
-        // var keys = Object.keys(this.displayedValues),
-        //     hasUpdated = false;
-        // for(var i=0; i<keys.length; i++) {
-        //   if(this.dimensions.indexOf(keys[i]) === -1) {
-        //     delete this.displayedValues[keys[i]];
-        //     hasUpdated = true;
-        //   }
-        // }
-        //
-        // // if we removed titles from the array make sure we notify
-        // if(hasUpdated) {
-        //   var newValues = this.displayedValues;
-        //   this.displayedValues = {};
-        //   this.set('displayedValues', newValues);
-        // }
       }
     },
+
     /*
      * Checks if there is a title specified in the series config and returns it; otherwise returns the axis id
      *
@@ -604,6 +661,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       }
     },
 
+    /*
+     * Deletes the brushes on its children axes
+     *
+     */
     deleteAllBrushes: function(){
       this.$.axisBrush.deleteAllBrushes();
     }

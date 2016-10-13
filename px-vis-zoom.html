@@ -48,12 +48,14 @@ Element providing an on-chart zoom.
      * @property properties
      * @type Object
      */
-    properties: {
-
-    },
+    properties: {},
     observers: [
       'zooooom(extentsData)'
     ],
+    /**
+     * Sets the selectedDomain to the drawn zoom and shows the button
+     *
+     */
     zooooom: function(extentsData) {
       //make sure the button is visible so we can measure it
       this.toggleClass('hidden', false, this.$.resetBtn);
@@ -67,6 +69,10 @@ Element providing an on-chart zoom.
       this.fire('px-vis-selected-domain-updated', { 'data':{x:extentsData.eX, y:extentsData.eY}, 'method': 'set', 'dataVar': 'selectedDomain' });
 
     },
+    /**
+     * resets the extents
+     *
+     */
     resetZoom: function(){
       this.set('selectedDomain', 'reset');
       this.fire('px-vis-selected-domain-updated', { 'data':'reset', 'method': 'set', 'dataVar': 'selectedDomain' });

@@ -442,25 +442,45 @@ PxVisBehavior.tooltipData = {
      * Data reported back by the interaction space component. Displays the series name, values, and timestamp in the register. tooltipData is in the form:
      *
      *```
-     *   {
-     *     'time': d3TimeStamp,
-     *     'series': [
-     *       {'name':'seriesName0','value': seriesVal0 },
-     *       {'name':'seriesName1','value': seriesVal1 }
-     *     ]
-     *   }
+     *    {
+     *        "time": "2015-03-25T20:34:47.085Z",
+     *        "series":[{
+     *            "name":"seriesId1",
+     *            "coord":[xCoord1, yCoord1],  //in pixel space
+     *            "value":{
+     *                "x":xVal1,             //in data space
+     *                "seriesId1":yVal1    //in data space
+     *            }
+     *        },{
+     *            "name":"seriesId2",
+     *            "coord":[xCoord2, yCoord2],  //in pixel space
+     *            "value":{
+     *                "x":xVal2,             //in data space
+     *                "seriesId2":yVal2    //in data space
+     *            },
+     *        }],
+     *        "mouse":[ mouseX, mouseY ],   //in pixel space
+     *        "xArr":[xCoord1 , xCoord2],   //in pixel space
+     *        "yArr":[yCoord1 , yCoord2],   //in pixel space
+     *    }
      *```
      *
      * When not hovering on a chart, the tooltipData should still have the series names in order for them to still appear in the register. IE:
      *
      *```
-     *   {
-     *     'time': null,
-     *     'series': [
-     *       {'name':'seriesName0','value': null },
-     *       {'name':'seriesName1','value': null }
-     *     ]
-     *   }
+     *    {
+     *        "time": null,
+     *        "series":[{
+     *            "name":"seriesId1",
+     *            "value": null
+     *        },{
+     *            "name":"seriesName1",
+     *            "value": null
+     *        }],
+     *        "mouse": null,
+     *        "xArr": null,
+     *        "yArr": null
+     *    }
      *```
      *
      * @property tooltipData
@@ -1033,6 +1053,10 @@ PxVisBehavior.seriesId = {
 */
 PxVisBehavior.dynamicConfigProperties = [{
   properties: {
+    /**
+      * A list of the dynamic properties
+      *
+      */
     _dynamicProperties: {
       type: Array,
       value: function() {
@@ -1040,13 +1064,22 @@ PxVisBehavior.dynamicConfigProperties = [{
       }
     }
   },
+
   observers: ['_processConfig(completeSeriesConfig.*, seriesId)'],
 
+  /**
+    * Decides if it should use a default or user specified value
+    *
+    */
   _computeValue: function(configValue, def) {
     return (typeof configValue !== 'undefined' && configValue !== null) ?
                               configValue : def;
   },
 
+  /**
+    * sets each property listed in dynamicProperies
+    *
+    */
   _processConfig: function(completeSeriesConfig, seriesId) {
 
     var conf = this.completeSeriesConfig[this.seriesId],
@@ -1057,6 +1090,10 @@ PxVisBehavior.dynamicConfigProperties = [{
     }
   },
 
+  /**
+    * Cycles through properties and adds them to dynamic properties
+    *
+    */
   _watchConfigProperty: function(name, defValue) {
     this.push('_dynamicProperties', name);
     this['_default' + name] = defValue;

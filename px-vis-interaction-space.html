@@ -83,8 +83,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       /**
        * Holder for the interaction rectangle object
        *
-       * @property _rect
-       * @type Object
        */
       _rect:{
         type:Object
@@ -92,13 +90,16 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       /**
        * an object that contains meta data for the area drawn by the user
        *
-       * @property _actionArea
-       * @type Object
        */
       _actionArea: {
         type: Object,
         value: function() {return {};}
       },
+
+      /**
+       * The actual mouse svg rect which can be used to activate tooltip
+       *
+       */
       mouseRect: {
         type: Object,
         notify: true
@@ -338,6 +339,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
             dataObj['xArr'] = xArr;
             dataObj['yArr'] = yArr;
+
             // now we can set our data that we want to pass out
             this.set('tooltipData',dataObj);
             this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });

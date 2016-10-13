@@ -61,7 +61,7 @@ The gridlines still make use of the d3.axis object, just with different settings
          * @type Object
          */
         properties: {
-          
+
           /**
            * Holder for the instantiated d3 grid
            *
@@ -83,11 +83,11 @@ The gridlines still make use of the d3.axis object, just with different settings
           },
           tickValues: {
               type: Array,
-              value: []
+              value: function() { return []; }
           },
           currentDomainY: {
               type: Array,
-              value: []
+              value: function() { return []; }
           }
         },
 
@@ -112,13 +112,13 @@ The gridlines still make use of the d3.axis object, just with different settings
           this.debounce('draw_grid', function() {
 
          //   if(!this.gridSvg) {
-             
+
              //clean the svg
             var node = this.svg.node();
             while (node.firstChild) {
                 node.removeChild(node.firstChild);
             }
-             
+
 
             var radius = this.axis.range()[1] - this.axis.range()[0];
 

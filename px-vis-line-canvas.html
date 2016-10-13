@@ -14,10 +14,13 @@ Element which draws lines series onto the chart
         complete-series-config="[[completeSeriesConfig]]"
         x="[[x]]"
         y="[[y]]"
-        current-domain-x="[[currentDomainX]]"
-        current-domain-y="[[currentDomainY]]"
+        domain-changed="[[domainChanged]]"
         muted-series="[[mutedSeries]]"
-        no-canvas-progressive-rendering>
+        no-canvas-progressive-rendering
+        width="[[width]]"
+        height="[[height]]"
+        margin="[[margin]]"
+        clip-path>
     </px-vis-line-canvas>
 
 @element px-vis-line
@@ -182,30 +185,40 @@ Element which draws lines series onto the chart
       },20);
     },
 
+    /**
+     * Draws a clip path for canvas
+     *
+     */
     drawClipPath: function() {
 
       if(this.radialLine) {
-        this._drawRadialClipPath();
+        this._drawRadarClipPath();
       } else {
-        //draw a box
         this._drawRectClipPath();
       }
     },
 
-    _drawRadialClipPath: function() {
+    /**
+     * draws a clip path for radar
+     */
+    _drawRadarClipPath: function() {
       //start off resetting our saved canvas
-      this._generateRadialClipData();
+      this._generateRadarClipData();
       //save our empty state
       this.canvasContext.save();
       //clear it (need to recent to 0,0 for clearing)
       this.canvasContext.clearRect(-this.canvasContext.canvas.width / 2, -this.canvasContext.canvas.height/ 2, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+
       this.canvasContext.beginPath();
+
       this.line(this._clipData[0]);
       this.line(this._clipData[1]);
+
       this.canvasContext.clip("evenodd");
-
     },
-
+    /**
+     * Draws a rectangular clip path for cartesian charts
+     */
     _drawRectClipPath: function() {
       this.canvasContext.save();
       //clear it (need to recent to 0,0 for clearing)
@@ -219,7 +232,11 @@ Element which draws lines series onto the chart
       this.canvasContext.clip();
     },
 
-    _generateRadialClipData: function() {
+    /**
+     * Generates the edges for the radar clip path
+     *
+     */
+    _generateRadarClipData: function() {
        var clipData = [{},{}];
        for(var i = 0; i < this.completeSeriesConfig[this.seriesId]['x'].length; i++) {
          clipData[0][ this.completeSeriesConfig[this.seriesId]['x'][i] ] = this.currentDomainY[0];
@@ -229,6 +246,10 @@ Element which draws lines series onto the chart
        this.set('_clipData' , clipData);
      },
 
+    /**
+    * if progressive rendering is disabled, draws all the lines and renders them in one batch
+    *
+    */
     _renderAtOnce: function(data) {
 
       //data format
@@ -284,6 +305,7 @@ Element which draws lines series onto the chart
 
         }
         this.canvasContext.stroke();
+
         //clean up drawing
         this._renderingEnded(false);
       }
@@ -436,6 +458,7 @@ Element which draws lines series onto the chart
 
       timer(processFunction);
     },
+
     /**
      * Used to 'clear' the canvas fater drawing in case we drew outside our limits.
      * We might want to consider using a clippath instead
@@ -451,6 +474,7 @@ Element which draws lines series onto the chart
 
       this.fire('px-vis-line-canvas-rendering-ended', { "progressiveRending": progressive });
     },
+
     /**
      * Checks mutedSeries to see if this ID is in there
      * Called from an observer watching mutedSeries
@@ -467,6 +491,7 @@ Element which draws lines series onto the chart
         return this.mutedSeries[this.seriesId] ? true : false;
       }
     },
+
     /**
      * Returns the correct rgba to use for the canvas line.
      *
@@ -481,6 +506,11 @@ Element which draws lines series onto the chart
       }
       return null;
     },
+    
+    /**
+     * adds alpha to an rgb value
+     *
+     */
     rgbToRgba: function(rgb, opacity) {
       //assuming rgb is correctly formatted...
       //remove ')'

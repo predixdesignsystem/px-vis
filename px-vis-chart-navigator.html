@@ -15,15 +15,22 @@
 Provides an interactive chart navigator with a brush to adjust the chart domain
 
 ##### Usage
-
     <px-vis-chart-navigator
-        x-scale="time"
-        y-scale="linear"
+        id="navigator"
+        x-axis-type="time"
+        y-axis-type="linear"
         width="[[width]]"
         height="100"
         margin="[[marginNav]]"
+        default-series-config="[[defaultSeriesConfig]]"
+        series-config="[[seriesConfig]]"
+        include-all-series="[[includeAllSeries]]"
         chart-data="[[chartData]]"
         nav-series-limit="[[navSeriesLimit]]"
+        chart-domain-x="[[currentDomainX]]"
+        chart-domain-y="[[currentDomainY]]"
+        range="[[range]]"
+        disable-empty-render
         selected-domain="{{selectedDomain}}">
     </px-vis-chart-navigator>
 
@@ -165,17 +172,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
             value: Infinity,
             notify: true
           },
-          xAxisLocation:{
-            type:String,
-            value:'bottom'
-          },
-          yAxisLocation:{
-            type:String,
-            value:'left'
-          },
-          margin:{
-            type:Object
-          },
+
           /**
            * The parent chart's extents
            *
@@ -226,15 +223,21 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
             value: false
           },
         },
+
         listeners: {
           'iron-resize': '_onIronResize'
         },
+
         attached: function() {
           this._onIronResize();
         },
-        _limitSeries: function(i){
+        /**
+         * Dom if function to decide if a repeated item is above our limit
+         */
+        _limitSeries: function(i) {
           return i < this.navSeriesLimit;
         },
+
         /**
          * Forces the chart to resize and redraw
          */
@@ -255,6 +258,10 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
             }
           },100);
         },
+
+        /**
+         * When a range from rangepicker changes
+         */
         _rangeChanged: function() {
           var newXRange = [Px.moment(this.range.from),Px.moment(this.range.to)];
 
@@ -301,6 +308,10 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
             this.set('selectedDomain', newDomain);
           }
         },
+
+        /**
+         * Creates some dummy data for iniitial use
+         */
         _updateDummyData: function(newXRange) {
           var config = this.seriesConfig[Object.keys(this.seriesConfig)[0]],
             newData1 = {},

@@ -165,8 +165,9 @@ PxVisBehaviorD3.svg = {
                   resultCanvas: canvas};
     canvg(canvas, svgData, options);
   },
+
   /**
-   *
+   * Tries to draw the SVG to canvas and if that doesnt work, falls back on a failure callback
    */
   _nativeDrawSvgOnCanvas: function(canvas, svgData, x, y, sucessCallback, failureCallback) {
     //detect canvas tainting failures
@@ -191,7 +192,9 @@ PxVisBehaviorD3.svg = {
 
       img.src = url;
   },
-
+  /**
+   * fix for IE to get outer HTML
+   */
   _getSVGOuterHtml: function(svg) {
     var serializeXML = function(node, output) {
       var nodeType = node.nodeType;
@@ -884,11 +887,15 @@ PxVisBehaviorD3.radialLineGenerator = [{
       type: Object
     },
 
+    /**
+    * sets a minimum value for the line amplitude. Points less than the lineRadiusLimit will be set to the limit
+    *
+    */
     lineRadiusLimit: {
       type: Number
     }
   },
-  
+
   /**
    * Defines a multi-scale d3 line generator and its attrs
    *
