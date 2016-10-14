@@ -1,3 +1,7 @@
+v0.6.5
+==================
+* Made tooltip detach px-tooltip
+
 v0.6.4
 ==================
 * Updated docs across all components
