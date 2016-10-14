@@ -1075,12 +1075,14 @@ PxVisBehaviorD3.lineShared = [{
     // if coloring by category
     if(categories.length > 0){
       for(var i = 0; i < categories.length; i++){
-        c = completeSeriesConfig[categories[i]]['color'].split('(')[1].split(',');
-        colors[categories[i]] = {
-          "r": Number(c[0]),
-          "g": Number(c[1]),
-          "b": Number(c[2].split(')')[0])
-        };
+        if(completeSeriesConfig[categories[i]]) {
+          c = completeSeriesConfig[categories[i]]['color'].split('(')[1].split(',');
+          colors[categories[i]] = {
+            "r": Number(c[0]),
+            "g": Number(c[1]),
+            "b": Number(c[2].split(')')[0])
+          };
+        }
       }
     }
 

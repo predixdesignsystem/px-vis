@@ -125,7 +125,14 @@ Element which draws lines series onto the chart
     observers: [
       'drawCanvas(canvasContext,domainChanged,chartData.*,completeSeriesConfig.*,_canvasRedraw)',
       'mutedChanged(mutedSeries.*, completeSeriesConfig)'
-     ],
+    ],
+
+    detached: function(){
+      //clear the canvas on detach
+      this.canvasContext.restore();
+
+      this.canvasContext.clearRect(-this.canvasContext._translation[0], -this.canvasContext._translation[1] , this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+    },
 
     /**
      * Draws or updates the line element.
@@ -506,7 +513,7 @@ Element which draws lines series onto the chart
       }
       return null;
     },
-    
+
     /**
      * adds alpha to an rgb value
      *
