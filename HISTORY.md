@@ -1,3 +1,7 @@
+v0.6.10
+==================
+* make sure scatter removes on detached
+
 v0.6.9
 ==================
 * ensure forceDateTimeDisplay works with new registers
