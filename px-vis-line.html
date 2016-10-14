@@ -134,11 +134,13 @@ Element which draws lines series onto the chart
       'drawElement(svg,domainChanged,chartData.*,completeSeriesConfig.*, counterClockwise)',
       'isIdInMuted(mutedSeries.*, completeSeriesConfig)',
       '_addClipPath(clipPath)'
-     ],
-     ready: function() {
-       this._watchConfigProperty('mutedOpacity', 0.3);
-     },
-
+    ],
+    ready: function() {
+      this._watchConfigProperty('mutedOpacity', 0.3);
+    },
+    detached: function() {
+      this.linePath.remove();
+    },
     /**
      * Draws or updates the line element.
      * Called from an observer watching for data and the necessary d3 objects
@@ -168,7 +170,7 @@ Element which draws lines series onto the chart
         }
 
         // set our data
-         var lineBuilder = this.lineGroup.selectAll('path.series-line')
+          var lineBuilder = this.lineGroup.selectAll('path.series-line')
           .data(data);
 
         // When datapoints disappear from our data, remove them

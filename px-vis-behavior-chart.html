@@ -84,6 +84,13 @@ PxVisBehaviorChart.chartCommon = [{
         type: Boolean,
         notify: true,
         value: false
+      },
+      /**
+       *  Representes the keys avaiable in completeSeriesConfig. It's being set 
+       *  before completeSeriesConfig is set
+       */
+      _seriesKeys: {
+        type: Array
       }
     },
 
@@ -130,7 +137,12 @@ PxVisBehaviorChart.chartCommon = [{
             yMins = [],
             yMaxes = [],
             missingYs,
-            x;
+            x,
+            isUpdate = this.completeSeriesConfig ? true : false,
+            addedSeriesKeys = [],
+            removedSeriesKeys = [],
+            updatedSeriesKeys = [];
+
         if(k.length === 0 && !this.includeAllSeries){
           console.warn("No series were added to the chart. Either add them in the seriesConfig or turn on includeAllSeries");
           return;
@@ -214,11 +226,57 @@ PxVisBehaviorChart.chartCommon = [{
           }
         }
 
+        //if this is an update bof series config find out additions/deletions
+        var deletion = false,
+            addition = false;
+        if(isUpdate) {
+          var currKeys = Object.keys(this.completeSeriesConfig),
+              newKeys = Object.keys(fullConfig);
+
+          //process updates and additions
+          for(var i=0; i<newKeys.length; i++) {
+            if(currKeys.includes(newKeys[i])) {
+              updatedSeriesKeys.push(newKeys[i]);
+            } else {
+              addedSeriesKeys.push(newKeys[i]);
+              addition = true;
+            }
+          }
+
+          //process deletions
+          for(var i=0; i<currKeys.length; i++) {
+            if(!newKeys.includes(currKeys[i])) {
+              removedSeriesKeys.push(currKeys[i]);
+              deletion = true;
+            } 
+          }
+        }
+
+        if(deletion) {
+          //we need to flush before setting completeSeriesConfig for deletion
+          //but need setting completeSeriesConfig before flushing for additions.
+          //Process the deletions first and we will process the addtions after setting
+          //completeseriesconfig (if needed)
+          this.set('_seriesKeys', updatedSeriesKeys);
+
+          //make sure we flush for all the components dom-repeating over _seriesKeys:
+          //if a serie needs to be removed this should be processed before we pass
+          //the new completeSeriesConfig or observers will run on the not-yet deleted serie
+          Polymer.dom.flush();
+        } else {
+          this.set('_seriesKeys', Object.keys(fullConfig));
+        }
+
         this.fire('px-vis-chart-extents', { 'dataVar': 'chartExtents', 'data': this.chartExtents, 'method':'set' });
-        this.notifyPath('chartExtents',this.chartExtents);
+        this.notifyPath('chartExtents', this.chartExtents);
 
         this.fire('px-vis-complete-series-config', { 'dataVar': 'completeSeriesConfig', 'data': fullConfig, 'method':'set' });
-        this.set('completeSeriesConfig',fullConfig);
+        this.set('completeSeriesConfig', fullConfig);
+
+        if(deletion && addition) {
+          //now that we have the new completeSeriesConfig process the additions
+          this.set('_seriesKeys', Object.keys(fullConfig));
+        } 
       }
     },
     /**

@@ -211,23 +211,30 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       }
 
-      // if we have multi-series then we need multiple circles...
-      if(this.circlePoint === 'yes' && !this._circles){
+      if(this.circlePoint === 'yes'){
         // append the circle
-        this._circles = this._cursor.selectAll('cirlcle.tooltipPoint')
-          .data(Object.keys(this.completeSeriesConfig))
+        this._circles = this._cursor.selectAll('circle.tooltipPoint')
+          .data(Object.keys(this.completeSeriesConfig));
+
+        this._circles.exit().remove();
+
+        this._circles
           .enter()
-          .append('circle')
-          .attr('class', 'tooltipPoint')
-          .attr('fill', (function(d){
-            return this.completeSeriesConfig[d]['color']
-          }).bind(this))
-          .attr('r', 3)
-          .attr('stroke', (function(d){
-            return this.completeSeriesConfig[d]['color']
-          }).bind(this))
-          .attr('stroke-width', 12)
-          .attr('stroke-opacity', 0.3);
+            .append('circle')
+            .attr('class', 'tooltipPoint')
+            .attr('r', 3)
+            .attr('stroke-width', 12)
+            .attr('stroke-opacity', 0.3)
+          .merge(this._circles)
+            .attr('fill', (function(d){
+              return this.completeSeriesConfig[d]['color']
+            }).bind(this))
+            .attr('stroke', (function(d){
+              return this.completeSeriesConfig[d]['color']
+            }).bind(this));
+          
+          this._circles = this._cursor.selectAll('circle.tooltipPoint');
+          
       }
     },  //drawElement
     /**
