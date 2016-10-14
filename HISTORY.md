@@ -1,3 +1,7 @@
+v0.6.11
+==================
+* changes for demo
+
 v0.6.10
 ==================
 * make sure scatter removes on detached
