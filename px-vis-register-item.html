@@ -4,11 +4,7 @@
 <link rel="import" href="px-vis-behavior-register.html"/>
 
 <!--
-Element providing a display and interaction space for series in your chart.
-
-It can be either vertical on the side of the chart or horizonal above or below your chart. It displays a colored bar matching the series color and the series name. When you hover over the chart, the chart sends data to the register via the bound "tooltipData" property. These data values are then displayed in the register.
-
-You can turn series on the chart off by clicking on that series in the register.
+Element providing a series line items on the register for regular charts
 
 ##### Usage
 
@@ -20,41 +16,8 @@ You can turn series on the chart off by clicking on that series in the register.
         y-axis-type="[[yAxisType]]">
     </px-vis-register-item>
 
-
-##### Sending Data to the Register
-tooltipData is in the form:
-
-    {
-        'time': d3TimeStamp,
-        'series': [
-            {'name':'seriesName0','value': seriesVal0 },
-            {'name':'seriesName1','value': seriesVal1 }
-        ]
-    }
-
-When not hovering on a chart, the tooltipData should still have the series names in order for them to still appear in the register. IE:
-
-    {
-        'time': null,
-        'series': [
-            {'name':'seriesName0','value': null },
-            {'name':'seriesName1','value': null }
-        ]
-    }
-
-##### Reporting Data from the Register
-The component returns an object via mutedSeries which the chart can take and react to:
-
-    {
-        'seriesId1':true,
-        'seriesId2':false,
-    }
-
-##### Time, number, and name formatting
-Formatting for the timestamps,the data values, and the series names can be controlled via a series of properties. Please see the properties for configuration details.
-
-@element px-vis-register
-@blurb Element providing a display and interaction space for series in your chart.
+@element px-vis-register-item
+@blurb Element providing a series line items on the register for regular charts
 @homepage index.html
 @demo demo.html
 -->
@@ -156,15 +119,83 @@ Formatting for the timestamps,the data values, and the series names can be contr
       PxVisBehavior.axisTypes,
       PxVisBehaviorRegister.register,
       PxVisBehaviorRegister.itemShared,
-      PxVisBehaviorRegister.nonPieItem,
+      PxVisBehaviorRegister.generalItem,
       commonColors
     ],
     properties: {
-
+      /**
+       * the units for the x value
+       */
+      _xUnit: {
+        type: String,
+        computed: '_computeXUnit(item, completeSeriesConfig.*)'
+      },
+      /**
+       * the units for the y value
+       */
+      _yUnit: {
+        type: String,
+        computed: '_computeYUnit(item, completeSeriesConfig.*)'
+      },
+      /**
+       * calcs the value for x
+       */
+      _itemX: {
+        type: String,
+        computed: '_computeItemX(item, completeSeriesConfig.*)'
+      },
+      /**
+       * calcs the value of y
+       */
+      _itemY: {
+        type: String,
+        computed: '_computeItemY(item, completeSeriesConfig.*)'
+      }
     },
+
     observers: [
       '_toggleSeries(item,mutedSeries.*)'
     ],
+
+    /**
+     * returns the unit for the x value based on the seriesConfig
+     */
+    _computeXUnit : function(item, completeSeriesConfig) {
+      return this.completeSeriesConfig[item.name] && this.completeSeriesConfig[item.name]['xAxisUnit'] ? this.completeSeriesConfig[item.name]['xAxisUnit'] : '';
+    },
+    /**
+     * returns the unit for the y value based on the seriesConfig
+     */
+    _computeYUnit : function(item, completeSeriesConfig) {
+      return this.completeSeriesConfig[item.name] && this.completeSeriesConfig[item.name]['yAxisUnit'] ? this.completeSeriesConfig[item.name]['yAxisUnit'] : '';
+    },
+
+    /**
+     * returns the value for y
+     */
+    _computeItemY: function() {
+      return this._returnVal(this.item, 'y', '&nbsp;/&nbsp');
+    },
+    /**
+     * returns the value for x
+     */
+    _computeItemX: function() {
+      return this._returnVal(this.item, 'x', '&nbsp;/&nbsp');
+    },
+
+    /**
+     * returns the value in the tooltip data
+     */
+    _returnVal: function(item, axis, separator) {
+      if(this.completeSeriesConfig[item.name]) {
+        var key = (axis === 'x') ? this.completeSeriesConfig[item.name]['x'] : this.completeSeriesConfig[item.name]['y'];
+
+        if(item.value && (item.value[key] || item.value[key] === 0)) {
+          return item.value[key] + (separator ? separator : '');
+        }
+      }
+      return null;
+    },
 
   });
 </script>

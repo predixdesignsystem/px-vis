@@ -35,23 +35,47 @@ You can turn series on the chart off by clicking on that series in the register.
 ##### Sending Data to the Register
 tooltipData is in the form:
 
+```
     {
-        'time': d3TimeStamp,
-        'series': [
-            {'name':'seriesName0','value': seriesVal0 },
-            {'name':'seriesName1','value': seriesVal1 }
-        ]
+        "time": "2015-03-25T20:34:47.085Z",
+        "series":[{
+            "name":"seriesId1",
+            "coord":[xCoord1, yCoord1],  //in pixel space
+            "value":{
+                "x":xVal1,             //in data space
+                "seriesId1":yVal1    //in data space
+            }
+        },{
+            "name":"seriesId2",
+            "coord":[xCoord2, yCoord2],  //in pixel space
+            "value":{
+                "x":xVal2,             //in data space
+                "seriesId2":yVal2    //in data space
+            },
+        }],
+        "mouse":[ mouseX, mouseY ],   //in pixel space
+        "xArr":[xCoord1 , xCoord2],   //in pixel space
+        "yArr":[yCoord1 , yCoord2],   //in pixel space
     }
+```
 
-When not hovering on a chart, the tooltipData should still have the series names in order for them to still appear in the register. IE:
+ When not hovering on a chart, the tooltipData should still have the series names in order for them to still appear in the register. IE:
 
+```
     {
-        'time': null,
-        'series': [
-            {'name':'seriesName0','value': null },
-            {'name':'seriesName1','value': null }
-        ]
+        "time": null,
+        "series":[{
+            "name":"seriesId1",
+            "value": null
+        },{
+            "name":"seriesName1",
+            "value": null
+        }],
+        "mouse": null,
+        "xArr": null,
+        "yArr": null
     }
+```
 
 ##### Reporting Data from the Register
 The component returns an object via mutedSeries which the chart can take and react to:
@@ -160,16 +184,16 @@ Formatting for the timestamps,the data values, and the series names can be contr
        *  - `vertical`
        *  - `horizontal`
        *
-       * @property type
-       * @type string
-       * @default vertical
       */
       type:{
        type:String,
        value:"vertical",
        notify: true
       },
-
+      /**
+       * List of the series to add to the register
+       *
+      */
       _series: {
         type: Array,
         notify: true,
@@ -227,7 +251,10 @@ Formatting for the timestamps,the data values, and the series names can be contr
         this.set('_separator', '');
       }
     },
-
+    /**
+     * returns the list of series
+     *
+    */
     _computeSeries: function() {
       return this.tooltipData.series;
     }

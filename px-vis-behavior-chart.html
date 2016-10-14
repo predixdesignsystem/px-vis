@@ -98,6 +98,9 @@ PxVisBehaviorChart.chartCommon = [{
       '_setCompleteSeriesConfig(defaultSeriesConfig.*,chartData.*,seriesConfig.*)'
     ],
 
+    /**
+    * Calcs the extents of the charts
+    */
     _calcChartExts: function(mins,maxes,axis){
       if(this[axis + 'AxisType'] === 'ordinal'){
         // how should someone set the ordinal list? Differet key in seriesConfig?
@@ -281,6 +284,7 @@ PxVisBehaviorChart.chartCommon = [{
         } 
       }
     },
+
     /**
      * Helper function to return the correct color for a particular index.
      **/
@@ -289,6 +293,7 @@ PxVisBehaviorChart.chartCommon = [{
           index = this._calcIndex(i,l);
       return this.dataVisColors[this.seriesColorOrder[ index ]];
     },
+
     /**
      * Helper function to calculate the index. When we run out of indcies, it loops back over valid indicies.
      **/
@@ -299,36 +304,39 @@ PxVisBehaviorChart.chartCommon = [{
     /**
      * Helper function for the register. Returns true if the side register should exist
      *
-     * @method _sideRegister
      */
     _sideRegister:function(location){
       return location === 'side' || location === 'both';
     },
+
     /**
      * Helper function for the register. Returns true if the top register should exist
      *
-     * @method _topRegister
      */
     _topRegister:function(location){
       return location === 'top' || location === 'both';
     },
+
     /**
      * Helper function for the line series. Returns true if the series is a line
      *
-     * @method _chartTypeLine
      */
     _chartTypeLine: function(key,obj){
         return obj[key]['type'] === 'line';
     },
+
     /**
      * Helper function for the line series. Returns true if the series is a line
      *
-     * @method _chartTypeLine
      */
     _chartTypeScatter: function(key,obj){
       return obj[key]['type'] === 'scatter';
     },
 
+    /**
+     * returns the keys of an object
+     *
+     */
     _returnKeys: function(obj){
       return Object.keys(obj);
     }
@@ -582,6 +590,10 @@ PxVisBehaviorChart.timeFiltering = [{
       computed: '_filterData(chartData, timeDomain, timeData)'
     }
   },
+
+  /**
+   * returns a filtered dataset based on the time domain
+   */
   _filterData: function(chartData, timeDomain, timeData) {
 
     if(timeDomain.x && timeDomain.x.length === 2) {

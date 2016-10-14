@@ -3,7 +3,7 @@ var PxVisBehaviorRegister = PxVisBehaviorRegister || {};
 
 /*
     Name:
-    PxVisBehavior.itemShared
+    PxVisBehaviorRegister.itemShared
 
     Description:
     Polymer behavior that provides the basic properties and methods for px-vis register items.
@@ -11,25 +11,40 @@ var PxVisBehaviorRegister = PxVisBehaviorRegister || {};
     Dependencies:
     - none
 
-    @polymerBehavior PxVisBehavior.itemShared
+    @polymerBehavior PxVisBehaviorRegister.itemShared
 */
 PxVisBehaviorRegister.itemShared = {
   properties: {
+    /**
+     * A holder for a line of the register
+     */
     item: {
       type: Object
     },
+    /**
+     * Which flex classes get applied to make it side or top
+     */
     _wrapperClass: {
       type: String,
       computed: '_getWrapperClass(item, completeSeriesConfig)'
     },
+    /**
+     * The name of the item
+     */
     _configName: {
       type: String,
       computed: '_computeConfigName(item, completeSeriesConfig)'
     },
+    /**
+     * the truncated name for the item
+     */
     _truncatedName: {
       type: String,
       computed: '_computeTruncatedName(_configName, completeSeriesConfig)'
     },
+    /**
+     * Whether truncation ran or not
+     */
     _didTruncate: {
       type: Boolean,
       computed: '_computeDidTruncate(_configName, completeSeriesConfig)'
@@ -40,9 +55,6 @@ PxVisBehaviorRegister.itemShared = {
      *  - `vertical`
      *  - `horizontal`
      *
-     * @property type
-     * @type string
-     * @default vertical
     */
     type: {
      type: String,
@@ -51,6 +63,9 @@ PxVisBehaviorRegister.itemShared = {
     }
   },
 
+  /**
+   * Returns the correct flex type based on the register type
+   */
   _getWrapperClass: function() {
     var classList = 'flex ';
     if(this.type === 'horizontal') {
@@ -61,15 +76,21 @@ PxVisBehaviorRegister.itemShared = {
     return classList;
   },
 
+  /**
+   * Returns the name of the item
+   */
   _computeConfigName: function() {
     return this._getConfigName(this.item.name);
   },
+  /**
+   * returns the truncated name of the item
+   */
   _computeTruncatedName: function(_configName) {
     return this._truncateName(_configName, this.truncationLength);
   },
 
   /**
-   * dom-if function for series names to decide if it was truncated. If so, add a tooltip showing full name
+   * decide if series name was truncated. If so, add a tooltip showing full name
    *
    */
   _computeDidTruncate: function(str,len) {
@@ -77,6 +98,9 @@ PxVisBehaviorRegister.itemShared = {
     return len > 2 && str.length > len ? true : false;
   },
 
+  /**
+   * Tries to draw the SVG to canvas and if that doesnt work, falls back on a failure callback
+   */
   _getConfigName: function(name) {
     if(this.completeSeriesConfig[this.item.name]) {
       if(this.xAxisType === 'pie') {
@@ -89,10 +113,6 @@ PxVisBehaviorRegister.itemShared = {
 
   /**
    * helper function to set initial classes
-   *
-   * Adds or removes muted class to those series in the register and sets base classes.
-   *
-   * @method _mutedToStart
    */
   _baseClasses: function() {
     var baseClasses = (this.type === 'horizontal') ? "series narrow flex flex--row" : "series wide flex flex--row";
@@ -102,7 +122,7 @@ PxVisBehaviorRegister.itemShared = {
 
 /*
     Name:
-    PxVisBehavior.register
+    PxVisBehaviorRegister.register
 
     Description:
     Polymer behavior that provides the basic properties and methods for px-vis register.
@@ -110,19 +130,13 @@ PxVisBehaviorRegister.itemShared = {
     Dependencies:
     - none
 
-    @polymerBehavior PxVisBehavior.register
+    @polymerBehavior PxVisBehaviorRegister.register
 */
 PxVisBehaviorRegister.register = {
-  properties: {
-    /**
-     * For pie charts whether the values should be displayed in %
-     */
-    usePercentage: {
-      type: Boolean,
-      value: false
-    }
-  },
-
+  properties: {},
+  /**
+   * returns the correct classes for the series based on type
+   */
   _getSeriesWrapperClass: function(type) {
     var classList = 'flex ';
 
@@ -135,6 +149,9 @@ PxVisBehaviorRegister.register = {
     return classList;
   },
 
+  /**
+   * tests if an item is of a type
+   */
   _isOfType: function(toTest, type) {
     return toTest === type;
   }
@@ -142,7 +159,7 @@ PxVisBehaviorRegister.register = {
 
 /*
     Name:
-    PxVisBehavior.pie
+    PxVisBehaviorRegister.pie
 
     Description:
     Polymer behavior that provides the basic properties and methods for px-vis register.
@@ -150,7 +167,7 @@ PxVisBehaviorRegister.register = {
     Dependencies:
     - none
 
-    @polymerBehavior PxVisBehavior.pie
+    @polymerBehavior PxVisBehaviorRegister.pie
 */
 PxVisBehaviorRegister.pie = {
   properties: {
@@ -166,7 +183,7 @@ PxVisBehaviorRegister.pie = {
 
 /*
     Name:
-    PxVisBehavior.datetime
+    PxVisBehaviorRegister.datetime
 
     Description:
     Polymer behavior that provides the basic properties and methods for px-vis register.
@@ -174,7 +191,7 @@ PxVisBehaviorRegister.pie = {
     Dependencies:
     - none
 
-    @polymerBehavior PxVisBehavior.datetime
+    @polymerBehavior PxVisBehaviorRegister.datetime
 */
 PxVisBehaviorRegister.datetime = {
   properties: {
@@ -214,7 +231,7 @@ PxVisBehaviorRegister.datetime = {
 
 /*
     Name:
-    PxVisBehavior.muteableItem
+    PxVisBehaviorRegister.generalItem
 
     Description:
     Polymer behavior that provides the muting properties.
@@ -222,50 +239,31 @@ PxVisBehaviorRegister.datetime = {
     Dependencies:
     - none
 
-    @polymerBehavior PxVisBehavior.muteableItem
+    @polymerBehavior PxVisBehaviorRegister.generalItem
 */
-PxVisBehaviorRegister.nonPieItem = [{
+PxVisBehaviorRegister.generalItem = [{
   properties: {
-    _xUnit: {
-      type: String,
-      computed: '_computeXUnit(item, completeSeriesConfig.*)'
-    },
-    _yUnit: {
-      type: String,
-      computed: '_computeYUnit(item, completeSeriesConfig.*)'
-    },
+    /**
+     * Decides if the item starts off muted
+     */
     _itemMutedToStart: {
       type: String,
       computed: '_computeItemMutedToStart(item, completeSeriesConfig.*)'
     },
+    /**
+     * calcates the color of the item
+     */
     _itemColor: {
       type: String,
       computed: '_computeItemColor(item, completeSeriesConfig.*)'
     },
-    _itemX: {
-      type: String,
-      computed: '_computeItemX(item, completeSeriesConfig.*)'
-    },
-    _itemY: {
-      type: String,
-      computed: '_computeItemY(item, completeSeriesConfig.*)'
-    },
   },
 
-  _computeXUnit : function(item, completeSeriesConfig) {
-    return this.completeSeriesConfig[item.name] && this.completeSeriesConfig[item.name]['xAxisUnit'] ? this.completeSeriesConfig[item.name]['xAxisUnit'] : '';
-  },
-  _computeYUnit : function(item, completeSeriesConfig) {
-    return this.completeSeriesConfig[item.name] && this.completeSeriesConfig[item.name]['yAxisUnit'] ? this.completeSeriesConfig[item.name]['yAxisUnit'] : '';
-  },
+  /**
+   * returns if the series should be muted to start
+   */
   _computeItemMutedToStart: function() {
     return this._mutedToStart(this.item.name);
-  },
-  _computeItemY: function() {
-    return this._returnVal(this.item, 'y', '&nbsp;/&nbsp');
-  },
-  _computeItemX: function() {
-    return this._returnVal(this.item, 'x', '&nbsp;/&nbsp');
   },
 
   /**
@@ -299,21 +297,6 @@ PxVisBehaviorRegister.nonPieItem = [{
     return classes;
   },
 
-  _returnVal: function(item, axis, separator) {
-    if(this.completeSeriesConfig[item.name]) {
-      var key = (axis === 'x') ? this.completeSeriesConfig[item.name]['x'] : this.completeSeriesConfig[item.name]['y'];
-
-      if(item.value && (item.value[key] || item.value[key] === 0)) {
-        return item.value[key] + (separator ? separator : '');
-      }
-    }
-    return null;
-  },
-
-  _getYUnit: function(item, completeSeriesConfig) {
-    return this.completeSeriesConfig[item.name] && this.completeSeriesConfig[item.name].yAxisUnit ? this.completeSeriesConfig[item.name].yAxisUnit : '';
-  },
-
   /**
    * Event function which is fired when a series is clicked.
    *
@@ -325,7 +308,7 @@ PxVisBehaviorRegister.nonPieItem = [{
   _seriesClicked: function(e) {
     var ne = Polymer.dom(e),
         series = ne.rootTarget.getAttribute('name').substr(1);
-    
+
     this.muteUnmuteSeries(series);
     e.stopPropagation();
   },

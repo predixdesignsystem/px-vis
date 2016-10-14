@@ -1,3 +1,15 @@
+v0.6.6
+==================
+* Added datetime imports to tooltip and passed down to register
+
+v0.6.5
+==================
+* Made tooltip detach px-tooltip
+
+v0.6.4
+==================
+* Updated docs across all components
+
 v0.6.3
 ==================
 * ensure brushing works when resizing

@@ -3,6 +3,7 @@
 <link rel="import" href="../px-tooltip/px-tooltip.html" />
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
+<link rel="import" href="px-vis-behavior-datetime.html"/>
 <link rel="import" href="px-vis-register.html" />
 
 
@@ -14,11 +15,16 @@ Element providing on-chart tooltip display
 ##### Usage
 
     <px-vis-tooltip
-        px-svg-elem=[[pxSvgElem]]
+        hover-target=[[mouseRect]]
+        mouse-position="[[mousePosition]]"
         width="250"
         margin="[[margin]]"
         chart-data="[[chartData]]"
-        tooltip-data="[[tooltipData]]">
+        tooltip-data="[[tooltipData]]"
+        complete-series-config="[[completeSeriesConfig]]"
+        x-axis-type="time"
+        tooltip-style="light"
+        muted-series="[[mutedSeries]]">
     </px-vis-tooltip>
 
 @element px-vis-tooltip
@@ -56,7 +62,11 @@ Element providing on-chart tooltip display
           number-format-culture="[[numberFormatCulture]]"
           number-format-is-currency$="[[numberFormatIsCurrency]]"
           number-format-currency="[[numberFormatCurrency]]"
-          number-format-zero="[[numberFormatZero]]">
+          number-format-zero="[[numberFormatZero]]"
+          first-date-time-format"[[firstDateTimeFormat]]"
+          second-date-time-format"[[secondDateTimeFormat]]"
+          separator="[[separator]]"
+          timezone="[[timezone]]">
         </px-vis-register>
 
     </px-tooltip>
@@ -75,6 +85,7 @@ Element providing on-chart tooltip display
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.mutedSeries,
       PxVisBehavior.formatting,
+      PxVisBehaviorTime.datetime,
       commonColors
     ],
 
@@ -85,19 +96,41 @@ Element providing on-chart tooltip display
      * @type Object
      */
     properties: {
+      /**
+       * The dom element over which the tooltip should be shown. Generally some <g> or <rect> element on the svg
+       *
+       */
       hoverTarget: {
         type: Object
       },
+      /**
+       * x,y screen position where you want the tooltip to be displayed. Can be the mouse position; can also be any arbitraty screen position.
+       *
+       */
       mousePosition:{
         type: Array
       },
+      /**
+       * Tooltip style supports two values:
+       * - `light` : gives tooltip a white background
+       * - `dark`  : gives tooltip a balck backgound. Default
+       *
+       */
       tooltipStyle: {
         type: String,
         value: "dark"
       },
+      /**
+       * The actual px-tooltip elem in case we need access to it higher up the dom.
+       *
+       */
       tooltipElem: {
         type: Object
       },
+      /**
+       * Orientation for the tooltip
+       *
+       */
       orientation: {
         type: String,
         value: "auto"
@@ -114,6 +147,10 @@ Element providing on-chart tooltip display
 
     ready: function() {
       this.set('tooltipElem', this.$.tooltip);
+    },
+
+    detached: function(){
+      this.tooltipElem.remove();
     }
   });
 </script>

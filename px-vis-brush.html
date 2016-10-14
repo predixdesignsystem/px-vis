@@ -14,14 +14,15 @@ This element sets the selectedDomain property based on the extents box. The sele
 ##### Usage
 
     <px-vis-brush
-      svg="[[varFromSVGComponent]]"
-      axis="[[varXFromScaleComponent]]"
-      width="[[width]]"
-      height="[[height]]"
-      margin="[[margin]]"
-      chart-domain=[[chartDomainX]]
-      current-domain="[[varXDomainFromScaleComponent]]"
-      selected-domain="{{selectedDomain}}">
+        svg="[[varFromSVGComponent]]"
+        axis="[[varXFromScaleComponent]]"
+        width="[[width]]"
+        height="[[height]]"
+        margin="[[margin]]"
+        chart-domain=[[chartDomainX]]
+        current-domain="[[varXDomainFromScaleComponent]]"
+        gradient-overlay="[[gradientOverlay]]"
+        selected-domain="{{selectedDomain}}">
     </px-vis-brush>
 
 @element px-vis-brush
@@ -67,8 +68,6 @@ This element sets the selectedDomain property based on the extents box. The sele
        *
        * We cant use the normal svg container due to drawing order. The purpose of this clone is to ensure the brush elements are drawn on top of the navigator chart rather than following normal draw order.
        *
-       * @property brushSvg
-       * @type Object
        */
       brushSvg:{
         type: Object,
@@ -79,8 +78,6 @@ This element sets the selectedDomain property based on the extents box. The sele
        *
        * See: https://github.com/mbostock/d3/wiki/SVG-Controls
        *
-       * @property _brush
-       * @type Object
        */
       _brush:{
         type: Object,
@@ -89,8 +86,6 @@ This element sets the selectedDomain property based on the extents box. The sele
       /**
        * Holder for a SVG group of elements pertaining to the brush
        *
-       * @property _brushGroup
-       * @type Object
        */
       _brushGroup:{
         type: Object,
@@ -99,8 +94,6 @@ This element sets the selectedDomain property based on the extents box. The sele
       /**
        * Holder for a SVG group of elements pertaining to the handles
        *
-       * @property _handleGroup
-       * @type Object
        */
       _handleGroup:{
         type: Object,
@@ -109,8 +102,6 @@ This element sets the selectedDomain property based on the extents box. The sele
       /**
        * Holder for a calculated center of the extent box
        *
-       * @property _center
-       * @type Object
        */
       _center:{
         type:Object,
@@ -119,8 +110,6 @@ This element sets the selectedDomain property based on the extents box. The sele
       /**
        * A boolean to tell if the extents box is currently moving
        *
-       * @property _centering
-       * @type Object
        */
       _centering:{
         type:Boolean,
@@ -163,9 +152,11 @@ This element sets the selectedDomain property based on the extents box. The sele
       'drawElement(domainChanged, svg,axis,height, selectedDomain, currentDomain)',
       '_zoomBrush(chartDomain.*)'
     ],
+
     detached: function() {
       this.unlisten(window,'mouseup','_brushMouseUp');
     },
+
     /**
      * Defines the svg for the brush, draws brush elements, and sets up listeners.
      *
@@ -182,6 +173,12 @@ This element sets the selectedDomain property based on the extents box. The sele
               [this.axis(this.currentDomain[0]),0],
               [this.axis(this.currentDomain[1]),h]
             ];
+
+        // check that our sizing is ok and wont freak d3 out.
+        // x2 and y2 must be greater than x1 & y1
+        domain[1][0] = (domain[1][0] > domain[0][0]) ? domain[1][0] : domain[0][0];
+        domain[1][1] = (domain[1][1] > domain[0][1]) ? domain[1][1] : domain[0][1];
+
       if(this._isObjEmpty(this._brush)) {
 
         // make sure the brush draws on top of everything; returns a set property brushSvg

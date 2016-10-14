@@ -122,6 +122,11 @@ This element draw the box over the axis signifying the active area to mute the s
               [_this.margin.top,_this.height - _this.margin.top - _this.margin.bottom]
             ];
 
+        // check that our sizing is ok and wont freak d3 out.
+        // x2 and y2 must be greater than x1 & y1
+        domain[1][0] = (domain[1][0] > domain[0][0]) ? domain[1][0] : domain[0][0];
+        domain[1][1] = (domain[1][1] > domain[0][1]) ? domain[1][1] : domain[0][1];
+
         if(!this._previousDomain){
           this._previousDomain = domain;
         }
