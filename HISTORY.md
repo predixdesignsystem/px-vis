@@ -1,3 +1,7 @@
+v0.6.9
+==================
+* ensure forceDateTimeDisplay works with new registers
+
 v0.6.8
 ==================
 * fix typo that would break the navigator series drawing
