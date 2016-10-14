@@ -173,6 +173,12 @@ This element sets the selectedDomain property based on the extents box. The sele
               [this.axis(this.currentDomain[0]),0],
               [this.axis(this.currentDomain[1]),h]
             ];
+
+        // check that our sizing is ok and wont freak d3 out.
+        // x2 and y2 must be greater than x1 & y1
+        domain[1][0] = (domain[1][0] > domain[0][0]) ? domain[1][0] : domain[0][0];
+        domain[1][1] = (domain[1][1] > domain[0][1]) ? domain[1][1] : domain[0][1];
+
       if(this._isObjEmpty(this._brush)) {
 
         // make sure the brush draws on top of everything; returns a set property brushSvg
