@@ -1,3 +1,7 @@
+v0.6.7
+==================
+* make sure addition/removal of series to seriesConfig are correctly processed
+
 v0.6.6
 ==================
 * Added datetime imports to tooltip and passed down to register
