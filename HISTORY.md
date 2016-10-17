@@ -1,3 +1,7 @@
+v0.6.13
+==================
+* added delaying chart draw until attached
+
 v0.6.12
 ==================
 * added additional check to radial scale

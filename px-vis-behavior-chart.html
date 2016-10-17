@@ -86,7 +86,7 @@ PxVisBehaviorChart.chartCommon = [{
         value: false
       },
       /**
-       *  Representes the keys avaiable in completeSeriesConfig. It's being set 
+       *  Representes the keys avaiable in completeSeriesConfig. It's being set
        *  before completeSeriesConfig is set
        */
       _seriesKeys: {
@@ -251,7 +251,7 @@ PxVisBehaviorChart.chartCommon = [{
             if(!newKeys.includes(currKeys[i])) {
               removedSeriesKeys.push(currKeys[i]);
               deletion = true;
-            } 
+            }
           }
         }
 
@@ -281,7 +281,7 @@ PxVisBehaviorChart.chartCommon = [{
           //we have processed updates and deleton, now need to process the additions
           //now that we have the new completeSeriesConfig process the additions
           this.set('_seriesKeys', Object.keys(fullConfig));
-        } 
+        }
       }
     },
 
@@ -609,5 +609,40 @@ PxVisBehaviorChart.timeFiltering = [{
   }
 }, PxVisBehavior.dataset];
 
+/*
+    Name:
+    PxVisBehaviorChart.waitForAttach
+
+    Description:
+    Polymer behavior that provides the the ability for the chart to delay running until attached.
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorChart.waitForAttach
+*/
+PxVisBehaviorChart.waitForAttach = {
+    properties: {
+      /**
+      * Boolean holding loading until the chart is actually attached
+      */
+      _loadedOnPage: {
+        type: Boolean
+      }
+    },
+
+    /**
+     * checks if the chart is attached, otherwise waits and recalls
+     */
+    _isLoadedOnPage: function() {
+      var rect = this.getBoundingClientRect();
+      if(rect.height > 0 && rect.width > 0){
+        this.set('_loadedOnPage', true);
+      } else {
+        this.async(this._isLoadedOnPage, 50);
+      }
+    }
+
+};
 
 </script>
