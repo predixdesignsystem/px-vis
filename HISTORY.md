@@ -1,3 +1,7 @@
+v0.6.12
+==================
+* added additional check to radial scale
+
 v0.6.11
 ==================
 * changes for demo
