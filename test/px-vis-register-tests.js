@@ -310,7 +310,7 @@ function basicTests(registerID,dir){
       var colorSet = commonColors.properties.dataVisColors.value;
       var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item');
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].querySelector('.seriesMarker').getAttribute('style').split(' ').join(''), 'background-color:' + colorSet[ colorOrder[i] ]);
+        assert.equal(series[i].querySelector('.seriesMarker').getAttribute('style').split(' ').join('').split(';')[0], 'background-color:' + colorSet[ colorOrder[i] ]);
       }
     });
 
