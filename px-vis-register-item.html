@@ -71,7 +71,6 @@ Element providing a series line items on the register for regular charts
           </template>
           <!-- if x axis is ordinal just display it -->
           <template is="dom-if" if="{{_isOfType(xAxisType, 'ordinal')}}">
-            x ordinal
             <span>[[_itemX]]</span>
             <template is="dom-if" if="[[_itemX]]">
               {{_xUnit}}
@@ -141,14 +140,14 @@ Element providing a series line items on the register for regular charts
        * calcs the value for x
        */
       _itemX: {
-        type: String,
+        type: Number,
         computed: '_computeItemX(item, completeSeriesConfig.*)'
       },
       /**
        * calcs the value of y
        */
       _itemY: {
-        type: String,
+        type: Number,
         computed: '_computeItemY(item, completeSeriesConfig.*)'
       }
     },
@@ -174,24 +173,23 @@ Element providing a series line items on the register for regular charts
      * returns the value for y
      */
     _computeItemY: function() {
-      return this._returnVal(this.item, 'y', '&nbsp;/&nbsp');
+      return this._returnVal(this.item, 'y');
     },
     /**
      * returns the value for x
      */
     _computeItemX: function() {
-      return this._returnVal(this.item, 'x', '&nbsp;/&nbsp');
+      return this._returnVal(this.item, 'x');
     },
 
     /**
      * returns the value in the tooltip data
      */
-    _returnVal: function(item, axis, separator) {
+    _returnVal: function(item, axis) {
       if(this.completeSeriesConfig[item.name]) {
         var key = (axis === 'x') ? this.completeSeriesConfig[item.name]['x'] : this.completeSeriesConfig[item.name]['y'];
-
         if(item.value && (item.value[key] || item.value[key] === 0)) {
-          return item.value[key] + (separator ? separator : '');
+          return item.value[key]
         }
       }
       return null;

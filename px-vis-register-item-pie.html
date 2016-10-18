@@ -34,11 +34,11 @@ Element providing a series line items on the register for pie charts
       <span
         id="pieItem"
         class$="{{_baseClasses()}}"
-        name$="R{{_returnPieVal(item, 'y', '', usePercentage, completeSeriesConfig)}}">
+        name$="R{{_returnPieVal(item, 'y', usePercentage, completeSeriesConfig)}}">
           <span
             class="seriesMarker"
             style$="background-color:{{_getPieBackColor(item, itemIndex)}}"
-            name$="R{{_returnPieVal(item, 'y', '', usePercentage, completeSeriesConfig)}}"
+            name$="R{{_returnPieVal(item, 'y', usePercentage, completeSeriesConfig)}}"
           >&nbsp;</span>
           <div class$="{{_getWrapperClass(type)}}">
             <div class="seriesName" name$="R{{_configName}}">
@@ -48,9 +48,9 @@ Element providing a series line items on the register for pie charts
               </template>
             </div>
             <!-- Display serie data differently depending on x and y axis types -->
-            <div class="seriesData" name$="R{{_returnPieVal(item, 'y', '', usePercentage, completeSeriesConfig)}}">
-              <span>[[_returnPieVal(item, 'x', '', usePercentage, completeSeriesConfig)]]</span>
-              <template is="dom-if" if="{{_returnPieVal(item, 'x', '', usePercentage, completeSeriesConfig)}}">{{_getPieUnit(usePercentage)}}</template>
+            <div class="seriesData" name$="R{{_returnPieVal(item, 'y', usePercentage, completeSeriesConfig)}}">
+              <span>[[_returnPieVal(item, 'x', usePercentage, completeSeriesConfig)]]</span>
+              <template is="dom-if" if="{{_returnPieVal(item, 'x', usePercentage, completeSeriesConfig)}}">{{_getPieUnit(usePercentage)}}</template>
             </div>
           </div>
       </span>
@@ -90,14 +90,13 @@ Element providing a series line items on the register for pie charts
      * returns the value of the pie slice
      *
      */
-    _returnPieVal: function(item, axis, separator, usePercentage) {
+    _returnPieVal: function(item, axis, usePercentage) {
       //pie should have only one config bit.
       var key = Object.keys(this.completeSeriesConfig)[0],
           axisKey = axis === 'x' ? this.completeSeriesConfig[key]['x'] : this.completeSeriesConfig[key]['y'],
           axisKey = usePercentage ? 'percentage' : axisKey;
-
       if(item && item[axisKey]) {
-        return item[axisKey] + (separator ? separator : '');
+        return item[axisKey];
       }
       return null;
     },
