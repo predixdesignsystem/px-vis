@@ -481,10 +481,17 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           var label = {};
 
           //for radial charts. TODO make it work with other charts?
-          if(this.labelPosition === 'inline'){
-            label.x = 0;
-            label.y = 0;
-            label.anchor = 'middle';
+          if(this.labelPosition === 'inline') {
+            if(this.orientation === 'left' || this.orientation === 'right') {
+              label.x = 0;
+              label.y = 0;
+              label.anchor = 'middle';
+            } else {
+              label.x = 0;
+              label.y = -this.labelTypeSize / 3;
+              label.anchor = 'middle';
+            }
+
             return label;
           }
 
@@ -744,7 +751,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             }
           }.bind(this), 5);
         },
-        
+
         /**
          * checks it the label needs a tooltip an appropriately add or remove it
          */

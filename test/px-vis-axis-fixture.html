@@ -321,7 +321,7 @@
           width="200"
           axis="[[x]]"
           axis-type="time"
-          title="myXTitle"
+          title="tickFormatXAxis"
           orientation="bottom"
           tick-format="%I %p"
           prevent-series-bar
@@ -335,12 +335,93 @@
           width="200"
           axis="[[y]]"
           tick-format=".2s"
-          title="myYTitle"
+          title="tickFormatYAxis"
           orientation="left"
           domain-changed="[[domainChanged]]"
           current-domain="[[currentDomainY]]">
         </px-vis-axis>
       </template>
+
+      <template is="dom-bind">
+        <px-vis-scale
+          id="inlineScale"
+          x-axis-type="time"
+          y-axis-type="linear"
+          x="{{x}}"
+          y="{{y}}"
+          domain-changed="{{domainChanged}}"
+          current-domain-x="{{currentDomainX}}"
+          current-domain-y="{{currentDomainY}}">
+        </px-vis-scale>
+        <px-vis-svg
+          id="inlineSVG"
+          svg="{{svg}}">
+        </px-vis-svg>
+        <px-vis-axis
+          id="inlineXAxis"
+          label-position="inline"
+          svg="[[svg]]"
+          axis="[[x]]"
+          title="inlineX"
+          height="200"
+          width="200"
+          orientation="bottom"
+          prevent-series-bar
+          axis-color="grey4"
+          title-type-size="20"
+          label-type-size="15"
+          domain-changed="[[domainChanged]]"
+          current-domain="[[currentDomainX]]">
+        </px-vis-axis>
+        <px-vis-axis
+          id="inlineYAxis"
+          label-position="inline"
+          svg="[[svg]]"
+          axis="[[y]]"
+          height="200"
+          width="200"
+          title="inlineY"
+          tick-values='[2,4,6,8]'
+          orientation="left"
+          axis-color="grey4"
+          title-type-size="20"
+          label-type-size="15"
+          domain-changed="[[domainChanged]]"
+          current-domain="[[currentDomainY]]">
+        </px-vis-axis>
+      </template>
+
+      <template is="dom-bind">
+        <px-vis-scale
+          id="noTicksScale"
+          x-axis-type="time"
+          y-axis-type="linear"
+          x="{{x}}"
+          y="{{y}}"
+          domain-changed="{{domainChanged}}"
+          current-domain-x="{{currentDomainX}}"
+          current-domain-y="{{currentDomainY}}">
+        </px-vis-scale>
+        <px-vis-svg
+          id="noTicksSVG"
+          svg="{{svg}}">
+        </px-vis-svg>
+        <px-vis-axis
+          id="noTicksAxis"
+          disable-ticks
+          svg="[[svg]]"
+          axis="[[y]]"
+          height="200"
+          width="200"
+          title="inlineY"
+          orientation="left"
+          title-type-size="20"
+          label-type-size="15"
+          domain-changed="[[domainChanged]]"
+          current-domain="[[currentDomainY]]">
+        </px-vis-axis>
+      </template>
+
 
     </template>
   </body>

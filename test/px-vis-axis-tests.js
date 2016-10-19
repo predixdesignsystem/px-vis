@@ -1119,4 +1119,217 @@ function runTests(){
     });
   });
 
+  suite('px-vis-axis inline labels works', function() {
+    var inlineScale = document.getElementById('inlineScale'),
+        inlineSVG = document.getElementById('inlineSVG'),
+        inlineXAxis = document.getElementById('inlineXAxis'),
+        inlineYAxis = document.getElementById('inlineYAxis'),
+        xLabels, yLabels, xRects, yRects;
+    var colors = commonColors.properties.colors.value;
+
+    suiteSetup(function(done){
+      var d = [{
+            "x": 1397102460000,
+            "y": 1
+          },{
+            "x": 1397131620000,
+            "y": 6
+          },{
+            "x": 1397160780000,
+            "y": 10
+          },{
+            "x": 1397189940000,
+            "y": 4
+          },{
+            "x": 1397219100000,
+            "y": 6
+          }
+        ],
+        completeSeriesConfig = {"mySeries":{
+          "type":"line",
+          "name":"mySeries",
+          "x":"x",
+          "y":"y",
+          "color": "rgb(93,165,218)"
+        }},
+        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        w = 500,
+        h = 300,
+        m = {
+          "top": 10,
+          "right": 5,
+          "bottom": 75,
+          "left": 50
+        };
+      inlineSVG.set('width',w);
+      inlineSVG.set('height',h);
+      inlineSVG.set('margin',m);
+
+      inlineScale.set('width',w);
+      inlineScale.set('height',h);
+      inlineScale.set('margin',m);
+      inlineScale.set('completeSeriesConfig',completeSeriesConfig);
+      inlineScale.set('chartExtents',chartExtents);
+      inlineScale.set('chartData',d);
+
+      inlineXAxis.set('margin',m);
+      inlineXAxis.set('height',h);
+      inlineXAxis.set('completeSeriesConfig',completeSeriesConfig);
+
+      inlineYAxis.set('margin',m);
+      inlineYAxis.set('height',h);
+      inlineYAxis.set('completeSeriesConfig',completeSeriesConfig);
+      inlineYAxis.set('chartData',d);
+      setTimeout(function(){
+        xLabels = inlineXAxis._axisGroup.selectAll('text').nodes();
+        yLabels = inlineYAxis._axisGroup.selectAll('text').nodes();
+        xRects = inlineXAxis._axisGroup.selectAll('rect').nodes();
+        yRects = inlineYAxis._axisGroup.selectAll('rect').nodes();
+
+        done();
+      },500);
+    });
+
+    test('inlineXAxis fixture is created', function() {
+      assert.isTrue(inlineXAxis !== null);
+    });
+    test('inlineYAxis fixture is created', function() {
+      assert.isTrue(inlineYAxis !== null);
+    });
+
+    test('X label count is correct', function() {
+      assert.equal(xLabels.length, 10);
+    });
+
+    test('X label positions are correct', function() {
+      assert.equal(xLabels[0].attributes.x.value, 0);
+      assert.equal(xLabels[0].attributes.y.value, -5);
+      assert.equal(xLabels[0].attributes['text-anchor'].value, 'middle');
+    });
+
+    test('X label size is correct', function() {
+      assert.equal(xLabels[0].attributes['font-size'].value, '15px');
+    });
+
+    test('X label color is correct', function() {
+      assert.equal(xLabels[0].attributes.fill.value, 'rgb(255,255,255)');
+    });
+
+    test('Y label count is correct', function() {
+      assert.equal(yLabels.length, 4);
+    });
+
+    test('Y label positions are correct', function() {
+      assert.equal(yLabels[0].attributes.x.value, 0);
+      assert.equal(yLabels[0].attributes.y.value, 0);
+      assert.equal(yLabels[0].attributes['text-anchor'].value, 'middle');
+    });
+
+    test('Y label size is correct', function() {
+      assert.equal(yLabels[0].attributes['font-size'].value, '15px');
+    });
+
+    test('Y label color is correct', function() {
+      assert.equal(yLabels[0].attributes.fill.value, 'rgb(255,255,255)');
+    });
+
+    test('x rect count is correct', function() {
+      assert.equal(xRects.length, 10);
+    });
+
+    test('x rect sizing is correct', function() {
+      assert.equal(xRects[0].attributes.width.value, xLabels[0].getBoundingClientRect().width + 6);
+      assert.equal(xRects[0].attributes.height.value, '19');
+      assert.equal(xRects[0].attributes.x.value, xLabels[0].getBoundingClientRect().width / -2 - 3);
+      assert.equal(xRects[0].attributes.y.value, '-9.5');
+    });
+
+    test('x rect color is correct', function() {
+      assert.equal(xRects[0].attributes.fill.value, colors['grey4']);
+    });
+
+    test('y rect count is correct', function() {
+      assert.equal(yRects.length, 4);
+    });
+
+    test('y rect sizing is correct', function() {
+      assert.equal(yRects[0].attributes.width.value, yLabels[0].getBoundingClientRect().width + 6);
+      assert.equal(yRects[0].attributes.height.value, '19');
+      assert.equal(yRects[0].attributes.x.value, yLabels[0].getBoundingClientRect().width / -2 - 3);
+      assert.equal(yRects[0].attributes.y.value, '-9.5');
+    });
+
+    test('y rect color is correct', function() {
+      assert.equal(yRects[0].attributes.fill.value, colors['grey4']);
+    });
+  });
+
+
+  suite('px-vis-axis disable ticks works', function() {
+    var noTicksScale = document.getElementById('noTicksScale'),
+        noTicksSVG = document.getElementById('noTicksSVG'),
+        noTicksAxis = document.getElementById('noTicksAxis');
+
+    suiteSetup(function(done){
+      var d = [{
+            "x": 1397102460000,
+            "y": 1
+          },{
+            "x": 1397131620000,
+            "y": 6
+          },{
+            "x": 1397160780000,
+            "y": 10
+          },{
+            "x": 1397189940000,
+            "y": 4
+          },{
+            "x": 1397219100000,
+            "y": 6
+          }
+        ],
+        completeSeriesConfig = {"mySeries":{
+          "type":"line",
+          "name":"mySeries",
+          "x":"x",
+          "y":"y",
+          "color": "rgb(93,165,218)"
+        }},
+        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        w = 500,
+        h = 300,
+        m = {
+          "top": 10,
+          "right": 5,
+          "bottom": 75,
+          "left": 50
+        };
+      noTicksSVG.set('width',w);
+      noTicksSVG.set('height',h);
+      noTicksSVG.set('margin',m);
+
+      noTicksScale.set('width',w);
+      noTicksScale.set('height',h);
+      noTicksScale.set('margin',m);
+      noTicksScale.set('completeSeriesConfig',completeSeriesConfig);
+      noTicksScale.set('chartExtents',chartExtents);
+      noTicksScale.set('chartData',d);
+
+      noTicksAxis.set('margin',m);
+      noTicksAxis.set('height',h);
+      noTicksAxis.set('completeSeriesConfig',completeSeriesConfig);
+      noTicksAxis.set('chartData',d);
+      setTimeout(function(){ done(); },500);
+    });
+
+    test('noTicksAxis fixture is created', function() {
+      assert.isTrue(noTicksAxis !== null);
+    });
+
+    test('noTicksAxis doesnt have ticks or labels', function() {
+      var ticks = noTicksAxis._axisGroup.selectAll('text').nodes();
+      assert.equal(ticks.length,0);
+    });
+  });
+
 } //runTests
