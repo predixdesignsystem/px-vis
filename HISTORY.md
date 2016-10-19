@@ -1,3 +1,7 @@
+v0.6.14
+==================
+* fix registers for pie
+
 v0.6.13
 ==================
 * added delaying chart draw until attached
