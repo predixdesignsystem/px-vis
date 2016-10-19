@@ -80,7 +80,7 @@ PxVisBehaviorRegister.itemShared = {
    * Returns the name of the item
    */
   _computeConfigName: function() {
-    return this._getConfigName(this.item.name);
+    return this._getConfigName();
   },
   /**
    * returns the truncated name of the item
@@ -101,11 +101,12 @@ PxVisBehaviorRegister.itemShared = {
   /**
    * Tries to draw the SVG to canvas and if that doesnt work, falls back on a failure callback
    */
-  _getConfigName: function(name) {
-    if(this.completeSeriesConfig[this.item.name]) {
-      if(this.xAxisType === 'pie') {
-        return this.item.y;
-      } else {
+  _getConfigName: function() {
+    
+    if(this.xAxisType === 'pie') {
+      return this.item.y;
+    } else {
+      if(this.completeSeriesConfig[this.item.name]) {
         return this.completeSeriesConfig[this.item.name]['name'];
       }
     }
