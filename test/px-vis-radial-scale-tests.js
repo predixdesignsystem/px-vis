@@ -131,4 +131,36 @@ function runTests(){
 
   }); //suite
 
+  suite('px-vis-radial-scale with bad data', function() {
+    var radialBadDataScale = document.getElementById('radialBadDataScale');
+
+    test('radialBadDataScale creates an x', function() {
+      assert.isDefined(radialBadDataScale.x);
+    });
+
+    test('radialBadDataScale creates an y', function() {
+      assert.isDefined(radialBadDataScale.y);
+    });
+
+    test('radialBadDataScale sets currentDomainX', function() {
+      assert.lengthOf(radialBadDataScale.currentDomainX,3);
+    });
+
+    test('radialBadDataScale sets currentDomainY', function() {
+      assert.lengthOf(radialBadDataScale.currentDomainY,2);
+    });
+
+    test('radialBadDataScale currentDomainX is correct', function() {
+      assert.equal( radialBadDataScale.currentDomainX[0], "y");
+      assert.equal( radialBadDataScale.currentDomainX[1], "y1");
+      assert.equal( radialBadDataScale.currentDomainX[2], "y2");
+    });
+
+    test('radialBadDataScale currentDomainY is correct', function() {
+      assert.equal( JSON.stringify(radialBadDataScale.y.domain()), JSON.stringify([0,32]));
+    });
+
+  }); //suite
+
+
 } //runTests

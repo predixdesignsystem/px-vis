@@ -288,8 +288,6 @@
     <template is="dom-bind">
       <px-vis-radial-scale
         id="polarDegreeScale"
-        x-axis-type="time"
-        y-axis-type="linear"
         x="{{x}}"
         y="{{y}}"
         current-domain-x="{{currentDomainX}}"
@@ -342,8 +340,6 @@
     <template is="dom-bind">
       <px-vis-radial-scale
         id="polarDegreeCCWScale"
-        x-axis-type="time"
-        y-axis-type="linear"
         x="{{x}}"
         y="{{y}}"
         current-domain-x="{{currentDomainX}}"
@@ -371,8 +367,6 @@
     <template is="dom-bind">
       <px-vis-radial-scale
         id="polarMissingScale"
-        x-axis-type="time"
-        y-axis-type="linear"
         x="{{x}}"
         y="{{y}}"
         current-domain-x="{{currentDomainX}}"
@@ -380,12 +374,13 @@
         domain-changed="{{domainChanged}}">
       </px-vis-radial-scale>
       <px-vis-svg
-        id="polarMissingSSVG"
+        id="polarMissingSVG"
         svg="{{svg}}">
       </px-vis-svg>
       <px-vis-line
-        id="polarMissingSLine1"
+        id="polarMissingLine"
         svg="[[svg]]"
+        radial-line
         x="[[x]]"
         y="[[y]]"
         current-domain-x="[[currentDomainX]]"
@@ -411,88 +406,10 @@
       <px-vis-line
         id="radarLine"
         svg="[[svg]]"
-        parallel-coordinates
+        radial-line
         multi-path
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]"
-        current-domain-x="[[currentDomainX]]"
-        current-domain-y="[[currentDomainY]]">
-      </px-vis-line>
-    </template>
-
-    <template is="dom-bind">
-      <px-vis-radial-scale
-        id="radarGradientScale"
-        x="{{x}}"
-        y="{{y}}"
-        current-domain-x="{{currentDomainX}}"
-        current-domain-y="{{currentDomainY}}"
-        domain-changed="{{domainChanged}}">
-      </px-vis-radial-scale>
-      <px-vis-svg-canvas
-        id="radarGradientSVG"
-        svg="{{svg}}">
-      </px-vis-svg-canvas>
-      <px-vis-line
-        id="radarGradientLine"
-        svg="[[svg]]"
-        parallel-coordinates
-        multi-path
-        gradient-line
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]"
-        current-domain-x="[[currentDomainX]]"
-        current-domain-y="[[currentDomainY]]">
-      </px-vis-line>
-    </template>
-
-    <template is="dom-bind">
-      <px-vis-radial-scale
-        id="radarCategoryScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}"
-        current-domain-x="{{currentDomainX}}"
-        current-domain-y="{{currentDomainY}}">
-      </px-vis-radial-scale>
-      <px-vis-svg-canvas
-        id="radarCategorySVG"
-        svg="{{svg}}">
-      </px-vis-svg-canvas>
-      <px-vis-line
-        id="radarCategoryLine"
-        svg="[[svg]]"
-        parallel-coordinates
-        multi-path
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]"
-        current-domain-x="[[currentDomainX]]"
-        current-domain-y="[[currentDomainY]]">
-      </px-vis-line>
-    </template>
-
-    <template is="dom-bind">
-      <px-vis-radial-scale
-        id="radarCategoryGradientScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}"
-        current-domain-x="{{currentDomainX}}"
-        current-domain-y="{{currentDomainY}}">
-      </px-vis-radial-scale>
-      <px-vis-svg-canvas
-        id="radarCategoryGradientSVG"
-        svg="{{svg}}">
-      </px-vis-svg-canvas>
-      <px-vis-line
-        id="radarCategoryGradientLine"
-        svg="[[svg]]"
-        parallel-coordinates
-        multi-path
-        gradient-line
+        line-radius-limit="25"
+        interpolation-function="bofCompleteManually"
         x="[[x]]"
         y="[[y]]"
         domain-changed="[[domainChanged]]"
@@ -517,8 +434,9 @@
       <px-vis-line
         id="radarMissingLine"
         svg="[[svg]]"
-        parallel-coordinates
+        radial-line
         multi-path
+        interpolation-function="bofCompleteManually"
         x="[[x]]"
         y="[[y]]"
         domain-changed="[[domainChanged]]"

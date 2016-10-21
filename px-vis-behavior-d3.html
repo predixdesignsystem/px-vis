@@ -912,8 +912,6 @@ PxVisBehaviorD3.radialLineGenerator = [{
 
     if(multiLine) {
 
-      var processAngle;
-
       if(this.interpolationFunction === 'bofCompleteManually') {
         //manually complete the circle.
         // if we use a d3 interpolator, it adds 'Z' to the path which cause all broken paths to complete. We want to keep broken paths broken
@@ -933,6 +931,8 @@ PxVisBehaviorD3.radialLineGenerator = [{
         }
         return radius
       }).defined(function(d) {
+        console.log(d)
+        console.log(_this._isValidData(_this.x(d[0])) && _this._isValidData(_this.y(Number(d[1]))))
         return _this._isValidData(_this.x(d[0])) && _this._isValidData(_this.y(Number(d[1])));
       });
 
@@ -1073,8 +1073,8 @@ PxVisBehaviorD3.lineShared = [{
     };
 
     // if coloring by category
-    if(categories.length > 0){
-      for(var i = 0; i < categories.length; i++){
+    if(categories.length > 0) {
+      for(var i = 0; i < categories.length; i++) {
         if(completeSeriesConfig[categories[i]]) {
           c = completeSeriesConfig[categories[i]]['color'].split('(')[1].split(',');
           colors[categories[i]] = {
@@ -1105,9 +1105,9 @@ PxVisBehaviorD3.lineShared = [{
    *
    */
   _computeGradientRange: function(chartData, selectedDomain,seriesId){
-    if(chartData.value.length > 0){
+    if(chartData.value.length > 0) {
       var x1,x2;
-      if(selectedDomain.value.x.length > 0){
+      if(selectedDomain.value.x.length > 0) {
         x1 = Number(selectedDomain.value.x[0]);
         x2 = Number(selectedDomain.value.x[1]);
       } else {

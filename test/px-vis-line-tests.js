@@ -290,6 +290,44 @@ function runTests(){
     });
   }); //suite
 
+  suite('px-vis-line with custom muted opacity', function() {
+    var mutedScale = document.getElementById('mutedScale'),
+        mutedSVG = document.getElementById('mutedSVG'),
+        mutedLine1 = document.getElementById('mutedLine1'),
+        mutedLine2 = document.getElementById('mutedLine2');
+
+    var colorOrder = commonColors.properties.seriesColorOrder.value;
+    var colorSet = commonColors.properties.dataVisColors.value;
+
+    suiteSetup(function(done){
+      var m = {
+        "mySeries":true,
+        "mySeries2":true
+      };
+      mutedLine1.set('mutedOpacity',0);
+      mutedLine2.set('mutedOpacity',0.6);
+      mutedLine1.set('mutedSeries',m);
+      mutedLine2.set('mutedSeries',m);
+      // setTimeout(function(){ done() }.bind(this),5000);
+      done();
+    });
+
+    test('mutedLine1 line series has the right stroke opacity', function() {
+      assert.equal(mutedLine1.linePath.attr('stroke-opacity'),0);
+    });
+    test('mutedLine1 line series has the right color', function() {
+      assert.equal(mutedLine1.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+    });
+
+    test('mutedLine2 line series has the right stroke opacity', function() {
+      assert.equal(mutedLine2.linePath.attr('stroke-opacity'),0.6);
+    });
+    test('mutedLine2 line series has the right color', function() {
+      assert.equal(mutedLine2.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
+    });
+
+  }); //suite
+
   suite('px-vis-line with missing data', function() {
     var missingDataPointScale = document.getElementById('missingDataPointScale'),
         missingDataPointSVG = document.getElementById('missingDataPointSVG'),
@@ -2024,6 +2062,535 @@ function runTests(){
       assert.equal(Number(matches[11]),0);
       assert.equal(Number(matches[12]),-240);
     });
+  }); //suite
+
+  suite('px-vis-line polar missing data works', function() {
+    var polarMissingScale = document.getElementById('polarMissingScale'),
+        polarMissingSVG = document.getElementById('polarMissingSVG'),
+        polarMissingLine = document.getElementById('polarMissingLine');
+
+    var colorOrder = commonColors.properties.seriesColorOrder.value;
+    var colorSet = commonColors.properties.dataVisColors.value;
+    var linePath;
+
+    suiteSetup(function(done){
+      var d = [{
+            "x": 0,
+            "y": 0
+          },{
+            "x": 0,
+            "y": 3
+          },{
+            "x": Math.PI/2,
+            "y": null
+          },{
+            "x": Math.PI
+          },{
+            "x": Math.PI * 3/2,
+            "y": 3
+          },{
+            "x": Math.PI * 2,
+            "y": 5
+          }
+        ],
+        completeSeriesConfig = {
+          "mySeries": {
+            "type":"line",
+            "name":"Data",
+            "y":"y",
+            "x":"x",
+            "color":"rgb(93,165,218)"
+          }
+        },
+        w = 500,
+        h = 500,
+        min = 480/2,
+        offset = [250,250],
+        m = {
+          "top": 10,
+          "right": 10,
+          "bottom": 10,
+          "left": 10
+        };
+      polarMissingSVG.set('width',w);
+      polarMissingSVG.set('height',h);
+      polarMissingSVG.set('margin',m);
+      polarMissingSVG.set('offset',offset);
+
+      polarMissingScale.set('width',min);
+      polarMissingScale.set('margin',m);
+      polarMissingScale.set('amplitudeKeys',['y']);
+      polarMissingScale.set('chartData',d);
+
+      polarMissingLine.set('seriesId',"mySeries");
+      polarMissingLine.set('completeSeriesConfig',completeSeriesConfig);
+      polarMissingLine.set('chartData',d);
+
+      // needed for the debounce in line
+      setTimeout(function(){
+        linePath =  polarMissingLine.lineGroup.select('path.series-line');
+        done();
+      },100);
+    });
+
+    test('polarMissingLine fixture is created', function() {
+      assert.isTrue(polarMissingLine !== null);
+    });
+
+    test('polarMissingLine linePath created', function() {
+      assert.equal(linePath.node().tagName,'path');
+    });
+
+    test('polarMissingLine line series ID', function() {
+      assert.equal(linePath.attr('series-id'),'line_mySeries');
+    });
+
+    test('polarMissingLine line series has the right color', function() {
+      assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+    });
+
+    test('polarMissingLine line d', function() {
+      //extract just the ints. who cares about the decimals
+      var re = new RegExp([
+        'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?'
+      ].join(''));
+
+      var matches = re.exec(linePath.attr('d'));
+
+      assert.equal(Number(matches[1]),0);
+      assert.equal(Number(matches[2]),0);
+      assert.equal(Number(matches[3]),0);
+      assert.equal(Number(matches[4]),-144);
+      assert.equal(Number(matches[5]),-144);
+      assert.equal(Number(matches[6]),2);
+      assert.equal(Number(matches[7]),-5);
+      assert.equal(Number(matches[8]),-240);
+    });
+  }); //suite
+
+
+  suite('px-vis-line renders radar to SVG', function() {
+    var radarScale = document.getElementById('radarScale'),
+        radarSVG = document.getElementById('radarSVG'),
+        radarLine = document.getElementById('radarLine');
+
+    var colorOrder = commonColors.properties.seriesColorOrder.value;
+    var colorSet = commonColors.properties.dataVisColors.value;
+    var linePath;
+
+    suiteSetup(function(done){
+      var d = [{
+            "x": 1397102460000,
+            "y": 1,
+            "y1": 1,
+            "y2": 1
+          },{
+            "x": 1397131620000,
+            "y": 6,
+            "y1": 15,
+            "y2": 21
+          },{
+            "x": 1397160780000,
+            "y": 10,
+            "y1": 8,
+            "y2": 3
+          },{
+            "x": 1397189940000,
+            "y": 4,
+            "y1": 10,
+            "y2": 10
+          },{
+            "x": 1397219100000,
+            "y": 6,
+            "y1": 20,
+            "y2": 27
+          }
+        ],
+        completeSeriesConfig = {
+          "x":{
+            "type":"line",
+            "name":"mySeries",
+            "x":['y','y1','y2'],
+            "y":['y','y1','y2'],
+            "color": "rgb(93,165,218)"
+          }
+        },
+        dim = ['y','y1','y2'],
+        w = 500,
+        h = 500,
+        min = 480/2,
+        offset = [250,250],
+        m = {
+          "top": 10,
+          "right": 10,
+          "bottom": 10,
+          "left": 10
+        };
+
+      radarSVG.set('width',w);
+      radarSVG.set('height',h);
+      radarSVG.set('margin',m);
+      radarSVG.set('offset',offset);
+
+      radarScale.set('width',min);
+      radarScale.set('margin',m);
+      radarScale.set('amplitudeKeys',dim);
+      radarScale.set('centerOffset',50);
+      radarScale.set('chartData',d);
+
+      radarLine.set('completeSeriesConfig',completeSeriesConfig);
+      radarLine.set('seriesId',"x");
+      radarLine.set('chartData',d);
+
+      setTimeout(function(){
+        linePath = radarLine.lineGroup.selectAll('path.series-line');
+        done();
+      },500);;
+    });
+
+    test('radarLine fixture is created', function() {
+      assert.isTrue(radarLine !== null);
+    });
+
+    test('radarLine linePath created', function() {
+      assert.equal(linePath.node().tagName,'path');
+    });
+
+    test('radarLine linePath created 5 lines', function() {
+      assert.equal(linePath.nodes().length,5);
+    });
+
+    test('radarLine lines have a series ID', function() {
+      assert.equal(d3.select(linePath.nodes()[0]).attr('series-id'),'line_1397102460000');
+      assert.equal(d3.select(linePath.nodes()[1]).attr('series-id'),'line_1397131620000');
+      assert.equal(d3.select(linePath.nodes()[2]).attr('series-id'),'line_1397160780000');
+      assert.equal(d3.select(linePath.nodes()[3]).attr('series-id'),'line_1397189940000');
+      assert.equal(d3.select(linePath.nodes()[4]).attr('series-id'),'line_1397219100000');
+    });
+
+    test('radarLine line series has the right color', function() {
+      assert.equal(d3.select(linePath.nodes()[0]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+    });
+
+    test('radarLine line d', function() {
+      var re = new RegExp([
+        'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?'
+      ].join(''));
+
+      var matches = [];
+      for(var i = 0; i < 5; i++){
+        matches.push(re.exec(Px.d3.select(linePath.nodes()[i]).attr('d')));
+      }
+
+      assert.equal(Number(matches[0][1]),0);
+      assert.equal(Number(matches[0][2]),-50);
+      assert.equal(Number(matches[0][3]),43);
+      assert.equal(Number(matches[0][4]),24);
+      assert.equal(Number(matches[0][5]),-43);
+      assert.equal(Number(matches[0][6]),25);
+      assert.equal(Number(matches[0][7]),0);
+      assert.equal(Number(matches[0][8]),-50);
+
+      assert.equal(Number(matches[1][1]),0);
+      assert.equal(Number(matches[1][2]),-86);
+      assert.equal(Number(matches[1][3]),131);
+      assert.equal(Number(matches[1][4]),75);
+      assert.equal(Number(matches[1][5]),-169);
+      assert.equal(Number(matches[1][6]),98);
+      assert.equal(Number(matches[1][7]),0);
+      assert.equal(Number(matches[1][8]),-86);
+
+      assert.equal(Number(matches[2][1]),0);
+      assert.equal(Number(matches[2][2]),-115);
+      assert.equal(Number(matches[2][3]),87);
+      assert.equal(Number(matches[2][4]),50);
+      assert.equal(Number(matches[2][5]),-55);
+      assert.equal(Number(matches[2][6]),32);
+      assert.equal(Number(matches[2][7]),0);
+      assert.equal(Number(matches[2][8]),-115);
+
+      assert.equal(Number(matches[3][1]),0);
+      assert.equal(Number(matches[3][2]),-71);
+      assert.equal(Number(matches[3][3]),99);
+      assert.equal(Number(matches[3][4]),57);
+      assert.equal(Number(matches[3][5]),-99);
+      assert.equal(Number(matches[3][6]),57);
+      assert.equal(Number(matches[3][7]),0);
+      assert.equal(Number(matches[3][8]),-71);
+
+      assert.equal(Number(matches[4][1]),0);
+      assert.equal(Number(matches[4][2]),-86);
+      assert.equal(Number(matches[4][3]),162);
+      assert.equal(Number(matches[4][4]),93);
+      assert.equal(Number(matches[4][5]),-207);
+      assert.equal(Number(matches[4][6]),120);
+      assert.equal(Number(matches[4][7]),0);
+      assert.equal(Number(matches[4][8]),-86);
+    });
+
+  }); //suite
+
+  suite('px-vis-line radar small lines stop at 25', function() {
+    var radarScale = document.getElementById('radarScale'),
+        chartExtents = {"x":["y","y1","y2"],"y":[15,20] },
+        linePath;
+
+    suiteSetup(function(done) {
+      radarScale.set('chartExtents',chartExtents);
+
+      setTimeout(function(){
+        linePath = radarLine.lineGroup.selectAll('path.series-line');
+        done();
+      },500);;
+    });
+
+    test('radarLine line d', function() {
+      var re = new RegExp([
+        'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?'
+      ].join(''));
+
+      var matches = [];
+      for(var i = 0; i < 5; i++){
+        matches.push(re.exec(Px.d3.select(linePath.nodes()[i]).attr('d')));
+      }
+
+      assert.equal(Number(matches[0][1]),0);
+      assert.equal(Number(matches[0][2]),-25);
+      assert.equal(Number(matches[0][3]),21);
+      assert.equal(Number(matches[0][4]),12);
+      assert.equal(Number(matches[0][5]),-21);
+      assert.equal(Number(matches[0][6]),12);
+      assert.equal(Number(matches[0][7]),0);
+      assert.equal(Number(matches[0][8]),-25);
+
+      assert.equal(Number(matches[1][1]),0);
+      assert.equal(Number(matches[1][2]),-25);
+      assert.equal(Number(matches[1][3]),43);
+      assert.equal(Number(matches[1][4]),24);
+      assert.equal(Number(matches[1][5]),-240);
+      assert.equal(Number(matches[1][6]),139);
+      assert.equal(Number(matches[1][7]),0);
+      assert.equal(Number(matches[1][8]),-25);
+
+      assert.equal(Number(matches[2][1]),0);
+      assert.equal(Number(matches[2][2]),-25);
+      assert.equal(Number(matches[2][3]),21);
+      assert.equal(Number(matches[2][4]),12);
+      assert.equal(Number(matches[2][5]),-21);
+      assert.equal(Number(matches[2][6]),12);
+      assert.equal(Number(matches[2][7]),0);
+      assert.equal(Number(matches[2][8]),-25);
+
+      assert.equal(Number(matches[3][1]),0);
+      assert.equal(Number(matches[3][2]),-25);
+      assert.equal(Number(matches[3][3]),21);
+      assert.equal(Number(matches[3][4]),12);
+      assert.equal(Number(matches[3][5]),-21);
+      assert.equal(Number(matches[3][6]),12);
+      assert.equal(Number(matches[3][7]),0);
+      assert.equal(Number(matches[3][8]),-25);
+
+      assert.equal(Number(matches[4][1]),0);
+      assert.equal(Number(matches[4][2]),-25);
+      assert.equal(Number(matches[4][3]),207);
+      assert.equal(Number(matches[4][4]),119);
+      assert.equal(Number(matches[4][5]),-438);
+      assert.equal(Number(matches[4][6]),253);
+      assert.equal(Number(matches[4][7]),0);
+      assert.equal(Number(matches[4][8]),-25);
+    });
+
+  }); //suite
+
+  suite('px-vis-line radar with missing data', function() {
+    var radarMissingScale = document.getElementById('radarMissingScale'),
+        radarMissingSVG = document.getElementById('radarMissingSVG'),
+        radarMissingLine = document.getElementById('radarMissingLine');
+
+    var colorOrder = commonColors.properties.seriesColorOrder.value;
+    var colorSet = commonColors.properties.dataVisColors.value;
+    var linePath;
+
+    suiteSetup(function(done){
+      var d = [{
+            "x": 1397102460000,
+            "y": 1,
+            "y1": null,
+            "y2": 1
+          },{
+            "x": 1397131620000,
+            "y": 6,
+            "y1": 15
+          },{
+            "x": 1397160780000,
+            "y": 10,
+            "y1": 8,
+            "y2": 3
+          },{
+            "x": 1397189940000,
+            "y": 4,
+            "y1": 10,
+            "y2": 10
+          },{
+            "x": 1397219100000,
+            "y1": 20,
+            "y2": 27
+          }
+        ],
+        completeSeriesConfig = {
+          "x":{
+            "type":"line",
+            "name":"mySeries",
+            "x":['y','y1','y2'],
+            "y":['y','y1','y2'],
+            "color": "rgb(93,165,218)"
+          }
+        },
+        dim = ['y','y1','y2'],
+        w = 500,
+        h = 500,
+        min = 480/2,
+        offset = [250,250],
+        m = {
+          "top": 10,
+          "right": 10,
+          "bottom": 10,
+          "left": 10
+        };
+
+      radarMissingSVG.set('width',w);
+      radarMissingSVG.set('height',h);
+      radarMissingSVG.set('margin',m);
+      radarMissingSVG.set('offset',offset);
+
+      radarMissingScale.set('width',min);
+      radarMissingScale.set('margin',m);
+      radarMissingScale.set('amplitudeKeys',dim);
+      radarMissingScale.set('centerOffset',50);
+      radarMissingScale.set('chartData',d);
+
+      radarMissingLine.set('completeSeriesConfig',completeSeriesConfig);
+      radarMissingLine.set('seriesId',"x");
+      radarMissingLine.set('chartData',d);
+
+      setTimeout(function(){
+        linePath = radarMissingLine.lineGroup.selectAll('path.series-line');
+        done();
+      },500);;
+    });
+
+    test('radarMissingLine fixture is created', function() {
+      assert.isTrue(radarMissingLine !== null);
+    });
+
+    test('radarMissingLine linePath created', function() {
+      assert.equal(linePath.node().tagName,'path');
+    });
+
+    test('radarMissingLine linePath created 5 lines', function() {
+      assert.equal(linePath.nodes().length,5);
+    });
+
+    test('radarMissingLine lines have a series ID', function() {
+      assert.equal(d3.select(linePath.nodes()[0]).attr('series-id'),'line_1397102460000');
+      assert.equal(d3.select(linePath.nodes()[1]).attr('series-id'),'line_1397131620000');
+      assert.equal(d3.select(linePath.nodes()[2]).attr('series-id'),'line_1397160780000');
+      assert.equal(d3.select(linePath.nodes()[3]).attr('series-id'),'line_1397189940000');
+      assert.equal(d3.select(linePath.nodes()[4]).attr('series-id'),'line_1397219100000');
+    });
+
+    test('radarMissingLine line series has the right color', function() {
+      assert.equal(d3.select(linePath.nodes()[0]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+    });
+
+    test('radarMissingLine full lines d', function() {
+      var re = new RegExp([
+        'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?'
+      ].join(''));
+
+      var matches = [];
+      matches.push(re.exec(Px.d3.select(linePath.nodes()[2]).attr('d')));
+      matches.push(re.exec(Px.d3.select(linePath.nodes()[3]).attr('d')));
+
+      assert.equal(Number(matches[0][1]),0);
+      assert.equal(Number(matches[0][2]),-115);
+      assert.equal(Number(matches[0][3]),87);
+      assert.equal(Number(matches[0][4]),50);
+      assert.equal(Number(matches[0][5]),-55);
+      assert.equal(Number(matches[0][6]),32);
+      assert.equal(Number(matches[0][7]),0);
+      assert.equal(Number(matches[0][8]),-115);
+
+      assert.equal(Number(matches[1][1]),0);
+      assert.equal(Number(matches[1][2]),-71);
+      assert.equal(Number(matches[1][3]),99);
+      assert.equal(Number(matches[1][4]),57);
+      assert.equal(Number(matches[1][5]),-99);
+      assert.equal(Number(matches[1][6]),57);
+      assert.equal(Number(matches[1][7]),0);
+      assert.equal(Number(matches[1][8]),-71);
+    });
+
+    test('radarMissingLine missing first point line d', function() {
+      var re = new RegExp([
+        'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?'
+      ].join(''));
+
+      var matches = re.exec(Px.d3.select(linePath.nodes()[4]).attr('d'));
+
+      assert.equal(Number(matches[1]),162);
+      assert.equal(Number(matches[2]),93);
+      assert.equal(Number(matches[3]),-207);
+      assert.equal(Number(matches[4]),120);
+    });
+
+    test('radarMissingLine missing second point line d', function() {
+      var re = new RegExp([
+        'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?Z',
+        'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?'
+      ].join(''));
+
+      var matches = re.exec(Px.d3.select(linePath.nodes()[0]).attr('d'));
+
+      assert.equal(Number(matches[1]),0);
+      assert.equal(Number(matches[2]),-50);
+      assert.equal(Number(matches[3]),-43);
+      assert.equal(Number(matches[4]),25);
+      assert.equal(Number(matches[5]),0);
+      assert.equal(Number(matches[6]),-50);
+    });
+
+    test('radarMissingLine missing third point line d', function() {
+      var re = new RegExp([
+        'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+      ].join(''));
+
+      var matches = re.exec(Px.d3.select(linePath.nodes()[1]).attr('d'));
+
+      assert.equal(Number(matches[1]),0);
+      assert.equal(Number(matches[2]),-86);
+      assert.equal(Number(matches[3]),131);
+      assert.equal(Number(matches[4]),75);
+      assert.equal(Number(matches[5]),0);
+      assert.equal(Number(matches[6]),-86);
+    });
+
   }); //suite
 
 } //runTests
