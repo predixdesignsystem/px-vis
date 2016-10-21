@@ -389,112 +389,112 @@ function runTests(){
     });
   }); //suite
 
-  suite('px-vis-line with two series renders to canvas', function() {
-    var canvasScale = document.getElementById('canvasScale'),
-        canvasSVG = document.getElementById('canvasSVG'),
-        canvasLine1 = document.getElementById('canvasLine1'),
-        canvasLine2 = document.getElementById('canvasLine2');
-
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
-    var linePath1,linePath2;
-
-    suiteSetup(function(done){
-      var d = [{
-            "x": 1397102460000,
-            "y": 1,
-            "y2": 1
-          },{
-            "x": 1397131620000,
-            "y": 6,
-            "y2": 21
-          },{
-            "x": 1397160780000,
-            "y": 10,
-            "y2": 3
-          },{
-            "x": 1397189940000,
-            "y": 4,
-            "y2": 10
-          },{
-            "x": 1397219100000,
-            "y": 6,
-            "y2": 27
-          }
-        ],
-        completeSeriesConfig = {
-          "mySeries":{
-            "type":"line",
-            "name":"mySeries",
-            "x":"x",
-            "y":"y",
-            "color": "rgb(93,165,218)"
-          },
-          "mySeries2":{
-            "type":"line",
-            "name":"mySeries2",
-            "x":"x",
-            "y":"y2",
-            "color": "rgb(250,164,58)"
-          }
-        },
-        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,27]},
-        w = 500,
-        h = 300,
-        m = {
-          "top": 10,
-          "right": 5,
-          "bottom": 20,
-          "left": 15
-        };
-
-      canvasSVG.set('width',w);
-      canvasSVG.set('height',h);
-      canvasSVG.set('margin',m);
-
-      canvasScale.set('width',w);
-      canvasScale.set('height',h);
-      canvasScale.set('margin',m);
-      canvasScale.set('completeSeriesConfig',completeSeriesConfig);
-      canvasScale.set('chartExtents',chartExtents);
-      canvasScale.set('chartData',d);
-
-      canvasLine1.set('completeSeriesConfig',completeSeriesConfig);
-      canvasLine1.set('seriesId',"mySeries");
-      canvasLine1.set('chartData',d);
-
-      canvasLine2.set('completeSeriesConfig',completeSeriesConfig);
-      canvasLine2.set('seriesId',"mySeries2");
-      canvasLine2.set('chartData',d);
-      setTimeout(function(){
-        linePath1 = canvasLine1.lineGroup;
-        linePath2 = canvasLine2.lineGroup;
-        done();
-      },100);;
-    });
-
-    test('canvasLine1 fixture is created', function() {
-      assert.isTrue(canvasLine1 !== null);
-    });
-    test('canvasLine2 fixture is created', function() {
-      assert.isTrue(canvasLine2 !== null);
-    });
-
-    test('context has correct total lines ', function() {
-      assert.equal(canvasSVG.canvasContext._pxLinesTotal, 2);
-    });
-
-    test('context has drawn 2 lines ', function() {
-      assert.equal(canvasSVG.canvasContext._pxLinesRedraw, 2);
-    });
-
-    test('context has added both to its list', function() {
-      assert.equal(Object.keys(canvasSVG.canvasContext._pxLinesSeries).length, 2);
-      assert.equal(canvasSVG.canvasContext._pxLinesSeries['mySeries'], true);
-      assert.equal(canvasSVG.canvasContext._pxLinesSeries['mySeries2'], true);
-    });
-
-  }); //suite
+  // suite('px-vis-line with two series renders to canvas', function() {
+  //   var canvasScale = document.getElementById('canvasScale'),
+  //       canvasSVG = document.getElementById('canvasSVG'),
+  //       canvasLine1 = document.getElementById('canvasLine1'),
+  //       canvasLine2 = document.getElementById('canvasLine2');
+  //
+  //   var colorOrder = commonColors.properties.seriesColorOrder.value;
+  //   var colorSet = commonColors.properties.dataVisColors.value;
+  //   var linePath1,linePath2;
+  //
+  //   suiteSetup(function(done){
+  //     var d = [{
+  //           "x": 1397102460000,
+  //           "y": 1,
+  //           "y2": 1
+  //         },{
+  //           "x": 1397131620000,
+  //           "y": 6,
+  //           "y2": 21
+  //         },{
+  //           "x": 1397160780000,
+  //           "y": 10,
+  //           "y2": 3
+  //         },{
+  //           "x": 1397189940000,
+  //           "y": 4,
+  //           "y2": 10
+  //         },{
+  //           "x": 1397219100000,
+  //           "y": 6,
+  //           "y2": 27
+  //         }
+  //       ],
+  //       completeSeriesConfig = {
+  //         "mySeries":{
+  //           "type":"line",
+  //           "name":"mySeries",
+  //           "x":"x",
+  //           "y":"y",
+  //           "color": "rgb(93,165,218)"
+  //         },
+  //         "mySeries2":{
+  //           "type":"line",
+  //           "name":"mySeries2",
+  //           "x":"x",
+  //           "y":"y2",
+  //           "color": "rgb(250,164,58)"
+  //         }
+  //       },
+  //       chartExtents = {"x":[1397102460000,1397219100000],"y":[0,27]},
+  //       w = 500,
+  //       h = 300,
+  //       m = {
+  //         "top": 10,
+  //         "right": 5,
+  //         "bottom": 20,
+  //         "left": 15
+  //       };
+  //
+  //     canvasSVG.set('width',w);
+  //     canvasSVG.set('height',h);
+  //     canvasSVG.set('margin',m);
+  //
+  //     canvasScale.set('width',w);
+  //     canvasScale.set('height',h);
+  //     canvasScale.set('margin',m);
+  //     canvasScale.set('completeSeriesConfig',completeSeriesConfig);
+  //     canvasScale.set('chartExtents',chartExtents);
+  //     canvasScale.set('chartData',d);
+  //
+  //     canvasLine1.set('completeSeriesConfig',completeSeriesConfig);
+  //     canvasLine1.set('seriesId',"mySeries");
+  //     canvasLine1.set('chartData',d);
+  //
+  //     canvasLine2.set('completeSeriesConfig',completeSeriesConfig);
+  //     canvasLine2.set('seriesId',"mySeries2");
+  //     canvasLine2.set('chartData',d);
+  //     setTimeout(function(){
+  //       linePath1 = canvasLine1.lineGroup;
+  //       linePath2 = canvasLine2.lineGroup;
+  //       done();
+  //     },100);;
+  //   });
+  //
+  //   test('canvasLine1 fixture is created', function() {
+  //     assert.isTrue(canvasLine1 !== null);
+  //   });
+  //   test('canvasLine2 fixture is created', function() {
+  //     assert.isTrue(canvasLine2 !== null);
+  //   });
+  //
+  //   test('context has correct total lines ', function() {
+  //     assert.equal(canvasSVG.canvasContext._pxLinesTotal, 2);
+  //   });
+  //
+  //   test('context has drawn 2 lines ', function() {
+  //     assert.equal(canvasSVG.canvasContext._pxLinesRedraw, 2);
+  //   });
+  //
+  //   test('context has added both to its list', function() {
+  //     assert.equal(Object.keys(canvasSVG.canvasContext._pxLinesSeries).length, 2);
+  //     assert.equal(canvasSVG.canvasContext._pxLinesSeries['mySeries'], true);
+  //     assert.equal(canvasSVG.canvasContext._pxLinesSeries['mySeries2'], true);
+  //   });
+  //
+  // }); //suite
 
 
   suite('px-vis-line renders parallel axis to SVG', function() {
@@ -1149,422 +1149,880 @@ function runTests(){
   }); //suite
 
 
-  suite('px-vis-line renders parallel axis to canvas', function() {
-    var parallelCanvasScale = document.getElementById('parallelCanvasScale'),
-        parallelCanvasSVG = document.getElementById('parallelCanvasSVG'),
-        parallelCanvasLine = document.getElementById('parallelCanvasLine');
+  // suite('px-vis-line renders parallel axis to canvas', function() {
+  //   var parallelCanvasScale = document.getElementById('parallelCanvasScale'),
+  //       parallelCanvasSVG = document.getElementById('parallelCanvasSVG'),
+  //       parallelCanvasLine = document.getElementById('parallelCanvasLine');
+  //
+  //   var colorOrder = commonColors.properties.seriesColorOrder.value;
+  //   var colorSet = commonColors.properties.dataVisColors.value;
+  //   var linePath1;
+  //
+  //   suiteSetup(function(done){
+  //     var d = [{
+  //           "x": 1397102460000,
+  //           "y": 1,
+  //           "y2": 1
+  //         },{
+  //           "x": 1397131620000,
+  //           "y": 6,
+  //           "y2": 21
+  //         },{
+  //           "x": 1397160780000,
+  //           "y": 10,
+  //           "y2": 3
+  //         },{
+  //           "x": 1397189940000,
+  //           "y": 4,
+  //           "y2": 10
+  //         },{
+  //           "x": 1397219100000,
+  //           "y": 6,
+  //           "y2": 27
+  //         }
+  //       ],
+  //       completeSeriesConfig = {
+  //         "x":{
+  //           "type":"line",
+  //           "name":"mySeries",
+  //           "x":['y','y2'],
+  //           "y":['y','y2'],
+  //           "color": "rgb(93,165,218)"
+  //         }
+  //       },
+  //       dim = ['y','y2'],
+  //       chartExtents = {"x":['y','y2'],"y":{'y':[0,27],'y2':[0,27]}},
+  //       w = 500,
+  //       h = 300,
+  //       m = {
+  //         "top": 10,
+  //         "right": 5,
+  //         "bottom": 20,
+  //         "left": 15
+  //       };
+  //
+  //     parallelCanvasSVG.set('width',w);
+  //     parallelCanvasSVG.set('height',h);
+  //     parallelCanvasSVG.set('margin',m);
+  //
+  //     parallelCanvasScale.set('width',w);
+  //     parallelCanvasScale.set('height',h);
+  //     parallelCanvasScale.set('margin',m);
+  //     parallelCanvasScale.set('completeSeriesConfig',completeSeriesConfig);
+  //     parallelCanvasScale.set('chartExtents',chartExtents);
+  //     parallelCanvasScale.set('dimensions',dim);
+  //     parallelCanvasScale.set('axes',dim);
+  //     parallelCanvasScale.set('chartData',d);
+  //
+  //     parallelCanvasLine.set('completeSeriesConfig',completeSeriesConfig);
+  //     parallelCanvasLine.set('seriesId',"x");
+  //     parallelCanvasLine.set('chartData',d);
+  //
+  //     setTimeout(function(){
+  //       linePath1 = parallelCanvasLine.lineGroup;
+  //       done();
+  //     },1000);;
+  //   });
+  //
+  //   test('parallelCanvasLine fixture is created', function() {
+  //     assert.isTrue(parallelCanvasLine !== null);
+  //   });
+  //
+  //   test('context has correct total lines ', function() {
+  //     assert.equal(parallelCanvasSVG.canvasContext._pxLinesTotal, 1);
+  //   });
+  //
+  //   test('context has drawn 2 lines ', function() {
+  //     assert.equal(parallelCanvasSVG.canvasContext._pxLinesRedraw, 1);
+  //   });
+  //
+  //   test('context has added both to its list', function() {
+  //     assert.equal(Object.keys(parallelCanvasSVG.canvasContext._pxLinesSeries).length, 1);
+  //     assert.equal(parallelCanvasSVG.canvasContext._pxLinesSeries['x'], true);
+  //   });
+  //
+  // }); //suite
+  //
+  // suite('px-vis-line renders parallel axis with gradient to canvas', function() {
+  //   var parallelGradientCanvasScale = document.getElementById('parallelGradientCanvasScale'),
+  //       parallelGradientCanvasSVG = document.getElementById('parallelGradientCanvasSVG'),
+  //       parallelGradientCanvasLine = document.getElementById('parallelGradientCanvasLine');
+  //
+  //   var colorOrder = commonColors.properties.seriesColorOrder.value;
+  //   var colorSet = commonColors.properties.dataVisColors.value;
+  //   var linePath1;
+  //
+  //   suiteSetup(function(done){
+  //     var d = [{
+  //           "x": 1397102460000,
+  //           "y": 1,
+  //           "y2": 1
+  //         },{
+  //           "x": 1397131620000,
+  //           "y": 6,
+  //           "y2": 21
+  //         },{
+  //           "x": 1397160780000,
+  //           "y": 10,
+  //           "y2": 3
+  //         },{
+  //           "x": 1397189940000,
+  //           "y": 4,
+  //           "y2": 10
+  //         },{
+  //           "x": 1397219100000,
+  //           "y": 6,
+  //           "y2": 27
+  //         }
+  //       ],
+  //       completeSeriesConfig = {
+  //         "x":{
+  //           "type":"line",
+  //           "name":"mySeries",
+  //           "x":['y','y2'],
+  //           "y":['y','y2'],
+  //           "color": "rgb(93,165,218)"
+  //         }
+  //       },
+  //       dim = ['y','y2'],
+  //       chartExtents = {"x":['y','y2'],"y":{'y':[0,27],'y2':[0,27]}},
+  //       w = 500,
+  //       h = 300,
+  //       m = {
+  //         "top": 10,
+  //         "right": 5,
+  //         "bottom": 20,
+  //         "left": 15
+  //       };
+  //
+  //     parallelGradientCanvasSVG.set('width',w);
+  //     parallelGradientCanvasSVG.set('height',h);
+  //     parallelGradientCanvasSVG.set('margin',m);
+  //
+  //     parallelGradientCanvasScale.set('width',w);
+  //     parallelGradientCanvasScale.set('height',h);
+  //     parallelGradientCanvasScale.set('margin',m);
+  //     parallelGradientCanvasScale.set('completeSeriesConfig',completeSeriesConfig);
+  //     parallelGradientCanvasScale.set('chartExtents',chartExtents);
+  //     parallelGradientCanvasScale.set('dimensions',dim);
+  //     parallelGradientCanvasScale.set('axes',dim);
+  //     parallelGradientCanvasScale.set('chartData',d);
+  //
+  //     parallelGradientCanvasLine.set('completeSeriesConfig',completeSeriesConfig);
+  //     parallelGradientCanvasLine.set('seriesId',"x");
+  //     parallelGradientCanvasLine.set('chartData',d);
+  //
+  //     setTimeout(function(){
+  //       linePath1 = parallelGradientCanvasLine.lineGroup;
+  //       done();
+  //     },1000);;
+  //   });
+  //
+  //   test('parallelCanvasLine fixture is created', function() {
+  //     assert.isTrue(parallelGradientCanvasLine !== null);
+  //   });
+  //
+  //   test('context has correct total lines ', function() {
+  //     assert.equal(parallelGradientCanvasSVG.canvasContext._pxLinesTotal, 1);
+  //   });
+  //
+  //   test('context has drawn 2 lines ', function() {
+  //     assert.equal(parallelGradientCanvasSVG.canvasContext._pxLinesRedraw, 1);
+  //   });
+  //
+  //   test('context has added both to its list', function() {
+  //     assert.equal(Object.keys(parallelCanvasSVG.canvasContext._pxLinesSeries).length, 1);
+  //     assert.equal(parallelGradientCanvasSVG.canvasContext._pxLinesSeries['x'], true);
+  //   });
+  //
+  // }); //suite
+  //
+  // suite('px-vis-line renders parallel axis with categories to canvas', function() {
+  //   var parallelCategoryCanvasScale = document.getElementById('parallelCategoryCanvasScale'),
+  //       parallelCategoryCanvasSVG = document.getElementById('parallelCategoryCanvasSVG'),
+  //       parallelCategoryCanvasLine = document.getElementById('parallelCategoryCanvasLine');
+  //
+  //   var colorOrder = commonColors.properties.seriesColorOrder.value;
+  //   var colorSet = commonColors.properties.dataVisColors.value;
+  //   var linePath1;
+  //
+  //   suiteSetup(function(done){
+  //     var d = [{
+  //           "x": 1397102460000,
+  //           "y": 1,
+  //           "y2": 1,
+  //           'cat': 'a'
+  //         },{
+  //           "x": 1397131620000,
+  //           "y": 6,
+  //           "y2": 21,
+  //           'cat': 'a'
+  //         },{
+  //           "x": 1397160780000,
+  //           "y": 10,
+  //           "y2": 3,
+  //           'cat': 'b'
+  //         },{
+  //           "x": 1397189940000,
+  //           "y": 4,
+  //           "y2": 10,
+  //           'cat': 'a'
+  //         },{
+  //           "x": 1397219100000,
+  //           "y": 6,
+  //           "y2": 27,
+  //           'cat': 'b'
+  //         }
+  //       ],
+  //       completeSeriesConfig = {
+  //         "x":{
+  //           "type":"line",
+  //           "name":"mySeries",
+  //           "x":['y','y2'],
+  //           "y":['y','y2'],
+  //           "color": "rgb(93,165,218)"
+  //         },
+  //         "a":{
+  //           "type":"line",
+  //           "name":"a",
+  //           "x":['y','y2'],
+  //           "y":['y','y2'],
+  //           "color": "rgb(93,165,218)"
+  //         },
+  //         "b":{
+  //           "type":"line",
+  //           "name":"b",
+  //           "x":['y','y2'],
+  //           "y":['y','y2'],
+  //           "color": "rgb(250,164,58)"
+  //         }
+  //       },
+  //       dim = ['y','y2'],
+  //       chartExtents = {"x":['y','y2'],"y":{'y':[0,27],'y2':[0,27]}},
+  //       categories = ['a','b'],
+  //       w = 500,
+  //       h = 300,
+  //       m = {
+  //         "top": 10,
+  //         "right": 5,
+  //         "bottom": 20,
+  //         "left": 15
+  //       };
+  //
+  //     parallelCategoryCanvasSVG.set('width',w);
+  //     parallelCategoryCanvasSVG.set('height',h);
+  //     parallelCategoryCanvasSVG.set('margin',m);
+  //
+  //     parallelCategoryCanvasScale.set('width',w);
+  //     parallelCategoryCanvasScale.set('height',h);
+  //     parallelCategoryCanvasScale.set('margin',m);
+  //     parallelCategoryCanvasScale.set('completeSeriesConfig',completeSeriesConfig);
+  //     parallelCategoryCanvasScale.set('chartExtents',chartExtents);
+  //     parallelCategoryCanvasScale.set('dimensions',dim);
+  //     parallelCategoryCanvasScale.set('axes',dim);
+  //     parallelCategoryCanvasScale.set('chartData',d);
+  //
+  //     parallelCategoryCanvasLine.set('completeSeriesConfig',completeSeriesConfig);
+  //     parallelCategoryCanvasLine.set('seriesId',"x");
+  //     parallelCategoryCanvasLine.set('categoryKey','cat');
+  //     parallelCategoryCanvasLine.set('categories',categories);
+  //     parallelCategoryCanvasLine.set('chartData',d);
+  //
+  //     setTimeout(function(){
+  //       linePath1 = parallelCategoryCanvasLine.lineGroup;
+  //       done();
+  //     },1000);;
+  //   });
+  //
+  //   test('parallelCanvasLine fixture is created', function() {
+  //     assert.isTrue(parallelCategoryCanvasLine !== null);
+  //   });
+  //
+  //   test('context has correct total lines ', function() {
+  //     assert.equal(parallelCategoryCanvasSVG.canvasContext._pxLinesTotal, 1);
+  //   });
+  //
+  //   test('context has drawn 2 lines ', function() {
+  //     assert.equal(parallelCategoryCanvasSVG.canvasContext._pxLinesRedraw, 1);
+  //   });
+  //
+  //   test('context has added both to its list', function() {
+  //     assert.equal(Object.keys(parallelCategoryCanvasSVG.canvasContext._pxLinesSeries).length, 1);
+  //     assert.equal(parallelCategoryCanvasSVG.canvasContext._pxLinesSeries['x'], true);
+  //   });
+  //
+  // }); //suite
+  //
+  // suite('px-vis-line renders parallel axis with categories and gradient to canvas', function() {
+  //   var parallelCategoryGradientCanvasScale = document.getElementById('parallelCategoryGradientCanvasScale'),
+  //       parallelCategoryGradientCanvasSVG = document.getElementById('parallelCategoryGradientCanvasSVG'),
+  //       parallelCategoryGradientCanvasLine = document.getElementById('parallelCategoryGradientCanvasLine');
+  //
+  //   var colorOrder = commonColors.properties.seriesColorOrder.value;
+  //   var colorSet = commonColors.properties.dataVisColors.value;
+  //   var linePath1;
+  //
+  //   suiteSetup(function(done){
+  //     var d = [{
+  //           "x": 1397102460000,
+  //           "y": 1,
+  //           "y2": 1,
+  //           'cat': 'a'
+  //         },{
+  //           "x": 1397131620000,
+  //           "y": 6,
+  //           "y2": 21,
+  //           'cat': 'a'
+  //         },{
+  //           "x": 1397160780000,
+  //           "y": 10,
+  //           "y2": 3,
+  //           'cat': 'b'
+  //         },{
+  //           "x": 1397189940000,
+  //           "y": 4,
+  //           "y2": 10,
+  //           'cat': 'a'
+  //         },{
+  //           "x": 1397219100000,
+  //           "y": 6,
+  //           "y2": 27,
+  //           'cat': 'b'
+  //         }
+  //       ],
+  //       completeSeriesConfig = {
+  //         "x":{
+  //           "type":"line",
+  //           "name":"mySeries",
+  //           "x":['y','y2'],
+  //           "y":['y','y2'],
+  //           "color": "rgb(93,165,218)"
+  //         },
+  //         "a":{
+  //           "type":"line",
+  //           "name":"a",
+  //           "x":['y','y2'],
+  //           "y":['y','y2'],
+  //           "color": "rgb(93,165,218)"
+  //         },
+  //         "b":{
+  //           "type":"line",
+  //           "name":"b",
+  //           "x":['y','y2'],
+  //           "y":['y','y2'],
+  //           "color": "rgb(250,164,58)"
+  //         }
+  //       },
+  //       dim = ['y','y2'],
+  //       chartExtents = {"x":['y','y2'],"y":{'y':[0,27],'y2':[0,27]}},
+  //       categories = ['a','b'],
+  //       w = 500,
+  //       h = 300,
+  //       m = {
+  //         "top": 10,
+  //         "right": 5,
+  //         "bottom": 20,
+  //         "left": 15
+  //       };
+  //
+  //     parallelCategoryGradientCanvasSVG.set('width',w);
+  //     parallelCategoryGradientCanvasSVG.set('height',h);
+  //     parallelCategoryGradientCanvasSVG.set('margin',m);
+  //
+  //     parallelCategoryGradientCanvasScale.set('width',w);
+  //     parallelCategoryGradientCanvasScale.set('height',h);
+  //     parallelCategoryGradientCanvasScale.set('margin',m);
+  //     parallelCategoryGradientCanvasScale.set('completeSeriesConfig',completeSeriesConfig);
+  //     parallelCategoryGradientCanvasScale.set('chartExtents',chartExtents);
+  //     parallelCategoryGradientCanvasScale.set('dimensions',dim);
+  //     parallelCategoryGradientCanvasScale.set('axes',dim);
+  //     parallelCategoryGradientCanvasScale.set('chartData',d);
+  //
+  //     parallelCategoryGradientCanvasLine.set('completeSeriesConfig',completeSeriesConfig);
+  //     parallelCategoryGradientCanvasLine.set('seriesId',"x");
+  //     parallelCategoryGradientCanvasLine.set('categoryKey','cat');
+  //     parallelCategoryGradientCanvasLine.set('categories',categories);
+  //     parallelCategoryGradientCanvasLine.set('chartData',d);
+  //
+  //     setTimeout(function(){
+  //       linePath1 = parallelCategoryGradientCanvasLine.lineGroup;
+  //       done();
+  //     },1000);
+  //   });
+  //
+  //   test('parallelCanvasLine fixture is created', function() {
+  //     assert.isTrue(parallelCategoryGradientCanvasLine !== null);
+  //   });
+  //
+  //   test('context has correct total lines ', function() {
+  //     assert.equal(parallelCategoryGradientCanvasSVG.canvasContext._pxLinesTotal, 1);
+  //   });
+  //
+  //   test('context has drawn 2 lines ', function() {
+  //     assert.equal(parallelCategoryGradientCanvasSVG.canvasContext._pxLinesRedraw, 1);
+  //   });
+  //
+  //   test('context has added both to its list', function() {
+  //     assert.equal(Object.keys(parallelCategoryGradientCanvasSVG.canvasContext._pxLinesSeries).length, 1);
+  //     assert.equal(parallelCategoryGradientCanvasSVG.canvasContext._pxLinesSeries['x'], true);
+  //   });
+  // }); //suite
+
+  suite('px-vis-line polar works', function() {
+    var polarScale = document.getElementById('polarScale'),
+        polarSVG = document.getElementById('polarSVG'),
+        polarLine = document.getElementById('polarLine');
 
     var colorOrder = commonColors.properties.seriesColorOrder.value;
     var colorSet = commonColors.properties.dataVisColors.value;
-    var linePath1;
+    var linePath;
 
     suiteSetup(function(done){
       var d = [{
-            "x": 1397102460000,
-            "y": 1,
-            "y2": 1
+            "x": 0,
+            "y": 0
           },{
-            "x": 1397131620000,
-            "y": 6,
-            "y2": 21
+            "x": 0,
+            "y": 3
           },{
-            "x": 1397160780000,
-            "y": 10,
-            "y2": 3
+            "x": Math.PI/2,
+            "y": 3
           },{
-            "x": 1397189940000,
-            "y": 4,
-            "y2": 10
+            "x": Math.PI,
+            "y": 5
           },{
-            "x": 1397219100000,
-            "y": 6,
-            "y2": 27
+            "x": Math.PI * 3/2,
+            "y": 3
+          },{
+            "x": Math.PI * 2,
+            "y": 5
           }
         ],
         completeSeriesConfig = {
-          "x":{
+          "mySeries": {
             "type":"line",
-            "name":"mySeries",
-            "x":['y','y2'],
-            "y":['y','y2'],
-            "color": "rgb(93,165,218)"
+            "name":"Data",
+            "y":"y",
+            "x":"x",
+            "color":"rgb(93,165,218)"
           }
         },
-        dim = ['y','y2'],
-        chartExtents = {"x":['y','y2'],"y":{'y':[0,27],'y2':[0,27]}},
         w = 500,
-        h = 300,
+        h = 500,
+        min = 480/2,
+        offset = [250,250],
         m = {
           "top": 10,
-          "right": 5,
-          "bottom": 20,
-          "left": 15
+          "right": 10,
+          "bottom": 10,
+          "left": 10
         };
+      polarSVG.set('width',w);
+      polarSVG.set('height',h);
+      polarSVG.set('margin',m);
+      polarSVG.set('offset',offset);
 
-      parallelCanvasSVG.set('width',w);
-      parallelCanvasSVG.set('height',h);
-      parallelCanvasSVG.set('margin',m);
+      polarScale.set('width',min);
+      polarScale.set('margin',m);
+      polarScale.set('amplitudeKeys',['y']);
+      polarScale.set('chartData',d);
 
-      parallelCanvasScale.set('width',w);
-      parallelCanvasScale.set('height',h);
-      parallelCanvasScale.set('margin',m);
-      parallelCanvasScale.set('completeSeriesConfig',completeSeriesConfig);
-      parallelCanvasScale.set('chartExtents',chartExtents);
-      parallelCanvasScale.set('dimensions',dim);
-      parallelCanvasScale.set('axes',dim);
-      parallelCanvasScale.set('chartData',d);
+      polarLine.set('seriesId',"mySeries");
+      polarLine.set('completeSeriesConfig',completeSeriesConfig);
+      polarLine.set('chartData',d);
 
-      parallelCanvasLine.set('completeSeriesConfig',completeSeriesConfig);
-      parallelCanvasLine.set('seriesId',"x");
-      parallelCanvasLine.set('chartData',d);
-
+      // needed for the debounce in line
       setTimeout(function(){
-        linePath1 = parallelCanvasLine.lineGroup;
+        linePath =  polarLine.lineGroup.select('path.series-line');
         done();
-      },1000);;
+      },100);
     });
 
-    test('parallelCanvasLine fixture is created', function() {
-      assert.isTrue(parallelCanvasLine !== null);
+    test('polarLine fixture is created', function() {
+      assert.isTrue(polarLine !== null);
     });
 
-    test('context has correct total lines ', function() {
-      assert.equal(parallelCanvasSVG.canvasContext._pxLinesTotal, 1);
+    test('polarLine linePath created', function() {
+      assert.equal(linePath.node().tagName,'path');
     });
 
-    test('context has drawn 2 lines ', function() {
-      assert.equal(parallelCanvasSVG.canvasContext._pxLinesRedraw, 1);
+    test('polarLine line series ID', function() {
+      assert.equal(linePath.attr('series-id'),'line_mySeries');
     });
 
-    test('context has added both to its list', function() {
-      assert.equal(Object.keys(parallelCanvasSVG.canvasContext._pxLinesSeries).length, 1);
-      assert.equal(parallelCanvasSVG.canvasContext._pxLinesSeries['x'], true);
+    test('polarLine line series has the right color', function() {
+      assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
     });
 
+    test('polarLine line d', function() {
+      //extract just the ints. who cares about the decimals
+      var re = new RegExp([
+        'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?'
+      ].join(''));
+
+      var matches = re.exec(linePath.attr('d'));
+
+      assert.equal(Number(matches[1]),0);
+      assert.equal(Number(matches[2]),0);
+      assert.equal(Number(matches[3]),0);
+      assert.equal(Number(matches[4]),-144);
+      assert.equal(Number(matches[5]),144);
+      assert.equal(Number(matches[6]),-8);
+      assert.equal(Number(matches[7]),2);
+      assert.equal(Number(matches[8]),240);
+      assert.equal(Number(matches[9]),-144);
+      assert.equal(Number(matches[10]),2);
+      //logically should be 0, but I guess we get a rounding error  :-/
+      assert.equal(Number(matches[11]),-5);
+      assert.equal(Number(matches[12]),-240);
+    });
   }); //suite
 
-  suite('px-vis-line renders parallel axis with gradient to canvas', function() {
-    var parallelGradientCanvasScale = document.getElementById('parallelGradientCanvasScale'),
-        parallelGradientCanvasSVG = document.getElementById('parallelGradientCanvasSVG'),
-        parallelGradientCanvasLine = document.getElementById('parallelGradientCanvasLine');
+  suite('px-vis-line polar with degrees and counter clockwise works', function() {
+    var polarDegreeScale = document.getElementById('polarDegreeScale'),
+        polarDegreeSVG = document.getElementById('polarDegreeSVG'),
+        polarDegreeLine = document.getElementById('polarDegreeLine');
 
     var colorOrder = commonColors.properties.seriesColorOrder.value;
     var colorSet = commonColors.properties.dataVisColors.value;
-    var linePath1;
+    var linePath;
 
     suiteSetup(function(done){
       var d = [{
-            "x": 1397102460000,
-            "y": 1,
-            "y2": 1
+            "x": 0,
+            "y": 0
           },{
-            "x": 1397131620000,
-            "y": 6,
-            "y2": 21
+            "x": 0,
+            "y": 3
           },{
-            "x": 1397160780000,
-            "y": 10,
-            "y2": 3
+            "x": 90,
+            "y": 3
           },{
-            "x": 1397189940000,
-            "y": 4,
-            "y2": 10
+            "x": 180,
+            "y": 5
           },{
-            "x": 1397219100000,
-            "y": 6,
-            "y2": 27
+            "x": 270,
+            "y": 3
+          },{
+            "x": 0,
+            "y": 5
           }
         ],
         completeSeriesConfig = {
-          "x":{
+          "mySeries": {
             "type":"line",
-            "name":"mySeries",
-            "x":['y','y2'],
-            "y":['y','y2'],
-            "color": "rgb(93,165,218)"
+            "name":"Data",
+            "y":"y",
+            "x":"x",
+            "color":"rgb(93,165,218)"
           }
         },
-        dim = ['y','y2'],
-        chartExtents = {"x":['y','y2'],"y":{'y':[0,27],'y2':[0,27]}},
         w = 500,
-        h = 300,
+        h = 500,
+        min = 480/2,
+        offset = [250,250],
         m = {
           "top": 10,
-          "right": 5,
-          "bottom": 20,
-          "left": 15
+          "right": 10,
+          "bottom": 10,
+          "left": 10
         };
+      polarDegreeSVG.set('width',w);
+      polarDegreeSVG.set('height',h);
+      polarDegreeSVG.set('margin',m);
+      polarDegreeSVG.set('offset',offset);
 
-      parallelGradientCanvasSVG.set('width',w);
-      parallelGradientCanvasSVG.set('height',h);
-      parallelGradientCanvasSVG.set('margin',m);
+      polarDegreeScale.set('width',min);
+      polarDegreeScale.set('margin',m);
+      polarDegreeScale.set('amplitudeKeys',['y']);
+      polarDegreeScale.set('chartData',d);
 
-      parallelGradientCanvasScale.set('width',w);
-      parallelGradientCanvasScale.set('height',h);
-      parallelGradientCanvasScale.set('margin',m);
-      parallelGradientCanvasScale.set('completeSeriesConfig',completeSeriesConfig);
-      parallelGradientCanvasScale.set('chartExtents',chartExtents);
-      parallelGradientCanvasScale.set('dimensions',dim);
-      parallelGradientCanvasScale.set('axes',dim);
-      parallelGradientCanvasScale.set('chartData',d);
+      polarDegreeLine.set('seriesId',"mySeries");
+      polarDegreeLine.set('completeSeriesConfig',completeSeriesConfig);
+      polarDegreeLine.set('chartData',d);
 
-      parallelGradientCanvasLine.set('completeSeriesConfig',completeSeriesConfig);
-      parallelGradientCanvasLine.set('seriesId',"x");
-      parallelGradientCanvasLine.set('chartData',d);
-
+      // needed for the debounce in line
       setTimeout(function(){
-        linePath1 = parallelGradientCanvasLine.lineGroup;
+        linePath =  polarDegreeLine.lineGroup.select('path.series-line');
         done();
-      },1000);;
+      },100);
     });
 
-    test('parallelCanvasLine fixture is created', function() {
-      assert.isTrue(parallelGradientCanvasLine !== null);
+    test('polarDegreeLine fixture is created', function() {
+      assert.isTrue(polarDegreeLine !== null);
     });
 
-    test('context has correct total lines ', function() {
-      assert.equal(parallelGradientCanvasSVG.canvasContext._pxLinesTotal, 1);
+    test('polarDegreeLine linePath created', function() {
+      assert.equal(linePath.node().tagName,'path');
     });
 
-    test('context has drawn 2 lines ', function() {
-      assert.equal(parallelGradientCanvasSVG.canvasContext._pxLinesRedraw, 1);
+    test('polarDegreeLine line series ID', function() {
+      assert.equal(linePath.attr('series-id'),'line_mySeries');
     });
 
-    test('context has added both to its list', function() {
-      assert.equal(Object.keys(parallelCanvasSVG.canvasContext._pxLinesSeries).length, 1);
-      assert.equal(parallelGradientCanvasSVG.canvasContext._pxLinesSeries['x'], true);
+    test('polarDegreeLine line series has the right color', function() {
+      assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
     });
 
+    test('polarDegreeLine line d', function() {
+      //extract just the ints. who cares about the decimals
+      var re = new RegExp([
+        'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?'
+      ].join(''));
+
+      var matches = re.exec(linePath.attr('d'));
+
+      assert.equal(Number(matches[1]),0);
+      assert.equal(Number(matches[2]),0);
+      assert.equal(Number(matches[3]),0);
+      assert.equal(Number(matches[4]),-144);
+      assert.equal(Number(matches[5]),144);
+      assert.equal(Number(matches[6]),-8);
+      assert.equal(Number(matches[7]),2);
+      assert.equal(Number(matches[8]),240);
+      assert.equal(Number(matches[9]),-144);
+      assert.equal(Number(matches[10]),2);
+      assert.equal(Number(matches[11]),0);
+      assert.equal(Number(matches[12]),-240);
+    });
   }); //suite
 
-  suite('px-vis-line renders parallel axis with categories to canvas', function() {
-    var parallelCategoryCanvasScale = document.getElementById('parallelCategoryCanvasScale'),
-        parallelCategoryCanvasSVG = document.getElementById('parallelCategoryCanvasSVG'),
-        parallelCategoryCanvasLine = document.getElementById('parallelCategoryCanvasLine');
+  suite('px-vis-line polar with degrees and counter clockwise works', function() {
+    var polarCCWScale = document.getElementById('polarCCWScale'),
+        polarCCWSVG = document.getElementById('polarCCWSVG'),
+        polarCCWLine = document.getElementById('polarCCWLine');
 
     var colorOrder = commonColors.properties.seriesColorOrder.value;
     var colorSet = commonColors.properties.dataVisColors.value;
-    var linePath1;
+    var linePath;
 
     suiteSetup(function(done){
       var d = [{
-            "x": 1397102460000,
-            "y": 1,
-            "y2": 1,
-            'cat': 'a'
+            "x": 0,
+            "y": 0
           },{
-            "x": 1397131620000,
-            "y": 6,
-            "y2": 21,
-            'cat': 'a'
+            "x": 0,
+            "y": 3
           },{
-            "x": 1397160780000,
-            "y": 10,
-            "y2": 3,
-            'cat': 'b'
+            "x": Math.PI/2,
+            "y": 3
           },{
-            "x": 1397189940000,
-            "y": 4,
-            "y2": 10,
-            'cat': 'a'
+            "x": Math.PI,
+            "y": 5
           },{
-            "x": 1397219100000,
-            "y": 6,
-            "y2": 27,
-            'cat': 'b'
+            "x": Math.PI * 3/2,
+            "y": 3
+          },{
+            "x": Math.PI * 2,
+            "y": 5
           }
         ],
         completeSeriesConfig = {
-          "x":{
+          "mySeries": {
             "type":"line",
-            "name":"mySeries",
-            "x":['y','y2'],
-            "y":['y','y2'],
-            "color": "rgb(93,165,218)"
-          },
-          "a":{
-            "type":"line",
-            "name":"a",
-            "x":['y','y2'],
-            "y":['y','y2'],
-            "color": "rgb(93,165,218)"
-          },
-          "b":{
-            "type":"line",
-            "name":"b",
-            "x":['y','y2'],
-            "y":['y','y2'],
-            "color": "rgb(250,164,58)"
+            "name":"Data",
+            "y":"y",
+            "x":"x",
+            "color":"rgb(93,165,218)"
           }
         },
-        dim = ['y','y2'],
-        chartExtents = {"x":['y','y2'],"y":{'y':[0,27],'y2':[0,27]}},
-        categories = ['a','b'],
         w = 500,
-        h = 300,
+        h = 500,
+        min = 480/2,
+        offset = [250,250],
         m = {
           "top": 10,
-          "right": 5,
-          "bottom": 20,
-          "left": 15
+          "right": 10,
+          "bottom": 10,
+          "left": 10
         };
+      polarCCWSVG.set('width',w);
+      polarCCWSVG.set('height',h);
+      polarCCWSVG.set('margin',m);
+      polarCCWSVG.set('offset',offset);
 
-      parallelCategoryCanvasSVG.set('width',w);
-      parallelCategoryCanvasSVG.set('height',h);
-      parallelCategoryCanvasSVG.set('margin',m);
+      polarCCWScale.set('width',min);
+      polarCCWScale.set('margin',m);
+      polarCCWScale.set('amplitudeKeys',['y']);
+      polarCCWScale.set('chartData',d);
 
-      parallelCategoryCanvasScale.set('width',w);
-      parallelCategoryCanvasScale.set('height',h);
-      parallelCategoryCanvasScale.set('margin',m);
-      parallelCategoryCanvasScale.set('completeSeriesConfig',completeSeriesConfig);
-      parallelCategoryCanvasScale.set('chartExtents',chartExtents);
-      parallelCategoryCanvasScale.set('dimensions',dim);
-      parallelCategoryCanvasScale.set('axes',dim);
-      parallelCategoryCanvasScale.set('chartData',d);
+      polarCCWLine.set('seriesId',"mySeries");
+      polarCCWLine.set('completeSeriesConfig',completeSeriesConfig);
+      polarCCWLine.set('chartData',d);
 
-      parallelCategoryCanvasLine.set('completeSeriesConfig',completeSeriesConfig);
-      parallelCategoryCanvasLine.set('seriesId',"x");
-      parallelCategoryCanvasLine.set('categoryKey','cat');
-      parallelCategoryCanvasLine.set('categories',categories);
-      parallelCategoryCanvasLine.set('chartData',d);
-
+      // needed for the debounce in line
       setTimeout(function(){
-        linePath1 = parallelCategoryCanvasLine.lineGroup;
+        linePath =  polarCCWLine.lineGroup.select('path.series-line');
         done();
-      },1000);;
+      },100);
     });
 
-    test('parallelCanvasLine fixture is created', function() {
-      assert.isTrue(parallelCategoryCanvasLine !== null);
+    test('polarCCWLine fixture is created', function() {
+      assert.isTrue(polarCCWLine !== null);
     });
 
-    test('context has correct total lines ', function() {
-      assert.equal(parallelCategoryCanvasSVG.canvasContext._pxLinesTotal, 1);
+    test('polarCCWLine linePath created', function() {
+      assert.equal(linePath.node().tagName,'path');
     });
 
-    test('context has drawn 2 lines ', function() {
-      assert.equal(parallelCategoryCanvasSVG.canvasContext._pxLinesRedraw, 1);
+    test('polarCCWLine line series ID', function() {
+      assert.equal(linePath.attr('series-id'),'line_mySeries');
     });
 
-    test('context has added both to its list', function() {
-      assert.equal(Object.keys(parallelCategoryCanvasSVG.canvasContext._pxLinesSeries).length, 1);
-      assert.equal(parallelCategoryCanvasSVG.canvasContext._pxLinesSeries['x'], true);
+    test('polarCCWLine line series has the right color', function() {
+      assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
     });
 
+    test('polarCCWLine line d', function() {
+      //extract just the ints. who cares about the decimals
+      var re = new RegExp([
+        'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?'
+      ].join(''));
+
+      var matches = re.exec(linePath.attr('d'));
+
+      assert.equal(Number(matches[1]),0);
+      assert.equal(Number(matches[2]),0);
+      assert.equal(Number(matches[3]),0);
+      assert.equal(Number(matches[4]),-144);
+      assert.equal(Number(matches[5]),-144);
+      assert.equal(Number(matches[6]),-8);
+      assert.equal(Number(matches[7]),-2);
+      assert.equal(Number(matches[8]),240);
+      assert.equal(Number(matches[9]),144);
+      assert.equal(Number(matches[10]),2);
+      assert.equal(Number(matches[11]),5);
+      assert.equal(Number(matches[12]),-240);
+    });
   }); //suite
 
-  suite('px-vis-line renders parallel axis with categories and gradient to canvas', function() {
-    var parallelCategoryGradientCanvasScale = document.getElementById('parallelCategoryGradientCanvasScale'),
-        parallelCategoryGradientCanvasSVG = document.getElementById('parallelCategoryGradientCanvasSVG'),
-        parallelCategoryGradientCanvasLine = document.getElementById('parallelCategoryGradientCanvasLine');
+
+  suite('px-vis-line polar with degrees and counter clockwise works', function() {
+    var polarDegreeCCWScale = document.getElementById('polarDegreeCCWScale'),
+        polarDegreeCCWSVG = document.getElementById('polarDegreeCCWSVG'),
+        polarDegreeCCWLine = document.getElementById('polarDegreeCCWLine');
 
     var colorOrder = commonColors.properties.seriesColorOrder.value;
     var colorSet = commonColors.properties.dataVisColors.value;
-    var linePath1;
+    var linePath;
 
     suiteSetup(function(done){
       var d = [{
-            "x": 1397102460000,
-            "y": 1,
-            "y2": 1,
-            'cat': 'a'
+            "x": 0,
+            "y": 0
           },{
-            "x": 1397131620000,
-            "y": 6,
-            "y2": 21,
-            'cat': 'a'
+            "x": 0,
+            "y": 3
           },{
-            "x": 1397160780000,
-            "y": 10,
-            "y2": 3,
-            'cat': 'b'
+            "x": 90,
+            "y": 3
           },{
-            "x": 1397189940000,
-            "y": 4,
-            "y2": 10,
-            'cat': 'a'
+            "x": 180,
+            "y": 5
           },{
-            "x": 1397219100000,
-            "y": 6,
-            "y2": 27,
-            'cat': 'b'
+            "x": 270,
+            "y": 3
+          },{
+            "x": 0,
+            "y": 5
           }
         ],
         completeSeriesConfig = {
-          "x":{
+          "mySeries": {
             "type":"line",
-            "name":"mySeries",
-            "x":['y','y2'],
-            "y":['y','y2'],
-            "color": "rgb(93,165,218)"
-          },
-          "a":{
-            "type":"line",
-            "name":"a",
-            "x":['y','y2'],
-            "y":['y','y2'],
-            "color": "rgb(93,165,218)"
-          },
-          "b":{
-            "type":"line",
-            "name":"b",
-            "x":['y','y2'],
-            "y":['y','y2'],
-            "color": "rgb(250,164,58)"
+            "name":"Data",
+            "y":"y",
+            "x":"x",
+            "color":"rgb(93,165,218)"
           }
         },
-        dim = ['y','y2'],
-        chartExtents = {"x":['y','y2'],"y":{'y':[0,27],'y2':[0,27]}},
-        categories = ['a','b'],
         w = 500,
-        h = 300,
+        h = 500,
+        min = 480/2,
+        offset = [250,250],
         m = {
           "top": 10,
-          "right": 5,
-          "bottom": 20,
-          "left": 15
+          "right": 10,
+          "bottom": 10,
+          "left": 10
         };
+      polarDegreeCCWSVG.set('width',w);
+      polarDegreeCCWSVG.set('height',h);
+      polarDegreeCCWSVG.set('margin',m);
+      polarDegreeCCWSVG.set('offset',offset);
 
-      parallelCategoryGradientCanvasSVG.set('width',w);
-      parallelCategoryGradientCanvasSVG.set('height',h);
-      parallelCategoryGradientCanvasSVG.set('margin',m);
+      polarDegreeCCWScale.set('width',min);
+      polarDegreeCCWScale.set('margin',m);
+      polarDegreeCCWScale.set('amplitudeKeys',['y']);
+      polarDegreeCCWScale.set('chartData',d);
 
-      parallelCategoryGradientCanvasScale.set('width',w);
-      parallelCategoryGradientCanvasScale.set('height',h);
-      parallelCategoryGradientCanvasScale.set('margin',m);
-      parallelCategoryGradientCanvasScale.set('completeSeriesConfig',completeSeriesConfig);
-      parallelCategoryGradientCanvasScale.set('chartExtents',chartExtents);
-      parallelCategoryGradientCanvasScale.set('dimensions',dim);
-      parallelCategoryGradientCanvasScale.set('axes',dim);
-      parallelCategoryGradientCanvasScale.set('chartData',d);
+      polarDegreeCCWLine.set('seriesId',"mySeries");
+      polarDegreeCCWLine.set('completeSeriesConfig',completeSeriesConfig);
+      polarDegreeCCWLine.set('chartData',d);
 
-      parallelCategoryGradientCanvasLine.set('completeSeriesConfig',completeSeriesConfig);
-      parallelCategoryGradientCanvasLine.set('seriesId',"x");
-      parallelCategoryGradientCanvasLine.set('categoryKey','cat');
-      parallelCategoryGradientCanvasLine.set('categories',categories);
-      parallelCategoryGradientCanvasLine.set('chartData',d);
-
+      // needed for the debounce in line
       setTimeout(function(){
-        linePath1 = parallelCategoryGradientCanvasLine.lineGroup;
+        linePath =  polarDegreeCCWLine.lineGroup.select('path.series-line');
         done();
-      },1000);
+      },100);
     });
 
-    test('parallelCanvasLine fixture is created', function() {
-      assert.isTrue(parallelCategoryGradientCanvasLine !== null);
+    test('polarDegreeCCWLine fixture is created', function() {
+      assert.isTrue(polarDegreeCCWLine !== null);
     });
 
-    test('context has correct total lines ', function() {
-      assert.equal(parallelCategoryGradientCanvasSVG.canvasContext._pxLinesTotal, 1);
+    test('polarDegreeCCWLine linePath created', function() {
+      assert.equal(linePath.node().tagName,'path');
     });
 
-    test('context has drawn 2 lines ', function() {
-      assert.equal(parallelCategoryGradientCanvasSVG.canvasContext._pxLinesRedraw, 1);
+    test('polarDegreeCCWLine line series ID', function() {
+      assert.equal(linePath.attr('series-id'),'line_mySeries');
     });
 
-    test('context has added both to its list', function() {
-      assert.equal(Object.keys(parallelCategoryGradientCanvasSVG.canvasContext._pxLinesSeries).length, 1);
-      assert.equal(parallelCategoryGradientCanvasSVG.canvasContext._pxLinesSeries['x'], true);
+    test('polarDegreeCCWLine line series has the right color', function() {
+      assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+    });
+
+    test('polarDegreeCCWLine line d', function() {
+      //extract just the ints. who cares about the decimals
+      var re = new RegExp([
+        'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+        'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?'
+      ].join(''));
+
+      var matches = re.exec(linePath.attr('d'));
+
+      assert.equal(Number(matches[1]),0);
+      assert.equal(Number(matches[2]),0);
+      assert.equal(Number(matches[3]),0);
+      assert.equal(Number(matches[4]),-144);
+      assert.equal(Number(matches[5]),-144);
+      assert.equal(Number(matches[6]),-8);
+      assert.equal(Number(matches[7]),-2);
+      assert.equal(Number(matches[8]),240);
+      assert.equal(Number(matches[9]),144);
+      assert.equal(Number(matches[10]),2);
+      assert.equal(Number(matches[11]),0);
+      assert.equal(Number(matches[12]),-240);
     });
   }); //suite
 

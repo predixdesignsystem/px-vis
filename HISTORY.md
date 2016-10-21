@@ -4,7 +4,6 @@ v0.6.14
 * moved forcedatetimedisplay to behavior
 * general bug fixes for register
 
-
 v0.6.13
 ==================
 * added delaying chart draw until attached

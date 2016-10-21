@@ -12,6 +12,7 @@
          when wct is run from the command line -->
     <script src="../web-component-tester/browser.js"></script>
     <link rel="import" href="../px-vis-scale.html" />
+    <link rel="import" href="../px-vis-radial-scale.html" />
     <link rel="import" href="../px-vis-svg.html" />
     <link rel="import" href="../px-vis-svg-canvas.html" />
     <link rel="import" href="../px-vis-multi-scale.html" />
@@ -123,44 +124,6 @@
       </px-vis-line>
     </template>
 
-<!-- CANVAS -->
-    <template is="dom-bind">
-      <px-vis-scale
-        id="canvasScale"
-        x-axis-type="time"
-        y-axis-type="linear"
-        x="{{x}}"
-        y="{{y}}"
-        current-domain-x="{{currentDomainX}}"
-        current-domain-y="{{currentDomainY}}"
-        domain-changed="{{domainChanged}}">
-      </px-vis-scale>
-      <px-vis-svg-canvas
-        id="canvasSVG"
-        svg="{{svg}}"
-        canvas-context="{{canvasContext}}">
-      </px-vis-svg-canvas>
-      <px-vis-line-canvas
-        id="canvasLine1"
-        svg="[[svg]]"
-        canvas-context="[[canvasContext]]"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]"
-        current-domain-x="[[currentDomainX]]"
-        current-domain-y="[[currentDomainY]]">
-      </px-vis-line-canvas>
-      <px-vis-line-canvas
-        id="canvasLine2"
-        svg="[[svg]]"
-        canvas-context="[[canvasContext]]"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]"
-        current-domain-x="[[currentDomainX]]"
-        current-domain-y="[[currentDomainY]]">
-      </px-vis-line-canvas>
-    </template>
 
 <!--  PARALLEL COORDINATES SVG-->
     <template is="dom-bind">
@@ -174,13 +137,11 @@
       </px-vis-multi-scale>
       <px-vis-svg-canvas
         id="parallelSVG"
-        svg="{{svg}}"
-        canvas-context="{{canvasContext}}">
+        svg="{{svg}}">
       </px-vis-svg-canvas>
       <px-vis-line
         id="parallelLine"
         svg="[[svg]]"
-        canvas-context="[[canvasContext]]"
         parallel-coordinates
         multi-path
         x="[[x]]"
@@ -202,13 +163,11 @@
       </px-vis-multi-scale>
       <px-vis-svg-canvas
         id="parallelGradientSVG"
-        svg="{{svg}}"
-        canvas-context="{{canvasContext}}">
+        svg="{{svg}}">
       </px-vis-svg-canvas>
       <px-vis-line
         id="parallelGradientLine"
         svg="[[svg]]"
-        canvas-context="[[canvasContext]]"
         parallel-coordinates
         multi-path
         gradient-line
@@ -231,13 +190,11 @@
       </px-vis-multi-scale>
       <px-vis-svg-canvas
         id="parallelCategorySVG"
-        svg="{{svg}}"
-        canvas-context="{{canvasContext}}">
+        svg="{{svg}}">
       </px-vis-svg-canvas>
       <px-vis-line
         id="parallelCategoryLine"
         svg="[[svg]]"
-        canvas-context="[[canvasContext]]"
         parallel-coordinates
         multi-path
         x="[[x]]"
@@ -259,13 +216,11 @@
       </px-vis-multi-scale>
       <px-vis-svg-canvas
         id="parallelCategoryGradientSVG"
-        svg="{{svg}}"
-        canvas-context="{{canvasContext}}">
+        svg="{{svg}}">
       </px-vis-svg-canvas>
       <px-vis-line
         id="parallelCategoryGradientLine"
         svg="[[svg]]"
-        canvas-context="[[canvasContext]]"
         parallel-coordinates
         multi-path
         gradient-line
@@ -277,25 +232,22 @@
       </px-vis-line>
     </template>
 
-<!--  PARALLEL COORDINATES CANVAS-->
     <template is="dom-bind">
       <px-vis-multi-scale
-        id="parallelCanvasScale"
+        id="parallelMissingScale"
         x="{{x}}"
         y="{{y}}"
-        domain-changed="{{domainChanged}}"
         current-domain-x="{{currentDomainX}}"
-        current-domain-y="{{currentDomainY}}">
+        current-domain-y="{{currentDomainY}}"
+        domain-changed="{{domainChanged}}">
       </px-vis-multi-scale>
       <px-vis-svg-canvas
-        id="parallelCanvasSVG"
-        svg="{{svg}}"
-        canvas-context="{{canvasContext}}">
+        id="parallelMissingSVG"
+        svg="{{svg}}">
       </px-vis-svg-canvas>
-      <px-vis-line-canvas
-        id="parallelCanvasLine"
+      <px-vis-line
+        id="parallelMissingLine"
         svg="[[svg]]"
-        canvas-context="[[canvasContext]]"
         parallel-coordinates
         multi-path
         x="[[x]]"
@@ -303,27 +255,188 @@
         domain-changed="[[domainChanged]]"
         current-domain-x="[[currentDomainX]]"
         current-domain-y="[[currentDomainY]]">
-      </px-vis-line-canvas>
+      </px-vis-line>
+    </template>
+
+
+    <!-- POLAR -->
+    <template is="dom-bind">
+      <px-vis-radial-scale
+        id="polarScale"
+        x="{{x}}"
+        y="{{y}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-radial-scale>
+      <px-vis-svg
+        id="polarSVG"
+        svg="{{svg}}">
+      </px-vis-svg>
+      <px-vis-line
+        id="polarLine"
+        svg="[[svg]]"
+        radial-line
+        x="[[x]]"
+        y="[[y]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]"
+        domain-changed="[[domainChanged]]">
+      </px-vis-line>
     </template>
 
     <template is="dom-bind">
-      <px-vis-multi-scale
-        id="parallelGradientCanvasScale"
+      <px-vis-radial-scale
+        id="polarDegreeScale"
+        x-axis-type="time"
+        y-axis-type="linear"
         x="{{x}}"
         y="{{y}}"
-        domain-changed="{{domainChanged}}"
         current-domain-x="{{currentDomainX}}"
-        current-domain-y="{{currentDomainY}}">
-      </px-vis-multi-scale>
-      <px-vis-svg-canvas
-        id="parallelGradientCanvasSVG"
-        svg="{{svg}}"
-        canvas-context="{{canvasContext}}">
-      </px-vis-svg-canvas>
-      <px-vis-line-canvas
-        id="parallelGradientCanvasLine"
+        current-domain-y="{{currentDomainY}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-radial-scale>
+      <px-vis-svg
+        id="polarDegreeSVG"
+        svg="{{svg}}">
+      </px-vis-svg>
+      <px-vis-line
+        id="polarDegreeLine"
         svg="[[svg]]"
-        canvas-context="[[canvasContext]]"
+        radial-line
+        use-degrees
+        x="[[x]]"
+        y="[[y]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]"
+        domain-changed="[[domainChanged]]">
+      </px-vis-line>
+    </template>
+
+    <template is="dom-bind">
+      <px-vis-radial-scale
+        id="polarCCWScale"
+        x="{{x}}"
+        y="{{y}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-radial-scale>
+      <px-vis-svg
+        id="polarCCWSVG"
+        svg="{{svg}}">
+      </px-vis-svg>
+      <px-vis-line
+        id="polarCCWLine"
+        svg="[[svg]]"
+        radial-line
+        counter-clockwise
+        x="[[x]]"
+        y="[[y]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]"
+        domain-changed="[[domainChanged]]">
+      </px-vis-line>
+    </template>
+
+    <template is="dom-bind">
+      <px-vis-radial-scale
+        id="polarDegreeCCWScale"
+        x-axis-type="time"
+        y-axis-type="linear"
+        x="{{x}}"
+        y="{{y}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-radial-scale>
+      <px-vis-svg
+        id="polarDegreeCCWSVG"
+        svg="{{svg}}">
+      </px-vis-svg>
+      <px-vis-line
+        id="polarDegreeCCWLine"
+        svg="[[svg]]"
+        radial-line
+        use-degrees
+        counter-clockwise
+        x="[[x]]"
+        y="[[y]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]"
+        domain-changed="[[domainChanged]]">
+      </px-vis-line>
+    </template>
+
+    <template is="dom-bind">
+      <px-vis-radial-scale
+        id="polarMissingScale"
+        x-axis-type="time"
+        y-axis-type="linear"
+        x="{{x}}"
+        y="{{y}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-radial-scale>
+      <px-vis-svg
+        id="polarMissingSSVG"
+        svg="{{svg}}">
+      </px-vis-svg>
+      <px-vis-line
+        id="polarMissingSLine1"
+        svg="[[svg]]"
+        x="[[x]]"
+        y="[[y]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]"
+        domain-changed="[[domainChanged]]">
+      </px-vis-line>
+    </template>
+
+    <!--  RADAR -->
+    <template is="dom-bind">
+      <px-vis-radial-scale
+        id="radarScale"
+        x="{{x}}"
+        y="{{y}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-radial-scale>
+      <px-vis-svg-canvas
+        id="radarSVG"
+        svg="{{svg}}">
+      </px-vis-svg-canvas>
+      <px-vis-line
+        id="radarLine"
+        svg="[[svg]]"
+        parallel-coordinates
+        multi-path
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]">
+      </px-vis-line>
+    </template>
+
+    <template is="dom-bind">
+      <px-vis-radial-scale
+        id="radarGradientScale"
+        x="{{x}}"
+        y="{{y}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-radial-scale>
+      <px-vis-svg-canvas
+        id="radarGradientSVG"
+        svg="{{svg}}">
+      </px-vis-svg-canvas>
+      <px-vis-line
+        id="radarGradientLine"
+        svg="[[svg]]"
         parallel-coordinates
         multi-path
         gradient-line
@@ -332,27 +445,25 @@
         domain-changed="[[domainChanged]]"
         current-domain-x="[[currentDomainX]]"
         current-domain-y="[[currentDomainY]]">
-      </px-vis-line-canvas>
+      </px-vis-line>
     </template>
 
     <template is="dom-bind">
-      <px-vis-multi-scale
-        id="parallelCategoryCanvasScale"
+      <px-vis-radial-scale
+        id="radarCategoryScale"
         x="{{x}}"
         y="{{y}}"
         domain-changed="{{domainChanged}}"
         current-domain-x="{{currentDomainX}}"
         current-domain-y="{{currentDomainY}}">
-      </px-vis-multi-scale>
+      </px-vis-radial-scale>
       <px-vis-svg-canvas
-        id="parallelCategoryCanvasSVG"
-        svg="{{svg}}"
-        canvas-context="{{canvasContext}}">
+        id="radarCategorySVG"
+        svg="{{svg}}">
       </px-vis-svg-canvas>
-      <px-vis-line-canvas
-        id="parallelCategoryCanvasLine"
+      <px-vis-line
+        id="radarCategoryLine"
         svg="[[svg]]"
-        canvas-context="[[canvasContext]]"
         parallel-coordinates
         multi-path
         x="[[x]]"
@@ -360,27 +471,25 @@
         domain-changed="[[domainChanged]]"
         current-domain-x="[[currentDomainX]]"
         current-domain-y="[[currentDomainY]]">
-      </px-vis-line-canvas>
+      </px-vis-line>
     </template>
 
     <template is="dom-bind">
-      <px-vis-multi-scale
-        id="parallelCategoryGradientCanvasScale"
+      <px-vis-radial-scale
+        id="radarCategoryGradientScale"
         x="{{x}}"
         y="{{y}}"
         domain-changed="{{domainChanged}}"
         current-domain-x="{{currentDomainX}}"
         current-domain-y="{{currentDomainY}}">
-      </px-vis-multi-scale>
+      </px-vis-radial-scale>
       <px-vis-svg-canvas
-        id="parallelCategoryGradientCanvasSVG"
-        svg="{{svg}}"
-        canvas-context="{{canvasContext}}">
+        id="radarCategoryGradientSVG"
+        svg="{{svg}}">
       </px-vis-svg-canvas>
-      <px-vis-line-canvas
-        id="parallelCategoryGradientCanvasLine"
+      <px-vis-line
+        id="radarCategoryGradientLine"
         svg="[[svg]]"
-        canvas-context="[[canvasContext]]"
         parallel-coordinates
         multi-path
         gradient-line
@@ -389,7 +498,33 @@
         domain-changed="[[domainChanged]]"
         current-domain-x="[[currentDomainX]]"
         current-domain-y="[[currentDomainY]]">
-      </px-vis-line-canvas>
+      </px-vis-line>
+    </template>
+
+    <template is="dom-bind">
+      <px-vis-radial-scale
+        id="radarMissingScale"
+        x="{{x}}"
+        y="{{y}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-radial-scale>
+      <px-vis-svg-canvas
+        id="radarMissingSVG"
+        svg="{{svg}}">
+      </px-vis-svg-canvas>
+      <px-vis-line
+        id="radarMissingLine"
+        svg="[[svg]]"
+        parallel-coordinates
+        multi-path
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]">
+      </px-vis-line>
     </template>
 
   </body>
