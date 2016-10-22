@@ -1198,7 +1198,7 @@ function runTests(){
     });
 
     test('X label count is correct', function() {
-      assert.equal(xLabels.length, 10);
+      assert.oneOf(xLabels.length, [10,11]);
     });
 
     test('X label positions are correct', function() {
@@ -1212,7 +1212,8 @@ function runTests(){
     });
 
     test('X label color is correct', function() {
-      assert.equal(xLabels[0].attributes.fill.value, 'rgb(255,255,255)');
+      var c = xLabels[0].attributes.fill.value.split(' ').join('');
+      assert.equal(c, 'rgb(255,255,255)');
     });
 
     test('Y label count is correct', function() {
@@ -1230,17 +1231,18 @@ function runTests(){
     });
 
     test('Y label color is correct', function() {
-      assert.equal(yLabels[0].attributes.fill.value, 'rgb(255,255,255)');
+      var c = yLabels[0].attributes.fill.value.split(' ').join('');
+      assert.equal(c, 'rgb(255,255,255)');
     });
 
     test('x rect count is correct', function() {
-      assert.equal(xRects.length, 10);
+      assert.oneOf(xRects.length, [10,11]);
     });
 
     test('x rect sizing is correct', function() {
-      assert.equal(xRects[0].attributes.width.value, xLabels[0].getBoundingClientRect().width + 6);
+      assert.closeTo(xRects[0].attributes.width.value, xLabels[0].getBoundingClientRect().width + 6,1);
       assert.equal(xRects[0].attributes.height.value, '19');
-      assert.equal(xRects[0].attributes.x.value, xLabels[0].getBoundingClientRect().width / -2 - 3);
+      assert.closeTo(xRects[0].attributes.x.value, xLabels[0].getBoundingClientRect().width / -2 - 3,1);
       assert.equal(xRects[0].attributes.y.value, '-9.5');
     });
 
@@ -1253,9 +1255,9 @@ function runTests(){
     });
 
     test('y rect sizing is correct', function() {
-      assert.equal(yRects[0].attributes.width.value, yLabels[0].getBoundingClientRect().width + 6);
+      assert.closeTo(yRects[0].attributes.width.value, yLabels[0].getBoundingClientRect().width + 6,1);
       assert.equal(yRects[0].attributes.height.value, '19');
-      assert.equal(yRects[0].attributes.x.value, yLabels[0].getBoundingClientRect().width / -2 - 3);
+      assert.closeTo(yRects[0].attributes.x.value, yLabels[0].getBoundingClientRect().width / -2 - 3,1);
       assert.equal(yRects[0].attributes.y.value, '-9.5');
     });
 

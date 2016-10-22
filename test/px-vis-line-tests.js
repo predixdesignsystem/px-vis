@@ -1705,19 +1705,19 @@ function runTests(){
 
       var matches = re.exec(linePath.attr('d'));
 
-      assert.equal(Number(matches[1]),0);
-      assert.equal(Number(matches[2]),0);
-      assert.equal(Number(matches[3]),0);
-      assert.equal(Number(matches[4]),-144);
-      assert.equal(Number(matches[5]),144);
-      assert.equal(Number(matches[6]),-8);
-      assert.equal(Number(matches[7]),2);
-      assert.equal(Number(matches[8]),240);
-      assert.equal(Number(matches[9]),-144);
-      assert.equal(Number(matches[10]),2);
+      assert.closeTo(Number(matches[1]),0,1);
+      assert.closeTo(Number(matches[2]),0,1);
+      assert.closeTo(Number(matches[3]),0,1);
+      assert.closeTo(Number(matches[4]),-144,1);
+      assert.closeTo(Number(matches[5]),144,1);
+      assert.closeTo(Number(matches[6]),-8,1);
+      assert.closeTo(Number(matches[7]),2,1);
+      assert.closeTo(Number(matches[8]),240,1);
+      assert.closeTo(Number(matches[9]),-144,1);
+      assert.closeTo(Number(matches[10]),2,1);
       //logically should be 0, but I guess we get a rounding error  :-/
-      assert.equal(Number(matches[11]),-5);
-      assert.equal(Number(matches[12]),-240);
+      assert.closeTo(Number(matches[11]),-5,1);
+      assert.closeTo(Number(matches[12]),-240,1);
     });
   }); //suite
 
@@ -1820,18 +1820,18 @@ function runTests(){
 
       var matches = re.exec(linePath.attr('d'));
 
-      assert.equal(Number(matches[1]),0);
-      assert.equal(Number(matches[2]),0);
-      assert.equal(Number(matches[3]),0);
-      assert.equal(Number(matches[4]),-144);
-      assert.equal(Number(matches[5]),144);
-      assert.equal(Number(matches[6]),-8);
-      assert.equal(Number(matches[7]),2);
-      assert.equal(Number(matches[8]),240);
-      assert.equal(Number(matches[9]),-144);
-      assert.equal(Number(matches[10]),2);
-      assert.equal(Number(matches[11]),0);
-      assert.equal(Number(matches[12]),-240);
+      assert.closeTo(Number(matches[1]),0,1);
+      assert.closeTo(Number(matches[2]),0,1);
+      assert.closeTo(Number(matches[3]),0,1);
+      assert.closeTo(Number(matches[4]),-144,1);
+      assert.closeTo(Number(matches[5]),144,1);
+      assert.closeTo(Number(matches[6]),-8,1);
+      assert.closeTo(Number(matches[7]),2,1);
+      assert.closeTo(Number(matches[8]),240,1);
+      assert.closeTo(Number(matches[9]),-144,1);
+      assert.closeTo(Number(matches[10]),2,1);
+      assert.closeTo(Number(matches[11]),0,1);
+      assert.closeTo(Number(matches[12]),-240,1);
     });
   }); //suite
 
@@ -1934,18 +1934,18 @@ function runTests(){
 
       var matches = re.exec(linePath.attr('d'));
 
-      assert.equal(Number(matches[1]),0);
-      assert.equal(Number(matches[2]),0);
-      assert.equal(Number(matches[3]),0);
-      assert.equal(Number(matches[4]),-144);
-      assert.equal(Number(matches[5]),-144);
-      assert.equal(Number(matches[6]),-8);
-      assert.equal(Number(matches[7]),-2);
-      assert.equal(Number(matches[8]),240);
-      assert.equal(Number(matches[9]),144);
-      assert.equal(Number(matches[10]),2);
-      assert.equal(Number(matches[11]),5);
-      assert.equal(Number(matches[12]),-240);
+      assert.closeTo(Number(matches[1]),0,1);
+      assert.closeTo(Number(matches[2]),0,1);
+      assert.closeTo(Number(matches[3]),0,1);
+      assert.closeTo(Number(matches[4]),-144,1);
+      assert.closeTo(Number(matches[5]),-144,1);
+      assert.closeTo(Number(matches[6]),-8,1);
+      assert.closeTo(Number(matches[7]),-2,1);
+      assert.closeTo(Number(matches[8]),240,1);
+      assert.closeTo(Number(matches[9]),144,1);
+      assert.closeTo(Number(matches[10]),2,1);
+      assert.closeTo(Number(matches[11]),5,1);
+      assert.closeTo(Number(matches[12]),-240,1);
     });
   }); //suite
 
@@ -2049,18 +2049,18 @@ function runTests(){
 
       var matches = re.exec(linePath.attr('d'));
 
-      assert.equal(Number(matches[1]),0);
-      assert.equal(Number(matches[2]),0);
-      assert.equal(Number(matches[3]),0);
-      assert.equal(Number(matches[4]),-144);
-      assert.equal(Number(matches[5]),-144);
-      assert.equal(Number(matches[6]),-8);
-      assert.equal(Number(matches[7]),-2);
-      assert.equal(Number(matches[8]),240);
-      assert.equal(Number(matches[9]),144);
-      assert.equal(Number(matches[10]),2);
-      assert.equal(Number(matches[11]),0);
-      assert.equal(Number(matches[12]),-240);
+      assert.closeTo(Number(matches[1]),0,1);
+      assert.closeTo(Number(matches[2]),0,1);
+      assert.closeTo(Number(matches[3]),0,1);
+      assert.closeTo(Number(matches[4]),-144,1);
+      assert.closeTo(Number(matches[5]),-144,1);
+      assert.closeTo(Number(matches[6]),-8,1);
+      assert.closeTo(Number(matches[7]),-2,1);
+      assert.closeTo(Number(matches[8]),240,1);
+      assert.closeTo(Number(matches[9]),144,1);
+      assert.closeTo(Number(matches[10]),2,1);
+      assert.closeTo(Number(matches[11]),0,1);
+      assert.closeTo(Number(matches[12]),-240,1);
     });
   }); //suite
 
@@ -2160,14 +2160,14 @@ function runTests(){
 
       var matches = re.exec(linePath.attr('d'));
 
-      assert.equal(Number(matches[1]),0);
-      assert.equal(Number(matches[2]),0);
-      assert.equal(Number(matches[3]),0);
-      assert.equal(Number(matches[4]),-144);
-      assert.equal(Number(matches[5]),-144);
-      assert.equal(Number(matches[6]),2);
-      assert.equal(Number(matches[7]),-5);
-      assert.equal(Number(matches[8]),-240);
+      assert.closeTo(Number(matches[1]),0,1);
+      assert.closeTo(Number(matches[2]),0,1);
+      assert.closeTo(Number(matches[3]),0,1);
+      assert.closeTo(Number(matches[4]),-144,1);
+      assert.closeTo(Number(matches[5]),-144,1);
+      assert.closeTo(Number(matches[6]),2,1);
+      assert.closeTo(Number(matches[7]),-5,1);
+      assert.closeTo(Number(matches[8]),-240,1);
     });
   }); //suite
 
@@ -2288,50 +2288,50 @@ function runTests(){
         matches.push(re.exec(Px.d3.select(linePath.nodes()[i]).attr('d')));
       }
 
-      assert.equal(Number(matches[0][1]),0);
-      assert.equal(Number(matches[0][2]),-50);
-      assert.equal(Number(matches[0][3]),43);
-      assert.equal(Number(matches[0][4]),24);
-      assert.equal(Number(matches[0][5]),-43);
-      assert.equal(Number(matches[0][6]),25);
-      assert.equal(Number(matches[0][7]),0);
-      assert.equal(Number(matches[0][8]),-50);
+      assert.closeTo(Number(matches[0][1]),0,1);
+      assert.closeTo(Number(matches[0][2]),-50,1);
+      assert.closeTo(Number(matches[0][3]),43,1);
+      assert.closeTo(Number(matches[0][4]),24,1);
+      assert.closeTo(Number(matches[0][5]),-43,1);
+      assert.closeTo(Number(matches[0][6]),25,1);
+      assert.closeTo(Number(matches[0][7]),0,1);
+      assert.closeTo(Number(matches[0][8]),-50,1);
 
-      assert.equal(Number(matches[1][1]),0);
-      assert.equal(Number(matches[1][2]),-86);
-      assert.equal(Number(matches[1][3]),131);
-      assert.equal(Number(matches[1][4]),75);
-      assert.equal(Number(matches[1][5]),-169);
-      assert.equal(Number(matches[1][6]),98);
-      assert.equal(Number(matches[1][7]),0);
-      assert.equal(Number(matches[1][8]),-86);
+      assert.closeTo(Number(matches[1][1]),0,1);
+      assert.closeTo(Number(matches[1][2]),-86,1);
+      assert.closeTo(Number(matches[1][3]),131,1);
+      assert.closeTo(Number(matches[1][4]),75,1);
+      assert.closeTo(Number(matches[1][5]),-169,1);
+      assert.closeTo(Number(matches[1][6]),98,1);
+      assert.closeTo(Number(matches[1][7]),0,1);
+      assert.closeTo(Number(matches[1][8]),-86,1);
 
-      assert.equal(Number(matches[2][1]),0);
-      assert.equal(Number(matches[2][2]),-115);
-      assert.equal(Number(matches[2][3]),87);
-      assert.equal(Number(matches[2][4]),50);
-      assert.equal(Number(matches[2][5]),-55);
-      assert.equal(Number(matches[2][6]),32);
-      assert.equal(Number(matches[2][7]),0);
-      assert.equal(Number(matches[2][8]),-115);
+      assert.closeTo(Number(matches[2][1]),0,1);
+      assert.closeTo(Number(matches[2][2]),-115,1);
+      assert.closeTo(Number(matches[2][3]),87,1);
+      assert.closeTo(Number(matches[2][4]),50,1);
+      assert.closeTo(Number(matches[2][5]),-55,1);
+      assert.closeTo(Number(matches[2][6]),32,1);
+      assert.closeTo(Number(matches[2][7]),0,1);
+      assert.closeTo(Number(matches[2][8]),-115,1);
 
-      assert.equal(Number(matches[3][1]),0);
-      assert.equal(Number(matches[3][2]),-71);
-      assert.equal(Number(matches[3][3]),99);
-      assert.equal(Number(matches[3][4]),57);
-      assert.equal(Number(matches[3][5]),-99);
-      assert.equal(Number(matches[3][6]),57);
-      assert.equal(Number(matches[3][7]),0);
-      assert.equal(Number(matches[3][8]),-71);
+      assert.closeTo(Number(matches[3][1]),0,1);
+      assert.closeTo(Number(matches[3][2]),-71,1);
+      assert.closeTo(Number(matches[3][3]),99,1);
+      assert.closeTo(Number(matches[3][4]),57,1);
+      assert.closeTo(Number(matches[3][5]),-99,1);
+      assert.closeTo(Number(matches[3][6]),57,1);
+      assert.closeTo(Number(matches[3][7]),0,1);
+      assert.closeTo(Number(matches[3][8]),-71,1);
 
-      assert.equal(Number(matches[4][1]),0);
-      assert.equal(Number(matches[4][2]),-86);
-      assert.equal(Number(matches[4][3]),162);
-      assert.equal(Number(matches[4][4]),93);
-      assert.equal(Number(matches[4][5]),-207);
-      assert.equal(Number(matches[4][6]),120);
-      assert.equal(Number(matches[4][7]),0);
-      assert.equal(Number(matches[4][8]),-86);
+      assert.closeTo(Number(matches[4][1]),0,1);
+      assert.closeTo(Number(matches[4][2]),-86,1);
+      assert.closeTo(Number(matches[4][3]),162,1);
+      assert.closeTo(Number(matches[4][4]),93,1);
+      assert.closeTo(Number(matches[4][5]),-207,1);
+      assert.closeTo(Number(matches[4][6]),120,1);
+      assert.closeTo(Number(matches[4][7]),0,1);
+      assert.closeTo(Number(matches[4][8]),-86,1);
     });
 
   }); //suite
@@ -2363,50 +2363,50 @@ function runTests(){
         matches.push(re.exec(Px.d3.select(linePath.nodes()[i]).attr('d')));
       }
 
-      assert.equal(Number(matches[0][1]),0);
-      assert.equal(Number(matches[0][2]),-25);
-      assert.equal(Number(matches[0][3]),21);
-      assert.equal(Number(matches[0][4]),12);
-      assert.equal(Number(matches[0][5]),-21);
-      assert.equal(Number(matches[0][6]),12);
-      assert.equal(Number(matches[0][7]),0);
-      assert.equal(Number(matches[0][8]),-25);
+      assert.closeTo(Number(matches[0][1]),0,1);
+      assert.closeTo(Number(matches[0][2]),-25,1);
+      assert.closeTo(Number(matches[0][3]),21,1);
+      assert.closeTo(Number(matches[0][4]),12,1);
+      assert.closeTo(Number(matches[0][5]),-21,1);
+      assert.closeTo(Number(matches[0][6]),12,1);
+      assert.closeTo(Number(matches[0][7]),0,1);
+      assert.closeTo(Number(matches[0][8]),-25,1);
 
-      assert.equal(Number(matches[1][1]),0);
-      assert.equal(Number(matches[1][2]),-25);
-      assert.equal(Number(matches[1][3]),43);
-      assert.equal(Number(matches[1][4]),24);
-      assert.equal(Number(matches[1][5]),-240);
-      assert.equal(Number(matches[1][6]),139);
-      assert.equal(Number(matches[1][7]),0);
-      assert.equal(Number(matches[1][8]),-25);
+      assert.closeTo(Number(matches[1][1]),0,1);
+      assert.closeTo(Number(matches[1][2]),-25,1);
+      assert.closeTo(Number(matches[1][3]),43,1);
+      assert.closeTo(Number(matches[1][4]),24,1);
+      assert.closeTo(Number(matches[1][5]),-240,1);
+      assert.closeTo(Number(matches[1][6]),139,1);
+      assert.closeTo(Number(matches[1][7]),0,1);
+      assert.closeTo(Number(matches[1][8]),-25,1);
 
-      assert.equal(Number(matches[2][1]),0);
-      assert.equal(Number(matches[2][2]),-25);
-      assert.equal(Number(matches[2][3]),21);
-      assert.equal(Number(matches[2][4]),12);
-      assert.equal(Number(matches[2][5]),-21);
-      assert.equal(Number(matches[2][6]),12);
-      assert.equal(Number(matches[2][7]),0);
-      assert.equal(Number(matches[2][8]),-25);
+      assert.closeTo(Number(matches[2][1]),0,1);
+      assert.closeTo(Number(matches[2][2]),-25,1);
+      assert.closeTo(Number(matches[2][3]),21,1);
+      assert.closeTo(Number(matches[2][4]),12,1);
+      assert.closeTo(Number(matches[2][5]),-21,1);
+      assert.closeTo(Number(matches[2][6]),12,1);
+      assert.closeTo(Number(matches[2][7]),0,1);
+      assert.closeTo(Number(matches[2][8]),-25,1);
 
-      assert.equal(Number(matches[3][1]),0);
-      assert.equal(Number(matches[3][2]),-25);
-      assert.equal(Number(matches[3][3]),21);
-      assert.equal(Number(matches[3][4]),12);
-      assert.equal(Number(matches[3][5]),-21);
-      assert.equal(Number(matches[3][6]),12);
-      assert.equal(Number(matches[3][7]),0);
-      assert.equal(Number(matches[3][8]),-25);
+      assert.closeTo(Number(matches[3][1]),0,1);
+      assert.closeTo(Number(matches[3][2]),-25,1);
+      assert.closeTo(Number(matches[3][3]),21,1);
+      assert.closeTo(Number(matches[3][4]),12,1);
+      assert.closeTo(Number(matches[3][5]),-21,1);
+      assert.closeTo(Number(matches[3][6]),12,1);
+      assert.closeTo(Number(matches[3][7]),0,1);
+      assert.closeTo(Number(matches[3][8]),-25,1);
 
-      assert.equal(Number(matches[4][1]),0);
-      assert.equal(Number(matches[4][2]),-25);
-      assert.equal(Number(matches[4][3]),207);
-      assert.equal(Number(matches[4][4]),119);
-      assert.equal(Number(matches[4][5]),-438);
-      assert.equal(Number(matches[4][6]),253);
-      assert.equal(Number(matches[4][7]),0);
-      assert.equal(Number(matches[4][8]),-25);
+      assert.closeTo(Number(matches[4][1]),0,1);
+      assert.closeTo(Number(matches[4][2]),-25,1);
+      assert.closeTo(Number(matches[4][3]),207,1);
+      assert.closeTo(Number(matches[4][4]),119,1);
+      assert.closeTo(Number(matches[4][5]),-438,1);
+      assert.closeTo(Number(matches[4][6]),253,1);
+      assert.closeTo(Number(matches[4][7]),0,1);
+      assert.closeTo(Number(matches[4][8]),-25,1);
     });
 
   }); //suite
@@ -2524,23 +2524,23 @@ function runTests(){
       matches.push(re.exec(Px.d3.select(linePath.nodes()[2]).attr('d')));
       matches.push(re.exec(Px.d3.select(linePath.nodes()[3]).attr('d')));
 
-      assert.equal(Number(matches[0][1]),0);
-      assert.equal(Number(matches[0][2]),-115);
-      assert.equal(Number(matches[0][3]),87);
-      assert.equal(Number(matches[0][4]),50);
-      assert.equal(Number(matches[0][5]),-55);
-      assert.equal(Number(matches[0][6]),32);
-      assert.equal(Number(matches[0][7]),0);
-      assert.equal(Number(matches[0][8]),-115);
+      assert.closeTo(Number(matches[0][1]),0,1);
+      assert.closeTo(Number(matches[0][2]),-115,1);
+      assert.closeTo(Number(matches[0][3]),87,1);
+      assert.closeTo(Number(matches[0][4]),50,1);
+      assert.closeTo(Number(matches[0][5]),-55,1);
+      assert.closeTo(Number(matches[0][6]),32,1);
+      assert.closeTo(Number(matches[0][7]),0,1);
+      assert.closeTo(Number(matches[0][8]),-115,1);
 
-      assert.equal(Number(matches[1][1]),0);
-      assert.equal(Number(matches[1][2]),-71);
-      assert.equal(Number(matches[1][3]),99);
-      assert.equal(Number(matches[1][4]),57);
-      assert.equal(Number(matches[1][5]),-99);
-      assert.equal(Number(matches[1][6]),57);
-      assert.equal(Number(matches[1][7]),0);
-      assert.equal(Number(matches[1][8]),-71);
+      assert.closeTo(Number(matches[1][1]),0,1);
+      assert.closeTo(Number(matches[1][2]),-71,1);
+      assert.closeTo(Number(matches[1][3]),99,1);
+      assert.closeTo(Number(matches[1][4]),57,1);
+      assert.closeTo(Number(matches[1][5]),-99,1);
+      assert.closeTo(Number(matches[1][6]),57,1);
+      assert.closeTo(Number(matches[1][7]),0,1);
+      assert.closeTo(Number(matches[1][8]),-71,1);
     });
 
     test('radarMissingLine missing first point line d', function() {
@@ -2551,10 +2551,10 @@ function runTests(){
 
       var matches = re.exec(Px.d3.select(linePath.nodes()[4]).attr('d'));
 
-      assert.equal(Number(matches[1]),162);
-      assert.equal(Number(matches[2]),93);
-      assert.equal(Number(matches[3]),-207);
-      assert.equal(Number(matches[4]),120);
+      assert.closeTo(Number(matches[1]),162,1);
+      assert.closeTo(Number(matches[2]),93,1);
+      assert.closeTo(Number(matches[3]),-207,1);
+      assert.closeTo(Number(matches[4]),120,1);
     });
 
     test('radarMissingLine missing second point line d', function() {
@@ -2566,12 +2566,12 @@ function runTests(){
 
       var matches = re.exec(Px.d3.select(linePath.nodes()[0]).attr('d'));
 
-      assert.equal(Number(matches[1]),0);
-      assert.equal(Number(matches[2]),-50);
-      assert.equal(Number(matches[3]),-43);
-      assert.equal(Number(matches[4]),25);
-      assert.equal(Number(matches[5]),0);
-      assert.equal(Number(matches[6]),-50);
+      assert.closeTo(Number(matches[1]),0,1);
+      assert.closeTo(Number(matches[2]),-50,1);
+      assert.closeTo(Number(matches[3]),-43,1);
+      assert.closeTo(Number(matches[4]),25,1);
+      assert.closeTo(Number(matches[5]),0,1);
+      assert.closeTo(Number(matches[6]),-50,1);
     });
 
     test('radarMissingLine missing third point line d', function() {
@@ -2583,12 +2583,12 @@ function runTests(){
 
       var matches = re.exec(Px.d3.select(linePath.nodes()[1]).attr('d'));
 
-      assert.equal(Number(matches[1]),0);
-      assert.equal(Number(matches[2]),-86);
-      assert.equal(Number(matches[3]),131);
-      assert.equal(Number(matches[4]),75);
-      assert.equal(Number(matches[5]),0);
-      assert.equal(Number(matches[6]),-86);
+      assert.closeTo(Number(matches[1]),0,1);
+      assert.closeTo(Number(matches[2]),-86,1);
+      assert.closeTo(Number(matches[3]),131,1);
+      assert.closeTo(Number(matches[4]),75,1);
+      assert.closeTo(Number(matches[5]),0,1);
+      assert.closeTo(Number(matches[6]),-86,1);
     });
 
   }); //suite
