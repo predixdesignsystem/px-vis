@@ -1120,10 +1120,10 @@ function runTests(){
   });
 
   suite('px-vis-axis inline labels works', function() {
-    var inlineScale = document.getElementById('inlineScale'),
-        inlineSVG = document.getElementById('inlineSVG'),
-        inlineXAxis = document.getElementById('inlineXAxis'),
-        inlineYAxis = document.getElementById('inlineYAxis'),
+    var inlineScale,
+        inlineSVG,
+        inlineXAxis,
+        inlineYAxis,
         xLabels, yLabels, xRects, yRects;
     var colors = commonColors.properties.colors.value;
 
@@ -1161,6 +1161,12 @@ function runTests(){
           "bottom": 75,
           "left": 50
         };
+      // beats me why I cant declare above. Stupid IE
+      inlineScale = document.getElementById('inlineScale');
+      inlineSVG = document.getElementById('inlineSVG');
+      inlineXAxis = document.getElementById('inlineXAxis');
+      inlineYAxis = document.getElementById('inlineYAxis');
+
       inlineSVG.set('width',w);
       inlineSVG.set('height',h);
       inlineSVG.set('margin',m);
@@ -1247,7 +1253,7 @@ function runTests(){
     });
 
     test('x rect color is correct', function() {
-      assert.equal(xRects[0].attributes.fill.value, colors['grey4']);
+      assert.equal(xRects[0].attributes.fill.value.split(' ').join(''), colors['grey4']);
     });
 
     test('y rect count is correct', function() {
@@ -1262,15 +1268,15 @@ function runTests(){
     });
 
     test('y rect color is correct', function() {
-      assert.equal(yRects[0].attributes.fill.value, colors['grey4']);
+      assert.equal(yRects[0].attributes.fill.value.split(' ').join(''), colors['grey4']);
     });
   });
 
 
   suite('px-vis-axis disable ticks works', function() {
-    var noTicksScale = document.getElementById('noTicksScale'),
-        noTicksSVG = document.getElementById('noTicksSVG'),
-        noTicksAxis = document.getElementById('noTicksAxis');
+    var noTicksScale,
+        noTicksSVG,
+        noTicksAxis;
 
     suiteSetup(function(done){
       var d = [{
@@ -1306,6 +1312,11 @@ function runTests(){
           "bottom": 75,
           "left": 50
         };
+
+      noTicksScale = document.getElementById('noTicksScale');
+      noTicksSVG = document.getElementById('noTicksSVG');
+      noTicksAxis = document.getElementById('noTicksAxis');
+
       noTicksSVG.set('width',w);
       noTicksSVG.set('height',h);
       noTicksSVG.set('margin',m);

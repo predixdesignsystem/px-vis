@@ -13,6 +13,9 @@ function runTests(){
     var baseScale = document.getElementById('baseScale'),
         baseSVG = document.getElementById('baseSVG'),
         baseGrid = document.getElementById('baseGrid');
+    var colorOrder = commonColors.properties.seriesColorOrder.value;
+    var colorSet = commonColors.properties.dataVisColors.va1lue;
+    var colors = commonColors.properties.colors.value;
 
     suiteSetup(function(done){
       var d = [
@@ -71,17 +74,6 @@ function runTests(){
     test('baseGrid fixture is created', function() {
       assert.isTrue(baseGrid !== null);
     });
-  });
-
-
-  suite('px-vis-gridlines baseGrid works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        baseGrid = document.getElementById('baseGrid');
-
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.va1lue;
-    var colors = commonColors.properties.colors.value;
 
     test('tickValues gets domain added', function() {
       assert.equal(baseGrid.tickValues.length, 8);
