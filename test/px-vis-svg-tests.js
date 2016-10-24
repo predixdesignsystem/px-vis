@@ -144,6 +144,23 @@ function runTests(){
     });
   });
 
+
+  suite('px-vis-svg runs with an offset', function() {
+    var offsetSVG = document.getElementById('offsetSVG');
+    var chartSVG = offsetSVG.querySelector('#chartSVG');
+
+    test('offsetSVG fixture is created', function() {
+      assert.isDefined(offsetSVG);
+    });
+
+    test('offsetSVG has a correct translate', function() {
+      var re = /translate\((\d+)\s?,?\s?(\d+)\)/;
+      var matches = re.exec(offsetSVG.svg.attr('transform'));
+      assert.equal(Number(matches[1]),265);
+      assert.equal(Number(matches[2]),160);
+    });
+  }); //suite
+
 } //runTests
 
 function basicAttrs(elem, elemName, w,h,m){
@@ -166,7 +183,12 @@ function basicAttrs(elem, elemName, w,h,m){
     assert.equal(elem.svg.attr('height'), h);
   });
   test(elemName + '.svg has correct translation', function() {
-    assert.isTrue(elem.svg.attr('transform').trim() === "translate("+m.left+","+m.top+")" || elem.svg.attr('transform').trim() === "translate("+m.left+" "+m.top+")");
+    var re = /translate\((\d+)\s?,?\s?(\d+)\)/;
+    var matches = re.exec(elem.svg.attr('transform'));
+    assert.equal(Number(matches[1]),m.left);
+    assert.equal(Number(matches[2]),m.top);
+
+    // assert.isTrue(elem.svg.attr('transform').trim() === "translate("+m.left+","+m.top+")" || elem.svg.attr('transform').trim() === "translate("+m.left+" "+m.top+")");
   });
 
   test(elemName + ' pxSvgElem is set',function(){

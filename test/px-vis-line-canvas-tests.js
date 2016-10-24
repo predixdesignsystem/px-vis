@@ -1755,7 +1755,7 @@ function runTests(){
     test('visual check with mask', function() {
       clipPathLine.drawClipPath();
       clipPathCanvas.canvasContext.fillRect(-500,-500,1000,1000);
-      debugger
+
       assert.equal(Object.keys(clipPathCanvas.canvasContext._pxLinesSeries).length, 1);
     });
   }); //suite

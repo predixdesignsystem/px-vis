@@ -146,6 +146,22 @@ function runTests(){
     });
   });
 
+  suite('px-vis-canvas with offset', function() {
+    var offsetCanvas = document.getElementById('offsetCanvas');
+    var chartCanvas = decCanvas.querySelector('#chartCanvas');
+
+    test('offsetCanvas fixture is created', function() {
+      assert.isDefined(offsetCanvas);
+    });
+
+    //no way to truly check the translation. At least look at our _translate prop
+    test('offsetCanvas _translate is correct', function() {
+      assert.equal(JSON.stringify(offsetCanvas.canvasContext._translation), '[265,160]');
+    });
+
+    // Cant test the event firing because it is loaded before we can set up the listener. Something todo later if we figure it out...
+  }); //suite
+
 } //runTests
 
 function basicAttrs(elem, elemName, w,h,m){
