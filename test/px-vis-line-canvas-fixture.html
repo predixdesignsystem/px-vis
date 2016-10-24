@@ -14,6 +14,7 @@
     <link rel="import" href="../px-vis-scale.html" />
     <link rel="import" href="../px-vis-svg-canvas.html" />
     <link rel="import" href="../px-vis-multi-scale.html" />
+    <link rel="import" href="../px-vis-radial-scale.html" />
     <link rel="import" href="../px-vis-line-canvas.html" />
     <!-- Retain this link for px-theme.html -->
     <!-- px-theme is needed for WCT to run without errors -->
@@ -300,40 +301,42 @@
 
     <!--  RADAR -->
     <template is="dom-bind">
-      <px-vis-multi-scale
+      <px-vis-radial-scale
         id="radarScale"
         x="{{x}}"
         y="{{y}}"
         current-domain-x="{{currentDomainX}}"
         current-domain-y="{{currentDomainY}}"
         domain-changed="{{domainChanged}}">
-      </px-vis-multi-scale>
+      </px-vis-radial-scale>
       <px-vis-svg-canvas
-        id="radarSVG"
+        id="radarCanvas"
         canvas-context="{{canvasContext}}">
       </px-vis-svg-canvas>
       <px-vis-line-canvas
         id="radarLine"
         canvas-context="[[canvasContext]]"
-        parallel-coordinates
+        radial-line
         multi-path
+        line-radius-limit="25"
         x="[[x]]"
         y="[[y]]"
         domain-changed="[[domainChanged]]"
         current-domain-x="[[currentDomainX]]"
-        current-domain-y="[[currentDomainY]]">
+        current-domain-y="[[currentDomainY]]"
+        interpolation-function="bofCompleteManually">
       </px-vis-line-canvas>
     </template>
 
     <template is="dom-bind">
-      <px-vis-multi-scale
+      <px-vis-radial-scale
         id="radarGradientScale"
         x="{{x}}"
         y="{{y}}"
         current-domain-x="{{currentDomainX}}"
         current-domain-y="{{currentDomainY}}"
         domain-changed="{{domainChanged}}">
-      </px-vis-multi-scale>
+      </px-vis-radial-scale>
       <px-vis-svg-canvas
         id="radarGradientSVG"
         canvas-context="{{canvasContext}}">
@@ -341,8 +344,9 @@
       <px-vis-line-canvas
         id="radarGradientLine"
         canvas-context="[[canvasContext]]"
-        parallel-coordinates
+        radial-line
         multi-path
+        line-radius-limit="25"
         gradient-line
         x="[[x]]"
         y="[[y]]"
@@ -353,67 +357,14 @@
     </template>
 
     <template is="dom-bind">
-      <px-vis-multi-scale
-        id="radarCategoryScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}"
-        current-domain-x="{{currentDomainX}}"
-        current-domain-y="{{currentDomainY}}">
-      </px-vis-multi-scale>
-      <px-vis-svg-canvas
-        id="radarCategorySVG"
-        canvas-context="{{canvasContext}}">
-      </px-vis-svg-canvas>
-      <px-vis-line-canvas
-        id="radarCategoryLine"
-        canvas-context="[[canvasContext]]"
-        parallel-coordinates
-        multi-path
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]"
-        current-domain-x="[[currentDomainX]]"
-        current-domain-y="[[currentDomainY]]">
-      </px-vis-line-canvas>
-    </template>
-
-    <template is="dom-bind">
-      <px-vis-multi-scale
-        id="radarCategoryGradientScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}"
-        current-domain-x="{{currentDomainX}}"
-        current-domain-y="{{currentDomainY}}">
-      </px-vis-multi-scale>
-      <px-vis-svg-canvas
-        id="radarCategoryGradientSVG"
-        canvas-context="{{canvasContext}}">
-      </px-vis-svg-canvas>
-      <px-vis-line-canvas
-        id="radarCategoryGradientLine"
-        canvas-context="[[canvasContext]]"
-        parallel-coordinates
-        multi-path
-        gradient-line
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]"
-        current-domain-x="[[currentDomainX]]"
-        current-domain-y="[[currentDomainY]]">
-      </px-vis-line-canvas>
-    </template>
-
-    <template is="dom-bind">
-      <px-vis-multi-scale
+      <px-vis-radial-scale
         id="radarMissingScale"
         x="{{x}}"
         y="{{y}}"
         current-domain-x="{{currentDomainX}}"
         current-domain-y="{{currentDomainY}}"
         domain-changed="{{domainChanged}}">
-      </px-vis-multi-scale>
+      </px-vis-radial-scale>
       <px-vis-svg-canvas
         id="radarMissingSVG"
         canvas-context="{{canvasContext}}">
@@ -421,8 +372,9 @@
       <px-vis-line-canvas
         id="radarMissingLine"
         canvas-context="[[canvasContext]]"
-        parallel-coordinates
+        radial-line
         multi-path
+        line-radius-limit="25"
         x="[[x]]"
         y="[[y]]"
         domain-changed="[[domainChanged]]"

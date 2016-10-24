@@ -891,962 +891,767 @@ function runTests(){
     });
   }); //suite
 
-  // suite('px-vis-line polar works', function() {
-  //   var polarScale = document.getElementById('polarScale'),
-  //       polarCanvas = document.getElementById('polarCanvas'),
-  //       polarLine = document.getElementById('polarLine');
+  // // suite('px-vis-line polar works', function() {
+  // //   var polarScale = document.getElementById('polarScale'),
+  // //       polarCanvas = document.getElementById('polarCanvas'),
+  // //       polarLine = document.getElementById('polarLine');
+  // //
+  // //   var colorOrder = commonColors.properties.seriesColorOrder.value;
+  // //   var colorSet = commonColors.properties.dataVisColors.value;
+  // //   var linePath;
+  // //
+  // //   suiteSetup(function(done){
+  // //     var d = [{
+  // //           "x": 0,
+  // //           "y": 0
+  // //         },{
+  // //           "x": 0,
+  // //           "y": 3
+  // //         },{
+  // //           "x": Math.PI/2,
+  // //           "y": 3
+  // //         },{
+  // //           "x": Math.PI,
+  // //           "y": 5
+  // //         },{
+  // //           "x": Math.PI * 3/2,
+  // //           "y": 3
+  // //         },{
+  // //           "x": Math.PI * 2,
+  // //           "y": 5
+  // //         }
+  // //       ],
+  // //       completeSeriesConfig = {
+  // //         "mySeries": {
+  // //           "type":"line",
+  // //           "name":"Data",
+  // //           "y":"y",
+  // //           "x":"x",
+  // //           "color":"rgb(93,165,218)"
+  // //         }
+  // //       },
+  // //       w = 500,
+  // //       h = 500,
+  // //       min = 480/2,
+  // //       offset = [250,250],
+  // //       m = {
+  // //         "top": 10,
+  // //         "right": 10,
+  // //         "bottom": 10,
+  // //         "left": 10
+  // //       };
+  // //
+  // //     polarScale.set('width',min);
+  // //     polarScale.set('margin',m);
+  // //     polarScale.set('amplitudeKeys',['y']);
+  // //     polarScale.set('chartData',d);
+  // //
+  // //     polarCanvas.set('width',w);
+  // //     polarCanvas.set('height',h);
+  // //     polarCanvas.set('margin',m);
+  // //     polarCanvas.set('offset',offset);
+  // //
+  // //     polarLine.set('seriesId',"mySeries");
+  // //     polarLine.set('completeSeriesConfig',completeSeriesConfig);
+  // //     polarLine.set('chartData',d);
+  // //
+  // //     // needed for the debounce in line
+  // //     setTimeout(function(){
+  // //       linePath =  polarLine.lineGroup;
+  // //       done();
+  // //     },100);
+  // //   });
+  // //
+  // //   test('polarLine fixture is created', function() {
+  // //     assert.isTrue(polarLine !== null);
+  // //   });
+  // //
+  // //   test('context has correct total lines ', function() {
+  // //     assert.equal(polarCanvas.canvasContext._pxLinesTotal, 1);
+  // //   });
+  // //
+  // //   test('context has drawn 1 lines ', function() {
+  // //     debugger
+  // //     assert.equal(polarCanvas.canvasContext._pxLinesRedraw, 1);
+  // //   });
+  // // }); //suite
   //
-  //   var colorOrder = commonColors.properties.seriesColorOrder.value;
-  //   var colorSet = commonColors.properties.dataVisColors.value;
-  //   var linePath;
-  //
-  //   suiteSetup(function(done){
-  //     var d = [{
-  //           "x": 0,
-  //           "y": 0
-  //         },{
-  //           "x": 0,
-  //           "y": 3
-  //         },{
-  //           "x": Math.PI/2,
-  //           "y": 3
-  //         },{
-  //           "x": Math.PI,
-  //           "y": 5
-  //         },{
-  //           "x": Math.PI * 3/2,
-  //           "y": 3
-  //         },{
-  //           "x": Math.PI * 2,
-  //           "y": 5
-  //         }
-  //       ],
-  //       completeSeriesConfig = {
-  //         "mySeries": {
-  //           "type":"line",
-  //           "name":"Data",
-  //           "y":"y",
-  //           "x":"x",
-  //           "color":"rgb(93,165,218)"
-  //         }
-  //       },
-  //       w = 500,
-  //       h = 500,
-  //       min = 480/2,
-  //       offset = [250,250],
-  //       m = {
-  //         "top": 10,
-  //         "right": 10,
-  //         "bottom": 10,
-  //         "left": 10
-  //       };
-  //
-  //     polarScale.set('width',min);
-  //     polarScale.set('margin',m);
-  //     polarScale.set('amplitudeKeys',['y']);
-  //     polarScale.set('chartData',d);
-  //
-  //     polarCanvas.set('width',w);
-  //     polarCanvas.set('height',h);
-  //     polarCanvas.set('margin',m);
-  //     polarCanvas.set('offset',offset);
-  //
-  //     polarLine.set('seriesId',"mySeries");
-  //     polarLine.set('completeSeriesConfig',completeSeriesConfig);
-  //     polarLine.set('chartData',d);
-  //
-  //     // needed for the debounce in line
-  //     setTimeout(function(){
-  //       linePath =  polarLine.lineGroup;
-  //       done();
-  //     },100);
-  //   });
-  //
-  //   test('polarLine fixture is created', function() {
-  //     assert.isTrue(polarLine !== null);
-  //   });
-  //
-  //   test('context has correct total lines ', function() {
-  //     assert.equal(polarCanvas.canvasContext._pxLinesTotal, 1);
-  //   });
-  //
-  //   test('context has drawn 1 lines ', function() {
-  //     debugger
-  //     assert.equal(polarCanvas.canvasContext._pxLinesRedraw, 1);
-  //   });
-  // }); //suite
+  // //
+  // // suite('px-vis-line polar with degrees and counter clockwise works', function() {
+  // //   var polarDegreeScale = document.getElementById('polarDegreeScale'),
+  // //       polarDegreeSVG = document.getElementById('polarDegreeSVG'),
+  // //       polarDegreeLine = document.getElementById('polarDegreeLine');
+  // //
+  // //   var colorOrder = commonColors.properties.seriesColorOrder.value;
+  // //   var colorSet = commonColors.properties.dataVisColors.value;
+  // //   var linePath;
+  // //
+  // //   suiteSetup(function(done){
+  // //     var d = [{
+  // //           "x": 0,
+  // //           "y": 0
+  // //         },{
+  // //           "x": 0,
+  // //           "y": 3
+  // //         },{
+  // //           "x": 90,
+  // //           "y": 3
+  // //         },{
+  // //           "x": 180,
+  // //           "y": 5
+  // //         },{
+  // //           "x": 270,
+  // //           "y": 3
+  // //         },{
+  // //           "x": 0,
+  // //           "y": 5
+  // //         }
+  // //       ],
+  // //       completeSeriesConfig = {
+  // //         "mySeries": {
+  // //           "type":"line",
+  // //           "name":"Data",
+  // //           "y":"y",
+  // //           "x":"x",
+  // //           "color":"rgb(93,165,218)"
+  // //         }
+  // //       },
+  // //       w = 500,
+  // //       h = 500,
+  // //       min = 480/2,
+  // //       offset = [250,250],
+  // //       m = {
+  // //         "top": 10,
+  // //         "right": 10,
+  // //         "bottom": 10,
+  // //         "left": 10
+  // //       };
+  // //     polarDegreeSVG.set('width',w);
+  // //     polarDegreeSVG.set('height',h);
+  // //     polarDegreeSVG.set('margin',m);
+  // //     polarDegreeSVG.set('offset',offset);
+  // //
+  // //     polarDegreeScale.set('width',min);
+  // //     polarDegreeScale.set('margin',m);
+  // //     polarDegreeScale.set('amplitudeKeys',['y']);
+  // //     polarDegreeScale.set('chartData',d);
+  // //
+  // //     polarDegreeLine.set('seriesId',"mySeries");
+  // //     polarDegreeLine.set('completeSeriesConfig',completeSeriesConfig);
+  // //     polarDegreeLine.set('chartData',d);
+  // //
+  // //     // needed for the debounce in line
+  // //     setTimeout(function(){
+  // //       linePath =  polarDegreeLine.lineGroup.select('path.series-line');
+  // //       done();
+  // //     },100);
+  // //   });
+  // //
+  // //   test('polarDegreeLine fixture is created', function() {
+  // //     assert.isTrue(polarDegreeLine !== null);
+  // //   });
+  // //
+  // //   test('polarDegreeLine linePath created', function() {
+  // //     assert.equal(linePath.node().tagName,'path');
+  // //   });
+  // //
+  // //   test('polarDegreeLine line series ID', function() {
+  // //     assert.equal(linePath.attr('series-id'),'line_mySeries');
+  // //   });
+  // //
+  // //   test('polarDegreeLine line series has the right color', function() {
+  // //     assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+  // //   });
+  // //
+  // //   test('polarDegreeLine line d', function() {
+  // //     //extract just the ints. who cares about the decimals
+  // //     var re = new RegExp([
+  // //       'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+  // //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+  // //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+  // //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+  // //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+  // //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?'
+  // //     ].join(''));
+  // //
+  // //     var matches = re.exec(linePath.attr('d'));
+  // //
+  // //     assert.closeTo(Number(matches[1]),0,1);
+  // //     assert.closeTo(Number(matches[2]),0,1);
+  // //     assert.closeTo(Number(matches[3]),0,1);
+  // //     assert.closeTo(Number(matches[4]),-144,1);
+  // //     assert.closeTo(Number(matches[5]),144,1);
+  // //     assert.closeTo(Number(matches[6]),-8,1);
+  // //     assert.closeTo(Number(matches[7]),2,1);
+  // //     assert.closeTo(Number(matches[8]),240,1);
+  // //     assert.closeTo(Number(matches[9]),-144,1);
+  // //     assert.closeTo(Number(matches[10]),2,1);
+  // //     assert.closeTo(Number(matches[11]),0,1);
+  // //     assert.closeTo(Number(matches[12]),-240,1);
+  // //   });
+  // // }); //suite
+  // //
+  // // suite('px-vis-line polar with degrees and counter clockwise works', function() {
+  // //   var polarCCWScale = document.getElementById('polarCCWScale'),
+  // //       polarCCWSVG = document.getElementById('polarCCWSVG'),
+  // //       polarCCWLine = document.getElementById('polarCCWLine');
+  // //
+  // //   var colorOrder = commonColors.properties.seriesColorOrder.value;
+  // //   var colorSet = commonColors.properties.dataVisColors.value;
+  // //   var linePath;
+  // //
+  // //   suiteSetup(function(done){
+  // //     var d = [{
+  // //           "x": 0,
+  // //           "y": 0
+  // //         },{
+  // //           "x": 0,
+  // //           "y": 3
+  // //         },{
+  // //           "x": Math.PI/2,
+  // //           "y": 3
+  // //         },{
+  // //           "x": Math.PI,
+  // //           "y": 5
+  // //         },{
+  // //           "x": Math.PI * 3/2,
+  // //           "y": 3
+  // //         },{
+  // //           "x": Math.PI * 2,
+  // //           "y": 5
+  // //         }
+  // //       ],
+  // //       completeSeriesConfig = {
+  // //         "mySeries": {
+  // //           "type":"line",
+  // //           "name":"Data",
+  // //           "y":"y",
+  // //           "x":"x",
+  // //           "color":"rgb(93,165,218)"
+  // //         }
+  // //       },
+  // //       w = 500,
+  // //       h = 500,
+  // //       min = 480/2,
+  // //       offset = [250,250],
+  // //       m = {
+  // //         "top": 10,
+  // //         "right": 10,
+  // //         "bottom": 10,
+  // //         "left": 10
+  // //       };
+  // //     polarCCWSVG.set('width',w);
+  // //     polarCCWSVG.set('height',h);
+  // //     polarCCWSVG.set('margin',m);
+  // //     polarCCWSVG.set('offset',offset);
+  // //
+  // //     polarCCWScale.set('width',min);
+  // //     polarCCWScale.set('margin',m);
+  // //     polarCCWScale.set('amplitudeKeys',['y']);
+  // //     polarCCWScale.set('chartData',d);
+  // //
+  // //     polarCCWLine.set('seriesId',"mySeries");
+  // //     polarCCWLine.set('completeSeriesConfig',completeSeriesConfig);
+  // //     polarCCWLine.set('chartData',d);
+  // //
+  // //     // needed for the debounce in line
+  // //     setTimeout(function(){
+  // //       linePath =  polarCCWLine.lineGroup.select('path.series-line');
+  // //       done();
+  // //     },100);
+  // //   });
+  // //
+  // //   test('polarCCWLine fixture is created', function() {
+  // //     assert.isTrue(polarCCWLine !== null);
+  // //   });
+  // //
+  // //   test('polarCCWLine linePath created', function() {
+  // //     assert.equal(linePath.node().tagName,'path');
+  // //   });
+  // //
+  // //   test('polarCCWLine line series ID', function() {
+  // //     assert.equal(linePath.attr('series-id'),'line_mySeries');
+  // //   });
+  // //
+  // //   test('polarCCWLine line series has the right color', function() {
+  // //     assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+  // //   });
+  // //
+  // //   test('polarCCWLine line d', function() {
+  // //     //extract just the ints. who cares about the decimals
+  // //     var re = new RegExp([
+  // //       'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+  // //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+  // //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+  // //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+  // //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+  // //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?'
+  // //     ].join(''));
+  // //
+  // //     var matches = re.exec(linePath.attr('d'));
+  // //
+  // //     assert.closeTo(Number(matches[1]),0,1);
+  // //     assert.closeTo(Number(matches[2]),0,1);
+  // //     assert.closeTo(Number(matches[3]),0,1);
+  // //     assert.closeTo(Number(matches[4]),-144,1);
+  // //     assert.closeTo(Number(matches[5]),-144,1);
+  // //     assert.closeTo(Number(matches[6]),-8,1);
+  // //     assert.closeTo(Number(matches[7]),-2,1);
+  // //     assert.closeTo(Number(matches[8]),240,1);
+  // //     assert.closeTo(Number(matches[9]),144,1);
+  // //     assert.closeTo(Number(matches[10]),2,1);
+  // //     assert.closeTo(Number(matches[11]),5,1);
+  // //     assert.closeTo(Number(matches[12]),-240,1);
+  // //   });
+  // // }); //suite
+  // //
+  // //
+  // // suite('px-vis-line polar with degrees and counter clockwise works', function() {
+  // //   var polarDegreeCCWScale = document.getElementById('polarDegreeCCWScale'),
+  // //       polarDegreeCCWSVG = document.getElementById('polarDegreeCCWSVG'),
+  // //       polarDegreeCCWLine = document.getElementById('polarDegreeCCWLine');
+  // //
+  // //   var colorOrder = commonColors.properties.seriesColorOrder.value;
+  // //   var colorSet = commonColors.properties.dataVisColors.value;
+  // //   var linePath;
+  // //
+  // //   suiteSetup(function(done){
+  // //     var d = [{
+  // //           "x": 0,
+  // //           "y": 0
+  // //         },{
+  // //           "x": 0,
+  // //           "y": 3
+  // //         },{
+  // //           "x": 90,
+  // //           "y": 3
+  // //         },{
+  // //           "x": 180,
+  // //           "y": 5
+  // //         },{
+  // //           "x": 270,
+  // //           "y": 3
+  // //         },{
+  // //           "x": 0,
+  // //           "y": 5
+  // //         }
+  // //       ],
+  // //       completeSeriesConfig = {
+  // //         "mySeries": {
+  // //           "type":"line",
+  // //           "name":"Data",
+  // //           "y":"y",
+  // //           "x":"x",
+  // //           "color":"rgb(93,165,218)"
+  // //         }
+  // //       },
+  // //       w = 500,
+  // //       h = 500,
+  // //       min = 480/2,
+  // //       offset = [250,250],
+  // //       m = {
+  // //         "top": 10,
+  // //         "right": 10,
+  // //         "bottom": 10,
+  // //         "left": 10
+  // //       };
+  // //     polarDegreeCCWSVG.set('width',w);
+  // //     polarDegreeCCWSVG.set('height',h);
+  // //     polarDegreeCCWSVG.set('margin',m);
+  // //     polarDegreeCCWSVG.set('offset',offset);
+  // //
+  // //     polarDegreeCCWScale.set('width',min);
+  // //     polarDegreeCCWScale.set('margin',m);
+  // //     polarDegreeCCWScale.set('amplitudeKeys',['y']);
+  // //     polarDegreeCCWScale.set('chartData',d);
+  // //
+  // //     polarDegreeCCWLine.set('seriesId',"mySeries");
+  // //     polarDegreeCCWLine.set('completeSeriesConfig',completeSeriesConfig);
+  // //     polarDegreeCCWLine.set('chartData',d);
+  // //
+  // //     // needed for the debounce in line
+  // //     setTimeout(function(){
+  // //       linePath =  polarDegreeCCWLine.lineGroup.select('path.series-line');
+  // //       done();
+  // //     },100);
+  // //   });
+  // //
+  // //   test('polarDegreeCCWLine fixture is created', function() {
+  // //     assert.isTrue(polarDegreeCCWLine !== null);
+  // //   });
+  // //
+  // //   test('polarDegreeCCWLine linePath created', function() {
+  // //     assert.equal(linePath.node().tagName,'path');
+  // //   });
+  // //
+  // //   test('polarDegreeCCWLine line series ID', function() {
+  // //     assert.equal(linePath.attr('series-id'),'line_mySeries');
+  // //   });
+  // //
+  // //   test('polarDegreeCCWLine line series has the right color', function() {
+  // //     assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+  // //   });
+  // //
+  // //   test('polarDegreeCCWLine line d', function() {
+  // //     //extract just the ints. who cares about the decimals
+  // //     var re = new RegExp([
+  // //       'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+  // //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+  // //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+  // //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+  // //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+  // //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?'
+  // //     ].join(''));
+  // //
+  // //     var matches = re.exec(linePath.attr('d'));
+  // //
+  // //     assert.closeTo(Number(matches[1]),0,1);
+  // //     assert.closeTo(Number(matches[2]),0,1);
+  // //     assert.closeTo(Number(matches[3]),0,1);
+  // //     assert.closeTo(Number(matches[4]),-144,1);
+  // //     assert.closeTo(Number(matches[5]),-144,1);
+  // //     assert.closeTo(Number(matches[6]),-8,1);
+  // //     assert.closeTo(Number(matches[7]),-2,1);
+  // //     assert.closeTo(Number(matches[8]),240,1);
+  // //     assert.closeTo(Number(matches[9]),144,1);
+  // //     assert.closeTo(Number(matches[10]),2,1);
+  // //     assert.closeTo(Number(matches[11]),0,1);
+  // //     assert.closeTo(Number(matches[12]),-240,1);
+  // //   });
+  // // }); //suite
+  // //
+  // // suite('px-vis-line polar missing data works', function() {
+  // //   var polarMissingScale = document.getElementById('polarMissingScale'),
+  // //       polarMissingSVG = document.getElementById('polarMissingSVG'),
+  // //       polarMissingLine = document.getElementById('polarMissingLine');
+  // //
+  // //   var colorOrder = commonColors.properties.seriesColorOrder.value;
+  // //   var colorSet = commonColors.properties.dataVisColors.value;
+  // //   var linePath;
+  // //
+  // //   suiteSetup(function(done){
+  // //     var d = [{
+  // //           "x": 0,
+  // //           "y": 0
+  // //         },{
+  // //           "x": 0,
+  // //           "y": 3
+  // //         },{
+  // //           "x": Math.PI/2,
+  // //           "y": null
+  // //         },{
+  // //           "x": Math.PI
+  // //         },{
+  // //           "x": Math.PI * 3/2,
+  // //           "y": 3
+  // //         },{
+  // //           "x": Math.PI * 2,
+  // //           "y": 5
+  // //         }
+  // //       ],
+  // //       completeSeriesConfig = {
+  // //         "mySeries": {
+  // //           "type":"line",
+  // //           "name":"Data",
+  // //           "y":"y",
+  // //           "x":"x",
+  // //           "color":"rgb(93,165,218)"
+  // //         }
+  // //       },
+  // //       w = 500,
+  // //       h = 500,
+  // //       min = 480/2,
+  // //       offset = [250,250],
+  // //       m = {
+  // //         "top": 10,
+  // //         "right": 10,
+  // //         "bottom": 10,
+  // //         "left": 10
+  // //       };
+  // //     polarMissingSVG.set('width',w);
+  // //     polarMissingSVG.set('height',h);
+  // //     polarMissingSVG.set('margin',m);
+  // //     polarMissingSVG.set('offset',offset);
+  // //
+  // //     polarMissingScale.set('width',min);
+  // //     polarMissingScale.set('margin',m);
+  // //     polarMissingScale.set('amplitudeKeys',['y']);
+  // //     polarMissingScale.set('chartData',d);
+  // //
+  // //     polarMissingLine.set('seriesId',"mySeries");
+  // //     polarMissingLine.set('completeSeriesConfig',completeSeriesConfig);
+  // //     polarMissingLine.set('chartData',d);
+  // //
+  // //     // needed for the debounce in line
+  // //     setTimeout(function(){
+  // //       linePath =  polarMissingLine.lineGroup.select('path.series-line');
+  // //       done();
+  // //     },100);
+  // //   });
+  // //
+  // //   test('polarMissingLine fixture is created', function() {
+  // //     assert.isTrue(polarMissingLine !== null);
+  // //   });
+  // //
+  // //   test('polarMissingLine linePath created', function() {
+  // //     assert.equal(linePath.node().tagName,'path');
+  // //   });
+  // //
+  // //   test('polarMissingLine line series ID', function() {
+  // //     assert.equal(linePath.attr('series-id'),'line_mySeries');
+  // //   });
+  // //
+  // //   test('polarMissingLine line series has the right color', function() {
+  // //     assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+  // //   });
+  // //
+  // //   test('polarMissingLine line d', function() {
+  // //     //extract just the ints. who cares about the decimals
+  // //     var re = new RegExp([
+  // //       'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+  // //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+  // //       'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
+  // //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?'
+  // //     ].join(''));
+  // //
+  // //     var matches = re.exec(linePath.attr('d'));
+  // //
+  // //     assert.closeTo(Number(matches[1]),0,1);
+  // //     assert.closeTo(Number(matches[2]),0,1);
+  // //     assert.closeTo(Number(matches[3]),0,1);
+  // //     assert.closeTo(Number(matches[4]),-144,1);
+  // //     assert.closeTo(Number(matches[5]),-144,1);
+  // //     assert.closeTo(Number(matches[6]),2,1);
+  // //     assert.closeTo(Number(matches[7]),-5,1);
+  // //     assert.closeTo(Number(matches[8]),-240,1);
+  // //   });
+  // // }); //suite
+  // //
 
-  //
-  // suite('px-vis-line polar with degrees and counter clockwise works', function() {
-  //   var polarDegreeScale = document.getElementById('polarDegreeScale'),
-  //       polarDegreeSVG = document.getElementById('polarDegreeSVG'),
-  //       polarDegreeLine = document.getElementById('polarDegreeLine');
-  //
-  //   var colorOrder = commonColors.properties.seriesColorOrder.value;
-  //   var colorSet = commonColors.properties.dataVisColors.value;
-  //   var linePath;
-  //
-  //   suiteSetup(function(done){
-  //     var d = [{
-  //           "x": 0,
-  //           "y": 0
-  //         },{
-  //           "x": 0,
-  //           "y": 3
-  //         },{
-  //           "x": 90,
-  //           "y": 3
-  //         },{
-  //           "x": 180,
-  //           "y": 5
-  //         },{
-  //           "x": 270,
-  //           "y": 3
-  //         },{
-  //           "x": 0,
-  //           "y": 5
-  //         }
-  //       ],
-  //       completeSeriesConfig = {
-  //         "mySeries": {
-  //           "type":"line",
-  //           "name":"Data",
-  //           "y":"y",
-  //           "x":"x",
-  //           "color":"rgb(93,165,218)"
-  //         }
-  //       },
-  //       w = 500,
-  //       h = 500,
-  //       min = 480/2,
-  //       offset = [250,250],
-  //       m = {
-  //         "top": 10,
-  //         "right": 10,
-  //         "bottom": 10,
-  //         "left": 10
-  //       };
-  //     polarDegreeSVG.set('width',w);
-  //     polarDegreeSVG.set('height',h);
-  //     polarDegreeSVG.set('margin',m);
-  //     polarDegreeSVG.set('offset',offset);
-  //
-  //     polarDegreeScale.set('width',min);
-  //     polarDegreeScale.set('margin',m);
-  //     polarDegreeScale.set('amplitudeKeys',['y']);
-  //     polarDegreeScale.set('chartData',d);
-  //
-  //     polarDegreeLine.set('seriesId',"mySeries");
-  //     polarDegreeLine.set('completeSeriesConfig',completeSeriesConfig);
-  //     polarDegreeLine.set('chartData',d);
-  //
-  //     // needed for the debounce in line
-  //     setTimeout(function(){
-  //       linePath =  polarDegreeLine.lineGroup.select('path.series-line');
-  //       done();
-  //     },100);
-  //   });
-  //
-  //   test('polarDegreeLine fixture is created', function() {
-  //     assert.isTrue(polarDegreeLine !== null);
-  //   });
-  //
-  //   test('polarDegreeLine linePath created', function() {
-  //     assert.equal(linePath.node().tagName,'path');
-  //   });
-  //
-  //   test('polarDegreeLine line series ID', function() {
-  //     assert.equal(linePath.attr('series-id'),'line_mySeries');
-  //   });
-  //
-  //   test('polarDegreeLine line series has the right color', function() {
-  //     assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
-  //   });
-  //
-  //   test('polarDegreeLine line d', function() {
-  //     //extract just the ints. who cares about the decimals
-  //     var re = new RegExp([
-  //       'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?'
-  //     ].join(''));
-  //
-  //     var matches = re.exec(linePath.attr('d'));
-  //
-  //     assert.closeTo(Number(matches[1]),0,1);
-  //     assert.closeTo(Number(matches[2]),0,1);
-  //     assert.closeTo(Number(matches[3]),0,1);
-  //     assert.closeTo(Number(matches[4]),-144,1);
-  //     assert.closeTo(Number(matches[5]),144,1);
-  //     assert.closeTo(Number(matches[6]),-8,1);
-  //     assert.closeTo(Number(matches[7]),2,1);
-  //     assert.closeTo(Number(matches[8]),240,1);
-  //     assert.closeTo(Number(matches[9]),-144,1);
-  //     assert.closeTo(Number(matches[10]),2,1);
-  //     assert.closeTo(Number(matches[11]),0,1);
-  //     assert.closeTo(Number(matches[12]),-240,1);
-  //   });
-  // }); //suite
-  //
-  // suite('px-vis-line polar with degrees and counter clockwise works', function() {
-  //   var polarCCWScale = document.getElementById('polarCCWScale'),
-  //       polarCCWSVG = document.getElementById('polarCCWSVG'),
-  //       polarCCWLine = document.getElementById('polarCCWLine');
-  //
-  //   var colorOrder = commonColors.properties.seriesColorOrder.value;
-  //   var colorSet = commonColors.properties.dataVisColors.value;
-  //   var linePath;
-  //
-  //   suiteSetup(function(done){
-  //     var d = [{
-  //           "x": 0,
-  //           "y": 0
-  //         },{
-  //           "x": 0,
-  //           "y": 3
-  //         },{
-  //           "x": Math.PI/2,
-  //           "y": 3
-  //         },{
-  //           "x": Math.PI,
-  //           "y": 5
-  //         },{
-  //           "x": Math.PI * 3/2,
-  //           "y": 3
-  //         },{
-  //           "x": Math.PI * 2,
-  //           "y": 5
-  //         }
-  //       ],
-  //       completeSeriesConfig = {
-  //         "mySeries": {
-  //           "type":"line",
-  //           "name":"Data",
-  //           "y":"y",
-  //           "x":"x",
-  //           "color":"rgb(93,165,218)"
-  //         }
-  //       },
-  //       w = 500,
-  //       h = 500,
-  //       min = 480/2,
-  //       offset = [250,250],
-  //       m = {
-  //         "top": 10,
-  //         "right": 10,
-  //         "bottom": 10,
-  //         "left": 10
-  //       };
-  //     polarCCWSVG.set('width',w);
-  //     polarCCWSVG.set('height',h);
-  //     polarCCWSVG.set('margin',m);
-  //     polarCCWSVG.set('offset',offset);
-  //
-  //     polarCCWScale.set('width',min);
-  //     polarCCWScale.set('margin',m);
-  //     polarCCWScale.set('amplitudeKeys',['y']);
-  //     polarCCWScale.set('chartData',d);
-  //
-  //     polarCCWLine.set('seriesId',"mySeries");
-  //     polarCCWLine.set('completeSeriesConfig',completeSeriesConfig);
-  //     polarCCWLine.set('chartData',d);
-  //
-  //     // needed for the debounce in line
-  //     setTimeout(function(){
-  //       linePath =  polarCCWLine.lineGroup.select('path.series-line');
-  //       done();
-  //     },100);
-  //   });
-  //
-  //   test('polarCCWLine fixture is created', function() {
-  //     assert.isTrue(polarCCWLine !== null);
-  //   });
-  //
-  //   test('polarCCWLine linePath created', function() {
-  //     assert.equal(linePath.node().tagName,'path');
-  //   });
-  //
-  //   test('polarCCWLine line series ID', function() {
-  //     assert.equal(linePath.attr('series-id'),'line_mySeries');
-  //   });
-  //
-  //   test('polarCCWLine line series has the right color', function() {
-  //     assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
-  //   });
-  //
-  //   test('polarCCWLine line d', function() {
-  //     //extract just the ints. who cares about the decimals
-  //     var re = new RegExp([
-  //       'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?'
-  //     ].join(''));
-  //
-  //     var matches = re.exec(linePath.attr('d'));
-  //
-  //     assert.closeTo(Number(matches[1]),0,1);
-  //     assert.closeTo(Number(matches[2]),0,1);
-  //     assert.closeTo(Number(matches[3]),0,1);
-  //     assert.closeTo(Number(matches[4]),-144,1);
-  //     assert.closeTo(Number(matches[5]),-144,1);
-  //     assert.closeTo(Number(matches[6]),-8,1);
-  //     assert.closeTo(Number(matches[7]),-2,1);
-  //     assert.closeTo(Number(matches[8]),240,1);
-  //     assert.closeTo(Number(matches[9]),144,1);
-  //     assert.closeTo(Number(matches[10]),2,1);
-  //     assert.closeTo(Number(matches[11]),5,1);
-  //     assert.closeTo(Number(matches[12]),-240,1);
-  //   });
-  // }); //suite
-  //
-  //
-  // suite('px-vis-line polar with degrees and counter clockwise works', function() {
-  //   var polarDegreeCCWScale = document.getElementById('polarDegreeCCWScale'),
-  //       polarDegreeCCWSVG = document.getElementById('polarDegreeCCWSVG'),
-  //       polarDegreeCCWLine = document.getElementById('polarDegreeCCWLine');
-  //
-  //   var colorOrder = commonColors.properties.seriesColorOrder.value;
-  //   var colorSet = commonColors.properties.dataVisColors.value;
-  //   var linePath;
-  //
-  //   suiteSetup(function(done){
-  //     var d = [{
-  //           "x": 0,
-  //           "y": 0
-  //         },{
-  //           "x": 0,
-  //           "y": 3
-  //         },{
-  //           "x": 90,
-  //           "y": 3
-  //         },{
-  //           "x": 180,
-  //           "y": 5
-  //         },{
-  //           "x": 270,
-  //           "y": 3
-  //         },{
-  //           "x": 0,
-  //           "y": 5
-  //         }
-  //       ],
-  //       completeSeriesConfig = {
-  //         "mySeries": {
-  //           "type":"line",
-  //           "name":"Data",
-  //           "y":"y",
-  //           "x":"x",
-  //           "color":"rgb(93,165,218)"
-  //         }
-  //       },
-  //       w = 500,
-  //       h = 500,
-  //       min = 480/2,
-  //       offset = [250,250],
-  //       m = {
-  //         "top": 10,
-  //         "right": 10,
-  //         "bottom": 10,
-  //         "left": 10
-  //       };
-  //     polarDegreeCCWSVG.set('width',w);
-  //     polarDegreeCCWSVG.set('height',h);
-  //     polarDegreeCCWSVG.set('margin',m);
-  //     polarDegreeCCWSVG.set('offset',offset);
-  //
-  //     polarDegreeCCWScale.set('width',min);
-  //     polarDegreeCCWScale.set('margin',m);
-  //     polarDegreeCCWScale.set('amplitudeKeys',['y']);
-  //     polarDegreeCCWScale.set('chartData',d);
-  //
-  //     polarDegreeCCWLine.set('seriesId',"mySeries");
-  //     polarDegreeCCWLine.set('completeSeriesConfig',completeSeriesConfig);
-  //     polarDegreeCCWLine.set('chartData',d);
-  //
-  //     // needed for the debounce in line
-  //     setTimeout(function(){
-  //       linePath =  polarDegreeCCWLine.lineGroup.select('path.series-line');
-  //       done();
-  //     },100);
-  //   });
-  //
-  //   test('polarDegreeCCWLine fixture is created', function() {
-  //     assert.isTrue(polarDegreeCCWLine !== null);
-  //   });
-  //
-  //   test('polarDegreeCCWLine linePath created', function() {
-  //     assert.equal(linePath.node().tagName,'path');
-  //   });
-  //
-  //   test('polarDegreeCCWLine line series ID', function() {
-  //     assert.equal(linePath.attr('series-id'),'line_mySeries');
-  //   });
-  //
-  //   test('polarDegreeCCWLine line series has the right color', function() {
-  //     assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
-  //   });
-  //
-  //   test('polarDegreeCCWLine line d', function() {
-  //     //extract just the ints. who cares about the decimals
-  //     var re = new RegExp([
-  //       'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?'
-  //     ].join(''));
-  //
-  //     var matches = re.exec(linePath.attr('d'));
-  //
-  //     assert.closeTo(Number(matches[1]),0,1);
-  //     assert.closeTo(Number(matches[2]),0,1);
-  //     assert.closeTo(Number(matches[3]),0,1);
-  //     assert.closeTo(Number(matches[4]),-144,1);
-  //     assert.closeTo(Number(matches[5]),-144,1);
-  //     assert.closeTo(Number(matches[6]),-8,1);
-  //     assert.closeTo(Number(matches[7]),-2,1);
-  //     assert.closeTo(Number(matches[8]),240,1);
-  //     assert.closeTo(Number(matches[9]),144,1);
-  //     assert.closeTo(Number(matches[10]),2,1);
-  //     assert.closeTo(Number(matches[11]),0,1);
-  //     assert.closeTo(Number(matches[12]),-240,1);
-  //   });
-  // }); //suite
-  //
-  // suite('px-vis-line polar missing data works', function() {
-  //   var polarMissingScale = document.getElementById('polarMissingScale'),
-  //       polarMissingSVG = document.getElementById('polarMissingSVG'),
-  //       polarMissingLine = document.getElementById('polarMissingLine');
-  //
-  //   var colorOrder = commonColors.properties.seriesColorOrder.value;
-  //   var colorSet = commonColors.properties.dataVisColors.value;
-  //   var linePath;
-  //
-  //   suiteSetup(function(done){
-  //     var d = [{
-  //           "x": 0,
-  //           "y": 0
-  //         },{
-  //           "x": 0,
-  //           "y": 3
-  //         },{
-  //           "x": Math.PI/2,
-  //           "y": null
-  //         },{
-  //           "x": Math.PI
-  //         },{
-  //           "x": Math.PI * 3/2,
-  //           "y": 3
-  //         },{
-  //           "x": Math.PI * 2,
-  //           "y": 5
-  //         }
-  //       ],
-  //       completeSeriesConfig = {
-  //         "mySeries": {
-  //           "type":"line",
-  //           "name":"Data",
-  //           "y":"y",
-  //           "x":"x",
-  //           "color":"rgb(93,165,218)"
-  //         }
-  //       },
-  //       w = 500,
-  //       h = 500,
-  //       min = 480/2,
-  //       offset = [250,250],
-  //       m = {
-  //         "top": 10,
-  //         "right": 10,
-  //         "bottom": 10,
-  //         "left": 10
-  //       };
-  //     polarMissingSVG.set('width',w);
-  //     polarMissingSVG.set('height',h);
-  //     polarMissingSVG.set('margin',m);
-  //     polarMissingSVG.set('offset',offset);
-  //
-  //     polarMissingScale.set('width',min);
-  //     polarMissingScale.set('margin',m);
-  //     polarMissingScale.set('amplitudeKeys',['y']);
-  //     polarMissingScale.set('chartData',d);
-  //
-  //     polarMissingLine.set('seriesId',"mySeries");
-  //     polarMissingLine.set('completeSeriesConfig',completeSeriesConfig);
-  //     polarMissingLine.set('chartData',d);
-  //
-  //     // needed for the debounce in line
-  //     setTimeout(function(){
-  //       linePath =  polarMissingLine.lineGroup.select('path.series-line');
-  //       done();
-  //     },100);
-  //   });
-  //
-  //   test('polarMissingLine fixture is created', function() {
-  //     assert.isTrue(polarMissingLine !== null);
-  //   });
-  //
-  //   test('polarMissingLine linePath created', function() {
-  //     assert.equal(linePath.node().tagName,'path');
-  //   });
-  //
-  //   test('polarMissingLine line series ID', function() {
-  //     assert.equal(linePath.attr('series-id'),'line_mySeries');
-  //   });
-  //
-  //   test('polarMissingLine line series has the right color', function() {
-  //     assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
-  //   });
-  //
-  //   test('polarMissingLine line d', function() {
-  //     //extract just the ints. who cares about the decimals
-  //     var re = new RegExp([
-  //       'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?'
-  //     ].join(''));
-  //
-  //     var matches = re.exec(linePath.attr('d'));
-  //
-  //     assert.closeTo(Number(matches[1]),0,1);
-  //     assert.closeTo(Number(matches[2]),0,1);
-  //     assert.closeTo(Number(matches[3]),0,1);
-  //     assert.closeTo(Number(matches[4]),-144,1);
-  //     assert.closeTo(Number(matches[5]),-144,1);
-  //     assert.closeTo(Number(matches[6]),2,1);
-  //     assert.closeTo(Number(matches[7]),-5,1);
-  //     assert.closeTo(Number(matches[8]),-240,1);
-  //   });
-  // }); //suite
-  //
-  //
-  // suite('px-vis-line renders radar to SVG', function() {
-  //   var radarScale = document.getElementById('radarScale'),
-  //       radarSVG = document.getElementById('radarSVG'),
-  //       radarLine = document.getElementById('radarLine');
-  //
-  //   var colorOrder = commonColors.properties.seriesColorOrder.value;
-  //   var colorSet = commonColors.properties.dataVisColors.value;
-  //   var linePath;
-  //
-  //   suiteSetup(function(done){
-  //     var d = [{
-  //           "x": 1397102460000,
-  //           "y": 1,
-  //           "y1": 1,
-  //           "y2": 1
-  //         },{
-  //           "x": 1397131620000,
-  //           "y": 6,
-  //           "y1": 15,
-  //           "y2": 21
-  //         },{
-  //           "x": 1397160780000,
-  //           "y": 10,
-  //           "y1": 8,
-  //           "y2": 3
-  //         },{
-  //           "x": 1397189940000,
-  //           "y": 4,
-  //           "y1": 10,
-  //           "y2": 10
-  //         },{
-  //           "x": 1397219100000,
-  //           "y": 6,
-  //           "y1": 20,
-  //           "y2": 27
-  //         }
-  //       ],
-  //       completeSeriesConfig = {
-  //         "x":{
-  //           "type":"line",
-  //           "name":"mySeries",
-  //           "x":['y','y1','y2'],
-  //           "y":['y','y1','y2'],
-  //           "color": "rgb(93,165,218)"
-  //         }
-  //       },
-  //       dim = ['y','y1','y2'],
-  //       w = 500,
-  //       h = 500,
-  //       min = 480/2,
-  //       offset = [250,250],
-  //       m = {
-  //         "top": 10,
-  //         "right": 10,
-  //         "bottom": 10,
-  //         "left": 10
-  //       };
-  //
-  //     radarSVG.set('width',w);
-  //     radarSVG.set('height',h);
-  //     radarSVG.set('margin',m);
-  //     radarSVG.set('offset',offset);
-  //
-  //     radarScale.set('width',min);
-  //     radarScale.set('margin',m);
-  //     radarScale.set('amplitudeKeys',dim);
-  //     radarScale.set('centerOffset',50);
-  //     radarScale.set('chartData',d);
-  //
-  //     radarLine.set('completeSeriesConfig',completeSeriesConfig);
-  //     radarLine.set('seriesId',"x");
-  //     radarLine.set('chartData',d);
-  //
-  //     setTimeout(function(){
-  //       linePath = radarLine.lineGroup.selectAll('path.series-line');
-  //       done();
-  //     },500);;
-  //   });
-  //
-  //   test('radarLine fixture is created', function() {
-  //     assert.isTrue(radarLine !== null);
-  //   });
-  //
-  //   test('radarLine linePath created', function() {
-  //     assert.equal(linePath.node().tagName,'path');
-  //   });
-  //
-  //   test('radarLine linePath created 5 lines', function() {
-  //     assert.equal(linePath.nodes().length,5);
-  //   });
-  //
-  //   test('radarLine lines have a series ID', function() {
-  //     assert.equal(d3.select(linePath.nodes()[0]).attr('series-id'),'line_1397102460000');
-  //     assert.equal(d3.select(linePath.nodes()[1]).attr('series-id'),'line_1397131620000');
-  //     assert.equal(d3.select(linePath.nodes()[2]).attr('series-id'),'line_1397160780000');
-  //     assert.equal(d3.select(linePath.nodes()[3]).attr('series-id'),'line_1397189940000');
-  //     assert.equal(d3.select(linePath.nodes()[4]).attr('series-id'),'line_1397219100000');
-  //   });
-  //
-  //   test('radarLine line series has the right color', function() {
-  //     assert.equal(d3.select(linePath.nodes()[0]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
-  //   });
-  //
-  //   test('radarLine line d', function() {
-  //     var re = new RegExp([
-  //       'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?'
-  //     ].join(''));
-  //
-  //     var matches = [];
-  //     for(var i = 0; i < 5; i++){
-  //       matches.push(re.exec(Px.d3.select(linePath.nodes()[i]).attr('d')));
-  //     }
-  //
-  //     assert.closeTo(Number(matches[0][1]),0,1);
-  //     assert.closeTo(Number(matches[0][2]),-50,1);
-  //     assert.closeTo(Number(matches[0][3]),43,1);
-  //     assert.closeTo(Number(matches[0][4]),24,1);
-  //     assert.closeTo(Number(matches[0][5]),-43,1);
-  //     assert.closeTo(Number(matches[0][6]),25,1);
-  //     assert.closeTo(Number(matches[0][7]),0,1);
-  //     assert.closeTo(Number(matches[0][8]),-50,1);
-  //
-  //     assert.closeTo(Number(matches[1][1]),0,1);
-  //     assert.closeTo(Number(matches[1][2]),-86,1);
-  //     assert.closeTo(Number(matches[1][3]),131,1);
-  //     assert.closeTo(Number(matches[1][4]),75,1);
-  //     assert.closeTo(Number(matches[1][5]),-169,1);
-  //     assert.closeTo(Number(matches[1][6]),98,1);
-  //     assert.closeTo(Number(matches[1][7]),0,1);
-  //     assert.closeTo(Number(matches[1][8]),-86,1);
-  //
-  //     assert.closeTo(Number(matches[2][1]),0,1);
-  //     assert.closeTo(Number(matches[2][2]),-115,1);
-  //     assert.closeTo(Number(matches[2][3]),87,1);
-  //     assert.closeTo(Number(matches[2][4]),50,1);
-  //     assert.closeTo(Number(matches[2][5]),-55,1);
-  //     assert.closeTo(Number(matches[2][6]),32,1);
-  //     assert.closeTo(Number(matches[2][7]),0,1);
-  //     assert.closeTo(Number(matches[2][8]),-115,1);
-  //
-  //     assert.closeTo(Number(matches[3][1]),0,1);
-  //     assert.closeTo(Number(matches[3][2]),-71,1);
-  //     assert.closeTo(Number(matches[3][3]),99,1);
-  //     assert.closeTo(Number(matches[3][4]),57,1);
-  //     assert.closeTo(Number(matches[3][5]),-99,1);
-  //     assert.closeTo(Number(matches[3][6]),57,1);
-  //     assert.closeTo(Number(matches[3][7]),0,1);
-  //     assert.closeTo(Number(matches[3][8]),-71,1);
-  //
-  //     assert.closeTo(Number(matches[4][1]),0,1);
-  //     assert.closeTo(Number(matches[4][2]),-86,1);
-  //     assert.closeTo(Number(matches[4][3]),162,1);
-  //     assert.closeTo(Number(matches[4][4]),93,1);
-  //     assert.closeTo(Number(matches[4][5]),-207,1);
-  //     assert.closeTo(Number(matches[4][6]),120,1);
-  //     assert.closeTo(Number(matches[4][7]),0,1);
-  //     assert.closeTo(Number(matches[4][8]),-86,1);
-  //   });
-  //
-  // }); //suite
-  //
-  // suite('px-vis-line radar small lines stop at 25', function() {
-  //   var radarScale = document.getElementById('radarScale'),
-  //       chartExtents = {"x":["y","y1","y2"],"y":[15,20] },
-  //       linePath;
-  //
-  //   suiteSetup(function(done) {
-  //     radarScale.set('chartExtents',chartExtents);
-  //
-  //     setTimeout(function(){
-  //       linePath = radarLine.lineGroup.selectAll('path.series-line');
-  //       done();
-  //     },500);;
-  //   });
-  //
-  //   test('radarLine line d', function() {
-  //     var re = new RegExp([
-  //       'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?'
-  //     ].join(''));
-  //
-  //     var matches = [];
-  //     for(var i = 0; i < 5; i++){
-  //       matches.push(re.exec(Px.d3.select(linePath.nodes()[i]).attr('d')));
-  //     }
-  //
-  //     assert.closeTo(Number(matches[0][1]),0,1);
-  //     assert.closeTo(Number(matches[0][2]),-25,1);
-  //     assert.closeTo(Number(matches[0][3]),21,1);
-  //     assert.closeTo(Number(matches[0][4]),12,1);
-  //     assert.closeTo(Number(matches[0][5]),-21,1);
-  //     assert.closeTo(Number(matches[0][6]),12,1);
-  //     assert.closeTo(Number(matches[0][7]),0,1);
-  //     assert.closeTo(Number(matches[0][8]),-25,1);
-  //
-  //     assert.closeTo(Number(matches[1][1]),0,1);
-  //     assert.closeTo(Number(matches[1][2]),-25,1);
-  //     assert.closeTo(Number(matches[1][3]),43,1);
-  //     assert.closeTo(Number(matches[1][4]),24,1);
-  //     assert.closeTo(Number(matches[1][5]),-240,1);
-  //     assert.closeTo(Number(matches[1][6]),139,1);
-  //     assert.closeTo(Number(matches[1][7]),0,1);
-  //     assert.closeTo(Number(matches[1][8]),-25,1);
-  //
-  //     assert.closeTo(Number(matches[2][1]),0,1);
-  //     assert.closeTo(Number(matches[2][2]),-25,1);
-  //     assert.closeTo(Number(matches[2][3]),21,1);
-  //     assert.closeTo(Number(matches[2][4]),12,1);
-  //     assert.closeTo(Number(matches[2][5]),-21,1);
-  //     assert.closeTo(Number(matches[2][6]),12,1);
-  //     assert.closeTo(Number(matches[2][7]),0,1);
-  //     assert.closeTo(Number(matches[2][8]),-25,1);
-  //
-  //     assert.closeTo(Number(matches[3][1]),0,1);
-  //     assert.closeTo(Number(matches[3][2]),-25,1);
-  //     assert.closeTo(Number(matches[3][3]),21,1);
-  //     assert.closeTo(Number(matches[3][4]),12,1);
-  //     assert.closeTo(Number(matches[3][5]),-21,1);
-  //     assert.closeTo(Number(matches[3][6]),12,1);
-  //     assert.closeTo(Number(matches[3][7]),0,1);
-  //     assert.closeTo(Number(matches[3][8]),-25,1);
-  //
-  //     assert.closeTo(Number(matches[4][1]),0,1);
-  //     assert.closeTo(Number(matches[4][2]),-25,1);
-  //     assert.closeTo(Number(matches[4][3]),207,1);
-  //     assert.closeTo(Number(matches[4][4]),119,1);
-  //     assert.closeTo(Number(matches[4][5]),-438,1);
-  //     assert.closeTo(Number(matches[4][6]),253,1);
-  //     assert.closeTo(Number(matches[4][7]),0,1);
-  //     assert.closeTo(Number(matches[4][8]),-25,1);
-  //   });
-  //
-  // }); //suite
-  //
-  // suite('px-vis-line radar with missing data', function() {
-  //   var radarMissingScale = document.getElementById('radarMissingScale'),
-  //       radarMissingSVG = document.getElementById('radarMissingSVG'),
-  //       radarMissingLine = document.getElementById('radarMissingLine');
-  //
-  //   var colorOrder = commonColors.properties.seriesColorOrder.value;
-  //   var colorSet = commonColors.properties.dataVisColors.value;
-  //   var linePath;
-  //
-  //   suiteSetup(function(done){
-  //     var d = [{
-  //           "x": 1397102460000,
-  //           "y": 1,
-  //           "y1": null,
-  //           "y2": 1
-  //         },{
-  //           "x": 1397131620000,
-  //           "y": 6,
-  //           "y1": 15
-  //         },{
-  //           "x": 1397160780000,
-  //           "y": 10,
-  //           "y1": 8,
-  //           "y2": 3
-  //         },{
-  //           "x": 1397189940000,
-  //           "y": 4,
-  //           "y1": 10,
-  //           "y2": 10
-  //         },{
-  //           "x": 1397219100000,
-  //           "y1": 20,
-  //           "y2": 27
-  //         }
-  //       ],
-  //       completeSeriesConfig = {
-  //         "x":{
-  //           "type":"line",
-  //           "name":"mySeries",
-  //           "x":['y','y1','y2'],
-  //           "y":['y','y1','y2'],
-  //           "color": "rgb(93,165,218)"
-  //         }
-  //       },
-  //       dim = ['y','y1','y2'],
-  //       w = 500,
-  //       h = 500,
-  //       min = 480/2,
-  //       offset = [250,250],
-  //       m = {
-  //         "top": 10,
-  //         "right": 10,
-  //         "bottom": 10,
-  //         "left": 10
-  //       };
-  //
-  //     radarMissingSVG.set('width',w);
-  //     radarMissingSVG.set('height',h);
-  //     radarMissingSVG.set('margin',m);
-  //     radarMissingSVG.set('offset',offset);
-  //
-  //     radarMissingScale.set('width',min);
-  //     radarMissingScale.set('margin',m);
-  //     radarMissingScale.set('amplitudeKeys',dim);
-  //     radarMissingScale.set('centerOffset',50);
-  //     radarMissingScale.set('chartData',d);
-  //
-  //     radarMissingLine.set('completeSeriesConfig',completeSeriesConfig);
-  //     radarMissingLine.set('seriesId',"x");
-  //     radarMissingLine.set('chartData',d);
-  //
-  //     setTimeout(function(){
-  //       linePath = radarMissingLine.lineGroup.selectAll('path.series-line');
-  //       done();
-  //     },500);;
-  //   });
-  //
-  //   test('radarMissingLine fixture is created', function() {
-  //     assert.isTrue(radarMissingLine !== null);
-  //   });
-  //
-  //   test('radarMissingLine linePath created', function() {
-  //     assert.equal(linePath.node().tagName,'path');
-  //   });
-  //
-  //   test('radarMissingLine linePath created 5 lines', function() {
-  //     assert.equal(linePath.nodes().length,5);
-  //   });
-  //
-  //   test('radarMissingLine lines have a series ID', function() {
-  //     assert.equal(d3.select(linePath.nodes()[0]).attr('series-id'),'line_1397102460000');
-  //     assert.equal(d3.select(linePath.nodes()[1]).attr('series-id'),'line_1397131620000');
-  //     assert.equal(d3.select(linePath.nodes()[2]).attr('series-id'),'line_1397160780000');
-  //     assert.equal(d3.select(linePath.nodes()[3]).attr('series-id'),'line_1397189940000');
-  //     assert.equal(d3.select(linePath.nodes()[4]).attr('series-id'),'line_1397219100000');
-  //   });
-  //
-  //   test('radarMissingLine line series has the right color', function() {
-  //     assert.equal(d3.select(linePath.nodes()[0]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
-  //   });
-  //
-  //   test('radarMissingLine full lines d', function() {
-  //     var re = new RegExp([
-  //       'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?'
-  //     ].join(''));
-  //
-  //     var matches = [];
-  //     matches.push(re.exec(Px.d3.select(linePath.nodes()[2]).attr('d')));
-  //     matches.push(re.exec(Px.d3.select(linePath.nodes()[3]).attr('d')));
-  //
-  //     assert.closeTo(Number(matches[0][1]),0,1);
-  //     assert.closeTo(Number(matches[0][2]),-115,1);
-  //     assert.closeTo(Number(matches[0][3]),87,1);
-  //     assert.closeTo(Number(matches[0][4]),50,1);
-  //     assert.closeTo(Number(matches[0][5]),-55,1);
-  //     assert.closeTo(Number(matches[0][6]),32,1);
-  //     assert.closeTo(Number(matches[0][7]),0,1);
-  //     assert.closeTo(Number(matches[0][8]),-115,1);
-  //
-  //     assert.closeTo(Number(matches[1][1]),0,1);
-  //     assert.closeTo(Number(matches[1][2]),-71,1);
-  //     assert.closeTo(Number(matches[1][3]),99,1);
-  //     assert.closeTo(Number(matches[1][4]),57,1);
-  //     assert.closeTo(Number(matches[1][5]),-99,1);
-  //     assert.closeTo(Number(matches[1][6]),57,1);
-  //     assert.closeTo(Number(matches[1][7]),0,1);
-  //     assert.closeTo(Number(matches[1][8]),-71,1);
-  //   });
-  //
-  //   test('radarMissingLine missing first point line d', function() {
-  //     var re = new RegExp([
-  //       'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?'
-  //     ].join(''));
-  //
-  //     var matches = re.exec(Px.d3.select(linePath.nodes()[4]).attr('d'));
-  //
-  //     assert.closeTo(Number(matches[1]),162,1);
-  //     assert.closeTo(Number(matches[2]),93,1);
-  //     assert.closeTo(Number(matches[3]),-207,1);
-  //     assert.closeTo(Number(matches[4]),120,1);
-  //   });
-  //
-  //   test('radarMissingLine missing second point line d', function() {
-  //     var re = new RegExp([
-  //       'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?Z\\s?',
-  //       'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?'
-  //     ].join(''));
-  //
-  //     var matches = re.exec(Px.d3.select(linePath.nodes()[0]).attr('d'));
-  //
-  //     assert.closeTo(Number(matches[1]),0,1);
-  //     assert.closeTo(Number(matches[2]),-50,1);
-  //     assert.closeTo(Number(matches[3]),-43,1);
-  //     assert.closeTo(Number(matches[4]),25,1);
-  //     assert.closeTo(Number(matches[5]),0,1);
-  //     assert.closeTo(Number(matches[6]),-50,1);
-  //   });
-  //
-  //   test('radarMissingLine missing third point line d', function() {
-  //     var re = new RegExp([
-  //       'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'L\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //       'M\\s?(-?\\d+)\\.?\\d*e?-?\\d*,?\\s?(-?\\d+)\\.?\\d*e?-?\\d*\\s?',
-  //     ].join(''));
-  //
-  //     var matches = re.exec(Px.d3.select(linePath.nodes()[1]).attr('d'));
-  //
-  //     assert.closeTo(Number(matches[1]),0,1);
-  //     assert.closeTo(Number(matches[2]),-86,1);
-  //     assert.closeTo(Number(matches[3]),131,1);
-  //     assert.closeTo(Number(matches[4]),75,1);
-  //     assert.closeTo(Number(matches[5]),0,1);
-  //     assert.closeTo(Number(matches[6]),-86,1);
-  //   });
-  //
-  // }); //suite
+  suite('px-vis-line renders radar to canvas', function() {
+    var radarScale = document.getElementById('radarScale'),
+        radarCanvas = document.getElementById('radarCanvas'),
+        radarLine = document.getElementById('radarLine');
+
+    var colorOrder = commonColors.properties.seriesColorOrder.value;
+    var colorSet = commonColors.properties.dataVisColors.value;
+    var linePath;
+
+    suiteSetup(function(done){
+      var d = [{
+            "x": 1397102460000,
+            "y": 1,
+            "y1": 1,
+            "y2": 1
+          },{
+            "x": 1397131620000,
+            "y": 6,
+            "y1": 15,
+            "y2": 21
+          },{
+            "x": 1397160780000,
+            "y": 10,
+            "y1": 8,
+            "y2": 3
+          },{
+            "x": 1397189940000,
+            "y": 4,
+            "y1": 10,
+            "y2": 10
+          },{
+            "x": 1397219100000,
+            "y": 6,
+            "y1": 20,
+            "y2": 27
+          }
+        ],
+        completeSeriesConfig = {
+          "x":{
+            "type":"line",
+            "name":"mySeries",
+            "x":['y','y1','y2'],
+            "y":['y','y1','y2'],
+            "color": "rgb(93,165,218)"
+          }
+        },
+        dim = ['y','y1','y2'],
+        w = 500,
+        h = 500,
+        min = 480/2,
+        offset = [250,250],
+        m = {
+          "top": 10,
+          "right": 10,
+          "bottom": 10,
+          "left": 10
+        };
+
+      radarCanvas.set('width',w);
+      radarCanvas.set('height',h);
+      radarCanvas.set('margin',m);
+      radarCanvas.set('offset',offset);
+
+      radarScale.set('width',min);
+      radarScale.set('margin',m);
+      radarScale.set('amplitudeKeys',dim);
+      radarScale.set('centerOffset',50);
+      radarScale.set('chartData',d);
+
+      radarLine.set('completeSeriesConfig',completeSeriesConfig);
+      radarLine.set('seriesId',"x");
+      radarLine.set('chartData',d);
+
+      setTimeout(function(){
+        linePath = radarLine.lineGroup;
+        done();
+      },500);;
+    });
+
+    test('radarLine fixture is created', function() {
+      assert.isTrue(radarLine !== null);
+    });
+
+    test('context has correct total lines ', function() {
+      assert.equal(radarCanvas.canvasContext._pxLinesTotal, 1);
+    });
+
+    test('context has drawn 2 lines ', function() {
+      assert.equal(radarCanvas.canvasContext._pxLinesRedraw, 1);
+    });
+
+    test('context has added both to its list', function() {
+      assert.equal(Object.keys(radarCanvas.canvasContext._pxLinesSeries).length, 1);
+      assert.equal(radarCanvas.canvasContext._pxLinesSeries['x'], true);
+    });
+  }); //suite
+
+  suite('px-vis-line radar small lines stop at 25', function() {
+    var radarScale = document.getElementById('radarScale'),
+        chartExtents = {"x":["y","y1","y2"],"y":[15,20] },
+        linePath;
+
+    suiteSetup(function(done) {
+      radarScale.set('chartExtents',chartExtents);
+
+      setTimeout(function(){
+        linePath = radarLine.lineGroup;
+        done();
+      },500);;
+    });
+
+    test('radarLine fixture is created', function() {
+      assert.isTrue(radarLine !== null);
+    });
+
+    test('context has correct total lines ', function() {
+      assert.equal(radarCanvas.canvasContext._pxLinesTotal, 1);
+    });
+
+    test('context has drawn 2 lines ', function() {
+      assert.equal(radarCanvas.canvasContext._pxLinesRedraw, 1);
+    });
+
+    test('context has added both to its list', function() {
+      assert.equal(Object.keys(radarCanvas.canvasContext._pxLinesSeries).length, 1);
+      assert.equal(radarCanvas.canvasContext._pxLinesSeries['x'], true);
+    });
+
+  }); //suite
+
+  suite('px-vis-line radar with missing data', function() {
+    var radarMissingScale = document.getElementById('radarMissingScale'),
+        radarMissingSVG = document.getElementById('radarMissingSVG'),
+        radarMissingLine = document.getElementById('radarMissingLine');
+
+    var colorOrder = commonColors.properties.seriesColorOrder.value;
+    var colorSet = commonColors.properties.dataVisColors.value;
+    var linePath;
+
+    suiteSetup(function(done){
+      var d = [{
+            "x": 1397102460000,
+            "y": 1,
+            "y1": null,
+            "y2": 1
+          },{
+            "x": 1397131620000,
+            "y": 6,
+            "y1": 15
+          },{
+            "x": 1397160780000,
+            "y": 10,
+            "y1": 8,
+            "y2": 3
+          },{
+            "x": 1397189940000,
+            "y": 4,
+            "y1": 10,
+            "y2": 10
+          },{
+            "x": 1397219100000,
+            "y1": 20,
+            "y2": 27
+          }
+        ],
+        completeSeriesConfig = {
+          "x":{
+            "type":"line",
+            "name":"mySeries",
+            "x":['y','y1','y2'],
+            "y":['y','y1','y2'],
+            "color": "rgb(93,165,218)"
+          }
+        },
+        dim = ['y','y1','y2'],
+        w = 500,
+        h = 500,
+        min = 480/2,
+        offset = [250,250],
+        m = {
+          "top": 10,
+          "right": 10,
+          "bottom": 10,
+          "left": 10
+        };
+
+      radarMissingSVG.set('width',w);
+      radarMissingSVG.set('height',h);
+      radarMissingSVG.set('margin',m);
+      radarMissingSVG.set('offset',offset);
+
+      radarMissingScale.set('width',min);
+      radarMissingScale.set('margin',m);
+      radarMissingScale.set('amplitudeKeys',dim);
+      radarMissingScale.set('centerOffset',50);
+      radarMissingScale.set('chartData',d);
+
+      radarMissingLine.set('completeSeriesConfig',completeSeriesConfig);
+      radarMissingLine.set('seriesId',"x");
+      radarMissingLine.set('chartData',d);
+
+      setTimeout(function(){
+        linePath = radarMissingLine.lineGroup;
+        done();
+      },500);;
+    });
+
+    test('radarMissingLine fixture is created', function() {
+      assert.isTrue(radarMissingLine !== null);
+    });
+
+    test('context has correct total lines ', function() {
+      assert.equal(radarMissingSVG.canvasContext._pxLinesTotal, 1);
+    });
+
+    test('context has drawn 2 lines ', function() {
+      assert.equal(radarMissingSVG.canvasContext._pxLinesRedraw, 1);
+    });
+
+    test('context has added both to its list', function() {
+      assert.equal(Object.keys(radarMissingSVG.canvasContext._pxLinesSeries).length, 1);
+      assert.equal(radarMissingSVG.canvasContext._pxLinesSeries['x'], true);
+    });
+
+  }); //suite
 
 } //runTests
