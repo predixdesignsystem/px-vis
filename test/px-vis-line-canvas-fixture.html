@@ -1,0 +1,435 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Web Component Test : Fixture for px-vis-line</title>
+
+    <!-- Requires Webcomponents.js polyfill is provided by the page for browsers that don't support html imports -->
+    <script src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <!-- web-component-tester automatically provides local copy of brower.js below
+         for any URL ending with "/web-component-tester/browser.js"
+         when wct is run from the command line -->
+    <script src="../web-component-tester/browser.js"></script>
+    <link rel="import" href="../px-vis-scale.html" />
+    <link rel="import" href="../px-vis-svg-canvas.html" />
+    <link rel="import" href="../px-vis-multi-scale.html" />
+    <link rel="import" href="../px-vis-line-canvas.html" />
+    <!-- Retain this link for px-theme.html -->
+    <!-- px-theme is needed for WCT to run without errors -->
+    <link rel="import" href="../../px-theme/px-theme.html"/>
+
+    <script src="px-vis-line-canvas-tests.js"></script>
+  </head>
+
+  <body>
+    <h3>Web Component Test : Fixture for px-vis-line</h3>
+
+<!-- CANVAS -->
+    <template is="dom-bind">
+      <px-vis-scale
+        id="baseScale"
+        x-axis-type="time"
+        y-axis-type="linear"
+        x="{{x}}"
+        y="{{y}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-scale>
+      <px-vis-svg-canvas
+        id="baseCanvas"
+        canvas-context="{{canvasContext}}">
+      </px-vis-svg-canvas>
+      <px-vis-line-canvas
+        id="baseLine1"
+        canvas-context="[[canvasContext]]"
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]">
+      </px-vis-line-canvas>
+      <px-vis-line-canvas
+        id="baseLine2"
+        svg="[[svg]]"
+        canvas-context="[[canvasContext]]"
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]">
+      </px-vis-line-canvas>
+    </template>
+
+    <template is="dom-bind">
+      <px-vis-scale
+        id="progressiveScale"
+        x-axis-type="time"
+        y-axis-type="linear"
+        x="{{x}}"
+        y="{{y}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-scale>
+      <px-vis-svg-canvas
+        id="progressiveCanvas"
+        canvas-context="{{canvasContext}}">
+      </px-vis-svg-canvas>
+      <px-vis-line-canvas
+        id="progressiveLine1"
+        canvas-context="[[canvasContext]]"
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]">
+      </px-vis-line-canvas>
+      <px-vis-line-canvas
+        id="progressiveLine2"
+        svg="[[svg]]"
+        canvas-context="[[canvasContext]]"
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]">
+      </px-vis-line-canvas>
+    </template>
+
+    <template is="dom-bind">
+      <px-vis-scale
+        id="canvasOnceScale"
+        x-axis-type="time"
+        y-axis-type="linear"
+        x="{{x}}"
+        y="{{y}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-scale>
+      <px-vis-svg-canvas
+        id="canvasOnce"
+        canvas-context="{{canvasContext}}">
+      </px-vis-svg-canvas>
+      <px-vis-line-canvas
+        id="canvasOnceLine1"
+        canvas-context="[[canvasContext]]"
+        no-canvas-progressive-rendering
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]">
+      </px-vis-line-canvas>
+      <px-vis-line-canvas
+        id="canvasOnceLine2"
+        svg="[[svg]]"
+        canvas-context="[[canvasContext]]"
+        no-canvas-progressive-rendering
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]">
+      </px-vis-line-canvas>
+    </template>
+
+<!--  PARALLEL COORDINATES CANVAS-->
+    <template is="dom-bind">
+      <px-vis-multi-scale
+        id="parallelCanvasScale"
+        x="{{x}}"
+        y="{{y}}"
+        domain-changed="{{domainChanged}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}">
+      </px-vis-multi-scale>
+      <px-vis-svg-canvas
+        id="parallelCanvasSVG"
+        canvas-context="{{canvasContext}}">
+      </px-vis-svg-canvas>
+      <px-vis-line-canvas
+        id="parallelCanvasLine"
+        canvas-context="[[canvasContext]]"
+        parallel-coordinates
+        multi-path
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]">
+      </px-vis-line-canvas>
+    </template>
+
+    <template is="dom-bind">
+      <px-vis-multi-scale
+        id="parallelGradientCanvasScale"
+        x="{{x}}"
+        y="{{y}}"
+        domain-changed="{{domainChanged}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}">
+      </px-vis-multi-scale>
+      <px-vis-svg-canvas
+        id="parallelGradientCanvasSVG"
+        canvas-context="{{canvasContext}}">
+      </px-vis-svg-canvas>
+      <px-vis-line-canvas
+        id="parallelGradientCanvasLine"
+        canvas-context="[[canvasContext]]"
+        parallel-coordinates
+        multi-path
+        gradient-line
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]">
+      </px-vis-line-canvas>
+    </template>
+
+    <template is="dom-bind">
+      <px-vis-multi-scale
+        id="parallelCategoryCanvasScale"
+        x="{{x}}"
+        y="{{y}}"
+        domain-changed="{{domainChanged}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}">
+      </px-vis-multi-scale>
+      <px-vis-svg-canvas
+        id="parallelCategoryCanvasSVG"
+        canvas-context="{{canvasContext}}">
+      </px-vis-svg-canvas>
+      <px-vis-line-canvas
+        id="parallelCategoryCanvasLine"
+        canvas-context="[[canvasContext]]"
+        parallel-coordinates
+        multi-path
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]">
+      </px-vis-line-canvas>
+    </template>
+
+    <template is="dom-bind">
+      <px-vis-multi-scale
+        id="parallelCategoryGradientCanvasScale"
+        x="{{x}}"
+        y="{{y}}"
+        domain-changed="{{domainChanged}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}">
+      </px-vis-multi-scale>
+      <px-vis-svg-canvas
+        id="parallelCategoryGradientCanvasSVG"
+        canvas-context="{{canvasContext}}">
+      </px-vis-svg-canvas>
+      <px-vis-line-canvas
+        id="parallelCategoryGradientCanvasLine"
+        canvas-context="[[canvasContext]]"
+        parallel-coordinates
+        multi-path
+        gradient-line
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]">
+      </px-vis-line-canvas>
+    </template>
+
+    <!-- POLAR -->
+    <!-- <template is="dom-bind">
+      <px-vis-scale
+        id="polarScale"
+        x-axis-type="time"
+        y-axis-type="linear"
+        x="{{x}}"
+        y="{{y}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-scale>
+      <px-vis-svg-canvas
+        id="polarCanvas"
+        canvas-context="{{canvasContext}}">
+      </px-vis-svg-canvas>
+      <px-vis-line-canvas
+        id="polarLine"
+        canvas-context="{{canvasContext}}"
+        radial-line
+        no-canvas-progressive-rendering
+        x="[[x]]"
+        y="[[y]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]"
+        domain-changed="[[domainChanged]]">
+      </px-vis-line-canvas>
+    </template>
+
+    <template is="dom-bind">
+      <px-vis-scale
+        id="polarMissingScale"
+        x-axis-type="time"
+        y-axis-type="linear"
+        x="{{x}}"
+        y="{{y}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-scale>
+      <px-vis-canvas
+        id="polarMissingSSVG"
+        canvas-context="{{canvasContext}}">
+      </px-vis-canvas>
+      <px-vis-line-canvas
+        id="polarMissingSLine1"
+        canvas-context="{{canvasContext}}"
+        x="[[x]]"
+        y="[[y]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]"
+        domain-changed="[[domainChanged]]">
+      </px-vis-line-canvas>
+    </template> -->
+
+    <!--  RADAR -->
+    <template is="dom-bind">
+      <px-vis-multi-scale
+        id="radarScale"
+        x="{{x}}"
+        y="{{y}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-multi-scale>
+      <px-vis-svg-canvas
+        id="radarSVG"
+        canvas-context="{{canvasContext}}">
+      </px-vis-svg-canvas>
+      <px-vis-line-canvas
+        id="radarLine"
+        canvas-context="[[canvasContext]]"
+        parallel-coordinates
+        multi-path
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]">
+      </px-vis-line-canvas>
+    </template>
+
+    <template is="dom-bind">
+      <px-vis-multi-scale
+        id="radarGradientScale"
+        x="{{x}}"
+        y="{{y}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-multi-scale>
+      <px-vis-svg-canvas
+        id="radarGradientSVG"
+        canvas-context="{{canvasContext}}">
+      </px-vis-svg-canvas>
+      <px-vis-line-canvas
+        id="radarGradientLine"
+        canvas-context="[[canvasContext]]"
+        parallel-coordinates
+        multi-path
+        gradient-line
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]">
+      </px-vis-line-canvas>
+    </template>
+
+    <template is="dom-bind">
+      <px-vis-multi-scale
+        id="radarCategoryScale"
+        x="{{x}}"
+        y="{{y}}"
+        domain-changed="{{domainChanged}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}">
+      </px-vis-multi-scale>
+      <px-vis-svg-canvas
+        id="radarCategorySVG"
+        canvas-context="{{canvasContext}}">
+      </px-vis-svg-canvas>
+      <px-vis-line-canvas
+        id="radarCategoryLine"
+        canvas-context="[[canvasContext]]"
+        parallel-coordinates
+        multi-path
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]">
+      </px-vis-line-canvas>
+    </template>
+
+    <template is="dom-bind">
+      <px-vis-multi-scale
+        id="radarCategoryGradientScale"
+        x="{{x}}"
+        y="{{y}}"
+        domain-changed="{{domainChanged}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}">
+      </px-vis-multi-scale>
+      <px-vis-svg-canvas
+        id="radarCategoryGradientSVG"
+        canvas-context="{{canvasContext}}">
+      </px-vis-svg-canvas>
+      <px-vis-line-canvas
+        id="radarCategoryGradientLine"
+        canvas-context="[[canvasContext]]"
+        parallel-coordinates
+        multi-path
+        gradient-line
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]">
+      </px-vis-line-canvas>
+    </template>
+
+    <template is="dom-bind">
+      <px-vis-multi-scale
+        id="radarMissingScale"
+        x="{{x}}"
+        y="{{y}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-multi-scale>
+      <px-vis-svg-canvas
+        id="radarMissingSVG"
+        canvas-context="{{canvasContext}}">
+      </px-vis-svg-canvas>
+      <px-vis-line-canvas
+        id="radarMissingLine"
+        canvas-context="[[canvasContext]]"
+        parallel-coordinates
+        multi-path
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]">
+      </px-vis-line-canvas>
+    </template>
+
+  </body>
+</html>
