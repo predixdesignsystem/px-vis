@@ -3,13 +3,13 @@ document.addEventListener("WebComponentsReady", function() {
 });
 
 function runTests(){
-  suite('px-vis-line does Polymer exist?', function() {
+  suite('px-vis-line-canvas does Polymer exist?', function() {
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
   });
 
-  suite('px-vis-line with two series renders to canvas', function() {
+  suite('px-vis-line-canvas with two series renders to canvas', function() {
     var baseScale = document.getElementById('baseScale'),
         baseCanvas = document.getElementById('baseCanvas'),
         baseLine1 = document.getElementById('baseLine1'),
@@ -116,7 +116,7 @@ function runTests(){
   }); //suite
 
 
-  suite('px-vis-line with two series renders progressively to canvas', function() {
+  suite('px-vis-line-canvas with two series renders progressively to canvas', function() {
     var progressiveScale = document.getElementById('progressiveScale'),
         progressiveCanvas = document.getElementById('progressiveCanvas'),
         progressiveLine1 = document.getElementById('progressiveLine1'),
@@ -243,7 +243,7 @@ function runTests(){
   }); //suite
 
 
-  suite('px-vis-line with two series renders to canvas without progressive rendering', function() {
+  suite('px-vis-line-canvas with two series renders to canvas without progressive rendering', function() {
     var canvasOnceScale = document.getElementById('canvasOnceScale'),
         canvasOnce = document.getElementById('canvasOnce'),
         canvasOnceLine1 = document.getElementById('canvasOnceLine1'),
@@ -349,7 +349,7 @@ function runTests(){
     });
   }); //suite
 
-  suite('px-vis-line mutes correctly', function() {
+  suite('px-vis-line-canvas mutes correctly', function() {
     var canvasOnceScale = document.getElementById('canvasOnceScale'),
         canvasOnce = document.getElementById('canvasOnce'),
         canvasOnceLine1 = document.getElementById('canvasOnceLine1'),
@@ -389,7 +389,7 @@ function runTests(){
     });
   }); //suite
 
-  suite('px-vis-line unmutes correctly', function() {
+  suite('px-vis-line-canvas unmutes correctly', function() {
     var canvasOnceScale = document.getElementById('canvasOnceScale'),
         canvasOnce = document.getElementById('canvasOnce'),
         canvasOnceLine1 = document.getElementById('canvasOnceLine1'),
@@ -429,7 +429,7 @@ function runTests(){
     });
   }); //suite
 
-  suite('px-vis-line mutes to 0 correctly', function() {
+  suite('px-vis-line-canvas mutes to 0 correctly', function() {
     var canvasOnceScale = document.getElementById('canvasOnceScale'),
         canvasOnce = document.getElementById('canvasOnce'),
         canvasOnceLine1 = document.getElementById('canvasOnceLine1'),
@@ -472,7 +472,7 @@ function runTests(){
   }); //suite
 
 
-  suite('px-vis-line renders parallel axis to canvas', function() {
+  suite('px-vis-line-canvas renders parallel axis to canvas', function() {
     var parallelCanvasScale = document.getElementById('parallelCanvasScale'),
         parallelCanvasSVG = document.getElementById('parallelCanvasSVG'),
         parallelCanvasLine = document.getElementById('parallelCanvasLine');
@@ -566,7 +566,7 @@ function runTests(){
 
   }); //suite
 
-  suite('px-vis-line renders parallel axis with gradient to canvas', function() {
+  suite('px-vis-line-canvas renders parallel axis with gradient to canvas', function() {
     var parallelGradientCanvasScale = document.getElementById('parallelGradientCanvasScale'),
         parallelGradientCanvasSVG = document.getElementById('parallelGradientCanvasSVG'),
         parallelGradientCanvasLine = document.getElementById('parallelGradientCanvasLine');
@@ -660,7 +660,7 @@ function runTests(){
 
   }); //suite
 
-  suite('px-vis-line renders parallel axis with categories to canvas', function() {
+  suite('px-vis-line-canvas renders parallel axis with categories to canvas', function() {
     var parallelCategoryCanvasScale = document.getElementById('parallelCategoryCanvasScale'),
         parallelCategoryCanvasSVG = document.getElementById('parallelCategoryCanvasSVG'),
         parallelCategoryCanvasLine = document.getElementById('parallelCategoryCanvasLine');
@@ -776,7 +776,7 @@ function runTests(){
 
   }); //suite
 
-  suite('px-vis-line renders parallel axis with categories and gradient to canvas', function() {
+  suite('px-vis-line-canvas renders parallel axis with categories and gradient to canvas', function() {
     var parallelCategoryGradientCanvasScale = document.getElementById('parallelCategoryGradientCanvasScale'),
         parallelCategoryGradientCanvasSVG = document.getElementById('parallelCategoryGradientCanvasSVG'),
         parallelCategoryGradientCanvasLine = document.getElementById('parallelCategoryGradientCanvasLine');
@@ -891,7 +891,7 @@ function runTests(){
     });
   }); //suite
 
-  // // suite('px-vis-line polar works', function() {
+  // // suite('px-vis-line-canvas polar works', function() {
   // //   var polarScale = document.getElementById('polarScale'),
   // //       polarCanvas = document.getElementById('polarCanvas'),
   // //       polarLine = document.getElementById('polarLine');
@@ -977,7 +977,7 @@ function runTests(){
   // // }); //suite
   //
   // //
-  // // suite('px-vis-line polar with degrees and counter clockwise works', function() {
+  // // suite('px-vis-line-canvas polar with degrees and counter clockwise works', function() {
   // //   var polarDegreeScale = document.getElementById('polarDegreeScale'),
   // //       polarDegreeSVG = document.getElementById('polarDegreeSVG'),
   // //       polarDegreeLine = document.getElementById('polarDegreeLine');
@@ -1091,7 +1091,7 @@ function runTests(){
   // //   });
   // // }); //suite
   // //
-  // // suite('px-vis-line polar with degrees and counter clockwise works', function() {
+  // // suite('px-vis-line-canvas polar with degrees and counter clockwise works', function() {
   // //   var polarCCWScale = document.getElementById('polarCCWScale'),
   // //       polarCCWSVG = document.getElementById('polarCCWSVG'),
   // //       polarCCWLine = document.getElementById('polarCCWLine');
@@ -1206,7 +1206,7 @@ function runTests(){
   // // }); //suite
   // //
   // //
-  // // suite('px-vis-line polar with degrees and counter clockwise works', function() {
+  // // suite('px-vis-line-canvas polar with degrees and counter clockwise works', function() {
   // //   var polarDegreeCCWScale = document.getElementById('polarDegreeCCWScale'),
   // //       polarDegreeCCWSVG = document.getElementById('polarDegreeCCWSVG'),
   // //       polarDegreeCCWLine = document.getElementById('polarDegreeCCWLine');
@@ -1320,7 +1320,7 @@ function runTests(){
   // //   });
   // // }); //suite
   // //
-  // // suite('px-vis-line polar missing data works', function() {
+  // // suite('px-vis-line-canvas polar missing data works', function() {
   // //   var polarMissingScale = document.getElementById('polarMissingScale'),
   // //       polarMissingSVG = document.getElementById('polarMissingSVG'),
   // //       polarMissingLine = document.getElementById('polarMissingLine');
@@ -1428,7 +1428,7 @@ function runTests(){
   // // }); //suite
   // //
 
-  suite('px-vis-line renders radar to canvas', function() {
+  suite('px-vis-line-canvas renders radar to canvas', function() {
     var radarScale = document.getElementById('radarScale'),
         radarCanvas = document.getElementById('radarCanvas'),
         radarLine = document.getElementById('radarLine');
@@ -1558,7 +1558,7 @@ function runTests(){
 
   }); //suite
 
-  suite('px-vis-line radar with missing data', function() {
+  suite('px-vis-line-canvas radar with missing data', function() {
     var radarMissingScale = document.getElementById('radarMissingScale'),
         radarMissingSVG = document.getElementById('radarMissingSVG'),
         radarMissingLine = document.getElementById('radarMissingLine');
@@ -1652,6 +1652,112 @@ function runTests(){
       assert.equal(radarMissingSVG.canvasContext._pxLinesSeries['x'], true);
     });
 
+  }); //suite
+
+  suite('px-vis-line-canvas creates a clip path', function() {
+    var clipPathScale = document.getElementById('clipPathScale'),
+        clipPathCanvas = document.getElementById('clipPathCanvas'),
+        clipPathLine = document.getElementById('clipPathLine');
+
+    var colorOrder = commonColors.properties.seriesColorOrder.value;
+    var colorSet = commonColors.properties.dataVisColors.value;
+    var linePath;
+
+    suiteSetup(function(done){
+      var d = [{
+            "x": 1397102460000,
+            "y": 1,
+            "y1": 1,
+            "y2": 1
+          },{
+            "x": 1397131620000,
+            "y": 6,
+            "y1": 15,
+            "y2": 21
+          },{
+            "x": 1397160780000,
+            "y": 10,
+            "y1": 8,
+            "y2": 3
+          },{
+            "x": 1397189940000,
+            "y": 4,
+            "y1": 10,
+            "y2": 10
+          },{
+            "x": 1397219100000,
+            "y": 6,
+            "y1": 20,
+            "y2": 27
+          }
+        ],
+        completeSeriesConfig = {
+          "x":{
+            "type":"line",
+            "name":"mySeries",
+            "x":['y','y1','y2'],
+            "y":['y','y1','y2'],
+            "color": "rgb(93,165,218)"
+          }
+        },
+        dim = ['y','y1','y2'],
+        w = 500,
+        h = 500,
+        min = 480/2,
+        offset = [250,250],
+        m = {
+          "top": 10,
+          "right": 10,
+          "bottom": 10,
+          "left": 10
+        },
+        chartExtents = {"x":["y","y1","y2"], 'y': [2,20]};
+
+      clipPathCanvas.set('width',w);
+      clipPathCanvas.set('height',h);
+      clipPathCanvas.set('margin',m);
+      clipPathCanvas.set('offset',offset);
+
+      clipPathScale.set('width',min);
+      clipPathScale.set('margin',m);
+      clipPathScale.set('amplitudeKeys',dim);
+      clipPathScale.set('centerOffset',50);
+      clipPathScale.set('chartData',d);
+      clipPathScale.set('chartExtents', chartExtents);
+
+      clipPathLine.set('completeSeriesConfig',completeSeriesConfig);
+      clipPathLine.set('seriesId',"x");
+      clipPathLine.set('chartData',d);
+
+      setTimeout(function(){
+        linePath = clipPathLine.lineGroup;
+        done();
+      },500);;
+    });
+
+    test('clipPathLine fixture is created', function() {
+      assert.isTrue(clipPathLine !== null);
+    });
+
+    test('context has correct total lines ', function() {
+      assert.equal(clipPathCanvas.canvasContext._pxLinesTotal, 1);
+    });
+
+    test('context has drawn 2 lines ', function() {
+      assert.equal(clipPathCanvas.canvasContext._pxLinesRedraw, 1);
+    });
+
+    test('context has added both to its list', function() {
+      assert.equal(Object.keys(clipPathCanvas.canvasContext._pxLinesSeries).length, 1);
+      assert.equal(clipPathCanvas.canvasContext._pxLinesSeries['x'], true);
+    });
+
+    test('visual check with mask', function() {
+      clipPathLine.drawClipPath();
+      clipPathCanvas.canvasContext.fillRect(-500,-500,1000,1000);
+      debugger
+      assert.equal(Object.keys(clipPathCanvas.canvasContext._pxLinesSeries).length, 1);
+    });
   }); //suite
 
 } //runTests
