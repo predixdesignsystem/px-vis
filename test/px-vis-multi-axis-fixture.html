@@ -1,0 +1,167 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Web Component Test : Fixture for px-vis-multi-axis</title>
+
+    <!-- Requires Webcomponents.js polyfill is provided by the page for browsers that don't support html imports -->
+    <script src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <!-- web-component-tester automatically provides local copy of brower.js below
+         for any URL ending with "/web-component-tester/browser.js"
+         when wct is run from the command line -->
+    <script src="../web-component-tester/browser.js"></script>
+    <link rel="import" href="../px-vis-multi-scale.html" />
+    <link rel="import" href="../px-vis-radial-scale.html" />
+    <link rel="import" href="../px-vis-svg.html" />
+    <link rel="import" href="../px-vis-multi-axis.html" />
+    <!-- Retain this link for px-theme.html -->
+    <!-- px-theme is needed for WCT to run without errors -->
+    <link rel="import" href="../../px-theme/px-theme.html"/>
+
+    <script src="px-vis-multi-axis-tests.js"></script>
+  </head>
+
+  <body>
+    <h3>Web Component Test : Fixture for px-vis-multi-axis</h3>
+    <template is="dom-bind">
+      <px-vis-multi-scale
+        id="multiScale"
+        axes="[[axes]]"
+        chart-data="[[chartData]]"
+        chart-extents="[[chartExtents]]"
+        x="{{x}}"
+        y="{{y}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-multi-scale>
+      <px-vis-svg
+        id="multiSVG"
+        svg="{{svg}}">
+      </px-vis-svg>
+      <px-vis-multi-axis
+        id="multiAxis"
+        svg="[[svg]]"
+        title-location='[[titleLocation]]'
+        x="[[x]]"
+        y="[[y]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]"
+        redraw-series="true"
+        stroke-width="2"
+        match-ticks
+        outer-tick-size="6"
+        label-type-size="10"
+        title-type-size="12"
+        displayed-values="{{displayedValues}}"
+        append-unit-in-title
+        domain-changed="[[domainChanged]]"
+        axis-groups="{{axisGroups}}"
+        brush-elems="{{brushElems}}">
+      </px-vis-multi-axis>
+    </template>
+
+    <template is="dom-bind">
+      <px-vis-multi-scale
+        id="multiScaleCommon"
+        axes="[[axes]]"
+        chart-data="[[chartData]]"
+        chart-extents="[[chartExtents]]"
+        x="{{x}}"
+        y="{{y}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-multi-scale>
+      <px-vis-svg
+        id="multiSVGCommon"
+        svg="{{svg}}">
+      </px-vis-svg>
+      <px-vis-multi-axis
+        id="multiAxisCommon"
+        svg="[[svg]]"
+        title-location='[[titleLocation]]'
+        x="[[x]]"
+        y="[[y]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]"
+        complete-series-config="{{completeSeriesConfig}}"
+        redraw-series="true"
+        stroke-width="2"
+        common-axis
+        grid-ticks="{{gridTicks}}"
+        grid-axis="{{gridAxis}}"
+        outer-tick-size="6"
+        label-type-size="10"
+        title-type-size="12"
+        displayed-values="{{displayedValues}}"
+        append-unit-in-title
+        domain-changed="[[domainChanged]]"
+        axis-groups="{{axisGroups}}"
+        brush-elems="{{brushElems}}">
+      </px-vis-multi-axis>
+    </template>
+
+    <template is="dom-bind">
+      <px-vis-radial-scale
+        width="[[_minDim]]"
+        margin="[[margin]]"
+        amplitude-keys="[[dimensions]]"
+        chart-data="[[chartData]]"
+        chart-extents="[[chartExtents]]"
+        x="{{x}}"
+        y="{{y}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}"
+        center-offset="[[centerOffset]]">
+      </px-vis-radial-scale>
+      <px-vis-svg
+        id="baseSVG"
+        svg="{{svg}}">
+      </px-vis-svg>
+      <px-vis-multi-axis
+        id="multiAxis"
+        svg="[[svg]]"
+        width="[[width]]"
+        height="[[height]]"
+        margin="[[margin]]"
+        offset="[[_offset]]"
+        length="[[_minDim]]"
+        x="[[x]]"
+        y="[[y]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]"
+        complete-series-config="{{completeSeriesConfig}}"
+        series-key="[[seriesKey]]"
+        chart-data="[[chartData]]"
+        dimensions="[[dimensions]]"
+        axes="[[axes]]"
+        muted-series="{{mutedSeriesBrush}}"
+        redraw-series="true"
+        stroke-width="2"
+        match-ticks="[[matchTicks]]"
+        grid-ticks="{{gridTicks}}"
+        grid-axis="{{gridAxis}}"
+        common-axis="[[commonAxis]]"
+        truncation-length="[[truncationLength]]"
+        append-unit-in-title
+        domain-changed="[[domainChanged]]"
+        axis-groups="{{axisGroups}}"
+        brush-elems="{{brushElems}}"
+        radial
+        single-domain
+        label-position="inline"
+        label-one-axis
+        axis-color="grey4"
+        ticks="[[ticks]]"
+        label-rotation="180"
+        brush-to-remove="[[brushToRemove]]"
+        center-offset="[[centerOffset]]"
+        drawn-tick-values="{{drawnTickValues}}"
+        title-type-size="15"
+        label-type-size="12">
+      </px-vis-multi-axis>
+    </template>
+  </body>
+</html>

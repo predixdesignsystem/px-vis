@@ -101,22 +101,31 @@ function runTests(){
         baseClip = document.getElementById('baseClip');
     var clipPath, clipPath2, rect, rectSeries;
 
-    suiteSetup(function(){
+    suiteSetup(function(done){
       clipPath = Px.d3.select(baseClip.svg.selectAll('clipPath').nodes()[0]);
       clipPath2 = Px.d3.select(baseClip.svg.selectAll('clipPath').nodes()[1]);
-      // Safari 8 cant seem to find it with d3 select... fallback
+
+      rect = baseClip._clipPathSvg;
+      rectSeries = baseClip._seriesClipPathSvg;
+
+      // Safari 8 is being weird
       if(clipPath.node() === null) {
         clipPath = Px.d3.select(document.getElementsByTagName('clipPath')[0]);
         clipPath2 = Px.d3.select(document.getElementsByTagName('clipPath')[1]);
+
+        rect = Px.d3.select(document.getElementsByTagName('clipPath')[0].getElementsByTagName("rect")[0]);
+        rectSeries = Px.d3.select(document.getElementsByTagName('clipPath')[1].getElementsByTagName("rect")[0]);
       }
-      rect = baseClip._clipPathSvg;
-      rectSeries = baseClip._seriesClipPathSvg;
+
+      setTimeout(function(){done()},500);
+
     });
 
     test('baseClip ID is set', function() {
       assert.equal(clipPath.attr('id'),baseClip.clipPath);
     });
     test('baseClip y', function() {
+      debugger
       assert.equal(rect.attr('y'),-10);
     });
     test('baseClip width', function() {

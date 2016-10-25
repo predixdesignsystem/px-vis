@@ -575,11 +575,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           this.axisGroups.filter(":not(:first-child)").selectAll('g.tick text').classed('hideCommon',true);
           this.axisGroups.selectAll('.hideCommon').style('display','none');
           this.axisGroups.on('mouseover',function(){
-            d3.select(this).selectAll('.hideCommon').style('display',null)
-            d3.select(this).selectAll('.hideCommon').style('fill',_this.colors.grey3)
+            Px.d3.select(this).selectAll('.hideCommon').style('display',null)
+            Px.d3.select(this).selectAll('.hideCommon').style('fill',_this.colors.grey3)
           }).on('mouseleave',function(){
-            d3.select(this).selectAll('.hideCommon').style('display','none')
-            d3.select(this).selectAll('.hideCommon').style('fill',"black")
+            Px.d3.select(this).selectAll('.hideCommon').style('display','none')
+            Px.d3.select(this).selectAll('.hideCommon').style('fill',"black")
           });
         } else {
           this.axisGroups.selectAll('.hideCommon').style('display',null);
@@ -616,6 +616,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
      *
      */
     _computedInternalDimensions: function(dC, dim) {
+      //FIXME ?? This if introduces a possible race condition where if dims have not been set on this component, but has on the scale, it will fail this check when dims is updated. Dont think this can happen outside a testing env, but should be careful
+      
+      //makes sure we dont try to process a new dim before it has a new scale.
       if(this._lastDomainChanged !== this.domainChanged) {
         this._lastDomainChanged = this.domainChanged;
         //if match ticks, make sure the domains can be aligned
