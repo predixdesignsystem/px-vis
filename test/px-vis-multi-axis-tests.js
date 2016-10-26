@@ -624,10 +624,10 @@ function runTests(){
       var ticks0 = Px.d3.select(multiAxisCommon.axisGroups.nodes()[0]).selectAll('g.tick text').nodes(),
           ticks1 = Px.d3.select(multiAxisCommon.axisGroups.nodes()[1]).selectAll('g.tick text').nodes(),
           ticks2 = Px.d3.select(multiAxisCommon.axisGroups.nodes()[2]).selectAll('g.tick text').nodes();
-
-      assert.equal(ticks0[0].classList.length, 0);
-      assert.equal(ticks1[0].classList[0], "hideCommon");
-      assert.equal(ticks2[0].classList[0], "hideCommon");
+      
+      assert.equal(ticks0[0].className.baseVal, "");
+      assert.equal(ticks1[0].className.baseVal, "hideCommon");
+      assert.equal(ticks2[0].className.baseVal, "hideCommon");
 
     });
 
