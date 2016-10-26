@@ -110,14 +110,15 @@ function runTests(){
     });
 
     test('multiAxis each group is transformed correctly', function() {
-      var gs = multiAxis.axisGroups.nodes(),
-          g0 = Px.d3.select(gs[0]).attr('transform'),
-          g1 = Px.d3.select(gs[1]).attr('transform'),
-          g2 = Px.d3.select(gs[2]).attr('transform');
+      var re = /translate\((\d+)\s?,?\d*\)/,
+          gs = multiAxis.axisGroups.nodes(),
+          g0 = re.exec(Px.d3.select(gs[0]).attr('transform')),
+          g1 = re.exec(Px.d3.select(gs[1]).attr('transform')),
+          g2 = re.exec(Px.d3.select(gs[2]).attr('transform'));
 
-      assert.equal(g0.split(' ').join('').split(',').join(''), "translate(800)");
-      assert.equal(g1.split(' ').join('').split(',').join(''), "translate(2400)");
-      assert.equal(g2.split(' ').join('').split(',').join(''), "translate(4000)");
+      assert.equal(g0[1], "80");
+      assert.equal(g1[1], "240");
+      assert.equal(g2[1], "400");
     });
 
     test('multiAxis axis gets correct calculated attrs', function() {
@@ -250,16 +251,17 @@ function runTests(){
     });
 
     test('multiAxis each group is transformed correctly', function() {
-      var gs = multiAxis.axisGroups.nodes(),
-          g0 = Px.d3.select(gs[0]).attr('transform'),
-          g1 = Px.d3.select(gs[1]).attr('transform'),
-          g2 = Px.d3.select(gs[2]).attr('transform'),
-          g3 = Px.d3.select(gs[3]).attr('transform');
+      var re = /translate\((\d+)\s?,?\d*\)/,
+          gs = multiAxis.axisGroups.nodes(),
+          g0 = re.exec(Px.d3.select(gs[0]).attr('transform')),
+          g1 = re.exec(Px.d3.select(gs[1]).attr('transform')),
+          g2 = re.exec(Px.d3.select(gs[2]).attr('transform')),
+          g3 = re.exec(Px.d3.select(gs[3]).attr('transform'));
 
-      assert.equal(g0.split(' ').join('').split(',').join(''), "translate(600)");
-      assert.equal(g1.split(' ').join('').split(',').join(''), "translate(1800)");
-      assert.equal(g2.split(' ').join('').split(',').join(''), "translate(3000)");
-      assert.equal(g3.split(' ').join('').split(',').join(''), "translate(4200)");
+      assert.equal(g0[1], "60");
+      assert.equal(g1[1], "180");
+      assert.equal(g2[1], "300");
+      assert.equal(g3[1], "420");
     });
 
 
@@ -385,14 +387,15 @@ function runTests(){
     });
 
     test('multiAxis each group is transformed correctly', function() {
-      var gs = multiAxis.axisGroups.nodes(),
-          g0 = Px.d3.select(gs[0]).attr('transform'),
-          g1 = Px.d3.select(gs[1]).attr('transform'),
-          g2 = Px.d3.select(gs[2]).attr('transform');
+      var re = /translate\((\d+)\s?,?\d*\)/,
+          gs = multiAxis.axisGroups.nodes(),
+          g0 = re.exec(Px.d3.select(gs[0]).attr('transform')),
+          g1 = re.exec(Px.d3.select(gs[1]).attr('transform')),
+          g2 = re.exec(Px.d3.select(gs[2]).attr('transform'));
 
-      assert.equal(g0.split(' ').join('').split(',').join(''), "translate(800)");
-      assert.equal(g1.split(' ').join('').split(',').join(''), "translate(2400)");
-      assert.equal(g2.split(' ').join('').split(',').join(''), "translate(4000)");
+      assert.equal(g0[1], "80");
+      assert.equal(g1[1], "240");
+      assert.equal(g2[1], "400");
     });
 
 
@@ -524,26 +527,17 @@ function runTests(){
     });
 
     test('multiAxisCommon each group is transformed correctly', function() {
-      var gs = multiAxisCommon.axisGroups.nodes(),
-          g0 = Px.d3.select(gs[0]).attr('transform'),
-          g1 = Px.d3.select(gs[1]).attr('transform'),
-          g2 = Px.d3.select(gs[2]).attr('transform');
+      var re = /translate\((\d+)\s?,?\d*\)/,
+          gs = multiAxisCommon.axisGroups.nodes(),
+          g0 = re.exec(Px.d3.select(gs[0]).attr('transform')),
+          g1 = re.exec(Px.d3.select(gs[1]).attr('transform')),
+          g2 = re.exec(Px.d3.select(gs[2]).attr('transform'));
 
-      assert.equal(g0.split(' ').join('').split(',').join(''), "translate(800)");
-      assert.equal(g1.split(' ').join('').split(',').join(''), "translate(2400)");
-      assert.equal(g2.split(' ').join('').split(',').join(''), "translate(4000)");
+      assert.equal(g0[1], "80");
+      assert.equal(g1[1], "240");
+      assert.equal(g2[1], "400");
     });
 
-    test('multiAxisCommon each group is transformed correctly', function() {
-      var gs = multiAxisCommon.axisGroups.nodes(),
-          g0 = Px.d3.select(gs[0]).attr('transform'),
-          g1 = Px.d3.select(gs[1]).attr('transform'),
-          g2 = Px.d3.select(gs[2]).attr('transform');
-
-      assert.equal(g0.split(' ').join('').split(',').join(''), "translate(800)");
-      assert.equal(g1.split(' ').join('').split(',').join(''), "translate(2400)");
-      assert.equal(g2.split(' ').join('').split(',').join(''), "translate(4000)");
-    });
 
     test('multiAxisCommon axis gets correct calculated attrs', function() {
       var axes = multiAxisCommon.getElementsByTagName('px-vis-axis');
