@@ -104,61 +104,76 @@
     </template>
 
     <template is="dom-bind">
-      <px-vis-radial-scale
-        width="[[_minDim]]"
-        margin="[[margin]]"
-        amplitude-keys="[[dimensions]]"
+      <px-vis-multi-scale
+        id="noMatchScale"
+        axes="[[axes]]"
         chart-data="[[chartData]]"
         chart-extents="[[chartExtents]]"
         x="{{x}}"
         y="{{y}}"
         current-domain-x="{{currentDomainX}}"
         current-domain-y="{{currentDomainY}}"
-        center-offset="[[centerOffset]]">
-      </px-vis-radial-scale>
+        domain-changed="{{domainChanged}}">
+      </px-vis-multi-scale>
       <px-vis-svg
-        id="baseSVG"
+        id="noMatchSVG"
         svg="{{svg}}">
       </px-vis-svg>
       <px-vis-multi-axis
-        id="multiAxis"
+        id="noMatchAxis"
         svg="[[svg]]"
-        width="[[width]]"
-        height="[[height]]"
-        margin="[[margin]]"
-        offset="[[_offset]]"
-        length="[[_minDim]]"
+        title-location='[[titleLocation]]'
         x="[[x]]"
         y="[[y]]"
         current-domain-x="[[currentDomainX]]"
         current-domain-y="[[currentDomainY]]"
         complete-series-config="{{completeSeriesConfig}}"
-        series-key="[[seriesKey]]"
-        chart-data="[[chartData]]"
-        dimensions="[[dimensions]]"
-        axes="[[axes]]"
-        muted-series="{{mutedSeriesBrush}}"
         redraw-series="true"
         stroke-width="2"
-        match-ticks="[[matchTicks]]"
         grid-ticks="{{gridTicks}}"
         grid-axis="{{gridAxis}}"
-        common-axis="[[commonAxis]]"
-        truncation-length="[[truncationLength]]"
+        outer-tick-size="6"
+        label-type-size="10"
+        title-type-size="12"
+        displayed-values="{{displayedValues}}"
         append-unit-in-title
         domain-changed="[[domainChanged]]"
         axis-groups="{{axisGroups}}"
-        brush-elems="{{brushElems}}"
+        brush-elems="{{brushElems}}">
+      </px-vis-multi-axis>
+    </template>
+
+    <template is="dom-bind">
+      <px-vis-radial-scale
+        id="radialScale"
+        x="{{x}}"
+        y="{{y}}"
+        domain-changed="{{domainChanged}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}">
+      </px-vis-radial-scale>
+      <px-vis-svg
+        id="radialSVG"
+        svg="{{svg}}">
+      </px-vis-svg>
+      <px-vis-multi-axis
+        id="radialAxis"
+        svg="[[svg]]"
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]"
+        redraw-series="true"
+        stroke-width="2"
+        append-unit-in-title
         radial
         single-domain
         label-position="inline"
         label-one-axis
         axis-color="grey4"
-        ticks="[[ticks]]"
         label-rotation="180"
-        brush-to-remove="[[brushToRemove]]"
-        center-offset="[[centerOffset]]"
-        drawn-tick-values="{{drawnTickValues}}"
+        brush-to-remove
         title-type-size="15"
         label-type-size="12">
       </px-vis-multi-axis>

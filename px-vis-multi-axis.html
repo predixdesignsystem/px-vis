@@ -476,9 +476,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
                 `.____.'                   `.____.'
                    0                          180
               */
-                return "rotate(" + (this.x(d) * 180 / Math.PI + 180) + ")"
+                return this.x(d) || this.x(d) === 0 ? "rotate(" + (this.x(d) * 180 / Math.PI + 180) + ")" : ''
               }
-              return "translate(" + this.x(d) + ",0)";
+              return this.x(d) || this.x(d) === 0 ? "translate(" + this.x(d) + ",0)" : '';
             }.bind(this));
 
             // if we removed titles from the array make sure we notify
@@ -617,7 +617,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
      */
     _computedInternalDimensions: function(dC, dim) {
       //FIXME ?? This if introduces a possible race condition where if dims have not been set on this component, but has on the scale, it will fail this check when dims is updated. Dont think this can happen outside a testing env, but should be careful
-      
+
       //makes sure we dont try to process a new dim before it has a new scale.
       if(this._lastDomainChanged !== this.domainChanged) {
         this._lastDomainChanged = this.domainChanged;
