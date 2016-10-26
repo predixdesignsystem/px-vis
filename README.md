@@ -9,7 +9,7 @@ Px-Vis is a Predix Experience ('Px') component
 
 ## Documentation
 
-Read the full API and view the demo here (coming soon).
+Read the full API and view the px-vis demo [here] (https://predixdev.github.io/px-vis).
 
 The documentation in this repository is supplemental to the official Predix documentation, which is continuously updated and maintained by the Predix documentation team. Go to [http://predix.io](http://predix.io)  to see the official Predix documentation.
 
