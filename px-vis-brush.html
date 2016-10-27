@@ -168,7 +168,7 @@ This element sets the selectedDomain property based on the extents box. The sele
      */
     drawElement: function() {
       var heightOffset = 5,
-            h = this.height - this.margin.bottom - heightOffset,
+            h = Math.max(this.height - this.margin.bottom - heightOffset,0),
             domain = [
               [this.axis(this.currentDomain[0]),0],
               [this.axis(this.currentDomain[1]),h]
@@ -302,19 +302,21 @@ This element sets the selectedDomain property based on the extents box. The sele
       // var s = d3.event.selection;
       // circle.classed("selected", function(d) { return s[0] <= d && d <= s[1]; });
       this.debounce('brushed', function () {
-        var newDomain = Px.d3.brushSelection(this._brushGroup.node()).map(this.axis.invert, this.axis);
-        //make sure this is an actual update
-        var changed = this.selectedDomain.x.length < 2 ||
-                        newDomain[0].toString() !== this.selectedDomain.x[0].toString() ||
-                        newDomain[1].toString() !== this.selectedDomain.x[1].toString();
+        if(Px.d3.brushSelection(this._brushGroup.node())) {
+          var newDomain = Px.d3.brushSelection(this._brushGroup.node()).map(this.axis.invert, this.axis);
+          //make sure this is an actual update
+          var changed = this.selectedDomain.x.length < 2 ||
+                          newDomain[0].toString() !== this.selectedDomain.x[0].toString() ||
+                          newDomain[1].toString() !== this.selectedDomain.x[1].toString();
 
-        if(!this._preventDomainChange && changed) {
-          this.set('selectedDomain', {x:newDomain,y:[]});
-          this.fire('px-vis-selected-domain-updated', {
-            'data':{x:newDomain,y:[]}, 'method': 'set', 'dataVar': 'selectedDomain'
-          });
+          if(!this._preventDomainChange && changed) {
+            this.set('selectedDomain', {x:newDomain,y:[]});
+            this.fire('px-vis-selected-domain-updated', {
+              'data':{x:newDomain,y:[]}, 'method': 'set', 'dataVar': 'selectedDomain'
+            });
+          }
         }
-    }, 10);
+      }, 10);
     },
     /**
      * Helper function fired whtn the navigator is clicked on
