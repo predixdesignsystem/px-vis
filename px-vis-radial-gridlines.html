@@ -7,21 +7,15 @@
 <!--
 Drawing object which adds radial (circular) gridlines to the chart.
 
-Orintation has two options:
-- `bottom`
-- `left`
-
-Using `bottom` specifies vertical gridlines drawn from the x-axis. Using `left` specifes horizontal gridlines from the y-axis.
-
 ##### Usage
 
     <px-vis-radial-gridlines
         svg="[[svg]]"
-        axis="[[x]]"
+        axis="[[y]]"
+        domain-changed="[[domainChanged]]"
+        current-domain-y="[[currentDomainY]]"
         margin="[[margin]]"
-        length="[[height]]"
-        orientation="bottom"
-        current-domain="[[currentDomainX]]">
+        tick-values="[[drawnTickValues]]">
     </px-vis-radial-gridlines>
 
 ##### d3 reference
@@ -95,7 +89,7 @@ The gridlines still make use of the d3.axis object, just with different settings
           'drawElement(domainChanged, axis, margin, svg, tickValues, currentDomainY)'
         ],
 
-
+//TODO you dont use this, do you?
         ready:function() {
           // if there is no dev set unique ID, generate one
           if(!this.gridId) {
@@ -114,6 +108,7 @@ The gridlines still make use of the d3.axis object, just with different settings
          //   if(!this.gridSvg) {
 
              //clean the svg
+//  TODO Comment me, Why are you doing this? Wont this delete everything else in the passed in g element?
             var node = this.svg.node();
             while (node.firstChild) {
                 node.removeChild(node.firstChild);
@@ -124,10 +119,12 @@ The gridlines still make use of the d3.axis object, just with different settings
 
             //draw the lines
             var ga = this.svg.append('g')
+// TODO was this inentional, give it class 'a' and class 'axis'?
                 .attr('class', 'a axis')
                 .attr('stroke', this.colors.grey4)
                 .attr('stroke-width', '1')
             .selectAll('g')
+                //data is our degree markings that are not occupied by axes
                 .data([30,60,120,150,210,240,310,340])
             .enter().append('g')
                 .attr('transform', function(d) { return 'rotate(' + -d + ')'; });
@@ -136,26 +133,31 @@ The gridlines still make use of the d3.axis object, just with different settings
                 .attr('x2', radius);
 
             //draw the circles
+// TODO why recreate an axis instead of using this.axis?
             var r = Px.d3.scaleLinear()
                             .domain(this.axis.domain())
                             .range(this.axis.range()),
+                //if we have ticks, use them, otherwise generate some from the scale
                 tickValues = this.tickValues.length > 0 ? this.tickValues : r.ticks(5).slice(1),
                 gr;
 
-                //make sure we have the last circle.
+                //make sure we have an outer circle.
                 if(this.currentDomainY.length > 1) {
                     tickValues.push(this.currentDomainY[1]);
                 }
 
                 gr = this.svg.append('g')
+// TODO was this inentional, give it class 'r' and class 'axis'?
                 .attr('class', 'r axis')
                 .attr('fill', 'none')
                 .attr('stroke', this.colors.grey4)
             .selectAll('g')
+//TODO shouldnt this be tickValues?
                 .data(this.tickValues.length > 0 ? this.tickValues : r.ticks(5).slice(1))
             .enter().append('g');
 
             gr.append('circle')
+                // pass in our scale to use as a callback function
                 .attr('r', r);
           },5);
         }
