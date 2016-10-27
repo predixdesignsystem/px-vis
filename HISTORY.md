@@ -3,7 +3,11 @@
 * bug fix for radial scale
 * fixed useDegrees for line
 * misc other bug fixes
-
+* fixed register with 0 value
+* changes to README
+* bug fixes for brush to prevent negative values
+* added various truthy tests for 0 values throughout
+* 
 
 v0.6.14
 ==================

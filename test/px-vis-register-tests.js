@@ -446,6 +446,34 @@ function basicTests(registerID,dir){
     });
   });
 
+  suite('px-vis-register shows zero values ', function() {
+    var register = document.getElementById('checkZero');
+
+    suiteSetup(function(done) {
+      var data = generateDataValues( generateEmptyData(2) );
+
+      data.data.series[0]['value']['x'] = 0;
+      data.data.series[0]['value']['y'] = 0;
+      setData(register, data,done);
+    });
+
+    test('showZero fixtures are created', function() {
+      assert.isTrue(register !== null);
+    });
+
+    test('showZero doesnt show date', function() {
+      assert.isNull(Polymer.dom(register.root).querySelector('px-vis-register-datetime'));
+    });
+
+    test('showZero formated', function() {
+      var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item'),
+          texts = series[0].querySelector('.seriesData').textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join('').split('/');
+
+      assert.equal(texts[0].trim(),'0xUnit');
+      assert.equal(texts[1].trim(),'0yUnit');
+    });
+  });
+
 }
 
 function generateEmptyData(num,str){
