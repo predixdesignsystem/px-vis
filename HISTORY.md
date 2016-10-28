@@ -1,3 +1,7 @@
+v0.6.16
+==================
+* included includes polyfill for IE11
+
 v0.6.15
 ==================
 * bug fix for radial scale
