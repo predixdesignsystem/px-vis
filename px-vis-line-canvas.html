@@ -180,7 +180,7 @@ Element which draws lines series onto the chart
 
         //Render data progressively
         this.canvasContext.lineWidth = 1;
-        if(this.noCanvasProgressiveRendering) {
+        if(this.noCanvasProgressiveRendering || data.length < 5) {
           this._renderAtOnce(data);
         } else {
           //render 1000 points at a time or 5 frames min
@@ -348,20 +348,40 @@ Element which draws lines series onto the chart
       //make sure canvas is clean
       this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
 
+      //split the data in the number of frames desired. This looks more complicated
+      //than it actually is... just splitting data in X batches, making sure it's 
+      //wrapped in an array if it's not a parallel or radial line
+      //we also need to make sure that the batches are "connected"
+      //between each other, hence prepending the last point of the previous
+      //batch to each batch > 0
       if(this.parallelCoordinates || this.radialLine) {
-        //split the data in the number of frames desired
-        for(j=0; j<numberOfFrames; j++) {
-          batches.push(data.slice(j*size, (j+1)*size));
+        for(j=0; j<= numberOfFrames; j++) {
+          //find end of this batch
+          var end = j === numberOfFrames ? data.length : (j+1)*size;
+          if(j > 0) {
+            //add previous last point so that the batches are connected
+            batches.push([data[j*size - 1]]);
+          } else {
+            batches.push([]);
+          }
+          //add data for this batch
+          batches[j] = batches[j].concat(data.slice(j*size, end));
         }
-        //push last slice
-        batches.push(data.slice(j*size, data.length));
+
       } else {
 
-        for(j=0; j<numberOfFrames; j++) {
-          batches.push([data.slice(j*size, (j+1)*size)]);
+        for(j=0; j<= numberOfFrames; j++) {
+          //find end of this batch
+          var end = j === numberOfFrames ? data.length : (j+1)*size;
+          if(j > 0) {
+            //add previous last point so that the batches are connected
+            batches.push([[data[j*size - 1]]]);
+          } else {
+            batches.push([[]]);
+          }
+          //add data for this batch
+          batches[j][0] = batches[j][0].concat(data.slice(j*size, end));
         }
-        //push last slice
-        batches.push([data.slice(j*size, data.length)]);
       }
 
       //PROCESSING FUNCTIONS

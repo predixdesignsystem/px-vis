@@ -1,3 +1,8 @@
+v0.6.17
+==================
+* make sure progressive rendering doesn't "break" the line between batches
+* ensure datasets with 5 or less points still render when progressive rendering is on
+
 v0.6.16
 ==================
 * included includes polyfill for IE11
