@@ -89,14 +89,6 @@ The gridlines still make use of the d3.axis object, just with different settings
           'drawElement(domainChanged, axis, margin, svg, tickValues, currentDomainY)'
         ],
 
-//TODO you dont use this, do you?
-        ready:function() {
-          // if there is no dev set unique ID, generate one
-          if(!this.gridId) {
-            this.set('gridId', this.generateRandomID('grid_'));
-          }
-        },
-
         /**
          * Method fired via observer which draws the gridlines
          *
@@ -105,21 +97,17 @@ The gridlines still make use of the d3.axis object, just with different settings
         drawElement: function() {
           this.debounce('draw_grid', function() {
 
-         //   if(!this.gridSvg) {
-
-             //clean the svg
-//  TODO Comment me, Why are you doing this? Wont this delete everything else in the passed in g element?
+            //clean the svg
+            //remove everything in the svg so we can start a clean draw
             var node = this.svg.node();
             while (node.firstChild) {
                 node.removeChild(node.firstChild);
             }
 
-
             var radius = this.axis.range()[1] - this.axis.range()[0];
 
             //draw the lines
             var ga = this.svg.append('g')
-// TODO was this inentional, give it class 'a' and class 'axis'?
                 .attr('class', 'a axis')
                 .attr('stroke', this.colors.grey4)
                 .attr('stroke-width', '1')
@@ -133,32 +121,28 @@ The gridlines still make use of the d3.axis object, just with different settings
                 .attr('x2', radius);
 
             //draw the circles
-// TODO why recreate an axis instead of using this.axis?
-            var r = Px.d3.scaleLinear()
-                            .domain(this.axis.domain())
-                            .range(this.axis.range()),
-                //if we have ticks, use them, otherwise generate some from the scale
-                tickValues = this.tickValues.length > 0 ? this.tickValues : r.ticks(5).slice(1),
-                gr;
+            //if we have ticks, use them, otherwise generate some from the scale
+            var tickValues = this.tickValues.length > 0 ? this.tickValues : this.axis.ticks(5).slice(1),
+            gr;
 
-                //make sure we have an outer circle.
-                if(this.currentDomainY.length > 1) {
-                    tickValues.push(this.currentDomainY[1]);
-                }
+            //make sure we have an outer circle.
+            if(this.currentDomainY.length > 1) {
+                tickValues.push(this.currentDomainY[1]);
+            }
 
-                gr = this.svg.append('g')
-// TODO was this inentional, give it class 'r' and class 'axis'?
+            gr = this.svg.append('g')
                 .attr('class', 'r axis')
                 .attr('fill', 'none')
                 .attr('stroke', this.colors.grey4)
-            .selectAll('g')
-//TODO shouldnt this be tickValues?
-                .data(this.tickValues.length > 0 ? this.tickValues : r.ticks(5).slice(1))
-            .enter().append('g');
+                .selectAll('g')
+                    .data(tickValues)
+                .enter().append('g');
+
+                gr.exit().remove();
 
             gr.append('circle')
                 // pass in our scale to use as a callback function
-                .attr('r', r);
+                .attr('r', this.axis);
           },5);
         }
     });
