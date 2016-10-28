@@ -600,9 +600,15 @@ PxVisBehaviorChart.timeFiltering = [{
       var min = Number(timeDomain.x[0]),
           max = Number(timeDomain.x[1]);
       return chartData.filter(function(val) {
-                var timeVal = Number(val[timeData]);
-                return timeVal >= min && timeVal <= max;
-              });
+        var timeVal = Number(val[timeData]);
+        // if the data doesn't have Date value, return the data as it is
+        if (typeof(val[timeData]) === 'undefined'){
+          return val;
+          // Otherwise return the data matching the selected time range
+        } else {
+          return (timeVal >= min && timeVal <= max);
+        }
+      });
     } else {
       return chartData;
     }
