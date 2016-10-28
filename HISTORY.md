@@ -1,4 +1,4 @@
-
+v0.6.15
 ==================
 * bug fix for radial scale
 * fixed useDegrees for line
