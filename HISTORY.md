@@ -7,7 +7,7 @@
 * changes to README
 * bug fixes for brush to prevent negative values
 * added various truthy tests for 0 values throughout
-* 
+* fix for register with value = 0
 
 v0.6.14
 ==================
