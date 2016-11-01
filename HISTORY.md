@@ -5,6 +5,7 @@ v0.6.18
 * set extents to range when available to avoid race condition on selectedDomain and chartExtents
 * pass seriesKeys to interaction space to remove registers on all data removed
 * added 0 check to width and height in interaction space
+* changed data converter to return empty dataset if originalData is empty
 
 v0.6.17
 ==================
