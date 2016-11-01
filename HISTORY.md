@@ -1,3 +1,10 @@
+v0.6.18
+==================
+* Added PxVisBehaviorChart.registerPositioning behavior to avoid code duplication
+* Allow interaction space action box to be drawn with mouse outside of interaction space
+* prevent errors when releasing mouse button on interaction space when the click had started outside of it
+* Call notifyResize when preventResize becomes false
+
 v0.6.17
 ==================
 * make sure progressive rendering doesn't "break" the line between batches

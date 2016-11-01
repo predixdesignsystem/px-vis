@@ -157,7 +157,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           .on("mouseout.tooltip", this._resetTooltipData.bind(this))
           .on("mousemove.tooltip",this._calcTooltipData.bind(this))
           .on("mousedown.action", this._drawActionBox.bind(this))
-          .on("mousemove.action", this._updateActionBox.bind(this))
           .on("mouseup.action", this._finishActionBox.bind(this))
           .style("cursor","crosshair");
 
@@ -459,6 +458,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         this.mouseDown = true;
         //in case the user clicks inside the chart, and mouses out, we are waiting for a mouseup, and closing our action box with the coordinates available on the mouseup.
         Px.d3.select(document).on('mouseup.action', this._mouseUpOutsideSvg.bind(this));
+        Px.d3.select(document).on('mousemove.action', this._updateActionBox.bind(this));
 
         var mousePos = Px.d3.mouse(this._rect.node());
         // use original svg so it draws under the _rect and does not interfer with our mouse events
@@ -501,17 +501,19 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           // save somewhere else--> not as an attr, inefficient
             ox = parseInt(this._actionArea.attr("ox")),
             oy = parseInt(this._actionArea.attr("oy")),
-            newX = mousePos[0],
-            newY = mousePos[1];
+            width = this._rect.attr('width'),
+            height = this._rect.attr('height')
+            newX = Math.max(Math.min(mousePos[0], width), 0),
+            newY = Math.max(Math.min(mousePos[1], height), 0);
 
         if(this.selectionType === 'xAxis') {
-          newY = this._rect.attr('height');
+          newY = height;
         } else if(this.selectionType === 'yAxis') {
-          newX = this._rect.attr('width');
+          newX = width;
         }
 
         // if current position is greater than the original position
-        if(newX >= ox){
+        if(newX >= ox) {
           // set x to the original position to prevent some drift on crossover. width is equal to the difference between the x and current mouse position
           this._actionArea.attr("x", ox);
           this._actionArea.attr("width", newX - ox);
@@ -521,13 +523,15 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           this._actionArea.attr("width", ox - newX);
         }
 
-        if(newY >= oy){
+        if(newY >= oy) {
           this._actionArea.attr("y", oy);
           this._actionArea.attr("height", newY - oy);
         } else {
           this._actionArea.attr("y", newY);
           this._actionArea.attr("height", oy - newY);
         }
+
+        Px.d3.event.preventDefault();
       }
     },
 
@@ -540,36 +544,41 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     _finishActionBox: function() {
       //since we are done drawing our action box, remove the listener from document using d3.
       Px.d3.select(document).on('mouseup.action', null);
-      this.mouseDown = false;
-      var extents = {};
+      Px.d3.select(document).on('mousemove.action', null);
 
-      //make sure we have somthing selected
-      if(this._actionArea.attr("width") > 0 && this._actionArea.attr("height") > 0) {
-        extents.x1 = parseInt(this._actionArea.attr("x"));
-        extents.y1 = parseInt(this._actionArea.attr("y"));
-        extents.w = parseInt(this._actionArea.attr("width"));
-        extents.h = parseInt(this._actionArea.attr("height"));
-        extents.x2 = extents.x1 + extents.w;
-        extents.y2 = extents.y1 + extents.h;
+      //make sure WE started this action.....
+      if(this.mouseDown) {
+        this.mouseDown = false;
+        var extents = {};
 
-        if(this.xAxisType === 'ordinal') {
-          extents.eX = this._getOrdinalRange(true, extents.x1, extents.x2);
-        } else {
-          extents.eX = [this.x.invert(extents.x1), this.x.invert(extents.x2)];
+        //make sure we have somthing selected
+        if(this._actionArea.attr("width") > 0 && this._actionArea.attr("height") > 0) {
+          extents.x1 = parseInt(this._actionArea.attr("x"));
+          extents.y1 = parseInt(this._actionArea.attr("y"));
+          extents.w = parseInt(this._actionArea.attr("width"));
+          extents.h = parseInt(this._actionArea.attr("height"));
+          extents.x2 = extents.x1 + extents.w;
+          extents.y2 = extents.y1 + extents.h;
+
+          if(this.xAxisType === 'ordinal') {
+            extents.eX = this._getOrdinalRange(true, extents.x1, extents.x2);
+          } else {
+            extents.eX = [this.x.invert(extents.x1), this.x.invert(extents.x2)];
+          }
+
+          if(this.yAxisType === 'ordinal') {
+            //Y axis is top to bottom
+            extents.eY = this._getOrdinalRange(false, extents.y2, extents.y1);
+          } else {
+            //Y axis is top to bottom
+            extents.eY = [this.y.invert(extents.y2), this.y.invert(extents.y1)];
+          }
+
+          this.set('extentsData', extents);
+          this.fire('px-vis-extents-data-updated', {'data': extents, 'dataVar': 'extentsData', 'method': 'set'});
         }
-
-        if(this.yAxisType === 'ordinal') {
-          //Y axis is top to bottom
-          extents.eY = this._getOrdinalRange(false, extents.y2, extents.y1);
-        } else {
-          //Y axis is top to bottom
-          extents.eY = [this.y.invert(extents.y2), this.y.invert(extents.y1)];
-        }
-
-        this.set('extentsData', extents);
-        this.fire('px-vis-extents-data-updated', {'data': extents, 'dataVar': 'extentsData', 'method': 'set'});
+        this._actionArea.remove();
       }
-      this._actionArea.remove();
     }
   });
 </script>
