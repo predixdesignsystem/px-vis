@@ -121,46 +121,8 @@ PxVisBehaviorChart.chartCommon = [{
     *
     */
     _setCompleteSeriesConfig: function(){
-      if(this._doesObjHaveValues(this.defaultSeriesConfig) && this._doesObjHaveValues(this.chartData)){
+      if(this._doesObjHaveValues(this.defaultSeriesConfig) && this._doesObjHaveValues(this.chartData)) {
         // FUTURE TODO refactor: use MAPs and SETs instead of Objects when IE has support / is no longer supported by us
-
-        /*
-          Polyfill to add .includes() for IE11.
-          We can remove this when IE11 support is dropped
-        */
-        if (!Array.prototype.includes) {
-          Array.prototype.includes = function(searchElement /*, fromIndex*/) {
-            'use strict';
-            if (this == null) {
-              throw new TypeError('Array.prototype.includes called on null or undefined');
-            }
-
-            var O = Object(this);
-            var len = parseInt(O.length, 10) || 0;
-            if (len === 0) {
-              return false;
-            }
-            var n = parseInt(arguments[1], 10) || 0;
-            var k;
-            if (n >= 0) {
-              k = n;
-            } else {
-              k = len + n;
-              if (k < 0) {k = 0;}
-            }
-            var currentElement;
-            while (k < len) {
-              currentElement = O[k];
-              if (searchElement === currentElement ||
-                 (searchElement !== searchElement && currentElement !== currentElement)) { // NaN !== NaN
-                return true;
-              }
-              k++;
-            }
-            return false;
-          };
-        }
-
         // We could use d3 sets and maps... worth it?
         var fullConfig = (this.seriesConfig) ? JSON.parse(JSON.stringify(this.seriesConfig)) : {},
             k = Object.keys(fullConfig),
@@ -254,15 +216,23 @@ PxVisBehaviorChart.chartCommon = [{
           fullConfig[ missingYs[i] ] = objYs[ missingYs[i] ];
         }
 
-        if(!this.chartExtents){
+        if(this.range) {
+          var min = Number(Px.moment(this.range.from, moment.ISO_8601).format('x')),
+              max = Number(Px.moment(this.range.to, moment.ISO_8601).format('x'));
+
+          this.chartExtents = {};
+          this.chartExtents["x"] = [min,max];
+        }
+
+        if(!this.chartExtents ){
           this.chartExtents = {};
           this.chartExtents['x'] = this._calcChartExts(xMins,xMaxes,'x');
           this.chartExtents['y'] = this._calcChartExts(yMins,yMaxes,'y');
         } else {
-          if(!this.chartExtents.x){
+          if(!this.chartExtents.x) {
             this.chartExtents['x'] = this._calcChartExts(xMins,xMaxes,'x');
           }
-          if(!this.chartExtents.y){
+          if(!this.chartExtents.y) {
             this.chartExtents['y'] = this._calcChartExts(yMins,yMaxes,'y');
           }
         }
@@ -320,6 +290,9 @@ PxVisBehaviorChart.chartCommon = [{
           //now that we have the new completeSeriesConfig process the additions
           this.set('_seriesKeys', Object.keys(fullConfig));
         }
+      } else if(this.chartData.length === 0) {
+        this.set('_seriesKeys', []);
+        Polymer.dom.flush();
       }
     },
 

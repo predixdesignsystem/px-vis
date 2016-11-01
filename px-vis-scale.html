@@ -279,12 +279,20 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
           'x': this.chartExtents['x'],
           'y': this.chartExtents['y']
         };
-
+      //if our chart data has not changed, then dont go through all the data. Just use the extents we have
       if(!this._chartDataHasChanged && exts.x.length > 0 && exts.x[0] !== Infinity && exts.x[1] !== -Infinity){
         xTime = false;
         doX = false;
       }
       if(!this._chartDataHasChanged && exts.y.length > 0 && exts.y[0] !== Infinity && exts.y[1] !== -Infinity){
+        yTime = false;
+        doY = false;
+      }
+
+      //if we have no chartData, dont look for new extents
+      if(this.chartData.length === 0) {
+        xTime = false;
+        doX = false;
         yTime = false;
         doY = false;
       }
