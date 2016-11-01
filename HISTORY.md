@@ -1,3 +1,8 @@
+v0.6.20
+==================
+* fixed chartExtents running prematurely
+* fixed linePath not being defined on detach
+
 v0.6.19
 ==================
 * fixed bug with range moment conversion
