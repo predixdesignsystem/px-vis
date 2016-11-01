@@ -73,7 +73,7 @@ function runTests(){
       baseIS.set('completeSeriesConfig',completeSeriesConfig);
       baseIS.set('chartData',d);
 
-      // setTimeout(function(){done()},5000);
+      setTimeout(function(){done()},100);
       done();
     });
 
@@ -146,7 +146,7 @@ function runTests(){
   }); //suite
 
   // TODO Figure out how to make this work in Edge
-  // 
+  //
   // suite('px-vis-interaction-space baseIS mouseover event', function() {
   //   var baseIS = document.getElementById('baseIS');
   //   var ttObj;

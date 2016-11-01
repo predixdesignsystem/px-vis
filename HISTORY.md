@@ -1,9 +1,28 @@
-v0.6.18
+v0.6.21
 ==================
 * Added PxVisBehaviorChart.registerPositioning behavior to avoid code duplication
 * Allow interaction space action box to be drawn with mouse outside of interaction space
 * prevent errors when releasing mouse button on interaction space when the click had started outside of it
 * Call notifyResize when preventResize becomes false
+
+v0.6.20
+==================
+* fixed chartExtents running prematurely
+* fixed linePath not being defined on detach
+
+v0.6.19
+==================
+* fixed bug with range moment conversion
+* added check to scale for x and y before selectedDomain
+
+v0.6.18
+==================
+* moved polyfills into its own file
+* fixed on-hover when chart all data is removed
+* set extents to range when available to avoid race condition on selectedDomain and chartExtents
+* pass seriesKeys to interaction space to remove registers on all data removed
+* added 0 check to width and height in interaction space
+* changed data converter to return empty dataset if originalData is empty
 
 v0.6.17
 ==================

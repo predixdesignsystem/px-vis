@@ -61,6 +61,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehavior.axisTypes,
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.zoomSelection,
+      PxVisBehavior.seriesKeys,
       commonColors
     ],
     /***EVENTS****
@@ -108,7 +109,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
     observers: [
       'drawElement(currentDomainX,currentDomainY,chartData.*,svg,width,height, completeSeriesConfig)',
-      '_resetTooltipData(completeSeriesConfig.*)'
+      '_resetTooltipData(completeSeriesConfig.*, seriesKeys.*)'
      ],
 
     /**
@@ -150,8 +151,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       if(!this._rect) {
         this._rect = this.interactionSvg.append("rect")
           .attr('id',"mouseCapture")
-          .attr("width", this.width - this.margin.left - this.margin.right)
-          .attr("height", this.height - this.margin.bottom - this.margin.top)
+          .attr("width", Math.max(this.width - this.margin.left - this.margin.right,0))
+          .attr("height", Math.max(this.height - this.margin.bottom - this.margin.top,0))
           .attr("fill", "none")
           .attr("pointer-events", "all")
           .on("mouseout.tooltip", this._resetTooltipData.bind(this))
@@ -189,7 +190,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             'xArr': null,
             'yArr': null
           },
-          keys = Object.keys(this.completeSeriesConfig),
+          keys = this.seriesKeys,
           len = keys.length,
           i;
 
@@ -208,7 +209,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      */
     _calcTooltipData:function() {
 
-      if(!this.mouseDown) {
+      if(!this.mouseDown && this.chartData.length > 0) {
         //  d3.mouse: returns the x position on the screen of the mouse
         var mousePos = Px.d3.mouse(this._rect.node()),
             x0,
@@ -233,7 +234,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
               result = {},
               xArr = [],
               yArr = [],
-              keys = Object.keys(this.completeSeriesConfig),
+              keys = this.seriesKeys,
               len  = keys.length,
               d,
               x1 = this.xAxisType !== 'ordinal' ? this.x.invert(mousePos[0]) : null,
