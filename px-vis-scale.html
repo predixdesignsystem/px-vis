@@ -345,27 +345,28 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @method _updateDomain
      */
     _updateDomain:function(selectedDomain){
+      if(this.x && this.y) {
+        if(selectedDomain === 'reset') {
+          this._currentDomain();
+        } else {
+          //set new X domain if provided
+          if(selectedDomain.x.length > 0) {
+            this.x.domain(selectedDomain.x);
+            this.currentDomainX = this.x.domain()
+            this.set('currentDomainX', this.x.domain());
+            this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
+          }
 
-      if(selectedDomain === 'reset') {
-        this._currentDomain();
-      } else {
-        //set new X domain if provided
-        if(selectedDomain.x.length > 0) {
-          this.x.domain(selectedDomain.x);
-          this.currentDomainX = this.x.domain()
-          this.set('currentDomainX', this.x.domain());
-          this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
+          //set new Y domain if provided
+          if(selectedDomain.y.length > 0) {
+            this.y.domain(selectedDomain.y);
+            this.set('currentDomainY', this.y.domain());
+            this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
+          }
+
+          this.set('domainChanged', !this.domainChanged);
+          this.fire('px-vis-domain-changed-updated', { 'dataVar': 'domainChanged', 'data': this.domainChanged, 'method':'set' });
         }
-
-        //set new Y domain if provided
-        if(selectedDomain.y.length > 0) {
-          this.y.domain(selectedDomain.y);
-          this.set('currentDomainY', this.y.domain());
-          this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
-        }
-
-        this.set('domainChanged', !this.domainChanged);
-        this.fire('px-vis-domain-changed-updated', { 'dataVar': 'domainChanged', 'data': this.domainChanged, 'method':'set' });
       }
     },
     _chartDataChanged: function() {

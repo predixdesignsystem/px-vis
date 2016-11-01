@@ -1,3 +1,8 @@
+v0.6.19
+==================
+* fixed bug with range moment conversion
+* added check to scale for x and y before selectedDomain
+
 v0.6.18
 ==================
 * moved polyfills into its own file
