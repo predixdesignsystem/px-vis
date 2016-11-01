@@ -144,7 +144,8 @@ PxVisBehaviorChart.chartCommon = [{
             isUpdate = this.completeSeriesConfig ? true : false,
             addedSeriesKeys = [],
             removedSeriesKeys = [],
-            updatedSeriesKeys = [];
+            updatedSeriesKeys = [],
+            extsObj = {};
 
         if(k.length === 0 && !this.includeAllSeries){
           console.warn("No series were added to the chart. Either add them in the seriesConfig or turn on includeAllSeries");
@@ -219,22 +220,14 @@ PxVisBehaviorChart.chartCommon = [{
         if(this.range) {
           var min = Number(Px.moment(this.range.from, Px.moment.ISO_8601).format('x')),
               max = Number(Px.moment(this.range.to, Px.moment.ISO_8601).format('x'));
-
-          this.chartExtents = {};
-          this.chartExtents["x"] = [min,max];
+          extsObj["x"] = [min,max];
         }
 
-        if(!this.chartExtents ){
-          this.chartExtents = {};
-          this.chartExtents['x'] = this._calcChartExts(xMins,xMaxes,'x');
-          this.chartExtents['y'] = this._calcChartExts(yMins,yMaxes,'y');
-        } else {
-          if(!this.chartExtents.x) {
-            this.chartExtents['x'] = this._calcChartExts(xMins,xMaxes,'x');
-          }
-          if(!this.chartExtents.y) {
-            this.chartExtents['y'] = this._calcChartExts(yMins,yMaxes,'y');
-          }
+        if(!extsObj.x) {
+          extsObj['x'] = this._calcChartExts(xMins,xMaxes,'x');
+        }
+        if(!extsObj.y) {
+          extsObj['y'] = this._calcChartExts(yMins,yMaxes,'y');
         }
 
         //if this is an update bof series config find out additions/deletions
@@ -279,8 +272,8 @@ PxVisBehaviorChart.chartCommon = [{
           this.set('_seriesKeys', Object.keys(fullConfig));
         }
 
-        this.fire('px-vis-chart-extents', { 'dataVar': 'chartExtents', 'data': this.chartExtents, 'method':'set' });
-        this.notifyPath('chartExtents', this.chartExtents);
+        this.fire('px-vis-chart-extents', { 'dataVar': 'chartExtents', 'data': extsObj, 'method':'set' });
+        this.notifyPath('chartExtents', extsObj);
 
         this.fire('px-vis-complete-series-config', { 'dataVar': 'completeSeriesConfig', 'data': fullConfig, 'method':'set' });
         this.set('completeSeriesConfig', fullConfig);
