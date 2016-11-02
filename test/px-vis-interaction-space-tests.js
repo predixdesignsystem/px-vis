@@ -2,7 +2,7 @@ document.addEventListener("WebComponentsReady", function() {
   runTests();
 });
 
-function runTests(){
+function runTests() {
   suite('px-vis-interaction-space does Polymer exist?', function() {
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
@@ -70,58 +70,59 @@ function runTests(){
       baseIS.set('margin',m);
       baseIS.set('width',w);
       baseIS.set('height',h);
+      // baseIS.set('seriesKeys',['mySeries']);
       baseIS.set('completeSeriesConfig',completeSeriesConfig);
       baseIS.set('chartData',d);
 
-      setTimeout(function(){done()},100);
+      // setTimeout(function(){done()},100);
       done();
     });
 
     test('baseIS fixture is created', function() {
       assert.isTrue(baseIS !== null);
     });
-    test('event fired', function() {
+    test('interaction-spcae event fired', function() {
       assert.isTrue(eventObj !== null);
     });
-    test('event dataVar', function() {
+    test('interaction-spcae event dataVar', function() {
       assert.equal(eventObj.dataVar, 'interactionSvg');
     });
-    test('event method', function() {
+    test('interaction-spcae event method', function() {
       assert.equal(eventObj.method, 'set');
     });
-    test('event data', function() {
+    test('interaction-spcae event data', function() {
       assert.equal(eventObj.data.node().tagName, 'g');
     });
 
-    test('event fired', function() {
+    test('tooltip event fired', function() {
       assert.isTrue(ttObj !== null);
     });
-    test('event dataVar', function() {
+    test('tooltip event dataVar', function() {
       assert.equal(ttObj.dataVar, 'tooltipData');
     });
-    test('event method', function() {
+    test('tooltip event method', function() {
       assert.equal(ttObj.method, 'set');
     });
-    test('event data time', function() {
+    test('tooltip event data time', function() {
       assert.equal(ttObj.data.time, null);
     });
-    test('event data mousePos', function() {
+    test('tooltip event data mousePos', function() {
       assert.equal(ttObj.data.mouse, null);
     });
     // maybe should be using 2 series data?
-    test('event data xArr', function() {
+    test('tooltip event data xArr', function() {
       assert.equal(ttObj.data.xArr, null);
     });
-    test('event data yArr', function() {
+    test('tooltip event data yArr', function() {
       assert.equal(ttObj.data.yArr, null);
     });
-    test('event data series.name', function() {
+    test('tooltip event data series.name', function() {
       assert.equal(ttObj.data.series[0]['name'], 'mySeries');
     });
-    test('event data series.value', function() {
+    test('tooltip event data series.value', function() {
       assert.equal(JSON.stringify(ttObj.data.series[0]['value']), 'null');
     });
-    test('event data series.coord', function() {
+    test('tooltip event data series.coord', function() {
       assert.equal(ttObj.data.series[0]['coord'], null);
     });
 

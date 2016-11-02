@@ -1,3 +1,7 @@
+v0.6.25
+==================
+* removed extra {
+
 v0.6.24
 ==================
 * fixed merge conflict
