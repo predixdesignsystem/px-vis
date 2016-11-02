@@ -70,7 +70,7 @@ function runTests() {
       baseIS.set('margin',m);
       baseIS.set('width',w);
       baseIS.set('height',h);
-      // baseIS.set('seriesKeys',['mySeries']);
+      baseIS.set('seriesKeys',['mySeries']);
       baseIS.set('completeSeriesConfig',completeSeriesConfig);
       baseIS.set('chartData',d);
 
@@ -255,6 +255,106 @@ function runTests() {
     });
     test('event data series.coord', function() {
       assert.equal(ttObj.data.series[0]['coord'], null);
+    });
+  }); //suite
+
+
+  suite('px-vis-interaction-space baseIS has no seriesKeys', function() {
+    var baseIS = document.getElementById('baseIS');
+    var ttObj;
+
+    suiteSetup(function(done){
+      document.addEventListener('px-vis-tooltip-updated',function(evt){
+        ttObj = evt.detail;
+      });
+
+      baseIS.set("seriesKeys", []);
+
+      // give event time to process and fire
+      setTimeout(function(){ done(); },10);
+    });
+
+    test('event fired', function() {
+      assert.isTrue(ttObj !== null);
+    });
+    test('event dataVar', function() {
+      assert.equal(ttObj.dataVar, 'tooltipData');
+    });
+    test('event method', function() {
+      assert.equal(ttObj.method, 'set');
+    });
+    test('event data time', function() {
+      assert.equal(ttObj.data.time, null);
+    });
+    test('event data mousePos', function() {
+      assert.equal(ttObj.data.mouse, null);
+    });
+    // maybe should be using 2 series data?
+    test('event data xArr', function() {
+      assert.equal(ttObj.data.xArr, null);
+    });
+    test('event data yArr', function() {
+      assert.equal(ttObj.data.yArr, null);
+    });
+    test('event data series.name', function() {
+      assert.isUndefined(ttObj.data.series[0]);
+    });
+    test('event data series.value', function() {
+      assert.isUndefined(ttObj.data.series[0]);
+    });
+    test('event data series.coord', function() {
+      assert.isUndefined(ttObj.data.series[0]);
+    });
+  }); //suite
+
+  suite('px-vis-interaction-space baseIS more seriesKeys', function() {
+    var baseIS = document.getElementById('baseIS');
+    var ttObj;
+
+    suiteSetup(function(done){
+      document.addEventListener('px-vis-tooltip-updated',function(evt){
+        ttObj = evt.detail;
+      });
+
+      baseIS.set("seriesKeys", ["mySeries", "anotherSeries"]);
+
+      // give event time to process and fire
+      setTimeout(function(){ done(); },10);
+    });
+
+    test('event fired', function() {
+      assert.isTrue(ttObj !== null);
+    });
+    test('event dataVar', function() {
+      assert.equal(ttObj.dataVar, 'tooltipData');
+    });
+    test('event method', function() {
+      assert.equal(ttObj.method, 'set');
+    });
+    test('event data time', function() {
+      assert.equal(ttObj.data.time, null);
+    });
+    test('event data mousePos', function() {
+      assert.equal(ttObj.data.mouse, null);
+    });
+    // maybe should be using 2 series data?
+    test('event data xArr', function() {
+      assert.equal(ttObj.data.xArr, null);
+    });
+    test('event data yArr', function() {
+      assert.equal(ttObj.data.yArr, null);
+    });
+    test('event data series.name', function() {
+      assert.equal(ttObj.data.series[0]['name'], 'mySeries');
+      assert.equal(ttObj.data.series[1]['name'], 'anotherSeries');
+    });
+    test('event data series.value', function() {
+      assert.equal(JSON.stringify(ttObj.data.series[0]['value']), 'null');
+      assert.equal(JSON.stringify(ttObj.data.series[1]['value']), 'null');
+    });
+    test('event data series.coord', function() {
+      assert.equal(ttObj.data.series[0]['coord'], null);
+      assert.equal(ttObj.data.series[1]['coord'], null);
     });
   }); //suite
 } //runTests

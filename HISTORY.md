@@ -1,3 +1,8 @@
+
+==================
+* added check that actionArea box has a selection
+* fixed empty seriesKeys with backwards compatibility
+
 v0.6.25
 ==================
 * removed extra {
