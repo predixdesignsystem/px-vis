@@ -545,7 +545,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     _finishActionBox: function() {
       //since we are done drawing our action box, remove the listener from document using d3.
       Px.d3.select(document).on('mouseup.action', null);
-<<<<<<< HEAD
       this.mouseDown = false;
       var extents = {};
 
@@ -563,29 +562,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         } else {
           extents.eX = [this.x.invert(extents.x1), this.x.invert(extents.x2)];
         }
-=======
-      Px.d3.select(document).on('mousemove.action', null);
-
-      //make sure WE started this action.....
-      if(this.mouseDown) {
-        this.mouseDown = false;
-        var extents = {};
-
-        //make sure we have somthing selected
-        if(this._actionArea.attr("width") > 0 && this._actionArea.attr("height") > 0) {
-          extents.x1 = parseInt(this._actionArea.attr("x"));
-          extents.y1 = parseInt(this._actionArea.attr("y"));
-          extents.w = parseInt(this._actionArea.attr("width"));
-          extents.h = parseInt(this._actionArea.attr("height"));
-          extents.x2 = extents.x1 + extents.w;
-          extents.y2 = extents.y1 + extents.h;
-
-          if(this.xAxisType === 'ordinal') {
-            extents.eX = this._getOrdinalRange(true, extents.x1, extents.x2);
-          } else {
-            extents.eX = [this.x.invert(extents.x1), this.x.invert(extents.x2)];
-          }
->>>>>>> e5ff7c653316f4a1efeebebe5f93d5c304ca9ab4
 
           if(this.yAxisType === 'ordinal') {
             //Y axis is top to bottom

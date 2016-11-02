@@ -1,3 +1,7 @@
+v0.6.24
+==================
+* fixed merge conflict
+
 v0.6.23
 ==================
 * added check for chartData being undefined in chartCommon
