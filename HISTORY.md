@@ -1,3 +1,7 @@
+v0.6.23
+==================
+* added check for chartData being undefined in chartCommon
+
 v0.6.22
 ==================
 * fixed completeSeriesConfig generation for mins and maxes
