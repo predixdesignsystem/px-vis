@@ -1,9 +1,16 @@
-
+v0.6.22
 ==================
 * fixed completeSeriesConfig generation for mins and maxes
 * added checks for d3 selection existance
 * changed clip path declaration
 * better fixed linePath/lineGroup not being defined on detach
+
+v0.6.21
+==================
+* Added PxVisBehaviorChart.registerPositioning behavior to avoid code duplication
+* Allow interaction space action box to be drawn with mouse outside of interaction space
+* prevent errors when releasing mouse button on interaction space when the click had started outside of it
+* Call notifyResize when preventResize becomes false
 
 v0.6.20
 ==================

@@ -78,7 +78,7 @@ PxVisBehaviorChart.chartCommon = [{
       /**
       * A boolean flag on whether to include all the series in the data.
       * - `false`: only series defined in the seriesConfig file will be drawn
-      * - `true`: All series in the dataset will be drawn. Defaults will be used for the seriesConfig
+      * - `true`: All series in the dataset will be drawn. Defaults will be used for the seriesConfig. If this is used do not specify a seriesConfig
       */
       includeAllSeries: {
         type: Boolean,
@@ -505,17 +505,23 @@ PxVisBehaviorChart.precipitationPattern = {
 
     @polymerBehavior PxVisBehaviorChart.chartAutoResize
 */
-PxVisBehaviorChart.chartAutoResize = {
+PxVisBehaviorChart.chartAutoResize = [{
     properties: {
       /**
       * Prevents the chart from automatically resizing to fit its container
       */
       preventResize: {
         type: Boolean,
-        value: false
+        value: false,
+        observer: '_preventResizeChanged'
+      }
+    },
+    _preventResizeChanged: function() {
+      if(!this.preventResize) {
+        this.notifyResize();
       }
     }
-};
+}, Polymer.IronResizableBehavior];
 
 /**
     Name:
@@ -654,6 +660,65 @@ PxVisBehaviorChart.waitForAttach = {
       }
     }
 
+};
+
+/*
+    Name:
+    PxVisBehaviorChart.registerPositioning
+
+    Description:
+    Behavior allowing a chart to position its registers
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorChart.registerPositioning
+*/
+PxVisBehaviorChart.registerPositioning = {
+  properties: {
+     /**
+      *
+      * Allows to hide the register
+      */
+    hideRegister: {
+      type: Boolean,
+      value: false,
+      observer: '_hideRegisterChanged'
+    },
+    _registerType: {
+      type: String
+    },
+    _registerWrapperClass: {
+      type: String,
+      computed: '_getRegisterWrapperClass(_registerType)'
+    }
+  },
+ /**
+  * determine the flex class on the wrapper depending on where the register is
+  */
+  _getRegisterWrapperClass: function() {
+    var classList = "flex ";
+
+    if(!this.hideRegister) {
+      if(this._registerType === 'vertical') {
+        classList += "flex--row--rev";
+      }
+      else {
+        classList += "flex--col";
+      }
+    }
+
+    return classList;
+  },
+  _hideRegisterChanged: function() {
+    this.notifyResize();
+  },
+  _getHideClass: function(hide) {
+    if(hide === true) {
+      return 'visuallyhidden';
+    }
+    return '';
+  },
 };
 
 </script>
