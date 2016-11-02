@@ -191,7 +191,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             'xArr': null,
             'yArr': null
           },
-          keys = this.seriesKeys,
+          keys = (this.seriesKeys && this.seriesKeys.length > 0) ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
           len = keys.length,
           i;
 
@@ -235,7 +235,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
               result = {},
               xArr = [],
               yArr = [],
-              keys = this.seriesKeys,
+              keys = (this.seriesKeys && this.seriesKeys.length > 0) ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
               len  = keys.length,
               d,
               x1 = this.xAxisType !== 'ordinal' ? this.x.invert(mousePos[0]) : null,
@@ -545,7 +545,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       var extents = {};
 
       //make sure we have somthing selected
-      if(this._actionArea.attr("width") > 0 && this._actionArea.attr("height") > 0) {
+      if(this._doesD3HaveValues(this._actionArea) && this._actionArea.attr("width") > 0 && this._actionArea.attr("height") > 0) {
         extents.x1 = parseInt(this._actionArea.attr("x"));
         extents.y1 = parseInt(this._actionArea.attr("y"));
         extents.w = parseInt(this._actionArea.attr("width"));

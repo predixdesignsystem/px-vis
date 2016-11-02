@@ -145,7 +145,8 @@ PxVisBehaviorChart.chartCommon = [{
             addedSeriesKeys = [],
             removedSeriesKeys = [],
             updatedSeriesKeys = [],
-            extsObj = {};
+            extsObj = {},
+            skipProperties = ['xMin','xMax','yMin','yMax'];
 
         if(k.length === 0 && !this.includeAllSeries){
           console.warn("No series were added to the chart. Either add them in the seriesConfig or turn on includeAllSeries");
@@ -174,8 +175,8 @@ PxVisBehaviorChart.chartCommon = [{
           //copy values from default config if needed
           for(var j=0; j<defaultConfigProps.length; j++) {
             var property = defaultConfigProps[j];
-
-            if(typeof fullConfig[k[i]][property] === 'undefined' && typeof this.defaultSeriesConfig[property] !== 'undefined') {
+            //if we dont already have the property, the default exists, and we want to copy the property
+            if(typeof fullConfig[k[i]][property] === 'undefined' && typeof this.defaultSeriesConfig[property] !== 'undefined' && skipProperties.indexOf(property) === -1) {
               fullConfig[k[i]][property] = this.defaultSeriesConfig[property];
             }
           }

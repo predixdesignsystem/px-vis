@@ -1,3 +1,10 @@
+
+==================
+* fixed completeSeriesConfig generation for mins and maxes
+* added checks for d3 selection existance
+* changed clip path declaration
+* better fixed linePath/lineGroup not being defined on detach
+
 v0.6.20
 ==================
 * fixed chartExtents running prematurely

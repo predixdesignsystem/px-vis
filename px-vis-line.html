@@ -100,16 +100,14 @@ Element which draws lines series onto the chart
        * @type String
        */
       lineBuilder:{
-        type:Object,
-        value: function() {return{};}
+        type:Object
       },
       /**
        * A holder object for the series group
        *
        */
       lineGroup:{
-        type:Object,
-        value: function() {return{};}
+        type:Object
       },
       /**
        * A dev set boolean specifying if the chart is for a parallel coordinates chart
@@ -141,10 +139,10 @@ Element which draws lines series onto the chart
       this._watchConfigProperty('mutedOpacity', 0.3);
     },
     detached: function() {
-      if(this.linePath) {
+      if(this._doesD3HaveValues(this.linePath)) {
         this.linePath.remove();
       }
-      if(this.lineGroup) {
+      if(this._doesD3HaveValues(this.lineGroup)) {
         this.lineGroup.remove();
       }
     },

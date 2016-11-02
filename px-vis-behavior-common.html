@@ -559,10 +559,37 @@ PxVisBehavior.commonMethods = {
    */
   _isObjEmpty:function(obj){
     if(typeof(obj) === 'undefined') {
-      return false;
+      return true;
     }
     return Object.keys(obj).length === 0;
   },
+
+  /**
+   * Checks to see if an d3 obj is empty
+   *
+   * @param {object}
+   * @return {bool}
+   */
+  _isD3Empty:function(obj){
+    if(this._isObjEmpty(obj)) {
+      return true;
+    }
+    return obj.empty();
+  },
+
+  /**
+   * Checks to see if an d3 obj has something
+   *
+   * @param {object}
+   * @return {bool}
+   */
+  _doesD3HaveValues:function(obj){
+    if(this._isObjEmpty(obj)) {
+      return false;
+    }
+    return !obj.empty();
+  },
+
   /**
    * Checks to see if an object has values
    *
