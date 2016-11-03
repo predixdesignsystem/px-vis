@@ -2,6 +2,7 @@
 ==================
 * added check that actionArea box has a selection
 * fixed empty seriesKeys with backwards compatibility
+* set chartExtents on range change to fix resize
 
 v0.6.25
 ==================

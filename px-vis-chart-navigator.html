@@ -262,7 +262,11 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
          * When a range from rangepicker changes
          */
         _rangeChanged: function() {
-          var newXRange = [Px.moment(this.range.from),Px.moment(this.range.to)];
+          var newXRange = [
+            Number(Px.moment(this.range.from, Px.moment.ISO_8601).format('x')),
+            Number(Px.moment(this.range.to, Px.moment.ISO_8601).format('x'))
+            // Px.moment(this.range.from),Px.moment(this.range.to)
+          ];
 
           //if we don't have data create 'empty' datra with new range
           if(!this.disableEmptyRender && (!this.chartData || this.chartData.length === 0)) {
@@ -284,7 +288,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
               "x":newXRange,
               "y":[Infinity,-Infinity]});
 
-          } else if(this._doesObjHaveValues(this.chartExtents) && this._doesObjHaveValues(this.chartExtents.x) && this._doesObjHaveValues(this.chartExtents.x)){
+          } else if(this._doesObjHaveValues(this.chartExtents) && this._doesObjHaveValues(this.chartExtents.x) && this._doesObjHaveValues(this.chartExtents.y)) {
             if(!this.disableEmptyRender){
               var config = this.seriesConfig[Object.keys(this.seriesConfig)[0]];
               //if we're using dummy data make sure it reflects the new range
@@ -293,7 +297,6 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
                 this._updateDummyData(newXRange);
               }
             }
-
             //set range in the data
             this.set('chartExtents', {
               "x": newXRange,
@@ -301,7 +304,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
             });
 
             var newDomain = {
-              'x': [newXRange[0].valueOf(), newXRange[1].valueOf()],
+              'x': [newXRange[0], newXRange[1]],
               'y': this.selectedDomain.y
             };
             this.set('selectedDomain', newDomain);
