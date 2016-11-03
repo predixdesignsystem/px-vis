@@ -126,7 +126,8 @@ Element which draws lines series onto the chart
        * This property will be read from the completeSeriesConfig
        */
       mutedOpacity: {
-        type: Number
+        type: Number,
+        value: 0
       }
     },
 
@@ -243,8 +244,12 @@ Element which draws lines series onto the chart
         }.bind(this));
         this._colorLine();
       } else if(this.mutedSeries.hasOwnProperty(this.seriesId)){
-
-        this._colorLine();
+        if (this.mutedSeries[this.seriesId]){
+          console.log(this.mutedSeries[this.seriesId])
+          this._muteLine();
+        } else {
+          this._colorLine();
+        }
       }
     },
     /**
@@ -252,35 +257,44 @@ Element which draws lines series onto the chart
      *
      */
     _colorLine:function(){
-      this.linePath.attr('stroke',function(d,i){
-        //normally, do this
-        if(!this.categoryKey){
-          return this.completeSeriesConfig[this.seriesId]['color'];
-        }
+      if (this.linePath){
+        this.linePath.attr('stroke',function(d,i){
+          //normally, do this
+          if(!this.categoryKey){
+            return this.completeSeriesConfig[this.seriesId]['color'];
+          }
 
-        //check that category has been defined
-        if(this.completeSeriesConfig[d[this.categoryKey]]){
-          return this.completeSeriesConfig[d[this.categoryKey]]['color']
-        }
+          //check that category has been defined
+          if(this.completeSeriesConfig[d[this.categoryKey]]){
+            return this.completeSeriesConfig[d[this.categoryKey]]['color']
+          }
 
-        //do nothing if not
-        return
-      }.bind(this))
-      .attr('stroke-opacity',this._svgLineOpacity.bind(this));
+          //do nothing if not
+          return
+        }.bind(this))
+          .attr('stroke-opacity',this._svgLineOpacity.bind(this));
+      }
     },
     /**
      * Returns the opacity for the SVG line
      *
      */
-    _svgLineOpacity: function(d) {
-      if(this.mutedSeries[this.seriesId]) {
+    _svgLineOpacity: function (d) {
+      if (this.mutedSeries[this.seriesId]) {
         return this.mutedOpacity;
       }
-      if(this.gradientLine) {
+      if (this.gradientLine) {
         return this._opacityLine(d);
       } else {
         return 1;
       }
+    },
+    /*
+    * mute the serie with mutedOpacity 0 and stroke width 0
+     */
+    _muteLine: function () {
+      if (this.linePath) this.linePath.attr('stroke', this.completeSeriesConfig[this.seriesId]['color'])
+        .attr('stroke-opacity', this.mutedOpacity).attr('stroke-width' , 0);
     }
   });
 </script>
