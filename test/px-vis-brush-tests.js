@@ -63,8 +63,8 @@ function runTests(){
 
       baseBrush.set('height',h);
 
-      // setTimeout(function(){done()},5000);
-      done();
+      setTimeout(function(){done()},500);
+      // done();
     });
 
     test('baseBrush fixture is created', function() {
