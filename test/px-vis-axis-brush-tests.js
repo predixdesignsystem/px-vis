@@ -147,11 +147,11 @@ function runTests(){
       assert.equal(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('height'), 176);
     });
     test('multiBrush._brushGroup.rect correct fill', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('fill'), 'rgb(0,0,0)');
+      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('fill').split(' ').join(''), 'rgb(0,0,0)');
       assert.equal(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('fill-opacity'), '0.15');
     });
     test('multiBrush._brushGroup.rect correct stroke', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('stroke'), colors["primary-blue"]);
+      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('stroke').split(' ').join(''), colors["primary-blue"]);
       assert.equal(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('stroke-dasharray'), null);
     });
 
@@ -547,11 +547,11 @@ function runTests(){
       assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('height'), 35);
     });
     test('radialBrush._brushGroup.rect correct fill', function() {
-      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('fill'), 'rgb(0,0,0)');
+      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('fill').split(' ').join(''), 'rgb(0,0,0)');
       assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('fill-opacity'), '0.15');
     });
     test('radialBrush._brushGroup.rect correct stroke', function() {
-      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('stroke'), colors["primary-blue"]);
+      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('stroke').split(' ').join(''), colors["primary-blue"]);
       assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('stroke-dasharray'), "5, 5");
     });
 
