@@ -552,7 +552,7 @@ function runTests(){
     });
     test('radialBrush._brushGroup.rect correct stroke', function() {
       assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('stroke').split(' ').join(''), colors["primary-blue"]);
-      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('stroke-dasharray'), "5, 5");
+      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('stroke-dasharray').split(' ').join(''), "5,5");
     });
 
     test('radialBrush mutedSeries is correct', function() {
