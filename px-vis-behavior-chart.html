@@ -515,12 +515,64 @@ PxVisBehaviorChart.chartAutoResize = [{
         type: Boolean,
         value: false,
         observer: '_preventResizeChanged'
+      },
+      /**
+       * This allows to decide how the chart 
+       * drawing will be horizontally aligned when smaller than its container. Values:
+       * -center
+       * -left
+       * -right
+       * if any other value is used then left alignment will be chosen
+       */
+      chartHorizontalAlignment: {
+        type: String,
+        value: 'center'
+      },
+      /**
+       * This allows to decide how the chart 
+       * drawing will be vertically aligned when smaller than its container. Values:
+       * -center
+       * -top
+       * -bottom
+       * if any other value is used then top alignment will be chosen
+       */
+      chartVerticalAlignment: {
+        type: String,
+        value: 'center'
+      },
+      /**
+       * Class to be used on the external wrapper within the chart
+       */
+      _chartWrapperClass: {
+        type: String,
+        computed: '_getChartWrapperClass(chartHorizontalAlignment, chartVerticalAlignment)'
       }
     },
     _preventResizeChanged: function() {
       if(!this.preventResize) {
         this.notifyResize();
       }
+    },
+    _getChartWrapperClass: function(hor, vert) {
+      var base = 'flex wrapper ';
+
+      if(hor === 'center') {
+        base += 'flex--center ';
+      } else if(hor === 'right') {
+        base += 'flex--right ';
+      } else {
+        base += 'flex--left ';
+      }
+
+      if(vert === 'center') {
+        base += 'flex--middle';
+      } else if(vert === 'bottom') {
+        base += 'flex--bottom';
+      } else {
+        base += 'flex--top';
+      }
+
+      return base;
     }
 }, Polymer.IronResizableBehavior];
 
@@ -719,7 +771,83 @@ PxVisBehaviorChart.registerPositioning = {
       return 'visuallyhidden';
     }
     return '';
-  },
+  }
 };
+
+/*
+    Name:
+    PxVisBehaviorChart.circleChart
+
+    Description:
+    Behavior providing attributes helping to position a circle based chart such as polar or pie.
+    for exmaple provides the center, radius... based on size and margin
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorChart.circleChart
+*/
+PxVisBehaviorChart.circleChart = [{
+  properties: {
+     /**
+      * Min between width and height
+      */
+     _smallerSide: {
+        type: Number
+      },
+      /**
+       * diameter of the chart drawing, adjusted with margins
+       */
+      _diameter: {
+        type: Number
+      },
+      /**
+       * radius of the chart drawing, adjusted with margins 
+       */
+      _radius: {
+        type: Number
+      },
+      /**
+       * center of the chart, based on radius and margins
+       */
+      _center: {
+        type: Array
+      },
+      /**
+       * internal margins we can use in addition to "margin", 
+       * used to offset chart labels for example
+       */
+      _internalCircleMargins: {
+        type: Object,
+        value: function() {
+          return {top: 0, left:0, right: 0, bottom:0};
+        }
+      }
+  },
+  observers: ['_sizeChanged(width, height, margin.*, _internalCircleMargins.*)'],
+  _sizeChanged: function(width, height, margin, internalMargin) {
+
+    //get the limiting side
+    this.set('_smallerSide', Math.max(Math.min(height,width), 0));
+
+    //measure appropriate width and height based on the smaller sides and margins
+    var ml = Number(this.margin.left) + Number(this._internalCircleMargins.left),
+        mr = Number(this.margin.right) + Number(this._internalCircleMargins.right),
+        mt = Number(this.margin.top) + Number(this._internalCircleMargins.top),
+        mb = Number(this.margin.bottom) + Number(this._internalCircleMargins.bottom),
+        adjWidth = Math.max(0, this._smallerSide - ml - mr),
+        adjHeight =  Math.max(0, this._smallerSide - mt - mb),
+        diameter = Math.min(adjWidth,adjHeight) ,
+        radius = diameter / 2,
+        center = [];
+    center[0] = ml + adjWidth/2;
+    center[1] = mt + adjHeight/2;
+
+    this.set('_diameter', diameter);
+    this.set('_radius', radius);
+    this.set('_center', center);
+
+  }
+}, PxVisBehavior.sizing];
 
 </script>
