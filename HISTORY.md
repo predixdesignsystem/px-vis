@@ -1,3 +1,7 @@
+v0.6.28
+==================
+* increased register height for scrollbars
+
 v0.6.27
 ==================
 * fix for large number of series in register
