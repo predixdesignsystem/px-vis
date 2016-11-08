@@ -1,3 +1,8 @@
+
+==================
+* fix for large number of series in register
+* fix series bars on chart navigator axis
+
 v0.6.26
 ==================
 * added check that actionArea box has a selection
