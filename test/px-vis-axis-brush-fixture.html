@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Web Component Test : Fixture for px-vis-brush</title>
+    <title>Web Component Test : Fixture for px-vis-axis-brush</title>
 
     <!-- Requires Webcomponents.js polyfill is provided by the page for browsers that don't support html imports -->
     <script src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
@@ -11,61 +11,65 @@
          for any URL ending with "/web-component-tester/browser.js"
          when wct is run from the command line -->
     <script src="../web-component-tester/browser.js"></script>
-    <link rel="import" href="../px-vis-scale.html" />
+    <link rel="import" href="../px-vis-multi-scale.html" />
+    <link rel="import" href="../px-vis-radial-scale.html" />
     <link rel="import" href="../px-vis-svg.html" />
-    <link rel="import" href="../px-vis-brush.html" />
+    <link rel="import" href="../px-vis-axis-brush.html" />
     <!-- Retain this link for px-theme.html -->
     <!-- px-theme is needed for WCT to run without errors -->
     <link rel="import" href="../../px-theme/px-theme.html"/>
 
-    <script src="px-vis-brush-tests.js"></script>
+    <script src="px-vis-axis-brush-tests.js"></script>
   </head>
 
   <body>
-    <h3>Web Component Test : Fixture for px-vis-brush</h3>
-    <template is="dom-bind">
-      <px-vis-scale
-        id="baseScale"
-        x-axis-type="time"
-        y-axis-type="linear"
-        x="{{x}}"
-        y="{{y}}"
-        current-domain-x="{{currentDomainX}}"
-        current-domain-y="{{currentDomainY}}">
-      </px-vis-scale>
-      <px-vis-svg
-        id="baseSVG"
-        svg="{{svg}}">
-      </px-vis-svg>
-      <px-vis-brush
-        id="baseBrush"
-        svg="[[svg]]"
-        axis="[[x]]"
-        selected-domain="{{selectedDomain}}"
-        current-domain="[[currentDomainX]]">
-      </px-vis-brush>
+    <h3>Web Component Test : Fixture for px-vis-axis-brush</h3>
+    <div>
+      <template is="dom-bind">
+        <px-vis-multi-scale
+          id="multiScale"
+          x="{{x}}"
+          y="{{y}}"
+          domain-changed="{{domainChanged}}"
+          current-domain-x="{{currentDomainX}}"
+          current-domain-y="{{currentDomainY}}">
+        </px-vis-multi-scale>
+        <px-vis-svg
+          id="multiSVG"
+          svg="{{svg}}">
+        </px-vis-svg>
+        <px-vis-axis-brush
+          id="multiBrush"
+          parent-svg="[[svg]]"
+          axis="[[y]]"
+          domain-changed="[[domainChanged]]">
+        </px-vis-axis-brush>
+      </template>
+    </div>
 
-      <px-vis-scale
-        id="gradientScale"
-        x-axis-type="time"
-        y-axis-type="linear"
-        x="{{x}}"
-        y="{{y}}"
-        current-domain-x="{{currentDomainX}}"
-        current-domain-y="{{currentDomainY}}">
-      </px-vis-scale>
-      <px-vis-svg
-        id="gradientSVG"
-        svg="{{svg}}">
-      </px-vis-svg>
-      <px-vis-brush
-        id="gradientBrush"
-        svg="[[svg]]"
-        axis="[[x]]"
-        selected-domain="{{selectedDomain}}"
-        current-domain="[[currentDomainX]]"
-        gradient-overlay>
-      </px-vis-brush>
-    </template>
+    <div>
+      <template is="dom-bind">
+        <px-vis-radial-scale
+          id="radialScale"
+          x="{{x}}"
+          y="{{y}}"
+          domain-changed="{{domainChanged}}"
+          current-domain-x="{{currentDomainX}}"
+          current-domain-y="{{currentDomainY}}">
+        </px-vis-radial-scale>
+        <px-vis-svg
+          id="radialSVG"
+          svg="{{svg}}">
+        </px-vis-svg>
+        <px-vis-axis-brush
+          id="radialBrush"
+          parent-svg="[[svg]]"
+          axis="[[y]]"
+          domain-changed="[[domainChanged]]"
+          radial
+          brush-to-remove>
+        </px-vis-axis-brush>
+      </template>
+    </div>
   </body>
 </html>

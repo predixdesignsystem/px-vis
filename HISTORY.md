@@ -1,7 +1,15 @@
 
 ==================
+* fix for large number of series in register
+* fix series bars on chart navigator axis
+* fix bug where deleting a series does not update mutedSeries and register
+
+v0.6.26
+==================
 * added check that actionArea box has a selection
 * fixed empty seriesKeys with backwards compatibility
+* set chartExtents on range change to fix resize
+* included radial definition in axis brush
 
 v0.6.25
 ==================

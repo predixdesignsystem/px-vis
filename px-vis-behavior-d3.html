@@ -511,33 +511,43 @@ PxVisBehaviorD3.selectedTimeDomain = [{
       //make sure we don't trigger a domain update when changing it from here
       this._preventDomainUpdate = true;
 
-      var newDomain = {};
-      newDomain.y = this.selectedDomain.y;
+      var newDomain = {},
+          chartExtents = {};
+      // newDomain.y = this.selectedDomain.y;
       newDomain.x = [];
-      newDomain.x[0] = Px.moment(range.from).valueOf();
-      newDomain.x[1] = Px.moment(range.to).valueOf();
+      newDomain.x[0] = Number(Px.moment(this.range.from, Px.moment.ISO_8601).format('x'));
+      newDomain.x[1] = Number(Px.moment(this.range.to, Px.moment.ISO_8601).format('x'));
 
-      this.set('selectedDomain', newDomain);
+      if(this.chartExtents && this.chartExtents.y.length > 0) {
+        chartExtents["y"] = this.chartExtents.y;
+      } else {
+        chartExtents.y = [Infinity, -Infinity];
+      }
+
+      chartExtents.x = newDomain.x;
+
+      // this.set('selectedDomain', newDomain);
+      this.set('chartExtents', chartExtents);
 
       this._preventDomainUpdate = false;
     }
 
   },
-  _selectedDomainChanged: function(selectedDomain) {
-    if(this._isAttached && !this._preventDomainUpdate) {
-      //update selectedDomain with those new values
-      //make sure we don't trigger a domain update when changing it from here
-      this._preventRangeUpdate = true;
-
-      var newRange = {};
-      newRange.from = Px.moment(this.selectedDomain.x[0]).toISOString();
-      newRange.to = Px.moment(this.selectedDomain.x[1]).toISOString();
-
-      this.set('range', newRange);
-
-      this._preventRangeUpdate = false;
-    }
-  }
+  // _selectedDomainChanged: function(selectedDomain) {
+  //   if(this._isAttached && !this._preventDomainUpdate) {
+  //     //update selectedDomain with those new values
+  //     //make sure we don't trigger a domain update when changing it from here
+  //     this._preventRangeUpdate = true;
+  //
+  //     var newRange = {};
+  //     newRange.from = Px.moment(this.selectedDomain.x[0]).toISOString();
+  //     newRange.to = Px.moment(this.selectedDomain.x[1]).toISOString();
+  //
+  //     this.set('range', newRange);
+  //
+  //     this._preventRangeUpdate = false;
+  //   }
+  // }
 
 }, PxVisBehaviorD3.selectedDomain];
 
