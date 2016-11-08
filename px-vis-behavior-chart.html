@@ -234,7 +234,9 @@ PxVisBehaviorChart.chartCommon = [{
 
         //if this is an update bof series config find out additions/deletions
         var deletion = false,
-            addition = false;
+            addition = false,
+            mutedKeys = [];
+
         if(isUpdate) {
           var currKeys = Object.keys(this.completeSeriesConfig),
               newKeys = Object.keys(fullConfig);
@@ -259,6 +261,19 @@ PxVisBehaviorChart.chartCommon = [{
         }
 
         if(deletion) {
+          // check mutedSeries
+          if(this.mutedSeries) {
+            for(var i = 0; i < removedSeriesKeys.length; i++) {
+              //if it is currently muted, unmute it.
+              if(this.mutedSeries[removedSeriesKeys[i]]) {
+                this.muteUnmuteSeries(removedSeriesKeys[i]);
+                mutedKeys.push(removedSeriesKeys[i]);
+              } else if(typeof this.mutedSeries[removedSeriesKeys[i]] === 'boolean') {
+                mutedKeys.push(removedSeriesKeys[i]);
+              }
+            }
+          }
+
           //we need to flush before setting completeSeriesConfig for deletion
           //but need setting completeSeriesConfig before flushing for additions.
           //Process the deletions first and we will process the addtions after setting
@@ -269,6 +284,13 @@ PxVisBehaviorChart.chartCommon = [{
           //if a serie needs to be removed this should be processed before we pass
           //the new completeSeriesConfig or observers will run on the not-yet deleted serie
           Polymer.dom.flush();
+
+          //clear out mutedSeries of the deleted stuff
+          if(mutedKeys.length > 0) {
+            for(var i = 0; i < mutedKeys.length; i++) {
+              delete this.mutedSeries[mutedKeys[i]];
+            }
+          }
         } else {
           //update or addition
           this.set('_seriesKeys', Object.keys(fullConfig));
@@ -285,6 +307,7 @@ PxVisBehaviorChart.chartCommon = [{
           //now that we have the new completeSeriesConfig process the additions
           this.set('_seriesKeys', Object.keys(fullConfig));
         }
+
       } else if(this.chartData && this.chartData.length === 0) {
         this.set('_seriesKeys', []);
         Polymer.dom.flush();
