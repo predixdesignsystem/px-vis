@@ -1,4 +1,4 @@
-
+v0.6.27
 ==================
 * fix for large number of series in register
 * fix series bars on chart navigator axis
