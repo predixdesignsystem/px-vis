@@ -198,6 +198,15 @@ The configureation object allows developers to set the icon used for each event 
       '_addClipPath(clipPath)'
      ],
 
+     detached: function() {
+       if(this.eventGroup) {
+         this.eventGroup.remove();
+         this.eventGroup = null;
+         this.eventLine = null;
+         this.eventIcon = null;
+       }
+     },
+
     ready:function(){
       // if there is no dev set unique ID, generate one
       if(!this.eventId){
@@ -225,33 +234,14 @@ The configureation object allows developers to set the icon used for each event 
           .attr('stroke',this.colors[this.lineConfig.color])
           .attr('stroke-width',this.lineConfig.weight);
 
-        if(this._thisConfig.type === 'image'){
-          this.eventIcon = this.eventGroup.append("image")
-            .attr("xlink:href", this._thisConfig.icon)
-            .attr("width", this._thisConfig.size + 'px')
-            .attr("height", this._thisConfig.size + 'px');
-        } else if(this._thisConfig.type === 'unicode'){
-          this.eventIcon = this.eventGroup.append("text")
-            .attr('font-family', 'FontAwesome')
-            .attr('font-size', this._thisConfig.size + 'px')
-            .attr('fill', this.colors[this._thisConfig.color])
-            .text(this._thisConfig.icon);
-        } else if(this._thisConfig.type === 'fa'){
-          this.eventIcon = this.eventGroup.append("text")
-            .attr('font-family', 'FontAwesome')
-            .attr('font-size', this._thisConfig.size + 'px')
-            .attr('fill', this.colors[this._thisConfig.color])
-            .text(String.fromCharCode(parseInt(this.fa[this._thisConfig.icon],16)));
-        }
-
-        this.eventIcon
-          .style("cursor","pointer")
-          .attr('id','ei_' + this.eventId);
+        this._addIcon();
 
         this._positionEvent();
 
         this._addClipPath();
       } else {
+        this.eventIcon.remove();
+        this._addIcon();
         // update the path
         this._positionEvent();
       }
@@ -284,6 +274,33 @@ The configureation object allows developers to set the icon used for each event 
         .attr('x',this.x(this.eventData[this.xKey]) - this._thisConfig.size/2 + this._thisConfig.offset[0])
         .attr("y", this.y(this.currentDomainY[1]) - 5 + this._thisConfig.offset[1]);
     },
+
+    _addIcon: function() {
+      if(this._thisConfig.type === 'image'){
+        this.eventIcon = this.eventGroup.append("image")
+          .attr("xlink:href", this._thisConfig.icon)
+          .attr("width", this._thisConfig.size + 'px')
+          .attr("height", this._thisConfig.size + 'px');
+      } else if(this._thisConfig.type === 'unicode'){
+        this.eventIcon = this.eventGroup.append("text")
+          .attr('font-family', 'FontAwesome')
+          .attr('font-size', this._thisConfig.size + 'px')
+          .attr('fill', this.colors[this._thisConfig.color])
+          .text(this._thisConfig.icon);
+      } else if(this._thisConfig.type === 'fa'){
+        this.eventIcon = this.eventGroup.append("text")
+          .attr('font-family', 'FontAwesome')
+          .attr('font-size', this._thisConfig.size + 'px')
+          .attr('fill', this.colors[this._thisConfig.color])
+          .text(String.fromCharCode(parseInt(this.fa[this._thisConfig.icon],16)));
+      }
+
+      this.eventIcon
+        .style("cursor","pointer")
+        .attr('id','ei_' + this.eventId);
+
+    },
+
     /**
      * Compiles a configuration object by looking if there is a dev set style, or if it should use defaults
      *

@@ -1,4 +1,9 @@
 
+==================
+* Enable event deletion
+* Fix in interaction space to ensure removal of mousemove event
+* Fix to allow axes to delete from radar chart
+
 v0.6.31
 ==================
 * bower updating px-demo-snippet
