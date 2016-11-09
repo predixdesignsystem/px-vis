@@ -1,3 +1,7 @@
+v0.6.29
+==================
+* IE min-height + flex bug fix for register / tooltip
+
 v0.6.28
 ==================
 * increased register height for scrollbars

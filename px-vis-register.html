@@ -99,60 +99,62 @@ Formatting for the timestamps,the data values, and the series names can be contr
   <template>
     <style include="px-vis-register-styles"></style>
     <style include="px-theme-styles"></style>
-    <div
-      id="registerWrap"
-      class="inline--flex flex--col"
-      style$="height:{{height}}px; width:[[width]]px">
+    <div class="flex flex-row">  <!--  IE min-height + flex bug workaround-->
+      <div
+        id="registerWrap"
+        class="inline--flex flex--col"
+        style$="height:{{height}}px; width:[[width]]px">
 
-      <template is="dom-if" if="{{_displayTime(xAxisType, forceDateTimeDisplay)}}">
-        <px-vis-register-datetime
-          first-date-time="[[_firstDateTime]]"
-          second-date-time="[[_secondDateTime]]"
-          separator="[[_separator]]"
-          x-axis-type="[[xAxisType]]"
-        ></px-vis-register-datetime>
-      </template>
+        <template is="dom-if" if="{{_displayTime(xAxisType, forceDateTimeDisplay)}}">
+          <px-vis-register-datetime
+            first-date-time="[[_firstDateTime]]"
+            second-date-time="[[_secondDateTime]]"
+            separator="[[_separator]]"
+            x-axis-type="[[xAxisType]]"
+          ></px-vis-register-datetime>
+        </template>
 
-      <div class$="{{_getSeriesWrapperClass(type)}}">
-        <template is="dom-if" if="{{!_isOfType(xAxisType, 'pie')}}">
-          <template is="dom-repeat" items="{{_series}}">
-            <px-vis-register-item
-              item="[[item]]"
-              complete-series-config="[[completeSeriesConfig]]"
-              type="[[type]]"
-              x-axis-type="[[xAxisType]]"
-              y-axis-type="[[yAxisType]]"
-              muted-series="{{mutedSeries}}"
-              number-format="[[numberFormat]]"
-              number-format-culture="[[numberFormatCulture]]"
-              number-format-is-currency$="[[numberFormatIsCurrency]]"
-              number-format-currency="[[numberFormatCurrency]]"
-              number-format-zero="[[numberFormatZero]]"
-              truncation-length="[[truncationLength]]">
-            </px-vis-register-item>
+        <div class$="{{_getSeriesWrapperClass(type)}}">
+          <template is="dom-if" if="{{!_isOfType(xAxisType, 'pie')}}">
+            <template is="dom-repeat" items="{{_series}}">
+              <px-vis-register-item
+                item="[[item]]"
+                complete-series-config="[[completeSeriesConfig]]"
+                type="[[type]]"
+                x-axis-type="[[xAxisType]]"
+                y-axis-type="[[yAxisType]]"
+                muted-series="{{mutedSeries}}"
+                number-format="[[numberFormat]]"
+                number-format-culture="[[numberFormatCulture]]"
+                number-format-is-currency$="[[numberFormatIsCurrency]]"
+                number-format-currency="[[numberFormatCurrency]]"
+                number-format-zero="[[numberFormatZero]]"
+                truncation-length="[[truncationLength]]">
+              </px-vis-register-item>
+            </template>
           </template>
-        </template>
-        <!-- For pie charts -->
-        <template is="dom-if" if="{{_isOfType(yAxisType, 'pie')}}">
-          <template is="dom-repeat" items="{{chartData}}">
-            <px-vis-register-item-pie
-              item="[[item]]"
-              item-index="[[index]]"
-              complete-series-config="[[completeSeriesConfig]]"
-              chart-data="[[chartData]]"
-              type="[[type]]"
-              x-axis-type="[[xAxisType]]"
-              y-axis-type="[[yAxisType]]"
-              use-percentage="[[usePercentage]]"
-              number-format="[[numberFormat]]"
-              number-format-culture="[[numberFormatCulture]]"
-              number-format-is-currency$="[[numberFormatIsCurrency]]"
-              number-format-currency="[[numberFormatCurrency]]"
-              number-format-zero="[[numberFormatZero]]"
-              truncation-length="[[truncationLength]]">
-            </px-vis-register-item-pie>
+          <!-- For pie charts -->
+          <template is="dom-if" if="{{_isOfType(yAxisType, 'pie')}}">
+            <template is="dom-repeat" items="{{chartData}}">
+              <px-vis-register-item-pie
+                item="[[item]]"
+                item-index="[[index]]"
+                complete-series-config="[[completeSeriesConfig]]"
+                chart-data="[[chartData]]"
+                type="[[type]]"
+                x-axis-type="[[xAxisType]]"
+                y-axis-type="[[yAxisType]]"
+                use-percentage="[[usePercentage]]"
+                number-format="[[numberFormat]]"
+                number-format-culture="[[numberFormatCulture]]"
+                number-format-is-currency$="[[numberFormatIsCurrency]]"
+                number-format-currency="[[numberFormatCurrency]]"
+                number-format-zero="[[numberFormatZero]]"
+                truncation-length="[[truncationLength]]">
+              </px-vis-register-item-pie>
+            </template>
           </template>
-        </template>
+        </div>
       </div>
     </div>
 
