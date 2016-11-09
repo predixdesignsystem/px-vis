@@ -234,6 +234,21 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           '_truncateTitle(title, truncationLength, appendUnitInTitle, completeSeriesConfig)'
         ],
 
+        detached: function() {
+          if(this._axisGroup) {
+            this._axisGroup.remove();
+            this._axisGroup = null;
+          }
+
+          if(this._titleGroup) {
+            this._titleGroup.remove();
+            this._titleGroup = null;
+          }
+          if(this.drawnTickValues && this.drawnTickValues.length > 0) {
+            this.set('drawnTickValues', []);
+          }
+        },
+
         ready: function() {
           // if there is no dev set unique ID, generate one
           if(!this.axisId) {
