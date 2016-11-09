@@ -1,3 +1,8 @@
+==================
+* Enable event deletion
+* Fix in interaction space to ensure removal of mousemove event
+* Fix to allow axes to delete from radar chart
+
 v0.6.29
 ==================
 * IE min-height + flex bug fix for register / tooltip
