@@ -114,23 +114,27 @@ Formatting for the timestamps,the data values, and the series names can be contr
           ></px-vis-register-datetime>
         </template>
 
-        <div class$="{{_getSeriesWrapperClass(type)}}">
+        <div class$="{{_getSeriesWrapperClassReverse(type)}}">
           <template is="dom-if" if="{{!_isOfType(xAxisType, 'pie')}}">
-            <template is="dom-repeat" items="{{_series}}">
-              <px-vis-register-item
-                item="[[item]]"
-                complete-series-config="[[completeSeriesConfig]]"
-                type="[[type]]"
-                x-axis-type="[[xAxisType]]"
-                y-axis-type="[[yAxisType]]"
-                muted-series="{{mutedSeries}}"
-                number-format="[[numberFormat]]"
-                number-format-culture="[[numberFormatCulture]]"
-                number-format-is-currency$="[[numberFormatIsCurrency]]"
-                number-format-currency="[[numberFormatCurrency]]"
-                number-format-zero="[[numberFormatZero]]"
-                truncation-length="[[truncationLength]]">
-              </px-vis-register-item>
+            <template is="dom-repeat" items="{{_series}}" as="_groups">
+              <div class$="{{_getSeriesWrapperClass(type)}}">
+                <template is="dom-repeat" items="{{_groups}}">
+                  <px-vis-register-item
+                    item="[[item]]"
+                    complete-series-config="[[completeSeriesConfig]]"
+                    type="[[type]]"
+                    x-axis-type="[[xAxisType]]"
+                    y-axis-type="[[yAxisType]]"
+                    muted-series="{{mutedSeries}}"
+                    number-format="[[numberFormat]]"
+                    number-format-culture="[[numberFormatCulture]]"
+                    number-format-is-currency$="[[numberFormatIsCurrency]]"
+                    number-format-currency="[[numberFormatCurrency]]"
+                    number-format-zero="[[numberFormatZero]]"
+                    truncation-length="[[truncationLength]]">
+                  </px-vis-register-item>
+                </template>
+              </div>
             </template>
           </template>
           <!-- For pie charts -->
@@ -207,7 +211,12 @@ Formatting for the timestamps,the data values, and the series names can be contr
       _series: {
         type: Array,
         notify: true,
-        computed: '_computeSeries(tooltipData.series.*)'
+        computed: '_computeSeries(tooltipData.series.*, groupings)'
+      },
+
+      groupings: {
+        type: Number,
+        value: 1
       }
     },
 
@@ -264,7 +273,21 @@ Formatting for the timestamps,the data values, and the series names can be contr
      *
     */
     _computeSeries: function() {
-      return this.tooltipData.series;
+      var allSeries = this.tooltipData.series,
+          pivot = Math.ceil(allSeries.length / this.groupings),
+          groupedSeries = [],
+          s = 0,
+          e = pivot;
+
+      for(var i = 0; i < this.groupings; i++) {
+        //copy the section of the series
+        groupedSeries.push(allSeries.slice(s,e));
+
+        //calc our next start and end
+        s = e;
+        e = s + pivot;
+      }
+      return groupedSeries;
     },
     _displayTime: function(xAxisType, forceDateTimeDisplay) {
       return forceDateTimeDisplay || xAxisType === 'time';

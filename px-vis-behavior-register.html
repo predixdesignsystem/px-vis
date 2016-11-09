@@ -102,7 +102,7 @@ PxVisBehaviorRegister.itemShared = {
    * Tries to draw the SVG to canvas and if that doesnt work, falls back on a failure callback
    */
   _getConfigName: function() {
-    
+
     if(this.xAxisType === 'pie') {
       return this.item.y;
     } else {
@@ -148,6 +148,13 @@ PxVisBehaviorRegister.register = {
     }
 
     return classList;
+  },
+
+  _getSeriesWrapperClassReverse: function(type) {
+    if(type === 'horizontal') {
+      return this._getSeriesWrapperClass('vertical');
+    }
+    return this._getSeriesWrapperClass('horizontal');
   },
 
   /**
