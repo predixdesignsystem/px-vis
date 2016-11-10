@@ -1,4 +1,5 @@
 ==================
+* added more checks on zoomBrush for onload
 * added check on axis bar draw to see if it is in mutedSeries
 * check mutedSeries observer in axis to only run if titles exist.
 * added check to make sure the register elem clicked on has a name, otherwise transverses path to find it
