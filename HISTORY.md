@@ -1,4 +1,6 @@
 ==================
+* added check to make sure the register elem clicked on has a name, otherwise transverses path to find it
+* Added check for currentDomainX & currentDomainY for event draw
 * Enable event deletion
 * Fix in interaction space to ensure removal of mousemove event
 * Fix to allow axes to delete from radar chart
