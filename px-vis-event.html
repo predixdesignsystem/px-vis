@@ -194,7 +194,7 @@ The configureation object allows developers to set the icon used for each event 
     },
 
     observers: [
-      'drawElement(svg,x,y,currentDomainX,currentDomainY,eventData.*,eventConfig.*)',
+      'drawElement(svg, currentDomainX,currentDomainY,eventData.*,eventConfig.*)',
       '_addClipPath(clipPath)'
      ],
 
@@ -220,33 +220,34 @@ The configureation object allows developers to set the icon used for each event 
      * @method drawElement
      */
     drawElement: function() {
-      this._processConfiguration();
+      if(this.currentDomainX.length > 0 && this.currentDomainY.length > 0) {
+        this._processConfiguration();
 
-      // checks to see if the axis already exists. If not, create; if so, update
-      if(this._isObjEmpty(this.eventGroup)){
-        this.eventGroup = this.svg.append('g')
-          .attr('class','event')
-          .attr('event-id',this.eventId)
-          .attr('id','event_' + this.eventId);
+        // checks to see if the axis already exists. If not, create; if so, update
+        if(this._isObjEmpty(this.eventGroup)){
+          this.eventGroup = this.svg.append('g')
+            .attr('class','event')
+            .attr('event-id',this.eventId)
+            .attr('id','event_' + this.eventId);
 
-        // draw the path
-        this.eventLine = this.eventGroup.append("line")
-          .attr('stroke',this.colors[this.lineConfig.color])
-          .attr('stroke-width',this.lineConfig.weight);
+          // draw the path
+          this.eventLine = this.eventGroup.append("line")
+            .attr('stroke',this.colors[this.lineConfig.color])
+            .attr('stroke-width',this.lineConfig.weight);
 
-        this._addIcon();
+          this._addIcon();
 
-        this._positionEvent();
+          this._positionEvent();
 
-        this._addClipPath();
-      } else {
-        this.eventIcon.remove();
-        this._addIcon();
-        // update the path
-        this._positionEvent();
+          this._addClipPath();
+        } else {
+          this.eventIcon.remove();
+          this._addIcon();
+          // update the path
+          this._positionEvent();
+        }
+        this._addTooltip();
       }
-      this._addTooltip();
-
     },
 
     /**
