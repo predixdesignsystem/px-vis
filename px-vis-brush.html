@@ -303,17 +303,29 @@ This element sets the selectedDomain property based on the extents box. The sele
       // circle.classed("selected", function(d) { return s[0] <= d && d <= s[1]; });
       this.debounce('brushed', function () {
         if(Px.d3.brushSelection(this._brushGroup.node())) {
-          var newDomain = Px.d3.brushSelection(this._brushGroup.node()).map(this.axis.invert, this.axis);
-          //make sure this is an actual update
-          var changed = this.selectedDomain.x.length < 2 ||
-                          newDomain[0].toString() !== this.selectedDomain.x[0].toString() ||
-                          newDomain[1].toString() !== this.selectedDomain.x[1].toString();
+          var brushExt = Px.d3.brushSelection(this._brushGroup.node());
 
-          if(!this._preventDomainChange && changed) {
-            this.set('selectedDomain', {x:newDomain,y:[]});
-            this.fire('px-vis-selected-domain-updated', {
-              'data':{x:newDomain,y:[]}, 'method': 'set', 'dataVar': 'selectedDomain'
-            });
+          //if our extents are the same, add or subtract one based on location and reset the brush
+          if(brushExt[0] === brushExt[1]) {
+            brushExt[0] = (brushExt[0] === 0) ? 0 : brushExt[1] - 1;
+            brushExt[1] = (brushExt[1] === 0) ? brushExt[0] + 1 : brushExt[1];
+
+            this._brushGroup
+              .call(this._brush.move,brushExt)
+          } else {
+
+            var newDomain = brushExt.map(this.axis.invert, this.axis),
+            //make sure this is an actual update
+                changed = this.selectedDomain.x.length < 2 ||
+                            newDomain[0].toString() !== this.selectedDomain.x[0].toString() ||
+                            newDomain[1].toString() !== this.selectedDomain.x[1].toString();
+
+            if(!this._preventDomainChange && changed) {
+              this.set('selectedDomain', {x:newDomain,y:[]});
+              this.fire('px-vis-selected-domain-updated', {
+                'data':{x:newDomain,y:[]}, 'method': 'set', 'dataVar': 'selectedDomain'
+              });
+            }
           }
         }
       }, 10);
@@ -530,7 +542,7 @@ This element sets the selectedDomain property based on the extents box. The sele
      * @method _zoomBrush
      */
     _zoomBrush: function(chartDomain){
-      if(!this._brushing && !this._centering && this.chartDomain.length > 0 && this._doesObjHaveValues(this._brush)){
+      if(!this._brushing && !this._centering && this.chartDomain.length > 0 && this._doesObjHaveValues(this._brush) && this._doesObjHaveValues(this._brushGroup) && this._doesObjHaveValues(this.axis)){
         var extent = Px.d3.brushSelection(this._brushGroup.node()),
             domain = [this.axis(this.chartDomain[0]),this.axis(this.chartDomain[1])];
         if(!(extent[0] === domain[0] && extent[1] === domain[1])){

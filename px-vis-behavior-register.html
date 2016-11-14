@@ -315,9 +315,19 @@ PxVisBehaviorRegister.generalItem = [{
    */
   _seriesClicked: function(e) {
     var ne = Polymer.dom(e),
-        series = ne.rootTarget.getAttribute('name').substr(1);
+        series = ne.rootTarget.getAttribute('name');
 
-    this.muteUnmuteSeries(series);
+    //if we clicked through to something without a name (such as numbro-element), go up and find it
+    if(!series) {
+      for(var i = 1; i < ne.path.length; i++) {
+        if(ne.path[i].getAttribute && ne.path[i].getAttribute('id') === 'regItem') {
+          series = ne.path[i].getAttribute('name');
+          break;
+        }
+      }
+    }
+
+    this.muteUnmuteSeries(series.substr(1));
     e.stopPropagation();
   },
 
