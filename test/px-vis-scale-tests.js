@@ -718,4 +718,67 @@ function runTests(){
     });
   }); //suite
 
+  suite('px-vis-scale two series, different x for each series', function() {
+    var diffXforY = document.getElementById('diffXforY');
+
+    suiteSetup(function(){
+      var ext = {
+        "x":[1397100000000,1397300000000], "y": [Infinity,-Infinity]
+        }
+      diffXforY.set('chartExtents',ext);
+    });
+
+    test('diffXforY fixture is created', function() {
+      assert.isTrue(diffXforY !== null);
+    });
+
+    test('diffXforY creates an x', function() {
+      assert.isDefined(diffXforY.x);
+    });
+
+    test('diffXforY creates an y', function() {
+      assert.isDefined(diffXforY.y);
+    });
+
+    test('diffXforY sets currentDomainX', function() {
+      assert.lengthOf(diffXforY.currentDomainX,2);
+    });
+    test('diffXforY sets currentDomainY', function() {
+      assert.lengthOf(diffXforY.currentDomainY,2);
+    });
+
+    test('diffXforY currentDomainX is correct', function() {
+      assert.equal( Number(diffXforY.currentDomainX[0]), 1397100000000);
+      assert.equal( Number(diffXforY.currentDomainX[1]), 1397300000000);
+    });
+    test('diffXforY currentDomainY is correct', function() {
+      assert.equal( JSON.stringify(diffXforY.currentDomainY), JSON.stringify([1,10]));
+    });
+
+    test('diffXforY x returns correct value 1397100000000', function() {
+      assert.equal( diffXforY.x(1397100000000), 0);
+    });
+
+    test('diffXforY x returns correct value 1397300000000', function() {
+      assert.equal( diffXforY.x(1397300000000), 480);
+    });
+
+    test('diffXforY x returns correct value 1397160780000', function() {
+      var n = (1397300000000 - 1397100000000)/2 + 1397100000000;
+      assert.equal( diffXforY.x(n), 240);
+    });
+
+    test('diffXforY y returns correct value 0', function() {
+      assert.equal( diffXforY.y(1), 270);
+    });
+
+    test('diffXforY y returns correct value 10', function() {
+      assert.equal( diffXforY.y(10), 0);
+    });
+
+    test('diffXforY y returns correct value 5', function() {
+      assert.equal( diffXforY.y(5.5), 135);
+    });
+  }); //suite
+
 } //runTests
