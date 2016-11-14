@@ -1,4 +1,5 @@
 ==================
+* added more math.max checks for sizing
 * fix to navigator brush so it cannot disappear when fully collapsed
 * added more checks on zoomBrush for onload
 * added check on axis bar draw to see if it is in mutedSeries
