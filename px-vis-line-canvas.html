@@ -232,8 +232,8 @@ Element which draws lines series onto the chart
       this.canvasContext.clearRect(-1, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
       this.canvasContext.beginPath();
 
-      var w = this.width - this.margin.left - this.margin.right,
-          h = this.height - this.margin.top - this.margin.bottom;
+      var w = Math.max(this.width - this.margin.left - this.margin.right,0),
+          h = Math.max(this.height - this.margin.top - this.margin.bottom,0);
 
       this.canvasContext.rect(0, 0, w, h);
       this.canvasContext.clip();
@@ -349,7 +349,7 @@ Element which draws lines series onto the chart
       this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
 
       //split the data in the number of frames desired. This looks more complicated
-      //than it actually is... just splitting data in X batches, making sure it's 
+      //than it actually is... just splitting data in X batches, making sure it's
       //wrapped in an array if it's not a parallel or radial line
       //we also need to make sure that the batches are "connected"
       //between each other, hence prepending the last point of the previous
