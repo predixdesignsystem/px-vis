@@ -159,13 +159,17 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       }
     },
 
-    _getDataExtents: function(d,yKeysArr){
+    _getDataExtents: function(d,yKeysArr) {
       var a = [];
-      for(var i = 0; i < yKeysArr.length; i++){
-        var key = yKeysArr[i];
-        a.push(d[this.completeSeriesConfig[key]['y']]);
+      for(var i = 0; i < yKeysArr.length; i++) {
+        var key = yKeysArr[i],
+            val = d[this.completeSeriesConfig[key]['y']];
+
+        if(val || val === 0) {
+          a.push(val);
+        }
       }
-      return [ Math.min.apply(null,a),Math.max.apply(null,a) ];
+      return [ Math.min.apply(null,a), Math.max.apply(null,a) ];
     },
 
     /**
