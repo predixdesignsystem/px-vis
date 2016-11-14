@@ -297,7 +297,7 @@ function runTests(){
     });
     test('Title series bars opacity', function() {
       var bar = baseYAxis._titleGroup.select('rect');
-      assert.equal(bar.attr('opacity'),null);
+      assert.equal(bar.attr('opacity'), 1);
     });
     test('Title series bars id', function() {
       var bar = baseYAxis._titleGroup.select('rect');
