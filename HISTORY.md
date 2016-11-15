@@ -1,3 +1,8 @@
+
+v0.6.31
+==================
+* bower updating px-demo-snippet
+
 v0.6.30
 ==================
 * Fix intermittent bug in IE when drawing an image on a canvas withing an image load
