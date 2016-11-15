@@ -890,6 +890,91 @@ PxVisBehavior.events = {
 
 /*
      Name:
+    PxVisBehavior.thresholds
+
+    Description:
+    Polymer behavior that provides config and data to manage "thresholds" (px-vis-threshold) on the chart
+
+
+    @polymerBehavior PxVisBehavior.thresholds
+*/
+
+PxVisBehavior.thresholds = {
+  properties: {
+    /**
+     * Configuration object to define what threshold should map to what color and line style.
+     * The object has a key being the threshold name, the value being a configuration object for that threshold. The configuration object has four properties:
+     * - `color`: A valid color name found in the px-colors-design. If no color is supplied, then it will match the series color or fallback to a default color.
+     * - `strokeWidth`: the stroke width for the line.
+     * - `dashPattern`: string for the dash pattern for the line in the form of stroke,gap. `5,2` would be a 5px dash with 2px gap. `5,2,1,2` would be a 5px dash, 2px gap, 1px dash, 2px gap. '5,0' would be effectively create a solid line.
+     * - `title`: The display title
+     *
+     *
+     * ```
+     * Example: {
+     *   "max":{
+     *     "color": "blue",
+     *     "strokeWidth": "2",
+     *     "dashPattern": "5",
+     *     "title": "Maximum"
+     *   },
+     *   "avg":{
+     *     "color": "green",
+     *     "strokeWidth": "1",
+     *     "dashPattern": "5,2,1,2",
+     *     "title": "Fleet Average"
+     *   },
+     *   "min":{
+     *     "title": "Min"
+     *    }
+     * }
+     *```
+     *
+     */
+    thresholdConfig: {
+      type: Object,
+      value: function() { return {}; }
+    },
+    /**
+     * Configuration object to define what the default icon should be. This gets used if a) no eventConfig is defined or b) the particular event is not defined in the eventConfig object.
+     *
+     *```
+     * Default: {
+     *   'strokeWidth': '1',
+     *   'dashPattern': '5,2'
+     * }
+     *```
+     *
+     */
+    defaultThresholdConfig: {
+      type: Object,
+      value: function() {
+        return {
+          'strokeWidth': '1',
+          'dashPattern': '5,2'
+        };
+      }
+    },
+    /**
+     * Data representing the events. Example:
+     * ```
+     * [
+     *      { "for":"y0", "type":"max", "value":35.4784 },
+     *      { "for":"y0", "type":"min", "value":7.6531 },
+     *      { "for":"y0", "type":"mean", "value":15.330657585139331 },
+     *      { "for":"y1", "type":"mean", "value":75 },
+     *      { "for":"", "type":"quartile", "value":17 }
+     *  ]
+     * ```
+     */
+    thresholdData: {
+      type: Array
+    }
+  }
+};
+
+/*
+     Name:
     PxVisBehavior.dimensions
 
     Description:
