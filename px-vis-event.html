@@ -86,6 +86,7 @@ The configureation object allows developers to set the icon used for each event 
       PxVisBehaviorD3.clipPath,
       PxVisBehavior.commonMethods,
       PxVisBehavior.events,
+      PxVisBehaviorD3.domainUpdate,
       commonColors,
       faCodes
     ],
@@ -194,7 +195,7 @@ The configureation object allows developers to set the icon used for each event 
     },
 
     observers: [
-      'drawElement(svg, currentDomainX,currentDomainY,eventData.*,eventConfig.*)',
+      'drawElement(svg, x, y, currentDomainX, currentDomainY, domainChanged, eventData.*,eventConfig.*)',
       '_addClipPath(clipPath)'
      ],
 
@@ -220,7 +221,7 @@ The configureation object allows developers to set the icon used for each event 
      * @method drawElement
      */
     drawElement: function() {
-      if(this.currentDomainX.length > 0 && this.currentDomainY.length > 0) {
+      // if(this.currentDomainX.length > 0 && this.currentDomainY.length > 0) {
         this._processConfiguration();
 
         // checks to see if the axis already exists. If not, create; if so, update
@@ -247,7 +248,7 @@ The configureation object allows developers to set the icon used for each event 
           this._positionEvent();
         }
         this._addTooltip();
-      }
+      // }
     },
 
     /**
