@@ -167,8 +167,16 @@ PxVisBehaviorD3.svg = {
 
       //once svg has been loaded
       img.onload = function() {
-        canvas.getContext('2d').drawImage(img, x, y);
-        DOMURL.revokeObjectURL(url);
+
+        //catching error for IE 11 here:
+        //http://stackoverflow.com/questions/25214395/unexpected-call-to-method-or-property-access-while-drawing-svg-image-onto-canvas
+        try {
+          canvas.getContext('2d').drawImage(img, x, y);
+          DOMURL.revokeObjectURL(url);
+        } catch(err) {
+          failureCallback(canvas);
+          return;
+        }
 
         sucessCallback(canvas);
       };
