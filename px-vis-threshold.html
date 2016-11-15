@@ -42,7 +42,6 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
       PxVisBehaviorD3.svg,
       PxVisBehaviorD3.axes,
       PxVisBehavior.commonMethods,
-      PxVisBehavior.dataset,
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.thresholds,
       commonColors
@@ -136,7 +135,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
     },
 
     observers: [
-      'drawElement(svg,x,y,currentDomainX,currentDomainY,chartData.*)',
+      'drawElement(svg,x,y,currentDomainX,currentDomainY,thresholdData.*)',
       '_setColors(completeSeriesConfig.*,thresholdText)',
      ],
 
@@ -160,7 +159,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
         this.thresholdGroup = this.thresholdSvg.append('g')
           .attr('id','thresholds')
           .selectAll('g.thresholds')
-          .data(this.chartData)
+          .data(this.thresholdData)
           .enter()
           .append("g")
           .attr('class','thresholds')
@@ -169,11 +168,11 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
         this.thresholdLine = this.thresholdGroup.append("line")
           .attr('stroke-width', function(d) {
             return (this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['strokeWidth'] )?
-              this.thresholdConfig[d.type]['strokeWidth'] : this.defaultThresholdConfig['strokeWidth'];
+              this.thresholdConfig[d.type]['strokeWidth'] : this._defaultThresholdConfig['strokeWidth'];
           }.bind(this))
           .attr('stroke-dasharray', function(d) {
             return this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['dashPattern'] ?
-              this.thresholdConfig[d.type]['dashPattern'] : this.defaultThresholdConfig['dashPattern'];
+              this.thresholdConfig[d.type]['dashPattern'] : this._defaultThresholdConfig['dashPattern'];
           }.bind(this))
           .attr('x1', this.x(this.currentDomainX[0]))
           .attr('x2', this.x(this.currentDomainX[1]))
