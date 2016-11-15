@@ -405,6 +405,119 @@ function runTests(){
     });
   });
 
+  suite('px-vis-axis-brush adding a new axis works', function() {
+    var multiScale = document.getElementById('multiScale'),
+        multiSVG = document.getElementById('multiSVG'),
+        multiBrush = document.getElementById('multiBrush');
+
+    var d = [{
+          "x": 1397102460000,
+          "y": 1,
+          "y1": 1,
+          "y2": 1,
+          "y3": 5
+        },{
+          "x": 1397131620000,
+          "y": 6,
+          "y1": 15,
+          "y2": 21,
+          "y3": 8
+        },{
+          "x": 1397160780000,
+          "y": 10,
+          "y1": 8,
+          "y2": 3,
+          "y3": 15
+        },{
+          "x": 1397189940000,
+          "y": 4,
+          "y1": 10,
+          "y2": 10,
+          "y3": 9
+        },{
+          "x": 1397219100000,
+          "y": 6,
+          "y1": 20,
+          "y2": 27,
+          "y3": 12
+        }
+      ],
+      dim = ['y','y1','y2','y3'],
+      ext = {'x': dim, 'y':{'y':[6,10], 'y1':[6,18], 'y2':[1,18], 'y3':[5,15]}};
+
+    suiteSetup(function(done) {
+      multiScale.set('axes',dim);
+      multiScale.set('chartExtents',ext);
+      multiScale.set('chartData',d);
+
+      var g = multiSVG.svg.selectAll('g.dimension')
+          .data(dim);
+      g.enter()
+        .append("g")
+        .attr("class", "dimension")
+        .attr("dimension", function(d) { return d })
+        .attr("transform", function(d,i) {
+          return "translate(" + (40 * i) + ",0)";
+        });
+
+        multiBrush.set('dimensions',dim);
+        multiBrush.set('chartData',d);
+        multiBrush.set('svg',multiSVG.svg.selectAll('g.dimension'));
+
+      setTimeout(function(){done()},500);
+    });
+
+    test('multiBrush._brushes are created', function() {
+      assert.equal(multiBrush._brushes.nodes().length, 4);
+    });
+    test('multiBrush._brushes is not selected', function() {
+      assert.equal(Px.d3.brushSelection(multiBrush._brushes.nodes()[0]),null);
+      assert.equal(Px.d3.brushSelection(multiBrush._brushes.nodes()[1]),null);
+      assert.equal(Px.d3.brushSelection(multiBrush._brushes.nodes()[2]),null);
+      assert.equal(Px.d3.brushSelection(multiBrush._brushes.nodes()[3]),null);
+    });
+
+    test('multiBrush mutedSeries is correct', function() {
+      assert.deepEqual(multiBrush.mutedSeries,{});
+    });
+  });
+
+  suite('px-vis-axis-brush brush on the new axis', function() {
+    var multiBrush = document.getElementById('multiBrush');
+    var d;
+    suiteSetup(function(done) {
+      d = [~~multiBrush.axis['y3'](12),~~multiBrush.axis['y3'](6)];
+      Px.d3.select(multiBrush._brushes.nodes()[3]).call(multiBrush._brush.move,d);
+       setTimeout(function(){done()},100);
+      //done();
+    });
+
+    test('multiBrush._brush extents match', function() {
+      assert.deepEqual(Px.d3.brushSelection(multiBrush._brushes.nodes()[3]),[144,432]);
+    });
+    test('multiBrush._brushGroup.rect attr x', function() {
+      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[3]).select('rect.selection').attr('x'), -10);
+    });
+    test('multiBrush._brushGroup.rect attr width', function() {
+      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[3]).select('rect.selection').attr('width'), 20);
+    });
+    test('multiBrush._brushGroup.rect attr y', function() {
+      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[3]).select('rect.selection').attr('y'), 144);
+    });
+    test('multiBrush._brushGroup.rect attr height', function() {
+      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[3]).select('rect.selection').attr('height'), 288);
+    });
+
+    test('multiBrush mutedSeries is correct', function() {
+      var ms = {
+        "1397102460000": true,
+        "1397160780000": true,
+        "1397219100000": true
+      };
+      assert.deepEqual(multiBrush.mutedSeries, ms);
+    });
+  });
+
 
   suite('px-vis-axis-brush radial setup works', function() {
     var radialScale = document.getElementById('radialScale'),

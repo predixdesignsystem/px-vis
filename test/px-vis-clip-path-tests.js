@@ -125,7 +125,6 @@ function runTests(){
       assert.equal(clipPath.attr('id'),baseClip.clipPath);
     });
     test('baseClip y', function() {
-      debugger
       assert.equal(rect.attr('y'),-10);
     });
     test('baseClip width', function() {
