@@ -1,4 +1,4 @@
-
+v0.6.32
 ==================
 * added more checks to event and axis mutedSeries bars
 * fix to scale extents where chart data ys do not share an x
