@@ -1,3 +1,10 @@
+v0.6.33
+==================
+* added additional check to brush zoomBrush
+* fixed attrs in tooltip being passed down to register
+* created chart behaviors for axisConfigs and registerConfigs
+* doc fixes
+
 v0.6.32
 ==================
 * added more checks to event and axis mutedSeries bars
