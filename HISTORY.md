@@ -1,3 +1,8 @@
+v1.0.0
+==================
+* Added new threshold configuration similar to events
+* Changed threshold data property from chartData to thresholdData
+* Added improved resize methods to chart behavior
 
 v0.6.34
 ==================
