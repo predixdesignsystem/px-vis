@@ -310,11 +310,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
                 this._axis.ticks(this.ticks.interval, this.ticks.format);
               // }
 
-            } else if(typeof(this.ticks) === 'object' && this.ticks.interval && this.axisType !== 'time') {
+            } else if(typeof(this.ticks) === 'object' && this.ticks.interval && (this.axisType !== 'time') || (this.axisType !== 'timeLocal')) {
 
               this._axis.ticks(this.ticks.interval);
 
-            } else if(typeof(this.ticks) === 'object' && this.ticks.format && this.axisType === 'time') {
+            } else if(typeof(this.ticks) === 'object' && this.ticks.format && (this.axisType !== 'time') || (this.axisType !== 'timeLocal')) {
 
               this._axis.ticks(10, this.ticks.format);
 
@@ -326,12 +326,12 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           //support for tick format
           // https://github.com/mbostock/d3/wiki/Formatting#d3_format
           if(this.tickFormat && this.axisType !== 'ordinal'){
-            if(this.axisType === 'time') {
-              if(typeof this.tickFormat === 'object') {
-                this._axis.tickFormat(this.tickFormat);
-              } else {
-                this._axis.tickFormat(Px.d3.timeFormat(this.tickFormat));
-              }
+            if(typeof this.tickFormat === 'object') {
+              this._axis.tickFormat(this.tickFormat);
+            } else if(this.axisType === 'time') {
+              this._axis.tickFormat(Px.d3.utcFormat(this.tickFormat));
+            } else if(this.axisType === 'timeLocal') {
+              this._axis.tickFormat(Px.d3.timeFormat(this.tickFormat));
             } else if(this.axisType === 'linear') {
               this._axis.tickFormat(Px.d3.format(this.tickFormat));
             }

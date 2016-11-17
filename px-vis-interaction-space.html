@@ -39,7 +39,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 <dom-module id="px-vis-interaction-space">
     <template>
       <style include="px-vis-styles"></style>
-      
+
 
     </template>
 </dom-module>
@@ -261,14 +261,14 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
               // setup a holder for our data to pass out
               var dataObj = {
-                'time':(this.xAxisType === 'time') ? x1 : null,
+                'time':(this.xAxisType === 'time' || this.xAxisType === 'timeLocal') ? x1 : null,
                 'series': [],
                 'mouse': mousePos,
                 'xArr': null,
                 'yArr': null
               };
 
-              //search for timestamp if we don't have it already (non time based chart) 
+              //search for timestamp if we don't have it already (non time based chart)
               //and we know the data has some notion of time
               searchTimeStamp = dataObj.time === null && !!this.chartData[0][this.timeData];
 
@@ -302,7 +302,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                   }
                 }
                 //find closest point....
-                else if(this.xAxisType === 'time') {
+                else if(this.xAxisType === 'time' || this.xAxisType === 'timeLocal') {
                   //time based X axis
                   /*
                     d3.bisector returns index in our array that corresponds to the horizontal position of the mouse pointer.
@@ -343,7 +343,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                       //during the calculation, hence needing to refetch from array
                       result[xKey] = this.chartData[j][xKey];
                       result[yKey] = this.chartData[j][yKey];
-                      
+
                       //store the timestamp and distance
                       if(searchTimeStamp && closestTimestamp[0] > minDist) {
                         closestTimestamp = [minDist, this.chartData[j][this.timeData]];

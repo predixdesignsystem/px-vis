@@ -1,5 +1,7 @@
 v1.0.0
 ==================
+* Changed time scale to UTC by default.
+* Added timeLocal option for local time
 * Added new threshold configuration similar to events
 * Changed threshold data property from chartData to thresholdData
 * Added improved resize methods to chart behavior
