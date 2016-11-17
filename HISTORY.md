@@ -1,3 +1,6 @@
+==================
+* ensure timeseries rendering to canvas with multiple lines are not cut off
+
 v0.6.32
 ==================
 * added more checks to event and axis mutedSeries bars

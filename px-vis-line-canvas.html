@@ -169,9 +169,9 @@ Element which draws lines series onto the chart
         // if we have previously drawn the same number of lines as series, then let's start over; Clear the drawing canvas
         if(this.canvasContext._pxLinesRedraw === this.canvasContext._pxLinesTotal){
           this.canvasContext._pxLinesRedraw = 0;
+          console.log('redraw')
           // (x1,y1,x2,y2)
           this.canvasContext.clearRect(-this.canvasContext._translation[0], -this.canvasContext._translation[1] , this.canvasContext.canvas.width, this.canvasContext.canvas.height);
-          // this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
         }
 
         if(this.clipPath) {
@@ -187,7 +187,7 @@ Element which draws lines series onto the chart
           var frames = Math.max(data.length/1000, 5);
           this._renderProgressively(data, frames);
         }
-        // make sure they are only drawn to the chart area and not the rest of the frame: equivalent to the clipPath for SVG
+
         this.canvasContext._pxLinesRedraw += 1;
       },20);
     },
@@ -228,8 +228,7 @@ Element which draws lines series onto the chart
      */
     _drawRectClipPath: function() {
       this.canvasContext.save();
-      //clear it (need to recent to 0,0 for clearing)
-      this.canvasContext.clearRect(-1, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+      
       this.canvasContext.beginPath();
 
       var w = Math.max(this.width - this.margin.left - this.margin.right,0),
@@ -346,7 +345,9 @@ Element which draws lines series onto the chart
       currentRenderingCounter = this._progressiveRenderingCounter;
 
       //make sure canvas is clean
-      this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+      if(this.parallelCoordinates) {
+        this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+      }
 
       //split the data in the number of frames desired. This looks more complicated
       //than it actually is... just splitting data in X batches, making sure it's
