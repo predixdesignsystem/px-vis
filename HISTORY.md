@@ -1,3 +1,7 @@
+v0.6.35
+==================
+* fixed axis ticks setting when it is only an object
+* added ability for axis tickFormat to be an object
 
 v0.6.34
 ==================

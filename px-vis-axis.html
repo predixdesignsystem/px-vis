@@ -229,7 +229,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           'drawElement(domainChanged,svg,axis,margin,height,disableTicks)',
           'drawSeriesBars(completeSeriesConfig.*, titleDrawn)',
           '_muteSeriesBars(mutedSeries.*)',
-          '_updateTicks(ticks)',
+          // '_updateTicks(ticks)',
           '_titleChanged(displayedTitle, _axisGroup, titleLocation.*, height, width)',
           '_truncateTitle(title, truncationLength, appendUnitInTitle, completeSeriesConfig)'
         ],
@@ -294,6 +294,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          *
          */
         _processTicks: function() {
+          
           //support for general ticks setting
           // https://github.com/d3/d3-axis#axis_ticks
           if(this.ticks && this.axisType !== 'ordinal') {
@@ -303,11 +304,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
             } else if(typeof(this.ticks) === 'object' && this.ticks.interval && this.ticks.format) {
 
-              if(this.axisType === 'time'){
-                this._axis.ticks(this.ticks.format, this.ticks.interval);
-              } else {
+              // if(this.axisType === 'time'){
+              //   this._axis.ticks(this.ticks.format, this.ticks.interval);
+              // } else {
                 this._axis.ticks(this.ticks.interval, this.ticks.format);
-              }
+              // }
 
             } else if(typeof(this.ticks) === 'object' && this.ticks.interval && this.axisType !== 'time') {
 
@@ -315,7 +316,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
             } else if(typeof(this.ticks) === 'object' && this.ticks.format && this.axisType === 'time') {
 
-              this._axis.ticks(this.ticks.format);
+              this._axis.ticks(10, this.ticks.format);
 
             } else {
               console.error('Cannot interpret axis ticks')
@@ -326,7 +327,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           // https://github.com/mbostock/d3/wiki/Formatting#d3_format
           if(this.tickFormat && this.axisType !== 'ordinal'){
             if(this.axisType === 'time') {
-              this._axis.tickFormat(Px.d3.timeFormat(this.tickFormat));
+              if(typeof this.tickFormat === 'object') {
+                this._axis.tickFormat(this.tickFormat);
+              } else {
+                this._axis.tickFormat(Px.d3.timeFormat(this.tickFormat));
+              }
             } else if(this.axisType === 'linear') {
               this._axis.tickFormat(Px.d3.format(this.tickFormat));
             }
@@ -464,7 +469,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             //apparently we need to give ourselves a bit of time to ensure the axis draws and it can clac this
             this.debounce("drawnTicks", function(){
               // FIXME Only works if ticks is a Number; need to support other formats for ticks
-              if(this.ticks){
+              if(this.ticks && typeof this.ticks === 'number') {
                 this.set('drawnTickValues', this._axis.scale().ticks(this.ticks));
               } else {
                 this.set('drawnTickValues', this._axis.scale().ticks());
