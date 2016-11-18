@@ -128,8 +128,9 @@ PxVisBehaviorChart.chartCommon = [{
         var fullConfig = (this.seriesConfig) ? JSON.parse(JSON.stringify(this.seriesConfig)) : {},
             k = Object.keys(fullConfig),
             kLen = k.length,
-            // FIXME 0 elem might not have all keys. How do we actually find all keys?
-            allYs = (this.includeAllSeries) ? Object.keys(this.chartData[0]) : [],
+            allYs = (this.includeAllSeries) ? Object.keys(d.reduce(function(a,b) {
+              return Object.assign(a, b);
+            }, {})) : [],
             // create a new object with the y keys as config keys
             objYs = allYs.reduce(function(obj, item) {
               obj[item] = {};
