@@ -118,6 +118,22 @@ PxVisBehaviorChart.chartCommon = [{
     },
 
     /**
+    * Goes through all the data and gathers unique keys. Returns a list of keys
+    *
+    */
+    _returnAllKeys(d) {
+      var o = {},
+          k;
+      for(var i = 0; i < d.length; i++) {
+        k = Object.keys(d[i]);
+        for(var j = 0; j < k.length; j++) {
+          o[k[j]] = true;
+        }
+      }
+      return Object.keys(o)
+    },
+
+    /**
     * Creates the real series confit object based on the default settings, the dev defined series config, and the includeAllSeries flag.
     *
     */
@@ -128,9 +144,7 @@ PxVisBehaviorChart.chartCommon = [{
         var fullConfig = (this.seriesConfig) ? JSON.parse(JSON.stringify(this.seriesConfig)) : {},
             k = Object.keys(fullConfig),
             kLen = k.length,
-            allYs = (this.includeAllSeries) ? Object.keys(d.reduce(function(a,b) {
-              return Object.assign(a, b);
-            }, {})) : [],
+            allYs = (this.includeAllSeries) ? this._returnAllKeys(this.chartData) : [],
             // create a new object with the y keys as config keys
             objYs = allYs.reduce(function(obj, item) {
               obj[item] = {};
