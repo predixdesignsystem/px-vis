@@ -7,6 +7,55 @@ var PxVisBehaviorChart = PxVisBehaviorChart || {};
 
 /*
     Name:
+    PxVisBehaviorChart.chartCommonMethods
+
+    Description:
+    Polymer behavior that provides some general methods used accross charts
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorChart.chartCommonMethods
+*/
+PxVisBehaviorChart.chartCommonMethods = {
+  /**
+  * Goes through an array of objects and gathers all unique keys. Returns a list of keys
+  *
+  * Expects and array of objects
+  *
+  * Returns an array of strings
+  */
+  _returnAllKeys: function(d) {
+    var o = {},
+        k;
+    for(var i = 0; i < d.length; i++) {
+      k = Object.keys(d[i]);
+      for(var j = 0; j < k.length; j++) {
+        o[k[j]] = true;
+      }
+    }
+    return Object.keys(o)
+  },
+
+  /**
+   * Helper function to return the correct color for a particular index.
+   **/
+  _getColor: function(i){
+    var l = this.seriesColorOrder.length,
+        index = this._calcIndex(i,l);
+    return this.dataVisColors[this.seriesColorOrder[ index ]];
+  },
+
+  /**
+   * Helper function to calculate the index. When we run out of indcies, it loops back over valid indicies.
+   **/
+  _calcIndex: function(i,l){
+    return i < l ? i : this._calcIndex(i - l,l);
+  }
+};
+
+/*
+    Name:
     PxVisBehaviorChart.chartCommon
 
     Description:
@@ -115,22 +164,6 @@ PxVisBehaviorChart.chartCommon = [{
       maxes.push(dMax);
 
       return [ Math.min.apply(null, mins) , Math.max.apply(null, maxes) ];
-    },
-
-    /**
-    * Goes through all the data and gathers unique keys. Returns a list of keys
-    *
-    */
-    _returnAllKeys(d) {
-      var o = {},
-          k;
-      for(var i = 0; i < d.length; i++) {
-        k = Object.keys(d[i]);
-        for(var j = 0; j < k.length; j++) {
-          o[k[j]] = true;
-        }
-      }
-      return Object.keys(o)
     },
 
     /**
@@ -330,22 +363,6 @@ PxVisBehaviorChart.chartCommon = [{
     },
 
     /**
-     * Helper function to return the correct color for a particular index.
-     **/
-    _getColor: function(i){
-      var l = this.seriesColorOrder.length,
-          index = this._calcIndex(i,l);
-      return this.dataVisColors[this.seriesColorOrder[ index ]];
-    },
-
-    /**
-     * Helper function to calculate the index. When we run out of indcies, it loops back over valid indicies.
-     **/
-    _calcIndex: function(i,l){
-      return i < l ? i : this._calcIndex(i - l,l);
-    },
-
-    /**
      * Helper function for the register. Returns true if the side register should exist
      *
      */
@@ -384,7 +401,7 @@ PxVisBehaviorChart.chartCommon = [{
     _returnKeys: function(obj){
       return Object.keys(obj);
     }
-}, commonColors, PxVisBehavior.commonMethods,PxVisBehavior.axisTypes];
+}, commonColors, PxVisBehaviorChart.chartCommonMethods, PxVisBehavior.commonMethods,PxVisBehavior.axisTypes];
 
 /*
     Name:
@@ -692,7 +709,7 @@ PxVisBehaviorChart.waitForAttach = {
      */
     _isLoadedOnPage: function() {
       var rect = this.getBoundingClientRect();
-      if(rect.height > 0 && rect.width > 0){
+      if(rect.height > 0 && rect.width > 0) {
         this.set('_loadedOnPage', true);
       } else {
         this.async(this._isLoadedOnPage, 50);

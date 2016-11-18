@@ -1,5 +1,7 @@
 ==================
 * ensure timeseries rendering to canvas with multiple lines are not cut off
+* added PxVisBehaviorChart.chartCommonMethods
+* made includeAllSeries loop over all data
 
 v0.6.32
 ==================
