@@ -1,3 +1,9 @@
+v0.6.37
+==================
+* fixed for event icons and clip path; changed how redrawing event icons works
+* added check to ensure that dates from currentDomain is valid for brush
+* fixed isObjEmpty check so it also checks for null
+
 v0.6.36
 ==================
 * fixed axis ticks setting when it is only an object
