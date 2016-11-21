@@ -2,6 +2,9 @@
 * ensure timeseries rendering to canvas with multiple lines are not cut off
 * added PxVisBehaviorChart.chartCommonMethods
 * made includeAllSeries loop over all data
+* added clip path to cursor
+* added cursor config to chart behavior
+* modified how cursor lines are calculated
 
 v0.6.32
 ==================
