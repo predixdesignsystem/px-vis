@@ -1,3 +1,7 @@
+v0.6.38
+==================
+* fixed axis tickFormat check so it looks for function, not object
+
 v0.6.37
 ==================
 * fixed for event icons and clip path; changed how redrawing event icons works
