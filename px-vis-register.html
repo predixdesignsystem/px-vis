@@ -103,7 +103,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
       <div
         id="registerWrap"
         class="inline--flex flex--col"
-        style$="height:{{_returnHeight(height,margin)}}px; width:[[width]]px">
+        style$="{{_returnHeight(height,margin)}}; width:[[width]]px">
 
         <template is="dom-if" if="{{_displayTime(xAxisType, forceDateTimeDisplay)}}">
           <px-vis-register-datetime
@@ -289,11 +289,27 @@ Formatting for the timestamps,the data values, and the series names can be contr
       }
       return groupedSeries;
     },
+
     _displayTime: function(xAxisType, forceDateTimeDisplay) {
       return forceDateTimeDisplay || xAxisType === 'time';
     },
+
     _returnHeight: function(height,margin) {
-      return height - 40;
+      return this.type === 'vertical' ? 'height:' + (height - 40) + 'px': '';
+    },
+
+    _scrollBarsPresent: function() {
+      var b = false;
+
+      if(this.type === 'vertical' &&
+          this.$.seriesWrap.scrollHeight > this.$.seriesWrap.clientHeight) {
+        b = true;
+      } else if(this.type === 'horizontal' &&
+          this.$.seriesWrap.scrollWidth > this.$.seriesWrap.clientWidth) {
+        b = true;
+      }
+
+      this.toggleClass('scrollOn', b, this.$.seriesWrap);
     }
   });
   </script>
