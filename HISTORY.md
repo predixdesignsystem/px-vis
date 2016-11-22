@@ -1,3 +1,7 @@
+v0.6.41
+==================
+* updated link inside px-vis to correct link (was missing path)
+
 v0.6.40
 ==================
 * changed radial scale to use infinity instead of max and min number
