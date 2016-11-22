@@ -1,3 +1,7 @@
+v0.6.39
+==================
+* fixed bug in IE when starting an svg line with mutedSeries
+
 v0.6.38
 ==================
 * fixed axis tickFormat check so it looks for function, not object
