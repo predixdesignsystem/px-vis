@@ -5,6 +5,8 @@
 * added clip path to cursor
 * added cursor config to chart behavior
 * modified how cursor lines are calculated
+* added preserveDataOrder for px-vis-pie
+* fixed issues with px-vis-pie updates/addition/deletion
 
 v0.6.32
 ==================
