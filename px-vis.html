@@ -43,9 +43,79 @@
 
 
 <!--
-THIS IS NOT A REAL COMPONENT. IT EXISTS AS A LOADING MECHANISM FOR ALL PX-VIS PROPERTIES SO GH-PAGES CAN GENERATE API DOCS.
--->
+  Set of base components to provide the ability to create charts. These components come "wrapped" into charts in px-vis-[[chartType]] repos. These base components can be used to create custom chart types and/or mixed with standard d3 methods.
 
+  At a very least, all charts need an svg component, an interpretor component, such as scale, and a drawing component.
+
+  All components are built to support the Precipitation Pattern. Declarative bindings also work.
+
+  ##### Usage
+
+      <px-vis-svg
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          svg="{{svg}}">
+      </px-vis-svg>
+      <px-vis-scale
+          x-scale="time"
+          y-scale="linear"
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          chart-data="[[chartData]]"
+          x="{{x}}"
+          y="{{y}}"
+          current-domain-x="{{currentDomainX}}"
+          current-domain-y="{{currentDomainY}}">
+      </px-vis-scale>
+      <px-vis-line
+          svg="[[svg]]"
+          series-id="[[seriesName]]"
+          series-number="[[seriesNumber]]"
+          chart-data="[[chartData]]"
+          x="[[x]]"
+          y="[[y]]"
+          current-domain-x="[[currentDomainX]]"
+          current-domain-y="[[currentDomainY]]"
+          muted-series="[[mutedSeries]]">
+      </px-vis-line>
+
+
+  #### px-vis components are categorized as such:
+
+  ##### SVG / drawing space:
+  - px-vis-svg
+
+  ##### Interpretors:
+  - px-vis-scale
+
+  ##### Drawing Objects:
+  - px-vis-line
+  - px-vis-scatter
+  - px-vis-axis
+  - px-vis-grindlines
+  - px-vis-events
+  - px-vis-threshold
+  - px-vis-cursor
+  - px-vis-register
+  - px-vis-tooltip
+
+  ##### Interaction Components:
+  - px-vis-brush
+  - px-vis-chart-navigator
+  - px-vis-interaction-space
+  - px-vis-zoom
+
+  ##### Data:
+  - px-vis-data-converter
+
+  @element px-vis
+  @blurb Set of base components to provide the ability to create charts.
+  @homepage index.html
+  @demo demo.html
+
+  -->
 
 <dom-module id="px-vis">
   <template>
@@ -58,7 +128,9 @@ THIS IS NOT A REAL COMPONENT. IT EXISTS AS A LOADING MECHANISM FOR ALL PX-VIS PR
 
     is: 'px-vis',
 
-    behaviors: [],
+    behaviors: [
+
+    ],
 
     /**
      * Properties block, expose attribute values to the DOM via 'reflect'
