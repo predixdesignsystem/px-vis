@@ -1,3 +1,9 @@
+v0.6.40
+==================
+* changed radial scale to use infinity instead of max and min number
+* added if statement for line canvas to check if chartData and axes are present
+* updated px-vis html with all components
+
 v0.6.39
 ==================
 * fixed bug in IE when starting an svg line with mutedSeries
