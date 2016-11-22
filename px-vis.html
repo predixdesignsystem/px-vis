@@ -1,0 +1,137 @@
+<link rel="import" href="px-vis-behavior-chart.html">
+<link rel="import" href="px-vis-behavior-common.html">
+<link rel="import" href="px-vis-behavior-d3.html">
+<link rel="import" href="px-vis-behavior-datetime.html">
+<link rel="import" href="../px-colors-design/colors.html" />
+
+
+
+<!--
+Set of base components to provide the ability to create charts. These components come "wrapped" into charts in px-vis-[[chartType]] repos. These base components can be used to create custom chart types and/or mixed with standard d3 methods.
+
+At a very least, all charts need an svg component, an interpretor component, such as scale, and a drawing component.
+
+All components are built to support the Precipitation Pattern. Declarative bindings also work.
+
+##### Usage
+
+    <px-vis-svg
+        width="[[width]]"
+        height="[[height]]"
+        margin="[[margin]]"
+        svg="{{svg}}">
+    </px-vis-svg>
+    <px-vis-scale
+        x-scale="time"
+        y-scale="linear"
+        width="[[width]]"
+        height="[[height]]"
+        margin="[[margin]]"
+        chart-data="[[chartData]]"
+        x="{{x}}"
+        y="{{y}}"
+        current-domain-x="{{currentDomainX}}"
+        current-domain-y="{{currentDomainY}}">
+    </px-vis-scale>
+    <px-vis-line
+        svg="[[svg]]"
+        series-id="[[seriesName]]"
+        series-number="[[seriesNumber]]"
+        chart-data="[[chartData]]"
+        x="[[x]]"
+        y="[[y]]"
+        current-domain-x="[[currentDomainX]]"
+        current-domain-y="[[currentDomainY]]"
+        muted-series="[[mutedSeries]]">
+    </px-vis-line>
+
+
+#### px-vis components are categorized as such:
+
+##### SVG / drawing space:
+- px-vis-svg
+
+##### Interpretors:
+- px-vis-scale
+
+##### Drawing Objects:
+- px-vis-line
+- px-vis-scatter
+- px-vis-axis
+- px-vis-grindlines
+- px-vis-events
+- px-vis-threshold
+- px-vis-cursor
+- px-vis-register
+- px-vis-tooltip
+
+##### Interaction Components:
+- px-vis-brush
+- px-vis-chart-navigator
+- px-vis-interaction-space
+- px-vis-zoom
+
+##### Data:
+- px-vis-data
+
+@element px-vis
+@blurb Set of base components to provide the ability to create charts.
+@homepage index.html
+@demo demo.html
+
+-->
+
+<link rel="import" href="css/px-vis-styles.html">
+
+<dom-module id="px-vis">
+  <template>
+    <style include="px-vis-styles"></style>
+    <style include="px-theme-styles"></style>
+
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'px-vis',
+
+    behaviors: [
+      PxVisBehavior.sizing,
+      PxVisBehavior.formatting,
+      PxVisBehavior.dataset,
+      PxVisBehavior.completeSeriesConfig,
+      PxVisBehavior.mutedSeries,
+      PxVisBehavior.tooltipData,
+      PxVisBehavior.extentsData,
+      PxVisBehavior.commonMethods,
+      PxVisBehavior.axisTypes,
+      PxVisBehavior.zoomSelection,
+      PxVisBehavior.chartExtents,
+      PxVisBehavior.events,
+      PxVisBehavior.dimensions,
+      PxVisBehaviorTime.datetime,
+      PxVisBehaviorD3.svg,
+      PxVisBehaviorD3.canvas,
+      PxVisBehaviorD3.axes,
+      PxVisBehaviorD3.axis,
+      PxVisBehaviorD3.selectedDomain,
+      PxVisBehaviorD3.interaction,
+      PxVisBehaviorD3.clipPath,
+      PxVisBehaviorD3.dynamicRedraw,
+      PxVisBehaviorD3.axisConfig,
+      PxVisBehaviorChart.chartCommon
+    ],
+
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+
+    } //properties
+  });
+
+</script>
