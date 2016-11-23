@@ -128,7 +128,12 @@ PxVisBehaviorD3.svg = {
         //ok no error were thrown, we can proceed
         this._nativeDrawSvgOnCanvas(canvas, svgData, x, y, function() {
           callback(canvas);
-        });
+        }, function() {
+          //fallback on canvg
+          this._drawCanvg(canvas, svgData, x, y, function() {
+            callback(this.resultCanvas);
+          });
+        }.bind(this));
       } catch(err) {
 
         //fallback on canvg
