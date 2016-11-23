@@ -1,3 +1,7 @@
+
+==================
+* added xlink namespace to svg
+
 v0.6.41
 ==================
 * updated link inside px-vis to correct link (was missing path)
