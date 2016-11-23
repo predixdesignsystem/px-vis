@@ -1,3 +1,7 @@
+v0.6.42
+==================
+* Update px-theme to 2.0.1 and update test fixtures
+
 
 ==================
 * added xlink namespace to svg
