@@ -369,7 +369,7 @@ PxVisBehaviorChart.chartCommon = [{
     _returnKeys: function(obj){
       return Object.keys(obj);
     }
-}, commonColors, PxVisBehavior.commonMethods,PxVisBehavior.axisTypes];
+}, commonColors, PxVisBehavior.completeSeriesConfig, PxVisBehavior.commonMethods,PxVisBehavior.axisTypes];
 
 /*
     Name:
@@ -381,7 +381,7 @@ PxVisBehaviorChart.chartCommon = [{
 
     @polymerBehavior PxVisBehaviorChart.saveImage
 */
-PxVisBehaviorChart.saveImage = {
+PxVisBehaviorChart.saveImage = [{
     /**
      * Takes a graphic "snapshot" of the component and pass results through a callback:
      * - a canvas containing the graphical snapshot
@@ -397,13 +397,15 @@ PxVisBehaviorChart.saveImage = {
      * further processing, such as combining different elements snapshot into one image
      *
      */
-    getImage: function(callback) {
+    getImage: function(callback, renderLegend) {
       //create a new canvas to render both the canvas and svg elements on it
       var canvas = document.createElement('canvas'),
           context,
           result,
           svgData;
-      canvas.width = this.width;
+
+      canvas.width = this.width + (renderLegend ? this._getRegisterWidth() : 0);
+
       canvas.height = this.height;
       context = canvas.getContext('2d');
 
@@ -412,13 +414,82 @@ PxVisBehaviorChart.saveImage = {
         context.drawImage(this.canvasContext.canvas, 0, 0);
       }
 
-      if(this.pxSvgElem) {
+     if(this.pxSvgElem) {
+       //drawing the svg bit
         this._drawSVGOnCanvas(canvas, function(resultCanvas) {
+          if(renderLegend) {
+            this._drawRegister(resultCanvas.getContext('2d'), this.width);
+          }
           callback({canvas: resultCanvas, image: resultCanvas.toDataURL()});
-        });
+        }.bind(this));
+      } else if(this.canvasContext) {
+        //we have a canvas but no svg
+        if(renderLegend) {
+          this._drawRegister(context, this.width);
+        }
+        callback({canvas: canvas, image: canvas.toDataURL()});
       }
+    },
+    _getRegisterWidth: function() {
+      var canvas = document.createElement('canvas');
+      canvas.height = this.height;
+      canvas.width = 9999;
+
+      var curY = 0,
+          curX = this.width + 5,
+          keys = Object.keys(this.completeSeriesConfig),
+          maxWidth = 0,
+          maxTotalWidth = 5,
+          context = canvas.getContext('2d');
+          curTextWidth = 0;
+
+      for(var i=0; i<keys.length; i++) {
+          curY += 30;
+
+          curTextWidth = context.measureText(this.completeSeriesConfig[keys[i]].name).width;
+          maxWidth = Math.max(maxWidth, curTextWidth);
+
+          if( (curY + 30) > this.height ) {
+            curX += maxWidth + 15;
+            curY = 0;
+            maxTotalWidth += maxWidth + 15;
+            maxWidth = 0;
+          }
+        }
+        maxTotalWidth += maxWidth + 15;
+
+        return maxTotalWidth;
+    },
+    /**
+     * Draws a fake representation of the registers
+     */
+    _drawRegister: function(context) {
+      var curY = 0,
+          lineLength = 25,
+          strokeWidth = 3,
+          curX = this.width + 5,
+          keys = Object.keys(this.completeSeriesConfig),
+          maxWidth = 0,
+          curTextWidth = 0;
+
+        //draw each serie
+        for(var i=0; i<keys.length; i++) {
+          curY += 30;
+
+          context.fillStyle = this.completeSeriesConfig[keys[i]].color;
+          context.fillRect(curX,curY,strokeWidth, lineLength);
+          context.fillStyle = 'rgb(0,0,0)';
+          context.fillText(this.completeSeriesConfig[keys[i]].name, curX + strokeWidth + 5, curY + 10);
+          curTextWidth = context.measureText(this.completeSeriesConfig[keys[i]].name).width;
+          maxWidth = Math.max(maxWidth, curTextWidth);
+
+          if( (curY + 30) > this.height ) {
+            curX += maxWidth + 15;
+            curY = 0;
+          }
+        }
     }
-};
+}, PxVisBehavior.completeSeriesConfig];
 /*
     Name:
     PxVisBehaviorChart.precipitationPattern
