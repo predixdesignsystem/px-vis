@@ -1,5 +1,6 @@
 v1.0.0
 ==================
+* Upgrade to d3 4.4.x.
 * Changed time scale to UTC by default.
 * Added timeLocal option for local time
 * Added new threshold configuration similar to events
