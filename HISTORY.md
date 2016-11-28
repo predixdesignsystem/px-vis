@@ -10,6 +10,8 @@ v0.7.0
 * Added ability to specify multiple columns to register
 * Added ability to use multi column register in tooltip
 * Added ability to draw a legend in the image exporter
+* added preserveDataOrder for px-vis-pie
+* fixed issues with px-vis-pie updates/addition/deletion
 
 v0.6.41
 ==================
