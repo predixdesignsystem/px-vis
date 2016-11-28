@@ -13,6 +13,15 @@ v0.7.0
 * added preserveDataOrder for px-vis-pie
 * fixed issues with px-vis-pie updates/addition/deletion
 
+v0.6.43
+==================
+* Update dependency versions
+
+v0.6.42
+==================
+* Update px-theme to 2.0.1 and update test fixtures
+* added xlink namespace to svg
+
 v0.6.41
 ==================
 * updated link inside px-vis to correct link (was missing path)
