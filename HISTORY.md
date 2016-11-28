@@ -1,3 +1,7 @@
+v0.6.46
+==================
+* adding check that canvasContext exists in line detach
+
 v0.6.45
 ==================
 * updating slider dependency
