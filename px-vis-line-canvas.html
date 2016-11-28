@@ -33,7 +33,7 @@ Element which draws lines series onto the chart
 <dom-module id="px-vis-line-canvas">
     <template>
       <style include="px-vis-styles"></style>
-      <style include="px-theme-styles"></style>
+
     </template>
 </dom-module>
 
@@ -141,7 +141,7 @@ Element which draws lines series onto the chart
      * @method drawElement
      */
     drawCanvas: function() {
-      this.debounce('drawCanvas',function(){
+      this.debounce('drawCanvas',function() {
         var data;
         // we need to wrap the data differently depending on if we are drawing many lines or just one line
         if(this.parallelCoordinates) {
@@ -196,11 +196,19 @@ Element which draws lines series onto the chart
      *
      */
     drawClipPath: function() {
-
-      if(this.radialLine) {
-        this._drawRadarClipPath();
-      } else {
-        this._drawRectClipPath();
+      /* not sure why this if statement bandaid is needed
+         if you have chartData with all the same value (such as all 0) and some axes and you clear axes first, then clear chartData
+         (not chartData and then axes), then reload the same data and axes (order doesnt matter), series do not plot.
+         Clearly related to the clip path, but cannot isolate.
+         If you load data that is not 100% 0, or change the chartData or axes on reload, doesnt happen.
+         This if statement prevents clipPath from running under these circumstances and everything is fine
+      */
+      if(this.chartData.length > 0 && this.completeSeriesConfig[this.seriesId]["x"].length > 0) {
+        if(this.radialLine) {
+          this._drawRadarClipPath();
+        } else {
+          this._drawRectClipPath();
+        }
       }
     },
 

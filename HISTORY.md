@@ -1,3 +1,4 @@
+v0.7.0
 ==================
 * ensure timeseries rendering to canvas with multiple lines are not cut off
 * added PxVisBehaviorChart.chartCommonMethods
@@ -5,6 +6,54 @@
 * added clip path to cursor
 * added cursor config to chart behavior
 * modified how cursor lines are calculated
+* Added scrollbars and styling to registers when there are too many series to fit
+* Added ability to specify multiple columns to register
+* Added ability to use multi column register in tooltip
+* Added ability to draw a legend in the image exporter
+
+v0.6.41
+==================
+* updated link inside px-vis to correct link (was missing path)
+
+v0.6.40
+==================
+* changed radial scale to use infinity instead of max and min number
+* added if statement for line canvas to check if chartData and axes are present
+* updated px-vis html with all components
+
+v0.6.39
+==================
+* fixed bug in IE when starting an svg line with mutedSeries
+
+v0.6.38
+==================
+* fixed axis tickFormat check so it looks for function, not object
+
+v0.6.37
+==================
+* fixed for event icons and clip path; changed how redrawing event icons works
+* added check to ensure that dates from currentDomain is valid for brush
+* fixed isObjEmpty check so it also checks for null
+
+v0.6.36
+==================
+* fixed axis ticks setting when it is only an object
+* added ability for axis tickFormat to be an object
+
+v0.6.35
+==================
+* removing px-theme style call
+
+v0.6.34
+==================
+* changing Gruntfile.js to gulpfile.js
+
+v0.6.33
+==================
+* added additional check to brush zoomBrush
+* fixed attrs in tooltip being passed down to register
+* created chart behaviors for axisConfigs and registerConfigs
+* doc fixes
 
 v0.6.32
 ==================

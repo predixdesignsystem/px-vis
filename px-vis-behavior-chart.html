@@ -107,7 +107,7 @@ PxVisBehaviorChart.chartCommon = [{
       /**
       * A default configuration file. It fills in the missing parts of seriesConfig. Any options from seriesConfig can be specified in the defaultSeriesConfig and will be automatically used if not defined in the seriesConfig
       *
-      * Default: 
+      * Default:
       *
       * ```
       *  {
@@ -411,7 +411,7 @@ PxVisBehaviorChart.chartCommon = [{
     _returnKeys: function(obj){
       return Object.keys(obj);
     }
-}, commonColors, PxVisBehaviorChart.chartCommonMethods, PxVisBehavior.commonMethods,PxVisBehavior.axisTypes];
+}, commonColors, PxVisBehaviorChart.chartCommonMethods, PxVisBehavior.commonMethods, PxVisBehavior.completeSeriesConfig, PxVisBehavior.axisTypes];
 
 /*
     Name:
@@ -423,7 +423,7 @@ PxVisBehaviorChart.chartCommon = [{
 
     @polymerBehavior PxVisBehaviorChart.saveImage
 */
-PxVisBehaviorChart.saveImage = {
+PxVisBehaviorChart.saveImage = [{
     /**
      * Takes a graphic "snapshot" of the component and pass results through a callback:
      * - a canvas containing the graphical snapshot
@@ -439,13 +439,15 @@ PxVisBehaviorChart.saveImage = {
      * further processing, such as combining different elements snapshot into one image
      *
      */
-    getImage: function(callback) {
+    getImage: function(callback, renderLegend) {
       //create a new canvas to render both the canvas and svg elements on it
       var canvas = document.createElement('canvas'),
           context,
           result,
           svgData;
-      canvas.width = this.width;
+
+      canvas.width = this.width + (renderLegend ? this._getRegisterWidth() : 0);
+
       canvas.height = this.height;
       context = canvas.getContext('2d');
 
@@ -454,13 +456,82 @@ PxVisBehaviorChart.saveImage = {
         context.drawImage(this.canvasContext.canvas, 0, 0);
       }
 
-      if(this.pxSvgElem) {
+     if(this.pxSvgElem) {
+       //drawing the svg bit
         this._drawSVGOnCanvas(canvas, function(resultCanvas) {
+          if(renderLegend) {
+            this._drawRegister(resultCanvas.getContext('2d'), this.width);
+          }
           callback({canvas: resultCanvas, image: resultCanvas.toDataURL()});
-        });
+        }.bind(this));
+      } else if(this.canvasContext) {
+        //we have a canvas but no svg
+        if(renderLegend) {
+          this._drawRegister(context, this.width);
+        }
+        callback({canvas: canvas, image: canvas.toDataURL()});
       }
+    },
+    _getRegisterWidth: function() {
+      var canvas = document.createElement('canvas');
+      canvas.height = this.height;
+      canvas.width = 9999;
+
+      var curY = 0,
+          curX = this.width + 5,
+          keys = Object.keys(this.completeSeriesConfig),
+          maxWidth = 0,
+          maxTotalWidth = 5,
+          context = canvas.getContext('2d');
+          curTextWidth = 0;
+
+      for(var i=0; i<keys.length; i++) {
+          curY += 30;
+
+          curTextWidth = context.measureText(this.completeSeriesConfig[keys[i]].name).width;
+          maxWidth = Math.max(maxWidth, curTextWidth);
+
+          if( (curY + 30) > this.height ) {
+            curX += maxWidth + 15;
+            curY = 0;
+            maxTotalWidth += maxWidth + 15;
+            maxWidth = 0;
+          }
+        }
+        maxTotalWidth += maxWidth + 15;
+
+        return maxTotalWidth;
+    },
+    /**
+     * Draws a fake representation of the registers
+     */
+    _drawRegister: function(context) {
+      var curY = 0,
+          lineLength = 25,
+          strokeWidth = 3,
+          curX = this.width + 5,
+          keys = Object.keys(this.completeSeriesConfig),
+          maxWidth = 0,
+          curTextWidth = 0;
+
+        //draw each serie
+        for(var i=0; i<keys.length; i++) {
+          curY += 30;
+
+          context.fillStyle = this.completeSeriesConfig[keys[i]].color;
+          context.fillRect(curX,curY,strokeWidth, lineLength);
+          context.fillStyle = 'rgb(0,0,0)';
+          context.fillText(this.completeSeriesConfig[keys[i]].name, curX + strokeWidth + 5, curY + 10);
+          curTextWidth = context.measureText(this.completeSeriesConfig[keys[i]].name).width;
+          maxWidth = Math.max(maxWidth, curTextWidth);
+
+          if( (curY + 30) > this.height ) {
+            curX += maxWidth + 15;
+            curY = 0;
+          }
+        }
     }
-};
+}, PxVisBehavior.completeSeriesConfig];
 /*
     Name:
     PxVisBehaviorChart.precipitationPattern
@@ -609,6 +680,7 @@ PxVisBehaviorChart.subConfiguration = {
      *
      */
     _applyConfigToElement: function(config, element) {
+
       if(typeof(config) === 'string'){
         config = JSON.parse(config);
       }
@@ -784,7 +856,77 @@ PxVisBehaviorChart.registerPositioning = {
       return 'visuallyhidden';
     }
     return '';
-  },
+  }
+};
+
+/*
+    Name:
+    PxVisBehaviorChart.registerConfigs
+
+    Description:
+    Behavior allowing providing component config declarations
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorChart.registerConfigs
+*/
+PxVisBehaviorChart.registerConfigs = {
+  properties: {
+    /**
+     * Configuration object used to customize the tooltip cosmetic properties.
+     * Please refer to px-vis-tooltip and px-vis-register (https://github.com/PredixDev/px-vis) for a list of supported proerties
+     *
+     */
+    tooltipConfig: {
+      type: Object,
+      notify: true
+    },
+    /**
+     * Configuration object used to customize the register cosmetic properties.
+     * Please refer to px-vis-register (https://github.com/PredixDev/px-vis) for a list of supported proerties
+     *
+     */
+    registerConfig: {
+      type: Object,
+      notify: true
+    }
+  }
+};
+
+/*
+    Name:
+    PxVisBehaviorChart.axisConfigs
+
+    Description:
+    Behavior allowing providing component config declarations
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorChart.axisConfigs
+*/
+PxVisBehaviorChart.axisConfigs = {
+  properties: {
+    /**
+     * Configuration object used to customize the X axis cosmetic properties.
+     * Please refer to px-vis-axis (https://github.com/PredixDev/px-vis) for a list of supported properties
+     *
+     */
+    xAxisConfig: {
+      type: Object,
+      notify: true
+    },
+    /**
+     * Configuration object used to customize the Y axis cosmetic properties.
+     * Please refer to px-vis-axis (https://github.com/PredixDev/px-vis) for a list of supported properties
+     *
+     */
+    yAxisConfig: {
+      type: Object,
+      notify: true
+    }
+  }
 };
 
 

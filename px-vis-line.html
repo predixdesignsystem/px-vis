@@ -34,7 +34,7 @@ Element which draws lines series onto the chart
 <dom-module id="px-vis-line">
     <template>
       <style include="px-vis-styles"></style>
-      <style include="px-theme-styles"></style>
+      
 
     </template>
 </dom-module>
@@ -185,7 +185,7 @@ Element which draws lines series onto the chart
         lineBuilder.enter()
           .append('path')
           .attr('class', 'series-line')
-          .attr('series-id', function(d,i){
+          .attr('series-id', function(d,i) {
             return this.multiPath ? 'line_' + d[this.seriesId] : 'line_' + this.seriesId
           }.bind(this))
           .attr('fill','none')
@@ -195,14 +195,14 @@ Element which draws lines series onto the chart
             return this.line(d);
           }.bind(this))
           .attr('stroke-width',this.strokeWidth)
-          .attr('stroke',function(d,i){
+          .attr('stroke',function(d,i) {
             //normally, do this
-            if(!this.categoryKey){
+            if(!this.categoryKey) {
               return this.completeSeriesConfig[this.seriesId]['color'];
             }
 
             //check that category has been defined
-            if(this.completeSeriesConfig[d[this.categoryKey]]){
+            if(this.completeSeriesConfig[d[this.categoryKey]]) {
               return this.completeSeriesConfig[d[this.categoryKey]]['color']
             }
 
@@ -236,13 +236,13 @@ Element which draws lines series onto the chart
      * @method isIdInMuted
      */
     isIdInMuted: function() {
-      if(this.multiPath && this._doesObjHaveValues(this.linePath)){
+      if(this.multiPath && this._doesObjHaveValues(this.linePath)) {
         this.linePath.style('display', function(d) {
           // if we have multiPaths, then just hide them; might want to changes this but need to check with design
           return this.mutedSeries[d[this.seriesId]] ? 'none' : null;
         }.bind(this));
         this._colorLine();
-      } else if(this.mutedSeries.hasOwnProperty(this.seriesId)){
+      } else if(this.mutedSeries.hasOwnProperty(this.seriesId)) {
 
         this._colorLine();
       }
@@ -251,22 +251,24 @@ Element which draws lines series onto the chart
      * Adds full color to the SVG line.
      *
      */
-    _colorLine:function(){
-      this.linePath.attr('stroke',function(d,i){
-        //normally, do this
-        if(!this.categoryKey){
-          return this.completeSeriesConfig[this.seriesId]['color'];
-        }
+    _colorLine:function() {
+      if(this.linePath) {
+        this.linePath.attr('stroke',function(d,i) {
+          //normally, do this
+          if(!this.categoryKey) {
+            return this.completeSeriesConfig[this.seriesId]['color'];
+          }
 
-        //check that category has been defined
-        if(this.completeSeriesConfig[d[this.categoryKey]]){
-          return this.completeSeriesConfig[d[this.categoryKey]]['color']
-        }
+          //check that category has been defined
+          if(this.completeSeriesConfig[d[this.categoryKey]]) {
+            return this.completeSeriesConfig[d[this.categoryKey]]['color']
+          }
 
-        //do nothing if not
-        return
-      }.bind(this))
-      .attr('stroke-opacity',this._svgLineOpacity.bind(this));
+          //do nothing if not
+          return
+        }.bind(this))
+        .attr('stroke-opacity',this._svgLineOpacity.bind(this));
+      }
     },
     /**
      * Returns the opacity for the SVG line
