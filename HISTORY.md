@@ -13,6 +13,18 @@ v0.7.0
 * added preserveDataOrder for px-vis-pie
 * fixed issues with px-vis-pie updates/addition/deletion
 
+v0.6.46
+==================
+* adding check that canvasContext exists in line detach
+
+v0.6.45
+==================
+* updating slider dependency
+
+v0.6.44
+==================
+* changing all devDeps to ^
+
 v0.6.43
 ==================
 * Update dependency versions
