@@ -30,27 +30,37 @@ Predix branding rules go in px-vis-predix.scss, not in this file.
 @import "px-viewport-design/_base.viewport.scss";
 @import "px-typography-design/_base.typography.scss";
 
+$register-font-size:    $inuit-base-font-size; //$inuit-heading-size-6
+$register-spacing-unit: calculateRem($register-font-size);
+
 $icon-width:            $inuit-base-spacing-unit / 3;
-$icon-wide-height:      $inuit-base-spacing-unit * 4 / 3;
-$icon-narrow-height:    $inuit-base-spacing-unit * 2;
 $icon-narrow-m-t:       $inuit-base-spacing-unit / 5;
 $icon-text-space:       $inuit-base-spacing-unit / 3;
+
+$icon-wide-height:      $register-spacing-unit * 4 / 3;
+$icon-narrow-height:    $register-spacing-unit * 2;
 
 $series-wide-spacing:   $inuit-base-spacing-unit / 5;
 $series-narrow-spacing: $inuit-base-spacing-unit;
 
 $series-time-spacing:   $inuit-base-spacing-unit * 2 / 3;
 
+
 .minSize {
-  min-height: $inuit-base-spacing-unit * 5.3;
-  min-width: $inuit-base-spacing-unit * 15;
+  min-height: $register-spacing-unit * 4.5; //4x the font size plus a little
 }
 
 #registerWrap{
   user-select:none;
   display: inline-flex;
+  font-size: $register-font-size;
+}
+
+#seriesWrap.scrollOn {
+  min-height: $register-spacing-unit * 4.5;  //needs to match the registerWrap min-height
   overflow: auto;
-  // font-size: 10px;
+  padding: $inuit-base-spacing-unit--tiny;
+  border: 1px solid $grey3;
 }
 
 #dateTime{
@@ -74,6 +84,8 @@ $series-time-spacing:   $inuit-base-spacing-unit * 2 / 3;
 .seriesName{
   margin-right:$inuit-base-spacing-unit;
   padding-right:0;
+  padding-top: 2px;
+  white-space:nowrap;
 }
 
 .series.wide{
@@ -85,6 +97,7 @@ $series-time-spacing:   $inuit-base-spacing-unit * 2 / 3;
 
   .seriesData{
     margin-left: auto;
+    padding-top: 2px;
   }
 }
 
@@ -95,6 +108,10 @@ $series-time-spacing:   $inuit-base-spacing-unit * 2 / 3;
     height: $icon-narrow-height;
     margin-top: $icon-narrow-m-t;
   }
+}
+
+div.flex + div.flex {
+  margin-left: $inuit-base-spacing-unit;
 }
 
 @import "px-meta-buttons-design/_meta.buttons.scss";

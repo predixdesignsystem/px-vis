@@ -103,7 +103,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
       <div
         id="registerWrap"
         class$="[[_getMinSizeClass(preventMinSize)]] inline--flex flex--col"
-        style$="height:{{height}}px; width:[[width]]px">
+        style$="{{_returnHeight(height,margin)}}; width:[[width]]px">
 
         <template is="dom-if" if="{{_displayTime(xAxisType, forceDateTimeDisplay)}}">
           <px-vis-register-datetime
@@ -114,23 +114,27 @@ Formatting for the timestamps,the data values, and the series names can be contr
           ></px-vis-register-datetime>
         </template>
 
-        <div class$="{{_getSeriesWrapperClass(type)}}">
+        <div id="seriesWrap" class$="{{_getSeriesWrapperClassReverse(type)}}">
           <template is="dom-if" if="{{!_isOfType(xAxisType, 'pie')}}">
-            <template is="dom-repeat" items="{{_series}}">
-              <px-vis-register-item
-                item="[[item]]"
-                complete-series-config="[[completeSeriesConfig]]"
-                type="[[type]]"
-                x-axis-type="[[xAxisType]]"
-                y-axis-type="[[yAxisType]]"
-                muted-series="{{mutedSeries}}"
-                number-format="[[numberFormat]]"
-                number-format-culture="[[numberFormatCulture]]"
-                number-format-is-currency$="[[numberFormatIsCurrency]]"
-                number-format-currency="[[numberFormatCurrency]]"
-                number-format-zero="[[numberFormatZero]]"
-                truncation-length="[[truncationLength]]">
-              </px-vis-register-item>
+            <template is="dom-repeat" items="{{_series}}" as="_groups">
+              <div class$="{{_getSeriesWrapperClass(type)}}">
+                <template is="dom-repeat" items="{{_groups}}" on-dom-change="_scrollBarsPresent">
+                  <px-vis-register-item
+                    item="[[item]]"
+                    complete-series-config="[[completeSeriesConfig]]"
+                    type="[[type]]"
+                    x-axis-type="[[xAxisType]]"
+                    y-axis-type="[[yAxisType]]"
+                    muted-series="{{mutedSeries}}"
+                    number-format="[[numberFormat]]"
+                    number-format-culture="[[numberFormatCulture]]"
+                    number-format-is-currency$="[[numberFormatIsCurrency]]"
+                    number-format-currency="[[numberFormatCurrency]]"
+                    number-format-zero="[[numberFormatZero]]"
+                    truncation-length="[[truncationLength]]">
+                  </px-vis-register-item>
+                </template>
+              </div>
             </template>
           </template>
           <!-- For pie charts -->
@@ -180,6 +184,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
       PxVisBehaviorRegister.pie,
       PxVisBehaviorRegister.datetime,
       PxVisBehavior.forceDateTimeDisplay,
+      PxVisBehaviorRegister.groupings,
       commonColors
     ],
     /**
@@ -207,7 +212,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
       _series: {
         type: Array,
         notify: true,
-        computed: '_computeSeries(tooltipData.series.*)'
+        computed: '_computeSeries(tooltipData.series.*, groupings)'
       },
       /**
        * Prevents the register from having a minimum size
@@ -221,6 +226,10 @@ Formatting for the timestamps,the data values, and the series names can be contr
     observers: [
       '_formatDateTime(tooltipData.*)',
      ],
+
+    //  listeners: {
+    //    'dom-change': '_scrollBarsPresent'
+    //  },
 
     /**
      * dom-if function for type property which returns true if type equals horizontal
@@ -271,17 +280,51 @@ Formatting for the timestamps,the data values, and the series names can be contr
      *
     */
     _computeSeries: function() {
-      return this.tooltipData.series;
+      var allSeries = this.tooltipData.series,
+          pivot = Math.ceil(allSeries.length / this.groupings),
+          groupedSeries = [],
+          s = 0,
+          e = pivot;
+
+      for(var i = 0; i < this.groupings; i++) {
+        //copy the section of the series
+        groupedSeries.push(allSeries.slice(s,e));
+
+        //calc our next start and end
+        s = e;
+        e = s + pivot;
+      }
+      return groupedSeries;
     },
+
     _displayTime: function(xAxisType, forceDateTimeDisplay) {
       return forceDateTimeDisplay || xAxisType === 'time';
     },
+
     _getMinSizeClass: function(preventMinSize) {
       if(preventMinSize) {
         return '';
       } else {
         return 'minSize';
       }
+    },
+
+    _returnHeight: function(height,margin) {
+      return this.type === 'vertical' ? 'height:' + (height - 40) + 'px': '';
+    },
+
+    _scrollBarsPresent: function() {
+      var b = false;
+
+      if(this.type === 'vertical' &&
+          this.$.seriesWrap.scrollHeight > this.$.seriesWrap.clientHeight) {
+        b = true;
+      } else if(this.type === 'horizontal' &&
+          this.$.seriesWrap.scrollWidth > this.$.seriesWrap.clientWidth) {
+        b = true;
+      }
+
+      this.toggleClass('scrollOn', b, this.$.seriesWrap);
     }
   });
   </script>
