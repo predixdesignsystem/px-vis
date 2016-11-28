@@ -52,35 +52,35 @@ function runTests(){
   });
 
   baseTests('baseCursor','full','full','yes',[0,500],[0,300]);
-  addTooltipTests('baseCursor',true,true,true,500,['translate(0,170)','translate(0,240)'],['translate(260,0)','translate(260)'],[['240','170'],['240','240']]);
+  addTooltipTests('baseCursor',true,true,true,500,[170,240],['translate(260,0)','translate(260)'],[['240','170'],['240','240']]);
   removeTooltipTests('baseCursor');
 
   baseTests('hLineLeftCursor','left','full','yes',[0,500],[0,300]);
-  addTooltipTests('hLineLeftCursor',true,true,true,-500,['translate(240,170)','translate(240,240)'],['translate(260,0)','translate(260)'],[['240','170'],['240','240']]);
+  addTooltipTests('hLineLeftCursor',true,true,true,240,[170,240],['translate(260,0)','translate(260)'],[['240','170'],['240','240']]);
   removeTooltipTests('hLineLeftCursor');
 
   baseTests('hLineRightCursor','right','full','yes',[0,500],[0,300]);
-  addTooltipTests('hLineRightCursor',true,true,true,500,['translate(240,170)','translate(240,240)'],['translate(260,0)','translate(260)'],[['240','170'],['240','240']]);
+  addTooltipTests('hLineRightCursor',true,true,true,500,[170,240],['translate(260,0)','translate(260)'],[['240','170'],['240','240']]);
   removeTooltipTests('hLineRightCursor');
 
   baseTests('hLineNoneCursor','none','full','yes',[0,500],[0,300]);
-  addTooltipTests('hLineNoneCursor',false,true,true,500,['translate(240,170)','translate(240,240)'],['translate(260,0)','translate(260)'],[['240','170'],['240','240']]);
+  addTooltipTests('hLineNoneCursor',false,true,true,500,[170,240],['translate(260,0)','translate(260)'],[['240','170'],['240','240']]);
   removeTooltipTests('hLineNoneCursor');
 
   baseTests('vLineTopCursor','full','top','yes',[0,500],[0,300]);
-  addTooltipTests('vLineTopCursor',true,true,true,500,['translate(0,170)','translate(0,240)'],'translate(240,170)',[['240','170'],['240','240']]);
+  addTooltipTests('vLineTopCursor',true,true,true,500,[170,240],'translate(240,170)',[['240','170'],['240','240']]);
   removeTooltipTests('vLineTopCursor');
 
   baseTests('vLineBottomCursor','full','bottom','yes',[0,500],[0,300]);
-  addTooltipTests('vLineBottomCursor',true,true,true,500,['translate(0,170)','translate(0,240)'],'translate(240,240)',[['240','170'],['240','240']]);
+  addTooltipTests('vLineBottomCursor',true,true,true,500,[170,240],'translate(240,240)',[['240','170'],['240','240']]);
   removeTooltipTests('vLineBottomCursor');
 
   baseTests('vLineNoneCursor','full','none','yes',[0,500],[0,300]);
-  addTooltipTests('vLineNoneCursor',true,false,true,500,['translate(0,170)','translate(0,240)'],['translate(260,0)','translate(260)'],[['240','170'],['240','240']]);
+  addTooltipTests('vLineNoneCursor',true,false,true,500,[170,240],['translate(260,0)','translate(260)'],[['240','170'],['240','240']]);
   removeTooltipTests('vLineNoneCursor');
 
   baseTests('circleNoCursor','full','full','no',[0,500],[0,300]);
-  addTooltipTests('circleNoCursor',true,true,false,500,['translate(0,170)','translate(0,240)'],['translate(260,0)','translate(260)'],[['240','170'],['240','240']]);
+  addTooltipTests('circleNoCursor',true,true,false,500,[170,240],['translate(260,0)','translate(260)'],[['240','170'],['240','240']]);
   removeTooltipTests('circleNoCursor');
 } //runTests
 
@@ -240,19 +240,25 @@ function addTooltipTests(elem,hLine,vLine,circle,hX2,hTransformArr,vTransform,cA
       assert.equal(cursor._cursor.attr('display'),null);
     });
 
-    if(hLine){
+    if(hLine) {
       test(elem + ' _hLines x2', function() {
         assert.equal(cursor._hLines.attr('x2'),hX2);
       });
-      test(elem + ' _hLines[0] transform', function() {
-        assert.equal(cursor._hLines.nodes()[0].getAttribute('transform').split(" ").join(','),hTransformArr[0]);
+      test(elem + ' _hLines0 y1', function() {
+        assert.equal(d3.select(cursor._hLines.nodes()[0]).attr('y1'),hTransformArr[0]);
       });
-      test(elem + ' _hLines[1] transform', function() {
-        assert.equal(cursor._hLines.nodes()[1].getAttribute('transform').split(" ").join(','),hTransformArr[1]);
+      test(elem + ' _hLines0 y2', function() {
+        assert.equal(d3.select(cursor._hLines.nodes()[0]).attr('y2'),hTransformArr[0]);
+      });
+      test(elem + ' _hLines1 y1', function() {
+        assert.equal(d3.select(cursor._hLines.nodes()[1]).attr('y1'),hTransformArr[1]);
+      });
+      test(elem + ' _hLines1 y2', function() {
+        assert.equal(d3.select(cursor._hLines.nodes()[1]).attr('y2'),hTransformArr[1]);
       });
     }
 
-    if(vLine){
+    if(vLine) {
       test(elem + ' _vLine transform', function() {
         if(typeof(vTransform)==='object'){
           // Stupid MS IE/Edge
@@ -263,7 +269,7 @@ function addTooltipTests(elem,hLine,vLine,circle,hX2,hTransformArr,vTransform,cA
       });
     }
 
-    if(circle){
+    if(circle) {
       test(elem + ' _circles[0] cx', function() {
         assert.equal(cursor._circles.nodes()[0].getAttribute('cx'),cArr[0][0]);
       });
