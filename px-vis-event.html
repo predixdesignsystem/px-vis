@@ -191,16 +191,25 @@ The configureation object allows developers to set the icon used for each event 
       xKey: {
         type: String,
         value: 'x'
+      },
+      /**
+       * Tracks if the event configuration has been edited
+       *
+       */
+      _eventConfigChanged: {
+        type: Boolean,
+        value: false
       }
     },
 
     observers: [
+      '_eventConfigHasChanged(eventConfig.*)',
       'drawElement(svg, x, y, currentDomainX, currentDomainY, domainChanged, eventData.*,eventConfig.*)',
       '_addClipPath(clipPath)'
      ],
 
      detached: function() {
-       if(this.eventGroup) {
+       if(this.eventGroup && this._doesD3HaveValues(this.eventGroup)) {
          this.eventGroup.remove();
          this.eventGroup = null;
          this.eventLine = null;
@@ -208,7 +217,7 @@ The configureation object allows developers to set the icon used for each event 
        }
      },
 
-    ready:function(){
+    ready:function() {
       // if there is no dev set unique ID, generate one
       if(!this.eventId){
         this.set('eventId', this.generateRandomID('event_'));
@@ -222,10 +231,16 @@ The configureation object allows developers to set the icon used for each event 
      */
     drawElement: function() {
       if(this.x && this.y && this.currentDomainX.length > 0 && this.currentDomainY.length > 0 && this._doesObjHaveValues(this.eventData)) {
+
+        if(this._eventConfigChanged && this.eventGroup && this._doesD3HaveValues(this.eventGroup)) {
+          this.eventGroup.remove();
+          this.eventGroup = null;
+        }
+
         this._processConfiguration();
 
         // checks to see if the axis already exists. If not, create; if so, update
-        if(this._isObjEmpty(this.eventGroup)){
+        if(this._isObjEmpty(this.eventGroup)) {
           this.eventGroup = this.svg.append('g')
             .attr('class','event')
             .attr('event-id',this.eventId)
@@ -241,9 +256,9 @@ The configureation object allows developers to set the icon used for each event 
           this._positionEvent();
 
           this._addClipPath();
+
+          this._eventConfigChanged = false;
         } else {
-          this.eventIcon.remove();
-          this._addIcon();
           // update the path
           this._positionEvent();
         }
@@ -252,11 +267,19 @@ The configureation object allows developers to set the icon used for each event 
     },
 
     /**
+     * Sets a boolean to true when run
+     *
+     */
+    _eventConfigHasChanged: function() {
+      this._eventConfigChanged = true;
+    },
+
+    /**
      * Helper to call addClipPath with the elem
      *
      * @method _addClipPath
      */
-    _addClipPath: function(){
+    _addClipPath: function() {
       this.addClipPath(this.eventLine);
       this.addClipPath(this.eventIcon);
     },
@@ -266,7 +289,7 @@ The configureation object allows developers to set the icon used for each event 
      *
      * @method _positionEvent
      */
-    _positionEvent: function(){
+    _positionEvent: function() {
       this.eventLine
         .attr("x1", this.x(this.eventData[this.xKey]))
         .attr("x2", this.x(this.eventData[this.xKey]))
@@ -308,7 +331,7 @@ The configureation object allows developers to set the icon used for each event 
      *
      * @method _processConfiguration
      */
-    _processConfiguration:function(){
+    _processConfiguration:function() {
       // is there a configuration object for this event type?
       if(this.eventConfig[this.eventData.label]){
         /*
@@ -330,7 +353,7 @@ The configureation object allows developers to set the icon used for each event 
      *
      * @method _addTooltip
      */
-    _addTooltip:function(){
+    _addTooltip:function() {
       this.$.eventTooltip.set('for',this.eventIcon.node());
     },
     /**
@@ -338,7 +361,7 @@ The configureation object allows developers to set the icon used for each event 
      *
      * @method _formatDatetime
      */
-    _formatDatetime: function(time,format){
+    _formatDatetime: function(time,format) {
       return this.formatTimestamp(time, this.timezone, format);
     },
     /**

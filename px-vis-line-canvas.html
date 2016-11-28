@@ -33,7 +33,7 @@ Element which draws lines series onto the chart
 <dom-module id="px-vis-line-canvas">
     <template>
       <style include="px-vis-styles"></style>
-      
+
     </template>
 </dom-module>
 
@@ -127,11 +127,13 @@ Element which draws lines series onto the chart
       'mutedChanged(mutedSeries.*, completeSeriesConfig)'
     ],
 
-    detached: function(){
-      //clear the canvas on detach
-      this.canvasContext.restore();
+    detached: function() {
+      if(this.canvasContext) {
+        //clear the canvas on detach
+        this.canvasContext.restore();
 
-      this.canvasContext.clearRect(-this.canvasContext._translation[0], -this.canvasContext._translation[1] , this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+        this.canvasContext.clearRect(-this.canvasContext._translation[0], -this.canvasContext._translation[1] , this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+      }
     },
 
     /**
@@ -141,7 +143,7 @@ Element which draws lines series onto the chart
      * @method drawElement
      */
     drawCanvas: function() {
-      this.debounce('drawCanvas',function(){
+      this.debounce('drawCanvas',function() {
         var data;
         // we need to wrap the data differently depending on if we are drawing many lines or just one line
         if(this.parallelCoordinates) {
@@ -171,7 +173,6 @@ Element which draws lines series onto the chart
           this.canvasContext._pxLinesRedraw = 0;
           // (x1,y1,x2,y2)
           this.canvasContext.clearRect(-this.canvasContext._translation[0], -this.canvasContext._translation[1] , this.canvasContext.canvas.width, this.canvasContext.canvas.height);
-          // this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
         }
 
         if(this.clipPath) {
@@ -187,7 +188,7 @@ Element which draws lines series onto the chart
           var frames = Math.max(data.length/1000, 5);
           this._renderProgressively(data, frames);
         }
-        // make sure they are only drawn to the chart area and not the rest of the frame: equivalent to the clipPath for SVG
+
         this.canvasContext._pxLinesRedraw += 1;
       },20);
     },
@@ -197,11 +198,19 @@ Element which draws lines series onto the chart
      *
      */
     drawClipPath: function() {
-
-      if(this.radialLine) {
-        this._drawRadarClipPath();
-      } else {
-        this._drawRectClipPath();
+      /* not sure why this if statement bandaid is needed
+         if you have chartData with all the same value (such as all 0) and some axes and you clear axes first, then clear chartData
+         (not chartData and then axes), then reload the same data and axes (order doesnt matter), series do not plot.
+         Clearly related to the clip path, but cannot isolate.
+         If you load data that is not 100% 0, or change the chartData or axes on reload, doesnt happen.
+         This if statement prevents clipPath from running under these circumstances and everything is fine
+      */
+      if(this.chartData.length > 0 && this.completeSeriesConfig[this.seriesId]["x"].length > 0) {
+        if(this.radialLine) {
+          this._drawRadarClipPath();
+        } else {
+          this._drawRectClipPath();
+        }
       }
     },
 
@@ -228,8 +237,7 @@ Element which draws lines series onto the chart
      */
     _drawRectClipPath: function() {
       this.canvasContext.save();
-      //clear it (need to recent to 0,0 for clearing)
-      this.canvasContext.clearRect(-1, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+      
       this.canvasContext.beginPath();
 
       var w = Math.max(this.width - this.margin.left - this.margin.right,0),
@@ -346,7 +354,9 @@ Element which draws lines series onto the chart
       currentRenderingCounter = this._progressiveRenderingCounter;
 
       //make sure canvas is clean
-      this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+      if(this.parallelCoordinates) {
+        this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+      }
 
       //split the data in the number of frames desired. This looks more complicated
       //than it actually is... just splitting data in X batches, making sure it's

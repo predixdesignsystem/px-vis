@@ -29,7 +29,7 @@ Element providing a series line items on the register for pie charts
 
   <template>
     <style include="px-vis-register-styles"></style>
-    
+
 
       <span
         id="pieItem"
@@ -40,18 +40,16 @@ Element providing a series line items on the register for pie charts
             style$="background-color:{{_getPieBackColor(item, itemIndex)}}"
             name$="R{{_returnPieVal(item, 'y', usePercentage, completeSeriesConfig)}}"
           >&nbsp;</span>
-          <div class$="{{_getWrapperClass(type)}}">
-            <div class="seriesName" name$="R{{_configName}}">
-              {{_truncatedName}}&nbsp;
-              <template is="dom-if" if="{{_didTruncate}}">
-                <px-tooltip delay="500">{{_configName}}</px-tooltip>
-              </template>
-            </div>
-            <!-- Display serie data differently depending on x and y axis types -->
-            <div class="seriesData" name$="R{{_returnPieVal(item, 'y', usePercentage, completeSeriesConfig)}}">
-              <span>[[_returnPieVal(item, 'x', usePercentage, completeSeriesConfig)]]</span>
-              <template is="dom-if" if="{{_returnPieVal(item, 'x', usePercentage, completeSeriesConfig)}}">{{_getPieUnit(usePercentage)}}</template>
-            </div>
+          <div class="seriesName" name$="R{{_configName}}">
+            {{_truncatedName}}&nbsp;
+            <template is="dom-if" if="{{_didTruncate}}">
+              <px-tooltip delay="500">{{_configName}}</px-tooltip>
+            </template>
+          </div>
+          <!-- Display serie data differently depending on x and y axis types -->
+          <div class="seriesData" name$="R{{_returnPieVal(item, 'y', usePercentage, completeSeriesConfig)}}">
+            <span>[[_returnPieVal(item, 'x', usePercentage, completeSeriesConfig)]]</span>
+            <template is="dom-if" if="{{_returnPieVal(item, 'x', usePercentage, completeSeriesConfig)}}">{{_getPieUnit(usePercentage)}}</template>
           </div>
       </span>
     </template>

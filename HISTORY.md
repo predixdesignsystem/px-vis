@@ -6,6 +6,66 @@ v1.0.0
 * Changed threshold data property from chartData to thresholdData
 * Added improved resize methods to chart behavior
 
+v0.7.0
+==================
+* ensure timeseries rendering to canvas with multiple lines are not cut off
+* added PxVisBehaviorChart.chartCommonMethods
+* made includeAllSeries loop over all data
+* added clip path to cursor
+* added cursor config to chart behavior
+* modified how cursor lines are calculated
+* Added scrollbars and styling to registers when there are too many series to fit
+* Added ability to specify multiple columns to register
+* Added ability to use multi column register in tooltip
+* Added ability to draw a legend in the image exporter
+* added preserveDataOrder for px-vis-pie
+* fixed issues with px-vis-pie updates/addition/deletion
+
+v0.6.46
+==================
+* adding check that canvasContext exists in line detach
+
+v0.6.45
+==================
+* updating slider dependency
+
+v0.6.44
+==================
+* changing all devDeps to ^
+
+v0.6.43
+==================
+* Update dependency versions
+
+v0.6.42
+==================
+* Update px-theme to 2.0.1 and update test fixtures
+* added xlink namespace to svg
+
+v0.6.41
+==================
+* updated link inside px-vis to correct link (was missing path)
+
+v0.6.40
+==================
+* changed radial scale to use infinity instead of max and min number
+* added if statement for line canvas to check if chartData and axes are present
+* updated px-vis html with all components
+
+v0.6.39
+==================
+* fixed bug in IE when starting an svg line with mutedSeries
+
+v0.6.38
+==================
+* fixed axis tickFormat check so it looks for function, not object
+
+v0.6.37
+==================
+* fixed for event icons and clip path; changed how redrawing event icons works
+* added check to ensure that dates from currentDomain is valid for brush
+* fixed isObjEmpty check so it also checks for null
+
 v0.6.36
 ==================
 * fixed axis ticks setting when it is only an object
