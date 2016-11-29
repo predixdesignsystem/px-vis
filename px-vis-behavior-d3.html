@@ -1198,22 +1198,11 @@ PxVisBehaviorD3.lineShared = [{
     @polymerBehavior PxVisBehaviorD3.serieToRedrawOnTopSVG
 */
 PxVisBehaviorD3.serieToRedrawOnTopSVG = [{
-  _drawSVGOnTop: function(idToRedraw, selfId, selfGroup) {
+  _drawSVGOnTop: function(idToRedraw, selfId, d3Selection) {
     //is this scatter involved in redraw?
     if(idToRedraw === selfId) {
 
-      //select all series
-      var seriesSvg = this.svg.selectAll('g.series-scatter,g.series-line').nodes();
-
-      //only move if we have more than 1 serie and we're not 
-      //the last one already (last one is drawn on top)
-      if(seriesSvg.length > 1 && 
-          seriesSvg[seriesSvg.length-1] !== selfGroup) {
-        
-        //draw on top: append after last serie
-        //if nextSibling is null it will append it properly.
-        this.svg.node().insertBefore(selfGroup, seriesSvg[seriesSvg.length-1].nextSibling);
-      }
+      d3Selection.raise();
     }
   }
 }, PxVisBehavior.serieToRedrawOnTop, PxVisBehaviorD3.svg];
