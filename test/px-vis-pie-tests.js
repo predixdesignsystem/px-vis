@@ -32,36 +32,36 @@ function runTests(){
       assert.isTrue(basePie !== null);
     });
 
+    test('pie has been initially translated by radius', function() {
+      var transform = basePie.pieGroup._groups[0][0].attributes['transform'].value.replace(',','').split(" ").join('');
+      assert.isTrue(transform.indexOf('translate(' + basePie._radius + basePie._radius + ')') !== -1);
+    });
+
+    test('pie has been translated by radius', function(done) {
+
+      setTimeout(function() {
+        
+        var transform = basePie.pieGroup._groups[0][0].attributes['transform'].value.replace('scale(1)','').replace(',','').split(" ").join(''),
+            expected = 'translate(' + basePie._radius +  basePie._radius + ')';
+
+        assert.isTrue(transform === expected);
+        done();
+      }, 1500);
+    });
+
     test('as many slices as data', function() {
 
       assert.equal(basePie.chartData.length,  basePie.pieGroup._groups[0][0].childNodes.length);
     });
 
     test('verify first slice path', function() {
-      var slicePath = basePie.pieGroup._groups[0][0].firstChild.firstChild.attributes['d'].value.split(/[\s,]+/).join(''),
+
+      var slicePath = basePie.pieGroup._groups[0][0].firstChild.attributes['d'].value.split(/[\s,]+/).join(''),
           normalPath = 'M1.3164953090834047e-14-215A215215001214.2656659964340217.754559276551454L00Z',
           iePath = 'M1.3165e-014-215A215215001214.26617.7546L00Z';
       assert.isTrue(slicePath === normalPath || slicePath === iePath);
     });
 
-    test('pie has been initially translated by radius', function() {
-      var transform = basePie.pieGroup._groups[0][0].attributes['transform'].value.replace(',','').split(" ").join('');
-      assert.isTrue(transform.indexOf('translate(' + basePie._radius + basePie._radius + ')') !== -1);
-    });
-
-    test('pie has been translated by radius and rotated after animation', function(done) {
-
-      setTimeout(function() {
-        var transform = basePie.pieGroup._groups[0][0].attributes['transform'].value.replace('scale(1)','').replace(',','').split(" ").join(''),
-            expected = 'translate(' + basePie._radius +  basePie._radius + ')rotate(-180)',
-            expectedIe = 'translate(' + basePie._radius +  basePie._radius + ')rotate(180)';
-
-        //opposite rotation for IE....
-        assert.isTrue(transform === expected || transform === expectedIe);
-        assert.equal(basePie._currentRotationAngle, -Math.PI);
-        done();
-      }, 1500);
-    });
 
     test('click on slice rotates pie', function(done) {
       var slice = basePie.pieGroup._groups[0][0].firstChild,

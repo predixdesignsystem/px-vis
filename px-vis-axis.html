@@ -304,7 +304,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
             } else if(typeof(this.ticks) === 'object' && this.ticks.interval && this.ticks.format) {
 
-              // if(this.axisType === 'time'){
+              // if(this.axisType === 'time') {
               //   this._axis.ticks(this.ticks.format, this.ticks.interval);
               // } else {
                 this._axis.ticks(this.ticks.interval, this.ticks.format);
@@ -325,8 +325,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
           //support for tick format
           // https://github.com/mbostock/d3/wiki/Formatting#d3_format
-          if(this.tickFormat && this.axisType !== 'ordinal'){
-            if(typeof this.tickFormat === 'object') {
+          if(this.tickFormat && this.axisType !== 'ordinal') {
+            if(typeof this.tickFormat === 'function') {
               this._axis.tickFormat(this.tickFormat);
             } else if(this.axisType === 'time') {
               this._axis.tickFormat(Px.d3.utcFormat(this.tickFormat));
@@ -339,9 +339,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
           //support for tick values
           // https://github.com/d3/d3-axis/blob/master/README.md#axis_tickValues
-          if(this.tickValues && this.tickValues.length > 0 && this.axisType !== 'ordinal'){
+          if(this.tickValues && this.tickValues.length > 0 && this.axisType !== 'ordinal') {
             //dont run if our domain is NaN. Otherwise raises errors
-            if(!isNaN(this.axis.domain()[0]) && !isNaN(this.axis.domain()[1])){
+            if(!isNaN(this.axis.domain()[0]) && !isNaN(this.axis.domain()[1])) {
               this._axis.tickValues(this.tickValues);
             }
           }
@@ -379,11 +379,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
               // TODO unify my orientation checks
               // TODO suport top and right
-              if(this.orientation === 'bottom'){
+              if(this.orientation === 'bottom') {
                 var h = Math.max(this.height - this.margin.bottom - this.margin.top,0);
 
                 this.translateAmt = [this.offset[0],this.offset[1] + h];
-              } else if(this.orientation === 'left'){
+              } else if(this.orientation === 'left') {
                 this.translateAmt = [this.offset[0],this.offset[1]];
               } else {
                 this.translateAmt = [this.offset[0],this.offset[1]];
@@ -404,7 +404,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * builds axis
          *
          */
-        _buildAxis: function(){
+        _buildAxis: function() {
           var g = this.svg.append('g')
             .attr('class', 'axis')
             .attr('axis-id',this.axisId)
@@ -467,7 +467,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         _calcDrawnTicks: function() {
           if(this.axisType !== 'ordinal') {
             //apparently we need to give ourselves a bit of time to ensure the axis draws and it can clac this
-            this.debounce("drawnTicks", function(){
+            this.debounce("drawnTicks", function() {
               // FIXME Only works if ticks is a Number; need to support other formats for ticks
               if(this.ticks && typeof this.ticks === 'number') {
                 this.set('drawnTickValues', this._axis.scale().ticks(this.ticks));
@@ -482,11 +482,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * Method to update tickValues and recall the axis
          *
          */
-        updateTicks: function(){
-          if(this._doesObjHaveValues(this._axis) && this._axisGroup && this._doesObjHaveValues(this.tickValues)){
+        updateTicks: function() {
+          if(this._doesObjHaveValues(this._axis) && this._axisGroup && this._doesObjHaveValues(this.tickValues)) {
             this._axis.tickValues(this.tickValues);
             //beats me why we need a timeout... some kind of nonsensical race condition.
-            setTimeout(function(){
+            setTimeout(function() {
               this._updateAxis();
             }.bind(this),5);
           }
@@ -576,7 +576,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
                 return tickText.nodes()[i].getBoundingClientRect().width / -2 - 3
               })
               .attr('y', this.labelTypeSize * -0.5 - 2)
-              .attr('width',function(d,i){
+              .attr('width',function(d,i) {
                 return tickText.nodes()[i].getBoundingClientRect().width + 6
               })
               .attr('height', this.labelTypeSize + 4)
@@ -720,11 +720,13 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         _drawBar:function(elem,sid,color,index) {
           var w = elem.select('.axis-title').node().getBoundingClientRect()['height'];
           elem.append('rect')
-            .attr('height',3)
+            .attr('height', 2)
+            // .attr('height',3)
             .attr('width',15)
             .attr('fill',color)
             .attr('series-bar-id','bar_' + sid)
-            .attr('transform','translate(-12,' + (-3 -w - 8 * index) + ')')
+            .attr('transform','translate(-12,' + (-3 -w - 5 * index) + ')')
+            // .attr('transform','translate(-12,' + (-3 -w - 8 * index) + ')')
             .attr('opacity', function() {
               return (this.mutedSeries && this.mutedSeries[sid]) ? 0.5 : 1;
             }.bind(this));
@@ -753,7 +755,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
               var oldTitle = this.displayedTitle,
                   newTitle;
-              if(this.titleTruncation){
+              if(this.titleTruncation) {
                 newTitle = this._truncateName(title, truncationLength) + this._currentUnits;
               } else {
                 newTitle = title + this._currentUnits;
