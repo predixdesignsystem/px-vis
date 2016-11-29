@@ -56,6 +56,8 @@ Element which draws lines series onto the chart
       PxVisBehaviorD3.selectedDomain,
       PxVisBehavior.polarData,
       PxVisBehavior.dynamicConfigProperties,
+      PxVisBehavior.serieToRedrawOnTop,
+      PxVisBehaviorD3.serieToRedrawOnTopSVG,
       commonColors
     ],
 
@@ -133,7 +135,8 @@ Element which draws lines series onto the chart
     observers: [
       'drawElement(svg,domainChanged,chartData.*,completeSeriesConfig.*, counterClockwise)',
       'isIdInMuted(mutedSeries.*, completeSeriesConfig)',
-      '_addClipPath(clipPath)'
+      '_addClipPath(clipPath)',
+      '_drawOnTop(serieToRedrawOnTop)'
     ],
     ready: function() {
       this._watchConfigProperty('mutedOpacity', 0.3);
@@ -170,7 +173,7 @@ Element which draws lines series onto the chart
         if(this._isObjEmpty(this.lineGroup)) {
           // draw the path
           this.lineGroup = this.svg.append('g')
-            .attr('series-id', 'line_' + this.seriesId)
+            .attr('series-id', this.seriesId)
             .attr('class', 'series-line');
         }
 
@@ -186,7 +189,7 @@ Element which draws lines series onto the chart
           .append('path')
           .attr('class', 'series-line')
           .attr('series-id', function(d,i) {
-            return this.multiPath ? 'line_' + d[this.seriesId] : 'line_' + this.seriesId
+            return this.multiPath ? d[this.seriesId] : this.seriesId
           }.bind(this))
           .attr('fill','none')
         // When datapoints are added OR this funtion is run, draw stuff
@@ -282,6 +285,14 @@ Element which draws lines series onto the chart
         return this._opacityLine(d);
       } else {
         return 1;
+      }
+    },
+    /**
+     * Redraw this serie on top if needed
+     */
+    _drawOnTop: function(serieToRedrawOnTop) {
+      if(this.lineGroup && this.seriesId) {
+        this._drawSVGOnTop(serieToRedrawOnTop, this.seriesId, this.lineGroup.node());
       }
     }
   });
