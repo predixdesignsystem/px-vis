@@ -6,6 +6,7 @@ v1.0.0
 * Added new threshold configuration similar to events
 * Changed threshold data property from chartData to thresholdData
 * Added improved resize methods to chart behavior
+* Added mechanism for redrawing an SVG serie on top of others
 
 v0.7.0
 ==================

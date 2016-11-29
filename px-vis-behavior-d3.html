@@ -23,21 +23,8 @@ var PxVisBehaviorD3 = PxVisBehaviorD3 || {};
 
     @polymerBehavior PxVisBehaviorD3.svg
 */
-PxVisBehaviorD3.svg = {
+PxVisBehaviorD3.svg = [{
   properties: {
-    /**
-     * svg is a holder for the d3 instantiated svg container to draw to.
-     * Must be set in ready and passed to all components so they know whom to draw to.
-     *
-     * FUTURE: when Polymer supports SVG, this only need be set on the SVG element.
-     *
-     * @property svg
-     * @type Object
-     */
-    svg: {
-      type: Object,
-      notify:true
-    },
     /*
     *
     * The SVG element inside the chart - not a D3 selected element.
@@ -244,7 +231,7 @@ PxVisBehaviorD3.svg = {
       svg.attributes.width.value + '" height="' + svg.attributes.height.value +
       '">' + output.join('') + '</svg>';
   }
-};
+}, PxVisBehavior.svgDefinition];
 
 /*
     Name:
@@ -1201,5 +1188,38 @@ PxVisBehaviorD3.lineShared = [{
     this.set('line',line);
   }
 },PxVisBehaviorD3.radialLineGenerator, PxVisBehavior.seriesId];
+
+/*
+    Name:
+    PxVisBehaviorD3.serieToRedrawOnTopSVG
+
+    Description:
+    Polymer behavior that provides the mechanism to redraw a serie on top for SVG
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorD3.serieToRedrawOnTopSVG
+*/
+PxVisBehaviorD3.serieToRedrawOnTopSVG = [{
+  _drawSVGOnTop: function(idToRedraw, selfId, selfGroup) {
+    //is this scatter involved in redraw?
+    if(idToRedraw === selfId) {
+
+      //select all series
+      var seriesSvg = this.svg.selectAll('g.series-scatter,g.series-line').nodes();
+
+      //only move if we have more than 1 serie and we're not 
+      //the last one already (last one is drawn on top)
+      if(seriesSvg.length > 1 && 
+          seriesSvg[seriesSvg.length-1] !== selfGroup) {
+        
+        //draw on top: append after last serie
+        //if nextSibling is null it will append it properly.
+        this.svg.node().insertBefore(selfGroup, seriesSvg[seriesSvg.length-1].nextSibling);
+      }
+    }
+  }
+}, PxVisBehavior.serieToRedrawOnTop, PxVisBehaviorD3.svg];
 
 </script>

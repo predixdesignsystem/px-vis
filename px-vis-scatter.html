@@ -57,6 +57,7 @@ Element which draws scatter series onto the chart
       PxVisBehavior.polarData,
       PxVisBehavior.seriesId,
       PxVisBehavior.dynamicConfigProperties,
+      PxVisBehaviorD3.serieToRedrawOnTopSVG,
       commonColors
     ],
 
@@ -187,7 +188,8 @@ Element which draws scatter series onto the chart
     observers: [
       'drawElement(svg, domainChanged, chartData.*, completeSeriesConfig.*, radial, counterClockwise,markerSymbol, markerScale, markerSize, markerFillOpacity, markerStrokeOpacity)',
       'isIdInMuted(mutedSeries.*)',
-      '_addClipPath(clipPath)'
+      '_addClipPath(clipPath)',
+      '_drawOnTop(serieToRedrawOnTop)'
      ],
 
     ready:function() {
@@ -216,7 +218,7 @@ Element which draws scatter series onto the chart
 
         // draw the path
         this.scatterGroup = this.svg.append('g')
-          .attr('series-id', 'scatter_' + this.seriesId)
+          .attr('series-id', this.seriesId)
           .attr('class', 'series-scatter');
 
         //send empty tooltip data so the register shows up
@@ -396,6 +398,14 @@ Element which draws scatter series onto the chart
         .attr('fill-opacity', muted ? this.mutedOpacity : this.markerFillOpacity)
         .attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
         .attr('stroke-opacity', muted ? 0 : this.markerStrokeOpacity);
+    },
+    /**
+     * Redraw this serie on top if needed
+     */
+    _drawOnTop: function(serieToRedrawOnTop) {
+      if(this.scatterGroup && this.seriesId) {
+        this._drawSVGOnTop(serieToRedrawOnTop, this.seriesId, this.scatterGroup.node());
+      }
     }
   });
 </script>
