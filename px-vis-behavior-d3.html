@@ -1108,7 +1108,7 @@ PxVisBehaviorD3.lineShared = [{
    * Computes the data range.
    *
    */
-  _computeGradientRange: function(chartData, selectedDomain,seriesId){
+  _computeGradientRange: function(chartData, selectedDomain,seriesId) {
     if(chartData.value.length > 0) {
       var x1,x2;
       if(selectedDomain.value.x.length > 0) {
@@ -1122,11 +1122,15 @@ PxVisBehaviorD3.lineShared = [{
     }
   },
 
+  _removeGaps: function(data) {
+
+  },
+
   /**
    * Defines the d3 line generator and its attrs
    *
    */
-  _defineSingleLine: function(toCanvas){
+  _defineSingleLine: function(toCanvas) {
     var _this = this,
         renderToCanvas = (typeof(toCanvas) !== 'undefined') ? toCanvas : false,
         xKey = _this.completeSeriesConfig[_this.seriesId]['x'],
@@ -1137,18 +1141,18 @@ PxVisBehaviorD3.lineShared = [{
             return ~~_this.x(d[xKey]);
           })
           .y(function(d) {
-              return ~~_this.y(d[yKey]);
+            return ~~_this.y(d[yKey]);
           })
           .defined(function(d) {
             return _this._isValidData(d[yKey]);
           });
 
-    if(this.interpolationFunction){
+    if(this.interpolationFunction) {
       line.curve(this.interpolationFunction);
     }
 
     // If using canvas, tell it the context to draw to.
-    if(renderToCanvas){
+    if(renderToCanvas) {
       line.context(this.canvasContext);
     }
 
