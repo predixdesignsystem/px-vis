@@ -1016,22 +1016,25 @@ PxVisBehaviorChart.layers = [{
    * Creates <g> layers
    *
    */
-  _createLayers: function() {
-    var layers = [];
+  _createLayers: function(svg, numberOfLayers, propName) {
+    var layers = [],
+        name = propName ? propName : 'layer';
 
-    for(var i = 0; i < this.numberOfLayers; i++) {
-      var layer = this.svg.append('g');
+    for(var i = 0; i < numberOfLayers; i++) {
+      var layer = svg.append('g');
       layer.attr('id', "layer" + i);
       layers.push(layer);
     }
 
-    this.set('layer',layers);
-    this.fire('px-vis-layer-updated',{ 'data': layers, 'dataVar': 'layer', 'method': 'set' });
+    this.set(name,layers);
+    this.fire('px-vis-' + name + '-updated',{ 'data': layers, 'dataVar': name, 'method': 'set' });
   },
-  _createLayersOnce: function() {
-    if(this.generateLayers && this._doesD3HaveValues(this.svg) && this.numberOfLayers > 0) {
-      this._createLayers();
-      this.generateLayers = false;
+  _createLayersOnce: function(svg, numberOfLayers, generateLayers, propName) {
+    var gen = generateLayers ? generateLayers : 'generateLayers';
+
+    if(this[gen] && this._doesD3HaveValues(svg) && numberOfLayers > 0) {
+      this._createLayers(svg, numberOfLayers, propName);
+      this.set(gen, false);
     }
   }
 }, PxVisBehaviorD3.svg];
