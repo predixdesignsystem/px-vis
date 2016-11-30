@@ -12,6 +12,7 @@ v1.0.0
 * modified thresholds so it doesnt clone svg
 * Fix placement of zoom button
 * changed px-vis-line to px-vis-line-svg
+* updated px-vis-line-svg in demos and updated threshold demo to use threshold-data
 
 v0.7.0
 ==================
