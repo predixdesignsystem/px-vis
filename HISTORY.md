@@ -1,3 +1,7 @@
+v0.7.1
+==================
+* Fixed register scroll for FF and IE
+
 v0.7.0
 ==================
 * ensure timeseries rendering to canvas with multiple lines are not cut off
