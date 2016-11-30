@@ -7,6 +7,9 @@ v1.0.0
 * Changed threshold data property from chartData to thresholdData
 * Added improved resize methods to chart behavior
 * Added mechanism for redrawing an SVG serie on top of others
+* Added layer generation to chart behavior
+* modified interaction space so it doesnt clone svg
+* modified thresholds so it doesnt clone svg
 
 v0.7.0
 ==================

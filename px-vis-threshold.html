@@ -29,7 +29,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
 <dom-module id="px-vis-threshold">
   <template>
     <style include="px-vis-styles"></style>
-    
+
   </template>
 </dom-module>
 
@@ -64,18 +64,6 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
       defaultColor:{
         type: String,
         value:'grey8'
-      },
-      /**
-       * Holder for a clone of the passed in svg container.
-       *
-       * We cant use the normal svg container due to drawing order. The purpose of this clone is to ensure the tooltip capture elements are drawn on top of the chart rather than following normal draw order.
-       *
-       * @property thresholdSvg
-       * @type Object
-       */
-      thresholdSvg:{
-        type: Object,
-        value: function() {return{};}
       },
       /**
        * Holder object for the event svg "g" element
@@ -153,10 +141,9 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
      * @method drawElement
      */
     drawElement: function() {
-      this.cloneSVGElem(this.svg.node(),'thresholdSvg');
       // checks to see if the threshold already exists. If not, create; if so, update
       if(this._isObjEmpty(this.thresholdGroup)) {
-        this.thresholdGroup = this.thresholdSvg.append('g')
+        this.thresholdGroup = this.svg.append('g')
           .attr('id','thresholds')
           .selectAll('g.thresholds')
           .data(this.thresholdData)

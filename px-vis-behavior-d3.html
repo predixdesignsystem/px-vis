@@ -553,34 +553,6 @@ PxVisBehaviorD3.selectedTimeDomain = [{
 
 /*
     Name:
-    PxVisBehaviorD3.interaction
-
-    Description:
-    Polymer behavior that provides the interactionSvg object for d3 components.
-
-    Dependencies:
-    - D3.js
-
-    @polymerBehavior PxVisBehaviorD3.interaction
-*/
-PxVisBehaviorD3.interaction = {
-  properties: {
-    /**
-     * Holder for a clone of the passed in svg container.
-     *
-     * We cant use the normal svg container due to drawing order. The purpose of this clone is to ensure the tooltip capture elements are drawn on top of the chart rather than following normal draw order.
-     *
-     * @property interactionSvg
-     * @type Object
-     */
-    interactionSvg: {
-      type: Object
-    }
-  }
-};
-
-/*
-    Name:
     PxVisBehaviorD3.clipPath
 
     Description:
@@ -1209,11 +1181,11 @@ PxVisBehaviorD3.serieToRedrawOnTopSVG = [{
       //select all series
       var seriesSvg = this.svg.selectAll('g.series-scatter,g.series-line').nodes();
 
-      //only move if we have more than 1 serie and we're not 
+      //only move if we have more than 1 serie and we're not
       //the last one already (last one is drawn on top)
-      if(seriesSvg.length > 1 && 
+      if(seriesSvg.length > 1 &&
           seriesSvg[seriesSvg.length-1] !== selfGroup) {
-        
+
         //draw on top: append after last serie
         //if nextSibling is null it will append it properly.
         this.svg.node().insertBefore(selfGroup, seriesSvg[seriesSvg.length-1].nextSibling);

@@ -985,4 +985,55 @@ PxVisBehaviorChart.cursorConfig = {
   }
 };
 
+
+/*
+    Name:
+    PxVisBehaviorChart.layers
+
+    Description:
+    Behavior providing the layers property and layer generation
+    @polymerBehavior PxVisBehaviorChart.layers
+*/
+PxVisBehaviorChart.layers = [{
+  properties: {
+    /**
+     * Array of the svg layers
+     *
+     */
+    layers: {
+      type: Array,
+      notify: true
+    },
+    numberOfLayers: {
+      type: Number
+    },
+    generateLayers: {
+      type: Boolean,
+      value: true
+    }
+  },
+  /**
+   * Creates <g> layers
+   *
+   */
+  _createLayers: function() {
+    var layers = [];
+
+    for(var i = 0; i < this.numberOfLayers; i++) {
+      var layer = this.svg.append('g');
+      layer.attr('id', "layer" + i);
+      layers.push(layer);
+    }
+
+    this.set('layers',layers);
+    this.fire('px-vis-layers-updated',{ 'data': layers, 'dataVar': 'layers', 'method': 'set' });
+  },
+  _createLayersOnce: function() {
+    if(this.generateLayers && this._doesD3HaveValues(this.svg) && this.numberOfLayers > 0) {
+      this._createLayers();
+      this.generateLayers = false;
+    }
+  }
+}, PxVisBehaviorD3.svg];
+
 </script>
