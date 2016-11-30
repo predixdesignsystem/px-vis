@@ -1,7 +1,3 @@
-v1.0.1
-==================
-* Fix placement of zoom button
-
 v1.0.0
 ==================
 * Upgrade to d3 4.4.x.
@@ -14,6 +10,7 @@ v1.0.0
 * Added layer generation to chart behavior
 * modified interaction space so it doesnt clone svg
 * modified thresholds so it doesnt clone svg
+* Fix placement of zoom button
 * changed px-vis-line to px-vis-line-svg
 
 v0.7.0
