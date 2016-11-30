@@ -1,3 +1,7 @@
+v1.0.1
+==================
+* Fix placement of zoom button
+
 v1.0.0
 ==================
 * Upgrade to d3 4.4.x.
