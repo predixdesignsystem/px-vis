@@ -3,13 +3,13 @@ document.addEventListener("WebComponentsReady", function() {
 });
 
 function runTests(){
-  suite('px-vis-line does Polymer exist?', function() {
+  suite('px-vis-line-svg does Polymer exist?', function() {
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
   });
 
-  suite('px-vis-line works', function() {
+  suite('px-vis-line-svg works', function() {
     var baseScale = document.getElementById('baseScale'),
         baseSVG = document.getElementById('baseSVG'),
         baseLine = document.getElementById('baseLine');
@@ -95,7 +95,7 @@ function runTests(){
     });
   }); //suite
 
-  suite('px-vis-line with two series works', function() {
+  suite('px-vis-line-svg with two series works', function() {
     var mutedScale = document.getElementById('mutedScale'),
         mutedSVG = document.getElementById('mutedSVG'),
         mutedLine1 = document.getElementById('mutedLine1'),
@@ -219,7 +219,7 @@ function runTests(){
     });
   }); //suite
 
-  suite('px-vis-line mutes', function() {
+  suite('px-vis-line-svg mutes', function() {
     var mutedScale = document.getElementById('mutedScale'),
         mutedSVG = document.getElementById('mutedSVG'),
         mutedLine1 = document.getElementById('mutedLine1'),
@@ -255,7 +255,7 @@ function runTests(){
 
   }); //suite
 
-  suite('px-vis-line unmutes', function() {
+  suite('px-vis-line-svg unmutes', function() {
     var mutedScale = document.getElementById('mutedScale'),
         mutedSVG = document.getElementById('mutedSVG'),
         mutedLine1 = document.getElementById('mutedLine1'),
@@ -290,7 +290,7 @@ function runTests(){
     });
   }); //suite
 
-  suite('px-vis-line with custom muted opacity', function() {
+  suite('px-vis-line-svg with custom muted opacity', function() {
     var mutedScale = document.getElementById('mutedScale'),
         mutedSVG = document.getElementById('mutedSVG'),
         mutedLine1 = document.getElementById('mutedLine1'),
@@ -328,7 +328,7 @@ function runTests(){
 
   }); //suite
 
-  suite('px-vis-line with missing data', function() {
+  suite('px-vis-line-svg with missing data', function() {
     var missingDataPointScale = document.getElementById('missingDataPointScale'),
         missingDataPointSVG = document.getElementById('missingDataPointSVG'),
         missingDataPointLine1 = document.getElementById('missingDataPointLine1'),
@@ -427,7 +427,7 @@ function runTests(){
     });
   }); //suite
 
-  // suite('px-vis-line with two series renders to canvas', function() {
+  // suite('px-vis-line-svg with two series renders to canvas', function() {
   //   var canvasScale = document.getElementById('canvasScale'),
   //       canvasSVG = document.getElementById('canvasSVG'),
   //       canvasLine1 = document.getElementById('canvasLine1'),
@@ -535,7 +535,7 @@ function runTests(){
   // }); //suite
 
 
-  suite('px-vis-line renders parallel axis to SVG', function() {
+  suite('px-vis-line-svg renders parallel axis to SVG', function() {
     var parallelScale = document.getElementById('parallelScale'),
         parallelSVG = document.getElementById('parallelSVG'),
         parallelLine = document.getElementById('parallelLine');
@@ -656,7 +656,7 @@ function runTests(){
 
   }); //suite
 
-  suite('px-vis-line renders parallel axis with gradient lines to SVG', function() {
+  suite('px-vis-line-svg renders parallel axis with gradient lines to SVG', function() {
     var paralleGradientlScale = document.getElementById('parallelGradientScale'),
         parallelGradientSVG = document.getElementById('parallelGradientSVG'),
         parallelGradientLine = document.getElementById('parallelGradientLine');
@@ -789,7 +789,7 @@ function runTests(){
 
   }); //suite
 
-  suite('px-vis-line renders parallel axis with multiple categories to SVG', function() {
+  suite('px-vis-line-svg renders parallel axis with multiple categories to SVG', function() {
     var parallelCategoryScale = document.getElementById('parallelCategoryScale'),
         parallelCategorySVG = document.getElementById('parallelCategorySVG'),
         parallelCategoryLine = document.getElementById('parallelCategoryLine');
@@ -936,7 +936,7 @@ function runTests(){
 
   }); //suite
 
-  suite('px-vis-line renders parallel axis with multiple categories and gradients to SVG', function() {
+  suite('px-vis-line-svg renders parallel axis with multiple categories and gradients to SVG', function() {
     var parallelCategoryGradientScale = document.getElementById('parallelCategoryGradientScale'),
         parallelCategoryGradientSVG = document.getElementById('parallelCategoryGradientSVG'),
         parallelCategoryGradientLine = document.getElementById('parallelCategoryGradientLine');
@@ -1091,7 +1091,7 @@ function runTests(){
 
   }); //suite
 
-  suite('px-vis-line mutes parallel axis on SVG and selectedDomain changes gradient', function() {
+  suite('px-vis-line-svg mutes parallel axis on SVG and selectedDomain changes gradient', function() {
     var parallelCategoryGradientScale = document.getElementById('parallelCategoryGradientScale'),
         parallelCategoryGradientSVG = document.getElementById('parallelCategoryGradientSVG'),
         parallelCategoryGradientLine = document.getElementById('parallelCategoryGradientLine');
@@ -1139,7 +1139,7 @@ function runTests(){
     });
   }); //suite
 
-  suite('px-vis-line unmutes parallel axis on SVG and selectedDomain changes gradient', function() {
+  suite('px-vis-line-svg unmutes parallel axis on SVG and selectedDomain changes gradient', function() {
     var parallelCategoryGradientScale = document.getElementById('parallelCategoryGradientScale'),
         parallelCategoryGradientSVG = document.getElementById('parallelCategoryGradientSVG'),
         parallelCategoryGradientLine = document.getElementById('parallelCategoryGradientLine');
@@ -1187,7 +1187,7 @@ function runTests(){
   }); //suite
 
 
-  // suite('px-vis-line renders parallel axis to canvas', function() {
+  // suite('px-vis-line-svg renders parallel axis to canvas', function() {
   //   var parallelCanvasScale = document.getElementById('parallelCanvasScale'),
   //       parallelCanvasSVG = document.getElementById('parallelCanvasSVG'),
   //       parallelCanvasLine = document.getElementById('parallelCanvasLine');
@@ -1281,7 +1281,7 @@ function runTests(){
   //
   // }); //suite
   //
-  // suite('px-vis-line renders parallel axis with gradient to canvas', function() {
+  // suite('px-vis-line-svg renders parallel axis with gradient to canvas', function() {
   //   var parallelGradientCanvasScale = document.getElementById('parallelGradientCanvasScale'),
   //       parallelGradientCanvasSVG = document.getElementById('parallelGradientCanvasSVG'),
   //       parallelGradientCanvasLine = document.getElementById('parallelGradientCanvasLine');
@@ -1375,7 +1375,7 @@ function runTests(){
   //
   // }); //suite
   //
-  // suite('px-vis-line renders parallel axis with categories to canvas', function() {
+  // suite('px-vis-line-svg renders parallel axis with categories to canvas', function() {
   //   var parallelCategoryCanvasScale = document.getElementById('parallelCategoryCanvasScale'),
   //       parallelCategoryCanvasSVG = document.getElementById('parallelCategoryCanvasSVG'),
   //       parallelCategoryCanvasLine = document.getElementById('parallelCategoryCanvasLine');
@@ -1491,7 +1491,7 @@ function runTests(){
   //
   // }); //suite
   //
-  // suite('px-vis-line renders parallel axis with categories and gradient to canvas', function() {
+  // suite('px-vis-line-svg renders parallel axis with categories and gradient to canvas', function() {
   //   var parallelCategoryGradientCanvasScale = document.getElementById('parallelCategoryGradientCanvasScale'),
   //       parallelCategoryGradientCanvasSVG = document.getElementById('parallelCategoryGradientCanvasSVG'),
   //       parallelCategoryGradientCanvasLine = document.getElementById('parallelCategoryGradientCanvasLine');
@@ -1606,7 +1606,7 @@ function runTests(){
   //   });
   // }); //suite
 
-  suite('px-vis-line polar works', function() {
+  suite('px-vis-line-svg polar works', function() {
     var polarScale = document.getElementById('polarScale'),
         polarSVG = document.getElementById('polarSVG'),
         polarLine = document.getElementById('polarLine');
@@ -1721,7 +1721,7 @@ function runTests(){
     });
   }); //suite
 
-  suite('px-vis-line polar with degrees and counter clockwise works', function() {
+  suite('px-vis-line-svg polar with degrees and counter clockwise works', function() {
     var polarDegreeScale = document.getElementById('polarDegreeScale'),
         polarDegreeSVG = document.getElementById('polarDegreeSVG'),
         polarDegreeLine = document.getElementById('polarDegreeLine');
@@ -1835,7 +1835,7 @@ function runTests(){
     });
   }); //suite
 
-  suite('px-vis-line polar with degrees and counter clockwise works', function() {
+  suite('px-vis-line-svg polar with degrees and counter clockwise works', function() {
     var polarCCWScale = document.getElementById('polarCCWScale'),
         polarCCWSVG = document.getElementById('polarCCWSVG'),
         polarCCWLine = document.getElementById('polarCCWLine');
@@ -1950,7 +1950,7 @@ function runTests(){
   }); //suite
 
 
-  suite('px-vis-line polar with degrees and counter clockwise works', function() {
+  suite('px-vis-line-svg polar with degrees and counter clockwise works', function() {
     var polarDegreeCCWScale = document.getElementById('polarDegreeCCWScale'),
         polarDegreeCCWSVG = document.getElementById('polarDegreeCCWSVG'),
         polarDegreeCCWLine = document.getElementById('polarDegreeCCWLine');
@@ -2064,7 +2064,7 @@ function runTests(){
     });
   }); //suite
 
-  suite('px-vis-line polar missing data works', function() {
+  suite('px-vis-line-svg polar missing data works', function() {
     var polarMissingScale = document.getElementById('polarMissingScale'),
         polarMissingSVG = document.getElementById('polarMissingSVG'),
         polarMissingLine = document.getElementById('polarMissingLine');
@@ -2172,7 +2172,7 @@ function runTests(){
   }); //suite
 
 
-  suite('px-vis-line renders radar to SVG', function() {
+  suite('px-vis-line-svg renders radar to SVG', function() {
     var radarScale = document.getElementById('radarScale'),
         radarSVG = document.getElementById('radarSVG'),
         radarLine = document.getElementById('radarLine');
@@ -2336,7 +2336,7 @@ function runTests(){
 
   }); //suite
 
-  suite('px-vis-line radar small lines stop at 25', function() {
+  suite('px-vis-line-svg radar small lines stop at 25', function() {
     var radarScale = document.getElementById('radarScale'),
         chartExtents = {"x":["y","y1","y2"],"y":[15,20] },
         linePath;
@@ -2411,7 +2411,7 @@ function runTests(){
 
   }); //suite
 
-  suite('px-vis-line radar with missing data', function() {
+  suite('px-vis-line-svg radar with missing data', function() {
     var radarMissingScale = document.getElementById('radarMissingScale'),
         radarMissingSVG = document.getElementById('radarMissingSVG'),
         radarMissingLine = document.getElementById('radarMissingLine');

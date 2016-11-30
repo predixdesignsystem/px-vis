@@ -10,6 +10,7 @@ v1.0.0
 * Added layer generation to chart behavior
 * modified interaction space so it doesnt clone svg
 * modified thresholds so it doesnt clone svg
+* changed px-vis-line to px-vis-line-svg
 
 v0.7.0
 ==================

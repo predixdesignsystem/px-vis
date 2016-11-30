@@ -3,7 +3,7 @@ document.addEventListener("WebComponentsReady", function() {
 });
 
 function runTests(){
-  suite('px-vis-line does Polymer exist?', function() {
+  suite('px-vis-pie does Polymer exist?', function() {
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
@@ -40,7 +40,7 @@ function runTests(){
     test('pie has been translated by radius', function(done) {
 
       setTimeout(function() {
-        
+
         var transform = basePie.pieGroup._groups[0][0].attributes['transform'].value.replace('scale(1)','').replace(',','').split(" ").join(''),
             expected = 'translate(' + basePie._radius +  basePie._radius + ')';
 

@@ -4,7 +4,7 @@
 <link rel="import" href="px-vis-behavior-datetime.html" />
 <link rel="import" href="px-vis-behavior-chart.html" />
 <link rel="import" href="px-vis-svg.html"/>
-<link rel="import" href="px-vis-line.html"/>
+<link rel="import" href="px-vis-line-svg.html"/>
 <link rel="import" href="px-vis-axis.html"/>
 <link rel="import" href="px-vis-brush.html"/>
 <link rel="import" href="px-vis-scale.html"/>
@@ -45,7 +45,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
 <dom-module id="px-vis-chart-navigator">
     <template>
       <style include="px-vis-styles"></style>
-      
+
       <div id="wrapper" style="height:100%;width:100%">
         <px-vis-scale
           svg="[[svg]]"
@@ -74,7 +74,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
         <template is="dom-repeat" items="[[_seriesKeys]]">
           <template is="dom-if" if="[[_limitSeries(index,navSeriesLimit)]]">
             <template is="dom-if" if="[[_chartTypeLine(item,completeSeriesConfig)]]">
-              <px-vis-line
+              <px-vis-line-svg
                 svg="[[svg]]"
                 series-id="[[item]]"
                 chart-data="[[chartData]]"
@@ -85,7 +85,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
                 current-domain-y="[[currentDomainY]]"
                 domain-changed="[[domainChanged]]"
                 muted-series="[[mutedSeries]]">
-              </px-vis-line>
+              </px-vis-line-svg>
             </template>
             <template is="dom-if" if="[[_chartTypeScatter(item,completeSeriesConfig)]]">
               <px-vis-scatter
