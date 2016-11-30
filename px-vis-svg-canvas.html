@@ -30,10 +30,21 @@ Element which creates an Canvas element and context
 <dom-module id="px-vis-svg-canvas">
   <template>
     <style include="px-vis-svg-canvas-styles"></style>
-    
+
     <div
       class="rel-container"
       style$="height:[[height]]px; width:[[width]]px">
+      <px-vis-svg
+        class="abs-elem"
+        on-px-vis-svg-updated="_refireEvent"
+        on-px-vis-svg-element-updated="_refireEvent"
+        svg="{{svgLower}}"
+        px-svg-elem="{{pxSvgElemLower}}"
+        width="[[width]]"
+        height="[[height]]"
+        margin="[[margin]]"
+        offset="[[offset]]">
+      </px-vis-svg>
       <px-vis-canvas
         class="abs-elem"
         on-px-vis-canvas-context-updated="_refireEvent"
@@ -65,7 +76,8 @@ Element which creates an Canvas element and context
         behaviors: [
           PxVisBehavior.sizing,
           PxVisBehaviorD3.canvas,
-          PxVisBehaviorD3.svg
+          PxVisBehaviorD3.svg,
+          PxVisBehaviorD3.svgLower
         ],
 
         /**
