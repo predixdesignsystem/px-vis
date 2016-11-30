@@ -1,3 +1,4 @@
+
 v1.0.0
 ==================
 * Upgrade to d3 4.4.x.
@@ -12,6 +13,10 @@ v1.0.0
 * modified thresholds so it doesnt clone svg
 * Fix placement of zoom button
 * changed px-vis-line to px-vis-line-svg
+
+v0.7.1
+==================
+* Fixed register scroll for FF and IE
 
 v0.7.0
 ==================

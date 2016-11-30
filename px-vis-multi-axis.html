@@ -68,7 +68,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 <dom-module id="px-vis-multi-axis">
     <template>
       <style include="px-vis-styles"></style>
-      
+
       <template id="bof" is="dom-repeat" items="[[_internalDimensions]]">
         <px-vis-axis
           svg="[[_returnGroup(index, _internalDimensionsChanged)]]"
@@ -197,7 +197,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
        * A clone svg group to draw the axis to in order to ensure they are on top
        *
        */
-      axisSvg: {
+      svg: {
         type: Object
       },
       /**
@@ -314,7 +314,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
     observers: [
       '_computedInternalDimensions(domainChanged.*,dimensions.*,svg)',
-      '_moveAxisGroup(margin.*,axisSvg,offset.*)',
       '_toggleTitleLocation(length)'
     ],
 
@@ -388,15 +387,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     },
 
     /**
-     * translates the axis svg to its proper place in case it isnt
-     *
-     */
-     _moveAxisGroup: function(margin,axisSvg){
-      //make sure it is translated properly and we are not running into a race condition
-      this.axisSvg.attr("transform", "translate(" + (this.margin.left + this.offset[0]) + "," + (this.margin.top + this.offset[1]) + ")");
-    },
-
-    /**
      * Generates a group elem for each dimension and moves it into the correct x coordinate
      *
      */
@@ -404,13 +394,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       // this.debounce('axisG',function(){
         if(this._doesObjHaveValues(this.svg)) {
 
-          if(!this.axisSvg) {
-            this.cloneSVGElem(this.svg.node(),'axisSvg');
-          }
-
           var _this = this,
               resetTitles = false,
-              removed = this.axisSvg.selectAll(".dimension").data().filter(function(d){
+              removed = this.svg.selectAll(".dimension").data().filter(function(d){
                 if(_this.dimensions.indexOf(d) === -1){
                   // _this.$.axisBrush.clearBrush(d);
                   delete _this.displayedValues[d];
@@ -422,7 +408,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
 
           // generate axis based on the dimensions
-          var g = this.axisSvg.selectAll(".dimension")
+          var g = this.svg.selectAll(".dimension")
             .data(this.dimensions);
             // .data(this.dimensions, function(d) { return d; });
 
@@ -489,7 +475,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             }
 
           // TODO When we support muting an axes, might want to be able to access the above g and change the transform
-          this.set('axisGroups', this.axisSvg.selectAll(".dimension"));
+          this.set('axisGroups', this.svg.selectAll(".dimension"));
           this.set('brushElems', this.axisGroups.selectAll('g.brush').nodes());
 
           //poke the titles
