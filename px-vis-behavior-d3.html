@@ -1099,17 +1099,40 @@ PxVisBehaviorD3.lineShared = [{
         renderToCanvas = (typeof(toCanvas) !== 'undefined') ? toCanvas : false,
         xKey = _this.completeSeriesConfig[_this.seriesId]['x'],
         yKey = _this.completeSeriesConfig[_this.seriesId]['y'],
-        line = Px.d3.line()
-          .x(function(d) {
-            // ~~ --> round pixels values to optimize svg perfs
+        line,
+        counter;
+//FIXME define showGaps
+//FIXME figure out defaults and what handling
+    if(this.showGaps) {
+      line = Px.d3.line()
+        .x(function(d) {
+          // ~~ --> round pixels values to optimize svg perfs
+          return ~~_this.x(d[xKey]);
+        })
+        .y(function(d) {
+          return ~~_this.y(d[yKey]);
+        })
+        .defined(function(d) {
+          return _this._isValidData(d[yKey]);
+        });
+    } else {
+      line = Px.d3.line()
+        .x(function(d,i) {
+          if(_this.chartData[i][xKey] && _this.chartData[i][yKey]) {
             return ~~_this.x(d[xKey]);
-          })
-          .y(function(d) {
+          } else {
+            return ~~_this.x(_this.chartData[counter][xKey]);
+          }
+        })
+        .y(function(d,i) {
+          if(_this.chartData[i][xKey] && _this.chartData[i][yKey]) {
+            counter = i;
             return ~~_this.y(d[yKey]);
-          })
-          .defined(function(d) {
-            return _this._isValidData(d[yKey]);
-          });
+          } else {
+            return ~~_this.y(_this.chartData[counter][yKey]);
+          }
+        });
+    }
 
     if(this.interpolationFunction) {
       line.curve(this.interpolationFunction);
@@ -1122,6 +1145,7 @@ PxVisBehaviorD3.lineShared = [{
 
     this.set('line',line);
   },
+
   /**
    * Defines a multi-scale d3 line generator and its attrs
    *
@@ -1179,7 +1203,7 @@ PxVisBehaviorD3.serieToRedrawOnTopSVG = [{
     if(idToRedraw === selfId) {
 
       d3Selection.raise();
-      
+
     }
   }
 }, PxVisBehavior.serieToRedrawOnTop, PxVisBehaviorD3.svg];
