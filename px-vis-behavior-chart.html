@@ -7,6 +7,55 @@ var PxVisBehaviorChart = PxVisBehaviorChart || {};
 
 /*
     Name:
+    PxVisBehaviorChart.chartCommonMethods
+
+    Description:
+    Polymer behavior that provides some general methods used accross charts
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorChart.chartCommonMethods
+*/
+PxVisBehaviorChart.chartCommonMethods = {
+  /**
+  * Goes through an array of objects and gathers all unique keys. Returns a list of keys
+  *
+  * Expects and array of objects
+  *
+  * Returns an array of strings
+  */
+  _returnAllKeys: function(d) {
+    var o = {},
+        k;
+    for(var i = 0; i < d.length; i++) {
+      k = Object.keys(d[i]);
+      for(var j = 0; j < k.length; j++) {
+        o[k[j]] = true;
+      }
+    }
+    return Object.keys(o)
+  },
+
+  /**
+   * Helper function to return the correct color for a particular index.
+   **/
+  _getColor: function(i){
+    var l = this.seriesColorOrder.length,
+        index = this._calcIndex(i,l);
+    return this.dataVisColors[this.seriesColorOrder[ index ]];
+  },
+
+  /**
+   * Helper function to calculate the index. When we run out of indcies, it loops back over valid indicies.
+   **/
+  _calcIndex: function(i,l){
+    return i < l ? i : this._calcIndex(i - l,l);
+  }
+};
+
+/*
+    Name:
     PxVisBehaviorChart.chartCommon
 
     Description:
@@ -56,10 +105,20 @@ PxVisBehaviorChart.chartCommon = [{
         }
       },
       /**
-      * A default configuration file. It fills in the missing parts of seriesConfig. Any options from seriesConfig
-      * can be specified in the defaultSeriesConfig and will be automatically used if not defined in
-      * the seriesConfig
+      * A default configuration file. It fills in the missing parts of seriesConfig. Any options from seriesConfig can be specified in the defaultSeriesConfig and will be automatically used if not defined in the seriesConfig
       *
+      * Default:
+      *
+      * ```
+      *  {
+      *     "type": "line",
+      *     "x": 'x',
+      *     "xMin": "dynamic",
+      *     "xMax": "dynamic",
+      *     "yMin": 0,
+      *     "yMax": "dynamic"
+      *  }
+      * ```
       */
       defaultSeriesConfig: {
         type: Object,
@@ -128,8 +187,7 @@ PxVisBehaviorChart.chartCommon = [{
         var fullConfig = (this.seriesConfig) ? JSON.parse(JSON.stringify(this.seriesConfig)) : {},
             k = Object.keys(fullConfig),
             kLen = k.length,
-            // FIXME 0 elem might not have all keys. How do we actually find all keys?
-            allYs = (this.includeAllSeries) ? Object.keys(this.chartData[0]) : [],
+            allYs = (this.includeAllSeries) ? this._returnAllKeys(this.chartData) : [],
             // create a new object with the y keys as config keys
             objYs = allYs.reduce(function(obj, item) {
               obj[item] = {};
@@ -315,22 +373,6 @@ PxVisBehaviorChart.chartCommon = [{
     },
 
     /**
-     * Helper function to return the correct color for a particular index.
-     **/
-    _getColor: function(i){
-      var l = this.seriesColorOrder.length,
-          index = this._calcIndex(i,l);
-      return this.dataVisColors[this.seriesColorOrder[ index ]];
-    },
-
-    /**
-     * Helper function to calculate the index. When we run out of indcies, it loops back over valid indicies.
-     **/
-    _calcIndex: function(i,l){
-      return i < l ? i : this._calcIndex(i - l,l);
-    },
-
-    /**
      * Helper function for the register. Returns true if the side register should exist
      *
      */
@@ -369,7 +411,7 @@ PxVisBehaviorChart.chartCommon = [{
     _returnKeys: function(obj){
       return Object.keys(obj);
     }
-}, commonColors, PxVisBehavior.commonMethods,PxVisBehavior.axisTypes];
+}, commonColors, PxVisBehaviorChart.chartCommonMethods, PxVisBehavior.commonMethods, PxVisBehavior.completeSeriesConfig, PxVisBehavior.axisTypes];
 
 /*
     Name:
@@ -381,7 +423,7 @@ PxVisBehaviorChart.chartCommon = [{
 
     @polymerBehavior PxVisBehaviorChart.saveImage
 */
-PxVisBehaviorChart.saveImage = {
+PxVisBehaviorChart.saveImage = [{
     /**
      * Takes a graphic "snapshot" of the component and pass results through a callback:
      * - a canvas containing the graphical snapshot
@@ -397,13 +439,15 @@ PxVisBehaviorChart.saveImage = {
      * further processing, such as combining different elements snapshot into one image
      *
      */
-    getImage: function(callback) {
+    getImage: function(callback, renderLegend) {
       //create a new canvas to render both the canvas and svg elements on it
       var canvas = document.createElement('canvas'),
           context,
           result,
           svgData;
-      canvas.width = this.width;
+
+      canvas.width = this.width + (renderLegend ? this._getRegisterWidth() : 0);
+
       canvas.height = this.height;
       context = canvas.getContext('2d');
 
@@ -412,13 +456,82 @@ PxVisBehaviorChart.saveImage = {
         context.drawImage(this.canvasContext.canvas, 0, 0);
       }
 
-      if(this.pxSvgElem) {
+     if(this.pxSvgElem) {
+       //drawing the svg bit
         this._drawSVGOnCanvas(canvas, function(resultCanvas) {
+          if(renderLegend) {
+            this._drawRegister(resultCanvas.getContext('2d'), this.width);
+          }
           callback({canvas: resultCanvas, image: resultCanvas.toDataURL()});
-        });
+        }.bind(this));
+      } else if(this.canvasContext) {
+        //we have a canvas but no svg
+        if(renderLegend) {
+          this._drawRegister(context, this.width);
+        }
+        callback({canvas: canvas, image: canvas.toDataURL()});
       }
+    },
+    _getRegisterWidth: function() {
+      var canvas = document.createElement('canvas');
+      canvas.height = this.height;
+      canvas.width = 9999;
+
+      var curY = 0,
+          curX = this.width + 5,
+          keys = Object.keys(this.completeSeriesConfig),
+          maxWidth = 0,
+          maxTotalWidth = 5,
+          context = canvas.getContext('2d');
+          curTextWidth = 0;
+
+      for(var i=0; i<keys.length; i++) {
+          curY += 30;
+
+          curTextWidth = context.measureText(this.completeSeriesConfig[keys[i]].name).width;
+          maxWidth = Math.max(maxWidth, curTextWidth);
+
+          if( (curY + 30) > this.height ) {
+            curX += maxWidth + 15;
+            curY = 0;
+            maxTotalWidth += maxWidth + 15;
+            maxWidth = 0;
+          }
+        }
+        maxTotalWidth += maxWidth + 15;
+
+        return maxTotalWidth;
+    },
+    /**
+     * Draws a fake representation of the registers
+     */
+    _drawRegister: function(context) {
+      var curY = 0,
+          lineLength = 25,
+          strokeWidth = 3,
+          curX = this.width + 5,
+          keys = Object.keys(this.completeSeriesConfig),
+          maxWidth = 0,
+          curTextWidth = 0;
+
+        //draw each serie
+        for(var i=0; i<keys.length; i++) {
+          curY += 30;
+
+          context.fillStyle = this.completeSeriesConfig[keys[i]].color;
+          context.fillRect(curX,curY,strokeWidth, lineLength);
+          context.fillStyle = 'rgb(0,0,0)';
+          context.fillText(this.completeSeriesConfig[keys[i]].name, curX + strokeWidth + 5, curY + 10);
+          curTextWidth = context.measureText(this.completeSeriesConfig[keys[i]].name).width;
+          maxWidth = Math.max(maxWidth, curTextWidth);
+
+          if( (curY + 30) > this.height ) {
+            curX += maxWidth + 15;
+            curY = 0;
+          }
+        }
     }
-};
+}, PxVisBehavior.completeSeriesConfig];
 /*
     Name:
     PxVisBehaviorChart.precipitationPattern
@@ -678,7 +791,7 @@ PxVisBehaviorChart.waitForAttach = {
      */
     _isLoadedOnPage: function() {
       var rect = this.getBoundingClientRect();
-      if(rect.height > 0 && rect.width > 0){
+      if(rect.height > 0 && rect.width > 0) {
         this.set('_loadedOnPage', true);
       } else {
         this.async(this._isLoadedOnPage, 50);
@@ -810,6 +923,33 @@ PxVisBehaviorChart.axisConfigs = {
      *
      */
     yAxisConfig: {
+      type: Object,
+      notify: true
+    }
+  }
+};
+
+
+/*
+    Name:
+    PxVisBehaviorChart.cursorConfig
+
+    Description:
+    Behavior providing the cursorConfig property
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorChart.cursorConfig
+*/
+PxVisBehaviorChart.cursorConfig = {
+  properties: {
+    /**
+     * Configuration object used to customize the cursor properties.
+     * Please refer to px-vis-cursor (https://github.com/PredixDev/px-vis) for a list of supported proerties
+     *
+     */
+    cursorConfig: {
       type: Object,
       notify: true
     }

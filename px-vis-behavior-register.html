@@ -3,6 +3,30 @@ var PxVisBehaviorRegister = PxVisBehaviorRegister || {};
 
 /*
     Name:
+    PxVisBehaviorRegister.groupings
+
+    Description:
+    Polymer behavior that provides the groupings property for px-vis register items.
+
+    Dependencies:
+    - none
+
+    @polymerBehavior PxVisBehaviorRegister.groupings
+*/
+PxVisBehaviorRegister.groupings = {
+  properties: {
+    /**
+     * A holder for a line of the register
+     */
+    groupings: {
+      type: Number,
+      value: 1
+    }
+  }
+};
+
+/*
+    Name:
     PxVisBehaviorRegister.itemShared
 
     Description:
@@ -40,14 +64,14 @@ PxVisBehaviorRegister.itemShared = {
      */
     _truncatedName: {
       type: String,
-      computed: '_computeTruncatedName(_configName, completeSeriesConfig)'
+      computed: '_computeTruncatedName(_configName, completeSeriesConfig, truncationLength)'
     },
     /**
      * Whether truncation ran or not
      */
     _didTruncate: {
       type: Boolean,
-      computed: '_computeDidTruncate(_configName, completeSeriesConfig)'
+      computed: '_computeDidTruncate(_configName, completeSeriesConfig, truncationLength)'
     },
 
     /**
@@ -148,6 +172,13 @@ PxVisBehaviorRegister.register = {
     }
 
     return classList;
+  },
+
+  _getSeriesWrapperClassReverse: function(type) {
+    if(type === 'horizontal') {
+      return this._getSeriesWrapperClass('vertical');
+    }
+    return this._getSeriesWrapperClass('horizontal');
   },
 
   /**
@@ -338,6 +369,7 @@ PxVisBehaviorRegister.generalItem = [{
     }
   }
 }, PxVisBehavior.muteUnmuteSeries];
+
 
 
 </script>

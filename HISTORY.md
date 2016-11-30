@@ -1,3 +1,18 @@
+v0.7.0
+==================
+* ensure timeseries rendering to canvas with multiple lines are not cut off
+* added PxVisBehaviorChart.chartCommonMethods
+* made includeAllSeries loop over all data
+* added clip path to cursor
+* added cursor config to chart behavior
+* modified how cursor lines are calculated
+* Added scrollbars and styling to registers when there are too many series to fit
+* Added ability to specify multiple columns to register
+* Added ability to use multi column register in tooltip
+* Added ability to draw a legend in the image exporter
+* added preserveDataOrder for px-vis-pie
+* fixed issues with px-vis-pie updates/addition/deletion
+
 v0.6.46
 ==================
 * adding check that canvasContext exists in line detach
