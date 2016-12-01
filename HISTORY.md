@@ -1,3 +1,7 @@
+v0.7.4
+==================
+* fix zoom resize on timeseries
+
 v0.7.3
 ==================
 * fix behavior declaration order
