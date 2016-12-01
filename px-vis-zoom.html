@@ -26,7 +26,6 @@ Element providing an on-chart zoom.
 <dom-module id="px-vis-zoom">
     <template>
       <style include="px-vis-zoom-styles"></style>
-      
       <button id="resetBtn" class="btn hidden" on-click="resetZoom">Reset Zoom</button>
     </template>
 </dom-module>
@@ -39,7 +38,8 @@ Element providing an on-chart zoom.
     behaviors: [
       PxVisBehaviorD3.svg,
       PxVisBehavior.extentsData,
-      PxVisBehaviorD3.selectedDomain
+      PxVisBehaviorD3.selectedDomain,
+      PxVisBehavior.baseSize
     ],
 
     /**
@@ -48,9 +48,18 @@ Element providing an on-chart zoom.
      * @property properties
      * @type Object
      */
-    properties: {},
+    properties: {
+      /**
+       * Whether we're currently zoomed
+       */
+      _zoomed: {
+        type: Boolean,
+        value: false
+      }
+    },
     observers: [
-      'zooooom(extentsData)'
+      'zooooom(extentsData)',
+      '_sizeChanged(width, height)'
     ],
     /**
      * Sets the selectedDomain to the drawn zoom and shows the button
@@ -59,15 +68,25 @@ Element providing an on-chart zoom.
     zooooom: function(extentsData) {
       //make sure the button is visible so we can measure it
       this.toggleClass('hidden', false, this.$.resetBtn);
+      this._zoomed = true;
 
-      var rect = this.pxSvgElem.getBoundingClientRect(),
-          topLeftRect = this.getBoundingClientRect();
-      this.$.resetBtn.style.left = rect.width - 107 - Number(this.margin.right) + 'px'; 
-      this.$.resetBtn.style.top = (rect.top - topLeftRect.top) + Number(this.margin.top) + 'px';
-
+      this.rePositionButton();
+     
       this.set('selectedDomain', {x:extentsData.eX, y:extentsData.eY});
       this.fire('px-vis-selected-domain-updated', { 'data':{x:extentsData.eX, y:extentsData.eY}, 'method': 'set', 'dataVar': 'selectedDomain' });
-
+    },
+    _sizeChanged: function(width, height) {
+      this.rePositionButton();
+    },
+    rePositionButton: function() {
+      if(this._zoomed) {
+        this.debounce('repositionButton', function() {
+          var rect = this.pxSvgElem.getBoundingClientRect(),
+            topLeftRect = this.getBoundingClientRect();
+          this.$.resetBtn.style.left = (rect.width - 170) - Number(this.margin.right) + 'px';
+          this.$.resetBtn.style.top = (rect.top - topLeftRect.top) + Number(this.margin.top) + 'px';
+        }.bind(this), 20);
+      }
     },
     /**
      * resets the extents
@@ -75,6 +94,7 @@ Element providing an on-chart zoom.
      */
     resetZoom: function(){
       this.set('selectedDomain', 'reset');
+      this._zoomed = false;
       this.fire('px-vis-selected-domain-updated', { 'data':'reset', 'method': 'set', 'dataVar': 'selectedDomain' });
       this.toggleClass('hidden', true, this.$.resetBtn);
     }

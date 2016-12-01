@@ -1,4 +1,3 @@
-
 v1.0.0
 ==================
 * Upgrade to d3 4.4.x.
@@ -16,6 +15,20 @@ v1.0.0
 * changed px-vis-line to px-vis-line-svg
 * Added an additional svg element below the canvas element on svg-canvas
 * updated px-vis-line-svg in demos and updated threshold demo to use threshold-data
+
+v0.7.4
+==================
+* fix zoom resize on timeseries
+
+v0.7.3
+==================
+* fix behavior declaration order
+
+v0.7.2
+==================
+* ensure current zoom is preserved when resizing a chart
+* re-position the "reset zoom" button on resizing
+* ensure scale manages cases where all the data is 0
 
 v0.7.1
 ==================
