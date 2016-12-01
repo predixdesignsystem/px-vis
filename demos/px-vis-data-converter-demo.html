@@ -10,21 +10,10 @@
   <template>
     <p id="px-vis-data-converter-anchor" class="epsilon demo__title">px-vis-data-converter</p>
     <div class="demo u-p+" style="display:block">
-
-      <!-- need for data-converter -->
-        <px-vis-data
-          request-data = '[{
-            "type":"line",
-            "name":"mySeries",
-              "url":"../demo-data/delta-egt-cruise.json"
-            },{
-              "type":"line",
-              "url":"../demo-data/hpt-acc-position-cruise.json"
-          }]'
-          data-var="originalData"
-          lists="append"
-          response-data="{{originalData}}">
-        </px-vis-data>
+        <p class="u-mt0 u-pb">
+          px-vis-data-converter converts data from the timeseries service to the schema required by the vis framework.
+        </p>
+        
         <px-vis-data-converter
           data-key = "series"
           id-key = "id"
@@ -47,17 +36,11 @@
             <pre>[[_formatName(chartData)]]</pre>
           </div>
 
-          <div class="">
+          <div>
             <strong>series-config</strong>
             <pre>[[_formatName(seriesConfig)]]</pre>
           </div>
 
-        </div>
-
-        <div class="demo__discription">
-          <p class="u-mt0 u-pb">
-            px-vis-data-converter converts data from the timeseries service to the schema required by the vis framework.
-          </p>
         </div>
 
     </div>
@@ -74,95 +57,43 @@
     Polymer({
       is: "px-vis-data-converter-demo",
       properties:{
-        //basics
-        width: {
-          type : Number,
-          value : 500
-        },
-        height:{
-          type : Number,
-          value : 200
-        },
-        margin:{
-          type : Object,
-          value : {
-            "top": 10,
-            "right": 10,
-            "bottom": 10,
-            "left": 10
-          }
-        },
-        chartData:{
+        originalData : {
           type : Array,
-          value : [{
-              'x': 1397102460000,
-              'y': 0.56
-            },{
-              'x': 1397139660000,
-              'y': 0.4
-            },{
-              'x': 1397177400000,
-              'y': 0.43
-            },{
-              'x': 1397228040000,
-              'y': 0.33
-            },{
-              'x': 1397248260000,
-              'y': 0.47
-            },{
-              'x': 1397291280000,
-              'y': 0.41
-            },{
-              'x': 1397318100000,
-              'y': 0.26
-            },{
-              'x': 1397342100000,
-              'y': 0.42
-            },{
-              'x': 1397390820000,
-              'y': 0.27
-            },{
-              'x': 1397408100000,
-              'y': 0.38
-            },{
-              'x': 1397458800000,
-              'y': 0.36
-            },{
-              'x': 1397522940000,
-              'y': 0.32
-          }]
-        },
-        seriesConfig:{
-          type : Object,
-          value: {
-            'mySeries': {
-              "name":"My-Series",
-              "type": "line",
-              "x": 'x',
-              "y": 'y',
-              'color': "rgb(93,165,218)"
-            }
-          }
-        },
-        originalDataDemo:{
-          type : Array,
-          value: [
+          value:[
             {
-              'x': 1397102460000,
-              'y': 0.56
-            },{
-              'x': 1397139660000,
-              'y': 0.4
+              "series": [ 
+                [ 1397102460000, 11.4403 ], 
+                [ 1397139660000, 13.1913 ], 
+                [ 1427813520000, 17.1241 ],
+                [ 1427839740000, 34.1624 ],
+                [ 1427920920000, 17.9158 ],
+                [ null, null ]
+              ],
+              "max": 35.4784,
+              "min": 7.6531,
+              "mean": 15.330657585139331,
+              "id": "px-elliot",
+              "name": "elliot"
+            },
+            {
+              "series": [
+              [ 1397102460000, 96.5 ],
+              [ 1397139660000, 96.5 ],
+              [ 1427813520000, 79 ],
+              [ 1427839740000, 48.2 ], 
+              [ 1427920920000, 96.5 ],
+              [ null, null ]
+              ],
+              "max": 96.5,
+              "min": 10,
+              "mean": 91.5203170028819,
+              "id": "px-benoit",
+              "name": "benoit"
             }
           ]
         },
-        //chartExtents
-        chartExtents:{
-          type : Object,
-          value: {
-            "x": [Infinity,-Infinity],
-            "y": [0,-Infinity]
-          }
+        aggregatedData : {
+          type : Array
         },
         // demo snippet
         elempropDataConverter:{
@@ -178,10 +109,14 @@
         }
       }, //end properties
 
+      /*
+       * stringify data to be printed out
+       */
       _formatName: function(data) {
           var  demoDataCode = JSON.stringify(data, null, ' ');
           return demoDataCode;
       }
+      
     });
   </script>
 </dom-module>
