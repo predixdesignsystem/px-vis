@@ -1,3 +1,9 @@
+v0.7.2
+==================
+* ensure current zoom is preserved when resizing a chart
+* re-position the "reset zoom" button on resizing
+* ensure scale manages cases where all the data is 0
+
 v0.7.1
 ==================
 * Fixed register scroll for FF and IE
