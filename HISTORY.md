@@ -1,3 +1,7 @@
+v0.7.3
+==================
+* fix behavior declaration order
+
 v0.7.2
 ==================
 * ensure current zoom is preserved when resizing a chart
