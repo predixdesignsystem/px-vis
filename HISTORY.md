@@ -1,3 +1,7 @@
+==================
+* ensure current zoom is preserved when resizing a chart
+* re-position the "reset zoom" button on resizing
+
 v0.7.0
 ==================
 * ensure timeseries rendering to canvas with multiple lines are not cut off
