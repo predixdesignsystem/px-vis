@@ -377,7 +377,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
     _updateDomain:function(selectedDomain){
       if(this.x && this.y) {
         if(selectedDomain === 'reset') {
-          this._currentDomain();
+          this._runCurrentDomain();
         } else {
           //set new X domain if provided
           if(selectedDomain.x.length > 0) {
@@ -397,6 +397,14 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
           this.set('domainChanged', !this.domainChanged);
           this.fire('px-vis-domain-changed-updated', { 'dataVar': 'domainChanged', 'data': this.domainChanged, 'method':'set' });
         }
+      }
+    },
+    _runCurrentDomain: function() {
+
+      //because we want to run this observer manually make sure everything 
+      //is defined
+      if(this.completeSeriesConfig && this.chartData && this.x && this.y && this.chartExtents) {
+        this._currentDomain();
       }
     },
     _chartDataChanged: function() {
