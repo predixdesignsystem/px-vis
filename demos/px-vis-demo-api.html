@@ -1,0 +1,101 @@
+
+  <link rel="stylesheet" type="text/css" href="../css/px-vis-demo.css"/>
+  <!-- Import custom element. Note: see comment about relative paths to dependencies in the *.html file referenced below -->
+  <link rel="import" href="../../polymer/polymer.html">
+
+  <link rel="import" href="../../px-theme/px-theme-styles.html">
+  <style include="px-theme-styles" is="custom-style"></style>
+
+  <link rel="import" href="../../px-demo-snippet/px-demo-snippet.html"/>
+  <link rel="import" href="../../px-api-viewer/px-api-viewer.html" />
+  <link rel="import" href="px-vis-line-svg-demo.html">
+
+<dom-module id="px-vis-demo-api">
+
+  <!-- Wrap elements with auto-binding template to -->
+  <!-- allow use of Polymer bindings in main document -->
+  <template is="dom-bind">
+
+    <!-- description -->
+    <div class="hero u-p++ text--shadow" id="px-vis-anchor">
+      <a class="actionable flex flex--right flex--middle" href="https://github.com/PredixDev/px-vis" target="_blank"><iron-icon class="menu__open" icon="fa:fa-github"></iron-icon>View on Github</a>
+      <h1 class="delta">{{componentName}}</h1>
+      <div class="description-text">
+        <p>
+          {{description}}
+        </p>
+      </div>
+      <div class="flex">
+        <img class="u-mr--" src="https://img.shields.io/travis/PredixDev/px-vis/master.svg?style=flat-square" alt="Travis" onerror="this.style.display='none'"/>
+        <img class="u-mr--" src="https://img.shields.io/bower/v/px-vis.svg?style=flat-square" alt="Bower" onerror="this.style.display='none'"/>
+        <img class="u-mr--" src="https://img.shields.io/github/issues-raw/PredixDev/px-vis.svg?style=flat-square" alt="Issues" onerror="this.style.display='none'"/>
+      </div>
+    </div>
+
+    <!-- mega demo -->
+    <div class="mega-demo u-p++">
+      
+      <content></content>
+      <px-demo-snippet
+        element-properties="[[elempropLine]]"
+        element-name="{{componentName}}"
+        code-link="{{codePenLink}}">
+      </px-demo-snippet>
+
+    </div>
+    <div class="apiContainer">
+      <div class="flex flex--col api u-mt++" >
+        <div>
+          <px-api-viewer source="{{componentName}}"></px-api-viewer>
+        </div>
+      </div>
+    </div> 
+    <footer class="footer flex flex--center">
+      <div class="footer__container u-pv++">
+        <div>
+          <a href="https://ge.com/digital" >
+            <img src="../monogram-wdmk.png" alt="GE Monogram" class="footer__img">
+          </a>
+        </div>
+        <div class="footer__list">
+          <ul class="list-inline list-inline--delimited">
+            <li>
+              <a href="http://predix.io/legal" class="footer__list--lnk">Legal</a>
+            </li>
+            <li>
+              <a href="mailto:info@predix.io" class="footer__list--lnk">Contact Us</a>
+            </li>
+            <li>Copyright &copy; 2016 General Electric Company. All rights reserved.</li>
+          </ul>
+        </div>
+      </div>
+    </footer>
+  </template>
+
+  <script>
+    Polymer({
+      is: "px-vis-demo-api",
+      properties:{
+        /*
+         * Name of vis component that is being demoed 
+         */
+        componentName: {
+          type : String
+        },
+        /*
+         * Description of vis component that is being demoed 
+         */
+        description: {
+          type: String
+        },
+        /*
+         * Configuration object that will be displayed in the demo snippet  
+         */
+        elempropLine: {
+          type : Object
+        }
+      }
+  });    
+  </script>
+</dom-module>
+
