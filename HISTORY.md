@@ -14,7 +14,7 @@ v1.0.0
 * Fix placement of zoom button
 * changed px-vis-line to px-vis-line-svg
 * Added an additional svg element below the canvas element on svg-canvas
-* updated px-vis-line-svg in demos and updated threshold demo to use threshold-data
+* demos: updated px-vis-line-svg, threshold demo to use threshold-data, removed vis-data from data-converter
 
 v0.7.4
 ==================
