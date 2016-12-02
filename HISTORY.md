@@ -2,20 +2,28 @@
 v1.0.0
 ==================
 * Upgrade to d3 4.4.x.
-* Changed time scale to UTC by default.
-* Added timeLocal option for local time
-* Added new threshold configuration similar to events
-* Changed threshold data property from chartData to thresholdData
+* Scale and axis changes:
+  * Changed time scale to UTC by default.
+  * Added timeLocal option for local time
+* Threshold changes:
+  * Added new threshold configuration similar to events
+  * Changed threshold data property from chartData to thresholdData
 * Added improved resize methods to chart behavior
-* Added mechanism for redrawing an SVG serie on top of others
-* Added layer generation to chart behavior
-* Added ability to generate layers for any svg element dynamically
-* modified interaction space so it doesnt clone svg
-* modified thresholds so it doesnt clone svg
+* Added mechanism for redrawing an SVG series on top of others
+* Layers
+  * Added layer generation to chart behavior
+  * Added ability to generate layers for any svg element dynamically
+  * modified interaction space so it doesnt clone svg
+  * modified thresholds so it doesnt clone svg
+  * Added an additional svg element below the canvas element on svg-canvas
 * Fix placement of zoom button
 * changed px-vis-line to px-vis-line-svg
-* Added an additional svg element below the canvas element on svg-canvas
-* updated px-vis-line-svg in demos and updated threshold demo to use threshold-data
+* Changed how chart extents are calculated:
+  * chartExtents are now only dev set
+  * added dataExtents for the chart extents calculated from data or range.
+  * scale will use chartExtents directly and fallback on dataExtents if not present.
+* Demo Updates:
+  * updated px-vis-line-svg in demos and updated threshold demo to use threshold-data
 
 v0.7.1
 ==================
