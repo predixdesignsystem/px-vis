@@ -1,3 +1,7 @@
+v0.7.5
+==================
+* protect running zoom too early
+
 v0.7.4
 ==================
 * fix zoom resize on timeseries

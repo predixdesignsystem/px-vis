@@ -72,10 +72,12 @@ Element providing an on-chart zoom.
     },
     rePositionButton: function() {
       this.debounce('repositionButton', function() {
-        var rect = this.pxSvgElem.getBoundingClientRect(),
-          topLeftRect = this.getBoundingClientRect();
-        this.$.resetBtn.style.left = rect.width - 170 - Number(this.margin.right) + 'px';
-        this.$.resetBtn.style.top = (rect.top - topLeftRect.top) + Number(this.margin.top) + 'px';
+        if(this.pxSvgElem) {
+          var rect = this.pxSvgElem.getBoundingClientRect(),
+            topLeftRect = this.getBoundingClientRect();
+          this.$.resetBtn.style.left = rect.width - 170 - Number(this.margin.right) + 'px';
+          this.$.resetBtn.style.top = (rect.top - topLeftRect.top) + Number(this.margin.top) + 'px';
+        } 
       }.bind(this), 20);
     },
     /**
