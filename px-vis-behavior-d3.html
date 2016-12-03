@@ -537,22 +537,22 @@ PxVisBehaviorD3.selectedTimeDomain = [{
       this._preventDomainUpdate = true;
 
       var newDomain = {},
-          chartExtents = {};
+          dataExtents = {};
       // newDomain.y = this.selectedDomain.y;
       newDomain.x = [];
       newDomain.x[0] = Number(Px.moment(this.range.from, Px.moment.ISO_8601).format('x'));
       newDomain.x[1] = Number(Px.moment(this.range.to, Px.moment.ISO_8601).format('x'));
 
-      if(this.chartExtents && this.chartExtents.y.length > 0) {
-        chartExtents["y"] = this.chartExtents.y;
+      if(this.dataExtents && this.dataExtents.y.length > 0) {
+        dataExtents["y"] = this.dataExtents.y;
       } else {
-        chartExtents.y = [Infinity, -Infinity];
+        dataExtents.y = [Infinity, -Infinity];
       }
 
-      chartExtents.x = newDomain.x;
+      dataExtents.x = newDomain.x;
 
       // this.set('selectedDomain', newDomain);
-      this.set('chartExtents', chartExtents);
+      this.set('dataExtents', dataExtents);
 
       this._preventDomainUpdate = false;
     }

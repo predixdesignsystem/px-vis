@@ -244,51 +244,66 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @method _currentDomain
      */
      _currentDomain: function() {
-      var xOrd = this.xAxisType === 'ordinal',
-        yOrd = this.yAxisType === 'ordinal',
-        xTime = this.xAxisType === 'time' || this.xAxisType === 'timeLocal',
-        doX = xTime ? false : true,
-        doY = true,
-        keys = Object.keys(this.completeSeriesConfig),
-        exts = {
-          'x': (this.chartExtents && this.chartExtents['x']) ? this.chartExtents['x'] : [],
-          'y': (this.chartExtents && this.chartExtents['y']) ? this.chartExtents['y'] : []
-        };
-      //if our chart data has not changed, then dont go through all the data. Just use the extents we have
-      if(!this._chartDataHasChanged && exts.x.length > 0 && exts.x[0] !== Infinity && exts.x[1] !== -Infinity){
-        xTime = false;
-        doX = false;
+      if(this._doesObjHaveValues(this.chartData) && this.x && this.y && this._doesObjHaveValues(this.completeSeriesConfig)) {
+        var xOrd = this.xAxisType === 'ordinal',
+          yOrd = this.yAxisType === 'ordinal',
+          xTime = this.xAxisType === 'time' || this.xAxisType === 'timeLocal',
+          doX = xTime ? false : true,
+          doY = true,
+          keys = Object.keys(this.completeSeriesConfig),
+          exts = {
+            'x': [],
+            'y': []
+          };
+
+        if(this.chartExtents && this.chartExtents['x']) {
+          exts.x = this.chartExtents['x'];
+        } else if(this.dataExtents && this.dataExtents['x']) {
+          exts.x = this.dataExtents['x'];
+        }
+
+        if(this.chartExtents && this.chartExtents['y']) {
+          exts.y = this.chartExtents['y'];
+        } else if(this.dataExtents && this.dataExtents['y']) {
+          exts.y = this.dataExtents['y'];
+        }
+
+        //if our chart data has not changed, then dont go through all the data. Just use the extents we have
+        if(exts.x.length > 0 && exts.x[0] !== Infinity && exts.x[1] !== -Infinity){
+          xTime = false;
+          doX = false;
+        }
+        if(exts.y.length > 0 && exts.y[0] !== Infinity && exts.y[1] !== -Infinity){
+          doY = false;
+        }
+
+        //if we have no chartData, dont look for new extents
+        if(this.chartData.length === 0) {
+          xTime = false;
+          doX = false;
+          doY = false;
+        }
+
+        //if we need, Chug through the data to max and min
+        if(doX || doY || xTime) {
+          this._findMinMax(this.chartData, doX, doY, xOrd, yOrd, xTime, exts, keys);
+        }
+
+        // this.set('_chartDataHasChanged', false);
+
+        this.x.domain(exts.x);
+        this.y.domain(exts.y);
+
+        // TODO would a bool be better? Flip when run?
+        // Set the domains
+        this.set('currentDomainX', this.x.domain());
+        this.set('currentDomainY', this.y.domain());
+        this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+
+        this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
+        this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
+        this.fire('px-vis-domain-changed-updated', { 'dataVar': 'domainChanged', 'data': this.domainChanged, 'method':'set' });
       }
-      if(!this._chartDataHasChanged && exts.y.length > 0 && exts.y[0] !== Infinity && exts.y[1] !== -Infinity){
-        doY = false;
-      }
-
-      //if we have no chartData, dont look for new extents
-      if(this.chartData.length === 0) {
-        xTime = false;
-        doX = false;
-        doY = false;
-      }
-
-      //if we need, Chug through the data to max and min
-      if(doX || doY || xTime) {
-        this._findMinMax(this.chartData, doX, doY, xOrd, yOrd, xTime, exts, keys);
-      }
-
-      this.set('_chartDataHasChanged', false);
-
-      this.x.domain(exts.x);
-      this.y.domain(exts.y);
-
-      // TODO would a bool be better? Flip when run?
-      // Set the domains
-      this.set('currentDomainX', this.x.domain());
-      this.set('currentDomainY', this.y.domain());
-      this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
-
-      this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
-      this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
-      this.fire('px-vis-domain-changed-updated', { 'dataVar': 'domainChanged', 'data': this.domainChanged, 'method':'set' });
     },
 
     _processOrdinalRange: function(axis, domainValues) {
