@@ -14,20 +14,20 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon"/>
 
   <link rel="import" href="demos/px-vis-demo-api.html">
-  <link rel="import" href="demos/px-vis-line-svg-demo.html">
+  <link rel="import" href="demos/px-vis-interaction-space-demo.html">
 
 </head>
 <body>
   <template id="just-for-demo" is="dom-bind">
 
     <px-vis-demo-api
-      component-name="px-vis-line-svg"
+      component-name="px-vis-interaction-space"
       description="{{description}}"
       elemprop-line="{{elempropLine}}"
-      codepen-link="http://codepen.io/menkhakl/pen/XjVqBW"
+      codepen-link="http://codepen.io/menkhakl/pen/pEpKvr"
       > 
       <!--add demo tag-->
-      <px-vis-line-svg-demo></px-vis-line-svg-demo>
+      <px-vis-interaction-space-demo></px-vis-interaction-space-demo>
     </px-vis-demo-api>
 
   </template>
@@ -35,15 +35,21 @@
 <script>
   var template = document.querySelector('template[is=dom-bind]'),
       elempropLine = {
+        "xAxisType":"time",
         "svg":"[[svg]]",
-        "seriesId":"mySeries",
-        "completeSeriesConfig":"[[seriesConfig]]",
+        "width":"[[width]]",
+        "height":"[[height]]",
+        "margin":"[[margin]]",
+        "completeSeriesConfigeries-config":"[[seriesConfig]]",
         "chartData":"[[chartData]]",
+        "tooltipData":"{{tooltipData}}",
+        "extentsData":"{{extentsData}}",
         "x":"[[x]]",
         "y":"[[y]]",
-        "domainChanged":"[[domainChanged]]"
+        "currentDomainX":"[[currentDomainX]]",
+        "currentDomainY":"[[currentDomainY]]"
       },
-      description = "Example of a line drawing object. Bound elements are set from other components, such as px-vis-svg and px-vis-scale, and passed into px-vis-line-svg.";
+      description = "The interaction-space provides the basis for all on-chart interaction. It detects mouseovers on the chart and builds the data objects which other components then consume.";
       
       template.elempropLine = elempropLine;
       template.description = description;
