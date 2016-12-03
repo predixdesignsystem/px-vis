@@ -57,6 +57,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           x="{{x}}"
           y="{{y}}"
           chart-extents="[[chartExtents]]"
+          data-extents="[[dataExtents]]"
           complete-series-config="[[completeSeriesConfig]]"
           chart-data="[[chartData]]"
           domain-changed="{{domainChanged}}"
@@ -149,6 +150,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           PxVisBehavior.dataset,
           PxVisBehavior.completeSeriesConfig,
           PxVisBehavior.commonMethods,
+          PxVisBehavior.dataExtents,
           PxVisBehavior.axisTypes,
           PxVisBehaviorChart.chartCommon,
           Polymer.IronResizableBehavior,
@@ -285,11 +287,11 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
 
             this._updateDummyData(newXRange);
 
-            this.set('chartExtents', {
+            this.set('dataExtents', {
               "x":newXRange,
               "y":[Infinity,-Infinity]});
 
-          } else if(this._doesObjHaveValues(this.chartExtents) && this._doesObjHaveValues(this.chartExtents.x) && this._doesObjHaveValues(this.chartExtents.y)) {
+          } else if(this._doesObjHaveValues(this.dataExtents) && this._doesObjHaveValues(this.dataExtents.x) && this._doesObjHaveValues(this.dataExtents.y)) {
             if(!this.disableEmptyRender){
               var config = this.seriesConfig[Object.keys(this.seriesConfig)[0]];
               //if we're using dummy data make sure it reflects the new range
@@ -299,9 +301,9 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
               }
             }
             //set range in the data
-            this.set('chartExtents', {
+            this.set('dataExtents', {
               "x": newXRange,
-              "y": [this.chartExtents.y[0],this.chartExtents.y[1]]
+              "y": [this.dataExtents.y[0],this.dataExtents.y[1]]
             });
 
             var newDomain = {
