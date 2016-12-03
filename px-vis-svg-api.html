@@ -4,7 +4,6 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>px-vis</title>
-  <!--<link rel="stylesheet" type="text/css" href="../css/px-vis-demo.css"/>-->
   <!-- Import custom element. Note: see comment about relative paths to dependencies in the *.html file referenced below -->
   <script src="../webcomponentsjs/webcomponents-lite.js"></script>
 
@@ -14,18 +13,20 @@
   <link rel="icon" href="favicon.ico" type="image/x-icon"/>
 
   <link rel="import" href="demos/px-vis-demo-api.html">
+  <link rel="import" href="demos/px-vis-svg-demo.html">
 
 </head>
 <body>
   <template id="just-for-demo" is="dom-bind">
 
     <px-vis-demo-api
-      component-name="px-vis-line-svg"
-      description="Example of a line drawing object. Bound elements are set from other components, such as px-vis-svg and px-vis-scale, and passed into px-vis-line-svg."
+      component-name="px-vis-svg"
+      description="{{description}}"
       elemprop-line="{{elempropLine}}"
+      codepen-link="http://codepen.io/menkhakl/pen/GjOVvr"
       > 
       <!--add demo tag-->
-      <px-vis-line-svg-demo></px-vis-line-svg-demo>
+      <px-vis-svg-demo></px-vis-svg-demo>
     </px-vis-demo-api>
 
   </template>
@@ -33,14 +34,14 @@
 <script>
   var template = document.querySelector('template[is=dom-bind]'),
       elempropLine = {
-        "svg":"[[svg]]",
-        "seriesId":"mySeries",
-        "completeSeriesConfig":"[[seriesConfig]]",
-        "chartData":"[[chartData]]",
-        "x":"[[x]]",
-        "y":"[[y]]",
-        "domainChanged":"[[domainChanged]]"
-      };
+        "width":"[[width]]",
+        "height":"[[height]]",
+        "margin":"[[margin]]",
+        "svg":"{{svg}}"
+      },
+      description = "All charts need a drawing space SVG component. These cannot be seen but provide the basic framework for drawing objects to be displayed. The svg component provides the drawing space and d3 instantiated drawing object. The svg component returns an 'svg' variable to be passed into drawing components. Note: All the subsequent charts will have this component, but they will not be shown in the code snippet.";
+      
       template.elempropLine = elempropLine;
+      template.description = description;
 </script>
 </html>
