@@ -107,9 +107,11 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
         </template>
 
         <px-vis-axis
+          id="xAxis"
           svg="[[svg]]"
           axis="[[x]]"
           axis-id="x"
+          axis-type="[[xAxisType]]"
           height="[[height]]"
           width="[[width]]"
           margin="[[margin]]"
@@ -156,7 +158,10 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           Polymer.IronResizableBehavior,
           PxVisBehaviorChart.saveImage,
           PxVisBehaviorChart.chartAutoResize,
-          PxVisBehaviorD3.domainUpdate
+          PxVisBehaviorD3.domainUpdate,
+          PxVisBehaviorChart.registerConfigs,
+          PxVisBehaviorChart.axisConfigs,
+          PxVisBehaviorChart.subConfiguration
         ],
 
         /**
@@ -226,6 +231,10 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           },
         },
 
+        observers: [
+          '_xAxisConfigChanged(xAxisConfig.*)',
+        ],
+
         listeners: {
           'iron-resize': '_onIronResize'
         },
@@ -233,6 +242,11 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
         attached: function() {
           this._onIronResize();
         },
+
+        _xAxisConfigChanged: function(conf) {
+          this._applyConfigToElement(this.xAxisConfig, this.$.xAxis);
+        },
+
         /**
          * Dom if function to decide if a repeated item is above our limit
          */
