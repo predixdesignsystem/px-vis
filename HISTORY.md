@@ -16,13 +16,15 @@ v1.0.0
   * modified thresholds so it doesnt clone svg
   * Added an additional svg element below the canvas element on svg-canvas
 * Fix placement of zoom button
-* changed px-vis-line to px-vis-line-svg
+* Changed px-vis-line to px-vis-line-svg for consistency
 * Changed how chart extents are calculated:
   * chartExtents are now only dev set
-  * added dataExtents for the chart extents calculated from data or range.
+  * added dataExtents behavior for the chart extents calculated from data or range.
   * scale will use chartExtents directly and fallback on dataExtents if not present.
 * Demo Updates:
-  * updated px-vis-line-svg in demos and updated threshold demo to use threshold-data
+  * updated px-vis-line-svg in demos  
+  * updated threshold demo to use threshold-data
+* Added navigatorConfig and ability to configure chart navigator with it
 
 v0.7.4
 ==================
