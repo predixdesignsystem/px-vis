@@ -646,7 +646,9 @@ PxVisBehavior.commonMethods = {
    *
    */
   _getPieColorForIndex: function(index) {
-    return commonColors.properties.dataVisColors.value[commonColors.properties.seriesColorOrder.value[index]];
+    var dataVisColors = this.dataVisColors || commonColors.properties.dataVisColors.value;
+    var seriesColorOrder = this.seriesColorOrder || commonColors.properties.seriesColorOrder.value;
+    return dataVisColors[seriesColorOrder[index]];
   },
   /**
    * escapes '.' in css selectors so that we can appropriately select stuff with dots in thei ids
