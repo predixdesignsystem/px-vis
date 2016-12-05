@@ -22,8 +22,8 @@ v1.0.0
   * added dataExtents behavior for the chart extents calculated from data or range.
   * scale will use chartExtents directly and fallback on dataExtents if not present.
 * Demo Updates:
-  * updated px-vis-line-svg in demos  
-  * updated threshold demo to use threshold-data
+  * updated demos with v1 changes
+  * all subcomponents have an API Documentation page
 * Added navigatorConfig and ability to configure chart navigator with it
 
 v0.7.4

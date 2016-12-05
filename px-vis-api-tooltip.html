@@ -1,0 +1,53 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>px-vis</title>
+  <!--<link rel="stylesheet" type="text/css" href="../css/px-vis-demo.css"/>-->
+  <!-- Import custom element. Note: see comment about relative paths to dependencies in the *.html file referenced below -->
+  <script src="../webcomponentsjs/webcomponents-lite.js"></script>
+
+  <link rel="import" href="../px-theme/px-theme-styles.html">
+  <style include="px-theme-styles" is="custom-style"></style>
+
+  <link rel="icon" href="favicon.ico" type="image/x-icon"/>
+
+  <link rel="import" href="demos/px-vis-demo-api.html">
+  <link rel="import" href="demos/px-vis-tooltip-demo.html">
+
+</head>
+<body>
+  <template id="just-for-demo" is="dom-bind">
+
+    <px-vis-demo-api
+      component-name="px-vis-tooltip"
+      description="{{description}}"
+      elemprop-line="{{elempropLine}}"
+      codepen-link="http://codepen.io/menkhakl/pen/xEpzBY"
+      > 
+      <!--add demo tag-->
+      <px-vis-tooltip-demo></px-vis-tooltip-demo>
+    </px-vis-demo-api>
+
+  </template>
+</body>
+<script>
+  var template = document.querySelector('template[is=dom-bind]'),
+      elempropLine = {
+        "hoverTarget":"[[mouseRect]]",
+        "mousePosition":"[[mousePosition]]",
+        "width":"250",
+        "margin":"[[margin]]",
+        "chartData":"[[chartData]]",
+        "tooltipData":"[[tooltipData]]",
+        "completeSeriesConfig":"[[seriesConfig]]",
+        "xAxisType":"time",
+        "tooltipStyle":"light",
+      },
+      description = "The tooltip provides similar data display functionality to the register, but on chart and without the user interaction.";
+      
+      template.elempropLine = elempropLine;
+      template.description = description;
+</script>
+</html>
