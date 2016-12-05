@@ -24,6 +24,7 @@ v1.0.0
 * Demo Updates:
   * updated px-vis-line-svg in demos  
   * updated threshold demo to use threshold-data
+  * all subcomponents have an API Documentation page
 * Added navigatorConfig and ability to configure chart navigator with it
 
 v0.7.1
