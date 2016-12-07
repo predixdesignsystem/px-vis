@@ -22,9 +22,23 @@ v1.0.0
   * added dataExtents behavior for the chart extents calculated from data or range.
   * scale will use chartExtents directly and fallback on dataExtents if not present.
 * Demo Updates:
-  * updated px-vis-line-svg in demos  
-  * updated threshold demo to use threshold-data
+  * updated demos with v1 changes
+  * all subcomponents have an API Documentation page
 * Added navigatorConfig and ability to configure chart navigator with it
+
+v0.7.4
+==================
+* fix zoom resize on timeseries
+
+v0.7.3
+==================
+* fix behavior declaration order
+
+v0.7.2
+==================
+* ensure current zoom is preserved when resizing a chart
+* re-position the "reset zoom" button on resizing
+* ensure scale manages cases where all the data is 0
 
 v0.7.1
 ==================

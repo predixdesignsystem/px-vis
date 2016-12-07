@@ -85,6 +85,9 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
        *
        */
       _chartDataHasChanged: {
+        type: Boolean
+      },
+      _calculatingDomain: {
         type: Boolean,
         value: false
       }
@@ -93,7 +96,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
     observers: [
       '_setXScale(width,margin)',
       '_setYScale(height,margin)',
-      '_currentDomain(chartData.*,x,y,completeSeriesConfig,dataExtents)',
+      '_currentDomain(_chartDataHasChanged.*,x,y,completeSeriesConfig,dataExtents)',
       '_currentDomain(chartExtents,dataExtents)',
       '_updateDomain(selectedDomain)',
       '_chartDataChanged(chartData.*)'
@@ -132,7 +135,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      */
     _setXScale: function(width,margin) {
       var w = Math.max(width - margin.left - margin.right,0);
-      this.set('x', this._setScale(this.xAxisType,[0, w]));
+      this.set('x', this._setScale(this.xAxisType,[0, w], this.x));
       this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
     },
     /**
@@ -142,7 +145,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      */
     _setYScale: function(height,margin) {
       var h = Math.max(height - margin.top - margin.bottom,0);
-      this.set('y', this._setScale(this.yAxisType,[h, 0]));
+      this.set('y', this._setScale(this.yAxisType,[h, 0], this.y));
       this.fire('px-vis-y-updated', { 'dataVar': 'y', 'data': this.y, 'method':'set' });
     },
     /**
@@ -150,17 +153,25 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      *
      * @method _setScale
      */
-    _setScale: function(val, range){
+    _setScale: function(val, range, currentAxis){
       // TODO support more types: log, quantile, etc
+      var result;
+
       if(val === 'time') {
-        return Px.d3.scaleUtc().nice().range(range);
+        result = Px.d3.scaleUtc().nice().range(range);
       } else if(val === 'timeLocal') {
-        return Px.d3.scaleTime().nice().range(range);
+        result = Px.d3.scaleTime().nice().range(range);
       } else if(val === 'linear'){
-        return Px.d3.scaleLinear().nice().range(range);
+        result = Px.d3.scaleLinear().nice().range(range);
       } else { //ordinal
-        return Px.d3.scalePoint().range(range).padding(0.5);
+        result = Px.d3.scalePoint().range(range).padding(0.5);
       }
+
+      if(currentAxis) {
+        result.domain(currentAxis.domain());
+      }
+
+      return result;
     },
 
     _getDataExtents: function(d,yKeysArr) {
@@ -244,7 +255,8 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @method _currentDomain
      */
      _currentDomain: function() {
-      if(this._doesObjHaveValues(this.chartData) && this.x && this.y && this._doesObjHaveValues(this.completeSeriesConfig)) {
+
+      if(!this._calculatingDomain && this._doesObjHaveValues(this.chartData) && this.x && this.y && this._doesObjHaveValues(this.completeSeriesConfig)) {
         var xOrd = this.xAxisType === 'ordinal',
           yOrd = this.yAxisType === 'ordinal',
           xTime = this.xAxisType === 'time' || this.xAxisType === 'timeLocal',
@@ -257,71 +269,90 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
             'y': [0, 0]
           };
 
-        //if the dev specified extents, use them
-        if(this.chartExtents && this.chartExtents['x'].length === 2) {
-          exts.x[0] = (this.chartExtents['x'][0] === 'dynamic') ? Infinity : this.chartExtents['x'][0];
-          exts.x[1] = (this.chartExtents['x'][1] === 'dynamic') ? -Infinity : this.chartExtents['x'][1];
-        }
-        //if there are dataExtents, use them if they dont overwrite the chartExtents
-        if(this.dataExtents && this.dataExtents['x']) {
+        this._calculatingDomain = true;
+
+        if(!this._chartDataHasChanged && this.selectedDomain.x && this.selectedDomain.x.length
+        && ((this.selectedDomain.y && this.selectedDomain.y.length) || (this.xAxisType === 'time' || this.xAxisType === 'timeLocal'))) {
+          this._updateDomain(this.selectedDomain);
+        } else {
+
+
+          //if the dev specified extents, use them
           if(this.chartExtents && this.chartExtents['x'].length === 2) {
-            exts.x[0] = (this.chartExtents['x'][0] === 'dynamic') ? this.dataExtents['x'][0] : this.chartExtents['x'][0];
-            exts.x[1] = (this.chartExtents['x'][1] === 'dynamic') ? this.dataExtents['x'][1] : this.chartExtents['x'][1];
-          } else {
-            exts.x = this.dataExtents['x'];
+            exts.x[0] = (this.chartExtents['x'][0] === 'dynamic') ? Infinity : this.chartExtents['x'][0];
+            exts.x[1] = (this.chartExtents['x'][1] === 'dynamic') ? -Infinity : this.chartExtents['x'][1];
           }
-        }
+          //if there are dataExtents, use them if they dont overwrite the chartExtents
+          if(this.dataExtents && this.dataExtents['x']) {
+            if(this.chartExtents && this.chartExtents['x'].length === 2) {
+              exts.x[0] = (this.chartExtents['x'][0] === 'dynamic') ? this.dataExtents['x'][0] : this.chartExtents['x'][0];
+              exts.x[1] = (this.chartExtents['x'][1] === 'dynamic') ? this.dataExtents['x'][1] : this.chartExtents['x'][1];
+            } else {
+              exts.x = this.dataExtents['x'];
+            }
+          }
 
-        //if the dev specified extents, use them
-        if(this.chartExtents && this.chartExtents['y'].length === 2) {
-          exts.y[0] = (this.chartExtents['y'][0] === 'dynamic') ? Infinity : this.chartExtents['y'][0];
-          exts.y[1] = (this.chartExtents['y'][1] === 'dynamic') ? -Infinity : this.chartExtents['y'][1];
-        }
-        //if there are dataExtents, use them if they dont overwrite the chartExtents
-        if(this.dataExtents && this.dataExtents['y']) {
+          //if the dev specified extents, use them
           if(this.chartExtents && this.chartExtents['y'].length === 2) {
-            exts.y[0] = (this.chartExtents['y'][0] === 'dynamic') ? this.dataExtents['y'][0] : this.chartExtents['y'][0];
-            exts.y[1] = (this.chartExtents['y'][1] === 'dynamic') ? this.dataExtents['y'][1] : this.chartExtents['y'][1];
-          } else {
-            exts.y = this.dataExtents['y'];
+            exts.y[0] = (this.chartExtents['y'][0] === 'dynamic') ? Infinity : this.chartExtents['y'][0];
+            exts.y[1] = (this.chartExtents['y'][1] === 'dynamic') ? -Infinity : this.chartExtents['y'][1];
           }
+          //if there are dataExtents, use them if they dont overwrite the chartExtents
+          if(this.dataExtents && this.dataExtents['y']) {
+            if(this.chartExtents && this.chartExtents['y'].length === 2) {
+              exts.y[0] = (this.chartExtents['y'][0] === 'dynamic') ? this.dataExtents['y'][0] : this.chartExtents['y'][0];
+              exts.y[1] = (this.chartExtents['y'][1] === 'dynamic') ? this.dataExtents['y'][1] : this.chartExtents['y'][1];
+            } else {
+              exts.y = this.dataExtents['y'];
+            }
+          }
+
+
+          //if our chart data has not changed, then dont go through all the data. Just use the extents we have
+          if(exts.x.length > 0 && exts.x[0] !== Infinity && exts.x[1] !== -Infinity){
+            xTime = false;
+            doX = false;
+          }
+          if(exts.y.length > 0 && exts.y[0] !== Infinity && exts.y[1] !== -Infinity){
+            doY = false;
+          }
+
+          //if we have no chartData, dont look for new extents
+          if(this.chartData.length === 0) {
+            xTime = false;
+            doX = false;
+            doY = false;
+          }
+
+          //if we need, Chug through the data to max and min
+          if(doX || doY || xTime) {
+            this._findMinMax(this.chartData, doX, doY, xOrd, yOrd, xTime, exts, keys);
+          }
+
+          this._chartDataHasChanged = false;
+
+          //if min and max are the same add 1 so we still get a range
+          if(exts.x[1] === exts.x[0]) {
+            exts.x[1] += 1;
+          }
+          if(exts.y[1] === exts.y[0]) {
+            exts.y[1] += 1;
+          }
+
+          this.x.domain(exts.x);
+          this.y.domain(exts.y);
+
+          // Set the domains
+          this.set('currentDomainX', this.x.domain());
+          this.set('currentDomainY', this.y.domain());
+          this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+
+          this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
+          this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
+          this.fire('px-vis-domain-changed-updated', { 'dataVar': 'domainChanged', 'data': this.domainChanged, 'method':'set' });
         }
 
-        //if our chart data has not changed, then dont go through all the data. Just use the extents we have
-        if(exts.x.length > 0 && exts.x[0] !== Infinity && exts.x[1] !== -Infinity){
-          xTime = false;
-          doX = false;
-        }
-        if(exts.y.length > 0 && exts.y[0] !== Infinity && exts.y[1] !== -Infinity){
-          doY = false;
-        }
-
-        //if we have no chartData, dont look for new extents
-        if(this.chartData.length === 0) {
-          xTime = false;
-          doX = false;
-          doY = false;
-        }
-
-        //if we need, Chug through the data to max and min
-        if(doX || doY || xTime) {
-          this._findMinMax(this.chartData, doX, doY, xOrd, yOrd, xTime, exts, keys);
-        }
-
-        // this.set('_chartDataHasChanged', false);
-
-        this.x.domain(exts.x);
-        this.y.domain(exts.y);
-
-        // TODO would a bool be better? Flip when run?
-        // Set the domains
-        this.set('currentDomainX', this.x.domain());
-        this.set('currentDomainY', this.y.domain());
-        this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
-
-        this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
-        this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
-        this.fire('px-vis-domain-changed-updated', { 'dataVar': 'domainChanged', 'data': this.domainChanged, 'method':'set' });
+        this._calculatingDomain = false;
       }
     },
 

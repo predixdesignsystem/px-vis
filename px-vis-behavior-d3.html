@@ -1128,6 +1128,7 @@ PxVisBehaviorD3.lineShared = [{
         counter;
 //FIXME define showGaps
 //FIXME figure out defaults and what handling
+//FIXME counter undefined when data doens't exists (time filtered data on XY for example)
     if(this.showGaps) {
       line = Px.d3.line()
         .x(function(d) {
@@ -1226,9 +1227,7 @@ PxVisBehaviorD3.serieToRedrawOnTopSVG = [{
   _drawSVGOnTop: function(idToRedraw, selfId, d3Selection) {
     //is this scatter involved in redraw?
     if(idToRedraw === selfId) {
-
       d3Selection.raise();
-
     }
   }
 }, PxVisBehavior.serieToRedrawOnTop, PxVisBehaviorD3.svg];

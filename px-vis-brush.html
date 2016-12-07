@@ -182,8 +182,6 @@ This element sets the selectedDomain property based on the extents box. The sele
 
         if(this._isObjEmpty(this._brush)) {
 
-          // make sure the brush draws on top of everything; returns a set property brushSvg
-          this.cloneSVGElem(this.svg.node(),'brushSvg');
           // first, define the brush using the axis
           this._brush = Px.d3.brushX()
             .extent(domain)
@@ -193,7 +191,7 @@ This element sets the selectedDomain property based on the extents box. The sele
             .on("end", this._brushend.bind(this));
 
           // now that we have our new g, proceed with drawing brush
-          this._brushGroup = this.brushSvg.append("g")
+          this._brushGroup = this.svg.append("g")
             .attr("class", "brush")
             .call(this._brush)
             .call(this._brush.move, this.axis.range());
@@ -209,7 +207,7 @@ This element sets the selectedDomain property based on the extents box. The sele
             .attr('shape-rendering','crispEdges');
 
           if(this.gradientOverlay){
-            var gradient = this.brushSvg.append("defs")
+            var gradient = this.svg.append("defs")
               .append("linearGradient")
               .attr("id", "overlayGradient");
 
@@ -275,7 +273,7 @@ This element sets the selectedDomain property based on the extents box. The sele
     _brushstart: function() {
       this.set("_brushing", true);
       //TODO do we want to issue a color change? if not, delete/ comment out
-      this.brushSvg.classed("selecting", true);
+      this.svg.classed("selecting", true);
     },
     /**
      * Helper function to remove class "selecting" to elems not selected in the brush
@@ -291,7 +289,7 @@ This element sets the selectedDomain property based on the extents box. The sele
 
       // console.log(d3.event.selection);
       //TODO do we want to issue a color change? if not, delete/ comment out
-      this.brushSvg.classed("selecting", false);
+      this.svg.classed("selecting", false);
     },
     /**
      * Helper function fired whtn the brush is moved / extents changed

@@ -48,7 +48,6 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
 
       <div id="wrapper" style="height:100%;width:100%">
         <px-vis-scale
-          svg="[[svg]]"
           x-axis-type="[[xAxisType]]"
           y-axis-type="[[yAxisType]]"
           width="[[width]]"
@@ -76,7 +75,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           <template is="dom-if" if="[[_limitSeries(index,navSeriesLimit)]]">
             <template is="dom-if" if="[[_chartTypeLine(item,completeSeriesConfig)]]">
               <px-vis-line-svg
-                svg="[[svg]]"
+                svg="[[layer.1]]"
                 series-id="[[item]]"
                 chart-data="[[chartData]]"
                 complete-series-config="[[completeSeriesConfig]]"
@@ -90,7 +89,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
             </template>
             <template is="dom-if" if="[[_chartTypeScatter(item,completeSeriesConfig)]]">
               <px-vis-scatter
-                svg="[[svg]]"
+                svg="[[layer.1]]"
                 series-id="[[item]]"
                 chart-data="[[chartData]]"
                 complete-series-config="[[completeSeriesConfig]]"
@@ -108,7 +107,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
 
         <px-vis-axis
           id="xAxis"
-          svg="[[svg]]"
+          svg="[[layer.0]]"
           axis="[[x]]"
           axis-id="x"
           axis-type="[[xAxisType]]"
@@ -122,7 +121,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           current-domain="[[currentDomainX]]">
         </px-vis-axis>
         <px-vis-brush
-          svg="[[svg]]"
+          svg="[[layer.2]]"
           axis="[[x]]"
           height="[[height]]"
           width="[[width]]"
@@ -161,7 +160,8 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           PxVisBehaviorD3.domainUpdate,
           PxVisBehaviorChart.registerConfigs,
           PxVisBehaviorChart.axisConfigs,
-          PxVisBehaviorChart.subConfiguration
+          PxVisBehaviorChart.subConfiguration,
+          PxVisBehaviorChart.layers
         ],
 
         /**
@@ -240,6 +240,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
         },
 
         attached: function() {
+          this.set('numberOfLayers', 3);
           this._onIronResize();
         },
 

@@ -53,7 +53,7 @@ Element which draws lines series onto the chart
       PxVisBehavior.categories,
       PxVisBehaviorD3.selectedDomain,
       PxVisBehavior.progressiveRendering,
-      PxVisBehavior.seriesToRedrawOnTop,
+      PxVisBehavior.serieToRedrawOnTop,
       commonColors
     ],
 
@@ -124,8 +124,9 @@ Element which draws lines series onto the chart
     },
 
     observers: [
-      'drawCanvas(canvasContext,domainChanged,chartData.*,completeSeriesConfig.*,_canvasRedraw)',
-      'mutedChanged(mutedSeries.*, completeSeriesConfig)'
+      '_redraw(canvasContext,domainChanged,chartData.*,completeSeriesConfig.*,_canvasRedraw)',
+      'mutedChanged(mutedSeries.*, completeSeriesConfig)',
+      '_drawOnTop(serieToRedrawOnTop)'
     ],
 
     detached: function() {
@@ -137,13 +138,16 @@ Element which draws lines series onto the chart
       }
     },
 
+    _redraw: function() {
+      this.drawCanvas(true);
+    },
     /**
      * Draws or updates the line element.
      * Called from an observer watching for data and the necessary d3 objects
      *
      * @method drawElement
      */
-    drawCanvas: function() {
+    drawCanvas: function(allowCanvasClearing) {
       this.debounce('drawCanvas',function() {
         var data;
         // we need to wrap the data differently depending on if we are drawing many lines or just one line
@@ -164,16 +168,19 @@ Element which draws lines series onto the chart
 
         // We need to track which lines we have drawn and which we want to draw.
         // If a line is not currently in our list, add it
-        if(!this.canvasContext._pxLinesSeries[this.seriesId]){
+        if(!this.canvasContext._pxLinesSeries[this.seriesId]) {
           this.canvasContext._pxLinesSeries[this.seriesId] = true;
           this.canvasContext._pxLinesTotal += 1;
         }
 
         // if we have previously drawn the same number of lines as series, then let's start over; Clear the drawing canvas
-        if(this.canvasContext._pxLinesRedraw === this.canvasContext._pxLinesTotal){
+        if(this.canvasContext._pxLinesRedraw === this.canvasContext._pxLinesTotal) {
           this.canvasContext._pxLinesRedraw = 0;
-          // (x1,y1,x2,y2)
-          this.canvasContext.clearRect(-this.canvasContext._translation[0], -this.canvasContext._translation[1] , this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+
+          if(allowCanvasClearing) {
+            // (x1,y1,x2,y2)
+            this.canvasContext.clearRect(-this.canvasContext._translation[0], -this.canvasContext._translation[1] , this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+          }
         }
 
         if(this.clipPath) {
@@ -293,7 +300,7 @@ Element which draws lines series onto the chart
       } else if(this.categoryKey) {
         // Yes, this repeates the if above but I dont really want it checking an if 20k times to see if it should apply a gradient or not.
         // Iterate over our data:
-        for(var i = 0; i < data.length; i++){
+        for(var i = 0; i < data.length; i++) {
           var opacity = this._isSerieMuted(data[i]) ? this.mutedOpacity : 1;
           // Check to see if it is "muted"; if not, draw a line
           if(opacity !== 0) {
@@ -310,7 +317,7 @@ Element which draws lines series onto the chart
         // start the path
         this.canvasContext.beginPath();
         // iterate through the data
-        for(var i = 0; i < data.length; i++){
+        for(var i = 0; i < data.length; i++) {
           var opacity = this._isSerieMuted(data[i]) ? this.mutedOpacity : 1;
           // Check to see if it is "muted"; if not, draw a line
           if(opacity !== 0) {
@@ -505,7 +512,7 @@ Element which draws lines series onto the chart
       //restore our context for safety
       this.canvasContext.restore();
 
-      if(progressive){
+      if(progressive) {
         this._progressiveRenderingCounter = 0;
         this.fire('px-vis-line-progressive-rendering-ended', {"numberOfFrames": numberOfFrames });
       }
@@ -534,11 +541,11 @@ Element which draws lines series onto the chart
      * Returns the correct rgba to use for the canvas line.
      *
      */
-    _canvasLineColor:function(d,opacity){
+    _canvasLineColor:function(d,opacity) {
       // figure out if we are using a category or the seriesID
       var key = this.categoryKey ? d[this.categoryKey] : this.seriesId;
       // check that we want to draw that category
-      if(this._colorArr[key]){
+      if(this._colorArr[key]) {
         // return the appropriate rgba
         return 'rgba(' + this._colorArr[key]['r'] + ',' + this._colorArr[key]['g'] + ',' + this._colorArr[key]['b'] + ',' + opacity + ')';
       }
@@ -556,6 +563,11 @@ Element which draws lines series onto the chart
       //add 'a' for 'rgba'
       result = 'rgba' + result.slice(3);
       return result + ',' + opacity + ')';
+    },
+    _drawOnTop: function(serieToRedraw) {
+      if(serieToRedraw === this.seriesId) {
+        this.drawCanvas(false);
+      }
     }
   });
 </script>
