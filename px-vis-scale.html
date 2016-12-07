@@ -135,7 +135,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      */
     _setXScale: function(width,margin) {
       var w = Math.max(width - margin.left - margin.right,0);
-      this.set('x', this._setScale(this.xAxisType,[0, w]));
+      this.set('x', this._setScale(this.xAxisType,[0, w], this.x));
       this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
     },
     /**
@@ -145,7 +145,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      */
     _setYScale: function(height,margin) {
       var h = Math.max(height - margin.top - margin.bottom,0);
-      this.set('y', this._setScale(this.yAxisType,[h, 0]));
+      this.set('y', this._setScale(this.yAxisType,[h, 0], this.y));
       this.fire('px-vis-y-updated', { 'dataVar': 'y', 'data': this.y, 'method':'set' });
     },
     /**
@@ -153,17 +153,25 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      *
      * @method _setScale
      */
-    _setScale: function(val, range){
+    _setScale: function(val, range, currentAxis){
       // TODO support more types: log, quantile, etc
+      var result;
+
       if(val === 'time') {
-        return Px.d3.scaleUtc().nice().range(range);
+        result = Px.d3.scaleUtc().nice().range(range);
       } else if(val === 'timeLocal') {
-        return Px.d3.scaleTime().nice().range(range);
+        result = Px.d3.scaleTime().nice().range(range);
       } else if(val === 'linear'){
-        return Px.d3.scaleLinear().nice().range(range);
+        result = Px.d3.scaleLinear().nice().range(range);
       } else { //ordinal
-        return Px.d3.scalePoint().range(range).padding(0.5);
+        result = Px.d3.scalePoint().range(range).padding(0.5);
       }
+
+      if(currentAxis) {
+        result.domain(currentAxis.domain());
+      }
+
+      return result;
     },
 
     _getDataExtents: function(d,yKeysArr) {
@@ -247,7 +255,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @method _currentDomain
      */
      _currentDomain: function() {
-
+     
       if(!this._calculatingDomain && this._doesObjHaveValues(this.chartData) && this.x && this.y && this._doesObjHaveValues(this.completeSeriesConfig)) {
         var xOrd = this.xAxisType === 'ordinal',
           yOrd = this.yAxisType === 'ordinal',
@@ -259,6 +267,8 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
             'x': [],
             'y': []
           };
+
+        this._calculatingDomain = true;
 
         if(!this._chartDataHasChanged && this.selectedDomain.x && this.selectedDomain.x.length
         && ((this.selectedDomain.y && this.selectedDomain.y.length) || (this.xAxisType === 'time' || this.xAxisType === 'timeLocal'))) {
