@@ -167,11 +167,8 @@ PxVisBehaviorChart.chartCommon = [{
         return [];
       }
 
-      var dMin = this.defaultSeriesConfig[axis+'Min'] === 'dynamic' ? Infinity: this.defaultSeriesConfig[axis+'Min'],
-          dMax = this.defaultSeriesConfig[axis+'Max'] === 'dynamic' ? -Infinity: this.defaultSeriesConfig[axis+'Max'];
-
-      mins.push(dMin);
-      maxes.push(dMax);
+      mins.push(Infinity);
+      maxes.push(-Infinity);
 
       return [ Math.min.apply(null, mins) , Math.max.apply(null, maxes) ];
     },
@@ -239,7 +236,7 @@ PxVisBehaviorChart.chartCommon = [{
               fullConfig[k[i]][property] = this.defaultSeriesConfig[property];
             }
           }
-
+//FIXME Check for "dynamic and replace"
           if(fullConfig[k[i]]['xMin']) {
             xMins.push(fullConfig[k[i]]['xMin']);
           }

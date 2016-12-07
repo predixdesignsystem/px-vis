@@ -251,21 +251,40 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
           doX = xTime ? false : true,
           doY = true,
           keys = Object.keys(this.completeSeriesConfig),
+          //by default, have dynamic extents and 0 yMin
           exts = {
-            'x': [],
-            'y': []
+            'x': [Infinity, -Infinity],
+            'y': [0, 0]
           };
 
-        if(this.chartExtents && this.chartExtents['x']) {
-          exts.x = this.chartExtents['x'];
-        } else if(this.dataExtents && this.dataExtents['x']) {
-          exts.x = this.dataExtents['x'];
+        //if the dev specified extents, use them
+        if(this.chartExtents && this.chartExtents['x'].length === 2) {
+          exts.x[0] = (this.chartExtents['x'][0] === 'dynamic') ? Infinity : this.chartExtents['x'][0];
+          exts.x[1] = (this.chartExtents['x'][1] === 'dynamic') ? -Infinity : this.chartExtents['x'][1];
+        }
+        //if there are dataExtents, use them if they dont overwrite the chartExtents
+        if(this.dataExtents && this.dataExtents['x']) {
+          if(this.chartExtents && this.chartExtents['x'].length === 2) {
+            exts.x[0] = (this.chartExtents['x'][0] === 'dynamic') ? this.dataExtents['x'][0] : this.chartExtents['x'][0];
+            exts.x[1] = (this.chartExtents['x'][1] === 'dynamic') ? this.dataExtents['x'][1] : this.chartExtents['x'][1];
+          } else {
+            exts.x = this.dataExtents['x'];
+          }
         }
 
-        if(this.chartExtents && this.chartExtents['y']) {
-          exts.y = this.chartExtents['y'];
-        } else if(this.dataExtents && this.dataExtents['y']) {
-          exts.y = this.dataExtents['y'];
+        //if the dev specified extents, use them
+        if(this.chartExtents && this.chartExtents['y'].length === 2) {
+          exts.y[0] = (this.chartExtents['y'][0] === 'dynamic') ? Infinity : this.chartExtents['y'][0];
+          exts.y[1] = (this.chartExtents['y'][1] === 'dynamic') ? -Infinity : this.chartExtents['y'][1];
+        }
+        //if there are dataExtents, use them if they dont overwrite the chartExtents
+        if(this.dataExtents && this.dataExtents['y']) {
+          if(this.chartExtents && this.chartExtents['y'].length === 2) {
+            exts.y[0] = (this.chartExtents['y'][0] === 'dynamic') ? this.dataExtents['y'][0] : this.chartExtents['y'][0];
+            exts.y[1] = (this.chartExtents['y'][1] === 'dynamic') ? this.dataExtents['y'][1] : this.chartExtents['y'][1];
+          } else {
+            exts.y = this.dataExtents['y'];
+          }
         }
 
         //if our chart data has not changed, then dont go through all the data. Just use the extents we have
