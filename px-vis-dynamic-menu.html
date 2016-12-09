@@ -1,0 +1,80 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
+
+
+<!--
+Element providing an on-chart zoom.
+
+##### Usage
+
+    <px-vis-zoom
+        margin="[[margin]]"
+        extents-data="[[extentsData]]"
+        selected-domain="{{selectedDomain}}"
+        px-svg-elem={{pxSvgElem}}>
+    </px-vis-zoom>
+
+@element px-vis-zoom
+@blurb Element providing an on-chart zoom.
+@homepage index.html
+@demo demo.html
+-->
+
+<link rel="import" href="css/px-vis-zoom-styles.html">
+
+<dom-module id="px-vis-dynamic-menu">
+    <template>
+      <style include="px-vis-dynamic-menu-styles"></style>
+      <button id="resetBtn" class="btn hidden" on-click="resetZoom">Reset Zoom</button>
+    </template>
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'px-vis-dynamic-menu',
+
+    behaviors: [
+      
+    ],
+
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      /**
+       * Whether we're currently shown
+       */
+      _shown: {
+        type: Boolean,
+        value: false
+      },
+      /**
+       * Whether we're currently fading (in or out)
+       */
+      _fading: {
+        type: Boolean,
+        value: false
+      }
+    },
+    observers: [
+      'zooooom(extentsData)',
+      '_sizeChanged(width, height)'
+    ],
+    listeners: {
+      'iron-resize': '_sizeChanged'
+    },
+    fadeIn: function() {
+        if(!this._shown && !this._fading) {
+            this._fading = true;
+        }
+    },
+    fadeOut: function() {
+
+    }
+  });
+</script>
