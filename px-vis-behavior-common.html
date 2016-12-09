@@ -1,4 +1,6 @@
 <link rel="import" href="px-vis-polyfills.html" />
+<link rel="import" href="../px-colors-design/colors.html" />
+
 
 <script>
 var PxVisBehavior = PxVisBehavior || {};
@@ -642,19 +644,42 @@ PxVisBehavior.commonMethods = {
     return false
   },
   /**
-   *  Returns the color used for a pie slice given a specific index
-   *
-   */
-  _getPieColorForIndex: function(index) {
-    return commonColors.properties.dataVisColors.value[commonColors.properties.seriesColorOrder.value[index]];
-  },
-  /**
    * escapes '.' in css selectors so that we can appropriately select stuff with dots in thei ids
    */
   _escapeCssSelector: function(selector) {
     return selector.replace('.', '\\.');
   }
 };
+
+/*
+    Name:
+    PxVisBehavior.getSeriesColors
+
+    Description:
+    Polymer behavior that provides the ability to retrieve the color of a serie given an index
+
+    Dependencies:
+    -
+
+    @polymerBehavior PxVisBehavior.getSeriesColors
+*/
+PxVisBehavior.getSeriesColors = [{
+  /**
+   * Helper function to return the correct color for a particular index.
+   **/
+  _getColor: function(i) {
+    var l = this.seriesColorOrder.length,
+        index = this._calcIndex(i,l);
+    return this.dataVisColors[this.seriesColorOrder[ index ]];
+  },
+
+  /**
+   * Helper function to calculate the index. When we run out of indcies, it loops back over valid indicies.
+   **/
+  _calcIndex: function(i, l) {
+    return i < l ? i : this._calcIndex(i - l,l);
+  }
+}, dataVisColors];
 
 /*
     Name:

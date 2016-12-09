@@ -25,6 +25,7 @@ v1.0.0
   * updated demos with v1 changes
   * all subcomponents have an API Documentation page
 * Added navigatorConfig and ability to configure chart navigator with it
+* most px-vis components now only loads basic colors as opposed to basic colors + dataVis colors
 
 v0.7.4
 ==================

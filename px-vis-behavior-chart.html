@@ -1,6 +1,7 @@
 
 <link rel="import" href="../px-colors-design/colors.html" />
 <link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 <script>
 var PxVisBehaviorChart = PxVisBehaviorChart || {};
@@ -17,7 +18,7 @@ var PxVisBehaviorChart = PxVisBehaviorChart || {};
 
     @polymerBehavior PxVisBehaviorChart.chartCommonMethods
 */
-PxVisBehaviorChart.chartCommonMethods = {
+PxVisBehaviorChart.chartCommonMethods = [{
   /**
   * Goes through an array of objects and gathers all unique keys. Returns a list of keys
   *
@@ -36,23 +37,7 @@ PxVisBehaviorChart.chartCommonMethods = {
     }
     return Object.keys(o)
   },
-
-  /**
-   * Helper function to return the correct color for a particular index.
-   **/
-  _getColor: function(i){
-    var l = this.seriesColorOrder.length,
-        index = this._calcIndex(i,l);
-    return this.dataVisColors[this.seriesColorOrder[ index ]];
-  },
-
-  /**
-   * Helper function to calculate the index. When we run out of indcies, it loops back over valid indicies.
-   **/
-  _calcIndex: function(i,l){
-    return i < l ? i : this._calcIndex(i - l,l);
-  }
-};
+}, PxVisBehavior.getSeriesColors];
 
 /*
     Name:
@@ -408,7 +393,7 @@ PxVisBehaviorChart.chartCommon = [{
     _returnKeys: function(obj){
       return Object.keys(obj);
     }
-}, commonColors, PxVisBehaviorChart.chartCommonMethods, PxVisBehavior.commonMethods, PxVisBehavior.completeSeriesConfig, PxVisBehavior.axisTypes];
+}, dataVisColors, PxVisBehaviorChart.chartCommonMethods, PxVisBehavior.commonMethods, PxVisBehavior.completeSeriesConfig, PxVisBehavior.axisTypes];
 
 /*
     Name:

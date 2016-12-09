@@ -72,7 +72,8 @@ Element which draws scatter series onto the chart
       PxVisBehavior.sizing,
       PxVisBehavior.dataset,
       PxVisBehavior.completeSeriesConfig,
-      commonColors
+      PxVisBehavior.getSeriesColors,
+      baseColors
     ],
 
     /**
@@ -344,7 +345,7 @@ Element which draws scatter series onto the chart
                     .attr('fill', function(d, i) {
                         d.innerRadius = this._innerRadiusPx;
                         d.outerRadius = this.radius;
-                        return this.empty ? this.dataVisColors['dv-light-gray'] : this._getPieColorForIndex(d.data.colorIndex);
+                        return this.empty ? this.dataVisColors['dv-light-gray'] : this._getColor(d.data.colorIndex);
                     }.bind(this))
                     .attr('opacity', this.empty ? 0.5 : 1)
                     .transition()
@@ -358,7 +359,7 @@ Element which draws scatter series onto the chart
         } else {
           this._arcs.selectAll('path')
             .attr('fill', function(d, i) {
-                  return this._getPieColorForIndex(d.data.colorIndex);
+                  return this._getColor(d.data.colorIndex);
               }.bind(this));
         }
 
