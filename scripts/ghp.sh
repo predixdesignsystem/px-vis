@@ -49,7 +49,7 @@ bower install ${REPO_NAME} --force
 
 #optimize for production
 cd ${REPO_NAME} #go into the component folder
-npm install vulcanize
+npm install vulcanize -g
 vulcanize index.html -o index.vulcanized.html --inline-scripts --inline-css --strip-comments
 yes | cp index.vulcanized.html index.html
 rm index.vulcanized.html
