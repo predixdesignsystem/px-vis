@@ -39,7 +39,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 <dom-module id="px-vis-interaction-space">
     <template>
       <style include="px-vis-styles"></style>
-      
+
 
     </template>
 </dom-module>
@@ -268,7 +268,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                 'yArr': null
               };
 
-              //search for timestamp if we don't have it already (non time based chart) 
+              //search for timestamp if we don't have it already (non time based chart)
               //and we know the data has some notion of time
               searchTimeStamp = dataObj.time === null && !!this.chartData[0][this.timeData];
 
@@ -343,7 +343,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                       //during the calculation, hence needing to refetch from array
                       result[xKey] = this.chartData[j][xKey];
                       result[yKey] = this.chartData[j][yKey];
-                      
+
                       //store the timestamp and distance
                       if(searchTimeStamp && closestTimestamp[0] > minDist) {
                         closestTimestamp = [minDist, this.chartData[j][this.timeData]];
@@ -499,9 +499,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           .attr('ry', 2)
           .attr('width', 0)
           .attr('height', 0)
-          .attr('fill', this.colors.grey2)
-          .attr('fill-opacity', 0.5)
-          .attr('stroke', this.colors.grey6);
+          .attr('fill', this._checkThemeVariable("--px-vis-zoom-brush-fill-color", this.colors.grey2))
+          .attr('fill-opacity', this._checkThemeVariable("--px-vis-zoom-brush-fill-opacity", 0.5))
+          .attr('stroke', this._checkThemeVariable("--px-vis-zoom-brush-outline-color", this.colors.grey6));
       }
     },
     /**

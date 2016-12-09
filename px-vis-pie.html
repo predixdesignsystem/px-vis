@@ -34,7 +34,7 @@ Element which draws scatter series onto the chart
 <dom-module id="px-vis-pie">
     <template>
       <style include="px-vis-pie-styles"></style>
-      
+
       <div id="popoverWrapper" class="anchor wrapper">
         <span id="popoverAnchor" class="anchor"></span>
         <px-popover id="popover" position="relative" popover-title="" orientation="top" hide-overlay class="popover" for="popoverAnchor" style="position:relative">
@@ -224,7 +224,7 @@ Element which draws scatter series onto the chart
         value: false
       },
       /**
-       * By default the pie chart slices will be ordered by value. Set to false 
+       * By default the pie chart slices will be ordered by value. Set to false
        * to keep the data order
        */
       preserveDataOrder: {
@@ -304,13 +304,13 @@ Element which draws scatter series onto the chart
 
           this._pie = gen(data);
         }
-        
+
         //use new values
         this._arcs = this.pieGroup
                          .selectAll('.slice')
                           //store previous data so that we can interpolate
                           //between old and new data for animation
-                          .property('_previousData', function(d) { 
+                          .property('_previousData', function(d) {
                               return {
                                 startAngle: d.startAngle,
                                 endAngle: d.endAngle,
@@ -318,7 +318,7 @@ Element which draws scatter series onto the chart
                                 outerRadius: d.outerRadius
                               };
                             })
-                          .data(this._pie, function(d) { 
+                          .data(this._pie, function(d) {
                             //map slices based on "y" in the data (name)
                             return d.data.y;
                           });
@@ -364,7 +364,7 @@ Element which draws scatter series onto the chart
                     .attr('fill', function(d, i) {
                         d.innerRadius = this._innerRadiusPx;
                         d.outerRadius = this._radius;
-                        return this.empty ? this.dataVisColors['dv-light-gray'] : this._getPieColorForIndex(d.data.colorIndex);
+                        return this.empty ? this._checkThemeVariable( "--px-vis-pie-empty-color", this.dataVisColors['dv-light-gray']): this._getPieColorForIndex(d.data.colorIndex);
                     }.bind(this))
                     .attr('opacity', this.empty ? 0.5 : 1)
                     .transition()
@@ -374,7 +374,7 @@ Element which draws scatter series onto the chart
         //apply color depending on the chart "emptiness"
         if(this.empty) {
           this._arcs.selectAll('path')
-            .attr('fill', this.dataVisColors['dv-light-gray']);
+            .attr('fill', this._checkThemeVariable( "--px-vis-pie-empty-color", this.dataVisColors['dv-light-gray']));
         } else {
           this._arcs.selectAll('path')
             .attr('fill', function(d, i) {

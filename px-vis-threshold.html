@@ -29,7 +29,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
 <dom-module id="px-vis-threshold">
   <template>
     <style include="px-vis-styles"></style>
-    
+
   </template>
 </dom-module>
 
@@ -55,13 +55,18 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
      */
     properties: {
       /**
+       * Default defailtColor
+       *
+       */
+      _defaultDefaultColor: {
+        type: String,
+        value:'grey8'
+      },
+      /**
        * Default color of the threshold.
        *
-       * @property defaultColor
-       * @type String
-       * @default grey8
        */
-      defaultColor:{
+      defaultColor: {
         type: String,
         value:'grey8'
       },
@@ -73,9 +78,9 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
        * @property thresholdSvg
        * @type Object
        */
-      thresholdSvg:{
+      thresholdSvg: {
         type: Object,
-        value: function() {return{};}
+        value: function() { return {}; }
       },
       /**
        * Holder object for the event svg "g" element
@@ -83,9 +88,9 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
        * @property thresholdGroup
        * @type Object
        */
-      thresholdGroup:{
+      thresholdGroup: {
         type:Object,
-        value: function() {return{};}
+        value: function() { return {}; }
       },
       /**
        * Holder object for the event line elements
@@ -93,7 +98,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
        * @property thresholdLine
        * @type Object
        */
-      thresholdLine:{
+      thresholdLine: {
         type:Object
       },
       /**
@@ -102,7 +107,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
        * @property thresholdRect
        * @type Object
        */
-      thresholdRect:{
+      thresholdRect: {
         type:Object
       },
       /**
@@ -111,7 +116,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
        * @property thresholdText
        * @type Object
        */
-      thresholdText:{
+      thresholdText: {
         type:Object
       },
       /**
@@ -123,19 +128,35 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
       showThresholdBox: {
         type:Boolean,
         value:false
+      },
+
+      _animationFrameDone: {
+        type: Boolean,
+        value: false
       }
     },
 
     observers: [
-      'drawElement(svg,x,y,currentDomainX,currentDomainY,chartData.*)',
+      'drawElement(svg,x,y,currentDomainX,currentDomainY,chartData.*,_animationFrameDone)',
       '_setColors(completeSeriesConfig.*,thresholdText)',
      ],
 
     ready:function(){
+      window.requestAnimationFrame(this._calcThemeOrConfig.bind(this));
+
       // if there is no dev set unique ID, generate one
       if(!this.thresholdId){
         this.set('thresholdId', this.generateRandomID('threshold_'));
       }
+    },
+
+    _calcThemeOrConfig: function() {
+      // if we have defaultColor has not changed, check theme
+      if(this.defaultColor === this._defaultDefaultColor) {
+        this.defaultColor = this._checkThemeVariable("--px-vis-threshold-color", this.colors[this._defaultDefaultColor]);
+      }
+
+      this.set('_animationFrameDone', true);
     },
 
     /**
@@ -145,63 +166,64 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
      * @method drawElement
      */
     drawElement: function() {
-      this.cloneSVGElem(this.svg.node(),'thresholdSvg');
-      // checks to see if the threshold already exists. If not, create; if so, update
-      if(this._isObjEmpty(this.thresholdGroup)) {
-        this.thresholdGroup = this.thresholdSvg.append('g')
-          .attr('id','thresholds')
-          .selectAll('g.thresholds')
-          .data(this.chartData)
-          .enter()
-          .append("g")
-          .attr('class','thresholds')
-          .attr('threshold-id',function(d){ return d.for });
+      if(this._animationFrameDone) {
+        this.cloneSVGElem(this.svg.node(),'thresholdSvg');
+        // checks to see if the threshold already exists. If not, create; if so, update
+        if(this._isObjEmpty(this.thresholdGroup)) {
+          this.thresholdGroup = this.thresholdSvg.append('g')
+            .attr('id','thresholds')
+            .selectAll('g.thresholds')
+            .data(this.chartData)
+            .enter()
+            .append("g")
+            .attr('class','thresholds')
+            .attr('threshold-id',function(d){ return d.for });
 
-        this.thresholdLine = this.thresholdGroup.append("line")
-          .attr('stroke-width', '1')
-          .attr('stroke-dasharray', "5,2")
-          .attr('x1', this.x(this.currentDomainX[0]))
-          .attr('x2', this.x(this.currentDomainX[1]))
-          .attr('y1', function(d){ return this.y(d.value); }.bind(this))
-          .attr('y2', function(d){ return this.y(d.value); }.bind(this));
-          // .on("mouseover", this._mouseOver.bind(this));
+          this.thresholdLine = this.thresholdGroup.append("line")
+            .attr('stroke-width', '1')
+            .attr('stroke-dasharray', "5,2")
+            .attr('x1', this.x(this.currentDomainX[0]))
+            .attr('x2', this.x(this.currentDomainX[1]))
+            .attr('y1', function(d){ return this.y(d.value); }.bind(this))
+            .attr('y2', function(d){ return this.y(d.value); }.bind(this));
+            // .on("mouseover", this._mouseOver.bind(this));
 
-        this.thresholdRect = this.thresholdGroup.append("rect")
-          .attr('x', this.x(this.currentDomainX[0]) + 5)
-          .attr('y', this._calcYPos.bind(this))
-          .attr('height','18');
+          this.thresholdRect = this.thresholdGroup.append("rect")
+            .attr('x', this.x(this.currentDomainX[0]) + 5)
+            .attr('y', this._calcYPos.bind(this))
+            .attr('height','18');
 
-        this.thresholdText = this.thresholdGroup.append("text")
-          .attr('font-size', '12px')
-          .style('font-family','GE Inspira Sans')
-          // .attr('font-style','GE Inspira Sans')
-          .attr('x', this.x(this.currentDomainX[0]) + 5 + 3)
-          .attr('y', function(d,i){ return this._calcYPos(d,i,13); }.bind(this) )
-          .text(function(d){ return (d.value).toFixed(2); });
+          this.thresholdText = this.thresholdGroup.append("text")
+            .attr('font-size', '12px')
+            .style('font-family','GE Inspira Sans')
+            // .attr('font-style','GE Inspira Sans')
+            .attr('x', this.x(this.currentDomainX[0]) + 5 + 3)
+            .attr('y', function(d,i){ return this._calcYPos(d,i,13); }.bind(this) )
+            .text(function(d){ return (d.value).toFixed(2); });
 
-        //must set rectangle width after text is set so we know how big it is
-        this.thresholdRect.attr('width',function(d,i){
-          return this.thresholdText.nodes()[i].getBBox().width + 5;  //should be 6 but 6 looks too big...
-        }.bind(this));
+          //must set rectangle width after text is set so we know how big it is
+          this.thresholdRect.attr('width',function(d,i){
+            return this.thresholdText.nodes()[i].getBBox().width + 5;  //should be 6 but 6 looks too big...
+          }.bind(this));
 
-        // this._setColors();
+          // this._setColors();
 
-      } else {
-        this.thresholdLine
-          .attr('x1', this.x(this.currentDomainX[0]))
-          .attr('x2', this.x(this.currentDomainX[1]))
-          .attr('y1', function(d){ return this.y(d.value); }.bind(this))
-          .attr('y2', function(d){ return this.y(d.value); }.bind(this));
-        this.thresholdRect.attr('x', this.x(this.currentDomainX[0]) + 5)
-                          .attr('y', this._calcYPos.bind(this));
+        } else {
+          this.thresholdLine
+            .attr('x1', this.x(this.currentDomainX[0]))
+            .attr('x2', this.x(this.currentDomainX[1]))
+            .attr('y1', function(d){ return this.y(d.value); }.bind(this))
+            .attr('y2', function(d){ return this.y(d.value); }.bind(this));
+          this.thresholdRect.attr('x', this.x(this.currentDomainX[0]) + 5)
+                            .attr('y', this._calcYPos.bind(this));
 
-        this.thresholdText.attr('x', this.x(this.currentDomainX[0]) + 5 + 3)
-                          .attr('y', function(d,i) {
-                              return this._calcYPos(d,i,13);
-                            }.bind(this) );
+          this.thresholdText.attr('x', this.x(this.currentDomainX[0]) + 5 + 3)
+                            .attr('y', function(d,i) {
+                                return this._calcYPos(d,i,13);
+                              }.bind(this) );
 
+        }
       }
-
     },
     /**
      * Sets the colors
@@ -225,7 +247,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
      * @method _getColors
      */
     _getColors: function(d,i){
-      return (d.for && this.completeSeriesConfig[d.for]) ? this.completeSeriesConfig[d.for]['color'] : this.colors[this.defaultColor];
+      return (d.for && this.completeSeriesConfig[d.for]) ? this.completeSeriesConfig[d.for]['color'] : this._checkColorType(this.defaultColor);
     },
     /**
      * Calculates a y-position for the text and rectangle

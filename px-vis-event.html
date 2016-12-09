@@ -98,34 +98,12 @@ The configureation object allows developers to set the icon used for each event 
      */
     properties: {
       /**
-       * Defines the color and weight styles for the event line.
-       *
-       *```
-       * Default: {
-       *   'color': 'grey9',
-       *   'weight': 1
-       * }
-       *```
-       *
-       * @property lineConfig
-       * @type Object
-       */
-      lineConfig:{
-        type: Object,
-        value:function() {
-          return {
-            'color':'grey9',
-            'weight':1
-          };
-        }
-      },
-      /**
        * The ID of the event. Either dev set or auto-generated
        *
        * @property eventId
        * @type String
        */
-      eventId:{
+      eventId: {
         type:String,
         value: '',
         notify: true,
@@ -140,7 +118,7 @@ The configureation object allows developers to set the icon used for each event 
        */
       eventGroup:{
         type:Object,
-        value: function() {return{};}
+        value: function() { return {}; }
       },
       /**
        * Holder object for the event svg "line" element
@@ -150,7 +128,7 @@ The configureation object allows developers to set the icon used for each event 
        */
       eventLine:{
         type:Object,
-        value: function() {return{};}
+        value: function() { return {}; }
       },
       /**
        * Holder object for the event svg icon
@@ -160,7 +138,7 @@ The configureation object allows developers to set the icon used for each event 
        */
       eventIcon:{
         type:Object,
-        value: function() {return{};}
+        value: function() { return {}; }
       },
       /**
        * Computed configuration object based on dev set styles and default styles
@@ -170,7 +148,7 @@ The configureation object allows developers to set the icon used for each event 
        */
       _thisConfig:{
         type:Object,
-      value: function() {return{};}
+      value: function() { return {}; }
       },
       /**
        * Specifies the orientation of the event tooltip
@@ -198,13 +176,19 @@ The configureation object allows developers to set the icon used for each event 
       _eventConfigChanged: {
         type: Boolean,
         value: false
+      },
+      
+      _animationFrameDone: {
+        type: Boolean,
+        value: false
       }
     },
 
     observers: [
       '_eventConfigHasChanged(eventConfig.*)',
-      'drawElement(svg, x, y, currentDomainX,currentDomainY,eventData.*,eventConfig.*)',
-      '_addClipPath(clipPath)'
+      'drawElement(svg, x, y, currentDomainX,currentDomainY,eventData.*,eventConfig.*, _animationFrameDone)',
+      '_addClipPath(clipPath)',
+      '_checkDefaultLineConfig(lineConfig.*)'
      ],
 
      detached: function() {
@@ -217,11 +201,38 @@ The configureation object allows developers to set the icon used for each event 
      },
 
     ready:function() {
+      window.requestAnimationFrame(this._calcThemeOrConfig.bind(this));
       // if there is no dev set unique ID, generate one
-      if(!this.eventId){
+      if(!this.eventId) {
         this.set('eventId', this.generateRandomID('event_'));
       }
     },
+
+    _calcThemeOrConfig: function() {
+      // if we have lineConfig, must be passed in so use it.
+      if(!this.lineConfig) {
+        var lineColor = this._checkThemeVariable("--px-vis-event-line-color", this.colors[this._lineConfigDefault.color]);
+
+        this.lineConfig = {
+          "color": lineColor,
+          "weight": this._lineConfigDefault.weight
+        };
+      }
+
+      if(!this.defaultEventConfig) {
+        var eventColor = this._checkThemeVariable("--px-vis-event-icon-color", this.colors[this._defaultDefaultEventConfig.color]);
+
+        this.defaultEventConfig = {
+          "color": eventColor,
+          'icon': this._defaultDefaultEventConfig.icon,
+          'type': this._defaultDefaultEventConfig.type,
+          'offset': this._defaultDefaultEventConfig.offset,
+          'size': this._defaultDefaultEventConfig.size
+        };
+      }
+      this.set('_animationFrameDone', true);
+    },
+
     /**
      * Draws or updates the event element.
      * Called from an observer watching for data and the necessary d3 objects
@@ -229,7 +240,7 @@ The configureation object allows developers to set the icon used for each event 
      * @method drawElement
      */
     drawElement: function() {
-      if(this.x && this.y && this.currentDomainX.length > 0 && this.currentDomainY.length > 0 && this._doesObjHaveValues(this.eventData)) {
+      if(this.x && this.y && this.currentDomainX.length > 0 && this.currentDomainY.length > 0 && this._doesObjHaveValues(this.eventData) && this._animationFrameDone) {
 
         if(this._eventConfigChanged && this.eventGroup && this._doesD3HaveValues(this.eventGroup)) {
           this.eventGroup.remove();
@@ -247,8 +258,8 @@ The configureation object allows developers to set the icon used for each event 
 
           // draw the path
           this.eventLine = this.eventGroup.append("line")
-            .attr('stroke',this.colors[this.lineConfig.color])
-            .attr('stroke-width',this.lineConfig.weight);
+            .attr('stroke', this._checkColorType(this.lineConfig.color))
+            .attr('stroke-width', this.lineConfig.weight);
 
           this._addIcon();
 
@@ -309,13 +320,13 @@ The configureation object allows developers to set the icon used for each event 
         this.eventIcon = this.eventGroup.append("text")
           .attr('font-family', 'FontAwesome')
           .attr('font-size', this._thisConfig.size + 'px')
-          .attr('fill', this.colors[this._thisConfig.color])
+          .attr('fill', this._checkColorType(this._thisConfig.color))
           .text(this._thisConfig.icon);
       } else if(this._thisConfig.type === 'fa'){
         this.eventIcon = this.eventGroup.append("text")
           .attr('font-family', 'FontAwesome')
           .attr('font-size', this._thisConfig.size + 'px')
-          .attr('fill', this.colors[this._thisConfig.color])
+          .attr('fill', this._checkColorType(this._thisConfig.color))
           .text(String.fromCharCode(parseInt(this.fa[this._thisConfig.icon],16)));
       }
 
@@ -385,6 +396,10 @@ The configureation object allows developers to set the icon used for each event 
       } else {
         return ': ' + this.eventData[this.xKey];
       }
+    },
+
+    _checkDefaultLineConfig: function(lineConf) {
+      console.log("set")
     }
   });
 </script>

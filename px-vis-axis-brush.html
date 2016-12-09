@@ -38,7 +38,7 @@ This element draw the box over the axis signifying the active area to mute the s
 <dom-module id="px-vis-axis-brush">
     <template>
       <style include="px-vis-styles"></style>
-      
+
 
     </template>
 </dom-module>
@@ -181,9 +181,9 @@ This element draw the box over the axis signifying the active area to mute the s
         var b = this.svg.selectAll('g.brush');
 
         b.selectAll("rect.selection")
-          .attr("fill", _this.colors.black)
-          .attr("fill-opacity", 0.15)
-          .attr("stroke", _this.colors["primary-blue"]);
+          .attr("fill", _this._checkThemeVariable("--px-vis-axis-brush-fill-color", _this.colors.black))
+          .attr("fill-opacity", _this._checkThemeVariable("--px-vis-axis-brush-fill-opacity", 0.15))
+          .attr("stroke", _this._checkThemeVariable("--px-vis-axis-brush-outline-color", _this.colors["primary-blue"]));
 
         if(this.brushToRemove) {
           b.selectAll("rect.selection")

@@ -653,7 +653,25 @@ PxVisBehavior.commonMethods = {
    */
   _escapeCssSelector: function(selector) {
     return selector.replace('.', '\\.');
-  }
+  },
+
+  /**
+   * Checks if a theme variable exists, if so, returns the theme value, if not, returns the default
+   */
+  _checkThemeVariable: function(varName, defaultValue) {
+    var themeVar = this.getComputedStyleValue(varName);
+    return (themeVar.length === 0) ? defaultValue : themeVar;
+  },
+
+  /**
+   * Checks if a color is already hex or rgb, if must be a colors obj
+   */
+  _checkColorType: function(c) {
+    if(c[0] === '#' || (c[0] === 'r' && c[1] === 'g' && c[2] === 'b')) {
+      return c;
+    }
+    return this.colors[c];
+  },
 };
 
 /*
@@ -795,19 +813,19 @@ PxVisBehavior.events = {
      * ```
      * Format: {
      *   "Event-Name-A":{
-     *     "color": "a_valid_color_from_px-colors-design",
+     *     "color": "a color, rgb or hex",
      *     "icon": "font-awesome-class",
      *     "type": "fa",
      *     "offset":[0,0]
      *   },
      *   "Event-Name-B":{
-     *     "color": "a_valid_color_from_px-colors-design",
+     *     "color": "a color, rgb or hex",
      *     "icon": "unicode-of-the-font-character",
      *     "type": "unicode",
      *     "offset":[0,0]
      *   },
      *   "Event-Name-C":{
-     *     "color": "a_valid_color_from_px-colors-design",
+     *     "color": "a color, rgb or hex",
      *     "icon": "path-to-an-img",
      *     "type": "image",
      *     "offset":[0,0]
@@ -818,13 +836,13 @@ PxVisBehavior.events = {
      * ```
      * Example: {
      *   "Recalibrate":{
-     *     "color": "blue",
+     *     "color": "rgb(0,0,255)",
      *     "icon": "fa-camera",
      *     "type": "fa",
      *     "offset":[-3,0]
      *   },
      *   "Fan start":{
-     *     "color": "green",
+     *     "color": "rgb(0,255,0)",
      *     "icon": "\uf015",
      *     "type": "unicode",
      *     "offset":[5,0]
@@ -849,7 +867,7 @@ PxVisBehavior.events = {
      *
      *```
      * Default: {
-     *   'color': 'grey7',
+     *   'color': 'grey7', //or theme var
      *   'icon': 'fa-circle',
      *   'type': 'fa',
      *   'offset': 0,
@@ -861,6 +879,23 @@ PxVisBehavior.events = {
      * @type Object
      */
     defaultEventConfig: {
+      type: Object
+    },
+    /**
+     * Default defaultEventConfig
+     *
+     *```
+     * Default: {
+     *   'color': 'grey7',
+     *   'icon': 'fa-circle',
+     *   'type': 'fa',
+     *   'offset': 0,
+     *   'size': '16'
+     * }
+     *```
+     *
+     */
+    _defaultDefaultEventConfig: {
       type: Object,
       value: function() {
         return {
@@ -871,6 +906,44 @@ PxVisBehavior.events = {
           'size':'16'
         };
       }
+    },
+    /**
+     * Defines the default lineConfig
+     *
+     *```
+     * Default: {
+     *   'color': 'grey9',
+     *   'weight': 1
+     * }
+     *```
+     *
+     * @property lineConfig
+     * @type Object
+     */
+    _lineConfigDefault: {
+      type: Object,
+      value:function() {
+        return {
+          'color': 'grey9',
+          'weight': 1
+        };
+      }
+    },
+    /**
+     * Defines the color and weight styles for the event line.
+     *
+     *```
+     * Default: {
+     *   'color': 'grey9', //or theme var
+     *   'weight': 1
+     * }
+     *```
+     *
+     * @property lineConfig
+     * @type Object
+     */
+    lineConfig: {
+      type: Object
     },
     /**
      * Data representing the events. Example:

@@ -1,3 +1,7 @@
+v0.8.0
+==================
+* Theming!
+
 v0.7.5
 ==================
 * protect running zoom too early
