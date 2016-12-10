@@ -26,7 +26,7 @@ Element providing an on-chart zoom.
 <dom-module id="px-vis-dynamic-menu">
     <template>
       <style include="px-vis-dynamic-menu-styles"></style>
-      <button id="resetBtn" class="btn hidden" on-click="resetZoom">Reset Zoom</button>
+        <button id="resetBtn" class="btn hidden" on-click="resetZoom">Reset Zoom</button>
     </template>
 </dom-module>
 
@@ -71,10 +71,20 @@ Element providing an on-chart zoom.
     fadeIn: function() {
         if(!this._shown && !this._fading) {
             this._fading = true;
+
+            debugger
+            this.classList.remove('fadeOut');
+            this.classList.add('fadeIn');
+
         }
     },
     fadeOut: function() {
-
+        if(this._shown && !this._fading) {
+            this._fading = true;
+            
+            this.classList.remove('fadeIn');
+            this.classList.add('fadeOut');
+        }
     }
   });
 </script>
