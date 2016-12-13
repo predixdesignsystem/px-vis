@@ -1,3 +1,8 @@
+v0.8.2
+==================
+* Cleaned up colors across the board
+* updated tests
+
 v0.8.1
 ==================
 * Update missed design depndencies
@@ -5,9 +10,6 @@ v0.8.1
 v0.8.0
 ==================
 * Updated dependencies
-
-v0.8.0
-==================
 * Theming!
 
 v0.7.5
