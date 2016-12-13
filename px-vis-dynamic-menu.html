@@ -1,4 +1,7 @@
 <link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="../neon-animation/neon-animation-runner-behavior.html"/>
+<link rel="import" href="../neon-animation/animations/fade-in-animation.html"/>
+<link rel="import" href="../neon-animation/animations/fade-out-animation.html"/>
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 
@@ -21,13 +24,24 @@ Element providing an on-chart zoom.
 @demo demo.html
 -->
 
-<link rel="import" href="css/px-vis-zoom-styles.html">
+<link rel="import" href="css/px-vis-dynamic-menu-styles.html">
 
 <dom-module id="px-vis-dynamic-menu">
-    <template>
-      <style include="px-vis-dynamic-menu-styles"></style>
-        <button id="resetBtn" class="btn hidden" on-click="resetZoom">Reset Zoom</button>
-    </template>
+  <template>
+    <style include="px-vis-dynamic-menu-styles"></style>
+
+      <button class="btn btn-menu" on-tap="_buttonClicked">+</button>
+      <div class$="[[_getWrapperClass(_opened)]] menu-wrapper">
+        <ul class="menu-list">
+          <template is="dom-repeat" items={{menuConfig}} strip-whitespace>
+            <li class="menu-wrapper--item u-p--" on-tap="_clickItem" value="{{index}}">{{item.name}}</li>
+          </template>
+        </ul>
+      </div>
+      <!--<template is="dom-if" if="{{_includeTooltip(item.val)}}" strip-whitespace>
+                <px-tooltip tooltip-message="{{item.name}}"></px-tooltip>
+              </template>-->
+  </template>
 </dom-module>
 
 <script>
@@ -36,7 +50,7 @@ Element providing an on-chart zoom.
     is: 'px-vis-dynamic-menu',
 
     behaviors: [
-      
+      Polymer.NeonAnimationRunnerBehavior
     ],
 
     /**
@@ -47,44 +61,134 @@ Element providing an on-chart zoom.
      */
     properties: {
       /**
-       * Whether we're currently shown
+       * Whether we (the button) are currently shown
        */
       _shown: {
         type: Boolean,
         value: false
       },
       /**
-       * Whether we're currently fading (in or out)
+       * Whether the menu is currently opened
        */
-      _fading: {
+      _opened: {
         type: Boolean,
         value: false
+      },
+      /**
+       * Animation config for the fadein/fadeout animations. Configure the "timing"
+       * object of both animations if needed (delay, duration, eaze)
+       */
+      animationConfig: {
+        type: Object,
+        value: function() {
+          return {
+            'fadeIn': {
+              name: 'fade-in-animation',
+              node: this,
+              timing: {
+                delay: 0,
+                duration: 500
+              }
+            },
+            'fadeOut': {
+              name: 'fade-out-animation',
+              node: this,
+              timing: {
+                delay: 0,
+                duration: 500
+              }
+            }
+          }
+        }
+      },
+      /**
+       * The target to bind to an action: this will be the 'this' object when running 
+       */
+     /* actionTarget: {
+        type: Object,
+        value: function() {
+          return this;
+        }
+      },*/
+      menuConfig: {
+        type: Array,
+        value: function() {
+          return [
+            {
+              'name': 'Delete',
+              'action': function(evt) {
+                console.log('run delete');
+              },
+              'eventName': 'delete'
+            },
+            {
+              'name': 'Bring To Front',
+              'action': function(evt) {
+                console.log('run bring to front');
+              },
+              'eventName': 'bring-to-front'
+            }
+
+          ];
+        }
       }
     },
     observers: [
-      'zooooom(extentsData)',
       '_sizeChanged(width, height)'
     ],
     listeners: {
-      'iron-resize': '_sizeChanged'
+      'iron-resize': '_sizeChanged',
+      'neon-animation-finish': '_onNeonAnimationFinish'
     },
     fadeIn: function() {
-        if(!this._shown && !this._fading) {
-            this._fading = true;
+        if(!this._shown) {
+            this._shown = true;
 
-            debugger
-            this.classList.remove('fadeOut');
-            this.classList.add('fadeIn');
+            this.cancelAnimation();
 
+            this.style.display = 'inline-block';
+            this.playAnimation('fadeIn');
         }
     },
     fadeOut: function() {
-        if(this._shown && !this._fading) {
-            this._fading = true;
-            
-            this.classList.remove('fadeIn');
-            this.classList.add('fadeOut');
+        if(this._shown) {
+            this._shown = false;
+
+            this.cancelAnimation();
+            this.playAnimation('fadeOut');
         }
+    },
+    _onNeonAnimationFinish: function() {
+      if(!this._shown) {
+        //hide and make sure we're closed
+        this.style.display = 'none';
+        this.set('_opened', false);
+      }
+    },
+    _getWrapperClass: function(_opened) {
+      if(_opened) {
+        return '';
+      } else {
+        return 'visuallyhidden';
+      }
+    },
+    _buttonClicked: function() {
+
+      this.set('_opened', !this._opened);
+    },
+    _clickItem: function(evt) {
+
+      var target = Polymer.dom(evt).rootTarget,
+          item = this.menuConfig[target.value];
+      if(item.action) {
+
+        //TODO: pass down serie
+        item.action();
+      }
+      if(item.eventName) {
+        this.fire('px-dynamic-menu-' + item.eventName, {test: "lolz"});
+      }
+      this.set('_opened', false);
     }
   });
 </script>

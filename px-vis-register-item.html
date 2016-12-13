@@ -1,6 +1,7 @@
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="px-vis-behavior-common.html"/>
 <link rel="import" href="px-vis-behavior-register.html"/>
+<link rel="import" href="px-vis-dynamic-menu.html"/>
 
 <!--
 Element providing a series line items on the register for regular charts
@@ -32,15 +33,16 @@ Element providing a series line items on the register for regular charts
     <span
       class$="[[_itemMutedToStart]]"
       name$="R{{item.name}}"
-      id="regItem"
-      on-click="_seriesClicked">
+      id="regItem">
       <span
         class="seriesMarker"
+        on-tap="_seriesClicked"
         style$="background-color:[[_itemColor]]"
         name$="R{{item.name}}">&nbsp;</span>
       <span class$="[[_wrapperClass]]">
         <div
           class="seriesName"
+          on-tap="_seriesClicked"
           name$="R{{item.name}}">
           {{_truncatedName}}&nbsp;
           <template is="dom-if" if="[[_didTruncate]]">
@@ -49,6 +51,8 @@ Element providing a series line items on the register for regular charts
         </div>
         <!-- Display serie data differently depending on x and y axis types -->
         <div class="seriesData" name$="R{{item.name}}">
+          <px-vis-dynamic-menu id="menu" style="display: none">
+          </px-vis-dynamic-menu>
           <!-- if x axis is number format and show it -->
           <template is="dom-if" if="{{_isOfType(xAxisType, 'linear')}}">
             <template is="dom-if" if="{{_checkItem(_itemX)}}">
@@ -153,7 +157,14 @@ Element providing a series line items on the register for regular charts
     observers: [
       '_toggleSeries(item,mutedSeries.*)'
     ],
-
+    attached: function() {
+      this.addEventListener('mouseenter', function() {
+        this.$.menu.fadeIn();
+      }.bind(this));
+      this.addEventListener('mouseleave', function() {
+        this.$.menu.fadeOut();
+      }.bind(this));
+    },
     /**
      * returns the unit for the x value based on the seriesConfig
      */
