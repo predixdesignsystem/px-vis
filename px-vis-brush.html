@@ -145,16 +145,27 @@ This element sets the selectedDomain property based on the extents box. The sele
       _preventDomainChange: {
         type: Boolean,
         value: false
+      },
+
+      _animationFrameDone: {
+        type: Boolean,
+        value: false
       }
     },
 
     observers: [
-      'drawElement(domainChanged, svg,axis,height, selectedDomain, currentDomain)',
+      'drawElement(domainChanged, svg,axis,height, selectedDomain, currentDomain, _animationFrameDone)',
       '_zoomBrush(chartDomain.*)'
     ],
 
     detached: function() {
       this.unlisten(window,'mouseup','_brushMouseUp');
+    },
+
+    ready: function() {
+      window.requestAnimationFrame(function() {
+        this.set('_animationFrameDone', true);
+      }.bind(this));
     },
 
     /**
@@ -167,7 +178,7 @@ This element sets the selectedDomain property based on the extents box. The sele
      * @method drawElement
      */
     drawElement: function() {
-      if(this.currentDomain && this.currentDomain.length === 2 && !isNaN(this.currentDomain[0].getTime()) && !isNaN(this.currentDomain[1].getTime())) {
+      if(this._animationFrameDone && this.currentDomain && this.currentDomain.length === 2 && !isNaN(this.currentDomain[0].getTime()) && !isNaN(this.currentDomain[1].getTime())) {
         var heightOffset = 5,
               h = Math.max(this.height - this.margin.bottom - heightOffset,0),
               domain = [

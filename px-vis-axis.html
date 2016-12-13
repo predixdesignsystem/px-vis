@@ -222,11 +222,16 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            */
           _titleGroup: {
             type: Object
+          },
+
+          _animationFrameDone: {
+            type: Boolean,
+            value: false
           }
         },
 
         observers: [
-          'drawElement(domainChanged,svg,axis,margin,height,disableTicks)',
+          'drawElement(domainChanged,svg,axis,margin,height,disableTicks, _animationFrameDone)',
           'drawSeriesBars(completeSeriesConfig.*, titleDrawn)',
           '_muteSeriesBars(mutedSeries.*)',
           '_updateTicks(ticks)',
@@ -250,6 +255,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         },
 
         ready: function() {
+          window.requestAnimationFrame(function(){
+            this.set('_animationFrameDone', true);
+          }.bind(this));
+
           // if there is no dev set unique ID, generate one
           if(!this.axisId) {
             this.set('axisId', this.generateRandomID('axis_'));
@@ -374,7 +383,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          */
         drawElement: function() {
         //  this.debounce('drawAxis', function() {
-            if(this.svg.node() && this.domainChanged !== null) {
+            if(this._animationFrameDone && this.svg.node() && this.domainChanged !== null) {
               this.defineAxis();
 
               // TODO unify my orientation checks

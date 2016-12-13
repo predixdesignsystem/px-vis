@@ -983,19 +983,19 @@ PxVisBehaviorChart.dataVisColorTheming = [{
           visColorCopy = this.dataVisColors,
           serieOrderCopy = this.seriesColorOrder;
 
-      //we rely on the first color being defined for a theme, and then having no 
+      //we rely on the first color being defined for a theme, and then having no
       //gaps in the number. The first "not found" number will bethe end of the themed color
       if(firstThemedColor) {
 
         //theme. Read colors until we can't find one anymore
         var stop = false,
             currentColor;
-            
+
         //rebuild our order
         serieOrderCopy = [];
         while(!stop) {
 
-          
+
           currentColor = this.getComputedStyleValue('--px-vis-series-color-' + index);
 
           if(currentColor) {
@@ -1034,19 +1034,7 @@ PxVisBehaviorChart.dataVisColorTheming = [{
       this.set('dataVisColors', visColorCopy);
       this.set('seriesColorOrder', serieOrderCopy);
 
-    },
-    _hexToRgb: function(hex) {
-        // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
-        var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-        hex = hex.replace(shorthandRegex, function(m, r, g, b) {
-            return r + r + g + g + b + b;
-        });
-
-        var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-        return result ? 'rgb(' + parseInt(result[1], 16) + ',' + 
-                                 parseInt(result[2], 16)+ ',' + 
-                                 parseInt(result[3], 16) + ')' : null;
     }
-}, commonColors];
+}, PxVisBehavior.commonMethods, commonColors];
 
 </script>

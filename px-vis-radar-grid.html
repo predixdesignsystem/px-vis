@@ -132,7 +132,8 @@ Element which draws lines series onto the chart
         if(this.tickValues && this.dimensions && this.tickValues.length > 0 && this.dimensions.length > 0) {
           var data = [],
               config = {},
-              domain = this.y.domain();
+              domain = this.y.domain(),
+              c;
 
           if(domain[0] !== this.tickValues[0]){
             this.tickValues.push(domain[0]);
@@ -149,8 +150,13 @@ Element which draws lines series onto the chart
             }
           }
 
+          //get the color
+          c = this._checkThemeVariable("--px-vis-gridlines-color", this.colors[this.axisColor]);
+          //make sure it is RGB
+          c = c[0] === '#' ? this._hexToRgb(c) : c;
+
           config[this._seriesKey] = {
-            "color" : this._checkThemeVariable("--px-vis-gridlines-color", this.colors[this.axisColor]),
+            "color" : c,
             'x' : this.dimensions
           };
 
