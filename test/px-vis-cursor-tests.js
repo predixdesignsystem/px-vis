@@ -88,8 +88,8 @@ function baseTests(elem,hLine,vLine,circle,hArr,yArr){
   suite('px-vis-cursor ' + elem + ' setup works', function() {
     var baseScale = document.getElementById('baseScale');
     var cursor = document.getElementById(elem),
-        colorOrder = commonColors.properties.seriesColorOrder.value,
-        colorSet = commonColors.properties.dataVisColors.value;
+        colorOrder = dataVisColors.properties.seriesColorOrder.value,
+        colorSet = dataVisColors.properties.dataVisColors.value;
 
     suiteSetup(function(done){
       var d = [{

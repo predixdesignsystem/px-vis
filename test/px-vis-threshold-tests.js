@@ -92,9 +92,9 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         defaultThreshold = document.getElementById('defaultThreshold');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
-    var colors = commonColors.properties.colors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colors = baseColors.properties.colors.value;
 
     test('defaultThreshold thresholdGroup created', function() {
       assert.equal(defaultThreshold.thresholdGroup.node().tagName,'g');
@@ -172,9 +172,9 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         defaultThreshold = document.getElementById('defaultThreshold');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
-    var colors = commonColors.properties.colors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colors = baseColors.properties.colors.value;
 
     test('defaultThreshold thresholdGroup created', function() {
       assert.equal(defaultThreshold.thresholdGroup.nodes()[1].tagName,'g');
@@ -253,9 +253,9 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         boxThreshold = document.getElementById('boxThreshold');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
-    var colors = commonColors.properties.colors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colors = baseColors.properties.colors.value;
 
     test('boxThreshold thresholdLine stroke width', function() {
       assert.equal(boxThreshold.thresholdLine.nodes()[0].getAttribute('stroke-width'),1);

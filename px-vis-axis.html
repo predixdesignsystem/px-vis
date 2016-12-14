@@ -222,11 +222,16 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            */
           _titleGroup: {
             type: Object
+          },
+
+          _animationFrameDone: {
+            type: Boolean,
+            value: false
           }
         },
 
         observers: [
-          'drawElement(domainChanged,svg,axis,margin,height,disableTicks)',
+          'drawElement(domainChanged,svg,axis,margin,height,disableTicks, _animationFrameDone)',
           'drawSeriesBars(completeSeriesConfig.*, titleDrawn)',
           '_muteSeriesBars(mutedSeries.*)',
           '_updateTicks(ticks)',
@@ -250,6 +255,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         },
 
         ready: function() {
+          window.requestAnimationFrame(function(){
+            this.set('_animationFrameDone', true);
+          }.bind(this));
+
           // if there is no dev set unique ID, generate one
           if(!this.axisId) {
             this.set('axisId', this.generateRandomID('axis_'));
@@ -374,7 +383,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          */
         drawElement: function() {
         //  this.debounce('drawAxis', function() {
-            if(this.svg.node() && this.domainChanged !== null) {
+            if(this._animationFrameDone && this.svg.node() && this.domainChanged !== null) {
               this.defineAxis();
 
               // TODO unify my orientation checks
@@ -419,6 +428,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .call(this._axis);
             // .each(function(d) { d3.select(this).call(_this._axis.scale(_this.axis[d])); })
 
+          g.select("path.domain").attr("stroke", this._checkThemeVariable("--px-vis-axis-color", this.colors[this.axisColor]))
           this.set('_axisGroup',g);
 
           this._setLineStyles(this._axisGroup,'line,path');
@@ -550,14 +560,21 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         _setLabelStyles:function(elem) {
           elem.selectAll('text')
             .attr('font-size', this.labelTypeSize + 'px')
-            .style('font-family','GE Inspira Sans');
-            // .attr('font-style','GE Inspira Sans');
+            .style('font-family',this._checkThemeVariable("--px-font-family", 'GE Inspira Sans'))
+            .attr('font-style', this._checkThemeVariable("--px-font-family", 'GE Inspira Sans'));
+
+          if(this.labelPosition !== 'inline') {
+            elem.selectAll('text')
+              .attr('fill',this._checkThemeVariable("--px-vis-axis-color", this.colors[this.axisColor]));
+
+            elem.selectAll('g.tick').selectAll("line")
+              .attr('stroke',this._checkThemeVariable("--px-vis-axis-color", this.colors[this.axisColor]));
+            }
 
           if(this.labelPosition !== 'center') {
             var label = this.setLabelDims();
 
             elem.selectAll('text')
-              .attr('fill',this.colors[this.axisColor])
               .attr('y', label.y)
               .attr('x', label.x)
               .attr('text-anchor', label.anchor)
@@ -580,10 +597,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
                 return tickText.nodes()[i].getBoundingClientRect().width + 6
               })
               .attr('height', this.labelTypeSize + 4)
-              .attr('fill',this.colors[this.axisColor])
+              .attr('fill',this._checkThemeVariable("--px-vis-axis-inline-box-color", this.colors[this.axisColor]))
               .attr('transform','rotate(' + this.labelRotation + ')');
 
-              tickText.attr('fill',this.colors['white']);
+              tickText.attr('fill', this._checkThemeVariable("--px-vis-axis-inline-type-color", this.colors['white']));
           }
         },
         /**
@@ -594,7 +611,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           elem.selectAll(lines)
             .attr('test','test')
             .attr('fill','none')
-            .attr('stroke', this.colors[this.axisColor])
+            .attr('stroke', this._checkThemeVariable("--px-vis-axis-color", this.colors[this.axisColor]))
             .attr('shape-rendering', 'crispEdges')
             .attr('stroke-width', this.strokeWidth);
         },
@@ -652,10 +669,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
             this._titleGroup.append('text')
               .attr('class','axis-title')
-              .attr('fill',this.colors[this.axisColor])
+              .attr('fill',this._checkThemeVariable("--px-vis-axis-color", this.colors[this.axisColor]))
               .attr('font-size', this.titleTypeSize + 'px')
-              .style('font-family','GE Inspira Sans')
-              // .attr('font-style','GE Inspira Sans')
+              .style('font-family',this._checkThemeVariable("--px-font-family", 'GE Inspira Sans'))
+              .attr('font-style', this._checkThemeVariable("--px-font-family", 'GE Inspira Sans'))
               .text(this.displayedTitle)
               .attr('text-anchor', anchor)
               .style('text-anchor', anchor)
@@ -667,7 +684,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             this.svg.select('g.title-group[for=' + this.axisId + '] text')
               .attr('text-anchor', anchor)
               .style('text-anchor', anchor)
-              .attr('fill',this.colors[this.axisColor])
+              .attr('fill',this._checkThemeVariable("--px-vis-axis-color", this.colors[this.axisColor]))
               .attr('font-size', this.titleTypeSize + 'px')
               .text(this.displayedTitle)
               .attr('transform','rotate(' + r + ')');
@@ -725,8 +742,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .attr('width',15)
             .attr('fill',color)
             .attr('series-bar-id','bar_' + sid)
-            .attr('transform','translate(-12,' + (-3 -w - 5 * index) + ')')
-            // .attr('transform','translate(-12,' + (-3 -w - 8 * index) + ')')
+            // .attr('transform','translate(-12,' + (-3 -w - 5 * index) + ')')
+            .attr('transform','translate(-12,' + (-3 -w - 8 * index) + ')')
             .attr('opacity', function() {
               return (this.mutedSeries && this.mutedSeries[sid]) ? 0.5 : 1;
             }.bind(this));

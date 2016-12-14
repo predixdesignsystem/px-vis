@@ -13,9 +13,7 @@ function runTests(){
     var baseScale = document.getElementById('baseScale'),
         baseSVG = document.getElementById('baseSVG'),
         baseGrid = document.getElementById('baseGrid');
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.va1lue;
-    var colors = commonColors.properties.colors.value;
+    var colors = baseColors.properties.colors.value;
 
     suiteSetup(function(done){
       var d = [

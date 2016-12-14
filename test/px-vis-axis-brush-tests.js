@@ -122,7 +122,7 @@ function runTests(){
 
   suite('px-vis-axis-brush brush resizes to the inputed domain', function() {
     var multiBrush = document.getElementById('multiBrush');
-    var colors = commonColors.properties.colors.value;
+    var colors = baseColors.properties.colors.value;
     var d;
     suiteSetup(function(done) {
       d = [~~multiBrush.axis['y1'](16),~~multiBrush.axis['y1'](9)];
@@ -635,7 +635,7 @@ function runTests(){
 
   suite('px-vis-axis-brush brush resizes to the inputed domain', function() {
     var radialBrush = document.getElementById('radialBrush');
-    var colors = commonColors.properties.colors.value;
+    var colors = baseColors.properties.colors.value;
     var d;
     suiteSetup(function(done) {
       d = [radialBrush.axis(9),radialBrush.axis(16)];

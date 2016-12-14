@@ -75,7 +75,7 @@ Element providing an on-chart zoom.
       this._zoomed = true;
 
       this.rePositionButton();
-     
+
       this.set('selectedDomain', {x:extentsData.eX, y:extentsData.eY});
       this.fire('px-vis-selected-domain-updated', { 'data':{x:extentsData.eX, y:extentsData.eY}, 'method': 'set', 'dataVar': 'selectedDomain' });
     },
@@ -85,10 +85,12 @@ Element providing an on-chart zoom.
     rePositionButton: function() {
       if(this._zoomed) {
         this.debounce('repositionButton', function() {
-          var rect = this.pxSvgElem.getBoundingClientRect(),
-            topLeftRect = this.getBoundingClientRect();
-          this.$.resetBtn.style.left = (rect.width - 170) - Number(this.margin.right) + 'px';
-          this.$.resetBtn.style.top = (rect.top - topLeftRect.top) + Number(this.margin.top) + 'px';
+          if(this.pxSvgElem) {
+            var rect = this.pxSvgElem.getBoundingClientRect(),
+              topLeftRect = this.getBoundingClientRect();
+            this.$.resetBtn.style.left = (rect.width - 170) - Number(this.margin.right) + 'px';
+            this.$.resetBtn.style.top = (rect.top - topLeftRect.top) + Number(this.margin.top) + 'px';
+          }
         }.bind(this), 20);
       }
     },

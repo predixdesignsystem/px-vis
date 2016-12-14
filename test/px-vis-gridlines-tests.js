@@ -81,9 +81,9 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         baseXGrid = document.getElementById('baseXGrid');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
-    var colors = commonColors.properties.colors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colors = baseColors.properties.colors.value;
 
     test('baseXGrid ID is random', function() {
       assert.equal(baseXGrid.gridId.length,15);
@@ -155,9 +155,9 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         baseYGrid = document.getElementById('baseYGrid');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
-    var colors = commonColors.properties.colors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colors = baseColors.properties.colors.value;
 
     test('baseYGrid ID is random', function() {
       assert.equal(baseYGrid.gridId.length,15);

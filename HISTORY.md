@@ -29,6 +29,24 @@ v1.0.0
 * Register Changes:
   * Added margin to register height calculation
 
+v0.8.2
+==================
+* Cleaned up colors across the board
+* updated tests
+
+v0.8.1
+==================
+* Update missed design depndencies
+
+v0.8.0
+==================
+* Updated dependencies
+* Theming!
+
+v0.7.5
+==================
+* protect running zoom too early
+
 v0.7.4
 ==================
 * fix zoom resize on timeseries
