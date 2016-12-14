@@ -26,6 +26,8 @@ v1.0.0
   * all subcomponents have an API Documentation page
 * Added navigatorConfig and ability to configure chart navigator with it
 * most px-vis components now only loads basic colors as opposed to basic colors + dataVis colors
+* Register Changes:
+  * Added margin to register height calculation
 
 v0.7.4
 ==================
