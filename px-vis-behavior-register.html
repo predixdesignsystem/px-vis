@@ -139,8 +139,8 @@ PxVisBehaviorRegister.itemShared = {
   /**
    * helper function to set initial classes
    */
-  _baseClasses: function() {
-    var baseClasses = (this.type === 'horizontal') ? "series narrow flex flex--row" : "series wide flex flex--row";
+  _computeBaseClasses: function() {
+    var baseClasses = (this.type === 'horizontal') ? "series narrow flex flex--row" : "series wide flex flex--row flex--justify";
     return baseClasses;
   },
 };
@@ -163,7 +163,7 @@ PxVisBehaviorRegister.register = {
    * returns the correct classes for the series based on type
    */
   _getSeriesWrapperClass: function(type) {
-    var classList = 'flex ';
+    var classList = 'flex fullWidth ';
 
     if(type === 'horizontal') {
       classList += 'flex--row ';
@@ -276,11 +276,18 @@ PxVisBehaviorRegister.datetime = {
 PxVisBehaviorRegister.generalItem = [{
   properties: {
     /**
-     * Decides if the item starts off muted
+     * Decides if the item should be muted
      */
     _itemMutedToStart: {
       type: String,
       computed: '_computeItemMutedToStart(item, completeSeriesConfig.*)'
+    },
+    /**
+     * Base classes for register item based on its type (vertical/horizontal)
+     */
+    _baseClasses: {
+      type: String,
+      computed: '_computeBaseClasses(type)'
     },
     /**
      * calcates the color of the item
@@ -316,17 +323,16 @@ PxVisBehaviorRegister.generalItem = [{
   /**
    * helper function to set initial classes
    *
-   * Adds or removes muted class to those series in the register and sets base classes.
+   * Adds or removes muted class to those series in the register
    *
    * @method _mutedToStart
    */
-  _mutedToStart: function() {
-    var classes = this._baseClasses();
+  _mutedToStart: function(name) {
 
-    if(this.mutedSeries[this.name]) {
-      return classes + ' muted';
+    if(this.mutedSeries[name]) {
+      return 'muted';
     }
-    return classes;
+    return '';
   },
 
   /**
@@ -365,7 +371,7 @@ PxVisBehaviorRegister.generalItem = [{
   _toggleSeries: function(item) {
     //if it is a bool, we have something.
     if(typeof this.mutedSeries[item.name] === 'boolean') {
-      this.toggleClass('muted', this.mutedSeries[item.name], this.$$.regItem);
+      this.toggleClass('muted', this.mutedSeries[item.name], this.$.regWithoutMenu);
     }
   }
 }, PxVisBehavior.muteUnmuteSeries];

@@ -1,6 +1,7 @@
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="px-vis-behavior-common.html"/>
 <link rel="import" href="px-vis-behavior-register.html"/>
+<link rel="import" href="px-vis-dynamic-menu.html"/>
 
 <!--
 Element providing a series line items on the register for regular charts
@@ -28,38 +29,51 @@ Element providing a series line items on the register for regular charts
   <template>
     <style include="px-vis-register-styles"></style>
 
-
     <span
-      class$="[[_itemMutedToStart]]"
+      class$="[[_baseClasses]] register-item--min-width"
       name$="R{{item.name}}"
-      id="regItem"
-      on-click="_seriesClicked">
-      <span
-        class="seriesMarker"
-        style$="background-color:[[_itemColor]]"
-        name$="R{{item.name}}">&nbsp;</span>
-      <span class$="[[_wrapperClass]]">
-        <div
-          class="seriesName"
-          name$="R{{item.name}}">
-          {{_truncatedName}}&nbsp;
-          <template is="dom-if" if="[[_didTruncate]]">
-            <px-tooltip delay="500">[[_configName]]</px-tooltip>
-          </template>
-        </div>
-        <!-- Display serie data differently depending on x and y axis types -->
-        <div class="seriesData" name$="R{{item.name}}">
-          <!-- if x axis is number format and show it -->
-          <template is="dom-if" if="{{_isOfType(xAxisType, 'linear')}}">
-            <template is="dom-if" if="{{_checkItem(_itemX)}}">
-              <numbro-element
-                value="[[_itemX]]"
-                format="[[numberFormat]]"
-                culture="[[numberFormatCulture]]"
-                currency$="[[numberFormatIsCurrency]]"
-                default-currency-format="[[numberFormatCurrency]]"
-                zero-format="[[numberFormatZero]]">
-              </numbro-element>
+      id="regItem">
+      <span 
+        class$="flex flex__item [[_itemMutedToStart]]"
+        on-tap="_seriesClicked"
+        id="regWithoutMenu">
+        <span
+          class="seriesMarker"
+          style$="background-color:[[_itemColor]]"
+          name$="R{{item.name}}">&nbsp;</span>
+        <span class$="[[_wrapperClass]]">
+          <div
+            class="seriesName flex__item"
+            name$="R{{item.name}}">
+            {{_truncatedName}}&nbsp;
+            <template is="dom-if" if="[[_didTruncate]]">
+              <px-tooltip delay="500">[[_configName]]</px-tooltip>
+            </template>
+          </div>
+          <!-- Display serie data differently depending on x and y axis types -->
+          <div class="seriesData flex__item" name$="R{{item.name}}">
+            <!-- if x axis is number format and show it -->
+            <template is="dom-if" if="{{_isOfType(xAxisType, 'linear')}}">
+              <template is="dom-if" if="{{_checkItem(_itemX)}}">
+                <numbro-element
+                  value="[[_itemX]]"
+                  format="[[numberFormat]]"
+                  culture="[[numberFormatCulture]]"
+                  currency$="[[numberFormatIsCurrency]]"
+                  default-currency-format="[[numberFormatCurrency]]"
+                  zero-format="[[numberFormatZero]]">
+                </numbro-element>
+                <template is="dom-if" if="[[_checkItem(_itemX)]]">
+                  {{_xUnit}}
+                </template>
+                <template is="dom-if" if="[[_checkItem(_itemX)]]">
+                  &nbsp;/&nbsp
+                </template>
+              </template>
+            </template>
+            <!-- if x axis is ordinal just display it -->
+            <template is="dom-if" if="{{_isOfType(xAxisType, 'ordinal')}}">
+              <span>[[_itemX]]</span>
               <template is="dom-if" if="[[_checkItem(_itemX)]]">
                 {{_xUnit}}
               </template>
@@ -67,40 +81,38 @@ Element providing a series line items on the register for regular charts
                 &nbsp;/&nbsp
               </template>
             </template>
-          </template>
-          <!-- if x axis is ordinal just display it -->
-          <template is="dom-if" if="{{_isOfType(xAxisType, 'ordinal')}}">
-            <span>[[_itemX]]</span>
-            <template is="dom-if" if="[[_checkItem(_itemX)]]">
-              {{_xUnit}}
-            </template>
-            <template is="dom-if" if="[[_checkItem(_itemX)]]">
-              &nbsp;/&nbsp
-            </template>
-          </template>
-          <!-- if x axis is time don't display it -->
-          <!-- if y axis is number format and show it -->
-            <template is="dom-if" if="{{_isOfType(yAxisType, 'linear')}}">
-              <template is="dom-if" if="{{_checkItem(_itemY)}}">
-                <numbro-element
-                  value="[[_itemY]]"
-                  format="[[numberFormat]]"
-                  culture="[[numberFormatCulture]]"
-                  currency$="[[numberFormatIsCurrency]]"
-                  default-currency-format="[[numberFormatCurrency]]"
-                  zero-format="[[numberFormatZero]]">
-                </numbro-element>
+            <!-- if x axis is time don't display it -->
+            <!-- if y axis is number format and show it -->
+              <template is="dom-if" if="{{_isOfType(yAxisType, 'linear')}}">
+                <template is="dom-if" if="{{_checkItem(_itemY)}}">
+                  <numbro-element
+                    value="[[_itemY]]"
+                    format="[[numberFormat]]"
+                    culture="[[numberFormatCulture]]"
+                    currency$="[[numberFormatIsCurrency]]"
+                    default-currency-format="[[numberFormatCurrency]]"
+                    zero-format="[[numberFormatZero]]">
+                  </numbro-element>
+                </template>
               </template>
-            </template>
-            <!-- if y axis is ordinal just display it -->
-            <template is="dom-if" if="{{_isOfType(yAxisType, 'ordinal')}}">
-              <span>[[_itemY]]</span>
-            </template>
-            <template is="dom-if" if="[[_checkItem(_itemY)]]">
-              {{_yUnit}}
-            </template>
-          </div>
+              <!-- if y axis is ordinal just display it -->
+              <template is="dom-if" if="{{_isOfType(yAxisType, 'ordinal')}}">
+                <span>[[_itemY]]</span>
+              </template>
+              <template is="dom-if" if="[[_checkItem(_itemY)]]">
+                {{_yUnit}}
+              </template>
+            </div>
+          </span>
         </span>
+        <!-- force opacity to 1 so that 'muted' is not applied to the menu -->
+        <px-vis-dynamic-menu 
+            id="menu" 
+            class$="[[_getDynamicMenuClass(type)]]"
+            style="display: none; opacity: 1"
+            additional-detail="[[item]]"
+            dynamic-menu-config="[[dynamicMenuConfig]]">
+        </px-vis-dynamic-menu>
       </span>
   </template>
 </dom-module>
@@ -117,7 +129,8 @@ Element providing a series line items on the register for regular charts
       PxVisBehavior.axisTypes,
       PxVisBehaviorRegister.register,
       PxVisBehaviorRegister.itemShared,
-      PxVisBehaviorRegister.generalItem
+      PxVisBehaviorRegister.generalItem,
+      PxVisBehavior.dynamicMenuConfig
     ],
     properties: {
       /**
@@ -153,7 +166,15 @@ Element providing a series line items on the register for regular charts
     observers: [
       '_toggleSeries(item,mutedSeries.*)'
     ],
+    attached: function() {
 
+      this.addEventListener('mouseenter', function() {
+        this.$.menu.fadeIn();
+      }.bind(this));
+      this.addEventListener('mouseleave', function() {
+        this.$.menu.fadeOut();
+      }.bind(this));
+    },
     /**
      * returns the unit for the x value based on the seriesConfig
      */
@@ -198,6 +219,14 @@ Element providing a series line items on the register for regular charts
         return true;
       }
       return false;
+    },
+
+    _getDynamicMenuClass: function(type) {
+      if(type === 'vertical') {
+        return 'flex__item--bottom';
+      } else {
+        return '';
+      }
     }
 
   });
