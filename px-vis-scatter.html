@@ -210,51 +210,53 @@ Element which draws scatter series onto the chart
      * @method drawElement
      */
     drawElement: function() {
-      var data = this.chartData;
+      if(this.domainChanged) {
+        var data = this.chartData;
 
-      // checks to see if the group already exists. If not, create; if so, update
-      if(this._isObjEmpty(this.scatterGroup)) {
+        // checks to see if the group already exists. If not, create; if so, update
+        if(this._isObjEmpty(this.scatterGroup)) {
 
-        // draw the path
-        this.scatterGroup = this.svg.append('g')
-          .attr('series-id', this.seriesId)
-          .attr('class', 'series-scatter');
+          // draw the path
+          this.scatterGroup = this.svg.append('g')
+            .attr('series-id', this.seriesId)
+            .attr('class', 'series-scatter');
 
-        //send empty tooltip data so the register shows up
-        this._hideTooltip();
+          //send empty tooltip data so the register shows up
+          this._hideTooltip();
+        }
+
+        if(this.radial) {
+          this._defineRadialLine(false, this.multiPath, this.counterClockwise, this.useDegrees);
+        }
+
+        var _this = this;
+
+        this.scatterBuilder = this.scatterGroup.selectAll('path.symbol')
+          .data(data);
+
+        this.scatterBuilder.exit().remove();
+  
+        this.scatterBuilder.enter()
+          .append('path')
+          .attr('class', 'symbol')
+          .on('mouseover', this._mouseEnterSymbol.bind(this))
+          .on('mouseleave', this._mouseLeaveSymbol.bind(this))
+        .merge(this.scatterBuilder)
+          .attr('d', Px.d3.symbol().type(this._markerMapping[this.markerSymbol]).size(this.markerSize))
+          .attr('transform', this._applyTransform.bind(this))
+          .each(function(d,i) {
+            // if this series is missing a datapoint, remove that point
+            if(!_this._isValidData(d[_this.completeSeriesConfig[_this.seriesId]['y']])) {
+              this.remove();
+            }
+          });
+
+        this.scatterDots = this.scatterGroup.selectAll('path.symbol');
+
+        this._colorScatter();
+
+        this._addClipPath();
       }
-
-      if(this.radial) {
-        this._defineRadialLine(false, this.multiPath, this.counterClockwise, this.useDegrees);
-      }
-
-      var _this = this;
-
-      this.scatterBuilder = this.scatterGroup.selectAll('path.symbol')
-        .data(data);
-
-      this.scatterBuilder.exit().remove();
-
-      this.scatterBuilder.enter()
-        .append('path')
-        .attr('class', 'symbol')
-        .on('mouseover', this._mouseEnterSymbol.bind(this))
-        .on('mouseleave', this._mouseLeaveSymbol.bind(this))
-      .merge(this.scatterBuilder)
-        .attr('d', Px.d3.symbol().type(this._markerMapping[this.markerSymbol]).size(this.markerSize))
-        .attr('transform', this._applyTransform.bind(this))
-        .each(function(d,i) {
-          // if this series is missing a datapoint, remove that point
-          if(!_this._isValidData(d[_this.completeSeriesConfig[_this.seriesId]['y']])) {
-            this.remove();
-          }
-        });
-
-      this.scatterDots = this.scatterGroup.selectAll('path.symbol');
-
-      this._colorScatter();
-
-      this._addClipPath();
     },
 
     /**
