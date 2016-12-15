@@ -27,9 +27,11 @@ The gridlines still make use of the d3.axis object, just with different settings
 @homepage index.html
 @demo demo.html
 -->
+<link rel="import" href="css/px-vis-styles.html">
+
 <dom-module id="px-vis-radial-gridlines">
-    <link rel="import" type="css" href="css/px-vis-radial-gridlines.css"/>
     <template>
+      <style include="px-vis-styles"></style>
 
     </template>
 </dom-module>
@@ -96,7 +98,6 @@ The gridlines still make use of the d3.axis object, just with different settings
          */
         drawElement: function() {
           this.debounce('draw_grid', function() {
-
             //clean the svg
             //remove everything in the svg so we can start a clean draw
             var node = this.svg.node();
@@ -109,7 +110,7 @@ The gridlines still make use of the d3.axis object, just with different settings
             //draw the lines
             var ga = this.svg.append('g')
                 .attr('class', 'a axis')
-                .attr('stroke', this.colors.grey4)
+                .attr('stroke', this._checkThemeVariable("--px-vis-gridlines-color", this.colors.grey4))
                 .attr('stroke-width', '1')
             .selectAll('g')
                 //data is our degree markings that are not occupied by axes
@@ -133,7 +134,7 @@ The gridlines still make use of the d3.axis object, just with different settings
             gr = this.svg.append('g')
                 .attr('class', 'r axis')
                 .attr('fill', 'none')
-                .attr('stroke', this.colors.grey4)
+                .attr('stroke', this._checkThemeVariable("--px-vis-gridlines-color", this.colors.grey4))
                 .selectAll('g')
                     .data(tickValues)
                 .enter().append('g');

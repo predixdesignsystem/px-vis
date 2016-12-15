@@ -85,9 +85,9 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         baseXAxis = document.getElementById('baseXAxis');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
-    var colors = commonColors.properties.colors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colors = baseColors.properties.colors.value;
 
     test('baseXAxis ID is random', function() {
       assert.equal(baseXAxis.axisId.length,15);
@@ -192,9 +192,9 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         baseYAxis = document.getElementById('baseYAxis');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
-    var colors = commonColors.properties.colors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colors = baseColors.properties.colors.value;
 
     test('baseYAxis ID is random', function() {
       assert.equal(baseYAxis.axisId.length,15);
@@ -1125,7 +1125,7 @@ function runTests(){
         inlineXAxis,
         inlineYAxis,
         xLabels, yLabels, xRects, yRects;
-    var colors = commonColors.properties.colors.value;
+    var colors = baseColors.properties.colors.value;
 
     suiteSetup(function(done){
       var d = [{

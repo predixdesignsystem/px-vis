@@ -306,8 +306,8 @@ function basicTests(registerID,dir){
     });
 
     test(registerID + ' colors are correct', function() {
-      var colorOrder = commonColors.properties.seriesColorOrder.value;
-      var colorSet = commonColors.properties.dataVisColors.value;
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
       var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item');
       for(var i = 0; i < series.length; i++){
         assert.equal(series[i].querySelector('.seriesMarker').getAttribute('style').split(' ').join('').split(';')[0], 'background-color:' + colorSet[ colorOrder[i] ]);
@@ -477,8 +477,8 @@ function basicTests(registerID,dir){
 }
 
 function generateEmptyData(num,str){
-  var colorOrder = commonColors.properties.seriesColorOrder.value;
-  var colorSet = commonColors.properties.dataVisColors.value;
+  var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+  var colorSet = dataVisColors.properties.dataVisColors.value;
   var str = str || 'series_';
   var chartData = [];
   var dataObj = {

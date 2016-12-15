@@ -1,5 +1,4 @@
 <link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="../px-colors-design/colors.html"/>
 <link rel="import" href="px-vis-behavior-common.html"/>
 <link rel="import" href="px-vis-behavior-register.html"/>
 <link rel="import" href="px-vis-behavior-datetime.html"/>
@@ -107,6 +106,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
 
         <template is="dom-if" if="{{_displayTime(xAxisType, forceDateTimeDisplay)}}">
           <px-vis-register-datetime
+            class$="[[tooltipStyle]]"
             first-date-time="[[_firstDateTime]]"
             second-date-time="[[_secondDateTime]]"
             separator="[[_separator]]"
@@ -120,6 +120,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
               <div class$="{{_getSeriesWrapperClass(type)}}">
                 <template is="dom-repeat" items="{{_groups}}" on-dom-change="_scrollBarsPresent">
                   <px-vis-register-item
+                    class$="[[tooltipStyle]]"
                     item="[[item]]"
                     dynamic-menu-config="[[dynamicMenuConfig]]"
                     complete-series-config="[[completeSeriesConfig]]"
@@ -316,7 +317,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
     },
 
     _returnHeight: function(height,margin) {
-      return this.type === 'vertical' ? 'height:' + (height - 40) + 'px': '';
+      return this.type === 'vertical' ? 'height:' + (height - margin.bottom) + 'px': '';
     },
 
     _scrollBarsPresent: function() {

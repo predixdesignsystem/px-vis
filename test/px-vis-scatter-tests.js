@@ -14,8 +14,8 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         baseScatter = document.getElementById('baseScatter');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
 
     suiteSetup(function(){
       var d = [{
@@ -115,8 +115,8 @@ function runTests(){
         mutedScatter1 = document.getElementById('mutedScatter1'),
         mutedScatter2 = document.getElementById('mutedScatter2');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
 
     suiteSetup(function(done){
       var d = [{
@@ -282,8 +282,8 @@ function runTests(){
         mutedScatter1 = document.getElementById('mutedScatter1'),
         mutedScatter2 = document.getElementById('mutedScatter2');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
 
     suiteSetup(function(done){
       var m = {
@@ -329,8 +329,8 @@ function runTests(){
         mutedScatter1 = document.getElementById('mutedScatter1'),
         mutedScatter2 = document.getElementById('mutedScatter2');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
 
     suiteSetup(function(done){
       var m = {
@@ -382,8 +382,8 @@ function runTests(){
         markerStar = document.getElementById('markerStar'),
         markerWye = document.getElementById('markerWye');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
 
     suiteSetup(function(done){
       var d = [{

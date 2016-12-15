@@ -14,8 +14,8 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         baseLine = document.getElementById('baseLine');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -101,8 +101,8 @@ function runTests(){
         mutedLine1 = document.getElementById('mutedLine1'),
         mutedLine2 = document.getElementById('mutedLine2');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
     var linePath1,linePath2;
 
     suiteSetup(function(done){
@@ -225,8 +225,8 @@ function runTests(){
         mutedLine1 = document.getElementById('mutedLine1'),
         mutedLine2 = document.getElementById('mutedLine2');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
 
     suiteSetup(function(done){
       var m = {
@@ -261,8 +261,8 @@ function runTests(){
         mutedLine1 = document.getElementById('mutedLine1'),
         mutedLine2 = document.getElementById('mutedLine2');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
 
     suiteSetup(function(done){
       var m = {
@@ -296,8 +296,8 @@ function runTests(){
         mutedLine1 = document.getElementById('mutedLine1'),
         mutedLine2 = document.getElementById('mutedLine2');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
 
     suiteSetup(function(done){
       var m = {
@@ -334,8 +334,8 @@ function runTests(){
         missingDataPointLine1 = document.getElementById('missingDataPointLine1'),
         missingDataPointLine2 = document.getElementById('missingDataPointLine2');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
     var linePath1,linePath2;
 
     suiteSetup(function(done){
@@ -433,8 +433,8 @@ function runTests(){
   //       canvasLine1 = document.getElementById('canvasLine1'),
   //       canvasLine2 = document.getElementById('canvasLine2');
   //
-  //   var colorOrder = commonColors.properties.seriesColorOrder.value;
-  //   var colorSet = commonColors.properties.dataVisColors.value;
+  //   var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+  //   var colorSet = dataVisColors.properties.dataVisColors.value;
   //   var linePath1,linePath2;
   //
   //   suiteSetup(function(done){
@@ -540,8 +540,8 @@ function runTests(){
         parallelSVG = document.getElementById('parallelSVG'),
         parallelLine = document.getElementById('parallelLine');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -661,8 +661,8 @@ function runTests(){
         parallelGradientSVG = document.getElementById('parallelGradientSVG'),
         parallelGradientLine = document.getElementById('parallelGradientLine');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -794,8 +794,8 @@ function runTests(){
         parallelCategorySVG = document.getElementById('parallelCategorySVG'),
         parallelCategoryLine = document.getElementById('parallelCategoryLine');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -941,8 +941,8 @@ function runTests(){
         parallelCategoryGradientSVG = document.getElementById('parallelCategoryGradientSVG'),
         parallelCategoryGradientLine = document.getElementById('parallelCategoryGradientLine');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1096,8 +1096,8 @@ function runTests(){
         parallelCategoryGradientSVG = document.getElementById('parallelCategoryGradientSVG'),
         parallelCategoryGradientLine = document.getElementById('parallelCategoryGradientLine');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1144,8 +1144,8 @@ function runTests(){
         parallelCategoryGradientSVG = document.getElementById('parallelCategoryGradientSVG'),
         parallelCategoryGradientLine = document.getElementById('parallelCategoryGradientLine');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1192,8 +1192,8 @@ function runTests(){
   //       parallelCanvasSVG = document.getElementById('parallelCanvasSVG'),
   //       parallelCanvasLine = document.getElementById('parallelCanvasLine');
   //
-  //   var colorOrder = commonColors.properties.seriesColorOrder.value;
-  //   var colorSet = commonColors.properties.dataVisColors.value;
+  //   var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+  //   var colorSet = dataVisColors.properties.dataVisColors.value;
   //   var linePath1;
   //
   //   suiteSetup(function(done){
@@ -1286,8 +1286,8 @@ function runTests(){
   //       parallelGradientCanvasSVG = document.getElementById('parallelGradientCanvasSVG'),
   //       parallelGradientCanvasLine = document.getElementById('parallelGradientCanvasLine');
   //
-  //   var colorOrder = commonColors.properties.seriesColorOrder.value;
-  //   var colorSet = commonColors.properties.dataVisColors.value;
+  //   var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+  //   var colorSet = dataVisColors.properties.dataVisColors.value;
   //   var linePath1;
   //
   //   suiteSetup(function(done){
@@ -1380,8 +1380,8 @@ function runTests(){
   //       parallelCategoryCanvasSVG = document.getElementById('parallelCategoryCanvasSVG'),
   //       parallelCategoryCanvasLine = document.getElementById('parallelCategoryCanvasLine');
   //
-  //   var colorOrder = commonColors.properties.seriesColorOrder.value;
-  //   var colorSet = commonColors.properties.dataVisColors.value;
+  //   var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+  //   var colorSet = dataVisColors.properties.dataVisColors.value;
   //   var linePath1;
   //
   //   suiteSetup(function(done){
@@ -1496,8 +1496,8 @@ function runTests(){
   //       parallelCategoryGradientCanvasSVG = document.getElementById('parallelCategoryGradientCanvasSVG'),
   //       parallelCategoryGradientCanvasLine = document.getElementById('parallelCategoryGradientCanvasLine');
   //
-  //   var colorOrder = commonColors.properties.seriesColorOrder.value;
-  //   var colorSet = commonColors.properties.dataVisColors.value;
+  //   var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+  //   var colorSet = dataVisColors.properties.dataVisColors.value;
   //   var linePath1;
   //
   //   suiteSetup(function(done){
@@ -1611,8 +1611,8 @@ function runTests(){
         polarSVG = document.getElementById('polarSVG'),
         polarLine = document.getElementById('polarLine');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1726,8 +1726,8 @@ function runTests(){
         polarDegreeSVG = document.getElementById('polarDegreeSVG'),
         polarDegreeLine = document.getElementById('polarDegreeLine');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1840,8 +1840,8 @@ function runTests(){
         polarCCWSVG = document.getElementById('polarCCWSVG'),
         polarCCWLine = document.getElementById('polarCCWLine');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1955,8 +1955,8 @@ function runTests(){
         polarDegreeCCWSVG = document.getElementById('polarDegreeCCWSVG'),
         polarDegreeCCWLine = document.getElementById('polarDegreeCCWLine');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -2069,8 +2069,8 @@ function runTests(){
         polarMissingSVG = document.getElementById('polarMissingSVG'),
         polarMissingLine = document.getElementById('polarMissingLine');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -2177,8 +2177,8 @@ function runTests(){
         radarSVG = document.getElementById('radarSVG'),
         radarLine = document.getElementById('radarLine');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -2416,8 +2416,8 @@ function runTests(){
         radarMissingSVG = document.getElementById('radarMissingSVG'),
         radarMissingLine = document.getElementById('radarMissingLine');
 
-    var colorOrder = commonColors.properties.seriesColorOrder.value;
-    var colorSet = commonColors.properties.dataVisColors.value;
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
     var linePath;
 
     suiteSetup(function(done){

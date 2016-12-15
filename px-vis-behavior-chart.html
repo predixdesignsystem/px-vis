@@ -85,7 +85,7 @@ PxVisBehaviorChart.chartCommon = [{
       seriesConfig: {
         type: Object,
         notify: true,
-        value: function(){
+        value: function() {
           return {}
         }
       },
@@ -108,7 +108,7 @@ PxVisBehaviorChart.chartCommon = [{
       defaultSeriesConfig: {
         type: Object,
         notify: true,
-        value: function(){
+        value: function() {
           // defaultSeriesConfig[xMin] cant be Infinity by default because then we cant assign it Infinity in json.
           return {
             "type": "line",
@@ -140,14 +140,14 @@ PxVisBehaviorChart.chartCommon = [{
     },
 
     observers: [
-      '_setCompleteSeriesConfig(defaultSeriesConfig.*,chartData.*,seriesConfig.*)'
+      '_setCompleteSeriesConfig(defaultSeriesConfig.*,chartData.*,seriesConfig.*,dataVisColors.*,seriesColorOrder.*)'
     ],
 
     /**
     * Calcs the extents of the charts
     */
-    _calcChartExts: function(mins,maxes,axis){
-      if(this[axis + 'AxisType'] === 'ordinal'){
+    _calcChartExts: function(mins,maxes,axis) {
+      if(this[axis + 'AxisType'] === 'ordinal') {
         // how should someone set the ordinal list? Differet key in seriesConfig?
         return [];
       }
@@ -162,8 +162,8 @@ PxVisBehaviorChart.chartCommon = [{
     * Creates the real series confit object based on the default settings, the dev defined series config, and the includeAllSeries flag.
     *
     */
-    _setCompleteSeriesConfig: function(){
-      if(this._doesObjHaveValues(this.defaultSeriesConfig) && this._doesObjHaveValues(this.chartData)) {
+    _setCompleteSeriesConfig: function() {
+      if(this._doesObjHaveValues(this.defaultSeriesConfig) && this._doesObjHaveValues(this.chartData) && this._doesObjHaveValues(this.dataVisColors)) {
         // FUTURE TODO refactor: use MAPs and SETs instead of Objects when IE has support / is no longer supported by us
         // We could use d3 sets and maps... worth it?
         var fullConfig = (this.seriesConfig) ? JSON.parse(JSON.stringify(this.seriesConfig)) : {},
@@ -189,19 +189,19 @@ PxVisBehaviorChart.chartCommon = [{
             extsObj = {},
             skipProperties = ['xMin','xMax','yMin','yMax'];
 
-        if(k.length === 0 && !this.includeAllSeries){
+        if(k.length === 0 && !this.includeAllSeries) {
           console.warn("No series were added to the chart. Either add them in the seriesConfig or turn on includeAllSeries");
           return;
         }
 
         // First, fill in the series specified in seriesConfig.
         for(var i = 0; i < kLen; i++) {
-          if(!fullConfig[k[i]].hasOwnProperty('y')){
+          if(!fullConfig[k[i]].hasOwnProperty('y')) {
             console.warn("Configuration " + k[i] + " does not have a y-value associated with it. Falling back to ID");
             fullConfig[k[i]]['y'] = k[i];
           }
 
-          if(!fullConfig[k[i]].hasOwnProperty('x')){
+          if(!fullConfig[k[i]].hasOwnProperty('x')) {
             console.warn("Configuration " + k[i] + " does not have a x-value associated with it. Falling back to default");
             fullConfig[k[i]]['x'] = this.defaultSeriesConfig['x'];
           }
@@ -248,7 +248,7 @@ PxVisBehaviorChart.chartCommon = [{
         // create a new set of whatever Ys are left so we can iterate over it
         missingYs = Object.keys(objYs);
         // add the missing keys to our configuration, use y as the config key by default
-        for(var i = 0; i < missingYs.length; i++){
+        for(var i = 0; i < missingYs.length; i++) {
           objYs[ missingYs[i] ]['type'] = this.defaultSeriesConfig['type'];
           objYs[ missingYs[i] ]['name'] = missingYs[i];
           objYs[ missingYs[i] ]['x'] = x;
@@ -358,7 +358,7 @@ PxVisBehaviorChart.chartCommon = [{
      * Helper function for the register. Returns true if the side register should exist
      *
      */
-    _sideRegister:function(location){
+    _sideRegister:function(location) {
       return location === 'side' || location === 'both';
     },
 
@@ -366,7 +366,7 @@ PxVisBehaviorChart.chartCommon = [{
      * Helper function for the register. Returns true if the top register should exist
      *
      */
-    _topRegister:function(location){
+    _topRegister:function(location) {
       return location === 'top' || location === 'both';
     },
 
@@ -374,7 +374,7 @@ PxVisBehaviorChart.chartCommon = [{
      * Helper function for the line series. Returns true if the series is a line
      *
      */
-    _chartTypeLine: function(key,obj){
+    _chartTypeLine: function(key,obj) {
         return obj[key]['type'] === 'line';
     },
 
@@ -382,7 +382,7 @@ PxVisBehaviorChart.chartCommon = [{
      * Helper function for the line series. Returns true if the series is a line
      *
      */
-    _chartTypeScatter: function(key,obj){
+    _chartTypeScatter: function(key,obj) {
       return obj[key]['type'] === 'scatter';
     },
 
@@ -390,7 +390,7 @@ PxVisBehaviorChart.chartCommon = [{
      * returns the keys of an object
      *
      */
-    _returnKeys: function(obj){
+    _returnKeys: function(obj) {
       return Object.keys(obj);
     }
 }, dataVisColors, PxVisBehaviorChart.chartCommonMethods, PxVisBehavior.commonMethods, PxVisBehavior.completeSeriesConfig, PxVisBehavior.axisTypes];
@@ -502,7 +502,7 @@ PxVisBehaviorChart.saveImage = [{
 
           context.fillStyle = this.completeSeriesConfig[keys[i]].color;
           context.fillRect(curX,curY,strokeWidth, lineLength);
-          context.fillStyle = 'rgb(0,0,0)';
+          context.fillStyle = this._checkThemeVariable("--px-vis-register-data-value", this.colors["black"]);
           context.fillText(this.completeSeriesConfig[keys[i]].name, curX + strokeWidth + 5, curY + 10);
           curTextWidth = context.measureText(this.completeSeriesConfig[keys[i]].name).width;
           maxWidth = Math.max(maxWidth, curTextWidth);
@@ -620,7 +620,7 @@ PxVisBehaviorChart.subConfiguration = {
      */
     _applyConfigToElement: function(config, element) {
 
-      if(typeof(config) === 'string'){
+      if(typeof(config) === 'string') {
         config = JSON.parse(config);
       }
       if(typeof(config) !== 'object') {
@@ -633,7 +633,7 @@ PxVisBehaviorChart.subConfiguration = {
       }
 
       var keys = Object.keys(config);
-      for(var i = 0; i < keys.length; i++){
+      for(var i = 0; i < keys.length; i++) {
         var key = keys[i];
         element.set(key, config[key])
       }
@@ -690,7 +690,7 @@ PxVisBehaviorChart.timeFiltering = [{
       return chartData.filter(function(val) {
         var timeVal = Number(val[timeData]);
         // if the data doesn't have Date value, return the data as it is
-        if (typeof(val[timeData]) === 'undefined'){
+        if (typeof(val[timeData]) === 'undefined') {
           return val;
           // Otherwise return the data matching the selected time range
         } else {
@@ -994,7 +994,6 @@ PxVisBehaviorChart.cursorConfig = {
   }
 };
 
-
 /*
     Name:
     PxVisBehaviorChart.layers
@@ -1050,5 +1049,86 @@ PxVisBehaviorChart.layers = [{
     }
   }
 }, PxVisBehaviorD3.svg];
+
+/*
+    Name:
+    PxVisBehaviorChart.dataVisColorTheming
+
+    Description:
+    Behavior trying to read themed datavis color if they exists
+
+    @polymerBehavior PxVisBehaviorChart.dataVisColorTheming
+*/
+PxVisBehaviorChart.dataVisColorTheming = [{
+  ready: function() {
+
+    //we have to wait for the first animation frame to be able
+    //to access our css theming vars
+    window.requestAnimationFrame(this.recalculateTheme.bind(this));
+  },
+  /**
+   *  Call this to have the chart recalculate its datavis colors based
+   *  on a theme
+   */
+  recalculateTheme: function() {
+
+      var firstThemedColor = this.getComputedStyleValue('--px-vis-series-color-0'),
+          index = 0,
+          visColorCopy = this.dataVisColors,
+          serieOrderCopy = this.seriesColorOrder;
+
+      //we rely on the first color being defined for a theme, and then having no
+      //gaps in the number. The first "not found" number will bethe end of the themed color
+      if(firstThemedColor) {
+
+        //theme. Read colors until we can't find one anymore
+        var stop = false,
+            currentColor;
+
+        //rebuild our order
+        serieOrderCopy = [];
+        while(!stop) {
+
+
+          currentColor = this.getComputedStyleValue('--px-vis-series-color-' + index);
+
+          if(currentColor) {
+
+            //make sure we are in rgb
+            currentColor = currentColor[0] === '#' ? this._hexToRgb(currentColor) : currentColor;
+
+            //store it
+            visColorCopy['pxVisSeriesColor' + index] = currentColor;
+            serieOrderCopy.push('pxVisSeriesColor' + index);
+          } else {
+            stop = true;
+          }
+          index++;
+        }
+      } else {
+
+        //no theme, reuse colors we have with the same nomenclature as if we had
+        //a theme: pxVisSeriesColorX
+        var keys = Object.keys(visColorCopy),
+            newKeys;
+        for(index; index<keys.length; index++) {
+          visColorCopy['pxVisSeriesColor' + index] = visColorCopy[keys[index]];
+        }
+
+        //now rebuild our order with the new nomenclature
+        newKeys = Object.keys(visColorCopy);
+        var length = this.seriesColorOrder.length;
+        for(var i=0; i<length; i++) {
+          var visIndex = newKeys.indexOf(this.seriesColorOrder[i]);
+          serieOrderCopy[i] = 'pxVisSeriesColor' + visIndex;
+        }
+      }
+
+      //TODO: 2.0 BATCH update
+      this.set('dataVisColors', visColorCopy);
+      this.set('seriesColorOrder', serieOrderCopy);
+
+    }
+}, PxVisBehavior.commonMethods, commonColors];
 
 </script>

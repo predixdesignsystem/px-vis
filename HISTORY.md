@@ -26,6 +26,26 @@ v1.0.0
   * all subcomponents have an API Documentation page
 * Added navigatorConfig and ability to configure chart navigator with it
 * most px-vis components now only loads basic colors as opposed to basic colors + dataVis colors
+* Register Changes:
+  * Added margin to register height calculation
+
+v0.8.2
+==================
+* Cleaned up colors across the board
+* updated tests
+
+v0.8.1
+==================
+* Update missed design depndencies
+
+v0.8.0
+==================
+* Updated dependencies
+* Theming!
+
+v0.7.5
+==================
+* protect running zoom too early
 
 v0.7.4
 ==================

@@ -1,6 +1,5 @@
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="px-vis-behavior-common.html" />
-<link rel="import" href="../px-colors-design/colors.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 
 
@@ -255,7 +254,6 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @method _currentDomain
      */
      _currentDomain: function() {
-
       if(!this._calculatingDomain && this._doesObjHaveValues(this.chartData) && this.x && this.y && this._doesObjHaveValues(this.completeSeriesConfig)) {
         var xOrd = this.xAxisType === 'ordinal',
           yOrd = this.yAxisType === 'ordinal',
@@ -266,7 +264,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
           //by default, have dynamic extents and 0 yMin
           exts = {
             'x': [Infinity, -Infinity],
-            'y': [0, 0]
+            'y': [0, -Infinity]
           };
 
         this._calculatingDomain = true;
@@ -288,7 +286,8 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
               exts.x[0] = (this.chartExtents['x'][0] === 'dynamic') ? this.dataExtents['x'][0] : this.chartExtents['x'][0];
               exts.x[1] = (this.chartExtents['x'][1] === 'dynamic') ? this.dataExtents['x'][1] : this.chartExtents['x'][1];
             } else {
-              exts.x = this.dataExtents['x'];
+              exts.x[0] = Math.min(this.dataExtents['x'][0], exts.x[0]);
+              exts.x[1] = Math.max(this.dataExtents['x'][1], exts.x[1]);
             }
           }
 
@@ -303,7 +302,8 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
               exts.y[0] = (this.chartExtents['y'][0] === 'dynamic') ? this.dataExtents['y'][0] : this.chartExtents['y'][0];
               exts.y[1] = (this.chartExtents['y'][1] === 'dynamic') ? this.dataExtents['y'][1] : this.chartExtents['y'][1];
             } else {
-              exts.y = this.dataExtents['y'];
+              exts.y[0] = Math.min(this.dataExtents['y'][0], exts.y[0]);
+              exts.y[1] = Math.max(this.dataExtents['y'][1], exts.y[1]);
             }
           }
 

@@ -13,7 +13,7 @@ function runTests(){
     var baseScale = document.getElementById('baseScale'),
         baseSVG = document.getElementById('baseSVG'),
         baseBrush = document.getElementById('baseBrush');
-    var colors = commonColors.properties.colors.value;
+    var colors = baseColors.properties.colors.value;
 
     suiteSetup(function(done){
       var d = [{
@@ -255,7 +255,7 @@ function runTests(){
   });
 
   suite('px-vis-brush handle mouseover ', function() {
-    var colors = commonColors.properties.colors.value;
+    var colors = baseColors.properties.colors.value;
 
     suiteSetup(function(done){
       var box = baseBrush._handleGroup.node().getBoundingClientRect();
@@ -284,7 +284,7 @@ function runTests(){
   });
 
   suite('px-vis-brush handle mouseleave ', function() {
-    var colors = commonColors.properties.colors.value;
+    var colors = baseColors.properties.colors.value;
 
 
     suiteSetup(function(done){
@@ -315,7 +315,7 @@ function runTests(){
   });
 
   suite('px-vis-brush handle press ', function() {
-    var colors = commonColors.properties.colors.value;
+    var colors = baseColors.properties.colors.value;
 
     suiteSetup(function(done){
       var box = baseBrush._handleGroup.node().getBoundingClientRect();
@@ -385,7 +385,7 @@ function runTests(){
     var gradientScale = document.getElementById('gradientScale'),
         gradientSVG = document.getElementById('gradientSVG'),
         gradientBrush = document.getElementById('gradientBrush');
-    var colors = commonColors.properties.colors.value;
+    var colors = baseColors.properties.colors.value;
 
     suiteSetup(function(done){
       var d = [{
