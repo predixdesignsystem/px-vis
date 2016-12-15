@@ -1,0 +1,67 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>px-vis Demo</title>
+    <!-- Requires Webcomponents.js polyfill is provided by the page for browsers that don't support html imports -->
+    <script src="../webcomponentsjs/webcomponents-lite.min.js"></script>
+    <link rel="import" href="../polymer/polymer.html">
+    <!-- Import custom element. Note: see comment about relative paths to dependencies in the *.html file referenced below -->
+    <link rel="import" href="px-vis-dynamic-menu.html"/>
+  </head>
+  <body>
+    <template id="basic-demo" is="dom-bind">
+        <div id="div" style="background-color: grey; width: 250px; height: 100px">
+            <px-vis-dynamic-menu id="menu" ></px-vis-dynamic-menu>
+        </div>
+    </template>
+  </body>
+  <script>
+    document.addEventListener('WebComponentsReady', function() {
+        var div = document.getElementById('div'),
+            menu = document.getElementById('menu'),
+            bool = true;
+
+        var menuConfig = [
+          {
+            'name': 'Delete',
+            'action': function(evt) {
+              var conf = timeSerie.seriesConfig;
+              delete conf[this.name];
+              timeSerie.set('seriesConfig', {});
+              timeSerie.set('seriesConfig', conf);
+            },
+            'eventName': 'delete'
+          },
+          {
+            'name': 'Bring To Front',
+            'action': function(evt) {
+              timeSerie.set('serieToRedrawOnTop', this.name);
+            },
+            'eventName': 'bring-to-front'
+          }
+        ];
+       
+        menu.set('dynamicMenuConfig', menuConfig);
+
+        div.addEventListener('mouseenter', function() {
+                menu.fadeIn();
+
+        });
+
+        div.addEventListener('mouseleave', function() {
+                menu.fadeOut();
+         
+        });
+
+        menu.addEventListener('px-dynamic-menu-delete', function() {
+            console.log('event listener delete')
+        });
+
+        menu.addEventListener('px-dynamic-menu-bring-to-front', function() {
+            console.log('event listener bring to front')
+        });
+    });
+  </script>
+</html>

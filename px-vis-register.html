@@ -99,7 +99,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
   <template>
     <style include="px-vis-register-styles"></style>
 
-    <div class="flex flex-row">  <!--  IE min-height + flex bug workaround-->
+    <div class="flex flex-row fullWidth">  <!--  IE min-height + flex bug workaround-->
       <div
         id="registerWrap"
         class$="[[_getMinSizeClass(preventMinSize)]] inline--flex flex--col"
@@ -121,6 +121,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
                 <template is="dom-repeat" items="{{_groups}}" on-dom-change="_scrollBarsPresent">
                   <px-vis-register-item
                     item="[[item]]"
+                    dynamic-menu-config="[[dynamicMenuConfig]]"
                     complete-series-config="[[completeSeriesConfig]]"
                     type="[[type]]"
                     x-axis-type="[[xAxisType]]"
@@ -189,7 +190,8 @@ Formatting for the timestamps,the data values, and the series names can be contr
       PxVisBehaviorRegister.datetime,
       PxVisBehavior.forceDateTimeDisplay,
       PxVisBehaviorRegister.groupings,
-      baseColors
+      baseColors,
+      PxVisBehavior.dynamicMenuConfig
     ],
     /**
      * Properties block, expose attribute values to the DOM via 'reflect'
