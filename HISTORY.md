@@ -1,3 +1,7 @@
+v0.8.3
+==================
+* Ensure pie doesn't fail on racing condition
+
 v0.8.2
 ==================
 * Cleaned up colors across the board
