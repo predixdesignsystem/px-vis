@@ -50,6 +50,7 @@ The gridlines still make use of the d3.axis object, just with different settings
 
         behaviors: [
           PxVisBehaviorD3.svg,
+          PxVisBehavior.sizing,
           PxVisBehavior.commonMethods,
           PxVisBehaviorD3.axis,
           PxVisBehaviorD3.axisConfig,
@@ -118,7 +119,7 @@ The gridlines still make use of the d3.axis object, just with different settings
         },
 
         observers: [
-          'drawElement(domainChanged,axis,margin,length,svg)'
+          'drawElement(domainChanged,axis,margin.*,length,svg)'
         ],
 
 
@@ -171,12 +172,11 @@ The gridlines still make use of the d3.axis object, just with different settings
 
           // TODO dev set # of gridlines
           // TODO link to number of gridlines the axis has and dev set multiplier (2x)
-          // change default (10) ticks
-          // this._grid.ticks();
+
           if(this.orientation === 'bottom') {
-            this._grid.tickSizeInner(this.margin.top + this.margin.bottom - this.length);
+            this._grid.tickSizeInner(Number(this.margin.top) + Number(this.margin.bottom) - this.length);
           } else if(this.orientation === 'left') {
-            this._grid.tickSizeInner(this.margin.left + this.margin.right - this.length);
+            this._grid.tickSizeInner(Number(this.margin.left) + Number(this.margin.right) - this.length);
           }
         },
         /**
@@ -190,7 +190,7 @@ The gridlines still make use of the d3.axis object, just with different settings
               this.defineGrid();
               // this._grid.tickValues(this.axis.domain());
               if(this.orientation === 'bottom') {
-                var h = this.svg.attr('height') - this.margin.bottom - this.margin.top;
+                var h = Px.d3.select(this.svg.node().ownerSVGElement).attr('height') - Number(this.margin.bottom) - Number(this.margin.top);
                 this.translateAmt = [0,h];
               } else if(this.orientation === 'left') {
                 this.translateAmt = [0,0];
@@ -206,13 +206,6 @@ The gridlines still make use of the d3.axis object, just with different settings
 
                 this._removeUncessaryElems(this._gridGroup);
                 this._setLineStyles(this._gridGroup,'line');
-                // the first tick overlaps the x-axis path and is unnessary
-                // TODO make sure this doesnt get us in trouble in different min y values
-                // TODO What if there is no x-axis? How to do this better?
-                // this._gridGroup.select('line').remove();
-
-                //keep a reference for later
-                // this._gridGroup = this.svg.select('g.grid[grid-id=' + this.gridId + ']');
 
               } else {
                 this._gridGroup

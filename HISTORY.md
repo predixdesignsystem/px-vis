@@ -28,6 +28,7 @@ v1.0.0
 * most px-vis components now only loads basic colors as opposed to basic colors + dataVis colors
 * Register Changes:
   * Added margin to register height calculation
+* Added checks to gridline to ensure it gets the svg height and number-izes margins
 
 v0.8.2
 ==================
