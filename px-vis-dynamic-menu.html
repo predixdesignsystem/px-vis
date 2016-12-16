@@ -178,12 +178,8 @@ Element providing an on-chart zoom.
       if(item.action) {
 
         //make sure we use a specific context if it exists
-        if(item.actionContext) {
-          var actionBound = item.action.bind(item.actionContext);
-          actionBound(item, this.additionalDetail);
-        } else {
-          item.action(item, this.additionalDetail);
-        }
+        var actionBound = item.actionContext ? item.action.bind(item.actionContext) : item.action.bind(this);
+        actionBound(item, this.additionalDetail);
       }
 
       //fire an event if required
