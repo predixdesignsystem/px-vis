@@ -1,3 +1,7 @@
+v0.8.4
+==================
+* Bump color design
+
 v0.8.3
 ==================
 * Ensure pie doesn't fail on racing condition
