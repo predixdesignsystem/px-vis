@@ -52,7 +52,7 @@ Element providing on-chart tooltip display
           id="register"
           tooltip-style="[[tooltipStyle]]"
           truncation-length="100"
-          groupings="[[groupings]]"
+          groupings="[[_groupings]]"
           force-date-time-display="[[forceDateTimeDisplay]]"
           tooltip-data=[[tooltipData]]
           chart-data="[[chartData]]"
@@ -137,6 +137,12 @@ Element providing on-chart tooltip display
       orientation: {
         type: String,
         value: "auto"
+      },
+
+      _groupings: {
+        type: Number,
+        value: 1,
+        computed: '_checkGroups(tooltipData.*, groupings)'
       }
 
     }, //properties
@@ -145,8 +151,25 @@ Element providing on-chart tooltip display
       this.set('tooltipElem', this.$.tooltip);
     },
 
-    detached: function(){
+    detached: function() {
       this.tooltipElem.remove();
+    },
+
+    _checkGroups: function() {
+      // if the dev specified a number of groups
+      if(this.groupings && this.groupings > 1) {
+        return this.groupings
+      }
+
+      if(this.tooltipData.series.length < 16) {
+        return 1;
+      } else if(this.tooltipData.series.length < 24) {
+        return 2;
+      } else {
+        return 3;
+      }
     }
+
+
   });
 </script>
