@@ -1,5 +1,3 @@
-
-<link rel="import" href="../px-colors-design/colors.html" />
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
@@ -392,7 +390,7 @@ PxVisBehaviorChart.chartCommon = [{
     _returnKeys: function(obj) {
       return Object.keys(obj);
     }
-}, dataVisColors, PxVisBehaviorChart.chartCommonMethods, PxVisBehavior.commonMethods, PxVisBehavior.completeSeriesConfig, PxVisBehavior.axisTypes];
+}, PxColorsBehavior.dataVisColors , PxVisBehaviorChart.chartCommonMethods, PxVisBehavior.commonMethods, PxVisBehavior.completeSeriesConfig, PxVisBehavior.axisTypes];
 
 /*
     Name:
@@ -1017,7 +1015,8 @@ PxVisBehaviorChart.layers = [{
     generateLayers: {
       type: Boolean,
       value: true
-    }
+    },
+    //TODIO: array of event allowed to pierce
   },
   observers: [
     '_createLayersOnce(svg, numberOfLayers)'
@@ -1045,89 +1044,72 @@ PxVisBehaviorChart.layers = [{
     if(this[gen] && this._doesD3HaveValues(svg) && numberOfLayers > 0) {
       this._createLayers(svg, numberOfLayers, propName);
       this.set(gen, false);
+
+      //uncomment to get layer piercing
+     // this._initMousePiercing();
     }
+  },
+  _initMousePiercing: function() {
+
+    var topLayer = this.layer[this.layer.length - 1],
+        _this = this,
+        //TODO: proeprty
+        events = ['mousedown', 'mouseover', 'click', 'hover'],
+        handlers = [];
+
+    //setup piercing for all events defined
+    for(var i=0; i<events.length; i++) {
+      var eventName = events[i],
+          _this = this;
+
+      handlers.push(this._createPiercingEventHandler(eventName, this, topLayer));
+      topLayer.node().addEventListener(eventName, handlers[i]);
+    }
+  },
+  _createPiercingEventHandler: function(eventName, context, topLayer) {
+    return function(evt) {
+
+              //recreate an event we will propagate
+              //This is true only for IE,firefox
+              var newEvt,
+                  target;
+
+              if(document.createEvent) {
+              // To create a mouse event , first we need to create an event and then initialize it.
+                  newEvt = document.createEvent('MouseEvent');
+                  newEvt.initMouseEvent(eventName,
+                  evt.bubbles,
+                  evt.cancelable,
+                  evt.view,evt.detail,evt.screenX,evt.screenY,evt.clientX,evt.clientY,
+                  evt.ctrlKey,evt.altKey,evt.shiftKey,evt.metaKey,evt.button,evt.relatedTarget);
+              }
+              else {
+                  newEvt = new MouseEvent(eventName, evt);
+              }
+              
+              //hide current layer so we can find who we need to notify
+              topLayer.node().style['display'] = 'none';
+
+              //chrome stops on custom elements when doing elementFromPoint so
+              //we need to recursively go down shadowRoots until we find the element
+              var findElem = function(elem) {
+                if(elem.shadowRoot) {
+                  return findElem(elem.shadowRoot.elementFromPoint(evt.clientX, evt.clientY));
+                } else {
+                  return elem;
+                }
+              }
+
+              target = findElem(document.elementFromPoint(evt.clientX, evt.clientY));
+              console.log('target: ' + target.classList)
+
+              //restore our layer visiblity
+              topLayer.node().style['display'] = 'inline';
+
+              //and dispatch the event to the appropriate target
+              target.dispatchEvent(newEvt);            
+          }.bind(context);
   }
 }, PxVisBehaviorD3.svg];
-
-/*
-    Name:
-    PxVisBehaviorChart.dataVisColorTheming
-
-    Description:
-    Behavior trying to read themed datavis color if they exists
-
-    @polymerBehavior PxVisBehaviorChart.dataVisColorTheming
-*/
-PxVisBehaviorChart.dataVisColorTheming = [{
-  ready: function() {
-
-    //we have to wait for the first animation frame to be able
-    //to access our css theming vars
-    window.requestAnimationFrame(this.recalculateTheme.bind(this));
-  },
-  /**
-   *  Call this to have the chart recalculate its datavis colors based
-   *  on a theme
-   */
-  recalculateTheme: function() {
-
-      var firstThemedColor = this.getComputedStyleValue('--px-vis-series-color-0'),
-          index = 0,
-          visColorCopy = this.dataVisColors,
-          serieOrderCopy = this.seriesColorOrder;
-
-      //we rely on the first color being defined for a theme, and then having no
-      //gaps in the number. The first "not found" number will bethe end of the themed color
-      if(firstThemedColor) {
-
-        //theme. Read colors until we can't find one anymore
-        var stop = false,
-            currentColor;
-
-        //rebuild our order
-        serieOrderCopy = [];
-        while(!stop) {
-
-
-          currentColor = this.getComputedStyleValue('--px-vis-series-color-' + index);
-
-          if(currentColor) {
-
-            //make sure we are in rgb
-            currentColor = currentColor[0] === '#' ? this._hexToRgb(currentColor) : currentColor;
-
-            //store it
-            visColorCopy['pxVisSeriesColor' + index] = currentColor;
-            serieOrderCopy.push('pxVisSeriesColor' + index);
-          } else {
-            stop = true;
-          }
-          index++;
-        }
-      } else {
-
-        //no theme, reuse colors we have with the same nomenclature as if we had
-        //a theme: pxVisSeriesColorX
-        var keys = Object.keys(visColorCopy),
-            newKeys;
-        for(index; index<keys.length; index++) {
-          visColorCopy['pxVisSeriesColor' + index] = visColorCopy[keys[index]];
-        }
-
-        //now rebuild our order with the new nomenclature
-        newKeys = Object.keys(visColorCopy);
-        var length = this.seriesColorOrder.length;
-        for(var i=0; i<length; i++) {
-          var visIndex = newKeys.indexOf(this.seriesColorOrder[i]);
-          serieOrderCopy[i] = 'pxVisSeriesColor' + visIndex;
-        }
-      }
-
-      //TODO: 2.0 BATCH update
-      this.set('dataVisColors', visColorCopy);
-      this.set('seriesColorOrder', serieOrderCopy);
-
-    }
-}, PxVisBehavior.commonMethods, commonColors];
 
 </script>
