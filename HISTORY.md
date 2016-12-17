@@ -4,6 +4,10 @@ v1.0.0
 * Scale and axis changes:
   * Changed time scale to UTC by default.
   * Added timeLocal option for local time
+* Greatly improved and simplified how chart extents are calculated:
+  * chartExtents are now only dev set
+  * max and mins from the seriesConfig and range pickers go to dataExtents
+  * scale will use chartExtents directly and fallback on dataExtents if not present. If neither, then looks through data.
 * Threshold changes:
   * Added new threshold configuration similar to events
   * Changed threshold data property from chartData to thresholdData
@@ -17,10 +21,6 @@ v1.0.0
   * Added an additional svg element below the canvas element on svg-canvas
 * Fix placement of zoom button
 * Changed px-vis-line to px-vis-line-svg for consistency
-* Changed how chart extents are calculated:
-  * chartExtents are now only dev set
-  * added dataExtents behavior for the chart extents calculated from data or range.
-  * scale will use chartExtents directly and fallback on dataExtents if not present.
 * Demo Updates:
   * updated demos with v1 changes
   * all subcomponents have an API Documentation page
@@ -28,6 +28,8 @@ v1.0.0
 * most px-vis components now only loads basic colors as opposed to basic colors + dataVis colors
 * Register Changes:
   * Added margin to register height calculation
+* Tooltip Changes:
+  * Added auto-calculated groupings to tooltip based on number of series. Can be overwritten by devs
 * Added checks to gridline to ensure it gets the svg height and number-izes margins
 
 v0.8.2
