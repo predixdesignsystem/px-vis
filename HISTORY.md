@@ -8,6 +8,7 @@ v1.0.0
   * chartExtents are now only dev set
   * max and mins from the seriesConfig and range pickers go to dataExtents
   * scale will use chartExtents directly and fallback on dataExtents if not present. If neither, then looks through data.
+  * defaultSeriesConfig no longer has default min and maxes
 * Threshold changes:
   * Added new threshold configuration similar to events
   * Changed threshold data property from chartData to thresholdData
