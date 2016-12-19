@@ -226,7 +226,7 @@ function runTests(){
       var ext = {
         "x":[Infinity,-Infinity], "y": [0,-Infinity]
         }
-      findExtents.set('chartExtents',ext);
+      findExtents.set('dataExtents',ext);
     });
 
     test('findExtents fixture is created', function() {
@@ -293,7 +293,7 @@ function runTests(){
         "x":[Infinity,-Infinity], "y": [0,-Infinity]
         }
       updateData.push('chartData',d);
-      updateData.set('chartExtents',ext);
+      updateData.set('dataExtents',ext);
     });
 
     test('updateData fixture is created', function() {
@@ -386,7 +386,7 @@ function runTests(){
         }
         updateData.set('completeSeriesConfig',c);
         updateData.set('chartData',d);
-        updateData.set('chartExtents',ext);
+        updateData.set('dataExtents',ext);
     });
 
     test('updateData fixture is created', function() {
@@ -449,7 +449,7 @@ function runTests(){
       var ext = {
         "x":[Infinity,-Infinity], "y": [0,100]
         }
-      findXExtents.set('chartExtents',ext);
+      findXExtents.set('dataExtents',ext);
     });
 
     test('findXExtents fixture is created', function() {
@@ -511,7 +511,7 @@ function runTests(){
       var ext = {
         "x":[1397100000000,1397300000000], "y": [Infinity,-Infinity]
         }
-      findYExtents.set('chartExtents',ext);
+      findYExtents.set('dataExtents',ext);
     });
 
     test('findYExtents fixture is created', function() {
@@ -538,7 +538,7 @@ function runTests(){
       assert.equal( Number(findYExtents.currentDomainX[1]), 1397300000000);
     });
     test('findYExtents currentDomainY is correct', function() {
-      assert.equal( JSON.stringify(findYExtents.currentDomainY), JSON.stringify([1,10]));
+      assert.equal( JSON.stringify(findYExtents.currentDomainY), JSON.stringify([0,10]));
     });
 
     test('findYExtents x returns correct value 1397100000000', function() {
@@ -555,7 +555,7 @@ function runTests(){
     });
 
     test('findYExtents y returns correct value 0', function() {
-      assert.equal( findYExtents.y(1), 270);
+      assert.equal( findYExtents.y(0), 270);
     });
 
     test('findYExtents y returns correct value 10', function() {
@@ -563,7 +563,7 @@ function runTests(){
     });
 
     test('findYExtents y returns correct value 5', function() {
-      assert.equal( findYExtents.y(5.5), 135);
+      assert.equal( findYExtents.y(5), 135);
     });
   }); //suite
 
@@ -574,7 +574,7 @@ function runTests(){
       var ext = {
         "x":[Infinity,-Infinity], "y": [Infinity,-Infinity]
         }
-      findLinearX.set('chartExtents',ext);
+      findLinearX.set('dataExtents',ext);
     });
 
     test('findLinearX fixture is created', function() {
@@ -616,7 +616,7 @@ function runTests(){
       var ext = {
         "x":[], "y": [Infinity,-Infinity]
         }
-      findOrdinalX.set('chartExtents',ext);
+      findOrdinalX.set('dataExtents',ext);
     });
 
     test('findOrdinalX fixture is created', function() {
@@ -644,7 +644,7 @@ function runTests(){
       assert.equal( findOrdinalX.currentDomainX[2], 'b');
     });
     test('findOrdinalX currentDomainY is correct', function() {
-      assert.equal( JSON.stringify(findOrdinalX.currentDomainY), JSON.stringify([1,10]));
+      assert.equal( JSON.stringify(findOrdinalX.currentDomainY), JSON.stringify([0,10]));
     });
 
     test('findOrdinalX x returns correct value a', function() {
@@ -660,7 +660,7 @@ function runTests(){
     });
 
     test('findOrdinalX y returns correct value 0', function() {
-      assert.equal( findOrdinalX.y(1), 270);
+      assert.equal( findOrdinalX.y(0), 270);
     });
 
     test('findOrdinalX y returns correct value 10', function() {
@@ -668,7 +668,7 @@ function runTests(){
     });
 
     test('findOrdinalX y returns correct value 5', function() {
-      assert.equal( findOrdinalX.y(5.5), 135);
+      assert.equal( findOrdinalX.y(5), 135);
     });
   }); //suite
 
@@ -680,6 +680,7 @@ function runTests(){
         "x":["a","b","c","d"], "y": [0,10]
         }
       setOrdinalX.set('chartExtents',ext);
+      setOrdinalX.set('dataExtents',ext);
     });
 
     test('setOrdinalX fixture is created', function() {
@@ -725,7 +726,7 @@ function runTests(){
       var ext = {
         "x":[1397100000000,1397300000000], "y": [Infinity,-Infinity]
         }
-      diffXforY.set('chartExtents',ext);
+      diffXforY.set('dataExtents',ext);
     });
 
     test('diffXforY fixture is created', function() {
@@ -752,7 +753,7 @@ function runTests(){
       assert.equal( Number(diffXforY.currentDomainX[1]), 1397300000000);
     });
     test('diffXforY currentDomainY is correct', function() {
-      assert.equal( JSON.stringify(diffXforY.currentDomainY), JSON.stringify([1,10]));
+      assert.equal( JSON.stringify(diffXforY.currentDomainY), JSON.stringify([0,10]));
     });
 
     test('diffXforY x returns correct value 1397100000000', function() {
@@ -769,7 +770,7 @@ function runTests(){
     });
 
     test('diffXforY y returns correct value 0', function() {
-      assert.equal( diffXforY.y(1), 270);
+      assert.equal( diffXforY.y(0), 270);
     });
 
     test('diffXforY y returns correct value 10', function() {
@@ -777,7 +778,74 @@ function runTests(){
     });
 
     test('diffXforY y returns correct value 5', function() {
-      assert.equal( diffXforY.y(5.5), 135);
+      assert.equal( diffXforY.y(5), 135);
+    });
+  }); //suite
+
+  suite('px-vis-scale chartExtents trumps dataExtents', function() {
+    var cExts = document.getElementById('cExts');
+
+    suiteSetup(function(){
+      var dext = {
+        "x":[1397000000000,1397700000000], "y": [5,25]
+      },
+      cext = {
+        "x":[1397100000000,1397300000000], "y": [1,21]
+        }
+      cExts.set('chartExtents',cext);
+      cExts.set('dataExtents',dext);
+    });
+
+    test('cExts fixture is created', function() {
+      assert.isTrue(cExts !== null);
+    });
+
+    test('cExts creates an x', function() {
+      assert.isDefined(cExts.x);
+    });
+
+    test('cExts creates an y', function() {
+      assert.isDefined(cExts.y);
+    });
+
+    test('cExts sets currentDomainX', function() {
+      assert.lengthOf(cExts.currentDomainX,2);
+    });
+    test('cExts sets currentDomainY', function() {
+      assert.lengthOf(cExts.currentDomainY,2);
+    });
+
+    test('cExts currentDomainX is correct', function() {
+      assert.equal( Number(cExts.currentDomainX[0]), 1397100000000);
+      assert.equal( Number(cExts.currentDomainX[1]), 1397300000000);
+    });
+    test('cExts currentDomainY is correct', function() {
+      assert.equal( JSON.stringify(cExts.currentDomainY), JSON.stringify([1,21]));
+    });
+
+    test('cExts x returns correct value 1397100000000', function() {
+      assert.equal( cExts.x(1397100000000), 0);
+    });
+
+    test('cExts x returns correct value 1397300000000', function() {
+      assert.equal( cExts.x(1397300000000), 480);
+    });
+
+    test('cExts x returns correct value 1397160780000', function() {
+      var n = (1397300000000 - 1397100000000)/2 + 1397100000000;
+      assert.equal( cExts.x(n), 240);
+    });
+
+    test('cExts y returns correct value 0', function() {
+      assert.equal( cExts.y(1), 270);
+    });
+
+    test('cExts y returns correct value 10', function() {
+      assert.equal( cExts.y(21), 0);
+    });
+
+    test('cExts y returns correct value 5', function() {
+      assert.equal( cExts.y(11), 135);
     });
   }); //suite
 
