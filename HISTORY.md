@@ -22,6 +22,9 @@ v1.0.0
   * Added an additional svg element below the canvas element on svg-canvas
 * Fix placement of zoom button
 * Changed px-vis-line to px-vis-line-svg for consistency
+  * Line now spans data undefined gaps by default
+  * Line will always gap "null" data
+  * Added showGaps to force it to show gaps for undefined data
 * Demo Updates:
   * updated demos with v1 changes
   * all subcomponents have an API Documentation page

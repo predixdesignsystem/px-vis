@@ -983,6 +983,33 @@ PxVisBehaviorD3.radialLineGenerator = [{
   }
 }, PxVisBehavior.completeSeriesConfig, PxVisBehavior.dataset];
 
+
+/*
+    Name:
+    PxVisBehaviorD3.lineGaps
+
+    Description:
+    Polymer behavior that provides definition for showGaps
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorD3.lineGaps
+*/
+PxVisBehaviorD3.lineGaps = {
+  properties: {
+    /**
+     * A boolean spcifying if the line should show gaps on undefined data.
+     *
+     */
+    showGaps: {
+      type: Boolean,
+      value: false
+    }
+  }
+};
+
+
 /*
     Name:
     PxVisBehaviorD3.lineShared
@@ -1050,7 +1077,7 @@ PxVisBehaviorD3.lineShared = [{
     multiPath: {
       type: Boolean,
       value: false
-    },
+    }
   },
 
   _computeColorArr: function(categories,completeSeriesConfig,seriesId){
@@ -1126,9 +1153,7 @@ PxVisBehaviorD3.lineShared = [{
         yKey = _this.completeSeriesConfig[_this.seriesId]['y'],
         line,
         counter = 0;
-//FIXME define showGaps
-//FIXME figure out defaults and what handling
-//FIXME counter undefined when data doens't exists (time filtered data on XY for example)
+
     if(this.showGaps) {
       line = Px.d3.line()
         .x(function(d) {
@@ -1144,19 +1169,22 @@ PxVisBehaviorD3.lineShared = [{
     } else {
       line = Px.d3.line()
         .x(function(d,i) {
-          if(_this.chartData[i][xKey] && _this.chartData[i][yKey]) {
+          if(_this.chartData[i][xKey] && (_this.chartData[i][yKey] || _this.chartData[i][yKey] === null)) {
             return ~~_this.x(d[xKey]);
           } else {
             return ~~_this.x(_this.chartData[counter][xKey]);
           }
         })
         .y(function(d,i) {
-          if(_this.chartData[i][xKey] && _this.chartData[i][yKey]) {
+          if(_this.chartData[i][xKey] && (_this.chartData[i][yKey] || _this.chartData[i][yKey] === null)) {
             counter = i;
             return ~~_this.y(d[yKey]);
           } else {
             return ~~_this.y(_this.chartData[counter][yKey]);
           }
+        })
+        .defined(function(d) {
+          return _this._isDataNotNull(d[yKey]);
         });
     }
 
@@ -1209,7 +1237,7 @@ PxVisBehaviorD3.lineShared = [{
 
     this.set('line',line);
   }
-},PxVisBehaviorD3.radialLineGenerator, PxVisBehavior.seriesId];
+},PxVisBehaviorD3.radialLineGenerator, PxVisBehavior.seriesId, PxVisBehaviorD3.lineGaps];
 
 /*
     Name:
