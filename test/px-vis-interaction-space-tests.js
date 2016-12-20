@@ -40,7 +40,7 @@ function runTests() {
           "y":"y",
           "color": "rgb(93,165,218)"
         }},
-        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        dataExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
         h = 300,
         m = {
@@ -49,7 +49,7 @@ function runTests() {
           "bottom": 10,
           "left": 10
         };
-      document.addEventListener('px-vis-interaction-svg-updated',function(evt){
+      document.addEventListener('px-vis-mouse-rect-updated',function(evt){
         eventObj = evt.detail;
       });
       document.addEventListener('px-vis-tooltip-updated',function(evt){
@@ -64,7 +64,7 @@ function runTests() {
       baseScale.set('height',h);
       baseScale.set('margin',m);
       baseScale.set('completeSeriesConfig',completeSeriesConfig);
-      baseScale.set('chartExtents',chartExtents);
+      baseScale.set('dataExtents',dataExtents);
       baseScale.set('chartData',d);
 
       baseIS.set('margin',m);
@@ -85,13 +85,13 @@ function runTests() {
       assert.isTrue(eventObj !== null);
     });
     test('interaction-spcae event dataVar', function() {
-      assert.equal(eventObj.dataVar, 'interactionSvg');
+      assert.equal(eventObj.dataVar, 'mouseRect');
     });
     test('interaction-spcae event method', function() {
       assert.equal(eventObj.method, 'set');
     });
     test('interaction-spcae event data', function() {
-      assert.equal(eventObj.data.node().tagName, 'g');
+      assert.equal(eventObj.data.tagName, 'rect');
     });
 
     test('tooltip event fired', function() {

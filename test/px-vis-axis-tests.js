@@ -40,7 +40,7 @@ function runTests(){
           "y":"y",
           "color": "rgb(93,165,218)"
         }},
-        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        dataExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
         h = 300,
         m = {
@@ -57,7 +57,7 @@ function runTests(){
       baseScale.set('height',h);
       baseScale.set('margin',m);
       baseScale.set('completeSeriesConfig',completeSeriesConfig);
-      baseScale.set('chartExtents',chartExtents);
+      baseScale.set('dataExtents',dataExtents);
       baseScale.set('chartData',d);
 
       baseXAxis.set('margin',m);
@@ -526,7 +526,7 @@ function runTests(){
           "color": "rgb(93,165,218)",
           "yAxisUnit": "BoF"
         }},
-        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        dataExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
         h = 300,
         m = {
@@ -543,7 +543,7 @@ function runTests(){
       pcAxisScale.set('height',h);
       pcAxisScale.set('margin',m);
       pcAxisScale.set('completeSeriesConfig',completeSeriesConfig);
-      pcAxisScale.set('chartExtents',chartExtents);
+      pcAxisScale.set('dataExtents',dataExtents);
       pcAxisScale.set('chartData',d);
 
       pcYAxis.set('margin',m);
@@ -612,7 +612,7 @@ function runTests(){
           "color": "rgb(93,165,218)",
           "yAxisUnit": "BoF"
         }},
-        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        dataExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
         h = 300,
         m = {
@@ -629,7 +629,7 @@ function runTests(){
       pcUnitAxisScale.set('height',h);
       pcUnitAxisScale.set('margin',m);
       pcUnitAxisScale.set('completeSeriesConfig',completeSeriesConfig);
-      pcUnitAxisScale.set('chartExtents',chartExtents);
+      pcUnitAxisScale.set('dataExtents',dataExtents);
       pcUnitAxisScale.set('chartData',d);
 
       pcUnitYAxis.set('margin',m);
@@ -698,7 +698,7 @@ function runTests(){
           "color": "rgb(93,165,218)",
           "yAxisUnit": "BoF"
         }},
-        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        dataExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
         h = 300,
         m = {
@@ -715,7 +715,7 @@ function runTests(){
       pcTruncAxisScale.set('height',h);
       pcTruncAxisScale.set('margin',m);
       pcTruncAxisScale.set('completeSeriesConfig',completeSeriesConfig);
-      pcTruncAxisScale.set('chartExtents',chartExtents);
+      pcTruncAxisScale.set('dataExtents',dataExtents);
       pcTruncAxisScale.set('chartData',d);
 
       pcTruncYAxis.set('margin',m);
@@ -784,7 +784,7 @@ function runTests(){
           "color": "rgb(93,165,218)",
           "yAxisUnit": "BoF"
         }},
-        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        dataExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
         h = 300,
         m = {
@@ -807,7 +807,7 @@ function runTests(){
       pcTruncUnitAxisScale.set('height',h);
       pcTruncUnitAxisScale.set('margin',m);
       pcTruncUnitAxisScale.set('completeSeriesConfig',completeSeriesConfig);
-      pcTruncUnitAxisScale.set('chartExtents',chartExtents);
+      pcTruncUnitAxisScale.set('dataExtents',dataExtents);
       pcTruncUnitAxisScale.set('chartData',d);
 
       pcTruncUnitYAxis.set('margin',m);
@@ -876,7 +876,7 @@ function runTests(){
           "color": "rgb(93,165,218)",
           "yAxisUnit": "BoF"
         }},
-        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        dataExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
         h = 300,
         m = {
@@ -899,7 +899,7 @@ function runTests(){
       pcRotateAxisScale.set('height',h);
       pcRotateAxisScale.set('margin',m);
       pcRotateAxisScale.set('completeSeriesConfig',completeSeriesConfig);
-      pcRotateAxisScale.set('chartExtents',chartExtents);
+      pcRotateAxisScale.set('dataExtents',dataExtents);
       pcRotateAxisScale.set('chartData',d);
 
       pcRotateYAxis.set('margin',m);
@@ -967,7 +967,7 @@ function runTests(){
           "y":"y",
           "color": "rgb(93,165,218)"
         }},
-        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        dataExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
         h = 300,
         m = {
@@ -991,7 +991,7 @@ function runTests(){
       tickScale.set('height',h);
       tickScale.set('margin',m);
       tickScale.set('completeSeriesConfig',completeSeriesConfig);
-      tickScale.set('chartExtents',chartExtents);
+      tickScale.set('dataExtents',dataExtents);
       tickScale.set('chartData',d);
 
       tickAxis.set('tickValues',tickValues);
@@ -1055,7 +1055,7 @@ function runTests(){
           "y":"y",
           "color": "rgb(93,165,218)"
         }},
-        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        dataExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
         h = 300,
         m = {
@@ -1080,7 +1080,7 @@ function runTests(){
       tickFormatScale.set('height',h);
       tickFormatScale.set('margin',m);
       tickFormatScale.set('completeSeriesConfig',completeSeriesConfig);
-      tickFormatScale.set('chartExtents',chartExtents);
+      tickFormatScale.set('dataExtents',dataExtents);
       tickFormatScale.set('chartData',d);
 
       tickFormatXAxis.set('margin',m);
@@ -1152,7 +1152,7 @@ function runTests(){
           "y":"y",
           "color": "rgb(93,165,218)"
         }},
-        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        dataExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
         h = 300,
         m = {
@@ -1175,7 +1175,7 @@ function runTests(){
       inlineScale.set('height',h);
       inlineScale.set('margin',m);
       inlineScale.set('completeSeriesConfig',completeSeriesConfig);
-      inlineScale.set('chartExtents',chartExtents);
+      inlineScale.set('dataExtents',dataExtents);
       inlineScale.set('chartData',d);
 
       inlineXAxis.set('margin',m);
@@ -1303,7 +1303,7 @@ function runTests(){
           "y":"y",
           "color": "rgb(93,165,218)"
         }},
-        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        dataExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
         h = 300,
         m = {
@@ -1325,7 +1325,7 @@ function runTests(){
       noTicksScale.set('height',h);
       noTicksScale.set('margin',m);
       noTicksScale.set('completeSeriesConfig',completeSeriesConfig);
-      noTicksScale.set('chartExtents',chartExtents);
+      noTicksScale.set('dataExtents',dataExtents);
       noTicksScale.set('chartData',d);
 
       noTicksAxis.set('margin',m);

@@ -40,7 +40,7 @@ function runTests(){
           "y":"y",
           "color": "rgb(93,165,218)"
         }},
-        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        dataExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
         h = 300,
         m = {
@@ -57,7 +57,7 @@ function runTests(){
       baseScale.set('height',h);
       baseScale.set('margin',m);
       baseScale.set('completeSeriesConfig',completeSeriesConfig);
-      baseScale.set('chartExtents',chartExtents);
+      baseScale.set('dataExtents',dataExtents);
       baseScale.set('chartData',d);
 
       baseXGrid.set('margin',m);

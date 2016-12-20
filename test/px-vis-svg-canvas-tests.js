@@ -63,7 +63,7 @@ function runTests(){
       assert.isDefined(svgEvt);
     });
     test('svgCanvas svgEvt has a data var', function() {
-      assert.equal(svgEvt.data , svgElem.svg);
+      assert.equal(JSON.stringify(svgEvt.data) , JSON.stringify(svgElem.svg));
     });
     test('svgCanvas svgEvt has a dataVar var', function() {
       assert.equal(svgEvt.dataVar , 'svg');

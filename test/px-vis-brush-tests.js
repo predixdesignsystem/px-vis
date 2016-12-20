@@ -40,7 +40,7 @@ function runTests(){
           "y":"y",
           "color": "rgb(93,165,218)"
         }},
-        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        dataExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
         h = 300,
         m = {
@@ -58,7 +58,7 @@ function runTests(){
       baseScale.set('height',h);
       baseScale.set('margin',m);
       baseScale.set('completeSeriesConfig',completeSeriesConfig);
-      baseScale.set('chartExtents',chartExtents);
+      baseScale.set('dataExtents',dataExtents);
       baseScale.set('chartData',d);
 
       baseBrush.set('height',h);
@@ -412,7 +412,7 @@ function runTests(){
           "y":"y",
           "color": "rgb(93,165,218)"
         }},
-        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
+        dataExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
         h = 300,
         m = {
@@ -430,7 +430,7 @@ function runTests(){
       gradientScale.set('height',h);
       gradientScale.set('margin',m);
       gradientScale.set('completeSeriesConfig',completeSeriesConfig);
-      gradientScale.set('chartExtents',chartExtents);
+      gradientScale.set('dataExtents',dataExtents);
       gradientScale.set('chartData',d);
 
       gradientBrush.set('height',h);
@@ -466,28 +466,28 @@ function runTests(){
     });
 
     test('def is created', function() {
-      assert.equal(gradientBrush.brushSvg.select('defs').node().tagName, 'defs');
+      assert.equal(gradientBrush.svg.select('defs').node().tagName, 'defs');
     });
     test('linearGradient is created', function() {
-      assert.equal(gradientBrush.brushSvg.select('defs').select('#overlayGradient').node().tagName, 'linearGradient');
+      assert.equal(gradientBrush.svg.select('defs').select('#overlayGradient').node().tagName, 'linearGradient');
     });
     test('linearGradient has correct id', function() {
-      assert.equal(gradientBrush.brushSvg.select('defs').select('#overlayGradient').attr('id'), 'overlayGradient');
+      assert.equal(gradientBrush.svg.select('defs').select('#overlayGradient').attr('id'), 'overlayGradient');
     });
     test('linearGradient stops are created', function() {
-      var stops = gradientBrush.brushSvg.select('defs').select('#overlayGradient').selectAll('stop').nodes();
+      var stops = gradientBrush.svg.select('defs').select('#overlayGradient').selectAll('stop').nodes();
       assert.equal(stops.length, 2);
       assert.equal(stops[0].tagName, 'stop');
       assert.equal(stops[1].tagName, 'stop');
     });
     test('linearGradient stop[0] is correct', function() {
-      var stop = d3.select(gradientBrush.brushSvg.select('defs').select('#overlayGradient').selectAll('stop').nodes()[0]);
+      var stop = d3.select(gradientBrush.svg.select('defs').select('#overlayGradient').selectAll('stop').nodes()[0]);
       assert.equal(stop.attr('offset'), '0%');
       assert.equal(stop.attr('stop-color').split(" ").join(''), colors.gray5);
       assert.equal(stop.attr('stop-opacity'), 0.2);
     });
     test('linearGradient stop[1] is correct', function() {
-      var stop = d3.select(gradientBrush.brushSvg.select('defs').select('#overlayGradient').selectAll('stop').nodes()[1]);
+      var stop = d3.select(gradientBrush.svg.select('defs').select('#overlayGradient').selectAll('stop').nodes()[1]);
       assert.equal(stop.attr('offset'), '100%');
       assert.equal(stop.attr('stop-color').split(" ").join(''), colors.gray5);
       assert.equal(stop.attr('stop-opacity'), 0.8);
