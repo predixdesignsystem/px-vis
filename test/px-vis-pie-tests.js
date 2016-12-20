@@ -78,7 +78,7 @@ function runTests(){
         assert.isTrue(popover.classList.contains('fadeFromHidden'));
 
         done();
-      }, 800);
+      }, 1000);
     });
 
     // test('tooltip starts hidden', function() {
