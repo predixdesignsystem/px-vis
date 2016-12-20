@@ -61,6 +61,7 @@ function runTests(){
       baseScale.set('margin',m);
       baseScale.set('completeSeriesConfig',completeSeriesConfig);
       baseScale.set('chartExtents',chartExtents);
+      baseScale.set('dataExtents',chartExtents);
       baseScale.set('chartData',d);
 
       baseLine.set('seriesId',"mySeries");
@@ -163,6 +164,7 @@ function runTests(){
       mutedScale.set('margin',m);
       mutedScale.set('completeSeriesConfig',completeSeriesConfig);
       mutedScale.set('chartExtents',chartExtents);
+      mutedScale.set('dataExtents',chartExtents);
       mutedScale.set('chartData',d);
 
       mutedLine1.set('completeSeriesConfig',completeSeriesConfig);
@@ -395,6 +397,7 @@ function runTests(){
       missingDataPointScale.set('margin',m);
       missingDataPointScale.set('completeSeriesConfig',completeSeriesConfig);
       missingDataPointScale.set('chartExtents',chartExtents);
+      missingDataPointScale.set('dataExtents',chartExtents);
       missingDataPointScale.set('chartData',d);
 
       missingDataPointLine1.set('completeSeriesConfig',completeSeriesConfig);
@@ -419,10 +422,211 @@ function runTests(){
     });
 
     test('missingDataPointLine1 line d', function() {
-      assert.equal(linePath1.attr('d').split(/[\s,]+/).join(''),'M0260L120210M360230L480210');
+      assert.equal(linePath1.attr('d').split(/[\s,]+/).join(''),'M0260L120210L120210L360230L480210');
     });
 
     test('missingDataPointLine2 line d', function() {
+      assert.equal(linePath2.attr('d').split(/[\s,]+/).join(''),'M0260L12060L240240L360170L4800');
+    });
+  }); //suite
+
+  suite('px-vis-line-svg with null data showing gaps', function() {
+    var missingDataPointScaleNull = document.getElementById('missingDataPointScaleNull'),
+        missingDataPointSVGNull = document.getElementById('missingDataPointSVGNull'),
+        missingDataPointLine1Null = document.getElementById('missingDataPointLine1Null'),
+        missingDataPointLine2Null = document.getElementById('missingDataPointLine2Null');
+
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var linePath1,linePath2;
+
+    suiteSetup(function(done){
+      var d = [{
+            "x": 1397102460000,
+            "y": 1,
+            "y2": 1
+          },{
+            "x": 1397131620000,
+            "y": 6,
+            "y2": 21
+          },{
+            "x": 1397160780000,
+            "y": null,
+            "y2": 3
+          },{
+            "x": 1397189940000,
+            "y": 4,
+            "y2": 10
+          },{
+            "x": 1397219100000,
+            "y": 6,
+            "y2": 27
+          }
+        ],
+        completeSeriesConfig = {
+          "mySeries":{
+            "type":"line",
+            "name":"mySeries",
+            "x":"x",
+            "y":"y",
+            "color": "rgb(93,165,218)"
+          },
+          "mySeries2":{
+            "type":"line",
+            "name":"mySeries2",
+            "x":"x",
+            "y":"y2",
+            "color": "rgb(250,164,58)"
+          }
+        },
+        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,27]},
+        w = 500,
+        h = 300,
+        m = {
+          "top": 10,
+          "right": 5,
+          "bottom": 20,
+          "left": 15
+        };
+
+      missingDataPointSVGNull.set('width',w);
+      missingDataPointSVGNull.set('height',h);
+      missingDataPointSVGNull.set('margin',m);
+
+      missingDataPointScaleNull.set('width',w);
+      missingDataPointScaleNull.set('height',h);
+      missingDataPointScaleNull.set('margin',m);
+      missingDataPointScaleNull.set('completeSeriesConfig',completeSeriesConfig);
+      missingDataPointScaleNull.set('chartExtents',chartExtents);
+      missingDataPointScaleNull.set('dataExtents',chartExtents);
+      missingDataPointScaleNull.set('chartData',d);
+
+      missingDataPointLine1Null.set('completeSeriesConfig',completeSeriesConfig);
+      missingDataPointLine1Null.set('seriesId',"mySeries");
+      missingDataPointLine1Null.set('chartData',d);
+
+      missingDataPointLine2Null.set('completeSeriesConfig',completeSeriesConfig);
+      missingDataPointLine2Null.set('seriesId',"mySeries2");
+      missingDataPointLine2Null.set('chartData',d);
+      setTimeout(function(){
+        linePath1 = missingDataPointLine1Null.lineGroup.select('path.series-line');
+        linePath2 = missingDataPointLine2Null.lineGroup.select('path.series-line');
+        done();
+      },100);;
+    });
+
+    test('missingDataPointLine1Null fixture is created', function() {
+      assert.isTrue(missingDataPointLine1Null !== null);
+    });
+    test('missingDataPointLine2Null fixture is created', function() {
+      assert.isTrue(missingDataPointLine2Null !== null);
+    });
+
+    test('missingDataPointLine1Null line d', function() {
+      assert.equal(linePath1.attr('d').split(/[\s,]+/).join(''),'M0260L120210M360230L480210');
+    });
+
+    test('missingDataPointLine2Null line d', function() {
+      assert.equal(linePath2.attr('d').split(/[\s,]+/).join(''),'M0260L12060L240240L360170L4800');
+    });
+  }); //suite
+
+  suite('px-vis-line-svg with missing data showing gaps', function() {
+    var missingDataPointScaleGap = document.getElementById('missingDataPointScaleGap'),
+        missingDataPointSVGGap = document.getElementById('missingDataPointSVGGap'),
+        missingDataPointLine1Gap = document.getElementById('missingDataPointLine1Gap'),
+        missingDataPointLine2Gap = document.getElementById('missingDataPointLine2Gap');
+
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var linePath1,linePath2;
+
+    suiteSetup(function(done){
+      var d = [{
+            "x": 1397102460000,
+            "y": 1,
+            "y2": 1
+          },{
+            "x": 1397131620000,
+            "y": 6,
+            "y2": 21
+          },{
+            "x": 1397160780000,
+            "y2": 3
+          },{
+            "x": 1397189940000,
+            "y": 4,
+            "y2": 10
+          },{
+            "x": 1397219100000,
+            "y": 6,
+            "y2": 27
+          }
+        ],
+        completeSeriesConfig = {
+          "mySeries":{
+            "type":"line",
+            "name":"mySeries",
+            "x":"x",
+            "y":"y",
+            "color": "rgb(93,165,218)"
+          },
+          "mySeries2":{
+            "type":"line",
+            "name":"mySeries2",
+            "x":"x",
+            "y":"y2",
+            "color": "rgb(250,164,58)"
+          }
+        },
+        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,27]},
+        w = 500,
+        h = 300,
+        m = {
+          "top": 10,
+          "right": 5,
+          "bottom": 20,
+          "left": 15
+        };
+
+      missingDataPointSVGGap.set('width',w);
+      missingDataPointSVGGap.set('height',h);
+      missingDataPointSVGGap.set('margin',m);
+
+      missingDataPointScaleGap.set('width',w);
+      missingDataPointScaleGap.set('height',h);
+      missingDataPointScaleGap.set('margin',m);
+      missingDataPointScaleGap.set('completeSeriesConfig',completeSeriesConfig);
+      missingDataPointScaleGap.set('chartExtents',chartExtents);
+      missingDataPointScaleGap.set('dataExtents',chartExtents);
+      missingDataPointScaleGap.set('chartData',d);
+
+      missingDataPointLine1Gap.set('completeSeriesConfig',completeSeriesConfig);
+      missingDataPointLine1Gap.set('seriesId',"mySeries");
+      missingDataPointLine1Gap.set('chartData',d);
+
+      missingDataPointLine2Gap.set('completeSeriesConfig',completeSeriesConfig);
+      missingDataPointLine2Gap.set('seriesId',"mySeries2");
+      missingDataPointLine2Gap.set('chartData',d);
+      setTimeout(function(){
+        linePath1 = missingDataPointLine1Gap.lineGroup.select('path.series-line');
+        linePath2 = missingDataPointLine2Gap.lineGroup.select('path.series-line');
+        done();
+      },100);;
+    });
+
+    test('missingDataPointLine1Gap fixture is created', function() {
+      assert.isTrue(missingDataPointLine1Gap !== null);
+    });
+    test('missingDataPointLine2Gap fixture is created', function() {
+      assert.isTrue(missingDataPointLine2Gap !== null);
+    });
+
+    test('missingDataPointLine1Gap line d', function() {
+      assert.equal(linePath1.attr('d').split(/[\s,]+/).join(''),'M0260L120210M360230L480210');
+    });
+
+    test('missingDataPointLine2Gap line d', function() {
       assert.equal(linePath2.attr('d').split(/[\s,]+/).join(''),'M0260L12060L240240L360170L4800');
     });
   }); //suite
