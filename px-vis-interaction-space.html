@@ -313,29 +313,41 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                 } else {
                   //non time based: iterate over points and find the closest
 
-                  for(var j = 0; j < this.chartData.length/10; j++) {
+                  var currX = this.x.domain(),
+                      currY = this.y.domain(),
+                      dataX,
+                      dataY;
 
-                    //get point coords
-                    x2 = this.x(this.chartData[j][xKey]);
-                    y2 = this.y(this.chartData[j][yKey]);
+                  for(var j = 0; j < this.chartData.length; j++) {
 
-                    //distance between the two points
-                    d = Math.sqrt( (x2-=mousePos[0])*x2 + (y2-=mousePos[1])*y2 );
+                    //get point values
+                    dataX = this.chartData[j][xKey];
+                    dataY = this.chartData[j][yKey];
 
-                    //keep the closest point
-                    if(d < minDist) {
-                      minDist = d;
-                      //store this point
-                      //Warning: You can't reuse x2 and y2! their values are changed
-                      //during the calculation, hence needing to refetch from array
-                      result[xKey] = this.chartData[j][xKey];
-                      result[yKey] = this.chartData[j][yKey];
+                    if(dataX >= currX[0] && dataX <= currX[1] && dataY >= currY[0] && dataY <= currY[1]) {
 
-                      //store the timestamp and distance
-                      if(searchTimeStamp && closestTimestamp[0] > minDist) {
-                        closestTimestamp = [minDist, this.chartData[j][this.timeData]];
+                      //get pixel coords
+                      x2 = this.x(dataX);
+                      y2 = this.y(dataY);
+
+                      //distance between the two points
+                      //! x2 and y2 are changed during this calculation
+                      d = Math.sqrt( (x2-=mousePos[0])*x2 + (y2-=mousePos[1])*y2 );
+
+                      //keep the closest point
+                      if(d < minDist) {
+                        minDist = d;
+
+                        //store this point
+                        result[xKey] = dataX;
+                        result[yKey] = dataY;
+
+                        //store the timestamp and distance
+                        if(searchTimeStamp && closestTimestamp[0] > minDist) {
+                          closestTimestamp = [minDist, this.chartData[j][this.timeData]];
+                        }
                       }
-                    }
+                    } 
                   }
                 }
 
