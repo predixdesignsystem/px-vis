@@ -56,7 +56,17 @@ function runTests(){
         dTB = [
           { "for":"mySeries", "type":"min", "value":4 },
           { "for":"", "type":"median", "value":6 }
-        ];
+        ],
+        dCustom = [
+          { "for":"mySeries", "type":"custom", "value": 5 }
+        ],
+        tConf = {
+          "custom": {
+            "color": "red",
+            "dashPattern": "5,0",
+            "title": "CUSTOM"
+          }
+        };
 
       baseSVG.set('width',w);
       baseSVG.set('height',h);
@@ -67,13 +77,18 @@ function runTests(){
       baseScale.set('margin',m);
       baseScale.set('completeSeriesConfig',completeSeriesConfig);
       baseScale.set('chartExtents',chartExtents);
+      baseScale.set('dataExtents',chartExtents);
       baseScale.set('chartData',d);
 
       defaultThreshold.set('completeSeriesConfig',completeSeriesConfig);
-      defaultThreshold.set('chartData',dT);
+      defaultThreshold.set('thresholdData',dT);
 
       boxThreshold.set('completeSeriesConfig',completeSeriesConfig);
-      boxThreshold.set('chartData',dTB);
+      boxThreshold.set('thresholdData',dTB);
+
+      customThresold.set('completeSeriesConfig',completeSeriesConfig);
+      customThresold.set('thresholdConfig',tConf);
+      customThresold.set('thresholdData',dCustom);
 
       // need a small delay for stuff to work
       setTimeout(function(){ done() }.bind(this),10);
@@ -84,6 +99,9 @@ function runTests(){
     });
     test('boxThreshold fixture is created', function() {
       assert.isTrue(boxThreshold !== null);
+    });
+    test('customThresold fixture is created', function() {
+      assert.isTrue(customThresold !== null);
     });
   }); //suite
 
@@ -291,6 +309,38 @@ function runTests(){
 
     test('boxThreshold thresholdText fill', function() {
       assert.equal(boxThreshold.thresholdText.nodes()[1].getAttribute('fill'),'white');
+    });
+  }); //suite
+
+  suite('px-vis-threshold customThresold have color', function() {
+    var baseScale = document.getElementById('baseScale'),
+        baseSVG = document.getElementById('baseSVG'),
+        customThresold = document.getElementById('customThresold');
+
+    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colors = baseColors.properties.colors.value;
+
+    test('customThresold thresholdLine stroke width', function() {
+      assert.equal(customThresold.thresholdLine.nodes()[0].getAttribute('stroke-width'),1);
+    });
+    test('customThresold thresholdLine stroke dasharray', function() {
+      assert.equal(customThresold.thresholdLine.nodes()[0].getAttribute('stroke-dasharray').split(' ').join(''),'5,0');
+    });
+    test('customThresold thresholdLine stroke', function() {
+      assert.equal(customThresold.thresholdLine.nodes()[0].getAttribute('stroke').split(' ').join(''),'red');
+    });
+
+    test('customThresold thresholdRect fill', function() {
+      assert.equal(customThresold.thresholdRect.nodes()[0].getAttribute('fill').split(' ').join(''),'none');
+    });
+
+    test('customThresold thresholdText fill', function() {
+      assert.equal(customThresold.thresholdText.nodes()[0].getAttribute('fill'),'red');
+    });
+
+    test('customThresold thresholdText fill', function() {
+      assert.equal(customThresold.thresholdText.text(),'5.00 (CUSTOM)');
     });
   }); //suite
 
