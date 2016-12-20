@@ -313,14 +313,14 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                 } else {
                   //non time based: iterate over points and find the closest
 
-                  for(var j = 0; j < this.chartData.length; j++) {
+                  for(var j = 0; j < this.chartData.length/10; j++) {
 
                     //get point coords
-                    x2 = this.chartData[j][xKey];
-                    y2 = this.chartData[j][yKey];
+                    x2 = this.x(this.chartData[j][xKey]);
+                    y2 = this.y(this.chartData[j][yKey]);
 
                     //distance between the two points
-                    d = Math.sqrt( (x2-=x1)*x2 + (y2-=y1)*y2 );
+                    d = Math.sqrt( (x2-=mousePos[0])*x2 + (y2-=mousePos[1])*y2 );
 
                     //keep the closest point
                     if(d < minDist) {
