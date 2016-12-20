@@ -161,6 +161,7 @@ function runTests(){
       baseScale.set('margin',m);
       baseScale.set('completeSeriesConfig',completeSeriesConfig);
       baseScale.set('chartExtents',chartExtents);
+      baseScale.set('dataExtents',chartExtents);
       baseScale.set('chartData',d);
 
       linearScale.set('width',w);
@@ -168,6 +169,7 @@ function runTests(){
       linearScale.set('margin',m);
       linearScale.set('completeSeriesConfig',completeSeriesConfig);
       linearScale.set('chartExtents',linearChartExtents);
+      linearScale.set('dataExtents',linearChartExtents);
       linearScale.set('chartData',linearD);
 
       ordinalScale.set('width',w);
@@ -175,6 +177,7 @@ function runTests(){
       ordinalScale.set('margin',m);
       ordinalScale.set('completeSeriesConfig',completeSeriesConfig);
       ordinalScale.set('chartExtents',ordinalChartExtents);
+      ordinalScale.set('dataExtents',ordinalChartExtents);
       ordinalScale.set('chartData',ordinalD);
 
       defaultEvent.set('eventConfig',eventConfig);

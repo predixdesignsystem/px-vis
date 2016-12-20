@@ -61,6 +61,7 @@ function runTests(){
       baseScale.set('margin',m);
       baseScale.set('completeSeriesConfig',completeSeriesConfig);
       baseScale.set('chartExtents',chartExtents);
+      baseScale.set('dataExtents',chartExtents);
       baseScale.set('chartData',d);
 
       baseScatter.set('completeSeriesConfig',completeSeriesConfig);
@@ -176,6 +177,7 @@ function runTests(){
       mutedScale.set('margin',m);
       mutedScale.set('completeSeriesConfig',completeSeriesConfig);
       mutedScale.set('chartExtents',chartExtents);
+      mutedScale.set('dataExtents',chartExtents);
       mutedScale.set('chartData',d);
 
       mutedScatter1.set('markerScale','0.5');
@@ -472,6 +474,7 @@ function runTests(){
       markerScale.set('margin',m);
       markerScale.set('completeSeriesConfig',completeSeriesConfig);
       markerScale.set('chartExtents',chartExtents);
+      markerScale.set('dataExtents',chartExtents);
       markerScale.set('chartData',d);
 
       markerCircle.set('completeSeriesConfig',completeSeriesConfig);
