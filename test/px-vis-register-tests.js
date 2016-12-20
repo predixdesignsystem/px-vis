@@ -44,10 +44,11 @@ function runTests(){
 
     test('doesItMute series has muted class', function() {
       var ms = doesItMute.mutedSeries;
-      var series = Polymer.dom(doesItMute.root).querySelectorAll('px-vis-register-item');
+      var series = Polymer.dom(doesItMute.root).querySelectorAll('px-vis-register-item'),
+          regWithoutMenu = series[1].querySelector('#regWithoutMenu');
 
       assert.isTrue(ms[data.data.series[1].name]);
-      assert.isTrue(series[1].classList.contains('muted'));
+      assert.isTrue(regWithoutMenu.classList.contains('muted'));
     });
 
   });
@@ -387,6 +388,7 @@ function basicTests(registerID,dir){
         regItem,
         series,
         seriesName,
+        regWithoutMenu,
         eventObj;
     suiteSetup(function(done) {
       data = generateEmptyData(5);
@@ -400,14 +402,15 @@ function basicTests(registerID,dir){
       regItem = Polymer.dom(register.root).querySelectorAll('px-vis-register-item')[1];
       series = regItem.querySelector('.series');
       seriesName = series.querySelector('.seriesName');
-      seriesName.click();
+      regWithoutMenu = series.querySelector('#regWithoutMenu');
+      regWithoutMenu.click();
 
       var ms = Object.keys(register.mutedSeries);
       assert.equal(ms.length, 1);
       assert.equal(ms[0], seriesName.getAttribute('name').substr(1));
       assert.equal(ms[0], Object.keys(register.completeSeriesConfig)[1]);
       assert.equal(register.mutedSeries[ms[0]], true);
-      assert.isTrue(regItem.classList.contains('muted'));
+      assert.isTrue(regWithoutMenu.classList.contains('muted'));
     });
 
     test(registerID + ' muted-series-updated event fired', function() {
@@ -424,14 +427,14 @@ function basicTests(registerID,dir){
     });
 
     test(registerID + ' mutedSeries change to false', function() {
-      seriesName.click();
+      regWithoutMenu.click();
 
       var ms = Object.keys(register.mutedSeries);
       assert.equal(ms.length, 1);
       assert.equal(ms[0], seriesName.getAttribute('name').substr(1));
       assert.equal(ms[0], Object.keys(register.completeSeriesConfig)[1]);
       assert.equal(register.mutedSeries[ms[0]], false);
-      assert.isTrue(!regItem.classList.contains('muted'));
+      assert.isTrue(!regWithoutMenu.classList.contains('muted'));
     });
 
     test(registerID + ' mutedSeries change back to true', function() {
@@ -442,7 +445,7 @@ function basicTests(registerID,dir){
       assert.equal(ms[0], seriesName.getAttribute('name').substr(1));
       assert.equal(ms[0], Object.keys(register.completeSeriesConfig)[1]);
       assert.equal(register.mutedSeries[ms[0]], true);
-      assert.isTrue(regItem.classList.contains('muted'));
+      assert.isTrue(regWithoutMenu.classList.contains('muted'));
     });
   });
 

@@ -14,7 +14,7 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         basePie = document.getElementById('baseLine');
 
-    suiteSetup(function(){
+    suiteSetup(function(done){
       var d = [{"x":15,"y":"IPA","percentage":"26"},{"x":1,"y":"Pils","percentage":"2"},{"x":1,"y":"Lager","percentage":"2"},{"x":8,"y":"Lambic","percentage":"14"},{"x":12,"y":"Stout","percentage":"21"},{"x":7,"y":"Pale Ale","percentage":"12"},{"x":9,"y":"Porter","percentage":"16"},{"x":4,"y":"Heffeweisse","percentage":"7"}],
           seriesConfig = {"y":{
             "type":"line",
@@ -26,39 +26,25 @@ function runTests(){
       basePie.set('chartData',d);
       basePie.set('completeSeriesConfig',seriesConfig);
       basePie.set('seriesId',"y");
+
+      //wait for animation to finish
+      setTimeout(function() {
+        done();
+      }, 1000);
     });
 
     test('basePie fixture is created', function() {
       assert.isTrue(basePie !== null);
     });
 
-    test('pie has been initially translated by radius', function() {
-      var transform = basePie.pieGroup._groups[0][0].attributes['transform'].value.replace(',','').split(" ").join('');
-      assert.isTrue(transform.indexOf('translate(' + basePie._radius + basePie._radius + ')') !== -1);
-    });
-
-    test('pie has been translated by radius', function(done) {
-
-      setTimeout(function() {
-
-        var transform = basePie.pieGroup._groups[0][0].attributes['transform'].value.replace('scale(1)','').replace(',','').split(" ").join(''),
-            expected = 'translate(' + basePie._radius +  basePie._radius + ')';
-
-        assert.isTrue(transform === expected);
-        done();
-      }, 1500);
-    });
-
     test('as many slices as data', function() {
-
       assert.equal(basePie.chartData.length,  basePie.pieGroup._groups[0][0].childNodes.length);
     });
 
     test('verify first slice path', function() {
-
       var slicePath = basePie.pieGroup._groups[0][0].firstChild.attributes['d'].value.split(/[\s,]+/).join(''),
-          normalPath = 'M1.3164953090834047e-14-215A215215001214.2656659964340217.754559276551454L00Z',
-          iePath = 'M1.3165e-014-215A215215001214.26617.7546L00Z';
+          normalPath = 'M1.5308084989341916e-14-250A250250001249.1461232516674620.644836368083084L00Z',
+          iePath = 'M1.53081e-014-250A250250001249.14620.6448L00Z';
       assert.isTrue(slicePath === normalPath || slicePath === iePath);
     });
 
