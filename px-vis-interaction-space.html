@@ -110,11 +110,50 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       timeData: {
         type: String,
         value: 'Timestamp'
+      },
+      /**
+       * Configuration used to define what actions happen on events. Each key represents an event,
+       * each value can be:
+       * - a predefined action found in `actionMapping`
+       * - a function which context will be bound to this element
+       */
+      actionConfig: {
+        type: Object,
+        value: {
+          'mousedown': 'startZooming',
+          'mouseup': 'stopZooming',
+          // 'mousedown': 'startPanning',
+          // 'mouseup': 'stopPanning',
+          'mouseout': 'resetTooltip',
+          'mousemove': 'calcTooltipData'
+        }
+      },
+      /**
+       * set of predefined action that can be used out of the box
+       */
+      actionMapping: {
+        type: Object,
+        readOnly: true,
+        value: {
+          'startZooming': '_drawActionBox',
+          'stopZooming': '_finishActionBox',
+          'calcTooltipData': '_calcTooltipData',
+          'resetTooltip': '_resetTooltipData',
+          'startPanning': '_startPanning',
+          'stopPanning': '_stopPanning'
+        }
+      },
+      _panningStartVal: {
+        type: Array,
+        value: function() {
+          return [];
+        }
       }
     },
 
     observers: [
       'drawElement(currentDomainX,currentDomainY,chartData.*,svg,width,height, completeSeriesConfig)',
+      '_setupActions(actionConfig.*)',
       '_resetTooltipDataLegacy(completeSeriesConfig.*,)',
       '_resetTooltipData(seriesKeys.*)'
      ],
@@ -144,32 +183,48 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     drawElement: function() {
       // append the rectangle to capture mouse interactions
       if(!this._rect) {
-        this._rect = this.svg.append("rect")
-          .attr('id',"mouseCapture")
-          .attr("width", Math.max(this.width - this.margin.left - this.margin.right,0))
-          .attr("height", Math.max(this.height - this.margin.bottom - this.margin.top,0))
-          .attr("fill", "none")
-          .attr("pointer-events", "all")
-          .on("mouseout.tooltip", this._resetTooltipData.bind(this))
-          .on("mousemove.tooltip",this._calcTooltipData.bind(this))
-          .on("mousedown.action", this._drawActionBox.bind(this))
-          .on("mouseup.action", this._finishActionBox.bind(this))
-          .style("cursor","crosshair");
+        this._rect = this.svg.append('rect')
+          .attr('id','mouseCapture')
+          .attr('width', Math.max(this.width - this.margin.left - this.margin.right,0))
+          .attr('height', Math.max(this.height - this.margin.bottom - this.margin.top,0))
+          .attr('fill', 'none')
+          .attr('pointer-events', 'all')
+          .style('cursor','crosshair');
 
-          this.set("mouseRect", this._rect.node());
+          this._setupActions();
+
+          this.set('mouseRect', this._rect.node());
           this.fire('px-vis-mouse-rect-updated', {'data': this.mouseRect, 'dataVar': 'mouseRect', 'method': 'set'});
       } else {
-        this._rect.attr("width", Math.max(0, this.width - this.margin.left - this.margin.right))
-        .attr("height", Math.max(0, this.height - this.margin.bottom - this.margin.top));
+        this._rect.attr('width', Math.max(0, this.width - this.margin.left - this.margin.right))
+        .attr('height', Math.max(0, this.height - this.margin.bottom - this.margin.top));
       }
-
-      // TODO touchevents
-      // TODO if there is no register tooltip or cursor, set .tooltip listeners to null
-      // TODO if there is no zoom or action panel, set action listeners to null
-
-      // send the register etc an empty list of series
-      // this._resetTooltipData();
     },  //drawElement
+
+    _setupActions: function() {
+      if(this._rect) {
+
+        var keys = Object.keys(this.actionConfig),
+            mouseEvent,
+            action;
+
+        for(var i=0; i<keys.length; i++) {
+
+          mouseEvent = keys[i],
+          action = this.actionConfig[keys[i]],
+          mappedAction = this[this.actionMapping[action]];
+
+          //is this a function defined here
+          if(mappedAction && typeof mappedAction === 'function') {
+            //we don't need to remove previous handlers as if they have the same
+            //mouseEVent name then they will be overriden
+            this._rect.on(mouseEvent, mappedAction.bind(this));
+          } else if(typeof action === 'function') {
+            this._rect.on(mouseEvent, action.bind(this));
+          }
+        }
+      }
+    },
 
     _resetTooltipDataLegacy: function() {
       if(!this.seriesKeys){
@@ -210,6 +265,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     _calcTooltipData:function() {
 
       if(!this.mouseDown && this.chartData.length > 0) {
+
         //  d3.mouse: returns the x position on the screen of the mouse
         var mousePos = Px.d3.mouse(this._rect.node()),
             x0,
@@ -454,12 +510,71 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
     /**
      * Helper function called on document.mouseup
-     * assumes the user wanted to "close" the action box, and calls _finishActionBox
+     * assumes the user wanted to 'close' the action box, and calls _finishActionBox
      *
      * @method _mouseUpOutsideSvg
      */
     _mouseUpOutsideSvg: function() {
       this._finishActionBox();
+    },
+    /**
+     * Initiate Panning action
+     */
+    _startPanning: function() {
+      //only allow left clicks
+      if(Px.d3.event.button === 0) {
+        this.mouseDown = true;
+
+        this._resetTooltipData();
+         
+        //in case the user clicks inside the chart, and mouses out, we are waiting for a mouseup, and closing our action box with the coordinates available on the mouseup.
+        Px.d3.select(document).on('mouseup.action', this._stopPanning);
+        Px.d3.select(document).on('mousemove.action', this._updatePanning.bind(this));
+
+        var mousePos = Px.d3.mouse(this._rect.node());
+        // use original svg so it draws under the _rect and does not interfer with our mouse events
+
+        this._panningStartVal = [this.x.invert(mousePos[0]), this.y.invert(mousePos[1])];
+      }
+    },
+    _updatePanning: function() {
+    
+        var newExtents = {},
+            mousePos = Px.d3.mouse(this._rect.node()),
+            currentPanningVal = [this.x.invert(mousePos[0]), this.y.invert(mousePos[1])],
+            diff = [(currentPanningVal[0] - this._panningStartVal[0]),
+                    (currentPanningVal[1] - this._panningStartVal[1])],
+            xDomain = this.x.domain(),
+            yDomain = this.y.domain();
+
+
+          //TODO: ordinal
+          newExtents.eX = [xDomain[0] - diff[0], xDomain[1] - diff[0]];
+          newExtents.eY = [yDomain[0] - diff[1], yDomain[1] - diff[1]];
+          // if(this.xAxisType === 'ordinal') {
+          //   extents.eX = this._getOrdinalRange(true, extents.x1, extents.x2);
+          // } else {
+          //   extents.eX = [this.x.invert(extents.x1), this.x.invert(extents.x2)];
+          // }
+
+          //   if(this.yAxisType === 'ordinal') {
+          //     //Y axis is top to bottom
+          //     extents.eY = this._getOrdinalRange(false, extents.y2, extents.y1);
+          //   } else {
+          //     //Y axis is top to bottom
+          //     extents.eY = [this.y.invert(extents.y2), this.y.invert(extents.y1)];
+          //   }
+          
+          this.set('extentsData', newExtents);      
+    },
+    _stopPanning: function() {
+
+      this._updatePanning();
+
+      Px.d3.select(document).on('mouseup.action', null);
+      Px.d3.select(document).on('mousemove.action', null);
+
+      this.mouseDown = false;
     },
     /**
      * Helper function called on mousedown.action
@@ -488,8 +603,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           startX = 0;
         }
 
-        this._actionArea = this.svg.append("rect")
-          .attr('class', "action-area")
+        this._actionArea = this.svg.append('rect')
+          .attr('class', 'action-area')
           .attr('x', startX)
           .attr('y', startY)
           .attr('ox', startX) // save this original position for calcs
@@ -498,9 +613,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           .attr('ry', 2)
           .attr('width', 0)
           .attr('height', 0)
-          .attr('fill', this._checkThemeVariable("--px-vis-zoom-brush-fill-color", this.colors.grey2))
-          .attr('fill-opacity', this._checkThemeVariable("--px-vis-zoom-brush-fill-opacity", 0.5))
-          .attr('stroke', this._checkThemeVariable("--px-vis-zoom-brush-outline-color", this.colors.grey6));
+          .attr('fill', this._checkThemeVariable('--px-vis-zoom-brush-fill-color', this.colors.grey2))
+          .attr('fill-opacity', this._checkThemeVariable('--px-vis-zoom-brush-fill-opacity', 0.5))
+          .attr('stroke', this._checkThemeVariable('--px-vis-zoom-brush-outline-color', this.colors.grey6));
       }
     },
     /**
@@ -515,8 +630,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
         var mousePos = Px.d3.mouse(this._rect.node()),
           // save somewhere else--> not as an attr, inefficient
-            ox = parseInt(this._actionArea.attr("ox")),
-            oy = parseInt(this._actionArea.attr("oy")),
+            ox = parseInt(this._actionArea.attr('ox')),
+            oy = parseInt(this._actionArea.attr('oy')),
             width = this._rect.attr('width'),
             height = this._rect.attr('height')
             newX = Math.max(Math.min(mousePos[0], width), 0),
@@ -531,20 +646,20 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         // if current position is greater than the original position
         if(newX >= ox) {
           // set x to the original position to prevent some drift on crossover. width is equal to the difference between the x and current mouse position
-          this._actionArea.attr("x", ox);
-          this._actionArea.attr("width", newX - ox);
+          this._actionArea.attr('x', ox);
+          this._actionArea.attr('width', newX - ox);
         } else {
           // else, the x is the current pos (because we cant have negative width) and width is the difference
-          this._actionArea.attr("x", newX);
-          this._actionArea.attr("width", ox - newX);
+          this._actionArea.attr('x', newX);
+          this._actionArea.attr('width', ox - newX);
         }
 
         if(newY >= oy) {
-          this._actionArea.attr("y", oy);
-          this._actionArea.attr("height", newY - oy);
+          this._actionArea.attr('y', oy);
+          this._actionArea.attr('height', newY - oy);
         } else {
-          this._actionArea.attr("y", newY);
-          this._actionArea.attr("height", oy - newY);
+          this._actionArea.attr('y', newY);
+          this._actionArea.attr('height', oy - newY);
         }
 
         Px.d3.event.preventDefault();
@@ -566,11 +681,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       if(this._doesD3HaveValues(this._actionArea)) {
         //make sure we have somthing selected
-        if(this._actionArea.attr("width") > 0 && this._actionArea.attr("height") > 0) {
-          extents.x1 = parseInt(this._actionArea.attr("x"));
-          extents.y1 = parseInt(this._actionArea.attr("y"));
-          extents.w = parseInt(this._actionArea.attr("width"));
-          extents.h = parseInt(this._actionArea.attr("height"));
+        if(this._actionArea.attr('width') > 0 && this._actionArea.attr('height') > 0) {
+          extents.x1 = parseInt(this._actionArea.attr('x'));
+          extents.y1 = parseInt(this._actionArea.attr('y'));
+          extents.w = parseInt(this._actionArea.attr('width'));
+          extents.h = parseInt(this._actionArea.attr('height'));
           extents.x2 = extents.x1 + extents.w;
           extents.y2 = extents.y1 + extents.h;
 
