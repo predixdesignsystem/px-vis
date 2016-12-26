@@ -33,7 +33,54 @@ PxVisBehavior.baseSize = {
     height: {
       type: Number,
       notify: true
+    }
+  }
+};
+
+/*
+    Name:
+    PxVisBehavior.baseSize
+
+    Description:
+    Polymer behavior that provides height and width
+
+    @polymerBehavior PxVisBehavior.baseSize
+*/
+PxVisBehavior.margins = {
+
+  properties: {
+    /**
+    * Copy of the default margin for checking if it has changed
+    *
+    */
+    _defaultMargin:{
+      type:Object,
+      notify: true,
+      value: function() {
+        return {
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0
+        };
+      }
     },
+    /**
+    * Defines the base margin for the chart. Calcs are run to add to the margin to accommodate axes and other elements which exist within the SVG frame, but outside the chart frame.
+    *
+    */
+    margin:{
+      type:Object,
+      notify: true,
+      value: function() {
+        return {
+          left: 0,
+          right: 0,
+          top: 0,
+          bottom: 0
+        };
+      }
+    }
   }
 };
 
@@ -51,24 +98,6 @@ PxVisBehavior.baseSize = {
 */
 PxVisBehavior.sizing = [{
   properties: {
-
-    /**
-    * Defines the base margin for the chart. Calcs are run to add to the margin to accommodate axes and other elements which exist within the SVG frame, but outside the chart frame.
-    *
-    */
-    margin:{
-      type:Object,
-      notify: true,
-      value: function() {
-        return {
-          left: 0,
-          right: 0,
-          top: 0,
-          bottom: 0
-        };
-      }
-    },
-
     /**
      * An optional offset for a variety of elements
      *
@@ -81,7 +110,7 @@ PxVisBehavior.sizing = [{
       }
     }
   }
-}, PxVisBehavior.baseSize];
+}, PxVisBehavior.baseSize, PxVisBehavior.margins];
 
 /*
     Name:
