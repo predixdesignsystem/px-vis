@@ -44,6 +44,8 @@ v1.0.0
 * Added px-vis-dynamic-menu in register, allowing developers to pass in custom features/function available in a menu in the register through dynamicMenuConfig
 * Added actionConfig to px-vis-interaction-space, allowing to define custom interaction on chart hover or click for example
 * Added panning capability to px-vis-interaction-space
+* Enabled top and right axes
+* Fixed event clip path to respect a right axis
 * Added px-vis-toolbar 
   * Toolbar items are configurable and each item can have:
     * a tooltip label
