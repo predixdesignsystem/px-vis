@@ -38,6 +38,8 @@ v1.0.0
 * completeSeriesConfig function will now complete and create an empty completeSeriesConfig if an empty seriesConfig is passed in. Allows the deletion of all series from the chart.
 * Ensure tooltip calculation are done based on pixel coordinates rather than values for non-time based charts
 * Added px-vis-dynamic-menu in register, allowing developers to pass in custom features available in a menu in the register through dynamicMenuConfig
+* Enabled top and right axes
+* Fixed event clip path to respect a right axis
 
 v0.8.2
 ==================

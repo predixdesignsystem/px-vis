@@ -1114,7 +1114,7 @@ PxVisBehaviorChart.layers = [{
 
     @polymerBehavior PxVisBehaviorChart.multiAxis
 */
-PxVisBehaviorChart.multiAxis = {
+PxVisBehaviorChart.multiAxis = [{
   properties: {
     /**
      * Boolean defining if chart has multiple axes
@@ -1127,20 +1127,20 @@ PxVisBehaviorChart.multiAxis = {
     },
 
     /**
-     * The svg elem for the left axes
+     * The size of an individual axis
      *
      */
-    _leftAxisSvg: {
-      type: Object,
+    _leftAxisSize: {
+      type: Number,
       notify: true
     },
 
     /**
-     * The svg elem for the right axes
+     * The size of an individual axis
      *
      */
-    _rightAxisSvg: {
-      type: Object,
+    _rightAxisSize: {
+      type: Number,
       notify: true
     },
 
@@ -1198,24 +1198,69 @@ PxVisBehaviorChart.multiAxis = {
       type: Number,
       value: 0,
       notify: true
-    }
+    },
 
+    _multiX: {
+      type: Object,
+      value: function() {
+        return function(d) {
+          var a = d.split('_');
+          if(a[0] === 'left') {
+            return Number(a[1]) * this._leftAxisSize;
+          } else {
+            return Number(a[1]) * this._rightAxisSize + this.width + this.margin.left;
+          }
+        }
+      }
+    },
+    _multiY: {
+      type: Object
+    },
+    _multiDomainChanged: {
+      type: Boolean
+    },
+
+    _seriesToDimensions: {
+      type: Object
+    },
+
+    multiChartExtents: {
+      type: Object,
+      value: function() {
+        return {}
+      }
+    },
+
+    _internalMultiChartExtents: {
+      type: Object,
+      computed: '_computeMultiChartExtents(_seriesToDimensions.*, chartData.*, multiChartExtents.*)'
+    }
   },
 
   _computeIsMultiAxis: function(seriesConfig) {
-    var k = Object.keys(this.seriesConfig),
+    var keys = Object.keys(this.seriesConfig),
         l = 0,
-        r = 0;
+        r = 0,
+        dims = {};
 
-    for(var i = 0; i < k.length; i++) {
-      if(this.seriesConfig[k[i]]['axis']) {
-        var axis = this.seriesConfig[k[i]]['axis'].split('_');
-        axis[1] = Number(axis[1]);
+    for(var i = 0; i < keys.length; i++) {
+      if(this.seriesConfig[keys[i]]['axis']) {
+        var k = keys[i],
+            axis = this.seriesConfig[k]['axis'],
+            axisVals = axis.split('_');
 
-        if(axis[0] === 'left') {
-          l = l > axis[1] ? l : axis[1];
+        axisVals[1] = Number(axisVals[1]);
+
+        if(dims[axis]) {
+          dims[axis].push(k);
         } else {
-          r = r > axis[1] ? r : axis[1];
+          dims[axis] = [ k ];
+        }
+
+        if(axisVals[0] === 'left') {
+          l = l > axisVals[1] ? l : axisVals[1];
+        } else {
+          r = r > axisVals[1] ? r : axisVals[1];
         }
       }
     }
@@ -1223,6 +1268,11 @@ PxVisBehaviorChart.multiAxis = {
     if(l + r > 1) {
       this.set('_numLeftAxes', l);
       this.set('_numRightAxes', r);
+
+      this.set('axes', Object.keys(dims).sort());
+      this.set('dimensions', this.axes);
+      this.set('_seriesToDimensions', dims);
+
       return true
     } else {
       return false
@@ -1231,33 +1281,106 @@ PxVisBehaviorChart.multiAxis = {
 
   _calcMultiAxisSizes: function(margin) {
     var leftAxisMargin,
-        rightAxisMargin;
+        rightAxisMargin,
+        leftAxisWidth = margin.left,
+        rightAxisWidth = margin.right;
 
     // width dependent on number of axes on each
     // axes fit into the margin section of the chart
-    margin.left = margin.left * this._numLeftAxes;
-    margin.right = margin.right * this._numRightAxes;
+    margin.left = leftAxisWidth * this._numLeftAxes;
+    margin.right = rightAxisWidth * this._numRightAxes;
 
-    // margins are the same but abutt the chart their respective side
-    leftAxisMargin = {
-      'top': margin.top,
-      'right': 0,
-      'bottom': margin.bottom,
-      'left': margin.left
-    };
-    rightAxisMargin = {
-      'top': margin.top,
-      'right': margin.right,
-      'bottom': margin.bottom,
-      'left': 0
-    };
+    // // margins are the same but abutt the chart their respective side
+    // leftAxisMargin = {
+    //   'top': margin.top,
+    //   'right': 0,
+    //   'bottom': margin.bottom,
+    //   'left': margin.left
+    // };
+    // rightAxisMargin = {
+    //   'top': margin.top,
+    //   'right': margin.right,
+    //   'bottom': margin.bottom,
+    //   'left': 0
+    // };
 
-    this.set('_leftAxesMargin', leftAxisMargin);
-    this.set('_rightAxesMargin', rightAxisMargin);
+    this.set('_leftAxisSize', leftAxisWidth);
+    this.set('_rightAxisSize', rightAxisWidth);
 
-    this.set('_leftAxesWidth', margin.left);
-    this.set('_rightAxesWidth', margin.right);
+    // this.set('_leftAxesMargin', leftAxisMargin);
+    // this.set('_rightAxesMargin', rightAxisMargin);
+    //
+    // this.set('_leftAxesWidth', margin.left);
+    // this.set('_rightAxesWidth', margin.right);
+  },
+
+  _computeMultiChartExtents: function() {
+    var search = false,
+        exts = {},
+        seriesToSearch = {},
+        k;
+
+    for(var i = 0; i < this.dimensions.length; i++) {
+      k = this.dimensions[i];
+      exts[k] = [Infinity, -Infinity];
+
+      // does it exist in completeSeriesConfig
+      // need to look at each series instead of each axis
+      for(var j = 0; j < this._seriesToDimensions[k].length; j++) {
+        var s = this._seriesToDimensions[k][j];
+
+        exts[k][0] = (this.completeSeriesConfig[s]['yMin'] || this.completeSeriesConfig[s]['yMin'] === 0) ?
+            Math.min(this.completeSeriesConfig[k]['yMin'], exts[k][0]) : exts[k][0];
+        exts[k][1] = (this.completeSeriesConfig[k]['yMax'] || this.completeSeriesConfig[k]['yMax'] === 0) ?
+            Math.max(this.completeSeriesConfig[k]['yMax'], exts[k][1]) : exts[k][1];
+      }
+
+      // does it exist in multiChartExtents, if so, overwrite
+      if(this.multiChartExtents[k]) {
+        exts[k][0] = (this.multiChartExtents[k][0] === 'dynamic') ? exts[k][0] : this.multiChartExtents[k][0];
+        exts[k][1] = (this.multiChartExtents[k][1] === 'dynamic') ? exts[k][1] : this.multiChartExtents[k][1];
+      }
+
+      // check if we need to search chartData for extents
+      if(exts[k][0] === Infinity || exts[k][1] === -Infinity) {
+        search = true;
+        for(var j = 0; j < this._seriesToDimensions[k].length; j++) {
+          var s = this._seriesToDimensions[k][j];
+          seriesToSearch[s] = {
+            "axis": k,
+            "min": exts[k][0] === Infinity ? true : false,
+            "max": exts[k][1] === -Infinity ? true : false
+          };
+        }
+      }
+    }
+
+    // if we indicated we need to search for extent values
+    if(search) {
+      for(var i = 0; i < this.chartData.length; i++) {
+        for(var j = 0; j < seriesToSearch.length; j++) {
+          var series = seriesToSearch[j],
+              axis = series.axis;
+          if(series.min) {
+            exts[axis][0] = Math.min(this.chartData[i][series], exts[axis][0]);
+          }
+          if(series.max) {
+            exts[axis][1] = Math.max(this.chartData[i][series], exts[axis][1]);
+          }
+        }
+      }
+    }
+
+    return exts;
+  },
+
+  _returnYScale: function(seriesId, config) {
+    if(this._isMultiAxis) {
+      var d = config[seriesId]['axis'];
+      return this._multiY[d];
+    }
+    return this.y;
   }
 
-};
+}, PxVisBehavior.dimensions];
 </script>
