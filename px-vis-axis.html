@@ -281,18 +281,27 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           switch(this.orientation) {
             case 'bottom':
               this._axis = Px.d3.axisBottom(this.axis);
+
+              var h = Math.max(this.height - this.margin.bottom - this.margin.top,0);
+              this.translateAmt = [this.offset[0],this.offset[1] + h];
               break;
 
             case 'top':
               this._axis = Px.d3.axisTop(this.axis);
+
+              this.translateAmt = [this.offset[0],this.offset[1]];
               break;
 
             case 'right':
               this._axis = Px.d3.axisRight(this.axis);
+
+              var w = Math.max(this.width - this.margin.left - this.margin.right,0);
+              this.translateAmt = [this.offset[0] + w ,this.offset[1] ];
               break;
 
             default: //case 'left':
               this._axis = Px.d3.axisLeft(this.axis);
+              this.translateAmt = [this.offset[0],this.offset[1]];
               break;
           }
 
@@ -384,19 +393,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         drawElement: function() {
         //  this.debounce('drawAxis', function() {
             if(this._animationFrameDone && this.svg.node() && this.domainChanged !== null) {
+
               this.defineAxis();
-
-              // TODO unify my orientation checks
-              // TODO suport top and right
-              if(this.orientation === 'bottom') {
-                var h = Math.max(this.height - this.margin.bottom - this.margin.top,0);
-
-                this.translateAmt = [this.offset[0],this.offset[1] + h];
-              } else if(this.orientation === 'left') {
-                this.translateAmt = [this.offset[0],this.offset[1]];
-              } else {
-                this.translateAmt = [this.offset[0],this.offset[1]];
-              }
 
               // checks to see if the axis already exists. If not, create; if so, update
               if(!this._axisGroup) {
