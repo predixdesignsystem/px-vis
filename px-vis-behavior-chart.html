@@ -1631,4 +1631,163 @@ PxVisBehaviorChart.noDebounceOnPanning = {
   }
 };
 
+*
+    Name:
+    PxVisBehaviorChart.multiAxis
+
+    Description:
+    Provides propterty definitions and methods for multi axis charts
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorChart.multiAxis
+*/
+PxVisBehaviorChart.multiAxis = {
+  properties: {
+    /**
+     * Boolean defining if chart has multiple axes
+     *
+     */
+    _isMultiAxis: {
+      type: Boolean,
+      value: false,
+      computed: '_computeIsMultiAxis(seriesConfig.*)'
+    },
+
+    /**
+     * The svg elem for the left axes
+     *
+     */
+    _leftAxisSvg: {
+      type: Object,
+      notify: true
+    },
+
+    /**
+     * The svg elem for the right axes
+     *
+     */
+    _rightAxisSvg: {
+      type: Object,
+      notify: true
+    },
+
+    /**
+     * The margins for left axes
+     *
+     */
+    _leftAxesMargin: {
+      type: Object,
+      notify: true
+    },
+
+    /**
+     * The margins for right axes
+     *
+     */
+    _rightAxesMargin: {
+      type: Object,
+      notify: true
+    },
+
+    /**
+     * The width for left axes
+     *
+     */
+    _leftAxesWidth: {
+      type: Number,
+      notify: true
+    },
+
+    /**
+     * The width for right axes
+     *
+     */
+    _rightAxesWidth: {
+      type: Number,
+      notify: true
+    },
+
+    /**
+     * Number of axes on the left
+     *
+     */
+    _numLeftAxes: {
+      type: Number,
+      value: 0,
+      notify: true
+    },
+
+    /**
+     * Number of axes on the right
+     *
+     */
+    _numRightAxes: {
+      type: Number,
+      value: 0,
+      notify: true
+    }
+
+  },
+
+  _computeIsMultiAxis: function(seriesConfig) {
+    var k = Object.keys(this.seriesConfig),
+        l = 0,
+        r = 0;
+
+    for(var i = 0; i < k.length; i++) {
+      if(this.seriesConfig[k[i]]['axis']) {
+        var axis = this.seriesConfig[k[i]]['axis'].split('_');
+        axis[1] = Number(axis[1]);
+
+        if(axis[0] === 'left') {
+          l = l > axis[1] ? l : axis[1];
+        } else {
+          r = r > axis[1] ? r : axis[1];
+        }
+      }
+    }
+
+    if(l + r > 1) {
+      this.set('_numLeftAxes', l);
+      this.set('_numRightAxes', r);
+      return true
+    } else {
+      return false
+    }
+  },
+
+  _calcMultiAxisSizes: function(margin) {
+    var leftAxisMargin,
+        rightAxisMargin;
+
+    // width dependent on number of axes on each
+    // axes fit into the margin section of the chart
+    margin.left = margin.left * this._numLeftAxes;
+    margin.right = margin.right * this._numRightAxes;
+
+    // margins are the same but abutt the chart their respective side
+    leftAxisMargin = {
+      'top': margin.top,
+      'right': 0,
+      'bottom': margin.bottom,
+      'left': margin.left
+    };
+    rightAxisMargin = {
+      'top': margin.top,
+      'right': margin.right,
+      'bottom': margin.bottom,
+      'left': 0
+    };
+
+    this.set('_leftAxesMargin', leftAxisMargin);
+    this.set('_rightAxesMargin', rightAxisMargin);
+
+    this.set('_leftAxesWidth', margin.left);
+    this.set('_rightAxesWidth', margin.right);
+  }
+
+};
+
 </script>
