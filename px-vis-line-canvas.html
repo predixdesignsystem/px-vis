@@ -148,55 +148,61 @@ Element which draws lines series onto the chart
      */
     drawCanvas: function(allowCanvasClearing) {
       this.debounce('drawCanvas',function() {
-        var data;
-        // we need to wrap the data differently depending on if we are drawing many lines or just one line
-        if(this.parallelCoordinates) {
-          this._defineMultiLine(true);
-          data = this.chartData;
-        } else if(this.radialLine) {
-          this._defineRadialLine(true, this.multiPath);
-          data = this.chartData;
-        } else {
-          this._defineSingleLine(true);
-          data = this.chartData;
-        }
-
-        //make sure we have the right muted opacity
-        this.mutedOpacity = this.completeSeriesConfig[this.seriesId].mutedOpacity || this.completeSeriesConfig[this.seriesId].mutedOpacity === 0 ?
-                              this.completeSeriesConfig[this.seriesId].mutedOpacity : this.mutedOpacity;
-
-        // We need to track which lines we have drawn and which we want to draw.
-        // If a line is not currently in our list, add it
-        if(!this.canvasContext._pxLinesSeries[this.seriesId]) {
-          this.canvasContext._pxLinesSeries[this.seriesId] = true;
-          this.canvasContext._pxLinesTotal += 1;
-        }
-
-        // if we have previously drawn the same number of lines as series, then let's start over; Clear the drawing canvas
-        if(this.canvasContext._pxLinesRedraw === this.canvasContext._pxLinesTotal) {
-          this.canvasContext._pxLinesRedraw = 0;
-
-          if(allowCanvasClearing) {
-            // (x1,y1,x2,y2)
-            this.canvasContext.clearRect(-this.canvasContext._translation[0], -this.canvasContext._translation[1] , this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+        if(this.domainChanged !== null &&
+            this._doesD3HaveValues(this.svg) &&
+            this.chartData.length > 0 &&
+            this._doesObjHaveValues(this.completeSeriesConfig)
+          ) {
+          var data;
+          // we need to wrap the data differently depending on if we are drawing many lines or just one line
+          if(this.parallelCoordinates) {
+            this._defineMultiLine(true);
+            data = this.chartData;
+          } else if(this.radialLine) {
+            this._defineRadialLine(true, this.multiPath);
+            data = this.chartData;
+          } else {
+            this._defineSingleLine(true);
+            data = this.chartData;
           }
-        }
 
-        if(this.clipPath) {
-          this.drawClipPath();
-        }
+          //make sure we have the right muted opacity
+          this.mutedOpacity = this.completeSeriesConfig[this.seriesId].mutedOpacity || this.completeSeriesConfig[this.seriesId].mutedOpacity === 0 ?
+                                this.completeSeriesConfig[this.seriesId].mutedOpacity : this.mutedOpacity;
 
-        //Render data progressively
-        this.canvasContext.lineWidth = 1;
-        if(this.noCanvasProgressiveRendering || data.length < 5) {
-          this._renderAtOnce(data);
-        } else {
-          //render 1000 points at a time or 5 frames min
-          var frames = Math.max(data.length/1000, 5);
-          this._renderProgressively(data, frames);
-        }
+          // We need to track which lines we have drawn and which we want to draw.
+          // If a line is not currently in our list, add it
+          if(!this.canvasContext._pxLinesSeries[this.seriesId]) {
+            this.canvasContext._pxLinesSeries[this.seriesId] = true;
+            this.canvasContext._pxLinesTotal += 1;
+          }
 
-        this.canvasContext._pxLinesRedraw += 1;
+          // if we have previously drawn the same number of lines as series, then let's start over; Clear the drawing canvas
+          if(this.canvasContext._pxLinesRedraw === this.canvasContext._pxLinesTotal) {
+            this.canvasContext._pxLinesRedraw = 0;
+
+            if(allowCanvasClearing) {
+              // (x1,y1,x2,y2)
+              this.canvasContext.clearRect(-this.canvasContext._translation[0], -this.canvasContext._translation[1] , this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+            }
+          }
+
+          if(this.clipPath) {
+            this.drawClipPath();
+          }
+
+          //Render data progressively
+          this.canvasContext.lineWidth = 1;
+          if(this.noCanvasProgressiveRendering || data.length < 5) {
+            this._renderAtOnce(data);
+          } else {
+            //render 1000 points at a time or 5 frames min
+            var frames = Math.max(data.length/1000, 5);
+            this._renderProgressively(data, frames);
+          }
+
+          this.canvasContext._pxLinesRedraw += 1;
+        }
       },20);
     },
 
