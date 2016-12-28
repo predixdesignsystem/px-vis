@@ -66,19 +66,24 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @type Object
      */
     properties: {
+      _isAttached: {
+        type: Boolean
+      }
     },
 
     observers: [
       '_setXScale(width,margin)',
       '_setYScale(height,margin,axes)',
-      '_currentDomain(x,y,chartExtents)'
+      '_currentDomain(x, y, chartExtents, _isAttached)'
     ],
     /**
     * when attached, re-fire set properties for precipitation pattern
     *
     * @method attached
     */
-    attached: function(){
+    attached: function() {
+      this.set('_isAttached', true);
+
       if(this._doesObjHaveValues(this.x)){
         this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
       }
@@ -149,7 +154,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      _currentDomain: function() {
       // check to make sure there is data
       if(this._doesObjHaveValues(this.x) &&
-      this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.chartExtents)){
+      this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.chartExtents)) {
 
         var dims = this.chartExtents.x
             exts = this.chartExtents;
@@ -180,7 +185,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         }
 
         this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
-        this.fire('px-vis-domain-changed-updated', { 'dataVar': 'domainChanged', 'data': this.domainChanged, 'method':'set' });
+        this.fire('px-vis-multi-domain-changed-updated', { 'dataVar': 'domainChanged', 'data': this.domainChanged, 'method':'set' });
       }
     }
   });

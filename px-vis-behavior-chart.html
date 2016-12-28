@@ -1745,8 +1745,11 @@ PxVisBehaviorChart.multiAxis = [{
     _multiY: {
       type: Object
     },
+
     _multiDomainChanged: {
-      type: Boolean
+      type: Boolean,
+      notify: true,
+      value: null
     },
 
     _seriesToDimensions: {
@@ -1847,38 +1850,38 @@ PxVisBehaviorChart.multiAxis = [{
     var search = false,
         exts = {},
         seriesToSearch = {},
-        k;
+        a;
 
     for(var i = 0; i < this.dimensions.length; i++) {
-      k = this.dimensions[i];
-      exts[k] = [Infinity, -Infinity];
+      a = this.dimensions[i];
+      exts[a] = [Infinity, -Infinity];
 
-      // does it exist in completeSeriesConfig
+      // does it exist in the seriesConfig
       // need to look at each series instead of each axis
-      for(var j = 0; j < this._seriesToDimensions[k].length; j++) {
-        var s = this._seriesToDimensions[k][j];
+      for(var j = 0; j < this._seriesToDimensions[a].length; j++) {
+        var s = this._seriesToDimensions[a][j];
 
-        exts[k][0] = (this.completeSeriesConfig[s]['yMin'] || this.completeSeriesConfig[s]['yMin'] === 0) ?
-            Math.min(this.completeSeriesConfig[k]['yMin'], exts[k][0]) : exts[k][0];
-        exts[k][1] = (this.completeSeriesConfig[k]['yMax'] || this.completeSeriesConfig[k]['yMax'] === 0) ?
-            Math.max(this.completeSeriesConfig[k]['yMax'], exts[k][1]) : exts[k][1];
+        exts[a][0] = (this.seriesConfig[s]['yMin'] || this.seriesConfig[s]['yMin'] === 0) ?
+            Math.min(this.seriesConfig[s]['yMin'], exts[a][0]) : exts[a][0];
+        exts[a][1] = (this.seriesConfig[s]['yMax'] || this.seriesConfig[s]['yMax'] === 0) ?
+            Math.max(this.seriesConfig[s]['yMax'], exts[a][1]) : exts[a][1];
       }
 
       // does it exist in multiChartExtents, if so, overwrite
-      if(this.multiChartExtents[k]) {
-        exts[k][0] = (this.multiChartExtents[k][0] === 'dynamic') ? exts[k][0] : this.multiChartExtents[k][0];
-        exts[k][1] = (this.multiChartExtents[k][1] === 'dynamic') ? exts[k][1] : this.multiChartExtents[k][1];
+      if(this.multiChartExtents[a]) {
+        exts[a][0] = (this.multiChartExtents[a][0] === 'dynamic') ? exts[a][0] : this.multiChartExtents[a][0];
+        exts[a][1] = (this.multiChartExtents[a][1] === 'dynamic') ? exts[a][1] : this.multiChartExtents[a][1];
       }
 
       // check if we need to search chartData for extents
-      if(exts[k][0] === Infinity || exts[k][1] === -Infinity) {
+      if(exts[a][0] === Infinity || exts[a][1] === -Infinity) {
         search = true;
-        for(var j = 0; j < this._seriesToDimensions[k].length; j++) {
-          var s = this._seriesToDimensions[k][j];
+        for(var j = 0; j < this._seriesToDimensions[a].length; j++) {
+          var s = this._seriesToDimensions[a][j];
           seriesToSearch[s] = {
-            "axis": k,
-            "min": exts[k][0] === Infinity ? true : false,
-            "max": exts[k][1] === -Infinity ? true : false
+            "axis": a,
+            "min": exts[a][0] === Infinity ? true : false,
+            "max": exts[a][1] === -Infinity ? true : false
           };
         }
       }
@@ -1900,15 +1903,22 @@ PxVisBehaviorChart.multiAxis = [{
       }
     }
 
-    return exts;
+    return { "x": this.dimensions, "y": exts };
   },
 
   _returnYScale: function(seriesId, config) {
     if(this._isMultiAxis) {
       var d = config[seriesId]['axis'];
-      return this._multiY[d];
+      return this._multiY && this._multiY[d] ? this._multiY[d] : null;
     }
     return this.y;
+  },
+
+  _returnDomainChanged: function() {
+    if(this._isMultiAxis) {
+      return this._multiDomainChanged;
+    }
+    return this.domainChanged;
   }
 
 }, PxVisBehavior.dimensions];
