@@ -12,6 +12,7 @@ v1.0.0
 * Threshold changes:
   * Added new threshold configuration similar to events
   * Changed threshold data property from chartData to thresholdData
+  * Simplified threshold component removing the need for the x scale
 * Added improved resize methods to chart behavior
 * Added mechanism for redrawing an SVG series on top of others
 * Layers
@@ -39,7 +40,13 @@ v1.0.0
 * Ensure tooltip calculation are done based on pixel coordinates rather than values for non-time based charts
 * Added px-vis-dynamic-menu in register, allowing developers to pass in custom features available in a menu in the register through dynamicMenuConfig
 * Enabled top and right axes
-* Fixed event clip path to respect a right axis
+* Events
+  * Fixed event clip path to respect a right axis
+  * Simplified event component removing the need for the y scale
+* Multi Axis:
+  * added support for multi axes via multiAxes behavior
+  * Many changes to components for support
+  * Modifications to px-vis-multi-axis for more flexibility
 
 v0.8.2
 ==================
