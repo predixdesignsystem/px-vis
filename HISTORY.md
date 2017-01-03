@@ -16,6 +16,7 @@ v1.0.0
 * Threshold changes:
   * Added new threshold configuration similar to events
   * Changed threshold data property from chartData to thresholdData
+  * Simplified threshold component removing the need for the x scale
 * Added improved resize methods to chart behavior
 * Added mechanism for redrawing an SVG series on top of others
 * Layers
@@ -45,7 +46,13 @@ v1.0.0
 * Added actionConfig to px-vis-interaction-space, allowing to define custom interaction on chart hover or click for example
 * Added panning capability to px-vis-interaction-space
 * Enabled top and right axes
-* Fixed event clip path to respect a right axis
+* Events
+  * Fixed event clip path to respect a right axis
+  * Simplified event component removing the need for the y scale
+* Multi Axis:
+  * added support for multi axes via multiAxes behavior
+  * Many changes to components for support
+  * Modifications to px-vis-multi-axis for more flexibility
 * Added px-vis-toolbar 
   * Toolbar items are configurable and each item can have:
     * a tooltip label

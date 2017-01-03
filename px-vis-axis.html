@@ -650,9 +650,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               break;
 
             case 'right':
-              x = this.labelTypeSize + parseFloat(ext['width']) + this.translateAmt[0];
+              x = this.labelTypeSize + parseFloat(ext['width']) + 8 + this.translateAmt[0];
               y = parseFloat(ext['height']) / 2 + this.translateAmt[1];
-              r = 90;
+              r = -90;
               anchor = 'middle';
               break;
 
@@ -700,13 +700,13 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * Draws the color bars for each series
          *
          */
-        drawSeriesBars:function() {
+        drawSeriesBars: function() {
           if(!this.preventSeriesBar && this._doesObjHaveValues(this.completeSeriesConfig) && this._axisGroup && this._titleGroup) {
 
             //reset bars...
             this._titleGroup.selectAll('rect').remove();
 
-            // FIXME do we need to move the title group based on how many series we have
+            // TODO do we need to move the title group based on how many series we have
             var keys = this.seriesOnAxis.length > 0 ? this.seriesOnAxis : Object.keys(this.completeSeriesConfig),
                 kLen = keys.length,
                 i;
@@ -719,7 +719,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * Mutes and unmutes the color bars for each series
          *
          */
-        _muteSeriesBars:function() {
+        _muteSeriesBars: function() {
           if(this._doesD3HaveValues(this._titleGroup)) {
             var keys = Object.keys(this.mutedSeries);
             for(var i = 0; i < keys.length; i++) {
@@ -746,7 +746,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .attr('fill',color)
             .attr('series-bar-id','bar_' + sid)
             // .attr('transform','translate(-12,' + (-3 -w - 5 * index) + ')')
-            .attr('transform','translate(-12,' + (-3 -w - 8 * index) + ')')
+            .attr('transform', 'translate(-12,' + (5 - w - 8 * index) + ')')
             .attr('opacity', function() {
               return (this.mutedSeries && this.mutedSeries[sid]) ? 0.5 : 1;
             }.bind(this));
