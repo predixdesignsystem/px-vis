@@ -74,6 +74,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
     observers: [
       '_setXScale(width,margin)',
       '_setYScale(height,margin,axes)',
+      '_updateDomain(selectedDomain)',
       '_currentDomain(x, y, chartExtents, _isAttached)'
     ],
     /**
@@ -186,6 +187,32 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
 
         this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
         this.fire('px-vis-multi-domain-changed-updated', { 'dataVar': 'domainChanged', 'data': this.domainChanged, 'method':'set' });
+      }
+    },
+
+    /**
+     * When the domain gets set via a user interaction, set the scale function to use the new domain
+     *
+     * https://github.com/mbostock/d3/wiki/API-Reference
+     *
+     * @method _updateDomain
+     */
+    _updateDomain:function(selectedDomain) {
+      if(this.y) {
+        if(selectedDomain === 'reset') {
+          this._currentDomain();
+        } else {
+          //set new Y domain if provided
+          if(selectedDomain.y.length > 0) {
+            console.log(selectedDomain)
+            // this.y.domain(selectedDomain.y);
+            // this.set('currentDomainY', this.y.domain());
+            // this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
+          }
+
+          this.set('domainChanged', !this.domainChanged);
+          this.fire('px-vis-domain-changed-updated', { 'dataVar': 'domainChanged', 'data': this.domainChanged, 'method':'set' });
+        }
       }
     }
   });

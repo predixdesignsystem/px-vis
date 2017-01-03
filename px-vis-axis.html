@@ -225,6 +225,13 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           _animationFrameDone: {
             type: Boolean,
             value: false
+          },
+
+          seriesOnAxis: {
+            type: Array,
+            value: function() {
+              return [];
+            }
           }
         },
 
@@ -615,7 +622,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * Draws the axis title
          *
          */
-        drawTitle:function() {
+        drawTitle: function() {
           var ext = this._axisGroup.node().getBBox(),
               location = this._doesObjHaveValues(this.titleLocation) ? 'custom' : this.orientation,
               x,y,r,anchor;
@@ -700,7 +707,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             this._titleGroup.selectAll('rect').remove();
 
             // FIXME do we need to move the title group based on how many series we have
-            var keys = Object.keys(this.completeSeriesConfig),
+            var keys = this.seriesOnAxis.length > 0 ? this.seriesOnAxis : Object.keys(this.completeSeriesConfig),
                 kLen = keys.length,
                 i;
             for(i = 0; i < kLen; i++) {
@@ -733,8 +740,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         _drawBar:function(elem,sid,color,index) {
           var w = elem.select('.axis-title').node().getBoundingClientRect()['height'];
           elem.append('rect')
-            .attr('height', 2)
-            // .attr('height',3)
+            // .attr('height', 2)
+            .attr('height',3)
             .attr('width',15)
             .attr('fill',color)
             .attr('series-bar-id','bar_' + sid)

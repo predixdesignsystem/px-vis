@@ -61,7 +61,8 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.chartExtents,
       PxVisBehavior.dataExtents,
-      PxVisBehaviorD3.domainUpdate
+      PxVisBehaviorD3.domainUpdate,
+      PxVisBehavior.isMultiAxis
     ],
 
     /**
@@ -108,14 +109,30 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
             "y": [0, -Infinity]
           }
         }
+      },
+
+      axes: {
+        type: Array,
+        value: function() {
+          return [];
+        }
+      },
+      seriesToAxes: {
+        type: Object,
+        value: function() {
+          return {};
+        }
+      },
+      isAttached: {
+        type: Boolean
       }
     },
 
     observers: [
-      '_setXScale(width,margin)',
-      '_setYScale(height,margin)',
-      '_currentDomain(_chartDataHasChanged.*,x,y,completeSeriesConfig,dataExtents)',
-      '_currentDomain(chartExtents,dataExtents)',
+      '_setXScale(width, margin, isAttached)',
+      '_setYScale(height, margin, axes, isAttached, isMultiAxis)',
+      '_currentDomain(_chartDataHasChanged.*,x,y,completeSeriesConfig,dataExtents,seriesToAxes, isAttached)',
+      '_currentDomain(chartExtents,dataExtents, isAttached)',
       '_updateDomain(selectedDomain)',
       '_chartDataChanged(chartData.*)'
     ],
@@ -124,7 +141,9 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
     *
     * @method attached
     */
-    attached: function(){
+    attached: function() {
+      this.set('isAttached', true);
+
       if(this._doesObjHaveValues(this.x)){
         this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
       }
@@ -152,26 +171,41 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @method _setXScale
      */
     _setXScale: function(width,margin) {
-      var w = Math.max(width - margin.left - margin.right,0);
-      this.set('x', this._setScale(this.xAxisType,[0, w], this.x));
-      this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
+      this.debounce('_setXScale', function() {
+        var w = Math.max(width - margin.left - margin.right, 0);
+        this.set('x', this._setScale(this.xAxisType,[0, w], this.x));
+        this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
+      }, 5);
     },
     /**
      * Sets the y scale
      *
      * @method _setYScale
      */
-    _setYScale: function(height,margin) {
-      var h = Math.max(height - margin.top - margin.bottom,0);
-      this.set('y', this._setScale(this.yAxisType,[h, 0], this.y));
-      this.fire('px-vis-y-updated', { 'dataVar': 'y', 'data': this.y, 'method':'set' });
+    _setYScale: function(height, margin, axes) {
+      this.debounce('_setYScale', function() {
+        var h = Math.max(height - margin.top - margin.bottom, 0),
+        newY;
+
+        if(this.isMultiAxis) {
+          newY = {};
+          for(var i = 0; i < axes.length; i++) {
+            newY[axes[i]] = this._setScale(this.yAxisType,[h, 0], this.y, axes[i]);
+          }
+        } else {
+          newY = this._setScale(this.yAxisType,[h, 0], this.y);
+        }
+
+        this.set('y', newY);
+        this.fire('px-vis-y-updated', { 'dataVar': 'y', 'data': this.y, 'method':'set' });
+      }, 5);
     },
     /**
      *  Helper function to set the x and y based on scale type
      *
      * @method _setScale
      */
-    _setScale: function(val, range, currentAxis){
+    _setScale: function(val, range, currentAxis, key){
       // TODO support more types: log, quantile, etc
 
       // FIXME This is somewhat silly; we recreate the scale every time b/c otherwise the observer wont rerun. Rethink this so we can just update range when necessary.
@@ -187,7 +221,9 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         result = Px.d3.scalePoint().range(range).padding(0.5);
       }
 
-      if(currentAxis) {
+      if(currentAxis && this.isMultiAxis && currentAxis[key]) {
+        result.domain(currentAxis[key].domain());
+      } else if(currentAxis && !this.isMultiAxis) {
         result.domain(currentAxis.domain());
       }
 
@@ -202,37 +238,53 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @method _currentDomain
      */
      _currentDomain: function() {
-      if(!this._calculatingDomain && this._doesObjHaveValues(this.chartData) && this.x && this.y && this._doesObjHaveValues(this.completeSeriesConfig)) {
+      this.debounce('_currentDomain', function() {
+        if(!this._calculatingDomain && this._doesObjHaveValues(this.chartData) && this.x && this.y && this._doesObjHaveValues(this.completeSeriesConfig)) {
 
-        // indicate we are calculating the domain
-        this._calculatingDomain = true;
+          // indicate we are calculating the domain
+          this._calculatingDomain = true;
 
-        // Check if you are zoomed in and resize window, make sure you keep your extents
-        if(!this._chartDataHasChanged && this.selectedDomain.x && this.selectedDomain.x.length
-        && ((this.selectedDomain.y && this.selectedDomain.y.length) || (this.xAxisType === 'time' || this.xAxisType === 'timeLocal'))) {
+          // Check if you are zoomed in and resize window, make sure you keep your extents
+          if(!this._chartDataHasChanged && this.selectedDomain.x && this.selectedDomain.x.length
+          && ((this.selectedDomain.y && this.selectedDomain.y.length) || (this.xAxisType === 'time' || this.xAxisType === 'timeLocal'))) {
 
-          this._updateDomain(this.selectedDomain);
+            this._updateDomain(this.selectedDomain);
 
-        //if not zoomed in, figure out our domain
-        } else {
+          //if not zoomed in, figure out our domain
+          } else {
 
-          var extents = this._determineExtents();
+            var extents = this._determineExtents();
 
-          this.x.domain(extents.x);
-          this.y.domain(extents.y);
+            this.x.domain(extents.x);
 
-          // Set the domains
-          this.set('currentDomainX', this.x.domain());
-          this.set('currentDomainY', this.y.domain());
-          this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+            if(this.isMultiAxis) {
+              if(typeof this.y !== 'object') {
+                return
+              }
+              for(var i = 0; i < this.axes.length; i++){
+                if(!this.y[this.axes[i]]) {
+                  continue;
+                }
 
-          this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
-          this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
-          this.fire('px-vis-domain-changed-updated', { 'dataVar': 'domainChanged', 'data': this.domainChanged, 'method':'set' });
+                this.y[this.axes[i]].domain(extents.y[this.axes[i]]);
+              }
+            } else {
+              this.y.domain(extents.y);
+            }
+
+            // Set the domains
+            this.set('currentDomainX', this.x.domain());
+            this.set('currentDomainY', this.isMultiAxis ? this.y[this.axes[0]].domain() : this.y.domain());
+            this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+
+            this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
+            this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
+            this.fire('px-vis-domain-changed-updated', { 'dataVar': 'domainChanged', 'data': this.domainChanged, 'method':'set' });
+          }
+
+          this._calculatingDomain = false;
         }
-
-        this._calculatingDomain = false;
-      }
+      }, 5);
     },
 
     /**
@@ -264,7 +316,8 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         xTime = false;
         doX = false;
       }
-      if(extents.y.length > 0 && extents.y[0] !== Infinity && extents.y[1] !== -Infinity) {
+      // if multiAxis, we calc in a different way, so dont calc again.
+      if(this.isMultiAxis || (extents.y.length > 0 && extents.y[0] !== Infinity && extents.y[1] !== -Infinity)) {
         doY = false;
       }
 
@@ -286,7 +339,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       if(extents.x[1] === extents.x[0]) {
         extents.x[1] += 1;
       }
-      if(extents.y[1] === extents.y[0]) {
+      if(!this.isMultiAxis && extents.y[1] === extents.y[0]) {
         extents.y[1] += 1;
       }
       return extents
@@ -298,6 +351,12 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      */
     _checkForExtents: function(isOrd, chartExtents, dataExtents, axis) {
       var exts = [];
+
+      // if multiAxis, we have a special func
+      if(this.isMultiAxis && axis === 'y') {
+        return this._calcMultiAxisExtents();
+      }
+
       // if we are dealing with ordinal data
       if(isOrd) {
         if(chartExtents && chartExtents[axis]) {
@@ -465,6 +524,71 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
           this._setMax(r[axis],v1);
         }
       }
+    },
+
+    /**
+     * calculates chart extents for multi axis
+     *
+     */
+    _calcMultiAxisExtents: function() {
+      // TODO integrate this into the other calcs
+      var search = false,
+          exts = {},
+          seriesToSearch = {},
+          a;
+
+      for(var i = 0; i < this.axes.length; i++) {
+        a = this.axes[i];
+        exts[a] = [Infinity, -Infinity];
+
+        // does it exist in the seriesConfig
+        // need to look at each series instead of each axis
+        for(var j = 0; j < this.seriesToAxes[a].length; j++) {
+          var s = this.seriesToAxes[a][j];
+
+          exts[a][0] = (this.completeSeriesConfig[s]['yMin'] || this.completeSeriesConfig[s]['yMin'] === 0) ?
+              Math.min(this.completeSeriesConfig[s]['yMin'], exts[a][0]) : exts[a][0];
+          exts[a][1] = (this.completeSeriesConfig[s]['yMax'] || this.completeSeriesConfig[s]['yMax'] === 0) ?
+              Math.max(this.completeSeriesConfig[s]['yMax'], exts[a][1]) : exts[a][1];
+        }
+
+        // does it exist in multiChartExtents, if so, overwrite
+        if(this.chartExtents && this.chartExtents[a]) {
+          exts[a][0] = (this.chartExtents[a][0] === 'dynamic') ? exts[a][0] : this.chartExtents[a][0];
+          exts[a][1] = (this.chartExtents[a][1] === 'dynamic') ? exts[a][1] : this.chartExtents[a][1];
+        }
+
+        // check if we need to search chartData for extents
+        if(exts[a][0] === Infinity || exts[a][1] === -Infinity) {
+          search = true;
+          for(var j = 0; j < this.seriesToAxes[a].length; j++) {
+            var s = this.seriesToAxes[a][j];
+            seriesToSearch[s] = {
+              "axis": a,
+              "min": exts[a][0] === Infinity ? true : false,
+              "max": exts[a][1] === -Infinity ? true : false
+            };
+          }
+        }
+      }
+
+      // if we indicated we need to search for extent values
+      if(search) {
+        for(var i = 0; i < this.chartData.length; i++) {
+          for(var j = 0; j < seriesToSearch.length; j++) {
+            var series = seriesToSearch[j],
+                axis = series.axis;
+            if(series.min) {
+              exts[axis][0] = Math.min(this.chartData[i][series], exts[axis][0]);
+            }
+            if(series.max) {
+              exts[axis][1] = Math.max(this.chartData[i][series], exts[axis][1]);
+            }
+          }
+        }
+      }
+
+      return exts;
     },
 
     /**
