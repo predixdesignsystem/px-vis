@@ -39,6 +39,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
     is: 'px-vis-threshold',
 
     behaviors: [
+      PxVisBehavior.sizing,
       PxVisBehaviorD3.svg,
       PxVisBehaviorD3.axes,
       PxVisBehavior.commonMethods,
@@ -135,7 +136,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
 
     observers: [
 
-      'drawElement(svg,x,y,currentDomainX,currentDomainY,thresholdData.*,_animationFrameDone)',
+      'drawElement(svg, y, currentDomainY, thresholdData.*, _animationFrameDone)',
       '_setColors(completeSeriesConfig.*,thresholdText)',
      ],
 
@@ -193,14 +194,14 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
             return this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['dashPattern'] ?
               this.thresholdConfig[d.type]['dashPattern'] : this._defaultThresholdConfig['dashPattern'];
           }.bind(this))
-          .attr('x1', this.x(this.currentDomainX[0]))
-          .attr('x2', this.x(this.currentDomainX[1]))
+          .attr('x1', 0)
+          .attr('x2', this.width - this.margin.right - this.margin.left)
           .attr('y1', function(d){ return this._getYVal(d); }.bind(this))
           .attr('y2', function(d){ return this._getYVal(d); }.bind(this));
           // .on("mouseover", this._mouseOver.bind(this));
 
         this.thresholdRect = this.thresholdGroup.append("rect")
-          .attr('x', this.x(this.currentDomainX[0]) + 5)
+          .attr('x', 5)
           .attr('y', this._calcYPos.bind(this))
           .attr('height','18');
 
@@ -208,7 +209,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
           .attr('font-size', '12px')
           .style('font-family',this._checkThemeVariable("--px-font-family", 'GE Inspira Sans'))
           .attr('font-style', this._checkThemeVariable("--px-font-family", 'GE Inspira Sans'))
-          .attr('x', this.x(this.currentDomainX[0]) + 5 + 3)
+          .attr('x', 8)
           .attr('y', function(d,i) { return this._calcYPos(d,i,13); }.bind(this) )
           .text(function(d) {
             var val = (d.value).toFixed(2),
@@ -221,26 +222,27 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
           }.bind(this));
 
         //must set rectangle width after text is set so we know how big it is
-        this.thresholdRect.attr('width',function(d,i) {
-          return this.thresholdText.nodes()[i].getBBox().width + 5;  //should be 6 but 6 looks too big...
-        }.bind(this));
+        // this.thresholdRect.attr('width', function(d,i) {
+        //   console.log(this.thresholdText.nodes()[i].getBBox().width);
+        //   return this.thresholdText.nodes()[i].getBBox().width + 3;  //should be 6 but 6 looks too big...
+        // }.bind(this));
     },
     /***
      * Subsequent drawing
      */
     _updateDrawing: function() {
       this.thresholdLine
-          .attr('x1', this.x(this.currentDomainX[0]))
-          .attr('x2', this.x(this.currentDomainX[1]))
+          .attr('x1', 0)
+          .attr('x2', this.width - this.margin.right - this.margin.left)
           .attr('y1', function(d) { return this._getYVal(d); }.bind(this))
           .attr('y2', function(d) { return this._getYVal(d); }.bind(this));
 
         this.thresholdRect
-          .attr('x', this.x(this.currentDomainX[0]) + 5)
+          .attr('x', 5)
           .attr('y', this._calcYPos.bind(this));
 
         this.thresholdText
-          .attr('x', this.x(this.currentDomainX[0]) + 5 + 3)
+          .attr('x', 8)
           .attr('y', function(d,i) { return this._calcYPos(d,i,13); }.bind(this) );
 
         //must set rectangle width after text is set so we know how big it is
