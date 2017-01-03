@@ -40,6 +40,14 @@ v1.0.0
 * Added px-vis-dynamic-menu in register, allowing developers to pass in custom features/function available in a menu in the register through dynamicMenuConfig
 * Added panning capability to px-vis-interaction-space
 
+v0.8.4
+==================
+* Bump color design
+
+v0.8.3
+==================
+* Ensure pie doesn't fail on racing condition
+
 v0.8.2
 ==================
 * Cleaned up colors across the board
