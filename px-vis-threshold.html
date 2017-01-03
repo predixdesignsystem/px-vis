@@ -44,6 +44,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
       PxVisBehavior.commonMethods,
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.thresholds,
+      PxVisBehavior.isMultiAxis,
       PxColorsBehavior.baseColors
     ],
 
@@ -194,8 +195,8 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
           }.bind(this))
           .attr('x1', this.x(this.currentDomainX[0]))
           .attr('x2', this.x(this.currentDomainX[1]))
-          .attr('y1', function(d){ return this.y(d.value); }.bind(this))
-          .attr('y2', function(d){ return this.y(d.value); }.bind(this));
+          .attr('y1', function(d){ return this._getYVal(d); }.bind(this))
+          .attr('y2', function(d){ return this._getYVal(d); }.bind(this));
           // .on("mouseover", this._mouseOver.bind(this));
 
         this.thresholdRect = this.thresholdGroup.append("rect")
@@ -231,8 +232,8 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
       this.thresholdLine
           .attr('x1', this.x(this.currentDomainX[0]))
           .attr('x2', this.x(this.currentDomainX[1]))
-          .attr('y1', function(d) { return this.y(d.value); }.bind(this))
-          .attr('y2', function(d) { return this.y(d.value); }.bind(this));
+          .attr('y1', function(d) { return this._getYVal(d); }.bind(this))
+          .attr('y2', function(d) { return this._getYVal(d); }.bind(this));
 
         this.thresholdRect
           .attr('x', this.x(this.currentDomainX[0]) + 5)
@@ -282,12 +283,31 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
      *
      * @method _calcYPos
      */
-    _calcYPos: function(d,i,offset){
+    _calcYPos: function(d,i,offset) {
       offset = offset | 0;
       var mid = (this.currentDomainY[1] +  this.currentDomainY[0]) / 2,
-          val = (d.value < mid) ? this.y(d.value) -1 + offset: this.y(d.value) -17 + offset;
+          val = (d.value < mid) ? this._getYVal(d) -1 + offset : this._getYVal(d) -17 + offset;
 
       return val;
+    },
+
+    _getYVal: function(d) {
+      if(this.isMultiAxis) {
+        // is for in our seriesConfig?
+        if(this.completeSeriesConfig[d.for] && this.completeSeriesConfig[d.for]['axis']) {
+          var axis = this.completeSeriesConfig[d.for]['axis'];
+          return this.y[axis](d.value);
+
+        // is for an axis?
+        } else if(this.y[d.for]) {
+          return this.y[d.for](d.value);
+        }
+
+        console.warn("Invalid series or axis for threshold: " + JSON.stringify(d));
+        return -9999; //basicall hide it
+        // TODO find a better solution for error case
+      }
+      return this.y(d.value);
     }
   });
 </script>
