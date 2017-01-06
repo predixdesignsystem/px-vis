@@ -1255,4 +1255,199 @@ PxVisBehaviorChart.multiAxis = [{
   }
 
 }, PxVisBehavior.dimensions, PxVisBehavior.seriesToAxes];
+
+/*
+    Name:
+    PxVisBehaviorChart.mutedAxes
+
+    Description:
+    Behavior providing property for muting axes
+    @polymerBehavior PxVisBehaviorChart.mutedAxes
+*/
+PxVisBehaviorChart.mutedAxes = {
+  properties: {
+    /**
+       * An object to hold which axes should be muted.
+       *
+       * *When adding keys to this, be sure to use Polymer set methods or notifyPath*
+       *
+       * ```
+       *    {
+       *        "Axes_to_skip_1":true,
+       *        "Axes_to_skip_2":true
+       *    }
+       * ```
+       */
+      mutedAxes: {
+        type: Object,
+        notify: true,
+        value: function() { return {}; }
+      },
+  },
+};
+
+/*
+    Name:
+    PxVisBehaviorChart.axisRegister
+
+    Description:
+    Behavior providing properties for dealing with an axis register (// coordinates and radar)
+    @polymerBehavior PxVisBehaviorChart.axisRegister
+*/
+PxVisBehaviorChart.axisRegister = [{
+  properties: {
+    /**
+    *
+    * Allows to hide the axis register
+    */
+    hideAxisRegister: {
+      type: Boolean,
+      value: false
+    },
+    _axisRegisterConfig: {
+      type: Object
+    },
+    _axisRegisterTooltipData: {
+      type: Object
+    }
+  },
+  observers: ['_computedAxisRegisterConf(axes, completeSeriesConfig)'],
+
+  _computedAxisRegisterConf: function(axes, completeSeriesConfig) {
+
+    //first set new config
+    var axisConfig = {},
+        configTitle,
+        tooltipData = {};
+    
+    tooltipData.series = [];
+
+    for(var i=0; i<axes.length; i++) {
+      configTitle = completeSeriesConfig[axes[i]] ? completeSeriesConfig[axes[i]].title : null;
+
+      axisConfig[axes[i]] = {
+        "name": configTitle ? configTitle : axes[i]
+      };
+      tooltipData.series.push({ 'name': axes[i]});
+    }
+
+
+    this.set('_axisRegisterConfig', axisConfig);
+    this.set('_axisRegisterTooltipData', tooltipData);
+  },
+
+  _getHideClass: function(hide) {
+    if(hide === true) {
+      return 'visuallyhidden';
+    }
+    return '';
+  },
+}, PxVisBehavior.dimensions, PxVisBehavior.completeSeriesConfig, PxVisBehaviorChart.mutedAxes];
+
+/*
+    Name:
+    PxVisBehaviorChart.categoryRegister
+
+    Description:
+    Behavior providing properties for dealing with a category register (// coordinates and radar)
+    @polymerBehavior PxVisBehaviorChart.categoryRegister
+*/
+PxVisBehaviorChart.categoryRegister = [{
+  properties: {
+    /**
+    *
+    * Allows to hide the axis register
+    */
+    hideCategoryRegister: {
+      type: Boolean,
+      value: false
+    },
+    _hideCategoryRegister: {
+      type: Boolean,
+      value: true
+    },
+    _categoryRegisterConfig: {
+      type: Object
+    },
+    _categoryRegisterTooltipData: {
+      type: Object
+    }
+  },
+  observers: [
+    '_computeCategoryRegisterConfig(categoryKey, completeSeriesConfig, categories)',
+    '_computeHideCategoryRegister(hideCategoryRegister, categoryKey)'
+  ],
+
+  _computeCategoryRegisterConfig: function() {
+    if(typeof(this.categoryKey) !== 'undefined') {
+      var tooltipData = {},
+          config = {};
+      tooltipData.series = [];
+
+      for(var i = 0; i < this.categories.length; i ++) {
+        
+        //TODO: what text do we want to display
+        config[this.categories[i].toString()] = {
+          'name': this.categoryKey + ' - ' + this.categories[i].toString(),
+          "color": this._getColor(this.startColorIndex + i),
+        };
+        tooltipData.series.push({"name": this.categories[i].toString()})
+      }
+
+      //set our confs
+      this.set('_categoryRegisterConfig', config);
+      this.set('_categoryRegisterTooltipData', tooltipData);
+    }
+  },
+  _computeHideCategoryRegister: function() {
+    this.set('_hideCategoryRegister', this.hideCategoryRegister || !this.categoryKey);
+  },
+  _getHideClass: function(hide) {
+    if(hide === true) {
+      return 'visuallyhidden';
+    }
+    return '';
+  },
+}, PxVisBehavior.completeSeriesConfig, PxVisBehavior.categories];
+
+/*
+    Name:
+    PxVisBehaviorChart.categoryAndAxisRegisterConfigs
+
+    Description:
+    Behavior providing properties for configuring category and axis register (// coordinates and radar)
+    @polymerBehavior PxVisBehaviorChart.categoryAndAxisRegisterConfigs
+*/
+PxVisBehaviorChart.categoryAndAxisRegisterConfigs = [{
+
+  properties: {
+    /**
+    * Configuration object used to customize the register cosmetic properties.
+    * Please refer to px-vis-register (https://github.com/PredixDev/px-vis) for a list of supported proerties
+    *
+    */
+    axisRegisterConfig: {
+      type: Object
+    },
+    /**
+    * Configuration object used to customize the register cosmetic properties.
+    * Please refer to px-vis-register (https://github.com/PredixDev/px-vis) for a list of supported proerties
+    *
+    */
+    categoryRegisterConfig: {
+      type: Object
+    }
+  },
+  observers: [
+    '_axisRegisterConfigChanged(axisRegisterConfig.*)',
+    '_categoryRegisterConfigChanged(categoryRegisterConfig.*)',
+  ],
+  _categoryRegisterConfigChanged: function(conf) {
+    this._applyConfigToElement(this.categoryRegisterConfig, this.$.categoryRegister);
+  },
+  _tooltipConfigChanged: function(conf) {
+    this._applyConfigToElement(this.tooltipConfig, this.$.tooltip);
+  },
+}, PxVisBehaviorChart.subConfiguration];
+
 </script>
