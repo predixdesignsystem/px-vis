@@ -60,6 +60,13 @@ PxVisBehaviorRegister.itemShared = {
       computed: '_computeConfigName(item, completeSeriesConfig)'
     },
     /**
+     * The key holdiong the name of the item in the config
+     */
+    nameKey: {
+      type: String,
+      value: 'name'
+    },
+    /**
      * the truncated name for the item
      */
     _truncatedName: {
@@ -117,7 +124,7 @@ PxVisBehaviorRegister.itemShared = {
    * returns the truncated name of the item
    */
   _computeTruncatedName: function(_configName) {
-    return this._truncateName(_configName, this.truncationLength);
+    return this._truncateName(_configName.toString(), this.truncationLength);
   },
 
   /**
@@ -296,6 +303,13 @@ PxVisBehaviorRegister.generalItem = [{
       type: String,
       computed: '_computeItemColor(item, completeSeriesConfig.*)'
     },
+    /**
+      * Prevents the mute on click behavior
+      */
+    preventMuting: {
+      type: Boolean,
+      value: false
+    }
   },
 
   /**
@@ -344,21 +358,23 @@ PxVisBehaviorRegister.generalItem = [{
    * @param {e} click event
    */
   _seriesClicked: function(e) {
-    var ne = Polymer.dom(e),
-        series = ne.rootTarget.getAttribute('name');
+    if(!this.preventMuting) {
+      var ne = Polymer.dom(e),
+          series = ne.rootTarget.getAttribute('name');
 
-    //if we clicked through to something without a name (such as numbro-element), go up and find it
-    if(!series) {
-      for(var i = 1; i < ne.path.length; i++) {
-        if(ne.path[i].getAttribute && ne.path[i].getAttribute('id') === 'regItem') {
-          series = ne.path[i].getAttribute('name');
-          break;
+      //if we clicked through to something without a name (such as numbro-element), go up and find it
+      if(!series) {
+        for(var i = 1; i < ne.path.length; i++) {
+          if(ne.path[i].getAttribute && ne.path[i].getAttribute('id') === 'regItem') {
+            series = ne.path[i].getAttribute('name');
+            break;
+          }
         }
       }
-    }
 
-    this.muteUnmuteSeries(series.substr(1));
-    e.stopPropagation();
+      this.muteUnmuteSeries(series.substr(1), true);
+      e.stopPropagation();
+    }
   },
 
   /**
