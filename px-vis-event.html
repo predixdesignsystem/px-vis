@@ -19,8 +19,7 @@ d3 element which draws a line and icon on the chart representing an event.
         chart-data="[[item]]"
         x="[[x]]"
         y="[[y]]"
-        event-config="[[eventConfig]]"
-        current-domain-x="[[currentDomainX]]">
+        event-config="[[eventConfig]]">
     </px-vis-event>
 
 The configureation object allows developers to set the icon used for each event type. It comes in the form:
@@ -187,7 +186,7 @@ The configureation object allows developers to set the icon used for each event 
 
     observers: [
       '_eventConfigHasChanged(eventConfig.*)',
-      'drawElement(svg, x, currentDomainX, domainChanged, eventData.*, eventConfig.*, _animationFrameDone)',
+      'drawElement(svg, x, domainChanged, eventData.*, eventConfig.*, _animationFrameDone)',
       '_addClipPath(clipPath)'
      ],
 
@@ -240,7 +239,7 @@ The configureation object allows developers to set the icon used for each event 
      * @method drawElement
      */
     drawElement: function() {
-      if(this.x && this.currentDomainX.length > 0 && this._doesObjHaveValues(this.eventData) && this._animationFrameDone) {
+      if(this.x && this._doesObjHaveValues(this.eventData) && this._animationFrameDone) {
 
         if(this._eventConfigChanged && this.eventGroup && this._doesD3HaveValues(this.eventGroup)) {
           this.eventGroup.remove();

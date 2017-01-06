@@ -144,7 +144,7 @@ This element sets the selectedDomain property based on the extents box. The sele
     },
 
     observers: [
-      'drawElement(domainChanged, svg,axis,height, selectedDomain, currentDomain, _animationFrameDone)',
+      'drawElement(domainChanged, svg, axis, height, selectedDomain, _animationFrameDone)',
       '_zoomBrush(chartDomain.*)'
     ],
 
@@ -161,19 +161,17 @@ This element sets the selectedDomain property based on the extents box. The sele
     /**
      * Defines the svg for the brush, draws brush elements, and sets up listeners.
      *
-     * Fired though an observer looking at currentDomain.
-     *
      * Can be called manually after svg and currentDomain are set.
      *
      * @method drawElement
      */
     drawElement: function() {
-      if(this._animationFrameDone && this.currentDomain && this.currentDomain.length === 2 && !isNaN(this.currentDomain[0].getTime()) && !isNaN(this.currentDomain[1].getTime())) {
+      if(this._animationFrameDone && this.domainChanged !== null && !isNaN(this.axis.domain()[0].getTime()) && !isNaN(this.axis.domain()[1].getTime())) {
         var heightOffset = 5,
               h = Math.max(this.height - this.margin.bottom - heightOffset,0),
               domain = [
-                [this.axis(this.currentDomain[0]),0],
-                [this.axis(this.currentDomain[1]),h]
+                [this.axis.range()[0],0],
+                [this.axis.range()[1],h]
               ];
 
           // check that our sizing is ok and wont freak d3 out.
