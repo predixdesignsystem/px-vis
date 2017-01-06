@@ -432,7 +432,7 @@ PxVisBehavior.muteUnmuteSeries = [{
    * Method to mute or umute
    *
    */
-  muteUnmuteSeries: function(series) {
+  muteUnmuteSeries: function(series, fromRegister) {
     //TODO Polymer 2.0: fix this
     // make sure we are not dealing with APM's IDs
     if(series.indexOf('.') === -1) {
@@ -450,7 +450,7 @@ PxVisBehavior.muteUnmuteSeries = [{
       this.set('mutedSeries', muted);
     }
 
-    this.fire('px-vis-muted-series-updated', { 'data': this.mutedSeries[series], 'dataVar': ('mutedSeries.'+series) ,'method': 'set' });
+    this.fire('px-vis-muted-series-updated', { 'name': series, 'value': this.mutedSeries[series], 'fromRegister': fromRegister});
   }
 }, PxVisBehavior.mutedSeries];
 
