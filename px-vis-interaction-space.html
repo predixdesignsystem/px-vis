@@ -19,8 +19,6 @@ Element providing on-chart hover functionality to get data values near the mouse
         chart-data="[[chartData]]"
         x="[[x]]"
         y="[[y]]"
-        current-domain-x="[[currentDomainX]]"
-        current-domain-y="[[currentDomainY]]"
         tooltip-data="{{tooltipData}}"
         extents-data="{{extentsData}}">
     </px-vis-interaction-space>
@@ -776,8 +774,17 @@ TODO implement a dev setting to choose between only showing data at that x, snap
               //Y axis is top to bottom
               extents.eY = this._getOrdinalRange(false, extents.y2, extents.y1);
             } else {
-              //Y axis is top to bottom
-              extents.eY = [this.y.invert(extents.y2), this.y.invert(extents.y1)];
+              if(this.isMultiAxis) {
+                //Y axis is top to bottom
+                extents.eY = {};
+                var k = Object.keys(this.y);
+                for(var i = 0; i < k.length; i++) {
+                  extents.eY[k[i]] = [this.y[k[i]].invert(extents.y2), this.y[k[i]].invert(extents.y1)];
+                }
+              } else {
+                //Y axis is top to bottom
+                extents.eY = [this.y.invert(extents.y2), this.y.invert(extents.y1)];
+              }
             }
 
             //save zoom state

@@ -13,8 +13,6 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
         chart-data="[[thresholdData]]"
         x="[[x]]"
         y="[[y]]"
-        current-domain-x="[[currentDomainX]]"
-        current-domain-y="[[currentDomainY]]"
         show-threshold-box="true">
     </px-vis-threshold>
 
@@ -46,6 +44,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.thresholds,
       PxVisBehavior.isMultiAxis,
+      PxVisBehaviorD3.domainUpdate,
       PxColorsBehavior.baseColors
     ],
 
@@ -136,7 +135,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
 
     observers: [
 
-      'drawElement(svg, y, currentDomainY, thresholdData.*, width, margin.*, _animationFrameDone)',
+      'drawElement(svg, y, domainChanged, completeSeriesConfig.*, thresholdData.*, width, margin.*, _animationFrameDone)',
       '_setColors(completeSeriesConfig.*,thresholdText)',
      ],
 
@@ -287,10 +286,10 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
      */
     _calcYPos: function(d,i,offset) {
       offset = offset | 0;
-      var mid = (this.currentDomainY[1] +  this.currentDomainY[0]) / 2,
-          val = (d.value < mid) ? this._getYVal(d) -1 + offset : this._getYVal(d) -17 + offset;
-
-      return val;
+      // var mid = (this.currentDomainY[1] +  this.currentDomainY[0]) / 2,
+      //     val = (d.value < mid) ? this._getYVal(d) -1 + offset : this._getYVal(d) -17 + offset;
+      // return val;
+      return this._getYVal(d) -17 + offset;
     },
 
     _getYVal: function(d) {
