@@ -1,64 +1,22 @@
-<link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 
-
-<!--
-Element providing user interaction on an axis.
-
-This element draw the box over the axis signifying the active area to mute the series outside that box.
-
-
-##### Usage
-    <px-vis-axis-drag
-        width="[[width]]"
-        x="[[x]]"
-        y="[[y]]"
-        margin="[[margin]]"
-        complete-series-config="{{completeSeriesConfig}}"
-        chart-data="[[chartData]]"
-        axes="[[axes]]"
-        dimensions="[[dimensions]]"
-        axis-groups="[[axisGroups]]"
-        drag-behavior="{{dragBehavior}}"
-        redraw-series="[[redrawSeries]]"
-        radial="[[radial]]"
-        series-key="[[seriesKey]]"
-        muted-series="{{mutedSeries}}">
-    </px-vis-axis-drag>
-
-@element px-vis-axis-brush
-@blurb Element providing user interaction on an axis..
-@homepage index.html
-@demo demo.html
--->
-
-<link rel="import" href="css/px-vis-styles.html">
-
-<dom-module id="px-vis-axis-drag">
-    <template>
-      <style include="px-vis-styles"></style>
-
-
-    </template>
-</dom-module>
-
 <script>
-  Polymer({
+var PxVisBehaviorDrag = PxVisBehaviorDrag || {};
 
-    is: 'px-vis-axis-drag',
+/*
+    Name:
+    PxVisBehaviorDrag.basicProps
 
-    behaviors: [
-      PxVisBehavior.sizing,
-      PxVisBehavior.dimensions,
-      PxVisBehavior.dataset,
-      PxVisBehavior.completeSeriesConfig,
-      PxVisBehaviorD3.dynamicRedraw,
-      PxVisBehavior.mutedSeries,
-      PxVisBehaviorD3.axes,
-      PxVisBehavior.radial
-    ],
+    Description:
+    Polymer behavior that provides the basic drag properties
 
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorDrag.basicProps
+*/
+PxVisBehaviorDrag.basicProps = [{
     /**
      * Properties block, expose attribute values to the DOM via 'reflect'
      *
@@ -83,12 +41,50 @@ This element draw the box over the axis signifying the active area to mute the s
         notify: true
       }
     },
+    /**
+     * helper function to calc the position of an axis
+     *
+     */
+    _position: function(d) {
+      var v = this._dragging[d];
+      return v == null ? this.x(d) : v;
+    },
 
-    ready:function(){
+    /**
+     * Defines our transition for axis snapping
+     *
+     */
+    transition: function(g) {
+      return g.transition().duration(500);
+    },
+  },
+  PxVisBehavior.sizing,
+  PxVisBehavior.dimensions,
+  PxVisBehavior.dataset,
+  PxVisBehavior.completeSeriesConfig,
+  PxVisBehaviorD3.dynamicRedraw,
+  PxVisBehavior.mutedSeries,
+  PxVisBehaviorD3.axes,
+  PxVisBehavior.radial
+];
+
+/*
+    Name:
+    PxVisBehaviorDrag.parallelAxisDrag
+
+    Description:
+    Polymer behavior that provides the drag behavior for parallel coordinates and radar
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorDrag.parallelAxisDrag
+*/
+PxVisBehaviorDrag.parallelAxisDrag = [{
+    createParallelAxisDrag: function(){
       var _this = this;
 
       this.dragBehavior = Px.d3.drag()
-        // .origin(function(d) { return { x: _this.axis(d)}; })
         .on("start.drag", this._onDragStart.bind(this))
         .on("drag.drag", this._onDrag.bind(this))
         .on("end.drag", function(d) {
@@ -129,7 +125,8 @@ This element draw the box over the axis signifying the active area to mute the s
      *
      */
     _onDrag: function(d) {
-      this.debounce('drag', function(e){
+      this.debounce('drag', function(e) {
+
         if(this.radial){
           /*
             arctan gives us our angle, but 0 at 3 o'clock and our chart 0 is at 12. So add pi/2
@@ -174,14 +171,7 @@ This element draw the box over the axis signifying the active area to mute the s
         this.fire('px-vis-recalc-title-location');
       }.bind(this,Px.d3.event),10);
     },
-    /**
-     * helper function to calc the position of an axis
-     *
-     */
-    _position: function(d) {
-      var v = this._dragging[d];
-      return v == null ? this.x(d) : v;
-    },
+
     /**
      * Sorting function for polar in a cartesian space
      *
@@ -251,14 +241,111 @@ This element draw the box over the axis signifying the active area to mute the s
      */
     _radialOrLinear: function(d){
       return this.radial ? "rotate(" + (this._position(d) * 180 / Math.PI + 180) + ")" : "translate(" + this._position(d) + ",0)";
+    }
+  },
+  PxVisBehaviorDrag.basicProps
+];
+
+/*
+    Name:
+    PxVisBehaviorDrag.cartesianDrag
+
+    Description:
+    Polymer behavior that provides the drag behavior for multiaxis cartesian charts
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorDrag.cartesianDrag
+*/
+PxVisBehaviorDrag.cartesianDrag = [{
+    createCartesianDrag: function() {
+      var _this = this;
+
+      var dragBehavior = Px.d3.drag()
+        .on("start.drag", this._onCartesianDragStart.bind(this))
+        .on("drag.drag", this._onCartesianDrag.bind(this))
+        .on("end.drag", function(d) {
+
+          _this._dragging = {};
+
+          // make the axis snap into place
+          _this.transition(Px.d3.select(this))
+            .attr("transform", function(a) {
+              return "translate(" + _this.x(a) + ",0)";
+            });
+
+          if(_this.redrawSeries){
+            // redraw the lines
+            _this.set('completeSeriesConfig.*.x',_this.dimensions);
+            _this.fire('px-vis-complete-series-config', { 'data': _this.dimensions, 'dataVar': 'completeSeriesConfig.*.x' ,'method': 'set' });
+
+            _this.fire('px-vis-redraw-lines');
+          }
+
+          // alert parents that we are done moving the axis
+          _this.fire("px-axis-drag-done");
+        });
+
+      this.set('dragBehavior', dragBehavior);
     },
     /**
-     * Defines our transition for axis snapping
+     * When an axis starts being dragged
      *
      */
-    transition: function(g) {
-      return g.transition().duration(500);
-    }
+    _onCartesianDragStart: function(d) {
+      //reset dragging var
+      this._dragging = {};
+      //set equal to our axis
+      this._dragging[d] = this.x(d);
+    },
+    /**
+     * When an axis is dragged
+     *
+     */
+    _onCartesianDrag: function(d) {
+      this.debounce('drag', function(e) {
+        var axis = d.split('_'),
+            side = axis[0],
+            num = axis[1];
 
-  });
+        //get the x coordinate bounded by our chart extents
+        if(side === 'left') {
+          this._dragging[d] = Math.min(this.width, Math.max(-this.margin.left, e.x));
+        } else if(side === 'right') {
+          this._dragging[d] = Math.min(this.width + this.margin.right, Math.max(-this.margin.left, e.x)) - this.width  + this.margin.left + this.margin.right;
+        }
+
+      // reorder dynamically:
+        // this.axes.sort(function(a, b) { return this._position(a) - this._position(b); }.bind(this) );
+        this.dimensions.sort(function(a, b) {
+          if(a.split('_')[0] === 'left' && b.split('_')[0] === 'left') {
+            return this._position(b) - this._position(a);
+          } else if(a.split('_')[0] === 'right' && b.split('_')[0] === 'right') {
+            return this._position(a) - this._position(b);
+          } else {
+            // FIXME figure out how to make this work
+            if(this._position(a) > this.width - this.margin.left - this.margin.right) {
+              return 1
+            }
+            return 0
+          }
+        }.bind(this));
+
+        var l = this.x.leftDomain().length;
+        var r = this.x.rightDomain().length;
+
+        this.x.leftDomain(this.dimensions.slice(0,l));
+        this.x.rightDomain(this.dimensions.slice(l));
+
+        // move the currently grabed axis (and reorder the others if above is active)
+        this.axisGroups.attr("transform", function(d) {
+          return "translate(" + this._position(d) + ",0)";
+        }.bind(this));
+
+      }.bind(this,Px.d3.event),10);
+    }
+  },
+  PxVisBehaviorDrag.basicProps
+];
 </script>

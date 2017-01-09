@@ -91,8 +91,8 @@ PxVisBehaviorScale.scale = {
         h = Math.max(height - margin.top - margin.bottom, 0),
         newY = {};
 
-    for(var i = 0; i < axes.length; i++) {
-      newY[axes[i]] = this._setScale(this.yAxisType,[h, 0], this[varName], this._isMultiAxis, axes[i]);
+    for(var i = 0; i < this.axes.length; i++) {
+      newY[this.axes[i]] = this._setScale(this.yAxisType,[h, 0], this[varName], true, this.axes[i]);
     }
 
     this.set(varName, newY);
@@ -155,10 +155,7 @@ PxVisBehaviorScale.scale = {
 
         this.x.domain(extents.x);
 
-        if(this._isMultiAxis) {
-          if(typeof this.y !== 'object') {
-            return
-          }
+        if(typeof this.y === 'object') {
           for(var i = 0; i < this.axes.length; i++){
             if(!this.y[this.axes[i]]) {
               continue;
@@ -207,15 +204,15 @@ PxVisBehaviorScale.scale = {
 
     // look at our chartExtents and dataExtents for values
     extents.x = this._checkForExtents(xOrd, this.chartExtents, this.dataExtents, "x");
-    extents.y = this._checkForExtents(yOrd, this.chartExtents, this.dataExtents, "y");
+    extents.y =  typeof this.y === 'object' ? this._calcMultiAxisExtents() : this._checkForExtents(yOrd, this.chartExtents, this.dataExtents, "y");
 
     //if our chart data has not changed, then dont go through all the data. Just use the extents we have
     if(extents.x.length > 0 && extents.x[0] !== Infinity && extents.x[1] !== -Infinity) {
       xTime = false;
       doX = false;
     }
-    // if multiAxis, we calc in a different way, so dont calc again.
-    if(this._isMultiAxis || (extents.y.length > 0 && extents.y[0] !== Infinity && extents.y[1] !== -Infinity)) {
+    // if multiAxis, we calced in a different way, so dont calc again.
+    if(!Array.isArray(extents.y) || (extents.y.length > 0 && extents.y[0] !== Infinity && extents.y[1] !== -Infinity)) {
       doY = false;
     }
 
@@ -237,7 +234,7 @@ PxVisBehaviorScale.scale = {
     if(extents.x[1] === extents.x[0]) {
       extents.x[1] += 1;
     }
-    if(!this._isMultiAxis && extents.y[1] === extents.y[0]) {
+    if(Array.isArray(extents.y) && extents.y[1] === extents.y[0]) {
       extents.y[1] += 1;
     }
     return extents
@@ -249,11 +246,6 @@ PxVisBehaviorScale.scale = {
    */
   _checkForExtents: function(isOrd, chartExtents, dataExtents, axis) {
     var exts = [];
-
-    // if multiAxis, we have a special func
-    if(this._isMultiAxis && axis === 'y') {
-      return this._calcMultiAxisExtents();
-    }
 
     // if we are dealing with ordinal data
     if(isOrd) {
@@ -436,8 +428,11 @@ PxVisBehaviorScale.scale = {
         a;
 
     for(var i = 0; i < this.axes.length; i++) {
+      // debugger
       a = this.axes[i];
-      exts[a] = [Infinity, -Infinity];
+      exts[a] = [];
+      exts[a][0] = this._defaultScaleValue.y[0];
+      exts[a][1] = this._defaultScaleValue.y[1];
 
       // does it exist in the seriesConfig
       // need to look at each series instead of each axis
@@ -450,10 +445,22 @@ PxVisBehaviorScale.scale = {
             Math.max(this.completeSeriesConfig[s]['yMax'], exts[a][1]) : exts[a][1];
       }
 
-      // does it exist in multiChartExtents, if so, overwrite
-      if(this.chartExtents && this.chartExtents[a]) {
-        exts[a][0] = (this.chartExtents[a][0] === 'dynamic') ? exts[a][0] : this.chartExtents[a][0];
-        exts[a][1] = (this.chartExtents[a][1] === 'dynamic') ? exts[a][1] : this.chartExtents[a][1];
+      // does it exist in chartExtents, if so, overwrite
+      if(this.chartExtents) {
+        if(this.chartExtents[a]) {
+          exts[a][0] = (this.chartExtents[a][0] === 'dynamic') ?
+            //if we got a value from seriesConfig, use it, otherwise Infinity
+            (exts[a][0] ? exts[a][0] : Infinity) :
+            this.chartExtents[a][0];
+          exts[a][1] = (this.chartExtents[a][1] === 'dynamic') ? exts[a][1] : this.chartExtents[a][1];
+
+        // for backwards compatibility, if they dont specify an axis apply to all
+        } else if(this.chartExtents['y']) {
+          exts[a][0] = (this.chartExtents['y'][0] === 'dynamic') ?
+            (exts[a][0] ? exts[a][0] : Infinity) :
+            this.chartExtents['y'][0];
+          exts[a][1] = (this.chartExtents['y'][1] === 'dynamic') ? exts[a][1] : this.chartExtents['y'][1];
+        }
       }
 
       // check if we need to search chartData for extents
@@ -507,11 +514,11 @@ PxVisBehaviorScale.scale = {
         }
 
         //set new Y domain if provided
-        if(this._isMultiAxis && !Array.isArray(selectedDomain.y)) {
+        if(typeof this.y === 'object' && !Array.isArray(selectedDomain.y)) {
           for(var i = 0; i < this.axes.length; i++) {
             this.y[this.axes[i]].domain(selectedDomain.y[this.axes[i]]);
           }
-        } else if(!this._isMultiAxis && selectedDomain.y.length > 0) {
+        } else if(typeof this.y === 'function' && selectedDomain.y.length > 0) {
           this.y.domain(selectedDomain.y);
         }
 
@@ -522,6 +529,44 @@ PxVisBehaviorScale.scale = {
   _chartDataChanged: function() {
 
     this.set('_chartDataHasChanged', true);
+  },
+
+  _setAxisScale: function(leftDims, rightDims, leftAxisSize, rightAxisSize) {
+    var leftDims = leftDims || [],
+        rightDims = rightDims || [],
+        allDims = leftDims.concat(rightDims),
+        leftAxisSize = leftAxisSize || 50,
+        rightAxisSize = rightAxisSize || 50;
+
+    var s = function(d) {
+      if(leftDims.indexOf(d) !== -1) {
+        return leftDims.indexOf(d) * leftAxisSize * -1;
+      } else if(rightDims.indexOf(d) !== -1) {
+        return rightDims.indexOf(d) * rightAxisSize;
+      } else {
+        console.warn("Error in axis scale")
+      }
+    }
+
+    s.domain = function(newDims) {
+      return allDims;
+    }
+
+    s.leftDomain = function(newDims) {
+      if(newDims) {
+        leftDims = newDims;
+      }
+      return leftDims;
+    }
+
+    s.rightDomain = function(newDims) {
+      if(newDims) {
+        rightDims = newDims;
+      }
+      return rightDims;
+    }
+
+    return s;
   }
 };
 
