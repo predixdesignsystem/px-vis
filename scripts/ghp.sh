@@ -42,8 +42,10 @@ echo "repo name is ${REPO_NAME}"
 
 # Copy the bower.json file out of the directory to a temp one
 cp bower.json ../tmp_bower/bower.json
-# ... and checkout gh-pages - create it if it doesn't exist.
-git checkout $TARGET_BRANCH || git checkout --orphan $TARGET_BRANCH
+# delete gh-pages branch if it already exists, redirect result to echo to not throw error if doesn't exist
+git branch -D $TARGET_BRANCH | echo
+# checkout a new orphan
+git checkout --orphan $TARGET_BRANCH
 # ... and copy the bower.json file from our temp directory into the current one, overriding it, and passing a yes in there's a prompt
 yes | cp ../tmp_bower/bower.json bower.json
 
@@ -92,7 +94,7 @@ perl -pi -w -e 's/px-theme\/px-theme-styles.html/px-dark-theme\/px-dark-theme-st
 cd ../
 
 # Do the git stuff
-git add .
+git add -A .
 git commit -m "${GIT_COMMIT_MESSAGE}"
 
 # Set git credentials (defined in settings above)
