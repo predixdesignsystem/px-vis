@@ -210,15 +210,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
           .attr('font-style', this._checkThemeVariable("--px-font-family", 'GE Inspira Sans'))
           .attr('x', 8)
           .attr('y', function(d,i) { return this._calcYPos(d,i,13); }.bind(this) )
-          .text(function(d) {
-            var val = (d.value).toFixed(2),
-                title = '';
-            if(this.displayTitle) {
-              title = this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['title'] ?
-                ' (' + this.thresholdConfig[d.type]['title'] + ')': ' (' + d.type + ')';
-            }
-            return val + title;
-          }.bind(this));
+          .text(this._calcTitle.bind(this));
 
         //must set rectangle width after text is set so we know how big it is
         // this.thresholdRect.attr('width', function(d,i) {
@@ -242,7 +234,8 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
 
         this.thresholdText
           .attr('x', 8)
-          .attr('y', function(d,i) { return this._calcYPos(d,i,13); }.bind(this) );
+          .attr('y', function(d,i) { return this._calcYPos(d,i,13); }.bind(this) )
+          .text(this._calcTitle.bind(this));
 
         //must set rectangle width after text is set so we know how big it is
         this.thresholdRect.attr('width',function(d,i){
@@ -309,6 +302,16 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
         // TODO find a better solution for error case
       }
       return this.y(d.value);
-    }
+    },
+
+    _calcTitle: function(d) {
+      var val = (d.value).toFixed(2),
+          title = '';
+      if(this.displayTitle) {
+        title = this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['title'] ?
+          ' (' + this.thresholdConfig[d.type]['title'] + ')': ' (' + d.type + ')';
+      }
+      return val + title;
+    };
   });
 </script>
