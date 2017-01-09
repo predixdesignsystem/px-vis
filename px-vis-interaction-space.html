@@ -59,9 +59,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.zoomSelection,
       PxVisBehavior.seriesKeys,
-      PxColorsBehavior.baseColors,
+      PxColorsBehavior.baseColors
       PxVisBehavior.actionConfig,
-      PxVisBehavior.isMultiAxis
     ],
     /***EVENTS****
     /*
@@ -321,7 +320,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
               chartData,
               //contains [distance, timestamp]
               closestTimestamp = [Number.MAX_VALUE, null],
-              searchTimeStamp;
+              searchTimeStamp,
+              isMultiAxis = typeof this.y === 'object';
 
               // setup a holder for our data to pass out
               var dataObj = {
@@ -355,7 +355,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                   if(this.yAxisType === 'ordinal') {
                     result[yKey] = this._getOrdinalValue(false, mousePos[1], axisKey);
                   } else {
-                    y1 = this.isMultiAxis ? this.y[axisKey].invert(mousePos[1]) : this.y.invert(mousePos[1]);
+                    y1 = isMultiAxis ? this.y[axisKey].invert(mousePos[1]) : this.y.invert(mousePos[1]);
                     result[yKey] = this._getClosestValue(false, y1, this.chartData, xKey, yKey, result[xKey]);
                   }
                 } else if(this.yAxisType === 'ordinal') {
@@ -398,7 +398,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                   for(var j = 0; j < this.chartData.length; j++) {
 
                     // get the y domain
-                    currY = this.isMultiAxis ? this.y[axisKey].domain() : this.y.domain();
+                    currY = isMultiAxis ? this.y[axisKey].domain() : this.y.domain();
 
                     //get point values
                     dataX = this.chartData[j][xKey];
@@ -409,7 +409,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
                       //get pixel coords
                       x2 = this.x(dataX);
-                      y2 = this.isMultiAxis ? this.y[axisKey](dataY) : this.y(dataY);
+                      y2 = isMultiAxis ? this.y[axisKey](dataY) : this.y(dataY);
 
                       //distance between the two points
                       //! x2 and y2 are changed during this calculation
@@ -434,7 +434,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
                 // get the pixel coords for that data
                 xCoord = this.x(result[xKey]);
-                yCoord = this.isMultiAxis ? this.y[axisKey](result[yKey]) : this.y(result[yKey]);
+                yCoord = isMultiAxis ? this.y[axisKey](result[yKey]) : this.y(result[yKey]);
 
                 xArr.push(xCoord);
                 yArr.push(yCoord);
@@ -469,7 +469,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       if(xAxis) {
         domain = this.x.domain();
         range = this.x.range();
-      } else if(this.isMultiAxis) {
+      } else if(typeof this.y === 'object') {
         domain = this.y[axisKey].domain();
         range = this.y[axisKey].range();
       } else {
@@ -774,7 +774,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
               //Y axis is top to bottom
               extents.eY = this._getOrdinalRange(false, extents.y2, extents.y1);
             } else {
-              if(this.isMultiAxis) {
+              if(typeof this.y === 'object') {
                 //Y axis is top to bottom
                 extents.eY = {};
                 var k = Object.keys(this.y);

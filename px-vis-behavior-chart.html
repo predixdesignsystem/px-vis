@@ -105,7 +105,8 @@ PxVisBehaviorChart.chartCommon = [{
         value: function() {
           return {
             "type": "line",
-            "x": 'x'
+            "x": 'x',
+            "axis": 'left_1'
           }
         }
       },
@@ -1645,14 +1646,6 @@ PxVisBehaviorChart.noDebounceOnPanning = {
 */
 PxVisBehaviorChart.multiAxis = [{
   properties: {
-    /**
-     * Boolean defining if chart has multiple axes
-     *
-     */
-    _isMultiAxis: {
-      type: Boolean,
-      computed: '_computeIsMultiAxis(completeSeriesConfig.*)'
-    },
 
     /**
      * The size of an individual axis
@@ -1694,16 +1687,7 @@ PxVisBehaviorChart.multiAxis = [{
 
     _axisX: {
       type: Object,
-      value: function() {
-        return function(d) {
-          var a = d.split('_');
-          if(a[0] === 'left') {
-            return (Number(a[1]) - 1) * this.leftAxisSize * -1;
-          } else {
-            return (Number(a[1]) - 1) * this.rightAxisSize;
-          }
-        }
-      }
+      notify: true
     },
 
     multiChartExtents: {
@@ -1714,16 +1698,16 @@ PxVisBehaviorChart.multiAxis = [{
     }
   },
 
-  _computeIsMultiAxis: function(seriesConfig) {
-    var keys = Object.keys(this.seriesConfig),
-        l = 0,
-        r = 0,
+  _calcAxes: function(completeSeriesConfig) {
+    var keys = Object.keys(this.completeSeriesConfig),
+        lDims = [],
+        rDims = [],
         dims = {};
 
     for(var i = 0; i < keys.length; i++) {
-      if(this.seriesConfig[keys[i]]['axis']) {
+      if(this.completeSeriesConfig[keys[i]]['axis']) {
         var k = keys[i],
-            axis = this.seriesConfig[k]['axis'],
+            axis = this.completeSeriesConfig[k]['axis'],
             axisVals = axis.split('_');
 
         axisVals[1] = Number(axisVals[1]);
@@ -1735,25 +1719,22 @@ PxVisBehaviorChart.multiAxis = [{
         }
 
         if(axisVals[0] === 'left') {
-          l = l > axisVals[1] ? l : axisVals[1];
+          lDims.push(axis);
         } else {
-          r = r > axisVals[1] ? r : axisVals[1];
+          rDims.push(axis);
         }
       }
     }
 
-    if(l + r > 1) {
-      this.set('_numLeftAxes', l);
-      this.set('_numRightAxes', r);
+    this.set('_numLeftAxes', lDims.length);
+    this.set('_numRightAxes', rDims.length);
 
-      this.set('axes', Object.keys(dims).sort());
-      this.set('dimensions', this.axes);
-      this.set('seriesToAxes', dims);
+    this.set('axes', Object.keys(dims).sort());
+    this.set('dimensions', this.axes);
+    this.set('seriesToAxes', dims);
 
-      return true
-    } else {
-      return false
-    }
+    this.set('_axisX', this._setAxisScale(lDims.sort(), rDims.sort(), this.leftAxisSize, this.rightAxisSize));
+
   },
 
   _calcMultiMargins: function(margin, leftAxisWidth, rightAxisWidth) {
@@ -1762,8 +1743,8 @@ PxVisBehaviorChart.multiAxis = [{
 
     // width dependent on number of axes on each
     // axes fit into the margin section of the chart
-    margin.left = leftAxisWidth * this._numLeftAxes;
-    margin.right = rightAxisWidth * this._numRightAxes;
+    margin.left = Math.max(leftAxisWidth * this._numLeftAxes, margin.left);
+    margin.right = Math.max(rightAxisWidth * this._numRightAxes, margin.right);
 
     this.set('_leftAxisSize', leftAxisWidth);
     this.set('_rightAxisSize', rightAxisWidth);
@@ -1772,14 +1753,15 @@ PxVisBehaviorChart.multiAxis = [{
 
 
   _returnYScale: function(seriesId, config) {
-    if(this._isMultiAxis) {
+    if(typeof this.y === 'object') {
       var d = config[seriesId]['axis'];
       if(this.y && this.y[d]) {
         return this.y[d];
       }
-      return;
+    } else if(typeof this.y === 'function') {
+      return this.y;
     }
-    return this.y;
+    return;
   }
 
 }, PxVisBehavior.dimensions, PxVisBehavior.seriesToAxes];

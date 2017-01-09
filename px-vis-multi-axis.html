@@ -3,7 +3,7 @@
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="px-vis-axis.html"/>
 <link rel="import" href="px-vis-axis-brush.html"/>
-<link rel="import" href="px-vis-axis-drag.html"/>
+<link rel="import" href="px-vis-behavior-axis-drag.html"/>
 <link rel="import" href="../px-colors-design/colors.html" />
 
 <!--
@@ -119,23 +119,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           brush-to-remove="[[brushToRemove]]">
         </px-vis-axis-brush>
       </template>
-      <px-vis-axis-drag
-        width="[[width]]"
-        x="[[x]]"
-        y="[[y]]"
-        margin="[[margin]]"
-        complete-series-config="{{completeSeriesConfig}}"
-        chart-data="[[chartData]]"
-        axes="[[axes]]"
-        dimensions="[[dimensions]]"
-        axis-groups="[[axisGroups]]"
-        drag-behavior="{{dragBehavior}}"
-        redraw-series="[[redrawSeries]]"
-        radial="[[radial]]"
-        series-key="[[seriesKey]]"
-        muted-series="{{mutedSeries}}">
-      </px-vis-axis-drag>
-
     </template>
 </dom-module>
 
@@ -160,6 +143,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       PxVisBehavior.radial,
       PxVisBehaviorD3.radialAxisConfig,
       PxVisBehavior.seriesToAxes,
+      PxVisBehaviorDrag.parallelAxisDrag,
+      PxVisBehaviorDrag.cartesianDrag,
       PxColorsBehavior.baseColors
     ],
 
@@ -335,6 +320,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         type: Boolean,
         value: false
       },
+      cartesianDragBehavior: {
+        type: Boolean,
+        value: false,
+        observer: '_setDragBehavior'
+      }
     },
 
     observers: [
@@ -347,6 +337,14 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       'px-axis-done': '_setAxisStyles',
       'px-vis-axis-displayed-title-changed': '_displayedTitleChanged',
       'px-vis-recalc-title-location' : '_toggleTitleLocation'
+    },
+
+    _setDragBehavior: function() {
+      if(this.cartesianDragBehavior) {
+        this.createCartesianDrag();
+      } else {
+        this.createParallelAxisDrag();
+      }
     },
 
     /**

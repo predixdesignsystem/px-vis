@@ -43,7 +43,6 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
       PxVisBehavior.commonMethods,
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.thresholds,
-      PxVisBehavior.isMultiAxis,
       PxVisBehaviorD3.domainUpdate,
       PxColorsBehavior.baseColors
     ],
@@ -286,7 +285,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
     },
 
     _getYVal: function(d) {
-      if(this.isMultiAxis) {
+      if(typeof this.y === 'object') {
         // is for in our seriesConfig?
         if(this.completeSeriesConfig[d.for] && this.completeSeriesConfig[d.for]['axis']) {
           var axis = this.completeSeriesConfig[d.for]['axis'];
@@ -295,6 +294,12 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
         // is for an axis?
         } else if(this.y[d.for]) {
           return this.y[d.for](d.value);
+
+        // just stick it on a default axis
+        } else if(this.y['left_1']) {
+          return this.y['left_1'](d.value);
+        } else if(this.y['right_1']) {
+          return this.y['right_1'](d.value);
         }
 
         console.warn("Invalid series or axis for threshold: " + JSON.stringify(d));
@@ -312,6 +317,6 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
           ' (' + this.thresholdConfig[d.type]['title'] + ')': ' (' + d.type + ')';
       }
       return val + title;
-    };
+    }
   });
 </script>
