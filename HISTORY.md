@@ -38,7 +38,16 @@ v1.0.0
 * completeSeriesConfig function will now complete and create an empty completeSeriesConfig if an empty seriesConfig is passed in. Allows the deletion of all series from the chart.
 * Ensure tooltip calculation are done based on pixel coordinates rather than values for non-time based charts
 * Added px-vis-dynamic-menu in register, allowing developers to pass in custom features/function available in a menu in the register through dynamicMenuConfig
+* Added actionConfig to px-vis-interaction-space, allowing to define custom interaction on chart hover or click for example
 * Added panning capability to px-vis-interaction-space
+* Added px-vis-toolbar 
+  * Toolbar items are configurable and each item can have:
+    * a tooltip label
+    * an event name (fired on click)
+    * an actionConfig used by px-vis-interaction space, allowing interactions on chart hover and click for example
+    * an icon
+  * Default actions of "zoom", "pan" and "tooltip" can be passed directly in the config
+  * Custom defined functions can also be used in the actionConfig
 
 v0.8.4
 ==================
