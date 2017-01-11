@@ -46,6 +46,7 @@ v1.0.0
     * an event name (fired on click)
     * an actionConfig used by px-vis-interaction space, allowing interactions on chart hover and click for example
     * an icon
+    * a set of sub items which will be displayed in the "secondary" toolbar below when the item is clicked
   * Default actions of "zoom", "pan" and "tooltip" can be passed directly in the config
   * Custom defined functions can also be used in the actionConfig
 
