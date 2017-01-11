@@ -29,42 +29,63 @@ fi
 # PREPARE FILESYSTEM
 # ------------------------------------------------------------------------------
 
-# Create a temp directory that will store the bower.json file
-mkdir tmp_bower
-
-# Clone this repo, and go into that folder
-git clone ${REPO} ghp_tmp
-cd ghp_tmp
+cd $TRAVIS_BUILD_DIR
 
 # Find out our repo name from the bower file
 REPO_NAME=$(grep "name" bower.json | sed 's/"name": "//' | sed 's/",//')
 echo "repo name is ${REPO_NAME}"
 
-# Copy the bower.json file out of the directory to a temp one
-cp bower.json ../tmp_bower/bower.json
-# delete gh-pages branch if it already exists, redirect result to echo to not throw error if doesn't exist
-git branch -D $TARGET_BRANCH | echo
-# checkout a new orphan
-git checkout --orphan $TARGET_BRANCH
-# ... and copy the bower.json file from our temp directory into the current one, overriding it, and passing a yes in there's a prompt
-yes | cp ../tmp_bower/bower.json bower.json
+#delete all the files!
+rm -rf node_modules
+rm -rf bower_components
+rm -rf css
+rm -rf sass
+rm -rf scripts
+rm -rf test
+rm *.html
+rm *.json
+rm *.enc
+rm *.js
+rm *.png
+rm *.lock
+rm *.ico
+rm *.md
+rm *.pdf
+yes | rm .travis.yml
+rm .bowerrc
+rm .editorconfig
+rm -rf .github
+rm .gitignore
+rm .jshintrc
 
-# Overwrite whatever is in root .bowerrc to force installation of bower packages at the root
-rm -f .bowerrc
+# force installation of bower packages at the root
 echo "{ \"directory\": \".\" }" > .bowerrc
 
-# Overwrite whatever is in root `index.html` to create the redirect
+#make sure the deploy key isn't saved into the git repo
+echo "deploy_key" > .gitignore
+
+# add the redirect.
 # Note: We are not overwriting the component's documentation `index.html` file
 # here, we are making sure that http://url/px-something/ redirects to
 # http://url/px-something/px-something/, where the demo page is installed
-rm -f index.html
 meta_temp='<META http-equiv=refresh content="0;URL=COMPONENT_NAME/">'
 echo ${meta_temp/'COMPONENT_NAME'/$REPO_NAME} > index.html
 
-# Install your new tag through bower (use --force because it will fail without forcing it)
-bower install ${REPO_NAME} --force
-# @DARK_THEME: Force install px-dark-theme (to generate dark-theme demos)
-bower install px-dark-theme --force
+# ------------------------------------------------------------------------------
+# BOWER
+# ------------------------------------------------------------------------------
+#
+#for some reason, bower isn't available here, so, install it globally, so it doesn't end up as another folder.
+npm install bower -g
+bower cache clean
+# Install the repo and the dark-theme.
+bower install ${REPO_NAME} px-dark-theme
+
+#copy the bower file into our root
+yes | cp ${REPO_NAME}/bower.json bower.json
+
+#and run install
+bower install
 
 # ------------------------------------------------------------------------------
 # BUILD PROJECT
@@ -77,7 +98,7 @@ cd ${REPO_NAME}
 yes | cp index.html index-dark.html
 
 # @DARK_THEME: Import dark-theme on the `index-dark.html` page
-perl -pi -w -e 's/px-theme\/px-theme-styles.html/px-dark-theme\/px-dark-theme-styles.html/g;' index-dark.html
+sed 's/px-theme\/px-theme-styles.html/px-dark-theme\/px-dark-theme-styles.html/g;' index-dark.html
 
 # ------------------------------------------------------------------------------
 # SW-PRECACHE
@@ -94,12 +115,17 @@ perl -pi -w -e 's/px-theme\/px-theme-styles.html/px-dark-theme\/px-dark-theme-st
 cd ../
 
 # Do the git stuff
+
+# checkout a new orphan
+git checkout --orphan $TARGET_BRANCH
+
 git add -A .
 git commit -m "${GIT_COMMIT_MESSAGE}"
 
 # Set git credentials (defined in settings above)
 git config user.name ${GIT_USER_NAME}
 git config user.email ${GIT_USER_EMAIL}
+
 
 # We get the URL in this format: "https://github.com/PredixDev/px-something"
 # First, we need to replace https-style remote URL with a SSH-style remote
