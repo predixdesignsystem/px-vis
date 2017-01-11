@@ -416,15 +416,6 @@ function basicTests(registerID,dir){
     test(registerID + ' muted-series-updated event fired', function() {
       assert.isDefined(eventObj);
     });
-    test(registerID + ' muted-series-updated method is set', function() {
-      assert.equal(eventObj.method, 'set');
-    });
-    test(registerID + ' muted-series-updated dataVar is mutedSeries.1', function() {
-      assert.equal(eventObj.dataVar, 'mutedSeries.series_1');
-    });
-    test(registerID + ' muted-series-updated data is true', function() {
-      assert.equal(eventObj.data, true);
-    });
 
     test(registerID + ' mutedSeries change to false', function() {
       regWithoutMenu.click();
