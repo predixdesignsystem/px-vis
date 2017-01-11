@@ -61,7 +61,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.zoomSelection,
       PxVisBehavior.seriesKeys,
-      PxColorsBehavior.baseColors
+      PxColorsBehavior.baseColors,
+      PxVisBehavior.actionConfig
     ],
     /***EVENTS****
     /*
@@ -110,23 +111,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       timeData: {
         type: String,
         value: 'Timestamp'
-      },
-      /**
-       * Configuration used to define what actions happen on events. Each key represents an event,
-       * each value can be:
-       * - a predefined action found in `actionMapping`
-       * - a function which context will be bound to this element
-       */
-      actionConfig: {
-        type: Object,
-        value: {
-          'mousedown': 'startZooming',
-          'mouseup': 'stopZooming',
-          // 'mousedown': 'startPanning',
-          // 'mouseup': 'stopPanning',
-          'mouseout': 'resetTooltip',
-          'mousemove': 'calcTooltipData'
-        }
       },
       /**
        * set of predefined action that can be used out of the box
@@ -221,6 +205,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             this._rect.on(mouseEvent, mappedAction.bind(this));
           } else if(typeof action === 'function') {
             this._rect.on(mouseEvent, action.bind(this));
+          } else if(typeof action === 'string') {
+            var fn = eval('var f = function() { return ' + action + ';}; f();');
+            this._rect.on(mouseEvent, fn.bind(this));
           }
         }
       }
@@ -528,13 +515,15 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         this._resetTooltipData();
          
         //in case the user clicks inside the chart, and mouses out, we are waiting for a mouseup, and closing our action box with the coordinates available on the mouseup.
-        Px.d3.select(document).on('mouseup.action', this._stopPanning);
+        Px.d3.select(document).on('mouseup.action', this._stopPanning.bind(this));
         Px.d3.select(document).on('mousemove.action', this._updatePanning.bind(this));
 
         var mousePos = Px.d3.mouse(this._rect.node());
         // use original svg so it draws under the _rect and does not interfer with our mouse events
 
         this._panningStartVal = [this.x.invert(mousePos[0]), this.y.invert(mousePos[1])];
+
+        this.fire('px-vis-interaction-space-start-panning');
       }
     },
     _updatePanning: function() {
@@ -575,6 +564,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       Px.d3.select(document).on('mousemove.action', null);
 
       this.mouseDown = false;
+
+      this.fire('px-vis-interaction-space-stop-panning');
     },
     /**
      * Helper function called on mousedown.action

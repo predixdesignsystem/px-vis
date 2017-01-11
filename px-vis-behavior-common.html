@@ -1594,7 +1594,15 @@ PxVisBehavior.svgLowerDefinition = {
   }
 };
 
+/*
+    Name:
+    PxVisBehavior.dynamicMenuConfig
 
+    Description:
+    Polymer behavior that provides the dynamicMenuConfig property
+
+    @polymerBehavior PxVisBehavior.dynamicMenuConfig
+*/
 PxVisBehavior.dynamicMenuConfig = {
   properties: {
     /**
@@ -1639,5 +1647,38 @@ PxVisBehavior.dynamicMenuConfig = {
     }
   }
 }
+
+/*
+    Name:
+    PxVisBehavior.actionConfig
+
+    Description:
+    Polymer behavior that provides the actionConfig property
+
+    @polymerBehavior PxVisBehavior.actionConfig
+*/
+PxVisBehavior.actionConfig = {
+  properties: {
+    /**
+      * Configuration used to define what actions happen on events. Each key represents an event,
+      * each value can be:
+      * - a predefined action found in px-vis-interaction-space `actionMapping`
+      * - a function which context will be bound to the px-vis-interaction-space
+      */
+    actionConfig: {
+      type: Object,
+      notify: true,
+      value: {
+        'mousedown': 'startZooming',
+        'mouseup': 'stopZooming',
+        // 'mousedown': 'startPanning',
+        // 'mouseup': 'stopPanning',
+        'mouseout': 'resetTooltip',
+        'mousemove': 'calcTooltipData'
+      }
+    }
+  }
+};
+
 
 </script>

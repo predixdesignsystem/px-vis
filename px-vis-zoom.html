@@ -26,7 +26,6 @@ Element providing an on-chart zoom.
 <dom-module id="px-vis-zoom">
     <template>
       <style include="px-vis-zoom-styles"></style>
-      <button id="resetBtn" class="btn hidden" on-click="resetZoom">Reset Zoom</button>
     </template>
 </dom-module>
 
@@ -36,11 +35,8 @@ Element providing an on-chart zoom.
     is: 'px-vis-zoom',
 
     behaviors: [
-      PxVisBehaviorD3.svg,
       PxVisBehavior.extentsData,
-      PxVisBehaviorD3.selectedDomain,
-      PxVisBehavior.baseSize,
-      Polymer.IronResizableBehavior
+      PxVisBehaviorD3.selectedDomain
     ],
 
     /**
@@ -51,48 +47,53 @@ Element providing an on-chart zoom.
      */
     properties: {
       /**
-       * Whether we're currently zoomed
+       * Whether we're currently zoomed in
        */
-      _zoomed: {
+      zoomed: {
         type: Boolean,
         value: false
+      },
+      /**
+       * Stack of previous zooms
+       */
+      zoomStack: {
+        type: Array,
+        value: function() {
+          return [];
+        }
       }
     },
     observers: [
-      'zooooom(extentsData)',
-      '_sizeChanged(width, height)'
+      'zoom(extentsData)'
     ],
-    listeners: {
-      'iron-resize': '_sizeChanged'
+
+    /**
+     * Restore zoom to its previous value, do nothing if no previous value
+     */
+    undoZoom: function() {
+      if(this.zoomStack.length === 1) {
+        this.resetZoom();
+      }
+
+      var extentsData = this.pop('zoomStack');
+      if(extentsData) {
+        this.set('selectedDomain', extentsData);
+        this.fire('px-vis-selected-domain-updated', { 'data':extentsData, 'method': 'set', 'dataVar': 'selectedDomain' });
+      }
     },
     /**
      * Sets the selectedDomain to the drawn zoom and shows the button
      *
      */
-    zooooom: function(extentsData) {
-      //make sure the button is visible so we can measure it
-      this.toggleClass('hidden', false, this.$.resetBtn);
-      this._zoomed = true;
+    zoom: function(extentsData) {
 
-      this.rePositionButton();
+      //remember zoom
+      this.push('zoomStack', this.selectedDomain);
+
+      this.zoomed = true;
 
       this.set('selectedDomain', {x:extentsData.eX, y:extentsData.eY});
       this.fire('px-vis-selected-domain-updated', { 'data':{x:extentsData.eX, y:extentsData.eY}, 'method': 'set', 'dataVar': 'selectedDomain' });
-    },
-    _sizeChanged: function(width, height) {
-      this.rePositionButton();
-    },
-    rePositionButton: function() {
-      if(this._zoomed) {
-        this.debounce('repositionButton', function() {
-          if(this.pxSvgElem) {
-            var rect = this.pxSvgElem.getBoundingClientRect(),
-              topLeftRect = this.getBoundingClientRect();
-            this.$.resetBtn.style.left = (rect.width - 170) - Number(this.margin.right) + 'px';
-            this.$.resetBtn.style.top = (rect.top - topLeftRect.top) + Number(this.margin.top) + 'px';
-          }
-        }.bind(this), 20);
-      }
     },
     /**
      * resets the extents
@@ -100,9 +101,12 @@ Element providing an on-chart zoom.
      */
     resetZoom: function(){
       this.set('selectedDomain', 'reset');
-      this._zoomed = false;
+      this.zoomed = false;
+
+      //ensure the zoom stack is reset
+      this.splice('zoomStack', 0, this.zoomStack.length);
+
       this.fire('px-vis-selected-domain-updated', { 'data':'reset', 'method': 'set', 'dataVar': 'selectedDomain' });
-      this.toggleClass('hidden', true, this.$.resetBtn);
     }
   });
 </script>
