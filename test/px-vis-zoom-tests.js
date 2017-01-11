@@ -33,9 +33,6 @@ function runTests(){
     test('baseZoom fixture is created', function() {
       assert.isTrue(baseZoom !== null);
     });
-    test('reset button is shown', function() {
-      assert.isTrue(baseZoom.$.resetBtn.classList.contains('hidden'));
-    });
   }); //suite
 
   suite('px-vis-zoom baseZoom extentsData added', function() {
@@ -81,57 +78,48 @@ function runTests(){
       assert.equal(eventObj.data.x[0],10);
       assert.equal(eventObj.data.x[1],52);
     });
-    test('reset button is shown', function() {
-      assert.isFalse(baseZoom.$.resetBtn.classList.contains('hidden'));
-    });
-    // test('reset button is positioned correctly - left', function() {
-    //   console.warn(baseSVG.$$('svg').getBoundingClientRect());
-    //   console.warn(baseSVG.svg.node().parentNode.getBoundingClientRect());
-    //   var left = baseSVG.$$('svg').getBoundingClientRect().right - 125;
-    //   assert.equal(baseZoom.$.resetBtn.style.left, left);
-    // });
-    // test('reset button is positioned correctly - top', function() {
-    //   var top = baseSVG.$$('svg').getBoundingClientRect().top + 20;
-    //   assert.equal(baseZoom.$.resetBtn.style.top, top);
-    // });
   }); //suite
 
-  suite('px-vis-zoom baseZoom reset button clicked', function() {
-    var baseSVG = document.getElementById('baseSVG'),
-        baseZoom = document.getElementById('baseZoom');
-    var eventObj = null;
+  suite('px-vis-zoom zoom stack', function() {
+    var baseZoom = document.getElementById('baseZoom'),
+        stack = [{eX:0,eY:0},{eX:1,eY:1},{eX:2,eY:2}];
 
-    suiteSetup(function(done){
-      document.addEventListener('px-vis-selected-domain-updated',function(evt){
-        eventObj = evt.detail;
-      });
+    suiteSetup(function() {
+      //manually reset
+      baseZoom.set('selectedDomain', null);
+      baseZoom.set('zoomStack', []);
 
-      //can't use new MouseEvent cause IE
-      var e = document.createEvent("MouseEvent");
-      e.initMouseEvent("click",true,true,window,0,0,0,0,0,false,false,false,false,0,null);
-      baseZoom.$.resetBtn.dispatchEvent(e);
-
-      // give event time to process and fire
-      setTimeout(function(){ done(); },100);
+      //zoom 3 times
+      baseZoom.set('extentsData', stack[0]);
+      baseZoom.set('extentsData', stack[1]);
+      baseZoom.set('extentsData', stack[2]);
     });
 
-    test('event fired', function() {
-      assert.isTrue(eventObj !== null);
+    test('initial zoom stack', function() {
+      assert.equal(baseZoom.zoomStack.length, 3);
     });
-    test('event dataVar', function() {
-      assert.equal(eventObj.dataVar, 'selectedDomain');
+    test('undoZoom', function() {
+      baseZoom.undoZoom();
+
+      assert.equal(baseZoom.zoomStack.length, 2);
+      assert.equal(baseZoom.selectedDomain.x, stack[1].eX);
+      assert.equal(baseZoom.selectedDomain.x, stack[1].eY);
     });
-    test('event method', function() {
-      assert.equal(eventObj.method, 'set');
+    test('reset zoom', function() {
+      baseZoom.resetZoom();
+
+      assert.equal(baseZoom.zoomStack.length, 0);
+      assert.equal(baseZoom.selectedDomain, 'reset');
     });
-    test('event data exists and is a string', function() {
-      assert.equal(typeof(eventObj.data),'string');
-    });
-    test('event data exists and matches expected', function() {
-      assert.equal(eventObj.data,'reset');
-    });
-    test('reset button is hidden', function() {
-      assert.isTrue(baseZoom.$.resetBtn.classList.contains('hidden'));
+    test('last undo zoom = reset zoom', function() {
+      //zoom once
+      baseZoom.set('extentsData', stack[0]);
+
+      assert.equal(baseZoom.zoomStack.length, 1);
+
+      baseZoom.undoZoom();
+      assert.equal(baseZoom.zoomStack.length, 0);
+      assert.equal(baseZoom.selectedDomain, 'reset');
     });
   }); //suite
 
