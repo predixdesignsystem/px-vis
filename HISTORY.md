@@ -49,6 +49,7 @@ v1.0.0
     * a set of sub items which will be displayed in the "secondary" toolbar below when the item is clicked
   * Default actions of "zoom", "pan" and "tooltip" can be passed directly in the config
   * Custom defined functions can also be used in the actionConfig
+* Removed px-vis-zoom and provide the PxVisBehaviorChart.zooming behavior for charts instead
 
 v0.8.4
 ==================

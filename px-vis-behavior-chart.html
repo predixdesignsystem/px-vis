@@ -1296,4 +1296,116 @@ PxVisBehaviorChart.categoryAndAxisRegisterConfigs = [{
   },
 }, PxVisBehaviorChart.subConfiguration];
 
+/*
+    Name:
+    PxVisBehaviorChart.zooming
+
+    Description:
+    Behavior providing properties and logic for chart zooming
+    @polymerBehavior PxVisBehaviorChart.zooming
+*/
+PxVisBehaviorChart.zooming = [{
+
+  /**
+   * Properties block, expose attribute values to the DOM via 'reflect'
+   *
+   * @property properties
+   * @type Object
+   */
+  properties: {
+    /**
+     * Stack of previous zooms
+     */
+    zoomStack: {
+      type: Array,
+      value: function() {
+        return [];
+      }
+    }
+  },
+  observers: [
+    'zoom(extentsData)'
+  ],
+  listeners: {
+    'px-vis-toolbar-reset-zoom': 'resetZoom',
+    'px-vis-toolbar-zoom-in': 'zoomIn',
+    'px-vis-toolbar-zoom-out': 'zoomOut',
+    'px-vis-toolbar-undo-zoom': 'undoZoom',
+    'px-vis-save-zoom-state': '_saveZoomState'
+  },
+
+  /**
+   * Restore zoom to its previous value, do nothing if no previous value
+   */
+  undoZoom: function() {
+    if(this.zoomStack.length === 1) {
+      this.resetZoom();
+    }
+
+    var extentsData = this.pop('zoomStack');
+    if(extentsData) {
+      this.set('selectedDomain', extentsData);
+      this.fire('px-vis-selected-domain-updated', { 'data':extentsData, 'method': 'set', 'dataVar': 'selectedDomain' });
+    }
+  },
+  _saveZoomState: function() {
+    this.push('zoomStack', this.selectedDomain);
+  },
+  zoomIn: function() {
+    this._saveZoomState();
+
+    var xMin = this.extentsData.eX[0],
+        xMax = this.extentsData.eX[1],
+        xRange = xMax - xMin,
+        yMin = this.extentsData.eY[0],
+        yMax = this.extentsData.eY[1],
+        yRange = yMax - yMin;
+    
+    newExtents = {
+      eX: [xMin + xRange/2, xMax - xRange/2],
+      eY: [yMin + yRange/2, yMax - yRange/2]
+    };
+    //this will kick zoom()
+    this.set('extentsData', newExtents);
+  },
+  zoomOut: function() {
+    this._saveZoomState();
+
+    var xMin = this.extentsData.eX[0],
+        xMax = this.extentsData.eX[1],
+        xRange = xMax - xMin,
+        yMin = this.extentsData.eY[0],
+        yMax = this.extentsData.eY[1],
+        yRange = yMax - yMin;
+    
+    newExtents = {
+      eX: [xMin - xRange/2, xMax + xRange/2],
+      eY: [yMin - yRange/2, yMax + yRange/2]
+    };
+    //this will kick zoom()
+    this.set('extentsData', newExtents);
+  },
+  /**
+   * Sets the selectedDomain to the drawn zoom and shows the button
+   *
+   */
+  zoom: function(extentsData) {
+
+    this.set('selectedDomain', {x:extentsData.eX, y:extentsData.eY});
+    this.fire('px-vis-selected-domain-updated', { 'data':{x:extentsData.eX, y:extentsData.eY}, 'method': 'set', 'dataVar': 'selectedDomain' });
+  },
+  /**
+   * resets the extents
+   *
+   */
+  resetZoom: function() {
+    this.set('selectedDomain', 'reset');
+
+    //ensure the zoom stack is reset
+    this.splice('zoomStack', 0, this.zoomStack.length);
+
+    this.fire('px-vis-selected-domain-updated', { 'data':'reset', 'method': 'set', 'dataVar': 'selectedDomain' });
+  }
+}, PxVisBehavior.extentsData, PxVisBehaviorD3.selectedDomain];
+
 </script>

@@ -1,0 +1,249 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="../px-tooltip/px-tooltip.html"/>
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
+
+
+<!--
+Element providing an on-chart zoom.
+
+##### Usage
+
+    <px-vis-toolbar 
+      additional-detail="[[item]]"
+      dynamic-menu-config="[[dynamicMenuConfig]]">
+    </px-vis-toolbar>
+
+@element px-vis-toolbar
+@blurb Element providing a menu dynamically built depending on options
+@homepage index.html
+@demo demo.html
+-->
+
+<link rel="import" href="css/px-vis-toolbar-styles.html">
+
+<dom-module id="px-vis-toolbar">
+  <template>
+    <style include="px-vis-toolbar-styles"></style>
+
+      <!--main row-->
+      <span class="flex flex--row--rev">
+        <template is="dom-repeat" items={{_internalConfig}} strip-whitespace>
+          <span class="u-p-- flex__item main-item" on-tap="_clickItem" value="{{index}}">
+            <i class$="fa [[_getIcon(item)]]" value="{{index}}">
+              <template is="dom-if" if="[[_hasTooltip(item)]]">
+                <px-tooltip 
+                  tooltip-message="[[item.tooltipLabel]]"
+                  orientation="top"
+                  smart-orientation>
+                </px-tooltip>
+              </template>
+            </i>
+          </span>
+        </template>
+      </span>
+      <!--sub row-->
+      <span class="flex flex--row--rev">
+        <template is="dom-repeat" items={{_currentSubConfig}} strip-whitespace>
+            <span class="u-p-- flex__item main-item" on-tap="_clickSubItem" value="{{index}}">
+              <i class$="fa [[_getIcon(item)]]" value="{{index}}">
+                <template is="dom-if" if="[[_hasTooltip(item)]]">
+                  <px-tooltip 
+                    tooltip-message="[[item.tooltipLabel]]"
+                    orientation="top"
+                    smart-orientation>
+                  </px-tooltip>
+                </template>
+              </i>
+            </span>
+        </template>
+      </span>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'px-vis-toolbar',
+
+    behaviors: [
+      PxVisBehavior.actionConfig
+    ],
+
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      /**
+       * Configuration object for the toolbar
+       */
+      toolbarConfig: {
+        type: Object
+      },
+      /**
+       * Current action config determined by what has been selected on the toolbar. Needs 
+       * to be used by interaction space
+       */
+      actionConfig: {
+        type: Object
+      },
+      /**
+       * Config for default actions: tooltip/pan/zoom
+       */
+      _defaultActionsMapping: {
+        type: Object,
+        value: function() {
+          return {
+            'tooltip': {
+              'tooltipLabel': 'tooltip',
+              'icon': 'fa-crosshairs',
+              'actionConfig': {
+                'mouseout': 'resetTooltip',
+                'mousemove': 'calcTooltipData'
+              }
+            },
+            'pan': {
+              'tooltipLabel': 'pan',
+              'icon': 'fa-arrows',
+              'actionConfig': {
+                'mousedown': 'startPanning',
+                'mouseup': 'stopPanning'
+              },
+              'subConfig': {
+                'resetZoom': {
+                  'icon': 'fa-undo',
+                  'tooltipLabel': 'reset zoom to inital value',
+                  'eventName': 'px-vis-toolbar-reset-zoom'
+                }
+              }
+            },
+            'zoom': {
+              'tooltipLabel': 'zoom',
+              'icon': 'fa-search',
+              'actionConfig': {
+                'mousedown': 'startZooming',
+                'mouseup': 'stopZooming',
+              },
+              'subConfig': {
+                'zoomIn': {
+                  'icon': 'fa-plus',
+                  'tooltipLabel': 'zoom in',
+                  'eventName': 'px-vis-toolbar-zoom-in'
+                },
+                'zoomOut': {
+                  'icon': 'fa-minus',
+                  'tooltipLabel': 'zoom out',
+                  'eventName': 'px-vis-toolbar-zoom-out'
+                },
+                'undoZoom': {
+                  'icon': 'fa-undo',
+                  'tooltipLabel': 'undo zoom',
+                  'eventName': 'px-vis-toolbar-undo-zoom'
+                },
+                'resetZoom': {
+                  'icon': 'fa-expand',
+                  'tooltipLabel': 'reset zoom to inital value',
+                  'eventName': 'px-vis-toolbar-reset-zoom'
+                }
+              }
+            }
+          };
+        }
+      },
+      /**
+       * Current subconfiguration
+       */
+      _currentSubConfig: {
+        type: Object
+      },
+      /**
+       * Current config used to build the toolbar
+       */
+      _internalConfig: {
+        type: Object
+      }
+    },
+    observers: [
+      '_configChanged(toolbarConfig.*)'
+    ],
+    listeners: {
+    },
+    _configChanged: function() {
+      var internalConf = [],
+          keys = Object.keys(this.toolbarConfig);
+
+      for(var i=0; i<keys.length; i++) {
+
+        //if this is a default action use it
+        if(this._defaultActionsMapping[keys[i]]) {
+          internalConf.push(this._defaultActionsMapping[keys[i]]);
+        } else {
+          internalConf.push(this.toolbarConfig[keys[i]]);
+        }
+      }
+
+      //reverse array to take flex row rev into account
+      internalConf.reverse();
+      this.set('_internalConfig', internalConf);
+    },
+    /**
+     * Called when clicking an item of the main toolbar. 
+     */
+    _clickItem: function(evt) {
+      evt = Polymer.dom(evt);
+      var conf = this._internalConfig[evt.localTarget.value];
+      
+      if(conf.subConfig) {
+        var subConf = [],
+            keys = Object.keys(conf.subConfig);
+
+        //reverse order to take flex-row-reverse into account
+        for(var i=keys.length-1; i>-1; i--) {
+          subConf.push(conf.subConfig[keys[i]]);
+        }
+
+        this.set('_currentSubConfig', subConf);
+      } else {
+        this.set('_currentSubConfig', []);
+      }
+
+      this._processItem(conf);
+    },
+    /**
+     * Called when clicking an item of the secondary toolbar. 
+     */
+    _clickSubItem: function(evt) {
+      evt = Polymer.dom(evt);
+      var conf = this._currentSubConfig[evt.localTarget.value];
+      
+      this._processItem(conf);
+    },
+
+    /**
+     * Processes an item click: fire event if needed and set action config appropriately
+     */
+    _processItem: function(conf) {
+      if(conf.actionConfig) {
+        if(typeof conf.actionConfig === 'string') {
+          this.set('actionConfig', JSON.parse(conf.actionConfig));
+        } else {
+          this.set('actionConfig', conf.actionConfig);
+        }
+      }
+
+      if(conf.eventName) {
+        this.fire(conf.eventName);
+      }
+    },
+
+    _getIcon: function(item) {
+      return item.icon ? (item.icon + ' u-mr--') : '';
+    },
+    _hasTooltip: function(item) {
+      return item.tooltipLabel && item.tooltipLabel.length;
+    }
+  });
+</script>
