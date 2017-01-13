@@ -182,7 +182,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
           .append("g")
           .attr('class','thresholds')
           .attr('threshold-id',function(d){ return d.for });
-
+// FIXME exit & merge
         this.thresholdLine = this.thresholdGroup.append("line")
           .attr('stroke-width', function(d) {
             return (this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['strokeWidth'] )?
@@ -287,8 +287,8 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
     _getYVal: function(d) {
       if(typeof this.y === 'object') {
         // is for in our seriesConfig?
-        if(this.completeSeriesConfig[d.for] && this.completeSeriesConfig[d.for]['axis']) {
-          var axis = this.completeSeriesConfig[d.for]['axis'];
+        if(this.completeSeriesConfig[d.for] && this.completeSeriesConfig[d.for]['axis'] && this.completeSeriesConfig[d.for]['axis']['id']) {
+          var axis = this.completeSeriesConfig[d.for]['axis']['id'];
           return this.y[axis](d.value);
 
         // is for an axis?
@@ -296,10 +296,8 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
           return this.y[d.for](d.value);
 
         // just stick it on a default axis
-        } else if(this.y['left_1']) {
-          return this.y['left_1'](d.value);
-        } else if(this.y['right_1']) {
-          return this.y['right_1'](d.value);
+        } else if(this.y['defaultAxis']) {
+          return this.y['defaultAxis'](d.value);
         }
 
         console.warn("Invalid series or axis for threshold: " + JSON.stringify(d));

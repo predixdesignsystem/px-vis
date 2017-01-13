@@ -75,9 +75,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           height="[[_heightOrLen]]"
           width="[[width]]"
           margin="[[margin]]"
-          orientation="[[_getOrientation(item, orientationFromDimensions)]]"
+          orientation="[[_getOrientation(item, orientationFromDimensions, _pokeOrientation)]]"
           title="[[_getTitle(item,completeSeriesConfig)]]"
-          title-location='[[_computeTitleLocation(item,titleLocation, _pokeTitleLocation)]]'
+          title-location='[[_computeTitleLocation(item, titleLocation, _pokeTitleLocation)]]'
           title-type-size="[[titleTypeSize]]"
           label-type-size="[[labelTypeSize]]"
           stroke-width="[[strokeWidth]]"
@@ -324,6 +324,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         type: Boolean,
         value: false,
         observer: '_setDragBehavior'
+      },
+      _pokeOrientation: {
+        type: Boolean,
+        value: false
       }
     },
 
@@ -336,7 +340,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     listeners:{
       'px-axis-done': '_setAxisStyles',
       'px-vis-axis-displayed-title-changed': '_displayedTitleChanged',
-      'px-vis-recalc-title-location' : '_toggleTitleLocation'
+      'px-vis-recalc-title-location' : '_toggleTitleLocation',
+      "px-axis-orientation-changed" : '_toggleOrientation'
     },
 
     _setDragBehavior: function() {
@@ -682,13 +687,17 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
      * Deletes the brushes on its children axes
      *
      */
-    deleteAllBrushes: function(){
+    deleteAllBrushes: function() {
       this.$.axisBrush.deleteAllBrushes();
     },
 
     _getOrientation: function(axisId, orientationFromDimensions) {
       if(orientationFromDimensions) {
-        return axisId.split('_')[0];
+        var rDims = this.x.rightDomain();
+        if(rDims.indexOf(axisId) !== -1) {
+          return "right"
+        }
+        return "left"
       }
       return "left"
     },
@@ -704,6 +713,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
     _returnSeriesArray: function(arr, axisId) {
       return (arr && arr[axisId]) ? arr[axisId] : [];
+    },
+
+    _toggleOrientation: function() {
+      this.set('_pokeOrientation', !this._pokeOrientation);
     }
   });
 </script>
