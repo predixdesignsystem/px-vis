@@ -236,11 +236,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         },
 
         observers: [
-          'drawElement(domainChanged,svg,axis,margin,height,disableTicks, _animationFrameDone)',
+          'drawElement(domainChanged, svg, axis, margin, height, disableTicks, _animationFrameDone, orientation)',
           'drawSeriesBars(completeSeriesConfig.*, titleDrawn)',
           '_muteSeriesBars(mutedSeries.*)',
           '_updateTicks(ticks)',
-          '_titleChanged(displayedTitle, _axisGroup, titleLocation.*, height, width)',
+          '_titleChanged(displayedTitle, _axisGroup, titleLocation.*, height, width, orientation)',
           '_truncateTitle(title, truncationLength, appendUnitInTitle, completeSeriesConfig)'
         ],
 
@@ -409,6 +409,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               } else {
                 this._updateAxis();
               }
+
             }
           // }, 5);
         },
@@ -612,7 +613,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          */
         _setLineStyles:function(elem,lines) {
           elem.selectAll(lines)
-            .attr('test','test')
             .attr('fill','none')
             .attr('stroke', this._checkThemeVariable("--px-vis-axis-color", this.colors[this.axisColor]))
             .attr('shape-rendering', 'crispEdges')

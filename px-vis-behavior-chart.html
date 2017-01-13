@@ -106,7 +106,11 @@ PxVisBehaviorChart.chartCommon = [{
           return {
             "type": "line",
             "x": 'x',
-            "axis": 'left_1'
+            "axis": {
+              "id": "defaultAxis",
+              "side": "left",
+              "number": 1
+            }
           }
         }
       },
@@ -1171,6 +1175,8 @@ PxVisBehaviorChart.multiAxis = [{
 
   _calcAxes: function(completeSeriesConfig) {
     var keys = Object.keys(this.completeSeriesConfig),
+        lSet = {},
+        rSet = {},
         lDims = [],
         rDims = [],
         dims = {};
@@ -1179,23 +1185,36 @@ PxVisBehaviorChart.multiAxis = [{
       if(this.completeSeriesConfig[keys[i]]['axis']) {
         var k = keys[i],
             axis = this.completeSeriesConfig[k]['axis'],
-            axisVals = axis.split('_');
+            axisId = axis.id;
 
-        axisVals[1] = Number(axisVals[1]);
-
-        if(dims[axis]) {
-          dims[axis].push(k);
+        // associates a series with an axes
+        if(dims[axisId]) {
+          dims[axisId].push(k);
         } else {
-          dims[axis] = [ k ];
+          dims[axisId] = [ k ];
         }
 
-        if(axisVals[0] === 'left') {
-          lDims.push(axis);
+        // count how many axes on each side
+        if(axis.side === 'right') {
+          if(lSet[axisId]) {
+            console.warn(axis.id + ' is defined on both the left and right side. Defaulting to left')
+            continue;
+          }
+
+          rSet[axisId] = true;
         } else {
-          rDims.push(axis);
+          if(rSet[axisId]) {
+            console.warn(axis.id + ' is defined on both the left and right side. Defaulting to right')
+            continue;
+          }
+          
+          lSet[axisId] = true;
         }
       }
     }
+
+    lDims = Object.keys(lSet);
+    rDims = Object.keys(rSet);
 
     this.set('_numLeftAxes', lDims.length);
     this.set('_numRightAxes', rDims.length);
@@ -1225,7 +1244,7 @@ PxVisBehaviorChart.multiAxis = [{
 
   _returnYScale: function(seriesId, config) {
     if(typeof this.y === 'object') {
-      var d = config[seriesId]['axis'];
+      var d = config[seriesId]['axis']['id'];
       if(this.y && this.y[d]) {
         return this.y[d];
       }
