@@ -1,3 +1,7 @@
+v0.8.6
+==================
+* updated brush tests with new colors
+
 v0.8.5
 ==================
 * Updated to cool grays
