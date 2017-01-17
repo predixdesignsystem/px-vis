@@ -97,10 +97,10 @@ function runTests(){
       assert.equal(baseBrush._brushGroup.select('rect.selection').attr('stroke').split(" ").join(''), colors.gray5);
     });
     test('baseBrush._brushGroup.rect attr fill', function() {
-      assert.equal(baseBrush._brushGroup.select('rect.selection').attr('fill').split(" ").join(''), colors.black);
+      assert.equal(baseBrush._brushGroup.select('rect.selection').attr('fill').split(" ").join(''), colors.gray5);
     });
     test('baseBrush._brushGroup.rect attr fill-opacity', function() {
-      assert.equal(baseBrush._brushGroup.select('rect.selection').attr('fill-opacity'), 0.1);
+      assert.equal(baseBrush._brushGroup.select('rect.selection').attr('fill-opacity'), 0.3);
     });
     test('baseBrush._brushGroup.rect attr x', function() {
       assert.equal(baseBrush._brushGroup.select('rect.selection').attr('x'), 0);
