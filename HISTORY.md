@@ -1,3 +1,7 @@
+v0.8.5
+==================
+* Updated to cool grays
+
 v0.8.4
 ==================
 * Bump color design
