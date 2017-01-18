@@ -165,7 +165,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            */
           _currentUnits: {
             type: String,
-            computed: '_computeUnits(appendUnitInTitle, completeSeriesConfig, title)'
+            value: '',
+            computed: '_computeUnits(appendUnitInTitle, title, unit)'
           },
           /**
            * A boolean specifying if the axis title should truncate if too long
@@ -245,8 +246,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         ],
 
         detached: function() {
-          this.removeAxis();
-          
+          this.removeAll();
+
           if(this.drawnTickValues && this.drawnTickValues.length > 0) {
             this.set('drawnTickValues', []);
           }
@@ -383,13 +384,19 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           }
         },
 
+        removeAll: function() {
+          this.removeAxis();
+          this.removeTitle();
+        },
+
         removeAxis: function() {
           // remove the axis
           if(this._axisGroup) {
             this._axisGroup.remove();
             this._axisGroup = null;
           }
-
+        },
+        removeTitle: function() {
           if(this._titleGroup) {
             this._titleGroup.remove();
             this._titleGroup = null;
@@ -759,12 +766,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * Helper function to append units to the title
          *
          */
-        _computeUnits: function(appendUnitInTitle, completeSeriesConfig, title) {
+        _computeUnits: function(appendUnitInTitle, title, unit) {
           var result = '';
-
-          if(appendUnitInTitle && this.completeSeriesConfig[this.seriesId]
-                && this.completeSeriesConfig[this.seriesId].yAxisUnit) {
-              result = ' [' + this.completeSeriesConfig[this.seriesId].yAxisUnit + ']';
+          if(appendUnitInTitle && this.unit) {
+            result = ' [' + this.unit + ']';
           }
 
           return result;
