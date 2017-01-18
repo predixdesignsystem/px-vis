@@ -1,5 +1,6 @@
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-chart.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="px-vis-axis.html"/>
 <link rel="import" href="px-vis-axis-brush.html"/>
@@ -69,6 +70,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
       <template id="bof" is="dom-repeat" items="[[_internalDimensions]]">
         <px-vis-axis
+          id="[[item]]"
+          axis-id="[[item]]"
           svg="[[_returnGroup(index, _internalDimensionsChanged)]]"
           axis="[[_returnY(item, _internalDimensionsChanged)]]"
           series-id="[[item]]"
@@ -86,6 +89,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           truncation-length="[[truncationLength]]"
           complete-series-config="[[completeSeriesConfig]]"
           append-unit-in-title="[[appendUnitInTitle]]"
+          unit="[[_getUnit(item, completeSeriesConfig)]]"
           prevent-series-bar="[[preventSeriesBar]]"
           domain-changed="[[_internalDimensionsChanged]]"
           selected-domain="[[selectedDomain]]"
@@ -145,7 +149,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       PxVisBehavior.seriesToAxes,
       PxVisBehaviorDrag.parallelAxisDrag,
       PxVisBehaviorDrag.cartesianDrag,
-      PxColorsBehavior.baseColors
+      PxColorsBehavior.baseColors,
+      PxVisBehaviorChart.subConfiguration
     ],
 
     /**
@@ -328,10 +333,14 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       _pokeOrientation: {
         type: Boolean,
         value: false
+      },
+      axisCofig: {
+        type: Object
       }
     },
 
     observers: [
+      '_yAxisConfigChanged(yAxisConfig.*)',
       '_computedInternalDimensions(domainChanged,dimensions.*,svg, dragBehavior)',
       '_recalcGTransforms(leftAxisSize, rightAxisSize)',
       '_toggleTitleLocation(length)'
@@ -341,7 +350,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       'px-axis-done': '_setAxisStyles',
       'px-vis-axis-displayed-title-changed': '_displayedTitleChanged',
       'px-vis-recalc-title-location' : '_toggleTitleLocation',
-      "px-axis-orientation-changed" : '_toggleOrientation'
+      "px-axis-orientation-changed" : '_toggleOrientation',
+      "dom-change": '_axisConfigChanged'
     },
 
     _setDragBehavior: function() {
@@ -349,6 +359,17 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         this.createCartesianDrag();
       } else {
         this.createParallelAxisDrag();
+      }
+    },
+
+    _axisConfigChanged: function(conf) {
+      if(this.axisConfig) {
+        var axes = Object.keys(this.axisConfig);
+        for(var i = 0; i < axes.length; i++) {
+          if(this.$$('#' + axes[i])) {
+            this._applyConfigToElement(this.axisConfig[axes[i]], this.$$('#' + axes[i]));
+          }
+        }
       }
     },
 
@@ -717,8 +738,13 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
     _toggleOrientation: function() {
       this.set('_pokeOrientation', !this._pokeOrientation);
+    },
 
-      // this.$.bof.render();
+    _getUnit: function(item, completeSeriesConfig) {
+      if(this.completeSeriesConfig[item] && this.completeSeriesConfig[item].yAxisUnit) {
+       return this.completeSeriesConfig[item].yAxisUnit
+      }
+      return
     }
   });
 </script>
