@@ -748,7 +748,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          *
          */
         _drawBar:function(elem,sid,color,index) {
-          var w = elem.select('.axis-title').node().getBoundingClientRect()['height'];
+          var w = elem.select('.axis-title').node().getComputedTextLength();
           elem.append('rect')
             // .attr('height', 2)
             .attr('height',3)
@@ -756,7 +756,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .attr('fill',color)
             .attr('series-bar-id','bar_' + sid)
             // .attr('transform','translate(-12,' + (-3 -w - 5 * index) + ')')
-            .attr('transform', 'translate(-12,' + (5 - w - 8 * index) + ')')
+            .attr('transform', 'translate(-12,' + ( -w/2 - 10 - 8 * index) + ')')
             .attr('opacity', function() {
               return (this.mutedSeries && this.mutedSeries[sid]) ? 0.5 : 1;
             }.bind(this));
