@@ -103,7 +103,7 @@ PxVisBehaviorScale.scale = {
    *
    * @method _setScale
    */
-  _setScale: function(type, range, currentAxis, isMultiAxis, key){
+  _setScale: function(type, range, currentAxis, isMultiAxis, key) {
     // TODO support more types: log, quantile, etc
 
     // FIXME This is somewhat silly; we recreate the scale every time b/c otherwise the observer wont rerun. Rethink this so we can just update range when necessary.
@@ -479,15 +479,17 @@ PxVisBehaviorScale.scale = {
 
     // if we indicated we need to search for extent values
     if(search) {
+      var seriesList = Object.keys(seriesToSearch);
       for(var i = 0; i < this.chartData.length; i++) {
-        for(var j = 0; j < seriesToSearch.length; j++) {
-          var series = seriesToSearch[j],
-              axis = series.axis;
-          if(series.min) {
-            exts[axis][0] = Math.min(this.chartData[i][series], exts[axis][0]);
+        for(var j = 0; j < seriesList.length; j++) {
+          var s = seriesList[j],
+              series = seriesToSearch[s],
+              axis = series['axis'];
+          if(series.min && this.chartData[i][s]) {
+            exts[axis][0] = Math.min(this.chartData[i][s], exts[axis][0]);
           }
-          if(series.max) {
-            exts[axis][1] = Math.max(this.chartData[i][series], exts[axis][1]);
+          if(series.max && this.chartData[i][s]) {
+            exts[axis][1] = Math.max(this.chartData[i][s], exts[axis][1]);
           }
         }
       }
