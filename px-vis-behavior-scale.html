@@ -142,41 +142,31 @@ PxVisBehaviorScale.scale = {
       // indicate we are calculating the domain
       this._calculatingDomain = true;
 
-      // Check if you are zoomed in and resize window, make sure you keep your extents
-      if(!this._chartDataHasChanged && this.selectedDomain.x && this.selectedDomain.x.length
-      && ((this.selectedDomain.y && this.selectedDomain.y.length) || (this.xAxisType === 'time' || this.xAxisType === 'timeLocal'))) {
+      var extents = this._determineExtents();
 
-        this._updateDomain(this.selectedDomain);
+      this.x.domain(extents.x);
 
-      //if not zoomed in, figure out our domain
-      } else {
-
-        var extents = this._determineExtents();
-
-        this.x.domain(extents.x);
-
-        if(typeof this.y === 'object') {
-          for(var i = 0; i < this.axes.length; i++){
-            if(!this.y[this.axes[i]]) {
-              continue;
-            }
-
-            if(this.matchTicks && !this.singleDomain) {
-              var min = Math.floor(extents.y[this.axes[i]][0]/10)*10,
-                  max = Math.ceil(extents.y[this.axes[i]][1]/10)*10;
-
-              this.y[this.axes[i]].domain([min,max]);
-            } else {
-              this.y[this.axes[i]].domain(extents.y[this.axes[i]]);
-            }
+      if(typeof this.y === 'object') {
+        for(var i = 0; i < this.axes.length; i++){
+          if(!this.y[this.axes[i]]) {
+            continue;
           }
-        } else {
-          this.y.domain(extents.y);
-        }
 
-        // Set the domains
-        this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+          if(this.matchTicks && !this.singleDomain) {
+            var min = Math.floor(extents.y[this.axes[i]][0]/10)*10,
+                max = Math.ceil(extents.y[this.axes[i]][1]/10)*10;
+
+            this.y[this.axes[i]].domain([min,max]);
+          } else {
+            this.y[this.axes[i]].domain(extents.y[this.axes[i]]);
+          }
+        }
+      } else {
+        this.y.domain(extents.y);
       }
+
+      // Set the domains
+      this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
 
       this._calculatingDomain = false;
     }
@@ -428,7 +418,6 @@ PxVisBehaviorScale.scale = {
         a;
 
     for(var i = 0; i < this.axes.length; i++) {
-      // debugger
       a = this.axes[i];
       exts[a] = [];
       exts[a][0] = this._defaultScaleValue.y[0];
@@ -540,13 +529,15 @@ PxVisBehaviorScale.scale = {
         leftAxisSize = leftAxisSize || 50,
         rightAxisSize = rightAxisSize || 50;
 
+    if(allDims.length === 0) {
+      return
+    }
+
     var s = function(d) {
       if(leftDims.indexOf(d) !== -1) {
         return leftDims.indexOf(d) * leftAxisSize * -1;
       } else if(rightDims.indexOf(d) !== -1) {
         return rightDims.indexOf(d) * rightAxisSize;
-      } else {
-        console.warn("Error in axis scale")
       }
     }
 

@@ -367,7 +367,7 @@ PxVisBehaviorChart.chartCommon = [{
      *
      */
     _chartTypeLine: function(key,obj) {
-        return obj[key]['type'] === 'line';
+        return obj && obj[key] && obj[key]['type'] === 'line';
     },
 
     /**
@@ -375,7 +375,7 @@ PxVisBehaviorChart.chartCommon = [{
      *
      */
     _chartTypeScatter: function(key,obj) {
-      return obj[key]['type'] === 'scatter';
+      return obj && obj[key] && obj[key]['type'] === 'scatter';
     },
 
     /**
@@ -1693,6 +1693,11 @@ PxVisBehaviorChart.multiAxis = [{
       notify: true
     },
 
+    _axisDomainChanged: {
+      type: Boolean,
+      value: null
+    },
+
     multiChartExtents: {
       type: Object,
       value: function() {
@@ -1753,8 +1758,12 @@ PxVisBehaviorChart.multiAxis = [{
     this.set('axes', lDims.concat(rDims));
     this.set('dimensions', this.axes);
     this.set('seriesToAxes', seriesToAxes);
-
+console.log(seriesToAxes);
     this.set('_axisX', this._setAxisScale(lDims.sort(), rDims.sort(), this.leftAxisSize, this.rightAxisSize));
+
+    if(typeof this._axisX === 'function') {
+      this.set('_axisDomainChanged', !this._axisDomainChanged);
+    }
 
   },
 
