@@ -741,8 +741,18 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     },
 
     _getUnit: function(item, completeSeriesConfig) {
+      //if we are dealing with the axes in completeSeriesConfig (|| and radar)
       if(this.completeSeriesConfig[item] && this.completeSeriesConfig[item].yAxisUnit) {
-       return this.completeSeriesConfig[item].yAxisUnit
+        return this.completeSeriesConfig[item].yAxisUnit
+
+      //if we are dealing with axes not in completeSeriesConfig (cartesian)
+      } else if(this.seriesToAxes && this.seriesToAxes[item]) {
+        for(var i = 0; i < this.seriesToAxes[item].length; i++) {
+          var series = this.seriesToAxes[item][i];
+          if(this.completeSeriesConfig[series] && this.completeSeriesConfig[series]['yAxisUnit']) {
+            return this.completeSeriesConfig[series]['yAxisUnit']
+          }
+        }
       }
       return
     }
