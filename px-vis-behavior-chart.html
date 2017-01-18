@@ -1179,7 +1179,7 @@ PxVisBehaviorChart.multiAxis = [{
         rSet = {},
         lDims = [],
         rDims = [],
-        dims = {};
+        seriesToAxes = {};
 
     for(var i = 0; i < keys.length; i++) {
       if(this.completeSeriesConfig[keys[i]]['axis']) {
@@ -1188,10 +1188,10 @@ PxVisBehaviorChart.multiAxis = [{
             axisId = axis.id;
 
         // associates a series with an axes
-        if(dims[axisId]) {
-          dims[axisId].push(k);
+        if(seriesToAxes[axisId]) {
+          seriesToAxes[axisId].push(k);
         } else {
-          dims[axisId] = [ k ];
+          seriesToAxes[axisId] = [ k ];
         }
 
         // count how many axes on each side
@@ -1202,26 +1202,29 @@ PxVisBehaviorChart.multiAxis = [{
           }
 
           rSet[axisId] = true;
+          rDims[axis["number"]] = axisId;
         } else {
           if(rSet[axisId]) {
             console.warn(axis.id + ' is defined on both the left and right side. Defaulting to right')
             continue;
           }
-          
+
           lSet[axisId] = true;
+          lDims[axis["number"]] = axisId;
         }
       }
     }
 
-    lDims = Object.keys(lSet);
-    rDims = Object.keys(rSet);
+    // strip out undefines
+    lDims = lDims.filter(Boolean);
+    rDims = rDims.filter(Boolean);
 
     this.set('_numLeftAxes', lDims.length);
     this.set('_numRightAxes', rDims.length);
 
-    this.set('axes', Object.keys(dims).sort());
+    this.set('axes', lDims.concat(rDims));
     this.set('dimensions', this.axes);
-    this.set('seriesToAxes', dims);
+    this.set('seriesToAxes', seriesToAxes);
 
     this.set('_axisX', this._setAxisScale(lDims.sort(), rDims.sort(), this.leftAxisSize, this.rightAxisSize));
 

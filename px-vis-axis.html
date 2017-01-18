@@ -245,15 +245,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         ],
 
         detached: function() {
-          if(this._axisGroup) {
-            this._axisGroup.remove();
-            this._axisGroup = null;
-          }
-
-          if(this._titleGroup) {
-            this._titleGroup.remove();
-            this._titleGroup = null;
-          }
+          this.removeAxis();
+          
           if(this.drawnTickValues && this.drawnTickValues.length > 0) {
             this.set('drawnTickValues', []);
           }
@@ -390,6 +383,19 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           }
         },
 
+        removeAxis: function() {
+          // remove the axis
+          if(this._axisGroup) {
+            this._axisGroup.remove();
+            this._axisGroup = null;
+          }
+
+          if(this._titleGroup) {
+            this._titleGroup.remove();
+            this._titleGroup = null;
+          }
+        },
+
         /**
          * Draws the axis
          *
@@ -399,16 +405,13 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         //  this.debounce('drawAxis', function() {
             if(this._animationFrameDone && this.svg.node() && this.domainChanged !== null) {
 
+              this.removeAxis();
+
               this.defineAxis();
 
-              // checks to see if the axis already exists. If not, create; if so, update
-              if(!this._axisGroup) {
-                this._buildAxis();
-                // alert parents that we are done drawing the axis
-                this.fire('px-axis-done');
-              } else {
-                this._updateAxis();
-              }
+              this._buildAxis();
+              // alert parents that we are done drawing the axis
+              this.fire('px-axis-done');
 
             }
           // }, 5);

@@ -308,7 +308,8 @@ PxVisBehaviorDrag.cartesianDrag = [{
         var rDims = this.x.rightDomain(),
             lDims = this.x.leftDomain(),
             side = rDims.indexOf(d) !== -1 ? "right" : "left",
-            num = rDims.indexOf(d) !== -1 ? rDims.indexOf(d) : lDims.indexOf(d);
+            num = rDims.indexOf(d) !== -1 ? rDims.indexOf(d) : lDims.indexOf(d),
+            orientationChanged = false;
 
         //get the x coordinate bounded by our chart extents
         if(side === 'left') {
@@ -318,32 +319,48 @@ PxVisBehaviorDrag.cartesianDrag = [{
         }
 
       // reorder dynamically:
-        // this.axes.sort(function(a, b) { return this._position(a) - this._position(b); }.bind(this) );
         this.dimensions.sort(function(a, b) {
+          // if the axes are on the same side
           if(lDims.indexOf(a) !== -1 && lDims.indexOf(b) !== -1) {
             return this._position(b) - this._position(a);
           } else if(rDims.indexOf(a) !== -1 && rDims.indexOf(b) !== -1) {
             return this._position(a) - this._position(b);
+
+          // if the axes are on different sides
           } else {
             if(side === "left") {
-              if(this._position(a) > this.width - this.margin.left - this.margin.right) {
-                return 1
+              if(this._position(lDims[0]) > this.width - this.margin.left - this.margin.right) {
+                orientationChanged = true;
               }
             } else {
-              if(this._position(b) < -this.width + this.margin.left + this.margin.right) {
-                return 1
+              if(this._position(rDims[0]) < -this.width + this.margin.left + this.margin.right) {
+                orientationChanged = true;
               }
             }
+            // dont swap positions; we'll do that manually
             return 0
           }
         }.bind(this));
 
-        var l = this.x.leftDomain().length;
-        var r = this.x.rightDomain().length;
+        if(orientationChanged) {
+          var l = lDims[0];
+          lDims[0] = rDims[0];
+          rDims[0] = l;
 
-        this.x.leftDomain(this.dimensions.slice(0,l));
-        this.x.rightDomain(this.dimensions.slice(l));
-        this.fire("px-axis-orientation-changed");
+          this.x.leftDomain(lDims);
+          this.x.rightDomain(rDims);
+
+          this.set('dimensions', lDims.concat(rDims));
+
+          this.fire("px-axis-orientation-changed");
+        } else {
+          // how many axes do we have on each side; maintain that proportion
+          var l = lDims.length;
+          var r = rDims.length;
+
+          this.x.leftDomain(this.dimensions.slice(0,l));
+          this.x.rightDomain(this.dimensions.slice(l));
+        }
 
         // move the currently grabed axis (and reorder the others if above is active)
         this.axisGroups.attr("transform", function(d) {
