@@ -132,7 +132,7 @@ Element which draws lines series onto the chart
     },
 
     observers: [
-      'drawElement(svg, domainChanged, chartData.*, completeSeriesConfig.*, counterClockwise)',
+      'drawElement(svg, y, domainChanged, chartData.*, completeSeriesConfig.*, counterClockwise)',
       'isIdInMuted(mutedSeries.*, completeSeriesConfig)',
       '_addClipPath(clipPath)',
       '_drawOnTop(serieToRedrawOnTop)'
@@ -158,6 +158,7 @@ Element which draws lines series onto the chart
       this.debounce('draw',function() {
         if(this.domainChanged !== null &&
             this._doesD3HaveValues(this.svg) &&
+            this.y &&
             this.chartData.length > 0 &&
             this._doesObjHaveValues(this.completeSeriesConfig)
           ) {

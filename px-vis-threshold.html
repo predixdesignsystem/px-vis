@@ -163,11 +163,13 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
      * @method drawElement
      */
     drawElement: function() {
-      // checks to see if the threshold already exists. If not, create; if so, update
-      if(this._animationFrameDone && this._isObjEmpty(this.thresholdGroup)) {
-        this._firstDrawing();
-      } else {
-        this._updateDrawing();
+      if(this.domainChanged !== null && this.y && (typeof this.y === 'function' || this._doesObjHaveValues(this.y))) {
+        // checks to see if the threshold already exists. If not, create; if so, update
+        if(this._animationFrameDone && this._isObjEmpty(this.thresholdGroup)) {
+          this._firstDrawing();
+        } else {
+          this._updateDrawing();
+        }
       }
     },
     /**
@@ -287,7 +289,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
     _getYVal: function(d) {
       if(typeof this.y === 'object') {
         // is for in our seriesConfig?
-        if(this.completeSeriesConfig[d.for] && this.completeSeriesConfig[d.for]['axis'] && this.completeSeriesConfig[d.for]['axis']['id']) {
+        if(this.completeSeriesConfig[d.for] && this.completeSeriesConfig[d.for]['axis'] && this.completeSeriesConfig[d.for]['axis']['id'] && this.y[this.completeSeriesConfig[d.for]['axis']['id']]) {
           var axis = this.completeSeriesConfig[d.for]['axis']['id'];
           return this.y[axis](d.value);
 
