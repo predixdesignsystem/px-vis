@@ -500,6 +500,7 @@ PxVisBehavior.tooltipData = {
      *```
      *    {
      *        "time": "2015-03-25T20:34:47.085Z",
+     *        "hidden": false,
      *        "series":[{
      *            "name":"seriesId1",
      *            "coord":[xCoord1, yCoord1],  //in pixel space
@@ -526,6 +527,7 @@ PxVisBehavior.tooltipData = {
      *```
      *    {
      *        "time": null,
+     *        "hidden": true,
      *        "series":[{
      *            "name":"seriesId1",
      *            "value": null
@@ -1611,7 +1613,7 @@ PxVisBehavior.dynamicMenuConfig = {
      * [
      *     {
      *      'name': 'Delete',
-     *       'action': function(itemConfig, additionalDetail) {
+     *       'action': function(data) {
      *         console.log('run delete');
      *       },
      *       'actionContext': aComponent,
@@ -1620,7 +1622,7 @@ PxVisBehavior.dynamicMenuConfig = {
      *     },
      *     {
      *       'name': 'Bring To Front',
-     *       'action': function(itemConfig, additionalDetail) {
+     *       'action': function(data) {
      *         console.log('run bring to front');
      *       },
      *       'eventName': 'bring-to-front',
@@ -1631,15 +1633,17 @@ PxVisBehavior.dynamicMenuConfig = {
      *
      * - `action` is function that will be run when a menu item is clicked. You can pass
      * a specific context to be used in that function through `actionContext`. Otherwsie the
-     * context is going to be the px-vis-dynamic-menu component. The `itemConfig`
-     * parameter is this specific menu item config object and `additionalDetail` represents the
+     * context is going to be the chart itself. The `data` parameter has 2 properties: `itemConfig`
+     * which is this specific menu item config object and `additionalDetail` which represents the
      * register item: `value` and `name` (name is the serie id). Please note that because `itemConfig`
-     * is being passed back you could tie anything to it and have it available in this function
+     * is being passed back you could tie anything to it and have it available in this function.
+     * If dynamicMenuConfig is passed in directly in the HTML then `action` will have to be passed in
+     * as a string with quotes escaped rather than directly as a function.
      * - `name` is the menu item displayed text
-     * - `eventName` is the text that will be appended to 'px-vis-dynamic-menu-' to create an event name.
-     * If defined an event with this name will be fired when clicking an item. the detail of this event
-     * will include `itemConfig` and `additionalDetail` just like `action` is getting.
-     * - `icon` is optional and defined a font-awesome icon to be used for the menu entry
+     * - if `eventName` is defined then an event with this name will be fired when clicking the item
+     * the detail of this event will include `data` which ahs 2 properties: `itemConfig` and `additionalDetail`
+     * just like `action` is getting. The event is fired from the chart
+     * - `icon` is optional and defines a font-awesome icon to be used for the menu entry
      *
      */
     dynamicMenuConfig: {
@@ -1663,16 +1667,14 @@ PxVisBehavior.actionConfig = {
       * Configuration used to define what actions happen on events. Each key represents an event,
       * each value can be:
       * - a predefined action found in px-vis-interaction-space `actionMapping`
-      * - a function which context will be bound to the px-vis-interaction-space
+      * - a function which context will be bound to the chart
       */
     actionConfig: {
       type: Object,
       notify: true,
       value: {
-        // 'mousedown': 'startZooming',
-        // 'mouseup': 'stopZooming',
-        // 'mousedown': 'startPanning',
-        // 'mouseup': 'stopPanning',
+        'mousedown': 'startZooming',
+        'mouseup': 'stopZooming',
         'mouseout': 'resetTooltip',
         'mousemove': 'calcTooltipData'
       }
@@ -1680,5 +1682,103 @@ PxVisBehavior.actionConfig = {
   }
 };
 
+/*
+    Name:
+    PxVisBehavior.toolbarConfig
+
+    Description:
+    Polymer behavior that provides the toolbarConfig property
+
+    @polymerBehavior PxVisBehavior.toolbarConfig
+*/
+PxVisBehavior.toolbarConfig = {
+  properties: {
+    /**
+       * Configuration object for the toolbar. This object drives what buttons are available on 
+       * the toolbar and what they do. Three actions can be used out of the box by passing them
+       * as keys in this config: 'zoom', 'pan' and 'tooltip'. Any other kind of actions and 
+       * buttons can be defined through this object.
+       * Example of a custom config:
+       * ```
+       * {
+       *   "customzoom": {
+       *     "tooltipLabel": "zoom",          //label used for the tooltip for this button
+       *     "icon": "fa-search",             //font-awesome icon used for this button
+       *     "buttonGroup": 1,              //if a button is part of a button group then it
+       * becomes blue when clicked and all other buttons with the same button group in the 
+       * same row become deselected (not blue)
+       *     "selected": true,                //force this button to be selected at start
+       *     "actionConfig": {                //this config will be propagated to 
+       * px-vis-interaction-space
+       *       "mousedown": "startZooming",   //key is an event, value is either a  
+       * predefined action defined in `actionMapping` in px-vis-interaction-space or a 
+       * function which context is bound to the chart
+       *         "mouseup": "stopZooming",
+       *         "mouseout": "null",          //by specifying null it ensures previous 
+       * actions registered against this event will be removed
+       *         "mousemove": "function() { console.log(\"Mouse moved on the chart!\");}"
+       *       },
+       *       "subConfig": {                 //subConfig allows you to defined a second row
+       * of buttons which will be displayed when clicking the main button
+       *         "x": {
+       *           "title": "X",              //you can use a title instead of/in addition to
+       * the icon
+       *           "tooltipLabel": "Zoom on X axis only",
+       *           "eventName": "my-custom-click", //an event will be fired when clicking on
+       * this button
+       *           "selectable": true,
+       *           "selected": true,
+       *           "onClick": "function() { this.set(\"selectionType\", \"xAxis\");}" //this 
+       * function will be run when clicking the button. The chart will be the context of this 
+       * function. If defined in HTML this needs to be a string, but if defined in javascript 
+       * this can be a function
+       *         },
+       *         "y": {
+       *           "title": "Y",
+       *           "tooltipLabel": "Zoom on Y axis only",
+       *           "selectable": true,
+       *           "onClick": "function() { this.set(\"selectionType\", \"yAxis\");}"
+       *         },
+       *         "xy": {
+       *           "title": "XY",
+       *           "tooltipLabel": "Zoom on X and Y axis",
+       *           "selectable": true,
+       *           "onClick": "function() { this.set(\"selectionType\", \"xy\");}"
+       *         },
+       *         "zoomIn": {
+       *           "icon": "fa-plus",
+       *           "tooltipLabel": "zoom in",
+       *           "eventName": "px-vis-toolbar-zoom-in" //those events are vis specific 
+       * events and are automatically caught by the chart to do something
+       *         },
+       *         "zoomOut": {
+       *           "icon": "fa-minus",
+       *           "tooltipLabel": "zoom out",
+       *           "eventName": "px-vis-toolbar-zoom-out"
+       *         },
+       *         "undoZoom": {
+       *           "icon": "fa-undo",
+       *           "tooltipLabel": "undo zoom",
+       *           "eventName": "px-vis-toolbar-undo-zoom"
+       *         },
+       *         "resetZoom": {
+       *           "icon": "fa-expand",
+       *           "tooltipLabel": "reset zoom to inital value",
+       *           "eventName": "px-vis-toolbar-reset-zoom"
+       *         }
+       *       }
+       *     },
+       *     "pan": true,           //default "out of the box" panning button
+       *     "tooltip": true        //default "out of the box" tooltip button
+       * ```
+       */
+      toolbarConfig: {
+        type: Object,
+        value: function() {
+          return {"zoom": true, "pan": true, "tooltip": true};
+        }
+      }
+  }
+};
 
 </script>

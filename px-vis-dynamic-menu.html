@@ -175,9 +175,32 @@ Element providing an on-chart zoom.
       //if a function has been defined for this entry then run it
       if(item.action) {
 
+        var action = item.action;
+        
+        //parse function if it's a string
+        if(typeof item.action === 'string') {
+          var fn = eval('var f = function() { return ' + action + ';}; f();');
+
+          item.action = fn;
+        }
+
         //make sure we use a specific context if it exists
-        var actionBound = item.actionContext ? item.action.bind(item.actionContext) : item.action.bind(this);
-        actionBound(item, this.additionalDetail);
+        if(item.actionContext) {
+          var actionBound = item.action.bind(item.actionContext);
+          actionBound({
+              'menuItem': item,
+              'additionalDetail': this.additionalDetail
+          });
+        } else {
+
+          //use chart context
+          this.fire('px-vis-action-request', {
+            'function': item.action, 
+            'data': {
+              'menuItem': item,
+              'additionalDetail': this.additionalDetail
+          }});
+        }
       }
 
       //fire an event if required
@@ -189,7 +212,7 @@ Element providing an on-chart zoom.
         detail.menuItem = item;
         detail.additionalDetail = this.additionalDetail;
         
-        this.fire('px-vis-dynamic-menu-' + item.eventName, detail);
+        this.fire('px-vis-event-request', {'eventName': item.eventName, 'data': detail})
       }
       this.set('_opened', false);
     },

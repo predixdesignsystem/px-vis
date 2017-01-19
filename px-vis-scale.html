@@ -185,6 +185,9 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         result = Px.d3.scaleLinear().nice().range(range);
       } else { //ordinal
         result = Px.d3.scalePoint().range(range).padding(0.5);
+        if(currentAxis) {
+          result.align(currentAxis.align());
+        }
       }
 
       if(currentAxis) {
@@ -477,7 +480,16 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
     _updateDomain:function(selectedDomain){
       if(this.x && this.y) {
         if(selectedDomain === 'reset') {
-          this._currentDomain();
+
+          //reset alignment for ordinals
+          if(this.xAxisType === 'ordinal') {
+            this.x.align(0.5);
+          }
+          if(this.yAxisType === 'ordinal') {
+            this.y.align(0.5);
+          }
+
+          this._currentDomain();          
         } else {
           //set new X domain if provided
           if(selectedDomain.x.length > 0) {

@@ -27,37 +27,39 @@ Element providing an on-chart zoom.
     <style include="px-vis-toolbar-styles"></style>
 
       <!--main row-->
-      <span class="flex flex--row--rev">
-        <template is="dom-repeat" items={{_internalConfig}} strip-whitespace>
-          <span class="u-p-- flex__item main-item" on-tap="_clickItem" value="{{index}}">
-            <i class$="fa [[_getIcon(item)]]" value="{{index}}">
-              <template is="dom-if" if="[[_hasTooltip(item)]]">
+      <span id="mainRow" class$="flex [[_getRowDirection(horizontalAlignment)]]">
+        <template id="mainRepeat" is="dom-repeat" items={{_internalConfig}} strip-whitespace>
+          <span class$="u-p-- flex__item main-item [[_getSelectedClass(item.selected)]]" on-tap="_clickItem" value="{{index}}">
+            <i class$="fa [[_getIcon(item)]] [[_getSelectedClass(item.selected)]]" value="{{index}}">
+            </i>{{item.title}}
+            <template is="dom-if" if="[[_hasTooltip(item)]]">
                 <px-tooltip 
                   tooltip-message="[[item.tooltipLabel]]"
                   orientation="top"
                   smart-orientation>
                 </px-tooltip>
               </template>
-            </i>
           </span>
         </template>
       </span>
       <!--sub row-->
-      <span class="flex flex--row--rev">
-        <template is="dom-repeat" items={{_currentSubConfig}} strip-whitespace>
-            <span class="u-p-- flex__item main-item" on-tap="_clickSubItem" value="{{index}}">
-              <i class$="fa [[_getIcon(item)]]" value="{{index}}">
+      <template id="templateSubRow" is="dom-if" if="[[_isWithinChart(withinChart)]]">
+        <span id="subRow" class$="flex [[_getRowDirection(horizontalAlignment)]] [[_getSubRowClass(withinChart)]]">
+          <template id="subRepeat" is="dom-repeat" items={{currentSubConfig}} strip-whitespace>
+              <span class$="u-p-- flex__item main-item [[_getSelectedClass(item.selected)]]" on-tap="_clickSubItem" value="{{index}}">
+                <i class$="fa [[_getIcon(item)]] [[_getSelectedClass(item.selected)]]" value="{{index}}">
+                </i>{{item.title}}
                 <template is="dom-if" if="[[_hasTooltip(item)]]">
-                  <px-tooltip 
-                    tooltip-message="[[item.tooltipLabel]]"
-                    orientation="top"
-                    smart-orientation>
-                  </px-tooltip>
-                </template>
-              </i>
-            </span>
-        </template>
-      </span>
+                    <px-tooltip 
+                      tooltip-message="[[item.tooltipLabel]]"
+                      orientation="top"
+                      smart-orientation>
+                    </px-tooltip>
+                  </template>
+              </span>
+          </template>
+        </span>
+      </template>
   </template>
 </dom-module>
 
@@ -67,7 +69,8 @@ Element providing an on-chart zoom.
     is: 'px-vis-toolbar',
 
     behaviors: [
-      PxVisBehavior.actionConfig
+      PxVisBehavior.actionConfig,
+      PxVisBehavior.toolbarConfig
     ],
 
     /**
@@ -78,9 +81,16 @@ Element providing an on-chart zoom.
      */
     properties: {
       /**
-       * Configuration object for the toolbar
+       * Whether the toolbar is within a chart. drives where the secondary toolbar is displayed
        */
-      toolbarConfig: {
+      withinChart: {
+        type: Boolean,
+        value: false
+      },
+      /**
+       * The charts margin. Used to position the secondary toolbar if withinChart is true
+       */
+      chartMargin: {
         type: Object
       },
       /**
@@ -100,21 +110,25 @@ Element providing an on-chart zoom.
             'tooltip': {
               'tooltipLabel': 'tooltip',
               'icon': 'fa-crosshairs',
+              'buttonGroup': 1,
               'actionConfig': {
                 'mouseout': 'resetTooltip',
-                'mousemove': 'calcTooltipData'
+                'mousemove': 'calcTooltipData',
+                'mousedown': 'null',
+                'mouseup': 'null'
               }
             },
             'pan': {
               'tooltipLabel': 'pan',
               'icon': 'fa-arrows',
+              'buttonGroup': 1,
               'actionConfig': {
                 'mousedown': 'startPanning',
-                'mouseup': 'stopPanning'
+                'mouseup': 'stopPanning',
               },
               'subConfig': {
                 'resetZoom': {
-                  'icon': 'fa-undo',
+                  'icon': 'fa-expand',
                   'tooltipLabel': 'reset zoom to inital value',
                   'eventName': 'px-vis-toolbar-reset-zoom'
                 }
@@ -123,6 +137,8 @@ Element providing an on-chart zoom.
             'zoom': {
               'tooltipLabel': 'zoom',
               'icon': 'fa-search',
+              'buttonGroup': 1,
+              'selected': true,
               'actionConfig': {
                 'mousedown': 'startZooming',
                 'mouseup': 'stopZooming',
@@ -154,20 +170,29 @@ Element providing an on-chart zoom.
         }
       },
       /**
-       * Current subconfiguration
+       * Current subconfiguration. Can be the result of the toolbarConfig or passed in from another toolbar
        */
-      _currentSubConfig: {
-        type: Object
+      currentSubConfig: {
+        type: Object,
+        notify: true
       },
       /**
        * Current config used to build the toolbar
        */
       _internalConfig: {
         type: Object
+      },
+      /**
+       * Horizontal alignment of the toolbar
+       */
+      horizontalAlignment: {
+        type: String,
+        value: 'right'
       }
     },
     observers: [
-      '_configChanged(toolbarConfig.*)'
+      '_configChanged(toolbarConfig.*, horizontalAlignment)',
+      '_positionSubRow(withinChart, chartMargin, horizontalAlignment)'
     ],
     listeners: {
     },
@@ -177,16 +202,24 @@ Element providing an on-chart zoom.
 
       for(var i=0; i<keys.length; i++) {
 
+        var toPush;
         //if this is a default action use it
         if(this._defaultActionsMapping[keys[i]]) {
-          internalConf.push(this._defaultActionsMapping[keys[i]]);
+          toPush = this._defaultActionsMapping[keys[i]];
         } else {
-          internalConf.push(this.toolbarConfig[keys[i]]);
+          toPush = this.toolbarConfig[keys[i]];
+        }
+        internalConf.push(toPush);
+
+        if(toPush.selected) {
+          this._tryProcessSubConfig(toPush);
         }
       }
 
       //reverse array to take flex row rev into account
-      internalConf.reverse();
+      if(this.horizontalAlignment === 'right') {
+        internalConf.reverse();
+      }
       this.set('_internalConfig', internalConf);
     },
     /**
@@ -194,30 +227,66 @@ Element providing an on-chart zoom.
      */
     _clickItem: function(evt) {
       evt = Polymer.dom(evt);
-      var conf = this._internalConfig[evt.localTarget.value];
+      var index = evt.localTarget.value,
+          conf = this._internalConfig[index];
       
+      //make it the current selection if it is in a buttonGroup
+      if(conf.buttonGroup) {
+        
+         //ensure we remember selection, deselect others and select this one
+        for(var i =0; i<this._internalConfig.length; i++) {
+          if(index !== i && this._internalConfig[i].buttonGroup === conf.buttonGroup) {
+            this.set('_internalConfig.#' + i + '.selected', false);
+          }
+        }
+        this.set('_internalConfig.#' + index + '.selected', true);
+      }
+
+      this._tryProcessSubConfig(conf);
+      this._processItem(conf);
+    },
+    _tryProcessSubConfig: function(conf) {
+      //process sub config if existing
       if(conf.subConfig) {
         var subConf = [],
             keys = Object.keys(conf.subConfig);
 
         //reverse order to take flex-row-reverse into account
-        for(var i=keys.length-1; i>-1; i--) {
-          subConf.push(conf.subConfig[keys[i]]);
+        if(this.horizontalAlignment === 'right') {
+          for(var i=keys.length-1; i>-1; i--) {
+            subConf.push(conf.subConfig[keys[i]]);
+          }
+        } else {
+          for(var i=0; i<keys.length; i++) {
+            subConf.push(conf.subConfig[keys[i]]);
+          }
         }
-
-        this.set('_currentSubConfig', subConf);
+        
+        this.set('currentSubConfig', subConf);
       } else {
-        this.set('_currentSubConfig', []);
+        this.set('currentSubConfig', []);
       }
-
-      this._processItem(conf);
     },
     /**
      * Called when clicking an item of the secondary toolbar. 
      */
     _clickSubItem: function(evt) {
       evt = Polymer.dom(evt);
-      var conf = this._currentSubConfig[evt.localTarget.value];
+      var index = evt.localTarget.value,
+          conf = this.currentSubConfig[index];
+
+      //make it the current selection if it is selectable
+      if(conf.buttonGroup) {
+
+        //ensure we remember selection, deselect others and select this one
+        
+        for(var i =0; i<this.currentSubConfig.length; i++) {
+          if(i !== index && this.currentSubConfig[i].buttonGroup === conf.buttonGroup) {
+            this.set('currentSubConfig.#' + i + '.selected', false);
+          }
+        }
+        this.set('currentSubConfig.#' + index + '.selected', true);
+      }
       
       this._processItem(conf);
     },
@@ -235,15 +304,59 @@ Element providing an on-chart zoom.
       }
 
       if(conf.eventName) {
-        this.fire(conf.eventName);
+
+        //fire the event fromt the chart's context
+        this.fire('px-vis-event-request', {'eventName': conf.eventName, 'data': conf});
+      }
+
+      if(conf.onClick) {
+        var fn;
+        if(typeof conf.onClick === 'function') {
+          fn = conf.onClick;
+        } else if (typeof conf.onClick === 'string') {
+          fn = eval('var f = function() { return ' + conf.onClick + ';}; f();');
+        }
+
+        //run it from the chart's context
+        this.fire('px-vis-action-request', {'function': fn, 'data': conf});
       }
     },
 
     _getIcon: function(item) {
       return item.icon ? (item.icon + ' u-mr--') : '';
     },
+    _getSelectedClass: function(selected) {
+      return selected ? 'selected ' : '';
+    },
     _hasTooltip: function(item) {
       return item.tooltipLabel && item.tooltipLabel.length;
+    },
+    _positionSubRow: function(withinChart, chartMargin) {
+      if(withinChart) {
+        //make sure dom if is up to date
+        this.$.templateSubRow.render();
+        this.$$('#subRow').style['top'] = Number(chartMargin.top) + 'px';
+        if(this.horizontalAlignment === 'left') {
+          this.$$('#subRow').style['left'] = Number(chartMargin.left) + 'px';
+        }
+      }
+    },
+    _getSubRowClass: function(withinChart) {
+      if(withinChart) {
+        return 'subrow--chart ';
+      } else {
+        return '';
+      }
+    },
+    _isWithinChart: function(withinChart) {
+      return withinChart;
+    },
+    _getRowDirection: function(horizontalAlignment) {
+      if(horizontalAlignment === 'right') {
+        return 'flex--row--rev ';
+      } else {
+        return 'flex--row ';
+      }
     }
   });
 </script>

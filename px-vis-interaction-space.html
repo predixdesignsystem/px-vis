@@ -73,6 +73,14 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     * fires an update to the tooltip
     * @event px-vis-tooltip-updated
     */
+    /*
+    * fired when panning starts
+    * @event px-vis-interaction-space-start-panning
+    */
+    /*
+    * fired when panning stop
+    * @event px-vis-interaction-space-stop-panning
+    */
 
     /**
      * Properties block, expose attribute values to the DOM via 'reflect'
@@ -190,24 +198,49 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
         var keys = Object.keys(this.actionConfig),
             mouseEvent,
-            action;
+            action,
+            bindingContext = this,
+            toBeUsed,
+            noChartContext;
 
         for(var i=0; i<keys.length; i++) {
 
-          mouseEvent = keys[i],
-          action = this.actionConfig[keys[i]],
+          mouseEvent = keys[i];
+          action = this.actionConfig[keys[i]];
           mappedAction = this[this.actionMapping[action]];
+          //toBeUsed = null;
+          noChartContext = false;
 
           //is this a function defined here
           if(mappedAction && typeof mappedAction === 'function') {
             //we don't need to remove previous handlers as if they have the same
             //mouseEVent name then they will be overriden
-            this._rect.on(mouseEvent, mappedAction.bind(this));
+            toBeUsed = mappedAction;
+            noChartContext = true;
           } else if(typeof action === 'function') {
-            this._rect.on(mouseEvent, action.bind(this));
+            toBeUsed = action;
           } else if(typeof action === 'string') {
-            var fn = eval('var f = function() { return ' + action + ';}; f();');
-            this._rect.on(mouseEvent, fn.bind(this));
+            toBeUsed = eval('var f = function() { return ' + action + ';}; f();');
+          }
+
+          if(toBeUsed) {
+
+            var wrapper;
+            if(noChartContext) {
+              wrapper = toBeUsed.bind(this);
+            } else {
+              //now ensure the action will be run within the context of the chart
+             var _this = this;
+
+             wrapper = function(evt) {
+                _this.fire('px-vis-action-request', {'function': this});
+              }.bind(toBeUsed);
+            }
+
+            this._rect.on(mouseEvent, wrapper);
+          } else {
+            //remove listener
+            this._rect.on(mouseEvent, null);
           }
         }
       }
@@ -220,13 +253,15 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
     /**
      * Helper function called on mouseout
-     * Hides the tooltip elements and resets tooltipData
+     * resets tooltipData
      *
      * @method _resetTooltipData
      */
     _resetTooltipData: function() {
+
       var ttD = {
             'time': null,
+            'hidden': true,
             'series': [],
             'mouse': null,
             'xArr': null,
@@ -292,6 +327,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
               // setup a holder for our data to pass out
               var dataObj = {
                 'time':(this.xAxisType === 'time' || this.xAxisType === 'timeLocal') ? x1 : null,
+                'hidden': false,
                 'series': [],
                 'mouse': mousePos,
                 'xArr': null,
@@ -519,42 +555,76 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         Px.d3.select(document).on('mousemove.action', this._updatePanning.bind(this));
 
         var mousePos = Px.d3.mouse(this._rect.node());
-        // use original svg so it draws under the _rect and does not interfer with our mouse events
 
-        this._panningStartVal = [this.x.invert(mousePos[0]), this.y.invert(mousePos[1])];
+        //for ordinal axis store mouse pos, for others the corresponding value
+        if(this.xAxisType === 'ordinal') {
+          this._panningStartVal[0] = mousePos[0]; 
+        } else {
+          this._panningStartVal[0] = this.x.invert(mousePos[0]); 
+        }
+
+        if(this.yAxisType === 'ordinal') {
+          this._panningStartVal[1] = mousePos[1];
+        } else {
+          this._panningStartVal[1] = this.y.invert(mousePos[1]);
+        }
 
         this.fire('px-vis-interaction-space-start-panning');
       }
     },
     _updatePanning: function() {
     
-        var newExtents = {},
-            mousePos = Px.d3.mouse(this._rect.node()),
-            currentPanningVal = [this.x.invert(mousePos[0]), this.y.invert(mousePos[1])],
-            diff = [(currentPanningVal[0] - this._panningStartVal[0]),
-                    (currentPanningVal[1] - this._panningStartVal[1])],
-            xDomain = this.x.domain(),
-            yDomain = this.y.domain();
+      var newExtents = {},
+          mousePos = Px.d3.mouse(this._rect.node()),
+          currentPanningVal,
+          diff,
+          xDomain = this.x.domain(),
+          yDomain = this.y.domain();
 
+        //for now ignore ordinal axis but allow panning along the other axis 
+        //if it's not ordinal as well
+        //X
+        if(this.xAxisType !== 'ordinal') {
+          currentPanningVal = this.x.invert(mousePos[0]);
+          diff = currentPanningVal - this._panningStartVal[0];
+          newExtents.eX = [xDomain[0] - diff, xDomain[1] - diff];
+        } else {
+          newExtents.eX = xDomain;
+          this._adjustOrdinalAlign(this.x, mousePos[0], this._panningStartVal[0]);
+          //store mouse pos for next update
+          this._panningStartVal[0] = mousePos[0];
+        }
+        
+        //Y
+        if(this.yAxisType !== 'ordinal') {
+          currentPanningVal = this.y.invert(mousePos[1]);
+          diff = currentPanningVal - this._panningStartVal[1];
+          newExtents.eY = [yDomain[0] - diff, yDomain[1] - diff];
+        } else {
+          //keep same domain and play on alignment for panning
+          newExtents.eY = yDomain;
+          this._adjustOrdinalAlign(this.y, mousePos[1], this._panningStartVal[1]);
+          //store mouse pos for next update
+          this._panningStartVal[1] = mousePos[1];
+        }
+        
+        this.set('extentsData', newExtents);      
+    },
+    _adjustOrdinalAlign: function(axis, mousePos, initialMousePos) {
+      var diff = (mousePos - initialMousePos)/2,
+          step = axis.step(),
+          axisRange = axis.range(),
+          outerSize = axis.step() * axis.padding(),
+          leftSize = outerSize * axis.align(),
+          //rightSize = outerSize * (1 - axis.align()),
+          newAlign;
 
-          //TODO: ordinal
-          newExtents.eX = [xDomain[0] - diff[0], xDomain[1] - diff[0]];
-          newExtents.eY = [yDomain[0] - diff[1], yDomain[1] - diff[1]];
-          // if(this.xAxisType === 'ordinal') {
-          //   extents.eX = this._getOrdinalRange(true, extents.x1, extents.x2);
-          // } else {
-          //   extents.eX = [this.x.invert(extents.x1), this.x.invert(extents.x2)];
-          // }
+      //adjust sizes with panning
+      leftSize = Math.min(Math.max(0, leftSize + diff), step);
+      //rightSize = Math.min(Math.max(0, rightSize - diff), step);
+      newAlign = Math.max(0, Math.min(leftSize/outerSize, 1));
 
-          //   if(this.yAxisType === 'ordinal') {
-          //     //Y axis is top to bottom
-          //     extents.eY = this._getOrdinalRange(false, extents.y2, extents.y1);
-          //   } else {
-          //     //Y axis is top to bottom
-          //     extents.eY = [this.y.invert(extents.y2), this.y.invert(extents.y1)];
-          //   }
-          
-          this.set('extentsData', newExtents);      
+      axis.align(newAlign);
     },
     _stopPanning: function() {
 

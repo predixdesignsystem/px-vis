@@ -1321,6 +1321,28 @@ PxVisBehaviorChart.zooming = [{
       value: function() {
         return [];
       }
+    },
+    /**
+     * Percentage used to calculate new extents when using zoomIn feature.
+     * The higher the number the more it will zoom in. should be less than 1.
+     */
+    zoomInPercentage: {
+      type: Number,
+      value: 0.5
+    },
+    /**
+     * Percentage used to calculate new extents when using zoomOut feature.
+     * The higher the number the more it will zoom out. should be less than 1.
+     */
+    zoomOutPercentage: {
+      type: Number,
+      value: 0.5
+    },
+    /**
+     * Original extents before zooming if one of the axis is ordinal
+     */
+    _originalOrdinalExtents: {
+      type: Array
     }
   },
   observers: [
@@ -1349,41 +1371,131 @@ PxVisBehaviorChart.zooming = [{
     }
   },
   _saveZoomState: function() {
+
+    //save ordinal domain if we aren't zoomed
+    if(this.zoomStack.length === 0 && (this.xAxisType === 'ordinal' || this.yAxisType === 'ordinal')) {
+      this.set('_originalOrdinalExtents', [this.x.domain(), this.y.domain()]);
+    }
     this.push('zoomStack', this.selectedDomain);
   },
   zoomIn: function() {
+    this._autoZoom(true);
+  },
+  zoomOut: function() {
+    this._autoZoom(false);
+  },
+  _autoZoom: function(isZoomIn) {
     this._saveZoomState();
 
-    var xMin = this.extentsData.eX[0],
-        xMax = this.extentsData.eX[1],
-        xRange = xMax - xMin,
-        yMin = this.extentsData.eY[0],
-        yMax = this.extentsData.eY[1],
-        yRange = yMax - yMin;
+    var xMin = this.x.domain()[0],
+        xMax = this.x.domain()[1],
+        yMin = this.y.domain()[0],
+        yMax = this.y.domain()[1],
+        newX,
+        newY;
     
+    if(this.xAxisType === 'ordinal') {
+      //add and remove values for ordinal
+      newX = this._calcNewOrdinalExtents(this.x.domain(), this._originalOrdinalExtents[0], isZoomIn);
+    } else {
+
+      //because we're going to apply a percentage to values we need to 
+      //make sure those values are linear
+      xMin = this._convertValue(xMin, this.xAxisType, true);
+      xMax = this._convertValue(xMax, this.xAxisType, true);
+
+      newX = this._calcNewLinearExtents(xMin, xMax, isZoomIn);
+
+      //make sure values are in the right format
+      newX[0] = this._convertValue(newX[0], this.xAxisType, false);
+      newX[1] = this._convertValue(newX[1], this.xAxisType, false);
+    }
+
+    if(this.yAxisType === 'ordinal') {
+      //add and remove values for ordinal
+      newY = this._calcNewOrdinalExtents(this.y.domain(), this._originalOrdinalExtents[1], isZoomIn);
+    } else {
+      //linear
+      newY = this._calcNewLinearExtents(yMin, yMax, isZoomIn);
+    }
+
     newExtents = {
-      eX: [xMin + xRange/2, xMax - xRange/2],
-      eY: [yMin + yRange/2, yMax - yRange/2]
+      eX: newX,
+      eY: newY
     };
     //this will kick zoom()
     this.set('extentsData', newExtents);
   },
-  zoomOut: function() {
-    this._saveZoomState();
+  _calcNewOrdinalExtents: function(currentDomain, originalDomain, isZoomIn) {
+    if(isZoomIn) {
+      this._calcNewZoomedInOrdinal(currentDomain, originalDomain);
+    } else {
+      this._calcNewZommedOutOrdinal(currentDomain, originalDomain);
+    }
+  },
+  _calcNewZoomedInOrdinal: function(currentDomain) {
 
-    var xMin = this.extentsData.eX[0],
-        xMax = this.extentsData.eX[1],
-        xRange = xMax - xMin,
-        yMin = this.extentsData.eY[0],
-        yMax = this.extentsData.eY[1],
-        yRange = yMax - yMin;
-    
-    newExtents = {
-      eX: [xMin - xRange/2, xMax + xRange/2],
-      eY: [yMin - yRange/2, yMax + yRange/2]
-    };
-    //this will kick zoom()
-    this.set('extentsData', newExtents);
+    var newCount = Math.ceil(currentDomain.length * this.zoomInPercentage),
+        removeCount = currentDomain.length - newCount,
+        removeOnLeft = Math.ceil(removeCount/2),
+        removeOnRight = Math.floor(removeCount/2);
+
+    currentDomain.splice(0, removeOnLeft);
+    currentDomain.splice(currentDomain.length - removeOnRight);
+
+    return currentDomain;
+  },
+  _calcNewZoomedOutOrdinal: function(currentDomain, originalDomain) {
+    var newCount = Math.min(Math.ceil(currentDomain.length / this.zoomOutPercentage), originalDomain.length),
+        addCount = newCount - currentDomain.length,
+        addOnLeft = Math.ceil(addCount/2),
+        addOnRight = Math.floor(addCount/2),
+        mostLeftIndex = originalDomain.indexOf(currentDomain[0]),
+        mostRightIndex = originalDomain.indexOf(currentDomain[currentDomain.length-1]);
+
+    //make sure we have enough columns on left
+    if(mostLeftIndex < addOnLeft) {
+      var diff = addOnLeft - mostLeftIndex;
+      addOnLeft -= diff;
+      addOnRight += diff;
+    }
+
+    //make sure we have enough columns on right
+    if(mostRightIndex < addOnRight) {
+      var diff = addOnRight - mostRightIndex;
+      addOnRight -= diff;
+      addOnLeft += diff;
+    }
+
+    //add on left
+    for(var i=1; i < addOnLeft + 1; i++) {
+      currentDomain.splice(0, 0, originalDomain[mostLeftIndex-i])
+    }
+
+    //add on right
+    for(var i=1; i < addOnRight + 1; i++) {
+      currentDomain.splice(currentDomain.length, 0, originalDomain[mostRightIndex+i])
+    }
+
+    return currentDomain;
+  },
+  _calcNewLinearExtents: function(min, max, isZoomIn) {
+    var range = max - min,
+        result = [];
+
+    result[0] = isZoomIn ? (min + (range * this.zoomInPercentage/2)) : 
+                            (min - (range * this.zoomOutPercentage/2));
+    result[1] = isZoomIn ? (max - (range * this.zoomInPercentage/2)) :
+                            (max + (range * this.zoomOutPercentage/2));
+
+    return result;
+  },
+  _convertValue: function(value, axisType, convertFrom) {
+    if(convertFrom) {
+      return axisType === 'time' ? Number(value) : value;
+    } else {
+      return axisType === 'time' ? new Date(value) : value;
+    }
   },
   /**
    * Sets the selectedDomain to the drawn zoom and shows the button
@@ -1406,6 +1518,117 @@ PxVisBehaviorChart.zooming = [{
 
     this.fire('px-vis-selected-domain-updated', { 'data':'reset', 'method': 'set', 'dataVar': 'selectedDomain' });
   }
-}, PxVisBehavior.extentsData, PxVisBehaviorD3.selectedDomain];
+}, PxVisBehavior.extentsData, PxVisBehaviorD3.selectedDomain, PxVisBehavior.axisTypes];
+
+/*
+    Name:
+    PxVisBehaviorChart.actionRequest
+
+    Description:
+    Behavior providing properties and logic running a function or firing an event within
+    the context of the chart
+    @polymerBehavior PxVisBehaviorChart.actionRequest
+*/
+PxVisBehaviorChart.actionRequest = {
+
+  listeners: {
+    'px-vis-action-request': '_actionRequest',
+    'px-vis-event-request': '_eventRequest'
+  },
+
+  /**
+   * Runs a custom function within the context of the chart
+   */
+  _actionRequest: function(evt) {
+   
+   var fn = evt.detail.function,
+       data = evt.detail.data;
+   if(fn) {
+
+     fn = fn.bind(this);
+     fn(data);
+   }
+
+   evt.stopPropagation();
+  },
+  /**
+   * Fires a custom event within the context of the chart
+   */
+  _eventRequest: function(evt) {
+
+    var eventName = evt.detail.eventName ? evt.detail.eventName : 'px-vis-event';
+    this.fire(evt.detail.eventName, {'data': evt.detail.data})
+
+    evt.stopPropagation();
+  },
+};
+
+/*
+    Name:
+    PxVisBehaviorChart.toolbarSubConfig
+
+    Description:
+    Behavior providing properties for the toolbar subconfig
+    @polymerBehavior PxVisBehaviorChart.toolbarSubConfig
+*/
+PxVisBehaviorChart.toolbarSubConfig = {
+
+  properties: {
+    /**
+     * TODO: comment
+     */
+    toolbarSubConfig: {
+      type: Object
+    }
+  }
+};
+
+/*
+    Name:
+    PxVisBehaviorChart.noDebounceOnPanning
+
+    Description:
+    Behavior removing debouynce on line drawing when panning
+    @polymerBehavior PxVisBehaviorChart.noDebounceOnPanning
+*/
+PxVisBehaviorChart.noDebounceOnPanning = {
+
+  properties: {
+    /**
+      * holds the previous drawing debounce timing (before panning)
+      */
+    _oldDrawDebouncedTime: {
+      type: Number
+    }
+  },
+  listeners: {
+    'px-vis-interaction-space-start-panning': '_startPanning',
+    'px-vis-interaction-space-stop-panning': '_stopPanning'
+  },
+  _startPanning: function() {
+
+    //remove draw debounce to have a smooth panning
+    var lineType = this.renderToCanvas ? 'px-vis-line-canvas' : 'px-vis-line-svg',
+        lines = Polymer.dom(this.root).querySelectorAll(lineType);
+
+    if(lines && lines.length > 0) {
+      this._oldDrawDebouncedTime = lines[0].drawDebounceTime;
+      for(var i=0; i<lines.length; i++) {
+        lines[i].set('drawDebounceTime', 0);
+      }
+    }
+  },
+  _stopPanning: function() {
+
+    var lineType = this.renderToCanvas ? 'px-vis-line-canvas' : 'px-vis-line-svg',
+        lines = Polymer.dom(this.root).querySelectorAll(lineType);
+
+    if(lines) {
+      for(var i=0; i<lines.length; i++) {
+        lines[i].set('drawDebounceTime', this._oldDrawDebouncedTime);
+      }
+    }
+  }
+};
 
 </script>

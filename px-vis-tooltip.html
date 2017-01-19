@@ -40,38 +40,40 @@ Element providing on-chart tooltip display
   <template>
     <style include="px-vis-tooltip-styles"></style>
 
-    <px-tooltip
-      id="tooltip"
-      tooltip-style="[[tooltipStyle]]"
-      for="[[hoverTarget]]"
-      delay="50"
-      orientation="[[orientation]]"
-      follow-mouse
-      mouse-coords="[[mousePosition]]">
-        <px-vis-register
-          id="register"
-          tooltip-style="[[tooltipStyle]]"
-          truncation-length="100"
-          groupings="[[_groupings]]"
-          force-date-time-display="[[forceDateTimeDisplay]]"
-          tooltip-data=[[tooltipData]]
-          chart-data="[[chartData]]"
-          x-axis-type="[[xAxisType]]"
-          y-axis-type="[[yAxisType]]"
-          complete-series-config="[[completeSeriesConfig]]"
-          muted-series="[[mutedSeries]]"
-          number-format="[[numberFormat]]"
-          number-format-culture="[[numberFormatCulture]]"
-          number-format-is-currency$="[[numberFormatIsCurrency]]"
-          number-format-currency="[[numberFormatCurrency]]"
-          number-format-zero="[[numberFormatZero]]"
-          first-date-time-format="[[firstDateTimeFormat]]"
-          second-date-time-format="[[secondDateTimeFormat]]"
-          separator="[[separator]]"
-          timezone="[[timezone]]"
-          prevent-min-size>
-        </px-vis-register>
-    </px-tooltip>
+    <template is="dom-if" if="[[_tooltipDataHidden(tooltipData)]]">
+      <px-tooltip
+        id="tooltip"
+        tooltip-style="[[tooltipStyle]]"
+        for="[[hoverTarget]]"
+        delay="50"
+        orientation="[[orientation]]"
+        follow-mouse
+        mouse-coords="[[mousePosition]]">
+          <px-vis-register
+            id="register"
+            tooltip-style="[[tooltipStyle]]"
+            truncation-length="100"
+            groupings="[[_groupings]]"
+            force-date-time-display="[[forceDateTimeDisplay]]"
+            tooltip-data=[[tooltipData]]
+            chart-data="[[chartData]]"
+            x-axis-type="[[xAxisType]]"
+            y-axis-type="[[yAxisType]]"
+            complete-series-config="[[completeSeriesConfig]]"
+            muted-series="[[mutedSeries]]"
+            number-format="[[numberFormat]]"
+            number-format-culture="[[numberFormatCulture]]"
+            number-format-is-currency$="[[numberFormatIsCurrency]]"
+            number-format-currency="[[numberFormatCurrency]]"
+            number-format-zero="[[numberFormatZero]]"
+            first-date-time-format="[[firstDateTimeFormat]]"
+            second-date-time-format="[[secondDateTimeFormat]]"
+            separator="[[separator]]"
+            timezone="[[timezone]]"
+            prevent-min-size>
+          </px-vis-register>
+      </px-tooltip>
+    </template>
   </template>
 </dom-module>
 
@@ -168,8 +170,10 @@ Element providing on-chart tooltip display
       } else {
         return 3;
       }
+    },
+
+    _tooltipDataHidden: function(tooltipData) {
+      return tooltipData.hidden !== true;
     }
-
-
   });
 </script>
