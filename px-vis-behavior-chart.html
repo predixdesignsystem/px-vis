@@ -1698,6 +1698,11 @@ PxVisBehaviorChart.multiAxis = [{
       value: null
     },
 
+    _multiAxisSeriesConfig: {
+      type: Object,
+      notify: true
+    },
+
     multiChartExtents: {
       type: Object,
       value: function() {
@@ -1758,12 +1763,14 @@ PxVisBehaviorChart.multiAxis = [{
     this.set('axes', lDims.concat(rDims));
     this.set('dimensions', this.axes);
     this.set('seriesToAxes', seriesToAxes);
-console.log(seriesToAxes);
     this.set('_axisX', this._setAxisScale(lDims.sort(), rDims.sort(), this.leftAxisSize, this.rightAxisSize));
 
     if(typeof this._axisX === 'function') {
       this.set('_axisDomainChanged', !this._axisDomainChanged);
     }
+    
+    // must decouple completeSeriesConfig from px-vis-multi-axis for timing reasons. Needs to set after dimensions
+    this.set('_multiAxisSeriesConfig', this.completeSeriesConfig);
 
   },
 
