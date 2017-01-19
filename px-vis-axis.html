@@ -450,29 +450,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
           this._calcDrawnTicks();
         },
-        /**
-         * Updates the axis
-         *
-         */
-        _updateAxis: function() {
-          this._axisGroup
-          .attr('transform', function() {
-            if(this.rotation) {
-              return 'rotate(' + (Number(this.rotation)) + ') translate(' + this.translateAmt.join(',') + ')';
-            } else {
-              return 'translate(' + this.translateAmt.join(',') + ')';
-            }
-          }.bind(this))
-          .call(this._axis);
-
-          this._setLineStyles(this._axisGroup,'line,path');
-          this._setLabelStyles(this._axisGroup);
-
-          this._calcDrawnTicks();
-
-          // alert parents that we are done drawing the axis
-          this.fire('px-axis-done');
-        },
 
         /**
          * Updates our ticks
@@ -633,6 +610,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          *
          */
         drawTitle: function() {
+
+          this.removeTitle();
+
           var ext = this._axisGroup.node().getBBox(),
               location = this._doesObjHaveValues(this.titleLocation) ? 'custom' : this.orientation,
               x,y,r,anchor;
@@ -674,7 +654,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               break;
           }
 
-          if(!this._titleGroup) {
+          // if(!this._titleGroup) {
             this._titleGroup = this.svg.append('g')
               .attr('class','title-group')
               .attr('for', this.axisId)
@@ -691,17 +671,17 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               .style('text-anchor', anchor)
               .attr('transform','rotate(' + r + ')');
 
-          } else {
-            this.svg.select('g.title-group[for=' + this.axisId + ']')
-              .attr('transform','translate(' + x + ',' + y + ')');
-            this.svg.select('g.title-group[for=' + this.axisId + '] text')
-              .attr('text-anchor', anchor)
-              .style('text-anchor', anchor)
-              .attr('fill',this._checkThemeVariable("--px-vis-axis-color", this.colors[this.axisColor]))
-              .attr('font-size', this.titleTypeSize + 'px')
-              .text(this.displayedTitle)
-              .attr('transform','rotate(' + r + ')');
-          }
+          // } else {
+          //   this.svg.select('g.title-group[for=' + this.axisId + ']')
+          //     .attr('transform','translate(' + x + ',' + y + ')');
+          //   this.svg.select('g.title-group[for=' + this.axisId + ']')
+          //     .attr('text-anchor', anchor)
+          //     .style('text-anchor', anchor)
+          //     .attr('fill',this._checkThemeVariable("--px-vis-axis-color", this.colors[this.axisColor]))
+          //     .attr('font-size', this.titleTypeSize + 'px')
+          //     .text(this.displayedTitle)
+          //     .attr('transform','rotate(' + r + ')');
+          // }
 
           this._processTooltip();
           this.set('titleDrawn', (this.titleDrawn === null) ? true : !this.titleDrawn);
@@ -714,8 +694,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           if(!this.preventSeriesBar && this._doesObjHaveValues(this.completeSeriesConfig) && this._axisGroup && this._titleGroup) {
 
             //reset bars...
-            this._titleGroup.selectAll('rect').remove();
-
+            // this._titleGroup.selectAll('rect').remove();
             // TODO do we need to move the title group based on how many series we have
             var keys = this.seriesOnAxis.length > 0 ? this.seriesOnAxis : Object.keys(this.completeSeriesConfig),
                 kLen = keys.length,
@@ -760,6 +739,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             .attr('opacity', function() {
               return (this.mutedSeries && this.mutedSeries[sid]) ? 0.5 : 1;
             }.bind(this));
+
         },
 
         /**
