@@ -10,7 +10,6 @@ function runTests() {
         deleteCounter = 0,
         deleteCounterEvent = 0,
         bringToFrontCounter = 0,
-        bringToFrontCounterEvent = 0,
         someContext = {'isContext': true};
 
     suiteSetup(function() {
@@ -18,11 +17,11 @@ function runTests() {
       conf = [
           {
             'name': 'Delete',
-            'action': function(itemConfig, additionalDetail) {
+            'action': function(data) {
               deleteCounter++;
               assert.deepEqual(this, someContext);
-              assert.deepEqual(itemConfig, conf[0]);
-              assert.equal(additionalDetail.test, 'aString');
+              assert.deepEqual(data.menuItem, conf[0]);
+              assert.equal(data.additionalDetail.test, 'aString');
             },
             'actionContext': someContext,
             'eventName': 'delete',
@@ -30,28 +29,27 @@ function runTests() {
           },
           {
             'name': 'Bring To Front',
-            'action': function(itemConfig, additionalDetail) {
+            'action': function(data) {
               bringToFrontCounter++;
-              assert.equal(this, menu);
-              assert.deepEqual(itemConfig, conf[1]);
-              assert.equal(additionalDetail.test, 'aString');
+              assert.deepEqual(data.menuItem, conf[1]);
+              assert.equal(data.additionalDetail.test, 'aString');
             },
-            'eventName': 'bring-to-front',
             'icon': 'fa-arrow-up'
           }
         ];
         
         menu.set('dynamicMenuConfig', conf);
 
-      document.addEventListener('px-vis-dynamic-menu-delete',function(evt) {
+      document.addEventListener('px-vis-event-request', function(evt) {
+        assert.equal(evt.detail.eventName, 'delete');
         deleteCounterEvent++;
-        assert.deepEqual(evt.detail.menuItem, conf[0]);
-        assert.equal(evt.detail.additionalDetail.test, 'aString');
       });
-      document.addEventListener('px-vis-dynamic-menu-bring-to-front',function(evt) {
-        bringToFrontCounterEvent++;
-        assert.deepEqual(evt.detail.menuItem, conf[1]);
-        assert.equal(evt.detail.additionalDetail.test, 'aString');
+
+      //because bring to front has no context it's trying to reach the chart
+      document.addEventListener('px-vis-action-request',function(evt) {
+        evt.detail.function(evt.detail.data);
+        assert.deepEqual(evt.detail.data.menuItem, conf[1]);
+        assert.equal(evt.detail.data.additionalDetail.test, 'aString');
       });
     });
 
@@ -97,7 +95,6 @@ function runTests() {
     });
 
     test('click on delete', function() {
-      
       var deleteItem = Polymer.dom(menu.root).querySelectorAll('.menu-wrapper--item')[0];
       deleteItem.click();
 
@@ -111,7 +108,6 @@ function runTests() {
       bringToFront.click();
 
       assert.equal(bringToFrontCounter, 1);
-      assert.equal(bringToFrontCounterEvent, 1);
     });
   });
 
