@@ -770,33 +770,32 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             extents.eX = [this.x.invert(extents.x1), this.x.invert(extents.x2)];
           }
 
-            if(this.yAxisType === 'ordinal') {
+          if(this.yAxisType === 'ordinal') {
+            //Y axis is top to bottom
+            extents.eY = this._getOrdinalRange(false, extents.y2, extents.y1);
+          } else {
+            if(typeof this.y === 'object') {
               //Y axis is top to bottom
-              extents.eY = this._getOrdinalRange(false, extents.y2, extents.y1);
+              extents.eY = {};
+              var k = Object.keys(this.y);
+              for(var i = 0; i < k.length; i++) {
+                extents.eY[k[i]] = [this.y[k[i]].invert(extents.y2), this.y[k[i]].invert(extents.y1)];
+              }
             } else {
-              if(typeof this.y === 'object') {
-                //Y axis is top to bottom
-                extents.eY = {};
-                var k = Object.keys(this.y);
-                for(var i = 0; i < k.length; i++) {
-                  extents.eY[k[i]] = [this.y[k[i]].invert(extents.y2), this.y[k[i]].invert(extents.y1)];
-                }
-              } else {
-                //Y axis is top to bottom
-                extents.eY = [this.y.invert(extents.y2), this.y.invert(extents.y1)];
-              }
-              }
+              //Y axis is top to bottom
+              extents.eY = [this.y.invert(extents.y2), this.y.invert(extents.y1)];
             }
-
-            //save zoom state
-            this.fire('px-vis-save-zoom-state');
-
-            //set new extents
-            this.set('extentsData', extents);
-            this.fire('px-vis-extents-data-updated', {'data': extents, 'dataVar': 'extentsData', 'method': 'set'});
           }
-          this._actionArea.remove();
         }
+
+        //save zoom state
+        this.fire('px-vis-save-zoom-state');
+
+        //set new extents
+        this.set('extentsData', extents);
+        this.fire('px-vis-extents-data-updated', {'data': extents, 'dataVar': 'extentsData', 'method': 'set'});
       }
+      this._actionArea.remove();
+    }
   });
 </script>
