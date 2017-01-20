@@ -47,13 +47,16 @@ v1.0.0
 * Added px-vis-toolbar 
   * Toolbar items are configurable and each item can have:
     * a tooltip label
+    * a title
     * an event name (fired on click)
+    * a function run on click
     * an actionConfig used by px-vis-interaction space, allowing interactions on chart hover and click for example
     * an icon
     * a set of sub items which will be displayed in the "secondary" toolbar below when the item is clicked
   * Default actions of "zoom", "pan" and "tooltip" can be passed directly in the config
   * Custom defined functions can also be used in the actionConfig
 * Removed px-vis-zoom and provide the PxVisBehaviorChart.zooming behavior for charts instead
+* Added 'zoom in' and 'zoom out' buttons in zoom controls
 
 v0.8.4
 ==================
