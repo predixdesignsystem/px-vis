@@ -1378,7 +1378,13 @@ PxVisBehaviorChart.zooming = [{
 
     //save ordinal domain if we aren't zoomed
     if(this.zoomStack.length === 0 && (this.xAxisType === 'ordinal' || this.yAxisType === 'ordinal')) {
-      this.set('_originalOrdinalExtents', [this.x.domain(), this.y.domain()]);
+      
+      var domains;
+      domains = this._processYValues(domains, function(axis, index) {
+        return axis.domain();
+      });
+      
+      this.set('_originalOrdinalExtents', [this.x.domain(), domains]);
     }
     this.push('zoomStack', this.selectedDomain);
   },
@@ -1393,14 +1399,11 @@ PxVisBehaviorChart.zooming = [{
 
     var xMin = this.x.domain()[0],
         xMax = this.x.domain()[1],
-        yMin = this.y.domain()[0],
-        yMax = this.y.domain()[1],
-        newX,
-        newY;
+        newExtents = {};
     
     if(this.xAxisType === 'ordinal') {
       //add and remove values for ordinal
-      newX = this._calcNewOrdinalExtents(this.x.domain(), this._originalOrdinalExtents[0], isZoomIn);
+      newExtents.eX = this._calcNewOrdinalExtents(this.x.domain(), this._originalOrdinalExtents[0], isZoomIn);
     } else {
 
       //because we're going to apply a percentage to values we need to 
@@ -1408,33 +1411,38 @@ PxVisBehaviorChart.zooming = [{
       xMin = this._convertValue(xMin, this.xAxisType, true);
       xMax = this._convertValue(xMax, this.xAxisType, true);
 
-      newX = this._calcNewLinearExtents(xMin, xMax, isZoomIn);
+      newExtents.eX = this._calcNewLinearExtents(xMin, xMax, isZoomIn);
 
       //make sure values are in the right format
-      newX[0] = this._convertValue(newX[0], this.xAxisType, false);
-      newX[1] = this._convertValue(newX[1], this.xAxisType, false);
+      newExtents.eX[0] = this._convertValue(newExtents.eX[0], this.xAxisType, false);
+      newExtents.eX[1] = this._convertValue(newExtents.eX[1], this.xAxisType, false);
     }
 
     if(this.yAxisType === 'ordinal') {
       //add and remove values for ordinal
-      newY = this._calcNewOrdinalExtents(this.y.domain(), this._originalOrdinalExtents[1], isZoomIn);
+      newExtents.eY = this._processYValues(newExtents.eY, function(axis, index) {
+        var originalDomain = this._originalOrdinalExtents[1];
+        //multi Y
+        if(index) {
+          originalDomain = originalDomain[index];
+        }
+        return this._calcNewOrdinalExtents(axis.domain(), originalDomain, isZoomIn);
+      });
     } else {
       //linear
-      newY = this._calcNewLinearExtents(yMin, yMax, isZoomIn);
+      newExtents.eY = this._processYValues(newExtents.eY, function(axis, index) {
+        return this._calcNewLinearExtents(axis.domain()[0], axis.domain()[1], isZoomIn);
+      });
     }
 
-    newExtents = {
-      eX: newX,
-      eY: newY
-    };
     //this will kick zoom()
     this.set('extentsData', newExtents);
   },
   _calcNewOrdinalExtents: function(currentDomain, originalDomain, isZoomIn) {
     if(isZoomIn) {
-      this._calcNewZoomedInOrdinal(currentDomain, originalDomain);
+      return this._calcNewZoomedInOrdinal(currentDomain, originalDomain);
     } else {
-      this._calcNewZommedOutOrdinal(currentDomain, originalDomain);
+      return this._calcNewZommedOutOrdinal(currentDomain, originalDomain);
     }
   },
   _calcNewZoomedInOrdinal: function(currentDomain) {
@@ -1522,7 +1530,7 @@ PxVisBehaviorChart.zooming = [{
 
     this.fire('px-vis-selected-domain-updated', { 'data':'reset', 'method': 'set', 'dataVar': 'selectedDomain' });
   }
-}, PxVisBehavior.extentsData, PxVisBehaviorD3.selectedDomain, PxVisBehavior.axisTypes];
+}, PxVisBehavior.extentsData, PxVisBehaviorD3.selectedDomain, PxVisBehavior.axisTypes, PxVisBehaviorD3.axes];
 
 /*
     Name:
