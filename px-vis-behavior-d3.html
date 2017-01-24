@@ -1145,14 +1145,14 @@ PxVisBehaviorD3.lineShared = [{
     } else {
       line = Px.d3.line()
         .x(function(d,i) {
-          if(_this.chartData[i][xKey] && (_this.chartData[i][yKey] || _this.chartData[i][yKey] === null)) {
+          if((_this.chartData[i][xKey] || _this.chartData[i][xKey] === 0) && (_this.chartData[i][yKey] || _this.chartData[i][yKey] === 0 ||  _this.chartData[i][yKey] === null)) {
             return ~~_this.x(d[xKey]);
           } else {
             return ~~_this.x(_this.chartData[counter][xKey]);
           }
         })
         .y(function(d,i) {
-          if(_this.chartData[i][xKey] && (_this.chartData[i][yKey] || _this.chartData[i][yKey] === null)) {
+          if((_this.chartData[i][xKey] || _this.chartData[i][xKey] === 0) && (_this.chartData[i][yKey] || _this.chartData[i][yKey] === 0 ||  _this.chartData[i][yKey] === null)) {
             counter = i;
             return ~~_this.y(d[yKey]);
           } else {
