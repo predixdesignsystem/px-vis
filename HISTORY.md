@@ -43,7 +43,7 @@ v1.0.0
 * Ensure tooltip calculation are done based on pixel coordinates rather than values for non-time based charts
 * Added px-vis-dynamic-menu in register, allowing developers to pass in custom features/function available in a menu in the register through dynamicMenuConfig
 * Added actionConfig to px-vis-interaction-space, allowing to define custom interaction on chart hover or click for example
-* Added panning capability to px-vis-interaction-space
+* Added panning capability to px-vis-interaction-space. Please note that when panning a chart with ordinal axes it is not possible to pan past those axes.
 * Added px-vis-toolbar 
   * Toolbar items are configurable and each item can have:
     * a tooltip label

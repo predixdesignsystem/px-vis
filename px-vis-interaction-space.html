@@ -140,6 +140,13 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         value: function() {
           return [];
         }
+      },
+      /**
+       * if false will pass hidden: true in the tooltip data
+       */
+      showTooltip: {
+        type: Boolean,
+        value: true
       }
     },
 
@@ -233,7 +240,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
              var _this = this;
 
              wrapper = function(evt) {
-                _this.fire('px-vis-action-request', {'function': this});
+                _this.fire('px-vis-action-request', {'function': this, 'data': Px.d3.mouse(_this._rect.node())});
               }.bind(toBeUsed);
             }
 
@@ -327,7 +334,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
               // setup a holder for our data to pass out
               var dataObj = {
                 'time':(this.xAxisType === 'time' || this.xAxisType === 'timeLocal') ? x1 : null,
-                'hidden': false,
+                'hidden': !this.showTooltip,
                 'series': [],
                 'mouse': mousePos,
                 'xArr': null,

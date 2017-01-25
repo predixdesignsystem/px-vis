@@ -822,6 +822,34 @@ PxVisBehaviorChart.registerConfigs = {
 
 /*
     Name:
+    PxVisBehaviorChart.chartToolbarConfig
+
+    Description:
+    Behavior providing configuration for a toolbar for a chart
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorChart.chartToolbarConfig
+*/
+PxVisBehaviorChart.chartToolbarConfig = {
+  properties: {
+      /**
+      * Configuration object used to customize the toolbar
+      * Please refer to px-vis-toolbar (https://github.com/PredixDev/px-vis) for a list of supported properties.
+      * Most interesting properties include:
+      * - config (complex object for customizing the toolbar)
+      * - horizontalAlignment
+      * - subToolbarAlignment
+      */
+    toolbarConfig: {
+      type: Object
+    },
+  }
+};
+
+/*
+    Name:
     PxVisBehaviorChart.axisConfigs
 
     Description:
@@ -1575,7 +1603,8 @@ PxVisBehaviorChart.toolbarSubConfig = {
 
   properties: {
     /**
-     * TODO: comment
+     * toolbarSubConfig can be passed around from a toolbar to another so that clicking
+     * on a "global" toolbar drives the sub row state for other toolbars
      */
     toolbarSubConfig: {
       type: Object
@@ -1629,6 +1658,40 @@ PxVisBehaviorChart.noDebounceOnPanning = {
       }
     }
   }
+};
+
+/*
+    Name:
+    PxVisBehaviorChart.showTooltip
+
+    Description:
+    Behavior allowing to have an internal and external properties driving tooltip
+    visibility
+    @polymerBehavior PxVisBehaviorChart.showTooltip
+*/
+PxVisBehaviorChart.showTooltip = {
+
+  properties: {
+    /**
+      * Whether to display the tooltip
+      */
+    showTooltip: {
+      type: Boolean,
+      value: false
+    },
+    _internalShowTooltip: {
+      type: Boolean,
+      value: true
+    },
+    _computedShowTooltip: {
+      type: Boolean,
+      computed: '_computeShowTooltip(showTooltip, _internalShowTooltip)'
+    }
+  },
+  _computeShowTooltip: function(showTooltip, _internalShowTooltip) {
+    return showTooltip && _internalShowTooltip;
+  }
+
 };
 
 </script>
