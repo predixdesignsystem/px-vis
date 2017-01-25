@@ -68,7 +68,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     <template>
       <style include="px-vis-styles"></style>
 
-      <template id="bof" is="dom-repeat" items="[[_internalDimensions]]">
+      <template id="bof" is="dom-repeat" items="[[_internalDimensions]]" sort="[[_sortDims(_internalDimensions)]]">
         <px-vis-axis
           id="[[item]]"
           svg="[[_returnGroup(item, index, _internalDimensionsChanged)]]"
@@ -461,8 +461,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
         // generate axis based on the dimensions
         var g = this.svg.selectAll(".dimension")
-          .data(this.dimensions);
-          // .data(this.dimensions, function(d) { return d; });
+          // .data(this.dimensions);
+          .data(this.dimensions, function(d) { return d; });
 
         g.exit()
           .each(function(d){
@@ -758,6 +758,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         }
       }
       return
+    },
+
+    _sortDims: function(dims) {
+      // I think the very presence of the sort function causes dom-repeate to insert/delete elements in place instead of at the end and repropogating properties. 
+      return 0
     }
   });
 </script>
