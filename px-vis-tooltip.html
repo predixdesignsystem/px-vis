@@ -40,13 +40,14 @@ Element providing on-chart tooltip display
   <template>
     <style include="px-vis-tooltip-styles"></style>
 
-    <template is="dom-if" if="[[_tooltipDataHidden(tooltipData)]]">
+    <template id="template" is="dom-if" if="[[!_tooltipDataHidden]]">
       <px-tooltip
         id="tooltip"
         tooltip-style="[[tooltipStyle]]"
         for="[[hoverTarget]]"
         delay="50"
         orientation="[[orientation]]"
+        smart-orientation
         follow-mouse
         mouse-coords="[[mousePosition]]">
           <px-vis-register
@@ -137,27 +138,40 @@ Element providing on-chart tooltip display
         type: Number,
         value: 1,
         computed: '_checkGroups(tooltipData.*, groupings)'
+      },
+      /**
+       * Whether tooltip should be hidden because of 'hidden' in tooltipdata
+       */
+      _tooltipDataHidden: {
+        type: Boolean,
+        value: false
+      },
+      _tooltipElem: {
+        type: HTMLElement
       }
 
-    }, //properties
+    },
+    observers: ['_ttDataChanged(tooltipData.*)'],
 
+    attached: function() {
+      this.set('_tooltipElem', this.$$('px-tooltip'));
+    },
     /**
      *  Forces the tooltip to show by calling _show on px-tooltip
      */
     forceShow: function() {
-      var tt = this.$$('px-tooltip');
-      if(tt) {
-        tt._show();
-      }
+
+      this.$.template.render();
+      this._tooltipElem._show();
+      this._tooltipElem._setPosition();      
     },
     /**
      *  Forces the tooltip to hide by calling _hide on px-tooltip
      */
     forceHide: function() {
-      var tt = this.$$('px-tooltip');
-      if(tt) {
-        tt._hide();
-      }
+
+      this.$.template.render();
+      this._tooltipElem._hide();
     },
 
     _checkGroups: function() {
@@ -175,8 +189,8 @@ Element providing on-chart tooltip display
       }
     },
 
-    _tooltipDataHidden: function(tooltipData) {
-      return tooltipData.hidden !== true;
+    _ttDataChanged: function() {
+      this.set('_tooltipDataHidden', this.tooltipData.hidden);
     }
   });
 </script>
