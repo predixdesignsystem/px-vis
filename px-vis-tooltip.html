@@ -126,13 +126,6 @@ Element providing on-chart tooltip display
         value: "dark"
       },
       /**
-       * The actual px-tooltip elem in case we need access to it higher up the dom.
-       *
-       */
-      tooltipElem: {
-        type: Object
-      },
-      /**
        * Orientation for the tooltip
        *
        */
@@ -140,7 +133,6 @@ Element providing on-chart tooltip display
         type: String,
         value: "auto"
       },
-
       _groupings: {
         type: Number,
         value: 1,
@@ -149,13 +141,22 @@ Element providing on-chart tooltip display
 
     }, //properties
 
-    ready: function() {
-      this.set('tooltipElem', this.$.tooltip);
+    /**
+     *  Forces the tooltip to show by calling _show on px-tooltip
+     */
+    forceShow: function() {
+      var tt = this.$$('px-tooltip');
+      if(tt) {
+        tt._show();
+      }
     },
-
-    detached: function() {
-      if(this.tooltipElem) {
-        this.tooltipElem.remove();
+    /**
+     *  Forces the tooltip to hide by calling _hide on px-tooltip
+     */
+    forceHide: function() {
+      var tt = this.$$('px-tooltip');
+      if(tt) {
+        tt._hide();
       }
     },
 
