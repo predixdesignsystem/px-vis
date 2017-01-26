@@ -78,7 +78,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           width="[[width]]"
           margin="[[margin]]"
           orientation="[[_getOrientation(item, orientationFromDimensions, domainChanged, _pokeOrientation)]]"
-          title="[[_getTitle(item,completeSeriesConfig)]]"
+          title="[[_getTitle(item,completeSeriesConfig, axisConfig)]]"
           title-location='[[_computeTitleLocation(item, titleLocation, _pokeTitleLocation)]]'
           title-type-size="[[titleTypeSize]]"
           label-type-size="[[labelTypeSize]]"
@@ -333,8 +333,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         type: Boolean,
         value: false
       },
-      axisCofig: {
-        type: Object
+      axisConfig: {
+        type: Object,
+        value: function() {
+          return {};
+        }
       },
       allowEmptyTitle: {
         type: Boolean,
@@ -698,10 +701,16 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
      *
      */
     _getTitle: function(item) {
+      console.log("title")
       if(this.completeSeriesConfig) {
-        if(this.completeSeriesConfig[item] && this.completeSeriesConfig[item].title) {
+        if(this.axisConfig && this.axisConfig[item] && this.axisConfig[item].title) {
+          console.log("axisConfig")
+          return this.axisConfig[item].title
+        } else if(this.completeSeriesConfig[item] && this.completeSeriesConfig[item].title) {
+          console.log("seriesConf")
           return this.completeSeriesConfig[item].title;
         } else {
+          console.log("default")
           return this.allowEmptyTitle ? '' : item ;
         }
       }
@@ -761,7 +770,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     },
 
     _sortDims: function(dims) {
-      // I think the very presence of the sort function causes dom-repeate to insert/delete elements in place instead of at the end and repropogating properties. 
+      // I think the very presence of the sort function causes dom-repeate to insert/delete elements in place instead of at the end and repropogating properties.
       return 0
     }
   });
