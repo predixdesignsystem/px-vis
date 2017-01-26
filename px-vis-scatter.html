@@ -234,10 +234,6 @@ Element which draws scatter series onto the chart
         this.scatterBuilder = this.scatterGroup.selectAll('path.symbol')
           .data(data);
 
-          this.scatterGroup.on('mousedown', function() {
-            console.log('SCATTER GROUP MOUSE DOWN')
-          })
-
         this.scatterBuilder.exit().remove();
 
         this.scatterBuilder.enter()
@@ -245,9 +241,6 @@ Element which draws scatter series onto the chart
           .attr('class', 'symbol')
           .on('mouseover', this._mouseEnterSymbol.bind(this))
           .on('mouseleave', this._mouseLeaveSymbol.bind(this))
-          .on('mousedown', function() {
-            console.log('SCATTER MOUSE DOWN')
-          })
         .merge(this.scatterBuilder)
           .attr('d', Px.d3.symbol().type(this._markerMapping[this.markerSymbol]).size(this.markerSize))
           .attr('transform', this._applyTransform.bind(this))
