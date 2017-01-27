@@ -1877,13 +1877,15 @@ PxVisBehaviorChart.multiAxis = [{
 
 
   _returnYScale: function(seriesId, config) {
-    if(typeof this.y === 'object') {
-      var d = config[seriesId]['axis']['id'];
-      if(this.y && this.y[d]) {
-        return this.y[d];
+    if(this.domainChanged !== null) {
+      if(typeof this.y === 'object') {
+        var d = config[seriesId]['axis']['id'];
+        if(this.y && this.y[d]) {
+          return this.y[d];
+        }
+      } else if(typeof this.y === 'function') {
+        return this.y;
       }
-    } else if(typeof this.y === 'function') {
-      return this.y;
     }
     return;
   }
