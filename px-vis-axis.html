@@ -19,8 +19,7 @@ d3 element creating an axis for the chart
         height="[[height]]"
         orientation="bottom"
         complete-series-config="[[completeSeriesConfig]]"
-        domain-changed="[[domainChanged]]"
-        current-domain="[[currentDomain]]">
+        domain-changed="[[domainChanged]]">
     </px-vis-axis>
 
 ##### Larger configuratoin example
@@ -37,7 +36,6 @@ d3 element creating an axis for the chart
         title-location='[[titleLocation]]'
         title-type-size="[[titleTypeSize]]"
         label-type-size="[[labelTypeSize]]"
-        current-domain="[[currentDomainY]]"
         stroke-width="[[strokeWidth]]"
         outer-tick-size="[[outerTickSize]]"
         tick-values="[[tickValues]]"
@@ -167,7 +165,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
            */
           _currentUnits: {
             type: String,
-            computed: '_computeUnits(appendUnitInTitle, completeSeriesConfig, title)'
+            value: '',
+            computed: '_computeUnits(appendUnitInTitle, title, unit)'
           },
           /**
            * A boolean specifying if the axis title should truncate if too long
@@ -227,28 +226,28 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           _animationFrameDone: {
             type: Boolean,
             value: false
+          },
+
+          seriesOnAxis: {
+            type: Array,
+            value: function() {
+              return [];
+            }
           }
         },
 
         observers: [
-          'drawElement(domainChanged,svg,axis,margin,height,disableTicks, _animationFrameDone)',
+          'drawElement(domainChanged, svg, axis, margin, width, height, disableTicks, _animationFrameDone, orientation)',
           'drawSeriesBars(completeSeriesConfig.*, titleDrawn)',
           '_muteSeriesBars(mutedSeries.*)',
           '_updateTicks(ticks)',
-          '_titleChanged(displayedTitle, _axisGroup, titleLocation.*, height, width)',
+          '_titleChanged(displayedTitle, _axisGroup, titleLocation.*, height, width, orientation)',
           '_truncateTitle(title, truncationLength, appendUnitInTitle, completeSeriesConfig)'
         ],
 
         detached: function() {
-          if(this._axisGroup) {
-            this._axisGroup.remove();
-            this._axisGroup = null;
-          }
+          this.removeAll();
 
-          if(this._titleGroup) {
-            this._titleGroup.remove();
-            this._titleGroup = null;
-          }
           if(this.drawnTickValues && this.drawnTickValues.length > 0) {
             this.set('drawnTickValues', []);
           }
@@ -281,18 +280,27 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           switch(this.orientation) {
             case 'bottom':
               this._axis = Px.d3.axisBottom(this.axis);
+
+              var h = Math.max(this.height - this.margin.bottom - this.margin.top,0);
+              this.translateAmt = [this.offset[0],this.offset[1] + h];
               break;
 
             case 'top':
               this._axis = Px.d3.axisTop(this.axis);
+
+              this.translateAmt = [this.offset[0],this.offset[1]];
               break;
 
             case 'right':
               this._axis = Px.d3.axisRight(this.axis);
+
+              var w = Math.max(this.width - this.margin.left - this.margin.right,0);
+              this.translateAmt = [this.offset[0] + w ,this.offset[1] ];
               break;
 
             default: //case 'left':
               this._axis = Px.d3.axisLeft(this.axis);
+              this.translateAmt = [this.offset[0],this.offset[1]];
               break;
           }
 
@@ -311,6 +319,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
               this._axis.ticks(this.ticks);
 
+            } else if(typeof(this.ticks) === 'function') {
+              this._axis.ticks(this.ticks);
             } else if(typeof(this.ticks) === 'object' && this.ticks.interval && this.ticks.format) {
 
               // if(this.axisType === 'time') {
@@ -376,6 +386,25 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           }
         },
 
+        removeAll: function() {
+          this.removeAxis();
+          this.removeTitle();
+        },
+
+        removeAxis: function() {
+          // remove the axis
+          if(this._axisGroup) {
+            this._axisGroup.remove();
+            this._axisGroup = null;
+          }
+        },
+        removeTitle: function() {
+          if(this._titleGroup) {
+            this._titleGroup.remove();
+            this._titleGroup = null;
+          }
+        },
+
         /**
          * Draws the axis
          *
@@ -384,28 +413,15 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         drawElement: function() {
         //  this.debounce('drawAxis', function() {
             if(this._animationFrameDone && this.svg.node() && this.domainChanged !== null) {
+
+              this.removeAxis();
+
               this.defineAxis();
 
-              // TODO unify my orientation checks
-              // TODO suport top and right
-              if(this.orientation === 'bottom') {
-                var h = Math.max(this.height - this.margin.bottom - this.margin.top,0);
+              this._buildAxis();
+              // alert parents that we are done drawing the axis
+              this.fire('px-axis-done');
 
-                this.translateAmt = [this.offset[0],this.offset[1] + h];
-              } else if(this.orientation === 'left') {
-                this.translateAmt = [this.offset[0],this.offset[1]];
-              } else {
-                this.translateAmt = [this.offset[0],this.offset[1]];
-              }
-
-              // checks to see if the axis already exists. If not, create; if so, update
-              if(!this._axisGroup) {
-                this._buildAxis();
-                // alert parents that we are done drawing the axis
-                this.fire('px-axis-done');
-              } else {
-                this._updateAxis();
-              }
             }
           // }, 5);
         },
@@ -435,29 +451,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           this._setLabelStyles(this._axisGroup);
 
           this._calcDrawnTicks();
-        },
-        /**
-         * Updates the axis
-         *
-         */
-        _updateAxis: function() {
-          this._axisGroup
-          .attr('transform', function() {
-            if(this.rotation) {
-              return 'rotate(' + (Number(this.rotation)) + ') translate(' + this.translateAmt.join(',') + ')';
-            } else {
-              return 'translate(' + this.translateAmt.join(',') + ')';
-            }
-          }.bind(this))
-          .call(this._axis);
-
-          this._setLineStyles(this._axisGroup,'line,path');
-          this._setLabelStyles(this._axisGroup);
-
-          this._calcDrawnTicks();
-
-          // alert parents that we are done drawing the axis
-          this.fire('px-axis-done');
         },
 
         /**
@@ -609,17 +602,20 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          */
         _setLineStyles:function(elem,lines) {
           elem.selectAll(lines)
-            .attr('test','test')
             .attr('fill','none')
             .attr('stroke', this._checkThemeVariable("--px-vis-axis-color", this.colors[this.axisColor]))
             .attr('shape-rendering', 'crispEdges')
             .attr('stroke-width', this.strokeWidth);
         },
+
         /**
          * Draws the axis title
          *
          */
-        drawTitle:function() {
+        drawTitle: function() {
+
+          this.removeTitle();
+
           var ext = this._axisGroup.node().getBBox(),
               location = this._doesObjHaveValues(this.titleLocation) ? 'custom' : this.orientation,
               x,y,r,anchor;
@@ -647,9 +643,9 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               break;
 
             case 'right':
-              x = this.labelTypeSize + parseFloat(ext['width']) + this.translateAmt[0];
+              x = this.labelTypeSize + parseFloat(ext['width']) + 4 + this.translateAmt[0];
               y = parseFloat(ext['height']) / 2 + this.translateAmt[1];
-              r = 90;
+              r = -90;
               anchor = 'middle';
               break;
 
@@ -661,7 +657,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               break;
           }
 
-          if(!this._titleGroup) {
+          // if(!this._titleGroup) {
             this._titleGroup = this.svg.append('g')
               .attr('class','title-group')
               .attr('for', this.axisId)
@@ -678,17 +674,17 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               .style('text-anchor', anchor)
               .attr('transform','rotate(' + r + ')');
 
-          } else {
-            this.svg.select('g.title-group[for=' + this.axisId + ']')
-              .attr('transform','translate(' + x + ',' + y + ')');
-            this.svg.select('g.title-group[for=' + this.axisId + '] text')
-              .attr('text-anchor', anchor)
-              .style('text-anchor', anchor)
-              .attr('fill',this._checkThemeVariable("--px-vis-axis-color", this.colors[this.axisColor]))
-              .attr('font-size', this.titleTypeSize + 'px')
-              .text(this.displayedTitle)
-              .attr('transform','rotate(' + r + ')');
-          }
+          // } else {
+          //   this.svg.select('g.title-group[for=' + this.axisId + ']')
+          //     .attr('transform','translate(' + x + ',' + y + ')');
+          //   this.svg.select('g.title-group[for=' + this.axisId + ']')
+          //     .attr('text-anchor', anchor)
+          //     .style('text-anchor', anchor)
+          //     .attr('fill',this._checkThemeVariable("--px-vis-axis-color", this.colors[this.axisColor]))
+          //     .attr('font-size', this.titleTypeSize + 'px')
+          //     .text(this.displayedTitle)
+          //     .attr('transform','rotate(' + r + ')');
+          // }
 
           this._processTooltip();
           this.set('titleDrawn', (this.titleDrawn === null) ? true : !this.titleDrawn);
@@ -697,14 +693,13 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * Draws the color bars for each series
          *
          */
-        drawSeriesBars:function() {
+        drawSeriesBars: function() {
           if(!this.preventSeriesBar && this._doesObjHaveValues(this.completeSeriesConfig) && this._axisGroup && this._titleGroup) {
 
             //reset bars...
-            this._titleGroup.selectAll('rect').remove();
-
-            // FIXME do we need to move the title group based on how many series we have
-            var keys = Object.keys(this.completeSeriesConfig),
+            // this._titleGroup.selectAll('rect').remove();
+            // TODO do we need to move the title group based on how many series we have
+            var keys = this.seriesOnAxis.length > 0 ? this.seriesOnAxis : Object.keys(this.completeSeriesConfig),
                 kLen = keys.length,
                 i;
             for(i = 0; i < kLen; i++) {
@@ -716,7 +711,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * Mutes and unmutes the color bars for each series
          *
          */
-        _muteSeriesBars:function() {
+        _muteSeriesBars: function() {
           if(this._doesD3HaveValues(this._titleGroup)) {
             var keys = Object.keys(this.mutedSeries);
             for(var i = 0; i < keys.length; i++) {
@@ -735,30 +730,29 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          *
          */
         _drawBar:function(elem,sid,color,index) {
-          var w = elem.select('.axis-title').node().getBoundingClientRect()['height'];
+          var w = elem.select('.axis-title').node().getComputedTextLength();
           elem.append('rect')
-            .attr('height', 2)
-            // .attr('height',3)
+            // .attr('height', 2)
+            .attr('height',3)
             .attr('width',15)
             .attr('fill',color)
             .attr('series-bar-id','bar_' + sid)
             // .attr('transform','translate(-12,' + (-3 -w - 5 * index) + ')')
-            .attr('transform','translate(-12,' + (-3 -w - 8 * index) + ')')
+            .attr('transform', 'translate(-12,' + ( -w/2 - 10 - 8 * index) + ')')
             .attr('opacity', function() {
               return (this.mutedSeries && this.mutedSeries[sid]) ? 0.5 : 1;
             }.bind(this));
+
         },
 
         /**
          * Helper function to append units to the title
          *
          */
-        _computeUnits: function(appendUnitInTitle, completeSeriesConfig, title) {
+        _computeUnits: function(appendUnitInTitle, title, unit) {
           var result = '';
-
-          if(appendUnitInTitle && this.completeSeriesConfig[this.seriesId]
-                && this.completeSeriesConfig[this.seriesId].yAxisUnit) {
-              result = ' [' + this.completeSeriesConfig[this.seriesId].yAxisUnit + ']';
+          if(appendUnitInTitle && this.unit) {
+            result = ' [' + this.unit + ']';
           }
 
           return result;

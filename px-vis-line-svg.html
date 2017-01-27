@@ -139,7 +139,7 @@ Element which draws lines series onto the chart
     },
 
     observers: [
-      'drawElement(svg,domainChanged,chartData.*,completeSeriesConfig.*, counterClockwise)',
+      'drawElement(svg, y, domainChanged, chartData.*, completeSeriesConfig.*, counterClockwise)',
       'isIdInMuted(mutedSeries.*, completeSeriesConfig)',
       '_addClipPath(clipPath)',
       '_drawOnTop(serieToRedrawOnTop)'
@@ -174,70 +174,77 @@ Element which draws lines series onto the chart
     },
 
     _drawElementDebounced: function() {
+      if(this.domainChanged !== null &&
+            this._doesD3HaveValues(this.svg) &&
+            this.y &&
+            this.chartData.length > 0 &&
+            this._doesObjHaveValues(this.completeSeriesConfig)
+          ) {
 
-      // we need to wrap the data differently depending on if we are drawing many lines or just one line
-      if(this.parallelCoordinates) {
-        var data = this.chartData;
-        this._defineMultiLine(false);
-      }  else if(this.radialLine) {
-        this._defineRadialLine(false, this.multiPath, this.counterClockwise, this.useDegrees);
-        data = this.multiPath ? this.chartData : [this.chartData];
-      } else {
-        var data = [this.chartData];
-        this._defineSingleLine(false);
-      }
-
-      // checks to see if the group already exists. If not, create; if so, update
-      if(this._isObjEmpty(this.lineGroup)) {
-        // draw the path
-        this.lineGroup = this.svg.append('g')
-          .attr('series-id', 'line_' + this.seriesId)
-          .attr('class', 'series-line');
-      }
-
-      // set our data
-      var lineBuilder = this.lineGroup.selectAll('path.series-line')
-        .data(data);
-
-      // When datapoints disappear from our data, remove them
-      lineBuilder.exit().remove();
-
-      // When datapoints are added to our data, add stuff
-      lineBuilder.enter()
-        .append('path')
-        .attr('class', 'series-line')
-        .attr('series-id', function(d,i) {
-          return this.multiPath ? 'line_' + d[this.seriesId] : 'line_' + this.seriesId
-        }.bind(this))
-        .attr('fill','none')
-      // When datapoints are added OR this funtion is run, draw stuff
-      .merge(lineBuilder)
-        .attr('d', function(d) {
-          return this.line(d);
-        }.bind(this))
-        .attr('stroke-width',this.strokeWidth)
-        .attr('stroke',function(d,i) {
-          //normally, do this
-          if(!this.categoryKey) {
-            return this.completeSeriesConfig[this.seriesId]['color'];
+          // we need to wrap the data differently depending on if we are drawing many lines or just one line
+          if(this.parallelCoordinates) {
+            var data = this.chartData;
+            this._defineMultiLine(false);
+          }  else if(this.radialLine) {
+            this._defineRadialLine(false, this.multiPath, this.counterClockwise, this.useDegrees);
+            data = this.multiPath ? this.chartData : [this.chartData];
+          } else {
+            var data = [this.chartData];
+            this._defineSingleLine(false);
           }
 
-          //check that category has been defined
-          if(this.completeSeriesConfig[d[this.categoryKey]]) {
-            return this.completeSeriesConfig[d[this.categoryKey]]['color']
+          // checks to see if the group already exists. If not, create; if so, update
+          if(this._isObjEmpty(this.lineGroup)) {
+            // draw the path
+            this.lineGroup = this.svg.append('g')
+              .attr('series-id', 'line_' + this.seriesId)
+              .attr('class', 'series-line');
           }
 
-          //do nothing if not
-          return
-        }.bind(this))
-        .attr('stroke-opacity',this._svgLineOpacity.bind(this));
+          // set our data
+          var lineBuilder = this.lineGroup.selectAll('path.series-line')
+            .data(data);
 
-      // Make it easy to get our lines again
-      this.linePath = this.lineGroup.selectAll('path.series-line');
+          // When datapoints disappear from our data, remove them
+          lineBuilder.exit().remove();
 
-      this._addClipPath();
+          // When datapoints are added to our data, add stuff
+          lineBuilder.enter()
+            .append('path')
+            .attr('class', 'series-line')
+            .attr('series-id', function(d,i) {
+              return this.multiPath ? 'line_' + d[this.seriesId] : 'line_' + this.seriesId
+            }.bind(this))
+            .attr('fill','none')
+          // When datapoints are added OR this funtion is run, draw stuff
+          .merge(lineBuilder)
+            .attr('d', function(d) {
+              return this.line(d);
+            }.bind(this))
+            .attr('stroke-width',this.strokeWidth)
+            .attr('stroke',function(d,i) {
+              //normally, do this
+              if(!this.categoryKey) {
+                return this.completeSeriesConfig[this.seriesId]['color'];
+              }
 
-      this.isIdInMuted();
+              //check that category has been defined
+              if(this.completeSeriesConfig[d[this.categoryKey]]) {
+                return this.completeSeriesConfig[d[this.categoryKey]]['color']
+              }
+
+              //do nothing if not
+              return
+            }.bind(this))
+            .attr('stroke-opacity',this._svgLineOpacity.bind(this));
+
+          // Make it easy to get our lines again
+          this.linePath = this.lineGroup.selectAll('path.series-line');
+
+          this._addClipPath();
+
+          this.isIdInMuted();
+        }
     },
 
     /**

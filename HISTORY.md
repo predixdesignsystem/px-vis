@@ -16,6 +16,7 @@ v1.0.0
 * Threshold changes:
   * Added new threshold configuration similar to events
   * Changed threshold data property from chartData to thresholdData
+  * Simplified threshold component removing the need for the x scale
 * Added improved resize methods to chart behavior
 * Added mechanism for redrawing an SVG series on top of others
 * Layers
@@ -42,7 +43,19 @@ v1.0.0
 * Ensure tooltip calculation are done based on pixel coordinates rather than values for non-time based charts
 * Added px-vis-dynamic-menu in register, allowing developers to pass in custom features/function available in a menu in the register through dynamicMenuConfig
 * Added actionConfig to px-vis-interaction-space, allowing to define custom interaction on chart hover or click for example
+<<<<<<< HEAD
 * Added panning capability to px-vis-interaction-space. Please note that when panning a chart with ordinal axes it is not possible to pan past those axes.
+=======
+* Added panning capability to px-vis-interaction-space
+* Enabled top and right axes
+* Events
+  * Fixed event clip path to respect a right axis
+  * Simplified event component removing the need for the y scale
+* Multi Axis:
+  * added support for multi axes via multiAxes behavior
+  * Many changes to components for support
+  * Modifications to px-vis-multi-axis for more flexibility
+>>>>>>> multiAxis
 * Added px-vis-toolbar 
   * Toolbar items are configurable and each item can have:
     * a tooltip label

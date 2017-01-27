@@ -19,9 +19,7 @@ d3 element which draws a line and icon on the chart representing an event.
         chart-data="[[item]]"
         x="[[x]]"
         y="[[y]]"
-        event-config="[[eventConfig]]"
-        current-domain-x="[[currentDomainX]]"
-        current-domain-y="[[currentDomainY]]">
+        event-config="[[eventConfig]]">
     </px-vis-event>
 
 The configureation object allows developers to set the icon used for each event type. It comes in the form:
@@ -81,6 +79,7 @@ The configureation object allows developers to set the icon used for each event 
     behaviors: [
       PxVisBehaviorD3.svg,
       PxVisBehaviorD3.axes,
+      PxVisBehavior.sizing,
       PxVisBehavior.axisTypes,
       PxVisBehaviorTime.datetime,
       PxVisBehaviorD3.clipPath,
@@ -187,7 +186,7 @@ The configureation object allows developers to set the icon used for each event 
 
     observers: [
       '_eventConfigHasChanged(eventConfig.*)',
-      'drawElement(svg, x, y, currentDomainX, currentDomainY, domainChanged, eventData.*,eventConfig.*, _animationFrameDone)',
+      'drawElement(svg, x, domainChanged, eventData.*, eventConfig.*, _animationFrameDone)',
       '_addClipPath(clipPath)'
      ],
 
@@ -240,7 +239,7 @@ The configureation object allows developers to set the icon used for each event 
      * @method drawElement
      */
     drawElement: function() {
-      if(this.x && this.y && this.currentDomainX.length > 0 && this.currentDomainY.length > 0 && this._doesObjHaveValues(this.eventData) && this._animationFrameDone) {
+      if(this.x && this._doesObjHaveValues(this.eventData) && this._animationFrameDone) {
 
         if(this._eventConfigChanged && this.eventGroup && this._doesD3HaveValues(this.eventGroup)) {
           this.eventGroup.remove();
@@ -303,11 +302,11 @@ The configureation object allows developers to set the icon used for each event 
       this.eventLine
         .attr("x1", this.x(this.eventData[this.xKey]))
         .attr("x2", this.x(this.eventData[this.xKey]))
-        .attr("y1", this.y(this.currentDomainY[0]))
-        .attr("y2", this.y(this.currentDomainY[1]));
+        .attr("y1", this.height - this.margin.bottom)
+        .attr("y2", 0);
       this.eventIcon
         .attr('x',this.x(this.eventData[this.xKey]) - this._thisConfig.size/2 + this._thisConfig.offset[0])
-        .attr("y", this.y(this.currentDomainY[1]) - 5 + this._thisConfig.offset[1]);
+        .attr("y", 0 - 5 + this._thisConfig.offset[1]);
     },
 
     _addIcon: function() {

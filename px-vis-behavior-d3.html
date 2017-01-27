@@ -335,30 +335,37 @@ PxVisBehaviorD3.axes = {
       type: Object,
       notify:true
     },
-    /**
-     * The chart extents which have been set by the scale component
-     *
-     * Serves as a trigger for many elements to redraw
-     *
-     * @property currentDomainX
-     * @type Array
-     */
-    currentDomainX: {
-      type:Array,
-      notify:true
-    },
-    /**
-     * The chart extents which have been set by the scale component
-     *
-     * Serves as a trigger for many elements to redraw
-     *
-     * @property currentDomainY
-     * @type Array
-     */
-    currentDomainY: {
-      type:Array,
-      notify:true
+    _isMultiY: {
+      type: Boolean,
+      computed: '_getIsMultiY(y.*)'
     }
+  },
+  _getIsMultiY: function() {
+    return typeof this.y === 'object';
+  },
+  /**
+   * This functions process Y axis and apply the result to some variable.
+   * If in single Y it just run the function and assign the result to `applyTo`, if multi Y
+   * it runs the function for each axis and stores the result against the axis key
+   * on `applyTo`
+   */
+  _processYValues: function(applyTo, callback) {
+    if(this._isMultiY) {
+      var applyTo = {},
+          keys = Object.keys(this.y);
+
+      callback = callback.bind(this);
+
+      for(var i=0; i<keys.length; i++) {
+        applyTo[keys[i]] = callback(this.y[keys[i]], keys[i]);
+      }
+
+      return applyTo;
+    } else {
+      applyTo = callback(this.y);
+    }
+
+    return applyTo;
   }
 };
 
@@ -694,7 +701,7 @@ PxVisBehaviorD3.axisConfig = {
      */
     labelPosition: {
       type: String,
-      value: 'center',
+      value: 'center'
     },
     /**
      * Defines how the label should be rotated. Number is the degree of rotation
@@ -1169,14 +1176,14 @@ PxVisBehaviorD3.lineShared = [{
     } else {
       line = Px.d3.line()
         .x(function(d,i) {
-          if(_this.chartData[i][xKey] && (_this.chartData[i][yKey] || _this.chartData[i][yKey] === null)) {
+          if((_this.chartData[i][xKey] || _this.chartData[i][xKey] === 0) && (_this.chartData[i][yKey] || _this.chartData[i][yKey] === 0 ||  _this.chartData[i][yKey] === null)) {
             return ~~_this.x(d[xKey]);
           } else {
             return ~~_this.x(_this.chartData[counter][xKey]);
           }
         })
         .y(function(d,i) {
-          if(_this.chartData[i][xKey] && (_this.chartData[i][yKey] || _this.chartData[i][yKey] === null)) {
+          if((_this.chartData[i][xKey] || _this.chartData[i][xKey] === 0) && (_this.chartData[i][yKey] || _this.chartData[i][yKey] === 0 ||  _this.chartData[i][yKey] === null)) {
             counter = i;
             return ~~_this.y(d[yKey]);
           } else {
