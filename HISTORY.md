@@ -1,3 +1,7 @@
+v0.8.7
+==================
+* adding check to zoom
+
 v0.8.6
 ==================
 * updated brush tests with new colors
