@@ -24,7 +24,6 @@ v1.0.0
   * modified interaction space so it doesnt clone svg
   * modified thresholds so it doesnt clone svg
   * Added an additional svg element below the canvas element on svg-canvas
-* Fix placement of zoom button
 * Changed px-vis-line to px-vis-line-svg for consistency
   * Line now spans data undefined gaps by default
   * Line will always gap "null" data
