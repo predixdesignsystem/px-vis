@@ -19,8 +19,6 @@ Element providing on-chart hover functionality to get data values near the mouse
         chart-data="[[chartData]]"
         x="[[x]]"
         y="[[y]]"
-        current-domain-x="[[currentDomainX]]"
-        current-domain-y="[[currentDomainY]]"
         tooltip-data="{{tooltipData}}"
         extents-data="{{extentsData}}">
     </px-vis-interaction-space>
@@ -151,7 +149,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     observers: [
-      'drawElement(currentDomainX,currentDomainY,chartData.*,svg,width,height, completeSeriesConfig)',
+      'drawElement(domainChanged, chartData.*, svg, width, height, completeSeriesConfig)',
       '_setupActions(actionConfig.*)',
       '_resetTooltipDataLegacy(completeSeriesConfig.*,)',
       '_resetTooltipData(seriesKeys.*)'
@@ -293,7 +291,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      */
     _calcTooltipData:function() {
 
-      if(!this.mouseDown && this.chartData.length > 0) {
+      if(!this.mouseDown && this.chartData.length > 0 && this.y) {
 
         //  d3.mouse: returns the x position on the screen of the mouse
         var mousePos = Px.d3.mouse(this._rect.node()),
@@ -323,7 +321,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
               len  = keys.length,
               d,
               x1 = this.xAxisType !== 'ordinal' ? this.x.invert(mousePos[0]) : null,
-              y1 = this.yAxisType !== 'ordinal' ? this.y.invert(mousePos[1]) : null,
+              y1,
               x2,
               y2,
               chartData,
@@ -348,7 +346,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
               for(var i = 0; i < len; i++) {
 
                 var yKey = this.completeSeriesConfig[keys[i]]['y'],
-                    xKey = this.completeSeriesConfig[keys[i]]['x'];
+                    xKey = this.completeSeriesConfig[keys[i]]['x'],
+                    axisKey = this.completeSeriesConfig[keys[i]]['axis']['id'];
 
                 minDist = Number.MAX_VALUE;
                 result = {};
@@ -356,27 +355,26 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                 //ordinal are specials...
                 if(this.xAxisType === 'ordinal') {
                   //find ordinal value for X
-                  result[xKey] = this._getOrdinalValue(true, mousePos[0]);
+                  result[xKey] = this._getOrdinalValue(true, mousePos[0], axisKey);
 
                   //now get Y
                   if(this.yAxisType === 'ordinal') {
-                    result[yKey] = this._getOrdinalValue(false, mousePos[1]);
+                    result[yKey] = this._getOrdinalValue(false, mousePos[1], axisKey);
                   } else {
+                    y1 = this._isMultiY ? this.y[axisKey].invert(mousePos[1]) : this.y.invert(mousePos[1]);
                     result[yKey] = this._getClosestValue(false, y1, this.chartData, xKey, yKey, result[xKey]);
                   }
                 } else if(this.yAxisType === 'ordinal') {
 
-                  result[yKey] = this._getOrdinalValue(false, mousePos[1]);
+                  result[yKey] = this._getOrdinalValue(false, mousePos[1], axisKey);
                   //now get X
                   if(this.yAxisType === 'ordinal') {
-                    result[xKey] = this._getOrdinalValue(true, mousePos[0]);
+                    result[xKey] = this._getOrdinalValue(true, mousePos[0], axisKey);
                   } else {
                     result[xKey] = this._getClosestValue(true, x1, this.chartData, xKey, yKey, result[yKey]);
                   }
-                }
-                //find closest point....
-                else if(this.xAxisType === 'time' || this.xAxisType === 'timeLocal') {
-                  //time based X axis
+                //time based X axis
+                } else if(this.xAxisType === 'time' || this.xAxisType === 'timeLocal') {
                   /*
                     d3.bisector returns index in our array that corresponds to the horizontal position of the mouse pointer.
                     Specifically this returns the date that falls to the left of the mouse cursor.
@@ -396,25 +394,28 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                   result[xKey] = r[xKey];
                   result[yKey] = r[yKey];
 
-                } else {
-                  //non time based: iterate over points and find the closest
+                } else {  //non time based: iterate over points and find the closest
 
                   var currX = this.x.domain(),
-                      currY = this.y.domain(),
+                      currY,
                       dataX,
                       dataY;
 
                   for(var j = 0; j < this.chartData.length; j++) {
 
+                    // get the y domain
+                    currY = this._isMultiY ? this.y[axisKey].domain() : this.y.domain();
+
                     //get point values
                     dataX = this.chartData[j][xKey];
                     dataY = this.chartData[j][yKey];
 
+                    // check if data is in our domain
                     if(dataX >= currX[0] && dataX <= currX[1] && dataY >= currY[0] && dataY <= currY[1]) {
 
                       //get pixel coords
                       x2 = this.x(dataX);
-                      y2 = this.y(dataY);
+                      y2 = this._isMultiY ? this.y[axisKey](dataY) : this.y(dataY);
 
                       //distance between the two points
                       //! x2 and y2 are changed during this calculation
@@ -433,13 +434,13 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                           closestTimestamp = [minDist, this.chartData[j][this.timeData]];
                         }
                       }
-                    } 
+                    }
                   }
                 }
 
                 // get the pixel coords for that data
                 xCoord = this.x(result[xKey]);
-                yCoord = this.y(result[yKey]);
+                yCoord = this._isMultiY ? this.y[axisKey](result[yKey]) : this.y(result[yKey]);
 
                 xArr.push(xCoord);
                 yArr.push(yCoord);
@@ -466,10 +467,21 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * Y value if searching on the Y axis
      *
      */
-    _getOrdinalValue: function(xAxis, mousePos) {
+    _getOrdinalValue: function(xAxis, mousePos, axisKey) {
       //TODO: try getting the closest one rather than the one directly on the left
-      var domain = xAxis ? this.x.domain() : this.y.domain(),
-          range = xAxis ? this.x.range() : this.y.range();
+      var domain,
+          range;
+
+      if(xAxis) {
+        domain = this.x.domain();
+        range = this.x.range();
+      } else if(this._isMultiY) {
+        domain = this.y[axisKey].domain();
+        range = this.y[axisKey].range();
+      } else {
+        domain = this.y.domain();
+        range = this.y.range();
+      }
 
       rangeInterval = (range[1] - range[0])/domain.length;
 
@@ -523,6 +535,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           currDiff,
           result;
 
+// FIXME remoe forEach
       data.forEach(function(point, index) {
         //only look at points that have the proper ordinal value
         if(point[ordIndex] === ordValue) {
@@ -556,7 +569,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         this.mouseDown = true;
 
         this._resetTooltipData();
-         
+
         //in case the user clicks inside the chart, and mouses out, we are waiting for a mouseup, and closing our action box with the coordinates available on the mouseup.
         Px.d3.select(document).on('mouseup.action', this._stopPanning.bind(this));
         Px.d3.select(document).on('mousemove.action', this._updatePanning.bind(this));
@@ -573,20 +586,22 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         if(this.yAxisType === 'ordinal') {
           this._panningStartVal[1] = mousePos[1];
         } else {
-          this._panningStartVal[1] = this.y.invert(mousePos[1]);
+          this._panningStartVal[1] = this._processYValues(this._panningStartVal[1], function(axis, index) {
+            return axis.invert(mousePos[1]);
+          });
         }
 
         this.fire('px-vis-interaction-space-start-panning');
       }
     },
     _updatePanning: function() {
-    
+
       var newExtents = {},
           mousePos = Px.d3.mouse(this._rect.node()),
           currentPanningVal,
           diff,
           xDomain = this.x.domain(),
-          yDomain = this.y.domain();
+          yDomain;
 
         //for now ignore ordinal axis but allow panning along the other axis 
         //if it's not ordinal as well
@@ -604,15 +619,24 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         
         //Y
         if(this.yAxisType !== 'ordinal') {
-          currentPanningVal = this.y.invert(mousePos[1]);
-          diff = currentPanningVal - this._panningStartVal[1];
-          newExtents.eY = [yDomain[0] - diff, yDomain[1] - diff];
+
+          newExtents.eY = this._processYValues(newExtents.eY, function(axis, index) {
+            currentPanningVal = axis.invert(mousePos[1]);
+            diff = currentPanningVal - this._panningStartVal[1][index];
+            yDomain = axis.domain(); 
+            return [yDomain[0] - diff, yDomain[1] - diff];
+          });
         } else {
           //keep same domain and play on alignment for panning
-          newExtents.eY = yDomain;
-          this._adjustOrdinalAlign(this.y, mousePos[1], this._panningStartVal[1]);
-          //store mouse pos for next update
-          this._panningStartVal[1] = mousePos[1];
+          newExtents.eY = this._processYValues(newExtents.eY, function(axis, index) {
+            //play on align to simulate panning
+            this._adjustOrdinalAlign(axis, mousePos[1], this._panningStartVal[1][index]);
+            //store mouse pos for next update
+            this._panningStartVal[1][index] = mousePos[1];
+
+            //keep same domain
+            return axis.domain();
+          });
         }
         
         this.set('extentsData', newExtents);      
@@ -763,23 +787,27 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             extents.eX = [this.x.invert(extents.x1), this.x.invert(extents.x2)];
           }
 
-            if(this.yAxisType === 'ordinal') {
-              //Y axis is top to bottom
-              extents.eY = this._getOrdinalRange(false, extents.y2, extents.y1);
-            } else {
-              //Y axis is top to bottom
-              extents.eY = [this.y.invert(extents.y2), this.y.invert(extents.y1)];
-            }
-
-            //save zoom state
-            this.fire('px-vis-save-zoom-state');
-
-            //set new extents
-            this.set('extentsData', extents);
-            this.fire('px-vis-extents-data-updated', {'data': extents, 'dataVar': 'extentsData', 'method': 'set'});
+          if(this.yAxisType === 'ordinal') {
+            //Y axis is top to bottom
+            extents.eY = this._getOrdinalRange(false, extents.y2, extents.y1);
+          } else {
+            extents.eY = this._processYValues(extents.eY, function(axis, index) {
+              return [axis.invert(extents.y2), axis.invert(extents.y1)];
+            });
           }
-          this._actionArea.remove();
         }
+
+        //save zoom state
+        this.fire('px-vis-save-zoom-state');
+
+        //set new extents
+        this.set('extentsData', extents);
+        this.fire('px-vis-extents-data-updated', {'data': extents, 'dataVar': 'extentsData', 'method': 'set'});
       }
+      this._actionArea.remove();
+    },
+    _applyFunctionToY: function(fn) {
+
+    }
   });
 </script>
