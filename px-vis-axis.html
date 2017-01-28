@@ -616,9 +616,23 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
 
           this.removeTitle();
 
-          var ext = this._axisGroup.node().getBBox(),
+          var ext,
               location = this._doesObjHaveValues(this.titleLocation) ? 'custom' : this.orientation,
               x,y,r,anchor;
+
+          /*
+            Regarding this longstanding Firefox only bug: https://bugzilla.mozilla.org/show_bug.cgi?id=612118
+              getBBox fails when chart is hidden
+              getBoundingClientRect also doesnt return the same exact values as getBBox in Firefox, which may cause title to overlay on the next axis in multi axis cases
+              So try getBBox, fallback on getBoundingClientRect which should never actually be used.
+
+              remove the try if mozilla ever fixes this bug
+          */
+          try {
+            ext = this._axisGroup.node().getBBox();
+          } catch(e) {
+            ext = this._axisGroup.node().getBoundingClientRect();
+          }
 
           switch(location) {
             case 'bottom':
