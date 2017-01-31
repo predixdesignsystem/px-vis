@@ -147,8 +147,8 @@ function runTests(){
       assert.equal(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('height'), 176);
     });
     test('multiBrush._brushGroup.rect correct fill', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('fill').split(' ').join(''), 'rgb(0,0,0)');
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('fill-opacity'), '0.15');
+      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('fill').split(' ').join(''), colors["grey5"]);
+      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('fill-opacity'), '0.3');
     });
     test('multiBrush._brushGroup.rect correct stroke', function() {
       assert.equal(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('stroke').split(' ').join(''), colors["primary-blue"]);
@@ -660,8 +660,8 @@ function runTests(){
       assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('height'), 35);
     });
     test('radialBrush._brushGroup.rect correct fill', function() {
-      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('fill').split(' ').join(''), 'rgb(0,0,0)');
-      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('fill-opacity'), '0.15');
+      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('fill').split(' ').join(''), colors['grey5']);
+      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('fill-opacity'), '0.3');
     });
     test('radialBrush._brushGroup.rect correct stroke', function() {
       assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('stroke').split(' ').join(''), colors["primary-blue"]);
