@@ -1338,6 +1338,15 @@ PxVisBehaviorChart.categoryAndAxisRegisterConfigs = [{
 */
 PxVisBehaviorChart.zooming = [{
 
+  /*
+  * fires when the chart has been zoomed in or out. contains an object 
+  * with 'x' and 'y' values.
+  * - x: array containing the domain for X
+  * - y: when only 1 y axis is defined, array containing the domain for Y
+  *      when multi Y axis, object with 1 key per axis, each value being 
+  * an array containing the domain for this specific axis
+  * @event px-vis-zoomed
+  */
   /**
    * Properties block, expose attribute values to the DOM via 'reflect'
    *
@@ -1375,6 +1384,10 @@ PxVisBehaviorChart.zooming = [{
      */
     _originalOrdinalExtents: {
       type: Array
+    },
+    _isPanning: {
+      type: Boolean,
+      value: false
     }
   },
   observers: [
@@ -1385,9 +1398,10 @@ PxVisBehaviorChart.zooming = [{
     'px-vis-toolbar-zoom-in': 'zoomIn',
     'px-vis-toolbar-zoom-out': 'zoomOut',
     'px-vis-toolbar-undo-zoom': 'undoZoom',
-    'px-vis-save-zoom-state': '_saveZoomState'
+    'px-vis-interaction-space-start-panning': '_intSpaceStartPan',
+    'px-vis-interaction-space-stop-panning': '_intSpaceStopPan'
   },
-
+  
   /**
    * Restore zoom to its previous value, do nothing if no previous value
    */
@@ -1400,6 +1414,7 @@ PxVisBehaviorChart.zooming = [{
     if(extentsData) {
       this.set('selectedDomain', extentsData);
       this.fire('px-vis-selected-domain-updated', { 'data':extentsData, 'method': 'set', 'dataVar': 'selectedDomain' });
+      this._notifyZoomed();
     }
   },
   _saveZoomState: function() {
@@ -1414,7 +1429,15 @@ PxVisBehaviorChart.zooming = [{
 
       this.set('_originalOrdinalExtents', [this.x.domain(), domains]);
     }
-    this.push('zoomStack', this.selectedDomain);
+    var selectedDomain = this.selectedDomain;
+
+    if(!this.selectedDomain.y || this.selectedDomain.y.length === 0) {
+      selectedDomain.y = this._processYValues(domains, function(axis, index) {
+        return axis.domain();
+      });
+    }
+
+    this.push('zoomStack', selectedDomain);
   },
   zoomIn: function() {
     this._autoZoom(true);
@@ -1423,7 +1446,6 @@ PxVisBehaviorChart.zooming = [{
     this._autoZoom(false);
   },
   _autoZoom: function(isZoomIn) {
-    this._saveZoomState();
 
     var xMin = this.x.domain()[0],
         xMax = this.x.domain()[1],
@@ -1543,9 +1565,15 @@ PxVisBehaviorChart.zooming = [{
    */
   zoom: function(extentsData) {
 
+    if(!this._isPanning) {
+      this._saveZoomState();
+    }
+
     this.set('selectedDomain', {x:extentsData.eX, y:extentsData.eY});
     this.fire('px-vis-selected-domain-updated', { 'data':{x:extentsData.eX, y:extentsData.eY}, 'method': 'set', 'dataVar': 'selectedDomain' });
+    this._notifyZoomed();
   },
+
   /**
    * resets the extents
    *
@@ -1557,7 +1585,20 @@ PxVisBehaviorChart.zooming = [{
     this.splice('zoomStack', 0, this.zoomStack.length);
 
     this.fire('px-vis-selected-domain-updated', { 'data':'reset', 'method': 'set', 'dataVar': 'selectedDomain' });
-  }
+    this._notifyZoomed();
+  },
+  _notifyZoomed: function() {
+    var domains = this._processYValues(domains, function(axis, index) {
+        return axis.domain();
+      });
+    this.fire('px-vis-zoomed', {x: this.x.domain(), y: domains});
+  },
+  _intSpaceStartPan: function() {
+    this.set('_isPanning', true);
+  },
+  _intSpaceStopPan: function() {
+    this.set('_isPanning', false);
+  },
 }, PxVisBehavior.extentsData, PxVisBehaviorD3.selectedDomain, PxVisBehavior.axisTypes, PxVisBehaviorD3.axes];
 
 /*
@@ -1966,7 +2007,6 @@ PxVisBehaviorChart.axisRegister = [{
       };
       tooltipData.series.push({ 'name': axes[i]});
     }
-
 
     this.set('_axisRegisterConfig', axisConfig);
     this.set('_axisRegisterTooltipData', tooltipData);

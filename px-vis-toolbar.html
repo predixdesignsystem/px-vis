@@ -107,7 +107,7 @@ Element providing an on-chart zoom.
         value: function() {
           return {
             'tooltip': {
-              'tooltipLabel': 'tooltip',
+              'tooltipLabel': 'Tooltip',
               'icon': 'fa-crosshairs',
               'buttonGroup': 1,
               'selected': true,
@@ -121,7 +121,7 @@ Element providing an on-chart zoom.
               }
             },
             'pan': {
-              'tooltipLabel': 'pan',
+              'tooltipLabel': 'Pan',
               'icon': 'fa-arrows',
               'onClick': 'function() {this.set("showTooltip", false);}',
               'onClickContext': "toolbar",
@@ -133,13 +133,13 @@ Element providing an on-chart zoom.
               'subConfig': {
                 'resetZoom': {
                   'icon': 'fa-expand',
-                  'tooltipLabel': 'reset panning',
+                  'tooltipLabel': 'Reset panning',
                   'eventName': 'px-vis-toolbar-reset-zoom'
                 }
               }
             },
             'zoom': {
-              'tooltipLabel': 'zoom',
+              'tooltipLabel': 'Zoom',
               'icon': 'fa-search',
               'onClick': 'function() {this.set("showTooltip", false);}',
               'onClickContext': "toolbar",
@@ -151,22 +151,78 @@ Element providing an on-chart zoom.
               'subConfig': {
                 'zoomIn': {
                   'icon': 'fa-plus',
-                  'tooltipLabel': 'zoom in',
+                  'tooltipLabel': 'Zoom in',
                   'eventName': 'px-vis-toolbar-zoom-in'
                 },
                 'zoomOut': {
                   'icon': 'fa-minus',
-                  'tooltipLabel': 'zoom out',
+                  'tooltipLabel': 'Zoom out',
                   'eventName': 'px-vis-toolbar-zoom-out'
                 },
                 'undoZoom': {
                   'icon': 'fa-undo',
-                  'tooltipLabel': 'undo zoom',
+                  'tooltipLabel': 'Undo zoom',
                   'eventName': 'px-vis-toolbar-undo-zoom'
                 },
                 'resetZoom': {
                   'icon': 'fa-expand',
-                  'tooltipLabel': 'reset zoom',
+                  'tooltipLabel': 'Reset zoom',
+                  'eventName': 'px-vis-toolbar-reset-zoom'
+                }
+              }
+            },
+            'advancedZoom': {
+              'tooltipLabel': 'Zoom',
+              'icon': 'fa-search',
+              'buttonGroup': 1,
+              'selectable': true,
+              'onClick': 'function() {this.set("showTooltip", false);}',
+              'onClickContext': 'toolbar',
+              'actionConfig': {
+                'mousedown': 'startZooming',
+                'mouseup': 'stopZooming'
+              },
+              'subConfig': {
+                'x': {
+                  'title': 'X',
+                  'buttonGroup': 1,
+                  'tooltipLabel': 'Zoom on X axis only',
+                  'eventName': 'my-custom-click',
+                  'selectable': true,
+                  'onClick': 'function() { this.set("selectionType", "xAxis");}'
+                },
+                'y': {
+                  'title': 'Y',
+                  'buttonGroup': 1,
+                  'tooltipLabel': 'Zoom on Y axis only',
+                  'selectable': true,
+                  'onClick': 'function() { this.set("selectionType", "yAxis");}'
+                },
+                'xy': {
+                  'title': 'XY',
+                  'tooltipLabel': 'Zoom on X and Y axis',
+                  'buttonGroup': 1,
+                  'selectable': true,
+                  'onClick': 'function() { this.set("selectionType", "xy");}'
+                },
+                'zoomIn': {
+                  'icon': 'fa-plus',
+                  'tooltipLabel': 'Zoom in',
+                  'eventName': 'px-vis-toolbar-zoom-in'
+                },
+                'zoomOut': {
+                  'icon': 'fa-minus',
+                  'tooltipLabel': 'Zoom out',
+                  'eventName': 'px-vis-toolbar-zoom-out'
+                },
+                'undoZoom': {
+                  'icon': 'fa-undo',
+                  'tooltipLabel': 'Undo zoom',
+                  'eventName': 'px-vis-toolbar-undo-zoom'
+                },
+                'resetZoom': {
+                  'icon': 'fa-expand',
+                  'tooltipLabel': 'Reset zoom',
                   'eventName': 'px-vis-toolbar-reset-zoom'
                 }
               }
@@ -327,6 +383,7 @@ Element providing an on-chart zoom.
 
         if(toPush.selected) {
           this._tryProcessSubConfig(toPush);
+          this._processItem(toPush);
         }
       }
 
