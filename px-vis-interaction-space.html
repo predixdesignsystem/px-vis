@@ -578,9 +578,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
         //for ordinal axis store mouse pos, for others the corresponding value
         if(this.xAxisType === 'ordinal') {
-          this._panningStartVal[0] = mousePos[0]; 
+          this._panningStartVal[0] = mousePos[0];
         } else {
-          this._panningStartVal[0] = this.x.invert(mousePos[0]); 
+          this._panningStartVal[0] = this.x.invert(mousePos[0]);
         }
 
         if(this.yAxisType === 'ordinal') {
@@ -603,7 +603,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           xDomain = this.x.domain(),
           yDomain;
 
-        //for now ignore ordinal axis but allow panning along the other axis 
+        //for now ignore ordinal axis but allow panning along the other axis
         //if it's not ordinal as well
         //X
         if(this.xAxisType !== 'ordinal') {
@@ -616,14 +616,14 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           //store mouse pos for next update
           this._panningStartVal[0] = mousePos[0];
         }
-        
+
         //Y
         if(this.yAxisType !== 'ordinal') {
 
           newExtents.eY = this._processYValues(newExtents.eY, function(axis, index) {
             currentPanningVal = axis.invert(mousePos[1]);
             diff = currentPanningVal - this._panningStartVal[1][index];
-            yDomain = axis.domain(); 
+            yDomain = axis.domain();
             return [yDomain[0] - diff, yDomain[1] - diff];
           });
         } else {
@@ -638,8 +638,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             return axis.domain();
           });
         }
-        
-        this.set('extentsData', newExtents);      
+
+        this.set('extentsData', newExtents);
     },
     _adjustOrdinalAlign: function(axis, mousePos, initialMousePos) {
       var diff = (mousePos - initialMousePos)/2,

@@ -128,7 +128,7 @@ function runTests(){
       assert.equal(rect.attr('y'),-10);
     });
     test('baseClip width', function() {
-      assert.equal(rect.attr('width'),235);
+      assert.equal(rect.attr('width'),230);
     });
     test('baseClip height', function() {
       assert.equal(rect.attr('height'),130);

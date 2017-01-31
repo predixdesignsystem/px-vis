@@ -58,7 +58,7 @@ function runTests(){
             "color": "rgb(250,164,58)"
           }
         },
-        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,27]},
+        dataExtents = {"x":[1397102460000,1397219100000],"y":[0,27]},
         w = 500,
         h = 300,
         m = {
@@ -76,7 +76,7 @@ function runTests(){
       baseScale.set('height',h);
       baseScale.set('margin',m);
       baseScale.set('completeSeriesConfig',completeSeriesConfig);
-      baseScale.set('chartExtents',chartExtents);
+      baseScale.set('dataExtents',dataExtents);
       baseScale.set('chartData',d);
 
       baseLine1.set('completeSeriesConfig',completeSeriesConfig);
@@ -185,7 +185,7 @@ function runTests(){
             "color": "rgb(250,164,58)"
           }
         },
-        chartExtents = {"x":[1397102460000,1397319100000],"y":[0,27]},
+        dataExtents = {"x":[1397102460000,1397319100000],"y":[0,27]},
         w = 500,
         h = 300,
         m = {
@@ -203,7 +203,7 @@ function runTests(){
       progressiveScale.set('height',h);
       progressiveScale.set('margin',m);
       progressiveScale.set('completeSeriesConfig',completeSeriesConfig);
-      progressiveScale.set('chartExtents',chartExtents);
+      progressiveScale.set('dataExtents',dataExtents);
       progressiveScale.set('chartData',d);
 
       progressiveLine1.set('completeSeriesConfig',completeSeriesConfig);
@@ -292,7 +292,7 @@ function runTests(){
             "color": "rgb(250,164,58)"
           }
         },
-        chartExtents = {"x":[1397102460000,1397219100000],"y":[0,27]},
+        dataExtents = {"x":[1397102460000,1397219100000],"y":[0,27]},
         w = 500,
         h = 300,
         m = {
@@ -310,7 +310,7 @@ function runTests(){
       canvasOnceScale.set('height',h);
       canvasOnceScale.set('margin',m);
       canvasOnceScale.set('completeSeriesConfig',completeSeriesConfig);
-      canvasOnceScale.set('chartExtents',chartExtents);
+      canvasOnceScale.set('dataExtents',dataExtents);
       canvasOnceScale.set('chartData',d);
 
       canvasOnceLine1.set('completeSeriesConfig',completeSeriesConfig);

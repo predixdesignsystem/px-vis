@@ -80,12 +80,18 @@ function runTests(){
       baseScale.set('dataExtents',chartExtents);
       baseScale.set('chartData',d);
 
+      defaultThreshold.set('width',w);
+      defaultThreshold.set('margin',m);
       defaultThreshold.set('completeSeriesConfig',completeSeriesConfig);
       defaultThreshold.set('thresholdData',dT);
 
+      boxThreshold.set('width',w);
+      boxThreshold.set('margin',m);
       boxThreshold.set('completeSeriesConfig',completeSeriesConfig);
       boxThreshold.set('thresholdData',dTB);
 
+      customThresold.set('width',w);
+      customThresold.set('margin',m);
       customThresold.set('completeSeriesConfig',completeSeriesConfig);
       customThresold.set('thresholdConfig',tConf);
       customThresold.set('thresholdData',dCustom);
@@ -153,7 +159,7 @@ function runTests(){
       assert.equal(defaultThreshold.thresholdRect.nodes()[0].getAttribute('x'),5);
     });
     test('defaultThreshold thresholdRect y', function() {
-      assert.equal(defaultThreshold.thresholdRect.nodes()[0].getAttribute('y'),219);
+      assert.equal(defaultThreshold.thresholdRect.nodes()[0].getAttribute('y'), (220-17));
     });
     // test('defaultThreshold thresholdRect width', function() {
     //   assert.equal(defaultThreshold.thresholdRect.nodes()[0].getAttribute('width'),defaultThreshold.thresholdText.nodes()[0].getBBox().width + 5);
@@ -178,7 +184,7 @@ function runTests(){
       assert.equal(defaultThreshold.thresholdText.nodes()[0].getAttribute('x'),8);
     });
     test('defaultThreshold thresholdText y', function() {
-      assert.equal(defaultThreshold.thresholdText.nodes()[0].getAttribute('y'),232);
+      assert.equal(defaultThreshold.thresholdText.nodes()[0].getAttribute('y'),(220-17+13));
     });
     test('defaultThreshold thresholdText text', function() {
       assert.equal(defaultThreshold.thresholdText.nodes()[0].textContent,'2.00');

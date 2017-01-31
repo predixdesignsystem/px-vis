@@ -180,6 +180,26 @@ function runTests(){
       ordinalScale.set('dataExtents',ordinalChartExtents);
       ordinalScale.set('chartData',ordinalD);
 
+      defaultEvent.set('height',h);
+      faEvent.set('height',h);
+      uniEvent.set('height',h);
+      imgEvent.set('height',h);
+      noLabelEvent.set('height',h);
+      noLabelEvent.set('height',h);
+      offsetEvent.set('height',h);
+      linearEvent.set('height',h);
+      ordinalEvent.set('height',h);
+
+      defaultEvent.set('margin',m);
+      faEvent.set('margin',m);
+      uniEvent.set('margin',m);
+      imgEvent.set('margin',m);
+      noLabelEvent.set('margin',m);
+      noLabelEvent.set('margin',m);
+      offsetEvent.set('margin',m);
+      linearEvent.set('margin',m);
+      ordinalEvent.set('margin',m);
+
       defaultEvent.set('eventConfig',eventConfig);
       faEvent.set('eventConfig',eventConfig);
       uniEvent.set('eventConfig',eventConfig);
@@ -285,7 +305,7 @@ function runTests(){
       assert.equal(defaultEvent.eventLine.attr('x2'),240);
     });
     test('defaultEvent eventLine y1', function() {
-      assert.equal(defaultEvent.eventLine.attr('y1'),255);
+      assert.equal(defaultEvent.eventLine.attr('y1'),275);
     });
     test('defaultEvent eventLine y2', function() {
       assert.equal(defaultEvent.eventLine.attr('y2'),0);
@@ -361,7 +381,7 @@ function runTests(){
       assert.equal(faEvent.eventLine.attr('x2'),360);
     });
     test('faEvent eventLine y1', function() {
-      assert.equal(faEvent.eventLine.attr('y1'),255);
+      assert.equal(faEvent.eventLine.attr('y1'),275);
     });
     test('faEvent eventLine y2', function() {
       assert.equal(faEvent.eventLine.attr('y2'),0);
@@ -437,7 +457,7 @@ function runTests(){
       assert.equal(uniEvent.eventLine.attr('x2'),0);
     });
     test('uniEvent eventLine y1', function() {
-      assert.equal(uniEvent.eventLine.attr('y1'),255);
+      assert.equal(uniEvent.eventLine.attr('y1'),275);
     });
     test('uniEvent eventLine y2', function() {
       assert.equal(uniEvent.eventLine.attr('y2'),0);
@@ -510,7 +530,7 @@ function runTests(){
       assert.equal(imgEvent.eventLine.attr('x2'),120);
     });
     test('imgEvent eventLine y1', function() {
-      assert.equal(imgEvent.eventLine.attr('y1'),255);
+      assert.equal(imgEvent.eventLine.attr('y1'),275);
     });
     test('imgEvent eventLine y2', function() {
       assert.equal(imgEvent.eventLine.attr('y2'),0);
@@ -589,7 +609,7 @@ function runTests(){
       assert.equal(noLabelEvent.eventLine.attr('x2'),37);
     });
     test('noLabelEvent eventLine y1', function() {
-      assert.equal(noLabelEvent.eventLine.attr('y1'),255);
+      assert.equal(noLabelEvent.eventLine.attr('y1'),275);
     });
     test('noLabelEvent eventLine y2', function() {
       assert.equal(noLabelEvent.eventLine.attr('y2'),0);
@@ -668,7 +688,7 @@ function runTests(){
       assert.equal(offsetEvent.eventLine.attr('x2'),278);
     });
     test('offsetEvent eventLine y1', function() {
-      assert.equal(offsetEvent.eventLine.attr('y1'),255);
+      assert.equal(offsetEvent.eventLine.attr('y1'),275);
     });
     test('offsetEvent eventLine y2', function() {
       assert.equal(offsetEvent.eventLine.attr('y2'),0);
@@ -727,7 +747,7 @@ function runTests(){
       assert.equal(linearEvent.eventLine.attr('x2'),144);
     });
     test('linearEvent eventLine y1', function() {
-      assert.equal(linearEvent.eventLine.attr('y1'),255);
+      assert.equal(linearEvent.eventLine.attr('y1'),275);
     });
     test('linearEvent eventLine y2', function() {
       assert.equal(linearEvent.eventLine.attr('y2'),0);
@@ -785,7 +805,7 @@ function runTests(){
       assert.equal(ordinalEvent.eventLine.attr('x2'),80);
     });
     test('ordinalEvent eventLine y1', function() {
-      assert.equal(ordinalEvent.eventLine.attr('y1'),255);
+      assert.equal(ordinalEvent.eventLine.attr('y1'),275);
     });
     test('ordinalEvent eventLine y2', function() {
       assert.equal(ordinalEvent.eventLine.attr('y2'),0);

@@ -17,7 +17,7 @@ function runTests(){
     var colorOrder = dataVisColors.properties.seriesColorOrder.value;
     var colorSet = dataVisColors.properties.dataVisColors.value;
 
-    suiteSetup(function(){
+    suiteSetup(function(done) {
       var d = [{
             "x": 1397102460000,
             "y": 1
@@ -67,6 +67,10 @@ function runTests(){
       baseScatter.set('completeSeriesConfig',completeSeriesConfig);
       baseScatter.set('seriesId',"mySeries");
       baseScatter.set('chartData',d);
+
+      setTimeout(function() {
+        done();
+      }, 100);
 
     });
 
@@ -189,8 +193,10 @@ function runTests(){
       mutedScatter2.set('completeSeriesConfig',completeSeriesConfig);
       mutedScatter2.set('seriesId',"mySeries2");
       mutedScatter2.set('chartData',d);
-      // setTimeout(function(){ done() }.bind(this),5000);
-      done();
+
+      setTimeout(function() {
+        done();
+      }, 100);
     });
 
     test('mutedScatter1 fixture is created', function() {
@@ -294,8 +300,10 @@ function runTests(){
       };
       mutedScatter1.set('mutedSeries',m);
       mutedScatter2.set('mutedSeries',m);
-      // setTimeout(function(){ done() }.bind(this),5000);
-      done();
+
+      setTimeout(function() {
+        done();
+      }, 100);
     });
 
     test('mutedScatter1 scatter series has the right stroke opacity', function() {
@@ -341,8 +349,10 @@ function runTests(){
       };
       mutedScatter1.set('mutedSeries',m);
       mutedScatter2.set('mutedSeries',m);
-      // setTimeout(function(){ done() }.bind(this),5000);
-      done();
+
+      setTimeout(function() {
+        done();
+      }, 100);
     });
 
     test('mutedScatter1 scatter series has the right stroke opacity', function() {
@@ -511,9 +521,10 @@ function runTests(){
       markerWye.set('markerSymbol',"wye");
       markerWye.set('seriesId',"wye");
       markerWye.set('chartData',d);
-      // debugger
-      // setTimeout(function(){ done(); },5000);
-      done();
+
+      setTimeout(function() {
+        done();
+      }, 100);
     });
 
     test('correct number of circles', function() {

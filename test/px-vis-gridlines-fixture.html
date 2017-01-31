@@ -11,7 +11,7 @@
          for any URL ending with "/web-component-tester/browser.js"
          when wct is run from the command line -->
     <script src="../web-component-tester/browser.js"></script>
-    <link rel="import" href="../px-vis-scale.html" />
+    <link rel="import" href="behaviors/scale-single.html" />
     <link rel="import" href="../px-vis-svg.html" />
     <link rel="import" href="../px-vis-gridlines.html" />
     <!-- Retain this link for px-theme.html -->
@@ -25,16 +25,14 @@
   <body>
     <h3>Web Component Test : Fixture for px-vis-gridlines</h3>
     <template is="dom-bind">
-      <px-vis-scale
+      <scale-single
         id="baseScale"
-        x-scale="time"
-        y-scale="linear"
+        x-axis-type="time"
+        y-axis-type="linear"
         x="{{x}}"
         y="{{y}}"
-        domain-changed="{{domainChanged}}"
-        current-domain-x="{{currentDomainX}}"
-        current-domain-y="{{currentDomainY}}">
-      </px-vis-scale>
+        domain-changed="{{domainChanged}}">
+      </scale-single>
       <px-vis-svg
         id="baseSVG"
         svg="{{svg}}">
@@ -43,19 +41,15 @@
         id="baseXGrid"
         svg="[[svg]]"
         axis="[[x]]"
-        title="myXTitle"
         orientation="bottom"
-        domain-changed="[[domainChanged]]"
-        current-domain="[[currentDomainX]]">
+        domain-changed="[[domainChanged]]">
       </px-vis-gridlines>
       <px-vis-gridlines
         id="baseYGrid"
         svg="[[svg]]"
         axis="[[y]]"
-        title="myYTitle"
         orientation="left"
-        domain-changed="[[domainChanged]]"
-        current-domain="[[currentDomainY]]">
+        domain-changed="[[domainChanged]]">
       </px-vis-gridlines>
     </template>
   </body>

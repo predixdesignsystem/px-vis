@@ -1,3 +1,5 @@
+<link rel="import" href="../polymer/polymer.html"/>
+
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 
@@ -16,7 +18,7 @@ var PxVisBehaviorScale = PxVisBehaviorScale || {};
 
     @polymerBehavior PxVisBehaviorScale.scale
 */
-PxVisBehaviorScale.scale = {
+PxVisBehaviorScale.scale = [{
   properties: {
     /**
      * Holder for chart extents from the seriesConfig object
@@ -63,10 +65,9 @@ PxVisBehaviorScale.scale = {
    *
    * @method _setXScale
    */
-  _setXScale: function(width, margin, varName) {
-    var varName = varName || 'x',
-        w = Math.max(width - margin.left - margin.right, 0);
-    this.set(varName, this._setScale(this.xAxisType,[0, w], this[varName]));
+  _setXScale: function(width, margin) {
+    var w = Math.max(width - margin.left - margin.right, 0);
+    this.set('x', this._setScale(this.xAxisType,[0, w], this.x));
   },
 
   /**
@@ -74,11 +75,10 @@ PxVisBehaviorScale.scale = {
    *
    * @method _setYScale
    */
-  _setYScale: function(height, margin, varName) {
-    var varName = varName || 'y',
-        h = Math.max(height - margin.top - margin.bottom, 0);
+  _setYScale: function(height, margin) {
+    var h = Math.max(height - margin.top - margin.bottom, 0);
 
-    this.set(varName, this._setScale(this.yAxisType,[h, 0], this[varName]));
+    this.set('y', this._setScale(this.yAxisType,[h, 0], this.y));
   },
 
   /**
@@ -86,16 +86,15 @@ PxVisBehaviorScale.scale = {
    *
    * @method _setYScale
    */
-  _setMultiYScale: function(height, margin, axes, varName) {
-    var varName = varName || 'y',
-        h = Math.max(height - margin.top - margin.bottom, 0),
+  _setMultiYScale: function(height, margin, axes) {
+    var h = Math.max(height - margin.top - margin.bottom, 0),
         newY = {};
 
     for(var i = 0; i < this.axes.length; i++) {
-      newY[this.axes[i]] = this._setScale(this.yAxisType,[h, 0], this[varName], true, this.axes[i]);
+      newY[this.axes[i]] = this._setScale(this.yAxisType,[h, 0], this.y, true, this.axes[i]);
     }
 
-    this.set(varName, newY);
+    this.set('y', newY);
   },
 
   /**
@@ -561,6 +560,18 @@ PxVisBehaviorScale.scale = {
 
     return s;
   }
-};
+},
+  PxVisBehavior.sizing,
+  PxVisBehaviorD3.axes,
+  PxVisBehavior.dataset,
+  PxVisBehavior.commonMethods,
+  PxVisBehaviorD3.selectedDomain,
+  PxVisBehavior.axisTypes,
+  PxColorsBehavior.baseColors,
+  PxVisBehavior.completeSeriesConfig,
+  PxVisBehavior.chartExtents,
+  PxVisBehavior.dataExtents,
+  PxVisBehaviorD3.domainUpdate
+];
 
 </script>

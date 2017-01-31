@@ -11,7 +11,7 @@
          for any URL ending with "/web-component-tester/browser.js"
          when wct is run from the command line -->
     <script src="../web-component-tester/browser.js"></script>
-    <link rel="import" href="../px-vis-scale.html" />
+    <link rel="import" href="behaviors/scale-single.html" />
     <link rel="import" href="../px-vis-svg.html" />
     <link rel="import" href="../px-vis-axis.html" />
     <!-- Retain this link for px-theme.html -->
@@ -25,16 +25,14 @@
   <body>
     <h3>Web Component Test : Fixture for px-vis-axis</h3>
     <template is="dom-bind">
-      <px-vis-scale
+      <scale-single
         id="baseScale"
         x-axis-type="time"
         y-axis-type="linear"
         x="{{x}}"
         y="{{y}}"
-        domain-changed="{{domainChanged}}"
-        current-domain-x="{{currentDomainX}}"
-        current-domain-y="{{currentDomainY}}">
-      </px-vis-scale>
+        domain-changed="{{domainChanged}}">
+      </scale-single>
       <px-vis-svg
         id="baseSVG"
         svg="{{svg}}">
@@ -48,8 +46,7 @@
         width="200"
         orientation="bottom"
         prevent-series-bar
-        domain-changed="[[domainChanged]]"
-        current-domain="[[currentDomainX]]">
+        domain-changed="[[domainChanged]]">
       </px-vis-axis>
       <px-vis-axis
         id="baseYAxis"
@@ -59,22 +56,19 @@
         width="200"
         title="myYTitle"
         orientation="left"
-        domain-changed="[[domainChanged]]"
-        current-domain="[[currentDomainY]]">
+        domain-changed="[[domainChanged]]">
       </px-vis-axis>
     </template>
 
     <template is="dom-bind">
-      <px-vis-scale
+      <scale-single
         id="pcAxisScale"
         x-axis-type="time"
         y-axis-type="linear"
         x="{{x}}"
         y="{{y}}"
-        domain-changed="{{domainChanged}}"
-        current-domain-x="{{currentDomainX}}"
-        current-domain-y="{{currentDomainY}}">
-      </px-vis-scale>
+        domain-changed="{{domainChanged}}">
+      </scale-single>
       <px-vis-svg
         id="pcAxisSVG"
         svg="{{svg}}">
@@ -94,7 +88,6 @@
             }'
         title-type-size="12"
         label-type-size="10"
-        current-domain="[[currentDomainY]]"
         stroke-width="2"
         height="200"
         width="200"
@@ -105,16 +98,14 @@
     </template>
 
     <template is="dom-bind">
-      <px-vis-scale
+      <scale-single
         id="pcUnitAxisScale"
         x-axis-type="time"
         y-axis-type="linear"
         x="{{x}}"
         y="{{y}}"
-        domain-changed="{{domainChanged}}"
-        current-domain-x="{{currentDomainX}}"
-        current-domain-y="{{currentDomainY}}">
-      </px-vis-scale>
+        domain-changed="{{domainChanged}}">
+      </scale-single>
       <px-vis-svg
         id="pcUnitAxisSVG"
         svg="{{svg}}">
@@ -136,9 +127,9 @@
         height="200"
         width="200"
         label-type-size="10"
-        current-domain="[[currentDomainY]]"
         stroke-width="2"
         outer-tick-size="0"
+        unit="BoF"
         append-unit-in-title
         prevent-series-bar
         domain-changed="[[domainChanged]]">
@@ -146,16 +137,14 @@
     </template>
 
     <template is="dom-bind">
-      <px-vis-scale
+      <scale-single
         id="pcTruncAxisScale"
         x-axis-type="time"
         y-axis-type="linear"
         x="{{x}}"
         y="{{y}}"
-        domain-changed="{{domainChanged}}"
-        current-domain-x="{{currentDomainX}}"
-        current-domain-y="{{currentDomainY}}">
-      </px-vis-scale>
+        domain-changed="{{domainChanged}}">
+      </scale-single>
       <px-vis-svg
         id="pcTruncAxisSVG"
         svg="{{svg}}">
@@ -177,7 +166,6 @@
             }'
         title-type-size="12"
         label-type-size="10"
-        current-domain="[[currentDomainY]]"
         stroke-width="2"
         outer-tick-size="0"
         truncation-length="4"
@@ -187,16 +175,14 @@
       </px-vis-axis>
 
       <template is="dom-bind">
-        <px-vis-scale
+        <scale-single
           id="pcTruncUnitAxisScale"
           x-axis-type="time"
           y-axis-type="linear"
           x="{{x}}"
           y="{{y}}"
-          domain-changed="{{domainChanged}}"
-          current-domain-x="{{currentDomainX}}"
-          current-domain-y="{{currentDomainY}}">
-        </px-vis-scale>
+          domain-changed="{{domainChanged}}">
+        </scale-single>
         <px-vis-svg
           id="pcTruncUnitAxisSVG"
           svg="{{svg}}">
@@ -218,28 +204,26 @@
               }'
           title-type-size="12"
           label-type-size="10"
-          current-domain="[[currentDomainY]]"
           stroke-width="2"
           outer-tick-size="0"
           truncation-length="4"
           append-unit-in-title
           prevent-series-bar
+          unit="BoF"
           domain-changed="[[domainChanged]]"
           title-truncation>
         </px-vis-axis>
       </template>
 
       <template is="dom-bind">
-        <px-vis-scale
+        <scale-single
           id="pcRotateAxisScale"
           x-axis-type="time"
           y-axis-type="linear"
           x="{{x}}"
           y="{{y}}"
-          domain-changed="{{domainChanged}}"
-          current-domain-x="{{currentDomainX}}"
-          current-domain-y="{{currentDomainY}}">
-        </px-vis-scale>
+          domain-changed="{{domainChanged}}">
+        </scale-single>
         <px-vis-svg
           id="pcRotateAxisSVG"
           svg="{{svg}}">
@@ -261,11 +245,11 @@
               }'
           title-type-size="12"
           label-type-size="10"
-          current-domain="[[currentDomainY]]"
           stroke-width="2"
           outer-tick-size="0"
           truncation-length="4"
           append-unit-in-title
+          unit="BoF"
           prevent-series-bar
           domain-changed="[[domainChanged]]"
           title-truncation>
@@ -273,16 +257,14 @@
       </template>
 
       <template is="dom-bind">
-        <px-vis-scale
+        <scale-single
           id="tickScale"
           x-axis-type="time"
           y-axis-type="linear"
           x="{{x}}"
           y="{{y}}"
-          domain-changed="{{domainChanged}}"
-          current-domain-x="{{currentDomainX}}"
-          current-domain-y="{{currentDomainY}}">
-        </px-vis-scale>
+          domain-changed="{{domainChanged}}">
+        </scale-single>
         <px-vis-svg
           id="tickSVG"
           svg="{{svg}}">
@@ -295,22 +277,19 @@
           axis="[[y]]"
           title="myYTitle"
           orientation="left"
-          domain-changed="[[domainChanged]]"
-          current-domain="[[currentDomainY]]">
+          domain-changed="[[domainChanged]]">
         </px-vis-axis>
       </template>
 
       <template is="dom-bind">
-        <px-vis-scale
+        <scale-single
           id="tickFormatScale"
           x-axis-type="time"
           y-axis-type="linear"
           x="{{x}}"
           y="{{y}}"
-          domain-changed="{{domainChanged}}"
-          current-domain-x="{{currentDomainX}}"
-          current-domain-y="{{currentDomainY}}">
-        </px-vis-scale>
+          domain-changed="{{domainChanged}}">
+        </scale-single>
         <px-vis-svg
           id="tickFormatSVG"
           svg="{{svg}}">
@@ -326,8 +305,7 @@
           orientation="bottom"
           tick-format="%I %p"
           prevent-series-bar
-          domain-changed="[[domainChanged]]"
-          current-domain="[[currentDomainX]]">
+          domain-changed="[[domainChanged]]">
         </px-vis-axis>
         <px-vis-axis
           id="tickFormatYAxis"
@@ -338,22 +316,19 @@
           tick-format=".2s"
           title="tickFormatYAxis"
           orientation="left"
-          domain-changed="[[domainChanged]]"
-          current-domain="[[currentDomainY]]">
+          domain-changed="[[domainChanged]]">
         </px-vis-axis>
       </template>
 
       <template is="dom-bind">
-        <px-vis-scale
+        <scale-single
           id="inlineScale"
           x-axis-type="time"
           y-axis-type="linear"
           x="{{x}}"
           y="{{y}}"
-          domain-changed="{{domainChanged}}"
-          current-domain-x="{{currentDomainX}}"
-          current-domain-y="{{currentDomainY}}">
-        </px-vis-scale>
+          domain-changed="{{domainChanged}}">
+        </scale-single>
         <px-vis-svg
           id="inlineSVG"
           svg="{{svg}}">
@@ -371,8 +346,7 @@
           axis-color="grey4"
           title-type-size="20"
           label-type-size="15"
-          domain-changed="[[domainChanged]]"
-          current-domain="[[currentDomainX]]">
+          domain-changed="[[domainChanged]]">
         </px-vis-axis>
         <px-vis-axis
           id="inlineYAxis"
@@ -387,22 +361,19 @@
           axis-color="grey4"
           title-type-size="20"
           label-type-size="15"
-          domain-changed="[[domainChanged]]"
-          current-domain="[[currentDomainY]]">
+          domain-changed="[[domainChanged]]">
         </px-vis-axis>
       </template>
 
       <template is="dom-bind">
-        <px-vis-scale
+        <scale-single
           id="noTicksScale"
           x-axis-type="time"
           y-axis-type="linear"
           x="{{x}}"
           y="{{y}}"
-          domain-changed="{{domainChanged}}"
-          current-domain-x="{{currentDomainX}}"
-          current-domain-y="{{currentDomainY}}">
-        </px-vis-scale>
+          domain-changed="{{domainChanged}}">
+        </scale-single>
         <px-vis-svg
           id="noTicksSVG"
           svg="{{svg}}">
@@ -418,8 +389,7 @@
           orientation="left"
           title-type-size="20"
           label-type-size="15"
-          domain-changed="[[domainChanged]]"
-          current-domain="[[currentDomainY]]">
+          domain-changed="[[domainChanged]]">
         </px-vis-axis>
       </template>
 

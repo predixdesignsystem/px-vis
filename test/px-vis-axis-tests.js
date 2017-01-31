@@ -310,7 +310,7 @@ function runTests(){
           arr = re.exec(s);
       assert.equal(arr[1],'translate');
       assert.equal(parseFloat(arr[2]),-12);
-      assert.closeTo(parseFloat(arr[3]),-55,12);
+      assert.closeTo(parseFloat(arr[3]),-37.5,3);
     });
   }); //suite
 

@@ -142,7 +142,7 @@ function runTests(){
       var g = baseSVG.svg.select('g.r.axis'),
           circle = g.selectAll('circle');
 
-      assert.lengthOf(circle.nodes(),6);
+      assert.lengthOf(circle.nodes(),5);
     });
 
     test('radialGrid circles have correct radius', function() {
@@ -243,7 +243,7 @@ function runTests(){
       var g = baseSVG.svg.select('g.r.axis'),
           circle = g.selectAll('circle');
 
-      assert.lengthOf(circle.nodes(),4);
+      assert.lengthOf(circle.nodes(),3);
     });
 
     test('radialGrid circles have correct radius', function() {

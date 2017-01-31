@@ -214,10 +214,15 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
           .text(this._calcTitle.bind(this));
 
         //must set rectangle width after text is set so we know how big it is
-        // this.thresholdRect.attr('width', function(d,i) {
-        //   console.log(this.thresholdText.nodes()[i].getBBox().width);
-        //   return this.thresholdText.nodes()[i].getBBox().width + 3;  //should be 6 but 6 looks too big...
-        // }.bind(this));
+        this.thresholdRect.attr('width', function(d,i) {
+          var w;
+          try {
+            w = this.thresholdText.nodes()[i].getBBox().width;
+          } catch(e) {
+            w = this.thresholdText.nodes()[i].getBoundingClientRect().width;
+          }
+          return w + 6;
+        }.bind(this));
     },
     /***
      * Subsequent drawing
@@ -248,8 +253,8 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
      *
      * @method _setColors
      */
-    _setColors: function(){
-      if(this.showThresholdBox){
+    _setColors: function() {
+      if(this.showThresholdBox) {
         this.thresholdRect.attr('fill', this._getColors.bind(this));
         this.thresholdText.attr('fill',"white");
       } else {

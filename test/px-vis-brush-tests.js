@@ -75,8 +75,8 @@ function runTests(){
       assert.isTrue(baseBrush._brush !== null);
     });
     test('baseBrush._brush extents are full', function() {
-      var x1 = baseScale.x(baseScale.currentDomainX[0]),
-          x2 = baseScale.x(baseScale.currentDomainX[1]);
+      var x1 = baseScale.x(baseScale.x.domain()[0]),
+          x2 = baseScale.x(baseScale.x.domain()[1]);
       assert.deepEqual(Px.d3.brushSelection(baseBrush._brushGroup.node()),[x1,x2]);
     });
 

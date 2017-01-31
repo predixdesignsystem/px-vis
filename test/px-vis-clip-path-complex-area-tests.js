@@ -65,10 +65,6 @@ function runTests(){
           "left": 10
         };
 
-      document.addEventListener('px-vis-clip-path-updated',function(evt){
-        eventObj = evt.detail;
-      });
-
       baseSVG.set('width',w);
       baseSVG.set('height',h);
       baseSVG.set('margin',m);
@@ -95,19 +91,6 @@ function runTests(){
     test('baseClip fixture is created', function() {
       assert.isTrue(baseClip !== null);
     });
-    test('event fired', function() {
-      assert.isTrue(eventObj !== null);
-    });
-    test('event dataVar', function() {
-      assert.equal(eventObj.dataVar, 'clipPath');
-    });
-    test('event method', function() {
-      assert.equal(eventObj.method, 'set');
-    });
-    test('event data', function() {
-      assert.equal(eventObj.data.length, 13);
-      assert.equal(eventObj.data.split('_')[0], 'cp');
-    });
   });
 
   suite('px-vis-clip-path-complex-area baseClip works', function() {
@@ -117,10 +100,6 @@ function runTests(){
 
     suiteSetup(function(){
       clipPath = baseSVG.svg.select('clipPath');
-      // Safari 8 cant seem to find it with d3 select... fallback
-      if(clipPath.node() === null) {
-        clipPath = Px.d3.select(document.getElementsByTagName('clipPath')[0]);
-      }
       rect = baseClip._clipPathSvg;
     });
 
