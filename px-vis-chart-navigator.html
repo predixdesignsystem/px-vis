@@ -3,11 +3,11 @@
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="px-vis-behavior-datetime.html" />
 <link rel="import" href="px-vis-behavior-chart.html" />
+<link rel="import" href="px-vis-behavior-scale.html" />
 <link rel="import" href="px-vis-svg.html"/>
 <link rel="import" href="px-vis-line-svg.html"/>
 <link rel="import" href="px-vis-axis.html"/>
 <link rel="import" href="px-vis-brush.html"/>
-<link rel="import" href="px-vis-scale.html"/>
 <link rel="import" href="../px-datetime-common/px-datetime-imports.html"/>
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html" />
 <link rel="import" href="../px-colors-design/colors.html" />
@@ -48,20 +48,6 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
       <style include="px-vis-styles"></style>
 
       <div id="wrapper" style="height:100%;width:100%">
-        <px-vis-scale
-          x-axis-type="[[xAxisType]]"
-          y-axis-type="[[yAxisType]]"
-          width="[[width]]"
-          height="[[height]]"
-          margin="[[margin]]"
-          x="{{x}}"
-          y="{{y}}"
-          chart-extents="[[chartExtents]]"
-          data-extents="[[dataExtents]]"
-          complete-series-config="[[completeSeriesConfig]]"
-          chart-data="[[chartData]]"
-          domain-changed="{{domainChanged}}">
-        </px-vis-scale>
         <px-vis-svg
           width="[[width]]"
           height="[[height]]"
@@ -135,6 +121,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
         is: 'px-vis-chart-navigator',
 
         behaviors: [
+          PxVisBehaviorScale.scale,
           PxVisBehavior.sizing,
           PxVisBehavior.formatting,
           PxVisBehaviorTime.datetime,
@@ -229,6 +216,11 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
 
         observers: [
           '_xAxisConfigChanged(xAxisConfig.*)',
+          '_setXScale(width, margin)',
+          '_setYScale(height, margin)',
+          '_setDomain(_chartDataHasChanged.*, x, y, completeSeriesConfig, dataExtents)',
+          '_setDomain(chartExtents, dataExtents)',
+          '_chartDataChanged(chartData.*)'
         ],
 
         listeners: {
@@ -303,7 +295,7 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
               "y":[Infinity,-Infinity]});
 
           } else if(this._doesObjHaveValues(this.dataExtents) && this._doesObjHaveValues(this.dataExtents.x) && this._doesObjHaveValues(this.dataExtents.y)) {
-            if(!this.disableEmptyRender){
+            if(!this.disableEmptyRender) {
               var config = this.seriesConfig[Object.keys(this.seriesConfig)[0]];
               //if we're using dummy data make sure it reflects the new range
               if(this.chartData.length === 2 && this.chartData[0][config.y] === 0 &&

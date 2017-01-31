@@ -223,8 +223,8 @@ This element sets the selectedDomain property based on the extents box. The sele
             overlay.attr('fill','url(#overlayGradient)')
               .attr('fill-opacity','1.0');
           } else {
-            overlay.attr('fill',this._checkThemeVariable("--px-vis-nav-brush-fill-color", this.colors.black))
-              .attr('fill-opacity', this._checkThemeVariable("--px-vis-nav-brush-opacity", 0.10))
+            overlay.attr('fill',this._checkThemeVariable("--px-vis-nav-brush-fill-color", this.colors.grey5))
+              .attr('fill-opacity', this._checkThemeVariable("--px-vis-nav-brush-opacity", 0.3));
           }
 
           this._drawHandles(heightOffset);
@@ -248,7 +248,7 @@ This element sets the selectedDomain property based on the extents box. The sele
         } else {
           //make sure brush has the right size
           this._brush.extent(domain)
-            .handleSize(6)
+            // .handleSize(6)
             .on("start", this._brushstart.bind(this))
             .on("brush", this._brushmove.bind(this))
             .on("end", this._brushend.bind(this));
@@ -326,6 +326,10 @@ This element sets the selectedDomain property based on the extents box. The sele
               });
             }
           }
+
+          // this._handleGroup.attr("transform", function(d,i) {
+          //   return "translate(" + (brushExt[i] - 10) + "," + (this.height-this.margin.bottom - this.margin.top-10)/2 + ")"
+          // }.bind(this));
         }
       }, 10);
     },
@@ -428,17 +432,17 @@ This element sets the selectedDomain property based on the extents box. The sele
      */
     _drawHandles:function(heightOffset){
       // Setup sizes for the handles on either end
-      var handleSize = {
-        'h':32,
-        'w':9,
-        's':1.5
-      };
+      // var handleSize = {
+      //   'h':32,
+      //   'w':9,
+      //   's':1.5
+      // };
+
       // handleSize['y'] = this.height/2 - handleSize.h/2 - heightOffset;
       //
       // var lineY = [handleSize.y + heightOffset * 1.5 , handleSize.y + handleSize.h - heightOffset * 1.5];
 
       //draw a group to hold the handles
-      // this._handleGroup = this._brushGroup.selectAll(".handle")
       this._handleGroup = this._brushGroup.selectAll(".handle")
         // provide listeners for hover and press events
         .on('brushmouseup',this._handleGroupMouseUp.bind(this))
@@ -446,11 +450,15 @@ This element sets the selectedDomain property based on the extents box. The sele
         .on("mouseenter.handle", this._handleGroupMouseEnter.bind(this))
         .on("mouseleave.handle", this._handleGroupMouseLeave.bind(this));
 
+      // this._handleGroup = this._brushGroup.selectAll(".handle--custom")
+      //   .data([{type: "w"}, {type: "e"}])
+      //   .enter().append("rect")
+      //     .attr("class", "handle--custom")
+      //     .attr("cursor", "ew-resize")
+      //     .attr("width", 20)
+      //     .attr("height", 20)
       // draw the handle rect / base
       this._handleGroup
-        // .attr("x", -handleSize.w/2)
-        // .attr("y", handleSize.y)
-        // .attr("height", handleSize.h)
         .attr('stroke',this._checkThemeVariable("--px-vis-nav-brush-handle-lines-color", this.colors.gray5))
         .attr('fill',this._checkThemeVariable("--px-vis-nav-brush-handle-fill-color", this.colors.white))
         .attr('shape-rendering','crispEdges');
@@ -541,13 +549,18 @@ This element sets the selectedDomain property based on the extents box. The sele
      *
      * @method _zoomBrush
      */
-    _zoomBrush: function(chartDomain){
-      if(!this._brushing && !this._centering && this.chartDomain.length > 0 && this._doesObjHaveValues(this._brush) && this._doesObjHaveValues(this._brushGroup) && this._doesObjHaveValues(this.axis) && Px.d3.brushSelection(this._brushGroup.node())){
+    _zoomBrush: function(chartDomain) {
+      if(!this._brushing && !this._centering && this.chartDomain.length > 0 && this._doesObjHaveValues(this._brush) && this._doesObjHaveValues(this._brushGroup) && this._doesObjHaveValues(this.axis) && Px.d3.brushSelection(this._brushGroup.node())) {
         var extent = Px.d3.brushSelection(this._brushGroup.node()),
-            domain = [this.axis(this.chartDomain[0]),this.axis(this.chartDomain[1])];
-        if(!(extent[0] === domain[0] && extent[1] === domain[1])){
+            range = [this.axis(this.chartDomain[0]),this.axis(this.chartDomain[1])];
+
+        // make sure brushes dont extend out of the navigator area
+        range[0] = Math.max(range[0], this.axis.range()[0]);
+        range[1] = Math.min(range[1], this.axis.range()[1]);
+
+        if(!(extent[0] === range[0] && extent[1] === range[1])) {
           this._brushGroup
-            .call(this._brush.move,domain)
+            .call(this._brush.move,range)
         }
       }
     },
