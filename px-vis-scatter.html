@@ -55,7 +55,8 @@ Element which draws scatter series onto the chart
       PxVisBehavior.seriesId,
       PxVisBehavior.dynamicConfigProperties,
       PxVisBehaviorD3.serieToRedrawOnTopSVG,
-      PxColorsBehavior.baseColors
+      PxColorsBehavior.baseColors,
+      PxVisBehavior.tooltipOnHover
     ],
 
     /**
@@ -262,11 +263,14 @@ Element which draws scatter series onto the chart
      *
      */
     _mouseEnterSymbol: function(d, i, paths) {
-      this._showTooltip(d, i, paths);
+
+      if(this.tooltipOnHover) {
+        this._showTooltip(d, i, paths);
+      }
       if(!this.mutedSeries[this.seriesId]) {
 
-      //if radial make sur eon hover we have 100% opacity
-      Px.d3.event.currentTarget.setAttribute('fill-opacity', 1);
+        //if radial make sur eon hover we have 100% opacity
+        Px.d3.event.currentTarget.setAttribute('fill-opacity', 1);
       }
     },
     /**
@@ -295,9 +299,9 @@ Element which draws scatter series onto the chart
 
       dataObj.series.push({'name': this.seriesId, 'value': values});
 
+      this.fire('px-vis-scatter-request-tooltip', {'show': true, 'mouseCoords': center});
       this.set('tooltipData',dataObj);
       this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
-      this.fire('px-vis-scatter-request-tooltip', {'show': true, 'mouseCoords': center});
     },
     /**
      * Mousevent on leave
@@ -326,7 +330,6 @@ Element which draws scatter series onto the chart
       };
       this.set('tooltipData',dataObj);
       this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
-      this.fire('px-vis-scatter-request-tooltip', {'show': false});
     },
 
     /**
