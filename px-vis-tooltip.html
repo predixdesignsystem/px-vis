@@ -40,7 +40,7 @@ Element providing on-chart tooltip display
   <template>
     <style include="px-vis-tooltip-styles"></style>
 
-    <template id="template" is="dom-if" if="[[!_tooltipDataHidden]]">
+    <template id="template" is="dom-if" if="[[!_internalHidden]]">
       <px-tooltip
         id="tooltip"
         tooltip-style="[[tooltipStyle]]"
@@ -140,18 +140,21 @@ Element providing on-chart tooltip display
         computed: '_checkGroups(tooltipData.*, groupings)'
       },
       /**
-       * Whether tooltip should be hidden because of 'hidden' in tooltipdata
+       * Turn on to hide the tooltip
        */
-      _tooltipDataHidden: {
+      hide: {
+        type: Boolean,
+        value: false
+      },
+      _internalHidden: {
         type: Boolean,
         value: false
       },
       _tooltipElem: {
         type: HTMLElement
       }
-
     },
-    observers: ['_ttDataChanged(tooltipData.*)'],
+    observers: ['_computeInternalHidden(hide, tooltipData.*)'],
 
     attached: function() {
       this.set('_tooltipElem', this.$$('px-tooltip'));
@@ -161,17 +164,19 @@ Element providing on-chart tooltip display
      */
     forceShow: function() {
 
-      this.$.template.render();
-      this._tooltipElem._show();
-      this._tooltipElem._setPosition();      
+      if(this._tooltipElem) {
+        this._tooltipElem._show();
+        this._tooltipElem._setPosition();     
+      } 
     },
     /**
      *  Forces the tooltip to hide by calling _hide on px-tooltip
      */
     forceHide: function() {
 
-      this.$.template.render();
-      this._tooltipElem._hide();
+      if(this._tooltipElem) {
+        this._tooltipElem._hide();
+      }
     },
 
     _checkGroups: function() {
@@ -188,9 +193,24 @@ Element providing on-chart tooltip display
         return 3;
       }
     },
+    _computeInternalHidden: function() {
+     
+      var hidden = this.tooltipData.hidden || this.hide;
+      this.set('_internalHidden', hidden);
 
+      this.$.template.render();
+      this.set('_tooltipElem', this.$$('px-tooltip'));
+
+      if(this._tooltipElem) {
+        if(hidden) {
+          this.forceHide();
+        } else {
+          this.forceShow()
+        }
+      }
+    },
     _ttDataChanged: function() {
       this.set('_tooltipDataHidden', this.tooltipData.hidden);
-    }
+    },
   });
 </script>
