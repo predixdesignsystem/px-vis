@@ -132,7 +132,6 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
           PxVisBehavior.dataset,
           PxVisBehavior.completeSeriesConfig,
           PxVisBehavior.commonMethods,
-          PxVisBehavior.chartExtents,
           PxVisBehavior.dataExtents,
           PxVisBehavior.axisTypes,
           PxVisBehaviorChart.chartCommon,
@@ -212,6 +211,33 @@ Provides an interactive chart navigator with a brush to adjust the chart domain
             type: Boolean,
             value: false
           },
+          /**
+          * Developer set chart extents for the chart. The chart will draw to whatever values are specified in the chartExtents.
+          *```
+          *  {
+          *      "x": [0,100],
+          *      "y": [5,50],
+          *  }
+          *```
+          *
+          * To force the chart to calculate based on data, use "dynamic".
+          *```
+          *  {
+          *      "x": [0,"dynaimc"],
+          *      "y": [-10,"dynaimc"],
+          *  }
+          *```
+          */
+          chartExtents: {
+            type: Object,
+            notify: true,
+            value: function() {
+              return {
+                "x": [Infinity, -Infinity],
+                "y": [Infinity, -Infinity]
+              }
+            }
+          }
         },
 
         observers: [
