@@ -1827,33 +1827,34 @@ PxVisBehaviorChart.axisRegister = [{
     return '';
   },
 
-  _buildAxisTooltipData: function(axisId, value, time) {
+  _buildAxisTooltipData: function(values, time) {
     //update axis register with the value
     if(this._axisRegisterTooltipData && this._axisRegisterTooltipData.series && !this.hideAxisRegister) {
       //rebuild object from scratch to avoid Polymer dirty check
-      var copy = {},
-          hasValue = value || value === 0;
+      var copy = {};
       copy.series = [];
       copy.time = time || null;
 
       for(var i=0; i<this._axisRegisterTooltipData.series.length; i++) {
-        var newSeries = {};
-        newSeries.name = this._axisRegisterTooltipData.series[i].name;
-        if(axisId && hasValue && newSeries.name === axisId) {
-          newSeries.value = value;
-        } 
+        var newSeries = {},
+            name = this._axisRegisterTooltipData.series[i].name;
+        newSeries.name = name;
+        if(values && values[name]) {
+          newSeries.value = {};
+          newSeries.value[name] = values[name];
+        }
         copy.series.push(newSeries);
       }
 
       this.set('_axisRegisterTooltipData', copy);
     }
   },
-  _updateAxisConfig: function(axisId, color) {
+  _updateAxisConfig: function(color) {
     var copy = this._axisRegisterConfig,
         keys = Object.keys(this._axisRegisterConfig);
 
     for(var i=0; i<keys.length; i++) {
-      if(keys[i] === axisId) {
+      if(color) {
         copy[keys[i]].color = color;
       } else {
         delete copy[keys[i]].color;
@@ -1861,7 +1862,7 @@ PxVisBehaviorChart.axisRegister = [{
     }
 
     this._axisRegisterConfig = copy;
-    this.notifyPath('_axisRegisterConfig.' + axisId + '.color');
+    this.notifyPath('_axisRegisterConfig');
   }
 }, PxVisBehavior.dimensions, PxVisBehavior.completeSeriesConfig, PxVisBehaviorChart.mutedAxes];
 
