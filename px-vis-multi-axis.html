@@ -71,6 +71,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       <template id="bof" is="dom-repeat" items="[[_internalDimensions]]" sort="[[_sortDims(_internalDimensions)]]">
         <px-vis-axis
           id="[[item]]"
+          class="multiAxis"
           svg="[[_returnGroup(item, index, _internalDimensionsChanged)]]"
           axis="[[_returnY(item, _internalDimensionsChanged)]]"
           series-id="[[item]]"
@@ -346,7 +347,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     },
 
     observers: [
-      '_yAxisConfigChanged(yAxisConfig.*)',
+      '_axisConfigChanged(axisConfig.*)',
       '_computedInternalDimensions(domainChanged, x, dimensions.*, svg, dragBehavior)',
       '_recalcGTransforms(leftAxisSize, rightAxisSize)',
       '_toggleTitleLocation(length)'
@@ -371,9 +372,21 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     _axisConfigChanged: function(conf) {
       if(this.axisConfig) {
         var axes = Object.keys(this.axisConfig);
+
+        // iterate through the axisConfig keys
         for(var i = 0; i < axes.length; i++) {
-          if(this.$$('#' + axes[i])) {
+          // if the key is an axis and the config is a set of configs, apply them to the axis
+          if(this.$$('#' + axes[i]) && typeof this.axisConfig[axes[i]] === 'object') {
             this._applyConfigToElement(this.axisConfig[axes[i]], this.$$('#' + axes[i]));
+
+          // if it is just a key, assume it is a property and set on all axes
+          } else {
+            var elems = Polymer.dom(this.root).querySelectorAll('.multiAxis');
+            if(elems) {
+              for(var j = 0; j < elems.length; j++) {
+                elems[j].set(axes[i], this.axisConfig[axes[i]]);
+              }
+            }
           }
         }
       }
