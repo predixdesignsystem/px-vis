@@ -169,21 +169,22 @@ This element sets the selectedDomain property based on the extents box. The sele
       if(this._animationFrameDone && this.domainChanged !== null && !isNaN(this.axis.domain()[0].getTime()) && !isNaN(this.axis.domain()[1].getTime())) {
         var heightOffset = 5,
               h = Math.max(this.height - this.margin.bottom - heightOffset,0),
-              domain = [
+              range = [
                 [this.axis.range()[0],0],
                 [this.axis.range()[1],h]
               ];
 
           // check that our sizing is ok and wont freak d3 out.
           // x2 and y2 must be greater than x1 & y1
-          domain[1][0] = (domain[1][0] > domain[0][0]) ? domain[1][0] : domain[0][0];
-          domain[1][1] = (domain[1][1] > domain[0][1]) ? domain[1][1] : domain[0][1];
+          range[1][0] = (range[1][0] > range[0][0]) ? range[1][0] : range[0][0];
+          range[1][1] = (range[1][1] > range[0][1]) ? range[1][1] : range[0][1];
 
         if(this._isObjEmpty(this._brush)) {
 
+          this._createClipPath([0,h]);
           // first, define the brush using the axis
           this._brush = Px.d3.brushX()
-            .extent(domain)
+            .extent(range)
             .handleSize(6)
             .on("start", this._brushstart.bind(this))
             .on("brush", this._brushmove.bind(this))
@@ -203,7 +204,8 @@ This element sets the selectedDomain property based on the extents box. The sele
             .attr("y", 0)
             .attr('stroke', this._checkThemeVariable("--px-vis-nav-brush-outline-color", this.colors.gray5))
             .attr('stroke-width',2)
-            .attr('shape-rendering','crispEdges');
+            .attr('shape-rendering','crispEdges')
+            .attr("clip-path", 'url(#navClipPath)');
 
           if(this.gradientOverlay){
             var gradient = this.svg.append("defs")
@@ -246,8 +248,10 @@ This element sets the selectedDomain property based on the extents box. The sele
           //   console.log("doesnt match");
           // }
         } else {
+
+          this._drawClipPath([0,h]);
           //make sure brush has the right size
-          this._brush.extent(domain)
+          this._brush.extent(range)
             // .handleSize(6)
             .on("start", this._brushstart.bind(this))
             .on("brush", this._brushmove.bind(this))
@@ -264,6 +268,48 @@ This element sets the selectedDomain property based on the extents box. The sele
         }
       }
     },
+
+    _createClipPath: function(vR) {
+      this._clipPathObj =  this.svg
+        .append("clipPath")
+        .attr("id", "navClipPath");
+
+      this._clipPathObj.append("path");
+
+
+      this._drawClipPath(vR);
+    },
+
+    _drawClipPath: function(vR) {
+      var hR = this.axis.range();
+      hR[0] -= 30;
+      hR[1] += 30;
+
+      vR[0] -= 5;
+      vR[1] += 5;
+
+      var halfV = (vR[1] + vR[0]) / 2,
+          n = 10,
+          n2 = 5,
+          d = "M" + hR[0] + ',' + vR[0] +
+              "L" + hR[1] + ',' + vR[0] +
+              "L" + hR[1] + ',' + (halfV - n) +
+              "L" + (hR[1] - 10) + ',' + (halfV - n2) +
+              "L" + (hR[1] + 10) + ',' + (halfV + n2) +
+              "L" + hR[1] + ',' + (halfV + n) +
+              "L" + hR[1] + ',' + vR[1] +
+              "L" + hR[0] + ',' + vR[1] +
+              "L" + hR[0] + ',' + (halfV + n) +
+              "L" + (hR[0] + 10) + ',' + (halfV + n2) +
+              "L" + (hR[0] - 10) + ',' + (halfV - n2) +
+              "L" + hR[0] + ',' + (halfV - n) +
+              "Z";
+              // "L" + hR[0] + ',' + vR[0];
+
+      this._clipPathObj.select("path")
+        .attr("d", d);
+    },
+
     /**
      * Helper function to add class "selecting" to elems selected in the brush
      *
@@ -459,6 +505,7 @@ This element sets the selectedDomain property based on the extents box. The sele
       //     .attr("height", 20)
       // draw the handle rect / base
       this._handleGroup
+        .attr("clip-path", 'url(#navClipPath)')
         .attr('stroke',this._checkThemeVariable("--px-vis-nav-brush-handle-lines-color", this.colors.gray5))
         .attr('fill',this._checkThemeVariable("--px-vis-nav-brush-handle-fill-color", this.colors.white))
         .attr('shape-rendering','crispEdges');
@@ -555,8 +602,8 @@ This element sets the selectedDomain property based on the extents box. The sele
             range = [this.axis(this.chartDomain[0]),this.axis(this.chartDomain[1])];
 
         // make sure brushes dont extend out of the navigator area
-        range[0] = Math.max(range[0], this.axis.range()[0]);
-        range[1] = Math.min(range[1], this.axis.range()[1]);
+        // range[0] = Math.max(range[0], this.axis.range()[0]);
+        // range[1] = Math.min(range[1], this.axis.range()[1]);
 
         if(!(extent[0] === range[0] && extent[1] === range[1])) {
           this._brushGroup
