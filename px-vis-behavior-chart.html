@@ -87,6 +87,7 @@ PxVisBehaviorChart.chartCommon = [{
           return {}
         }
       },
+
       /**
       * A default configuration file. It fills in the missing parts of seriesConfig. Any options from seriesConfig can be specified in the defaultSeriesConfig and will be automatically used if not defined in the seriesConfig
       *
@@ -95,11 +96,15 @@ PxVisBehaviorChart.chartCommon = [{
       * ```
       *  {
       *     "type": "line",
-      *     "x": 'x'
-      *  }
+      *     "x": 'x',
+      *     "axis": {
+      *       "id": "defaultAxis",
+      *       "side": "left",
+      *       "number": 1
+      *   }}
       * ```
       */
-      defaultSeriesConfig: {
+      _defaultSeriesConfig: {
         type: Object,
         notify: true,
         value: function() {
@@ -114,6 +119,18 @@ PxVisBehaviorChart.chartCommon = [{
           }
         }
       },
+
+      /**
+      * Overwrites to the default configuration file. The defaultSeriesConfig is used to fill in the missing parts of seriesConfig. Any options from seriesConfig can be specified in the defaultSeriesConfig and will be automatically used if not defined in the seriesConfig
+      *
+      */
+      defaultSeriesConfig: {
+        type: Object,
+        notify: true,
+        value: function() { return {}; },
+        observer: '_updateDSC'
+      },
+      
       /**
       * A boolean flag on whether to include all the series in the data.
       * - `false`: only series defined in the seriesConfig file will be drawn
@@ -134,7 +151,7 @@ PxVisBehaviorChart.chartCommon = [{
     },
 
     observers: [
-      '_setCompleteSeriesConfig(defaultSeriesConfig.*,chartData.*,seriesConfig.*,dataVisColors.*,seriesColorOrder.*)'
+      '_setCompleteSeriesConfig(_defaultSeriesConfig.*,chartData.*,seriesConfig.*,dataVisColors.*,seriesColorOrder.*)'
     ],
 
     /**
@@ -156,7 +173,7 @@ PxVisBehaviorChart.chartCommon = [{
     *
     */
     _setCompleteSeriesConfig: function() {
-      if(this._doesObjHaveValues(this.defaultSeriesConfig) && this._doesObjHaveValues(this.chartData) && this._doesObjHaveValues(this.dataVisColors)) {
+      if(this._doesObjHaveValues(this._defaultSeriesConfig) && this._doesObjHaveValues(this.chartData) && this._doesObjHaveValues(this.dataVisColors)) {
         // FUTURE TODO refactor: use MAPs and SETs instead of Objects when IE has support / is no longer supported by us
         // We could use d3 sets and maps... worth it?
         var fullConfig = (this.seriesConfig) ? JSON.parse(JSON.stringify(this.seriesConfig)) : {},
@@ -168,7 +185,7 @@ PxVisBehaviorChart.chartCommon = [{
               obj[item] = {};
               return obj;
             }, {}),
-            defaultConfigProps = Object.keys(this.defaultSeriesConfig),
+            defaultConfigProps = Object.keys(this._defaultSeriesConfig),
             xMins = [],
             xMaxes = [],
             yMins = [],
@@ -195,7 +212,7 @@ PxVisBehaviorChart.chartCommon = [{
 
           if(!fullConfig[k[i]].hasOwnProperty('x')) {
             console.warn("Configuration " + k[i] + " does not have a x-value associated with it. Falling back to default");
-            fullConfig[k[i]]['x'] = this.defaultSeriesConfig['x'];
+            fullConfig[k[i]]['x'] = this._defaultSeriesConfig['x'];
           }
 
           if(!fullConfig[k[i]]['name']) {
@@ -209,8 +226,8 @@ PxVisBehaviorChart.chartCommon = [{
           for(var j = 0; j < defaultConfigProps.length; j++) {
             var property = defaultConfigProps[j];
             //if we dont already have the property, the default exists, and we want to copy the property
-            if(typeof fullConfig[k[i]][property] === 'undefined' && typeof this.defaultSeriesConfig[property] !== 'undefined' && skipProperties.indexOf(property) === -1) {
-              fullConfig[k[i]][property] = this.defaultSeriesConfig[property];
+            if(typeof fullConfig[k[i]][property] === 'undefined' && typeof this._defaultSeriesConfig[property] !== 'undefined' && skipProperties.indexOf(property) === -1) {
+              fullConfig[k[i]][property] = this._defaultSeriesConfig[property];
             }
           }
 
@@ -234,14 +251,14 @@ PxVisBehaviorChart.chartCommon = [{
         // delete the 'x' key from our all y keys obj
 
         //figure out what x is, either a config value (assuming all x are the same) or the default
-        x = (k.length > 0) ? fullConfig[k[0]]['x'] : this.defaultSeriesConfig['x'];
+        x = (k.length > 0) ? fullConfig[k[0]]['x'] : this._defaultSeriesConfig['x'];
         delete objYs [x];
 
         // create a new set of whatever Ys are left so we can iterate over it
         missingYs = Object.keys(objYs);
         // add the missing keys to our configuration, use y as the config key by default
         for(var i = 0; i < missingYs.length; i++) {
-          objYs[ missingYs[i] ]['type'] = this.defaultSeriesConfig['type'];
+          objYs[ missingYs[i] ]['type'] = this._defaultSeriesConfig['type'];
           objYs[ missingYs[i] ]['name'] = missingYs[i];
           objYs[ missingYs[i] ]['x'] = x;
           objYs[ missingYs[i] ]['y'] = missingYs[i];
@@ -384,6 +401,18 @@ PxVisBehaviorChart.chartCommon = [{
      */
     _returnKeys: function(obj) {
       return Object.keys(obj);
+    },
+
+    _updateDSC: function(dsc) {
+      var k = Object.keys(this.defaultSeriesConfig),
+          val;
+
+      for(var i = 0; i < k.length; i++) {
+        val = this.defaultSeriesConfig[k[i]];
+        this._defaultSeriesConfig[k[i]] = val;
+      }
+
+      this.notifyPath('_defaultSeriesConfig');
     }
 }, PxColorsBehavior.dataVisColors , PxVisBehaviorChart.chartCommonMethods, PxVisBehavior.commonMethods, PxVisBehavior.completeSeriesConfig, PxVisBehavior.axisTypes];
 
@@ -1175,11 +1204,11 @@ PxVisBehaviorChart.mutedAxes = {
 PxVisBehaviorChart.zooming = [{
 
   /*
-  * fires when the chart has been zoomed in or out. contains an object 
+  * fires when the chart has been zoomed in or out. contains an object
   * with 'x' and 'y' values.
   * - x: array containing the domain for X
   * - y: when only 1 y axis is defined, array containing the domain for Y
-  *      when multi Y axis, object with 1 key per axis, each value being 
+  *      when multi Y axis, object with 1 key per axis, each value being
   * an array containing the domain for this specific axis
   * @event px-vis-zoomed
   */
@@ -1237,7 +1266,7 @@ PxVisBehaviorChart.zooming = [{
     'px-vis-interaction-space-start-panning': '_intSpaceStartPan',
     'px-vis-interaction-space-stop-panning': '_intSpaceStopPan'
   },
-  
+
   /**
    * Restore zoom to its previous value, do nothing if no previous value
    */

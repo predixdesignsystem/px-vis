@@ -1,18 +1,17 @@
-v1.0.1
-==================
-* changing ghp.sh to account for Alpha releases
-
 v1.0.0
 ==================
 * Upgrade to d3 4.4.x.
 * Scale and axis changes:
   * Changed time scale to UTC by default.
   * Added timeLocal option for local time
+  * Moved Scale into a behavior
+  * scale now a simple wrapper around behavior
 * Greatly improved and simplified how chart extents are calculated:
   * chartExtents are now only dev set
   * max and mins from the seriesConfig and range pickers go to dataExtents
   * scale will use chartExtents directly and fallback on dataExtents if not present. If neither, then looks through data.
   * defaultSeriesConfig no longer has default min and maxes
+  * defaultSeriesConfig now updates \_defaultSeriesConfig so defaultSeriesConfig doesnt have to have all defaults
 * Threshold changes:
   * Added new threshold configuration similar to events
   * Changed threshold data property from chartData to thresholdData
@@ -43,9 +42,7 @@ v1.0.0
 * Ensure tooltip calculation are done based on pixel coordinates rather than values for non-time based charts
 * Added px-vis-dynamic-menu in register, allowing developers to pass in custom features/function available in a menu in the register through dynamicMenuConfig
 * Added actionConfig to px-vis-interaction-space, allowing to define custom interaction on chart hover or click for example
-<<<<<<< HEAD
 * Added panning capability to px-vis-interaction-space. Please note that when panning a chart with ordinal axes it is not possible to pan past those axes.
-=======
 * Added panning capability to px-vis-interaction-space
 * Enabled top and right axes
 * Events
@@ -55,8 +52,7 @@ v1.0.0
   * added support for multi axes via multiAxes behavior
   * Many changes to components for support
   * Modifications to px-vis-multi-axis for more flexibility
->>>>>>> multiAxis
-* Added px-vis-toolbar 
+* Added px-vis-toolbar
   * Toolbar items are configurable and each item can have:
     * a tooltip label
     * a title
@@ -69,6 +65,7 @@ v1.0.0
   * Custom defined functions can also be used in the actionConfig
 * Removed px-vis-zoom and provide the PxVisBehaviorChart.zooming behavior for charts instead
 * Added 'zoom in' and 'zoom out' buttons in zoom controls
+* changing ghp.sh to account for Alpha releases
 
 v0.8.4
 ==================
