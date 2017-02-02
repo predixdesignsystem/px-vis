@@ -471,13 +471,14 @@ PxVisBehaviorScale.scale = [{
       for(var i = 0; i < this.chartData.length; i++) {
         for(var j = 0; j < seriesList.length; j++) {
           var s = seriesList[j],
+              sY = this.completeSeriesConfig[s]['y'],
               series = seriesToSearch[s],
               axis = series['axis'];
-          if(series.min && this.chartData[i][s]) {
-            exts[axis][0] = Math.min(this.chartData[i][s], exts[axis][0]);
+          if(series.min && this.chartData[i][sY]) {
+            exts[axis][0] = Math.min(this.chartData[i][sY], exts[axis][0]);
           }
-          if(series.max && this.chartData[i][s]) {
-            exts[axis][1] = Math.max(this.chartData[i][s], exts[axis][1]);
+          if(series.max && this.chartData[i][sY]) {
+            exts[axis][1] = Math.max(this.chartData[i][sY], exts[axis][1]);
           }
         }
       }
