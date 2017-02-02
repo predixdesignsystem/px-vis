@@ -24,10 +24,10 @@ function runTests(){
     });
 
     test('emptyAxisType does sets default xAxisType property', function() {
-      assert.isUndefined(emptyAxisType.xAxisType);
+      assert.equal(emptyAxisType.xAxisType, "linear");
     });
     test('emptyAxisType sets default yAxisType property', function() {
-      assert.isUndefined(emptyAxisType.yAxisType);
+      assert.equal(emptyAxisType.yAxisType, "linear");
     });
   });
 
