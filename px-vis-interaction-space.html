@@ -586,7 +586,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         if(this.yAxisType === 'ordinal') {
           this._panningStartVal[1] = mousePos[1];
         } else {
-          this._panningStartVal[1] = this._processYValues(this._panningStartVal[1], function(axis, index) {
+          this._panningStartVal[1] = this._processYValues(function(axis, index) {
             return axis.invert(mousePos[1]);
           });
         }
@@ -620,20 +620,25 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         //Y
         if(this.yAxisType !== 'ordinal') {
 
-          newExtents.eY = this._processYValues(newExtents.eY, function(axis, index) {
+          newExtents.eY = this._processYValues(function(axis, index) {
             currentPanningVal = axis.invert(mousePos[1]);
-            diff = currentPanningVal - this._panningStartVal[1][index];
+            diff = (index || index === 0) ? currentPanningVal - this._panningStartVal[1][index] : currentPanningVal - this._panningStartVal[1];
             yDomain = axis.domain();
             return [yDomain[0] - diff, yDomain[1] - diff];
           });
         } else {
           //keep same domain and play on alignment for panning
-          newExtents.eY = this._processYValues(newExtents.eY, function(axis, index) {
+          newExtents.eY = this._processYValues(function(axis, index) {
             //play on align to simulate panning
-            this._adjustOrdinalAlign(axis, mousePos[1], this._panningStartVal[1][index]);
-            //store mouse pos for next update
-            this._panningStartVal[1][index] = mousePos[1];
-
+            if(index || index === 0) {
+              this._adjustOrdinalAlign(axis, mousePos[1], this._panningStartVal[1][index]);
+              //store mouse pos for next update
+              this._panningStartVal[1][index] = mousePos[1];
+            } else {
+              this._adjustOrdinalAlign(axis, mousePos[1], this._panningStartVal[1]);
+              //store mouse pos for next update
+              this._panningStartVal[1] = mousePos[1];
+            }
             //keep same domain
             return axis.domain();
           });
@@ -791,7 +796,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             //Y axis is top to bottom
             extents.eY = this._getOrdinalRange(false, extents.y2, extents.y1);
           } else {
-            extents.eY = this._processYValues(extents.eY, function(axis, index) {
+            extents.eY = this._processYValues(function(axis, index) {
               return [axis.invert(extents.y2), axis.invert(extents.y1)];
             });
           }

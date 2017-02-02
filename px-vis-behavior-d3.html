@@ -344,28 +344,29 @@ PxVisBehaviorD3.axes = {
     return typeof this.y === 'object';
   },
   /**
-   * This functions process Y axis and apply the result to some variable.
-   * If in single Y it just run the function and assign the result to `applyTo`, if multi Y
+   * This functions process Y axis and applies the result to some variable.
+   * If in single Y it just run the function and assign the result to `result`, if multi Y
    * it runs the function for each axis and stores the result against the axis key
-   * on `applyTo`
+   * on `result`
    */
-  _processYValues: function(applyTo, callback) {
+  _processYValues: function(callback) {
 
     callback = callback.bind(this);
+
     if(this._isMultiY) {
-      var applyTo = {},
+      var result = {},
           keys = Object.keys(this.y);
 
       for(var i=0; i<keys.length; i++) {
-        applyTo[keys[i]] = callback(this.y[keys[i]], keys[i]);
+        result[keys[i]] = callback(this.y[keys[i]], keys[i]);
       }
 
-      return applyTo;
+      return result;
     } else {
-      applyTo = callback(this.y);
+      result = callback(this.y);
     }
 
-    return applyTo;
+    return result;
   }
 };
 

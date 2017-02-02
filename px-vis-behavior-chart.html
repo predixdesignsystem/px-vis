@@ -1291,25 +1291,29 @@ PxVisBehaviorChart.zooming = [{
   },
   _saveZoomState: function() {
 
-    //save ordinal domain if we aren't zoomed
-    if(this.zoomStack.length === 0 && (this.xAxisType === 'ordinal' || this.yAxisType === 'ordinal')) {
+    this._saveOrdinalOriginalExtents();
 
-      var domains;
-      domains = this._processYValues(domains, function(axis, index) {
-        return axis.domain();
-      });
-
-      this.set('_originalOrdinalExtents', [this.x.domain(), domains]);
-    }
     var selectedDomain = this.selectedDomain;
 
     if(!this.selectedDomain.y || this.selectedDomain.y.length === 0) {
-      selectedDomain.y = this._processYValues(domains, function(axis, index) {
+      selectedDomain.y = this._processYValues(function(axis, index) {
         return axis.domain();
       });
     }
 
     this.push('zoomStack', selectedDomain);
+  },
+  _saveOrdinalOriginalExtents: function() {
+    //save ordinal domain if we aren't zoomed
+    if(this.zoomStack.length === 0 && (this.xAxisType === 'ordinal' || this.yAxisType === 'ordinal')) {
+
+      var domains;
+      domains = this._processYValues(function(axis, index) {
+        return axis.domain();
+      });
+
+      this.set('_originalOrdinalExtents', [this.x.domain(), domains]);
+    }
   },
   zoomIn: function() {
     this._autoZoom(true);
@@ -1322,6 +1326,8 @@ PxVisBehaviorChart.zooming = [{
     var xMin = this.x.domain()[0],
         xMax = this.x.domain()[1],
         newExtents = {};
+
+    this._saveOrdinalOriginalExtents();
 
     if(this.xAxisType === 'ordinal') {
       //add and remove values for ordinal
@@ -1342,17 +1348,17 @@ PxVisBehaviorChart.zooming = [{
 
     if(this.yAxisType === 'ordinal') {
       //add and remove values for ordinal
-      newExtents.eY = this._processYValues(newExtents.eY, function(axis, index) {
+      newExtents.eY = this._processYValues(function(axis, index) {
         var originalDomain = this._originalOrdinalExtents[1];
         //multi Y
-        if(index) {
+        if(index || index === 0) {
           originalDomain = originalDomain[index];
         }
         return this._calcNewOrdinalExtents(axis.domain(), originalDomain, isZoomIn);
       });
     } else {
       //linear
-      newExtents.eY = this._processYValues(newExtents.eY, function(axis, index) {
+      newExtents.eY = this._processYValues(function(axis, index) {
         return this._calcNewLinearExtents(axis.domain()[0], axis.domain()[1], isZoomIn);
       });
     }
@@ -1362,9 +1368,9 @@ PxVisBehaviorChart.zooming = [{
   },
   _calcNewOrdinalExtents: function(currentDomain, originalDomain, isZoomIn) {
     if(isZoomIn) {
-      return this._calcNewZoomedInOrdinal(currentDomain, originalDomain);
+      return this._calcNewZoomedInOrdinal(currentDomain);
     } else {
-      return this._calcNewZommedOutOrdinal(currentDomain, originalDomain);
+      return this._calcNewZoomedOutOrdinal(currentDomain, originalDomain);
     }
   },
   _calcNewZoomedInOrdinal: function(currentDomain) {
@@ -1460,7 +1466,7 @@ PxVisBehaviorChart.zooming = [{
     this._notifyZoomed();
   },
   _notifyZoomed: function() {
-    var domains = this._processYValues(domains, function(axis, index) {
+    var domains = this._processYValues(function(axis, index) {
         return axis.domain();
       });
     this.fire('px-vis-zoomed', {x: this.x.domain(), y: domains});
