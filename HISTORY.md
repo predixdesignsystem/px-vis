@@ -48,6 +48,7 @@ v1.0.0
 * Events
   * Fixed event clip path to respect a right axis
   * Simplified event component removing the need for the y scale
+  * Enabled configuration of the line
 * Multi Axis:
   * added support for multi axes via multiAxes behavior
   * Many changes to components for support
