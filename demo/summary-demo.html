@@ -1,0 +1,131 @@
+<!-- <link rel="import" href="px-vis-axis-y-demo.html"> -->
+<!-- <link rel="import" href="px-vis-svg-demo.html">
+<link rel="import" href="px-vis-scale-demo.html">
+<link rel="import" href="px-vis-line-svg-demo.html">
+<link rel="import" href="px-vis-scatter-demo.html">
+<link rel="import" href="px-vis-axis-x-demo.html">
+<link rel="import" href="px-vis-gridlines-x-demo.html">
+<link rel="import" href="px-vis-gridlines-y-demo.html">
+<link rel="import" href="px-vis-event-demo.html">
+<link rel="import" href="px-vis-threshold-demo.html">
+<link rel="import" href="px-vis-interaction-space-demo.html">
+<link rel="import" href="px-vis-cursor-demo.html">
+<link rel="import" href="px-vis-register-horizontal-demo.html">
+<link rel="import" href="px-vis-register-vertical-demo.html">
+<link rel="import" href="px-vis-tooltip-demo.html">
+<link rel="import" href="px-vis-zoom-demo.html">
+<link rel="import" href="px-vis-chart-navigator-demo.html">
+<link rel="import" href="px-vis-data-converter-demo.html"> -->
+<link rel="import" href="../../px-demo/css/px-demo-styles.html" />
+<link rel="import" href="px-vis-demo-loop.html">
+<dom-module id="summary-demo">
+  <template>
+  <style include="px-demo-styles" is="custom-style"></style>
+
+  <!-- Light theme -->
+  <style include="px-theme-styles" is="custom-style"></style>
+
+
+          <div class="mega-demo u-p++">
+            <template is="dom-repeat" items="[[items]]">
+              <px-vis-demo-loop item="[[item]]"></px-vis-demo-loop>
+            </template>
+          </div>
+  </template>
+</dom-module>
+<script>
+  Polymer({
+    is:'summary-demo',
+    properties: {
+
+      items: {
+        type: Array,
+        value: [{
+          name: 'px-vis-svg',
+          description: "All charts need a drawing space SVG component. These cannot be seen but provide the basic framework for drawing objects to be displayed.The svg component provides the drawing space and d3 instantiated drawing object. The svg component returns an 'svg' variable to be passed into drawing components.",
+          note: "Note: All the subsequent charts will have this component, but they will not be shown in the code snippet."
+        },
+        {
+          name: 'px-vis-scale',
+          description: "All charts need an interpretor component. These cannot be seen but provide the basic framework for drawing objects to be displayed. Interpretor components convert data into drawing space coordinates.The scale component creates 'x' &amp 'y' and 'currentDomainX' &amp 'currentDomainY' variables which can be passed into drawing components.",
+          note: "Note: All the subsequent charts will have this component, but they will not be shown in the code snippet."
+        },
+        {
+          name: 'px-vis-line-svg',
+          description: "Example of a line drawing object. Bound elements are set from other components, such as px-vis-svg and px-vis-scale, and passed into px-vis-line-svg."
+        },
+        {
+          name: 'px-vis-scatter',
+          description: "Example of a scatter drawing object. Very similar configuration to px-vis-line-svg."
+        },
+        {
+          name: 'px-vis-axis-x',
+          description: "Example of an axis drawing object. The axis drawing object can draw both x and y axis. This example draws an x-axis."
+        },
+        {
+          name: 'px-vis-axis-y',
+          description: "Example of an axis drawing object. The axis drawing object can draw both x and y axis. This example draws an y-axis.",
+          tag: 'px-vis-axis-y'
+        },
+        {
+          name: 'px-vis-gridlines-x',
+          description: "Chart gridlines can be added to either the x or the y axis."
+        },
+        {
+          name: 'px-vis-gridlines-y',
+          description: "Chart gridlines can be added to either the x or the y axis."
+        },
+        {
+          name: 'px-vis-event',
+            description: "Chart events use their own dataset. A vertical line is drawn at the x-coordinate and an icon above. A configuration object can be applied to associate the event label with a desired icon, color, and position. If no configuration is set for a label, a default icon and color are applied. ",
+            list: {
+              header:"The icons can either be a:",
+              items: [
+                "Font Awesome class name, e.g. 'fa-camera'",
+                "Font Awesome unicode, e.g. '\uf015'",
+                "url to an image file; png, jpg, gif all work"
+              ]
+          },
+            secondaryDescription: "The colors are px-colors-design colors.",
+            tertiaryDescription: "Since each icon / image have a different center point, you may need to specify an offset to center the icon above the line. The offset is a two element array consisiting of an x and y value, '[x,y]'. For images, you'll also have to specify a size"
+        },
+        {
+          name: 'px-vis-threshold',
+          description: "Chart threshold provide horizonal lines across the chart. A default color is used if no 'color' is specified (or if the color does not match a series name). When a valid 'color' is given the threshold color will match that of the series. The demo chart shows both, one threshold with a valid 'color' and one with no 'color'."
+        },
+        {
+          name: 'px-vis-interaction-space',
+          description: "The interaction-space provides the basis for all on-chart interaction. It detects mouseovers on the chart and builds the data objects which other components then consume."
+        },
+        {
+          name: 'px-vis-cursor',
+          description: "The cursor provides an on-chart reticule on-hover. Hover your mouse over the chart to see it in action. Cursor requires a px-vis-interaction-space which provides the mouseover data."
+        },
+        {
+          name: 'px-vis-register-horizontal',
+          description: "The register displays data from the chart on mouseover. There are two options, a horizontal version for placement above or below the chart, or a vertical version for placement to the right or left of the chart. It must be paired with <strong>px-vis-interaction-space</strong> which provides the mouseover capabilities. Clicking on a series name on the register adds that series to the mutedSeries property. Series on the chart can listen to this property to toggle series on and off."
+        },
+        {
+          name: 'px-vis-register-vertical',
+          description: "The register displays data from the chart on mouseover. There are two options, a horizonal version for placement above or below the chart, or a vertical version for placement to the right or left of the chart. It must be paired with <strong>px-vis-interaction-space</strong> which provides the mouseover capabilities. Clicking on a series name on the register adds that series to the mutedSeries property. Series on the chart can listen to this property to toggle series on and off."
+        },
+        {
+          name: 'px-vis-tooltip',
+          description: "The tooltip provides similar data display functionality to the register, but on chart and without the user interaction."
+        },
+        {
+          name: 'px-vis-zoom',
+          description: "The on-chart zoom action. It requires the px-vis-interaction-space. Click and drag on the chart to see."
+        },
+        {
+          name: 'px-vis-chart-navigator',
+          description: "Example of a chart-navigator drawing object. Very similar configuration to px-vis-line-svg."
+        },
+        {
+          name: 'px-vis-data-converter',
+          description: " px-vis-data-converter converts data from the timeseries service to the schema required by the vis framework."
+        }]
+      }
+    }
+  });
+</script>

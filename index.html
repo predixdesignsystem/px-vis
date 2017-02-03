@@ -1,360 +1,99 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>px-vis</title>
-  <link rel="stylesheet" type="text/css" href="css/px-vis-demo.css"/>
-  <!-- Import custom element. Note: see comment about relative paths to dependencies in the *.html file referenced below -->
-  <script src="../webcomponentsjs/webcomponents-lite.js"></script>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Predix UI</title>
 
-  <link rel="import" href="../px-theme/px-theme-styles.html">
-  <style include="px-theme-styles" is="custom-style"></style>
+    <!--
+      Fast bootstrapping of the webcomponents-lite library. Only loads the library
+      if the browser doesn't natively support web components.
+    -->
+    <script type="text/javascript">
+    (function() {
+      'use strict';
 
-  <link rel="icon" href="favicon.ico" type="image/x-icon"/>
-  <link rel="import" href="../px-demo-snippet/px-demo-snippet.html"/>
-  <link rel="import" href="../px-polymer-font-awesome/polymer-font-awesome.html" />
-  <link rel="import" href="../px-datetime-common/px-datetime-imports.html">
-  <link rel="import" href="../px-api-viewer/px-api-viewer.html" />
+      var onload = function() {
+        // For native Imports, manually fire WebComponentsReady so user code
+        // can use the same code path for native and polyfill'd imports.
+        if (!window.HTMLImports) {
+          document.dispatchEvent(
+            new CustomEvent('WebComponentsReady', {bubbles: true})
+          );
+        }
+      };
 
-  <link rel="import" href="demos/px-vis-svg-demo.html">
-  <link rel="import" href="demos/px-vis-scale-demo.html">
-  <link rel="import" href="demos/px-vis-line-svg-demo.html">
-  <link rel="import" href="demos/px-vis-scatter-demo.html">
-  <link rel="import" href="demos/px-vis-axis-x-demo.html">
-  <link rel="import" href="demos/px-vis-axis-y-demo.html">
-  <link rel="import" href="demos/px-vis-gridlines-x-demo.html">
-  <link rel="import" href="demos/px-vis-gridlines-y-demo.html">
-  <link rel="import" href="demos/px-vis-event-demo.html">
-  <link rel="import" href="demos/px-vis-threshold-demo.html">
-  <link rel="import" href="demos/px-vis-interaction-space-demo.html">
-  <link rel="import" href="demos/px-vis-cursor-demo.html">
-  <link rel="import" href="demos/px-vis-register-horizontal-demo.html">
-  <link rel="import" href="demos/px-vis-register-vertical-demo.html">
-  <link rel="import" href="demos/px-vis-tooltip-demo.html">
-  <link rel="import" href="demos/px-vis-zoom-demo.html">
-  <link rel="import" href="demos/px-vis-chart-navigator-demo.html">
-  <link rel="import" href="demos/px-vis-data-converter-demo.html">
+      var webComponentsSupported = (
+        'registerElement' in document && 'import' in document.createElement('link') && 'content' in document.createElement('template')
+      );
 
+      if (!webComponentsSupported) {
+        var script = document.createElement('script');
+        script.async = true;
+        script.src = '../webcomponentsjs/webcomponents-lite.min.js';
+        script.onload = onload;
+        document.head.appendChild(script);
+      } else {
+        onload();
+      }
+    })();
+    </script>
+
+    <!--
+      Load the Polymer library.
+    -->
+    <link rel="import" href="../polymer/polymer.html" />
+
+    <!--
+      Load the light theme (default theme).
+    -->
+    <link rel="import" href="../px-theme/px-theme-styles.html">
+    <style include="px-theme-styles" is="custom-style"></style>
+
+    <!--
+      Asynchronously import the px-catalog element, which is the entrypoint
+      for our application.
+    -->
+    <link
+        async
+        id="main-element-import"
+        rel="import"
+        href="demo/index.html">
+
+    <!--
+      Load the app icon and manifest for Android devices.
+    -->
+    <link defer rel="icon" href="favicon.ico" type="image/x-icon" />
+
+    <!--
+      Basic page styles.
+    -->
+    <style>
+      html, body {
+        margin: 0;
+        padding: 0;
+      }
+    </style>
   </head>
-<body>
-  <!-- Wrap elements with auto-binding template to -->
-  <!-- allow use of Polymer bindings in main document -->
-    <!-- discription -->
-    <div class="hero u-p++ text--shadow" id="px-vis-anchor">
-      <a class="actionable flex flex--right flex--middle" href="https://github.com/PredixDev/px-vis" target="_blank"><iron-icon class="menu__open" icon="fa:fa-github"></iron-icon>View on Github</a>
-  		<h1 class="delta">px-vis</h1>
-      <div class="description-text">
-    		<p>
-          px-vis is a visualzation framework.
-        </p>
-        <p>It is a set of base components to provide the ability to create charts. These components come "wrapped" into charts in px-vis-[[chartType]] repos. These base components can be used to create custom chart types and/or mixed with standard d3 methods.</p>
-        <p>At a very least, all charts need an svg component, an interpretor component, such as scale, and a drawing component.</p>
-        <p>All components are built to support the Precipitation Pattern. Declarative bindings also work.</p>
-      </div>
-  		<div class="flex">
-  			<img class="u-mr--" src="https://img.shields.io/travis/PredixDev/px-vis/master.svg?style=flat-square" alt="Travis" onerror="this.style.display='none'"/>
-  			<img class="u-mr--" src="https://img.shields.io/bower/v/px-vis.svg?style=flat-square" alt="Bower" onerror="this.style.display='none'"/>
-  			<img class="u-mr--" src="https://img.shields.io/github/issues-raw/PredixDev/px-vis.svg?style=flat-square" alt="Issues" onerror="this.style.display='none'"/>
-  		</div>
-      <div class="u-mt jump-nav">
-        <a href="#px-vis-svg-anchor" class="actionable">px-vis-svg</a> <br/>
-        <!--<a href="px-vis-api-svg.html" class="actionable" target="_blank"> (API Documentation)</a><br/>-->
 
-        <a href="#px-vis-scale-anchor" class="actionable">px-vis-scale</a> <br/>
-        <!--<a href="px-vis-api-svg.html" class="actionable" target="_blank"> (API Documentation)</a><br/>-->
-        
-        <a href="#px-vis-line-svg-anchor" class="actionable">px-vis-line-svg</a> <br/>
-        <!--<a href="px-vis-api-svg.html" class="actionable" target="_blank"> (API Documentation)</a><br/>-->
-        
-        <a href="#px-vis-scatter-anchor" class="actionable">px-vis-scatter</a> <br/>
-        <!--<a href="px-vis-api-svg.html" class="actionable" target="_blank"> (API Documentation)</a><br/>-->
-        
-        <a href="#px-vis-axis-x-anchor" class="actionable">px-vis-axis: x-axis</a> <br/>
-        <!--<a href="px-vis-api-svg.html" class="actionable" target="_blank"> (API Documentation)</a><br/>-->
-        
-        <a href="#px-vis-axis-y-anchor" class="actionable">px-vis-axis: y-axis</a> <br/>
-        <!--<a href="px-vis-api-svg.html" class="actionable" target="_blank"> (API Documentation)</a><br/>-->
-        
-        <a href="#px-vis-gridlines-y-anchor" class="actionable">px-vis-gridlines: x-axis</a> <br/>
-        <!--<a href="px-vis-api-svg.html" class="actionable" target="_blank"> (API Documentation)</a><br/>-->
-        
-        <a href="#px-vis-gridlines-x-anchor" class="actionable">px-vis-gridlines: y-axis</a> <br/>
-        <!--<a href="px-vis-api-svg.html" class="actionable" target="_blank"> (API Documentation)</a><br/>-->
-        
-        <a href="#px-vis-event-anchor" class="actionable">px-vis-event</a> <br/>
-        <!--<a href="px-vis-api-svg.html" class="actionable" target="_blank"> (API Documentation)</a><br/>-->
-        
-        <a href="#px-vis-threshold-anchor" class="actionable">px-vis-threshold</a> <br/>
-        <!--<a href="px-vis-api-svg.html" class="actionable" target="_blank"> (API Documentation)</a><br/>-->
-        
-        <a href="#px-vis-interaction-space-anchor" class="actionable">px-vis-interaction-space</a> <br/>
-        <!--<a href="px-vis-api-svg.html" class="actionable" target="_blank"> (API Documentation)</a><br/>-->
-        
-        <a href="#px-vis-cursor-anchor" class="actionable">px-vis-cursor</a> <br/>
-        <!--<a href="px-vis-api-svg.html" class="actionable" target="_blank"> (API Documentation)</a><br/>-->
-        
-        <a href="#px-vis-register-horizontal-anchor" class="actionable">px-vis-register: horizontal</a> <br/>
-        <!--<a href="px-vis-api-svg.html" class="actionable" target="_blank"> (API Documentation)</a><br/>-->
-        
-        <a href="#px-vis-register-vertical-anchor" class="actionable">px-vis-register: vertical</a> <br/>
-        <!--<a href="px-vis-api-svg.html" class="actionable" target="_blank"> (API Documentation)</a><br/>-->
-        
-        <a href="#px-vis-tooltip-anchor" class="actionable">px-vis-tooltip</a> <br/>
-        <!--<a href="px-vis-api-svg.html" class="actionable" target="_blank"> (API Documentation)</a><br/>-->
-        
-        <a href="#px-vis-zoom-anchor" class="actionable">px-vis-zoom</a> <br/>
-        <!--<a href="px-vis-api-svg.html" class="actionable" target="_blank"> (API Documentation)</a><br/>-->
-        
-        <a href="#px-vis-chart-navigator-anchor" class="actionable">px-vis-chart-navigator</a> <br/>
-        <!--<a href="px-vis-api-svg.html" class="actionable" target="_blank"> (API Documentation)</a><br/>-->
-        
-        <a href="#px-vis-data-converter-anchor" class="actionable">px-vis-data-converter</a>
-        <!--<a href="px-vis-api-svg.html" class="actionable" target="_blank"> (API Documentation)</a>-->
+  <body>
+    <!-- Elements wait on the page and are upgraded after demo/index.html is loaded. -->
+    <local-element-demo></local-element-demo>
 
-      </div>
-  	</div>
-
-    <!-- mega demo -->
-    <div class="mega-demo u-p++">
-      
-      <!--px-vis-svg-->
-      <p id="px-vis-svg-anchor" class="epsilon demo__title">px-vis-svg</p>
-      <div class="demo u-p+">
-        <px-vis-svg-demo></px-vis-svg-demo>
-        <div class="demo__discription">
-          <p class="u-mt0"><strong>All charts need a drawing space SVG component.</strong> These <strong>cannot be seen</strong> but provide the basic framework for drawing objects to be displayed.</p>
-          <p>The svg component provides the drawing space and d3 instantiated drawing object.</p>
-          <p>The svg component returns an 'svg' variable to be passed into drawing components.</p>
-          <p style="oblique">Note: All the subsequent charts will have this component, but they will not be shown in the code snippet.</p>
-          <a href="px-vis-api-svg.html" class="actionable" target="_blank">API Documentation</a> 
-        </div>
-      </div>
-      <br/>
-
-      <!--px-vis-scale-->
-      <p id="px-vis-scale-anchor" class="epsilon demo__title">px-vis-scale</p>
-      <div class="demo u-p+">
-        <px-vis-scale-demo></px-vis-scale-demo>
-        <div class="demo__discription">
-          <p class="u-mt0"><strong>All charts need an interpretor component.</strong> These <strong>cannot be seen</strong> but provide the basic framework for drawing objects to be displayed.</p>
-          <p>Interpretor components convert data into drawing space coordinates.</p>
-          <p>The scale component creates 'x' &amp 'y' and 'currentDomainX' &amp 'currentDomainY' variables which can be passed into drawing components.</p>
-          <p style="oblique">Note: All the subsequent charts will have this component, but they will not be shown in the code snippet.</p>
-          <a href="px-vis-api-scale.html" class="actionable" target="_blank">API Documentation</a> 
-        </div>
-      </div>
-      <br/>
-
-      <!--px-vis-line-svg-->
-      <p id="px-vis-line-svg-anchor" class="epsilon demo__title">px-vis-line-svg</p>
-      <div class="demo u-p+">
-        <px-vis-line-svg-demo></px-vis-line-svg-demo>
-        <div class="demo__discription">
-          <p class="u-mt0">Example of a line drawing object. Bound elements are set from other components, such as px-vis-svg and px-vis-scale, and passed into px-vis-line-svg.</p>
-          <a href="px-vis-api-line-svg.html" class="actionable" target="_blank">API Documentation</a> 
-        </div>
-      </div>
-      <br/>
-
-      <!--px-vis-scatter-->
-      <p id="px-vis-scatter-anchor" class="epsilon demo__title">px-vis-scatter</p>
-      <div class="demo u-p+">
-        <px-vis-scatter-demo></px-vis-scatter-demo>
-        <div class="demo__discription">
-          <p class="u-mt0">Example of a scatter drawing object. Very similar configuration to px-vis-line-svg.</p>
-          <a href="px-vis-api-scatter.html" class="actionable" target="_blank">API Documentation</a>
-        </div>
-      </div>
-      <br/>
-
-      <!--px-vis-axis-x-->
-      <p id="px-vis-axis-x-anchor" class="epsilon demo__title">px-vis-axis: x-axis</p>
-      <div class="demo u-p+">
-        <px-vis-axis-x-demo></px-vis-axis-x-demo>
-        <div class="demo__discription">
-          <p class="u-mt0">Example of an axis drawing object. </p>
-          <p>The axis drawing object can draw both x and y axis. This example draws an x-axis.</p>
-          <a href="px-vis-api-axis-x.html" class="actionable" target="_blank">API Documentation</a>
-        </div>
-      </div>
-      <br/>
-
-      <!--px-vis-axis-y-->
-      <p id="px-vis-axis-y-anchor" class="epsilon demo__title">px-vis-axis: y-axis</p>
-      <div class="demo u-p+">
-        <px-vis-axis-y-demo></px-vis-axis-y-demo>
-        <div class="demo__discription">
-          <p class="u-mt0">Example of an axis drawing object. </p>
-          <p>The axis drawing object can draw both x and y axis. This example draws an y-axis.</p>
-          <a href="px-vis-api-axis-y.html" class="actionable" target="_blank">API Documentation</a>
-        </div>
-      </div>
-      <br/>
-
-      <!--px-vis-gridlines-x-->
-      <p id="px-vis-gridlines-x-anchor" class="epsilon demo__title">px-vis-gridlines: x-axis</p>
-      <div class="demo u-p+">
-        <px-vis-gridlines-x-demo></px-vis-gridlines-x-demo>
-        <div class="demo__discription">
-          <p class="u-mt0">Chart gridlines can be added to either the x or the y axis.</p>
-          <a href="px-vis-api-gridlines-x.html" class="actionable" target="_blank">API Documentation</a>
-        </div>
-      </div>
-      <br/>
-
-      <!--px-vis-gridlines-y-->
-      <p id="px-vis-gridlines-y-anchor" class="epsilon demo__title">px-vis-gridlines: y-axis</p>
-      <div class="demo u-p+">
-        <px-vis-gridlines-y-demo></px-vis-gridlines-y-demo>
-        <div class="demo__discription">
-          <p class="u-mt0">Chart gridlines can be added to either the x or the y axis.</p>
-          <a href="px-vis-api-gridlines-y.html" class="actionable" target="_blank">API Documentation</a>
-        </div>
-      </div>
-      <br/>
-
-      <!--px-vis-event-->
-      <p id="px-vis-event-anchor" class="epsilon demo__title">px-vis-event</p>
-      <div class="demo u-p+">
-        <px-vis-event-demo></px-vis-event-demo>
-        <div class="demo__discription">
-          <p class="u-mt0">Chart events use their own dataset. A vertical line is drawn at the x-coordinate and an icon above.</p>
-          <p>A configuration object can be applied to associate the event label with a desired icon, color, and position. If no configuration is set for a label, a default icon and color are applied.</p>
-          <p class="u-mb0">The icons can either be a: </p>
-          <ul class="list-bare u-ml">
-            <li>Font Awesome class name, e.g. 'fa-camera'</li>
-            <li>Font Awesome unicode, e.g. '\uf015' </li>
-            <li>url to an image file; png, jpg, gif all work</li>
-          </ul>
-          <p>The colors are px-colors-design colors. </p>
-          <p class="u-mb0">Since each icon / image have a different center point, you may need to specify an offset to center the icon above the line. The offset is a two element array consisiting of an x and y value, '[x,y]'. For images, you'll also have to specify a size </p>
-          <p><a href="px-vis-api-event.html" class="actionable" target="_blank">API Documentation</a></p>
-        </div>
-      </div>
-      <br/>
-
-      <!--px-vis-threshold-->
-      <p id="px-vis-threshold-anchor" class="epsilon demo__title">px-vis-threshold</p>
-      <div class="demo u-p+">
-        <px-vis-threshold-demo></px-vis-threshold-demo>
-        <div class="demo__discription">
-          <p class="u-mt0">Chart threshold provide horizonal lines across the chart.</p>
-          <p>A default color is used if no 'color' is specified (or if the color does not match a series name). When a valid 'color' is given the threshold color will match that of the series.</p>
-          <p>The demo chart shows both, one threshold with a valid 'color' and one with no 'color'.</p>
-          <p><a href="px-vis-api-threshold.html" class="actionable" target="_blank">API Documentation</a></p>
-        </div>
-      </div>
-      <br/>
-
-      <!--px-vis-interaction-space-->
-      <p id="px-vis-interaction-space-anchor" class="epsilon demo__title">px-vis-interaction-space</p>
-      <div class="demo u-p+">
-        <px-vis-interaction-space-demo></px-vis-interaction-space-demo>
-        <div class="demo__discription">
-          <p class="u-mt0">The interaction-space provides the basis for all on-chart interaction. It detects mouseovers on the chart and builds the data objects which other components then consume.</p>
-          <p><a href="px-vis-api-interaction-space.html" class="actionable" target="_blank">API Documentation</a></p>
-        </div>
-      </div>
-      <br/>
-
-      <!--px-vis-cursor-->
-      <p id="px-vis-cursor-anchor" class="epsilon demo__title">px-vis-cursor</p>
-      <div class="demo u-p+">
-        <px-vis-cursor-demo></px-vis-cursor-demo>
-        <div class="demo__discription">
-          <p class="u-mt0">The cursor provides an on-chart reticule on-hover. Hover your mouse over the chart to see it in action. Cursor requires a <strong>px-vis-interaction-space</strong> which provides the mouseover data.</p>
-          <p><a href="px-vis-api-cursor.html" class="actionable" target="_blank">API Documentation</a></p>
-        </div>
-      </div>
-      <br/>
-
-      <!--px-vis-register-horizontal-->
-      <p id="px-vis-register-horizontal-anchor" class="epsilon demo__title">px-vis-register: horizontal</p>
-      <div class="demo u-p+">
-        <px-vis-register-horizontal-demo></px-vis-register-horizontal-demo>
-        <div class="demo__discription">
-          <p class="u-mt0">The register displays data from the chart on mouseover. There are two options, a horizontal version for placement above or below the chart, or a vertical version for placement to the right or left of the chart. It must be paired with <strong>px-vis-interaction-space</strong> which provides the mouseover capabilities. Clicking on a series name on the register adds that series to the mutedSeries property. Series on the chart can listen to this property to toggle series on and off.</p>
-          <p><a href="px-vis-api-register-horizontal.html" class="actionable" target="_blank">API Documentation</a></p>
-        </div>
-      </div>
-      <br/>
-
-      <!--px-vis-register-vertical-->
-      <p id="px-vis-register-vertical-anchor" class="epsilon demo__title">px-vis-register: vertical</p>
-      <div class="demo u-p+">
-        <px-vis-register-vertical-demo></px-vis-register-vertical-demo>
-        <div class="demo__discription">
-          <p class="u-mt0">The register displays data from the chart on mouseover. There are two options, a horizonal version for placement above or below the chart, or a vertical version for placement to the right or left of the chart. It must be paired with <strong>px-vis-interaction-space</strong> which provides the mouseover capabilities. Clicking on a series name on the register adds that series to the mutedSeries property. Series on the chart can listen to this property to toggle series on and off.</p>
-          <p><a href="px-vis-api-register-vertical.html" class="actionable" target="_blank">API Documentation</a></p>
-        </div>
-      </div>
-      <br/>
-
-      <!--px-vis-tooltip-->
-      <p id="px-vis-tooltip-anchor" class="epsilon demo__title">px-vis-tooltip</p>
-      <div class="demo u-p+">
-        <px-vis-tooltip-demo></px-vis-tooltip-demo>
-        <div class="demo__discription">
-          <p class="u-mt0">The tooltip provides similar data display functionality to the register, but on chart and without the user interaction.</p>
-          <p><a href="px-vis-api-tooltip.html" class="actionable" target="_blank">API Documentation</a></p>
-        </div>
-      </div>
-      <br/>
-
-      <!--px-vis-zoom-->
-      <p id="px-vis-zoom-anchor" class="epsilon demo__title">px-vis-zoom</p>
-      <div class="demo u-p+">
-        <px-vis-zoom-demo></px-vis-zoom-demo>
-        <div class="demo__discription">
-          <p class="u-mt0">The on-chart zoom action. It requires the px-vis-interaction-space. Click and drag on the chart to see.</p>
-          <p><a href="px-vis-api-zoom.html" class="actionable" target="_blank">API Documentation</a></p>
-        </div>
-      </div>
-      <br/>
-
-      <!--px-vis-chart-navigator-->
-      <p id="px-vis-chart-navigator-anchor" class="epsilon demo__title">px-vis-chart-navigator</p>
-      <div class="demo u-p+">
-        <px-vis-chart-navigator-demo></px-vis-chart-navigator-demo>
-        <div class="demo__discription">
-          <p class="u-mt0">Example of a chart-navigator drawing object. Very similar configuration to px-vis-line-svg.</p>
-          <p><a href="px-vis-api-chart-navigator.html" class="actionable" target="_blank">API Documentation</a></p>
-        </div>
-      </div>
-      <br/>
-
-      <!--px-vis-data-converter-->
-      <p id="px-vis-data-converter-anchor" class="epsilon demo__title">px-vis-data-converter</p>
-      <div class="demo u-p+">
-        <div>
-          <p class="u-mt0"> px-vis-data-converter converts data from the timeseries service to the schema required by the vis framework.</p>
-          <p class="u-pb++"><a href="px-vis-api-data-converter.html" class="actionable" target="_blank">API Documentation</a></p>
-          <px-vis-data-converter-demo></px-vis-data-converter-demo>
-        </div>
-      </div>
-      <br/>
-
-    </div>
-    <footer class="footer flex flex--center">
-      <div class="footer__container u-pv++">
-        <div>
-          <a href="https://ge.com/digital" >
-            <img src="monogram-wdmk.png" alt="GE Monogram" class="footer__img">
-          </a>
-        </div>
-        <div class="footer__list">
-          <ul class="list-inline list-inline--delimited">
-            <li>
-              <a href="http://predix.io/legal" class="footer__list--lnk">Legal</a>
-            </li>
-            <li>
-              <a href="mailto:info@predix.io" class="footer__list--lnk">Contact Us</a>
-            </li>
-            <li>Copyright &copy; 2016 General Electric Company. All rights reserved.</li>
-          </ul>
-        </div>
-      </div>
-    </footer>
-</body>
+    <!--
+      Attempt to register a service worker with the correct scope. Fail quietly
+      if this doesn't work, but log the result to the console.
+    -->
+    <script type="text/javascript">
+      // if ('serviceWorker' in navigator) {
+      //   navigator.serviceWorker.register('service-worker.js').then(function(registration) {
+      //     // Registration was successful
+      //     console.log('ServiceWorker registration successful with scope: ', registration.scope);
+      //   }).catch(function(err) {
+      //     // registration failed :(
+      //     console.log('ServiceWorker registration failed: ', err);
+      //   });
+      // }
+    </script>
+  </body>
 </html>

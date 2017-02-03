@@ -1,0 +1,54 @@
+<dom-module id="px-vis-demo-loop">
+  <template>
+      <p id="[[name]]-anchor" class="epsilon demo__title">[[item.name]]</p>
+      <div class="demo u-p+">
+        <div class="demo__description">
+          <p class="u-mt0">[[item.description]]</p>
+          <template is="dom-if" if="[[_listExists(item)]]">
+            <ul class="list-bare u-ml">
+              <template is="dom-repeat" items=[[item.list.items]] as="list_item">
+                <li>[[list_item]]</li>
+              </template>
+            </ul>
+          </template>
+          <template is="dom-if" if="[[_secondaryDescriptionExists(item)]]">
+            <p>[[item.secondaryDescription]]</p>
+          </template>
+          <template is="dom-if" if="[[_tertiaryDescriptionExists(item)]]">
+            <p class="u-mb0">[[item.tertiaryDescription]]</p>
+          </template>
+          <p><a href="[[item.name]]-demo.html" class="actionable" target="_blank">API Documentation</a></p>
+        </div>
+      </div>
+      <br/>
+    </template>
+  </template>
+</dom-module>
+<script>
+Polymer({
+  is: "px-vis-demo-loop",
+  properties: {
+    item: {
+      type: Object,
+      value: function() {
+        return {};
+      },
+      observer: '_addDemo'
+    }
+  },
+  _addDemo: function() {
+    var newDemoElement = document.createElement(this.item.tag + '-demo-component');
+    Polymer.dom(this.root).querySelector('.demo').appendChild(newDemoElement);
+  },
+  _tertiaryDescriptionExists: function(item) {
+    return item.tertiaryDescription && item.tertiaryDescription.length;
+  },
+  _secondaryDescriptionExists: function(item) {
+    return item.secondaryDescription && item.secondaryDescription.length;
+  },
+  _listExists: function(item) {
+    return item.list && item.list.items && item.list.items.length;
+  }
+});
+
+  </script>
