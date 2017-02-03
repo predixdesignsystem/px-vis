@@ -168,16 +168,23 @@ This element sets the selectedDomain property based on the extents box. The sele
     drawElement: function() {
       if(this._animationFrameDone && this.domainChanged !== null && !isNaN(this.axis.domain()[0].getTime()) && !isNaN(this.axis.domain()[1].getTime())) {
         var heightOffset = 5,
-              h = Math.max(this.height - this.margin.bottom - heightOffset,0),
-              range = [
-                [this.axis.range()[0],0],
-                [this.axis.range()[1],h]
-              ];
+            h = Math.max(this.height - this.margin.bottom - heightOffset, 1),  //make sure it is bigger than 0 for range
+            axisRange = this.axis.range(),
+            range;
 
-          // check that our sizing is ok and wont freak d3 out.
-          // x2 and y2 must be greater than x1 & y1
-          range[1][0] = (range[1][0] > range[0][0]) ? range[1][0] : range[0][0];
-          range[1][1] = (range[1][1] > range[0][1]) ? range[1][1] : range[0][1];
+        // check that our range is ok and wont freak d3 out.
+        // x2 must be greater than x1
+        if(axisRange[0] > axisRange[1]) {
+          axisRange[0] = this.axis.range()[1];
+          axisRange[1] = this.axis.range()[0];
+        } else if(axisRange[0] === axisRange[1]) {
+          axisRange[1] += 1;
+        }
+
+        range = [
+          [axisRange[0], 0],
+          [axisRange[1], h]
+        ];
 
         if(this._isObjEmpty(this._brush)) {
 
@@ -194,7 +201,7 @@ This element sets the selectedDomain property based on the extents box. The sele
           this._brushGroup = this.svg.append("g")
             .attr("class", "brush")
             .call(this._brush)
-            .call(this._brush.move, this.axis.range());
+            .call(this._brush.move, axisRange);
 
           /* Style the brush overlay box
              There are actually two boxes, .selection and .overlay:
