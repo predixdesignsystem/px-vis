@@ -14,10 +14,10 @@
 <link rel="import" href="../../px-demo/css/px-demo-styles.html" />
 
 <!-- Imports for this componnent -->
-<link rel="import" href="px-vis-chart-navigator-demo-component.html">
+<link rel="import" href="px-vis-cursor-demo-component.html">
 
 <!-- Demo DOM module -->
-<dom-module id="px-vis-chart-navigator-demo">
+<dom-module id="px-vis-cursor-demo">
   <template>
   <style include="px-demo-styles" is="custom-style"></style>
 
@@ -30,7 +30,7 @@
 
     <!-- Header -->
     <px-demo-header
-        module-name="px-vis-chart-navigator"
+        module-name="px-vis-cursor"
         description="[[description]]"
         parent-name="px-vis">
     </px-demo-header>
@@ -43,19 +43,18 @@
 
       <!-- Component ---------------------------------------------------------->
       <px-demo-component>
-        <px-vis-chart-navigator-demo-component></px-vis-chart-navigator-demo-component>
+        <px-vis-cursor-demo-component></px-vis-cursor-demo-component>
       </px-demo-component>
       <!-- END Component ------------------------------------------------------>
 
       <px-demo-component-snippet
           element-properties="{{props}}"
-          element-name="px-vis-chart-navigator"
-          code-link="http://codepen.io/menkhakl/pen/wzPQzz">
+          element-name="px-vis-cursor">
       </px-demo-component-snippet>
     </px-demo-interactive>
 
     <!-- API Viewer -->
-    <px-demo-api-viewer source="px-vis-chart-navigator"></px-demo-api-viewer>
+    <px-demo-api-viewer source="px-vis-cursor"></px-demo-api-viewer>
 
     <!-- Footer -->
     <px-demo-footer></px-demo-footer>
@@ -65,11 +64,11 @@
 </dom-module>
 <script>
   Polymer({
-    is: 'px-vis-chart-navigator-demo',
+    is: 'px-vis-cursor-demo',
     properties: {
       description: {
         type: String,
-        value: "Example of a chart-navigator drawing object. Very similar configuration to px-vis-line-svg."
+        value: "The cursor provides an on-chart reticule on-hover. Hover your mouse over the chart to see it in action. Cursor requires a px-vis-interaction-space which provides the mouseover data."
       },
       /**
        * @property demoProps
@@ -96,19 +95,39 @@
       },
     },
     demoProps: {
-      // demo snippet
-      elempropChartNavigator:{
-        type : Object,
-        defaultValue:{
-          "xAxisType":"time",
-          "yAxisType":"linear",
-          "width":"[[width]]",
-          "height":"100",
-          "margin":"[[margin]]",
-          "includeAllSeries":"true",
-          "chartData":"[[chartData]]"
-        }
-      }
+      svg:{
+				defaultValue:"[[svg]]"
+			},
+      width:{
+				defaultValue:"[[width]]"
+			},
+      height:{
+				defaultValue:"[[height]]"
+			},
+      margin:{
+				defaultValue:"[[margin]]"
+			},
+      completeSeriesConfig:{
+				defaultValue:"[[seriesConfig]]"
+			},
+      chartData:{
+				defaultValue:"[[chartData]]"
+			},
+      horizontalLine:{
+				defaultValue:"full"
+			},
+      verticalLine:{
+				defaultValue:"full"
+			},
+      circlePoint:{
+				defaultValue:"yes"
+			},
+      tooltipData:{
+				defaultValue:"[[tooltipData]]"
+			},
+      selectionType:{
+				defaultValue:"[[selectionType]]"
+      },
     }
   });
 </script>
