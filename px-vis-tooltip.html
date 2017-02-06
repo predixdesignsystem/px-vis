@@ -199,15 +199,17 @@ Element providing on-chart tooltip display
       this.set('_internalHidden', hidden);
 
       this.$.template.render();
-      this.set('_tooltipElem', this.$$('px-tooltip'));
-
+      if(!this._tooltipElem) {
+        this.set('_tooltipElem', this.$$('px-tooltip'));
+      }
+      
       if(this._tooltipElem) {
         if(hidden) {
           this.forceHide();
         } else {
           this.forceShow()
         }
-      }
+      } 
     },
     _ttDataChanged: function() {
       this.set('_tooltipDataHidden', this.tooltipData.hidden);
