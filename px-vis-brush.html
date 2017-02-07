@@ -279,39 +279,53 @@ This element sets the selectedDomain property based on the extents box. The sele
     _createClipPath: function(vR) {
       this._clipPathObj =  this.svg
         .append("clipPath")
-        .attr("id", "navClipPath");
+        .attr("id", "navClipPath" + this.seriesId);
 
       this._clipPathObj.append("path");
-
 
       this._drawClipPath(vR);
     },
 
     _drawClipPath: function(vR) {
-      var hR = this.axis.range();
-      hR[0] -= 30;
-      hR[1] += 30;
 
+      var hR = this.axis.range(),
+          domain = this.axis.domain(),
+          clipLeft = this.selectedDomain.x[0] < domain[0],
+          clipRight = this.selectedDomain.x[1] > domain[1],
+          d = '';
+     
       vR[0] -= 5;
       vR[1] += 5;
 
+      hR[0] -= 5;
+      hR[1] += 5;
+
       var halfV = (vR[1] + vR[0]) / 2,
           n = 10,
-          n2 = 5,
+          n2 = 5;
           d = "M" + hR[0] + ',' + vR[0] +
-              "L" + hR[1] + ',' + vR[0] +
-              "L" + hR[1] + ',' + (halfV - n) +
-              "L" + (hR[1] - 10) + ',' + (halfV - n2) +
-              "L" + (hR[1] + 10) + ',' + (halfV + n2) +
-              "L" + hR[1] + ',' + (halfV + n) +
-              "L" + hR[1] + ',' + vR[1] +
-              "L" + hR[0] + ',' + vR[1] +
-              "L" + hR[0] + ',' + (halfV + n) +
-              "L" + (hR[0] + 10) + ',' + (halfV + n2) +
-              "L" + (hR[0] - 10) + ',' + (halfV - n2) +
-              "L" + hR[0] + ',' + (halfV - n) +
-              "Z";
-              // "L" + hR[0] + ',' + vR[0];
+              "L" + hR[1] + ',' + vR[0];
+        
+      //add squiglly line on right if clip
+      if(clipRight) {
+        d += "L" + hR[1] + ',' + (halfV - n) +
+          "L" + (hR[1] - 10) + ',' + (halfV - n2) +
+          "L" + (hR[1] + 10) + ',' + (halfV + n2) +
+          "L" + hR[1] + ',' + (halfV + n);
+      }
+
+      d += "L" + hR[1] + ',' + vR[1] +
+          "L" + hR[0] + ',' + vR[1];
+    
+      //add squiggly line on left if clip
+      if(clipLeft) {
+          d += "L" + hR[0] + ',' + (halfV + n) +
+            "L" + (hR[0] + 10) + ',' + (halfV + n2) +
+            "L" + (hR[0] - 10) + ',' + (halfV - n2) +
+            "L" + hR[0] + ',' + (halfV - n);
+      }
+        
+      d += "Z";
 
       this._clipPathObj.select("path")
         .attr("d", d);

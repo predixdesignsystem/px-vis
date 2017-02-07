@@ -131,6 +131,24 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           'resetTooltip': '_resetTooltipData',
           'startPanning': '_startPanning',
           'stopPanning': '_stopPanning'
+        },
+         /**
+          * Configuration used to define what actions happen on events. Each key represents an event,
+          * each value can be:
+          * - a predefined action found in px-vis-interaction-space `actionMapping`
+          * - a function which context will be bound to the chart. The function argument will be the mouse position on the chart
+          */
+        actionConfig: {
+          type: Object,
+          notify: true,
+          value: function() {
+            return {
+              'mousedown': 'startZooming',
+              'mouseup': 'stopZooming',
+              'mouseout': 'resetTooltip',
+              'mousemove': 'calcTooltipData'
+            };
+          }
         }
       },
       _panningStartVal: {
@@ -806,7 +824,10 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         this.set('extentsData', extents);
         this.fire('px-vis-extents-data-updated', {'data': extents, 'dataVar': 'extentsData', 'method': 'set'});
       }
-      this._actionArea.remove();
+
+      if(this._actionArea && this._actionArea.remove) {
+        this._actionArea.remove();
+      }
     },
     _applyFunctionToY: function(fn) {
 
