@@ -181,16 +181,24 @@ The configureation object allows developers to set the icon used for each event 
       _animationFrameDone: {
         type: Boolean,
         value: false
+      },
+
+      _eventDrawn: {
+        type: Boolean,
+        value: false
       }
     },
 
     observers: [
       '_eventConfigHasChanged(eventConfig.*)',
-      'drawElement(svg, x, domainChanged, eventData.*, eventConfig.*, _animationFrameDone)',
+      'drawElement(svg, eventData.*, eventConfig.*, _animationFrameDone)',
+      'positionElement(x, domainChanged)',
       '_addClipPath(clipPath)'
      ],
 
      detached: function() {
+       this._eventDrawn = false;
+
        if(this.eventGroup && this._doesD3HaveValues(this.eventGroup)) {
          this.eventGroup.remove();
          this.eventGroup = null;
@@ -208,27 +216,22 @@ The configureation object allows developers to set the icon used for each event 
     },
 
     _calcThemeOrConfig: function() {
-      // if we have lineConfig, must be passed in so use it.
-      if(!this.lineConfig) {
-        var lineColor = this._checkThemeVariable("--px-vis-event-line-color", this.colors[this._lineConfigDefault.color]);
-
-        this.lineConfig = {
-          "color": lineColor,
-          "weight": this._lineConfigDefault.weight
-        };
-      }
 
       if(!this.defaultEventConfig) {
         var eventColor = this._checkThemeVariable("--px-vis-event-icon-color", this.colors[this._defaultDefaultEventConfig.color]);
+        var lineColor = this._checkThemeVariable("--px-vis-event-line-color", this.colors[this._defaultDefaultEventConfig.lineColor]);
 
         this.defaultEventConfig = {
           "color": eventColor,
           'icon': this._defaultDefaultEventConfig.icon,
           'type': this._defaultDefaultEventConfig.type,
           'offset': this._defaultDefaultEventConfig.offset,
-          'size': this._defaultDefaultEventConfig.size
+          'size': this._defaultDefaultEventConfig.size,
+          'lineColor': lineColor,
+          "lineWeight": this._defaultDefaultEventConfig.lineWeight
         };
       }
+
       this.set('_animationFrameDone', true);
     },
 
@@ -239,17 +242,18 @@ The configureation object allows developers to set the icon used for each event 
      * @method drawElement
      */
     drawElement: function() {
-      if(this.x && this._doesObjHaveValues(this.eventData) && this._animationFrameDone) {
+      this.debounce('drawEvent', function() {
+        if(this.svg && this._doesObjHaveValues(this.eventData) && this._animationFrameDone) {
 
-        if(this._eventConfigChanged && this.eventGroup && this._doesD3HaveValues(this.eventGroup)) {
-          this.eventGroup.remove();
-          this.eventGroup = null;
-        }
+          if(this.eventGroup && this._doesD3HaveValues(this.eventGroup)) {
+            this._eventDrawn = false;
+            this.eventGroup.remove();
+            this.eventGroup = null;
+          }
 
-        this._processConfiguration();
+          this._processConfiguration();
 
-        // checks to see if the axis already exists. If not, create; if so, update
-        if(this._isObjEmpty(this.eventGroup)) {
+
           this.eventGroup = this.svg.append('g')
             .attr('class','event')
             .attr('event-id',this.eventId)
@@ -257,21 +261,33 @@ The configureation object allows developers to set the icon used for each event 
 
           // draw the path
           this.eventLine = this.eventGroup.append("line")
-            .attr('stroke', this._checkColorType(this.lineConfig.color))
-            .attr('stroke-width', this.lineConfig.weight);
+            .attr('stroke', this._checkColorType(this._thisConfig.lineColor))
+            .attr('stroke-width', this._thisConfig.lineWeight);
 
           this._addIcon();
 
-          this._positionEvent();
+          this._eventDrawn = true;
+
+          this.positionElement();
 
           this._addClipPath();
 
-          this._eventConfigChanged = false;
-        } else {
-          // update the path
-          this._positionEvent();
+
+          this._addTooltip();
         }
-        this._addTooltip();
+      }, 5);
+    },
+
+
+    /**
+     * Updates the position of the event
+     * Called from an observer watching for data and the necessary d3 objects
+     *
+     * @method positionElement
+     */
+    positionElement: function() {
+      if(this.x && this._eventDrawn) {
+        this._positionEvent();
       }
     },
 
@@ -342,7 +358,7 @@ The configureation object allows developers to set the icon used for each event 
      */
     _processConfiguration:function() {
       // is there a configuration object for this event type?
-      if(this.eventConfig[this.eventData.label]){
+      if(this.eventConfig[this.eventData.label]) {
         /*
           check each key (icon, color, etc) of the defaultEventConfig and see if the eventConfig is overwriting that property. If so, set it, otherwise use default
         */
