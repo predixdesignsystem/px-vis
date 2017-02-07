@@ -140,6 +140,9 @@ This element sets the selectedDomain property based on the extents box. The sele
       _animationFrameDone: {
         type: Boolean,
         value: false
+      },
+      _clipPathId: {
+        type: String
       }
     },
 
@@ -156,6 +159,8 @@ This element sets the selectedDomain property based on the extents box. The sele
       window.requestAnimationFrame(function() {
         this.set('_animationFrameDone', true);
       }.bind(this));
+
+      this.set('_clipPathId', this.generateRandomID('navClipPath'));
     },
 
     /**
@@ -212,7 +217,7 @@ This element sets the selectedDomain property based on the extents box. The sele
             .attr('stroke', this._checkThemeVariable("--px-vis-nav-brush-outline-color", this.colors.gray5))
             .attr('stroke-width',2)
             .attr('shape-rendering','crispEdges')
-            .attr("clip-path", 'url(#navClipPath)');
+            .attr("clip-path", 'url(#' + this._clipPathId + ')');
 
           if(this.gradientOverlay){
             var gradient = this.svg.append("defs")
@@ -279,7 +284,7 @@ This element sets the selectedDomain property based on the extents box. The sele
     _createClipPath: function(vR) {
       this._clipPathObj =  this.svg
         .append("clipPath")
-        .attr("id", "navClipPath");
+        .attr("id", this._clipPathId);
 
       this._clipPathObj.append("path");
 
@@ -526,7 +531,7 @@ This element sets the selectedDomain property based on the extents box. The sele
       //     .attr("height", 20)
       // draw the handle rect / base
       this._handleGroup
-        .attr("clip-path", 'url(#navClipPath)')
+        .attr("clip-path", 'url(#' + this._clipPathId + ')')
         .attr('stroke',this._checkThemeVariable("--px-vis-nav-brush-handle-lines-color", this.colors.gray5))
         .attr('fill',this._checkThemeVariable("--px-vis-nav-brush-handle-fill-color", this.colors.white))
         .attr('shape-rendering','crispEdges');

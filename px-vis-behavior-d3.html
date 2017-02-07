@@ -44,13 +44,21 @@ PxVisBehaviorD3.svg = [{
    * @return {id string}
    */
   generateRandomID: function(baseStr) {
-    // FIXME In theory, we could get two of the same IDs.
+
     var id = baseStr,
         abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
         len = abc.length;
 
     for(var i = 0; i < 10; i++){
       id += abc.charAt(Math.floor(Math.random() * len));
+    }
+
+    Px.uniqueIds = Px.uniqueIds || [];
+    if(Px.uniqueIds.indexOf(id) !== -1) {
+      //id exists, recreate it.
+      return this.generateRandomID(baseStr);
+    } else {
+      Px.uniqueIds.push(id);
     }
 
     return id;
