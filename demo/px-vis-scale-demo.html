@@ -14,10 +14,10 @@
 <link rel="import" href="../../px-demo/css/px-demo-styles.html" />
 
 <!-- Imports for this componnent -->
-<link rel="import" href="px-vis-interaction-space-demo-component.html">
+<link rel="import" href="px-vis-scale-demo-component.html">
 
 <!-- Demo DOM module -->
-<dom-module id="px-vis-interaction-space-demo">
+<dom-module id="px-vis-scale-demo">
   <template>
   <style include="px-demo-styles" is="custom-style"></style>
 
@@ -30,7 +30,7 @@
 
     <!-- Header -->
     <px-demo-header
-        module-name="px-vis-interaction-space"
+        module-name="px-vis-scale"
         description="[[description]]"
         parent-name="px-vis">
     </px-demo-header>
@@ -43,18 +43,18 @@
 
       <!-- Component ---------------------------------------------------------->
       <px-demo-component>
-        <px-vis-interaction-space-demo-component></px-vis-interaction-space-demo-component>
+        <px-vis-scale-demo-component></px-vis-scale-demo-component>
       </px-demo-component>
       <!-- END Component ------------------------------------------------------>
 
       <px-demo-component-snippet
           element-properties="{{props}}"
-          element-name="px-vis-interaction-space">
+          element-name="px-vis-scale">
       </px-demo-component-snippet>
     </px-demo-interactive>
 
     <!-- API Viewer -->
-    <px-demo-api-viewer source="px-vis-interaction-space"></px-demo-api-viewer>
+    <px-demo-api-viewer source="px-vis-scale"></px-demo-api-viewer>
 
     <!-- Footer -->
     <px-demo-footer></px-demo-footer>
@@ -64,11 +64,11 @@
 </dom-module>
 <script>
   Polymer({
-    is: 'px-vis-interaction-space-demo',
+    is: 'px-vis-scale-demo',
     properties: {
       description: {
         type: String,
-        value: "The interaction-space provides the basis for all on-chart interaction. It detects mouseovers on the chart and builds the data objects which other components then consume."
+        value: "All charts need an interpretor component. These cannot be seen but provide the basic framework for drawing objects to be displayed. Interpretor components convert data into drawing space coordinates. The scale component creates 'x' &amp 'y' and 'currentDomainX' &amp 'currentDomainY' variables which can be passed into drawing components. Note: All the subsequent charts will have this component, but they will not be shown in the code snippet."
       },
       /**
        * @property demoProps
@@ -96,43 +96,43 @@
     },
     demoProps: {
       xAxisType:{
-        value:"time"
-      },
-        svg:{
-        value:"[[svg]]"
-      },
-        width:{
-        value:"[[width]]"
-      },
-        height:{
-        value:"[[height]]"
-      },
-        margin:{
-        value:"[[margin]]"
-      },
-        completeSeriesConfigeriesConfig:{
-        value:"[[seriesConfig]]"
-      },
-        chartData:{
-        value:"[[chartData]]"
-      },
-        tooltipData:{
-        value:"{{tooltipData}}"
-      },
-        extentsData:{
-        value:"{{extentsData}}"
-      },
-        x:{
-        value:"[[x]]"
-      },
-        y:{
-        value:"[[y]]"
-      },
-        currentDomainX:{
-        value:"[[currentDomainX]]"
-      },
-        currentDomainY:{
-        value:"[[currentDomainY]]"
+				value:"time"
+			},
+      yAxisType:{
+				value:"linear"
+			},
+      completeSeriesConfig:{
+				value:"[[seriesConfig]]"
+			},
+      chartExtents:{
+				value:"[[chartExtents]]"
+			},
+      width:{
+				value:"[[width]]"
+			},
+      height:{
+				value:"[[height]]"
+			},
+      margin:{
+				value:"[[margin]]"
+			},
+      chartData:{
+				value:"{{chartData}}"
+			},
+      x:{
+				value:"{{x}}"
+			},
+      y:{
+				value:"{{y}}"
+			},
+      currentDomainX:{
+				value:"{{currentDomainX}}"
+			},
+      currentDomainY:{
+				value:"{{currentDomainY}}"
+			},
+      selectedDomain:{
+				value:"[[selectedDomain]]"
       }
     }
   });
