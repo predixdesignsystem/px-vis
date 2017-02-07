@@ -1644,7 +1644,7 @@ PxVisBehaviorChart.multiAxis = [{
      * The size of an individual axis
      *
      */
-    _leftAxisSize: {
+    leftAxisSize: {
       type: Number,
       notify: true
     },
@@ -1653,7 +1653,7 @@ PxVisBehaviorChart.multiAxis = [{
      * The size of an individual axis
      *
      */
-    _rightAxisSize: {
+    rightAxisSize: {
       type: Number,
       notify: true
     },
@@ -1662,7 +1662,7 @@ PxVisBehaviorChart.multiAxis = [{
      * Number of axes on the left
      *
      */
-    _numLeftAxes: {
+    numLeftAxes: {
       type: Number,
       value: 0,
       notify: true
@@ -1672,7 +1672,7 @@ PxVisBehaviorChart.multiAxis = [{
      * Number of axes on the right
      *
      */
-    _numRightAxes: {
+    numRightAxes: {
       type: Number,
       value: 0,
       notify: true
@@ -1757,13 +1757,13 @@ PxVisBehaviorChart.multiAxis = [{
     lDims = lDims.filter(Boolean);
     rDims = rDims.filter(Boolean);
 
-    this.set('_numLeftAxes', lDims.length);
-    this.set('_numRightAxes', rDims.length);
+    this.set('numLeftAxes', lDims.length);
+    this.set('numRightAxes', rDims.length);
 
     this.set('axes', lDims.concat(rDims));
     this.set('dimensions', this.axes);
     this.set('seriesToAxes', seriesToAxes);
-    this.set('_axisX', this._setAxisScale(lDims.sort(), rDims.sort(), this._leftAxisSize, this._rightAxisSize));
+    this.set('_axisX', this._setAxisScale(lDims.sort(), rDims.sort(), this.leftAxisSize, this.rightAxisSize));
 
     if(typeof this._axisX === 'function') {
       this.set('_axisDomainChanged', !this._axisDomainChanged);
@@ -1779,11 +1779,11 @@ PxVisBehaviorChart.multiAxis = [{
 
     // width dependent on number of axes on each
     // axes fit into the margin section of the chart
-    margin.left = Math.max(leftAxisWidth * this._numLeftAxes, margin.left);
-    margin.right = Math.max(rightAxisWidth * this._numRightAxes, margin.right);
+    margin.left = Math.max(leftAxisWidth * this.numLeftAxes, margin.left);
+    margin.right = Math.max(rightAxisWidth * this.numRightAxes, margin.right);
 
-    this.set('_leftAxisSize', leftAxisWidth);
-    this.set('_rightAxisSize', rightAxisWidth);
+    this.set('leftAxisSize', leftAxisWidth);
+    this.set('rightAxisSize', rightAxisWidth);
   },
 
 
