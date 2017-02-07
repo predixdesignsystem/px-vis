@@ -19,7 +19,7 @@
 <link rel="import" href="px-vis-register-demo.html">
 <link rel="import" href="px-vis-gridlines-demo.html">
 <link rel="import" href="px-vis-brush-demo.html">
- -->
+ <link rel="import" href="px-vis-canvas-demo.html">
 
 <!-- Demo DOM module -->
 <dom-module id="local-element-demo">
@@ -31,7 +31,7 @@
     <style include="px-dark-theme-styles" is="custom-style"></style>
 
     <!-- Demo list/view change entrypoint -->
-    <px-demo-collection demos="{{demos}}"></px-demo-collection>
+    <px-demo-collection demos="{{demos}}" chosen-demo-name="{{chosenDemoName}}"></px-demo-collection>
 
   </template>
 </dom-module>
@@ -68,6 +68,8 @@
             	tagName:'px-vis-axis-demo'},
             {name:'px-vis-brush',
             	tagName:'px-vis-brush-demo'},
+            {name:'px-vis-canvas',
+            	tagName:'px-vis-canvas-demo'},
             {name:'px-vis-chart-navigator',
             	tagName:'px-vis-chart-navigator-demo'},
             {name:'px-vis-cursor',
@@ -99,16 +101,22 @@
       },
 
       /**
-       * The name of the active demo. Can be set to update the currently visible
-       * demo, or listened to for notifications when the user changes the
-       * active demo.
-       *
-       * @property chosenDemoName
-       * @type {String}
-       */
-      chosenDemoName: {
-        type: String
-      }
-    }
+      * The name of the active demo. Can be set to update the currently visible
+      * demo, or listened to for notifications when the user changes the
+      * active demo.
+      *
+      * @property chosenDemoName
+      * @type {String}
+      */
+     chosenDemoName: {
+       type: String
+     }
+   },
+   listeners: {
+     'px-demo-active-should-change' : '_handleActiveChange'
+   },
+   _handleActiveChange: function(evt) {
+     this.set('chosenDemoName', evt.detail.name);
+   }
   });
 </script>

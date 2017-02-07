@@ -17,7 +17,7 @@
           <template is="dom-if" if="[[_tertiaryDescriptionExists(item)]]">
             <p class="u-mb0">[[item.tertiaryDescription]]</p>
           </template>
-          <p><a href="[[item.name]]-demo.html" class="actionable" target="_blank">API Documentation</a></p>
+          <p><span class="actionable--text" data-demo-name="[[item.name]]" on-tap="_changeApiView">API Documentation</span></p>
         </div>
       </div>
       <br/>
@@ -48,6 +48,10 @@ Polymer({
   },
   _listExists: function(item) {
     return item.list && item.list.items && item.list.items.length;
+  },
+  _changeApiView: function(evt) {
+    var name = evt.target.dataDemoName;
+    this.fire('px-demo-active-should-change', {name: name});
   }
 });
 
