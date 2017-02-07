@@ -2,25 +2,20 @@
 
 <link rel="import" href="../px-vis-scale.html">
 <link rel="import" href="../px-vis-svg.html">
-<link rel="import" href="../px-vis-data.html">
 <link rel="import" href="../px-vis-data-converter.html">
 
-<dom-module id="px-vis-data-converter-demo">
-  <link rel="import" type="css" href="../css/px-vis-demo.css"/>
+<dom-module id="px-vis-data-converter-demo-component">
   <template>
-        
     <px-vis-data-converter
-      data-key = "series"
-      id-key = "id"
+      data-key="series"
+      id-key="id"
       name-key="name"
-      original-data = "[[originalData]]"
+      original-data="[[originalData]]"
       series-config="{{seriesConfig}}"
       chart-data="{{chartData}}">
     </px-vis-data-converter>
 
-
     <div class="flex flex--wrap">
-
       <div style="padding-right:40px">
         <strong>original-data</strong>
         <pre>[[_formatName(originalData)]]</pre>
@@ -35,21 +30,20 @@
         <strong>series-config</strong>
         <pre>[[_formatName(seriesConfig)]]</pre>
       </div>
-
     </div>
 
   </template>
   <script>
     Polymer({
-      is: "px-vis-data-converter-demo",
+      is: "px-vis-data-converter-demo-component",
       properties:{
         originalData : {
           type : Array,
           value:[
             {
-              "series": [ 
-                [ 1397102460000, 11.4403 ], 
-                [ 1397139660000, 13.1913 ], 
+              "series": [
+                [ 1397102460000, 11.4403 ],
+                [ 1397139660000, 13.1913 ],
                 [ 1427813520000, 17.1241 ],
                 [ 1427839740000, 34.1624 ],
                 [ 1427920920000, 17.9158 ],
@@ -66,7 +60,7 @@
               [ 1397102460000, 96.5 ],
               [ 1397139660000, 96.5 ],
               [ 1427813520000, 79 ],
-              [ 1427839740000, 48.2 ], 
+              [ 1427839740000, 48.2 ],
               [ 1427920920000, 96.5 ],
               [ null, null ]
               ],
@@ -81,28 +75,14 @@
         aggregatedData : {
           type : Array
         },
-        // demo snippet
-        elempropDataConverter:{
-          type : Object,
-          value:{
-            "data-key":"series",
-            "id-key":"name",
-            "nameKey":"name",
-            "original-data":"[[originalData]]",
-            "series-config":"{{seriesConfig}}",
-            "chart-data":"{{chartData}}"
-          }
-        }
       }, //end properties
 
       /*
        * stringify data to be printed out
        */
       _formatName: function(data) {
-          var  demoDataCode = JSON.stringify(data, null, ' ');
-          return demoDataCode;
+        return JSON.stringify(data, null, ' ');
       }
-      
     });
   </script>
 </dom-module>
