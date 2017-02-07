@@ -14,10 +14,10 @@
 <link rel="import" href="../../px-demo/css/px-demo-styles.html" />
 
 <!-- Imports for this componnent -->
-<link rel="import" href="px-vis-chart-navigator-demo-component.html">
+<link rel="import" href="px-vis-brush-demo-component.html">
 
 <!-- Demo DOM module -->
-<dom-module id="px-vis-chart-navigator-demo">
+<dom-module id="px-vis-brush-demo">
   <template>
   <style include="px-demo-styles" is="custom-style"></style>
 
@@ -30,7 +30,7 @@
 
     <!-- Header -->
     <px-demo-header
-        module-name="px-vis-chart-navigator"
+        module-name="px-vis-brush"
         description="[[description]]"
         parent-name="px-vis">
     </px-demo-header>
@@ -43,19 +43,19 @@
 
       <!-- Component ---------------------------------------------------------->
       <px-demo-component>
-        <px-vis-chart-navigator-demo-component></px-vis-chart-navigator-demo-component>
+        <px-vis-brush-demo-component></px-vis-brush-demo-component>
       </px-demo-component>
       <!-- END Component ------------------------------------------------------>
 
       <px-demo-component-snippet
           element-properties="{{props}}"
-          element-name="px-vis-chart-navigator"
+          element-name="px-vis-brush"
           code-link="http://codepen.io/menkhakl/pen/wzPQzz">
       </px-demo-component-snippet>
     </px-demo-interactive>
 
     <!-- API Viewer -->
-    <px-demo-api-viewer source="px-vis-chart-navigator"></px-demo-api-viewer>
+    <px-demo-api-viewer source="px-vis-brush"></px-demo-api-viewer>
 
     <!-- Footer -->
     <px-demo-footer></px-demo-footer>
@@ -65,11 +65,11 @@
 </dom-module>
 <script>
   Polymer({
-    is: 'px-vis-chart-navigator-demo',
+    is: 'px-vis-brush-demo',
     properties: {
       description: {
         type: String,
-        value: "Example of a chart-navigator drawing object. Very similar configuration to px-vis-line-svg."
+        value: "Element providing user interaction on the navigator. This element draw the box over the navigator signifying the selected chart extents and provides the user interactions to resize and move the extent box. This element sets the selectedDomain property based on the extents box. The selectedDomain variable can then be consumed by the scale component to change the main chart extents."
       },
       /**
        * @property demoProps
@@ -96,33 +96,33 @@
       },
     },
     demoProps: {
-      // demo snippet
-      elempropChartNavigator:{
-        type : Object,
-        defaultValue:{
-          xAxisType:{
-						value:"time"
-					},
-          yAxisType:{
-						value:"linear"
-					},
-          width:{
-						value:"[[width]]"
-					},
-          height:{
-						value:"100"
-					},
-          margin:{
-						value:"[[margin]]"
-					},
-          includeAllSeries:{
-						value:"true"
-					},
-          chartData:{
-						value:"[[chartData]]"
-          }
-        }
-      }
+      svg:{
+				value:"[[varFromSVGComponent]]"
+			},
+      axis:{
+				value:"[[varXFromScaleComponent]]"
+			},
+      width:{
+				value:"[[width]]"
+			},
+      height:{
+				value:"[[height]]"
+			},
+      margin:{
+				value:"[[margin]]"
+			},
+      chartDomain:{
+				value:"[[chartDomainX]]"
+			},
+      currentDomain:{
+				value:"[[XDomainFromScaleComponent]]"
+			},
+      gradientOverlay:{
+				value:"[[gradientOverlay]]"
+			},
+      selectedDomain:{
+				value:"{{selectedDomain}}"
+			}
     }
   });
 </script>
