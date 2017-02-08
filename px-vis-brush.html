@@ -140,6 +140,9 @@ This element sets the selectedDomain property based on the extents box. The sele
       _animationFrameDone: {
         type: Boolean,
         value: false
+      },
+      _clipPathId: {
+        type: String
       }
     },
 
@@ -156,155 +159,183 @@ This element sets the selectedDomain property based on the extents box. The sele
       window.requestAnimationFrame(function() {
         this.set('_animationFrameDone', true);
       }.bind(this));
+
+      this.set('_clipPathId', this.generateRandomID('navClipPath'));
     },
 
     /**
      * Defines the svg for the brush, draws brush elements, and sets up listeners.
      *
-     * Can be called manually after svg and currentDomain are set.
+     * Can be called manually after svg and domainChanged are set.
      *
      * @method drawElement
      */
     drawElement: function() {
-      if(this._animationFrameDone && this.domainChanged !== null && !isNaN(this.axis.domain()[0].getTime()) && !isNaN(this.axis.domain()[1].getTime())) {
-        var heightOffset = 5,
-              h = Math.max(this.height - this.margin.bottom - heightOffset,0),
-              range = [
-                [this.axis.range()[0],0],
-                [this.axis.range()[1],h]
-              ];
+    //  this.debounce('drawElement', function() {
 
-          // check that our sizing is ok and wont freak d3 out.
-          // x2 and y2 must be greater than x1 & y1
-          range[1][0] = (range[1][0] > range[0][0]) ? range[1][0] : range[0][0];
-          range[1][1] = (range[1][1] > range[0][1]) ? range[1][1] : range[0][1];
+        if(this._animationFrameDone && this.domainChanged !== null && !isNaN(this.axis.domain()[0].getTime()) && !isNaN(this.axis.domain()[1].getTime())) {
+          var heightOffset = 5,
+              h = Math.max(this.height - this.margin.bottom - heightOffset, 1),  //make sure it is bigger than 0 for range
+              axisRange = this.axis.range(),
+              range;
 
-        if(this._isObjEmpty(this._brush)) {
-
-          this._createClipPath([0,h]);
-          // first, define the brush using the axis
-          this._brush = Px.d3.brushX()
-            .extent(range)
-            .handleSize(6)
-            .on("start", this._brushstart.bind(this))
-            .on("brush", this._brushmove.bind(this))
-            .on("end", this._brushend.bind(this));
-
-          // now that we have our new g, proceed with drawing brush
-          this._brushGroup = this.svg.append("g")
-            .attr("class", "brush")
-            .call(this._brush)
-            .call(this._brush.move, this.axis.range());
-
-          /* Style the brush overlay box
-             There are actually two boxes, .selection and .overlay:
-             overlay captures the mouse events; selection is what is visible
-          */
-          var overlay = this._brushGroup.select("rect.selection")
-            .attr("y", 0)
-            .attr('stroke', this._checkThemeVariable("--px-vis-nav-brush-outline-color", this.colors.gray5))
-            .attr('stroke-width',2)
-            .attr('shape-rendering','crispEdges')
-            .attr("clip-path", 'url(#navClipPath)');
-
-          if(this.gradientOverlay){
-            var gradient = this.svg.append("defs")
-              .append("linearGradient")
-              .attr("id", "overlayGradient");
-
-            gradient.append("stop")
-              .attr("offset", "0%")
-              .attr("stop-color", this._checkThemeVariable("--px-vis-nav-brush-gradient-fill-color", this.colors.grey5))
-              .attr("stop-opacity", this._checkThemeVariable("--px-vis-nav-brush-gradient-opacity-1", 0.2));
-
-            gradient.append("stop")
-              .attr("offset", "100%")
-              .attr("stop-color", this._checkThemeVariable("--px-vis-nav-brush-gradient-fill-color", this.colors.grey5))
-              .attr("stop-opacity", this._checkThemeVariable("--px-vis-nav-brush-gradient-opacity-2", 0.8));
-
-            overlay.attr('fill','url(#overlayGradient)')
-              .attr('fill-opacity','1.0');
-          } else {
-            overlay.attr('fill',this._checkThemeVariable("--px-vis-nav-brush-fill-color", this.colors.grey5))
-              .attr('fill-opacity', this._checkThemeVariable("--px-vis-nav-brush-opacity", 0.3));
+          // check that our range is ok and wont freak d3 out.
+          // x2 must be greater than x1
+          if(axisRange[0] > axisRange[1]) {
+            axisRange[0] = this.axis.range()[1];
+            axisRange[1] = this.axis.range()[0];
+          } else if(axisRange[0] === axisRange[1]) {
+            axisRange[1] += 1;
           }
 
-          this._drawHandles(heightOffset);
+          range = [
+            [axisRange[0], 0],
+            [axisRange[1], h]
+          ];
 
-          // // Setup listeners for click on the navigator so the brush will jump instead of redraw
-          this._brushGroup.select("rect.overlay")
-            .on("mousedown.brush", this._brushcenter.bind(this))
-            .on("touchstart.brush", this._brushcenter.bind(this));
+          if(this._isObjEmpty(this._brush)) {
 
-          //if we want fancy color changes, etc, can use brushstart to prime those changes
-          // this._brushstart();
-          // this._brushmove();
-          // this._brush.extent(this.currentDomain);
-          //
-          // console.log(this._brushGroup.node().parentNode.childNodes);
-          // var nodes = this._brushGroup.node().parentNode.childNodes;
-          // console.log(nodes[nodes.length -1]);
-          // if(nodes[nodes.length -1] !== this._brushGroup.node()){
-          //   console.log("doesnt match");
-          // }
-        } else {
+            this._createClipPath([0,h]);
+            // first, define the brush using the axis
+            this._brush = Px.d3.brushX()
+              .extent(range)
+              .handleSize(6)
+              .on("start", this._brushstart.bind(this))
+              .on("brush", this._brushmove.bind(this))
+              .on("end", this._brushend.bind(this));
 
-          this._drawClipPath([0,h]);
-          //make sure brush has the right size
-          this._brush.extent(range)
-            // .handleSize(6)
-            .on("start", this._brushstart.bind(this))
-            .on("brush", this._brushmove.bind(this))
-            .on("end", this._brushend.bind(this));
-
-          if(this.selectedDomain && this.selectedDomain.x.length > 0) {
-            //redraw the brush in the right place, but make sure we don't fire a change of domain
-            this._preventDomainChange = true;
-            this._brushGroup
+              this._preventDomainChange = true;
+            // now that we have our new g, proceed with drawing brush
+            this._brushGroup = this.svg.append("g")
+              .attr("class", "brush")
               .call(this._brush)
-              .call(this._brush.move, [this.axis(this.selectedDomain.x[0]), this.axis(this.selectedDomain.x[1])]);
-            this._preventDomainChange = false;
+              .call(this._brush.move, axisRange);
+              this._preventDomainChange = false;
+
+            /* Style the brush overlay box
+              There are actually two boxes, .selection and .overlay:
+              overlay captures the mouse events; selection is what is visible
+            */
+            var overlay = this._brushGroup.select("rect.selection")
+              .attr("y", 0)
+              .attr('stroke', this._checkThemeVariable("--px-vis-nav-brush-outline-color", this.colors.gray5))
+              .attr('stroke-width',2)
+              .attr('shape-rendering','crispEdges')
+              .attr("clip-path", 'url(#' + this._clipPathId + ')');
+
+            if(this.gradientOverlay){
+              var gradient = this.svg.append("defs")
+                .append("linearGradient")
+                .attr("id", "overlayGradient");
+
+              gradient.append("stop")
+                .attr("offset", "0%")
+                .attr("stop-color", this._checkThemeVariable("--px-vis-nav-brush-gradient-fill-color", this.colors.grey5))
+                .attr("stop-opacity", this._checkThemeVariable("--px-vis-nav-brush-gradient-opacity-1", 0.2));
+
+              gradient.append("stop")
+                .attr("offset", "100%")
+                .attr("stop-color", this._checkThemeVariable("--px-vis-nav-brush-gradient-fill-color", this.colors.grey5))
+                .attr("stop-opacity", this._checkThemeVariable("--px-vis-nav-brush-gradient-opacity-2", 0.8));
+
+              overlay.attr('fill','url(#overlayGradient)')
+                .attr('fill-opacity','1.0');
+            } else {
+              overlay.attr('fill',this._checkThemeVariable("--px-vis-nav-brush-fill-color", this.colors.grey5))
+                .attr('fill-opacity', this._checkThemeVariable("--px-vis-nav-brush-opacity", 0.3));
+            }
+
+            this._drawHandles(heightOffset);
+
+            // // Setup listeners for click on the navigator so the brush will jump instead of redraw
+            this._brushGroup.select("rect.overlay")
+              .on("mousedown.brush", this._brushcenter.bind(this))
+              .on("touchstart.brush", this._brushcenter.bind(this));
+
+            //if we want fancy color changes, etc, can use brushstart to prime those changes
+            // this._brushstart();
+            // this._brushmove();
+            // this._brush.extent(this.currentDomain);
+            //
+            // console.log(this._brushGroup.node().parentNode.childNodes);
+            // var nodes = this._brushGroup.node().parentNode.childNodes;
+            // console.log(nodes[nodes.length -1]);
+            // if(nodes[nodes.length -1] !== this._brushGroup.node()){
+            //   console.log("doesnt match");
+            // }
+          } else {
+
+            this._drawClipPath([0,h]);
+            //make sure brush has the right size
+            this._brush.extent(range)
+              // .handleSize(6)
+              .on("start", this._brushstart.bind(this))
+              .on("brush", this._brushmove.bind(this))
+              .on("end", this._brushend.bind(this));
+
+            if(this.selectedDomain && this.selectedDomain.x.length > 0) {
+              //redraw the brush in the right place, but make sure we don't fire a change of domain
+              this._preventDomainChange = true;
+              this._brushGroup
+                .call(this._brush)
+                .call(this._brush.move, [this.axis(this.selectedDomain.x[0]), this.axis(this.selectedDomain.x[1])]);
+              this._preventDomainChange = false;
+            }
           }
         }
-      }
+   //   },1)
     },
 
     _createClipPath: function(vR) {
       this._clipPathObj =  this.svg
         .append("clipPath")
-        .attr("id", "navClipPath");
+        .attr("id", this._clipPathId);
 
       this._clipPathObj.append("path");
-
 
       this._drawClipPath(vR);
     },
 
     _drawClipPath: function(vR) {
-      var hR = this.axis.range();
-      hR[0] -= 30;
-      hR[1] += 30;
 
+      var hR = this.axis.range(),
+          domain = this.axis.domain(),
+          clipLeft = this.selectedDomain.x[0] < domain[0],
+          clipRight = this.selectedDomain.x[1] > domain[1],
+          d = '';
+     
       vR[0] -= 5;
       vR[1] += 5;
 
+      hR[0] -= 5;
+      hR[1] += 5;
+
       var halfV = (vR[1] + vR[0]) / 2,
           n = 10,
-          n2 = 5,
+          n2 = 5;
           d = "M" + hR[0] + ',' + vR[0] +
-              "L" + hR[1] + ',' + vR[0] +
-              "L" + hR[1] + ',' + (halfV - n) +
-              "L" + (hR[1] - 10) + ',' + (halfV - n2) +
-              "L" + (hR[1] + 10) + ',' + (halfV + n2) +
-              "L" + hR[1] + ',' + (halfV + n) +
-              "L" + hR[1] + ',' + vR[1] +
-              "L" + hR[0] + ',' + vR[1] +
-              "L" + hR[0] + ',' + (halfV + n) +
-              "L" + (hR[0] + 10) + ',' + (halfV + n2) +
-              "L" + (hR[0] - 10) + ',' + (halfV - n2) +
-              "L" + hR[0] + ',' + (halfV - n) +
-              "Z";
-              // "L" + hR[0] + ',' + vR[0];
+              "L" + hR[1] + ',' + vR[0];
+        
+      //add squiglly line on right if clip
+      if(clipRight) {
+        d += "L" + hR[1] + ',' + (halfV - n) +
+          "L" + (hR[1] - 10) + ',' + (halfV - n2) +
+          "L" + (hR[1] + 10) + ',' + (halfV + n2) +
+          "L" + hR[1] + ',' + (halfV + n);
+      }
+
+      d += "L" + hR[1] + ',' + vR[1] +
+          "L" + hR[0] + ',' + vR[1];
+    
+      //add squiggly line on left if clip
+      if(clipLeft) {
+          d += "L" + hR[0] + ',' + (halfV + n) +
+            "L" + (hR[0] + 10) + ',' + (halfV + n2) +
+            "L" + (hR[0] - 10) + ',' + (halfV - n2) +
+            "L" + hR[0] + ',' + (halfV - n);
+      }
+        
+      d += "Z";
 
       this._clipPathObj.select("path")
         .attr("d", d);
@@ -343,10 +374,11 @@ This element sets the selectedDomain property based on the extents box. The sele
      *
      * @method _brushmove
      */
-    _brushmove: function() {
+    _brushmove: function(range) {
       // var s = d3.event.selection;
       // circle.classed("selected", function(d) { return s[0] <= d && d <= s[1]; });
       this.debounce('brushed', function () {
+        
         if(Px.d3.brushSelection(this._brushGroup.node())) {
           var brushExt = Px.d3.brushSelection(this._brushGroup.node());
 
@@ -417,7 +449,7 @@ This element sets the selectedDomain property based on the extents box. The sele
       this._recenter(false);
     },
     /**
-     * Helper function to to call the currentDomain function and disable listner
+     * Helper function to move the brush and disable listner
      *
      * @method _brushcenterend
      */
@@ -505,7 +537,7 @@ This element sets the selectedDomain property based on the extents box. The sele
       //     .attr("height", 20)
       // draw the handle rect / base
       this._handleGroup
-        .attr("clip-path", 'url(#navClipPath)')
+        .attr("clip-path", 'url(#' + this._clipPathId + ')')
         .attr('stroke',this._checkThemeVariable("--px-vis-nav-brush-handle-lines-color", this.colors.gray5))
         .attr('fill',this._checkThemeVariable("--px-vis-nav-brush-handle-fill-color", this.colors.white))
         .attr('shape-rendering','crispEdges');

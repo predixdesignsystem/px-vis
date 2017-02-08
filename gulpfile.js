@@ -43,7 +43,7 @@ function buildCSS(){
 }
 
 gulp.task('sass', function() {
-  return gulp.src(['./sass/*.scss', '!./sass/*sketch.scss', '!./sass/*-demo.scss'])
+  return gulp.src(['./sass/*.scss', '!./sass/*sketch.scss'])
     .pipe(buildCSS())
     .pipe(gulpif(/.*predix/,
       $.rename(function(path){
@@ -59,16 +59,8 @@ gulp.task('sass', function() {
     .pipe(browserSync.stream({match: 'css/*.html'}));
 });
 
-gulp.task('demosass', function() {
-  return gulp.src(['./sass/*-demo.scss'])
-    .pipe(buildCSS())
-    .pipe(gulp.dest('css'))
-    .pipe(browserSync.stream({match: '**/*.css'}));
-});
-
 gulp.task('watch', function() {
-  gulp.watch(['!sass/*-demo.scss', 'sass/*.scss'], ['sass']);
-  gulp.watch('sass/*-demo.scss', ['demosass']);
+  gulp.watch(['sass/*.scss'], ['sass']);
 });
 
 gulp.task('serve', function() {
@@ -83,8 +75,6 @@ gulp.task('serve', function() {
 
   gulp.watch(['css/*-styles.html', 'css/*-demo.css', '*.html', '*.js']).on('change', browserSync.reload);
   gulp.watch(['sass/*.scss', '!sass/*-demo.scss'], ['sass']);
-  gulp.watch('sass/*-demo.scss', ['demosass']);
-
 });
 
 gulp.task('bump:patch', function(){
@@ -106,5 +96,5 @@ gulp.task('bump:major', function(){
 });
 
 gulp.task('default', function(callback) {
-  gulpSequence('clean', 'sass', 'demosass')(callback);
+  gulpSequence('clean', 'sass')(callback);
 });

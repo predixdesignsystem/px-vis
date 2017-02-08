@@ -93,13 +93,6 @@ Element providing an on-chart zoom.
         type: Object
       },
       /**
-       * Current action config determined by what has been selected on the toolbar. Needs 
-       * to be used by interaction space
-       */
-      actionConfig: {
-        type: Object
-      },
-      /**
        * Config for default actions: tooltip/pan/zoom
        */
       _defaultActionsMapping: {
@@ -278,7 +271,8 @@ Element providing an on-chart zoom.
        *     "buttonGroup": 1,              //if a button is part of a button group then it
        * becomes blue when clicked and all other buttons with the same button group in the 
        * same row become deselected (not blue)
-       *     "selected": true,                //force this button to be selected at start
+       *     "selected": true,                //force this button to be selected at start 
+       *(including applying its actionConfig and subConfig)
        *     "actionConfig": {                //this config will be propagated to 
        * px-vis-interaction-space
        *       "mousedown": "startZooming",   //key is an event, value is either a  
@@ -344,10 +338,7 @@ Element providing an on-chart zoom.
        * ```
        */
       config: {
-        type: Object,
-        value: function() {
-          return {"tooltip": true, "zoom": true, "pan": true};
-        }
+        type: Object
       },
       /**
        *
@@ -358,6 +349,24 @@ Element providing an on-chart zoom.
         value: true,
         notify: true
       },
+      /**
+      * Configuration used to define what actions happen on events. Each key represents an event,
+      * each value can be:
+      * - a predefined action found as a key in px-vis-interaction-space `actionMapping`
+      * - a function which context will be bound to the chart. The function argument will be the mouse position on the chart
+      */
+      actionConfig: {
+        type: Object,
+        notify: true,
+        value: function() {
+          return {
+            'mousedown': 'startZooming',
+            'mouseup': 'stopZooming',
+            'mouseout': 'resetTooltip',
+            'mousemove': 'calcTooltipData'
+          };
+        }
+      }
     },
     observers: [
       '_configChanged(config.*, horizontalAlignment)',

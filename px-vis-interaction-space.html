@@ -131,6 +131,24 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           'resetTooltip': '_resetTooltipData',
           'startPanning': '_startPanning',
           'stopPanning': '_stopPanning'
+        },
+         /**
+          * Configuration used to define what actions happen on events. Each key represents an event,
+          * each value can be:
+          * - a predefined action found in px-vis-interaction-space `actionMapping`
+          * - a function which context will be bound to the chart. The function argument will be the mouse position on the chart
+          */
+        actionConfig: {
+          type: Object,
+          notify: true,
+          value: function() {
+            return {
+              'mousedown': 'startZooming',
+              'mouseup': 'stopZooming',
+              'mouseout': 'resetTooltip',
+              'mousemove': 'calcTooltipData'
+            };
+          }
         }
       },
       _panningStartVal: {
@@ -145,6 +163,10 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       showTooltip: {
         type: Boolean,
         value: true
+      },
+      _calculatingTooltipData: {
+        type: Boolean,
+        value: false
       }
     },
 
@@ -188,7 +210,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           .attr('pointer-events', 'all')
           .style('cursor','crosshair');
 
-          this._setupActions();
+          if(this.actionConfig) {
+            this._setupActions();
+          }
 
           this.set('mouseRect', this._rect.node());
           this.fire('px-vis-mouse-rect-updated', {'data': this.mouseRect, 'dataVar': 'mouseRect', 'method': 'set'});
@@ -264,6 +288,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      */
     _resetTooltipData: function() {
 
+      this.set('_calculatingTooltipData', false);
       var ttD = {
             'time': null,
             'hidden': true,
@@ -290,7 +315,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * @method _calcTooltipData
      */
     _calcTooltipData:function() {
-
+      
+      this.set('_calculatingTooltipData', true);
       if(!this.mouseDown && this.chartData.length > 0 && this.y) {
 
         //  d3.mouse: returns the x position on the screen of the mouse
@@ -309,7 +335,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             yCoord;
 
 
-        this.debounce('move',function(){
+        this.debounce('move',function() {
 
           // TODO Maybe this should be a option: return all val at x or closets vals at cursor
           // invert: takes position on the screen and converts it into an equivalent date
@@ -345,6 +371,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
               for(var i = 0; i < len; i++) {
 
+                //if we had a request to reset tooltip stop calculating
+                if(!this._calculatingTooltipData) {
+                  break;
+                }
+                
                 var yKey = this.completeSeriesConfig[keys[i]]['y'],
                     xKey = this.completeSeriesConfig[keys[i]]['x'],
                     axisKey = this.completeSeriesConfig[keys[i]]['axis']['id'];
@@ -456,9 +487,13 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             }
 
             // now we can set our data that we want to pass out
-            this.set('tooltipData',dataObj);
-            this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
-        },1);
+            if(this._calculatingTooltipData) {
+            
+              this.set('tooltipData',dataObj);
+              this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
+              this.set('_calculatingTooltipData', false);
+            }
+        },10);
       }
     },
     /**
@@ -806,7 +841,10 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         this.set('extentsData', extents);
         this.fire('px-vis-extents-data-updated', {'data': extents, 'dataVar': 'extentsData', 'method': 'set'});
       }
-      this._actionArea.remove();
+
+      if(this._actionArea && this._actionArea.remove) {
+        this._actionArea.remove();
+      }
     },
     _applyFunctionToY: function(fn) {
 

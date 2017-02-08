@@ -44,13 +44,21 @@ PxVisBehaviorD3.svg = [{
    * @return {id string}
    */
   generateRandomID: function(baseStr) {
-    // FIXME In theory, we could get two of the same IDs.
+
     var id = baseStr,
         abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
         len = abc.length;
 
     for(var i = 0; i < 10; i++){
       id += abc.charAt(Math.floor(Math.random() * len));
+    }
+
+    Px.uniqueIds = Px.uniqueIds || [];
+    if(Px.uniqueIds.indexOf(id) !== -1) {
+      //id exists, recreate it.
+      return this.generateRandomID(baseStr);
+    } else {
+      Px.uniqueIds.push(id);
     }
 
     return id;
@@ -389,7 +397,7 @@ PxVisBehaviorD3.domainUpdate = {
      *
      * Serves as a trigger for many elements to redraw
      *
-     * @property currentDomain
+     * @property domainChanged
      * @type Object
      */
     domainChanged: {
@@ -427,18 +435,6 @@ PxVisBehaviorD3.axis = {
     axis: {
       type: Object,
       notify: true
-    },
-    /**
-     * The chart extents which have been set by the scale component
-     *
-     * Serves as a trigger for many elements to redraw
-     *
-     * @property currentDomain
-     * @type Object
-     */
-    currentDomain: {
-      type:Array,
-      notify:true
     },
     /**
      * Defines which side the axis should be on.
@@ -1017,6 +1013,31 @@ PxVisBehaviorD3.lineGaps = {
   }
 };
 
+/*
+    Name:
+    PxVisBehaviorD3.interpolationFunction
+
+    Description:
+    Polymer behavior that provides definition for interpolationFunction
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorD3.interpolationFunction
+*/
+PxVisBehaviorD3.interpolationFunction = {
+  properties: {
+    /**
+    * A d3 function used to interpolate the series lines.
+    *
+    * See: https://github.com/d3/d3-shape/blob/master/README.md#curves
+    */
+    interpolationFunction: {
+      type: Object,
+      notify: true
+    }
+  }
+};
 
 /*
     Name:
@@ -1072,12 +1093,7 @@ PxVisBehaviorD3.lineShared = [{
       type: Array,
       computed: '_computeColorArr(categories,completeSeriesConfig,seriesId)'
     },
-    /**
-    * Counter to track progressive rendering requests and only draw the latest one
-    */
-    interpolationFunction: {
-      type: Object
-    },
+
     /**
      * A boolean spcifying if multiple paths get drawn by the line
      *
@@ -1245,7 +1261,7 @@ PxVisBehaviorD3.lineShared = [{
 
     this.set('line',line);
   }
-},PxVisBehaviorD3.radialLineGenerator, PxVisBehavior.seriesId, PxVisBehaviorD3.lineGaps];
+},PxVisBehaviorD3.radialLineGenerator, PxVisBehavior.seriesId, PxVisBehaviorD3.lineGaps, PxVisBehaviorD3.interpolationFunction];
 
 /*
     Name:

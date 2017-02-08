@@ -1,8 +1,10 @@
+<link rel="import" href="../css/px-vis-summary-demo-styles.html" />
 <dom-module id="px-vis-demo-loop">
   <template>
+    <style include="px-vis-summary-demo-styles" is="custom-style"></style>
       <p id="[[name]]-anchor" class="epsilon demo__title">[[item.name]]</p>
-      <div class="demo u-p+">
-        <div class="demo__description">
+      <div class="demo u-p+ flex flex--col">
+        <div class="demo__description u-mt+">
           <p class="u-mt0">[[item.description]]</p>
           <template is="dom-if" if="[[_listExists(item)]]">
             <ul class="list-bare u-ml">
@@ -17,7 +19,7 @@
           <template is="dom-if" if="[[_tertiaryDescriptionExists(item)]]">
             <p class="u-mb0">[[item.tertiaryDescription]]</p>
           </template>
-          <p><span class="actionable--text" data-demo-name="[[item.name]]" on-tap="_changeApiView">API Documentation</span></p>
+          <p><span class="actionable" data-demo-name="[[item.name]]" on-tap="_changeApiView">API Documentation</span></p>
         </div>
       </div>
       <br/>
@@ -37,8 +39,10 @@ Polymer({
     }
   },
   _addDemo: function() {
-    var newDemoElement = document.createElement(this.item.tag + '-demo-component');
-    Polymer.dom(this.root).querySelector('.demo').appendChild(newDemoElement);
+    //debugger;
+    var demoContainer = Polymer.dom(this.root).querySelector('.demo');
+    var newDemoElement = document.createElement(this.item.name + '-demo-component');
+    Polymer.dom(this.root).querySelector('.demo').insertBefore(newDemoElement, demoContainer.firstChild);
   },
   _tertiaryDescriptionExists: function(item) {
     return item.tertiaryDescription && item.tertiaryDescription.length;

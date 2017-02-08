@@ -198,16 +198,18 @@ Element providing on-chart tooltip display
       var hidden = this.tooltipData.hidden || this.hide;
       this.set('_internalHidden', hidden);
 
-      this.$.template.render();
-      this.set('_tooltipElem', this.$$('px-tooltip'));
-
+      if(!this._tooltipElem && !this._internalHidden) {
+        this.$.template.render();
+        this.set('_tooltipElem', this.$$('px-tooltip'));
+      }
+      
       if(this._tooltipElem) {
         if(hidden) {
           this.forceHide();
         } else {
           this.forceShow()
         }
-      }
+      } 
     },
     _ttDataChanged: function() {
       this.set('_tooltipDataHidden', this.tooltipData.hidden);

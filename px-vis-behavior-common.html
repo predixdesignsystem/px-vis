@@ -784,7 +784,7 @@ PxVisBehavior.axisTypes = {
      * - `time`: for time domains.
      * - `timeLocal`: for local time domains.
      * - `linear`: for continuous input domains, such as numbers.
-     * - 'pie': for pie/donut charts
+     * - `pie`: for pie/donut charts
      */
     xAxisType: {
       type: String,
@@ -797,7 +797,7 @@ PxVisBehavior.axisTypes = {
      * Valid entries are:
      * - `ordinal`: for discrete input domains, such as names or categories.
      * - `linear`: for continuous input domains, such as numbers.
-     * - 'pie': for pie/donut charts
+     * - `pie`: for pie/donut charts
      */
     yAxisType: {
       type: String,
@@ -1005,7 +1005,8 @@ PxVisBehavior.events = {
      *   'icon': 'fa-circle',
      *   'type': 'fa',
      *   'offset': 0,
-     *   'size': '16'
+     *   'lineColor': 'grey9',
+     *   'lineWeght': 1,
      * }
      *```
      *
@@ -1024,7 +1025,9 @@ PxVisBehavior.events = {
      *   'icon': 'fa-circle',
      *   'type': 'fa',
      *   'offset': 0,
-     *   'size': '16'
+     *   'size': '16',
+     *   'lineColor': 'grey9',
+     *   'lineWeight': 1
      * }
      *```
      *
@@ -1037,48 +1040,13 @@ PxVisBehavior.events = {
           'icon': 'fa-info-circle',
           'type': 'fa',
           'offset': [0,0],
-          'size':'16'
+          'size':'16',
+          'lineColor': 'grey9',
+          'lineWeight': 1
         };
       }
     },
-    /**
-     * Defines the default lineConfig
-     *
-     *```
-     * Default: {
-     *   'color': 'grey9',
-     *   'weight': 1
-     * }
-     *```
-     *
-     * @property lineConfig
-     * @type Object
-     */
-    _lineConfigDefault: {
-      type: Object,
-      value:function() {
-        return {
-          'color': 'grey9',
-          'weight': 1
-        };
-      }
-    },
-    /**
-     * Defines the color and weight styles for the event line.
-     *
-     *```
-     * Default: {
-     *   'color': 'grey9', //or theme var
-     *   'weight': 1
-     * }
-     *```
-     *
-     * @property lineConfig
-     * @type Object
-     */
-    lineConfig: {
-      type: Object
-    },
+
     /**
      * Data representing the events. Example:
      * [
@@ -1675,18 +1643,12 @@ PxVisBehavior.actionConfig = {
     /**
       * Configuration used to define what actions happen on events. Each key represents an event,
       * each value can be:
-      * - a predefined action found in px-vis-interaction-space `actionMapping`
+      * - a predefined action found as a key in px-vis-interaction-space `actionMapping`
       * - a function which context will be bound to the chart. The function argument will be the mouse position on the chart
       */
     actionConfig: {
       type: Object,
-      notify: true,
-      value: {
-        'mousedown': 'startZooming',
-        'mouseup': 'stopZooming',
-        'mouseout': 'resetTooltip',
-        'mousemove': 'calcTooltipData'
-      }
+      notify: true
     }
   }
 };

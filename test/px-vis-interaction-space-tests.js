@@ -73,6 +73,10 @@ function runTests() {
       baseIS.set('seriesKeys',['mySeries']);
       baseIS.set('completeSeriesConfig',completeSeriesConfig);
       baseIS.set('chartData',d);
+      baseIS.set('actionConfig', { 'mouseout': 'resetTooltip',
+                'mousemove': 'calcTooltipData',
+                'mousedown': 'startZooming',
+                'mouseup': 'stopZooming'});
 
       // setTimeout(function(){done()},100);
       done();
