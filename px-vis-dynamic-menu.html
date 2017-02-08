@@ -8,11 +8,11 @@
 
 
 <!--
-Element providing an on-chart zoom.
+Element providing a menu dynamically built depending on options
 
 ##### Usage
 
-    <px-vis-dynamic-menu 
+    <px-vis-dynamic-menu
       additional-detail="[[item]]"
       dynamic-menu-config="[[dynamicMenuConfig]]">
     </px-vis-dynamic-menu>
@@ -176,7 +176,7 @@ Element providing an on-chart zoom.
       if(item.action) {
 
         var action = item.action;
-        
+
         //parse function if it's a string
         if(typeof item.action === 'string') {
           var fn = eval('var f = function() { return ' + action + ';}; f();');
@@ -195,7 +195,7 @@ Element providing an on-chart zoom.
 
           //use chart context
           this.fire('px-vis-action-request', {
-            'function': item.action, 
+            'function': item.action,
             'data': {
               'menuItem': item,
               'additionalDetail': this.additionalDetail
@@ -211,7 +211,7 @@ Element providing an on-chart zoom.
         //include context if it exists
         detail.menuItem = item;
         detail.additionalDetail = this.additionalDetail;
-        
+
         this.fire('px-vis-event-request', {'eventName': item.eventName, 'data': detail})
       }
       this.set('_opened', false);
