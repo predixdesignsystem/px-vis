@@ -2,6 +2,7 @@
 <link rel="import" href="px-vis-behavior-common.html"/>
 <link rel="import" href="px-vis-behavior-register.html"/>
 <link rel="import" href="px-vis-dynamic-menu.html"/>
+<link rel="import" href="px-number-formatter/px-number-formatter.html" />
 
 <!--
 Element providing a series line items on the register for regular charts
@@ -33,7 +34,7 @@ Element providing a series line items on the register for regular charts
       class$="[[_baseClasses]] register-item--min-width"
       name$="R{{item.name}}"
       id="regItem">
-      <span 
+      <span
         class$="flex [[_itemMutedToStart]]"
         on-tap="_seriesClicked"
         id="regWithoutMenu">
@@ -55,14 +56,14 @@ Element providing a series line items on the register for regular charts
             <!-- if x axis is number format and show it -->
             <template is="dom-if" if="{{_isOfType(xAxisType, 'linear')}}">
               <template is="dom-if" if="{{_checkItem(_itemX)}}">
-                <numbro-element
+                <px-number-formatter
                   value="[[_itemX]]"
                   format="[[numberFormat]]"
                   culture="[[numberFormatCulture]]"
                   currency$="[[numberFormatIsCurrency]]"
                   default-currency-format="[[numberFormatCurrency]]"
                   zero-format="[[numberFormatZero]]">
-                </numbro-element>
+                </px-number-formatter>
                 <template is="dom-if" if="[[_checkItem(_itemX)]]">
                   {{_xUnit}}
                 </template>
@@ -85,14 +86,14 @@ Element providing a series line items on the register for regular charts
             <!-- if y axis is number format and show it -->
               <template is="dom-if" if="{{_isOfType(yAxisType, 'linear')}}">
                 <template is="dom-if" if="{{_checkItem(_itemY)}}">
-                  <numbro-element
+                  <px-number-formatter
                     value="[[_itemY]]"
                     format="[[numberFormat]]"
                     culture="[[numberFormatCulture]]"
                     currency$="[[numberFormatIsCurrency]]"
                     default-currency-format="[[numberFormatCurrency]]"
                     zero-format="[[numberFormatZero]]">
-                  </numbro-element>
+                  </px-number-formatter>
                 </template>
               </template>
               <!-- if y axis is ordinal just display it -->
@@ -105,8 +106,8 @@ Element providing a series line items on the register for regular charts
             </div>
           </span>
         </span>
-        <px-vis-dynamic-menu 
-            id="menu" 
+        <px-vis-dynamic-menu
+            id="menu"
             class$="[[_getDynamicMenuClass(type)]]"
             style="display: none"
             additional-detail="[[item]]"
