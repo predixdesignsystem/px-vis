@@ -56,7 +56,7 @@ Element providing on-chart tooltip display
             truncation-length="100"
             groupings="[[_groupings]]"
             force-date-time-display="[[forceDateTimeDisplay]]"
-            tooltip-data=[[tooltipData]]
+            tooltip-data="[[tooltipData]]"
             chart-data="[[chartData]]"
             x-axis-type="[[xAxisType]]"
             y-axis-type="[[yAxisType]]"
@@ -164,9 +164,8 @@ Element providing on-chart tooltip display
      */
     forceShow: function() {
 
-      if(this._tooltipElem) {
-        this._tooltipElem._show();
-        this._tooltipElem._setPosition();     
+      if(this._tooltipElem && (!this._tooltipElem._isShowing && !this._tooltipElem._requestShow)) {
+        this._tooltipElem._show();  
       } 
     },
     /**
@@ -174,7 +173,7 @@ Element providing on-chart tooltip display
      */
     forceHide: function() {
 
-      if(this._tooltipElem) {
+      if(this._tooltipElem && (this._tooltipElem._isShowing || this._tooltipElem._requestShow)) {
         this._tooltipElem._hide();
       }
     },
@@ -195,7 +194,9 @@ Element providing on-chart tooltip display
     },
     _computeInternalHidden: function() {
      
-      var hidden = this.tooltipData.hidden || this.hide;
+     if(this.tooltipData) {
+      var oldHidden = this._internalHidden,
+          hidden = this.tooltipData.hidden || this.hide;
       this.set('_internalHidden', hidden);
 
       if(!this._tooltipElem && !this._internalHidden) {
@@ -205,14 +206,14 @@ Element providing on-chart tooltip display
       
       if(this._tooltipElem) {
         if(hidden) {
-          this.forceHide();
+          if(!oldHidden) {
+            this.forceHide();
+          }
         } else {
           this.forceShow()
         }
       } 
-    },
-    _ttDataChanged: function() {
-      this.set('_tooltipDataHidden', this.tooltipData.hidden);
-    },
+     }
+    }
   });
 </script>
