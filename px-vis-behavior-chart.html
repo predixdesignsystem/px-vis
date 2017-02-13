@@ -2007,5 +2007,77 @@ PxVisBehaviorChart.categoryAndAxisRegisterConfigs = [{
   },
 }, PxVisBehaviorChart.subConfiguration];
 
+/*
+    Name:
+    PxVisBehaviorChart.sizeVerticalRegister
+
+    Description:
+    Behavior providing the ability to size the height of a vertical register
+    @polymerBehavior PxVisBehaviorChart.sizeVerticalRegister
+*/
+PxVisBehaviorChart.sizeVerticalRegister = [{
+
+  properties: {
+    /**
+    * the calculated height that should be used by the vertical register
+    *
+    */
+    _verticalRegisterHeight: {
+      type: Number
+    },
+    /**
+    * When calculating the register height if the height deductions to do 
+    * haven't been passed in (i.e height changed rather than ironResize being called)
+    * then this list of string will be used to search for elements IDs and calculate
+    * their height, deducting them
+    */
+    _verticalRegisterHeightDeductions: {
+      type: Array
+    },
+    /**
+     * ID of the element where the drawing happens. used to get its height property
+     */
+    _verticalRegisterDrawingCanvasId: {
+      type: String
+    }
+  },
+  observers: [
+    '_heightChanged(height)'
+  ],
+  ready:function() {
+      this.set('_verticalRegisterHeight', this.height);
+  },
+  _heightChanged: function() {
+    this._computeVerticalRegisterHeight();
+  },
+  _computeVerticalRegisterHeight: function(deductions) {
+
+    this.debounce('_computeVerticalRegisterHeight', function() {
+
+      var deductionsTotal = 0;
+      if(!deductions) {
+        if(this._verticalRegisterHeightDeductions && this._verticalRegisterHeightDeductions.length) {
+          
+          //try to get each eleme we want to add
+          for(var i=0; i<this._verticalRegisterHeightDeductions.length; i++) {
+            var el = this.$$('#' + this._verticalRegisterHeightDeductions[i]);
+
+            //if we found the item get its height
+            if(el) {
+              deductionsTotal += el.getBoundingClientRect().height;
+            }
+          }
+        }
+      } else {
+        //just add all deductions
+        for(var i=0; i<deductions.length; i++) {
+          deductionsTotal += deductions[i];
+        }
+      }
+
+      this.set('_verticalRegisterHeight', Math.max(Number(this.$[this._verticalRegisterDrawingCanvasId].height) + deductionsTotal, 0));
+    }.bind(this), 50);
+  },
+}, PxVisBehavior.baseSize];
 
 </script>
