@@ -59,8 +59,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.zoomSelection,
       PxVisBehavior.seriesKeys,
-      PxColorsBehavior.baseColors,
-      PxVisBehavior.actionConfig
+      PxColorsBehavior.baseColors
     ],
     /***EVENTS****
     /*
@@ -131,24 +130,24 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           'resetTooltip': '_resetTooltipData',
           'startPanning': '_startPanning',
           'stopPanning': '_stopPanning'
-        },
-         /**
-          * Configuration used to define what actions happen on events. Each key represents an event,
-          * each value can be:
-          * - a predefined action found in px-vis-interaction-space `actionMapping`
-          * - a function which context will be bound to the chart. The function argument will be the mouse position on the chart
-          */
-        actionConfig: {
-          type: Object,
-          notify: true,
-          value: function() {
-            return {
-              'mousedown': 'startZooming',
-              'mouseup': 'stopZooming',
-              'mouseout': 'resetTooltip',
-              'mousemove': 'calcTooltipData'
-            };
-          }
+        }
+      },
+      /**
+      * Configuration used to define what actions happen on events. Each key represents an event,
+      * each value can be:
+      * - a predefined action found in px-vis-interaction-space `actionMapping`
+      * - a function which context will be bound to the chart. The function argument will be the mouse position on the chart
+      */
+      actionConfig: {
+        type: Object,
+        notify: true,
+        value: function() {
+          return {
+            'mousedown': 'startZooming',
+            'mouseup': 'stopZooming',
+            'mouseout': 'resetTooltip',
+            'mousemove': 'calcTooltipData'
+          };
         }
       },
       _panningStartVal: {
@@ -378,7 +377,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
                 var yKey = this.completeSeriesConfig[keys[i]]['y'],
                     xKey = this.completeSeriesConfig[keys[i]]['x'],
-                    axisKey = this.completeSeriesConfig[keys[i]]['axis']['id'];
+                    axisKey = (this.completeSeriesConfig[keys[i]]['axis'] && this.completeSeriesConfig[keys[i]]['axis']['id']) ? this.completeSeriesConfig[keys[i]]['axis']['id'] : null;
 
                 minDist = Number.MAX_VALUE;
                 result = {};
