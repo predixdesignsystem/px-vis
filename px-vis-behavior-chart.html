@@ -2081,4 +2081,59 @@ PxVisBehaviorChart.sizeVerticalRegister = [{
   },
 }, PxVisBehavior.baseSize];
 
+/*
+    Name:
+    PxVisBehaviorChart.tooltipFollowMouseCalculation
+
+    Listen/unlisten mousemove on a target (based on _computedShowTooltip) and caculates mouse pos for it, 
+    storing it in mousePosition
+
+    Description:
+    Behavior providing property for muting axes
+    @polymerBehavior PxVisBehaviorChart.mutedAxes
+*/
+PxVisBehaviorChart.tooltipFollowMouseCalculation = [{
+  properties: {
+    /**
+      * handler to the function for calculating tooltip pos
+      */
+      _tooltipCalcMousePosHandler: {
+        type: Function
+      },
+      /**
+       * Id of the target of hovering
+       */
+      _tooltipCalcHoverTargetId: {
+        type: String
+      },
+      /**
+       * The mouse position in pixel coordinates. Only valid if _computedShowTooltip is true
+       */
+      mousePosition: {
+        type: Array
+      },
+  },
+  observers: [
+    '_computedShowTooltipChanged(_computedShowTooltip)'
+  ],
+  _computedShowTooltipChanged: function() {    
+    if(!this._tooltipCalcMousePosHandler) {
+      this._createHandler();
+    }
+
+    //listen or unlisten mousemove
+    if(this._computedShowTooltip) {
+      this.$[this._tooltipCalcHoverTargetId].addEventListener('mousemove', this._tooltipCalcMousePosHandler);
+    } else {
+      this.$[this._tooltipCalcHoverTargetId].removeEventListener('mousemove', this._tooltipCalcMousePosHandler);
+    }
+  },
+  _calcMousePos: function(evt) {
+    this.set('mousePosition',[evt.pageX,evt.pageY]);
+  },
+  _createHandler: function() {
+    this._tooltipCalcMousePosHandler = this._calcMousePos.bind(this);
+  }
+}, PxVisBehaviorChart.showTooltip];
+
 </script>
