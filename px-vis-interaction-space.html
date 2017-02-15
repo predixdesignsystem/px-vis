@@ -173,7 +173,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     observers: [
       'drawElement(domainChanged, chartData.*, svg, width, height, completeSeriesConfig)',
       '_setupActions(actionConfig.*)',
-      '_resetTooltipDataLegacy(completeSeriesConfig.*,)',
+      '_resetTooltipDataLegacy(completeSeriesConfig.*)',
       '_resetTooltipData(seriesKeys.*)'
      ],
 
@@ -315,7 +315,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * @method _calcTooltipData
      */
     _calcTooltipData:function() {
-      
+
       this.set('_calculatingTooltipData', true);
       if(!this.mouseDown && this.chartData.length > 0 && this.y) {
 
@@ -375,7 +375,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                 if(!this._calculatingTooltipData) {
                   break;
                 }
-                
+
                 var yKey = this.completeSeriesConfig[keys[i]]['y'],
                     xKey = this.completeSeriesConfig[keys[i]]['x'],
                     axisKey = this.completeSeriesConfig[keys[i]]['axis']['id'];
@@ -488,7 +488,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
             // now we can set our data that we want to pass out
             if(this._calculatingTooltipData) {
-            
+
               this.set('tooltipData',dataObj);
               this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
               this.set('_calculatingTooltipData', false);
