@@ -661,6 +661,35 @@ PxVisBehaviorD3.dynamicRedraw = {
   }
 };
 
+
+/*
+    Name:
+    PxVisBehaviorD3.labelTypeSize
+
+    Description:
+    Polymer behavior that provides the labelTypeSize objects for d3 components.
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorD3.labelTypeSize
+*/
+PxVisBehaviorD3.labelTypeSize = {
+  properties: {
+    /**
+     * Defines the base label type size
+     *
+     * @property labelTypeSize
+     * @type Number
+     * @default 12
+     */
+    labelTypeSize: {
+      type: Number,
+      value: 12,
+    }
+  }
+};
+
 /*
     Name:
     PxVisBehaviorD3.axisConfig
@@ -673,7 +702,7 @@ PxVisBehaviorD3.dynamicRedraw = {
 
     @polymerBehavior PxVisBehaviorD3.axisConfig
 */
-PxVisBehaviorD3.axisConfig = {
+PxVisBehaviorD3.axisConfig = [{
   properties: {
     /**
      * The displayed title for the axis
@@ -721,17 +750,6 @@ PxVisBehaviorD3.axisConfig = {
     labelTranslation: {
       type: Array,
       value: function() {return [0,0];},
-    },
-    /**
-     * Defines the base label type size
-     *
-     * @property labelTypeSize
-     * @type Number
-     * @default 12
-     */
-    labelTypeSize: {
-      type: Number,
-      value: 12,
     },
     /**
      * Array of the series which belong to this axis
@@ -837,7 +855,7 @@ PxVisBehaviorD3.axisConfig = {
       notify: true
     }
   }
-};
+}, PxVisBehaviorD3.labelTypeSize];
 
 
 
@@ -855,6 +873,10 @@ PxVisBehaviorD3.axisConfig = {
 */
 PxVisBehaviorD3.radialAxisConfig = {
   properties: {
+    /**
+    * Used in a radial chart to provide a hole in the center of the chart
+    *
+    */
     centerOffset: {
       type: Number,
       value: 0,
