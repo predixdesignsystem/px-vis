@@ -59,8 +59,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.zoomSelection,
       PxVisBehavior.seriesKeys,
-      PxColorsBehavior.baseColors,
-      PxVisBehavior.actionConfig
+      PxColorsBehavior.baseColors
     ],
     /***EVENTS****
     /*
@@ -131,7 +130,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           'resetTooltip': '_resetTooltipData',
           'startPanning': '_startPanning',
           'stopPanning': '_stopPanning'
-        },
+        }},
          /**
           * Configuration used to define what actions happen on events. Each key represents an event,
           * each value can be:
@@ -149,8 +148,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
               'mousemove': 'calcTooltipData'
             };
           }
-        }
-      },
+        },
       _panningStartVal: {
         type: Array,
         value: function() {
@@ -173,7 +171,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     observers: [
       'drawElement(domainChanged, chartData.*, svg, width, height, completeSeriesConfig)',
       '_setupActions(actionConfig.*)',
-      '_resetTooltipDataLegacy(completeSeriesConfig.*,)',
+      '_resetTooltipDataLegacy(completeSeriesConfig.*)',
       '_resetTooltipData(seriesKeys.*)'
      ],
 
@@ -315,7 +313,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * @method _calcTooltipData
      */
     _calcTooltipData:function() {
-      
+
       this.set('_calculatingTooltipData', true);
       if(!this.mouseDown && this.chartData.length > 0 && this.y) {
 
@@ -375,7 +373,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
                 if(!this._calculatingTooltipData) {
                   break;
                 }
-                
+
                 var yKey = this.completeSeriesConfig[keys[i]]['y'],
                     xKey = this.completeSeriesConfig[keys[i]]['x'],
                     axisKey = this.completeSeriesConfig[keys[i]]['axis']['id'];
@@ -488,7 +486,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
             // now we can set our data that we want to pass out
             if(this._calculatingTooltipData) {
-            
+
               this.set('tooltipData',dataObj);
               this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
               this.set('_calculatingTooltipData', false);
@@ -765,7 +763,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             ox = parseInt(this._actionArea.attr('ox')),
             oy = parseInt(this._actionArea.attr('oy')),
             width = this._rect.attr('width'),
-            height = this._rect.attr('height')
+            height = this._rect.attr('height'),
             newX = Math.max(Math.min(mousePos[0], width), 0),
             newY = Math.max(Math.min(mousePos[1], height), 0);
 

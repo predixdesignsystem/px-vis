@@ -43,7 +43,7 @@
 
       <!-- Component ---------------------------------------------------------->
       <px-demo-component>
-        <px-vis-radar-grid-demo-component></px-vis-radar-grid-demo-component>
+        <px-vis-radar-grid-demo-component axis-color="[[axisColor]]"></px-vis-radar-grid-demo-component>
       </px-demo-component>
       <!-- END Component ------------------------------------------------------>
 
@@ -56,9 +56,6 @@
     <!-- API Viewer -->
     <px-demo-api-viewer source="px-vis-radar-grid"></px-demo-api-viewer>
 
-    <!-- Footer -->
-    <px-demo-footer></px-demo-footer>
-
   </template>
 
 </dom-module>
@@ -68,7 +65,7 @@
     properties: {
       description: {
         type: String,
-        value: "An element which draws polygonal grid lines."
+        value: "An element which draws polygonal grid lines. Must be accompanied by a workspace such as px-vis-svg or px-vis-canvas, and a scale, such as px-vis-scale."
       },
       /**
        * @property demoProps
@@ -96,17 +93,31 @@
     },
     demoProps: {
       svg:{
-				value:"[[svg]]"
+				defaultValue:"[[svgGeneratedFromSvg]]"
 			},
       tickValues:{
-  			value:"[[gridTicks]]"
+  			defaultValue:"[[tickValues]]"
   		},
       dimensions:{
   			value:"[[dimensions]]"
   		},
       domainChanged:{
-  			value:"[[domainChanged]]"
+  			value:"[[domainChangedGeneratedFromScale]]"
+      },
+      x: {
+        defaultValue: "[[xGeneratedFromScale]]"
+      },
+      y: {
+        defaultValue: "[[yGeneratedFromScale]]"
+      },
+      margin: {
+        defaultValue: "[[margin]]"
+      },
+      axisColor: {
+        defaultValue: 'gray4'
       }
+
+
     }
   });
 </script>
