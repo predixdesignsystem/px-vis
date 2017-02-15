@@ -241,6 +241,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           'drawSeriesBars(completeSeriesConfig.*, titleDrawn)',
           '_muteSeriesBars(mutedSeries.*)',
           '_updateTicks(ticks)',
+          '_updateTicks(tickFormat)',
+          '_updateTicks(tickValues)',
           '_titleChanged(displayedTitle, _axisGroup, titleLocation.*, height, width, orientation)',
           '_truncateTitle(title, truncationLength, appendUnitInTitle, completeSeriesConfig)'
         ],
@@ -412,7 +414,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          */
         drawElement: function() {
         //  this.debounce('drawAxis', function() {
-            if(this._animationFrameDone && this.svg.node() && this.domainChanged !== null) {
+            if(this._animationFrameDone && this._doesD3HaveValues(this.svg) && this.domainChanged !== null) {
 
               this.removeAxis();
 
