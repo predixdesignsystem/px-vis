@@ -67,6 +67,7 @@ v1.0.0
 * Removed px-vis-zoom and provide the PxVisBehaviorChart.zooming behavior for charts instead
 * Added 'zoom in' and 'zoom out' buttons in zoom controls
 * changing ghp.sh to account for Alpha releases
+After BETA
 =======================
 * post beta fixes
   * cancel tooltip calculation when mouse leaves the chart, avoiding scenarios where the tooltip would appear after the mouse left
@@ -77,6 +78,9 @@ v1.0.0
   * separated labelTypeSize from axisConfig
   * changed event config - made line config part of it
   * made axis size and number properties public
+  * added "reset" flag to px-vis-zoomed event
+  * fix console error when clicking on interaction space with zooming on
+  * fix chart navigator brush bug and make it redraw properly on size change
 
 v0.8.4
 ==================
