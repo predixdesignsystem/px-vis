@@ -172,7 +172,10 @@ This element sets the selectedDomain property based on the extents box. The sele
      */
     drawElement: function() {
 
-      if(this._animationFrameDone && this.domainChanged !== null && !isNaN(this.axis.domain()[0].getTime()) && !isNaN(this.axis.domain()[1].getTime())) {
+      if(this._animationFrameDone && this.domainChanged !== null &&
+        this.height && 
+        !isNaN(this.axis.domain()[0].getTime()) && 
+        !isNaN(this.axis.domain()[1].getTime())) {
         var heightOffset = 5,
             h = Math.max(this.height - this.margin.bottom - heightOffset, 1),  //make sure it is bigger than 0 for range
             axisRange = this.axis.range(),
@@ -264,15 +267,10 @@ This element sets the selectedDomain property based on the extents box. The sele
         } else {
           this._drawClipPath([0,h]);
 
-          //make sure brush has the right size
-          this._brush.extent(range)
-            // .handleSize(6)
-            .on("start", this._brushstart.bind(this))
-            .on("brush", this._brushmove.bind(this))
-            .on("end", this._brushend.bind(this));
-
-          //update brush size if needed
-          this._brushGroup
+          //make sure brush has the right extents in case of a height change
+          this._brush = this._brush.extent(range);
+          //and update the g with the new extents
+          this._brushGroup = this.svg.select("g.brush")
             .call(this._brush);
 
           if(this.selectedDomain && this.selectedDomain.x.length > 0) {
@@ -280,6 +278,11 @@ This element sets the selectedDomain property based on the extents box. The sele
             this._preventDomainChange = true;
             this._brushGroup
               .call(this._brush.move, [this.axis(this.selectedDomain.x[0]), this.axis(this.selectedDomain.x[1])]);
+          } else {
+            //make sure we redraw in case of a size change
+            this._preventDomainChange = true;
+            this._brushGroup
+              .call(this._brush.move, axisRange);
           }
         }
       }
@@ -379,8 +382,8 @@ This element sets the selectedDomain property based on the extents box. The sele
 
       this.debounce('brushed', function () {
 
-        if(Px.d3.brushSelection(this._brushGroup.node())) {
-          var brushExt = Px.d3.brushSelection(this._brushGroup.node());
+        var brushExt = Px.d3.brushSelection(this._brushGroup.node());
+        if(brushExt) {
 
           //if our extents are the same, add or subtract one based on location and reset the brush
           if(brushExt[0] === brushExt[1]) {
@@ -406,6 +409,7 @@ This element sets the selectedDomain property based on the extents box. The sele
                 });
               }
             } else {
+              
               this._preventDomainChange = false;
             }
           }

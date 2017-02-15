@@ -67,8 +67,9 @@ v1.0.0
 * Removed px-vis-zoom and provide the PxVisBehaviorChart.zooming behavior for charts instead
 * Added 'zoom in' and 'zoom out' buttons in zoom controls
 * changing ghp.sh to account for Alpha releases
+After BETA
 =======================
-* bug fixes
+* bug fixes 
   * cancel tooltip calculation when mouse leaves the chart, avoiding scenarios where the tooltip would appear after the mouse left
   * ensure zomming in/out works with 'timeLocal' axis
 
