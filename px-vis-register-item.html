@@ -29,7 +29,15 @@ Element providing a series line items on the register for regular charts
 
   <template>
     <style include="px-vis-register-styles"></style>
-
+    <style>
+      :host {
+        /*  Fix for Safari flex bug:
+            https://philipwalton.com/articles/normalizing-cross-browser-flexbox-bugs/
+            Demo of bug: http://jsbin.com/xetinivozo/1/edit?html,js,output
+        */
+        flex-shrink: 0;
+      }
+    </style>
     <span
       class$="[[_baseClasses]] register-item--min-width"
       name$="R{{item.name}}"
