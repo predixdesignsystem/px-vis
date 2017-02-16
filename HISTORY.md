@@ -81,6 +81,7 @@ After BETA
   * added "reset" flag to px-vis-zoomed event
   * fix console error when clicking on interaction space with zooming on
   * fix chart navigator brush bug and make it redraw properly on size change
+  * Moved showThresholdBox and displayTitle to thresholdConfig
 
 v0.8.4
 ==================
