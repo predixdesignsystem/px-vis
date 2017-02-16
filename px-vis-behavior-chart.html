@@ -2027,7 +2027,7 @@ PxVisBehaviorChart.sizeVerticalRegister = [{
       type: Number
     },
     /**
-    * When calculating the register height if the height deductions to do 
+    * When calculating the register height if the height deductions to do
     * haven't been passed in (i.e height changed rather than ironResize being called)
     * then this list of string will be used to search for elements IDs and calculate
     * their height, deducting them
@@ -2058,7 +2058,7 @@ PxVisBehaviorChart.sizeVerticalRegister = [{
       var deductionsTotal = 0;
       if(!deductions) {
         if(this._verticalRegisterHeightDeductions && this._verticalRegisterHeightDeductions.length) {
-          
+
           //try to get each eleme we want to add
           for(var i=0; i<this._verticalRegisterHeightDeductions.length; i++) {
             var el = this.$$('#' + this._verticalRegisterHeightDeductions[i]);
@@ -2085,7 +2085,7 @@ PxVisBehaviorChart.sizeVerticalRegister = [{
     Name:
     PxVisBehaviorChart.tooltipFollowMouseCalculation
 
-    Listen/unlisten mousemove on a target (based on _computedShowTooltip) and caculates mouse pos for it, 
+    Listen/unlisten mousemove on a target (based on _computedShowTooltip) and caculates mouse pos for it,
     storing it in mousePosition
 
     Description:
@@ -2116,7 +2116,7 @@ PxVisBehaviorChart.tooltipFollowMouseCalculation = [{
   observers: [
     '_computedShowTooltipChanged(_computedShowTooltip)'
   ],
-  _computedShowTooltipChanged: function() {    
+  _computedShowTooltipChanged: function() {
     if(!this._tooltipCalcMousePosHandler) {
       this._createHandler();
     }
@@ -2135,5 +2135,27 @@ PxVisBehaviorChart.tooltipFollowMouseCalculation = [{
     this._tooltipCalcMousePosHandler = this._calcMousePos.bind(this);
   }
 }, PxVisBehaviorChart.showTooltip];
+
+/*
+    Name:
+    PxVisBehaviorChart.thresholdConfig
+
+    Description:
+    Behavior providing the thresholdConfig property
+    @polymerBehavior PxVisBehaviorChart.thresholdConfig
+*/
+PxVisBehaviorChart.thresholdConfig = {
+  properties: {
+    /**
+     * Configuration object used to customize the threshold properties.
+     * Please refer to px-vis-threshold (https://github.com/PredixDev/px-vis) for a list of supported proerties
+     *
+     */
+    thresholdConfig: {
+      type: Object,
+      notify: true
+    }
+  }
+};
 
 </script>

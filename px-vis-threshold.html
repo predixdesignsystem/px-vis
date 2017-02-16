@@ -254,13 +254,21 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
      * @method _setColors
      */
     _setColors: function() {
-      if(this.showThresholdBox) {
-        this.thresholdRect.attr('fill', this._getColors.bind(this));
-        this.thresholdText.attr('fill',"white");
-      } else {
-        this.thresholdRect.attr('fill', 'none');
-        this.thresholdText.attr('fill',this._getColors.bind(this));
-      }
+      this.thresholdRect.attr('fill', function(d,i) {
+        var type = d.type;
+        if(this.thresholdConfig[type] && this.thresholdConfig[type]['showThresholdBox']) {
+          return this._getColors(d,i);
+        }
+        return 'none';
+      }.bind(this));
+
+      this.thresholdText.attr('fill', function(d,i) {
+        var type = d.type;
+        if(this.thresholdConfig[type] && this.thresholdConfig[type]['showThresholdBox']) {
+          return "white"
+        }
+        return this._getColors(d,i);
+      }.bind(this));
 
       this.thresholdLine.attr('stroke', this._getColors.bind(this));
     },
@@ -317,7 +325,7 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
     _calcTitle: function(d) {
       var val = (d.value).toFixed(2),
           title = '';
-      if(this.displayTitle) {
+      if(this.thresholdConfig[d.type] && this.thresholdConfig[d.type].displayTitle) {
         title = this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['title'] ?
           ' (' + this.thresholdConfig[d.type]['title'] + ')': ' (' + d.type + ')';
       }
