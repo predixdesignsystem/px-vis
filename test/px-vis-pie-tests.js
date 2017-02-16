@@ -103,7 +103,7 @@ function runTests(){
         //tooltip should be shown
         assert.isTrue(tooltip._isShowing);
         done();
-      }, 100);
+      }, 1000);
     });
 
     test('mouseleave hides tooltip', function(done) {
