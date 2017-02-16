@@ -56,7 +56,6 @@ Element providing on-chart tooltip display
             truncation-length="100"
             groupings="[[_groupings]]"
             force-date-time-display="[[forceDateTimeDisplay]]"
-            tooltip-data="[[tooltipData]]"
             chart-data="[[chartData]]"
             x-axis-type="[[xAxisType]]"
             y-axis-type="[[yAxisType]]"
@@ -152,6 +151,9 @@ Element providing on-chart tooltip display
       },
       _tooltipElem: {
         type: HTMLElement
+      },
+      _registerElem: {
+        type: HTMLElement
       }
     },
     observers: ['_computeInternalHidden(hide, tooltipData.*)'],
@@ -202,6 +204,7 @@ Element providing on-chart tooltip display
       if(!this._tooltipElem && !this._internalHidden) {
         this.$.template.render();
         this.set('_tooltipElem', this.$$('px-tooltip'));
+        this.set('_registerElem', this.$$('px-vis-register'));
       }
       
       if(this._tooltipElem) {
@@ -210,6 +213,9 @@ Element providing on-chart tooltip display
             this.forceHide();
           }
         } else {
+          //only update tooltip data for register when we're shown to avoid
+          //non needed calculations by register
+          this._registerElem.set('tooltipData', this.tooltipData);
           this.forceShow()
         }
       } 
