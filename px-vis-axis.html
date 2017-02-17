@@ -249,14 +249,15 @@ Custom property | Description | Default
         },
 
         observers: [
-          'drawElement(domainChanged, svg, axis, margin, width, height, disableTicks, _animationFrameDone, orientation)',
+          'drawElement(domainChanged, svg, axis, margin, width, height, disableTicks, _animationFrameDone)',
           'drawSeriesBars(completeSeriesConfig.*, titleDrawn)',
           '_muteSeriesBars(mutedSeries.*)',
           '_updateTicks(ticks)',
           '_updateTicks(tickFormat)',
           '_updateTicks(tickValues)',
-          '_titleChanged(displayedTitle, _axisGroup, titleLocation.*, height, width, orientation)',
-          '_truncateTitle(title, truncationLength, appendUnitInTitle, completeSeriesConfig)'
+          '_titleChanged(displayedTitle, _axisGroup, titleLocation.*, height, width)',
+          '_truncateTitle(title, truncationLength, appendUnitInTitle, completeSeriesConfig)',
+          '_orientationChanged(orientation)'
         ],
 
         detached: function() {
@@ -425,24 +426,18 @@ Custom property | Description | Default
          * @method drawElement
          */
         drawElement: function() {
-        //  this.debounce('drawAxis', function() {
-            if(this._animationFrameDone && this._doesD3HaveValues(this.svg) && this.domainChanged !== null) {
+          if(this._animationFrameDone && this._doesD3HaveValues(this.svg) && this.domainChanged !== null && this.orientation) {
 
-              if(!this._axisGroup) {
-                this.removeAxis();
-
-                this.defineAxis();
-
-                this._buildAxis();
-                // alert parents that we are done drawing the axis
-                this.fire('px-axis-done');
-              } else {
-                this.defineAxis();
-                this._updateAxis();
-              }
-
+            this.defineAxis();
+            if(!this._axisGroup) {
+              this._buildAxis();
+            } else {
+              this._updateAxis();
             }
-          // }, 5);
+
+            // alert parents that we are done drawing the axis
+            this.fire('px-axis-done');
+          }
         },
         /**
          * Updates the axis
@@ -464,9 +459,6 @@ Custom property | Description | Default
           this._setLabelStyles(this._axisGroup);
 
           this._calcDrawnTicks();
-
-          // alert parents that we are done drawing the axis
-          this.fire('px-axis-done');
         },
 
         /**
@@ -843,7 +835,8 @@ Custom property | Description | Default
          */
         _titleChanged: function(displayedTitle) {
           this.debounce('drawTitle', function() {
-            if(this._doesObjHaveValues(this._axisGroup) && this._axisGroup.node() !== null && this._axisGroup.node().ownerSVGElement !== null) {
+            if(this._doesObjHaveValues(this._axisGroup) && this._axisGroup.node() !== null && 
+            this._axisGroup.node().ownerSVGElement !== null && this.orientation) {
 
               this.drawTitle();
             }
@@ -874,6 +867,11 @@ Custom property | Description | Default
             this._axisGroup.node().appendChild(this.$.tooltip);
             this.$.tooltip.for = this._titleGroup.node();
           }
+        },
+        _orientationChanged: function() {
+          
+          this.removeAxis();
+          this.drawElement();
         }
     });
 </script>
