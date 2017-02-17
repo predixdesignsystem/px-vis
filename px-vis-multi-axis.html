@@ -68,6 +68,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
     <template>
       <style include="px-vis-styles"></style>
 
+      <!-- don't bind domain changed since other props already depend on it, avoiding drawing each axis twice-->
       <template id="bof" is="dom-repeat" items="[[_internalDimensions]]" sort="[[_sortDims(_internalDimensions)]]">
         <px-vis-axis
           id="[[item]]"
@@ -91,7 +92,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
           append-unit-in-title="[[appendUnitInTitle]]"
           unit="[[_getUnit(item, completeSeriesConfig)]]"
           prevent-series-bar="[[preventSeriesBar]]"
-          domain-changed="[[_internalDimensionsChanged]]"
+          domain-changed=true
           selected-domain="[[selectedDomain]]"
           title-truncation
           disable-ticks="[[_calcDisableTicks(item,recalcTicks)]]"
@@ -343,6 +344,13 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
       allowEmptyTitle: {
         type: Boolean,
         value: false
+      },
+      _commonAxisRanAtLeastOnce: {
+        type: Boolean
+      },
+      _axisDoneCounter: {
+        type: Number,
+        value: 0
       }
     },
 
@@ -623,24 +631,35 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
      */
     _setAxisStyles: function(e) {
       if(this.axisGroups){
-        var _this = this;
+        var _this = this,
+            axisCount = this._internalDimensions.length;
 
-        if(this.commonAxis){
-          this.axisGroups.filter(":not(:first-child)").selectAll('g.tick text').classed('hideCommon',true);
-          this.axisGroups.selectAll('.hideCommon').style('display','none');
-          this.axisGroups.on('mouseover',function(){
-            Px.d3.select(this).selectAll('.hideCommon').style('display',null)
-            Px.d3.select(this).selectAll('.hideCommon').style('fill',_this.colors.grey3)
-          }).on('mouseleave',function(){
-            Px.d3.select(this).selectAll('.hideCommon').style('display','none')
-            Px.d3.select(this).selectAll('.hideCommon').style('fill',"black")
-          });
-        } else {
-          this.axisGroups.selectAll('.hideCommon').style('display',null);
-          this.axisGroups.selectAll('.hideCommon').classed('hideCommon',false);
+        //count the axis so that we only run that function once as opposed as the number of axis
+        this._axisDoneCounter = this._axisDoneCounter % axisCount;
+        this._axisDoneCounter++;
+
+        if(this._axisDoneCounter === axisCount) {
+          if(this.commonAxis) {
+            this._commonAxisRanAtLeastOnce = true;
+            this.axisGroups.filter(":not(:first-child)").selectAll('g.tick text').classed('hideCommon',true);
+            this.axisGroups.selectAll('.hideCommon').style('display','none');
+            this.axisGroups.on('mouseover',function(){
+              Px.d3.select(this).selectAll('.hideCommon').style('display',null)
+              Px.d3.select(this).selectAll('.hideCommon').style('fill',_this.colors.grey3)
+            }).on('mouseleave',function(){
+              Px.d3.select(this).selectAll('.hideCommon').style('display','none')
+              Px.d3.select(this).selectAll('.hideCommon').style('fill',"black")
+            });
+
+            this.set('recalcTicks', !this.recalcTicks);
+          } else if(this._commonAxisRanAtLeastOnce) {
+
+            this.axisGroups.selectAll('.hideCommon').style('display',null);
+            this.axisGroups.selectAll('.hideCommon').classed('hideCommon',false);
+
+            this.set('recalcTicks', !this.recalcTicks);
+          }
         }
-
-        this.set('recalcTicks', !this.recalcTicks);
       }
     },
     /*

@@ -82,6 +82,9 @@ After BETA
   * fix console error when clicking on interaction space with zooming on
   * fix chart navigator brush bug and make it redraw properly on size change
   * Moved showThresholdBox and displayTitle to thresholdConfig
+  * improve axis drawing time
+  * improve scale updating
+  * improve multi axis drawing time
 
 v0.8.4
 ==================

@@ -268,19 +268,18 @@ This element sets the selectedDomain property based on the extents box. The sele
           this._drawClipPath([0,h]);
 
           //make sure brush has the right extents in case of a height change
-          this._brush = this._brush.extent(range);
-          //and update the g with the new extents
-          this._brushGroup = this.svg.select("g.brush")
-            .call(this._brush);
+           this._brush = this._brush.extent(range);
+          // //and update the g with the new extents
+           this._brushGroup = this.svg.select("g.brush")
+             .call(this._brush);
 
           if(this.selectedDomain && this.selectedDomain.x.length > 0) {
-            //redraw the brush in the right place, but make sure we don't fire a change of domain
-            this._preventDomainChange = true;
+            //redraw the brush in the right place
             this._brushGroup
               .call(this._brush.move, [this.axis(this.selectedDomain.x[0]), this.axis(this.selectedDomain.x[1])]);
-          } else {
+           } else {
+
             //make sure we redraw in case of a size change
-            this._preventDomainChange = true;
             this._brushGroup
               .call(this._brush.move, axisRange);
           }
@@ -379,7 +378,6 @@ This element sets the selectedDomain property based on the extents box. The sele
     _brushmove: function(range) {
       // var s = d3.event.selection;
       // circle.classed("selected", function(d) { return s[0] <= d && d <= s[1]; });
-
       this.debounce('brushed', function () {
 
         var brushExt = Px.d3.brushSelection(this._brushGroup.node());
@@ -394,7 +392,7 @@ This element sets the selectedDomain property based on the extents box. The sele
               .call(this._brush.move,brushExt)
           } else {
 
-            if(!this._preventDomainChange) {
+           if(!this._preventDomainChange) {
 
               var newDomain = brushExt.map(this.axis.invert, this.axis),
               //make sure this is an actual update
@@ -408,10 +406,9 @@ This element sets the selectedDomain property based on the extents box. The sele
                   'data':{x:newDomain,y:[]}, 'method': 'set', 'dataVar': 'selectedDomain'
                 });
               }
-            } else {
-
-              this._preventDomainChange = false;
-            }
+           } else {
+             this._preventDomainChange = false;
+           }
           }
 
           // this._handleGroup.attr("transform", function(d,i) {
@@ -645,8 +642,14 @@ This element sets the selectedDomain property based on the extents box. The sele
         // make sure brushes dont extend out of the navigator area
         // range[0] = Math.max(range[0], this.axis.range()[0]);
         // range[1] = Math.min(range[1], this.axis.range()[1]);
-
         if(!(extent[0] === range[0] && extent[1] === range[1])) {
+
+          //we come from the chart, make sure we don't fire a selected domain change
+          //because of the debounce in brushmove we could theoretically have an issue
+          //if the user moves the brush himself after this call and before the debounce
+          //kicks in, in which case the user interaction will be ignored. In reality
+          //unlikely since _zoom brush usually happens on the chart zooming/panning
+          this._preventDomainChange = true;
           this._brushGroup
             .call(this._brush.move,range)
         }

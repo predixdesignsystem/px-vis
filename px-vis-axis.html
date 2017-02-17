@@ -416,17 +416,47 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         //  this.debounce('drawAxis', function() {
             if(this._animationFrameDone && this._doesD3HaveValues(this.svg) && this.domainChanged !== null) {
 
-              this.removeAxis();
+              if(!this._axisGroup) {
+                this.removeAxis();
 
-              this.defineAxis();
+                this.defineAxis();
 
-              this._buildAxis();
-              // alert parents that we are done drawing the axis
-              this.fire('px-axis-done');
+                this._buildAxis();
+                // alert parents that we are done drawing the axis
+                this.fire('px-axis-done');
+              } else {
+                this.defineAxis();
+                this._updateAxis();
+              }
 
             }
           // }, 5);
         },
+        /**
+         * Updates the axis
+         *
+         */
+        _updateAxis: function() {
+
+          this._axisGroup
+          .attr('transform', function() {
+            if(this.rotation) {
+              return 'rotate(' + (Number(this.rotation)) + ') translate(' + this.translateAmt.join(',') + ')';
+            } else {
+              return 'translate(' + this.translateAmt.join(',') + ')';
+            }
+          }.bind(this))
+          .call(this._axis);
+
+          this._setLineStyles(this._axisGroup,'line,path');
+          this._setLabelStyles(this._axisGroup);
+
+          this._calcDrawnTicks();
+
+          // alert parents that we are done drawing the axis
+          this.fire('px-axis-done');
+        },
+
         /**
          * builds axis
          *
@@ -461,6 +491,7 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          */
         _updateTicks: function() {
           if(this.axis && this.margin && this.height && typeof this.disableTicks !== 'undefined') {
+            this._processTicks();
             this.drawElement();
           }
         },
