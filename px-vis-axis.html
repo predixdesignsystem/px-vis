@@ -494,8 +494,8 @@ Custom property | Description | Default
          *
          */
         _updateTicks: function() {
-          if(this.axis && this.margin && this.height && typeof this.disableTicks !== 'undefined') {
-            this._processTicks();
+          if(this._doesObjHaveValues(this._axis) && this.axis && this.margin && this.height && typeof this.disableTicks !== 'undefined') {
+
             this.drawElement();
           }
         },
@@ -515,20 +515,6 @@ Custom property | Description | Default
                 this.set('drawnTickValues', this._axis.scale().ticks());
               }
             },1)
-          }
-        },
-
-        /**
-         * Method to update tickValues and recall the axis
-         *
-         */
-        updateTicks: function() {
-          if(this._doesObjHaveValues(this._axis) && this._axisGroup && this._doesObjHaveValues(this.tickValues)) {
-            this._axis.tickValues(this.tickValues);
-            //beats me why we need a timeout... some kind of nonsensical race condition.
-            setTimeout(function() {
-              this._updateAxis();
-            }.bind(this),5);
           }
         },
 
