@@ -27,6 +27,27 @@ Element providing on-chart tooltip display
         muted-series="[[mutedSeries]]">
     </px-vis-tooltip>
 
+    ### Styling
+    The following custom properties are available for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+  `--px-vis-register-series-name` | The color of the data series name | `$gray5`
+  `--px-vis-register-data-value` | The color of the data series value | `$black`
+  `--px-vis-register-box` | The color of the box around the register when a scrollbar is present | `$gray3`
+  |  |
+  |  |
+  |  |
+  `--px-tooltip-background-color` | The color of the tooltip | `$black`;
+  `--px-tooltip-text-color` | The color of the tooltip text | `$white`;
+  `--px-tooltip-light-background-color` | The color of the light version tooltip | `$white`;
+  `--px-tooltip-light-text-color` | The color of the light version tooltip text | `$black`;
+  `--px-tooltip-light-border-color`| The color of the light version tooltip border |  `$black`;
+  |  |
+  |  |
+  |  |
+  `--px-font-family` | The font family for all labels and text | `GE Inspira Sans`
+
 @element px-vis-tooltip
 @blurb Element providing on-chart hover functionality to get data values near the mouse cursor.
 @homepage index.html
@@ -167,8 +188,8 @@ Element providing on-chart tooltip display
     forceShow: function() {
 
       if(this._tooltipElem && (!this._tooltipElem._isShowing && !this._tooltipElem._requestShow)) {
-        this._tooltipElem._show();  
-      } 
+        this._tooltipElem._show();
+      }
     },
     /**
      *  Forces the tooltip to hide by calling _hide on px-tooltip
@@ -195,7 +216,7 @@ Element providing on-chart tooltip display
       }
     },
     _computeInternalHidden: function() {
-     
+
      if(this.tooltipData) {
       var oldHidden = this._internalHidden,
           hidden = this.tooltipData.hidden || this.hide;
@@ -206,7 +227,7 @@ Element providing on-chart tooltip display
         this.set('_tooltipElem', this.$$('px-tooltip'));
         this.set('_registerElem', this.$$('px-vis-register'));
       }
-      
+
       if(this._tooltipElem) {
         if(hidden) {
           if(!oldHidden) {
@@ -218,7 +239,7 @@ Element providing on-chart tooltip display
           this._registerElem.set('tooltipData', this.tooltipData);
           this.forceShow()
         }
-      } 
+      }
      }
     }
   });
