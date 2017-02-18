@@ -82,7 +82,7 @@ Custom property | Description | Default
       <style include="px-vis-styles"></style>
 
       <!-- don't bind domain changed since other props already depend on it, avoiding drawing each axis twice-->
-      <template id="bof" is="dom-repeat" items="[[_internalDimensions]]" sort="[[_sortDims(_internalDimensions)]]">
+      <template id="bof" is="dom-repeat" items="[[_internalDimensions]]" >
         <px-vis-axis
           id="[[item]]"
           class="multiAxis"
@@ -116,7 +116,8 @@ Custom property | Description | Default
           label-translation="[[labelTranslation]]"
           series-on-axis="[[_returnSeriesArray(seriesToAxes, item)]]"
           muted-series="[[mutedSeries]]"
-          drawn-tick-values={{drawnTickValues}}>
+          drawn-tick-values={{drawnTickValues}}
+          rebuild-on-draw="[[_rebuildOnDraw]]">
         </px-vis-axis>
       </template>
       <template is="dom-if" if="[[!disableBrush]]">
@@ -364,6 +365,10 @@ Custom property | Description | Default
       _axisDoneCounter: {
         type: Number,
         value: 0
+      },
+      _rebuildOnDraw: {
+        type: Boolean,
+        value: true
       }
     },
 
@@ -652,6 +657,10 @@ Custom property | Description | Default
         this._axisDoneCounter++;
 
         if(this._axisDoneCounter === axisCount) {
+console.log(axisCount)
+          this._rebuildOnDraw = false;
+          console.log("setting to false")
+
           if(this.commonAxis) {
             this._commonAxisRanAtLeastOnce = true;
             this.axisGroups.filter(":not(:first-child)").selectAll('g.tick text').classed('hideCommon',true);
@@ -708,6 +717,11 @@ Custom property | Description | Default
       if(this._lastDomainChanged !== this.domainChanged) {
 
         this._lastDomainChanged = this.domainChanged;
+        this._rebuildOnDraw = true;
+
+        this._axisDoneCounter = 0;
+console.log(this._axisDoneCounter);
+        console.log("setting to true")
         //if match ticks, make sure the domains can be aligned
         if(this.matchTicks && !this.singleDomain) {
           for(var i = 0; i < this.dimensions.length; i++) {
@@ -808,11 +822,6 @@ Custom property | Description | Default
         }
       }
       return
-    },
-
-    _sortDims: function(dims) {
-      // I think the very presence of the sort function causes dom-repeate to insert/delete elements in place instead of at the end and repropogating properties.
-      return 0
     }
   });
 </script>

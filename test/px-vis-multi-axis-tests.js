@@ -280,7 +280,7 @@ function runTests(){
 
       setTimeout(function(){
         console.log(multiAxis.domainChanged);
-        done()},300);
+        done()}, 1000);
      // done();
     });
 
@@ -403,7 +403,7 @@ function runTests(){
     });
   });
 
-  suite('px-vis-multi-axis delete a dimension', function() {
+  suite('px-vis-multi-axis deletes a dimension', function() {
     var multiScale = document.getElementById('multiScale'),
         multiSVG = document.getElementById('multiSVG'),
         multiAxis = document.getElementById('multiAxis');
@@ -466,7 +466,7 @@ function runTests(){
           "bottom": 10,
           "left": 10
         };
-
+debugger
       multiScale.set('axes',dim);
       multiAxis.set('dimensions',dim);
       multiAxis.set('axes',dim);
@@ -480,7 +480,7 @@ function runTests(){
       multiAxis.set('chartData',d);
 
       setTimeout(function(){
-        done()},500);
+        done()}, 500);
      // done();
     });
 

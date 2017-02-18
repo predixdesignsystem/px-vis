@@ -245,6 +245,11 @@ Custom property | Description | Default
             value: function() {
               return [];
             }
+          },
+
+          rebuildOnDraw: {
+            type: Boolean,
+            value: false
           }
         },
 
@@ -428,7 +433,12 @@ Custom property | Description | Default
         drawElement: function() {
           if(this._animationFrameDone && this._doesD3HaveValues(this.svg) && this.domainChanged !== null && this.orientation) {
 
+             if(this.rebuildOnDraw) {
+              this.removeAxis();
+             }
+
             this.defineAxis();
+
             if(!this._axisGroup) {
               this._buildAxis();
             } else {
@@ -821,7 +831,7 @@ Custom property | Description | Default
          */
         _titleChanged: function(displayedTitle) {
           this.debounce('drawTitle', function() {
-            if(this._doesObjHaveValues(this._axisGroup) && this._axisGroup.node() !== null && 
+            if(this._doesObjHaveValues(this._axisGroup) && this._axisGroup.node() !== null &&
             this._axisGroup.node().ownerSVGElement !== null && this.orientation) {
 
               this.drawTitle();
@@ -855,7 +865,7 @@ Custom property | Description | Default
           }
         },
         _orientationChanged: function() {
-          
+
           this.removeAxis();
           this.drawElement();
         }
