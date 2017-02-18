@@ -244,12 +244,15 @@ Custom property | Description | Default
             type: Array,
             value: function() {
               return [];
-            }
-          },
-
-          rebuildOnDraw: {
+            },
+            rebuildOnDraw: {
             type: Boolean,
             value: false
+          },
+          _removingAxis: {
+            type: Boolean,
+            value:false
+          }
           }
         },
 
@@ -412,11 +415,13 @@ Custom property | Description | Default
         },
 
         removeAxis: function() {
+          this._removingAxis = true;
           // remove the axis
           if(this._axisGroup) {
             this._axisGroup.remove();
             this._axisGroup = null;
           }
+          this._removingAxis = false;
         },
         removeTitle: function() {
           if(this._titleGroup) {
@@ -431,23 +436,24 @@ Custom property | Description | Default
          * @method drawElement
          */
         drawElement: function() {
-          if(this._animationFrameDone && this._doesD3HaveValues(this.svg) && this.domainChanged !== null && this.orientation) {
+          this.debounce('drawaxis', function() {
 
-             if(this.rebuildOnDraw) {
-              this.removeAxis();
-             }
+            if(this._animationFrameDone && this._doesD3HaveValues(this.svg) && this.domainChanged !== null && this.orientation) {
+              
+              if(this.rebuildOnDraw) {
+                this.removeAxis();
+              }
+                          this.defineAxis();
+              if(!this._axisGroup) {
+                this._buildAxis();
+              } else {
+                this._updateAxis();
+              }
 
-            this.defineAxis();
-
-            if(!this._axisGroup) {
-              this._buildAxis();
-            } else {
-              this._updateAxis();
+              // alert parents that we are done drawing the axis
+              this.fire('px-axis-done');
             }
-
-            // alert parents that we are done drawing the axis
-            this.fire('px-axis-done');
-          }
+          }, 10)
         },
         /**
          * Updates the axis
@@ -830,13 +836,15 @@ Custom property | Description | Default
          * redraws title on change
          */
         _titleChanged: function(displayedTitle) {
-          this.debounce('drawTitle', function() {
-            if(this._doesObjHaveValues(this._axisGroup) && this._axisGroup.node() !== null &&
+      //    this.debounce('drawTitle', function() {
+        if(!this._removingAxis) {
+            if(this._doesObjHaveValues(this._axisGroup) && this._axisGroup.node() !== null && 
             this._axisGroup.node().ownerSVGElement !== null && this.orientation) {
 
               this.drawTitle();
             }
-          }.bind(this), 5);
+        }
+     //     }.bind(this), 5);
         },
 
         /**
@@ -865,7 +873,7 @@ Custom property | Description | Default
           }
         },
         _orientationChanged: function() {
-
+          
           this.removeAxis();
           this.drawElement();
         }
