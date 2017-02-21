@@ -219,8 +219,7 @@ function runTests(){
       linearEvent.set('eventData',dE[6]);
       ordinalEvent.set('eventData',dE[7]);
 
-      // setTimeout(function(){ done() }.bind(this),5000);
-      done();
+      setTimeout(function(){ done() }.bind(this), 500);
     });
 
     test('defaultEvent fixture is created', function() {

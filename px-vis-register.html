@@ -86,6 +86,27 @@ The component returns an object via mutedSeries which the chart can take and rea
 ##### Time, number, and name formatting
 Formatting for the timestamps,the data values, and the series names can be controlled via a series of properties. Please see the properties for configuration details.
 
+### Styling
+The following custom properties are available for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+  `--px-vis-register-series-name` | The color of the data series name | `$gray5`
+  `--px-vis-register-data-value` | The color of the data series value | `$black`
+  `--px-vis-register-box` | The color of the box around the register when a scrollbar is present | `$gray3`
+  |  |
+  |  |
+  |  |
+  `--px-tooltip-background-color` | The color of the tooltip | `$black`;
+  `--px-tooltip-text-color` | The color of the tooltip text | `$white`;
+  `--px-tooltip-light-background-color` | The color of the light version tooltip | `$white`;
+  `--px-tooltip-light-text-color` | The color of the light version tooltip text | `$black`;
+  `--px-tooltip-light-border-color`| The color of the light version tooltip border |  `$black`;
+  |  |
+  |  |
+  |  |
+  `--px-font-family` | The font family for all labels and text | `GE Inspira Sans`
+
 @element px-vis-register
 @blurb Element providing a display and interaction space for series in your chart.
 @homepage index.html
@@ -101,7 +122,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
       <div
         id="registerWrap"
         class$="[[_getMinSizeClass(preventMinSize)]] inline--flex flex--col"
-        style$="{{_returnHeight(height,margin)}}; width:[[width]]px">
+        style$="{{_returnHeight(height,margin)}}; [[_returnWidth(chartWidth, width, margin)]]">
 
         <template is="dom-if" if="{{_displayTime(xAxisType, forceDateTimeDisplay)}}">
           <px-vis-register-datetime
@@ -117,7 +138,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
           <template is="dom-if" if="{{!_isOfType(xAxisType, 'pie')}}">
             <template is="dom-repeat" items="{{_series}}" as="_groups">
               <div class$="{{_getSeriesWrapperClass(type)}}">
-                <template is="dom-repeat" items="{{_groups}}" on-dom-change="_scrollBarsPresent">
+                <template is="dom-repeat" id="itemRepeat" items="{{_groups}}" on-dom-change="_scrollBarsPresent">
                   <px-vis-register-item
                     class$="[[tooltipStyle]]"
                     item="[[item]]"
@@ -207,7 +228,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
        *  - `horizontal`
        *
       */
-      type:{
+      type: {
        type:String,
        value:"vertical",
        notify: true
@@ -218,8 +239,7 @@ Formatting for the timestamps,the data values, and the series names can be contr
       */
       _series: {
         type: Array,
-        notify: true,
-        computed: '_computeSeries(tooltipData.series.*, groupings)'
+        notify: true
       },
       /**
        * Prevents the register from having a minimum size
@@ -234,17 +254,28 @@ Formatting for the timestamps,the data values, and the series names can be contr
       preventMuting: {
         type: Boolean,
         value: false
+      },
+      chartWidth: {
+        type: Number,
+        value: ''
+      },
+
+      width: {
+        type: Number,
+        value: ''
+      },
+
+      _itemCount: {
+        type: Number,
+        value: 0
       }
     },
 
     observers: [
       '_formatDateTime(tooltipData.*)',
-      '_scrollBarsPresent(height)'
+      '_scrollBarsPresent(height)',
+      '_computeSeries(tooltipData.series.*, groupings)'
      ],
-
-    //  listeners: {
-    //    'dom-change': '_scrollBarsPresent'
-    //  },
 
     /**
      * dom-if function for type property which returns true if type equals horizontal
@@ -291,25 +322,28 @@ Formatting for the timestamps,the data values, and the series names can be contr
       }
     },
     /**
-     * returns the list of series
+     * returns the list of series with proper grouping
+     * Also sets _seriesKeys and _tooltipDataObj
      *
     */
     _computeSeries: function() {
-      var allSeries = this.tooltipData.series,
-          pivot = Math.ceil(allSeries.length / this.groupings),
-          groupedSeries = [],
-          s = 0,
-          e = pivot;
+      this.debounce('computeSeries', function() {
+        var allSeries = this.tooltipData.series,
+            pivot = Math.ceil(allSeries.length / this.groupings),
+            groupedSeries = [],
+            s = 0,
+            e = pivot;
 
-      for(var i = 0; i < this.groupings; i++) {
-        //copy the section of the series
-        groupedSeries.push(allSeries.slice(s,e));
+        for(var i = 0; i < this.groupings; i++) {
+          //copy the section of the series
+          groupedSeries.push(allSeries.slice(s,e));
 
-        //calc our next start and end
-        s = e;
-        e = s + pivot;
-      }
-      return groupedSeries;
+          //calc our next start and end
+          s = e;
+          e = s + pivot;
+        }
+        this.set('_series', groupedSeries);
+      }, 1);
     },
 
     _displayTime: function(xAxisType, forceDateTimeDisplay) {
@@ -328,18 +362,26 @@ Formatting for the timestamps,the data values, and the series names can be contr
       return this.type === 'vertical' ? 'height:' + (height - margin.bottom) + 'px': '';
     },
 
+
+    _returnWidth: function(chartWidth, width, margin) {
+      return this.type === 'horizontal' ? 'width:' + chartWidth + 'px;': 'width:' + width + 'px;';
+    },
+
     _scrollBarsPresent: function() {
-      var b = false;
+      if(this.$$('#itemRepeat') && this._itemCount !== this.$$('#itemRepeat').renderedItemCount) {
+        var b = false;
+        if(this.type === 'vertical' &&
+            this.$.seriesWrap.scrollHeight > (this.height - this.margin.top - this.margin.bottom)) {
+          b = true;
+        } else if(this.type === 'horizontal' &&
+            this.$.seriesWrap.scrollWidth > this.chartWidth) {
+          b = true;
+        }
 
-      if(this.type === 'vertical' &&
-          this.$.seriesWrap.scrollHeight > (this.height - this.margin.top - this.margin.bottom)) {
-        b = true;
-      } else if(this.type === 'horizontal' &&
-          this.$.seriesWrap.scrollWidth > this.$.seriesWrap.clientWidth) {
-        b = true;
+        this.toggleClass('scrollOn', b, this.$.seriesWrap);
+
+        this._itemCount = this.$$('#itemRepeat').renderedItemCount;
       }
-
-      this.toggleClass('scrollOn', b, this.$.seriesWrap);
     }
   });
   </script>

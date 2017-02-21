@@ -17,6 +17,27 @@ Element providing a series line items on the register for regular charts
         y-axis-type="[[yAxisType]]">
     </px-vis-register-item>
 
+### Styling
+The following custom properties are available for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+  `--px-vis-register-series-name` | The color of the data series name | `$gray5`
+  `--px-vis-register-data-value` | The color of the data series value | `$black`
+  `--px-vis-register-box` | The color of the box around the register when a scrollbar is present | `$gray3`
+  |  |
+  |  |
+  |  |
+  `--px-tooltip-background-color` | The color of the tooltip | `$black`;
+  `--px-tooltip-text-color` | The color of the tooltip text | `$white`;
+  `--px-tooltip-light-background-color` | The color of the light version tooltip | `$white`;
+  `--px-tooltip-light-text-color` | The color of the light version tooltip text | `$black`;
+  `--px-tooltip-light-border-color`| The color of the light version tooltip border |  `$black`;
+  |  |
+  |  |
+  |  |
+  `--px-font-family` | The font family for all labels and text | `GE Inspira Sans`
+
 @element px-vis-register-item
 @blurb Element providing a series line items on the register for regular charts
 @homepage index.html
@@ -29,7 +50,15 @@ Element providing a series line items on the register for regular charts
 
   <template>
     <style include="px-vis-register-styles"></style>
-
+    <style>
+      :host {
+        /*  Fix for Safari flex bug:
+            https://philipwalton.com/articles/normalizing-cross-browser-flexbox-bugs/
+            Demo of bug: http://jsbin.com/xetinivozo/1/edit?html,js,output
+        */
+        flex-shrink: 0;
+      }
+    </style>
     <span
       class$="[[_baseClasses]] register-item--min-width"
       name$="R{{item.name}}"

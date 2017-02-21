@@ -25,6 +25,24 @@ This element sets the selectedDomain property based on the extents box. The sele
         selected-domain="{{selectedDomain}}">
     </px-vis-brush>
 
+### Styling
+The following custom properties are available for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+  `--px-vis-nav-brush-outline-color` | The stroke (border) color for the brushed box | `$gray5`
+  `--px-vis-nav-brush-fill-color` | The fill (background) color for the brushed box | `$gray5`
+  `--px-vis-nav-brush-opacity` | The opacity of the brushed box | `0.3`
+  `--px-vis-nav-brush-gradient-fill-color` | The fill (background) color for the brushed box when gradientOverlay is 'true' | `$gray5`
+  `--px-vis-nav-brush-gradient-opacity-1` | The start opacity of the brushed box when gradientOverlay is 'true' | `0.2`
+  `--px-vis-nav-brush-gradient-opacity-2` | The end opacity of the brushed box when gradientOverlay is 'true' | `0.8`
+  `--px-vis-nav-brush-handle-fill-color` | The fill (background) color for the handles on the brushed box | `$white`
+  `--px-vis-nav-brush-handle-lines-color` | The stroke (border) color for the handles on the brushed box | `$gray5`
+  `--px-vis-nav-brush-handle-fill-color-hover` | The hover state fill (background) color for the handles on the brushed box | `$gray5`
+  `--px-vis-nav-brush-handle-lines-color-hover` | The hover state stroke (border) color for the handles on the brushed box | `$gray6`
+  `--px-vis-nav-brush-handle-fill-color-press` | The pressed/mousedown state fill (background) color for the handles on the brushed box | `$gray6`
+  `--px-vis-nav-brush-handle-lines-color-press` | The pressed/mousedown state stroke (border) color for the handles on the brushed box | `$gray7`
+
 @element px-vis-brush
 @blurb Element providing user interaction on the navigator.
 @homepage index.html
@@ -172,7 +190,10 @@ This element sets the selectedDomain property based on the extents box. The sele
      */
     drawElement: function() {
 
-      if(this._animationFrameDone && this.domainChanged !== null && !isNaN(this.axis.domain()[0].getTime()) && !isNaN(this.axis.domain()[1].getTime())) {
+      if(this._animationFrameDone && this.domainChanged !== null &&
+        this.height &&
+        !isNaN(this.axis.domain()[0].getTime()) &&
+        !isNaN(this.axis.domain()[1].getTime())) {
         var heightOffset = 5,
             h = Math.max(this.height - this.margin.bottom - heightOffset, 1),  //make sure it is bigger than 0 for range
             axisRange = this.axis.range(),
@@ -264,22 +285,21 @@ This element sets the selectedDomain property based on the extents box. The sele
         } else {
           this._drawClipPath([0,h]);
 
-          //make sure brush has the right size
-          this._brush.extent(range)
-            // .handleSize(6)
-            .on("start", this._brushstart.bind(this))
-            .on("brush", this._brushmove.bind(this))
-            .on("end", this._brushend.bind(this));
-
-          //update brush size if needed
-          this._brushGroup
-            .call(this._brush);
+          //make sure brush has the right extents in case of a height change
+           this._brush = this._brush.extent(range);
+          // //and update the g with the new extents
+           this._brushGroup = this.svg.select("g.brush")
+             .call(this._brush);
 
           if(this.selectedDomain && this.selectedDomain.x.length > 0) {
-            //redraw the brush in the right place, but make sure we don't fire a change of domain
-            this._preventDomainChange = true;
+            //redraw the brush in the right place
             this._brushGroup
               .call(this._brush.move, [this.axis(this.selectedDomain.x[0]), this.axis(this.selectedDomain.x[1])]);
+           } else {
+
+            //make sure we redraw in case of a size change
+            this._brushGroup
+              .call(this._brush.move, axisRange);
           }
         }
       }
@@ -302,7 +322,7 @@ This element sets the selectedDomain property based on the extents box. The sele
           clipLeft = this.selectedDomain.x[0] < domain[0],
           clipRight = this.selectedDomain.x[1] > domain[1],
           d = '';
-     
+
       vR[0] -= 5;
       vR[1] += 5;
 
@@ -314,7 +334,7 @@ This element sets the selectedDomain property based on the extents box. The sele
           n2 = 5;
           d = "M" + hR[0] + ',' + vR[0] +
               "L" + hR[1] + ',' + vR[0];
-        
+
       //add squiglly line on right if clip
       if(clipRight) {
         d += "L" + hR[1] + ',' + (halfV - n) +
@@ -325,7 +345,7 @@ This element sets the selectedDomain property based on the extents box. The sele
 
       d += "L" + hR[1] + ',' + vR[1] +
           "L" + hR[0] + ',' + vR[1];
-    
+
       //add squiggly line on left if clip
       if(clipLeft) {
           d += "L" + hR[0] + ',' + (halfV + n) +
@@ -333,7 +353,7 @@ This element sets the selectedDomain property based on the extents box. The sele
             "L" + (hR[0] - 10) + ',' + (halfV - n2) +
             "L" + hR[0] + ',' + (halfV - n);
       }
-        
+
       d += "Z";
 
       this._clipPathObj.select("path")
@@ -376,11 +396,10 @@ This element sets the selectedDomain property based on the extents box. The sele
     _brushmove: function(range) {
       // var s = d3.event.selection;
       // circle.classed("selected", function(d) { return s[0] <= d && d <= s[1]; });
-
       this.debounce('brushed', function () {
 
-        if(Px.d3.brushSelection(this._brushGroup.node())) {
-          var brushExt = Px.d3.brushSelection(this._brushGroup.node());
+        var brushExt = Px.d3.brushSelection(this._brushGroup.node());
+        if(brushExt) {
 
           //if our extents are the same, add or subtract one based on location and reset the brush
           if(brushExt[0] === brushExt[1]) {
@@ -391,7 +410,7 @@ This element sets the selectedDomain property based on the extents box. The sele
               .call(this._brush.move,brushExt)
           } else {
 
-            if(!this._preventDomainChange) {
+           if(!this._preventDomainChange) {
 
               var newDomain = brushExt.map(this.axis.invert, this.axis),
               //make sure this is an actual update
@@ -405,9 +424,9 @@ This element sets the selectedDomain property based on the extents box. The sele
                   'data':{x:newDomain,y:[]}, 'method': 'set', 'dataVar': 'selectedDomain'
                 });
               }
-            } else {
-              this._preventDomainChange = false;
-            }
+           } else {
+             this._preventDomainChange = false;
+           }
           }
 
           // this._handleGroup.attr("transform", function(d,i) {
@@ -641,8 +660,14 @@ This element sets the selectedDomain property based on the extents box. The sele
         // make sure brushes dont extend out of the navigator area
         // range[0] = Math.max(range[0], this.axis.range()[0]);
         // range[1] = Math.min(range[1], this.axis.range()[1]);
-
         if(!(extent[0] === range[0] && extent[1] === range[1])) {
+
+          //we come from the chart, make sure we don't fire a selected domain change
+          //because of the debounce in brushmove we could theoretically have an issue
+          //if the user moves the brush himself after this call and before the debounce
+          //kicks in, in which case the user interaction will be ignored. In reality
+          //unlikely since _zoom brush usually happens on the chart zooming/panning
+          this._preventDomainChange = true;
           this._brushGroup
             .call(this._brush.move,range)
         }

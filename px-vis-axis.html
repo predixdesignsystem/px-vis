@@ -58,6 +58,18 @@ d3 element creating an axis for the chart
 ##### d3 reference
 https://github.com/mbostock/d3/wiki/SVG-Axes
 
+### Styling
+The following custom properties are available for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+  `--px-font-family` | The font family for all labels and text | `GE Inspira Sans`
+  `--px-vis-axis-color` | The color for the axis lines, axis ticks, and axis tick labels | `$gray9`
+  `--px-vis-axis-title-color` | The color for the axis title | `$gray9`
+  `--px-vis-axis-inline-title-color` | The color for the axis title  | `$gray9`
+  `--px-vis-axis-inline-type-color` | The color for the axis lines, axis ticks, and axis tick labels when using 'inline' labelPosition | `$white`
+  `--px-vis-axis-inline-box-color` | The color for the tick boxes when using 'inline' labelPosition | `$gray9`
+
 @element px-vis-axis
 @blurb d3 element creating an axis for the chart
 @homepage index.html
@@ -232,17 +244,28 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             type: Array,
             value: function() {
               return [];
-            }
+            },
+            rebuildOnDraw: {
+            type: Boolean,
+            value: false
+          },
+          _removingAxis: {
+            type: Boolean,
+            value:false
+          }
           }
         },
 
         observers: [
-          'drawElement(domainChanged, svg, axis, margin, width, height, disableTicks, _animationFrameDone, orientation)',
+          'drawElement(domainChanged, svg, axis, margin, width, height, disableTicks, _animationFrameDone)',
           'drawSeriesBars(completeSeriesConfig.*, titleDrawn)',
           '_muteSeriesBars(mutedSeries.*)',
           '_updateTicks(ticks)',
-          '_titleChanged(displayedTitle, _axisGroup, titleLocation.*, height, width, orientation)',
-          '_truncateTitle(title, truncationLength, appendUnitInTitle, completeSeriesConfig)'
+          '_updateTicks(tickFormat)',
+          '_updateTicks(tickValues)',
+          '_titleChanged(displayedTitle, _axisGroup, titleLocation.*, height, width)',
+          '_truncateTitle(title, truncationLength, appendUnitInTitle, completeSeriesConfig)',
+          '_orientationChanged(orientation)'
         ],
 
         detached: function() {
@@ -392,11 +415,13 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
         },
 
         removeAxis: function() {
+          this._removingAxis = true;
           // remove the axis
           if(this._axisGroup) {
             this._axisGroup.remove();
             this._axisGroup = null;
           }
+          this._removingAxis = false;
         },
         removeTitle: function() {
           if(this._titleGroup) {
@@ -411,20 +436,47 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * @method drawElement
          */
         drawElement: function() {
-        //  this.debounce('drawAxis', function() {
-            if(this._animationFrameDone && this.svg.node() && this.domainChanged !== null) {
+          this.debounce('drawaxis', function() {
 
-              this.removeAxis();
+            if(this._animationFrameDone && this._doesD3HaveValues(this.svg) && this.domainChanged !== null && this.orientation) {
+              
+              if(this.rebuildOnDraw) {
+                this.removeAxis();
+              }
+                          this.defineAxis();
+              if(!this._axisGroup) {
+                this._buildAxis();
+              } else {
+                this._updateAxis();
+              }
 
-              this.defineAxis();
-
-              this._buildAxis();
               // alert parents that we are done drawing the axis
               this.fire('px-axis-done');
-
             }
-          // }, 5);
+          }, 10)
         },
+        /**
+         * Updates the axis
+         *
+         */
+        _updateAxis: function() {
+
+          this._axisGroup
+          .attr('transform', function() {
+            if(this.rotation) {
+              return 'rotate(' + (Number(this.rotation)) + ') translate(' + this.translateAmt.join(',') + ')';
+            } else {
+              return 'translate(' + this.translateAmt.join(',') + ')';
+            }
+          }.bind(this))
+          .call(this._axis);
+
+          this._setLineStyles(this._axisGroup,'line,path');
+          this._setLabelStyles(this._axisGroup);
+
+          this._calcDrawnTicks();
+        },
+
         /**
          * builds axis
          *
@@ -458,7 +510,8 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          *
          */
         _updateTicks: function() {
-          if(this.axis && this.margin && this.height && typeof this.disableTicks !== 'undefined') {
+          if(this._doesObjHaveValues(this._axis) && this.axis && this.margin && this.height && typeof this.disableTicks !== 'undefined') {
+
             this.drawElement();
           }
         },
@@ -478,20 +531,6 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
                 this.set('drawnTickValues', this._axis.scale().ticks());
               }
             },1)
-          }
-        },
-
-        /**
-         * Method to update tickValues and recall the axis
-         *
-         */
-        updateTicks: function() {
-          if(this._doesObjHaveValues(this._axis) && this._axisGroup && this._doesObjHaveValues(this.tickValues)) {
-            this._axis.tickValues(this.tickValues);
-            //beats me why we need a timeout... some kind of nonsensical race condition.
-            setTimeout(function() {
-              this._updateAxis();
-            }.bind(this),5);
           }
         },
 
@@ -677,9 +716,10 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
               .attr('for', this.axisId)
               .attr('transform','translate(' + x + ',' + y + ')');
 
+            var themeVar = (this.labelPosition === 'inline') ? "--px-vis-axis-inline-title-color" : "--px-vis-axis-title-color";
             this._titleGroup.append('text')
               .attr('class','axis-title')
-              .attr('fill',this._checkThemeVariable("--px-vis-axis-color", this.colors[this.axisColor]))
+              .attr('fill',this._checkThemeVariable(themeVar, this.colors[this.axisColor]))
               .attr('font-size', this.titleTypeSize + 'px')
               .style('font-family',this._checkThemeVariable("--px-font-family", 'GE Inspira Sans'))
               .attr('font-style', this._checkThemeVariable("--px-font-family", 'GE Inspira Sans'))
@@ -796,12 +836,15 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
          * redraws title on change
          */
         _titleChanged: function(displayedTitle) {
-          this.debounce('drawTitle', function() {
-            if(this._doesObjHaveValues(this._axisGroup) && this._axisGroup.node() !== null && this._axisGroup.node().ownerSVGElement !== null) {
+      //    this.debounce('drawTitle', function() {
+        if(!this._removingAxis) {
+            if(this._doesObjHaveValues(this._axisGroup) && this._axisGroup.node() !== null && 
+            this._axisGroup.node().ownerSVGElement !== null && this.orientation) {
 
               this.drawTitle();
             }
-          }.bind(this), 5);
+        }
+     //     }.bind(this), 5);
         },
 
         /**
@@ -828,6 +871,11 @@ https://github.com/mbostock/d3/wiki/SVG-Axes
             this._axisGroup.node().appendChild(this.$.tooltip);
             this.$.tooltip.for = this._titleGroup.node();
           }
+        },
+        _orientationChanged: function() {
+          
+          this.removeAxis();
+          this.drawElement();
         }
     });
 </script>

@@ -359,15 +359,25 @@ Element which draws scatter series onto the chart
      *
      */
     _applyTransform: function(d) {
-
+/*
+  FIXME
+  1) Unify the isValidData and lines(d) checks.
+  2) Figure out better default instead of 0,0 for transform
+  3) Think about using cx & cy instead of transform.
+*/
       if(!this._isValidData(d[this.completeSeriesConfig[this.seriesId]['y']])) {
         return '';
       }
 
       if(this.radial) {
-
-        var coors = this.line([d]).slice(1).slice(0, -1);
-        return 'translate(' + coors + ')' + ' scale(' + this.markerScale + ')';
+        var line = this.line([d]);
+        if (line) {
+          var coors = line.slice(1).slice(0, -1);
+          if (coors !== 'NaN,NaN') {
+            return 'translate(' + coors + ')' + ' scale(' + this.markerScale + ')';
+          }
+        }
+        return 'translate(0,0)' + ' scale(' + this.markerScale + ')';
       } else {
 
         var xTrans,

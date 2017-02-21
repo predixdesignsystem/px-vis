@@ -375,10 +375,10 @@ function basicTests(registerID,dir){
 
     test(registerID + ' values are blank', function() {
       var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item'),
-          numbroElem;
+          numForm;
       for(var i = 0; i < series.length; i++){
-        numbroElem = series[i].querySelector('.seriesData').querySelectorAll('numbro-element')[0];
-        assert.equal(numbroElem.style['display'], 'none');
+        numForm = series[i].querySelector('.seriesData').querySelector('px-number-formatter');
+        assert.equal(numForm.style["display"], "none");
       }
     });
   });

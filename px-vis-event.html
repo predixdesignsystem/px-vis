@@ -45,6 +45,22 @@ The configureation object allows developers to set the icon used for each event 
       }
     }
 
+### Styling
+The following custom properties are available for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+  `--px-vis-event-line-color` | The default color for the vertical lines below the icon | `$grey9`
+  `--px-vis-event-icon-color` | The default color for the event icon markers | `$gray7`
+  |  |
+  |  |
+  |  |
+  `--px-tooltip-background-color` | The color of the tooltip | `$black`;
+  `--px-tooltip-text-color` | The color of the tooltip text | `$white`;
+  `--px-tooltip-light-background-color` | The color of the light version tooltip | `$white`;
+  `--px-tooltip-light-text-color` | The color of the light version tooltip text | `$black`;
+  `--px-tooltip-light-border-color`| The color of the light version tooltip border |  `$black`;
+
 @element px-vis-event
 @blurb d3 element which draws a line and icon on the chart representing an event.
 @homepage index.html
@@ -366,7 +382,7 @@ The configureation object allows developers to set the icon used for each event 
             i,
             len = k.length;
         for(i = 0; i < len; i++){
-          this._thisConfig[k[i]] =  this.eventConfig[this.eventData.label][k[i]] || this.defaultEventConfig[k[i]];
+          this._thisConfig[k[i]] =  this.eventConfig[this.eventData.label][k[i]] || this.eventConfig[this.eventData.label][k[i]] === 0 ? this.eventConfig[this.eventData.label][k[i]] : this.defaultEventConfig[k[i]];
         }
       } else {
         // else, set everything to default

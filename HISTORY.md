@@ -67,10 +67,24 @@ v1.0.0
 * Removed px-vis-zoom and provide the PxVisBehaviorChart.zooming behavior for charts instead
 * Added 'zoom in' and 'zoom out' buttons in zoom controls
 * changing ghp.sh to account for Alpha releases
+After BETA
 =======================
-* bug fixes
+* post beta fixes
   * cancel tooltip calculation when mouse leaves the chart, avoiding scenarios where the tooltip would appear after the mouse left
   * ensure zomming in/out works with 'timeLocal' axis
+  * tickFormat on axis now causes axis to redraw
+  * fixed various typos in interaction space
+  * implemented px-number-formatter for register
+  * separated labelTypeSize from axisConfig
+  * changed event config - made line config part of it
+  * made axis size and number properties public
+  * added "reset" flag to px-vis-zoomed event
+  * fix console error when clicking on interaction space with zooming on
+  * fix chart navigator brush bug and make it redraw properly on size change
+  * Moved showThresholdBox and displayTitle to thresholdConfig
+  * improve axis drawing time
+  * improve scale updating
+  * improve multi axis drawing time
 
 v0.8.4
 ==================
