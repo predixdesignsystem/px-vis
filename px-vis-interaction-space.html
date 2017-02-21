@@ -816,42 +816,45 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       //since we are done drawing our action box, remove the listener from document using d3.
       Px.d3.select(document).on('mouseup.action', null);
       Px.d3.select(document).on('mousemove.action', null);
-      this.mouseDown = false;
-      var extents = {};
 
-      if(this._doesD3HaveValues(this._actionArea)) {
-        //make sure we have somthing selected
-        if(this._actionArea.attr('width') > 0 && this._actionArea.attr('height') > 0) {
-          extents.x1 = parseInt(this._actionArea.attr('x'));
-          extents.y1 = parseInt(this._actionArea.attr('y'));
-          extents.w = parseInt(this._actionArea.attr('width'));
-          extents.h = parseInt(this._actionArea.attr('height'));
-          extents.x2 = extents.x1 + extents.w;
-          extents.y2 = extents.y1 + extents.h;
+      if(this.mouseDown) {
+        this.mouseDown = false;
+        var extents = {};
 
-          if(this.xAxisType === 'ordinal') {
-            extents.eX = this._getOrdinalRange(true, extents.x1, extents.x2);
-          } else {
-            extents.eX = [this.x.invert(extents.x1), this.x.invert(extents.x2)];
+        if(this._doesD3HaveValues(this._actionArea)) {
+          //make sure we have somthing selected
+          if(this._actionArea.attr('width') > 0 && this._actionArea.attr('height') > 0) {
+            extents.x1 = parseInt(this._actionArea.attr('x'));
+            extents.y1 = parseInt(this._actionArea.attr('y'));
+            extents.w = parseInt(this._actionArea.attr('width'));
+            extents.h = parseInt(this._actionArea.attr('height'));
+            extents.x2 = extents.x1 + extents.w;
+            extents.y2 = extents.y1 + extents.h;
+
+            if(this.xAxisType === 'ordinal') {
+              extents.eX = this._getOrdinalRange(true, extents.x1, extents.x2);
+            } else {
+              extents.eX = [this.x.invert(extents.x1), this.x.invert(extents.x2)];
+            }
+
+            if(this.yAxisType === 'ordinal') {
+              //Y axis is top to bottom
+              extents.eY = this._getOrdinalRange(false, extents.y2, extents.y1);
+            } else {
+              extents.eY = this._processYValues(function(axis, index) {
+                return [axis.invert(extents.y2), axis.invert(extents.y1)];
+              });
+            }
+
+            //set new extents
+          this.set('extentsData', extents);
+          this.fire('px-vis-extents-data-updated', {'data': extents, 'dataVar': 'extentsData', 'method': 'set'});
           }
-
-          if(this.yAxisType === 'ordinal') {
-            //Y axis is top to bottom
-            extents.eY = this._getOrdinalRange(false, extents.y2, extents.y1);
-          } else {
-            extents.eY = this._processYValues(function(axis, index) {
-              return [axis.invert(extents.y2), axis.invert(extents.y1)];
-            });
-          }
-
-          //set new extents
-        this.set('extentsData', extents);
-        this.fire('px-vis-extents-data-updated', {'data': extents, 'dataVar': 'extentsData', 'method': 'set'});
         }
-      }
 
-      if(this._actionArea && this._actionArea.remove) {
-        this._actionArea.remove();
+        if(this._actionArea && this._actionArea.remove) {
+          this._actionArea.remove();
+        }
       }
     },
     _applyFunctionToY: function(fn) {
