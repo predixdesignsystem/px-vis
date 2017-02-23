@@ -1775,4 +1775,66 @@ PxVisBehavior.seriesToAxes = {
   }
 };
 
+/*
+    Name:
+    PxVisBehavior.uniqueIds
+
+    Description:
+    Polymer behavior that provides ability to clean d3/native objects on detached
+
+    Dependencies:
+    - none
+
+    @polymerBehavior PxVisBehavior.uniqueIds
+*/
+PxVisBehavior.uniqueIds = {
+  properties: {
+    /**
+     * Array of unique IDs generated for this comp. cleaned from global
+     * store on detached
+     */
+     _uniqueIdsUsed: {
+       type: Array,
+       value: function() {
+         return [];
+       }
+     },
+  },
+  detached: function () {
+    for(var i=0; i<this._uniqueIdsUsed.length; i++) {
+      Px.uniqueIds.splice(Px.uniqueIds.indexOf(this._uniqueIdsUsed[i]), 1);
+    }
+    this._uniqueIdsUsed = null;
+  },
+  /**
+   * Generates a random id string.
+   *
+   * Takes a string prefix, then adds 10 random chars
+   *
+   * @param {string}
+   * @return {id string}
+   */
+  generateRandomID: function(baseStr) {
+
+    var id = baseStr,
+        abc = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789",
+        len = abc.length;
+
+    for(var i = 0; i < 10; i++){
+      id += abc.charAt(Math.floor(Math.random() * len));
+    }
+
+    Px.uniqueIds = Px.uniqueIds || [];
+    if(Px.uniqueIds.indexOf(id) !== -1) {
+      //id exists, recreate it.
+      return this.generateRandomID(baseStr);
+    } else {
+      Px.uniqueIds.push(id);
+    }
+
+    this._uniqueIdsUsed.push(id);
+    return id;
+  }
+};
+
 </script>
