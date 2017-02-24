@@ -296,24 +296,26 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      */
     _resetTooltipData: function() {
 
-      this.set('_calculatingTooltipData', false);
-      var ttD = {
-            'time': null,
-            'hidden': true,
-            'series': [],
-            'mouse': null,
-            'xArr': null,
-            'yArr': null
-          },
-          keys = (this.seriesKeys) ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
-          len = keys.length,
-          i;
+      if(this.tooltipData) {
+        this.set('_calculatingTooltipData', false);
+        var ttD = {
+              'time': null,
+              'hidden': true,
+              'series': [],
+              'mouse': null,
+              'xArr': null,
+              'yArr': null
+            },
+            keys = (this.seriesKeys) ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
+            len = keys.length,
+            i;
 
-      for(i = 0; i < len; i++){
-        ttD.series.push({'name':keys[i],'value': null });
+        for(i = 0; i < len; i++){
+          ttD.series.push({'name':keys[i],'value': null });
+        }
+        this.set('tooltipData',ttD);
+        this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': ttD, 'method':'set' });
       }
-      this.set('tooltipData',ttD);
-      this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': ttD, 'method':'set' });
     },
 
     /**
