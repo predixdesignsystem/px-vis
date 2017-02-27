@@ -1,0 +1,595 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-chart.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
+<link rel="import" href="px-vis-axis.html"/>
+<link rel="import" href="px-vis-axis-brush.html"/>
+<link rel="import" href="px-vis-behavior-axis-drag.html"/>
+<link rel="import" href="../px-colors-design/colors.html" />
+
+<!--
+d3 element creating an axis for the chart
+
+##### Usage
+
+    <px-vis-interactive-axis
+        svg="[[svg]]"
+        width="[[width]]"
+        height="[[height]]"
+        margin="[[margin]]"
+        offset="[[_offset]]"
+        length="[[_minDim]]"
+        x="[[x]]"
+        y="[[y]]"
+        complete-series-config="{{completeSeriesConfig}}"
+        series-key="[[seriesKey]]"
+        chart-data="[[chartData]]"
+        dimensions="[[dimensions]]"
+        axes="[[axes]]"
+        muted-series="{{mutedSeriesBrush}}"
+        redraw-series="true"
+        stroke-width="2"
+        match-ticks="[[matchTicks]]"
+        grid-ticks="{{gridTicks}}"
+        grid-axis="{{gridAxis}}"
+        common-axis="[[commonAxis]]"
+        truncation-length="[[truncationLength]]"
+        displayed-values="{{displayedValues}}"
+        append-unit-in-title
+        domain-changed="[[domainChanged]]"
+        axis-groups="{{axisGroups}}"
+        brush-elems="{{brushElems}}"
+        radial
+        single-domain
+        label-position="inline"
+        label-one-axis
+        axis-color="grey4"
+        ticks="[[ticks]]"
+        label-rotation="180"
+        brush-to-remove="[[brushToRemove]]"
+        center-offset="[[centerOffset]]"
+        drawn-tick-values="{{drawnTickValues}}"
+        title-type-size="15"
+        label-type-size="12">
+    </px-vis-interactive-axis>
+
+##### d3 reference
+https://github.com/mbostock/d3/wiki/SVG-Axes
+
+### Styling
+The following custom properties are available for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+  `--px-font-family` | The font family for all labels and text | `GE Inspira Sans`
+  `--px-vis-axis-color` | The color for the axis lines, axis ticks, and axis tick labels | `$gray9`
+  `--px-vis-axis-title-color` | The color for the axis title | `$gray9`
+  `--px-vis-axis-inline-title-color` | The color for the axis title  | `$gray9`
+  `--px-vis-axis-inline-type-color` | The color for the axis lines, axis ticks, and axis tick labels when using 'inline' labelPosition | `$white`
+  `--px-vis-axis-inline-box-color` | The color for the tick boxes when using 'inline' labelPosition | `$gray9`
+
+
+@element px-vis-axis
+@blurb d3 element creating an axis for the chart
+@homepage index.html
+@demo demo.html
+-->
+
+<link rel="import" href="css/px-vis-styles.html">
+
+<dom-module id="px-vis-interactive-axis">
+    <template>
+      <style include="px-vis-styles"></style>
+      <px-vis-axis
+        id="[[item]]"
+        class="interactiveAxis"
+        svg="[[_interactiveGroup]]"
+        axis="[[y]]"
+        dimension="[[dimension]]"
+        height="[[height]]"
+        width="[[width]]"
+        margin="[[margin]]"
+        orientation="[[orientation]]"
+        title="[[title]]"
+        title-location='[[titleLocation]]'
+        title-type-size="[[titleTypeSize]]"
+        label-type-size="[[labelTypeSize]]"
+        stroke-width="[[strokeWidth]]"
+        outer-tick-size="0"
+        tick-values="[[tickValues]]"
+        truncation-length="[[truncationLength]]"
+        complete-series-config="[[completeSeriesConfig]]"
+        append-unit-in-title="[[appendUnitInTitle]]"
+        unit="[[unit]]"
+        prevent-series-bar="[[preventSeriesBar]]"
+        domain-changed="[[domainChanged]]"
+        selected-domain="[[selectedDomain]]"
+        title-truncation
+        disable-ticks="[[disableTicks]]"
+        label-position="[[labelPosition]]"
+        axis-color="[[axisColor]]"
+        ticks="[[ticks]]"
+        label-rotation="[[labelRotation]]"
+        label-translation="[[labelTranslation]]"
+        series-on-axis="[[seriesOnAxis]]"
+        muted-series="[[mutedSeries]]"
+        drawn-tick-values="{{drawnTickValues}}"
+        rebuild-on-draw="[[_rebuildOnDraw]]">
+      </px-vis-axis>
+      <template is="dom-if" if="[[!disableBrush]]">
+        <px-vis-axis-brush
+          id="axisBrush"
+          svg="[[_interactiveGroup]]"
+          parent-svg="[[svg]]"
+          height="[[height]]"
+          axis="[[y]]"
+          margin="[[margin]]"
+          chart-data="[[chartData]]"
+          dimension="[[dimension]]"
+          series-key="[[seriesKey]]"
+          domain-changed="[[domainChanged]]"
+          muted-series="{{mutedSeries}}"
+          radial="[[radial]]"
+          center-offset="[[centerOffset]]"
+          brush-to-remove="[[brushToRemove]]">
+        </px-vis-axis-brush>
+      </template>
+    </template>
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'px-vis-interactive-axis',
+
+    behaviors: [
+      PxVisBehaviorD3.svg,
+      PxVisBehavior.sizing,
+      PxVisBehavior.completeSeriesConfig,
+      PxVisBehavior.commonMethods,
+      PxVisBehaviorD3.axisConfig,
+      PxVisBehavior.dataset,
+      PxVisBehavior.dimensions,
+      PxVisBehavior.mutedSeries,
+      PxVisBehaviorD3.dynamicRedraw,
+      PxVisBehavior.commonAxis,
+      PxVisBehaviorD3.domainUpdate,
+      PxVisBehaviorD3.selectedDomain,
+      PxVisBehavior.radial,
+      PxVisBehaviorD3.radialAxisConfig,
+      PxVisBehavior.seriesToAxes,
+      PxVisBehaviorDrag.parallelAxisDrag,
+      PxVisBehaviorDrag.cartesianDrag,
+      PxColorsBehavior.baseColors,
+      PxVisBehaviorChart.subConfiguration
+    ],
+
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      /**
+       * A dictionary of g elems for each dimension
+       *
+       */
+      _interactiveGroup: {
+        type: Object
+      },
+
+      /**
+       * The string identifier for the axis
+       *
+       */
+      dimension: {
+        type: String
+      },
+
+      /**
+       * A dictionary of g elems for each dimension
+       *
+       */
+      brushElems: {
+        type: Object
+      },
+      /**
+       * A holder for the drag behavior
+       *
+       */
+      dragBehavior: {
+        type: Object
+      },
+
+      /**
+       * Whether to append unit in brackets in axis title. e.g [Hz]
+       */
+      appendUnitInTitle: {
+        type: Boolean,
+        value: false
+      },
+      /**
+       * Array representing the actual displayed titles for each axis
+       */
+      displayedValues: {
+        type: Object,
+        notify: true,
+        value: function() {
+          return {};
+        }
+      },
+
+      /**
+       * Whether the axis ticks should be hidden and shown on hover or always shown
+       */
+      showTicksOnHover: {
+        type: Boolean,
+        value: false
+      },
+      /**
+       * Boolean to decide if all axes should get ticks or just one
+       */
+      disableTicks:{
+        type: Boolean,
+        value: false
+      },
+      /**
+       * Length of the axis
+       */
+      length: {
+        type: Number,
+        value: null
+      },
+      /**
+       * Boolean controling if brushing should retain or delete series
+       */
+      brushToRemove: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * Force a redraw for titleLocation
+       */
+      _pokeTitleLocation: {
+        type: Boolean,
+        value: false
+      },
+      /**
+       * Force a redraw if ticks
+       */
+      recalcTicks: {
+        type: Boolean,
+        value: false
+      },
+
+      orientationFromDimensions: {
+        type: Boolean,
+        value: false
+      },
+
+      leftAxisSize: {
+        type: Number
+      },
+      rightAxisSize: {
+        type: Number
+      },
+
+      disableBrush: {
+        type: Boolean,
+        value: false
+      },
+      /**
+        * Boolean to specify not to draw the series bars
+        */
+      preventSeriesBar: {
+        type: Boolean,
+        value: false
+      },
+      // cartesianDragBehavior: {
+      //   type: Boolean,
+      //   value: false,
+      //   observer: '_setDragBehavior'
+      // },
+      _pokeOrientation: {
+        type: Boolean,
+        value: false
+      },
+      axisConfig: {
+        type: Object,
+        value: function() {
+          return {};
+        }
+      },
+      allowEmptyTitle: {
+        type: Boolean,
+        value: false
+      },
+      _commonAxisRanAtLeastOnce: {
+        type: Boolean
+      },
+      _axisDoneCounter: {
+        type: Number,
+        value: 0
+      },
+      _rebuildOnDraw: {
+        type: Boolean,
+        value: true
+      }
+    },
+
+    observers: [
+      '_axisConfigChanged(axisConfig.*)',
+      '_createGroup(domainChanged, x, svg)'
+      // '_computedInternalDimensions(domainChanged, x, dimensions.*, svg, dragBehavior)',
+      // '_recalcGTransforms(leftAxisSize, rightAxisSize)',
+      // '_toggleTitleLocation(length)'
+    ],
+
+    listeners:{
+      'px-axis-done': '_setAxisStyles',
+      'px-vis-axis-displayed-title-changed': '_displayedTitleChanged',
+      'px-vis-recalc-title-location' : '_toggleTitleLocation',
+      "px-axis-orientation-changed" : '_toggleOrientation',
+      "dom-change": '_axisConfigChanged'
+    },
+    //
+    // _setDragBehavior: function() {
+    //   if(this.cartesianDragBehavior) {
+    //     this.createCartesianDrag();
+    //   } else {
+    //     this.createParallelAxisDrag();
+    //   }
+    // },
+
+    _axisConfigChanged: function(conf) {
+      if(this.axisConfig) {
+        var axes = Object.keys(this.axisConfig);
+
+        // iterate through the axisConfig keys
+        for(var i = 0; i < axes.length; i++) {
+          // if the key is an axis and the config is a set of configs, apply them to the axis
+          if(this.$$('#' + axes[i]) && typeof this.axisConfig[axes[i]] === 'object') {
+            this._applyConfigToElement(this.axisConfig[axes[i]], this.$$('#' + axes[i]));
+
+          // if it is just a key, assume it is a property and set on all axes
+          } else {
+            var elems = Polymer.dom(this.root).querySelectorAll('.interactiveAxis');
+            if(elems) {
+              for(var j = 0; j < elems.length; j++) {
+                elems[j].set(axes[i], this.axisConfig[axes[i]]);
+              }
+            }
+          }
+        }
+      }
+    },
+
+    /**
+     * At ready, set the margin and titleLocation objects
+     *
+     */
+    _computeTitleLocation: function(dimension, titleLocation) {
+      if(this.radial) {
+        var r = (this.x(item) * 180 / Math.PI),
+            attrs = {
+            'x': null,
+            'y': null,
+            'r': (r + 180) * -1,  //we rotate each group so we have to un-rotate each title
+            'anchor': null
+          };
+
+        if(r > 10 && r <= 100) {
+          attrs.anchor = 'start';
+          attrs.x = 0;
+          attrs.y = this.length + 10;
+        } else if(r > 100 && r < 170) {
+          attrs.anchor = 'start';
+          attrs.x = -12 * Math.sin(Math.PI - this.x(item));
+          attrs.y = this.length + 10 + 12 * Math.cos(Math.PI - this.x(item));
+        } else if(r >= 170 && r <= 190){
+          attrs.anchor = 'middle';
+          attrs.x = -12 * Math.sin(Math.PI - this.x(item));
+          attrs.y = this.length + 10 + 12 ; //text size plus spacer
+        } else if(r > 190 && r < 260){
+          attrs.anchor = 'end';
+          attrs.x = -12 * Math.sin(Math.PI - this.x(item));
+          attrs.y = this.length + 10 + 12 * Math.cos(Math.PI - this.x(item));
+        } else if(r >= 260 && r < 355){
+          attrs.anchor = 'end';
+          attrs.x = 0;
+          attrs.y = this.length + 10;
+        } else {
+          attrs.anchor = 'middle';
+          attrs.x = -12 * Math.sin(Math.PI - this.x(item));
+          attrs.y = this.length + 10;
+        }
+        return attrs;
+      }
+      return titleLocation;
+    },
+
+    /**
+     * Forces a redraw of the titleLocation
+     *
+     */
+    _toggleTitleLocation: function() {
+      this.set('_pokeTitleLocation' , !this._pokeTitleLocation);
+    },
+
+    /**
+     * Generates a group elem for each dimension and moves it into the correct x coordinate
+     *
+     */
+    _createGroup: function() {
+      this.debounce('createInteractiveGroup', function() {
+        if(this._doesD3HaveValues(this.svg)) {
+          var _this = this;
+              // resetTitles = false,
+              // removed = this.svg.selectAll(".dimension").data().filter(function(d){
+              //   if(_this.dimensions.indexOf(d) === -1){
+              //     // _this.$.axisBrush.clearBrush(d);
+              //     delete _this.displayedValues[d];
+              //     resetTitles = true;
+              //     return true
+              //   }
+              //   return false
+              // });
+          if(this._isD3Empty(this._interactiveGroup)) {
+            var g = this.svg.append('g')
+              .attr("class", ".dimension")
+              // .attr("axis-number", function(d,i) { return i; })
+              .attr("dimension", this.dimension)
+              .on('mousemove', function() {
+                // TODO add a check that we want it to fire these events?
+
+                // Dont know why, but need to do this calc before the debounce
+                var m = Px.d3.mouse(this),
+                    elem = this;
+
+                _this.debounce('axisMouseMove', function() {
+                  var deets = {
+                    'axis': _this.dimension,
+                    'elem': elem,
+                    'mousePos': m
+                  }
+                  _this.fire('px-vis-multi-axis-mousemove', deets);
+                }, 10);
+              })
+              .on('mouseleave',function(){
+                var deets = {
+                  'axis': _this.dimension,
+                  'elem': this,
+                  'mousePos': Px.d3.mouse(this)
+                }
+                _this.fire('px-vis-multi-axis-mouseleave', deets);
+              })
+              .style("cursor","move")
+              // .call(this.dragBehavior)
+              ;
+
+            this._interactiveGroup = g;
+          }
+
+          this._interactiveGroup.attr("transform", this._calcTransformation.bind(this));
+
+          // if we removed titles from the array make sure we notify
+          // if(resetTitles) {
+          //   var newValues = this.displayedValues;
+          //   this.displayedValues = {};
+          //   this.set('displayedValues', newValues);
+          // }
+
+          // this.set('axisGroups', this.svg.selectAll(".dimension"));
+          // this.set('brushElems', this.axisGroups.selectAll('g.brush').nodes());
+
+          //poke the titles
+          // this.set('_pokeTitleLocation',!this._pokeTitleLocation);
+
+          //sometime after draw (doesnt entirely matter when since it is for an interaction piece), move the brushes on top of everything so they dont get interrupted by other things drawn on top
+          setTimeout(function() {
+            this._interactiveGroup.select('g.brush').raise();
+          }.bind(this), 200);
+        }
+      }, 10);
+    },
+
+    _calcTransformation: function() {
+      var d = this.dimension;
+
+      if(this.radial) {
+      /*
+      +180 to flip orientation of axes to start at top (which matches where lines start)
+           180                        0
+          ____                       ____
+        .'    `.                   .'    `.
+       /        \                 /        \
+    90|          | 270  -->  270 |          |90
+       \        /                 \        /
+        `.____.'                   `.____.'
+           0                          180
+      */
+        return this.x(d) || this.x(d) === 0 ? "rotate(" + (this.x(d) * 180 / Math.PI + 180) + ")" : ''
+      }
+
+      // else cartesian:
+      return this.x(d) || this.x(d) === 0 ? "translate(" + this.x(d) + ",0)" : '';
+    },
+
+    /*
+     * Sets styles and on hover for common axis
+     *
+     */
+    _setAxisStyles: function(e) {
+      if(this.axisGroups){
+        var _this = this,
+            axisCount = this._internalDimensions.length;
+
+        //count the axis so that we only run that function once as opposed as the number of axis
+        this._axisDoneCounter = this._axisDoneCounter % axisCount;
+        this._axisDoneCounter++;
+
+        if(this._axisDoneCounter === axisCount) {
+
+          this._rebuildOnDraw = false;
+
+          if(this.commonAxis) {
+            this._commonAxisRanAtLeastOnce = true;
+            this.axisGroups.filter(":not(:first-child)").selectAll('g.tick text').classed('hideCommon',true);
+            this.axisGroups.selectAll('.hideCommon').style('display','none');
+            this.axisGroups.on('mouseover',function(){
+              Px.d3.select(this).selectAll('.hideCommon').style('display',null)
+              Px.d3.select(this).selectAll('.hideCommon').style('fill',_this.colors.grey3)
+            }).on('mouseleave',function(){
+              Px.d3.select(this).selectAll('.hideCommon').style('display','none')
+              Px.d3.select(this).selectAll('.hideCommon').style('fill',"black")
+            });
+
+            this.set('recalcTicks', !this.recalcTicks);
+          } else if(this._commonAxisRanAtLeastOnce) {
+
+            this.axisGroups.selectAll('.hideCommon').style('display',null);
+            this.axisGroups.selectAll('.hideCommon').classed('hideCommon',false);
+
+            this.set('recalcTicks', !this.recalcTicks);
+          }
+        }
+      }
+    },
+
+    // /*
+    //  * Deletes the brushes on its children axes
+    //  *
+    //  */
+    // deleteAllBrushes: function() {
+    //   this.$.axisBrush.deleteAllBrushes();
+    // },
+    //
+    // _getOrientation: function(axisId, orientationFromDimensions) {
+    //   if(orientationFromDimensions) {
+    //     var rDims = this.x.rightDomain();
+    //     if(rDims.indexOf(axisId) !== -1) {
+    //       return "right"
+    //     }
+    //     return "left"
+    //   }
+    //   return "left"
+    // },
+
+    _recalcGTransforms: function(leftSize, rightSize) {
+      if(leftSize && rightSize && this._doesD3HaveValues(this.svg) && this._doesD3HaveValues(this.svg.selectAll(".dimension"))) {
+        this.svg.selectAll(".dimension")
+          .attr("transform", function(d) {
+            return this.x(d) || this.x(d) === 0 ? "translate(" + this.x(d) + ",0)" : '';
+          }.bind(this));
+      }
+    },
+
+    // _toggleOrientation: function() {
+    //   this.set('_pokeOrientation', !this._pokeOrientation);
+    // },
+
+
+  });
+</script>

@@ -244,15 +244,15 @@ Custom property | Description | Default
             type: Array,
             value: function() {
               return [];
-            },
-            rebuildOnDraw: {
+            }
+          },
+          rebuildOnDraw: {
             type: Boolean,
             value: false
           },
           _removingAxis: {
             type: Boolean,
             value:false
-          }
           }
         },
 
@@ -410,14 +410,15 @@ Custom property | Description | Default
         },
 
         removeAll: function() {
-          this.removeAxis();
           this.removeTitle();
+          this.removeAxis();
         },
 
         removeAxis: function() {
           this._removingAxis = true;
           // remove the axis
           if(this._axisGroup) {
+            // this._axisGroup.selectAll('*').remove();
             this._axisGroup.remove();
             this._axisGroup = null;
           }
@@ -439,7 +440,7 @@ Custom property | Description | Default
           this.debounce('drawaxis', function() {
 
             if(this._animationFrameDone && this._doesD3HaveValues(this.svg) && this.domainChanged !== null && this.orientation) {
-              
+
               if(this.rebuildOnDraw) {
                 this.removeAxis();
               }
@@ -838,7 +839,7 @@ Custom property | Description | Default
         _titleChanged: function(displayedTitle) {
       //    this.debounce('drawTitle', function() {
         if(!this._removingAxis) {
-            if(this._doesObjHaveValues(this._axisGroup) && this._axisGroup.node() !== null && 
+            if(this._doesObjHaveValues(this._axisGroup) && this._axisGroup.node() !== null &&
             this._axisGroup.node().ownerSVGElement !== null && this.orientation) {
 
               this.drawTitle();
@@ -873,7 +874,7 @@ Custom property | Description | Default
           }
         },
         _orientationChanged: function() {
-          
+
           this.removeAxis();
           this.drawElement();
         }
