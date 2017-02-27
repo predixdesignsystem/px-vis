@@ -82,6 +82,7 @@ Custom property | Description | Default
       <style include="px-vis-styles"></style>
 
       <!-- don't bind domain changed since other props already depend on it, avoiding drawing each axis twice-->
+      <!-- don't double bind drawnTickValues or each axis update will trigger multi axis to reset the prop on every axis. Use event instead-->
       <template id="bof" is="dom-repeat" items="[[_internalDimensions]]" >
         <px-vis-axis
           id="[[item]]"
@@ -116,7 +117,6 @@ Custom property | Description | Default
           label-translation="[[labelTranslation]]"
           series-on-axis="[[_returnSeriesArray(seriesToAxes, item)]]"
           muted-series="[[mutedSeries]]"
-          drawn-tick-values={{drawnTickValues}}
           rebuild-on-draw="[[_rebuildOnDraw]]">
         </px-vis-axis>
       </template>
@@ -383,8 +383,9 @@ Custom property | Description | Default
       'px-axis-done': '_setAxisStyles',
       'px-vis-axis-displayed-title-changed': '_displayedTitleChanged',
       'px-vis-recalc-title-location' : '_toggleTitleLocation',
-      "px-axis-orientation-changed" : '_toggleOrientation',
-      "dom-change": '_axisConfigChanged'
+      'px-axis-orientation-changed' : '_toggleOrientation',
+      'dom-change': '_axisConfigChanged',
+      'px-vis-axis-drawn-tick-values-changed': '_drawnTickValuesChanged'
     },
 
     _setDragBehavior: function() {
@@ -490,7 +491,7 @@ Custom property | Description | Default
 
         var _this = this,
             resetTitles = false,
-            removed = this.svg.selectAll(".dimension").data().filter(function(d){
+            removed = this.svg.selectAll('.dimension').data().filter(function(d){
               if(_this.dimensions.indexOf(d) === -1){
                 // _this.$.axisBrush.clearBrush(d);
                 delete _this.displayedValues[d];
@@ -502,7 +503,7 @@ Custom property | Description | Default
 
 
         // generate axis based on the dimensions
-        var g = this.svg.selectAll(".dimension")
+        var g = this.svg.selectAll('.dimension')
           // .data(this.dimensions);
           .data(this.dimensions, function(d) { return d; });
 
@@ -513,9 +514,9 @@ Custom property | Description | Default
             resetTitles = true;
           }.bind(this)).remove();
         g.enter()
-          .append("g")
-          .attr("class", "dimension")
-          .attr("axis-number", function(d,i) { return i; })
+          .append('g')
+          .attr('class', 'dimension')
+          .attr('axis-number', function(d,i) { return i; })
           .on('mousemove', function(d) {
             // TODO add a check that we want it to fire these events?
 
@@ -540,11 +541,11 @@ Custom property | Description | Default
             }
             _this.fire('px-vis-multi-axis-mouseleave', deets);
           })
-          .style("cursor","move")
+          .style('cursor','move')
           .call(this.dragBehavior)
         .merge(g)
-          .attr("dimension", function(d) { return d })
-          .attr("transform", function(d) {
+          .attr('dimension', function(d) { return d })
+          .attr('transform', function(d) {
             if(this.radial) {
             /*
             +180 to flip orientation of axes to start at top (which matches where lines start)
@@ -557,9 +558,9 @@ Custom property | Description | Default
               `.____.'                   `.____.'
                  0                          180
             */
-              return this.x(d) || this.x(d) === 0 ? "rotate(" + (this.x(d) * 180 / Math.PI + 180) + ")" : ''
+              return this.x(d) || this.x(d) === 0 ? 'rotate(' + (this.x(d) * 180 / Math.PI + 180) + ')' : ''
             }
-            return this.x(d) || this.x(d) === 0 ? "translate(" + this.x(d) + ",0)" : '';
+            return this.x(d) || this.x(d) === 0 ? 'translate(' + this.x(d) + ',0)' : '';
           }.bind(this));
           // if we removed titles from the array make sure we notify
           if(resetTitles) {
@@ -569,7 +570,7 @@ Custom property | Description | Default
           }
 
         // TODO When we support muting an axes, might want to be able to access the above g and change the transform
-        this.set('axisGroups', this.svg.selectAll(".dimension"));
+        this.set('axisGroups', this.svg.selectAll('.dimension'));
         this.set('brushElems', this.axisGroups.selectAll('g.brush').nodes());
 
         //poke the titles
@@ -587,7 +588,7 @@ Custom property | Description | Default
      *
      */
     _returnGroup: function(item, i) {
-      return this.axisGroups.filter("[dimension=" + item + "]")
+      return this.axisGroups.filter('[dimension=' + item + ']')
       // return Px.d3.select(this.axisGroups.nodes()[i])
     },
     /**
@@ -662,14 +663,14 @@ Custom property | Description | Default
 
           if(this.commonAxis) {
             this._commonAxisRanAtLeastOnce = true;
-            this.axisGroups.filter(":not(:first-child)").selectAll('g.tick text').classed('hideCommon',true);
+            this.axisGroups.filter(':not(:first-child)').selectAll('g.tick text').classed('hideCommon',true);
             this.axisGroups.selectAll('.hideCommon').style('display','none');
             this.axisGroups.on('mouseover',function(){
               Px.d3.select(this).selectAll('.hideCommon').style('display',null)
               Px.d3.select(this).selectAll('.hideCommon').style('fill',_this.colors.grey3)
             }).on('mouseleave',function(){
               Px.d3.select(this).selectAll('.hideCommon').style('display','none')
-              Px.d3.select(this).selectAll('.hideCommon').style('fill',"black")
+              Px.d3.select(this).selectAll('.hideCommon').style('fill','black')
             });
 
             this.set('recalcTicks', !this.recalcTicks);
@@ -781,18 +782,18 @@ Custom property | Description | Default
       if(orientationFromDimensions) {
         var rDims = this.x.rightDomain();
         if(rDims.indexOf(axisId) !== -1) {
-          return "right"
+          return 'right'
         }
-        return "left"
+        return 'left'
       }
-      return "left"
+      return 'left'
     },
 
     _recalcGTransforms: function(leftSize, rightSize) {
-      if(leftSize && rightSize && this._doesD3HaveValues(this.svg) && this._doesD3HaveValues(this.svg.selectAll(".dimension"))) {
-        this.svg.selectAll(".dimension")
-          .attr("transform", function(d) {
-            return this.x(d) || this.x(d) === 0 ? "translate(" + this.x(d) + ",0)" : '';
+      if(leftSize && rightSize && this._doesD3HaveValues(this.svg) && this._doesD3HaveValues(this.svg.selectAll('.dimension'))) {
+        this.svg.selectAll('.dimension')
+          .attr('transform', function(d) {
+            return this.x(d) || this.x(d) === 0 ? 'translate(' + this.x(d) + ',0)' : '';
           }.bind(this));
       }
     },
@@ -820,6 +821,31 @@ Custom property | Description | Default
         }
       }
       return
+    },
+
+    _drawnTickValuesChanged: function(evt) {
+
+      //try counting axis since most likely all axis will fire once.
+      //set a debounce in case not all axis fired so we can fall back on the last value
+      this._drawnTickValuesChangedCounter++;
+
+      //"failure" scenario
+      this.debounce('_drawnTickValuesChangedFallback', function() {
+
+        this._applyDrawnTickValuesChanged(evt.detail.drawnTickValues);
+      }.bind(this), 10);
+
+      //all axis fired, cancel debounce and finish
+      if(this._drawnTickValuesChangedCounter === this._internalDimensions.length) {
+        
+        this.cancelDebouncer('_drawnTickValuesChangedFallback');
+        this._applyDrawnTickValuesChanged(evt.detail.drawnTickValues);
+      }
+    },
+
+    _applyDrawnTickValuesChanged: function(val) {
+      this.set('drawnTickValues', val);
+      this._drawnTickValuesChangedCounter = 0;
     }
   });
 </script>
