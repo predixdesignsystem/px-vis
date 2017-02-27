@@ -4,7 +4,9 @@
 <dom-module id="px-vis-dynamic-menu-demo-component">
   <template>
     <!--add demo tag-->
-    <px-vis-dynamic-menu></px-vis-dynamic-menu>
+    <px-vis-dynamic-menu
+      dynamic-menu-config="[[dynamicMenuConfig]]"
+    ></px-vis-dynamic-menu>
   </template>
 </dom-module>
 
@@ -15,6 +17,22 @@ Polymer({
     description: {
       type: String,
       value: "Element providing a menu dynamically built depending on options."
+    },
+    dynamicMenuConfig: {
+      type: Array,
+      value: [{
+             "name": "Delete",
+             "action": "function(data) { var conf = this.seriesConfig;  delete conf[data.additionalDetail.name]; this.set("seriesConfig", {}); this.set("seriesConfig", conf);}",
+             "eventName": "delete",
+             "icon": "fa-trash"
+           },
+           {
+             "name": "Bring To Front",
+             "action": "function(data) { this.set("serieToRedrawOnTop", data.additionalDetail.name);}",
+             "eventName": "bring-to-front",
+             "icon": "fa-arrow-up"
+           }
+         ]
     }
   }
 });
