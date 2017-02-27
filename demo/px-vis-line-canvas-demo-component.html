@@ -4,7 +4,37 @@
 <dom-module id="px-vis-line-canvas-demo-component">
   <template>
     <!--add demo tag-->
-    <px-vis-line-canvas></px-vis-line-canvas>
+    <px-vis-svg-canvas
+        width="[[width]]"
+        height="[[height]]"
+        margin="[[margin]]"
+        canvas-context="{{canvasContext}}">
+      </px-vis-svg-canvas>
+      <px-vis-scale
+        x-axis-type="time"
+        y-axis-type="linear"
+        complete-series-config="[[seriesConfig]]"
+        data-extents="[[dataExtents]]"
+        width="[[width]]"
+        height="[[height]]"
+        margin="[[margin]]"
+        chart-data={{chartData}}
+        x="{{x}}"
+        y="{{y}}"
+        domainChanged="{{domainChanged}}"
+        selected-domain="[[selectedDomain]]">
+      </px-vis-scale>
+      <px-vis-line-canvas
+        series-id="mySeries"
+        complete-series-config="[[seriesConfig]]"
+        chart-data="[[chartData]]"
+        x="[[x]]"
+        y="[[y]]"
+        width="[[width]]"
+        height="[[height]]"
+        margin="[[margin]]"
+        canvas-context="[[canvasContext]]"
+        domain-changed="[[domainChanged]]"></px-vis-line-canvas>
   </template>
 </dom-module>
 
@@ -15,7 +45,89 @@ Polymer({
     description: {
       type: String,
       value: "Element which draws lines series onto the chart"
+    },
+    //basics
+      width: {
+        type : Number,
+        value : 500
+      },
+      height:{
+        type : Number,
+        value : 200
+      },
+      margin:{
+        type : Object,
+        value : {
+          "top": 10,
+          "right": 10,
+          "bottom": 10,
+          "left": 10
+        }
+      },
+      domainChanged:{
+        type: Boolean,
+        value: false
+      },
+      chartData:{
+        type : Array,
+        value : [{
+            'x': 1397102460000,
+            'y': 0.56
+          },{
+            'x': 1397139660000,
+            'y': 0.4
+          },{
+            'x': 1397177400000,
+            'y': 0.43
+          },{
+            'x': 1397228040000,
+            'y': 0.33
+          },{
+            'x': 1397248260000,
+            'y': 0.47
+          },{
+            'x': 1397291280000,
+            'y': 0.41
+          },{
+            'x': 1397318100000,
+            'y': 0.26
+          },{
+            'x': 1397342100000,
+            'y': 0.42
+          },{
+            'x': 1397390820000,
+            'y': 0.27
+          },{
+            'x': 1397408100000,
+            'y': 0.38
+          },{
+            'x': 1397458800000,
+            'y': 0.36
+          },{
+            'x': 1397522940000,
+            'y': 0.32
+        }]
+      },
+      seriesConfig:{
+        type : Object,
+        value: {
+          'mySeries': {
+            "name":"My-Series",
+            "type": "line",
+            "x": 'x',
+            "y": 'y',
+            'color': "rgb(93,165,218)"
+          }
+        }
+      },
+      //dataExtents
+      dataExtents:{
+        type : Object,
+        value: {
+          "x": [Infinity,-Infinity],
+          "y": [0,-Infinity]
+        }
+      }
     }
-  }
 });
 </script>
