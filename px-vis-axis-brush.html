@@ -122,87 +122,90 @@ Custom property | Description | Default
      */
     drawElement: function() {
       if(this.domainChanged !== null && this.svg) {
-        var _this = this,
-            domain = this.radial ? // [ [x1,y1] , [x2,y2] ]
-            [
-              [-10,this.centerOffset],
-              [10,_this.height]
-            ] :
-            [
-              [-10,0],
-              [_this.margin.top,Math.max(_this.height - _this.margin.top - _this.margin.bottom,0)]
-            ];
 
-        // check that our sizing is ok and wont freak d3 out.
-        // x2 and y2 must be greater than x1 & y1
-        domain[1][0] = (domain[1][0] > domain[0][0]) ? domain[1][0] : domain[0][0];
-        domain[1][1] = (domain[1][1] > domain[0][1]) ? domain[1][1] : domain[0][1];
+        this.debounce('_axisBrush', function() {
 
-        if(!this._previousDomain){
-          this._previousDomain = domain;
-        }
+          var _this = this,
+              domain = this.radial ? // [ [x1,y1] , [x2,y2] ]
+              [
+                [-10,this.centerOffset],
+                [10,_this.height]
+              ] :
+              [
+                [-10,0],
+                [_this.margin.top,Math.max(_this.height - _this.margin.top - _this.margin.bottom,0)]
+              ];
 
-        // Add and store a brush for each axis.
-        this.svg.each(function(d) {
-          if(Px.d3.select(this).select('g.brush').node()) {
-            // now handled in recalcBrush...
+          // check that our sizing is ok and wont freak d3 out.
+          // x2 and y2 must be greater than x1 & y1
+          domain[1][0] = (domain[1][0] > domain[0][0]) ? domain[1][0] : domain[0][0];
+          domain[1][1] = (domain[1][1] > domain[0][1]) ? domain[1][1] : domain[0][1];
 
-            // //update the brush when resize occurs
-              var brsh = Px.d3.select(this).select('g.brush'),
-                  curBrush;
-                  // curSelection = Px.d3.brushSelection(brsh.node());
-            //
-              //set appropriate domain
-              brsh.call(
-                curBrush = Px.d3.brushY().extent(domain)
-              );
-            //
-            //   //if currently active (=drawn) make sure we redraw the brush with appropriate
-            //   //size and position
-            //   if(curSelection) {
-            //     //calculate new pos/size
-            //     var totDomain = Math.abs(domain[1][1] - domain[1][0]),
-            //         totPreviousDomain = Math.abs(_this._previousDomain[1][1] - _this._previousDomain[1][0]),
-            //         startPercentage = curSelection[0]/totPreviousDomain,
-            //         stopPercentage = curSelection[1]/totPreviousDomain;
-            //
-            //     //set it
-            //     brsh.call(curBrush.move, [totDomain * startPercentage, totDomain * stopPercentage]);
-            //   }
-            //   //now restore brushing functions
-              curBrush.on("start.brush", _this.brushstart.bind(_this))
-                      .on("end.brush", _this.brushEnd.bind(_this));
-          } else {
-            // create a new brush
-            Px.d3.select(this).append("g")
-            .attr("class", "brush")
-            .call(
-              _this._brush = Px.d3.brushY()
-                .extent(_this._previousDomain)
-                .on("start.brush", _this.brushstart.bind(_this))
-                // .on("brush.brush", _this.brush.bind(_this))
-                .on("end.brush", _this.brushEnd.bind(_this))
-            );
-
-            // TODO make a flag so brushing is dynamic instead of just at the end
+          if(!this._previousDomain){
+            this._previousDomain = domain;
           }
-        });
 
-        var b = this.svg.selectAll('g.brush');
+          // Add and store a brush for each axis.
+          this.svg.each(function(d) {
+            if(Px.d3.select(this).select('g.brush').node()) {
+              // now handled in recalcBrush...
+  console.log('update axis brudh')
+              // //update the brush when resize occurs
+                var brsh = Px.d3.select(this).select('g.brush'),
+                    curBrush;
+                    // curSelection = Px.d3.brushSelection(brsh.node());
+              //
+                //set appropriate domain
+                brsh.call(
+                  curBrush = Px.d3.brushY().extent(domain)
+                );
+              //
+              //   //if currently active (=drawn) make sure we redraw the brush with appropriate
+              //   //size and position
+              //   if(curSelection) {
+              //     //calculate new pos/size
+              //     var totDomain = Math.abs(domain[1][1] - domain[1][0]),
+              //         totPreviousDomain = Math.abs(_this._previousDomain[1][1] - _this._previousDomain[1][0]),
+              //         startPercentage = curSelection[0]/totPreviousDomain,
+              //         stopPercentage = curSelection[1]/totPreviousDomain;
+              //
+              //     //set it
+              //     brsh.call(curBrush.move, [totDomain * startPercentage, totDomain * stopPercentage]);
+              //   }
+              //   //now restore brushing functions
+                curBrush.on("start.brush", _this.brushstart.bind(_this))
+                        .on("end.brush", _this.brushEnd.bind(_this));
+            } else {
+              // create a new brush
+              Px.d3.select(this).append("g")
+              .attr("class", "brush")
+              .call(
+                _this._brush = Px.d3.brushY()
+                  .extent(_this._previousDomain)
+                  .on("start.brush", _this.brushstart.bind(_this))
+                  // .on("brush.brush", _this.brush.bind(_this))
+                  .on("end.brush", _this.brushEnd.bind(_this))
+              );
+              // TODO make a flag so brushing is dynamic instead of just at the end
+            }
+          });
 
-        b.selectAll("rect.selection")
-          .attr("fill", _this._checkThemeVariable("--px-vis-axis-brush-fill-color", _this.colors.grey5))
-          .attr("fill-opacity", _this._checkThemeVariable("--px-vis-axis-brush-fill-opacity", 0.3))
-          .attr("stroke", _this._checkThemeVariable("--px-vis-axis-brush-outline-color", _this.colors["primary-blue"]));
+          var b = this.svg.selectAll('g.brush');
 
-        if(this.brushToRemove) {
           b.selectAll("rect.selection")
-            .attr("stroke-dasharray", ("5, 5"));
-        }
+            .attr("fill", _this._checkThemeVariable("--px-vis-axis-brush-fill-color", _this.colors.grey5))
+            .attr("fill-opacity", _this._checkThemeVariable("--px-vis-axis-brush-fill-opacity", 0.3))
+            .attr("stroke", _this._checkThemeVariable("--px-vis-axis-brush-outline-color", _this.colors["primary-blue"]));
 
-        // save these brushes for access in brush()
-        this.set('_brushes', b);
-        this.set('_previousDomain', domain);
+          if(this.brushToRemove) {
+            b.selectAll("rect.selection")
+              .attr("stroke-dasharray", ("5, 5"));
+          }
+
+          // save these brushes for access in brush()
+          this.set('_brushes', b);
+          this.set('_previousDomain', domain);
+        }, 10);
       }
     },
 

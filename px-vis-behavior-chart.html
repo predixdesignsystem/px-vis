@@ -177,7 +177,7 @@ PxVisBehaviorChart.chartCommon = [{
     *
     */
     _setCompleteSeriesConfig: function() {
-      if(this._doesObjHaveValues(this._defaultSeriesConfig) && this._doesObjHaveValues(this.chartData) && this._doesObjHaveValues(this.dataVisColors)) {
+      if(this._doesObjHaveValues(this._defaultSeriesConfig) && this._doesObjHaveValues(this.chartData) && this._doesObjHaveValues(this.dataVisColors) && this.dataVisColors['pxVisSeriesColor0']) {
         // FUTURE TODO refactor: use MAPs and SETs instead of Objects when IE has support / is no longer supported by us
         // We could use d3 sets and maps... worth it?
         var fullConfig = (this.seriesConfig) ? JSON.parse(JSON.stringify(this.seriesConfig)) : {},
@@ -1212,11 +1212,12 @@ PxVisBehaviorChart.zooming = [{
 
   /*
   * fires when the chart has been zoomed in or out. contains an object
-  * with 'x' and 'y' values and a 'reset' boolean flag
+  * with 'x' and 'y' values, a 'reset' boolean flag and a 'panning' boolean
   * - x: array containing the domain for X
   * - y: when only 1 y axis is defined, array containing the domain for Y
   *      when multi Y axis, object with 1 key per axis, each value being
   * - reset: true if the event is a zoom reset, false otherwise
+  * - panning: true if the event comes from a panning action, false otherwise
   * an array containing the domain for this specific axis
   * @event px-vis-zoomed
   */
@@ -1470,7 +1471,7 @@ PxVisBehaviorChart.zooming = [{
     var domains = this._processYValues(function(axis, index) {
         return axis.domain();
       });
-    this.fire('px-vis-zoomed', {x: this.x.domain(), y: domains, reset: isReset});
+    this.fire('px-vis-zoomed', {x: this.x.domain(), y: domains, reset: isReset, panning: this._isPanning});
   },
   _intSpaceStartPan: function() {
     this.set('_isPanning', true);

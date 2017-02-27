@@ -85,6 +85,13 @@ After BETA
   * improve axis drawing time
   * improve scale updating
   * improve multi axis drawing time
+After BETA2
+==========================
+  * don't fire zoom on pure mouseup in interaction space
+  * add panning flag to zoom event
+  * ensure uniqued IDs are cleaned up when a chart is removed
+  * wait for colors to have finished initializing before processing seriesConfig
+
 
 v0.8.4
 ==================

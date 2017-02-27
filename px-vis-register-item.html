@@ -189,6 +189,12 @@ Custom property | Description | Default
       _itemY: {
         type: Number,
         computed: '_computeItemY(item, completeSeriesConfig.*)'
+      },
+      _mouseEnterHandler: {
+        type: Function
+      },
+      _mouseLeaveHandler: {
+        type: Function
       }
     },
 
@@ -197,12 +203,18 @@ Custom property | Description | Default
     ],
     attached: function() {
 
-      this.addEventListener('mouseenter', function() {
+      this._mouseEnterHandler = function() {
         this.$.menu.fadeIn();
-      }.bind(this));
-      this.addEventListener('mouseleave', function() {
+      }.bind(this);
+      this._mouseLeaveHandler = function() {
         this.$.menu.fadeOut();
-      }.bind(this));
+      }.bind(this);
+      this.addEventListener('mouseenter', this._mouseEnterHandler);
+      this.addEventListener('mouseleave', this._mouseLeaveHandler);
+    },
+    detached: function() {
+      this.removeEventListener('mouseenter', this._mouseEnterHandler);
+      this.removeEventListener('mouseleave', this._mouseLeaveHandler);
     },
     /**
      * returns the unit for the x value based on the seriesConfig
