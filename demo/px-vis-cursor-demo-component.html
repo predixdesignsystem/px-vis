@@ -27,8 +27,7 @@
           chart-data={{chartData}}
           x="{{x}}"
           y="{{y}}"
-          current-domain-x="{{currentDomainX}}"
-          current-domain-y="{{currentDomainY}}"
+          domain-changed="{{domainChanged}}"
           selected-domain="[[selectedDomain]]">
         </px-vis-scale>
         <px-vis-interaction-space
@@ -40,11 +39,11 @@
           complete-series-config="[[seriesConfig]]"
           chart-data="[[chartData]]"
           tooltip-data={{tooltipData}}
+          series-keys="[[seriesKeys]]"
           extents-data={{extentsData}}
           x="[[x]]"
           y="[[y]]"
-          current-domain-x="[[currentDomainX]]"
-          current-domain-y="[[currentDomainY]]">
+          domain-changed="[[domainChanged]]">
         </px-vis-interaction-space>
         <px-vis-cursor
           svg="[[svg]]"
@@ -53,13 +52,9 @@
           margin="[[margin]]"
           complete-series-config="[[seriesConfig]]"
           chart-data="[[chartData]]"
-          horizontal-line="full"
-          vertical-line="full"
-          circle-point="yes"
           tooltip-data="[[tooltipData]]"
           selection-type=[[selectionType]]>
         </px-vis-cursor>
-
       </div>
 
   </template>
@@ -84,6 +79,10 @@
             "bottom": 0,
             "left": 0
           }
+        },
+        seriesKeys: {
+          type: Array,
+          value: ['mySeries']
         },
         chartData:{
           type : Array,
