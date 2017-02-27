@@ -648,7 +648,26 @@ Custom property | Description | Default
             .attr('shape-rendering', 'crispEdges')
             .attr('stroke-width', this.strokeWidth);
         },
+        /**
+         * /!\ forces layout reflow, call carefully
+         */
+        _getAxisGroupSize: function() {
+          var ext;
+          /*
+            Regarding this longstanding Firefox only bug: https://bugzilla.mozilla.org/show_bug.cgi?id=612118
+            getBBox fails when chart is hidden
+            getBoundingClientRect also doesnt return the same exact values as getBBox in Firefox, which may cause title to overlay on the next axis in multi axis cases
+            So try getBBox, fallback on getBoundingClientRect which should never actually be used.
 
+            remove the try if mozilla ever fixes this bug
+          */
+          try {
+            ext = this._axisGroup.node().getBBox();
+          } catch(e) {
+            ext = this._axisGroup.node().getBoundingClientRect();
+          }
+          return ext;
+        },
         /**
          * Draws the axis title
          *
@@ -661,22 +680,9 @@ Custom property | Description | Default
               location = this._doesObjHaveValues(this.titleLocation) ? 'custom' : this.orientation,
               x,y,r,anchor;
 
-          /*
-            Regarding this longstanding Firefox only bug: https://bugzilla.mozilla.org/show_bug.cgi?id=612118
-              getBBox fails when chart is hidden
-              getBoundingClientRect also doesnt return the same exact values as getBBox in Firefox, which may cause title to overlay on the next axis in multi axis cases
-              So try getBBox, fallback on getBoundingClientRect which should never actually be used.
-
-              remove the try if mozilla ever fixes this bug
-          */
-          try {
-            ext = this._axisGroup.node().getBBox();
-          } catch(e) {
-            ext = this._axisGroup.node().getBoundingClientRect();
-          }
-
           switch(location) {
             case 'bottom':
+              ext = this._getAxisGroupSize();
               x = parseFloat(ext['width']) / 2 + this.translateAmt[0];
               y = this.labelTypeSize * 1.5 + parseFloat(ext['height']) + this.translateAmt[1];
               r = 0;
@@ -684,6 +690,7 @@ Custom property | Description | Default
               break;
 
             case 'top':
+              ext = this._getAxisGroupSize();
               x = parseFloat(ext['width']) / 2 + this.translateAmt[0];
               y = this.translateAmt[1];
               r = 0;
@@ -691,6 +698,7 @@ Custom property | Description | Default
               break;
 
             case 'left':
+              ext = this._getAxisGroupSize();
               x = (this.labelTypeSize + parseFloat(ext['width'])) * -1 + this.translateAmt[0];
               y = parseFloat(ext['height']) / 2 + this.translateAmt[1];
               r = -90;
@@ -698,6 +706,7 @@ Custom property | Description | Default
               break;
 
             case 'right':
+              ext = this._getAxisGroupSize();
               x = this.labelTypeSize + parseFloat(ext['width']) + 4 + this.translateAmt[0];
               y = parseFloat(ext['height']) / 2 + this.translateAmt[1];
               r = -90;
