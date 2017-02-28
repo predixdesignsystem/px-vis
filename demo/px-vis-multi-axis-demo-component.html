@@ -1,10 +1,37 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../px-vis-multi-axis.html">
+<link rel="import" href="../../iron-ajax/iron-ajax.html">
 
 <dom-module id="px-vis-multi-axis-demo-component">
   <template>
+    <iron-ajax
+      url="../px-demo-data/demo-data/apm/timeseries_demo.json"
+      handle-as="json"
+      auto
+      last-response="{{chartData}}"
+    >
     <!--add demo tag-->
-    <px-vis-multi-axis></px-vis-multi-axis>
+    <px-vis-multi-axis
+    
+    ></px-vis-multi-axis>
+    <px-vis-multi-scale
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      axes="[[axes]]"
+      dimensions="[[dimensions]]"
+      chart-data="[[chartData]]"
+      chart-extents="[[chartExtents]]"
+      x="{{x}}"
+      y="{{y}}"
+      domain-changed="{{domainChanged}}"
+      ></px-vis-multi-scale>
+    <px-vis-svg
+      width="[[width]]"
+      height="[[height]]"
+      svg="{{svg}}"
+      margin="[[margin]]"
+      ></px-vis-svg>
   </template>
 </dom-module>
 
