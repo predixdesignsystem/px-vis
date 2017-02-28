@@ -86,6 +86,7 @@ Custom property | Description | Default
       <template id="bof" is="dom-repeat" items="[[_internalDimensions]]" >
         <px-vis-axis
           id="[[item]]"
+          prevent-initial-drawing="[[preventInitialDrawing]]"
           class="multiAxis"
           svg="[[_returnGroup(item, index, _internalDimensionsChanged)]]"
           axis="[[_returnY(item, _internalDimensionsChanged)]]"
@@ -165,7 +166,8 @@ Custom property | Description | Default
       PxVisBehaviorDrag.parallelAxisDrag,
       PxVisBehaviorDrag.cartesianDrag,
       PxColorsBehavior.baseColors,
-      PxVisBehaviorChart.subConfiguration
+      PxVisBehaviorChart.subConfiguration,
+      PxVisBehavior.preventInitialDrawing
     ],
 
     /**
@@ -242,10 +244,7 @@ Custom property | Description | Default
        */
       displayedValues: {
         type: Object,
-        notify: true,
-        value: function() {
-          return {};
-        }
+        notify: true
       },
       /**
        * internal dimensions to defeat race condition
@@ -369,12 +368,35 @@ Custom property | Description | Default
       _rebuildOnDraw: {
         type: Boolean,
         value: true
+      },
+      /**
+       * counter to number of axis title that have been updated
+       */
+      _displayedTitlesCounter: {
+        type: Number,
+        value: 0
+      },
+      /**
+       * builder for current axis title updates
+       */
+      _displayedTitlesBuilder: {
+        type: Object,
+        value: function() {
+          return {};
+        }
+      },
+      /**
+       * counter to number of drawn tick values that have been updated
+       */
+      _drawnTickValuesChangedCounter: {
+        type: Number,
+        value: 0
       }
     },
 
     observers: [
       '_axisConfigChanged(axisConfig.*)',
-      '_computedInternalDimensions(domainChanged, x, dimensions.*, svg, dragBehavior)',
+      '_computedInternalDimensions(domainChanged, x, dimensions, svg, dragBehavior)',
       '_recalcGTransforms(leftAxisSize, rightAxisSize)',
       '_toggleTitleLocation(length)'
     ],
@@ -692,25 +714,12 @@ Custom property | Description | Default
       return 'axis_' + item;
     },
     /*
-     * sets the displayed value of the title including truncation
-     *
-     */
-    _displayedTitleChanged: function(evt) {
-      var vals = this.displayedValues;
-      this.displayedValues = {};
-      vals[evt.detail.id] = evt.detail.displayedTitle;
-      this.set('displayedValues', vals);
-
-      evt.stopPropagation();
-      evt.stopImmediatePropagation();
-    },
-    /*
      * Sets _internalDimensions to the value of dimensions but trigged AFTER the scale
      * has been set. Avoids an annoying race condition where dimensions triggers a
      * chart refresh but the new scale has yet to be triggered
      *
      */
-    _computedInternalDimensions: function(dC, dim) {
+    _computedInternalDimensions: function() {
       //FIXME ?? This if introduces a possible race condition where if dims have not been set on this component, but has on the scale, it will fail this check when dims is updated. Dont think this can happen outside a testing env, but should be careful
 
       //makes sure we dont try to process a new dim before it has a new scale.
@@ -846,6 +855,48 @@ Custom property | Description | Default
     _applyDrawnTickValuesChanged: function(val) {
       this.set('drawnTickValues', val);
       this._drawnTickValuesChangedCounter = 0;
-    }
+    },
+
+    /*
+     * sets the displayed value of the title including truncation
+     *
+     */
+    _displayedTitleChanged: function(evt) {
+
+      this._displayedTitlesCounter++;
+      this._displayedTitlesBuilder[evt.detail.id] = evt.detail.displayedTitle;
+
+      //"failure" scenario
+      this.debounce('_displayedTitleChangedFallback', function() {
+
+        //fallback on existing values if possible
+        if(this.displayedValues) {
+          //copy everything that has not been updated to our builder
+          var keys = Object.keys(this.displayedValues);
+          for(var i=0; i<keys.length; i++) {
+            //if it hasn't been updated then add it
+            if(!this._displayedTitlesBuilder[keys[i]]) {
+              this._displayedTitlesBuilder[keys[i]] = this.displayedValues[keys[i]];
+            }
+          }
+        }
+        this._applyDisplayedTitlesChanged();
+      }.bind(this), 50);
+
+      //all axis fired, cancel debounce and finish
+      if(this._displayedTitlesCounter === this._internalDimensions.length) {
+        
+        this.cancelDebouncer('_displayedTitleChangedFallback');
+        this._applyDisplayedTitlesChanged();
+      }
+
+      evt.stopPropagation();
+      evt.stopImmediatePropagation();
+    },
+    _applyDisplayedTitlesChanged: function() {
+      this.set('displayedValues', this._displayedTitlesBuilder);
+      this._displayedTitlesCounter = 0;
+      this._displayedTitlesBuilder = {};
+    },
   });
 </script>

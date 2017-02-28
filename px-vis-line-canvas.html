@@ -54,7 +54,8 @@ Element which draws lines series onto the chart
       PxVisBehavior.progressiveRendering,
       PxVisBehavior.serieToRedrawOnTop,
       PxVisBehaviorD3.domainUpdate, 
-      PxColorsBehavior.baseColors
+      PxColorsBehavior.baseColors,
+      PxVisBehavior.preventInitialDrawing
     ],
 
     /**
@@ -131,7 +132,7 @@ Element which draws lines series onto the chart
     },
 
     observers: [
-      '_redraw(canvasContext, domainChanged, chartData.*, completeSeriesConfig.*, _canvasRedraw)',
+      '_redraw(canvasContext, domainChanged, chartData.*, completeSeriesConfig.*, _canvasRedraw, preventInitialDrawing)',
       'mutedChanged(mutedSeries.*, completeSeriesConfig)',
       '_drawOnTop(serieToRedrawOnTop)'
     ],
@@ -146,7 +147,9 @@ Element which draws lines series onto the chart
     },
 
     _redraw: function() {
-      this.drawCanvas(true);
+      if(!this.preventInitialDrawing) {
+        this.drawCanvas(true);
+      }
     },
     /**
      * Draws or updates the line element.

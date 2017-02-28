@@ -80,8 +80,9 @@ Custom property | Description | Default
 <dom-module id="px-vis-axis">
     <template>
       <style include="px-vis-styles"></style>
-
-      <px-tooltip id="tooltip" delay=500>{{title}} {{_currentUnits}}</px-tooltip>
+      <template id="tooltipTemplate" is="dom-if" if="[[_titleTruncated]]">
+        <px-tooltip id="tooltip" delay="500">{{title}} {{_currentUnits}}</px-tooltip>
+      </template>
     </template>
 </dom-module>
 
@@ -99,7 +100,8 @@ Custom property | Description | Default
           PxVisBehaviorD3.axisConfig,
           PxVisBehavior.truncating,
           PxVisBehaviorD3.domainUpdate,
-          PxColorsBehavior.baseColors
+          PxColorsBehavior.baseColors,
+          PxVisBehavior.preventInitialDrawing
         ],
 
         /**
@@ -141,8 +143,7 @@ Custom property | Description | Default
            */
           displayedTitle: {
             type: String,
-            notify: true,
-            value: ''
+            notify: true
           },
           /**
            * Whether to append unit (if existing in config) in the title
@@ -185,6 +186,13 @@ Custom property | Description | Default
            *
            */
           titleTruncation: {
+            type: Boolean,
+            value: false
+          },
+          /**
+           * Whether the title has been truncated
+           */ 
+          _titleTruncated: {
             type: Boolean,
             value: false
           },
@@ -245,19 +253,22 @@ Custom property | Description | Default
             value: function() {
               return [];
             },
-            rebuildOnDraw: {
+          },
+          rebuildOnDraw: {
             type: Boolean,
             value: false
           },
           _removingAxis: {
             type: Boolean,
             value:false
-          }
+          },
+          _tooltipElem: {
+            type: HTMLElement
           }
         },
 
         observers: [
-          'drawElement(domainChanged, svg, axis, margin, width, height, disableTicks, _animationFrameDone)',
+          'drawElement(domainChanged, svg, axis, margin, width, height, disableTicks, _animationFrameDone, preventInitialDrawing)',
           'drawSeriesBars(completeSeriesConfig.*, titleDrawn)',
           '_muteSeriesBars(mutedSeries.*)',
           '_updateTicks(ticks)',
@@ -437,6 +448,9 @@ Custom property | Description | Default
          * @method drawElement
          */
         drawElement: function() {
+
+          
+          if(typeof this.preventInitialDrawing !== undefined && this.preventInitialDrawing === false) {
           this.debounce('drawaxis', function() {
 
             if(this._animationFrameDone && this._doesD3HaveValues(this.svg) && this.domainChanged !== null && this.orientation) {
@@ -455,6 +469,7 @@ Custom property | Description | Default
               this.fire('px-axis-done');
             }
           }, 10)
+          }
         },
         /**
          * Updates the axis
@@ -830,13 +845,19 @@ Custom property | Description | Default
           this.debounce('_truncateTitle', function() {
 
               var oldTitle = this.displayedTitle,
+                  combined = title + this._currentUnits,
                   newTitle;
-              if(this.titleTruncation) {
-                newTitle = this._truncateName(title, truncationLength) + this._currentUnits;
+              if(this.titleTruncation &&
+                  combined.length > 2 && combined.length > this.truncationLength) {
+
+                newTitle = this._truncateName(combined, truncationLength);
+                this.set('_titleTruncated', true);
               } else {
-                newTitle = title + this._currentUnits;
+                newTitle = combined;
+                this.set('_titleTruncated', false);
               }
               if(newTitle !== oldTitle) {
+                this._processTooltip();
                 this.fire('px-vis-axis-displayed-title-changed', {displayedTitle: newTitle, title: this.title, id: this.seriesId});
                 this.set('displayedTitle', newTitle);
               }
@@ -859,28 +880,22 @@ Custom property | Description | Default
         },
 
         /**
-         * checks it the label needs a tooltip an appropriately add or remove it
+         * assign target to tooltip
          */
         _processTooltip: function() {
-          var isTruncated = this.title.length > 2 && this.title.length > this.truncationLength,
-              containsTooltip = false,
-              children = this._axisGroup.node().childNodes;
+          if(this._titleTruncated) {
 
-          //can't use 'contains' function on the node cause it's an SVG
-          //element and IE doesn't support it
-          for(var i=0; i<children.length; i++) {
-            if(children === this.$.tooltip) {
-              containsTooltip = true;
-              break;
+            //try getting a ref to the tooltip
+            if(!this._tooltipElem) {
+              this._tooltipElem = this.$$('px-tooltip');
             }
-          }
 
-          if(!isTruncated && containsTooltip) {
-            //not needed anymore, remove
-            this._axisGroup.node().removeChild(this.$.tooltip);
-          } else if(isTruncated && !containsTooltip) {
-            this._axisGroup.node().appendChild(this.$.tooltip);
-            this.$.tooltip.for = this._titleGroup.node();
+            if(this._tooltipElem && this._titleGroup && 
+              (this._tooltipElem.for !== this._titleGroup.node())) {
+              this._tooltipElem.for = this._titleGroup.node();
+            } 
+          } else if(this._tooltipElem){
+            this._tooltipElem.for = null;
           }
         },
         _orientationChanged: function() {
