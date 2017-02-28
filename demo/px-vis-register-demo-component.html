@@ -10,81 +10,77 @@
   <template>
        <div class="outline flex flex--col">
 
-      <!-- need for register-dynamic -->
-      <div>
-          <px-vis-register
-          width="[[width]]"
-          height="[[heightRegister]]"
-          margin="[[margin]]"
-          type="[[type]]"
-          complete-series-config="[[seriesConfig]]"
-          tooltip-data=[[tooltipData]]
-          muted-series="{{mutedSeries}}"
-          x-axis-type="time"
-          y-axis-type="linear"
-          chart-data="[[chartData]]">
-        </px-vis-register>
+        <!-- need for register-dynamic -->
+        
+            <px-vis-register
+            width="[[width]]"
+            height="75"
+            margin="[[margin]]"
+            type="[[type]]"
+            complete-series-config="[[seriesConfig]]"
+            tooltip-data=[[tooltipData]]
+            muted-series="{{mutedSeries}}"
+            x-axis-type="time"
+            y-axis-type="linear"
+            chart-data="[[chartData]]">
+          </px-vis-register>
+            <px-vis-svg
+            width="[[width]]"
+            height="[[height]]"
+            margin="[[margin]]"
+            svg="{{svg}}">
+          </px-vis-svg>
+          <px-vis-scale
+            x-axis-type="time"
+            y-axis-type="linear"
+            complete-series-config="[[seriesConfig]]"
+            data-extents="[[dataExtents]]"
+            width="[[width]]"
+            height="[[height]]"
+            margin="[[margin]]"
+            chart-data="{{chartData}}"
+            x="{{x}}"
+            y="{{y}}"
+            domain-changed="{{domainChanged}}"
+            selected-domain="[[selectedDomain]]">
+          </px-vis-scale>
+          <px-vis-interaction-space
+            x-axis-type="time"
+            y-axis-type="linear"
+            svg="[[svg]]"
+            width="[[width]]"
+            height="[[height]]"
+            margin="[[margin]]"
+            complete-series-config="[[seriesConfig]]"
+            chart-data="[[chartData]]"
+            tooltip-data="{{tooltipData}}"
+            extents-data="{{extentsData}}"
+            domain-changed="[[domainChanged]]"
+            x="[[x]]"
+            y="[[y]]">
+          </px-vis-interaction-space>
+          <px-vis-line-svg
+            svg="[[svg]]"
+            series-id="mySeries"
+            complete-series-config="[[seriesConfig]]"
+            chart-data="[[chartData]]"
+            x="[[x]]"
+            y="[[y]]"
+            muted-series="[[mutedSeries]]"
+            domain-changed="[[domainChanged]]">
+          </px-vis-line-svg>
+          <px-vis-line-svg
+            svg="[[svg]]"
+            series-id="mySeries2"
+            complete-series-config="[[seriesConfig]]"
+            chart-data="[[chartData]]"
+            x="[[x]]"
+            y="[[y]]"
+            muted-series="[[mutedSeries]]"
+            domain-changed="[[domainChanged]]">
+          </px-vis-line-svg>
+        
       </div>
-      <div>
-          <px-vis-svg
-          width="[[width]]"
-          height="[[height]]"
-          margin="[[margin]]"
-          svg="{{svg}}">
-        </px-vis-svg>
-        <px-vis-scale
-          x-axis-type="time"
-          y-axis-type="linear"
-          complete-series-config="[[seriesConfig]]"
-          data-extents="[[dataExtents]]"
-          width="[[width]]"
-          height="[[height]]"
-          margin="[[margin]]"
-          chart-data="{{chartData}}"
-          x="{{x}}"
-          y="{{y}}"
-          domain-changed="{{domainChanged}}"
-          selected-domain="[[selectedDomain]]">
-        </px-vis-scale>
-        <px-vis-interaction-space
-          x-axis-type="time"
-          y-axis-type="linear"
-          svg="[[svg]]"
-          width="[[width]]"
-          height="[[height]]"
-          margin="[[margin]]"
-          complete-series-config="[[seriesConfig]]"
-          chart-data="[[chartData]]"
-          tooltip-data="{{tooltipData}}"
-          extents-data="{{extentsData}}"
-          domain-changed="[[domainChanged]]"
-          x="[[x]]"
-          y="[[y]]">
-        </px-vis-interaction-space>
-        <px-vis-line-svg
-          svg="[[svg]]"
-          series-id="mySeries"
-          complete-series-config="[[seriesConfig]]"
-          chart-data="[[chartData]]"
-          x="[[x]]"
-          y="[[y]]"
-          muted-series="[[mutedSeries]]"
-          domain-changed="[[domainChanged]]">
-        </px-vis-line-svg>
-        <px-vis-line-svg
-          svg="[[svg]]"
-          series-id="mySeries2"
-          complete-series-config="[[seriesConfig]]"
-          chart-data="[[chartData]]"
-          x="[[x]]"
-          y="[[y]]"
-          muted-series="[[mutedSeries]]"
-          domain-changed="[[domainChanged]]">
-        </px-vis-line-svg>
-      </div>
-
-      </div>
-
   </template>
   <script>
     Polymer({
@@ -197,6 +193,19 @@
           value: {
             "x": [Infinity,-Infinity],
             "y": [0,-Infinity]
+          }
+        },
+        tooltipData: {
+          value: {
+            'time': null,
+            'hidden': true,
+            'series': [
+              {'name':'mySeries','value': null },
+              {'name':'mySeries2','value': null }
+            ],
+            'mouse': null,
+            'xArr': null,
+            'yArr': null
           }
         }
       }

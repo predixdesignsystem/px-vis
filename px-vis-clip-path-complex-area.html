@@ -4,28 +4,29 @@
 
 
 <!--
-"The clipping path restricts the region to which paint can be applied. Conceptually, any parts of the drawing that lie outside of the region bounded by the currently active clipping path are not drawn." (MDN)
+"The clipping path restricts the region to which paint can be applied. 
+Conceptually, any parts of the drawing that lie outside of the region bounded by the currently active clipping path are not drawn." (MDN)
 
 Ostensibly, the clipping path gets applied to drawing components to prevent them from drawing on certain parts of the chart, such stopping a line series drawing where the axis is drawn.
 
-This clip path currently only applies a compound path for radar. Other paths will be forthcoming based on need
+This clip path currently only applies a compound path for radar. Other paths will be forthcoming based on need.
 
 ##### Usage
 
-    <px-vis-clip-path-radar
-        clip-path="{{clipPath}}"
-        svg="[[svg]]"
-        x="[[x]]"
-        y="[[y]]"
-        width="[[width]]"
-        height="[[height]]"
-        margin="[[margin]]">
-    </px-vis-clip-path-radar>
+    <px-vis-clip-complex-area
+      svg="[[svg]]"
+      x="[[x]]"
+      y="[[y]]"
+      domain-changed="[[domainChanged]]"
+      chart-data="[[chartData]]"
+      dimensions="[[dimensions]]"
+      clip-path="{{clipPath}}">
+    </px-vis-clip-complex-area>
 
 ## MDN Spec
 https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath
 
-@element px-vis-clip-path
+@element px-vis-clip-path-complex-area
 @blurb The clipping path restricts the region to which paint can be applied.
 @homepage index.html
 @demo demo.html
@@ -113,7 +114,7 @@ https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath
         .enter()
         .append("path");
 
-      //cant do merge because our data is not changing. So run always
+      //cant do merge because our data is not changing. So always run 
       this._clipPathObj.selectAll("path")
         .attr('d', function(d) {
           return area(d);

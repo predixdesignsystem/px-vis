@@ -30,10 +30,10 @@
         </px-vis-scale>
         <px-vis-gridlines
           svg="[[svg]]"
-          axis="[[x]]"
+          axis="[[xOrY]]"
           margin="[[margin]]"
           length="[[height]]"
-          orientation="bottom"
+          orientation="[[orientation]]"
           domain-changed="[[domainChanged]]">
         </px-vis-gridlines>
       </div>
@@ -119,7 +119,20 @@
             "x": [Infinity,-Infinity],
             "y": [0,-Infinity]
           }
+        },
+        orientation: {
+          type: String,
+          value: "bottom"
+          },
+        xOrY : {
+          type: Object,
+          computed: "_returnXOrY(orientation, x, y)"
         }
+      },
+      
+      _returnXOrY: function() {
+        console.log('x or y' + (this.orientation === "bottom") ? this.x : this.y);
+        return (this.orientation === "bottom") ? this.x : this.y;
       }
     });
   </script>

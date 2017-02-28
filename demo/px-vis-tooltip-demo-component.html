@@ -5,6 +5,7 @@
 <link rel="import" href="../px-vis-tooltip.html">
 <link rel="import" href="../px-vis-interaction-space.html">
 <link rel="import" href="../px-vis-line-svg.html">
+<link rel="import" href="../px-vis-behavior-chart.html" />
 
 <dom-module id="px-vis-tooltip-demo-component">
   <template>
@@ -12,7 +13,7 @@
 
       <!-- need for tooltip -->
         <px-vis-tooltip
-          hover-target=[[mouseRect]]
+          hover-target="[[mouseRect]]"
           mouse-position="[[mousePosition]]"
           width="250"
           margin="[[margin]]"
@@ -39,28 +40,26 @@
           chart-data={{chartData}}
           x="{{x}}"
           y="{{y}}"
-          current-domain-x="{{currentDomainX}}"
-          current-domain-y="{{currentDomainY}}"
+          domain-changed="{{domainChanged}}"
           selected-domain="[[selectedDomain]]">
         </px-vis-scale>
         <px-vis-interaction-space
           x-axis-type="time"
-          svg="[[svg]]"
+          svg="[[layer.1]]"
           width="[[width]]"
           height="[[height]]"
           margin="[[margin]]"
           complete-series-config="[[seriesConfig]]"
           chart-data="[[chartData]]"
-          tooltip-data={{tooltipData}}
-          extents-data={{extentsData}}
+          tooltip-data="{{tooltipData}}"
+          extents-data="{{extentsData}}"
           x="[[x]]"
           y="[[y]]"
-          current-domain-x="[[currentDomainX]]"
-          current-domain-y="[[currentDomainY]]"
-          mouse-rect={{mouseRect}}>
+          domain-changed="[[domainChanged]]"
+          mouse-rect="{{mouseRect}}">
         </px-vis-interaction-space>
         <px-vis-line-svg
-          svg="[[svg]]"
+          svg="[[layer.0]]"
           series-id="mySeries"
           complete-series-config="[[seriesConfig]]"
           chart-data="[[chartData]]"
@@ -68,10 +67,7 @@
           y="[[y]]"
           domain-changed="[[domainChanged]]">
         </px-vis-line-svg>
-
-
       </div>
-
   </template>
   <script>
     Polymer({
@@ -162,6 +158,10 @@
         mousePosition:{
           type: Array
         }
+      },
+      behaviors: [PxVisBehaviorChart.layers],
+      ready: function() {
+        this.set('numberOfLayers',2);
       },
       _calcMousePos: function(evt) {
         this.set('mousePosition',[evt.pageX,evt.pageY]);
