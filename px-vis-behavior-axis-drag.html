@@ -30,7 +30,7 @@ PxVisBehaviorDrag.basicProps = [{
        */
       _dragging: {
         type: Object,
-        value: function(){ return {}; }
+        value: function() { return {}; }
       },
       /**
        * Holder for the drag behavior
@@ -81,33 +81,13 @@ PxVisBehaviorDrag.basicProps = [{
     @polymerBehavior PxVisBehaviorDrag.parallelAxisDrag
 */
 PxVisBehaviorDrag.parallelAxisDrag = [{
-    createParallelAxisDrag: function(){
-      var _this = this;
+    createParallelAxisDrag: function() {
 
       this.dragBehavior = Px.d3.drag()
         .on("start.drag", this._onDragStart.bind(this))
         .on("drag.drag", this._onDrag.bind(this))
-        .on("end.drag", function(d) {
+        .on("end.drag", this._onDragEnd.bind(this));
 
-          _this._dragging = {};
-
-          // make the axis snap into place
-          _this.transition(Px.d3.select(this))
-            .attr("transform", function(a) {
-              return _this.radial ? "rotate(" + (_this.x(a) * 180 / Math.PI + 180) + ")" : "translate(" + _this.x(a) + ",0)";
-            });
-
-          if(_this.redrawSeries){
-            // redraw the lines
-            _this.set('completeSeriesConfig.*.x',_this.dimensions);
-            _this.fire('px-vis-complete-series-config', { 'data': _this.dimensions, 'dataVar': 'completeSeriesConfig.*.x' ,'method': 'set' });
-
-            _this.fire('px-vis-redraw-lines');
-          }
-
-          // alert parents that we are done moving the axis
-          _this.fire("px-axis-done");
-        });
       this.notifyPath('dragBehavior', this.dragBehavior);
     },
     /**
@@ -124,12 +104,73 @@ PxVisBehaviorDrag.parallelAxisDrag = [{
      * When an axis is dragged
      *
      */
-    _onDrag: function(d) {
+    _onDrag: function() {
       this.debounce('drag', function(e) {
 
-        if(this.radial){
-          /*
-            arctan gives us our angle, but 0 at 3 o'clock and our chart 0 is at 12. So add pi/2
+        if(this.radial) {
+          this._radialDrag(e);
+        } else {
+          this._linearDrag(e);
+        }
+
+        //reset the domain
+        // this.x.domain(this.dimensions);
+
+        // redraw the lines
+        if(this.redrawSeries & this.dynamicRedraw){
+          _this.fire('px-vis-redraw-lines');
+        }
+
+        // move the currently grabed axis (and reorder the others if above is active)
+        this._interactiveGroup.attr("transform", this._radialOrLinear.bind(this));
+
+        this.fire('px-vis-recalc-title-location');
+      }.bind(this,Px.d3.event),10);
+    },
+
+    _onDragEnd: function() {
+
+      this._dragging = {};
+
+      // make the axis snap into place
+      this.transition(this._interactiveGroup)
+        .attr("transform", function() {
+          return this.radial ? "rotate(" + (this.x(this.dimension) * 180 / Math.PI + 180) + ")" : "translate(" + this.x(this.dimension) + ",0)";
+        }.bind(this));
+
+      if(this.redrawSeries){
+        // redraw the lines
+        this.set('completeSeriesConfig.*.x',this.dimensions);
+        this.fire('px-vis-complete-series-config', { 'data': this.dimensions, 'dataVar': 'completeSeriesConfig.*.x' ,'method': 'set' });
+
+        this.fire('px-vis-redraw-lines');
+      }
+
+      // alert parents that we are done moving the axis
+      this.fire("px-axis-done");
+    },
+
+    _linearDrag: function(e) {
+      var d = this.dimension;
+
+      //get the x coordinate bounded by our chart extents
+      this._dragging[d] = Math.min(this.width, Math.max(0, e.x));
+
+      // reorder dynamically:
+      // this._linearSort(this.axes, this.dimension);
+      var swappedDim = this._linearSort(this.dimensions, this.dimension, e);
+
+      if(swappedDim) {
+        this.fire('px-vis-drag-dimension-swapped', { "dimensions" : this.dimensions, "swappedDim": swappedDim });
+      }
+      // this.axes.sort(function(a, b) { return this._position(a) - this._position(b); }.bind(this) );
+      // this.dimensions.sort(function(a, b) { return this._position(a) - this._position(b); }.bind(this));
+
+    },
+
+    _radialDrag: function(e) {
+      /*
+        arctan gives us our angle, but 0 at 3 o'clock and our chart 0 is at 12. So add pi/2
 
               -pi/2                         0
                ____                        ____
@@ -139,37 +180,45 @@ PxVisBehaviorDrag.parallelAxisDrag = [{
             \        /                  \        /
              `.____.'                    `.____.'
                pi/2                         pi
-          */
-          var angle = Math.atan2(e.y,e.x) + Math.PI / 2,
-              //arctan also gives us angle from -pi to pi; we want 0 to 2pi, so check if it is still negative
-              angle_2PI = angle < 0 ? angle + 2 * Math.PI : angle;
+      */
 
-          this._dragging[d] = angle_2PI;
+      var angle = Math.atan2(e.y,e.x) + Math.PI / 2,
+          //arctan also gives us angle from -pi to pi; we want 0 to 2pi, so check if it is still negative
+          angle_2PI = angle < 0 ? angle + 2 * Math.PI : angle,
+          d = this.dimension;
 
-          this.axes = this._radialSort(this.axes, d, angle_2PI);
-          this.dimensions = this._radialSort(this.dimensions, d, angle_2PI);
-        } else {
-          //get the x coordinate bounded by our chart extents
-          this._dragging[d] = Math.min(this.width, Math.max(0, e.x));
+      this._dragging[d] = angle_2PI;
 
-        // reorder dynamically:
-          this.axes.sort(function(a, b) { return this._position(a) - this._position(b); }.bind(this) );
-          this.dimensions.sort(function(a, b) { return this._position(a) - this._position(b); }.bind(this));
-        }
+      // this.axes = this._radialSort(this.axes, d, angle_2PI);
+      var swappedDim = this._radialSort(this.dimensions, d, angle_2PI);
 
-        //reset the domain
-        this.x.domain(this.dimensions);
+      if(swappedDim) {
+        this.fire('px-vis-drag-dimension-swapped', { "dimensions" : this.dimensions, "swappedDim": swappedDim });
+      }
+    },
 
-        // redraw the lines
-        if(this.redrawSeries & this.dynamicRedraw){
-          _this.fire('px-vis-redraw-lines');
-        }
+    _linearSort: function(dims, d, e) {
+      var len = dims.length - 1,
+          index = dims.indexOf(d),
+          left_index = index === 0 ? -1 : index - 1,
+          right_index = index === len ? -1 : index + 1,
+          myPos = Math.min(this.width, Math.max(0, e.x)),
+          leftPos = left_index === -1 ? 'edge' : this.x(dims[left_index]),
+          rightPos = right_index === -1 ? 'edge' : this.x(dims[right_index]),
+          swapWithDim = null;
 
-        // move the currently grabed axis (and reorder the others if above is active)
-        this.axisGroups.attr("transform", this._radialOrLinear.bind(this));
+      // if we are not on the chart edge and we have moved past our left hand neighbor
+      if(leftPos !== 'edge' && myPos < leftPos) {
+        swapWithDim = dims[left_index];
+        dims[index] = swapWithDim;
+        dims[left_index] = d;
+      } else if(rightPos !== 'edge' && myPos > rightPos) {
+        swapWithDim = dims[right_index];
+        dims[index] = swapWithDim;
+        dims[right_index] = d;
+      }
 
-        this.fire('px-vis-recalc-title-location');
-      }.bind(this,Px.d3.event),10);
+      return swapWithDim;
     },
 
     /**
@@ -181,7 +230,8 @@ PxVisBehaviorDrag.parallelAxisDrag = [{
       var len = dims.length - 1,
           index = dims.indexOf(d),
           left_index = index === 0 ? len : index - 1,
-          right_index = index === len ? 0 : index + 1;
+          right_index = index === len ? 0 : index + 1,
+          swapWithDim;
 
       //if we are moving the center elem
       if(index === 0){
@@ -190,9 +240,11 @@ PxVisBehaviorDrag.parallelAxisDrag = [{
             left_bound = len === 2 ? Math.PI : this.x(dims[left_index - 1]);
         //make sure it is bounded by two axes
         if(angle > this.x(dims[right_index]) && angle < right_bound) {
+          swapWithDim = dims[right_index];
           dims[index] = dims[right_index];
           dims[right_index] = d;
         } else if(angle < this.x(dims[left_index]) && angle > left_bound) {
+          swapWithDim = dims[left_index];
           dims[index] = dims[left_index];
           dims[left_index] = d;
         }
@@ -203,9 +255,11 @@ PxVisBehaviorDrag.parallelAxisDrag = [{
 
         //if our angle is greater than our last element, then we have passed 0
         if(angle > bounding_angle) {
+          swapWithDim = dims[left_index];
           dims[index] = dims[left_index];
           dims[left_index] = d;
         } else if(angle > this.x(dims[right_index])) {
+          swapWithDim = dims[right_index];
           dims[index] = dims[right_index];
           dims[right_index] = d;
         }
@@ -216,9 +270,11 @@ PxVisBehaviorDrag.parallelAxisDrag = [{
 
         //see if angle is > 0 and bounded by the first axis
         if(angle <= bounding_angle) {
+          swapWithDim = dims[right_index];
           dims[index] = dims[right_index];
           dims[right_index] = d;
         } else if(angle < this.x(dims[left_index])) {
+          swapWithDim = dims[left_index];
           dims[index] = dims[left_index];
           dims[left_index] = d;
         }
@@ -226,20 +282,23 @@ PxVisBehaviorDrag.parallelAxisDrag = [{
       //else, just flip axes as normal
       else {
         if(angle < this.x(dims[left_index])) {
+          swapWithDim = dims[left_index];
           dims[index] = dims[left_index];
           dims[left_index] = d;
         } else if(angle > this.x(dims[right_index])) {
+          swapWithDim = dims[right_index];
           dims[index] = dims[right_index];
           dims[right_index] = d;
         }
       }
-      return dims;
+      return swapWithDim;
     },
     /**
      * Helper function to return either a rotate transform or translate transform
      *
      */
-    _radialOrLinear: function(d){
+    _radialOrLinear: function() {
+      var d = this.dimension;
       return this.radial ? "rotate(" + (this._position(d) * 180 / Math.PI + 180) + ")" : "translate(" + this._position(d) + ",0)";
     }
   },
@@ -367,7 +426,7 @@ PxVisBehaviorDrag.cartesianDrag = [{
           return "translate(" + this._position(d) + ",0)";
         }.bind(this));
 
-      }.bind(this,Px.d3.event),10);
+      }.bind(this,Px.d3.event),1);
     }
   },
   PxVisBehaviorDrag.basicProps

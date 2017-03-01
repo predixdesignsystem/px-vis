@@ -287,11 +287,11 @@ Custom property | Description | Default
         type: Boolean,
         value: false
       },
-      // cartesianDragBehavior: {
-      //   type: Boolean,
-      //   value: false,
-      //   observer: '_setDragBehavior'
-      // },
+      cartesianDragBehavior: {
+        type: Boolean,
+        value: false,
+        observer: '_setDragBehavior'
+      },
       _pokeOrientation: {
         type: Boolean,
         value: false
@@ -321,27 +321,27 @@ Custom property | Description | Default
 
     observers: [
       '_axisConfigChanged(axisConfig.*)',
-      '_createGroup(domainChanged, x, svg)'
+      '_createGroup(domainChanged, x, svg, dragBehavior)'
       // '_computedInternalDimensions(domainChanged, x, dimensions.*, svg, dragBehavior)',
-      // '_recalcGTransforms(leftAxisSize, rightAxisSize)',
+      // '_axisSizeChanged(leftAxisSize, rightAxisSize)',
       // '_toggleTitleLocation(length)'
     ],
 
     listeners:{
       'px-axis-done': '_setAxisStyles',
       'px-vis-axis-displayed-title-changed': '_displayedTitleChanged',
-      'px-vis-recalc-title-location' : '_toggleTitleLocation',
+      // 'px-vis-recalc-title-location' : '_toggleTitleLocation',
       "px-axis-orientation-changed" : '_toggleOrientation',
       "dom-change": '_axisConfigChanged'
     },
-    //
-    // _setDragBehavior: function() {
-    //   if(this.cartesianDragBehavior) {
-    //     this.createCartesianDrag();
-    //   } else {
-    //     this.createParallelAxisDrag();
-    //   }
-    // },
+
+    _setDragBehavior: function() {
+      if(this.cartesianDragBehavior) {
+        this.createCartesianDrag();
+      } else {
+        this.createParallelAxisDrag();
+      }
+    },
 
     _axisConfigChanged: function(conf) {
       if(this.axisConfig) {
@@ -466,8 +466,7 @@ Custom property | Description | Default
                 _this.fire('px-vis-multi-axis-mouseleave', deets);
               })
               .style("cursor","move")
-              // .call(this.dragBehavior)
-              ;
+              .call(this.dragBehavior);
 
             this._interactiveGroup = g;
           }
@@ -577,7 +576,7 @@ Custom property | Description | Default
     //   return "left"
     // },
 
-    _recalcGTransforms: function(leftSize, rightSize) {
+    _axisSizeChanged: function(leftSize, rightSize) {
       if(leftSize && rightSize && this._doesD3HaveValues(this.svg) && this._doesD3HaveValues(this.svg.selectAll(".dimension"))) {
         this.svg.selectAll(".dimension")
           .attr("transform", function(d) {
@@ -585,6 +584,10 @@ Custom property | Description | Default
           }.bind(this));
       }
     },
+
+    recalcTranform: function() {
+      this._interactiveGroup.attr("transform", this._calcTransformation.bind(this));
+    }
 
     // _toggleOrientation: function() {
     //   this.set('_pokeOrientation', !this._pokeOrientation);
