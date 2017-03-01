@@ -372,11 +372,12 @@ Custom property | Description | Default
       'px-axis-done': '_setAxisStyles',
       'px-vis-axis-displayed-title-changed': '_displayedTitleChanged',
       'px-vis-recalc-title-location' : '_toggleTitleLocation',
-      "px-axis-orientation-changed" : '_toggleOrientation'
+      "px-axis-orientation-changed" : '_toggleOrientation',
+      'dom-change': '_axisConfigChanged',
+      'px-vis-axis-drawn-tick-values-changed': '_drawnTickValuesChanged'
     },
 
     _axisConfigChanged: function(conf) {
-
       if(this.axisConfig) {
         var axes = Object.keys(this.axisConfig);
 
@@ -459,7 +460,6 @@ Custom property | Description | Default
      *
      */
     _toggleTitleLocation: function() {
-      // this.$.bof.render();
       this.set('_pokeTitleLocation' , !this._pokeTitleLocation);
     },
 
@@ -736,6 +736,73 @@ Custom property | Description | Default
         */
         fullSeries[k] = true;
       }
+    },
+
+    _drawnTickValuesChanged: function(evt) {
+
+      //try counting axis since most likely all axis will fire once.
+      //set a debounce in case not all axis fired so we can fall back on the last value
+      this._drawnTickValuesChangedCounter++;
+
+      //"failure" scenario
+      this.debounce('_drawnTickValuesChangedFallback', function() {
+
+        this._applyDrawnTickValuesChanged(evt.detail.drawnTickValues);
+      }.bind(this), 10);
+
+      //all axis fired, cancel debounce and finish
+      if(this._drawnTickValuesChangedCounter === this._internalDimensions.length) {
+
+        this.cancelDebouncer('_drawnTickValuesChangedFallback');
+        this._applyDrawnTickValuesChanged(evt.detail.drawnTickValues);
+      }
+    },
+
+    _applyDrawnTickValuesChanged: function(val) {
+      this.set('drawnTickValues', val);
+      this._drawnTickValuesChangedCounter = 0;
+    },
+
+    /*
+     * sets the displayed value of the title including truncation
+     *
+     */
+    _displayedTitleChanged: function(evt) {
+
+      this._displayedTitlesCounter++;
+      this._displayedTitlesBuilder[evt.detail.id] = evt.detail.displayedTitle;
+
+      //"failure" scenario
+      this.debounce('_displayedTitleChangedFallback', function() {
+
+        //fallback on existing values if possible
+        if(this.displayedValues) {
+          //copy everything that has not been updated to our builder
+          var keys = Object.keys(this.displayedValues);
+          for(var i=0; i<keys.length; i++) {
+            //if it hasn't been updated then add it
+            if(!this._displayedTitlesBuilder[keys[i]]) {
+              this._displayedTitlesBuilder[keys[i]] = this.displayedValues[keys[i]];
+            }
+          }
+        }
+        this._applyDisplayedTitlesChanged();
+      }.bind(this), 50);
+
+      //all axis fired, cancel debounce and finish
+      if(this._displayedTitlesCounter === this._internalDimensions.length) {
+
+        this.cancelDebouncer('_displayedTitleChangedFallback');
+        this._applyDisplayedTitlesChanged();
+      }
+
+      evt.stopPropagation();
+      evt.stopImmediatePropagation();
+    },
+    _applyDisplayedTitlesChanged: function() {
+      this.set('displayedValues', this._displayedTitlesBuilder);
+      this._displayedTitlesCounter = 0;
+      this._displayedTitlesBuilder = {};
     }
 
   });
