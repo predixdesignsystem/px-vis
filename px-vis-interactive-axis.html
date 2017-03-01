@@ -85,7 +85,7 @@ Custom property | Description | Default
         class="interactiveAxis"
         svg="[[_interactiveGroup]]"
         axis="[[y]]"
-        dimension="[[dimension]]"
+        series-id="[[dimension]]"
         height="[[height]]"
         width="[[width]]"
         margin="[[margin]]"
@@ -114,7 +114,8 @@ Custom property | Description | Default
         series-on-axis="[[seriesOnAxis]]"
         muted-series="[[mutedSeries]]"
         drawn-tick-values="{{drawnTickValues}}"
-        rebuild-on-draw="[[_rebuildOnDraw]]">
+        rebuild-on-draw="[[_rebuildOnDraw]]"
+        prevent-initial-drawing="[[preventInitialDrawing]]">
       </px-vis-axis>
       <template is="dom-if" if="[[!disableBrush]]">
         <px-vis-axis-brush
@@ -161,7 +162,8 @@ Custom property | Description | Default
       PxVisBehaviorDrag.parallelAxisDrag,
       PxVisBehaviorDrag.cartesianDrag,
       PxColorsBehavior.baseColors,
-      PxVisBehaviorChart.subConfiguration
+      PxVisBehaviorChart.subConfiguration,
+      PxVisBehavior.preventInitialDrawing
     ],
 
     /**
@@ -322,16 +324,10 @@ Custom property | Description | Default
     observers: [
       '_axisConfigChanged(axisConfig.*)',
       '_createGroup(domainChanged, x, svg, dragBehavior)'
-      // '_computedInternalDimensions(domainChanged, x, dimensions.*, svg, dragBehavior)',
-      // '_axisSizeChanged(leftAxisSize, rightAxisSize)',
-      // '_toggleTitleLocation(length)'
     ],
 
     listeners:{
       'px-axis-done': '_setAxisStyles',
-      'px-vis-axis-displayed-title-changed': '_displayedTitleChanged',
-      // 'px-vis-recalc-title-location' : '_toggleTitleLocation',
-      "px-axis-orientation-changed" : '_toggleOrientation',
       "dom-change": '_axisConfigChanged'
     },
 
@@ -364,58 +360,6 @@ Custom property | Description | Default
           }
         }
       }
-    },
-
-    /**
-     * At ready, set the margin and titleLocation objects
-     *
-     */
-    _computeTitleLocation: function(dimension, titleLocation) {
-      if(this.radial) {
-        var r = (this.x(item) * 180 / Math.PI),
-            attrs = {
-            'x': null,
-            'y': null,
-            'r': (r + 180) * -1,  //we rotate each group so we have to un-rotate each title
-            'anchor': null
-          };
-
-        if(r > 10 && r <= 100) {
-          attrs.anchor = 'start';
-          attrs.x = 0;
-          attrs.y = this.length + 10;
-        } else if(r > 100 && r < 170) {
-          attrs.anchor = 'start';
-          attrs.x = -12 * Math.sin(Math.PI - this.x(item));
-          attrs.y = this.length + 10 + 12 * Math.cos(Math.PI - this.x(item));
-        } else if(r >= 170 && r <= 190){
-          attrs.anchor = 'middle';
-          attrs.x = -12 * Math.sin(Math.PI - this.x(item));
-          attrs.y = this.length + 10 + 12 ; //text size plus spacer
-        } else if(r > 190 && r < 260){
-          attrs.anchor = 'end';
-          attrs.x = -12 * Math.sin(Math.PI - this.x(item));
-          attrs.y = this.length + 10 + 12 * Math.cos(Math.PI - this.x(item));
-        } else if(r >= 260 && r < 355){
-          attrs.anchor = 'end';
-          attrs.x = 0;
-          attrs.y = this.length + 10;
-        } else {
-          attrs.anchor = 'middle';
-          attrs.x = -12 * Math.sin(Math.PI - this.x(item));
-          attrs.y = this.length + 10;
-        }
-        return attrs;
-      }
-      return titleLocation;
-    },
-
-    /**
-     * Forces a redraw of the titleLocation
-     *
-     */
-    _toggleTitleLocation: function() {
-      this.set('_pokeTitleLocation' , !this._pokeTitleLocation);
     },
 
     /**
@@ -561,38 +505,15 @@ Custom property | Description | Default
     //  * Deletes the brushes on its children axes
     //  *
     //  */
-    // deleteAllBrushes: function() {
+    // deleteBrush: function() {
     //   this.$.axisBrush.deleteAllBrushes();
     // },
-    //
-    // _getOrientation: function(axisId, orientationFromDimensions) {
-    //   if(orientationFromDimensions) {
-    //     var rDims = this.x.rightDomain();
-    //     if(rDims.indexOf(axisId) !== -1) {
-    //       return "right"
-    //     }
-    //     return "left"
-    //   }
-    //   return "left"
-    // },
 
-    _axisSizeChanged: function(leftSize, rightSize) {
-      if(leftSize && rightSize && this._doesD3HaveValues(this.svg) && this._doesD3HaveValues(this.svg.selectAll(".dimension"))) {
-        this.svg.selectAll(".dimension")
-          .attr("transform", function(d) {
-            return this.x(d) || this.x(d) === 0 ? "translate(" + this.x(d) + ",0)" : '';
-          }.bind(this));
-      }
-    },
+
 
     recalcTranform: function() {
       this._interactiveGroup.attr("transform", this._calcTransformation.bind(this));
     }
-
-    // _toggleOrientation: function() {
-    //   this.set('_pokeOrientation', !this._pokeOrientation);
-    // },
-
 
   });
 </script>

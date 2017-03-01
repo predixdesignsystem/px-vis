@@ -126,7 +126,9 @@ Custom property | Description | Default
           rebuild-on-draw="[[_rebuildOnDraw]]"
           disable-brush="[[disableBrush]]"
           drag-behavior="[[dragBehavior]]"
-          rebuild-on-draw="[[_rebuildOnDraw]]">
+          rebuild-on-draw="[[_rebuildOnDraw]]"
+          prevent-initial-drawing="[[preventInitialDrawing]]"
+          redraw-series="[[redrawSeries]]">
         </px-vis-interactive-axis>
       </template>
     </template>
@@ -399,7 +401,6 @@ Custom property | Description | Default
     },
 
     _axisDragged: function(e) {
-      console.log("dc")
       this.dimensions = e.detail.dimensions;
       try {
         this.x.domain(this.dimensions);
@@ -411,6 +412,8 @@ Custom property | Description | Default
 
     /**
      * At ready, set the margin and titleLocation objects
+     *
+     * Used for radar to rotate the title appropriately
      *
      */
     _computeTitleLocation: function(item, titleLocation) {
@@ -783,6 +786,7 @@ Custom property | Description | Default
       evt.stopPropagation();
       evt.stopImmediatePropagation();
     },
+
     _applyDisplayedTitlesChanged: function() {
       this.set('displayedValues', this._displayedTitlesBuilder);
       this._displayedTitlesCounter = 0;
