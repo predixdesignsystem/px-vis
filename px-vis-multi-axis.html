@@ -81,9 +81,11 @@ Custom property | Description | Default
       <style include="px-vis-styles"></style>
 
       <!-- don't bind domain changed since other props already depend on it, avoiding drawing each axis twice-->
+      <!-- don't double bind drawnTickValues or each axis update will trigger multi axis to reset the prop on every axis. Use event instead-->
       <template id="bof" is="dom-repeat" items="[[_internalDimensions]]" >
         <px-vis-interactive-axis
           id="[[item]]"
+          prevent-initial-drawing="[[preventInitialDrawing]]"
           class="multiAxis"
           svg="[[svg]]"
           x="[[x]]"
@@ -123,7 +125,8 @@ Custom property | Description | Default
           drawn-tick-values="[[drawnTickValues]]"
           rebuild-on-draw="[[_rebuildOnDraw]]"
           disable-brush="[[disableBrush]]"
-          drag-behavior="[[dragBehavior]]">
+          drag-behavior="[[dragBehavior]]"
+          rebuild-on-draw="[[_rebuildOnDraw]]">
         </px-vis-interactive-axis>
       </template>
     </template>
@@ -199,10 +202,7 @@ Custom property | Description | Default
        */
       displayedValues: {
         type: Object,
-        notify: true,
-        value: function() {
-          return {};
-        }
+        notify: true
       },
       /**
        * internal dimensions to defeat race condition
@@ -326,12 +326,10 @@ Custom property | Description | Default
         type: Boolean,
         value: true
       },
-
       _mutedSeriesPerBrush: {
         type: Object,
         value: function() { return {}; }
       },
-
       /**
        * counter to number of axis title that have been updated
        */
@@ -546,14 +544,14 @@ Custom property | Description | Default
 
           if(this.commonAxis) {
             this._commonAxisRanAtLeastOnce = true;
-            this.axisGroups.filter(":not(:first-child)").selectAll('g.tick text').classed('hideCommon',true);
+            this.axisGroups.filter(':not(:first-child)').selectAll('g.tick text').classed('hideCommon',true);
             this.axisGroups.selectAll('.hideCommon').style('display','none');
             this.axisGroups.on('mouseover',function(){
               Px.d3.select(this).selectAll('.hideCommon').style('display',null)
               Px.d3.select(this).selectAll('.hideCommon').style('fill',_this.colors.grey3)
             }).on('mouseleave',function(){
               Px.d3.select(this).selectAll('.hideCommon').style('display','none')
-              Px.d3.select(this).selectAll('.hideCommon').style('fill',"black")
+              Px.d3.select(this).selectAll('.hideCommon').style('fill','black')
             });
 
             this.set('recalcTicks', !this.recalcTicks);
@@ -569,26 +567,12 @@ Custom property | Description | Default
     },
 
     /*
-     * sets the displayed value of the title including truncation
-     *
-     */
-    _displayedTitleChanged: function(evt) {
-      var vals = this.displayedValues;
-      this.displayedValues = {};
-      vals[evt.detail.id] = evt.detail.displayedTitle;
-      this.set('displayedValues', vals);
-
-      evt.stopPropagation();
-      evt.stopImmediatePropagation();
-    },
-    /*
      * Sets _internalDimensions to the value of dimensions but trigged AFTER the scale
      * has been set. Avoids an annoying race condition where dimensions triggers a
      * chart refresh but the new scale has yet to be triggered
      *
      */
     _computedInternalDimensions: function(dC, dim) {
-
       //makes sure we dont try to process a new dim before it has a new scale.
       if(this._lastDomainChanged !== this.domainChanged) {
 
@@ -658,18 +642,18 @@ Custom property | Description | Default
       if(orientationFromDimensions) {
         var rDims = this.x.rightDomain();
         if(rDims.indexOf(axisId) !== -1) {
-          return "right"
+          return 'right'
         }
-        return "left"
+        return 'left'
       }
-      return "left"
+      return 'left'
     },
 
     _recalcGTransforms: function(leftSize, rightSize) {
-      if(leftSize && rightSize && this._doesD3HaveValues(this.svg) && this._doesD3HaveValues(this.svg.selectAll(".dimension"))) {
-        this.svg.selectAll(".dimension")
-          .attr("transform", function(d) {
-            return this.x(d) || this.x(d) === 0 ? "translate(" + this.x(d) + ",0)" : '';
+      if(leftSize && rightSize && this._doesD3HaveValues(this.svg) && this._doesD3HaveValues(this.svg.selectAll('.dimension'))) {
+        this.svg.selectAll('.dimension')
+          .attr('transform', function(d) {
+            return this.x(d) || this.x(d) === 0 ? 'translate(' + this.x(d) + ',0)' : '';
           }.bind(this));
       }
     },
@@ -804,6 +788,5 @@ Custom property | Description | Default
       this._displayedTitlesCounter = 0;
       this._displayedTitlesBuilder = {};
     }
-
   });
 </script>

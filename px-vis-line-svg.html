@@ -56,7 +56,8 @@ Element which draws lines series onto the chart
       PxVisBehavior.serieToRedrawOnTop,
       PxVisBehaviorD3.serieToRedrawOnTopSVG,
       PxVisBehaviorD3.domainUpdate,
-      PxColorsBehavior.baseColors
+      PxColorsBehavior.baseColors,
+      PxVisBehavior.preventInitialDrawing
     ],
 
     /**
@@ -138,7 +139,7 @@ Element which draws lines series onto the chart
     },
 
     observers: [
-      'drawElement(svg, y, domainChanged, chartData.*, completeSeriesConfig.*, counterClockwise)',
+      'drawElement(svg, y, domainChanged, chartData.*, completeSeriesConfig.*, counterClockwise, preventInitialDrawing)',
       'isIdInMuted(mutedSeries.*, completeSeriesConfig)',
       '_addClipPath(clipPath)',
       '_drawOnTop(serieToRedrawOnTop)'
@@ -162,13 +163,15 @@ Element which draws lines series onto the chart
      */
     drawElement: function() {
 
-      //if 0 don't debounce at all
-      if(this.drawDebounceTime > 0) {
-        this.debounce('draw',function() {
+      if(!this.preventInitialDrawing) {
+        //if 0 don't debounce at all
+        if(this.drawDebounceTime > 0) {
+          this.debounce('draw',function() {
+            this._drawElementDebounced();
+          }.bind(this), this.drawDebounceTime);
+        } else {
           this._drawElementDebounced();
-        }.bind(this), this.drawDebounceTime);
-      } else {
-        this._drawElementDebounced();
+        }
       }
     },
 

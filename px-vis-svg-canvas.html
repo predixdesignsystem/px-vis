@@ -36,8 +36,6 @@ Element which creates an Canvas element and context
       style$="height:[[height]]px; width:[[width]]px">
       <px-vis-svg
         class="abs-elem inline--flex"
-        on-px-vis-svg-updated="_refireEvent"
-        on-px-vis-svg-element-updated="_refireEvent"
         svg="{{svgLower}}"
         px-svg-elem="{{pxSvgElemLower}}"
         width="[[width]]"
@@ -47,7 +45,6 @@ Element which creates an Canvas element and context
       </px-vis-svg>
       <px-vis-canvas
         class="abs-elem inline--flex"
-        on-px-vis-canvas-context-updated="_refireEvent"
         canvas-context="{{canvasContext}}"
         width="[[width]]"
         height="[[height]]"
@@ -56,8 +53,6 @@ Element which creates an Canvas element and context
       </px-vis-canvas>
       <px-vis-svg
         class="abs-elem inline--flex"
-        on-px-vis-svg-updated="_refireEvent"
-        on-px-vis-svg-element-updated="_refireEvent"
         svg="{{svg}}"
         px-svg-elem="{{pxSvgElem}}"
         width="[[width]]"
@@ -87,15 +82,5 @@ Element which creates an Canvas element and context
          * @type Object
          */
         properties: {},
-
-        /**
-         * Refires the caught events for precipitation pattern. We must refire because canvas and svg are "local" properties and thus the depth of their origin matters.
-         *
-         */
-        _refireEvent: function(evt) {
-          evt.stopPropagation();
-
-          this.fire(evt.type,{ 'data': evt.detail.data, 'dataVar': evt.detail.dataVar, 'method': evt.detail.method });
-        }
     });
 </script>

@@ -138,62 +138,64 @@ Custom property | Description | Default
      */
     drawElement: function() {
       if(this.domainChanged !== null && this.svg) {
-        // TODO make brush width dynamic --> replace -10 & 10 with brushWidth/2
-        // brush range expects: [ [x1,y1] , [x2,y2] ]
-        var range = this.radial ?
-            [
-              [-10, this.centerOffset],
-              [10, this.height]
-            ] :
-            [
-              [-10, 0],
-              [10, Math.max(this.height - this.margin.top - this.margin.bottom, 1)]
-            ];
+        this.debounce('_axisBrush', function() {
+          // TODO make brush width dynamic --> replace -10 & 10 with brushWidth/2
+          // brush range expects: [ [x1,y1] , [x2,y2] ]
+          var range = this.radial ?
+              [
+                [-10, this.centerOffset],
+                [10, this.height]
+              ] :
+              [
+                [-10, 0],
+                [10, Math.max(this.height - this.margin.top - this.margin.bottom, 1)]
+              ];
 
-        // check that our sizing is ok and wont freak d3 out.
-        // x2 and y2 must be greater than x1 & y1
-        range[1][0] = (range[1][0] > range[0][0]) ? range[1][0] : range[0][0];
-        range[1][1] = (range[1][1] > range[0][1]) ? range[1][1] : range[0][1];
+          // check that our sizing is ok and wont freak d3 out.
+          // x2 and y2 must be greater than x1 & y1
+          range[1][0] = (range[1][0] > range[0][0]) ? range[1][0] : range[0][0];
+          range[1][1] = (range[1][1] > range[0][1]) ? range[1][1] : range[0][1];
 
-        // check if we already have a brush
-        // if so, update the brush when resize occurs
-        if(this._doesD3HaveValues(this._brushD3)) {
+          // check if we already have a brush
+          // if so, update the brush when resize occurs
+          if(this._doesD3HaveValues(this._brushD3)) {
 
-          //set appropriate range
-          this._brushD3.call(
-            this._brush.extent(range)
-              .on("start.brush", this.brushstart.bind(this))
-              .on("end.brush", this.brushEnd.bind(this))
-          );
+            //set appropriate range
+            this._brushD3.call(
+              this._brush.extent(range)
+                .on("start.brush", this.brushstart.bind(this))
+                .on("end.brush", this.brushEnd.bind(this))
+            );
 
-        } else {
-          // create a new brush
-          var b = this.svg.append("g")
-            .attr("class", "brush");
-          b.call(
-            this._brush = Px.d3.brushY()
-              .extent(range)
-              .on("start.brush", this.brushstart.bind(this))
-              // TODO make a flag so brushing is dynamic instead of just at the end
-              // .on("brush.brush", this.brush.bind(this))
-              .on("end.brush", this.brushEnd.bind(this))
-          );
+          } else {
+            // create a new brush
+            var b = this.svg.append("g")
+              .attr("class", "brush");
+            b.call(
+              this._brush = Px.d3.brushY()
+                .extent(range)
+                .on("start.brush", this.brushstart.bind(this))
+                // TODO make a flag so brushing is dynamic instead of just at the end
+                // .on("brush.brush", this.brush.bind(this))
+                .on("end.brush", this.brushEnd.bind(this))
+            );
 
-          b.selectAll("rect.selection")
-            .attr("fill", this._checkThemeVariable("--px-vis-axis-brush-fill-color", this.colors.grey5))
-            .attr("fill-opacity", this._checkThemeVariable("--px-vis-axis-brush-fill-opacity", 0.3))
-            .attr("stroke", this._checkThemeVariable("--px-vis-axis-brush-outline-color", this.colors["primary-blue"]));
+            b.selectAll("rect.selection")
+              .attr("fill", this._checkThemeVariable("--px-vis-axis-brush-fill-color", this.colors.grey5))
+              .attr("fill-opacity", this._checkThemeVariable("--px-vis-axis-brush-fill-opacity", 0.3))
+              .attr("stroke", this._checkThemeVariable("--px-vis-axis-brush-outline-color", this.colors["primary-blue"]));
 
-          // save our references
-          this._brushD3 = b;
-          this._brushElem = b.node();
+            // save our references
+            this._brushD3 = b;
+            this._brushElem = b.node();
 
-        }
+          }
 
-        if(this.brushToRemove) {
-          this._brushD3.selectAll("rect.selection")
-            .attr("stroke-dasharray", ("5, 5"));
-        }
+          if(this.brushToRemove) {
+            this._brushD3.selectAll("rect.selection")
+              .attr("stroke-dasharray", ("5, 5"));
+          }
+        }, 10);
       }
     },
 
