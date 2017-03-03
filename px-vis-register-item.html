@@ -210,23 +210,23 @@ Custom property | Description | Default
     ],
     attached: function() {
 
-      this._registerMenuHandlers();
+      this._mouseEnterHandler = function() {
+
+        if(this._hasDynamicMenu && !this.$.menu) {
+          this.$.menu = this.$$('px-vis-dynamic-menu');
+        }
+
+        this.$.menu.fadeIn();
+      }.bind(this);
+      this._mouseLeaveHandler = function() {
+        this.$.menu.fadeOut();
+      }.bind(this);
+      this.addEventListener('mouseenter', this._mouseEnterHandler);
+      this.addEventListener('mouseleave', this._mouseLeaveHandler);
     },
     detached: function() {
       this.removeEventListener('mouseenter', this._mouseEnterHandler);
       this.removeEventListener('mouseleave', this._mouseLeaveHandler);
-    },
-    _registerMenuHandlers: function() {
-      if(this.$.menu) {
-        this._mouseEnterHandler = function() {
-          this.$.menu.fadeIn();
-        }.bind(this);
-        this._mouseLeaveHandler = function() {
-          this.$.menu.fadeOut();
-        }.bind(this);
-        this.addEventListener('mouseenter', this._mouseEnterHandler);
-        this.addEventListener('mouseleave', this._mouseLeaveHandler);
-      }
     },
     /**
      * returns the unit for the x value based on the seriesConfig
@@ -284,13 +284,6 @@ Custom property | Description | Default
 
     _menuConfigChanged: function(dynamicMenuConfig) {
       this._hasDynamicMenu = dynamicMenuConfig.length > 0;
-
-      //if this is the first time we're showing up register the menu element
-      if(this._hasDynamicMenu && !this.$.menu) {
-        this.$.menuTemplate.render();
-        this.$.menu = this.$$('px-vis-dynamic-menu');
-        this._registerMenuHandlers();
-      }
     }
 
   });
