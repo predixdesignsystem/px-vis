@@ -458,7 +458,8 @@ Custom property | Description | Default
               if(this.rebuildOnDraw) {
                 this.removeAxis();
               }
-                          this.defineAxis();
+              
+               this.defineAxis();
               if(!this._axisGroup) {
                 this._buildAxis();
               } else {
@@ -868,6 +869,8 @@ Custom property | Description | Default
          * redraws title on change
          */
         _titleChanged: function(displayedTitle) {
+          //right now we're debouncing to makew sure the title is drawn in the right place.
+          //TODO: find out why we need this and remove it
           this.debounce('drawTitle', function() {
             if(!this._removingAxis) {
                 if(this._doesObjHaveValues(this._axisGroup) && this._axisGroup.node() !== null && 
@@ -876,7 +879,7 @@ Custom property | Description | Default
                   this.drawTitle();
                 }
             }
-          }.bind(this), 5);
+          }.bind(this), 10);
         },
 
         /**
