@@ -298,9 +298,8 @@ Custom property | Description | Default
     _calcMutedSeries: function(extents) {
       // if the brush has been cleared
       if(!extents || extents.length === 0) {
-        // this.brushDomains[this.dimension] = [];
 
-        // this.fire('px-vis-brush-brush-domain-updated', { 'data': [], 'dimension': this.dimension });
+        this.fire('px-vis-brush-brush-domain-delete', { 'data': [], 'dimension': this.dimension });
 
         this.set('mutedSeries', {});
         this.fire('px-vis-brush-muted-series-updated', { 'data': {}, 'dimension': this.dimension });
@@ -433,13 +432,13 @@ Custom property | Description | Default
     /**
      * Final update on a brush end event
      */
-    clearBrush: function(bid) {
-      // figure out if it was is being removed and has a brush and clear the brush if so
-      if(this.dimension === bid && Px.d3.brushSelection(this._brushElem)) {
-        this._brushD3.call(this._brush.move, null);
-      }
-
-    },
+    // clearBrush: function(bid) {
+    //   // figure out if it was is being removed and has a brush and clear the brush if so
+    //   if(this.dimension === bid && Px.d3.brushSelection(this._brushElem)) {
+    //     this._brushD3.call(this._brush.move, null);
+    //   }
+    //
+    // },
 
     /**
      * deletes a brush
