@@ -129,7 +129,8 @@ Custom property | Description | Default
           rebuild-on-draw="[[_rebuildOnDraw]]"
           prevent-initial-drawing="[[preventInitialDrawing]]"
           redraw-series="[[redrawSeries]]"
-          brush-domains="[[_brushDomains]]">
+          brush-domains="[[_brushDomains]]"
+          hide-and-show-on-hover="[[_isFirst(index)]]">
         </px-vis-interactive-axis>
       </template>
     </template>
@@ -376,7 +377,6 @@ Custom property | Description | Default
       'px-vis-drag-dimension-swapped' : '_axisDragged',
       'px-vis-brush-brush-domain-updated' : '_updateBrushDomains',
 
-      'px-axis-done': '_setAxisStyles',
       'px-vis-axis-displayed-title-changed': '_displayedTitleChanged',
       'px-vis-recalc-title-location' : '_toggleTitleLocation',
       "px-axis-orientation-changed" : '_toggleOrientation',
@@ -415,6 +415,10 @@ Custom property | Description | Default
 
     _updateBrushDomains: function(e) {
       this._brushDomains[e.detail.dimension] = e.detail.data;
+    },
+
+    _deleteBrushDomains: function(e) {
+      delete this._brushDomains[e.detail.dimension];
     },
 
     /**
@@ -534,46 +538,6 @@ Custom property | Description | Default
      */
     _calcGridAxis: function(dim){
       this.set('gridAxis', this._returnY(dim));
-    },
-    /*
-     * Sets styles and on hover for common axis
-     *
-     */
-    _setAxisStyles: function(e) {
-      if(this.axisGroups){
-        var _this = this,
-            axisCount = this._internalDimensions.length;
-
-        //count the axis so that we only run that function once as opposed as the number of axis
-        this._axisDoneCounter = this._axisDoneCounter % axisCount;
-        this._axisDoneCounter++;
-
-        if(this._axisDoneCounter === axisCount) {
-
-          this._rebuildOnDraw = false;
-
-          if(this.commonAxis) {
-            this._commonAxisRanAtLeastOnce = true;
-            this.axisGroups.filter(':not(:first-child)').selectAll('g.tick text').classed('hideCommon',true);
-            this.axisGroups.selectAll('.hideCommon').style('display','none');
-            this.axisGroups.on('mouseover',function(){
-              Px.d3.select(this).selectAll('.hideCommon').style('display',null)
-              Px.d3.select(this).selectAll('.hideCommon').style('fill',_this.colors.grey3)
-            }).on('mouseleave',function(){
-              Px.d3.select(this).selectAll('.hideCommon').style('display','none')
-              Px.d3.select(this).selectAll('.hideCommon').style('fill','black')
-            });
-
-            this.set('recalcTicks', !this.recalcTicks);
-          } else if(this._commonAxisRanAtLeastOnce) {
-
-            this.axisGroups.selectAll('.hideCommon').style('display',null);
-            this.axisGroups.selectAll('.hideCommon').classed('hideCommon',false);
-
-            this.set('recalcTicks', !this.recalcTicks);
-          }
-        }
-      }
     },
 
     /*
@@ -712,6 +676,9 @@ Custom property | Description | Default
 
     _combineMutedSeries: function() {
       this.debounce('_combineMutedSeries', function() {
+
+        this._cleanUpMutedSeries();
+
         var dims = Object.keys(this._mutedSeriesPerBrush),
             series = {};
 
@@ -737,6 +704,18 @@ Custom property | Description | Default
           deletes if false.
         */
         fullSeries[k] = true;
+      }
+    },
+
+    _cleanUpMutedSeries: function() {
+      var dims = Object.keys(this._brushDomains);
+
+      for(var i = 0; i < dims.length; i++) {
+        var d = dims[i];
+        if(this._internalDimensions.indexOf(d) === -1) {
+          delete this._mutedSeriesPerBrush[d];
+          delete this._brushDomains[d];
+        }
       }
     },
 
@@ -806,6 +785,14 @@ Custom property | Description | Default
       this.set('displayedValues', this._displayedTitlesBuilder);
       this._displayedTitlesCounter = 0;
       this._displayedTitlesBuilder = {};
+    },
+
+    _isFirst: function(index) {
+      if(!this.commonAxis) {
+        return false;
+      }
+
+      return index === 0 ? false : true;
     }
   });
 </script>
