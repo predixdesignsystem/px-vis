@@ -319,56 +319,37 @@ PxVisBehaviorDrag.parallelAxisDrag = [{
 */
 PxVisBehaviorDrag.cartesianDrag = [{
     createCartesianDrag: function() {
-      var _this = this;
-
       var dragBehavior = Px.d3.drag()
         .on("start.drag", this._onCartesianDragStart.bind(this))
         .on("drag.drag", this._onCartesianDrag.bind(this))
-        .on("end.drag", function(d) {
-
-          _this._dragging = {};
-
-          // make the axis snap into place
-          _this.transition(Px.d3.select(this))
-            .attr("transform", function(a) {
-              return "translate(" + _this.x(a) + ",0)";
-            });
-
-          if(_this.redrawSeries){
-            // redraw the lines
-            _this.set('completeSeriesConfig.*.x',_this.dimensions);
-            _this.fire('px-vis-complete-series-config', { 'data': _this.dimensions, 'dataVar': 'completeSeriesConfig.*.x' ,'method': 'set' });
-
-            _this.fire('px-vis-redraw-lines');
-          }
-
-          // alert parents that we are done moving the axis
-          _this.fire("px-axis-drag-done");
-        });
+        .on("end.drag",this._onCartesianDragEnd.bind(this));
 
       this.set('dragBehavior', dragBehavior);
     },
+
     /**
      * When an axis starts being dragged
      *
      */
-    _onCartesianDragStart: function(d) {
+    _onCartesianDragStart: function() {
       //reset dragging var
       this._dragging = {};
       //set equal to our axis
-      this._dragging[d] = this.x(d);
+      this._dragging[this.dimension] = this.x(this.dimension);
     },
     /**
      * When an axis is dragged
      *
      */
-    _onCartesianDrag: function(d) {
+    _onCartesianDrag: function() {
       this.debounce('drag', function(e) {
         var rDims = this.x.rightDomain(),
             lDims = this.x.leftDomain(),
+            d = this.dimension,
             side = rDims.indexOf(d) !== -1 ? "right" : "left",
             num = rDims.indexOf(d) !== -1 ? rDims.indexOf(d) : lDims.indexOf(d),
-            orientationChanged = false;
+            orientationChanged = false,
+            swappedDim = null;
 
         //get the x coordinate bounded by our chart extents
         if(side === 'left') {
@@ -381,9 +362,21 @@ PxVisBehaviorDrag.cartesianDrag = [{
         this.dimensions.sort(function(a, b) {
           // if the axes are on the same side
           if(lDims.indexOf(a) !== -1 && lDims.indexOf(b) !== -1) {
-            return this._position(b) - this._position(a);
+            var p = this._position(b) - this._position(a);
+            // if we are going to swap, figure out which we are swapping with so we can move it into place later
+            if(p > 0) {
+              swappedDim = a === this.dimension ? b : a;
+            }
+
+            return p;
           } else if(rDims.indexOf(a) !== -1 && rDims.indexOf(b) !== -1) {
-            return this._position(a) - this._position(b);
+            var p = this._position(a) - this._position(b);
+            // if we are going to swap, figure out which we are swapping with so we can move it into place later
+            if(p > 0) {
+              swappedDim = a === this.dimension ? b : a;
+            }
+
+            return p;
 
           // if the axes are on different sides
           } else {
@@ -401,7 +394,23 @@ PxVisBehaviorDrag.cartesianDrag = [{
           }
         }.bind(this));
 
-        if(orientationChanged) {
+        if(swappedDim) {
+          var l = lDims.length,
+              r = rDims.length,
+              newLDims = this.dimensions.slice(0,l),
+              newRDims = this.dimensions.slice(l);
+
+          this.x.leftDomain(newLDims);
+          this.x.rightDomain(newRDims);
+
+          this.fire('px-vis-drag-dimension-swapped', {
+            "dimensions" : this.dimensions,
+            "lDims" : newLDims,
+            "rDims" : newRDims,
+            "swappedDim": swappedDim
+          });
+
+        } else if(orientationChanged) {
           var l = lDims[0];
           lDims[0] = rDims[0];
           rDims[0] = l;
@@ -409,7 +418,7 @@ PxVisBehaviorDrag.cartesianDrag = [{
           this.x.leftDomain(lDims);
           this.x.rightDomain(rDims);
 
-          this.set('dimensions', lDims.concat(rDims));
+          this.dimensions = lDims.concat(rDims);
 
           this.fire("px-axis-orientation-changed");
         } else {
@@ -422,13 +431,24 @@ PxVisBehaviorDrag.cartesianDrag = [{
         }
 
         // move the currently grabed axis (and reorder the others if above is active)
-        this.axisGroups.attr("transform", function(d) {
-          return "translate(" + this._position(d) + ",0)";
+        this._interactiveGroup.attr("transform", function() {
+          return "translate(" + this._position(this.dimension) + ",0)";
         }.bind(this));
 
       }.bind(this,Px.d3.event),1);
+    },
+    _onCartesianDragEnd: function() {
+
+      this._dragging = {};
+
+      // make the axis snap into place
+      this.transition(this._interactiveGroup)
+        .attr("transform", function() {
+          return "translate(" + this.x(this.dimension) + ",0)";
+        }.bind(this));
+
+      // alert parents that we are done moving the axis
+      this.fire("px-axis-drag-done");
     }
-  },
-  PxVisBehaviorDrag.basicProps
-];
+  }, PxVisBehaviorDrag.basicProps];
 </script>

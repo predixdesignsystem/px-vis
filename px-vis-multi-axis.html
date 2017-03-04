@@ -130,7 +130,8 @@ Custom property | Description | Default
           prevent-initial-drawing="[[preventInitialDrawing]]"
           redraw-series="[[redrawSeries]]"
           brush-domains="[[_brushDomains]]"
-          hide-and-show-on-hover="[[_isFirst(index)]]">
+          hide-and-show-on-hover="[[_isFirst(index)]]"
+          cartesian-drag-behavior="[[cartesianDragBehavior]]">
         </px-vis-interactive-axis>
       </template>
     </template>
@@ -409,8 +410,17 @@ Custom property | Description | Default
     },
 
     _axisDragged: function(e) {
-      this.dimensions = e.detail.dimensions;
-      this.x.domain(this.dimensions);
+      if(this.cartesianDrag) {
+        this.x.leftDomain(e.detail.lDims);
+        this.x.rightDomain(e.detail.rDims);
+
+        this.dimensions = e.detail.dimensions;
+
+      } else {
+        this.dimensions = e.detail.dimensions;
+        this.x.domain(this.dimensions);
+      }
+
       this.$$('px-vis-interactive-axis#' + e.detail.swappedDim).recalcTranform();
     },
 
