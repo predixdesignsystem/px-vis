@@ -211,15 +211,21 @@ Custom property | Description | Default
     attached: function() {
 
       this._mouseEnterHandler = function() {
-        //store a ref to the menu
-        if(this._hasDynamicMenu && !this.$.menu) {
-          this.$.menu = this.$$('px-vis-dynamic-menu');
-        }
+        
+        if(this._hasDynamicMenu) {
+          
+          //store a ref to the menu if we don't have it yet
+          if(!this.$.menu) {
+            this.$.menu = this.$$('px-vis-dynamic-menu');
+          }
 
-        this.$.menu.fadeIn();
+          this.$.menu.fadeIn();
+        }
       }.bind(this);
       this._mouseLeaveHandler = function() {
-        this.$.menu.fadeOut();
+        if(this._hasDynamicMenu && this.$.menu) {
+          this.$.menu.fadeOut();
+        }
       }.bind(this);
       
       this.addEventListener('mouseenter', this._mouseEnterHandler);
@@ -283,8 +289,8 @@ Custom property | Description | Default
       }
     },
 
-    _menuConfigChanged: function(dynamicMenuConfig) {
-      this._hasDynamicMenu = dynamicMenuConfig.length > 0;
+    _menuConfigChanged: function() {
+      this._hasDynamicMenu = this.dynamicMenuConfig && this.dynamicMenuConfig.length > 0;
     }
 
   });
