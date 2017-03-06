@@ -2,9 +2,8 @@
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-chart.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
-<link rel="import" href="px-vis-axis.html"/>
+<link rel="import" href="px-vis-interactive-axis.html"/>
 <link rel="import" href="px-vis-axis-brush.html"/>
-<link rel="import" href="px-vis-behavior-axis-drag.html"/>
 <link rel="import" href="../px-colors-design/colors.html" />
 
 <!--
@@ -84,16 +83,22 @@ Custom property | Description | Default
       <!-- don't bind domain changed since other props already depend on it, avoiding drawing each axis twice-->
       <!-- don't double bind drawnTickValues or each axis update will trigger multi axis to reset the prop on every axis. Use event instead-->
       <template id="bof" is="dom-repeat" items="[[_internalDimensions]]" >
-        <px-vis-axis
+        <px-vis-interactive-axis
           id="[[item]]"
           prevent-initial-drawing="[[preventInitialDrawing]]"
           class="multiAxis"
-          svg="[[_returnGroup(item, index, _internalDimensionsChanged)]]"
-          axis="[[_returnY(item, _internalDimensionsChanged)]]"
-          series-id="[[item]]"
+          svg="[[svg]]"
+          x="[[x]]"
+          y="[[_returnY(item, _internalDimensionsChanged)]]"
+          dimension="[[item]]"
+          axes="[[axes]]"
+          dimensions="[[dimensions]]"
+          series-key="[[seriesKey]]"
           height="[[_heightOrLen]]"
           width="[[width]]"
           margin="[[margin]]"
+          chart-data="[[chartData]]"
+          radial="[[radial]]"
           orientation="[[_getOrientation(item, orientationFromDimensions, domainChanged, _pokeOrientation)]]"
           title="[[_getTitle(item,completeSeriesConfig, axisConfig)]]"
           title-location='[[_computeTitleLocation(item, titleLocation, _pokeTitleLocation)]]'
@@ -107,7 +112,7 @@ Custom property | Description | Default
           append-unit-in-title="[[appendUnitInTitle]]"
           unit="[[_getUnit(item, completeSeriesConfig)]]"
           prevent-series-bar="[[preventSeriesBar]]"
-          domain-changed=true
+          domain-changed="[[_internalDimensionsChanged]]"
           selected-domain="[[selectedDomain]]"
           title-truncation
           disable-ticks="[[_calcDisableTicks(item,recalcTicks)]]"
@@ -118,26 +123,16 @@ Custom property | Description | Default
           label-translation="[[labelTranslation]]"
           series-on-axis="[[_returnSeriesArray(seriesToAxes, item)]]"
           muted-series="[[mutedSeries]]"
-          rebuild-on-draw="[[_rebuildOnDraw]]">
-        </px-vis-axis>
-      </template>
-      <template is="dom-if" if="[[!disableBrush]]">
-        <px-vis-axis-brush
-          id="axisBrush"
-          svg="[[axisGroups]]"
-          parent-svg="[[svg]]"
-          height="[[_heightOrLen]]"
-          axis="[[y]]"
-          margin="[[margin]]"
-          chart-data="[[chartData]]"
-          dimensions="[[dimensions]]"
-          series-key="[[seriesKey]]"
-          domain-changed="[[_internalDimensionsChanged]]"
-          muted-series="{{mutedSeries}}"
-          radial="[[radial]]"
-          center-offset="[[centerOffset]]"
-          brush-to-remove="[[brushToRemove]]">
-        </px-vis-axis-brush>
+          drawn-tick-values="[[drawnTickValues]]"
+          rebuild-on-draw="[[_rebuildOnDraw]]"
+          disable-brush="[[disableBrush]]"
+          drag-behavior="[[dragBehavior]]"
+          prevent-initial-drawing="[[preventInitialDrawing]]"
+          redraw-series="[[redrawSeries]]"
+          brush-domains="[[_brushDomains]]"
+          hide-and-show-on-hover="[[_isFirst(index)]]"
+          cartesian-drag-behavior="[[cartesianDragBehavior]]">
+        </px-vis-interactive-axis>
       </template>
     </template>
 </dom-module>
@@ -148,7 +143,7 @@ Custom property | Description | Default
     is: 'px-vis-multi-axis',
 
     behaviors: [
-      PxVisBehaviorD3.svg,
+      PxVisBehavior.svgDefinition,
       PxVisBehavior.sizing,
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.commonMethods,
@@ -163,8 +158,6 @@ Custom property | Description | Default
       PxVisBehavior.radial,
       PxVisBehaviorD3.radialAxisConfig,
       PxVisBehavior.seriesToAxes,
-      PxVisBehaviorDrag.parallelAxisDrag,
-      PxVisBehaviorDrag.cartesianDrag,
       PxColorsBehavior.baseColors,
       PxVisBehaviorChart.subConfiguration,
       PxVisBehavior.preventInitialDrawing
@@ -177,37 +170,7 @@ Custom property | Description | Default
      * @type Object
      */
     properties: {
-      /**
-       * A dictionary of g elems for each dimension
-       *
-       */
-      axisGroups: {
-        type: Object,
-        notify: true
-      },
-      /**
-       * A dictionary of g elems for each dimension
-       *
-       */
-      brushElems: {
-        type: Object,
-        notify: true
-      },
-      /**
-       * A holder for the drag behavior
-       *
-       */
-      dragBehavior: {
-        type: Object,
-        notify: true
-      },
-      /**
-       * A clone svg group to draw the axis to in order to ensure they are on top
-       *
-       */
-      svg: {
-        type: Object
-      },
+
       /**
        * A boolean to specify if the axis ticks should align or each have their own ranges
        *
@@ -341,8 +304,7 @@ Custom property | Description | Default
       },
       cartesianDragBehavior: {
         type: Boolean,
-        value: false,
-        observer: '_setDragBehavior'
+        value: false
       },
       _pokeOrientation: {
         type: Boolean,
@@ -369,6 +331,10 @@ Custom property | Description | Default
         type: Boolean,
         value: true
       },
+      _mutedSeriesPerBrush: {
+        type: Object,
+        value: function() { return {}; }
+      },
       /**
        * counter to number of axis title that have been updated
        */
@@ -391,58 +357,144 @@ Custom property | Description | Default
       _drawnTickValuesChangedCounter: {
         type: Number,
         value: 0
+      },
+
+      _brushDomains: {
+        type: Object,
+        value: function() { return {}; }
       }
+
     },
 
     observers: [
       '_axisConfigChanged(axisConfig.*)',
-      '_computedInternalDimensions(domainChanged, x, dimensions, svg, dragBehavior)',
+      '_computedInternalDimensions(domainChanged, x, dimensions)',
       '_recalcGTransforms(leftAxisSize, rightAxisSize)',
       '_toggleTitleLocation(length)'
     ],
 
     listeners:{
-      'px-axis-done': '_setAxisStyles',
+      'px-vis-brush-muted-series-updated' : '_mutedSeriesFromBrush',
+      'px-vis-drag-dimension-swapped' : '_axisDragged',
+      'px-vis-drag-update-title-location' : '_toggleTitleLocation',
+      'px-vis-brush-brush-domain-updated' : '_updateBrushDomains',
+      'px-vis-brush-brush-domain-delete' : '_deleteBrushDomains',
+
       'px-vis-axis-displayed-title-changed': '_displayedTitleChanged',
       'px-vis-recalc-title-location' : '_toggleTitleLocation',
-      'px-axis-orientation-changed' : '_toggleOrientation',
+      "px-axis-orientation-changed" : '_toggleOrientation',
       'dom-change': '_axisConfigChanged',
       'px-vis-axis-drawn-tick-values-changed': '_drawnTickValuesChanged'
     },
 
-    _setDragBehavior: function() {
-      if(this.cartesianDragBehavior) {
-        this.createCartesianDrag();
-      } else {
-        this.createParallelAxisDrag();
-      }
-    },
-
     _axisConfigChanged: function(conf) {
-      if(this.axisConfig) {
-        var axes = Object.keys(this.axisConfig);
+      if(this.axisConfig && this._doesObjHaveValues(this.dimensions)) {
+        var keys = Object.keys(this.axisConfig),
+            hasProps = false,
+            hasAC = false,
+            props = {},
+            propKeys = [],
+            configs = {},
+            axesConfigs = [];
 
         // iterate through the axisConfig keys
-        for(var i = 0; i < axes.length; i++) {
-          // if the key is an axis and the config is a set of configs, apply them to the axis
-          if(this.$$('#' + axes[i]) && typeof this.axisConfig[axes[i]] === 'object') {
-            this._applyConfigToElement(this.axisConfig[axes[i]], this.$$('#' + axes[i]));
+        for(var i = 0; i < keys.length; i++) {
+          var k = keys[i];
 
-          // if it is just a key, assume it is a property and set on all axes
+          // if it is just a key, it is a property to apply to everyone
+          if(this.dimensions.indexOf(k) === -1) {
+            props[k] = this.axisConfig[k];
+            propKeys.push(k);
+            hasProps = true;
+
+          // if the key is an axis, save for later
           } else {
-            var elems = Polymer.dom(this.root).querySelectorAll('.multiAxis');
-            if(elems) {
-              for(var j = 0; j < elems.length; j++) {
-                elems[j].set(axes[i], this.axisConfig[axes[i]]);
-              }
+            axesConfigs.push({ k : this.axisConfig[k] });
+            hasAC = true;
+
+          }
+        }
+
+        // if we dont have raw properties but do have axis specific configs, just apply the configs
+        if(!hasProps && hasAC) {
+          for(var i =0; i < axesConfigs.length; i++) {
+            var obj = axesConfigs[i],
+                a = Object.keys(obj);
+
+            this.$$('#' + a).set('axisConfig', obj);
+          }
+
+          return;
+        }
+
+        // if we have raw properties
+        if(hasProps) {
+          // first, create configs for each dimension
+          for(var i = 0 ; i < this.dimensions.length; i++) {
+            configs[this.dimensions[i]] = this._copyConfig(propKeys, props);
+          }
+        }
+
+        // if we have config objects and props, mix em
+        if(hasAC) {
+          for(var i = 0; i < axesConfigs.length; i++) {
+            var obj = axesConfigs[i],
+                a = Object.keys(obj),
+                confKeys = Object.keys(axesConfigs[i][a]);
+
+            configs[a] = configs[a] || {};
+
+            for(var j = 0; j < confKeys.length; j++) {
+              configs[a][confKeys[j]] = obj[a][confKeys[j]];
             }
           }
+        }
+
+        // apply the configs
+        for(var i = 0; i < this.dimensions.length; i++) {
+          var a = this.dimensions[i]
+          this.$$('#' + a).set('axisConfig', configs[a]);
         }
       }
     },
 
+    _copyConfig: function(k, conf) {
+      var c = {};
+
+      for(var i = 0; i < k.length; i++) {
+        c[k[i]] = conf[k[i]];
+      }
+
+      return c;
+    },
+
+    _axisDragged: function(e) {
+      if(this.cartesianDrag) {
+        this.x.leftDomain(e.detail.lDims);
+        this.x.rightDomain(e.detail.rDims);
+
+        this.dimensions = e.detail.dimensions;
+
+      } else {
+        this.dimensions = e.detail.dimensions;
+        this.x.domain(this.dimensions);
+      }
+
+      this.$$('px-vis-interactive-axis#' + e.detail.swappedDim).recalcTranform();
+    },
+
+    _updateBrushDomains: function(e) {
+      this._brushDomains[e.detail.dimension] = e.detail.data;
+    },
+
+    _deleteBrushDomains: function(e) {
+      delete this._brushDomains[e.detail.dimension];
+    },
+
     /**
      * At ready, set the margin and titleLocation objects
+     *
+     * Used for radar to rotate the title appropriately
      *
      */
     _computeTitleLocation: function(item, titleLocation) {
@@ -505,115 +557,6 @@ Custom property | Description | Default
     },
 
     /**
-     * Generates a group elem for each dimension and moves it into the correct x coordinate
-     *
-     */
-    _generateGs: function() {
-      if(this._doesD3HaveValues(this.svg)) {
-
-        var _this = this,
-            resetTitles = false,
-            removed = this.svg.selectAll('.dimension').data().filter(function(d){
-              if(_this.dimensions.indexOf(d) === -1){
-                // _this.$.axisBrush.clearBrush(d);
-                delete _this.displayedValues[d];
-                resetTitles = true;
-                return true
-              }
-              return false
-            });
-
-
-        // generate axis based on the dimensions
-        var g = this.svg.selectAll('.dimension')
-          // .data(this.dimensions);
-          .data(this.dimensions, function(d) { return d; });
-
-        g.exit()
-          .each(function(d){
-            // this.$.axisBrush.clearBrush(d);
-            delete this.displayedValues[d];
-            resetTitles = true;
-          }.bind(this)).remove();
-        g.enter()
-          .append('g')
-          .attr('class', 'dimension')
-          .attr('axis-number', function(d,i) { return i; })
-          .on('mousemove', function(d) {
-            // TODO add a check that we want it to fire these events?
-
-            // Dont know why, but need to do this calc before the debounce
-            var m = Px.d3.mouse(this),
-                elem = this;
-
-            _this.debounce('axisMouseMove', function() {
-              var deets = {
-                'axis': d,
-                'elem': elem,
-                'mousePos': m
-              }
-              _this.fire('px-vis-multi-axis-mousemove', deets);
-            },10);
-          })
-          .on('mouseleave',function(d){
-            var deets = {
-              'axis': d,
-              'elem': this,
-              'mousePos': Px.d3.mouse(this)
-            }
-            _this.fire('px-vis-multi-axis-mouseleave', deets);
-          })
-          .style('cursor','move')
-          .call(this.dragBehavior)
-        .merge(g)
-          .attr('dimension', function(d) { return d })
-          .attr('transform', function(d) {
-            if(this.radial) {
-            /*
-            +180 to flip orientation of axes to start at top (which matches where lines start)
-                 180                        0
-                ____                       ____
-              .'    `.                   .'    `.
-             /        \                 /        \
-          90|          | 270  -->  270 |          |90
-             \        /                 \        /
-              `.____.'                   `.____.'
-                 0                          180
-            */
-              return this.x(d) || this.x(d) === 0 ? 'rotate(' + (this.x(d) * 180 / Math.PI + 180) + ')' : ''
-            }
-            return this.x(d) || this.x(d) === 0 ? 'translate(' + this.x(d) + ',0)' : '';
-          }.bind(this));
-          // if we removed titles from the array make sure we notify
-          if(resetTitles) {
-            var newValues = this.displayedValues;
-            this.displayedValues = {};
-            this.set('displayedValues', newValues);
-          }
-
-        // TODO When we support muting an axes, might want to be able to access the above g and change the transform
-        this.set('axisGroups', this.svg.selectAll('.dimension'));
-        this.set('brushElems', this.axisGroups.selectAll('g.brush').nodes());
-
-        //poke the titles
-        this.set('_pokeTitleLocation',!this._pokeTitleLocation);
-
-        //sometime after draw (doesnt entirely matter when since it is for an interaction piece), move the brushes on top of everything so they dont get interrupted by other things drawn on top
-        setTimeout(function(){
-          this.axisGroups.selectAll('g.brush').raise();
-        }.bind(this),200);
-      }
-    },
-
-    /**
-     * Returns an indivdual d3 selected element
-     *
-     */
-    _returnGroup: function(item, i) {
-      return this.axisGroups.filter('[dimension=' + item + ']')
-      // return Px.d3.select(this.axisGroups.nodes()[i])
-    },
-    /**
      * returns the appropriate scale for a dimension
      *
      */
@@ -666,53 +609,7 @@ Custom property | Description | Default
     _calcGridAxis: function(dim){
       this.set('gridAxis', this._returnY(dim));
     },
-    /*
-     * Sets styles and on hover for common axis
-     *
-     */
-    _setAxisStyles: function(e) {
-      if(this.axisGroups){
-        var _this = this,
-            axisCount = this._internalDimensions.length;
 
-        //count the axis so that we only run that function once as opposed as the number of axis
-        this._axisDoneCounter = this._axisDoneCounter % axisCount;
-        this._axisDoneCounter++;
-
-        if(this._axisDoneCounter === axisCount) {
-
-          this._rebuildOnDraw = false;
-
-          if(this.commonAxis) {
-            this._commonAxisRanAtLeastOnce = true;
-            this.axisGroups.filter(':not(:first-child)').selectAll('g.tick text').classed('hideCommon',true);
-            this.axisGroups.selectAll('.hideCommon').style('display','none');
-            this.axisGroups.on('mouseover',function(){
-              Px.d3.select(this).selectAll('.hideCommon').style('display',null)
-              Px.d3.select(this).selectAll('.hideCommon').style('fill',_this.colors.grey3)
-            }).on('mouseleave',function(){
-              Px.d3.select(this).selectAll('.hideCommon').style('display','none')
-              Px.d3.select(this).selectAll('.hideCommon').style('fill','black')
-            });
-
-            this.set('recalcTicks', !this.recalcTicks);
-          } else if(this._commonAxisRanAtLeastOnce) {
-
-            this.axisGroups.selectAll('.hideCommon').style('display',null);
-            this.axisGroups.selectAll('.hideCommon').classed('hideCommon',false);
-
-            this.set('recalcTicks', !this.recalcTicks);
-          }
-        }
-      }
-    },
-    /*
-     * returns 'axis_' + axis id
-     *
-     */
-    _createAxisID: function(item) {
-      return 'axis_' + item;
-    },
     /*
      * Sets _internalDimensions to the value of dimensions but trigged AFTER the scale
      * has been set. Avoids an annoying race condition where dimensions triggers a
@@ -720,15 +617,15 @@ Custom property | Description | Default
      *
      */
     _computedInternalDimensions: function() {
-      //FIXME ?? This if introduces a possible race condition where if dims have not been set on this component, but has on the scale, it will fail this check when dims is updated. Dont think this can happen outside a testing env, but should be careful
-
       //makes sure we dont try to process a new dim before it has a new scale.
       if(this._lastDomainChanged !== this.domainChanged) {
 
         this._lastDomainChanged = this.domainChanged;
         this._rebuildOnDraw = true;
 
-        this._axisDoneCounter = 0;
+        // FIXME technically, we should look and see if we need to rerender; if dimensions didnt change, but domainChanged did  due to a y domain change, then we may rerender unncessarily.
+        var notFirst = this._internalDimensions ? true : false,
+            dimsChanged = (notFirst && this.dimensions.length === this._internalDimensions.length) ? false : true;
 
         //if match ticks, make sure the domains can be aligned
         if(this.matchTicks && !this.singleDomain) {
@@ -742,23 +639,35 @@ Custom property | Description | Default
           }
         }
 
-        this._generateGs();
-
-        var notFirst = this._internalDimensions ? true : false;
         this.set('_internalDimensions', this.dimensions);
-
-        if(notFirst) {
-          this.$.bof.render();
-        }
 
         this._calcGridTicks(this._internalDimensions[0]);
         this._calcGridAxis(this._internalDimensions[0]);
 
+
+        if(dimsChanged) {
+          this.$.bof.render();
+        }
+
         this.set('_internalDimensionsChanged', !this._internalDimensionsChanged);
+        //
+        // //cycle through dimensions and set empty brushDomains or brushDomains
+        // // necssary for syncing the brushes if dimensions change
+        // for(var i = 0; i < this.dimensions.length; i++) {
+        //   var d = this.dimensions[i],
+        //       bd = {};
+        //   if(this._brushDomains[d] && this._brushDomains[d].length === 2) {
+        //     bd[d] = this._brushDomains[d];
+        //   } else {
+        //     bd[d] = [];
+        //   }
+        // }
+        //
+        // this.set('_brushDomains', bd);
 
       } else if(this.dimensions.length === 0 && this._internalDimensions && this._internalDimensions.length > 0) {
         this.set('_internalDimensions', []);
-        this.$.bof.render();
+        // this.$.bof.render();
         this.set('_internalDimensionsChanged', []);
       }
     },
@@ -832,6 +741,60 @@ Custom property | Description | Default
       return
     },
 
+    _mutedSeriesFromBrush: function(evt) {
+      var dim = evt.detail.dimension,
+          ms = evt.detail.data;
+
+      this._mutedSeriesPerBrush[dim] = ms;
+
+      this._combineMutedSeries();
+    },
+
+    _combineMutedSeries: function() {
+      this.debounce('_combineMutedSeries', function() {
+
+        this._cleanUpMutedSeries();
+
+        var dims = Object.keys(this._mutedSeriesPerBrush),
+            series = {};
+
+        for(var i = 0; i < dims.length; i++) {
+          var d = dims[i];
+          this._addToMutedSeries(series, this._mutedSeriesPerBrush[d]);
+        }
+
+        this.set('mutedSeries', series);
+      }, 50);
+    },
+
+    _addToMutedSeries: function(fullSeries, partialSeries) {
+      var mutedKeys = Object.keys(partialSeries);
+      for(var i = 0; i < mutedKeys.length; i++) {
+        var k = mutedKeys[i];
+
+        /*
+          To be a proper general solution, we should look at partialSeries[k] to see if it is true or false
+          We would have to also check fullSeries to see if it has k and if true or false
+
+          Instead, we are being lazy and just using the fact that axis brush always marks as true and
+          deletes if false.
+        */
+        fullSeries[k] = true;
+      }
+    },
+
+    _cleanUpMutedSeries: function() {
+      var dims = Object.keys(this._brushDomains);
+
+      for(var i = 0; i < dims.length; i++) {
+        var d = dims[i];
+        if(this._internalDimensions.indexOf(d) === -1) {
+          delete this._mutedSeriesPerBrush[d];
+          delete this._brushDomains[d];
+        }
+      }
+    },
+
     _drawnTickValuesChanged: function(evt) {
 
       //try counting axis since most likely all axis will fire once.
@@ -846,7 +809,7 @@ Custom property | Description | Default
 
       //all axis fired, cancel debounce and finish
       if(this._drawnTickValuesChangedCounter === this._internalDimensions.length) {
-        
+
         this.cancelDebouncer('_drawnTickValuesChangedFallback');
         this._applyDrawnTickValuesChanged(evt.detail.drawnTickValues);
       }
@@ -885,7 +848,7 @@ Custom property | Description | Default
 
       //all axis fired, cancel debounce and finish
       if(this._displayedTitlesCounter === this._internalDimensions.length) {
-        
+
         this.cancelDebouncer('_displayedTitleChangedFallback');
         this._applyDisplayedTitlesChanged();
       }
@@ -893,10 +856,19 @@ Custom property | Description | Default
       evt.stopPropagation();
       evt.stopImmediatePropagation();
     },
+
     _applyDisplayedTitlesChanged: function() {
       this.set('displayedValues', this._displayedTitlesBuilder);
       this._displayedTitlesCounter = 0;
       this._displayedTitlesBuilder = {};
     },
+
+    _isFirst: function(index) {
+      if(!this.commonAxis) {
+        return false;
+      }
+
+      return index === 0 ? false : true;
+    }
   });
 </script>

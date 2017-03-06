@@ -1,0 +1,510 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-chart.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
+<link rel="import" href="px-vis-axis.html"/>
+<link rel="import" href="px-vis-axis-brush.html"/>
+<link rel="import" href="px-vis-behavior-axis-drag.html"/>
+<link rel="import" href="../px-colors-design/colors.html" />
+
+<!--
+d3 element creating an axis for the chart
+
+##### Usage
+
+    <px-vis-interactive-axis
+        prevent-initial-drawing="[[preventInitialDrawing]]"
+        svg="[[svg]]"
+        x="[[x]]"
+        y="[[y]]"
+        dimension="[[dimension]]"
+        series-key="[[seriesKey]]"
+        height="[[height]]"
+        width="[[width]]"
+        margin="[[margin]]"
+        chart-data="[[chartData]]"
+        orientation="[[orientation]]"
+        title="[[title]]"
+        title-location='[[titleLocation]]'
+        title-type-size="[[titleTypeSize]]"
+        label-type-size="[[labelTypeSize]]"
+        stroke-width="[[strokeWidth]]"
+        outer-tick-size="0"
+        tick-values="[[tickValues]]"
+        truncation-length="[[truncationLength]]"
+        complete-series-config="[[completeSeriesConfig]]"
+        append-unit-in-title="[[appendUnitInTitle]]"
+        unit="[[unit]]"
+        prevent-series-bar="[[preventSeriesBar]]"
+        domain-changed="[[_internalDimensionsChanged]]"
+        selected-domain="[[selectedDomain]]"
+        title-truncation
+        disable-ticks="[[disableTicks]]"
+        label-position="[[labelPosition]]"
+        axis-color="[[axisColor]]"
+        ticks="[[ticks]]"
+        label-rotation="[[labelRotation]]"
+        label-translation="[[labelTranslation]]"
+        series-on-axis="[[seriesOnAxes]]"
+        muted-series="[[mutedSeries]]"
+        drawn-tick-values="[[drawnTickValues]]"
+        rebuild-on-draw="[[_rebuildOnDraw]]"
+        disable-brush="[[disableBrush]]"
+        drag-behavior="[[dragBehavior]]"
+        rebuild-on-draw="[[_rebuildOnDraw]]"
+        prevent-initial-drawing="[[preventInitialDrawing]]"
+        redraw-series="[[redrawSeries]]"
+        brush-domains="[[_brushDomains]]"
+        hide-and-show-on-hover="[[hideAndShowOnHover]]">
+    </px-vis-interactive-axis>
+
+##### d3 reference
+https://github.com/mbostock/d3/wiki/SVG-Axes
+
+### Styling
+The following custom properties are available for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+  `--px-font-family` | The font family for all labels and text | `GE Inspira Sans`
+  `--px-vis-axis-color` | The color for the axis lines, axis ticks, and axis tick labels | `$gray9`
+  `--px-vis-axis-title-color` | The color for the axis title | `$gray9`
+  `--px-vis-axis-inline-title-color` | The color for the axis title  | `$gray9`
+  `--px-vis-axis-inline-type-color` | The color for the axis lines, axis ticks, and axis tick labels when using 'inline' labelPosition | `$white`
+  `--px-vis-axis-inline-box-color` | The color for the tick boxes when using 'inline' labelPosition | `$gray9`
+
+
+@element px-vis-axis
+@blurb d3 element creating an axis for the chart
+@homepage index.html
+@demo demo.html
+-->
+
+<link rel="import" href="css/px-vis-styles.html">
+
+<dom-module id="px-vis-interactive-axis">
+    <template>
+      <style include="px-vis-styles"></style>
+      <px-vis-axis
+        id="[[dimension]]"
+        class="interactiveAxis"
+        svg="[[_interactiveGroup]]"
+        axis="[[y]]"
+        series-id="[[dimension]]"
+        height="[[height]]"
+        width="[[width]]"
+        margin="[[margin]]"
+        orientation="[[orientation]]"
+        title="[[title]]"
+        title-location='[[titleLocation]]'
+        title-type-size="[[titleTypeSize]]"
+        label-type-size="[[labelTypeSize]]"
+        stroke-width="[[strokeWidth]]"
+        outer-tick-size="0"
+        tick-values="[[tickValues]]"
+        truncation-length="[[truncationLength]]"
+        complete-series-config="[[completeSeriesConfig]]"
+        append-unit-in-title="[[appendUnitInTitle]]"
+        unit="[[unit]]"
+        prevent-series-bar="[[preventSeriesBar]]"
+        domain-changed="[[domainChanged]]"
+        selected-domain="[[selectedDomain]]"
+        title-truncation
+        disable-ticks="[[disableTicks]]"
+        label-position="[[labelPosition]]"
+        axis-color="[[axisColor]]"
+        ticks="[[ticks]]"
+        label-rotation="[[labelRotation]]"
+        label-translation="[[labelTranslation]]"
+        series-on-axis="[[seriesOnAxis]]"
+        muted-series="[[mutedSeries]]"
+        drawn-tick-values="{{drawnTickValues}}"
+        rebuild-on-draw="[[_rebuildOnDraw]]"
+        prevent-initial-drawing="[[preventInitialDrawing]]">
+      </px-vis-axis>
+      <template is="dom-if" if="[[!disableBrush]]">
+        <px-vis-axis-brush
+          id="axisBrush"
+          svg="[[_interactiveGroup]]"
+          parent-svg="[[svg]]"
+          height="[[height]]"
+          axis="[[y]]"
+          margin="[[margin]]"
+          chart-data="[[chartData]]"
+          dimension="[[dimension]]"
+          series-key="[[seriesKey]]"
+          domain-changed="[[domainChanged]]"
+          muted-series="{{mutedSeries}}"
+          radial="[[radial]]"
+          center-offset="[[centerOffset]]"
+          brush-to-remove="[[brushToRemove]]"
+          brush-domains="[[brushDomains]]">
+        </px-vis-axis-brush>
+      </template>
+    </template>
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'px-vis-interactive-axis',
+
+    behaviors: [
+      PxVisBehaviorD3.svg,
+      PxVisBehavior.sizing,
+      PxVisBehavior.completeSeriesConfig,
+      PxVisBehavior.commonMethods,
+      PxVisBehaviorD3.axisConfig,
+      PxVisBehavior.dataset,
+      PxVisBehavior.dimensions,
+      PxVisBehavior.mutedSeries,
+      PxVisBehaviorD3.dynamicRedraw,
+      PxVisBehavior.commonAxis,
+      PxVisBehaviorD3.domainUpdate,
+      PxVisBehaviorD3.selectedDomain,
+      PxVisBehavior.radial,
+      PxVisBehaviorD3.radialAxisConfig,
+      PxVisBehavior.seriesToAxes,
+      PxVisBehaviorDrag.parallelAxisDrag,
+      PxVisBehaviorDrag.cartesianDrag,
+      PxColorsBehavior.baseColors,
+      PxVisBehaviorChart.subConfiguration,
+      PxVisBehavior.preventInitialDrawing
+    ],
+
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      /**
+       * A dictionary of g elems for each dimension
+       *
+       */
+      _interactiveGroup: {
+        type: Object
+      },
+
+      /**
+       * The string identifier for the axis
+       *
+       */
+      dimension: {
+        type: String
+      },
+
+      /**
+       * A dictionary of g elems for each dimension
+       *
+       */
+      brushElems: {
+        type: Object
+      },
+      /**
+       * A holder for the drag behavior
+       *
+       */
+      dragBehavior: {
+        type: Object
+      },
+
+      /**
+       * Whether to append unit in brackets in axis title. e.g [Hz]
+       */
+      appendUnitInTitle: {
+        type: Boolean,
+        value: false
+      },
+      /**
+       * Array representing the actual displayed titles for each axis
+       */
+      displayedValues: {
+        type: Object,
+        notify: true,
+        value: function() {
+          return {};
+        }
+      },
+
+      /**
+       * Whether the axis ticks should be hidden and shown on hover or always shown
+       */
+      showTicksOnHover: {
+        type: Boolean,
+        value: false
+      },
+      /**
+       * Boolean to decide if all axes should get ticks or just one
+       */
+      disableTicks:{
+        type: Boolean,
+        value: false
+      },
+      /**
+       * Length of the axis
+       */
+      length: {
+        type: Number,
+        value: null
+      },
+      /**
+       * Boolean controling if brushing should retain or delete series
+       */
+      brushToRemove: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * Force a redraw for titleLocation
+       */
+      _pokeTitleLocation: {
+        type: Boolean,
+        value: false
+      },
+      /**
+       * Force a redraw if ticks
+       */
+      recalcTicks: {
+        type: Boolean,
+        value: false
+      },
+
+      orientationFromDimensions: {
+        type: Boolean,
+        value: false
+      },
+
+      leftAxisSize: {
+        type: Number
+      },
+      rightAxisSize: {
+        type: Number
+      },
+
+      disableBrush: {
+        type: Boolean,
+        value: false
+      },
+      /**
+        * Boolean to specify not to draw the series bars
+        */
+      preventSeriesBar: {
+        type: Boolean,
+        value: false
+      },
+      cartesianDragBehavior: {
+        type: Boolean,
+        value: false,
+        observer: '_setDragBehavior'
+      },
+      _pokeOrientation: {
+        type: Boolean,
+        value: false
+      },
+      axisConfig: {
+        type: Object,
+        value: function() {
+          return {};
+        }
+      },
+      allowEmptyTitle: {
+        type: Boolean,
+        value: false
+      },
+      _commonAxisRanAtLeastOnce: {
+        type: Boolean
+      },
+      _axisDoneCounter: {
+        type: Number,
+        value: 0
+      },
+      _rebuildOnDraw: {
+        type: Boolean,
+        value: true
+      },
+      /**
+        * Object to pass in a brush domain
+        */
+      brushDomains: {
+        type: Object,
+        value: function() { return {}; }
+      },
+
+      hideAndShowOnHover: {
+        type: Boolean,
+        value: false
+      }
+    },
+
+    observers: [
+      '_axisConfigChanged(axisConfig.*)',
+      '_createGroup(domainChanged, x, svg, dragBehavior)'
+    ],
+
+    listeners:{
+      'px-axis-done': '_setAxisStyles',
+      "dom-change": '_axisConfigChanged'
+    },
+
+    _setDragBehavior: function() {
+      if(this.cartesianDragBehavior) {
+        this.createCartesianDrag();
+      } else {
+        this.createParallelAxisDrag();
+      }
+    },
+
+    _axisConfigChanged: function(conf) {
+      if(this.axisConfig && this.dimension) {
+        this._applyConfigToElement(this.axisConfig, this.$$('#' + this.dimension));
+      }
+    },
+
+    /**
+     * Generates a group elem for each dimension and moves it into the correct x coordinate
+     *
+     */
+    _createGroup: function() {
+      // this.debounce('createInteractiveGroup', function() {
+        if(this._doesD3HaveValues(this.svg)) {
+          var _this = this;
+              // resetTitles = false,
+              // removed = this.svg.selectAll(".dimension").data().filter(function(d){
+              //   if(_this.dimensions.indexOf(d) === -1){
+              //     // _this.$.axisBrush.clearBrush(d);
+              //     delete _this.displayedValues[d];
+              //     resetTitles = true;
+              //     return true
+              //   }
+              //   return false
+              // });
+          if(this._isD3Empty(this._interactiveGroup)) {
+            var g = this.svg.append('g')
+              .attr("class", ".dimension")
+              // .attr("axis-number", function(d,i) { return i; })
+              .attr("dimension", this.dimension)
+              .on('mousemove', function() {
+                // TODO add a check that we want it to fire these events?
+
+                // Dont know why, but need to do this calc before the debounce
+                var m = Px.d3.mouse(this),
+                    elem = this;
+
+                _this.debounce('axisMouseMove', function() {
+                  var deets = {
+                    'axis': _this.dimension,
+                    'elem': elem,
+                    'mousePos': m
+                  }
+                  _this.fire('px-vis-multi-axis-mousemove', deets);
+                }, 10);
+              })
+              .on('mouseleave',function(){
+                var deets = {
+                  'axis': _this.dimension,
+                  'elem': this,
+                  'mousePos': Px.d3.mouse(this)
+                }
+                _this.fire('px-vis-multi-axis-mouseleave', deets);
+              })
+              .style("cursor","move")
+              .call(this.dragBehavior);
+
+            this._interactiveGroup = g;
+          }
+
+          this._interactiveGroup.attr("transform", this._calcTransformation.bind(this));
+
+          // if we removed titles from the array make sure we notify
+          // if(resetTitles) {
+          //   var newValues = this.displayedValues;
+          //   this.displayedValues = {};
+          //   this.set('displayedValues', newValues);
+          // }
+
+          // this.set('axisGroups', this.svg.selectAll(".dimension"));
+          // this.set('brushElems', this.axisGroups.selectAll('g.brush').nodes());
+
+          //poke the titles
+          // this.set('_pokeTitleLocation',!this._pokeTitleLocation);
+
+          //sometime after draw (doesnt entirely matter when since it is for an interaction piece), move the brushes on top of everything so they dont get interrupted by other things drawn on top
+          setTimeout(function() {
+            this._interactiveGroup.select('g.brush').raise();
+          }.bind(this), 200);
+        }
+      // }, 10);
+    },
+
+    _calcTransformation: function() {
+      var d = this.dimension;
+
+      if(this.radial) {
+      /*
+      +180 to flip orientation of axes to start at top (which matches where lines start)
+           180                        0
+          ____                       ____
+        .'    `.                   .'    `.
+       /        \                 /        \
+    90|          | 270  -->  270 |          |90
+       \        /                 \        /
+        `.____.'                   `.____.'
+           0                          180
+      */
+        return this.x(d) || this.x(d) === 0 ? "rotate(" + (this.x(d) * 180 / Math.PI + 180) + ")" : ''
+      }
+
+      // else cartesian:
+      return this.x(d) || this.x(d) === 0 ? "translate(" + this.x(d) + ",0)" : '';
+    },
+
+    /*
+     * Sets styles and on hover for common axis
+     *
+     */
+    _setAxisStyles: function(e) {
+      if(this._interactiveGroup) {
+        var _this = this;
+
+        if(this.hideAndShowOnHover) {
+          this._commonAxisRanAtLeastOnce = true;
+          this._interactiveGroup.selectAll('g.tick text').classed('hideCommon',true);
+          this._interactiveGroup.selectAll('.hideCommon').style('display','none');
+          this._interactiveGroup.on('mouseover',function(){
+            _this._interactiveGroup.selectAll('.hideCommon').style('display',null)
+            _this._interactiveGroup.selectAll('.hideCommon').style('fill',_this.colors.grey3)
+          }).on('mouseleave',function(){
+            _this._interactiveGroup.selectAll('.hideCommon').style('display','none')
+            _this._interactiveGroup.selectAll('.hideCommon').style('fill',"black")
+          });
+
+          // this.set('recalcTicks', !this.recalcTicks);
+        } else if(this._commonAxisRanAtLeastOnce) {
+
+          this._interactiveGroup.selectAll('.hideCommon').style('display',null);
+          this._interactiveGroup.selectAll('.hideCommon').classed('hideCommon',false);
+
+          // this.set('recalcTicks', !this.recalcTicks);
+        }
+      }
+    },
+
+    // /*
+    //  * Deletes the brushes on its children axes
+    //  *
+    //  */
+    // deleteBrush: function() {
+    //   this.$.axisBrush.deleteAllBrushes();
+    // },
+
+
+
+    recalcTranform: function() {
+      this._interactiveGroup.attr("transform", this._calcTransformation.bind(this));
+    }
+
+  });
+</script>
