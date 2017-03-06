@@ -86,7 +86,7 @@ Custom property | Description | Default
     <template>
       <style include="px-vis-styles"></style>
       <px-vis-axis
-        id="[[item]]"
+        id="[[dimension]]"
         class="interactiveAxis"
         svg="[[_interactiveGroup]]"
         axis="[[y]]"
@@ -358,25 +358,8 @@ Custom property | Description | Default
     },
 
     _axisConfigChanged: function(conf) {
-      if(this.axisConfig) {
-        var axes = Object.keys(this.axisConfig);
-
-        // iterate through the axisConfig keys
-        for(var i = 0; i < axes.length; i++) {
-          // if the key is an axis and the config is a set of configs, apply them to the axis
-          if(this.$$('#' + axes[i]) && typeof this.axisConfig[axes[i]] === 'object') {
-            this._applyConfigToElement(this.axisConfig[axes[i]], this.$$('#' + axes[i]));
-
-          // if it is just a key, assume it is a property and set on all axes
-          } else {
-            var elems = Polymer.dom(this.root).querySelectorAll('.interactiveAxis');
-            if(elems) {
-              for(var j = 0; j < elems.length; j++) {
-                elems[j].set(axes[i], this.axisConfig[axes[i]]);
-              }
-            }
-          }
-        }
+      if(this.axisConfig && this.dimension) {
+        this._applyConfigToElement(this.axisConfig, this.$$('#' + this.dimension));
       }
     },
 

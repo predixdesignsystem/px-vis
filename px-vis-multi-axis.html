@@ -387,26 +387,84 @@ Custom property | Description | Default
     },
 
     _axisConfigChanged: function(conf) {
-      if(this.axisConfig) {
-        var axes = Object.keys(this.axisConfig);
+      if(this.axisConfig && this._doesObjHaveValues(this.dimensions)) {
+        var keys = Object.keys(this.axisConfig),
+            hasProps = false,
+            hasAC = false,
+            props = {},
+            propKeys = [],
+            configs = {},
+            axesConfigs = [];
 
         // iterate through the axisConfig keys
-        for(var i = 0; i < axes.length; i++) {
-          // if the key is an axis and the config is a set of configs, apply them to the axis
-          if(this.$$('#' + axes[i]) && typeof this.axisConfig[axes[i]] === 'object') {
-            this._applyConfigToElement(this.axisConfig[axes[i]], this.$$('#' + axes[i]));
+        for(var i = 0; i < keys.length; i++) {
+          var k = keys[i];
 
-          // if it is just a key, assume it is a property and set on all axes
+          // if it is just a key, it is a property to apply to everyone
+          if(this.dimensions.indexOf(k) === -1) {
+            props[k] = this.axisConfig[k];
+            propKeys.push(k);
+            hasProps = true;
+
+          // if the key is an axis, save for later
           } else {
-            var elems = Polymer.dom(this.root).querySelectorAll('.multiAxis');
-            if(elems) {
-              for(var j = 0; j < elems.length; j++) {
-                elems[j].set(axes[i], this.axisConfig[axes[i]]);
-              }
+            axesConfigs.push({ k : this.axisConfig[k] });
+            hasAC = true;
+
+          }
+        }
+
+        // if we dont have raw properties but do have axis specific configs, just apply the configs
+        if(!hasProps && hasAC) {
+          for(var i =0; i < axesConfigs.length; i++) {
+            var obj = axesConfigs[i],
+                a = Object.keys(obj);
+
+            this.$$('#' + a).set('axisConfig', obj);
+          }
+
+          return;
+        }
+
+        // if we have raw properties
+        if(hasProps) {
+          // first, create configs for each dimension
+          for(var i = 0 ; i < this.dimensions.length; i++) {
+            configs[this.dimensions[i]] = this._copyConfig(propKeys, props);
+          }
+        }
+
+        // if we have config objects and props, mix em
+        if(hasAC) {
+          for(var i = 0; i < axesConfigs.length; i++) {
+            var obj = axesConfigs[i],
+                a = Object.keys(obj),
+                confKeys = Object.keys(axesConfigs[i][a]);
+
+            configs[a] = configs[a] || {};
+
+            for(var j = 0; j < confKeys.length; j++) {
+              configs[a][confKeys[j]] = obj[a][confKeys[j]];
             }
           }
         }
+
+        // apply the configs
+        for(var i = 0; i < this.dimensions.length; i++) {
+          var a = this.dimensions[i]
+          this.$$('#' + a).set('axisConfig', configs[a]);
+        }
       }
+    },
+
+    _copyConfig: function(k, conf) {
+      var c = {};
+
+      for(var i = 0; i < k.length; i++) {
+        c[k[i]] = conf[k[i]];
+      }
+
+      return c;
     },
 
     _axisDragged: function(e) {
