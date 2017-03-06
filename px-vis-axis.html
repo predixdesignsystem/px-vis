@@ -191,7 +191,7 @@ Custom property | Description | Default
           },
           /**
            * Whether the title has been truncated
-           */ 
+           */
           _titleTruncated: {
             type: Boolean,
             value: false
@@ -252,7 +252,7 @@ Custom property | Description | Default
             type: Array,
             value: function() {
               return [];
-            },
+            }
           },
           rebuildOnDraw: {
             type: Boolean,
@@ -422,14 +422,15 @@ Custom property | Description | Default
         },
 
         removeAll: function() {
-          this.removeAxis();
           this.removeTitle();
+          this.removeAxis();
         },
 
         removeAxis: function() {
           this._removingAxis = true;
           // remove the axis
           if(this._axisGroup) {
+            // this._axisGroup.selectAll('*').remove();
             this._axisGroup.remove();
             this._axisGroup = null;
           }
@@ -449,16 +450,16 @@ Custom property | Description | Default
          */
         drawElement: function() {
 
-          
+
           if(typeof this.preventInitialDrawing !== undefined && this.preventInitialDrawing === false) {
-          this.debounce('drawaxis', function() {
+          // this.debounce('drawaxis', function() {
 
             if(this._animationFrameDone && this._doesD3HaveValues(this.svg) && this.domainChanged !== null && this.orientation) {
-              
+
               if(this.rebuildOnDraw) {
                 this.removeAxis();
               }
-              
+
                this.defineAxis();
               if(!this._axisGroup) {
                 this._buildAxis();
@@ -469,7 +470,7 @@ Custom property | Description | Default
               // alert parents that we are done drawing the axis
               this.fire('px-axis-done');
             }
-          }, 10)
+          // }, 10)
           }
         },
         /**
@@ -869,17 +870,15 @@ Custom property | Description | Default
          * redraws title on change
          */
         _titleChanged: function(displayedTitle) {
-          //right now we're debouncing to makew sure the title is drawn in the right place.
-          //TODO: find out why we need this and remove it
-          this.debounce('drawTitle', function() {
-            if(!this._removingAxis) {
-                if(this._doesObjHaveValues(this._axisGroup) && this._axisGroup.node() !== null && 
-                this._axisGroup.node().ownerSVGElement !== null && this.orientation) {
+      //    this.debounce('drawTitle', function() {
+          if(!this._removingAxis) {
+            if(this._doesObjHaveValues(this._axisGroup) && this._axisGroup.node() !== null &&
+            this._axisGroup.node().ownerSVGElement !== null && this.orientation) {
 
-                  this.drawTitle();
-                }
+              this.drawTitle();
             }
-          }.bind(this), 10);
+          }
+          // }.bind(this), 10);
         },
 
         /**
@@ -893,16 +892,16 @@ Custom property | Description | Default
               this._tooltipElem = this.$$('px-tooltip');
             }
 
-            if(this._tooltipElem && this._titleGroup && 
+            if(this._tooltipElem && this._titleGroup &&
               (this._tooltipElem.for !== this._titleGroup.node())) {
               this._tooltipElem.for = this._titleGroup.node();
-            } 
+            }
           } else if(this._tooltipElem){
             this._tooltipElem.for = null;
           }
         },
         _orientationChanged: function() {
-          
+
           this.removeAxis();
           this.drawElement();
         }
