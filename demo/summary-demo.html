@@ -1,6 +1,6 @@
 <link rel="import" href="../css/px-vis-summary-demo-styles.html" />
 <link rel="import" href="../../px-demo/css/px-demo-styles.html" />
-<link rel="import" href="px-vis-demo-loop.html">
+<link rel="import" href="px-vis-overview.html">
 <dom-module id="summary-demo">
   <template>
   <style include="px-demo-styles" is="custom-style"></style>
@@ -8,163 +8,12 @@
   <!-- Light theme -->
   <style include="px-vis-summary-demo-styles" is="custom-style"></style>
   <style include="px-theme-styles" is="custom-style"></style>
-  <div class="hero u-p++ text--shadow" id="px-vis-anchor">
-    <a class="actionable flex flex--right flex--middle" href="https://github.com/PredixDev/px-vis" target="_blank"><iron-icon class="menu__open" icon="fa:fa-github"></iron-icon>View on Github</a>
-    <h1 class="delta">px-vis</h1>
-    <div class="description-text">
-      <p>
-        px-vis is a visualzation framework.
-      </p>
-      <p>It is a set of base components to provide the ability to create charts. These components come "wrapped" into charts in px-vis-[[chartType]] repos. These base components can be used to create custom chart types and/or mixed with standard d3 methods.</p>
-      <p>At a very least, all charts need an svg component, an interpretor component, such as scale, and a drawing component.</p>
-      <p>All components are built to support the Precipitation Pattern. Declarative bindings also work.</p>
-    </div>
-    <div class="flex">
-      <img class="u-mr--" src="https://img.shields.io/travis/PredixDev/px-vis/master.svg?style=flat-square" alt="Travis" onerror="this.style.display='none'"/>
-      <img class="u-mr--" src="https://img.shields.io/bower/v/px-vis.svg?style=flat-square" alt="Bower" onerror="this.style.display='none'"/>
-      <img class="u-mr--" src="https://img.shields.io/github/issues-raw/PredixDev/px-vis.svg?style=flat-square" alt="Issues" onerror="this.style.display='none'"/>
-    </div>
-    <div class="u-mt jump-nav">
-      <template is="dom-repeat" items=[[items]]>
-        <a href="#[[item.name]]-anchor" class="actionable">[[item.name]]</a> <br/>
-      </template>
-    </div>
-  </div>
-  <div class="mega-demo u-p++">
-    <template is="dom-repeat" items="[[items]]">
-      <px-vis-demo-loop item="[[item]]"></px-vis-demo-loop>
-    </template>
-  </div>
+    <px-vis-overview></px-vis-overview>
   </template>
 </dom-module>
 <script>
   Polymer({
     is:'summary-demo',
-    properties: {
-
-      items: {
-        type: Array,
-        value: [
-          {
-            name: 'px-vis-axis',
-            description: "Example of an axis drawing object. The axis drawing object can draw both x and y axis. This example draws an x-axis."
-          },
-          {
-            name: 'px-vis-brush',
-            description: "Element providing user interaction on the navigator. This element draw the box over the navigator signifying the selected chart extents and provides the user interactions to resize and move the extent box. This element sets the selectedDomain property based on the extents box. The selectedDomain variable can then be consumed by the scale component to change the main chart extents."
-          },
-          {
-            name: 'px-vis-canvas',
-            description: "Element which creates an Canvas element and context."
-          },
-          {
-            name: 'px-vis-chart-navigator',
-            description: "Example of a chart-navigator drawing object. Very similar configuration to px-vis-line-svg."
-          },
-          {
-            name: 'px-vis-clip-path',
-            description: "\"The clipping path restricts the region to which paint can be applied. Conceptually, any parts of the drawing that lie outside of the region bounded by the currently active clipping path are not drawn.\" (MDN) Ostensibly, the clipping path gets applied to drawing components to prevent them from drawing on certain parts of the chart, such stopping a line series drawing where the axis is drawn. To use, specfify the sizing, svg, and interpreters as specified in the example. It will return an ID for the clipping path which can be passed to other drawing objects. This component returns TWO different clip path IDs. clipPath includes the margin on top and seriesClipPath excludes it."
-          },
-          {
-            name: 'px-vis-clip-path-complex-area',
-            description: "The clipping path gets applied to drawing components to prevent them from drawing on certain parts of the chart, such stopping a line series drawing where the axis is drawn. This clip path currently only applies a compound path for radar. Other paths will be forthcoming based on need."
-          },
-          {
-            name: 'px-vis-cursor',
-            description: "The cursor provides an on-chart reticule on-hover. Hover your mouse over the chart to see it in action. Cursor requires a px-vis-interaction-space which provides the mouseover data."
-          },
-          {
-            name: 'px-vis-data-converter',
-            description: "px-vis-data-converter converts data from the timeseries service to the schema required by the vis framework."
-          },
-          {
-            name: 'px-vis-dynamic-menu',
-            description: "Element providing a menu dynamically built depending on options."
-          },
-
-          {
-            name: 'px-vis-event',
-              description: "Chart events use their own dataset. A vertical line is drawn at the x-coordinate and an icon above. A configuration object can be applied to associate the event label with a desired icon, color, and position. If no configuration is set for a label, a default icon and color are applied. ",
-              list: {
-                header:"The icons can either be a:",
-                items: [
-                  "Font Awesome class name, e.g. 'fa-camera'",
-                  "Font Awesome unicode, e.g. '\uf015'",
-                  "url to an image file; png, jpg, gif all work"
-                ]
-            },
-              secondaryDescription: "The colors are px-colors-design colors.",
-              tertiaryDescription: "Since each icon / image have a different center point, you may need to specify an offset to center the icon above the line. The offset is a two element array consisiting of an x and y value, '[x,y]'. For images, you'll also have to specify a size"
-          },
-          {
-            name: 'px-vis-gridlines',
-            description: "Chart gridlines can be added to either the x or the y axis."
-          },
-          {
-            name: 'px-vis-interaction-space',
-            description: "The interaction-space provides the basis for all on-chart interaction. It detects mouseovers on the chart and builds the data objects which other components then consume."
-          },
-          {
-            name: 'px-vis-line-canvas',
-            description: "Element which draws lines series onto the chart"
-          },
-
-          {
-            name: 'px-vis-line-svg',
-            description: "Example of a line drawing object. Bound elements are set from other components, such as px-vis-svg and px-vis-scale, and passed into px-vis-line-svg."
-          },
-          {
-            name: 'px-vis-multi-axis',
-            description: "d3 element creating multiple axes in the chart."
-          },
-          {
-            name: 'px-vis-pie',
-            description: "Creates an interactive pie or donut chart."
-          },
-          {
-            name: 'px-vis-radar-grid',
-            description: "An element which draws polygonal grid lines."
-          },
-          {
-            name: 'px-vis-radial-gridlines',
-            description: "An element which draws polar grid lines."
-          },
-
-          {
-            name: 'px-vis-register',
-            description: "The register displays data from the chart on mouseover. There are two options, a horizonal version for placement above or below the chart, or a vertical version for placement to the right or left of the chart. It must be paired with px-vis-interaction-space which provides the mouseover capabilities. Clicking on a series name on the register adds that series to the mutedSeries property. Series on the chart can listen to this property to toggle series on and off."
-          },
-          {
-            name: 'px-vis-scale',
-            description: "All charts need an interpretor component. These cannot be seen but provide the basic framework for drawing objects to be displayed. Interpretor components convert data into drawing space coordinates.The scale component creates 'x' &amp 'y' and 'currentDomainX' &amp 'currentDomainY' variables which can be passed into drawing components.",
-            note: "Note: All the subsequent charts will have this component, but they will not be shown in the code snippet."
-          },
-          {
-            name: 'px-vis-scatter',
-            description: "Example of a scatter drawing object. Very similar configuration to px-vis-line-svg."
-          },
-          {
-            name: 'px-vis-svg',
-            description: "All charts need a drawing space SVG component. These cannot be seen but provide the basic framework for drawing objects to be displayed.The svg component provides the drawing space and d3 instantiated drawing object. The svg component returns an 'svg' variable to be passed into drawing components.",
-            note: "Note: All the subsequent charts will have this component, but they will not be shown in the code snippet."
-          },
-          {
-            name: 'px-vis-svg-canvas',
-            description: "Element which creates an Canvas element and context"
-          },
-          {
-            name: 'px-vis-threshold',
-            description: "Chart threshold provide horizonal lines across the chart. A default color is used if no 'color' is specified (or if the color does not match a series name). When a valid 'color' is given the threshold color will match that of the series. The demo chart shows both, one threshold with a valid 'color' and one with no 'color'."
-          },
-          {
-            name: 'px-vis-toolbar',
-            description: "Element providing a configurable toolbar which can be configured to add chart interaction through developer configured features."
-          },
-          {
-            name: 'px-vis-tooltip',
-            description: "The tooltip provides similar data display functionality to the register, but on chart and without the user interaction."
-          }]
-      }
-    }
+    properties: {}
   });
 </script>
