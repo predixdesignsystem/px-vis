@@ -419,8 +419,9 @@ Custom property | Description | Default
           for(var i =0; i < axesConfigs.length; i++) {
             var obj = axesConfigs[i],
                 a = Object.keys(obj);
-
-            this.$$('#' + a).set('axisConfig', obj);
+            if(this.$$('#' + a)) {
+              this.$$('#' + a).set('axisConfig', obj);
+            }
           }
 
           return;
@@ -452,7 +453,9 @@ Custom property | Description | Default
         // apply the configs
         for(var i = 0; i < this.dimensions.length; i++) {
           var a = this.dimensions[i]
-          this.$$('#' + a).set('axisConfig', configs[a]);
+          if(this.$$('#' + a)) {
+            this.$$('#' + a).set('axisConfig', configs[a]);
+          }
         }
       }
     },
@@ -477,6 +480,7 @@ Custom property | Description | Default
       } else {
         this.dimensions = e.detail.dimensions;
         this.x.domain(this.dimensions);
+
       }
 
       this.$$('px-vis-interactive-axis#' + e.detail.swappedDim).recalcTranform();
