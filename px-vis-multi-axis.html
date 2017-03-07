@@ -363,6 +363,11 @@ Custom property | Description | Default
       _brushDomains: {
         type: Object,
         value: function() { return {}; }
+      },
+
+      _normalizedTicks: {
+        type: Boolean,
+        value: false
       }
 
     },
@@ -377,7 +382,6 @@ Custom property | Description | Default
     listeners:{
       'px-vis-brush-muted-series-updated' : '_mutedSeriesFromBrush',
       'px-vis-drag-dimension-swapped' : '_axisDragged',
-      'px-vis-drag-update-title-location' : '_toggleTitleLocation',
       'px-vis-brush-brush-domain-updated' : '_updateBrushDomains',
       'px-vis-brush-brush-domain-delete' : '_deleteBrushDomains',
 
@@ -421,8 +425,9 @@ Custom property | Description | Default
           for(var i =0; i < axesConfigs.length; i++) {
             var obj = axesConfigs[i],
                 a = Object.keys(obj);
-
-            this.$$('#' + a).set('axisConfig', obj);
+            if(this.$$('#' + a)) {
+              this.$$('#' + a).set('axisConfig', obj);
+            }
           }
 
           return;
@@ -454,7 +459,9 @@ Custom property | Description | Default
         // apply the configs
         for(var i = 0; i < this.dimensions.length; i++) {
           var a = this.dimensions[i]
-          this.$$('#' + a).set('axisConfig', configs[a]);
+          if(this.$$('#' + a)) {
+            this.$$('#' + a).set('axisConfig', configs[a]);
+          }
         }
       }
     },
@@ -479,6 +486,7 @@ Custom property | Description | Default
       } else {
         this.dimensions = e.detail.dimensions;
         this.x.domain(this.dimensions);
+
       }
 
       this.$$('px-vis-interactive-axis#' + e.detail.swappedDim).recalcTranform();
@@ -630,6 +638,7 @@ Custom property | Description | Default
 
         //if match ticks, make sure the domains can be aligned
         if(this.matchTicks && !this.singleDomain) {
+          this._normalizedTicks = true;
           for(var i = 0; i < this.dimensions.length; i++) {
             var dim = this.dimensions[i],
                 d = this.y[dim].domain(),
@@ -639,6 +648,12 @@ Custom property | Description | Default
             this.y[dim].domain([min,max]);
           }
         }
+        // TODO Make match ticks dynamic
+        //if match ticks was flipped on and then off, undo our aligning
+        // if(this._normalizedTicks && !this.matchTicks) {
+        //   this._normalizedTicks = true;
+        //   // Reset the domains
+        // }
 
         this.set('_internalDimensions', this.dimensions);
 
@@ -651,20 +666,6 @@ Custom property | Description | Default
         }
 
         this.set('_internalDimensionsChanged', !this._internalDimensionsChanged);
-        //
-        // //cycle through dimensions and set empty brushDomains or brushDomains
-        // // necssary for syncing the brushes if dimensions change
-        // for(var i = 0; i < this.dimensions.length; i++) {
-        //   var d = this.dimensions[i],
-        //       bd = {};
-        //   if(this._brushDomains[d] && this._brushDomains[d].length === 2) {
-        //     bd[d] = this._brushDomains[d];
-        //   } else {
-        //     bd[d] = [];
-        //   }
-        // }
-        //
-        // this.set('_brushDomains', bd);
 
       } else if(this.dimensions.length === 0 && this._internalDimensions && this._internalDimensions.length > 0) {
         this.set('_internalDimensions', []);
