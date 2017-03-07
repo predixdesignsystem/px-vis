@@ -268,7 +268,8 @@ Custom property | Description | Default
         },
 
         observers: [
-          'drawElement(domainChanged, svg, axis, margin, width, height, disableTicks, _animationFrameDone, preventInitialDrawing)',
+          'drawElement(svg, axis, margin, width, height, disableTicks, _animationFrameDone, preventInitialDrawing)',
+          '_calcDrawnTicks(domainChanged)',
           'drawSeriesBars(completeSeriesConfig.*, titleDrawn)',
           '_muteSeriesBars(mutedSeries.*)',
           '_updateTicks(ticks)',
@@ -453,8 +454,8 @@ Custom property | Description | Default
 
           if(typeof this.preventInitialDrawing !== undefined && this.preventInitialDrawing === false) {
           // this.debounce('drawaxis', function() {
-
-            if(this._animationFrameDone && this._doesD3HaveValues(this.svg) && this.domainChanged !== null && this.orientation) {
+console.log("draw")
+            if(this._animationFrameDone && this._doesD3HaveValues(this.svg) && this.domainChanged !== null && this.orientation && this.axis) {
 
               if(this.rebuildOnDraw) {
                 this.removeAxis();
@@ -512,7 +513,6 @@ Custom property | Description | Default
               }
             }.bind(this))
             .call(this._axis);
-            // .each(function(d) { d3.select(this).call(_this._axis.scale(_this.axis[d])); })
 
           g.select("path.domain").attr("stroke", this._checkThemeVariable("--px-vis-axis-color", this.colors[this.axisColor]))
           this.set('_axisGroup',g);
@@ -539,7 +539,7 @@ Custom property | Description | Default
          *
          */
         _calcDrawnTicks: function() {
-          if(this.axisType !== 'ordinal') {
+          if(this.axisType !== 'ordinal' && this._axis && this._axis.scale) {
             //apparently we need to give ourselves a bit of time to ensure the axis draws and it can clac this
             this.debounce("drawnTicks", function() {
               // FIXME Only works if ticks is a Number; need to support other formats for ticks
@@ -776,18 +776,21 @@ Custom property | Description | Default
          *
          */
         drawSeriesBars: function() {
-          if(!this.preventSeriesBar && this._doesObjHaveValues(this.completeSeriesConfig) && this._axisGroup && this._titleGroup) {
+          // this.debounce("drawSeriesBars", function() {
+            if(!this.preventSeriesBar && this._doesObjHaveValues(this.completeSeriesConfig) && this._axisGroup && this._titleGroup) {
 
-            //reset bars...
-            // this._titleGroup.selectAll('rect').remove();
-            // TODO do we need to move the title group based on how many series we have
-            var keys = this.seriesOnAxis.length > 0 ? this.seriesOnAxis : Object.keys(this.completeSeriesConfig),
-                kLen = keys.length,
-                i;
-            for(i = 0; i < kLen; i++) {
-              this._drawBar(this._titleGroup,keys[i],this.completeSeriesConfig[keys[i]]['color'],i);
+              // TODO do we need to move the title group based on how many series we have
+              var keys = this.seriesOnAxis.length > 0 ? this.seriesOnAxis : Object.keys(this.completeSeriesConfig),
+                  kLen = keys.length,
+                  i;
+
+              for(i = 0; i < kLen; i++) {
+                if(this.completeSeriesConfig[keys[i]]) {
+                  this._drawBar(this._titleGroup,keys[i], this.completeSeriesConfig[keys[i]]['color'], i);
+                }
+              }
             }
-          }
+          // }, 10);
         },
         /**
          * Mutes and unmutes the color bars for each series

@@ -414,9 +414,10 @@ Custom property | Description | Default
 
           // if the key is an axis, save for later
           } else {
-            axesConfigs.push({ k : this.axisConfig[k] });
+            var o = {};
+            o[k] = this.axisConfig[k];
+            axesConfigs.push(o);
             hasAC = true;
-
           }
         }
 
@@ -576,7 +577,7 @@ Custom property | Description | Default
      * In order to make the ticks align, we iterate through and generate some round numbers for each axis
      *
      */
-    _calcTickVals: function(item){
+    _calcTickVals: function(item) {
       if(!this.y[item]){ return false }
 
       if(this.matchTicks && !this.singleDomain) {
@@ -591,6 +592,7 @@ Custom property | Description | Default
         }
         return vals;
       }
+      // console.log("null")
       return null;
     },
     /**
