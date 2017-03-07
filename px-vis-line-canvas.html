@@ -226,10 +226,10 @@ Element which draws lines series onto the chart
             }
           }
 
-          //save our empty state
+          //restore our empty state
           this.canvasContext.restore();
-          this.canvasContext.save();
 
+//FIXME Clip Path can be optimized. Currently draws with every TS line. Can be drawn once.
           if(this.clipPath) {
             this.drawClipPath();
           }
@@ -262,6 +262,8 @@ Element which draws lines series onto the chart
       */
       if(this.chartData.length > 0 && this.completeSeriesConfig[this.seriesId]["x"].length > 0) {
         if(this.radialLine) {
+          // Save seems required for Radar but breaks TS. Look into more.
+          this.canvasContext.save();
           this._drawRadarClipPath();
         } else {
           this._drawRectClipPath();
@@ -290,7 +292,6 @@ Element which draws lines series onto the chart
      * Draws a rectangular clip path for cartesian charts
      */
     _drawRectClipPath: function() {
-
       this.canvasContext.beginPath();
 
       var w = Math.max(this.width - this.margin.left - this.margin.right,0),
