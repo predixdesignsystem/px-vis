@@ -1726,53 +1726,55 @@ PxVisBehaviorChart.multiAxis = [{
   },
 
   _calcAxes: function(completeSeriesConfig) {
-    var keys = Object.keys(this.completeSeriesConfig),
-        lSet = {},
-        rSet = {},
-        lDims = [],
-        rDims = [],
-        seriesToAxes = {};
+    if(this._doesObjHaveValues(this.completeSeriesConfig)) {
+      var keys = Object.keys(this.completeSeriesConfig),
+          lSet = {},
+          rSet = {},
+          lDims = [],
+          rDims = [],
+          seriesToAxes = {};
 
-    for(var i = 0; i < keys.length; i++) {
-      if(this.completeSeriesConfig[keys[i]]['axis']) {
-        var k = keys[i],
-            axis = this.completeSeriesConfig[k]['axis'],
-            axisId = axis.id;
+      for(var i = 0; i < keys.length; i++) {
+        if(this.completeSeriesConfig[keys[i]]['axis']) {
+          var k = keys[i],
+              axis = this.completeSeriesConfig[k]['axis'],
+              axisId = axis.id;
 
-        // associates a series with an axes
-        if(seriesToAxes[axisId]) {
-          seriesToAxes[axisId].push(k);
-        } else {
-          seriesToAxes[axisId] = [ k ];
-        }
+          // associates a series with an axes
+          if(seriesToAxes[axisId]) {
+            seriesToAxes[axisId].push(k);
+          } else {
+            seriesToAxes[axisId] = [ k ];
+          }
 
-        // count how many axes on each side
-        if(axis.side === 'right') {
-          this._addAxisToList(axisId, axis.number, rSet, lSet, rDims);
-        } else {
-          this._addAxisToList(axisId, axis.number, lSet, rSet, lDims);
+          // count how many axes on each side
+          if(axis.side === 'right') {
+            this._addAxisToList(axisId, axis.number, rSet, lSet, rDims);
+          } else {
+            this._addAxisToList(axisId, axis.number, lSet, rSet, lDims);
+          }
         }
       }
+  // debugger
+      // strip out undefines
+      lDims = lDims.filter(Boolean);
+      rDims = rDims.filter(Boolean);
+
+      this.set('numLeftAxes', lDims.length);
+      this.set('numRightAxes', rDims.length);
+
+      this.set('axes', lDims.concat(rDims));
+      this.set('dimensions', this.axes);
+      this.set('seriesToAxes', seriesToAxes);
+      this.set('_axisX', this._setAxisScale(lDims.sort(), rDims.sort(), this.leftAxisSize, this.rightAxisSize));
+
+      if(typeof this._axisX === 'function') {
+        this.set('_axisDomainChanged', !this._axisDomainChanged);
+      }
+
+      // must decouple completeSeriesConfig from px-vis-multi-axis for timing reasons. Needs to set after dimensions
+      this.set('_multiAxisSeriesConfig', this.completeSeriesConfig);
     }
-
-    // strip out undefines
-    lDims = lDims.filter(Boolean);
-    rDims = rDims.filter(Boolean);
-
-    this.set('numLeftAxes', lDims.length);
-    this.set('numRightAxes', rDims.length);
-
-    this.set('axes', lDims.concat(rDims));
-    this.set('dimensions', this.axes);
-    this.set('seriesToAxes', seriesToAxes);
-    this.set('_axisX', this._setAxisScale(lDims.sort(), rDims.sort(), this.leftAxisSize, this.rightAxisSize));
-
-    if(typeof this._axisX === 'function') {
-      this.set('_axisDomainChanged', !this._axisDomainChanged);
-    }
-
-    // must decouple completeSeriesConfig from px-vis-multi-axis for timing reasons. Needs to set after dimensions
-    this.set('_multiAxisSeriesConfig', this.completeSeriesConfig);
   },
 
   _calcMultiMargins: function(margin, leftAxisWidth, rightAxisWidth) {
