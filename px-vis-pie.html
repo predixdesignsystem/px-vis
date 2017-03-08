@@ -60,7 +60,7 @@ Custom property | Description | Default
         <span id="totalValue">{{total}} {{_getUnit(completeSeriesConfig, seriesId)}}</span>
       </div>
       <!-- tooltip elem -->
-      <px-tooltip id="tooltip" orientation="top" delay="10" for="tooltipAnchor">
+      <px-tooltip id="tooltip" orientation="top" delay="10" follow-mouse>
         <div style="display:flex; flex-direction:column; align-items:center">
           <span>{{_ttTitle}}</span>
           <span>{{_ttMessage}}</span>
@@ -349,7 +349,7 @@ Custom property | Description | Default
                   .append('svg:path')
                     .attr('class', 'slice')
                     .on('tap', this._onSliceClick.bind(this))
-                    .on('mouseover', this._showTooltip.bind(this))
+                    .on('mouseenter', this._showTooltip.bind(this))
                     .on('mouseleave', this._hideTooltip.bind(this))
                   //new + update
                   .merge(this._arcs)
@@ -416,8 +416,7 @@ Custom property | Description | Default
 
       var rect = this.pxSvgElem.getBoundingClientRect();
 
-      this.$.tooltipAnchor.style.left = (center[0] +  this.radius + Number(this.margin.left)) + 'px';
-      this.$.tooltipAnchor.style.top =  (center[1] - rect.height + Number(this.margin.top) + this.radius) + 'px';
+      this.$.tooltip.mouseCoords = [center[0]  + rect.left+  this.radius + Number(this.margin.left),center[1] + Number(this.margin.top) + rect.top + this.radius];
       this.$.tooltip._show();
     },
     _hideTooltip: function(datum, index, group) {

@@ -122,22 +122,24 @@ Custom property | Description | Default
       <div
         id="registerWrap"
         class$="[[_getMinSizeClass(preventMinSize)]] inline--flex flex--col"
-        style$="{{_returnHeight(height,margin)}}; [[_returnWidth(chartWidth, width, margin)]]">
+        style$="{{_returnHeight(height,margin, type)}}; [[_returnWidth(chartWidth, width, margin, type)]]">
 
         <template is="dom-if" if="{{_displayTime(xAxisType, forceDateTimeDisplay)}}">
-          <px-vis-register-datetime
-            class$="[[tooltipStyle]]"
-            first-date-time="[[_firstDateTime]]"
-            second-date-time="[[_secondDateTime]]"
-            separator="[[_separator]]"
-            x-axis-type="[[xAxisType]]"
-          ></px-vis-register-datetime>
+          <div class$="{{_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)}}">
+            <px-vis-register-datetime
+              class$="[[tooltipStyle]]"
+              first-date-time="[[_firstDateTime]]"
+              second-date-time="[[_secondDateTime]]"
+              separator="[[_separator]]"
+              x-axis-type="[[xAxisType]]"
+            ></px-vis-register-datetime>
+          </div>
         </template>
 
         <div id="seriesWrap" class$="{{_getSeriesWrapperClassReverse(type)}}">
           <template is="dom-if" if="{{!_isOfType(xAxisType, 'pie')}}">
             <template is="dom-repeat" items="{{_series}}" as="_groups">
-              <div class$="{{_getSeriesWrapperClass(type)}}">
+              <div class$="{{_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)}}">
                 <template is="dom-repeat" id="itemRepeat" items="{{_groups}}" on-dom-change="_scrollBarsPresent">
                   <px-vis-register-item
                     class$="[[tooltipStyle]]"
@@ -163,8 +165,8 @@ Custom property | Description | Default
           <!-- For pie charts -->
           <template is="dom-if" if="{{_isOfType(yAxisType, 'pie')}}">
             <div class$="{{_getSeriesWrapperClassReverse(type)}}">
-              <div class$="{{_getSeriesWrapperClass(type)}}">
-                <template is="dom-repeat" items="{{chartData}}">
+              <div class$="{{_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)}}">
+                <template is="dom-repeat" id="pieItemRepeat" items="{{chartData}}" on-dom-change="_scrollBarsPresentPie">
                   <px-vis-register-item-pie
                     item="[[item]]"
                     item-index="[[index]]"
@@ -234,6 +236,24 @@ Custom property | Description | Default
        notify: true
       },
       /**
+       * If the `type` is 'horizontal' how the register should horizontally align, using flex align
+       * - 'left'
+       * - 'center'
+       * - 'right'
+       * - 'justify'
+       * - 'spaced'
+       * If the registers starts overflowing this will be ignored so that all register 
+       * items are accessible through scrolling
+       */
+      horizontalAlignment: {
+        type: String,
+        value: 'left'
+      },
+      _hasScrollBar: {
+        type: Boolean,
+        value: false
+      },
+      /**
        * List of the series to add to the register
        *
       */
@@ -273,24 +293,10 @@ Custom property | Description | Default
 
     observers: [
       '_formatDateTime(tooltipData.*)',
-      '_scrollBarsPresent(height)',
+      '_scrollBarsPresent(height, width)',
+      '_scrollBarsPresentPie(height, width)',
       '_computeSeries(tooltipData.series.*, groupings)'
      ],
-
-    /**
-     * dom-if function for type property which returns true if type equals horizontal
-     *
-     * `type` is dev set type property.
-     *
-     * `bool` is true if type === 'horizontal'; false if not
-     *
-     * @method _typeEqualHorizontal
-     * @param {type}
-     * @return {bool}
-     */
-    _typeEqualHorizontal: function(type) {
-      return type === 'horizontal';
-    },
 
     /**
      * Function which takes the incoming datetime from tooltipData and formats it.
@@ -358,12 +364,13 @@ Custom property | Description | Default
       }
     },
 
-    _returnHeight: function(height,margin) {
+    _returnHeight: function(height,margin, type) {
       return this.type === 'vertical' ? 'height:' + (height - margin.bottom) + 'px': '';
     },
 
 
-    _returnWidth: function(chartWidth, width, margin) {
+    _returnWidth: function(chartWidth, width, margin, type) {
+
       return this.type === 'horizontal' ? 'width:' + chartWidth + 'px;': 'width:' + width + 'px;';
     },
 
@@ -381,6 +388,24 @@ Custom property | Description | Default
         this.toggleClass('scrollOn', b, this.$.seriesWrap);
 
         this._itemCount = this.$$('#itemRepeat').renderedItemCount;
+      }
+    },
+
+    _scrollBarsPresentPie: function() {
+      if(this.$$('#pieItemRepeat') && this._itemCount !== this.$$('#pieItemRepeat').renderedItemCount) {
+        var b = false;
+        if(this.type === 'vertical' &&
+            this.$.seriesWrap.scrollHeight > (this.height - this.margin.top - this.margin.bottom)) {
+          b = true;
+        } else if(this.type === 'horizontal' &&
+            this.$.seriesWrap.scrollWidth > this.chartWidth) {
+          b = true;
+        }
+
+        this.toggleClass('scrollOn', b, this.$.seriesWrap);
+        this.set('_hasScrollBar', b);
+
+        this._itemCount = this.$$('#pieItemRepeat').renderedItemCount;
       }
     }
   });
