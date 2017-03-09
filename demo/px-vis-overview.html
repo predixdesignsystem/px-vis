@@ -46,16 +46,18 @@
         </li>
         <li><a class="actionable" href="#what_you_need_to_draw">What drawing tools can you use to draw in your chart?</a><br />
           <ol>
+            <li><a class="actionable" href="#axis">Axis</a></li>
             <li><a class="actionable" href="#clip_path">Clip Path</a></li>
-            <li><a class="actionable" href="#clip_path_complex">Clip path complex area (API documentation)</a></li>
+            <li><a class="actionable" href="#clip_path_complex">Clip path complex area</a></li>
             <li><a class="actionable" href="#event">Event</a></li>
-            <li><a class="actionable" href="#grid_lines">Grid lines</a></li>
+            <li><a class="actionable" href="#gridlines">Gridlines</a></li>
+            <li><a class="actionable" href="#interactive_axis">Interactive Axis</a></li>
             <li><a class="actionable" href="#line_canvas">Line Canvas</a></li>
             <li><a class="actionable" href="#line_svg">Line SVG</a></li>
             <li><a class="actionable" href="#multi_axis">Multi Axis</a></li>
             <li><a class="actionable" href="#pie">Pie</a></li>
             <li><a class="actionable" href="#radar_grid">Radar Grid</a></li>
-            <li><a class="actionable" href="#radial_grid_lines">Radial grid lines</a></li>
+            <li><a class="actionable" href="#radial_grid_lines">Radial gridlines</a></li>
             <li><a class="actionable" href="#scatter">Scatter</a></li>
             <li><a class="actionable" href="#threshold">Threshold</a></li>
           </ol>
@@ -84,7 +86,7 @@
         </li>
         <li><a class="actionable" href="#utilities">Utilities you can use in your chart</a><br />
           <ol>
-            <li><a class="actionable" href="#vis_d3">vis-d3</a></li>
+            <li><a class="actionable" href="#vis_d3">vis-d3 &amp; vis-behavior-d3</a></li>
             <li><a class="actionable" href="#data_converter">Data Converter</a></li>
           </ol>
         </li>
@@ -93,7 +95,8 @@
 
       <a name="overview" class="delta">Overview</a>
       <p>
-        Px-vis a charting platform, developed by the Predix UI team. It relies on the open source D3 library, and provides wrappers around a lot of features and functionalities offered in D3.
+        Px-vis a charting platform, developed by the Predix UI team. It relies on the open source d3 library, and provides wrappers around a lot of features and functionalities offered in D3. 
+        Please note that you do not need to know any d3 to use px-vis, but if you do, you can make modifications with d3 on top of the charts.
       </p>
 
       <p>
@@ -134,13 +137,13 @@
       </p>
 
       <ul>
-        <li><a href="https://www.predix-ui.com/#/components/px-vis-parallel-coordinates/">Parallel Coordinates</a></li>
-        <li>Pie Chart</li>
-        <li>Polar Chart</li>
-        <li>Radar</li>
-        <li>Spark</li>
-        <li>Timeseries</li>
-        <li>XY</li>
+        <li><a href="https://www.predix-ui.com/#/components/px-vis-parallel-coordinates/" target="_blank">Parallel Coordinates</a></li>
+        <li><a href="https://www.predix-ui.com/#/components/px-vis-pie-chart/" target="_blank">Pie Chart</li>
+        <li><a href="https://www.predix-ui.com/#/components/px-vis-polar/" target="_blank">Polar Chart</li>
+        <li><a href="https://www.predix-ui.com/#/components/px-vis-radar/" target="_blank">Radar</li>
+        <li><a href="https://www.predix-ui.com/#/components/px-vis-spark/" target="_blank">Spark</li>
+        <li><a href="https://www.predix-ui.com/#/components/px-vis-timeseries/" target="_blank">Timeseries</li>
+        <li><a href="https://www.predix-ui.com/#/components/px-vis-xy-chart/" target="_blank">XY</li>
       </ul>
 
       <a name="build_your_own_chart" class="epsilon">Build Your Own Charts</a>
@@ -220,7 +223,7 @@
       </p>
 
       <p>
-        For example, the svg attribute is defined and exported in the px-vis-svg component:
+        For example,  take this px-vis-svg component:
       </p>
 
 <p>
@@ -231,6 +234,8 @@
     margin="&#91; &#91; margin &#93; &#93;">
   &lt;/px-vis-svg></code></pre></div>
 </p>  
+      <p>Here, the component uses the one-way bound width, height, and margin, and defines and exports the svg attribute for consumption in other components.</p>
+
 
       <a name="what_you_need_to_start_charting" class="delta">What do you need to start charting</a>
       <p>
@@ -250,22 +255,21 @@
         The following explanations should provide guidelines to help you determine which of the 3 types of workspaces would best fit your needs:
       </p>
 
-      <a name="canvas" class="epsilon">canvas</a>
+      <a name="canvas" class="epsilon">canvas</a> (<span class="apiDocumentation actionable" data-demo="px-vis-canvas">API Documentation</span>)
       <p>
-        Canvas provides a rasterized (flattened) version of a workspace – it has the advantage of loading things much faster than SVG, but you pay the price by exchanging speed with quality – canvas is not recommended for high quality data representation or highly detailed charts, and Canvas is best suited for large quantities of data where speed of data rendering is a key requirement.
-      </p>
-      
-      <p>
-        When using canvas in the workspace, working with elements may require more extensive handling, e.g. pinpointing the cursor's exact position. To help you with this, the px-vis framework offers the px-vis-interaction-space interaction tool.
+        Canvas provides a rasterized (flattened) version of a workspace – it has the advantage of loading things much faster than SVG, but you pay the price by exchanging speed with quality – canvas lines and text are not as crisp as SVG and providing interactions with things drawn on canvas is more difficult, and Canvas is best suited for large quantities of data where speed of data rendering is a key requirement.
       </p>
 
-      <a name="svg" class="epsilon">svg</a>
+      <a name="svg" class="epsilon">svg</a> (<span class="apiDocumentation actionable" data-demo="px-vis-svg">API Documentation</span>)
       <p>
         SVG provides an easy to read XML code for creating vector based lines/paths. 
-        It works best when you need higher quality images, with more details – however, please note that after a certain number of points/lines, it does come with a hefty price that comes from the number of DOM manipulation that comes from adding all the created nodes to the DOM. The more points/lines/paths you add into your svg workspace, the slower your chart is going to load.<br />
+        It works best when you need higher quality images, with more details, and provides easier user interactions capabilities – however, please note that after a certain number of points/lines, it does come with a hefty price that comes from the number of DOM manipulation that comes from adding all the created nodes to the DOM. <br />
+        The more points/lines/paths you add into your svg workspace, the slower your chart is going to load.<br />
+        <br />
+        When using svg in the workspace, working with elements may require more extensive handling, e.g. pinpointing the cursor’s exact position. To help you with this, the px-vis framework offers the px-vis-interaction-space interaction tool.
       </p>
   
-        <a name="svg_canvas" class="epsilon">svg-canvas</a>
+        <a name="svg_canvas" class="epsilon">svg-canvas</a> (<span class="apiDocumentation actionable" data-demo="px-vis-svg-canvas">API Documentation</span>)
         <p>
         This is a hybrid of both Svg and Canvas, using the best features of each. 
         <ol>
@@ -332,17 +336,18 @@
       </p>
       </p>
 
+      
+      <a name="scale" class="epsilon">Scale</a> (<span class="apiDocumentation actionable" data-demo="px-vis-scale">API Documentation</span>)
       <p>
-        <a name="scale" class="epsilon">Scale</a>
-        This component provides two scales – an X (independent axis) and Y (dependent axis). Scale is available as either a behavior or a component (Polymer HTML elements).
+          This component provides two scales – an X (independent axis) and Y (dependent axis). Scale is available as either a behavior or a component (Polymer HTML elements).
       </p>  
+      <a name="multi_scale" class="epsilon">Multi Scale</a> (<span class="apiDocumentation actionable" data-demo="px-vis-multi-scale">API Documentation</span>)
       <p>
-        <a name="multi_scale" class="epsilon">Multi Scale</a>
         This component provides a single ordinal X axis and multiple independent continuous Y axes. This scale is only available as a component.
       </p>
 
+      <a name="radial_scale" class="epsilon">Radial Scale</a> (<span class="apiDocumentation actionable" data-demo="px-vis-radial-scale">API Documentation</span>)
       <p>
-        <a name="radial_scale" class="epsilon">Radial Scale</a>
         This component provides an X and Y - similar to scale, but the scale accepts polar data and returns Cartesian pixel coordinates, creating a polar plot. This scale is only available as a component.
       </p>  
 
@@ -374,78 +379,88 @@
       </p>
 
       <ul>
+        <li><a href="#axis">Axis</a></li>
         <li><a href="#clip_path">clip-path</a></li>
         <li><a href="#clip_path_complex">clip-path-complex-area</a> </li>
         <li><a href="#event">event</a></li>
-        <li><a href="#grid_lines">grid-lines</a></li>
+        <li><a href="#gridlines">grid-lines</a></li>
+        <li><a href="#interactive_axis">interactive-axis</a></li>
         <li><a href="#line_canvas">line-canvas</a></li>
         <li><a href="#line_svg">line-svg</a></li>
         <li><a href="#multi_axis">multi-axis</a></li>
         <li><a href="#pie">pie</a></li>
         <li><a href="#radar_grid">radar-grid</a></li>
-        <li><a href="#radial_grid_lines">radial-grid-lines</a></li>
+        <li><a href="#radial_grid_lines">radial-gridlines</a></li>
         <li><a href="#scatter">scatter</a></li>
         <li><a href="#threshold">threshold</a></li>
       </ul>
+      <a name="axis" class="epsilon">Axis</a> (<span class="apiDocumentation actionable" data-demo="px-vis-axis">API Documentation</span>)
+      <p>
+        Draws an axis line with tick marks. Can be vertical or horizontal and can be positioned on any edge of the chart
+      </p>
 
-      <a name="clip_path" class="epsilon">Clip Path</a>
+      <a name="clip_path" class="epsilon">Clip Path</a> (<span class="apiDocumentation actionable" data-demo="px-vis-clip-path">API Documentation</span>)
       <p>
         Draws an SVG rectangular clipPath, preventing SVG from drawing anything outside of the clip rectangle. Does not work with Canvas.
       </p>
 
-      <a name="clip_path_complex" class="epsilon">Clip path complex area</a>
+      <a name="clip_path_complex" class="epsilon">Clip path complex area</a> (<span class="apiDocumentation actionable" data-demo="px-vis-clip-path-complex-area">API Documentation</span>)
       <p>
         Draws an SVG compound polygonal clipPath, preventing SVG from drawing anything outside of the clip shape. Does not work with Canvas.
       </p> 
 
-      <a name="event" class="epsilon">Event</a>
+      <a name="event" class="epsilon">Event</a> (<span class="apiDocumentation actionable" data-demo="px-vis-event">API Documentation</span>)
       <p>
         Used for marking an event occurrence. Draws an icon and line vertically. 
         The icon includes a tooltip, which can contain the X value, event name and event ID.
       </p> 
 
-      <a name="grid_lines" class="epsilon">Grid lines</a>
+      <a name="gridlines" class="epsilon">Grid lines</a> (<span class="apiDocumentation actionable" data-demo="px-vis-gridlines">API Documentation</span>)
       <p>
         Draws horizontal or vertical grid lines in your chart, depending the passed in configuration.  Helps in the association of axes values and data points.
       </p>
 
-      <a name="line_canvas" class="epsilon">Line Canvas</a>
+      <a name="interactive_axis" class="epsilon">Interactive Axis</a> (<span class="apiDocumentation actionable" data-demo="px-vis-interactive-axis">API Documentation</span>)
+      <p>
+        Draws an axis with integrated user interactivity, such as brush and drag.
+      </p>
+
+      <a name="line_canvas" class="epsilon">Line Canvas</a> (<span class="apiDocumentation actionable" data-demo="px-vis-line-canvas">API Documentation</span>)
       <p>
         Draws a line representation of data, using Canvas. Can either draw single or multiple lines depending on configuration and data.
       </p>
 
-      <a name="line_svg" class="epsilon">Line SVG</a>
+      <a name="line_svg" class="epsilon">Line SVG</a> (<span class="apiDocumentation actionable" data-demo="px-vis-line-svg">API Documentation</span>)
       <p>
         Draws a line representation of your data, using SVG. Can either draw single or multiple lines depending on configuration and data.
       </p>
 
-      <a name="multi_axis" class="epsilon">Multi Axis</a>
+      <a name="multi_axis" class="epsilon">Multi Axis</a> (<span class="apiDocumentation actionable" data-demo="px-vis-multi-axis">API Documentation</span>)
       <p>
-        Draws multiple Axes positioned ordinally. Each axis can have an individual or shared scale. 
-        Can also be positioned radially or horizontally.
+        Draws multiple Axes positioned ordinally. Each axis can have an individual or shared scale. Can be radial or horizontal.
       </p>
 
-      <a name="pie" class="epsilon">Pie</a>
+      <a name="pie" class="epsilon">Pie</a> (<span class="apiDocumentation actionable" data-demo="px-vis-pie">API Documentation</span>)
       <p>
         Draws a pie or donut representation of your data, using SVG. Includes a tooltip and popover. The colors need to be included in the data set, through a colorIndex property.
       </p>
 
-      <a name="radar_grid" class="epsilon">Radar Grid</a>
+      <a name="radar_grid" class="epsilon">Radar Grid</a> (<span class="apiDocumentation actionable" data-demo="px-vis-radar-grid">API Documentation</span>)
       <p>
         Creates polygonal grid lines. Used as a background for radar charts. 
       </p>
 
-      <a name="radial_grid_lines" class="epsilon">Radial grid lines</a>
+      <a name="radial_grid_lines" class="epsilon">Radial gridlines</a> (<span class="apiDocumentation actionable" data-demo="px-vis-radial-gridlines">API Documentation</span>)
       <p>
         Creates circular grid lines. Used as a background for polar charts. 
       </p>
 
-      <a name="scatter" class="epsilon">Scatter</a>
+      <a name="scatter" class="epsilon">Scatter</a> (<span class="apiDocumentation actionable" data-demo="px-vis-scatter">API Documentation</span>)
       <p>
         Draws symbols which represents your data using SVG. The symbols can be customized using markerSymbol; the default is a circle.
       </p>
 
-      <a name="threshold" class="epsilon">Threshold</a>
+      <a name="threshold" class="epsilon">Threshold</a> (<span class="apiDocumentation actionable" data-demo="px-vis-threshold">API Documentation</span>)
       <p>
         Creates a horizontal line to indicate a predefined threshold level.  Threshold attributes are set through threshold-config which can contain a title, line color and type.
       </p>
@@ -465,57 +480,59 @@
         <li><a href="#axis_brush">Axis brush</a></li>
         <li><a href="#axis_drag">Axis drag</a> (behavior)</li>
         <li><a href="#brush">Brush</a></li>
-        <li><a href="#chart_navigator">Chart navigator</a> </li>
+        <li><a href="#chart_navigator">Chart navigator</a></li>
         <li><a href="#dynamic_menu">Dynamic menu</a></li>
         <li><a href="#interaction_space">Interaction Space</a></li>
         <li><a href="#register">Register</a></li>
-        <li><a href="#toolbar">Toolbar</a></li>
+        <li><a href="#toolbar">Toolbar</a></li> 
       </ol>
 
-      <a name="axis_brush" class="epsilon">Axis Brush</a>
+      <a name="axis_brush" class="epsilon">Axis Brush</a> (<span class="apiDocumentation actionable" data-demo="px-vis-axis-brush">API Documentation</span>)
       <p>
-        A drawn box used to select a 1-dimensional region on an axis. Usually drawn by a mouse, although the box can be drawn programmatically. To enable the brush, you have to select the axis so the cursor is triggered, then drag to draw the rectangle which will then remove all other data points outside of the brushed area. This brush can also be deleted programmatically or through a user interaction by clicking off the brush.
+        A drawn box used to select a range on an axis. Usually drawn by a mouse, although the box can be drawn programmatically. To enable the brush, you have to select the axis so the cursor is triggered, then drag to draw the rectangle which will then remove all other data points outside of the brushed area. This brush can also be deleted programmatically or through a user interaction by clicking off the brush.
       </p>
 
-      <a name="axis_drag" class="epsilon">Axis Drag</a>
+      <a name="axis_drag" class="epsilon">Axis Drag</a> (<span class="apiDocumentation actionable" data-demo="px-vis-axis-drag">API Documentation</span>)
       <p>
         Provides drag behavior to an axis, allowing the user to reposition the axis using their mouse.
       </p>
 
-      <a name="brush" class="epsilon">Brush</a>
+      <a name="brush" class="epsilon">Brush</a> (<span class="apiDocumentation actionable" data-demo="px-vis-brush">API Documentation</span>)
       <p>
-        A drawn box used to select a 1-dimensional region. Usually drawn by a mouse, although the box can be drawn programmatically. It always has visible handles and the brushed (selected) area always stays visible. While using the mouse, you are confined to the visible portion of the workspace.
+        A drawn box used to select range on a 1-dimensional region. Usually drawn by a mouse, although the box can be drawn programmatically. It always has visible handles and the brushed (selected) area always stays visible. While using the mouse, you are confined to the visible portion of the workspace.
       </p>
 
-      <a name="chart_navigator" class="epsilon">Chart Navigator</a>
+      <a name="chart_navigator" class="epsilon">Chart Navigator</a> (<span class="apiDocumentation actionable" data-demo="px-vis-chart-navigator">API Documentation</span>)
       <p>
         This component provides a way to filter your data –with a brush - based on the time domain.
-        The chart navigator is a small chart accompanying the main chart or charts, which displays the entire data set for the provided series. 
-        When tied to a timeseries, the filtering results in zooming and panning.
+        The chart navigator is a small chart accompanying the main chart or charts, intended to display the entire data set for the provided series. 
+        When tied to a timeseries chart, the filtering results in zooming and panning. In non-timeseries charts, it filters the displayed data based on the time domain.
       </p>
 
-      <a name="dynamic_menu" class="epsilon">Dynamic Menu</a>
+      <a name="dynamic_menu" class="epsilon">Dynamic Menu</a> (<span class="apiDocumentation actionable" data-demo="px-vis-dynamic-menu">API Documentation</span>)
       <p>
         A configurable dropdown menu, used inside a register. Can be used to hook custom functions, fire events, and define actions which pertain to a particular series.
       </p>
 
-      <a name="interaction_space" class="epsilon">Interaction Space</a>
+      <a name="interaction_space" class="epsilon">Interaction Space</a> (<span class="apiDocumentation actionable" data-demo="px-vis-interaction-space">API Documentation</span>)
       <p>
-        Provides an invisible rectangle, overlaid over your chart, which captures mouse interactions.
-        Also provides mechanisms for zooming, panning and tooltip calculations. 
+        Interaction Space is an invisible rectangle overlaid on the chart which captures mouse interactions and performs calculations for zooming, panning and tooltip functionality.
+        <br />
         Can be configured for custom interactions on the chart through actionContext.
       </p>
 
-      <a name="register" class="epsilon">Register</a>
+      <a name="register" class="epsilon">Register</a> (<span class="apiDocumentation actionable" data-demo="px-vis-register">API Documentation</span>)
       <p>
-        An HTML element which can be used to display the series names, colors, and values.  
+        An HTML element which can be used to display the series names, colors, values, and timestamps.  
         Each register can include dynamic menus that can be configured to interact with a particular series.  Includes px-vis-register-item, px-vis-register-item-pie and px-vis-register-datetime.
       </p>
 
-      <a name="toolbar" class="epsilon">Toolbar</a>
+      <a name="toolbar" class="epsilon">Toolbar</a> (<span class="apiDocumentation actionable" data-demo="px-vis-toolbar">API Documentation</span>)
       <p>
-        A configurable element providing buttons which help with chart interaction. 
+        A configurable element enabling direct interaction with the chart.
+        There are sample interactions provided as "out of the box" examples in chart demos; however, the toolbar is fully configurable and can be customized to any application requirements that requires direct interaction with the chart.<br /> 
         Each main row button can have a defined sub row – either one of which can trigger events or/and function calls. The toolbar can return an actionContext property, used by px-vis-interaction-space, to define custom mouse interactions on the chart.
+
       </p>
 
 
@@ -530,15 +547,15 @@
         <li><a href="#tooltip">Tooltip</a></li>
       </ol>
 
-      <a name="cursor" class="epsilon">Cursor</a>
+      <a name="cursor" class="epsilon">Cursor</a> (<span class="apiDocumentation actionable" data-demo="px-vis-cursor">API Documentation</span>)
       <p>
         A tool used to highlight data points using a configurable circles and lines. Typically used to draw attention to a particular data point.
       </p>
 
-      <a name="tooltip" class="epsilon">Tooltip</a>
+      <a name="tooltip" class="epsilon">Tooltip</a> (<span class="apiDocumentation actionable" data-demo="px-vis-tooltip">API Documentation</span>)
       <p>
         A floating version of the register which can follow the mouse, or be triggered on hover over data points, displaying the same information as the register. The tooltip does not have any interactions with the dynamic menu and only contains informational data values.
-        At this time, we do not recommend using the tooltip, since the data is not visible beneath it.
+        Use of the tooltip is not recommended since it covers the data beneath it.
       </p>
 
       <a name="utilities" class="delta">Utilities you can use in your chart</a>
@@ -548,11 +565,11 @@
         These utilities are:
       </p>
       <ol>
-        <li><a href="#vis_d3">px-vis-d3</a></li>
+        <li><a href="#vis_d3">px-vis-d3 &amp; px-vis-behavior-d3 </a></li>
         <li><a href="#data_converter">px-vis-data-converter</a></li>
       </ol>
 
-      <a name="vis_d3" class="epsilon">vis-d3</a>
+      <a name="vis_d3" class="epsilon">vis-d3 &amp; vis-behavior-d3</a>
       <p>
         Loads d3 for px and stores any other version of d3 that was previously loaded. Used to avoid d3 version conflicts. The previously loaded versions are stored in window.Px.oldD3.
       </p>
@@ -568,6 +585,24 @@
 <script>
   Polymer({
     is: "px-vis-overview",
-    properties:{}
+    properties:{},
+    _changeToDemo: function(evt) {
+      var name= Polymer.dom(evt).rootTarget.dataset.demo;
+      debugger;
+      this.fire('px-demo-active-should-change', {name:name});
+    },
+    attached: function() {
+      this.listen(this, 'tap', '_pageTap');
+    },
+    detached: function() {
+      this.unlisten(this, 'tap', '_pageTap');
+    },
+    _pageTap: function(evt) {
+      var classList = evt.target.classList;
+
+      if (classList.contains('apiDocumentation')) {
+        this._changeToDemo(evt);
+      }
+    }
   });
 </script>
