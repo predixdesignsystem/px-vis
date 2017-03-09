@@ -46,11 +46,6 @@ Custom property | Description | Default
     <template>
       <style include="px-vis-pie-styles"></style>
 
-      <div id="popoverWrapper" class="anchor wrapper">
-        <span id="popoverAnchor" class="anchor"></span>
-        <px-popover id="popover" position="relative" popover-title="" orientation="top" hide-overlay class="popover" for="popoverAnchor" style="position:relative">
-        </px-popover>
-      </div>
       <!-- anchors for tooltip and popovers -->
       <span id="tooltipAnchor" class=" anchor"></span>
 
@@ -87,6 +82,12 @@ Custom property | Description | Default
       PxColorsBehavior.baseColors
     ],
 
+    
+    /**
+    * Fired when the pie finished rotated for centering on a slice
+    * detail: { name: nameOfTheSlice, value: valueOfTheSlice}
+    * @event px-vis-pie-centered-on-slice
+    */
     /**
      * Properties block, expose attribute values to the DOM via 'reflect'
      *
@@ -416,7 +417,8 @@ Custom property | Description | Default
 
       var rect = this.pxSvgElem.getBoundingClientRect();
 
-      this.$.tooltip.mouseCoords = [center[0]  + rect.left+  this.radius + Number(this.margin.left),center[1] + Number(this.margin.top) + rect.top + this.radius];
+      this.$.tooltip.mouseCoords = [ center[0] + rect.left + 250,
+                                     center[1] + rect.top + 270];
       this.$.tooltip._show();
     },
     _hideTooltip: function(datum, index, group) {
@@ -469,17 +471,7 @@ Custom property | Description | Default
         this._positionChart(750);
         //display a popover after the rotation
         setTimeout(function() {
-
-          var rect = this.pxSvgElem.getBoundingClientRect();
-
-          //position popover anchor
-          this.$.popoverWrapper.style.left =  (Number(this.margin.left) +  this.radius) + 'px';
-          this.$.popoverWrapper.style.top = -rect.height + Number(this.margin.top) + 'px';
-
-          this.$.popover.popoverTitle = datum.data[this.completeSeriesConfig[this.seriesId].y];
-          this.$.popover.popoverBody = this._getSliceValue(datum);
-
-          this.$.popover.show();
+          this.fire('px-vis-pie-centered-on-slice', {name: datum.data[this.completeSeriesConfig[this.seriesId].y],value: this._getSliceValue(datum)});
         }.bind(this), 750);
       }
     },

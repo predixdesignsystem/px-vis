@@ -634,7 +634,9 @@ Custom property | Description | Default
         this._lastDomainChanged = this.domainChanged;
         this._rebuildOnDraw = true;
 
-        // FIXME technically, we should look and see if we need to rerender; if dimensions didnt change, but domainChanged did  due to a y domain change, then we may rerender unncessarily.
+        // FIXME technically, we should look and see if we need to rerender; 
+        //if dimensions didnt change, but domainChanged did  due to a y domain 
+        //change, then we may rerender unncessarily.
         var notFirst = this._internalDimensions ? true : false,
             dimsChanged = (notFirst && this.dimensions.length === this._internalDimensions.length) ? false : true;
 
@@ -662,8 +664,8 @@ Custom property | Description | Default
         this._calcGridTicks(this._internalDimensions[0]);
         this._calcGridAxis(this._internalDimensions[0]);
 
-
-        if(dimsChanged) {
+        //don't force rendering the first time to have faster init
+        if(dimsChanged && notFirst) {
           this.$.bof.render();
         }
 
@@ -767,7 +769,10 @@ Custom property | Description | Default
           this._addToMutedSeries(series, this._mutedSeriesPerBrush[d]);
         }
 
-        this.set('mutedSeries', series);
+        //don't update if they're both empty
+        if(Object.keys(this.mutedSeries).length !== 0 || Object.keys(series).length !== 0) {
+          this.set('mutedSeries', series);
+        }
       }, 50);
     },
 
