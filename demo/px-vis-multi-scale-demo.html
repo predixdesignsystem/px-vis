@@ -14,10 +14,10 @@
 <link rel="import" href="../../px-demo/css/px-demo-styles.html" />
 
 <!-- Imports for this componnent -->
-<link rel="import" href="px-vis-svg-demo-component.html">
+<link rel="import" href="px-vis-multi-scale-demo-component.html">
 
 <!-- Demo DOM module -->
-<dom-module id="px-vis-svg-demo">
+<dom-module id="px-vis-multi-scale-demo">
   <template>
   <style include="px-demo-styles" is="custom-style"></style>
 
@@ -30,7 +30,7 @@
 
     <!-- Header -->
     <px-demo-header
-        module-name="px-vis-svg"
+        module-name="px-vis-multi-scale"
         description="[[description]]"
         parent-name="px-vis">
     </px-demo-header>
@@ -43,29 +43,29 @@
 
       <!-- Component ---------------------------------------------------------->
       <px-demo-component>
-        <px-vis-svg-demo-component></px-vis-svg-demo-component>
+        <px-vis-multi-scale-demo-component></px-vis-multi-scale-demo-component>
       </px-demo-component>
       <!-- END Component ------------------------------------------------------>
 
       <px-demo-component-snippet
           element-properties="{{props}}"
-          element-name="px-vis-svg">
+          element-name="px-vis-multi-scale">
       </px-demo-component-snippet>
     </px-demo-interactive>
 
     <!-- API Viewer -->
-    <px-demo-api-viewer source="px-vis-svg"></px-demo-api-viewer>
+    <px-demo-api-viewer source="px-vis-multi-scale"></px-demo-api-viewer>
 
   </template>
 
 </dom-module>
 <script>
   Polymer({
-    is: 'px-vis-svg-demo',
+    is: 'px-vis-multi-scale-demo',
     properties: {
       description: {
         type: String,
-        value: "All charts need a drawing space SVG component. These cannot be seen but provide the basic framework for drawing objects to be displayed. The svg component provides the drawing space and d3 instantiated drawing object. The svg component returns an 'svg' variable to be passed into drawing components. Note: All the subsequent charts will have this component, but they will not be shown in the code snippet."
+        value: "Interpreter component which creates x & y interpreters which act as data converters."
       },
       /**
        * @property demoProps
@@ -94,17 +94,36 @@
     },
     demoProps: {
       width:{
-				value:"[[width]]"
+				defaultValue:"[[width]]"
 			},
       height:{
-				value:"[[height]]"
+				defaultValue:"[[height]]"
 			},
       margin:{
-				value:"[[margin]]"
+				defaultValue:"[[margin]]"
 			},
-      svg:{
-				value:"{{svg}}"
+      axes:{
+        defaultValue: "[[axes]]"
+      },
+      chartData:{
+        defaultValue: "[[chartData]]"
+      },
+      chartExtents:{
+        defaultValue: "[[chartExtents]]"
+      },
+      x:{
+        defaultValue: "{{x}}"
+      },
+      y:{
+        defaultValue: "{{y}}"
+      },
+      domainChanged:{
+        defaultValue: "{{domainChanged}}"
       }
     }
   });
+
+
+      
+
 </script>

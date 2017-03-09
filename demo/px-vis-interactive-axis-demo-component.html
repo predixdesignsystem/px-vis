@@ -1,6 +1,6 @@
 <link rel="import" href="../../polymer/polymer.html">
 
-<link rel="import" href="../px-vis-scale.html">
+<link rel="import" href="../px-vis-multi-scale.html">
 <link rel="import" href="../px-vis-svg.html">
 <link rel="import" href="../px-vis-interactive-axis.html">
 
@@ -15,31 +15,36 @@
         margin="[[margin]]"
         svg="{{svg}}">
       </px-vis-svg>
-      <px-vis-scale
-        x-axis-type="time"
-        y-axis-type="linear"
-        complete-series-config="[[seriesConfig]]"
-        data-extents="[[dataExtents]]"
-        width="[[width]]"
-        height="[[height]]"
-        margin="[[margin]]"
-        chart-data={{chartData}}
+      <px-vis-multi-scale
+        id="multiScale"
+        axes='["y"]'
+        chart-data="[[chartData]]"
+        chart-extents="[[chartExtents]]"
         x="{{x}}"
         y="{{y}}"
-        domain-changed="{{domainChanged}}">
-      </px-vis-scale>
-      <px-vis-interactive-axis
-        svg="[[svg]]"
-        axis="[[y]]"
-        margin="[[margin]]"
         width="[[width]]"
         height="[[height]]"
-        title="myTitle"
-        orientation="left"
-        label-position="center"
-        complete-series-config="[[seriesConfig]]"
-        muted-series=[[mutedSeries]]
-        domain-changed="[[domainChanged]]">
+        margin="[[margin]]"
+        dimensions='["y"]'
+        domain-changed="{{domainChanged}}">
+      </px-vis-multi-scale>
+      <px-vis-interactive-axis
+          svg="[[svg]]"
+          x="[[x]]"
+          y="[[_returnY(y, domainChanged)]]"
+          dimension="y"
+          axes='["y"]'
+          dimensions='["y"]'
+          series-key="x"
+          height="[[height]]"
+          width="[[width]]"
+          margin="[[margin]]"
+          chart-data="[[chartData]]"
+          orientation="left"
+          complete-series-config="[[completeSeriesConfig]]"
+          domain-changed="[[domainChanged]]"
+          series-on-axis='["y"]'
+          >
       </px-vis-interactive-axis>
         <p style="text-align: center; color: rgb(177,177,188)">px-vis-interactive-axis demo is work in progress.</p>
 
@@ -132,8 +137,28 @@
             "x": [Infinity,-Infinity],
             "y": [0,-Infinity]
           }
+        },
+        chartExtents: {
+          type: Object,
+          value: {'x': ['y'], 'y':{'y':[1,10]}}
+        },
+        completeSeriesConfig: {
+          value: {
+              "x":{
+                "type":"line",
+                "name":"mySeries",
+                "x":['y'],
+                "y":['y'],
+                "color": "rgb(93,165,218)"
+              }
+            },
+          type: Object  
         }
+      },
+      _returnY: function(y, dc) {
+        return y.y
       }
+
     });
   </script>
 </dom-module>
