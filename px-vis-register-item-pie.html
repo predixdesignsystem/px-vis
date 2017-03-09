@@ -51,28 +51,49 @@ Custom property | Description | Default
 
   <template>
     <style include="px-vis-register-styles"></style>
-
+    <style>
+      :host {
+        /*  Fix for Safari flex bug:
+            https://philipwalton.com/articles/normalizing-cross-browser-flexbox-bugs/
+            Demo of bug: http://jsbin.com/xetinivozo/1/edit?html,js,output
+        */
+        flex-shrink: 0;
+      }
+    </style>
 
       <span
         id="pieItem"
-        class$="{{_baseClasses}}"
-        name$="R{{_returnPieVal(item, 'y', usePercentage, completeSeriesConfig)}}">
+        class$="[[_baseClasses]] register-item--min-width">
+        <span
+          class$="flex [[_itemMutedToStart]]"
+          id="regWithoutMenu">
           <span
             class="seriesMarker"
-            style$="background-color:{{_getPieBackColor(item, itemIndex, completeSeriesConfig)}}"
-            name$="R{{_returnPieVal(item, 'y', usePercentage, completeSeriesConfig)}}"
+            style$="background-color:[[_getPieBackColor(item, itemIndex, completeSeriesConfig)]]"
           >&nbsp;</span>
-          <div class="seriesName" name$="R{{_configName}}">
-            {{_truncatedName}}&nbsp;
-            <template is="dom-if" if="{{_didTruncate}}">
-              <px-tooltip delay="500">{{_configName}}</px-tooltip>
-            </template>
-          </div>
-          <!-- Display serie data differently depending on x and y axis types -->
-          <div class="seriesData" name$="R{{_returnPieVal(item, 'y', usePercentage, completeSeriesConfig)}}">
-            <span>[[_returnPieVal(item, 'x', usePercentage, completeSeriesConfig)]]</span>
-            <template is="dom-if" if="{{_returnPieVal(item, 'x', usePercentage, completeSeriesConfig)}}">{{_getPieUnit(usePercentage)}}</template>
-          </div>
+          <span class$="[[_wrapperClass]]">
+            <div class="seriesName flex__item--msfix">
+              [[_truncatedName]]&nbsp;
+              <template is="dom-if" if="[[_didTruncate]]">
+                <px-tooltip delay="500">[[_configName]]</px-tooltip>
+              </template>
+            </div>
+            <!-- Display serie data differently depending on x and y axis types -->
+            <div class="seriesData flex__item--msfix">
+              <span>[[_returnPieVal(item, 'x', usePercentage, completeSeriesConfig)]]</span>
+              <template is="dom-if" if="[[_returnPieVal(item, 'x', usePercentage, completeSeriesConfig)]]">[[_getPieUnit(usePercentage)]]</template>
+            </div>
+          </span>
+        </span>
+        <template id="menuTemplate" is="dom-if" if="[[_hasDynamicMenu]]">
+          <px-vis-dynamic-menu
+              id="menu"
+              class$="[[_getDynamicMenuClass(type)]]"
+              style="display: none"
+              additional-detail="[[item]]"
+              dynamic-menu-config="[[dynamicMenuConfig]]">
+          </px-vis-dynamic-menu>
+        </template>
       </span>
     </template>
   </template>
@@ -93,7 +114,8 @@ Custom property | Description | Default
       PxVisBehaviorRegister.register,
       PxVisBehaviorRegister.pie,
       PxVisBehaviorRegister.itemShared,
-      PxVisBehavior.getSeriesColors
+      PxVisBehavior.getSeriesColors,
+      PxVisBehavior.dynamicMenuConfig
     ],
 
     properties: {
@@ -136,6 +158,6 @@ Custom property | Description | Default
      */
     _getPieBackColor: function(item, index) {
       return item.backgroundColor ? item.backgroundColor : this._getColor(index);
-    },
+    }
   });
 </script>

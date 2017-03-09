@@ -69,7 +69,9 @@ Custom property | Description | Default
 <dom-module id="px-vis-axis">
     <template>
       <style include="px-vis-styles"></style>
-      <px-tooltip id="tooltip" delay=500>{{title}} {{_currentUnits}}</px-tooltip>
+      <template id="tooltipTemplate" is="dom-if" if="[[_titleTruncated]]">
+        <px-tooltip id="tooltip" delay="500">{{title}} {{_currentUnits}}</px-tooltip>
+      </template>
     </template>
 </dom-module>
 
@@ -87,7 +89,8 @@ Custom property | Description | Default
           PxVisBehaviorD3.axisConfig,
           PxVisBehavior.truncating,
           PxVisBehaviorD3.domainUpdate,
-          PxColorsBehavior.baseColors
+          PxColorsBehavior.baseColors,
+          PxVisBehavior.preventInitialDrawing
         ],
 
         /**
@@ -129,8 +132,7 @@ Custom property | Description | Default
            */
           displayedTitle: {
             type: String,
-            notify: true,
-            value: ''
+            notify: true
           },
           /**
            * Whether to append unit (if existing in config) in the title
@@ -173,6 +175,13 @@ Custom property | Description | Default
            *
            */
           titleTruncation: {
+            type: Boolean,
+            value: false
+          },
+          /**
+           * Whether the title has been truncated
+           */
+          _titleTruncated: {
             type: Boolean,
             value: false
           },
@@ -232,20 +241,24 @@ Custom property | Description | Default
             type: Array,
             value: function() {
               return [];
-            },
-            rebuildOnDraw: {
+            }
+          },
+          rebuildOnDraw: {
             type: Boolean,
             value: false
           },
           _removingAxis: {
             type: Boolean,
             value:false
-          }
+          },
+          _tooltipElem: {
+            type: HTMLElement
           }
         },
 
         observers: [
-          'drawElement(domainChanged, svg, axis, margin, width, height, disableTicks, _animationFrameDone)',
+          'drawElement(domainChanged, svg, axis, margin, width, height, disableTicks, _animationFrameDone, preventInitialDrawing)',
+          '_calcDrawnTicks(domainChanged)',
           'drawSeriesBars(completeSeriesConfig.*, titleDrawn)',
           '_muteSeriesBars(mutedSeries.*)',
           '_updateTicks(ticks)',
@@ -399,14 +412,15 @@ Custom property | Description | Default
         },
 
         removeAll: function() {
-          this.removeAxis();
           this.removeTitle();
+          this.removeAxis();
         },
 
         removeAxis: function() {
           this._removingAxis = true;
           // remove the axis
           if(this._axisGroup) {
+            // this._axisGroup.selectAll('*').remove();
             this._axisGroup.remove();
             this._axisGroup = null;
           }
@@ -425,14 +439,18 @@ Custom property | Description | Default
          * @method drawElement
          */
         drawElement: function() {
-          this.debounce('drawaxis', function() {
 
-            if(this._animationFrameDone && this._doesD3HaveValues(this.svg) && this.domainChanged !== null && this.orientation) {
-              
+
+          if(typeof this.preventInitialDrawing !== undefined && this.preventInitialDrawing === false) {
+           //this.debounce('drawaxis', function() {
+
+            if(this._animationFrameDone && this._doesD3HaveValues(this.svg) && this.domainChanged !== null && this.orientation && this.axis) {
+
               if(this.rebuildOnDraw) {
                 this.removeAxis();
               }
-                          this.defineAxis();
+
+               this.defineAxis();
               if(!this._axisGroup) {
                 this._buildAxis();
               } else {
@@ -442,7 +460,8 @@ Custom property | Description | Default
               // alert parents that we are done drawing the axis
               this.fire('px-axis-done');
             }
-          }, 10)
+           //}, 10)
+          }
         },
         /**
          * Updates the axis
@@ -483,7 +502,6 @@ Custom property | Description | Default
               }
             }.bind(this))
             .call(this._axis);
-            // .each(function(d) { d3.select(this).call(_this._axis.scale(_this.axis[d])); })
 
           g.select("path.domain").attr("stroke", this._checkThemeVariable("--px-vis-axis-color", this.colors[this.axisColor]))
           this.set('_axisGroup',g);
@@ -510,7 +528,7 @@ Custom property | Description | Default
          *
          */
         _calcDrawnTicks: function() {
-          if(this.axisType !== 'ordinal') {
+          if(this.axisType !== 'ordinal' && this._axis && this._axis.scale) {
             //apparently we need to give ourselves a bit of time to ensure the axis draws and it can clac this
             this.debounce("drawnTicks", function() {
               // FIXME Only works if ticks is a Number; need to support other formats for ticks
@@ -747,18 +765,21 @@ Custom property | Description | Default
          *
          */
         drawSeriesBars: function() {
-          if(!this.preventSeriesBar && this._doesObjHaveValues(this.completeSeriesConfig) && this._axisGroup && this._titleGroup) {
+          // this.debounce("drawSeriesBars", function() {
+            if(!this.preventSeriesBar && this._doesObjHaveValues(this.completeSeriesConfig) && this._axisGroup && this._titleGroup) {
 
-            //reset bars...
-            // this._titleGroup.selectAll('rect').remove();
-            // TODO do we need to move the title group based on how many series we have
-            var keys = this.seriesOnAxis.length > 0 ? this.seriesOnAxis : Object.keys(this.completeSeriesConfig),
-                kLen = keys.length,
-                i;
-            for(i = 0; i < kLen; i++) {
-              this._drawBar(this._titleGroup,keys[i],this.completeSeriesConfig[keys[i]]['color'],i);
+              // TODO do we need to move the title group based on how many series we have
+              var keys = this.seriesOnAxis.length > 0 ? this.seriesOnAxis : Object.keys(this.completeSeriesConfig),
+                  kLen = keys.length,
+                  i;
+
+              for(i = 0; i < kLen; i++) {
+                if(this.completeSeriesConfig[keys[i]]) {
+                  this._drawBar(this._titleGroup,keys[i], this.completeSeriesConfig[keys[i]]['color'], i);
+                }
+              }
             }
-          }
+          // }, 10);
         },
         /**
          * Mutes and unmutes the color bars for each series
@@ -818,13 +839,19 @@ Custom property | Description | Default
           this.debounce('_truncateTitle', function() {
 
               var oldTitle = this.displayedTitle,
+                  combined = title + this._currentUnits,
                   newTitle;
-              if(this.titleTruncation) {
-                newTitle = this._truncateName(title, truncationLength) + this._currentUnits;
+              if(this.titleTruncation &&
+                  combined.length > 2 && combined.length > this.truncationLength) {
+
+                newTitle = this._truncateName(combined, truncationLength);
+                this.set('_titleTruncated', true);
               } else {
-                newTitle = title + this._currentUnits;
+                newTitle = combined;
+                this.set('_titleTruncated', false);
               }
               if(newTitle !== oldTitle) {
+                this._processTooltip();
                 this.fire('px-vis-axis-displayed-title-changed', {displayedTitle: newTitle, title: this.title, id: this.seriesId});
                 this.set('displayedTitle', newTitle);
               }
@@ -836,43 +863,37 @@ Custom property | Description | Default
          */
         _titleChanged: function(displayedTitle) {
       //    this.debounce('drawTitle', function() {
-        if(!this._removingAxis) {
-            if(this._doesObjHaveValues(this._axisGroup) && this._axisGroup.node() !== null && 
+          if(!this._removingAxis) {
+            if(this._doesObjHaveValues(this._axisGroup) && this._axisGroup.node() !== null &&
             this._axisGroup.node().ownerSVGElement !== null && this.orientation) {
 
               this.drawTitle();
             }
-        }
-     //     }.bind(this), 5);
+          }
+          // }.bind(this), 10);
         },
 
         /**
-         * checks it the label needs a tooltip an appropriately add or remove it
+         * assign target to tooltip
          */
         _processTooltip: function() {
-          var isTruncated = this.title.length > 2 && this.title.length > this.truncationLength,
-              containsTooltip = false,
-              children = this._axisGroup.node().childNodes;
+          if(this._titleTruncated) {
 
-          //can't use 'contains' function on the node cause it's an SVG
-          //element and IE doesn't support it
-          for(var i=0; i<children.length; i++) {
-            if(children === this.$.tooltip) {
-              containsTooltip = true;
-              break;
+            //try getting a ref to the tooltip
+            if(!this._tooltipElem) {
+              this._tooltipElem = this.$$('px-tooltip');
             }
-          }
 
-          if(!isTruncated && containsTooltip) {
-            //not needed anymore, remove
-            this._axisGroup.node().removeChild(this.$.tooltip);
-          } else if(isTruncated && !containsTooltip) {
-            this._axisGroup.node().appendChild(this.$.tooltip);
-            this.$.tooltip.for = this._titleGroup.node();
+            if(this._tooltipElem && this._titleGroup &&
+              (this._tooltipElem.for !== this._titleGroup.node())) {
+              this._tooltipElem.for = this._titleGroup.node();
+            }
+          } else if(this._tooltipElem){
+            this._tooltipElem.for = null;
           }
         },
         _orientationChanged: function() {
-          
+
           this.removeAxis();
           this.drawElement();
         }

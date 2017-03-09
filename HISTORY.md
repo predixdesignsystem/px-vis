@@ -91,7 +91,14 @@ After BETA2
   * add panning flag to zoom event
   * ensure uniqued IDs are cleaned up when a chart is removed
   * wait for colors to have finished initializing before processing seriesConfig
-
+After BETA3
+==========================
+  * performance improvments on drawing axis, multi axis, axis title, axis brushes
+  * take units into account when truncating an axis title
+  * only initialize tooltips on axis when needed
+  * allow to prevent initial drawing for several elements, allowing charts to have more control over initialization
+  * added horizontalAlignment to registers (only useful when register type is 'horizontal')
+  * fix pie registers
 
 v0.8.4
 ==================

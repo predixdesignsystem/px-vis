@@ -57,6 +57,20 @@ PxVisBehaviorScale.scale = [{
           "y": [0, -Infinity]
         }
       }
+    },
+
+    /**
+     * Defines if the viewable chart extents should update when chartData is updated
+     *
+     */
+    disableDynamicUpdate: {
+      type: Boolean,
+      value: false
+    },
+
+    _runOnce: {
+      type: Boolean,
+      value: false
     }
   },
 
@@ -75,7 +89,7 @@ PxVisBehaviorScale.scale = [{
     } else {
       this.set('x', this._setScale(this.xAxisType,[0, w], this.x));
     }
-    
+
   },
 
   /**
@@ -102,19 +116,23 @@ PxVisBehaviorScale.scale = [{
    */
   _setMultiYScale: function(height, margin, axes) {
     var h = Math.max(height - margin.top - margin.bottom, 0),
-        newY = {};
+        newY;
+
+    if(!this.y) {
+      this.y = {};
+    }
 
     //create or update
-    if(this.y) {
-      for(var i = 0; i < this.axes.length; i++) {
+    for(var i = 0; i < this.axes.length; i++) {
+      if(this.y[this.axes[i]]) {
         this.y[this.axes[i]].range([h, 0]);
-      }
-    } else {
-      for(var i = 0; i < this.axes.length; i++) {
-        newY[this.axes[i]] = this._setScale(this.yAxisType,[h, 0], this.y, true, this.axes[i]);
-      }
+        this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+      } else {
+        newY = this._setScale(this.yAxisType,[h, 0], this.y, true, this.axes[i]);
+        this.y[this.axes[i]] = newY;
 
-      this.set('y', newY);
+        this.notifyPath('y');
+      }
     }
   },
 
@@ -164,8 +182,6 @@ PxVisBehaviorScale.scale = [{
 
       var extents = this._determineExtents();
 
-      this.x.domain(extents.x);
-
       if(typeof this.y === 'object') {
         for(var i = 0; i < this.axes.length; i++){
           if(!this.y[this.axes[i]]) {
@@ -184,9 +200,19 @@ PxVisBehaviorScale.scale = [{
       } else {
         this.y.domain(extents.y);
       }
-        
-      // Set the domains
-      this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+
+      // if we are streaming data, dont keep updating x
+      if(this.disableDynamicUpdate) {
+        if(!this.runOnce) {
+          this.x.domain(extents.x);
+          this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+
+          this.runOnce = true;
+        }
+      } else {
+        this.x.domain(extents.x);
+        this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+      }
 
       this._calculatingDomain = false;
     }

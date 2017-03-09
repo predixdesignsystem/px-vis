@@ -70,28 +70,49 @@ Element which draws lines series onto the chart
       PxVisBehaviorD3.selectedDomain,
       PxVisBehavior.progressiveRendering,
       PxVisBehavior.serieToRedrawOnTop,
-      PxVisBehaviorD3.domainUpdate, 
-      PxColorsBehavior.baseColors
+      PxVisBehaviorD3.domainUpdate,
+      PxColorsBehavior.baseColors,
+      PxVisBehavior.preventInitialDrawing
     ],
 
     /**
-     * px-vis-progressive-rendering-started, fired when a canvas with progressive rendering
+     * px-vis-line-progressive-rendering-started, fired when a canvas with progressive rendering
      * enabled starts rendering
      * evt.details contains:
      * { numberOfFrames: the number of frames that will be used to render,
      * }
      *
-     * @event px-vis-progressive-rendering-started
+     * @event px-vis-line-progressive-rendering-started
+     */
+    /**
+     * px-vis-line-canvas-progressive-batch, fired when a canvas with progressive rendering
+     * has finished rendering one batch of data
+     * evt.details contains:
+     * { numberOfFrames: the number of frames that will be used to render,
+     *  currentFrame: index of the frame that has just been rendered
+     * }
+     *
+     * @event px-vis-line-canvas-progressive-batch
      */
 
     /**
-     * px-vis-progressive-rendering-ended, fired when a canvas with progressive rendering
+     * px-vis-line-progressive-rendering-ended, fired when a canvas with progressive rendering
      * enabled has finished rendering
      * evt.details contains:
      * { numberOfFrames: the number of frames that have been used to render,
      * }
      *
-     * @event px-vis-progressive-rendering-ended
+     * @event px-vis-line-progressive-rendering-ended
+     */
+
+    /**
+     * px-vis-line-canvas-rendering-ended, fired when a canvas has finished rendering,
+     * whether it had progressive rendering or not
+     * evt.details contains:
+     * { progressiveRending: whether progressive rendering was enabled,
+     * }
+     *
+     * @event px-vis-line-canvas-rendering-ended
      */
 
     /**
@@ -148,7 +169,7 @@ Element which draws lines series onto the chart
     },
 
     observers: [
-      '_redraw(canvasContext, domainChanged, chartData.*, completeSeriesConfig.*, _canvasRedraw)',
+      '_redraw(canvasContext, domainChanged, chartData.*, completeSeriesConfig.*, _canvasRedraw, preventInitialDrawing)',
       'mutedChanged(mutedSeries.*, completeSeriesConfig)',
       '_drawOnTop(serieToRedrawOnTop)'
     ],
@@ -163,7 +184,9 @@ Element which draws lines series onto the chart
     },
 
     _redraw: function() {
-      this.drawCanvas(true);
+      if(!this.preventInitialDrawing) {
+        this.drawCanvas(true);
+      }
     },
     /**
      * Draws or updates the line element.
@@ -220,6 +243,10 @@ Element which draws lines series onto the chart
             }
           }
 
+          //restore our empty state
+          this.canvasContext.restore();
+
+//FIXME Clip Path can be optimized. Currently draws with every TS line. Can be drawn once.
           if(this.clipPath) {
             this.drawClipPath();
           }
@@ -252,6 +279,8 @@ Element which draws lines series onto the chart
       */
       if(this.chartData.length > 0 && this.completeSeriesConfig[this.seriesId]["x"].length > 0) {
         if(this.radialLine) {
+          // Save seems required for Radar but breaks TS. Look into more.
+          this.canvasContext.save();
           this._drawRadarClipPath();
         } else {
           this._drawRectClipPath();
@@ -265,8 +294,7 @@ Element which draws lines series onto the chart
     _drawRadarClipPath: function() {
       //start off resetting our saved canvas
       this._generateRadarClipData();
-      //save our empty state
-      this.canvasContext.save();
+
       //clear it (need to recent to 0,0 for clearing)
       this.canvasContext.clearRect(-this.canvasContext.canvas.width / 2, -this.canvasContext.canvas.height/ 2, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
 
@@ -281,8 +309,6 @@ Element which draws lines series onto the chart
      * Draws a rectangular clip path for cartesian charts
      */
     _drawRectClipPath: function() {
-      this.canvasContext.save();
-
       this.canvasContext.beginPath();
 
       var w = Math.max(this.width - this.margin.left - this.margin.right,0),
@@ -303,7 +329,7 @@ Element which draws lines series onto the chart
          clipData[1][ this.completeSeriesConfig[this.seriesId]['x'][i] ] = this.y.domain()[1];
        }
 
-       this.set('_clipData' , clipData);
+       this._clipData = clipData;
      },
 
     /**

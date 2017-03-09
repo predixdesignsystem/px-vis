@@ -107,6 +107,9 @@ https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath
                 // ~~ --> round pixels values to optimize svg perfs
               return ~~_this.y.range()[1];
             })
+            .defined( function(d) {
+              return _this.x(d) || _this.x(d) === 0;
+            })
             .curve(Px.d3.curveLinearClosed);
 
       this._clipPathSvg = this._clipPathObj.selectAll("path")
