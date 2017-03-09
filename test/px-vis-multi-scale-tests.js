@@ -25,26 +25,6 @@ function runTests(){
       assert.isDefined(multiScale.y);
     });
 
-    test('multiScale sets currentDomainX', function() {
-      assert.lengthOf(multiScale.currentDomainX,3);
-    });
-
-    test('multiScale sets currentDomainY', function() {
-      assert.lengthOf(multiScale.currentDomainY,2);
-    });
-
-    test('multiScale currentDomainX is correct', function() {
-      assert.equal( multiScale.currentDomainX[0], "y");
-      assert.equal( multiScale.currentDomainX[1], "y1");
-      assert.equal( multiScale.currentDomainX[2], "y2");
-    });
-
-    test('multiScale currentDomainY is correct', function() {
-      assert.equal( JSON.stringify(multiScale.y["y"].domain()), JSON.stringify([0,10]));
-      assert.equal( JSON.stringify(multiScale.y["y1"].domain()), JSON.stringify([11,23]));
-      assert.equal( JSON.stringify(multiScale.y["y2"].domain()), JSON.stringify([20,32]));
-    });
-
     test('multiScale x returns correct value "y"', function() {
       assert.equal( multiScale.x("y"), 130);
     });
@@ -103,18 +83,13 @@ function runTests(){
         chartExtents = {"x":[],"y":{"y":[0,10],"y1":[11,23],"y2":[20,32] }},
         domainChanged;
 
-    suiteSetup(function() {
+    suiteSetup(function(done) {
       domainChanged = multiScale.domainChanged;
       multiScale.set('chartExtents',chartExtents);
+
+      setTimeout(function() { done(); }, 500);
     });
 
-    test('currentDomainX become empty', function() {
-      assert.equal(multiScale.currentDomainX.length, 0);
-    });
-
-    test('currentDomainY become empty', function() {
-      assert.equal(multiScale.currentDomainY.length, 0);
-    });
 
     test('domainChanged is flipped', function() {
       assert.equal(multiScale.domainChanged, !domainChanged);

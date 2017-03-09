@@ -55,9 +55,6 @@ function runTests(){
     test('svgCanvas canvasEvt has a method var', function() {
       assert.equal(canvasEvt.method , 'set');
     });
-    test('svgCanvas canvasEvt was retargeted', function() {
-      assert.equal(canvasEvtNE.rootTarget, svgCanvas);
-    });
 
     test('svgCanvas fired off the svg event', function() {
       assert.isDefined(svgEvt);
@@ -70,9 +67,6 @@ function runTests(){
     });
     test('svgCanvas svgEvt has a method var', function() {
       assert.equal(svgEvt.method , 'set');
-    });
-    test('svgCanvas svgEvt was retargeted', function() {
-      assert.equal(svgEvtNE.rootTarget, svgCanvas);
     });
 
     test('rec-container has correct height', function(){
