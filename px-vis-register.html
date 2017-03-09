@@ -297,7 +297,7 @@ Custom property | Description | Default
       '_scrollBarsPresent(height)',
       '_scrollBarsPresent(chartWidth)',
       '_scrollBarsPresentPie(height)',
-      '_scrollBarsPresentPie(chartWidth)',
+      '_scrollBarsPresentPie(chartWidth, type)',
       '_computeSeries(tooltipData.series.*, groupings)'
      ],
 
@@ -395,7 +395,10 @@ Custom property | Description | Default
     },
 
     _scrollBarsPresentPie: function() {
-      if(this.$$('#pieItemRepeat') && this._itemCount !== this.$$('#pieItemRepeat').renderedItemCount) {
+      //disable optimization for pie chart as we don't hit this function as 
+      //often and this helps making the register dynamically adjust
+      //its scrollbars. we might want to revisit the scrollbar process in general
+      // if(this.$$('#pieItemRepeat') && this._itemCount !== this.$$('#pieItemRepeat').renderedItemCount) {
         var b = false;
         if(this.type === 'vertical' &&
             this.$.seriesWrap.scrollHeight > (this.height - this.margin.top - this.margin.bottom)) {
@@ -408,8 +411,8 @@ Custom property | Description | Default
         this.toggleClass('scrollOn', b, this.$.seriesWrap);
         this.set('_hasScrollBar', b);
 
-        this._itemCount = this.$$('#pieItemRepeat').renderedItemCount;
-      }
+        //this._itemCount = this.$$('#pieItemRepeat').renderedItemCount;
+      // }
     }
   });
   </script>

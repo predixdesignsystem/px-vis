@@ -45,13 +45,6 @@ Custom property | Description | Default
 <dom-module id="px-vis-pie">
     <template>
       <style include="px-vis-pie-styles"></style>
-
-      <!-- Title in the middle -->
-      <div id="title" class$="[[_getTitleClass(showTitle)]]">
-        <span id="totalTitle">Total</span>
-        <span id="totalValue">{{total}} {{_getUnit(completeSeriesConfig, seriesId)}}</span>
-      </div>
-
     </template>
 </dom-module>
 
@@ -74,22 +67,22 @@ Custom property | Description | Default
     
     /**
     * Fired when the pie finished rotated for centering on a slice
-    * detail: { name: nameOfTheSlice, value: valueOfTheSlice, datum: datumRelativeToSlice}
+    * detail: { datum: datumRelativeToSlice}
     * @event px-vis-pie-centered-on-slice
     */
     /**
     * Fired when the mouse enters a pie slice
-    * detail: { name: nameOfTheSlice, value: valueOfTheSlice, datum: datumRelativeToSlice, rotatedDatum: DatumUsedToDrawTheSlice}
+    * detail: { datum: datumRelativeToSlice, rotatedDatum: DatumUsedToDrawTheSlice}
     * @event px-vis-pie-mouse-enter-slice
     */
      /**
     * Fired when the mouse leaves a pie slice
-    * detail: { name: nameOfTheSlice, value: valueOfTheSlice, datum: datumRelativeToSlice}
+    * detail: { datum: datumRelativeToSlice}
     * @event px-vis-pie-mouse-leave-slice
     */
     /**
     * Fired when a pie slice is clicked
-    * detail: { name: nameOfTheSlice, value: valueOfTheSlice, datum: datumRelativeToSlice}
+    * detail: { datum: datumRelativeToSlice}
     * @event px-vis-pie-slice-clicked
     */
     
@@ -100,15 +93,6 @@ Custom property | Description | Default
      * @type Object
      */
     properties: {
-      /**
-       * A unique ID for each line series
-       *
-       * @property seriesId
-       * @type String
-       */
-      seriesId: {
-        type:String
-      },
       /**
        * allows to draw an empty pie chart when data is empty/null
        */
@@ -152,15 +136,6 @@ Custom property | Description | Default
       donut: {
         type: Boolean,
         value: false
-      },
-      /**
-       * Whether to show a title in the middle of the pie/donut with the total value.
-       * Meant to be used with a donut chart
-       */
-      showTitle: {
-        type: Boolean,
-        value: false,
-        observer: '_showTitleChanged'
       },
       /**
        * A holder object for the series object
@@ -213,27 +188,12 @@ Custom property | Description | Default
       preserveDataOrder: {
         type: Boolean,
         value: false
-      },
-      /**
-       * Unit currently in use: unit or %
-       */
-      _internalUnits: {
-        type: String,
-        computed: '_computeInternalUnits(completeSeriesConfig, seriesId, usePercentage)'
       }
     },
 
     observers: [
-      'drawElement(radius,svg,chartData.*,completeSeriesConfig, seriesId, usePercentage, donut, innerRadius, showTitle)'
+      'drawElement(radius,svg,chartData.*,completeSeriesConfig, usePercentage, donut, innerRadius)'
      ],
-     _repositionTitle: function() {
-       var titleRect = this.$.title.getBoundingClientRect(),
-           leftMarg = Number(this.margin.left);
-
-       //position title div
-       this.$.title.style.left = (leftMarg + this.radius - titleRect.width/2) + 'px';
-       this.$.title.style.top = -this.height + Number(this.margin.top) + this.radius - titleRect.height/2 + 'px';
-     },
     /**
      * Draws or updates the pie element.
      * Called from an observer watching for data and the necessary d3 objects
@@ -245,8 +205,6 @@ Custom property | Description | Default
       this._checkInitialGroupCreation();
 
       this._updateDrawing();
-
-      this._repositionTitle();
     },
     /**
      * Checks whether the group holding all slices has been created and creates it
@@ -257,7 +215,7 @@ Custom property | Description | Default
       if(this._isObjEmpty(this.pieGroup)){
         // draw the path and move it so the ie is centered
         this.pieGroup = this.svg.append('g')
-          .attr('series-id', 'pie_' + this.seriesId)
+          .attr('series-id', 'pie_')
           .attr('class', 'pie-slice');
       }
     },
@@ -271,7 +229,7 @@ Custom property | Description | Default
         var _this = this,
             data = this.chartData,
             isFirstDrawing = this._arcs ? false : true;
-            xKey = this.empty ? '' : this.completeSeriesConfig[this.seriesId].x;
+            xKey = this.empty ? '' : this.completeSeriesConfig[Object.keys(this.completeSeriesConfig)[0]].x;
 
         //generate the pie data
         if(this.empty) {
@@ -370,16 +328,7 @@ Custom property | Description | Default
         this._positionChart(0);
         }.bind(this), 5);
     },
-    /**
-     * Return the value or the slice datum depending on use of percentages
-     */
-    _getSliceValue: function(datum) {
-      if(this.usePercentage) {
-        return datum.data.percentage + this._internalUnits;
-      } else {
-        return datum.data[this.completeSeriesConfig[this.seriesId].x] + ' ' + this._internalUnits;
-      }
-    },
+    
     /**
      * Function used to display a tooltip for a specific slice
      *
@@ -394,11 +343,11 @@ Custom property | Description | Default
         outerRadius: this.radius
       };
 
-      this.fire('px-vis-pie-mouse-enter-slice', {name: datum.data[this.completeSeriesConfig[this.seriesId].y],value: this._getSliceValue(datum), datum: datum, rotatedDatum: rotatedDatum});
+      this.fire('px-vis-pie-mouse-enter-slice', {datum: datum, rotatedDatum: rotatedDatum});
     },
     _mouseLeaveSlice: function(datum, index, group) {
 
-      this.fire('px-vis-pie-mouse-leave-slice', {name: datum.data[this.completeSeriesConfig[this.seriesId].y], value: this._getSliceValue(datum), datum: datum});
+      this.fire('px-vis-pie-mouse-leave-slice', {datum: datum});
     },
     /**
      * Position the chart given the rotation angle
@@ -417,7 +366,7 @@ Custom property | Description | Default
      */
     _onSliceClick: function (datum, index, group) {
       
-      this.fire('px-vis-pie-slice-clicked', {name: datum.data[this.completeSeriesConfig[this.seriesId].y], value: this._getSliceValue(datum), datum: datum});
+      this.fire('px-vis-pie-slice-clicked', {datum: datum});
 
       this._centerOnSlice(datum, index, group);
     },
@@ -431,7 +380,7 @@ Custom property | Description | Default
         this._positionChart(750);
         //display a popover after the rotation
         setTimeout(function() {
-          this.fire('px-vis-pie-centered-on-slice', {name: datum.data[this.completeSeriesConfig[this.seriesId].y],value: this._getSliceValue(datum)});
+          this.fire('px-vis-pie-centered-on-slice', {datum: datum});
         }.bind(this), 750);
       }
     },
@@ -455,21 +404,6 @@ Custom property | Description | Default
 
       return adjusted;
     },
-    _getTitleClass: function(showTitle) {
-      var classList = 'title inline--flex flex--col flex--middle ';
-
-      if(!showTitle) {
-        classList += 'visuallyhidden ';
-      }
-
-      return classList;
-    },
-    _getUnit: function(completeSeriesConfig, seriesId) {
-      return completeSeriesConfig[seriesId].xAxisUnit;
-    },
-    _computeInternalUnits: function(completeSeriesConfig, seriesId, usePercentage) {
-      return usePercentage ? '%' : this._getUnit(completeSeriesConfig, seriesId);
-    },
     _calcInnerRadiusPx: function() {
       if(this.donut) {
         //if no inner radius defined used 30px by default
@@ -483,9 +417,6 @@ Custom property | Description | Default
       if(this.empty) {
         this.drawElement();
       }
-    },
-    _showTitleChanged: function() {
-      this._repositionTitle();
     }
   });
 </script>
