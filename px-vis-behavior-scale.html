@@ -83,7 +83,7 @@ PxVisBehaviorScale.scale = [{
     var w = Math.max(width - margin.left - margin.right, 0);
 
     //create or update
-    if(this.x) {
+    if(this.x && this.x._scaleType === this.xAxisType) {
       this.x.range([0,w]);
       this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
     } else {
@@ -101,7 +101,7 @@ PxVisBehaviorScale.scale = [{
     var h = Math.max(height - margin.top - margin.bottom, 0);
 
     //create or update
-    if(this.y) {
+    if(this.y && this.y._scaleType === this.yAxisType) {
       this.y.range([h, 0]);
       this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
     } else {
@@ -124,7 +124,7 @@ PxVisBehaviorScale.scale = [{
 
     //create or update
     for(var i = 0; i < this.axes.length; i++) {
-      if(this.y[this.axes[i]]) {
+      if(this.y[this.axes[i]] && this.y[this.axes[i]]._scaleType === this.yAxisType) {
         this.y[this.axes[i]].range([h, 0]);
         this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
       } else {
@@ -150,12 +150,16 @@ PxVisBehaviorScale.scale = [{
 
     if(type === 'time') {
       result = Px.d3.scaleUtc().nice().range(range);
+      result._scaleType = "time";
     } else if(type === 'timeLocal') {
       result = Px.d3.scaleTime().nice().range(range);
-    } else if(type === 'linear'){
+      result._scaleType = "timeLocal";
+    } else if(type === 'linear') {
       result = Px.d3.scaleLinear().nice().range(range);
+      result._scaleType = "linear";
     } else { //ordinal
       result = Px.d3.scalePoint().range(range).padding(0.5);
+      result._scaleType = "ordinal";
     }
 
     if(currentAxis && isMultiAxis && currentAxis[key]) {
@@ -265,6 +269,22 @@ PxVisBehaviorScale.scale = [{
     }
 
     this._chartDataHasChanged = false;
+
+    // check that we found something for x
+    if(extents.x[0] === Infinity) {
+      extents.x[0] = 0;
+    }
+    if(extents.x[1] === -Infinity) {
+      extents.x[1] = 1;
+    }
+
+    // check that we found something for y
+    if(Array.isArray(extents.y) && extents.y[0] === Infinity) {
+      extents.y[0] = 0;
+    }
+    if(Array.isArray(extents.y) && extents.y[1] === -Infinity) {
+      extents.y[1] = 1;
+    }
 
     //if min and max are the same add 1 so we still get a range
     if(extents.x[1] === extents.x[0]) {

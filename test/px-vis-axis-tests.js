@@ -841,6 +841,7 @@ function runTests(){
     });
     test('Title _titleGroup text text', function() {
       var text = pcTruncUnitYAxis._titleGroup.select('text.axis-title');
+
       assert.equal(text.text(),'my...le [BoF]');
     });
   });

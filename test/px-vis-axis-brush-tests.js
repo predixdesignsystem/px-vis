@@ -12,7 +12,9 @@ function runTests(){
   suite('px-vis-axis-brush basic setup works', function() {
     var multiScale = document.getElementById('multiScale'),
         multiSVG = document.getElementById('multiSVG'),
-        multiBrush = document.getElementById('multiBrush');
+        brush1 = document.getElementById('brush1'),
+        brush2 = document.getElementById('brush2'),
+        brush3 = document.getElementById('brush3');
 
     suiteSetup(function(done){
       var d = [{
@@ -85,131 +87,167 @@ function runTests(){
             .data(dim);
         g.enter()
           .append("g")
-          .attr("class", "dimension")
+          .attr("class", function(d,i) { return "dimension" + i})
           .attr("dimension", function(d) { return d })
           .attr("transform", function(d,i) {
             return "translate(" + (50 * i) + ",0)";
           });
 
-        multiBrush.set('margin',m);
-        multiBrush.set('height',h);
-        multiBrush.set('seriesKey',"x");
-        multiBrush.set('dimensions',dim);
-        multiBrush.set('chartData',d);
-        multiBrush.set('svg',multiSVG.svg.selectAll('g.dimension'));
+        brush1.set('margin',m);
+        brush1.set('height',h);
+        brush1.set('seriesKey',"x");
+        brush1.set('dimension',dim[0]);
+        brush1.set('chartData',d);
 
-      setTimeout(function(){done()},500);
+        brush2.set('margin',m);
+        brush2.set('height',h);
+        brush2.set('seriesKey',"x");
+        brush2.set('dimension',dim[1]);
+        brush2.set('chartData',d);
+
+        brush3.set('margin',m);
+        brush3.set('height',h);
+        brush3.set('seriesKey',"x");
+        brush3.set('dimension',dim[2]);
+        brush3.set('chartData',d);
+
+        brush1.set('axis', multiScale.y['y']);
+        brush2.set('axis', multiScale.y['y1']);
+        brush3.set('axis', multiScale.y['y2']);
+
+        brush1.set('svg', multiSVG.svg.select('g.dimension0'));
+        brush2.set('svg', multiSVG.svg.select('g.dimension1'));
+        brush3.set('svg', multiSVG.svg.select('g.dimension2'));
+
+      setTimeout(function(){done()}, 1000);
       // done();
     });
 
-    test('multiBrush fixture is created', function() {
-      assert.isTrue(multiBrush !== null);
+    test('brush fixture is created', function() {
+      assert.isTrue(brush1 !== null);
+      assert.isTrue(brush2 !== null);
+      assert.isTrue(brush3 !== null);
     });
 
-    test('multiBrush._brushes are created', function() {
-      assert.equal(multiBrush._brushes.nodes().length, 3);
+    test('brush._brushD3 are created', function() {
+
+      assert.equal(brush1._brushD3.nodes().length, 1);
+      assert.equal(brush2._brushD3.nodes().length, 1);
+      assert.equal(brush3._brushD3.nodes().length, 1);
     });
-    test('multiBrush._brushes is not selected', function() {
-      assert.equal(Px.d3.brushSelection(multiBrush._brushes.nodes()[0]),null);
-      assert.equal(Px.d3.brushSelection(multiBrush._brushes.nodes()[1]),null);
-      assert.equal(Px.d3.brushSelection(multiBrush._brushes.nodes()[2]),null);
+    test('brush._brushD3 is not selected', function() {
+      assert.equal(Px.d3.brushSelection(brush1._brushElem), null);
+      assert.equal(Px.d3.brushSelection(brush2._brushElem), null);
+      assert.equal(Px.d3.brushSelection(brush3._brushElem), null);
     });
 
-    test('multiBrush mutedSeries is correct', function() {
-      assert.deepEqual(multiBrush.mutedSeries,{});
+    test('brush mutedSeries is correct', function() {
+      assert.deepEqual(brush1.mutedSeries, {});
+      assert.deepEqual(brush2.mutedSeries, {});
+      assert.deepEqual(brush3.mutedSeries, {});
     });
   });
 
   suite('px-vis-axis-brush brush resizes to the inputed domain', function() {
-    var multiBrush = document.getElementById('multiBrush');
+    var brush1 = document.getElementById('brush1'),
+        brush2 = document.getElementById('brush2'),
+        brush3 = document.getElementById('brush3');
     var colors = baseColors.properties.colors.value;
     var d;
+
     suiteSetup(function(done) {
-      d = [~~multiBrush.axis['y1'](16),~~multiBrush.axis['y1'](9)];
-      Px.d3.select(multiBrush._brushes.nodes()[1]).call(multiBrush._brush.move,d);
-       setTimeout(function(){done()},100);
-      //done();
+      d = [brush2.axis(16),brush2.axis(9)];
+      brush2._brushD3.call(brush2._brush.move,d);
+
+      setTimeout(function(){ done() }, 300);
     });
 
-    test('multiBrush._brush extents match', function() {
-      assert.deepEqual(Px.d3.brushSelection(multiBrush._brushes.nodes()[1]),[101,277]);
+    test('brush2._brush extents match', function() {
+      assert.closeTo(Px.d3.brushSelection(brush2._brushElem)[0], 101, 2);
+      assert.closeTo(Px.d3.brushSelection(brush2._brushElem)[1], 277, 2);
     });
-    test('multiBrush._brushGroup.rect attr x', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('x'), -10);
+    test('brush2._brushGroup.rect attr x', function() {
+      assert.equal(brush2._brushD3.select('rect.selection').attr('x'), -10);
     });
-    test('multiBrush._brushGroup.rect attr width', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('width'), 20);
+    test('brush2._brushGroup.rect attr width', function() {
+      assert.equal(brush2._brushD3.select('rect.selection').attr('width'), 20);
     });
-    test('multiBrush._brushGroup.rect attr y', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('y'), 101);
+    test('brush2._brushGroup.rect attr y', function() {
+      assert.closeTo(Number(brush2._brushD3.select('rect.selection').attr('y')), 101, 2);
     });
-    test('multiBrush._brushGroup.rect attr height', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('height'), 176);
+    test('brush2._brushGroup.rect attr height', function() {
+      assert.closeTo(Number(brush2._brushD3.select('rect.selection').attr('height')), 176, 2);
     });
-    test('multiBrush._brushGroup.rect correct fill', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('fill').split(' ').join(''), colors["grey5"]);
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('fill-opacity'), '0.3');
+    test('brush2._brushGroup.rect correct fill', function() {
+      assert.equal(brush2._brushD3.select('rect.selection').attr('fill').split(' ').join(''), colors["grey5"]);
+      assert.equal(brush2._brushD3.select('rect.selection').attr('fill-opacity'), '0.3');
     });
-    test('multiBrush._brushGroup.rect correct stroke', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('stroke').split(' ').join(''), colors["primary-blue"]);
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('stroke-dasharray'), null);
+    test('brush2._brushGroup.rect correct stroke', function() {
+      assert.equal(brush2._brushD3.select('rect.selection').attr('stroke').split(' ').join(''), colors["primary-blue"]);
+      assert.equal(brush2._brushD3.select('rect.selection').attr('stroke-dasharray'), null);
     });
 
-    test('multiBrush mutedSeries is correct', function() {
+    test('brush2 mutedSeries is correct', function() {
       var ms = {
         "1397102460000": true,
         "1397160780000": true,
         "1397219100000": true
       };
-      assert.deepEqual(multiBrush.mutedSeries, ms);
+      assert.deepEqual(brush2.mutedSeries, ms);
     });
   });
 
   suite('px-vis-axis-brush min size', function() {
-    var multiBrush = document.getElementById('multiBrush');
+    var brush1 = document.getElementById('brush1'),
+        brush2 = document.getElementById('brush2'),
+        brush3 = document.getElementById('brush3');
     var d1, d2;
 
     suiteSetup(function(done) {
-      d1 = [~~multiBrush.axis['y'](1.01),~~multiBrush.axis['y'](1)];
-      d2 = [~~multiBrush.axis['y2'](27),~~multiBrush.axis['y2'](26.9)];
-      Px.d3.select(multiBrush._brushes.nodes()[0]).call(multiBrush._brush.move,d1);
-      Px.d3.select(multiBrush._brushes.nodes()[2]).call(multiBrush._brush.move,d2);
-       setTimeout(function(){done()},100);
-      //done();
+      d1 = [brush1.axis(1.01),brush1.axis(1)];
+      d2 = [brush3.axis(27),brush3.axis(26.9)];
+
+      brush1._brushD3.call(brush1._brush.move, d1);
+      brush3._brushD3.call(brush3._brush.move, d2);
+
+      setTimeout(function(){done()}, 100);
+
     });
-    test('multiBrush._brush y extents match', function() {
-      assert.deepEqual(Px.d3.brushSelection(multiBrush._brushes.nodes()[0]),[475,480]);
+    test('brush1._brush extents match', function() {
+      assert.closeTo(Px.d3.brushSelection(brush1._brushElem)[0], 475, 2);
+      assert.closeTo(Px.d3.brushSelection(brush1._brushElem)[1], 480, 2);
     });
-    test('multiBrush._brush y rect attr x', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[0]).select('rect.selection').attr('x'), -10);
+    test('brush1._brush rect attr x', function() {
+      assert.equal(Px.d3.select(brush1._brushElem).select('rect.selection').attr('x'), -10);
     });
-    test('multiBrush._brush y rect attr width', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[0]).select('rect.selection').attr('width'), 20);
+    test('brush1._brush rect attr width', function() {
+      assert.equal(Px.d3.select(brush1._brushElem).select('rect.selection').attr('width'), 20);
     });
-    test('multiBrush._brush y rect attr y', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[0]).select('rect.selection').attr('y'), 475);
+    test('brush1._brush rect attr y', function() {
+      assert.closeTo(Number(Px.d3.select(brush1._brushElem).select('rect.selection').attr('y')), 475, 2);
     });
-    test('multiBrush._brush y rect attr height', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[0]).select('rect.selection').attr('height'), 5);
+    test('brush1._brush rect attr height', function() {
+      assert.closeTo(Number(Px.d3.select(brush1._brushElem).select('rect.selection').attr('height')), 5,2 );
     });
 
-    test('multiBrush._brush y2 extents match', function() {
-      assert.deepEqual(Px.d3.brushSelection(multiBrush._brushes.nodes()[2]),[0,5]);
+    test('brush3._brush extents match', function() {
+      assert.closeTo(Px.d3.brushSelection(brush3._brushElem)[0], 0, 2);
+      assert.closeTo(Px.d3.brushSelection(brush3._brushElem)[1], 5, 2);
     });
-    test('multiBrush._brush y2 rect attr x', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[2]).select('rect.selection').attr('x'), -10);
+    test('brush3._brush rect attr x', function() {
+      assert.equal(Px.d3.select(brush3._brushElem).select('rect.selection').attr('x'), -10);
     });
-    test('multiBrush._brush y2 rect attr width', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[2]).select('rect.selection').attr('width'), 20);
+    test('brush3._brush rect attr width', function() {
+      assert.equal(Px.d3.select(brush3._brushElem).select('rect.selection').attr('width'), 20);
     });
-    test('multiBrush._brush y2 rect attr y', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[2]).select('rect.selection').attr('y'), 0);
+    test('brush3._brush rect attr y', function() {
+      assert.closeTo(Number(Px.d3.select(brush3._brushElem).select('rect.selection').attr('y')), 0, 2);
     });
-    test('multiBrush._brush y2 rect attr height', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[2]).select('rect.selection').attr('height'), 5);
+    test('brush3._brush rect attr height', function() {
+      assert.closeTo(Number(Px.d3.select(brush3._brushElem).select('rect.selection').attr('height')), 5, 2);
     });
 
-    test('multiBrush mutedSeries is correct', function() {
+    test('brush mutedSeries is correct', function() {
       var ms = {
         "1397102460000": true,
         "1397131620000": true,
@@ -218,303 +256,251 @@ function runTests(){
         "1397219100000": true
       };
 
-      assert.deepEqual(multiBrush.mutedSeries, ms);
+      assert.deepEqual(brush1.mutedSeries, ms);
+      assert.deepEqual(brush3.mutedSeries, ms);
     });
   });
 
   suite('px-vis-axis-brush resize', function() {
-    var multiBrush = document.getElementById('multiBrush');
+    var brush1 = document.getElementById('brush1'),
+        brush2 = document.getElementById('brush2'),
+        brush3 = document.getElementById('brush3');
     var d1, d2;
 
     suiteSetup(function(done) {
-      d1 = [~~multiBrush.axis['y'](5),~~multiBrush.axis['y'](1)];
-      d2 = [~~multiBrush.axis['y2'](27),~~multiBrush.axis['y2'](15)];
+      d1 = [brush1.axis(5),brush1.axis(1)];
+      d2 = [brush3.axis(27),brush3.axis(15)];
 
-      Px.d3.select(multiBrush._brushes.nodes()[0]).call(multiBrush._brush.move,d1);
-      Px.d3.select(multiBrush._brushes.nodes()[2]).call(multiBrush._brush.move,d2);
+      brush1._brushD3.call(brush1._brush.move, d1);
+      brush3._brushD3.call(brush3._brush.move, d2);
 
-      setTimeout(function(){done()},100);
-      //done();
+      setTimeout(function(){done()}, 500);
     });
-    test('multiBrush._brush y extents match', function() {
-      assert.deepEqual(Px.d3.brushSelection(multiBrush._brushes.nodes()[0]),[266,480]);
+    test('brush1._brush extents match', function() {
+      assert.closeTo(Px.d3.brushSelection(brush1._brushElem)[0],266, 2);
+      assert.closeTo(Px.d3.brushSelection(brush1._brushElem)[1], 480, 2);
     });
-    test('multiBrush._brush y rect attr y', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[0]).select('rect.selection').attr('y'), 266);
+    test('brush1._brush rect attr y', function() {
+      assert.closeTo(Number(Px.d3.select(brush1._brushElem).select('rect.selection').attr('y')), 266, 2);
     });
-    test('multiBrush._brush y rect attr height', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[0]).select('rect.selection').attr('height'), 214);
+    test('brush1._brush rect attr height', function() {
+      assert.closeTo(Number(Px.d3.select(brush1._brushElem).select('rect.selection').attr('height')), 214, 2);
     });
 
-    test('multiBrush._brush y2 extents match', function() {
-      assert.deepEqual(Px.d3.brushSelection(multiBrush._brushes.nodes()[2]),[0,221]);
+    test('brush3._brush extents match', function() {
+      assert.closeTo(Px.d3.brushSelection(brush3._brushElem)[0], 0, 2);
+      assert.closeTo(Px.d3.brushSelection(brush3._brushElem)[1], 221, 2);
     });
-    test('multiBrush._brush y2 rect attr y', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[2]).select('rect.selection').attr('y'), 0);
+    test('brush3._brush rect attr y', function() {
+      assert.closeTo(Number(Px.d3.select(brush3._brushElem).select('rect.selection').attr('y')), 0, 2);
     });
-    test('multiBrush._brush y2 rect attr height', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[2]).select('rect.selection').attr('height'), 221);
+    test('brush3._brush rect attr height', function() {
+      assert.closeTo(Number(Px.d3.select(brush3._brushElem).select('rect.selection').attr('height')), 221, 2);
     });
 
     test('multiBrush mutedSeries is correct', function() {
-      var ms = {
-        "1397102460000": true,
-        "1397131620000": true,
-        "1397160780000": true,
-        "1397189940000": true,
-        "1397219100000": true
-      };
+      var ms1 = {
+            "1397102460000": true,
+            "1397131620000": true,
+            "1397160780000": true,
+            "1397219100000": true
+          },
+          ms3 = {
+            "1397102460000": true,
+            "1397160780000": true,
+            "1397189940000": true,
+            "1397219100000": true
+         };
 
-      assert.deepEqual(multiBrush.mutedSeries, ms);
+      assert.deepEqual(brush1.mutedSeries, ms1);
+      assert.deepEqual(brush3.mutedSeries, ms3);
     });
   });
 
   suite('px-vis-axis-brush domain change', function() {
     var multiScale = document.getElementById('multiScale');
-    var multiBrush = document.getElementById('multiBrush');
+    var brush1 = document.getElementById('brush1'),
+        brush2 = document.getElementById('brush2'),
+        brush3 = document.getElementById('brush3');
+
     var dim = ['y','y1','y2'];
     var ext = {'x': dim, 'y':{'y':[3,10], 'y1':[6,18], 'y2':[1,18]}};
 
     suiteSetup(function(done) {
-      multiScale.set('chartExtents',ext);
+      multiScale.set('chartExtents', ext);
 
-      setTimeout(function(){done()},100);
+      setTimeout(function() { done() }, 100);
 
-    });
-
-    test('multiBrush._brush y extents match', function() {
-      assert.deepEqual(Px.d3.brushSelection(multiBrush._brushes.nodes()[0]),[342,480]);
-    });
-    test('multiBrush._brush y rect attr y', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[0]).select('rect.selection').attr('y'), 342);
-    });
-    test('multiBrush._brush y rect attr height', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[0]).select('rect.selection').attr('height'), 138);
     });
 
-    test('multiBrush._brush y1 extents match', function() {
-      assert.closeTo(Px.d3.brushSelection(multiBrush._brushes.nodes()[1])[0],80, 1);
-      assert.closeTo(Px.d3.brushSelection(multiBrush._brushes.nodes()[1])[1],359,1);
+    test('brush1._brush extents match', function() {
+      assert.closeTo(Px.d3.brushSelection(brush1._brushElem)[0], 342, 2);
+      assert.closeTo(Px.d3.brushSelection(brush1._brushElem)[1], 480, 2);
     });
-    test('multiBrush._brush y rect attr y1', function() {
-      assert.closeTo(Number(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('y')), 80, 1);
+    test('brush1._brush rect attr y', function() {
+      assert.closeTo(Number(brush1._brushD3.select('rect.selection').attr('y')), 342 ,2);
     });
-    test('multiBrush._brush y1 rect attr height', function() {
-      assert.closeTo(Number(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('height')), 279,1 );
+    test('brush1._brush rect attr height', function() {
+      assert.closeTo(Number(brush1._brushD3.select('rect.selection').attr('height')), 138, 2);
     });
 
-    test('multiBrush._brush y2 extents match', function() {
-      assert.equal(Px.d3.brushSelection(multiBrush._brushes.nodes()[2])[0],0);
-      assert.closeTo(Px.d3.brushSelection(multiBrush._brushes.nodes()[2])[1],84,1);
+    test('brush2._brush extents match', function() {
+      assert.closeTo(Px.d3.brushSelection(brush2._brushElem)[0], 80, 2);
+      assert.closeTo(Px.d3.brushSelection(brush2._brushElem)[1], 359, 2);
     });
-    test('multiBrush._brush y2 rect attr y', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[2]).select('rect.selection').attr('y'), 0);
+    test('brush2._brush rect attr y1', function() {
+      assert.closeTo(Number(brush2._brushD3.select('rect.selection').attr('y')), 80, 2);
     });
-    test('multiBrush._brush y2 rect attr height', function() {
-      assert.closeTo(Number(Px.d3.select(multiBrush._brushes.nodes()[2]).select('rect.selection').attr('height')), 84, 1);
+    test('brush2._brush rect attr height', function() {
+      assert.closeTo(Number(brush2._brushD3.select('rect.selection').attr('height')), 279, 2);
+    });
+
+    test('brush3._brush extents match', function() {
+      assert.closeTo(Px.d3.brushSelection(brush3._brushElem)[0], 0, 2);
+      assert.closeTo(Px.d3.brushSelection(brush3._brushElem)[1], 84, 2);
+    });
+    test('brush3._brush rect attr y', function() {
+      assert.closeTo(Number(brush3._brushD3.select('rect.selection').attr('y')), 0, 2);
+    });
+    test('brush3._brush rect attr height', function() {
+      assert.closeTo(Number(brush3._brushD3.select('rect.selection').attr('height')), 84, 2);
     });
 
     test('multiBrush mutedSeries is correct', function() {
-      var ms = {
-        "1397102460000": true,
-        "1397131620000": true,
-        "1397160780000": true,
-        "1397189940000": true,
-        "1397219100000": true
-      };
+      var ms1 = {
+            "1397102460000": true,
+            "1397131620000": true,
+            "1397160780000": true,
+            "1397219100000": true
+          },
+          ms2 = {
+            "1397102460000": true,
+            "1397160780000": true,
+            "1397219100000": true
+          },
+          ms3 = {
+            "1397102460000": true,
+            "1397131620000": true,
+            "1397160780000": true,
+            "1397189940000": true,
+            "1397219100000": true
+          };
 
-      assert.deepEqual(multiBrush.mutedSeries, ms);
+      assert.deepEqual(brush1.mutedSeries, ms1);
+      assert.deepEqual(brush2.mutedSeries, ms2);
+      assert.deepEqual(brush3.mutedSeries, ms3);
     });
   });
 
   suite('px-vis-axis-brush domain change so brush falls outside', function() {
     var multiScale = document.getElementById('multiScale');
-    var multiBrush = document.getElementById('multiBrush');
+    var brush1 = document.getElementById('brush1'),
+        brush2 = document.getElementById('brush2'),
+        brush3 = document.getElementById('brush3');
     var dim = ['y','y1','y2'];
     var ext = {'x': dim, 'y':{'y':[6,10], 'y1':[6,18], 'y2':[1,18]}};
 
     suiteSetup(function(done) {
       multiScale.set('chartExtents',ext);
 
-      setTimeout(function(){done()},100);
+      setTimeout(function(){ done() }, 100);
 
     });
 
-    test('multiBrush._brush y extents match', function() {
-      assert.deepEqual(Px.d3.brushSelection(multiBrush._brushes.nodes()[0]),null);
+    test('brush1._brush extents match', function() {
+      assert.deepEqual(Px.d3.brushSelection(brush1._brushElem), null);
     });
 
-    test('multiBrush._brush y1 extents match', function() {
-      assert.closeTo(Px.d3.brushSelection(multiBrush._brushes.nodes()[1])[0],80, 1);
-      assert.closeTo(Px.d3.brushSelection(multiBrush._brushes.nodes()[1])[1],359,1);
+    test('brush2._brush extents match', function() {
+      assert.closeTo(Px.d3.brushSelection(brush2._brushElem)[0],80, 2);
+      assert.closeTo(Px.d3.brushSelection(brush2._brushElem)[1],359, 2);
     });
-    test('multiBrush._brush y rect attr y1', function() {
-      assert.closeTo(Number(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('y')), 80, 1);
+    test('brush2._brush rect attr y1', function() {
+      assert.closeTo(Number(brush2._brushD3.select('rect.selection').attr('y')), 80, 2);
     });
-    test('multiBrush._brush y1 rect attr height', function() {
-      assert.closeTo(Number(Px.d3.select(multiBrush._brushes.nodes()[1]).select('rect.selection').attr('height')), 279,1 );
+    test('brush2._brush rect attr height', function() {
+      assert.closeTo(Number(brush2._brushD3.select('rect.selection').attr('height')), 279, 2);
     });
 
-    test('multiBrush._brush y2 extents match', function() {
-      assert.equal(Px.d3.brushSelection(multiBrush._brushes.nodes()[2])[0],0);
-      assert.closeTo(Px.d3.brushSelection(multiBrush._brushes.nodes()[2])[1],84,1);
+    test('brush3._brush extents match', function() {
+      assert.closeTo(Px.d3.brushSelection(brush3._brushElem)[0], 0, 2);
+      assert.closeTo(Px.d3.brushSelection(brush3._brushElem)[1], 84, 2);
     });
-    test('multiBrush._brush y2 rect attr y', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[2]).select('rect.selection').attr('y'), 0);
+    test('brush3._brush rect attr y', function() {
+      assert.closeTo(Number(brush3._brushD3.select('rect.selection').attr('y')), 0, 2);
     });
-    test('multiBrush._brush y2 rect attr height', function() {
-      assert.closeTo(Number(Px.d3.select(multiBrush._brushes.nodes()[2]).select('rect.selection').attr('height')), 84, 1);
+    test('brush3._brush rect attr height', function() {
+      assert.closeTo(Number(brush3._brushD3.select('rect.selection').attr('height')), 84, 2);
     });
 
     test('multiBrush mutedSeries is correct', function() {
-      var ms = {
-        "1397102460000": true,
-        "1397131620000": true,
-        "1397160780000": true,
-        "1397189940000": true,
-        "1397219100000": true
-      };
+      var ms1 = {},
+          ms2 = {
+            "1397102460000": true,
+            "1397160780000": true,
+            "1397219100000": true
+          },
+          ms3 = {
+            "1397102460000": true,
+            "1397131620000": true,
+            "1397160780000": true,
+            "1397189940000": true,
+            "1397219100000": true
+          };
 
-      assert.deepEqual(multiBrush.mutedSeries, ms);
+      assert.deepEqual(brush1.mutedSeries, ms1);
+      assert.deepEqual(brush2.mutedSeries, ms2);
+      assert.deepEqual(brush3.mutedSeries, ms3);
     });
   });
 
-  suite('px-vis-axis-brush delete all', function() {
-    var multiBrush = document.getElementById('multiBrush');
+  suite('px-vis-axis-brush delete works', function() {
+    var brush1 = document.getElementById('brush1'),
+        brush2 = document.getElementById('brush2'),
+        brush3 = document.getElementById('brush3');
 
     suiteSetup(function(done) {
-      multiBrush.deleteAllBrushes();
+      brush1.deleteBrush();
+      brush2.deleteBrush();
+      brush3.deleteBrush();
 
-      setTimeout(function(){done()},100);
+      setTimeout(function(){ done() }, 100);
     });
 
-    test('multiBrush._brush y brush deleted', function() {
-      assert.deepEqual(Px.d3.brushSelection(multiBrush._brushes.nodes()[0]),null);
+    test('brush1._brush brush deleted', function() {
+      assert.deepEqual(Px.d3.brushSelection(brush1._brushElem), null);
     });
 
-    test('multiBrush._brush y1 brush deleted', function() {
-      assert.deepEqual(Px.d3.brushSelection(multiBrush._brushes.nodes()[1]),null);
+    test('brush2._brush brush deleted', function() {
+      assert.deepEqual(Px.d3.brushSelection(brush2._brushElem),null);
     });
 
-    test('multiBrush._brush y2 brush deleted', function() {
-      assert.deepEqual(Px.d3.brushSelection(multiBrush._brushes.nodes()[2]),null);
+    test('brush3._brush brush deleted', function() {
+      assert.deepEqual(Px.d3.brushSelection(brush3._brushElem),null);
     });
 
-    test('multiBrush mutedSeries is correct', function() {
-      assert.deepEqual(multiBrush.mutedSeries, {});
+    test('brushes mutedSeries is correct', function() {
+      assert.deepEqual(brush1.mutedSeries, {});
+      assert.deepEqual(brush2.mutedSeries, {});
+      assert.deepEqual(brush3.mutedSeries, {});
     });
   });
 
-  suite('px-vis-axis-brush adding a new axis works', function() {
-    var multiScale = document.getElementById('multiScale'),
-        multiSVG = document.getElementById('multiSVG'),
-        multiBrush = document.getElementById('multiBrush');
-
-    var d = [{
-          "x": 1397102460000,
-          "y": 1,
-          "y1": 1,
-          "y2": 1,
-          "y3": 5
-        },{
-          "x": 1397131620000,
-          "y": 6,
-          "y1": 15,
-          "y2": 21,
-          "y3": 8
-        },{
-          "x": 1397160780000,
-          "y": 10,
-          "y1": 8,
-          "y2": 3,
-          "y3": 15
-        },{
-          "x": 1397189940000,
-          "y": 4,
-          "y1": 10,
-          "y2": 10,
-          "y3": 9
-        },{
-          "x": 1397219100000,
-          "y": 6,
-          "y1": 20,
-          "y2": 27,
-          "y3": 12
-        }
-      ],
-      dim = ['y','y1','y2','y3'],
-      ext = {'x': dim, 'y':{'y':[6,10], 'y1':[6,18], 'y2':[1,18], 'y3':[5,15]}};
+  suite('px-vis-axis-brush draw still works after delete', function() {
+    var brush1 = document.getElementById('brush1'),
+        brush2 = document.getElementById('brush2'),
+        brush3 = document.getElementById('brush3');
 
     suiteSetup(function(done) {
-      multiScale.set('axes',dim);
-      multiScale.set('chartExtents',ext);
-      multiScale.set('chartData',d);
+      d = [brush2.axis(16),brush2.axis(9)];
+      brush2._brushD3.call(brush2._brush.move,d);
 
-      var g = multiSVG.svg.selectAll('g.dimension')
-          .data(dim);
-      g.enter()
-        .append("g")
-        .attr("class", "dimension")
-        .attr("dimension", function(d) { return d })
-        .attr("transform", function(d,i) {
-          return "translate(" + (40 * i) + ",0)";
-        });
-
-        multiBrush.set('dimensions',dim);
-        multiBrush.set('chartData',d);
-        multiBrush.set('svg',multiSVG.svg.selectAll('g.dimension'));
-
-      setTimeout(function(){done()},500);
+      setTimeout(function(){ done() }, 300);
     });
 
-    test('multiBrush._brushes are created', function() {
-      assert.equal(multiBrush._brushes.nodes().length, 4);
-    });
-    test('multiBrush._brushes is not selected', function() {
-      assert.equal(Px.d3.brushSelection(multiBrush._brushes.nodes()[0]),null);
-      assert.equal(Px.d3.brushSelection(multiBrush._brushes.nodes()[1]),null);
-      assert.equal(Px.d3.brushSelection(multiBrush._brushes.nodes()[2]),null);
-      assert.equal(Px.d3.brushSelection(multiBrush._brushes.nodes()[3]),null);
-    });
-
-    test('multiBrush mutedSeries is correct', function() {
-      assert.deepEqual(multiBrush.mutedSeries,{});
-    });
-  });
-
-  suite('px-vis-axis-brush brush on the new axis', function() {
-    var multiBrush = document.getElementById('multiBrush');
-    var d;
-    suiteSetup(function(done) {
-      d = [~~multiBrush.axis['y3'](12),~~multiBrush.axis['y3'](6)];
-      Px.d3.select(multiBrush._brushes.nodes()[3]).call(multiBrush._brush.move,d);
-       setTimeout(function(){done()},100);
-      //done();
-    });
-
-    test('multiBrush._brush extents match', function() {
-      assert.deepEqual(Px.d3.brushSelection(multiBrush._brushes.nodes()[3]),[144,432]);
-    });
-    test('multiBrush._brushGroup.rect attr x', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[3]).select('rect.selection').attr('x'), -10);
-    });
-    test('multiBrush._brushGroup.rect attr width', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[3]).select('rect.selection').attr('width'), 20);
-    });
-    test('multiBrush._brushGroup.rect attr y', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[3]).select('rect.selection').attr('y'), 144);
-    });
-    test('multiBrush._brushGroup.rect attr height', function() {
-      assert.equal(Px.d3.select(multiBrush._brushes.nodes()[3]).select('rect.selection').attr('height'), 288);
-    });
-
-    test('multiBrush mutedSeries is correct', function() {
-      var ms = {
-        "1397102460000": true,
-        "1397160780000": true,
-        "1397219100000": true
-      };
-      assert.deepEqual(multiBrush.mutedSeries, ms);
+    test('brush2._brush extents match', function() {
+      assert.closeTo(Px.d3.brushSelection(brush2._brushElem)[0], 80, 2);
+      assert.closeTo(Px.d3.brushSelection(brush2._brushElem)[1], 359, 2);
     });
   });
 
@@ -522,9 +508,11 @@ function runTests(){
   suite('px-vis-axis-brush radial setup works', function() {
     var radialScale = document.getElementById('radialScale'),
         radialSVG = document.getElementById('radialSVG'),
-        radialBrush = document.getElementById('radialBrush');
+        radialBrush1 = document.getElementById('radialBrush1'),
+        radialBrush2 = document.getElementById('radialBrush2'),
+        radialBrush3 = document.getElementById('radialBrush3');
 
-    suiteSetup(function(done){
+    suiteSetup(function(done) {
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -597,75 +585,100 @@ function runTests(){
             .data(dim);
         g.enter()
           .append("g")
-          .attr("class", "dimension")
+          .attr("class", function(d,i) { return "dimension" + i })
           .attr("dimension", function(d) { return d })
           .attr("transform", function(d) {
             return "rotate(" + (radialScale.x(d) * 180 / Math.PI + 180) + ")";
           });
 
-        radialBrush.set('margin',m);
-        radialBrush.set('height',h/2);
-        radialBrush.set('centerOffset',20);
-        radialBrush.set('seriesKey',"x");
-        radialBrush.set('dimensions',dim);
-        radialBrush.set('chartData',d);
-        radialBrush.set('svg',radialSVG.svg.selectAll('g.dimension'));
+        radialBrush1.set('margin',m);
+        radialBrush1.set('height',h/2);
+        radialBrush1.set('centerOffset',20);
+        radialBrush1.set('seriesKey',"x");
+        radialBrush1.set('dimension',dim[0]);
+        radialBrush1.set('chartData',d);
 
-      setTimeout(function(){done()},500);
-      // done();
+        radialBrush2.set('margin',m);
+        radialBrush2.set('height',h/2);
+        radialBrush2.set('centerOffset',20);
+        radialBrush2.set('seriesKey',"x");
+        radialBrush2.set('dimension',dim[1]);
+        radialBrush2.set('chartData',d);
+
+        radialBrush3.set('margin',m);
+        radialBrush3.set('height',h/2);
+        radialBrush3.set('centerOffset',20);
+        radialBrush3.set('seriesKey',"x");
+        radialBrush3.set('dimension',dim[2]);
+        radialBrush3.set('chartData',d);
+
+        radialBrush1.set('svg', radialSVG.svg.select('g.dimension0'));
+        radialBrush2.set('svg', radialSVG.svg.select('g.dimension1'));
+        radialBrush3.set('svg', radialSVG.svg.select('g.dimension2'));
+
+      setTimeout(function(){done()}, 500);
     });
 
     test('radialBrush fixture is created', function() {
-      assert.isTrue(radialBrush !== null);
+      assert.isTrue(radialBrush1 !== null);
+      assert.isTrue(radialBrush2 !== null);
+      assert.isTrue(radialBrush3 !== null);
     });
 
     test('radialBrush._brushes are created', function() {
-      assert.equal(radialBrush._brushes.nodes().length, 3);
+      assert.equal(radialBrush1._brushD3.nodes().length, 1);
+      assert.equal(radialBrush2._brushD3.nodes().length, 1);
+      assert.equal(radialBrush3._brushD3.nodes().length, 1);
     });
     test('radialBrush._brushes is not selected', function() {
-      assert.equal(Px.d3.brushSelection(radialBrush._brushes.nodes()[0]),null);
-      assert.equal(Px.d3.brushSelection(radialBrush._brushes.nodes()[1]),null);
-      assert.equal(Px.d3.brushSelection(radialBrush._brushes.nodes()[2]),null);
+
+      assert.equal(Px.d3.brushSelection(radialBrush1._brushElem), null);
+      assert.equal(Px.d3.brushSelection(radialBrush2._brushElem), null);
+      assert.equal(Px.d3.brushSelection(radialBrush3._brushElem), null);
     });
 
     test('radialBrush mutedSeries is correct', function() {
-      assert.deepEqual(radialBrush.mutedSeries,{});
+      assert.deepEqual(radialBrush1.mutedSeries,{});
+      assert.deepEqual(radialBrush2.mutedSeries,{});
+      assert.deepEqual(radialBrush3.mutedSeries,{});
     });
   });
 
   suite('px-vis-axis-brush brush resizes to the inputed domain', function() {
-    var radialBrush = document.getElementById('radialBrush');
+    var radialBrush1 = document.getElementById('radialBrush1'),
+        radialBrush2 = document.getElementById('radialBrush2'),
+        radialBrush3 = document.getElementById('radialBrush3');
     var colors = baseColors.properties.colors.value;
     var d;
     suiteSetup(function(done) {
-      d = [radialBrush.axis(9),radialBrush.axis(16)];
-      Px.d3.select(radialBrush._brushes.nodes()[1]).call(radialBrush._brush.move,d);
-       setTimeout(function(){done()},100);
-      //done();
+      d = [radialBrush2.axis(9), radialBrush2.axis(16)];
+      radialBrush2._brushD3.call(radialBrush2._brush.move, d);
+      setTimeout(function() { done() }, 100);
     });
 
     test('radialBrush._brush extents match', function() {
-      assert.deepEqual(Px.d3.brushSelection(radialBrush._brushes.nodes()[1]),[60,95]);
+      assert.closeTo(Px.d3.brushSelection(radialBrush2._brushElem)[0], 60, 2);
+      assert.closeTo(Px.d3.brushSelection(radialBrush2._brushElem)[1], 95, 2);
     });
     test('radialBrush._brushGroup.rect attr x', function() {
-      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('x'), -10);
+      assert.equal(radialBrush2._brushD3.select('rect.selection').attr('x'), -10);
     });
     test('radialBrush._brushGroup.rect attr width', function() {
-      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('width'), 20);
+      assert.equal(radialBrush2._brushD3.select('rect.selection').attr('width'), 20);
     });
     test('radialBrush._brushGroup.rect attr y', function() {
-      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('y'), 60);
+      assert.equal(radialBrush2._brushD3.select('rect.selection').attr('y'), 60);
     });
     test('radialBrush._brushGroup.rect attr height', function() {
-      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('height'), 35);
+      assert.equal(radialBrush2._brushD3.select('rect.selection').attr('height'), 35);
     });
     test('radialBrush._brushGroup.rect correct fill', function() {
-      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('fill').split(' ').join(''), colors['grey5']);
-      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('fill-opacity'), '0.3');
+      assert.equal(radialBrush2._brushD3.select('rect.selection').attr('fill').split(' ').join(''), colors['grey5']);
+      assert.equal(radialBrush2._brushD3.select('rect.selection').attr('fill-opacity'), '0.3');
     });
     test('radialBrush._brushGroup.rect correct stroke', function() {
-      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('stroke').split(' ').join(''), colors["primary-blue"]);
-      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('stroke-dasharray').split(' ').join(''), "5,5");
+      assert.equal(radialBrush2._brushD3.select('rect.selection').attr('stroke').split(' ').join(''), colors["primary-blue"]);
+      assert.equal(radialBrush2._brushD3.select('rect.selection').attr('stroke-dasharray').split(' ').join(''), "5,5");
     });
 
     test('radialBrush mutedSeries is correct', function() {
@@ -673,59 +686,67 @@ function runTests(){
         "1397131620000": true,
         "1397189940000": true
       };
-      assert.deepEqual(radialBrush.mutedSeries, ms);
+      assert.deepEqual(radialBrush2.mutedSeries, ms);
     });
   });
 
   suite('px-vis-axis-brush resize', function() {
-    var radialBrush = document.getElementById('radialBrush');
+    var radialBrush1 = document.getElementById('radialBrush1'),
+        radialBrush2 = document.getElementById('radialBrush2'),
+        radialBrush3 = document.getElementById('radialBrush3');
     var d1, d2;
 
     suiteSetup(function(done) {
-      d1 = [radialBrush.axis(1),radialBrush.axis(5)];
-      d2 = [radialBrush.axis(15),radialBrush.axis(27)];
+      d1 = [radialBrush1.axis(1),radialBrush1.axis(5)];
+      d2 = [radialBrush3.axis(15),radialBrush3.axis(27)];
 
-      Px.d3.select(radialBrush._brushes.nodes()[0]).call(radialBrush._brush.move,d1);
-      Px.d3.select(radialBrush._brushes.nodes()[2]).call(radialBrush._brush.move,d2);
+      radialBrush1._brushD3.call(radialBrush1._brush.move,d1);
+      radialBrush3._brushD3.call(radialBrush3._brush.move,d2);
 
-      setTimeout(function(){done()},100);
-      //done();
+      setTimeout(function(){ done() }, 100);
     });
-    test('radialBrush._brush y extents match', function() {
-      assert.deepEqual(Px.d3.brushSelection(radialBrush._brushes.nodes()[0]),[20,40]);
+    test('radialBrush1._brush extents match', function() {
+      assert.closeTo(Px.d3.brushSelection(radialBrush1._brushElem)[0], 20, 2);
+      assert.closeTo(Px.d3.brushSelection(radialBrush1._brushElem)[1], 40, 2);
     });
-    test('radialBrush._brush y rect attr y', function() {
-      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[0]).select('rect.selection').attr('y'), 20);
+    test('radialBrush1._brush rect attr y', function() {
+      assert.closeTo(Number(radialBrush1._brushD3.select('rect.selection').attr('y')), 20, 2);
     });
-    test('radialBrush._brush y rect attr height', function() {
-      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[0]).select('rect.selection').attr('height'), 20);
+    test('radialBrush1._brush rect attr height', function() {
+      assert.closeTo(Number(radialBrush1._brushD3.select('rect.selection').attr('height')), 20, 2);
     });
 
-    test('radialBrush._brush y2 extents match', function() {
-      assert.deepEqual(Px.d3.brushSelection(radialBrush._brushes.nodes()[2]),[90,150]);
+    test('radialBrush3._brush extents match', function() {
+      assert.closeTo(Px.d3.brushSelection(radialBrush3._brushElem)[0], 90, 2);
+      assert.closeTo(Px.d3.brushSelection(radialBrush3._brushElem)[1], 150, 2);
     });
-    test('radialBrush._brush y2 rect attr y', function() {
-      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[2]).select('rect.selection').attr('y'), 90);
+    test('radialBrush3._brush rect attr y', function() {
+      assert.closeTo(Number(radialBrush3._brushD3.select('rect.selection').attr('y')), 90, 2);
     });
-    test('radialBrush._brush y2 rect attr height', function() {
-      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[2]).select('rect.selection').attr('height'), 60);
+    test('radialBrush3._brush rect attr height', function() {
+      assert.closeTo(Number(radialBrush3._brushD3.select('rect.selection').attr('height')), 60, 2);
     });
 
     test('radialBrush mutedSeries is correct', function() {
-      var ms = {
-        "1397102460000": true,
-        "1397131620000": true,
-        "1397189940000": true,
-        "1397219100000": true
-      };
+      var ms1 = {
+            "1397102460000": true,
+            "1397189940000": true
+          },
+          ms3 = {
+            "1397131620000": true,
+            "1397219100000": true
+          };
 
-      assert.deepEqual(radialBrush.mutedSeries, ms);
+      assert.deepEqual(radialBrush1.mutedSeries, ms1);
+      assert.deepEqual(radialBrush3.mutedSeries, ms3);
     });
   });
 
   suite('px-vis-axis-brush domain change', function() {
     var radialScale = document.getElementById('radialScale');
-    var radialBrush = document.getElementById('radialBrush');
+    var radialBrush1 = document.getElementById('radialBrush1'),
+        radialBrush2 = document.getElementById('radialBrush2'),
+        radialBrush3 = document.getElementById('radialBrush3');
     var dim = ['y','y1','y2'];
     var ext = {'x': dim, 'y':[3,18]};
 
@@ -735,120 +756,157 @@ function runTests(){
       setTimeout(function(){done()},100);
     });
 
-    test('radialBrush._brush y extents match', function() {
-      assert.equal(Px.d3.brushSelection(radialBrush._brushes.nodes()[0])[0],20);
-      assert.closeTo(Px.d3.brushSelection(radialBrush._brushes.nodes()[0])[1],37, 1);
+    test('radialBrush1._brush extents match', function() {
+      assert.closeTo(Px.d3.brushSelection(radialBrush1._brushElem)[0], 20, 2);
+      assert.closeTo(Px.d3.brushSelection(radialBrush1._brushElem)[1], 37, 2);
     });
-    test('radialBrush._brush y rect attr y', function() {
-      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[0]).select('rect.selection').attr('y'), 20);
+    test('radialBrush1._brush rect attr y', function() {
+      assert.closeTo(Number(radialBrush1._brushD3.select('rect.selection').attr('y')), 20, 2);
     });
-    test('radialBrush._brush y rect attr height', function() {
-      assert.closeTo(Number(Px.d3.select(radialBrush._brushes.nodes()[0]).select('rect.selection').attr('height')), 17, 1);
-    });
-
-    test('radialBrush._brush y1 extents match', function() {
-      assert.closeTo(Px.d3.brushSelection(radialBrush._brushes.nodes()[1])[0],72, 1);
-      assert.closeTo(Px.d3.brushSelection(radialBrush._brushes.nodes()[1])[1],133,1);
-    });
-    test('radialBrush._brush y rect attr y1', function() {
-      assert.closeTo(Number(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('y')), 72, 1);
-    });
-    test('radialBrush._brush y1 rect attr height', function() {
-      assert.closeTo(Number(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('height')), 61,1 );
+    test('radialBrush1._brush rect attr height', function() {
+      assert.closeTo(Number(radialBrush1._brushD3.select('rect.selection').attr('height')), 17, 2);
     });
 
-    test('radialBrush._brush y2 extents match', function() {
-      assert.equal(Px.d3.brushSelection(radialBrush._brushes.nodes()[2])[0],124);
-      assert.closeTo(Px.d3.brushSelection(radialBrush._brushes.nodes()[2])[1],150,1);
+    test('radialBrush2._brush extents match', function() {
+      assert.closeTo(Px.d3.brushSelection(radialBrush2._brushElem)[0],72, 2);
+      assert.closeTo(Px.d3.brushSelection(radialBrush2._brushElem)[1],133,2);
     });
-    test('radialBrush._brush y2 rect attr y', function() {
-      assert.equal(Px.d3.select(radialBrush._brushes.nodes()[2]).select('rect.selection').attr('y'), 124);
+    test('radialBrush2._brush rect attr y1', function() {
+      assert.closeTo(Number(radialBrush2._brushD3.select('rect.selection').attr('y')), 72, 2);
     });
-    test('radialBrush._brush y2 rect attr height', function() {
-      assert.closeTo(Number(Px.d3.select(radialBrush._brushes.nodes()[2]).select('rect.selection').attr('height')), 26, 1);
+    test('radialBrush2._brush rect attr height', function() {
+      assert.closeTo(Number(radialBrush2._brushD3.select('rect.selection').attr('height')), 61, 2);
+    });
+
+    test('radialBrush3._brush extents match', function() {
+      assert.closeTo(Px.d3.brushSelection(radialBrush3._brushElem)[0], 124, 2);
+      assert.closeTo(Px.d3.brushSelection(radialBrush3._brushElem)[1], 150, 2);
+    });
+    test('radialBrush3._brush rect attr y', function() {
+      assert.closeTo(Number(radialBrush3._brushD3.select('rect.selection').attr('y')), 124, 2);
+    });
+    test('radialBrush3._brush rect attr height', function() {
+      assert.closeTo(Number(radialBrush3._brushD3.select('rect.selection').attr('height')), 26, 1);
     });
 
     test('radialBrush mutedSeries is correct', function() {
-      var ms = {
-        "1397189940000": true,
-        "1397131620000": true
-      };
-      assert.deepEqual(radialBrush.mutedSeries, ms);
+      var ms1 = {
+            "1397189940000": true
+          },
+          ms2 = {
+            "1397131620000": true,
+            "1397189940000": true
+          },
+          ms3 = {};
+
+      assert.deepEqual(radialBrush1.mutedSeries, ms1);
+      assert.deepEqual(radialBrush2.mutedSeries, ms2);
+      assert.deepEqual(radialBrush3.mutedSeries, ms3);
     });
   });
 
   suite('px-vis-axis-brush domain change so brush falls outside', function() {
     var radialScale = document.getElementById('radialScale');
-    var radialBrush = document.getElementById('radialBrush');
+    var radialBrush1 = document.getElementById('radialBrush1'),
+        radialBrush2 = document.getElementById('radialBrush2'),
+        radialBrush3 = document.getElementById('radialBrush3');
     var dim = ['y','y1','y2'];
     var ext = {'x': dim, 'y':[7,18]};
 
     suiteSetup(function(done) {
       radialScale.set('chartExtents',ext);
 
-      setTimeout(function(){done()},100);
+      setTimeout(function(){ done() }, 100);
 
     });
 
-    test('radialBrush._brush y extents match', function() {
-      assert.deepEqual(Px.d3.brushSelection(radialBrush._brushes.nodes()[0]),null);
+    test('radialBrush1._brush extents match', function() {
+      assert.deepEqual(Px.d3.brushSelection(radialBrush1._brushElem), null);
     });
 
-    test('radialBrush._brush y1 extents match', function() {
-      assert.closeTo(Px.d3.brushSelection(radialBrush._brushes.nodes()[1])[0],44, 1);
-      assert.closeTo(Px.d3.brushSelection(radialBrush._brushes.nodes()[1])[1],126,1);
+    test('radialBrush2._brush extents match', function() {
+      assert.closeTo(Px.d3.brushSelection(radialBrush2._brushElem)[0],44, 2);
+      assert.closeTo(Px.d3.brushSelection(radialBrush2._brushElem)[1],126, 2);
     });
-    test('radialBrush._brush y rect attr y1', function() {
-      assert.closeTo(Number(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('y')), 44, 1);
+    test('radialBrush2._brush rect attr y1', function() {
+      assert.closeTo(Number(radialBrush2._brushD3.select('rect.selection').attr('y')), 44, 2);
     });
-    test('radialBrush._brush y1 rect attr height', function() {
-      assert.closeTo(Number(Px.d3.select(radialBrush._brushes.nodes()[1]).select('rect.selection').attr('height')), 83,1 );
+    test('radialBrush2._brush rect attr height', function() {
+      assert.closeTo(Number(radialBrush2._brushD3.select('rect.selection').attr('height')), 83, 2);
     });
 
-    test('radialBrush._brush y2 extents match', function() {
-      assert.closeTo(Px.d3.brushSelection(radialBrush._brushes.nodes()[2])[0],115, 1);
-      assert.closeTo(Px.d3.brushSelection(radialBrush._brushes.nodes()[2])[1],150,1);
+    test('radialBrush3._brush extents match', function() {
+      assert.closeTo(Px.d3.brushSelection(radialBrush3._brushElem)[0],115, 2);
+      assert.closeTo(Px.d3.brushSelection(radialBrush3._brushElem)[1],150, 2);
     });
-    test('radialBrush._brush y2 rect attr y', function() {
-      assert.closeTo(Number(Px.d3.select(radialBrush._brushes.nodes()[2]).select('rect.selection').attr('y')), 115, 1);
+    test('radialBrush3._brush rect attr y', function() {
+      assert.closeTo(Number(radialBrush3._brushD3.select('rect.selection').attr('y')), 115, 2);
     });
-    test('radialBrush._brush y2 rect attr height', function() {
-      assert.closeTo(Number(Px.d3.select(radialBrush._brushes.nodes()[2]).select('rect.selection').attr('height')), 35, 1);
+    test('radialBrush3._brush rect attr height', function() {
+      assert.closeTo(Number(radialBrush3._brushD3.select('rect.selection').attr('height')), 35, 2);
     });
 
     test('radialBrush mutedSeries is correct', function() {
-      var ms = {
-        "1397131620000": true,
-        "1397189940000": true
-      };
+      var ms1 = {},
+          ms2 = {
+            "1397131620000": true,
+            "1397189940000": true
+          },
+          ms3 = {};
 
-      assert.deepEqual(radialBrush.mutedSeries, ms);
+      assert.deepEqual(radialBrush1.mutedSeries, ms1);
+      assert.deepEqual(radialBrush2.mutedSeries, ms2);
+      assert.deepEqual(radialBrush3.mutedSeries, ms3);
     });
   });
 
-  suite('px-vis-axis-brush delete all', function() {
-    var radialBrush = document.getElementById('radialBrush');
+  suite('px-vis-axis-brush delete works', function() {
+    var radialBrush1 = document.getElementById('radialBrush1'),
+        radialBrush2 = document.getElementById('radialBrush2'),
+        radialBrush3 = document.getElementById('radialBrush3');
 
     suiteSetup(function(done) {
-      radialBrush.deleteAllBrushes();
+      radialBrush1.deleteBrush();
+      radialBrush2.deleteBrush();
+      radialBrush3.deleteBrush();
 
-      setTimeout(function(){done()},100);
+      setTimeout(function(){ done() }, 100);
     });
 
-    test('radialBrush._brush y brush deleted', function() {
-      assert.deepEqual(Px.d3.brushSelection(radialBrush._brushes.nodes()[0]),null);
+    test('radialBrush1._brush brush deleted', function() {
+      assert.deepEqual(Px.d3.brushSelection(radialBrush1._brushElem), null);
     });
 
-    test('radialBrush._brush y1 brush deleted', function() {
-      assert.deepEqual(Px.d3.brushSelection(radialBrush._brushes.nodes()[1]),null);
+    test('radialBrush2._brush brush deleted', function() {
+      assert.deepEqual(Px.d3.brushSelection(radialBrush2._brushElem),null);
     });
 
-    test('radialBrush._brush y2 brush deleted', function() {
-      assert.deepEqual(Px.d3.brushSelection(radialBrush._brushes.nodes()[2]),null);
+    test('radialBrush3._brush brush deleted', function() {
+      assert.deepEqual(Px.d3.brushSelection(radialBrush3._brushElem),null);
     });
 
-    test('radialBrush mutedSeries is correct', function() {
-      assert.deepEqual(radialBrush.mutedSeries, {});
+    test('brushes mutedSeries is correct', function() {
+      assert.deepEqual(radialBrush1.mutedSeries, {});
+      assert.deepEqual(radialBrush2.mutedSeries, {});
+      assert.deepEqual(radialBrush3.mutedSeries, {});
+    });
+  });
+
+  suite('px-vis-axis-brush draw still works after delete', function() {
+    var radialBrush1 = document.getElementById('radialBrush1'),
+        radialBrush2 = document.getElementById('radialBrush2'),
+        radialBrush3 = document.getElementById('radialBrush3');
+
+    suiteSetup(function(done) {
+      d = [radialBrush2.axis(9),radialBrush2.axis(16)];
+      radialBrush2._brushD3.call(radialBrush2._brush.move,d);
+
+      setTimeout(function(){ done() }, 300);
+    });
+
+    test('radialBrush2._brush extents match', function() {
+      assert.closeTo(Px.d3.brushSelection(radialBrush2._brushElem)[0], 44, 2);
+      assert.closeTo(Px.d3.brushSelection(radialBrush2._brushElem)[1], 126, 2);
     });
   });
 

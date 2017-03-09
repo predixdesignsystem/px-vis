@@ -246,7 +246,8 @@ Element which draws scatter series onto the chart
           .attr('transform', this._applyTransform.bind(this))
           .each(function(d,i) {
             // if this series is missing a datapoint, remove that point
-            if(!_this._isValidData(d[_this.completeSeriesConfig[_this.seriesId]['y']])) {
+            if(!_this._isValidData(d[_this.completeSeriesConfig[_this.seriesId]['y']]) ||
+               !_this._isValidData(d[_this.completeSeriesConfig[_this.seriesId]['x']])) {
               this.remove();
             }
           });
@@ -366,7 +367,8 @@ Element which draws scatter series onto the chart
   2) Figure out better default instead of 0,0 for transform
   3) Think about using cx & cy instead of transform.
 */
-      if(!this._isValidData(d[this.completeSeriesConfig[this.seriesId]['y']])) {
+      if(!this._isValidData(d[this.completeSeriesConfig[this.seriesId]['y']]) ||
+         !this._isValidData(d[this.completeSeriesConfig[this.seriesId]['x']])) {
         return '';
       }
 
@@ -381,15 +383,8 @@ Element which draws scatter series onto the chart
         return 'translate(0,0)' + ' scale(' + this.markerScale + ')';
       } else {
 
-        var xTrans,
-            yTrans;
-
-        if(this._isValidData(d[this.completeSeriesConfig[this.seriesId]['x']])) {
-          xTrans = this.x(d[this.completeSeriesConfig[this.seriesId]['x']]);
-        }
-        if(this._isValidData(d[this.completeSeriesConfig[this.seriesId]['y']])) {
-          yTrans = this.y(d[this.completeSeriesConfig[this.seriesId]['y']]);
-        }
+        var xTrans = this.x(d[this.completeSeriesConfig[this.seriesId]['x']]),
+            yTrans = this.y(d[this.completeSeriesConfig[this.seriesId]['y']]);
 
         //make sure we have a value
         xTrans = xTrans ? xTrans : 0;

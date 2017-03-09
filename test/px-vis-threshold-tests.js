@@ -66,6 +66,14 @@ function runTests(){
             "dashPattern": "5,0",
             "title": "CUSTOM"
           }
+        },
+        dTBConf = {
+          "min": {
+            "showThresholdBox": true
+          },
+          "median": {
+            "showThresholdBox": true
+          }
         };
 
       baseSVG.set('width',w);
@@ -88,6 +96,7 @@ function runTests(){
       boxThreshold.set('width',w);
       boxThreshold.set('margin',m);
       boxThreshold.set('completeSeriesConfig',completeSeriesConfig);
+      boxThreshold.set('thresholdConfig',dTBConf);
       boxThreshold.set('thresholdData',dTB);
 
       customThresold.set('width',w);
@@ -242,9 +251,6 @@ function runTests(){
     test('defaultThreshold thresholdRect y', function() {
       assert.equal(Math.round(defaultThreshold.thresholdRect.nodes()[1].getAttribute('y')),38);
     });
-    // test('defaultThreshold thresholdRect width', function() {
-    //   assert.equal(defaultThreshold.thresholdRect.nodes()[1].getAttribute('width'),defaultThreshold.thresholdText.nodes()[1].getBBox().width + 5);
-    // });
     test('defaultThreshold thresholdRect height', function() {
       assert.equal(defaultThreshold.thresholdRect.nodes()[1].getAttribute('height'),18);
     });
@@ -258,9 +264,6 @@ function runTests(){
     test('defaultThreshold thresholdText font-size', function() {
       assert.equal(defaultThreshold.thresholdText.nodes()[1].getAttribute('font-size'),'12px');
     });
-    // test('defaultThreshold thresholdText font-style', function() {
-    //   assert.equal(Px.d3.select(defaultThreshold.thresholdText.nodes()[0]).style('font-family'),'"GE Inspira Sans"');
-    // });
     test('defaultThreshold thresholdText x', function() {
       assert.equal(defaultThreshold.thresholdText.nodes()[1].getAttribute('x'),8);
     });
