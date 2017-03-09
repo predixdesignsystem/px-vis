@@ -39,7 +39,7 @@ PxVisBehaviorRegister.groupings = {
 
     @polymerBehavior PxVisBehaviorRegister.itemShared
 */
-PxVisBehaviorRegister.itemShared = {
+PxVisBehaviorRegister.itemShared = [{
   properties: {
     /**
      * A holder for a line of the register
@@ -100,8 +100,49 @@ PxVisBehaviorRegister.itemShared = {
      type: String,
      value: "vertical",
      notify: true
+    },
+    _mouseEnterHandler: {
+      type: Function
+    },
+    _mouseLeaveHandler: {
+      type: Function
+    },
+    _hasDynamicMenu: {
+      type: Boolean,
+      value: false
     }
   },
+
+  observers: [
+    '_menuConfigChanged(dynamicMenuConfig)'
+  ],
+  attached: function() {
+
+    this._mouseEnterHandler = function() {
+        
+        if(this._hasDynamicMenu) {
+          
+          //store a ref to the menu if we don't have it yet
+          if(!this.$.menu) {
+            this.$.menu = this.$$('px-vis-dynamic-menu');
+          }
+
+          this.$.menu.fadeIn();
+        }
+      }.bind(this);
+      this._mouseLeaveHandler = function() {
+        if(this._hasDynamicMenu && this.$.menu) {
+          this.$.menu.fadeOut();
+        }
+      }.bind(this);
+      
+      this.addEventListener('mouseenter', this._mouseEnterHandler);
+      this.addEventListener('mouseleave', this._mouseLeaveHandler);
+    },
+    detached: function() {
+      this.removeEventListener('mouseenter', this._mouseEnterHandler);
+      this.removeEventListener('mouseleave', this._mouseLeaveHandler);
+    },
 
   /**
    * Returns the correct flex type based on the register type
@@ -159,7 +200,18 @@ PxVisBehaviorRegister.itemShared = {
     var baseClasses = (this.type === 'horizontal') ? "series narrow flex flex--row" : "series wide flex flex--row flex--justify";
     return baseClasses;
   },
-};
+  _getDynamicMenuClass: function(type) {
+    if(type === 'vertical') {
+      return 'flex__item--bottom';
+    } else {
+      return '';
+    }
+  },
+
+  _menuConfigChanged: function() {
+    this._hasDynamicMenu = this.dynamicMenuConfig && this.dynamicMenuConfig.length > 0;
+  }
+}, PxVisBehavior.dynamicMenuConfig];
 
 /*
     Name:
@@ -178,11 +230,23 @@ PxVisBehaviorRegister.register = {
   /**
    * returns the correct classes for the series based on type
    */
-  _getSeriesWrapperClass: function(type) {
+  _getSeriesWrapperClass: function(type, hozAlign, _hasScrollBar) {
     var classList = 'flex fullWidth ';
 
     if(type === 'horizontal') {
       classList += 'flex--row ';
+      
+      if(_hasScrollBar || hozAlign === 'left') {
+         classList += 'flex--left ';
+      } else if(hozAlign === 'center') {
+        classList += 'flex--center ';
+      } else if(hozAlign === 'right') {
+        classList += 'flex--right ';
+      } else if(hozAlign === 'justify') {
+        classList += 'flex--justify ';
+      } else if(hozAlign === 'spaced') {
+        classList += 'flex--spaced ';
+      }
     } else {
       classList += 'flex--col';
     }
@@ -391,7 +455,7 @@ PxVisBehaviorRegister.generalItem = [{
     if(typeof this.mutedSeries[item.name] === 'boolean') {
       this.toggleClass('muted', this.mutedSeries[item.name], this.$.regWithoutMenu);
     }
-  }
+  },
 }, PxVisBehavior.muteUnmuteSeries];
 
 

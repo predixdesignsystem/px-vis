@@ -97,6 +97,8 @@ After BETA3
   * take units into account when truncating an axis title
   * only initialize tooltips on axis when needed
   * allow to prevent initial drawing for several elements, allowing charts to have more control over initialization
+  * added horizontalAlignment to registers (only useful when register type is 'horizontal')
+  * fix pie registers
 
 v0.8.4
 ==================
