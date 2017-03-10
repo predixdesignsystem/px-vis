@@ -839,15 +839,14 @@ Custom property | Description | Default
           this.debounce('_truncateTitle', function() {
 
               var oldTitle = this.displayedTitle,
-                  combined = title + this._currentUnits,
                   newTitle;
               if(this.titleTruncation &&
-                  combined.length > 2 && combined.length > this.truncationLength) {
+                  title.length > 2 && title.length > this.truncationLength) {
 
-                newTitle = this._truncateName(combined, truncationLength);
+                newTitle = this._truncateName(title, truncationLength) + this._currentUnits;
                 this.set('_titleTruncated', true);
               } else {
-                newTitle = combined;
+                newTitle = title + this._currentUnits;
                 this.set('_titleTruncated', false);
               }
               if(newTitle !== oldTitle) {

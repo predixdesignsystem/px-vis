@@ -13,19 +13,18 @@ This area mutes or selects the series outside of the drawn box, depending on pas
 
 ##### Usage
     <px-vis-axis-brush
-      svg="[[axisGroups]]"
-      parent-svg="[[svg]]"
-      height="[[_heightOrLen]]"
-      axis="[[y]]"
-      margin="[[margin]]"
-      chart-data="[[chartData]]"
-      dimensions="[[dimensions]]"
-      series-key="[[seriesKey]]"
-      domain-changed="[[domainChanged]]"
-      muted-series="{{mutedSeries}}"
-      radial="[[radial]]"
-      center-offset="[[centerOffset]]"
-      brush-to-remove="[[brushToRemove]]">
+        svg="[[axisGroup]]"
+        height="[[_heightOrLen]]"
+        axis="[[y]]"
+        margin="[[margin]]"
+        chart-data="[[chartData]]"
+        dimensions="[[dimensions]]"
+        series-key="[[seriesKey]]"
+        domain-changed="[[domainChanged]]"
+        muted-series="{{mutedSeries}}"
+        radial="[[radial]]"
+        center-offset="[[centerOffset]]"
+        brush-to-remove="[[brushToRemove]]">
     </px-vis-axis-brush>
 
 ### Styling
@@ -125,9 +124,6 @@ Custom property | Description | Default
         type: Object,
         value: function() { return {}; }
       },
-      parentSvg: {
-        type: Object
-      },
       brushToRemove: {
         type: Boolean,
         value: false
@@ -135,8 +131,8 @@ Custom property | Description | Default
     },
 
     observers: [
-      'drawElement(svg, margin.* , height)',
-      'recalcBrush(domainChanged, brushDomains.*)',
+      'drawElement(svg, margin.* , height, domainChanged)',
+      'recalcBrush(domainChanged)',
     ],
 
     /**
@@ -251,10 +247,10 @@ Custom property | Description | Default
       if(this._doesD3HaveValues(this._brushD3) && this.domainChanged !== null) {
 
           //first, delete all brushes and start over (probably dont have to do this, but seems safest)
-          this.deleteBrush(this._brushD3);
+          this.deleteAndClearBrush(this._brushD3);
 
           //if there is a brush, calc what size it should be now
-          if(this.brushDomains[this.dimension] && this.brushDomains[this.dimension].length > 0) { //TODO
+          if(this.brushDomains[this.dimension] && this.brushDomains[this.dimension].length > 0) {
             // if the axis exists, then lets check out the extents
             var oldBrushDomain = this.brushDomains[this.dimension],
                 newAxisDomain = this.axis.domain(),
@@ -334,7 +330,7 @@ Custom property | Description | Default
           domain = [y0, y1];
         }
 
-        // this.brushDomains[this.dimension] = domain;
+        this.brushDomains[this.dimension] = domain;
         this.fire('px-vis-brush-brush-domain-updated', { 'data': domain, 'dimension': this.dimension });
 
         this.set('mutedSeries', series);
@@ -395,7 +391,7 @@ Custom property | Description | Default
 
       } else {
         //delete and move on to the next brush
-        this.deleteBrush(elem);
+        this.deleteAndClearBrush(elem);
         return [];
       }
 
@@ -422,26 +418,11 @@ Custom property | Description | Default
       return newRange;
     },
 
-    _updateBrushDomains: function() {
-      this._brushDomain = this.brushDomain;
-      this.recalcBrush();
-    },
 
     /**
-     * Final update on a brush end event
+     * deletes a brush and clears listeners
      */
-    // clearBrush: function(bid) {
-    //   // figure out if it was is being removed and has a brush and clear the brush if so
-    //   if(this.dimension === bid && Px.d3.brushSelection(this._brushElem)) {
-    //     this._brushD3.call(this._brush.move, null);
-    //   }
-    //
-    // },
-
-    /**
-     * deletes a brush
-     */
-    deleteBrush: function(elem) {
+    deleteAndClearBrush: function(elem) {
       //clear listeners
       elem.call(this._brush
         .on("start.brush", null)
@@ -450,20 +431,11 @@ Custom property | Description | Default
       elem.call(this._brush.move, null);
     },
 
-    /**
-     * Remmves all brushes from the axes
-     */
-    // deleteAllBrushes: function(){
-    //   if(this._brushes){
-    //     var _this = this;
-    //
-    //     // for each brush, figure out if it was brushed and build an array of obj with the extents and the dimension
-    //     this._brushes.each(function(d) {
-    //       //first, delete all brushes and start over
-    //       _this.deleteBrush(Px.d3.select(this));
-    //     });
-    //     this._calcMutedSeries({});
-    //   }
-    // }
+    deleteBrush: function() {
+      if(this._doesD3HaveValues(this._brushD3)) {
+        //delete
+        this._brushD3.call(this._brush.move, null);
+      }
+    }
   });
 </script>
