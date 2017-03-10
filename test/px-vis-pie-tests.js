@@ -51,13 +51,9 @@ function runTests(){
 
     test('click on slice rotates pie', function(done) {
       var slice = basePie.pieGroup._groups[0][0].firstChild,
-          evt = document.createEvent("MouseEvent"),
-          popover = Polymer.dom(basePie.root).querySelector('px-popover');
+          evt = document.createEvent("MouseEvent");
 
       evt.initMouseEvent("tap",true,true,window,0,0,0,0,0,false,false,false,false,0,null);
-
-      //popover hidden
-      assert.isFalse(popover.classList.contains('fadeFromHidden'));
 
       //click
       slice.dispatchEvent(evt);
@@ -74,57 +70,8 @@ function runTests(){
         //IE uses opposite
         assert.isTrue(rot === -47.4 || rot === (360-47.4));
 
-        //popover should be shown
-        assert.isTrue(popover.classList.contains('fadeFromHidden'));
-
         done();
       }, 1000);
-    });
-
-    // test('tooltip starts hidden', function() {
-    //   var tooltip = Polymer.dom(basePie.root).querySelector('px-tooltip');
-    //   console.log(tooltip._isShowing)
-    //   //tooltip hidden
-    //   assert.isFalse(tooltip._isShowing);
-    // });
-
-    test('hover shows tooltip', function(done) {
-      var slice = basePie.pieGroup._groups[0][0].firstChild,
-          evt = document.createEvent("MouseEvent"),
-          tooltip = Polymer.dom(basePie.root).querySelector('px-tooltip');
-
-      evt.initMouseEvent("mouseover",true,true,window,0,0,0,0,0,false,false,false,false,0,null);
-
-      //hover
-      slice.dispatchEvent(evt);
-
-      setTimeout(function() {
-
-        //tooltip should be shown
-        assert.isTrue(tooltip._isShowing);
-        done();
-      }, 1000);
-    });
-
-    test('mouseleave hides tooltip', function(done) {
-      var slice = basePie.pieGroup._groups[0][0].firstChild,
-          evt = document.createEvent("MouseEvent"),
-          tooltip = Polymer.dom(basePie.root).querySelector('px-tooltip');
-
-      evt.initMouseEvent("mouseleave",true,true,window,0,0,0,0,0,false,false,false,false,0,null);
-
-      //tooltip shown
-      assert.isTrue(tooltip._isShowing);
-
-      //hover
-      slice.dispatchEvent(evt);
-
-      setTimeout(function() {
-
-        //tooltip should be hidden
-        assert.isFalse(tooltip._isShowing);
-        done();
-      }, 10);
     });
 
     test('click on slice emits px-vis-pie-slice-clicked event with slice data', function(done) {
@@ -136,9 +83,10 @@ function runTests(){
 
       evt.initMouseEvent("tap",true,true,window,0,0,0,0,0,false,false,false,false,0,null);
       basePie.addEventListener('px-vis-pie-slice-clicked', function (e) {
-        var eventSliceName = e.detail.data.y,
-            eventSliceAmount = e.detail.data.x,
-            eventSlicePercentage = e.detail.data.percentage;
+
+        var eventSliceName = e.detail.datum.data.y,
+            eventSliceAmount = e.detail.datum.data.x,
+            eventSlicePercentage = e.detail.datum.data.percentage;
         assert.equal(sliceName, eventSliceName);
         assert.equal(sliceAmount, eventSliceAmount);
         assert.equal(slicePercentage, eventSlicePercentage);
