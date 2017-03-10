@@ -542,9 +542,9 @@ function setData(series, data, done){
   series.set('chartData',data.data.series);
 
   // pause and let the dom repeate chug away
-  setTimeout(function(){
+  setTimeout(function() {
     if(done){ done(); }
-  },10);
+  }, 10);
 }
 
 function setMutedSeries(series, name, done){
