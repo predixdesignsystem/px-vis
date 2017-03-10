@@ -291,7 +291,6 @@ function runTests(){
       multiAxis.set('chartData',d);
 
       setTimeout(function(){
-        console.log(multiAxis.domainChanged);
         done()}, 1000);
      // done();
     });
