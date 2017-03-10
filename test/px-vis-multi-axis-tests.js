@@ -90,8 +90,7 @@ function runTests(){
       multiAxis.set('axes',dim);
       multiAxis.set('chartData',d);
 
-      setTimeout(function(){done()},300);
-     // done();
+      setTimeout(function(){done()}, 500);
     });
 
     test('multiAxis fixture is created', function() {

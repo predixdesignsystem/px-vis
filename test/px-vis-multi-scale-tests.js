@@ -12,6 +12,10 @@ function runTests(){
   suite('px-vis-multi-scale runs with basic declarative bindings', function() {
     var multiScale = document.getElementById('multiScale');
 
+    suiteSetup(function(done) {
+      setTimeout(function() { done(); }, 100);
+    });
+
     test('multiScale fixture is created', function() {
       assert.isTrue(multiScale !== null);
     });
