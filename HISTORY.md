@@ -104,6 +104,7 @@ After BETA3
   * added scale type to scale
   * fixed scale type not being dynamic
   * fixed canvas clip path issues
+  * Separated much multi-axis code into a separate interactive axis component. Reworked axis drag and axis brush as a result.
 
 v0.8.4
 ==================
