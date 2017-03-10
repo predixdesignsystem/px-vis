@@ -7,23 +7,42 @@
 <!--
 Element providing user interaction on the navigator.
 
-This element draw the box over the navigator signifying the selected chart extents and provides the user interactions to resize and move the extent box.
+This element draw the box over the navigator signifying the selected chart extents 
+and provides the user interactions to resize and move the extent box.
 
-This element sets the selectedDomain property based on the extents box. The selectedDomain variable can then be consumed by the scale component to change the main chart extents.
+This element sets the selectedDomain property based on the extents box. 
+
+The selectedDomain variable can then be consumed by the scale component to change the main chart extents.
 
 ##### Usage
 
     <px-vis-brush
-        svg="[[varFromSVGComponent]]"
-        axis="[[varXFromScaleComponent]]"
-        width="[[width]]"
-        height="[[height]]"
-        margin="[[margin]]"
-        chart-domain=[[chartDomainX]]
-        current-domain="[[varXDomainFromScaleComponent]]"
-        gradient-overlay="[[gradientOverlay]]"
-        selected-domain="{{selectedDomain}}">
+      svg="[[svg]]"
+      axis="[[x]]"
+      height="[[height]]"
+      width="[[width]]"
+      margin="[[margin]]"
+      domain-changed="[[domainChanged]]">
     </px-vis-brush>
+    <px-vis-svg
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      svg="{{svg}}">
+    </px-vis-svg>
+    <px-vis-scale
+      x-axis-type="time"
+      y-axis-type="linear"
+      complete-series-config="[[seriesConfig]]"
+      data-extents="[[dataExtents]]"
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      chart-data="[[chartData]]"
+      x="{{x}}"
+      y="{{y}}"
+      domain-changed="{{domainChanged}}">
+    </px-vis-scale>
 
 ### Styling
 The following custom properties are available for styling:

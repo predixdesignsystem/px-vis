@@ -1,0 +1,125 @@
+<!-- Common imports -->
+<link rel="import" href="../../polymer/polymer.html" />
+<link rel="import" href="../../px-polymer-font-awesome/px-polymer-font-awesome.html" />
+
+<!-- Common demo imports -->
+<link rel="import" href="../../px-demo/px-demo-header.html" />
+<link rel="import" href="../../px-demo/px-demo-api-viewer.html" />
+<link rel="import" href="../../px-demo/px-demo-footer.html" />
+<link rel="import" href="../../px-demo/px-demo-props.html" />
+<link rel="import" href="../../px-demo/px-demo-configs.html" />
+<link rel="import" href="../../px-demo/px-demo-interactive.html" />
+<link rel="import" href="../../px-demo/px-demo-component-snippet.html" />
+<link rel="import" href="../../px-demo/px-demo-code-editor.html" />
+<link rel="import" href="../../px-demo/css/px-demo-styles.html" />
+
+<!-- Imports for this componnent -->
+<link rel="import" href="px-vis-scatter-demo-component.html">
+
+<!-- Demo DOM module -->
+<dom-module id="px-vis-scatter-demo">
+  <template>
+  <style include="px-demo-styles" is="custom-style"></style>
+
+  <!-- Light theme -->
+  <style include="px-theme-styles" is="custom-style"></style>
+
+  <!-- Dark theme -->
+  <style include="px-dark-demo-theme-styles" is="custom-style"></style>
+  <style include="px-dark-theme-styles" is="custom-style"></style>
+
+    <!-- Header -->
+    <px-demo-header
+        module-name="px-vis-scatter"
+        description="[[description]]"
+        parent-name="px-vis">
+    </px-demo-header>
+
+    <!-- Interactive -->
+    <px-demo-interactive force-hide-props>
+      <px-demo-configs configs="[[configs]]" props="{{props}}" chosen-config="{{chosenConfig}}"></px-demo-configs>
+      <!-- Props -->
+    <px-demo-props props="{{props}}" config="[[chosenConfig]]"></px-demo-props>
+
+      <!-- Component ---------------------------------------------------------->
+      <px-demo-component>
+        <px-vis-scatter-demo-component></px-vis-scatter-demo-component>
+      </px-demo-component>
+      <!-- END Component ------------------------------------------------------>
+
+      <px-demo-component-snippet
+          element-properties="{{props}}"
+          element-name="px-vis-scatter">
+      </px-demo-component-snippet>
+    </px-demo-interactive>
+
+    <!-- API Viewer -->
+    <px-demo-api-viewer source="px-vis-scatter"></px-demo-api-viewer>
+
+  </template>
+
+</dom-module>
+<script>
+  Polymer({
+    is: 'px-vis-scatter-demo',
+    properties: {
+      description: {
+        type: String,
+        value: "Example of a scatter drawing object. Very similar configuration to px-vis-line-svg."
+      },
+      /**
+       * @property demoProps
+       * @type {Object}
+       */
+      props: {
+        type: Object,
+        value: function(){ return this.demoProps; }
+      },
+
+      /**
+       * @property demoProps
+       * @type {Array}
+       */
+      configs: {
+        type: Array,
+        value: function(){
+          return [
+              {
+                configName: "Default",
+                configShowProps: []
+              }
+          ];
+        },
+      },
+    },
+    demoProps: {
+      svg:{
+				value: "[[svg]]"
+			},
+      seriesId:{
+				value: "mySeries"
+			},
+      completeSeriesConfig:{
+				value: "[[seriesConfig]]"
+			},
+      chartData:{
+				value: "[[chartData]]"
+			},
+      x:{
+				value: "[[x]]"
+			},
+      y:{
+				value: "[[y]]"
+			},
+      currentDomainX:{
+				value: "[[currentDomainX]]"
+			},
+      currentDomainY:{
+				value: "[[currentDomainY]]"
+			},
+      domainChanged:{
+				value: "[[domainChanged]]"
+      }
+    }
+  });
+</script>

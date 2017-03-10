@@ -1,0 +1,171 @@
+<link rel="import" href="../../polymer/polymer.html">
+
+<link rel="import" href="../px-vis-scale.html">
+<link rel="import" href="../px-vis-svg.html">
+<link rel="import" href="../px-vis-tooltip.html">
+<link rel="import" href="../px-vis-interaction-space.html">
+<link rel="import" href="../px-vis-line-svg.html">
+<link rel="import" href="../px-vis-behavior-chart.html" />
+
+<dom-module id="px-vis-tooltip-demo-component">
+  <template>
+      <div class="outline" on-mousemove="_calcMousePos">
+
+      <!-- need for tooltip -->
+        <px-vis-tooltip
+          hover-target="[[mouseRect]]"
+          mouse-position="[[mousePosition]]"
+          width="250"
+          margin="[[margin]]"
+          chart-data="[[chartData]]"
+          tooltip-data="[[tooltipData]]"
+          complete-series-config="[[seriesConfig]]"
+          x-axis-type="time"
+          tooltip-style="light">
+        </px-vis-tooltip>
+        <px-vis-svg
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          svg="{{svg}}">
+        </px-vis-svg>
+        <px-vis-scale
+          x-axis-type="time"
+          y-axis-type="linear"
+          complete-series-config="[[seriesConfig]]"
+          data-extents="[[dataExtents]]"
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          chart-data={{chartData}}
+          x="{{x}}"
+          y="{{y}}"
+          domain-changed="{{domainChanged}}"
+          selected-domain="[[selectedDomain]]">
+        </px-vis-scale>
+        <px-vis-interaction-space
+          x-axis-type="time"
+          svg="[[layer.1]]"
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          complete-series-config="[[seriesConfig]]"
+          chart-data="[[chartData]]"
+          tooltip-data="{{tooltipData}}"
+          extents-data="{{extentsData}}"
+          x="[[x]]"
+          y="[[y]]"
+          domain-changed="[[domainChanged]]"
+          mouse-rect="{{mouseRect}}">
+        </px-vis-interaction-space>
+        <px-vis-line-svg
+          svg="[[layer.0]]"
+          series-id="mySeries"
+          complete-series-config="[[seriesConfig]]"
+          chart-data="[[chartData]]"
+          x="[[x]]"
+          y="[[y]]"
+          domain-changed="[[domainChanged]]">
+        </px-vis-line-svg>
+      </div>
+  </template>
+  <script>
+    Polymer({
+      is: "px-vis-tooltip-demo-component",
+      properties:{
+        //basics
+        width: {
+          type : Number,
+          value : 500
+        },
+        height:{
+          type : Number,
+          value : 200
+        },
+        margin:{
+          type : Object,
+          value : {
+            "top": 10,
+            "right": 10,
+            "bottom": 10,
+            "left": 10
+          }
+        },
+        domainChanged:{
+          type: Boolean,
+          value: false
+        },
+        chartData:{
+          type : Array,
+          value : [{
+              'x': 1397102460000,
+              'y': 0.56
+            },{
+              'x': 1397139660000,
+              'y': 0.4
+            },{
+              'x': 1397177400000,
+              'y': 0.43
+            },{
+              'x': 1397228040000,
+              'y': 0.33
+            },{
+              'x': 1397248260000,
+              'y': 0.47
+            },{
+              'x': 1397291280000,
+              'y': 0.41
+            },{
+              'x': 1397318100000,
+              'y': 0.26
+            },{
+              'x': 1397342100000,
+              'y': 0.42
+            },{
+              'x': 1397390820000,
+              'y': 0.27
+            },{
+              'x': 1397408100000,
+              'y': 0.38
+            },{
+              'x': 1397458800000,
+              'y': 0.36
+            },{
+              'x': 1397522940000,
+              'y': 0.32
+          }]
+        },
+        seriesConfig:{
+          type : Object,
+          value: {
+            'mySeries': {
+              "name":"My-Series",
+              "type": "line",
+              "x": 'x',
+              "y": 'y',
+              'color': "rgb(93,165,218)"
+            }
+          }
+        },
+        //dataExtents
+        dataExtents:{
+          type : Object,
+          value: {
+            "x": [Infinity,-Infinity],
+            "y": [0,-Infinity]
+          }
+        },
+        mousePosition:{
+          type: Array
+        }
+      },
+      behaviors: [PxVisBehaviorChart.layers],
+      ready: function() {
+        this.set('numberOfLayers',2);
+      },
+      _calcMousePos: function(evt) {
+        this.set('mousePosition',[evt.pageX,evt.pageY]);
+      }
+    });
+  </script>
+</dom-module>

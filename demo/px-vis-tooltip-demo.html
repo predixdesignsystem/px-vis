@@ -1,0 +1,125 @@
+<!-- Common imports -->
+<link rel="import" href="../../polymer/polymer.html" />
+<link rel="import" href="../../px-polymer-font-awesome/px-polymer-font-awesome.html" />
+
+<!-- Common demo imports -->
+<link rel="import" href="../../px-demo/px-demo-header.html" />
+<link rel="import" href="../../px-demo/px-demo-api-viewer.html" />
+<link rel="import" href="../../px-demo/px-demo-footer.html" />
+<link rel="import" href="../../px-demo/px-demo-props.html" />
+<link rel="import" href="../../px-demo/px-demo-configs.html" />
+<link rel="import" href="../../px-demo/px-demo-interactive.html" />
+<link rel="import" href="../../px-demo/px-demo-component-snippet.html" />
+<link rel="import" href="../../px-demo/px-demo-code-editor.html" />
+<link rel="import" href="../../px-demo/css/px-demo-styles.html" />
+
+<!-- Imports for this componnent -->
+<link rel="import" href="px-vis-tooltip-demo-component.html">
+
+<!-- Demo DOM module -->
+<dom-module id="px-vis-tooltip-demo">
+  <template>
+  <style include="px-demo-styles" is="custom-style"></style>
+
+  <!-- Light theme -->
+  <style include="px-theme-styles" is="custom-style"></style>
+
+  <!-- Dark theme -->
+  <style include="px-dark-demo-theme-styles" is="custom-style"></style>
+  <style include="px-dark-theme-styles" is="custom-style"></style>
+
+    <!-- Header -->
+    <px-demo-header
+        module-name="px-vis-tooltip"
+        description="[[description]]"
+        parent-name="px-vis">
+    </px-demo-header>
+
+    <!-- Interactive -->
+    <px-demo-interactive force-hide-props>
+      <px-demo-configs configs="[[configs]]" props="{{props}}" chosen-config="{{chosenConfig}}"></px-demo-configs>
+      <!-- Props -->
+    <px-demo-props props="{{props}}" config="[[chosenConfig]]"></px-demo-props>
+
+      <!-- Component ---------------------------------------------------------->
+      <px-demo-component>
+        <px-vis-tooltip-demo-component></px-vis-tooltip-demo-component>
+      </px-demo-component>
+      <!-- END Component ------------------------------------------------------>
+
+      <px-demo-component-snippet
+          element-properties="{{props}}"
+          element-name="px-vis-tooltip">
+      </px-demo-component-snippet>
+    </px-demo-interactive>
+
+    <!-- API Viewer -->
+    <px-demo-api-viewer source="px-vis-tooltip"></px-demo-api-viewer>
+
+  </template>
+
+</dom-module>
+<script>
+  Polymer({
+    is: 'px-vis-tooltip-demo',
+    properties: {
+      description: {
+        type: String,
+        value: "The tooltip provides similar data display functionality to the register, but on chart and without the user interaction."
+      },
+      /**
+       * @property demoProps
+       * @type {Object}
+       */
+      props: {
+        type: Object,
+        value: function(){ return this.demoProps; }
+      },
+
+      /**
+       * @property demoProps
+       * @type {Array}
+       */
+      configs: {
+        type: Array,
+        value: function(){
+          return [
+              {
+                configName: "Default",
+                configShowProps: []
+              }
+          ];
+        },
+      },
+    },
+    demoProps: {
+      hoverTarget:{
+				value:"[[mouseRect]]"
+			},
+      mousePosition:{
+				value:"[[mousePosition]]"
+			},
+      width:{
+				value:"250"
+			},
+      margin:{
+				value:"[[margin]]"
+			},
+      chartData:{
+				value:"[[chartData]]"
+			},
+      tooltipData:{
+				value:"[[tooltipData]]"
+			},
+      completeSeriesConfig:{
+				value:"[[seriesConfig]]"
+			},
+      xAxisType:{
+				value:"time"
+			},
+      tooltipStyle:{
+				value:"light"
+      }
+    }
+  });
+</script>

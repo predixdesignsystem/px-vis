@@ -1,0 +1,175 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../px-vis-radar-grid.html">
+<link rel="import" href="../px-vis-svg.html">
+<link rel="import" href="../px-vis-radial-scale.html">
+
+<dom-module id="px-vis-radar-grid-demo-component">
+  <template>
+    <!--add demo tag-->
+    <px-vis-radar-grid
+        svg="[[svg]]"
+        x="[[x]]"
+        y="[[y]]"
+        axis-color="[[axisColor]]"
+        tick-values="[[drawnTickValues]]"
+        dimensions="[[dimensions]]"
+        margin="[[margin]]"
+        domain-changed="[[domainChanged]]">
+      </px-vis-radar-grid>
+      <px-vis-svg
+        id="svg"
+        svg="{{svg}}"
+        width="[[width]]"
+        height="[[height]]"
+        offset="[[offset]]">
+      </px-vis-svg>
+      <px-vis-radial-scale
+        width="[[radius]]"
+        height="[[radius]]"
+        margin="[[margin]]"
+        amplitude-keys="[[dimensions]]"
+        chart-data="[[chartData]]"
+        chart-extents="[[chartExtents]]"
+        x="{{x}}"
+        y="{{y}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-radial-scale>
+  </template>
+</dom-module>
+
+<script>
+Polymer({
+  is: 'px-vis-radar-grid-demo-component',
+  properties: {
+    description: {
+      type: String,
+      value: "An element which draws polygonal grid lines."
+    },
+    axisColor: {
+      type: String,
+      value: "grey4"
+    },
+    radius:{
+      type: Number,
+      value: 150
+    },
+    width:{
+      type: Number,
+      value: 400
+    },
+    height: {
+      type: Number,
+      value: 400
+    },
+    margin: {
+      type: Object,
+      value: {top: 0, bottom: 0, right: 0, left: 0}
+    },
+    chartExtents: {
+      type: Object,
+      value: {
+        "x": ["a","b","c","d","e"],
+        "y": [0,50]
+      }
+    },
+    dimensions: {
+      type: Array,
+      value: ['a','b','c','d','e']
+    },
+    drawnTickValues: {
+      type: Array,
+      value: [0, 10, 20, 30,40,50]
+    },
+    chartData: {
+      type: Array,
+      value: [
+            {
+              "TimeStamp":1465416480000,
+              "axis1":"1",
+              "axis2":"7",
+              "axis3":"6",
+              "axis4":"6",
+              "axis5":"7",
+              "category":"a"
+            },{
+              "TimeStamp":1465416540000,
+              "axis1":"3",
+              "axis2":"7",
+              "axis3":"7",
+              "axis4":"6",
+              "axis5":"6",
+              "category":"d"
+            },{
+              "TimeStamp":1465416600000,
+              "axis1":"4",
+              "axis2":"6",
+              "axis3":"7",
+              "axis4":"6",
+              "axis5":"7",
+              "category":"b"
+            },{
+              "TimeStamp":1465416660000,
+              "axis1":"6",
+              "axis2":"7",
+              "axis3":"7",
+              "axis4":"6",
+              "axis5":"6",
+              "category":"b"
+            },{
+              "TimeStamp":1465416720000,
+              "axis1":"8",
+              "axis2":"6",
+              "axis3":"6",
+              "axis4":"6",
+              "axis5":"7",
+              "category":"c"
+            },{
+              "TimeStamp":1465416780000,
+              "axis1":"9",
+              "axis2":"6",
+              "axis3":"8",
+              "axis4":"7",
+              "axis5":"8",
+              "category":"c"
+            },{
+              "TimeStamp":1465416840000,
+              "axis1":"10",
+              "axis2":"5",
+              "axis3":"7",
+              "axis4":"5",
+              "axis5":"6",
+              "category":"a"
+            },{
+              "TimeStamp":1465416900000,
+              "axis1":"7",
+              "axis2":"6",
+              "axis3":"7",
+              "axis4":"7",
+              "axis5":"7",
+              "category":"b"
+            },{
+              "TimeStamp":1465416960000,
+              "axis1":"5",
+              "axis2":"7",
+              "axis3":"6",
+              "axis4":"5",
+              "axis5":"6",
+              "category":"a"
+            },{
+              "TimeStamp":1465417020000,
+              "axis1":"2",
+              "axis2":"8",
+              "axis3":"6",
+              "axis4":"7",
+              "axis5":"6",
+              "category":"c"
+            }
+          ]
+    },
+    offset: {
+      type: Array,
+      value: [200,200]
+    }
+  }
+});
+</script>

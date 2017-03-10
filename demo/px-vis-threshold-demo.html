@@ -1,0 +1,119 @@
+<!-- Common imports -->
+<link rel="import" href="../../polymer/polymer.html" />
+<link rel="import" href="../../px-polymer-font-awesome/px-polymer-font-awesome.html" />
+
+<!-- Common demo imports -->
+<link rel="import" href="../../px-demo/px-demo-header.html" />
+<link rel="import" href="../../px-demo/px-demo-api-viewer.html" />
+<link rel="import" href="../../px-demo/px-demo-footer.html" />
+<link rel="import" href="../../px-demo/px-demo-props.html" />
+<link rel="import" href="../../px-demo/px-demo-configs.html" />
+<link rel="import" href="../../px-demo/px-demo-interactive.html" />
+<link rel="import" href="../../px-demo/px-demo-component-snippet.html" />
+<link rel="import" href="../../px-demo/px-demo-code-editor.html" />
+<link rel="import" href="../../px-demo/css/px-demo-styles.html" />
+
+<!-- Imports for this componnent -->
+<link rel="import" href="px-vis-threshold-demo-component.html">
+
+<!-- Demo DOM module -->
+<dom-module id="px-vis-threshold-demo">
+  <template>
+  <style include="px-demo-styles" is="custom-style"></style>
+
+  <!-- Light theme -->
+  <style include="px-theme-styles" is="custom-style"></style>
+
+  <!-- Dark theme -->
+  <style include="px-dark-demo-theme-styles" is="custom-style"></style>
+  <style include="px-dark-theme-styles" is="custom-style"></style>
+
+    <!-- Header -->
+    <px-demo-header
+        module-name="px-vis-threshold"
+        description="[[description]]"
+        parent-name="px-vis">
+    </px-demo-header>
+
+    <!-- Interactive -->
+    <px-demo-interactive force-hide-props>
+      <px-demo-configs configs="[[configs]]" props="{{props}}" chosen-config="{{chosenConfig}}"></px-demo-configs>
+      <!-- Props -->
+    <px-demo-props props="{{props}}" config="[[chosenConfig]]"></px-demo-props>
+
+      <!-- Component ---------------------------------------------------------->
+      <px-demo-component>
+        <px-vis-threshold-demo-component></px-vis-threshold-demo-component>
+      </px-demo-component>
+      <!-- END Component ------------------------------------------------------>
+
+      <px-demo-component-snippet
+          element-properties="{{props}}"
+          element-name="px-vis-threshold">
+      </px-demo-component-snippet>
+    </px-demo-interactive>
+
+    <!-- API Viewer -->
+    <px-demo-api-viewer source="px-vis-threshold"></px-demo-api-viewer>
+
+  </template>
+
+</dom-module>
+<script>
+  Polymer({
+    is: 'px-vis-threshold-demo',
+    properties: {
+      description: {
+        type: String,
+        value: "Chart threshold provide horizonal lines across the chart. A default color is used if no 'color' is specified (or if the color does not match a series name). When a valid 'color' is given the threshold color will match that of the series. The demo chart shows both, one threshold with a valid 'color' and one with no 'color'."
+      },
+      /**
+       * @property demoProps
+       * @type {Object}
+       */
+      props: {
+        type: Object,
+        value: function(){ return this.demoProps; }
+      },
+
+      /**
+       * @property demoProps
+       * @type {Array}
+       */
+      configs: {
+        type: Array,
+        value: function(){
+          return [
+              {
+                configName: "Default",
+                configShowProps: []
+              }
+          ];
+        },
+      },
+    },
+    demoProps: {
+      svg:{
+				value:"[[svg]]"
+			},
+      completeSeriesConfig:{
+				value:"[[seriesConfig]]"
+			},
+      chartData:{
+				value:"[[thresholdData]]"
+			},
+      x:{
+				value:"[[x]]"
+			},
+      y:{
+				value:"[[y]]"
+			},
+      currentDomainX:{
+				value:"[[currentDomainX]]"
+			},
+      currentDomainY:{
+				value:"[[currentDomainY]]"
+      }
+    }
+  });
+</script>

@@ -1,0 +1,143 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../px-vis-multi-axis.html">
+<link rel="import" href="../px-vis-multi-scale.html">
+<link rel="import" href="../px-vis-svg.html">
+
+<dom-module id="px-vis-multi-axis-demo-component">
+  <template>
+    <!--add demo tag-->
+    <px-vis-multi-scale
+      id="multiScale"
+      axes="[[axes]]"
+      chart-data="[[chartData]]"
+      chart-extents="[[chartExtents]]"
+      x="{{x}}"
+      y="{{y}}"
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      dimensions="[[dimensions]]"
+      domain-changed="{{domainChanged}}">
+    </px-vis-multi-scale>
+    <px-vis-multi-axis
+      id="multiAxis"
+      dimensions="[[dimensions]]"
+      axes="[[axes]]"
+      svg="[[svg]]"
+      prevent-series-bar
+      x="[[x]]"
+      y="[[y]]"
+      redraw-series="true"
+      stroke-width="2"
+      match-ticks
+      outer-tick-size="6"
+      label-type-size="10"
+      title-type-size="12"
+      displayed-values="{{displayedValues}}"
+      append-unit-in-title
+      domain-changed="[[domainChanged]]"
+      axis-groups="{{axisGroups}}"
+      brush-elems="{{brushElems}}"
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]">
+    </px-vis-multi-axis>
+    <px-vis-svg
+      width="[[width]]"
+      height="[[height]]"
+      svg="{{svg}}"
+      margin="[[margin]]"
+      ></px-vis-svg>
+  </template>
+</dom-module>
+
+<script>
+Polymer({
+  is: 'px-vis-multi-axis-demo-component',
+  properties: {
+    description: {
+      type: String,
+      value: "d3 element creating an axis for the chart"
+    },
+    chartData: {
+      value: [{
+            "x": 1397102460000,
+            "y": 1,
+            "y1": 1,
+            "y2": 1
+          },{
+            "x": 1397131620000,
+            "y": 6,
+            "y1": 15,
+            "y2": 21
+          },{
+            "x": 1397160780000,
+            "y": 10,
+            "y1": 8,
+            "y2": 3
+          },{
+            "x": 1397189940000,
+            "y": 4,
+            "y1": 10,
+            "y2": 10
+          },{
+            "x": 1397219100000,
+            "y": 6,
+            "y1": 20,
+            "y2": 27
+          }
+        ],
+      type: Array
+    },
+    completeSeriesConfig: {
+      value: {
+          "x":{
+            "type":"line",
+            "name":"mySeries",
+            "x":['y','y1','y2'],
+            "y":['y','y1','y2'],
+            "color": "rgb(93,165,218)"
+          },
+          "y1": {
+            "title": "2nd Title"
+          },
+          "y2": {
+            "title": "Third Title",
+            "yAxisUnit": "bofs"
+          }
+        },
+      type: Object  
+    },
+    dimensions: {
+      type :Array,
+      value: ['y','y1','y2']
+    },
+    axes: {
+      type :Array,
+      value: ['y','y1','y2']
+    },
+    width: {
+      type: Number,
+      value: 500
+    },
+    height: {
+      type: Number,
+      value: 250
+    },
+    chartExtents: {
+      type: Object,
+      value: {'x': ['y','y1','y2'], 'y':{'y':[1,10], 'y1':[1,20], 'y2':[1,27]}}
+    },
+    margin: {
+      type: Object,
+      value: {
+        "top": 10,
+        "right": 10,
+        "bottom": 10,
+        "left": 10
+      }
+    }
+      
+  }
+});
+</script>

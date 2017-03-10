@@ -1,0 +1,212 @@
+<!-- Common imports -->
+<link rel="import" href="../../polymer/polymer.html" />
+<link rel="import" href="../../px-polymer-font-awesome/px-polymer-font-awesome.html" />
+
+<!-- Common demo imports -->
+<link rel="import" href="../../px-demo/px-demo-header.html" />
+<link rel="import" href="../../px-demo/px-demo-api-viewer.html" />
+<link rel="import" href="../../px-demo/px-demo-footer.html" />
+<link rel="import" href="../../px-demo/px-demo-props.html" />
+<link rel="import" href="../../px-demo/px-demo-configs.html" />
+<link rel="import" href="../../px-demo/px-demo-interactive.html" />
+<link rel="import" href="../../px-demo/px-demo-component-snippet.html" />
+<link rel="import" href="../../px-demo/px-demo-code-editor.html" />
+<link rel="import" href="../../px-demo/css/px-demo-styles.html" />
+
+<!-- Imports for this componnent -->
+<link rel="import" href="px-vis-multi-axis-demo-component.html">
+
+<!-- Demo DOM module -->
+<dom-module id="px-vis-multi-axis-demo">
+  <template>
+  <style include="px-demo-styles" is="custom-style"></style>
+
+  <!-- Light theme -->
+  <style include="px-theme-styles" is="custom-style"></style>
+
+  <!-- Dark theme -->
+  <style include="px-dark-demo-theme-styles" is="custom-style"></style>
+  <style include="px-dark-theme-styles" is="custom-style"></style>
+
+    <!-- Header -->
+    <px-demo-header
+        module-name="px-vis-multi-axis"
+        description="[[description]]"
+        parent-name="px-vis">
+    </px-demo-header>
+
+    <!-- Interactive -->
+    <px-demo-interactive force-hide-props>
+      <px-demo-configs configs="[[configs]]" props="{{props}}" chosen-config="{{chosenConfig}}"></px-demo-configs>
+      <!-- Props -->
+    <px-demo-props props="{{props}}" config="[[chosenConfig]]"></px-demo-props>
+
+      <!-- Component ---------------------------------------------------------->
+      <px-demo-component>
+        <px-vis-multi-axis-demo-component></px-vis-multi-axis-demo-component>
+      </px-demo-component>
+      <!-- END Component ------------------------------------------------------>
+
+      <px-demo-component-snippet
+          element-properties="{{props}}"
+          element-name="px-vis-multi-axis">
+      </px-demo-component-snippet>
+    </px-demo-interactive>
+
+    <!-- API Viewer -->
+    <px-demo-api-viewer source="px-vis-multi-axis"></px-demo-api-viewer>
+
+  </template>
+
+</dom-module>
+<script>
+  Polymer({
+    is: 'px-vis-multi-axis-demo',
+    properties: {
+      description: {
+        type: String,
+        value: "d3 element creating an axis for the chart."
+      },
+      /**
+       * @property demoProps
+       * @type {Object}
+       */
+      props: {
+        type: Object,
+        value: function(){ return this.demoProps; }
+      },
+
+      /**
+       * @property demoProps
+       * @type {Array}
+       */
+      configs: {
+        type: Array,
+        value: function(){
+          return [
+              {
+                configName: "Default",
+                configShowProps: []
+              }
+          ];
+        },
+      },
+    },
+    demoProps: {
+      svg:{
+				value:"[[svg]]"
+			},
+      width:{
+				value:"[[width]]"
+			},
+      height:{
+				value:"[[height]]"
+			},
+      margin:{
+				value:"[[margin]]"
+			},
+      offset:{
+				value:"[[_offset]]"
+			},
+      length:{
+				value:"[[_minDim]]"
+			},
+      x:{
+				value:"[[x]]"
+			},
+      y:{
+				value:"[[y]]"
+			},
+      completeSeriesConfig:{
+				value:"{{completeSeriesConfig}}"
+			},
+      seriesKey:{
+				value:"[[seriesKey]]"
+			},
+      chartData:{
+				value:"[[chartData]]"
+			},
+      dimensions:{
+				value:"[[dimensions]]"
+			},
+      axes:{
+				value:"[[axes]]"
+			},
+      mutedSeries:{
+				value:"{{mutedSeriesBrush}}"
+			},
+      redrawSeries:{
+				value:"true"
+			},
+      strokeWidth:{
+				value:"2"
+			},
+      matchTicks:{
+				value:"[[matchTicks]]"
+			},
+      gridTicks:{
+				value:"{{gridTicks}}"
+			},
+      gridAxis:{
+				value:"{{gridAxis}}"
+			},
+      commonAxis:{
+				value:"[[commonAxis]]"
+			},
+      truncationLength:{
+				value:"[[truncationLength]]"
+			},
+      displayedValues:{
+				value:"{{displayedValues}}"
+			},
+      appendUnitInTitle:{
+				value:"true"
+			},
+      domainChanged:{
+				value:"[[domainChanged]]"
+			},
+      axisGroups:{
+				value:"{{axisGroups}}"
+			},
+      brushElems:{
+				value:"{{brushElems}}"
+			},
+      radial:{
+				value:"true"
+			},
+      singleDomain:{
+				value:"true"
+			},
+      labelPosition:{
+				value:"inline"
+			},
+      labelOneAxis:{
+				value:"true"
+			},
+      axisColor:{
+				value:"grey4"
+			},
+      ticks:{
+				value:"[[ticks]]"
+			},
+      labelRotation:{
+				value:"180"
+			},
+      brushToRemove:{
+				value:"[[brushToRemove]]"
+			},
+      centerOffset:{
+				value:"[[centerOffset]]"
+			},
+      drawnTickValues:{
+				value:"{{drawnTickValues}}"
+			},
+      titleTypeSize:{
+				value:"15"
+			},
+      labelTypeSize:{
+				value:"12"
+      }
+    }
+  });
+</script>

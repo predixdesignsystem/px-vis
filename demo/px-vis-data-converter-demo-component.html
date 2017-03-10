@@ -1,0 +1,88 @@
+<link rel="import" href="../../polymer/polymer.html">
+
+<link rel="import" href="../px-vis-scale.html">
+<link rel="import" href="../px-vis-svg.html">
+<link rel="import" href="../px-vis-data-converter.html">
+
+<dom-module id="px-vis-data-converter-demo-component">
+  <template>
+    <px-vis-data-converter
+      data-key="series"
+      id-key="id"
+      name-key="name"
+      original-data="[[originalData]]"
+      series-config="{{seriesConfig}}"
+      chart-data="{{chartData}}">
+    </px-vis-data-converter>
+
+    <div class="flex flex--wrap">
+      <div style="padding-right:40px">
+        <strong>original-data</strong>
+        <pre>[[_formatName(originalData)]]</pre>
+      </div>
+
+      <div style="padding-right:40px">
+        <strong>chart-data</strong>
+        <pre>[[_formatName(chartData)]]</pre>
+      </div>
+
+      <div>
+        <strong>series-config</strong>
+        <pre>[[_formatName(seriesConfig)]]</pre>
+      </div>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: "px-vis-data-converter-demo-component",
+      properties:{
+        originalData : {
+          type : Array,
+          value:[
+            {
+              "series": [
+                [ 1397102460000, 11.4403 ],
+                [ 1397139660000, 13.1913 ],
+                [ 1427813520000, 17.1241 ],
+                [ 1427839740000, 34.1624 ],
+                [ 1427920920000, 17.9158 ],
+                [ null, null ]
+              ],
+              "max": 35.4784,
+              "min": 7.6531,
+              "mean": 15.330657585139331,
+              "id": "px-elliot",
+              "name": "elliot"
+            },
+            {
+              "series": [
+              [ 1397102460000, 96.5 ],
+              [ 1397139660000, 96.5 ],
+              [ 1427813520000, 79 ],
+              [ 1427839740000, 48.2 ],
+              [ 1427920920000, 96.5 ],
+              [ null, null ]
+              ],
+              "max": 96.5,
+              "min": 10,
+              "mean": 91.5203170028819,
+              "id": "px-benoit",
+              "name": "benoit"
+            }
+          ]
+        },
+        aggregatedData : {
+          type : Array
+        },
+      }, //end properties
+
+      /*
+       * stringify data to be printed out
+       */
+      _formatName: function(data) {
+        return JSON.stringify(data, null, ' ');
+      }
+    });
+  </script>
+</dom-module>

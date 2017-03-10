@@ -1,0 +1,137 @@
+<!-- Common imports -->
+<link rel="import" href="../../polymer/polymer.html" />
+<link rel="import" href="../../px-polymer-font-awesome/px-polymer-font-awesome.html" />
+
+<!-- Common demo imports -->
+<link rel="import" href="../../px-demo/px-demo-header.html" />
+<link rel="import" href="../../px-demo/px-demo-api-viewer.html" />
+<link rel="import" href="../../px-demo/px-demo-footer.html" />
+<link rel="import" href="../../px-demo/px-demo-props.html" />
+<link rel="import" href="../../px-demo/px-demo-configs.html" />
+<link rel="import" href="../../px-demo/px-demo-interactive.html" />
+<link rel="import" href="../../px-demo/px-demo-component-snippet.html" />
+<link rel="import" href="../../px-demo/px-demo-code-editor.html" />
+<link rel="import" href="../../px-demo/css/px-demo-styles.html" />
+
+<!-- Imports for this componnent -->
+<link rel="import" href="px-vis-scale-demo-component.html">
+
+<!-- Demo DOM module -->
+<dom-module id="px-vis-scale-demo">
+  <template>
+  <style include="px-demo-styles" is="custom-style"></style>
+
+  <!-- Light theme -->
+  <style include="px-theme-styles" is="custom-style"></style>
+
+  <!-- Dark theme -->
+  <style include="px-dark-demo-theme-styles" is="custom-style"></style>
+  <style include="px-dark-theme-styles" is="custom-style"></style>
+
+    <!-- Header -->
+    <px-demo-header
+        module-name="px-vis-scale"
+        description="[[description]]"
+        parent-name="px-vis">
+    </px-demo-header>
+
+    <!-- Interactive -->
+    <px-demo-interactive force-hide-props>
+      <px-demo-configs configs="[[configs]]" props="{{props}}" chosen-config="{{chosenConfig}}"></px-demo-configs>
+      <!-- Props -->
+    <px-demo-props props="{{props}}" config="[[chosenConfig]]"></px-demo-props>
+
+      <!-- Component ---------------------------------------------------------->
+      <px-demo-component>
+        <px-vis-scale-demo-component></px-vis-scale-demo-component>
+      </px-demo-component>
+      <!-- END Component ------------------------------------------------------>
+
+      <px-demo-component-snippet
+          element-properties="{{props}}"
+          element-name="px-vis-scale">
+      </px-demo-component-snippet>
+    </px-demo-interactive>
+
+    <!-- API Viewer -->
+    <px-demo-api-viewer source="px-vis-scale"></px-demo-api-viewer>
+
+  </template>
+
+</dom-module>
+<script>
+  Polymer({
+    is: 'px-vis-scale-demo',
+    properties: {
+      description: {
+        type: String,
+        value: "All charts need an interpretor component. These cannot be seen but provide the basic framework for drawing objects to be displayed. Interpretor components convert data into drawing space coordinates. The scale component creates 'x' &amp 'y' and 'currentDomainX' &amp 'currentDomainY' variables which can be passed into drawing components. Note: All the subsequent charts will have this component, but they will not be shown in the code snippet."
+      },
+      /**
+       * @property demoProps
+       * @type {Object}
+       */
+      props: {
+        type: Object,
+        value: function(){ return this.demoProps; }
+      },
+
+      /**
+       * @property demoProps
+       * @type {Array}
+       */
+      configs: {
+        type: Array,
+        value: function(){
+          return [
+              {
+                configName: "Default",
+                configShowProps: []
+              }
+          ];
+        },
+      },
+    },
+    demoProps: {
+      xAxisType:{
+				value:"time"
+			},
+      yAxisType:{
+				value:"linear"
+			},
+      completeSeriesConfig:{
+				value:"[[seriesConfig]]"
+			},
+      chartExtents:{
+				value:"[[chartExtents]]"
+			},
+      width:{
+				value:"[[width]]"
+			},
+      height:{
+				value:"[[height]]"
+			},
+      margin:{
+				value:"[[margin]]"
+			},
+      chartData:{
+				value:"{{chartData}}"
+			},
+      x:{
+				value:"{{x}}"
+			},
+      y:{
+				value:"{{y}}"
+			},
+      currentDomainX:{
+				value:"{{currentDomainX}}"
+			},
+      currentDomainY:{
+				value:"{{currentDomainY}}"
+			},
+      selectedDomain:{
+				value:"[[selectedDomain]]"
+      }
+    }
+  });
+</script>

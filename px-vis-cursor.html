@@ -5,20 +5,56 @@
 
 
 <!--
-Element which draws crosshairs around mouse pointer / data points and highlight adjacent datapoints.
+Element which draws crosshairs around mouse pointer / data points and highlights adjacent datapoints.
 - Uses tooltipData property.
 
 ##### Usage
 
-    <px-vis-cursor
-        svg="[[svg]]"
-        width="[[width]]"
-        height="[[height]]"
-        margin="[[margin]]"
-        chart-data="[[chartData]]"
-        horizontal-line="none"
-        tooltip-data="[[tooltipData]]">
-    </px-vis-cursor>
+  <px-vis-svg
+    width="[[width]]"
+    height="[[height]]"
+    margin="[[margin]]"
+    svg="{{svg}}">
+  </px-vis-svg>
+  <px-vis-scale
+    x-axis-type="time"
+    y-axis-type="linear"
+    complete-series-config="[[seriesConfig]]"
+    data-extents="[[dataExtents]]"
+    width="[[width]]"
+    height="[[height]]"
+    margin="[[margin]]"
+    chart-data={{chartData}}
+    x="{{x}}"
+    y="{{y}}"
+    domain-changed="{{domainChanged}}"
+    selected-domain="[[selectedDomain]]">
+  </px-vis-scale>
+  <px-vis-interaction-space
+    x-axis-type="time"
+    svg="[[svg]]"
+    width="[[width]]"
+    height="[[height]]"
+    margin="[[margin]]"
+    complete-series-config="[[seriesConfig]]"
+    chart-data="[[chartData]]"
+    tooltip-data={{tooltipData}}
+    series-keys="[[seriesKeys]]"
+    extents-data={{extentsData}}
+    x="[[x]]"
+    y="[[y]]"
+    domain-changed="[[domainChanged]]">
+  </px-vis-interaction-space>
+  <px-vis-cursor
+    svg="[[svg]]"
+    width="[[width]]"
+    height="[[height]]"
+    margin="[[margin]]"
+    complete-series-config="[[seriesConfig]]"
+    chart-data="[[chartData]]"
+    tooltip-data="[[tooltipData]]"
+    selection-type=[[selectionType]]>
+  </px-vis-cursor>
 
 ### Styling
 The following custom properties are available for styling:
@@ -31,9 +67,9 @@ Custom property | Description | Default
 @element px-vis-cursor
 @blurb Element which draws crosshairs around mouse pointer / data points and highlight adjacent datapoints.
 @homepage index.html
-@demo demo.html
+@demo demo/index.html
 
-TODO implement a dev setting to choose between only showing data at that x, snapping to nearest data, or interpolating value at x
+//TODO implement a dev setting to choose between only showing data at that x, snapping to nearest data, or interpolating value at x
 
 -->
 
@@ -42,8 +78,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 <dom-module id="px-vis-cursor">
     <template>
       <style include="px-vis-styles"></style>
-
-
     </template>
 </dom-module>
 
@@ -452,7 +486,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           this.setAttribute('stroke-opacity', strokeOpacity);
         });
       }
-      //var multiplier =
     }
   });
 </script>

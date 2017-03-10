@@ -1,0 +1,128 @@
+<!-- Common imports -->
+<link rel="import" href="../../polymer/polymer.html" />
+<link rel="import" href="../../px-polymer-font-awesome/px-polymer-font-awesome.html" />
+
+<!-- Common demo imports -->
+<link rel="import" href="../../px-demo/px-demo-header.html" />
+<link rel="import" href="../../px-demo/px-demo-api-viewer.html" />
+<link rel="import" href="../../px-demo/px-demo-footer.html" />
+<link rel="import" href="../../px-demo/px-demo-props.html" />
+<link rel="import" href="../../px-demo/px-demo-configs.html" />
+<link rel="import" href="../../px-demo/px-demo-interactive.html" />
+<link rel="import" href="../../px-demo/px-demo-component-snippet.html" />
+<link rel="import" href="../../px-demo/px-demo-code-editor.html" />
+<link rel="import" href="../../px-demo/css/px-demo-styles.html" />
+
+<!-- Imports for this componnent -->
+<link rel="import" href="px-vis-register-demo-component.html">
+
+<!-- Demo DOM module -->
+<dom-module id="px-vis-register-demo">
+  <template>
+  <style include="px-demo-styles" is="custom-style"></style>
+
+  <!-- Light theme -->
+  <style include="px-theme-styles" is="custom-style"></style>
+
+  <!-- Dark theme -->
+  <style include="px-dark-demo-theme-styles" is="custom-style"></style>
+  <style include="px-dark-theme-styles" is="custom-style"></style>
+
+    <!-- Header -->
+    <px-demo-header
+        module-name="px-vis-register"
+        description="[[description]]"
+        parent-name="px-vis">
+    </px-demo-header>
+
+    <!-- Interactive -->
+    <px-demo-interactive force-hide-props>
+      <px-demo-configs configs="[[configs]]" props="{{props}}" chosen-config="{{chosenConfig}}"></px-demo-configs>
+      <!-- Props -->
+    <px-demo-props props="{{props}}" config="[[chosenConfig]]"></px-demo-props>
+
+      <!-- Component ---------------------------------------------------------->
+      <px-demo-component>
+        <px-vis-register-demo-component type="{{props.type.value}}"></px-vis-register-demo-component>
+      </px-demo-component>
+      <!-- END Component ------------------------------------------------------>
+
+      <px-demo-component-snippet
+          element-properties="{{props}}"
+          element-name="px-vis-register">
+      </px-demo-component-snippet>
+    </px-demo-interactive>
+
+    <!-- API Viewer -->
+    <px-demo-api-viewer source="px-vis-register"></px-demo-api-viewer>
+
+  </template>
+
+</dom-module>
+<script>
+  Polymer({
+    is: 'px-vis-register-demo',
+    properties: {
+      description: {
+        type: String,
+        value: "The register displays data from the chart on mouseover. There are two options, a horizonal version for placement above or below the chart, or a vertical version for placement to the right or left of the chart. It must be paired with px-vis-interaction-space which provides the mouseover capabilities. Clicking on a series name on the register adds that series to the mutedSeries property. Series on the chart can listen to this property to toggle series on and off."
+      },
+      /**
+       * @property demoProps
+       * @type {Object}
+       */
+      props: {
+        type: Object,
+        value: function(){ return this.demoProps; }
+      },
+
+      /**
+       * @property demoProps
+       * @type {Array}
+       */
+      configs: {
+        type: Array,
+        value: function(){
+          return [
+              {
+                configName: "Horizontal",
+                configReset: true,
+                configShowProps: []
+              },
+              {
+                configName: "Vertical",
+                type: "vertical",
+                configShowProps: []
+              }
+          ];
+        },
+      },
+    },
+    demoProps: {
+      width:{
+				defaultValue:"[[width]]"
+			},
+      height:{
+				defaultValue:"[[height]]"
+			},
+      units:{
+				defaultValue:"Hz"
+			},
+      type:{
+				defaultValue:"horizontal"
+			},
+      completeSeriesConfig:{
+				defaultValue:"[[seriesConfig]]"
+			},
+      tooltipData:{
+				defaultValue:"[[tooltipData]]"
+			},
+      mutedSeries:{
+				defaultValue:"[[mutedSeries]]"
+			},
+      xAxisType:{
+				defaultValue:"time"
+      }
+    }
+  });
+</script>

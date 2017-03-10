@@ -1,0 +1,137 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../px-vis-behavior-common.html" />
+<link rel="import" href="../px-vis-scale.html">
+<link rel="import" href="../px-vis-svg.html">
+<link rel="import" href="../px-vis-threshold.html">
+
+<dom-module id="px-vis-threshold-demo-component">
+  <template>
+      <div class="outline">
+
+      <!-- need for threshold -->
+      <px-vis-svg
+        width="[[width]]"
+        height="[[height]]"
+        margin="[[margin]]"
+        svg="{{svg}}">
+      </px-vis-svg>
+      <px-vis-scale
+        x-axis-type="time"
+        y-axis-type="linear"
+        complete-series-config="[[seriesConfig]]"
+        data-extents="[[dataExtents]]"
+        width="[[width]]"
+        height="[[height]]"
+        margin="[[margin]]"
+        chart-data="{{chartData}}"
+        x="{{x}}"
+        y="{{y}}"
+        domain-changed='{{domainChanged}}'
+        selected-domain="[[selectedDomain]]">
+      </px-vis-scale>
+      <px-vis-threshold
+        svg="[[svg]]"
+        complete-series-config="[[seriesConfig]]"
+        threshold-data="[[thresholdData]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        threshold-config="[[thresholdConfig]]"
+        width="[[width]]"
+        margin="[[margin]]"> 
+      </px-vis-threshold>
+      </div>
+  </template>
+  <script>
+    Polymer({
+      is: "px-vis-threshold-demo-component",
+      behaviors: [ PxVisBehaviorChart.thresholdConfig],
+      properties:{
+        //basics
+        width: {
+          type : Number,
+          value : 500
+        },
+        height:{
+          type : Number,
+          value : 200
+        },
+        margin:{
+          type : Object,
+          value : {
+            "top": 10,
+            "right": 10,
+            "bottom": 10,
+            "left": 10
+          }
+        },
+        chartData:{
+          type : Array,
+          value : [{
+              'x': 1397102460000,
+              'y': 0.56
+            },{
+              'x': 1397139660000,
+              'y': 0.4
+            },{
+              'x': 1397177400000,
+              'y': 0.43
+            },{
+              'x': 1397228040000,
+              'y': 0.33
+            },{
+              'x': 1397248260000,
+              'y': 0.47
+            },{
+              'x': 1397291280000,
+              'y': 0.41
+            },{
+              'x': 1397318100000,
+              'y': 0.26
+            },{
+              'x': 1397342100000,
+              'y': 0.42
+            },{
+              'x': 1397390820000,
+              'y': 0.27
+            },{
+              'x': 1397408100000,
+              'y': 0.38
+            },{
+              'x': 1397458800000,
+              'y': 0.36
+            },{
+              'x': 1397522940000,
+              'y': 0.32
+          }]
+        },
+        seriesConfig:{
+          type : Object,
+          value: {
+            'mySeries': {
+              "name":"My-Series",
+              "type": "line",
+              "x": 'x',
+              "y": 'y',
+              'color': "rgb(93,165,218)"
+            }
+          }
+        },
+        thresholdData:{
+          type : Array,
+          value: [
+            { "for":"mySeries", "type":"mean", "value":0.5 },
+            { "type":"mine", "value":0.25 }
+          ],
+        },
+        //dataExtents
+        dataExtents:{
+          type : Object,
+          value: {
+            "x": [Infinity,-Infinity],
+            "y": [0,-Infinity]
+          }
+        }
+      }
+    });
+  </script>
+</dom-module>

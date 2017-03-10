@@ -1,0 +1,131 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../px-vis-brush.html">
+<link rel="import" href="../px-vis-svg.html">
+<link rel="import" href="../px-vis-scale.html">
+
+
+<dom-module id="px-vis-brush-demo-component">
+  <template>
+    <!--add demo tag-->
+    <px-vis-brush
+      svg="[[svg]]"
+      axis="[[x]]"
+      height="[[height]]"
+      width="[[width]]"
+      margin="[[margin]]"
+      domain-changed="[[domainChanged]]">
+    </px-vis-brush>
+    <px-vis-svg
+      class="inline--flex flex__item--msfix"
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      svg="{{svg}}">
+    </px-vis-svg>
+    <px-vis-scale
+      x-axis-type="time"
+      y-axis-type="linear"
+      complete-series-config="[[seriesConfig]]"
+      data-extents="[[dataExtents]]"
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      chart-data="[[chartData]]"
+      x="{{x}}"
+      y="{{y}}"
+      domain-changed="{{domainChanged}}">
+    </px-vis-scale>
+  </template>
+</dom-module>
+
+<script>
+Polymer({
+  is: 'px-vis-brush-demo-component',
+  properties: {
+    description: {
+      type: String,
+      value: "Element providing user interaction on the navigator. This element draw the box over the navigator signifying the selected chart extents and provides the user interactions to resize and move the extent box. This element sets the selectedDomain property based on the extents box. The selectedDomain variable can then be consumed by the scale component to change the main chart extents."
+    },
+    width: {
+      type : Number,
+      value : 500
+    },
+    height:{
+      type : Number,
+      value : 100
+    },
+    margin:{
+      type : Object,
+      value : {
+        "top": 10,
+        "right": 10,
+        "bottom": 20,
+        "left": 10
+      }
+    },
+    dataExtents: {
+      
+    },
+    chartData:{
+      type : Array,
+      value : [{
+          'x': 1397102460000,
+          'y': 0.56
+        },{
+          'x': 1397139660000,
+          'y': 0.4
+        },{
+          'x': 1397177400000,
+          'y': 0.43
+        },{
+          'x': 1397228040000,
+          'y': 0.33
+        },{
+          'x': 1397248260000,
+          'y': 0.47
+        },{
+          'x': 1397291280000,
+          'y': 0.41
+        },{
+          'x': 1397318100000,
+          'y': 0.26
+        },{
+          'x': 1397342100000,
+          'y': 0.42
+        },{
+          'x': 1397390820000,
+          'y': 0.27
+        },{
+          'x': 1397408100000,
+          'y': 0.38
+        },{
+          'x': 1397458800000,
+          'y': 0.36
+        },{
+          'x': 1397522940000,
+          'y': 0.32
+      }]
+    },
+    seriesConfig:{
+      type : Object,
+      value: {
+        'mySeries': {
+          "name":"My-Series",
+          "type": "line",
+          "x": 'x',
+          "y": 'y',
+          'color': "rgb(93,165,218)"
+        }
+      }
+    },
+
+    dataExtents:{
+      type : Object,
+      value: {
+        "x": [Infinity,-Infinity],
+        "y": [0,-Infinity]
+      }
+    }
+  }
+});
+</script>

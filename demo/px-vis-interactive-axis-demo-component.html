@@ -1,0 +1,174 @@
+<link rel="import" href="../../polymer/polymer.html">
+
+<link rel="import" href="../px-vis-multi-scale.html">
+<link rel="import" href="../px-vis-svg.html">
+<link rel="import" href="../px-vis-interactive-axis.html">
+
+<dom-module id="px-vis-interactive-axis-demo-component">
+  <template>
+      <div class="outline">
+
+      <!-- need for svg -->
+        <px-vis-svg
+        width="[[width]]"
+        height="[[height]]"
+        margin="[[margin]]"
+        svg="{{svg}}">
+      </px-vis-svg>
+      <px-vis-multi-scale
+        id="multiScale"
+        axes='["y"]'
+        chart-data="[[chartData]]"
+        chart-extents="[[chartExtents]]"
+        x="{{x}}"
+        y="{{y}}"
+        width="[[width]]"
+        height="[[height]]"
+        margin="[[margin]]"
+        dimensions='["y"]'
+        domain-changed="{{domainChanged}}">
+      </px-vis-multi-scale>
+      <px-vis-interactive-axis
+          svg="[[svg]]"
+          x="[[x]]"
+          title="Draw a box or drag me"
+          title-truncation="[[titleTruncation]]"
+          title-location='{
+              "x": "3",
+              "y": 190,
+              "r": 0,
+              "anchor": "middle"
+            }'
+          y="[[_returnY(y, domainChanged)]]"
+          dimension="y"
+          axes='["y"]'
+          dimensions='["y"]'
+          series-key="x"
+          height="[[height]]"
+          width="[[width]]"
+          margin="[[margin]]"
+          chart-data="[[chartData]]"
+          orientation="left"
+          complete-series-config="[[completeSeriesConfig]]"
+          domain-changed="[[domainChanged]]"
+          series-on-axis='["y"]'
+          >
+      </px-vis-interactive-axis>
+      </div>
+    </div>
+
+  </template>
+  <script>
+    Polymer({
+      is: "px-vis-interactive-axis-demo-component",
+       properties:{
+        //basics
+        width: {
+          type : Number,
+          value : 500
+        },
+        height:{
+          type : Number,
+          value : 200
+        },
+        y: {
+          type: Object,
+          notify: true
+        },
+        margin:{
+          type : Object,
+          value : {
+            "top": 5,
+            "right": 10,
+            "bottom": 25,
+            "left": 70
+          }
+        },
+        chartData:{
+          type : Array,
+          value : [{
+              'x': 1397102460000,
+              'y': 0.56
+            },{
+              'x': 1397139660000,
+              'y': 0.4
+            },{
+              'x': 1397177400000,
+              'y': 0.43
+            },{
+              'x': 1397228040000,
+              'y': 0.33
+            },{
+              'x': 1397248260000,
+              'y': 0.47
+            },{
+              'x': 1397291280000,
+              'y': 0.41
+            },{
+              'x': 1397318100000,
+              'y': 0.26
+            },{
+              'x': 1397342100000,
+              'y': 0.42
+            },{
+              'x': 1397390820000,
+              'y': 0.27
+            },{
+              'x': 1397408100000,
+              'y': 0.38
+            },{
+              'x': 1397458800000,
+              'y': 0.36
+            },{
+              'x': 1397522940000,
+              'y': 0.32
+          }]
+        },
+        seriesConfig:{
+          type : Object,
+          value: {
+            'mySeries': {
+              "name":"My-Series",
+              "type": "line",
+              "x": 'x',
+              "y": 'y',
+              'color': "rgb(93,165,218)"
+            }
+          }
+        },
+        //dataExtents
+        dataExtents:{
+          type : Object,
+          value: {
+            "x": [Infinity,-Infinity],
+            "y": [0,-Infinity]
+          }
+        },
+        chartExtents: {
+          type: Object,
+          value: {'x': ['y'], 'y':{'y':[1,10]}}
+        },
+        completeSeriesConfig: {
+          value: {
+              "x":{
+                "type":"line",
+                "name":"mySeries",
+                "x":['y'],
+                "y":['y'],
+                "color": "rgb(93,165,218)"
+              }
+            },
+          type: Object  
+        },
+        titleTruncation: {
+          type: Boolean,
+          value: false
+        }
+      },
+      _returnY: function(y, dc) {
+        return y.y
+      }
+
+    });
+  </script>
+</dom-module>
