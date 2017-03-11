@@ -1,3 +1,9 @@
+v1.0.1
+==================
+* Fixed multi axis dragging position on Safari and IE 11
+* Fixed axis demo
+* Update px-number-formatter version
+
 v1.0.0
 ==================
 * Upgrade to d3 4.4.x.
