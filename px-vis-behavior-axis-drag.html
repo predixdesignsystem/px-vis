@@ -346,52 +346,82 @@ PxVisBehaviorDrag.cartesianDrag = [{
             side = rDims.indexOf(d) !== -1 ? "right" : "left",
             num = rDims.indexOf(d) !== -1 ? rDims.indexOf(d) : lDims.indexOf(d),
             orientationChanged = false,
-            swappedDim = null;
+            swappedDim = null,
+            dimToLeft = null,
+            dimToRight = null,
+            posDim,
+            posDimToLeft,
+            posDimToRight,
+            leftOffset = 0,
+            rightOffset = 0;
 
-        //get the x coordinate bounded by our chart extents
+
         if(side === 'left') {
+          //get the x coordinate bounded by our chart extents
           this._dragging[d] = Math.min(this.width, Math.max(-this.margin.left, e.x));
+
+          // get left and right bounding axis
+          dimToLeft = lDims[num+1] ? lDims[num+1] : null;
+          // if we are on a side, look at the start of the opposite axis set
+          if(num === 0) {
+            dimToRight = rDims[0] ? rDims[0] : null;
+            rightOffset = this.width - this.margin.left * lDims.length;
+          } else {
+            dimToRight = lDims[num-1];
+          }
         } else if(side === 'right') {
+          //get the x coordinate bounded by our chart extents
           this._dragging[d] = Math.min(this.width + this.margin.right, Math.max(-this.margin.left, e.x)) - this.width  + this.margin.left + this.margin.right;
+
+          // get left and right bounding axis
+          dimToRight = rDims[num+1] ? rDims[num+1] : null;
+          // if we are on a side, look at the start of the opposite axis set
+          if(num === 0) {
+            dimToLeft = lDims[0] ? lDims[0] : null;
+            leftOffset =  this.margin.right * rDims.length - this.width;
+          } else {
+            dimToLeft = rDims[num-1];
+          }
         }
 
-      // reorder dynamically:
-        this.dimensions.sort(function(a, b) {
-          // if the axes are on the same side
-          if(lDims.indexOf(a) !== -1 && lDims.indexOf(b) !== -1) {
-            var p = this._position(b) - this._position(a);
-            // if we are going to swap, figure out which we are swapping with so we can move it into place later
-            if(p > 0) {
-              swappedDim = a === this.dimension ? b : a;
-            }
+        // sort it
+        // FIXME this is dumb; should be able to get rid of _position, but cant be arsed to do it right now
+        posDim = this._position(d);
+        posDimToLeft = dimToLeft ? this.x(dimToLeft) + leftOffset: null;
+        posDimToRight = dimToRight ? this.x(dimToRight)  + rightOffset : null;
 
-            return p;
-          } else if(rDims.indexOf(a) !== -1 && rDims.indexOf(b) !== -1) {
-            var p = this._position(a) - this._position(b);
-            // if we are going to swap, figure out which we are swapping with so we can move it into place later
-            if(p > 0) {
-              swappedDim = a === this.dimension ? b : a;
-            }
+        // has it passed to the left
+        if((posDimToLeft || posDimToLeft === 0) && posDim < posDimToLeft) {
+          swappedDim = dimToLeft;
 
-            return p;
-
-          // if the axes are on different sides
-          } else {
-            if(side === "left") {
-              if(this._position(lDims[0]) > this.width - this.margin.left - this.margin.right) {
-                orientationChanged = true;
-              }
-            } else {
-              if(this._position(rDims[0]) < -this.width + this.margin.left + this.margin.right) {
-                orientationChanged = true;
-              }
-            }
-            // dont swap positions; we'll do that manually
-            return 0
+          // if we were on the side, then we've changed orientation
+          if(num === 0 && side === "right") {
+            orientationChanged = true;
           }
-        }.bind(this));
 
-        if(swappedDim) {
+          // swap the two dims
+          var n = this.dimensions.indexOf(d),
+              nl = this.dimensions.indexOf(dimToLeft);
+          this.dimensions[n] = dimToLeft;
+          this.dimensions[nl] = d;
+
+        } else if((posDimToRight || posDimToRight === 0) && posDim > posDimToRight) {
+          swappedDim = dimToRight;
+
+          // if we were on the side, then we've changed orientation
+          if(num === 0 && side === "left") {
+            orientationChanged = true;
+          }
+
+          // swap the two dims
+          var n = this.dimensions.indexOf(d),
+              nr = this.dimensions.indexOf(dimToRight);
+          this.dimensions[n] = dimToRight;
+          this.dimensions[nr] = d;
+        }
+
+        // did we move a dimension
+        if(swappedDim && !orientationChanged) {
           var l = lDims.length,
               r = rDims.length,
               newLDims = this.dimensions.slice(0,l),
