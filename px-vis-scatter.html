@@ -199,6 +199,13 @@ Element which draws a scatter series onto the chart
         type: String,
         value: 'Timestamp'
       },
+      /**
+       * Debounce time to use for drawing
+       */
+      drawDebounceTime: {
+        type: Number,
+        value: 10
+      }
     },
 
     observers: [
@@ -220,14 +227,34 @@ Element which draws a scatter series onto the chart
     detached: function() {
      this.scatterGroup.remove();
     },
-    /**
+     /**
      * Draws or updates the scatter element.
      * Called from an observer watching for data and the necessary d3 objects
      *
      * @method drawElement
      */
     drawElement: function() {
+
+      if(!this.preventInitialDrawing) {
+        //if 0 don't debounce at all
+        if(this.drawDebounceTime > 0) {
+          this.debounce('draw',function() {
+            this._drawElementDebounced();
+          }.bind(this), this.drawDebounceTime);
+        } else {
+          this._drawElementDebounced();
+        }
+      }
+    },
+    /**
+     * Draws or updates the scatter element.
+     * Called from an observer watching for data and the necessary d3 objects
+     *
+     * @method drawElement
+     */
+    _drawElementDebounced: function() {
       if(this.y && typeof this.domainChanged !== 'undefined' && this.domainChanged !== null) {
+       
         var data = this.chartData;
 
         // checks to see if the group already exists. If not, create; if so, update
@@ -265,7 +292,7 @@ Element which draws a scatter series onto the chart
           .each(function(d,i) {
             // if this series is missing a datapoint, remove that point
             if(!_this._isValidData(d[_this.completeSeriesConfig[_this.seriesId]['y']]) ||
-               !_this._isValidData(d[_this.completeSeriesConfig[_this.seriesId]['x']])) {
+              !_this._isValidData(d[_this.completeSeriesConfig[_this.seriesId]['x']])) {
               this.remove();
             }
           });
@@ -275,6 +302,7 @@ Element which draws a scatter series onto the chart
         this._colorScatter();
 
         this._addClipPath();
+      //  this.fire('linefinished');
       }
     },
 

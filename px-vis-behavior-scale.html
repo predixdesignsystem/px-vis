@@ -116,23 +116,34 @@ PxVisBehaviorScale.scale = [{
    */
   _setMultiYScale: function(height, margin, axes) {
     var h = Math.max(height - margin.top - margin.bottom, 0),
-        newY;
+        newY,
+        copy,
+        updated = false,
+        created = false;
 
     if(!this.y) {
-      this.y = {};
+      copy = {};
+    } else {
+      copy = this.y;
     }
 
     //create or update
     for(var i = 0; i < this.axes.length; i++) {
-      if(this.y[this.axes[i]] && this.y[this.axes[i]]._scaleType === this.yAxisType) {
-        this.y[this.axes[i]].range([h, 0]);
-        this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+      if(copy[this.axes[i]] && copy[this.axes[i]]._scaleType === this.yAxisType) {
+        copy[this.axes[i]].range([h, 0]);
+        updated = true;
       } else {
-        newY = this._setScale(this.yAxisType,[h, 0], this.y, true, this.axes[i]);
-        this.y[this.axes[i]] = newY;
+        newY = this._setScale(this.yAxisType,[h, 0], copy, true, this.axes[i]);
+        copy[this.axes[i]] = newY;
 
-        this.notifyPath('y');
+        created = true;
       }
+    }
+    if(created) {
+      this.set('y', copy);
+    }
+    if(updated) {
+      this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
     }
   },
 

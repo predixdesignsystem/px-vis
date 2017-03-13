@@ -1558,7 +1558,13 @@ PxVisBehaviorChart.noDebounceOnPanning = {
     /**
       * holds the previous drawing debounce timing (before panning)
       */
-    _oldDrawDebouncedTime: {
+    _oldLinesDrawDebounceTime: {
+      type: Number
+    },
+    /**
+      * holds the previous drawing debounce timing (before panning)
+      */
+    _oldScatterDrawDebounceTime: {
       type: Number
     }
   },
@@ -1570,23 +1576,38 @@ PxVisBehaviorChart.noDebounceOnPanning = {
 
     //remove draw debounce to have a smooth panning
     var lineType = this.renderToCanvas ? 'px-vis-line-canvas' : 'px-vis-line-svg',
-        lines = Polymer.dom(this.root).querySelectorAll(lineType);
+        lines = Polymer.dom(this.root).querySelectorAll(lineType),
+        scatter = Polymer.dom(this.root).querySelectorAll('px-vis-scatter');
 
     if(lines && lines.length > 0) {
-      this._oldDrawDebouncedTime = lines[0].drawDebounceTime;
+      this._oldLinesDrawDebounceTime = lines[0].drawDebounceTime;
       for(var i=0; i<lines.length; i++) {
         lines[i].set('drawDebounceTime', 0);
+      }
+    }
+
+    if(scatter && scatter.length) {
+      this._oldScatterDrawDebounceTime = scatter[0].drawDebounceTime;
+      for(var i=0; i<scatter.length; i++) {
+        scatter[i].set('drawDebounceTime', 0);
       }
     }
   },
   _stopPanning: function() {
 
     var lineType = this.renderToCanvas ? 'px-vis-line-canvas' : 'px-vis-line-svg',
-        lines = Polymer.dom(this.root).querySelectorAll(lineType);
+        lines = Polymer.dom(this.root).querySelectorAll(lineType),
+        scatter = Polymer.dom(this.root).querySelectorAll('px-vis-scatter');
 
     if(lines) {
       for(var i=0; i<lines.length; i++) {
-        lines[i].set('drawDebounceTime', this._oldDrawDebouncedTime);
+        lines[i].set('drawDebounceTime', this._oldLinesDrawDebounceTime);
+      }
+    }
+
+    if(scatter) {
+      for(var i=0; i<scatter.length; i++) {
+        scatter[i].set('drawDebounceTime', this._oldScatterDrawDebounceTime);
       }
     }
   }
@@ -1665,7 +1686,6 @@ PxVisBehaviorChart.multiAxis = [{
      */
     numLeftAxes: {
       type: Number,
-      value: 0,
       notify: true
     },
 
@@ -1675,7 +1695,6 @@ PxVisBehaviorChart.multiAxis = [{
      */
     numRightAxes: {
       type: Number,
-      value: 0,
       notify: true
     },
 
