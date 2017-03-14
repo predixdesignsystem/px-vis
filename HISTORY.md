@@ -1,3 +1,9 @@
+v1.0.2
+==================
+* Fixed line drawing from 0,0 if start of data is empty. Now leaves a break until first valud data
+* Updated to use px-d3-imports
+* Fixed gridline demo
+
 v1.0.1
 ==================
 * Fixed multi axis dragging position on Safari and IE 11

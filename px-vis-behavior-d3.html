@@ -1,13 +1,7 @@
-<link rel="import" href="px-vis-d3.html" />
+<link rel="import" href="../px-d3-imports/px-d3-imports.html" />
 <link rel="import" href="px-vis-imports.html" />
 <link rel="import" href="px-vis-behavior-common.html" />
 <script>
-
-Px.d3 = d3;
-
-if(typeof Px.oldD3 !== 'undefined') {
-  d3 = Px.oldD3;
-}
 
 var PxVisBehaviorD3 = PxVisBehaviorD3 || {};
 
@@ -1243,7 +1237,7 @@ PxVisBehaviorD3.lineShared = [{
         xKey = _this.completeSeriesConfig[_this.seriesId]['x'],
         yKey = _this.completeSeriesConfig[_this.seriesId]['y'],
         line,
-        counter = 0;
+        counter = null;
 
     if(this.showGaps) {
       line = Px.d3.line()
@@ -1275,7 +1269,7 @@ PxVisBehaviorD3.lineShared = [{
           }
         })
         .defined(function(d) {
-          return _this._isDataNotNull(d[yKey]);
+          return counter === null ? _this._isValidData(d[yKey]) : _this._isDataNotNull(d[yKey]);
         });
     }
 
