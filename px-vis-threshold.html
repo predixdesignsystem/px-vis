@@ -8,11 +8,11 @@ d3 element which draws a horizontal line at a specified threshold value. The thr
 
 ##### Usage
 
-You must have a link import for px-vis-behavior-common (i.e.) 
+You must have a link import for px-vis-behavior-common (i.e.)
     <link rel="import" href="../px-vis/px-vis-behavior-common.html" />
 and include the PxVisBehavior.thresholds behavior in the behaviors array inside your Polymer object configuration.
 
-The following attributes are required: 
+The following attributes are required:
 
     <px-vis-threshold
         svg="[[svg]]"
@@ -60,7 +60,9 @@ Custom property | Description | Default
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.thresholds,
       PxVisBehaviorD3.domainUpdate,
-      PxColorsBehavior.baseColors
+      PxColorsBehavior.baseColors,
+      PxVisBehaviorD3.clipPath,
+      PxVisBehavior.measureText
     ],
 
     /**
@@ -114,15 +116,6 @@ Custom property | Description | Default
       thresholdRect: {
         type:Object
       },
-      /**
-       * Holder object for the event text elements
-       *
-       * @property thresholdText
-       * @type Object
-       */
-      thresholdText: {
-        type:Object
-      },
 
       /**
        * Boolean to show or hide the title on the threshold
@@ -136,16 +129,22 @@ Custom property | Description | Default
       _animationFrameDone: {
         type: Boolean,
         value: false
+      },
+
+      _thresholdBuilder: {
+        type: Object
       }
     },
 
     observers: [
 
       'drawElement(svg, y, domainChanged, completeSeriesConfig.*, thresholdData.*, width, margin.*, _animationFrameDone)',
-      '_setColors(completeSeriesConfig.*,thresholdText)',
+      '_addClipPath(clipPath)'
      ],
 
-    ready:function(){
+    ready:function() {
+      this._createMeasurementCanvas();
+
       window.requestAnimationFrame(this._calcThemeOrConfig.bind(this));
 
       // if there is no dev set unique ID, generate one
@@ -171,113 +170,147 @@ Custom property | Description | Default
      */
     drawElement: function() {
       if(this._animationFrameDone && this.domainChanged !== null && this.y && (typeof this.y === 'function' || this._doesObjHaveValues(this.y))) {
-        // checks to see if the threshold already exists. If not, create; if so, update
-        if(this._isD3Empty(this.thresholdGroup)) {
-          this._firstDrawing();
-        } else {
-          this._updateDrawing();
-        }
+
+        this.debounce('_drawThreshold', function() {
+          this._drawElementDebounced();
+        }, 10);
       }
     },
-    /**
-     * Initial drawing, creations of elements
-     */
-    _firstDrawing: function() {
-      this.thresholdGroup = this.svg.append('g')
-        .attr('id','thresholds')
-        .selectAll('g.thresholds')
-        .data(this.thresholdData)
+
+    _drawElementDebounced: function() {
+      var _this = this,
+          updateColors = true;
+
+      if(this._isD3Empty(this.thresholdGroup)) {
+        this.thresholdGroup = this.svg.append('g')
+          .attr('class', 'thresholds');
+      }
+
+      this._thresholdBuilder = this.thresholdGroup.selectAll('g.threshold')
+        .data(this.thresholdData, function(d) { return d.value });
+
+
+      this._thresholdBuilder.exit().remove();
+
+      this._thresholdBuilder
         .enter()
-        .append("g")
-        .attr('class','thresholds')
-        .attr('threshold-id',function(d){ return d.for });
-// FIXME exit & merge
-      this.thresholdLine = this.thresholdGroup.append("line")
+          .append('g')
+          .attr('class', 'threshold')
+          .attr('threshold-id',function(d){ return d.for })
+          .each(function(d,i) {
+            _this._enterLine(d, i, this);
+            _this._enterRect(d, i, this);
+            _this._enterText(d, i, this);
+          })
+        .merge(this._thresholdBuilder)
+          .each(function(d,i) {
+            updateColors = false;
+            _this._mergeLine(d, i, this);
+            _this._mergeRect(d, i, this);
+
+            var title = _this._mergeText(d, i, this);
+
+            _this._rectWidth(this, d, title);
+          });
+
+      if(updateColors) {
+        this._setColors();
+      }
+    },
+
+    _enterLine: function(d, i, elem) {
+      Px.d3.select(elem).append('line')
+        .attr("class", "threshold-line");
+    },
+
+    _mergeLine: function(d, i, elem) {
+      Px.d3.select(elem).select("line.threshold-line")
+        .attr('x1', 0)
+        .attr('x2', this.width - this.margin.right - this.margin.left)
+        .attr('y1', function(d) { return this._getYVal(d); }.bind(this))
+        .attr('y2', function(d) { return this._getYVal(d); }.bind(this))
+        .attr('stroke', this._getColors.bind(this))
         .attr('stroke-width', function(d) {
-          return (this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['strokeWidth'] )?
-            this.thresholdConfig[d.type]['strokeWidth'] : this._defaultThresholdConfig['strokeWidth'];
+          return (this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['strokeWidth'] ) ?
+            this.thresholdConfig[d.type]['strokeWidth'] :
+            this._defaultThresholdConfig['strokeWidth'];
         }.bind(this))
         .attr('stroke-dasharray', function(d) {
           return this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['dashPattern'] ?
-            this.thresholdConfig[d.type]['dashPattern'] : this._defaultThresholdConfig['dashPattern'];
-        }.bind(this))
-        .attr('x1', 0)
-        .attr('x2', this.width - this.margin.right - this.margin.left)
-        .attr('y1', function(d){ return this._getYVal(d); }.bind(this))
-        .attr('y2', function(d){ return this._getYVal(d); }.bind(this));
-        // .on("mouseover", this._mouseOver.bind(this));
+            this.thresholdConfig[d.type]['dashPattern'] :
+            this._defaultThresholdConfig['dashPattern'];
+        }.bind(this));
+    },
 
-      this.thresholdRect = this.thresholdGroup.append("rect")
+    _enterRect: function(d, i, elem) {
+      Px.d3.select(elem).append("rect")
+        .attr("class", "threshold-rect")
         .attr('x', 5)
-        .attr('y', this._calcYPos.bind(this))
         .attr('height','18');
+    },
 
-      this.thresholdText = this.thresholdGroup.append("text")
+    _mergeRect: function(d, i, elem) {
+      Px.d3.select(elem).select("rect.threshold-rect")
+        .attr('y', this._calcYPos.bind(this))
+        .attr('fill', function(d, i) {
+          var type = d.type;
+          if(this.thresholdConfig[type] && this.thresholdConfig[type]['showThresholdBox']) {
+            return this._getColors(d,i);
+          }
+          return 'none';
+        }.bind(this));
+    },
+
+    _enterText: function(d, i, elem) {
+      Px.d3.select(elem).append("text")
+        .attr("class", "threshold-text")
         .attr('font-size', '12px')
         .style('font-family',this._checkThemeVariable("--px-font-family", 'GE Inspira Sans'))
         .attr('font-style', this._checkThemeVariable("--px-font-family", 'GE Inspira Sans'))
-        .attr('x', 8)
+        .attr('x', 8);
+    },
+
+    _mergeText: function(d, i, elem) {
+      var title = this._calcTitle(d);
+      Px.d3.select(elem).select("text.threshold-text")
+        .text(title)
         .attr('y', function(d,i) { return this._calcYPos(d,i,13); }.bind(this) )
-        .text(this._calcTitle.bind(this));
-
-      //must set rectangle width after text is set so we know how big it is
-      this.thresholdRect.attr('width', function(d,i) {
-        var w;
-        try {
-          w = this.thresholdText.nodes()[i].getBBox().width;
-        } catch(e) {
-          w = this.thresholdText.nodes()[i].getBoundingClientRect().width;
-        }
-        return w + 6;
-      }.bind(this));
-    },
-    /***
-     * Subsequent drawing
-     */
-    _updateDrawing: function() {
-      this.thresholdLine
-          .attr('x1', 0)
-          .attr('x2', this.width - this.margin.right - this.margin.left)
-          .attr('y1', function(d) { return this._getYVal(d); }.bind(this))
-          .attr('y2', function(d) { return this._getYVal(d); }.bind(this));
-
-        this.thresholdRect
-          .attr('x', 5)
-          .attr('y', this._calcYPos.bind(this));
-
-        this.thresholdText
-          .attr('x', 8)
-          .attr('y', function(d,i) { return this._calcYPos(d,i,13); }.bind(this) )
-          .text(this._calcTitle.bind(this));
-
-        //must set rectangle width after text is set so we know how big it is
-        this.thresholdRect.attr('width',function(d,i){
-          return this.thresholdText.nodes()[i].getBBox().width + 5;  //should be 6 but 6 looks too big...
+        .attr('fill', function(d,i) {
+          var type = d.type;
+          if(this.thresholdConfig[type] && this.thresholdConfig[type]['showThresholdBox']) {
+            return "white"
+          }
+          return this._getColors(d,i);
         }.bind(this));
+
+      return title
     },
+
+    _rectWidth: function(elem, d, title) {
+      var w = 0;
+
+      if(this.thresholdConfig[d.type] && this.thresholdConfig[d.type]["showThresholdBox"]) {
+        w = this._measureTextOnCanvas(title).width * 1.1 + 6;
+      }
+
+      Px.d3.select(elem).select("rect.threshold-rect").attr('width', w);
+    },
+
     /**
      * Sets the colors
      *
      * @method _setColors
      */
     _setColors: function() {
-      this.thresholdRect.attr('fill', function(d,i) {
-        var type = d.type;
-        if(this.thresholdConfig[type] && this.thresholdConfig[type]['showThresholdBox']) {
-          return this._getColors(d,i);
-        }
-        return 'none';
-      }.bind(this));
-
-      this.thresholdText.attr('fill', function(d,i) {
-        var type = d.type;
-        if(this.thresholdConfig[type] && this.thresholdConfig[type]['showThresholdBox']) {
-          return "white"
-        }
-        return this._getColors(d,i);
-      }.bind(this));
-
-      this.thresholdLine.attr('stroke', this._getColors.bind(this));
+      if(this._doesD3HaveValues(this.thresholdGroup)) {
+        var _this = this;
+        this.thresholdGroup.selectAll('g.thresholds')
+          .each(function(d, i) {
+            _this._mergeLine(d, i, this);
+            _this._mergeRect(d, i, this);
+            _this._mergeText(d, i, this);
+          });
+      }
     },
     /**
      * Returns the color of the associated series or returns the default color
@@ -337,6 +370,15 @@ Custom property | Description | Default
           ' (' + this.thresholdConfig[d.type]['title'] + ')': ' (' + d.type + ')';
       }
       return val + title;
-    }
+    },
+
+    /**
+     * Helper to call adClipPath with the elem
+     *
+     * @method _addClipPath
+     */
+    _addClipPath: function() {
+      // this.addClipPath(this.lineGroup);
+    },
   });
 </script>

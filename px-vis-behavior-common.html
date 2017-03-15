@@ -852,7 +852,7 @@ PxVisBehavior.chartExtents = {
     * To force the chart to calculate based on data, use "dynamic".
     *```
     *  {
-    *      "x": [0,"dynaimc"],
+    *      "x": [0,"dynamic"],
     *      "y": [-10,"dynaimc"],
     *  }
     *```
@@ -1824,7 +1824,7 @@ PxVisBehavior.uniqueIds = {
     PxVisBehavior.preventInitialDrawing
 
     Description:
-    Polymer behavior that provides the preventInitialDrawing property, 
+    Polymer behavior that provides the preventInitialDrawing property,
     used to block an element from drawing until set to false
 
     Dependencies:
@@ -1866,6 +1866,44 @@ PxVisBehavior.selectionType = {
       value: 'xy'
     }
   }
+};
+
+/*
+    Name:
+    PxVisBehavior.measureText
+
+    Description:
+    Behavior providing the abilit to measure text
+    @polymerBehavior PxVisBehavior.measureText
+*/
+PxVisBehavior.measureText = {
+  properties: {
+    /**
+     * The zoom selection type:
+     * - xy
+     * - xAxis
+     * - yAxis
+     */
+    _measurementCanvas: {
+      type: Object
+    }
+  },
+
+  _createMeasurementCanvas(width, height) {
+    var canvas = document.createElement('canvas');
+    canvas.height = height || this.height;
+    canvas.width = width || 9999;
+
+    this._measurementCanvas = canvas;
+  },
+
+  _measureTextOnCanvas: function(text) {
+    var context = this._measurementCanvas.getContext('2d'),
+    textSize = context.measureText(text);
+
+    return textSize;
+  }
+
 };
 
 </script>

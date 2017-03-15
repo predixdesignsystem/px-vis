@@ -1,8 +1,10 @@
-v1.0.2
+v1.1.0
 ==================
 * Fixed line drawing from 0,0 if start of data is empty. Now leaves a break until first valud data
 * Updated to use px-d3-imports
 * Fixed gridline demo
+* Made thresholds dynamic
+* Performance improvements on thresholds
 
 v1.0.1
 ==================
