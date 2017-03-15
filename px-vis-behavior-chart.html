@@ -1556,6 +1556,12 @@ PxVisBehaviorChart.noDebounceOnPanning = {
       */
     _oldScatterDrawDebounceTime: {
       type: Number
+    },
+    /**
+      * holds the previous drawing debounce timing (before panning)
+      */
+    _oldThresholdDrawDebounceTime: {
+      type: Number
     }
   },
   listeners: {
@@ -1567,7 +1573,8 @@ PxVisBehaviorChart.noDebounceOnPanning = {
     //remove draw debounce to have a smooth panning
     var lineType = this.renderToCanvas ? 'px-vis-line-canvas' : 'px-vis-line-svg',
         lines = Polymer.dom(this.root).querySelectorAll(lineType),
-        scatter = Polymer.dom(this.root).querySelectorAll('px-vis-scatter');
+        scatter = Polymer.dom(this.root).querySelectorAll('px-vis-scatter'),
+        threshold = Polymer.dom(this.root).querySelector('px-vis-threshold');
 
     if(lines && lines.length > 0) {
       this._oldLinesDrawDebounceTime = lines[0].drawDebounceTime;
@@ -1582,12 +1589,18 @@ PxVisBehaviorChart.noDebounceOnPanning = {
         scatter[i].set('drawDebounceTime', 0);
       }
     }
+
+    if(threshold) {
+      this._oldThresholdDrawDebounceTime = threshold.drawDebounceTime;
+      threshold.set('drawDebounceTime', 0);
+    }
   },
   _stopPanning: function() {
 
     var lineType = this.renderToCanvas ? 'px-vis-line-canvas' : 'px-vis-line-svg',
         lines = Polymer.dom(this.root).querySelectorAll(lineType),
-        scatter = Polymer.dom(this.root).querySelectorAll('px-vis-scatter');
+        scatter = Polymer.dom(this.root).querySelectorAll('px-vis-scatter'),
+        threshold = Polymer.dom(this.root).querySelector('px-vis-threshold');
 
     if(lines) {
       for(var i=0; i<lines.length; i++) {
@@ -1599,6 +1612,10 @@ PxVisBehaviorChart.noDebounceOnPanning = {
       for(var i=0; i<scatter.length; i++) {
         scatter[i].set('drawDebounceTime', this._oldScatterDrawDebounceTime);
       }
+    }
+
+    if(threshold) {
+      threshold.set('drawDebounceTime', this._oldThresholdDrawDebounceTime);
     }
   }
 };

@@ -133,13 +133,19 @@ Custom property | Description | Default
 
       _thresholdBuilder: {
         type: Object
+      },
+      /**
+       * Debounce time to use for drawing
+       */
+      drawDebounceTime: {
+        type: Number,
+        value: 10
       }
     },
 
     observers: [
 
-      'drawElement(svg, y, domainChanged, completeSeriesConfig.*, thresholdData.*, width, margin.*, _animationFrameDone)',
-      '_addClipPath(clipPath)'
+      'drawElement(svg, y, domainChanged, completeSeriesConfig.*, thresholdData.*, width, margin.*, _animationFrameDone)'
      ],
 
     ready:function() {
@@ -170,10 +176,13 @@ Custom property | Description | Default
      */
     drawElement: function() {
       if(this._animationFrameDone && this.domainChanged !== null && this.y && (typeof this.y === 'function' || this._doesObjHaveValues(this.y))) {
-
-        this.debounce('_drawThreshold', function() {
+        if(this.drawDebounceTime > 0) {
+          this.debounce('_drawThreshold', function() {
+            this._drawElementDebounced();
+          }, this.drawDebounceTime);
+        } else {
           this._drawElementDebounced();
-        }, 10);
+        }
       }
     },
 
@@ -239,7 +248,8 @@ Custom property | Description | Default
           return this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['dashPattern'] ?
             this.thresholdConfig[d.type]['dashPattern'] :
             this._defaultThresholdConfig['dashPattern'];
-        }.bind(this));
+        }.bind(this))
+        .attr("clip-path", 'url(#' + this.clipPath + ')');
     },
 
     _enterRect: function(d, i, elem) {
@@ -258,7 +268,8 @@ Custom property | Description | Default
             return this._getColors(d,i);
           }
           return 'none';
-        }.bind(this));
+        }.bind(this))
+        .attr("clip-path", 'url(#' + this.clipPath + ')');
     },
 
     _enterText: function(d, i, elem) {
@@ -281,7 +292,8 @@ Custom property | Description | Default
             return "white"
           }
           return this._getColors(d,i);
-        }.bind(this));
+        }.bind(this))
+        .attr("clip-path", 'url(#' + this.clipPath + ')');
 
       return title
     },
@@ -370,15 +382,6 @@ Custom property | Description | Default
           ' (' + this.thresholdConfig[d.type]['title'] + ')': ' (' + d.type + ')';
       }
       return val + title;
-    },
-
-    /**
-     * Helper to call adClipPath with the elem
-     *
-     * @method _addClipPath
-     */
-    _addClipPath: function() {
-      // this.addClipPath(this.lineGroup);
-    },
+    }
   });
 </script>
