@@ -953,6 +953,44 @@ PxVisBehaviorD3.radialAxisConfig = {
 
 /*
     Name:
+    PxVisBehaviorD3.interpolationFunction
+
+    Description:
+    Polymer behavior that provides definition for interpolationFunction and method to check for an interpolationFunction
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorD3.interpolationFunction
+*/
+PxVisBehaviorD3.interpolationFunction = {
+  properties: {
+    /**
+    * A d3 function used to interpolate the series lines.
+    *
+    * See: https://github.com/d3/d3-shape/blob/master/README.md#curves
+    */
+    interpolationFunction: {
+      type: Function
+    }
+  },
+
+  _checkInterpolation: function() {
+    var interpolate = null;
+    //see if there is a universal interpolationFunction
+    interpolate = typeof this.interpolationFunction === 'function' ? this.interpolationFunction : null;
+    //see if there is a series specific function; fallback to previous value if not
+    interpolate = this.completeSeriesConfig[this.seriesId]['interpolationFunction'] &&
+                  typeof this.completeSeriesConfig[this.seriesId]['interpolationFunction'] === 'function' ?
+                  this.completeSeriesConfig[this.seriesId]['interpolationFunction'] : interpolate;
+
+    return interpolate;
+  }
+};
+
+
+/*
+    Name:
     PxVisBehaviorD3.radialLineGenerator
 
     Description:
@@ -1063,8 +1101,10 @@ PxVisBehaviorD3.radialLineGenerator = [{
       }
     }
 
-    if(typeof this.interpolationFunction === 'function') {
-      path.curve(this.interpolationFunction);
+    var interpolate = this._checkInterpolation();
+
+    if(interpolate) {
+      path.curve(interpolate);
     }
 
     // add the canvas context if relevant
@@ -1073,7 +1113,7 @@ PxVisBehaviorD3.radialLineGenerator = [{
     }
     this.set('line', line);
   }
-}, PxVisBehavior.completeSeriesConfig, PxVisBehavior.dataset];
+}, PxVisBehavior.completeSeriesConfig, PxVisBehavior.dataset, PxVisBehaviorD3.interpolationFunction];
 
 
 /*
@@ -1097,31 +1137,6 @@ PxVisBehaviorD3.lineGaps = {
     showGaps: {
       type: Boolean,
       value: false
-    }
-  }
-};
-
-/*
-    Name:
-    PxVisBehaviorD3.interpolationFunction
-
-    Description:
-    Polymer behavior that provides definition for interpolationFunction
-
-    Dependencies:
-    - D3.js
-
-    @polymerBehavior PxVisBehaviorD3.interpolationFunction
-*/
-PxVisBehaviorD3.interpolationFunction = {
-  properties: {
-    /**
-    * A d3 function used to interpolate the series lines.
-    *
-    * See: https://github.com/d3/d3-shape/blob/master/README.md#curves
-    */
-    interpolationFunction: {
-      type: Object
     }
   }
 };
@@ -1299,8 +1314,10 @@ PxVisBehaviorD3.lineShared = [{
         });
     }
 
-    if(this.interpolationFunction) {
-      line.curve(this.interpolationFunction);
+    var interpolate = this._checkInterpolation();
+
+    if(interpolate) {
+      line.curve(interpolate);
     }
 
     // If using canvas, tell it the context to draw to.
@@ -1337,8 +1354,10 @@ PxVisBehaviorD3.lineShared = [{
           }.bind(this)));
         }.bind(this);
 
-    if(this.interpolationFunction){
-      path.curve(this.interpolationFunction);
+    var interpolate = this._checkInterpolation();
+
+    if(interpolate) {
+      path.curve(interpolate);
     }
 
     // add the canvas context if relevant
