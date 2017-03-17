@@ -5,7 +5,7 @@
 <!--
 Element which draws area series onto the chart
 
-Unlike most other drawing elements which can use chartData directly, area requires that data first be passed through d3.stack and to be an array of length 1 for of that series: https://github.com/d3/d3-shape/blob/master/README.md#stack
+Unlike most other drawing elements which can use chartData directly, area requires that data first be passed through d3.stack: https://github.com/d3/d3-shape/blob/master/README.md#stack
 
 ##### Usage
 
@@ -31,7 +31,6 @@ Unlike most other drawing elements which can use chartData directly, area requir
 
     <px-vis-area-svg
       svg="[[svg]]"
-      series-id="mySeries"
       complete-series-config="[[seriesConfig]]"
       chart-data="[[stackedChartData]]"
       x="[[x]]"
@@ -109,11 +108,20 @@ Unlike most other drawing elements which can use chartData directly, area requir
       drawDebounceTime: {
         type: Number,
         value: 10
+      },
+
+      _xKey: {
+        type: String
+      },
+
+      _keySeriesDict: {
+        type: Object,
+        computed: '_computekeySeriesDict(completeSeriesConfig.*)'
       }
     },
 
     observers: [
-      'drawElement(svg, y, domainChanged, chartData.*, completeSeriesConfig.*, preventInitialDrawing)',
+      'drawElement(svg, y, domainChanged, chartData.*, completeSeriesConfig.*, _keySeriesDict,  preventInitialDrawing)',
       '_addClipPath(clipPath)'
     ],
 
@@ -134,68 +142,78 @@ Unlike most other drawing elements which can use chartData directly, area requir
     drawElement: function() {
 
       if(!this.preventInitialDrawing) {
-        //if 0 don't debounce at all
-        if(this.drawDebounceTime > 0) {
-          this.debounce('draw',function() {
-            this._drawElementDebounced();
-          }.bind(this), this.drawDebounceTime);
-        } else {
-          this._drawElementDebounced();
-        }
-      }
-    },
 
-    _drawElementDebounced: function() {
-      if(this.domainChanged !== null &&
+        if(this.domainChanged !== null &&
             this._doesD3HaveValues(this.svg) &&
             this.y &&
             this.chartData.length > 0 &&
             this._doesObjHaveValues(this.completeSeriesConfig)
           ) {
 
-          this._defineArea();
+            //if 0 don't debounce at all
+            if(this.drawDebounceTime > 0) {
+              this.debounce('draw',function() {
+                this._drawElementDebounced();
+              }.bind(this), this.drawDebounceTime);
+            } else {
+              this._drawElementDebounced();
+            }
 
-          // checks to see if the group already exists. If not, create; if so, update
-          if(this._isObjEmpty(this.areaGroup)) {
-            // draw the path
-            this.areaGroup = this.svg.append('g')
-              .attr('series-id', 'area_' + this.seriesId)
-              .attr('class', 'series-area');
-          }
-
-          // set our data
-          var areaBuilder = this.areaGroup.selectAll('path.series-area')
-            .data(this.chartData);
-
-          // When datapoints disappear from our data, remove them
-          areaBuilder.exit().remove();
-
-          // When datapoints are added to our data, add stuff
-          areaBuilder.enter()
-            .append('path')
-            .attr('class', 'series-area')
-            .attr('series-id', 'area_' + this.seriesId)
-            .attr('fill','none')
-          // When datapoints are added OR this funtion is run, draw stuff
-          .merge(areaBuilder)
-            .attr('d', function(d) {
-              return this.area(d);
-            }.bind(this))
-            .attr('fill', this.completeSeriesConfig[this.seriesId]['color']);
-
-          // Make it easy to get our areas again
-          this.areaPath = this.areaGroup.selectAll('path.series-area');
-
-          this._addClipPath();
-
-          this.fire('areafinished');
         }
+      }
+    },
+
+    _drawElementDebounced: function() {
+      this._defineArea();
+
+      // checks to see if the group already exists. If not, create; if so, update
+      if(this._isObjEmpty(this.areaGroup)) {
+        // draw the path
+        this.areaGroup = this.svg.append('g')
+          .attr('series-id', 'areas')
+          .attr('class', 'series-area');
+      }
+
+      // set our data
+      var areaBuilder = this.areaGroup.selectAll('path.series-area')
+        .data(this.chartData);
+
+      // When datapoints disappear from our data, remove them
+      areaBuilder.exit().remove();
+
+      // When datapoints are added to our data, add stuff
+      areaBuilder.enter()
+        .append('path')
+        .attr('class', 'series-area')
+      // When datapoints are added OR this funtion is run, draw stuff
+      .merge(areaBuilder)
+        .attr('series-id', function(d, i) {
+          var series = this._keySeriesDict[d.key];
+          return 'area_' + series;
+        }.bind(this))
+        .attr('series-keys', function(d, i) {
+          return this._keySeriesDict[d.key];
+        }.bind(this))
+        .attr('d', function(d) {
+          return this.area(d);
+        }.bind(this))
+        .attr('fill', function(d,i) {
+          var series = this._keySeriesDict[d.key];
+          return this.completeSeriesConfig[series]['color'];
+        }.bind(this))
+      // Make it easy to get our areas again
+      this.areaPath = this.areaGroup.selectAll('path.series-area');
+
+      this._addClipPath();
+
+      this.fire('areafinished');
     },
 
     _defineArea: function() {
-      var k = this.completeSeriesConfig[this.seriesId]['x'];
       this.area = Px.d3.area()
-        .x(function(d, i) { return this.x(d.data[k]); }.bind(this))
+        .x(function(d, i) {
+          return this.x(d.data[this._xKey]);
+        }.bind(this))
         .y0(function(d) { return this.y(d[0]); }.bind(this))
         .y1(function(d) { return this.y(d[1]); }.bind(this));
     },
@@ -207,6 +225,21 @@ Unlike most other drawing elements which can use chartData directly, area requir
      */
     _addClipPath: function() {
       this.addClipPath(this.areaGroup);
+    },
+
+    _computekeySeriesDict: function(completeSeriesConfig) {
+      var keys = Object.keys(this.completeSeriesConfig),
+          dict = {};
+
+      for(var i = 0; i < keys.length; i++) {
+        var k = keys[i],
+            y = this.completeSeriesConfig[k]['y'];
+        dict[y] = k;
+      }
+
+      this._xKey = this.completeSeriesConfig[keys[0]]['x'];
+
+      return dict;
     }
   });
 </script>

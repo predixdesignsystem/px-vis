@@ -105,9 +105,7 @@ function runTests() {
   suite('px-vis-area-svg with two series works', function() {
     var multiScale = document.getElementById('multiScale'),
         multiSVG = document.getElementById('multiSVG'),
-        multiArea1 = document.getElementById('multiArea1'),
-        multiArea2 = document.getElementById('multiArea2'),
-        multiArea3 = document.getElementById('multiArea3');
+        multiArea = document.getElementById('multiArea')
 
     var colorOrder = dataVisColors.properties.seriesColorOrder.value;
     var colorSet = dataVisColors.properties.dataVisColors.value;
@@ -190,70 +188,50 @@ function runTests() {
       multiScale.set('dataExtents',chartExtents);
       multiScale.set('chartData',d);
 
-      multiArea1.set('completeSeriesConfig',completeSeriesConfig);
-      multiArea1.set('seriesId',"mySeries");
-      multiArea1.set('chartData',[stackData[0]]);
-
-      multiArea2.set('completeSeriesConfig',completeSeriesConfig);
-      multiArea2.set('seriesId',"mySeries2");
-      multiArea2.set('chartData',[stackData[1]]);
-
-      multiArea3.set('completeSeriesConfig',completeSeriesConfig);
-      multiArea3.set('seriesId',"mySeries3");
-      multiArea3.set('chartData',[stackData[2]]);
+      multiArea.set('completeSeriesConfig',completeSeriesConfig);
+      multiArea.set('seriesId',"mySeries");
+      multiArea.set('chartData',stackData);
 
       setTimeout(function() {
-        areaPath1 = multiArea1.areaGroup.select('path.series-area');
-        areaPath2 = multiArea2.areaGroup.select('path.series-area');
-        areaPath3 = multiArea3.areaGroup.select('path.series-area');
+        areaPath1 = multiArea.areaGroup.select('[series-id="area_mySeries"]');
+        areaPath2 = multiArea.areaGroup.select('[series-id="area_mySeries2"]')
+        areaPath3 = multiArea.areaGroup.select('[series-id="area_mySeries3"]');
         done();
-      },100);;
+      }, 100);;
     });
 
-    test('multiArea1 fixture is created', function() {
-      assert.isTrue(multiArea1 !== null);
-    });
-    test('multiArea2 fixture is created', function() {
-      assert.isTrue(multiArea2 !== null);
+    test('multiArea fixture is created', function() {
+      assert.isTrue(multiArea !== null);
     });
 
-    test('multiArea1 areaPath created', function() {
+    test('multiArea areaPath created', function() {
       assert.equal(areaPath1.node().tagName,'path');
     });
-    test('multiArea1 area series ID is set', function() {
-      assert.equal(areaPath1.attr('series-id'),'area_mySeries');
-    });
-    test('multiArea1 area series has the right color', function() {
+    test('multiArea area series has the right color', function() {
       assert.equal(areaPath1.attr('fill').split(' ').join(''),colorSet[ colorOrder[0] ]);
     });
-    test('multiArea1 area d', function() {
+    test('multiArea area d', function() {
       assert.equal(areaPath1.attr('d').split(/[\s,]+/).join(''),'M0261L120216L240180L360234L480216L480270L360270L240270L120270L0270Z');
     });
 
     test('multiArea2 areaPath created', function() {
       assert.equal(areaPath2.node().tagName,'path');
     });
-    test('multiArea2 area series ID is set', function() {
-      assert.equal(areaPath2.attr('series-id'),'area_mySeries2');
-    });
     test('multiArea2 area series has the right color', function() {
       assert.equal(areaPath2.attr('fill').split(' ').join(''),colorSet[ colorOrder[1] ]);
     });
     test('multiArea2 area d', function() {
-      assert.equal(areaPath2.attr('d').split(/[\s,]+/).join(''),'M0216L120144L240153L360189L480207L480216L360234L240180L120216L0261Z');
+      assert.equal(areaPath2.attr('d').split(/[\s,]+/).join(''),'M0207L120-45L240126L36099L480-18L480207L360189L240153L120144L0216Z');
     });
 
     test('multiArea3 areaPath created', function() {
       assert.equal(areaPath3.node().tagName,'path');
     });
-    test('multiArea3 area series ID is set', function() {
-      assert.equal(areaPath3.attr('series-id'),'area_mySeries3');
-    });
     test('multiArea3 area series has the right color', function() {
       assert.equal(areaPath3.attr('fill').split(' ').join(''),colorSet[ colorOrder[2] ]);
     });
     test('multiArea3 area d', function() {
-      assert.equal(areaPath3.attr('d').split(/[\s,]+/).join(''),"M0207L120-45L240126L36099L480-18L480207L360189L240153L120144L0216Z"
+      assert.equal(areaPath3.attr('d').split(/[\s,]+/).join(''),"M0216L120144L240153L360189L480207L480216L360234L240180L120216L0261Z"
 );
     });
   }); //suite
