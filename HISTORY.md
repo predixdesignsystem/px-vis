@@ -5,6 +5,7 @@ v1.1.0
 * Fixed gridline demo
 * Made thresholds dynamic
 * Performance improvements on thresholds
+* Added area component
 
 v1.0.1
 ==================

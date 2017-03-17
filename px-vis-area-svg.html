@@ -1,0 +1,212 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="px-vis-behavior-d3.html" />
+<link rel="import" href="px-vis-behavior-common.html" />
+
+<!--
+Element which draws area series onto the chart
+
+Unlike most other drawing elements which can use chartData directly, area requires that data first be passed through d3.stack and to be an array of length 1 for of that series: https://github.com/d3/d3-shape/blob/master/README.md#stack
+
+##### Usage
+
+    <px-vis-svg
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      svg="{{svg}}">
+    </px-vis-svg>
+    <px-vis-scale
+      x-axis-type="time"
+      y-axis-type="linear"
+      complete-series-config="[[seriesConfig]]"
+      data-extents="[[dataExtents]]"
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      chart-data={{chartData}}
+      x="{{x}}"
+      y="{{y}}"
+      selected-domain="[[selectedDomain]]">
+    </px-vis-scale>
+
+    <px-vis-area-svg
+      svg="[[svg]]"
+      series-id="mySeries"
+      complete-series-config="[[seriesConfig]]"
+      chart-data="[[stackedChartData]]"
+      x="[[x]]"
+      y="[[y]]"
+      domain-changed="[[domainChanged]]">
+    </px-vis-area-svg>
+
+@element px-vis-area-svg
+@blurb Element which draws area series onto the chart
+@homepage index.html
+@demo demo.html
+-->
+
+<link rel="import" href="css/px-vis-styles.html">
+
+<dom-module id="px-vis-area-svg">
+    <template>
+      <style include="px-vis-styles"></style>
+
+
+    </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'px-vis-area-svg',
+
+    behaviors: [
+      PxVisBehaviorD3.svg,
+      PxVisBehaviorD3.axes,
+      PxVisBehavior.dataset,
+      PxVisBehavior.commonMethods,
+      PxVisBehaviorD3.clipPath,
+      PxVisBehavior.completeSeriesConfig,
+      PxVisBehavior.dynamicConfigProperties,
+      PxVisBehaviorD3.domainUpdate,
+      PxColorsBehavior.baseColors,
+      PxVisBehavior.preventInitialDrawing
+    ],
+
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      /**
+       * A holder object for the series object
+       *
+       */
+      areaPath:{
+        type:Object
+      },
+      /**
+       * A holder object for the series builder
+       *
+       * @property linePath
+       * @type String
+       */
+      areaBuilder:{
+        type:Object
+      },
+      /**
+       * A holder object for the series group
+       *
+       */
+      areaGroup:{
+        type:Object
+      },
+
+      /**
+       * Debounce time to use for drawing
+       */
+      drawDebounceTime: {
+        type: Number,
+        value: 10
+      }
+    },
+
+    observers: [
+      'drawElement(svg, y, domainChanged, chartData.*, completeSeriesConfig.*, preventInitialDrawing)',
+      '_addClipPath(clipPath)'
+    ],
+
+    detached: function() {
+      if(this._doesD3HaveValues(this.areaPath)) {
+        this.areaPath.remove();
+      }
+      if(this._doesD3HaveValues(this.areaGroup)) {
+        this.areaGroup.remove();
+      }
+    },
+    /**
+     * Draws or updates the line element.
+     * Called from an observer watching for data and the necessary d3 objects
+     *
+     * @method drawElement
+     */
+    drawElement: function() {
+
+      if(!this.preventInitialDrawing) {
+        //if 0 don't debounce at all
+        if(this.drawDebounceTime > 0) {
+          this.debounce('draw',function() {
+            this._drawElementDebounced();
+          }.bind(this), this.drawDebounceTime);
+        } else {
+          this._drawElementDebounced();
+        }
+      }
+    },
+
+    _drawElementDebounced: function() {
+      if(this.domainChanged !== null &&
+            this._doesD3HaveValues(this.svg) &&
+            this.y &&
+            this.chartData.length > 0 &&
+            this._doesObjHaveValues(this.completeSeriesConfig)
+          ) {
+
+          this._defineArea();
+
+          // checks to see if the group already exists. If not, create; if so, update
+          if(this._isObjEmpty(this.areaGroup)) {
+            // draw the path
+            this.areaGroup = this.svg.append('g')
+              .attr('series-id', 'area_' + this.seriesId)
+              .attr('class', 'series-area');
+          }
+
+          // set our data
+          var areaBuilder = this.areaGroup.selectAll('path.series-area')
+            .data(this.chartData);
+
+          // When datapoints disappear from our data, remove them
+          areaBuilder.exit().remove();
+
+          // When datapoints are added to our data, add stuff
+          areaBuilder.enter()
+            .append('path')
+            .attr('class', 'series-area')
+            .attr('series-id', 'area_' + this.seriesId)
+            .attr('fill','none')
+          // When datapoints are added OR this funtion is run, draw stuff
+          .merge(areaBuilder)
+            .attr('d', function(d) {
+              return this.area(d);
+            }.bind(this))
+            .attr('fill', this.completeSeriesConfig[this.seriesId]['color']);
+
+          // Make it easy to get our areas again
+          this.areaPath = this.areaGroup.selectAll('path.series-area');
+
+          this._addClipPath();
+
+          this.fire('areafinished');
+        }
+    },
+
+    _defineArea: function() {
+      var k = this.completeSeriesConfig[this.seriesId]['x'];
+      this.area = Px.d3.area()
+        .x(function(d, i) { return this.x(d.data[k]); }.bind(this))
+        .y0(function(d) { return this.y(d[0]); }.bind(this))
+        .y1(function(d) { return this.y(d[1]); }.bind(this));
+    },
+
+    /**
+     * Helper to call adClipPath with the elem
+     *
+     * @method _addClipPath
+     */
+    _addClipPath: function() {
+      this.addClipPath(this.areaGroup);
+    }
+  });
+</script>

@@ -2,41 +2,46 @@
 
 <link rel="import" href="../px-vis-scale.html">
 <link rel="import" href="../px-vis-svg.html">
+<link rel="import" href="../px-vis-area-svg.html">
 
-<dom-module id="px-vis-scale-demo-component">
+<dom-module id="px-vis-area-svg-demo-component">
   <template>
-      <div class="outline">
+    <div class="outline">
 
-      <!-- need for scale -->
-        <px-vis-svg
-          width="[[width]]"
-          height="[[height]]"
-          margin="[[margin]]"
-          svg="{{svg}}">
-        </px-vis-svg>
-        <px-vis-scale
-          x-axis-type="time"
-          y-axis-type="linear"
-          complete-series-config="[[seriesConfig]]"
-          data-extents="[[dataExtents]]"
-          width="[[width]]"
-          height="[[height]]"
-          margin="[[margin]]"
-          chart-data={{chartData}}
-          x="{{x}}"
-          y="{{y}}"
-          selected-domain="[[selectedDomain]]">
-        </px-vis-scale>
+      <px-vis-svg
+        width="[[width]]"
+        height="[[height]]"
+        margin="[[margin]]"
+        svg="{{svg}}">
+      </px-vis-svg>
+      <px-vis-scale
+        x-axis-type="time"
+        y-axis-type="linear"
+        complete-series-config="[[seriesConfig]]"
+        data-extents="[[dataExtents]]"
+        width="[[width]]"
+        height="[[height]]"
+        margin="[[margin]]"
+        chart-data={{chartData}}
+        x="{{x}}"
+        y="{{y}}"
+        selected-domain="[[selectedDomain]]">
+      </px-vis-scale>
+      <px-vis-area-svg
+        svg="[[svg]]"
+        series-id="mySeries"
+        complete-series-config="[[seriesConfig]]"
+        chart-data="[[_returnStack(chartData)]]"
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]">
+      </px-vis-area-svg>
 
-        <p style="text-align: center; color: rgb(177,177,188)">px-vis-scale cannot be seen</p>
-
-      </div>
     </div>
-
   </template>
   <script>
     Polymer({
-      is: "px-vis-scale-demo-component",
+      is: "px-vis-area-svg-demo-component",
       properties:{
         //basics
         width: {
@@ -45,7 +50,7 @@
         },
         height:{
           type : Number,
-          value : 150
+          value : 200
         },
         margin:{
           type : Object,
@@ -55,6 +60,10 @@
             "bottom": 10,
             "left": 10
           }
+        },
+        domainChanged:{
+          type: Boolean,
+          value: false
         },
         chartData:{
           type : Array,
@@ -101,7 +110,7 @@
           value: {
             'mySeries': {
               "name":"My-Series",
-              "type": "line",
+              "type": "area",
               "x": 'x',
               "y": 'y',
               'color': "rgb(93,165,218)"
@@ -116,6 +125,12 @@
             "y": [0,-Infinity]
           }
         }
+      },
+
+      _returnStack: function(chartData) {
+        var stack = Px.d3.stack();
+        stack.keys(["y"]);
+        return stack(chartData);
       }
     });
   </script>
