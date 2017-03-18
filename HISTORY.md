@@ -6,6 +6,7 @@ v1.1.0
 * Made thresholds dynamic
 * Performance improvements on thresholds
 * Added area component
+* Added disableClick for register
 
 v1.0.1
 ==================

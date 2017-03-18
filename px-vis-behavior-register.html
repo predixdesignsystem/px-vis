@@ -29,6 +29,27 @@ PxVisBehaviorRegister.groupings = {
 
 /*
     Name:
+    PxVisBehaviorRegister.disableClick
+
+    Description:
+    Polymer behavior that provides the disableClick property for px-vis register items.
+
+    Dependencies:
+    - none
+
+    @polymerBehavior PxVisBehaviorRegister.disableClick
+*/
+PxVisBehaviorRegister.disableClick = {
+  properties: {
+    disableClick: {
+      type: Boolean,
+      value: false
+    }
+  }
+}
+
+/*
+    Name:
     PxVisBehaviorRegister.itemShared
 
     Description:
@@ -119,9 +140,9 @@ PxVisBehaviorRegister.itemShared = [{
   attached: function() {
 
     this._mouseEnterHandler = function() {
-        
+
         if(this._hasDynamicMenu) {
-          
+
           //store a ref to the menu if we don't have it yet
           if(!this.$.menu) {
             this.$.menu = this.$$('px-vis-dynamic-menu');
@@ -135,7 +156,7 @@ PxVisBehaviorRegister.itemShared = [{
           this.$.menu.fadeOut();
         }
       }.bind(this);
-      
+
       this.addEventListener('mouseenter', this._mouseEnterHandler);
       this.addEventListener('mouseleave', this._mouseLeaveHandler);
     },
@@ -235,7 +256,7 @@ PxVisBehaviorRegister.register = {
 
     if(type === 'horizontal') {
       classList += 'flex--row ';
-      
+
       if(_hasScrollBar || hozAlign === 'left') {
          classList += 'flex--left ';
       } else if(hozAlign === 'center') {

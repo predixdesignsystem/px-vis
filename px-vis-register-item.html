@@ -161,7 +161,8 @@ Custom property | Description | Default
       PxVisBehavior.axisTypes,
       PxVisBehaviorRegister.register,
       PxVisBehaviorRegister.itemShared,
-      PxVisBehaviorRegister.generalItem
+      PxVisBehaviorRegister.generalItem,
+      PxVisBehaviorRegister.disableClick
     ],
     properties: {
       /**
@@ -201,7 +202,8 @@ Custom property | Description | Default
     },
 
     observers: [
-      '_toggleSeries(item,mutedSeries.*)'
+      '_toggleSeries(item,mutedSeries.*)',
+      '_disableClickFunc(disableClick)'
     ],
 
     /**
@@ -250,5 +252,10 @@ Custom property | Description | Default
       return false;
     },
 
+    _disableClickFunc: function(disableClick) {
+      if(disableClick) {
+        this.unlisten(this.$.regWithoutMenu, "tap", '_seriesClicked');
+      }
+    }
   });
 </script>
