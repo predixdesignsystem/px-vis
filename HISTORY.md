@@ -1,3 +1,7 @@
+v1.1.1
+==================
+* fixed demo for area-svg.
+
 v1.1.0
 ==================
 * Fixed line drawing from 0,0 if start of data is empty. Now leaves a break until first valud data
