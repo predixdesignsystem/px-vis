@@ -252,6 +252,10 @@ Custom property | Description | Default
           },
           _tooltipElem: {
             type: HTMLElement
+          },
+          _axisDrawn: {
+            type: Number,
+            value: 0
           }
         },
 
@@ -263,7 +267,7 @@ Custom property | Description | Default
           '_updateTicks(ticks)',
           '_updateTicks(tickFormat)',
           '_updateTicks(tickValues)',
-          '_titleChanged(displayedTitle, _axisGroup, titleLocation.*, height, width)',
+          '_titleChanged(displayedTitle, _axisDrawn, titleLocation.*)',
           '_truncateTitle(title, truncationLength, appendUnitInTitle, completeSeriesConfig)',
           '_orientationChanged(orientation)'
         ],
@@ -416,11 +420,10 @@ Custom property | Description | Default
         },
 
         removeAxis: function() {
-          debugger
           this._removingAxis = true;
+          this._axisDrawn = 0;
           // remove the axis
           if(this._axisGroup) {
-            // this._axisGroup.selectAll('*').remove();
             this._axisGroup.remove();
             this._axisGroup = null;
           }
@@ -442,28 +445,31 @@ Custom property | Description | Default
 
 
           if(typeof this.preventInitialDrawing !== undefined && this.preventInitialDrawing === false) {
-           this.debounce('drawaxis', function() {
+            this.debounce('drawaxis', function() {
 
-            // Should be inside debounce to ensure that nothing changed after the debounce timer started
-            if(this._isAttached && this._animationFrameDone && this._doesD3HaveValues(this.svg) && this.domainChanged !== null && this.orientation && this.axis) {
+              // Should be inside debounce to ensure that nothing changed after the debounce timer started
+              if(this._isAttached && this._animationFrameDone && this._doesD3HaveValues(this.svg) && this.domainChanged !== null && this.orientation && this.axis) {
 
-              if(this.rebuildOnDraw) {
-                this.removeAxis();
+                if(this.rebuildOnDraw) {
+                  this.removeAxis();
+                }
+
+                this.defineAxis();
+                if(!this._axisGroup) {
+                  this._buildAxis();
+                } else {
+                  this._updateAxis();
+                }
+
+                this._axisDrawn += 1;
+
+                // alert parents that we are done drawing the axis
+                this.fire('px-axis-done');
               }
-
-               this.defineAxis();
-              if(!this._axisGroup) {
-                this._buildAxis();
-              } else {
-                this._updateAxis();
-              }
-
-              // alert parents that we are done drawing the axis
-              this.fire('px-axis-done');
-            }
-           }, 10)
+            }, 10);
           }
         },
+
         /**
          * Updates the axis
          *
@@ -728,7 +734,6 @@ Custom property | Description | Default
               break;
           }
 
-          // if(!this._titleGroup) {
             this._titleGroup = this.svg.append('g')
               .attr('class','title-group')
               .attr('for', this.axisId)
@@ -746,18 +751,6 @@ Custom property | Description | Default
               .style('text-anchor', anchor)
               .attr('transform','rotate(' + r + ')');
 
-          // } else {
-          //   this.svg.select('g.title-group[for=' + this.axisId + ']')
-          //     .attr('transform','translate(' + x + ',' + y + ')');
-          //   this.svg.select('g.title-group[for=' + this.axisId + ']')
-          //     .attr('text-anchor', anchor)
-          //     .style('text-anchor', anchor)
-          //     .attr('fill',this._checkThemeVariable("--px-vis-axis-color", this.colors[this.axisColor]))
-          //     .attr('font-size', this.titleTypeSize + 'px')
-          //     .text(this.displayedTitle)
-          //     .attr('transform','rotate(' + r + ')');
-          // }
-
           this._processTooltip();
           this.set('titleDrawn', (this.titleDrawn === null) ? true : !this.titleDrawn);
         },
@@ -766,21 +759,19 @@ Custom property | Description | Default
          *
          */
         drawSeriesBars: function() {
-          // this.debounce("drawSeriesBars", function() {
-            if(!this.preventSeriesBar && this._doesObjHaveValues(this.completeSeriesConfig) && this._axisGroup && this._titleGroup) {
+          if(!this.preventSeriesBar && this._doesObjHaveValues(this.completeSeriesConfig) && this._axisGroup && this._titleGroup) {
 
-              // TODO do we need to move the title group based on how many series we have
-              var keys = this.seriesOnAxis.length > 0 ? this.seriesOnAxis : Object.keys(this.completeSeriesConfig),
-                  kLen = keys.length,
-                  i;
+            // TODO do we need to move the title group based on how many series we have
+            var keys = this.seriesOnAxis.length > 0 ? this.seriesOnAxis : Object.keys(this.completeSeriesConfig),
+                kLen = keys.length,
+                i;
 
-              for(i = 0; i < kLen; i++) {
-                if(this.completeSeriesConfig[keys[i]]) {
-                  this._drawBar(this._titleGroup,keys[i], this.completeSeriesConfig[keys[i]]['color'], i);
-                }
+            for(i = 0; i < kLen; i++) {
+              if(this.completeSeriesConfig[keys[i]]) {
+                this._drawBar(this._titleGroup,keys[i], this.completeSeriesConfig[keys[i]]['color'], i);
               }
             }
-          // }, 10);
+          }
         },
         /**
          * Mutes and unmutes the color bars for each series
@@ -862,15 +853,10 @@ Custom property | Description | Default
          * redraws title on change
          */
         _titleChanged: function(displayedTitle) {
-      //    this.debounce('drawTitle', function() {
-          if(!this._removingAxis) {
-            if(this._doesObjHaveValues(this._axisGroup) && this._axisGroup.node() !== null &&
-            this._axisGroup.node().ownerSVGElement !== null && this.orientation) {
-
-              this.drawTitle();
-            }
+          // No debounce. Even though it fires a lot, debounce causes a noticable lag in the title.
+          if(!this._removingAxis && this._axisDrawn) {
+            this.drawTitle();
           }
-          // }.bind(this), 10);
         },
 
         /**
@@ -892,8 +878,8 @@ Custom property | Description | Default
             this._tooltipElem.for = null;
           }
         },
-        _orientationChanged: function() {
 
+        _orientationChanged: function() {
           this.removeAxis();
           this.drawElement();
         }
