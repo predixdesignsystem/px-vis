@@ -100,41 +100,84 @@ Custom property | Description | Default
       <style include="px-vis-styles"></style>
 
       <div id="wrapper" class="inline--flex " style="height:100%;width:100%">
-        <px-vis-svg
+        <px-vis-svg-canvas
           class="inline--flex flex__item--msfix"
           width="[[width]]"
           height="[[height]]"
           margin="[[margin]]"
           svg="{{svg}}"
-          px-svg-elem="{{pxSvgElem}}">
-        </px-vis-svg>
+          canvas-context="{{canvasContext}}">
+        </px-vis-svg-canvas>
 
         <template is="dom-repeat" items="[[_seriesKeys]]">
           <template is="dom-if" if="[[_limitSeries(index,navSeriesLimit)]]">
             <template is="dom-if" if="[[_chartTypeLine(item,completeSeriesConfig)]]">
-              <px-vis-line-svg
-                svg="[[layer.1]]"
-                series-id="[[item]]"
-                chart-data="[[chartData]]"
-                complete-series-config="[[completeSeriesConfig]]"
-                x="[[x]]"
-                y="[[y]]"
-                domain-changed="[[domainChanged]]"
-                muted-series="[[mutedSeries]]">
-              </px-vis-line-svg>
+              <template is="dom-if" if="[[renderToCanvas]]" restamp>
+                <px-vis-line-canvas
+                  id="lineCanvas"
+                  canvas-context="[[canvasContext]]"
+                  series-id="[[item]]"
+                  chart-data="[[chartData]]"
+                  complete-series-config="[[completeSeriesConfig]]"
+                  x="[[x]]"
+                  y="[[y]]"
+                  domain-changed="[[domainChanged]]"
+                  show-gaps="[[showGaps]]"
+                  no-canvas-progressive-rendering="[[noCanvasProgressiveRendering]]"
+                  progressive-rendering-points-per-frame="[[progressiveRenderingPointsPerFrame]]"
+                  progressive-rendering-minimum-frames="[[progressiveRenderingMinimumFrames]]"
+                  width="[[width]]"
+                  height="[[height]]"
+                  margin="[[margin]]"
+                  clip-path>
+                </px-vis-line-canvas>
+              </template>
+              <template is="dom-if" if="[[!renderToCanvas]]" restamp>
+                <px-vis-line-svg
+                  svg="[[layer.1]]"
+                  series-id="[[item]]"
+                  chart-data="[[chartData]]"
+                  complete-series-config="[[completeSeriesConfig]]"
+                  x="[[x]]"
+                  y="[[y]]"
+                  domain-changed="[[domainChanged]]"
+                  muted-series="[[mutedSeries]]">
+                </px-vis-line-svg>
+              </template>
             </template>
             <template is="dom-if" if="[[_chartTypeScatter(item,completeSeriesConfig)]]">
-              <px-vis-scatter
-                svg="[[layer.1]]"
-                series-id="[[item]]"
-                chart-data="[[chartData]]"
-                complete-series-config="[[completeSeriesConfig]]"
-                marker-size="2"
-                x="[[x]]"
-                y="[[y]]"
-                domain-changed="[[domainChanged]]"
-                muted-series="[[mutedSeries]]">
-              </px-vis-scatter>
+              <template is="dom-if" if="[[renderToCanvas]]" restamp>
+                <px-vis-scatter-canvas
+                  canvas-context="[[canvasContext]]"
+                  series-id="[[item]]"
+                  chart-data="[[chartData]]"
+                  complete-series-config="[[completeSeriesConfig]]"
+                  width="[[width]]"
+                  height="[[height]]"
+                  margin="[[margin]]"
+                  x="[[x]]"
+                  y="[[y]]"
+                  clip-path
+                  no-canvas-progressive-rendering="[[noCanvasProgressiveRendering]]"
+                  progressive-rendering-points-per-frame="[[progressiveRenderingPointsPerFrame]]"
+                  progressive-rendering-minimum-frames="[[progressiveRenderingMinimumFrames]]"
+                  domain-changed="[[domainChanged]]"
+                  marker-size="2">
+                </px-vis-scatter-canvas>
+              </template>
+              <template is="dom-if" if="[[!renderToCanvas]]" restamp>
+                <px-vis-scatter
+                  svg="[[layer.1]]"
+                  series-id="[[item]]"
+                  chart-data="[[chartData]]"
+                  complete-series-config="[[completeSeriesConfig]]"
+                  marker-size="2"
+                  x="[[x]]"
+                  y="[[y]]"
+                  domain-changed="[[domainChanged]]"
+                  muted-series="[[mutedSeries]]">
+                </px-vis-scatter>
+              </template>
             </template>
           </template>
         </template>
@@ -187,6 +230,9 @@ Custom property | Description | Default
           PxVisBehavior.commonMethods,
           PxVisBehavior.dataExtents,
           PxVisBehavior.axisTypes,
+          PxVisBehavior.progressiveRendering,
+          PxVisBehaviorD3.canvasContext,
+          PxVisBehaviorD3.renderToCanvas,
           PxVisBehaviorChart.chartCommon,
           Polymer.IronResizableBehavior,
           PxVisBehaviorChart.saveImage,

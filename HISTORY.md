@@ -1,3 +1,10 @@
+v1.0.0
+==================
+* added px-vis-scatter-canvas for supporting scatter on canvas rather than svg. dramatically faster on IE (always), faster on other browsers for big dataset, similar for other browsers for small datasets (<5k points)
+* px-vis-chart-navigator now supports canvas rendering
+* progressive rendering now can be customized through progressiveRenderingPointsPerFrame (16000 by default for lines, 2000 byy default for scatter) and progressiveRenderingMinimumFrames. Increase progressiveRenderingPointsPerFrame for better performance and decrease for smoother drawing. When at the right value no performance cost incurs and drawing is smooth but if value is too small can incur a performance cost (i.e the drawing will take longer, but will always start at the same time, also the UI won't be frozen)
+* fix issue where progressive rendering could miss 1 point per frame, potentially a lot for big dataset
+
 v1.0.1
 ==================
 * Fixed multi axis dragging position on Safari and IE 11

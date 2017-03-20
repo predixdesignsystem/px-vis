@@ -1,0 +1,627 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
+
+<!--
+Element which draws a scatter series onto the chart
+
+##### Usage
+
+    <px-vis-scale
+      x-axis-type="time"
+      y-axis-type="linear"
+      complete-series-config="[[seriesConfig]]"
+      data-extents="[[dataExtents]]"
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      chart-data="{{chartData}}"
+      x="{{x}}"
+      y="{{y}}"
+      domain-changed="{{domainChanged}}"
+      selected-domain="[[selectedDomain]]">
+    </px-vis-scale>
+    <px-vis-svg
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      svg="{{svg}}">
+    </px-vis-svg>
+    <px-vis-scatter-canvas
+      svg="[[svg]]"
+      series-id="mySeries"
+      complete-series-config="[[seriesConfig]]"
+      chart-data="[[chartData]]"
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      x="[[x]]"
+      y="[[y]]"
+      domain-changed="[[domainChanged]]">
+    </px-vis-scatter-canvas>
+
+@element px-vis-scatter-canvas
+@blurb Element which draws a scatter series onto the chart
+@homepage index.html
+@demo demo.html
+-->
+
+<link rel="import" href="css/px-vis-styles.html">
+
+<dom-module id="px-vis-scatter-canvas">
+  <template>
+    <style include="px-vis-styles"></style>
+
+
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'px-vis-scatter-canvas',
+
+    behaviors: [
+      PxVisBehaviorD3.canvas,
+      PxVisBehaviorD3.axes,
+      PxVisBehavior.dataset,
+      PxVisBehavior.mutedSeries,
+      PxVisBehavior.commonMethods,
+      PxVisBehavior.completeSeriesConfig,
+      PxVisBehaviorD3.radialLineGenerator,
+      PxVisBehavior.tooltipData,
+      PxVisBehaviorD3.domainUpdate,
+      PxVisBehavior.polarData,
+      PxVisBehavior.seriesId,
+      PxVisBehavior.dynamicConfigProperties,
+      PxVisBehavior.progressiveRendering,
+      PxVisBehavior.serieToRedrawOnTop,
+      PxColorsBehavior.baseColors,
+      PxVisBehavior.preventInitialDrawing
+    ],
+    /**
+     * px-vis-scatter-progressive-rendering-started, fired when a canvas with progressive rendering
+     * enabled starts rendering
+     * evt.details contains:
+     * { numberOfFrames: the number of frames that will be used to render,
+     * }
+     *
+     * @event px-vis-scatter-progressive-rendering-started
+     */
+    /**
+     * px-vis-scatter-canvas-progressive-batch, fired when a canvas with progressive rendering
+     * has finished rendering one batch of data
+     * evt.details contains:
+     * { numberOfFrames: the number of frames that will be used to render,
+     *  currentFrame: index of the frame that has just been rendered
+     * }
+     *
+     * @event px-vis-scatter-canvas-progressive-batch
+     */
+
+    /**
+     * px-vis-scatter-progressive-rendering-ended, fired when a canvas with progressive rendering
+     * enabled has finished rendering
+     * evt.details contains:
+     * { numberOfFrames: the number of frames that have been used to render,
+     * }
+     *
+     * @event px-vis-scatter-progressive-rendering-ended
+     */
+
+    /**
+     * px-vis-scatter-canvas-rendering-ended, fired when a canvas has finished rendering,
+     * whether it had progressive rendering or not
+     * evt.details contains:
+     * { progressiveRending: whether progressive rendering was enabled,
+     * }
+     *
+     * @event px-vis-scatter-canvas-rendering-ended
+     */
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      /**
+       * An index of the series used for calculating its color
+       *
+       * @property scatterNumber
+       * @type String
+       */
+      seriesNumber:{
+        type:Number,
+        value:0
+      },
+      /**
+       * Maps dev input markers to d3 symbols
+       *
+       */
+      _markerMapping: {
+        type: Object,
+        readOnly: true,
+        value: {
+          'circle': Px.d3.symbolCircle,
+          'cross': Px.d3.symbolCross,
+          'diamond': Px.d3.symbolDiamond,
+          'square': Px.d3.symbolSquare,
+          'triangle-up': Px.d3.symbolTriangle,
+          'star': Px.d3.symbolStar,
+          'wye': Px.d3.symbolWye
+        },
+        /**
+         * The symbol used for the marker. Supported symbols:
+         * - 'circle'
+         * - 'cross'
+         * - 'diamond'
+         * - 'square'
+         * - 'triangle-up'
+         * - 'star'
+         * - 'wye'
+         * more info at https://github.com/d3/d3-shape/blob/master/README.md#symbols
+         * This property will be read from the completeSeriesConfig
+         */
+        markerSymbol: {
+          type: String
+        },
+        /**
+         * Scales the size of the scatter marker
+         * This property will be read from the completeSeriesConfig
+         */
+        markerScale: {
+          type: Number
+        },
+        /**
+         * the size of the markers
+         * This property will be read from the completeSeriesConfig
+         */
+        markerSize: {
+          type: Number
+        },
+        /**
+         * The opacity of the fill (inside) of the marker
+         * This property will be read from the completeSeriesConfig
+         */
+        markerFillOpacity: {
+          type: Number
+        },
+        /**
+         * The opacity of the stroke (outside) of the marker
+         * This property will be read from the completeSeriesConfig
+         */
+        markerStrokeOpacity: {
+          type: Number
+        },
+        /**
+         * the opacity value of the fill to be used when muting a serie (stroke is not drawn on mute)
+         * This property will be read from the completeSeriesConfig
+         */
+        mutedOpacity: {
+          type: Number
+        },
+      },
+      /**
+       * A holder object for the series group
+       *
+       * @property scatterGroup
+       * @type Object
+       */
+      scatterGroup:{
+        type:Object,
+        value: function() {return{};}
+      },
+      /**
+       * A holder object for the series objects
+       *
+       */
+      scatterDots:{
+        type:Object
+      },
+      /**
+       * A holder object for the series builder
+       *
+       */
+      scatterBuilder: {
+        type: Object
+      },
+      /**
+       * Whether the scatter plot is using radial coiordinates (x=phase, y=amplitude)
+       */
+      radial: {
+        type: Boolean,
+        value: false
+      },
+      /**
+       * Name of the variable holding the time stamp in the data. Used for non timeseries charts
+       */
+      timeData: {
+        type: String,
+        value: 'Timestamp'
+      },
+      /**
+       * Debounce time to use for drawing
+       */
+      drawDebounceTime: {
+        type: Number,
+        value: 10
+      },
+      /**
+      * Counter to track progressive rendering requests and only draw the latest one
+      */
+      _progressiveRenderingCounter: {
+        type: Number,
+        value: 0
+      },
+      /**
+       * options currently in use for drawing scatter: opacity, symbol, drawing function....
+       */
+      _currentDrawingOptions: {
+        type: Object,
+        value:function() {
+          return {};
+        }
+      },
+      /**
+      * Number of points to be drawn per progressive rendering frame.
+      * The higher the value the fastest the processing but the more
+      * likely the UI will stutter/freeze.
+      */
+      progressiveRenderingPointsPerFrame: {
+        type: Number,
+        value: 2000
+      },
+      /**
+       * Whether to use the clippath to avoid drawing outside of axes
+       *
+       */
+      clipPath: {
+        type: Boolean,
+        value: false
+      }
+    },
+
+    observers: [
+      '_redraw(canvasContext, domainChanged, chartData.*, completeSeriesConfig.*, _canvasRedraw, preventInitialDrawing, radial, counterClockwise,markerSymbol, markerScale, markerSize, markerFillOpacity, markerStrokeOpacity)',
+      'mutedChanged(mutedSeries.*, completeSeriesConfig)',
+      '_drawOnTop(serieToRedrawOnTop)'
+     ],
+
+    ready:function() {
+      //generate properties dynamically
+      this._watchConfigProperty('markerSymbol', 'circle');
+      this._watchConfigProperty('markerScale', 1);
+      this._watchConfigProperty('markerSize', 64);
+      this._watchConfigProperty('markerFillOpacity', 0.6);
+      this._watchConfigProperty('markerStrokeOpacity', 1);
+      this._watchConfigProperty('mutedOpacity', 0.3);
+    },
+
+    _redraw: function() {
+      if(!this.preventInitialDrawing) {
+        this.drawCanvas(true);
+      }
+    },
+    /**
+     * Draws or updates the line element.
+     * Called from an observer watching for data and the necessary d3 objects
+     *
+     * @method drawElement
+     */
+    drawCanvas: function(allowCanvasClearing) {
+      if(this.drawDebounceTime > 0) {
+        this.debounce('drawCanvasScatter',function() {
+          this._drawCanvasDebounced(allowCanvasClearing);
+        }.bind(this), this.drawDebounceTime);
+      } else {
+        this._drawCanvasDebounced(allowCanvasClearing);
+      }
+    },
+    _drawCanvasDebounced: function(allowCanvasClearing) {
+
+      if(this.y && typeof this.domainChanged !== 'undefined' && this.domainChanged !== null) {
+
+        var data = this.chartData;
+
+        // We need to track which scatter we have drawn and which we want to draw.
+        // If a scatter is not currently in our list, add it
+        if(!this.canvasContext._pxScatterSeries[this.seriesId]) {
+          this.canvasContext._pxScatterSeries[this.seriesId] = true;
+          this.canvasContext._pxScatterTotal += 1;
+        }
+
+        // if we have previously drawn the same number of scatter as series, then let's start over; Clear the drawing canvas
+        if(this.canvasContext._pxScatterRedraw === this.canvasContext._pxScatterTotal) {
+          this.canvasContext._pxScatterRedraw = 0;
+
+          if(allowCanvasClearing) {
+
+            // (x1,y1,x2,y2)
+            this.canvasContext.clearRect(-this.canvasContext._translation[0], -this.canvasContext._translation[1] , this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+          }
+        }
+          //send empty tooltip data so the register shows up
+          //TODO: this should not be here....
+         // this._hideTooltip();
+
+        if(this.radial) {
+          this._defineRadialLine(false, this.multiPath, this.counterClockwise, this.useDegrees);
+        }
+
+        //prepare values and draw
+        this._initiateRendering();
+
+        if(allowCanvasClearing) {
+          this.canvasContext._pxScatterRedraw += 1;
+        }
+      }
+    },
+
+
+    _initiateRendering: function() {
+
+      //create symbol, retrieve opacity values
+      this._currentDrawingOptions.symbol = Px.d3.symbol().type(this._markerMapping[this.markerSymbol]).size(this.markerSize).context(this.canvasContext);
+      this._currentDrawingOptions.muted = this.mutedSeries[this.seriesId];
+      this._currentDrawingOptions.fillOpacity = this._currentDrawingOptions.muted  ? this.mutedOpacity : this.markerFillOpacity;
+      this._currentDrawingOptions.strokeOpacity = this._currentDrawingOptions.muted  ? 0 : this.markerStrokeOpacity;
+      this._currentDrawingOptions.sameOpacity = this._currentDrawingOptions.fillOpacity === this._currentDrawingOptions.strokeOpacity;
+      this._currentDrawingOptions.drawingFunction;
+      this._currentDrawingOptions.oldAlpha = this.canvasContext.globalAlpha;
+      this._currentDrawingOptions.previousTranslate = [0,0];
+      //TODO: ordinal?......
+      this._currentDrawingOptions.xDomain = this.x.domain();
+      this._currentDrawingOptions.yDomain = this.y.domain();
+
+      //small optimization if we have the same opacity values, no need to change
+      //opacity all the time
+      if(!this._currentDrawingOptions.sameOpacity) {
+        this._currentDrawingOptions.drawingFunction = function() {
+          this.canvasContext.globalAlpha = this._currentDrawingOptions.fillOpacity;
+          this.canvasContext.fill();
+          this.canvasContext.globalAlpha = this._currentDrawingOptions.strokeOpacity;
+          this.canvasContext.stroke();
+        }.bind(this);
+      } else {
+        this._currentDrawingOptions.drawingFunction = function() {
+          this.canvasContext.fill();
+          this.canvasContext.stroke();
+        }.bind(this);
+      };
+
+      if(this.noCanvasProgressiveRendering) {
+        this._renderAtOnce();
+      } else {
+        //get number of frames
+        var numberOfSeries = Object.keys(this.completeSeriesConfig).length;
+        var frames = Math.ceil(Math.max(((this.chartData.length*numberOfSeries)/this.progressiveRenderingPointsPerFrame), this.progressiveRenderingMinimumFrames));
+        this._renderProgressively(frames);
+      }
+    },
+
+    _renderAtOnce: function() {
+
+      //don't actually draw if invisible
+      if(!(this._currentDrawingOptions.sameOpacity && this._currentDrawingOptions.fillOpacity === 0)) {
+
+        this._renderOneBatch(this.chartData);
+      }
+
+      this._renderingEnded(false);
+    },
+
+    /**
+     * Renders data in a specific number of frames, splitting the batch
+     *
+     */
+    _renderProgressively: function(numberOfFrames) {
+
+      //don't actually draw if invisible
+      if(!(this._currentDrawingOptions.sameOpacity && this._currentDrawingOptions.fillOpacity === 0)) {
+
+        this.fire('px-vis-scatter-progressive-rendering-started', {numberOfFrames: numberOfFrames});
+
+        var batches = [],
+            currentIndex = 0,
+            j = 0,
+            _this = this,
+            size = Math.ceil(this.chartData.length/numberOfFrames),
+            timer = window.requestAnimationFrame
+              || window.webkitRequestAnimationFrame
+              || window.mozRequestAnimationFrame
+              || window.oRequestAnimationFrame
+              || window.msRequestAnimationFrame
+              || function(callback) { setTimeout(callback, 17); },
+            currentRenderingCounter;
+
+        //new request
+        this._progressiveRenderingCounter++;
+        currentRenderingCounter = this._progressiveRenderingCounter;
+
+        //split the data in the number of frames desired.
+        for(j=0; j< numberOfFrames; j++) {
+
+          //add data for this batch
+          batches[j] = this.chartData.slice(j*size, (j+1)*size);
+        }
+
+        //called every animation frame
+        var processData = function() {
+
+          if(currentRenderingCounter !== this._progressiveRenderingCounter) {
+            //new request came in, cancel this drawing. Don't reset the counter as we want
+            //the new request to finish
+            return;
+          }
+
+          var d = batches[currentIndex];
+          this._renderOneBatch(d);
+
+          currentIndex++;
+
+          if(currentIndex < numberOfFrames) {
+            //continue processing
+            this.fire('px-vis-scatter-canvas-progressive-batch', { "numberOfFrames": numberOfFrames, "currentFrame":currentIndex });
+            timer(processData);
+          } else {
+            //finished drawing, reset drawing request counter
+            this._renderingEnded(true, numberOfFrames);
+          }
+        }.bind(this);
+
+        timer(processData);
+      }
+    },
+
+    /**
+     * progressive or normal rendering is completely done
+     */
+    _renderingEnded: function(progressive,numberOfFrames) {
+
+      if(progressive) {
+        this._progressiveRenderingCounter = 0;
+        this.fire('px-vis-scatter-progressive-rendering-ended', {"numberOfFrames": numberOfFrames });
+      }
+
+      this.fire('px-vis-scatter-canvas-rendering-ended', { "progressiveRending": progressive });
+    },
+
+    /**
+     * Draws a clip path for canvas
+     *
+     */
+    drawClipPath: function() {
+      /* not sure why this if statement bandaid is needed
+         if you have chartData with all the same value (such as all 0) and some axes and you clear axes first, then clear chartData
+         (not chartData and then axes), then reload the same data and axes (order doesnt matter), series do not plot.
+         Clearly related to the clip path, but cannot isolate.
+         If you load data that is not 100% 0, or change the chartData or axes on reload, doesnt happen.
+         This if statement prevents clipPath from running under these circumstances and everything is fine
+      */
+      if(this.chartData.length > 0 && this.completeSeriesConfig[this.seriesId]["x"].length > 0) {
+        this.canvasContext.beginPath();
+
+        var w = Math.max(this.width - this.margin.left - this.margin.right,0),
+            h = Math.max(this.height - this.margin.top - this.margin.bottom,0);
+
+        this.canvasContext.rect(0, 0, w, h);
+        this.canvasContext.clip();
+      }
+    },
+
+    /**
+     * Renders one batch of scatter data (can be one batch during progressive rendering
+     * or all data during render at once)
+     */
+    _renderOneBatch : function(data) {
+
+      //save and restore context for safety
+      this.canvasContext.save();
+
+      if(this.clipPath) {
+        this.drawClipPath();
+      }
+
+      //get serie specific values. stroke and fill opacities
+      //are handled in the options.drawingFunction
+      this.canvasContext.scale(this.markerScale, this.markerScale);
+      this.canvasContext.fillStyle = this.completeSeriesConfig[this.seriesId]['color'];
+      this.canvasContext.strokeStyle = this.completeSeriesConfig[this.seriesId]['color'];
+      this.canvasContext.globalAlpha = this._currentDrawingOptions.fillOpacity;
+      var previousTranslate = [0,0];
+
+      for(var i = 0; i < data.length; i++) {
+
+        // var xValue = data[i][this.completeSeriesConfig[this.seriesId]['x']],
+        //     yValue = data[i][this.completeSeriesConfig[this.seriesId]['y']];
+        // if(xValue > this._currentDrawingOptions.xDomain[0] &&
+        //    xValue < this._currentDrawingOptions.xDomain[1] &&
+        //    yValue > this._currentDrawingOptions.yDomain[0] &&
+        //    yValue < this._currentDrawingOptions.yDomain[1]) {
+
+        //get the position of the symbol
+        var translate = this._getTransform(data[i]);
+
+        //move canvas to new pos
+        this.canvasContext.translate(translate[0] - previousTranslate[0], translate[1] - previousTranslate[1]);
+
+        //draw
+        this.canvasContext.beginPath();
+        this._currentDrawingOptions.symbol();
+        this.canvasContext.closePath();
+        this._currentDrawingOptions.drawingFunction();
+
+        //remember pos so that we can move to the next point in 1 translate
+        //instead of restoring the translate here
+        previousTranslate = translate;
+          //  }
+      }
+
+      //restore canvas pos
+      this.canvasContext.translate(-previousTranslate[0], -previousTranslate[1]);
+
+      this.canvasContext.restore();
+    },
+
+    _getTransform: function(d) {
+/*
+  FIXME
+  1) Unify the isValidData and lines(d) checks.
+  2) Figure out better default instead of 0,0 for transform
+  3) Think about using cx & cy instead of transform.
+*/
+      if(!this._isValidData(d[this.completeSeriesConfig[this.seriesId]['y']]) ||
+         !this._isValidData(d[this.completeSeriesConfig[this.seriesId]['x']])) {
+        return [0,0];
+      }
+
+      if(this.radial) {
+        var line = this.line([d]);
+        if (line) {
+          var coors = line.slice(1).slice(0, -1);
+          if (coors !== 'NaN,NaN') {
+            return [coors.slice(coors.indexOf(0,',')), coors];
+          }
+        }
+        return [0,0];
+      } else {
+
+        var xTrans = this.x(d[this.completeSeriesConfig[this.seriesId]['x']]),
+            yTrans = this.y(d[this.completeSeriesConfig[this.seriesId]['y']]);
+
+        //make sure we have a value
+        xTrans = xTrans ? xTrans : 0;
+        yTrans = yTrans ? yTrans : 0;
+
+        return [xTrans, yTrans];
+      }
+    },
+
+    _isSerieMuted: function(d) {
+      if(this.multiPath) {
+        return this.mutedSeries[d[this.seriesId]] ? true : false;
+      } else {
+        return this.mutedSeries[this.seriesId] ? true : false;
+      }
+    },
+    /**
+     * Checks mutedSeries to see if this ID is in there
+     * Called from an observer watching mutedSeries
+     *
+     * @method mutedChanged
+     */
+    mutedChanged: function() {
+      this.set('_canvasRedraw', !this._canvasRedraw);
+    },
+
+    /**
+     * Redraw this serie on top if needed
+     */
+    _drawOnTop: function(serieToRedraw) {
+      if(serieToRedraw === this.seriesId) {
+        this.drawCanvas(false);
+      }
+    }
+  });
+</script>

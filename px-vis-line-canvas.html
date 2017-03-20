@@ -152,7 +152,7 @@ Element which draws lines series onto the chart
         type: Array
       },
       /**
-       * Holder for our data for clipPath
+       * Whether to use the clippath to avoid drawing outside of axes
        *
        */
       clipPath: {
@@ -173,15 +173,6 @@ Element which draws lines series onto the chart
       'mutedChanged(mutedSeries.*, completeSeriesConfig)',
       '_drawOnTop(serieToRedrawOnTop)'
     ],
-
-    detached: function() {
-      if(this.canvasContext) {
-        //clear the canvas on detach
-        this.canvasContext.restore();
-
-        this.canvasContext.clearRect(-this.canvasContext._translation[0], -this.canvasContext._translation[1] , this.canvasContext.canvas.width, this.canvasContext.canvas.height);
-      }
-    },
 
     _redraw: function() {
       if(!this.preventInitialDrawing) {
@@ -256,8 +247,9 @@ Element which draws lines series onto the chart
           if(this.noCanvasProgressiveRendering || data.length < 5) {
             this._renderAtOnce(data);
           } else {
-            //render 1000 points at a time or 5 frames min
-            var frames = Math.max(data.length/1000, 5);
+            //get number of frames
+            var numberOfSeries = Object.keys(this.completeSeriesConfig).length;
+            var frames = Math.ceil(Math.max(((this.chartData.length*numberOfSeries)/this.progressiveRenderingPointsPerFrame), this.progressiveRenderingMinimumFrames));
             this._renderProgressively(data, frames);
           }
 
@@ -409,7 +401,7 @@ Element which draws lines series onto the chart
             currentIndex = 0,
             j = 0,
             _this = this,
-            size = Math.floor(data.length/numberOfFrames),
+            size = Math.ceil(data.length/numberOfFrames),
             timer = window.requestAnimationFrame
               || window.webkitRequestAnimationFrame
               || window.mozRequestAnimationFrame
@@ -436,9 +428,8 @@ Element which draws lines series onto the chart
       //between each other, hence prepending the last point of the previous
       //batch to each batch > 0
       if(this.parallelCoordinates || this.radialLine) {
-        for(j=0; j<= numberOfFrames; j++) {
-          //find end of this batch
-          var end = j === numberOfFrames ? data.length : (j+1)*size;
+        for(j=0; j< numberOfFrames; j++) {
+
           if(j > 0) {
             //add previous last point so that the batches are connected
             batches.push([data[j*size - 1]]);
@@ -446,22 +437,21 @@ Element which draws lines series onto the chart
             batches.push([]);
           }
           //add data for this batch
-          batches[j] = batches[j].concat(data.slice(j*size, end));
+          batches[j] = batches[j].concat(data.slice(j*size, (j+1)*size));
         }
 
       } else {
-
-        for(j=0; j<= numberOfFrames; j++) {
+        for(j=0; j< numberOfFrames; j++) {
           //find end of this batch
-          var end = j === numberOfFrames ? data.length : (j+1)*size;
           if(j > 0) {
             //add previous last point so that the batches are connected
             batches.push([[data[j*size - 1]]]);
+
           } else {
             batches.push([[]]);
           }
           //add data for this batch
-          batches[j][0] = batches[j][0].concat(data.slice(j*size, end));
+          batches[j][0] = batches[j][0].concat(data.slice(j*size, (j+1)*size));
         }
       }
 
