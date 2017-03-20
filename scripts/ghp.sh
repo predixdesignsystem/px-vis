@@ -79,7 +79,7 @@ echo ${meta_temp/'COMPONENT_NAME'/$REPO_NAME} > index.html
 npm install bower -g
 bower cache clean
 # Install the repo and the dark-theme.
-bower install ${REPO_NAME} px-dark-theme
+bower install ${REPO_NAME} px-dark-theme px-dark-demo-theme
 
 #copy the bower file into our root
 yes | cp ${REPO_NAME}/bower.json bower.json
@@ -92,13 +92,7 @@ bower install
 # ------------------------------------------------------------------------------
 
 # Go into the component folder we've just installed from bower
-cd ${REPO_NAME}
-
-# @DARK_THEME: Copy `index.html` to new file, where we will add dark theme
-yes | cp index.html index-dark.html
-
-# @DARK_THEME: Import dark-theme on the `index-dark.html` page
-sed 's/px-theme\/px-theme-styles.html/px-dark-theme\/px-dark-theme-styles.html/g;' index-dark.html
+# cd ${REPO_NAME}
 
 # ------------------------------------------------------------------------------
 # SW-PRECACHE
@@ -112,7 +106,7 @@ sed 's/px-theme\/px-theme-styles.html/px-dark-theme\/px-dark-theme-styles.html/g
 # ------------------------------------------------------------------------------
 
 # Remember to exit out of the component before we do any git stuff
-cd ../
+# cd ../
 
 # Do the git stuff
 

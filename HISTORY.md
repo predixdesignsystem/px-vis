@@ -9,6 +9,7 @@ v1.1.0
 * Added disableClick for register
 * fixed bug where deleted axis still draws
 * Added isAttached behavior to track if we are attached to detached from dom
+* Updates to demo dark theme
 
 v1.0.1
 ==================
