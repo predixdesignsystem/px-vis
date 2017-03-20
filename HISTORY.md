@@ -10,6 +10,14 @@ v1.1.0
 * fixed bug where deleted axis still draws
 * Added isAttached behavior to track if we are attached to detached from dom
 * Updates to demo dark theme
+* added px-vis-scatter-canvas for supporting scatter on canvas rather than svg. dramatically faster on IE (always), faster on other browsers for big dataset, similar for other browsers for small datasets (<5k points)
+* px-vis-chart-navigator now supports canvas rendering
+* progressive rendering now can be customized through progressiveRenderingPointsPerFrame (16000 by default for lines, 2000 byy default for scatter) and progressiveRenderingMinimumFrames. Increase progressiveRenderingPointsPerFrame for better performance and decrease for smoother drawing. When at the right value no performance cost incurs and drawing is smooth but if value is too small can incur a performance cost (i.e the drawing will take longer, but will always start at the same time, also the UI won't be frozen)
+* fix issue where progressive rendering could miss 1 point per frame, potentially a lot for big dataset
+* added cleanOnDetached to ensure a chart is cleaned after detached so that it can be properly reused with other data and config
+* ensure canvas and svg clean themselves up on detached (they will redraw on attached if needed)
+* ensure gridlines will redraw when moving/removing a chart in/from the dom
+* added px-vis-line-svg-rendering-ended and px-vis-scatter-rendering-ended events
 
 v1.0.1
 ==================

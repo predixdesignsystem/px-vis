@@ -465,6 +465,22 @@ PxVisBehavior.progressiveRendering = {
     noCanvasProgressiveRendering: {
       type: Boolean,
       value: false
+    },
+    /**
+     * Number of points to be drawn per progressive rendering frame.
+     * The higher the value the fastest the processing but the more
+     * likely the UI will stutter/freeze.
+     */
+    progressiveRenderingPointsPerFrame: {
+      type: Number,
+      value: 16000
+    },
+    /**
+     * Minimum number of frames to be used if using progressive rendering
+     */
+    progressiveRenderingMinimumFrames: {
+      type: Number,
+      value: 1
     }
   }
 };
@@ -1783,10 +1799,12 @@ PxVisBehavior.uniqueIds = {
      },
   },
   detached: function () {
-    for(var i=0; i<this._uniqueIdsUsed.length; i++) {
-      Px.uniqueIds.splice(Px.uniqueIds.indexOf(this._uniqueIdsUsed[i]), 1);
+    if(this._uniqueIdsUsed) {
+      for(var i=0; i<this._uniqueIdsUsed.length; i++) {
+        Px.uniqueIds.splice(Px.uniqueIds.indexOf(this._uniqueIdsUsed[i]), 1);
+      }
+      this._uniqueIdsUsed = null;
     }
-    this._uniqueIdsUsed = null;
   },
   /**
    * Generates a random id string.
@@ -1870,6 +1888,7 @@ PxVisBehavior.selectionType = {
 
 /*
     Name:
+<<<<<<< HEAD
     PxVisBehavior.measureText
 
     Description:
@@ -1931,6 +1950,26 @@ PxVisBehavior.isAttached = {
 
   attached: function() {
     this.set('_isAttached', true);
+  }
+};
+
+/*
+    PxVisBehavior.cleanOnDetached
+
+    Description:
+    Behavior providing the cleanOnDetached property
+    @polymerBehavior PxVisBehavior.cleanOnDetached
+*/
+PxVisBehavior.cleanOnDetached = {
+  properties: {
+    /**
+     * Whether the chart/element should clean itself on detached to
+     * be ready for reuse
+     */
+    cleanOnDetached: {
+      type: Boolean,
+      notify: false
+    }
   }
 };
 

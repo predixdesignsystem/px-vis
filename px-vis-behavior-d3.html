@@ -262,17 +262,17 @@ PxVisBehaviorD3.svgLower = [{
 
 /*
     Name:
-    PxVisBehaviorD3.canvas
+    PxVisBehaviorD3.canvasContext
 
     Description:
-    Polymer behavior that provides the canvas property and core methods for d3 components.
+    Polymer behavior that provides the canvasContext property.
 
     Dependencies:
     - D3.js
 
-    @polymerBehavior PxVisBehaviorD3.canvas
+    @polymerBehavior PxVisBehaviorD3.canvasContext
 */
-PxVisBehaviorD3.canvas = {
+PxVisBehaviorD3.canvasContext = {
   properties: {
     /**
      * canvasContext is a holder for the instantiated canvas context to draw to.
@@ -282,12 +282,53 @@ PxVisBehaviorD3.canvas = {
     canvasContext: {
       type: Object,
       notify:true
-    },
+    }
+  }
+};
+
+/*
+    Name:
+    PxVisBehaviorD3.canvas
+
+    Description:
+    Polymer behavior that provides the canvasContext and renderToSvg properties
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorD3.canvas
+*/
+PxVisBehaviorD3.canvas = [{
+  properties: {
     /**
     * Boolean to specify if drawings should render to svg instead of canvas
     *
     */
     renderToSvg: {
+      type: Boolean,
+      value: false
+    }
+  }
+}, PxVisBehaviorD3.canvasContext]
+
+/*
+    Name:
+    PxVisBehaviorD3.renderToCanvas
+
+    Description:
+    Polymer behavior that provides the renderToCanvas property
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorD3.renderToCanvas
+*/
+PxVisBehaviorD3.renderToCanvas = {
+  properties: {
+    /**
+    * Boolean to specify if drawings should render to canvas instead of svg
+    */
+    renderToCanvas: {
       type: Boolean,
       value: false
     }
