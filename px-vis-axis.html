@@ -90,7 +90,8 @@ Custom property | Description | Default
           PxVisBehavior.truncating,
           PxVisBehaviorD3.domainUpdate,
           PxColorsBehavior.baseColors,
-          PxVisBehavior.preventInitialDrawing
+          PxVisBehavior.preventInitialDrawing,
+          PxVisBehavior.isAttached
         ],
 
         /**
@@ -255,7 +256,7 @@ Custom property | Description | Default
         },
 
         observers: [
-          'drawElement(domainChanged, svg, axis, margin, width, height, disableTicks, _animationFrameDone, preventInitialDrawing)',
+          'drawElement(domainChanged, svg, axis, margin, width, height, disableTicks, _animationFrameDone, preventInitialDrawing, _isAttached)',
           '_calcDrawnTicks(domainChanged)',
           'drawSeriesBars(completeSeriesConfig.*, titleDrawn)',
           '_muteSeriesBars(mutedSeries.*)',
@@ -415,6 +416,7 @@ Custom property | Description | Default
         },
 
         removeAxis: function() {
+          debugger
           this._removingAxis = true;
           // remove the axis
           if(this._axisGroup) {
@@ -442,7 +444,8 @@ Custom property | Description | Default
           if(typeof this.preventInitialDrawing !== undefined && this.preventInitialDrawing === false) {
            this.debounce('drawaxis', function() {
 
-            if(this._animationFrameDone && this._doesD3HaveValues(this.svg) && this.domainChanged !== null && this.orientation && this.axis) {
+            // Should be inside debounce to ensure that nothing changed after the debounce timer started
+            if(this._isAttached && this._animationFrameDone && this._doesD3HaveValues(this.svg) && this.domainChanged !== null && this.orientation && this.axis) {
 
               if(this.rebuildOnDraw) {
                 this.removeAxis();
