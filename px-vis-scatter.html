@@ -78,6 +78,12 @@ Element which draws a scatter series onto the chart
     ],
 
     /**
+     * px-vis-scatter-rendering-ended, fired when an svg scatter series has finished
+     * drawing its scatter points
+     * @event px-vis-scatter-rendering-ended
+     */
+
+    /**
      * Properties block, expose attribute values to the DOM via 'reflect'
      *
      * @property properties
@@ -225,7 +231,10 @@ Element which draws a scatter series onto the chart
       this._watchConfigProperty('mutedOpacity', 0.3);
     },
     detached: function() {
-     this.scatterGroup.remove();
+      if(this._doesD3HaveValues(this.scatterGroup)) {
+        this.scatterGroup.remove();
+      }
+      this.scatterGroup = null;
     },
      /**
      * Draws or updates the scatter element.
@@ -254,7 +263,7 @@ Element which draws a scatter series onto the chart
      */
     _drawElementDebounced: function() {
       if(this.y && typeof this.domainChanged !== 'undefined' && this.domainChanged !== null) {
-       
+
         var data = this.chartData;
 
         // checks to see if the group already exists. If not, create; if so, update
@@ -302,7 +311,8 @@ Element which draws a scatter series onto the chart
         this._colorScatter();
 
         this._addClipPath();
-        this.fire('linefinished');
+
+        this.fire('px-vis-scatter-rendering-ended');
       }
     },
 

@@ -28,7 +28,7 @@ Element which creates an Canvas element and context
 
     <template>
       <style include="px-vis-styles"></style>
-      
+
       <canvas
         id="chartCanvas"
         width="[[width]]"
@@ -92,8 +92,24 @@ Element which creates an Canvas element and context
           if(this._doesObjHaveValues(this.canvasContext)){
             this.fire('px-vis-canvas-context-updated',{ 'data': this.canvasContext, 'dataVar': 'canvasContext', 'method': 'set' });
           }
-        },
 
+          if(this._isDirty && this.canvasContext) {
+            this.canvasContext.save()
+            this.canvasContext.setTransform(1, 0, 0, 1, 0, 0);
+            this.canvasContext.clearRect(0,0, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+            this.canvasContext.restore();
+            this._isDirty = false;
+          }
+        },
+        detached: function() {
+          this._isDirty = true;
+          if(this.canvasContext) {
+            this.canvasContext.save()
+            this.canvasContext.setTransform(1, 0, 0, 1, 0, 0);
+            this.canvasContext.clearRect(0,0, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+            this.canvasContext.restore();
+          }
+        },
         /**
          * Configures the canvas and context
          *
@@ -115,7 +131,11 @@ Element which creates an Canvas element and context
             context._pxLinesSeries = {};
             context._pxLinesTotal = 0;
             context._pxLinesRedraw = 0;
+            context._pxScatterSeries = {};
+            context._pxScatterTotal = 0;
+            context._pxScatterRedraw = 0;
             context._translation = [this.margin.left + this.offset[0], this.margin.top + this.offset[1]];
+
 
             this.set('canvasContext',context);
             this.fire('px-vis-canvas-context-updated',{ 'data': context, 'dataVar': 'canvasContext', 'method': 'set' });

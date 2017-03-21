@@ -74,7 +74,7 @@ gulp.task('serve', function() {
   });
 
   gulp.watch(['css/*-styles.html', 'css/*-demo.css', '*.html', '*.js']).on('change', browserSync.reload);
-  gulp.watch(['sass/*.scss', '!sass/*-demo.scss'], ['sass']);
+  gulp.watch(['sass/*.scss'], ['sass']);
 });
 
 gulp.task('bump:patch', function(){
