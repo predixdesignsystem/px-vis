@@ -4,6 +4,9 @@
 <link rel="import" href="../px-vis-svg.html">
 <link rel="import" href="../px-vis-threshold.html">
 
+<link rel="import" href="../px-vis-behavior-common.html">
+<link rel="import" href="../bower_components/px-colors-design/colors.html" />
+
 <dom-module id="px-vis-threshold-demo-component">
   <template>
       <div class="outline">
@@ -18,7 +21,7 @@
       <px-vis-scale
         x-axis-type="time"
         y-axis-type="linear"
-        complete-series-config="[[seriesConfig]]"
+        complete-series-config="[[completeSeriesConfig]]"
         data-extents="[[dataExtents]]"
         width="[[width]]"
         height="[[height]]"
@@ -31,20 +34,27 @@
       </px-vis-scale>
       <px-vis-threshold
         svg="[[svg]]"
-        complete-series-config="[[seriesConfig]]"
+        complete-series-config="[[completeSeriesConfig]]"
         threshold-data="[[thresholdData]]"
         y="[[y]]"
         domain-changed="[[domainChanged]]"
         threshold-config="[[thresholdConfig]]"
         width="[[width]]"
-        margin="[[margin]]"> 
+        margin="[[margin]]">
       </px-vis-threshold>
       </div>
   </template>
   <script>
     Polymer({
       is: "px-vis-threshold-demo-component",
-      behaviors: [ PxVisBehaviorChart.thresholdConfig],
+
+      behaviors: [
+        PxVisBehaviorChart.thresholdConfig,
+        PxColorsBehavior.dataVisColors,
+        PxColorsBehavior.dataVisColorTheming,
+        PxVisBehavior.getSeriesColors
+      ],
+
       properties:{
         //basics
         width: {
@@ -104,17 +114,8 @@
               'y': 0.32
           }]
         },
-        seriesConfig:{
-          type : Object,
-          value: {
-            'mySeries': {
-              "name":"My-Series",
-              "type": "line",
-              "x": 'x',
-              "y": 'y',
-              'color': "rgb(93,165,218)"
-            }
-          }
+        completeSeriesConfig:{
+          type : Object
         },
         thresholdData:{
           type : Array,
@@ -131,6 +132,22 @@
             "y": [0,-Infinity]
           }
         }
+      },
+
+      listeners: {
+        "px-data-vis-colors-applied" : '_returnCompleteSeriesConfig'
+      },
+
+      _returnCompleteSeriesConfig: function() {
+        this.set('completeSeriesConfig', {
+          'mySeries': {
+            "name":"My-Series",
+            "type": "area",
+            "x": 'x',
+            "y": 'y',
+            'color': this._getColor(0)
+          }
+        });
       }
     });
   </script>

@@ -1973,4 +1973,26 @@ PxVisBehavior.cleanOnDetached = {
   }
 };
 
+/*
+    PxVisBehavior.waitForAnimationFrame
+
+    Description:
+    Behavior providing the _animationFrameDone property and sets to true
+    @polymerBehavior PxVisBehavior.waitForAnimationFrame
+*/
+PxVisBehavior.waitForAnimationFrame = {
+  properties: {
+    _animationFrameDone: {
+      type: Boolean,
+      value: false
+    }
+  },
+
+  ready: function() {
+    window.requestAnimationFrame(function() {
+      this._animationFrameDone = true;
+    }.bind(this));
+  }
+};
+
 </script>

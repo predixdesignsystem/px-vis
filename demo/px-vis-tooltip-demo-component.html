@@ -7,6 +7,9 @@
 <link rel="import" href="../px-vis-line-svg.html">
 <link rel="import" href="../px-vis-behavior-chart.html" />
 
+<link rel="import" href="../px-vis-behavior-common.html">
+<link rel="import" href="../bower_components/px-colors-design/colors.html" />
+
 <dom-module id="px-vis-tooltip-demo-component">
   <template>
       <div class="outline" on-mousemove="_calcMousePos">
@@ -19,7 +22,7 @@
           margin="[[margin]]"
           chart-data="[[chartData]]"
           tooltip-data="[[tooltipData]]"
-          complete-series-config="[[seriesConfig]]"
+          complete-series-config="[[completeSeriesConfig]]"
           x-axis-type="time"
           tooltip-style="light">
         </px-vis-tooltip>
@@ -32,7 +35,7 @@
         <px-vis-scale
           x-axis-type="time"
           y-axis-type="linear"
-          complete-series-config="[[seriesConfig]]"
+          complete-series-config="[[completeSeriesConfig]]"
           data-extents="[[dataExtents]]"
           width="[[width]]"
           height="[[height]]"
@@ -49,7 +52,7 @@
           width="[[width]]"
           height="[[height]]"
           margin="[[margin]]"
-          complete-series-config="[[seriesConfig]]"
+          complete-series-config="[[completeSeriesConfig]]"
           chart-data="[[chartData]]"
           tooltip-data="{{tooltipData}}"
           extents-data="{{extentsData}}"
@@ -61,7 +64,7 @@
         <px-vis-line-svg
           svg="[[layer.0]]"
           series-id="mySeries"
-          complete-series-config="[[seriesConfig]]"
+          complete-series-config="[[completeSeriesConfig]]"
           chart-data="[[chartData]]"
           x="[[x]]"
           y="[[y]]"
@@ -72,6 +75,14 @@
   <script>
     Polymer({
       is: "px-vis-tooltip-demo-component",
+
+      behaviors: [
+        PxVisBehaviorChart.layers,
+        PxColorsBehavior.dataVisColors,
+        PxColorsBehavior.dataVisColorTheming,
+        PxVisBehavior.getSeriesColors
+      ],
+
       properties:{
         //basics
         width: {
@@ -135,17 +146,8 @@
               'y': 0.32
           }]
         },
-        seriesConfig:{
-          type : Object,
-          value: {
-            'mySeries': {
-              "name":"My-Series",
-              "type": "line",
-              "x": 'x',
-              "y": 'y',
-              'color': "rgb(93,165,218)"
-            }
-          }
+        completeSeriesConfig:{
+          type : Object
         },
         //dataExtents
         dataExtents:{
@@ -159,12 +161,29 @@
           type: Array
         }
       },
-      behaviors: [PxVisBehaviorChart.layers],
+
+      listeners: {
+        "px-data-vis-colors-applied" : '_returnCompleteSeriesConfig'
+      },
+
       ready: function() {
         this.set('numberOfLayers',2);
       },
+
       _calcMousePos: function(evt) {
         this.set('mousePosition',[evt.pageX,evt.pageY]);
+      },
+
+      _returnCompleteSeriesConfig: function() {
+        this.set('completeSeriesConfig', {
+          'mySeries': {
+            "name":"My-Series",
+            "type": "area",
+            "x": 'x',
+            "y": 'y',
+            'color': this._getColor(0)
+          }
+        });
       }
     });
   </script>

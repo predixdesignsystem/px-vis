@@ -3,6 +3,8 @@
 <link rel="import" href="../px-vis-svg.html">
 <link rel="import" href="../px-vis-scale.html">
 
+<link rel="import" href="../px-vis-behavior-common.html">
+<link rel="import" href="../bower_components/px-colors-design/colors.html" />
 
 <dom-module id="px-vis-brush-demo-component">
   <template>
@@ -25,7 +27,7 @@
     <px-vis-scale
       x-axis-type="time"
       y-axis-type="linear"
-      complete-series-config="[[seriesConfig]]"
+      complete-series-config="[[completeSeriesConfig]]"
       data-extents="[[dataExtents]]"
       width="[[width]]"
       height="[[height]]"
@@ -41,6 +43,13 @@
 <script>
 Polymer({
   is: 'px-vis-brush-demo-component',
+
+  behaviors: [
+    PxColorsBehavior.dataVisColors,
+    PxColorsBehavior.dataVisColorTheming,
+    PxVisBehavior.getSeriesColors
+  ],
+
   properties: {
     description: {
       type: String,
@@ -64,7 +73,7 @@ Polymer({
       }
     },
     dataExtents: {
-      
+
     },
     chartData:{
       type : Array,
@@ -106,17 +115,8 @@ Polymer({
           'y': 0.32
       }]
     },
-    seriesConfig:{
-      type : Object,
-      value: {
-        'mySeries': {
-          "name":"My-Series",
-          "type": "line",
-          "x": 'x',
-          "y": 'y',
-          'color': "rgb(93,165,218)"
-        }
-      }
+    completeSeriesConfig:{
+      type : Object
     },
 
     dataExtents:{
@@ -126,6 +126,22 @@ Polymer({
         "y": [0,-Infinity]
       }
     }
+  },
+
+  listeners: {
+    "px-data-vis-colors-applied" : '_returnCompleteSeriesConfig'
+  },
+
+  _returnCompleteSeriesConfig: function() {
+    this.set('completeSeriesConfig', {
+      'mySeries': {
+        "name":"My-Series",
+        "type": "area",
+        "x": 'x',
+        "y": 'y',
+        'color': this._getColor(0)
+      }
+    });
   }
 });
 </script>

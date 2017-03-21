@@ -18,6 +18,7 @@ v1.1.0
 * ensure canvas and svg clean themselves up on detached (they will redraw on attached if needed)
 * ensure gridlines will redraw when moving/removing a chart in/from the dom
 * added px-vis-line-svg-rendering-ended and px-vis-scatter-rendering-ended events
+* Fixed demos to support dark theme
 
 v1.0.1
 ==================

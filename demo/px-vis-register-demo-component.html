@@ -6,18 +6,21 @@
 <link rel="import" href="../px-vis-interaction-space.html">
 <link rel="import" href="../px-vis-line-svg.html">
 
+<link rel="import" href="../px-vis-behavior-common.html">
+<link rel="import" href="../bower_components/px-colors-design/colors.html" />
+
 <dom-module id="px-vis-register-demo-component">
   <template>
        <div class="outline flex flex--col">
 
         <!-- need for register-dynamic -->
-        
+
             <px-vis-register
             width="[[width]]"
             height="75"
             margin="[[margin]]"
             type="[[type]]"
-            complete-series-config="[[seriesConfig]]"
+            complete-series-config="[[completeSeriesConfig]]"
             tooltip-data=[[tooltipData]]
             muted-series="{{mutedSeries}}"
             x-axis-type="time"
@@ -33,7 +36,7 @@
           <px-vis-scale
             x-axis-type="time"
             y-axis-type="linear"
-            complete-series-config="[[seriesConfig]]"
+            complete-series-config="[[completeSeriesConfig]]"
             data-extents="[[dataExtents]]"
             width="[[width]]"
             height="[[height]]"
@@ -51,7 +54,7 @@
             width="[[width]]"
             height="[[height]]"
             margin="[[margin]]"
-            complete-series-config="[[seriesConfig]]"
+            complete-series-config="[[completeSeriesConfig]]"
             chart-data="[[chartData]]"
             tooltip-data="{{tooltipData}}"
             extents-data="{{extentsData}}"
@@ -62,7 +65,7 @@
           <px-vis-line-svg
             svg="[[svg]]"
             series-id="mySeries"
-            complete-series-config="[[seriesConfig]]"
+            complete-series-config="[[completeSeriesConfig]]"
             chart-data="[[chartData]]"
             x="[[x]]"
             y="[[y]]"
@@ -72,19 +75,26 @@
           <px-vis-line-svg
             svg="[[svg]]"
             series-id="mySeries2"
-            complete-series-config="[[seriesConfig]]"
+            complete-series-config="[[completeSeriesConfig]]"
             chart-data="[[chartData]]"
             x="[[x]]"
             y="[[y]]"
             muted-series="[[mutedSeries]]"
             domain-changed="[[domainChanged]]">
           </px-vis-line-svg>
-        
+
       </div>
   </template>
   <script>
     Polymer({
       is: "px-vis-register-demo-component",
+
+      behaviors: [
+        PxColorsBehavior.dataVisColors,
+        PxColorsBehavior.dataVisColorTheming,
+        PxVisBehavior.getSeriesColors
+      ],
+
       properties:{
         type: {
           type: String,
@@ -125,67 +135,51 @@
             },{
               'x': 1397139660000,
               'y': 0.4,
-              'y1': 0.56
+              'y1': 0.50
             },{
               'x': 1397177400000,
               'y': 0.43,
-              'y1': 0.56
+              'y1': 0.46
             },{
               'x': 1397228040000,
               'y': 0.33,
-              'y1': 0.56
+              'y1': 0.40
             },{
               'x': 1397248260000,
               'y': 0.47,
-              'y1': 0.56
+              'y1': 0.36
             },{
               'x': 1397291280000,
               'y': 0.41,
-              'y1': 0.56
+              'y1': 0.3
             },{
               'x': 1397318100000,
               'y': 0.26,
-              'y1': 0.56
+              'y1': 0.26
             },{
               'x': 1397342100000,
               'y': 0.42,
-              'y1': 0.56
+              'y1': 0.0
             },{
               'x': 1397390820000,
               'y': 0.27,
-              'y1': 0.56
+              'y1': 0.16
             },{
               'x': 1397408100000,
               'y': 0.38,
-              'y1': 0.56
+              'y1': 0.1
             },{
               'x': 1397458800000,
               'y': 0.36,
-              'y1': 0.56
+              'y1': 0.06
             },{
               'x': 1397522940000,
               'y': 0.32,
-              'y1': 0.56
+              'y1': 0
           }]
         },
-        seriesConfig:{
-          type : Object,
-          value: {
-            'mySeries': {
-              "name":"My-Series",
-              "type": "line",
-              "x": 'x',
-              "y": 'y',
-              'color': "rgb(93,165,218)"
-            },
-            'mySeries2': {
-              "name":"My-Series 2",
-              "type": "line",
-              "x": 'x',
-              "y": 'y1',
-              'color': "rgb(223,92,46)"
-            }
-          }
+        completeSeriesConfig:{
+          type : Object
         },
         //dataExtents
         dataExtents:{
@@ -208,6 +202,29 @@
             'yArr': null
           }
         }
+      },
+
+      listeners: {
+        "px-data-vis-colors-applied" : '_returnCompleteSeriesConfig'
+      },
+
+      _returnCompleteSeriesConfig: function() {
+        this.set('completeSeriesConfig', {
+          'mySeries': {
+            "name":"My-Series",
+            "type": "line",
+            "x": 'x',
+            "y": 'y',
+            'color': this._getColor(0)
+          },
+          'mySeries2': {
+            "name":"My-Series 2",
+            "type": "line",
+            "x": 'x',
+            "y": 'y1',
+            'color': this._getColor(1)
+          }
+        });
       }
     });
 
