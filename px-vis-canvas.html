@@ -102,13 +102,13 @@ Element which creates an Canvas element and context
           }
         },
         detached: function() {
-          this._isDirty = true;
-          if(this.canvasContext) {
+          if(this._isDirty && this.canvasContext) {
             this.canvasContext.save()
             this.canvasContext.setTransform(1, 0, 0, 1, 0, 0);
             this.canvasContext.clearRect(0,0, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
             this.canvasContext.restore();
           }
+          this._isDirty = true;
         },
         /**
          * Configures the canvas and context
@@ -136,6 +136,12 @@ Element which creates an Canvas element and context
             context._pxScatterRedraw = 0;
             context._translation = [this.margin.left + this.offset[0], this.margin.top + this.offset[1]];
 
+            context.clearCanvas = function() {
+              this.save()
+              this.setTransform(1, 0, 0, 1, 0, 0);
+              this.clearRect(0,0, this.canvas.width, this.canvas.height);
+              this.restore();
+            }.bind(context);
 
             this.set('canvasContext',context);
             this.fire('px-vis-canvas-context-updated',{ 'data': context, 'dataVar': 'canvasContext', 'method': 'set' });

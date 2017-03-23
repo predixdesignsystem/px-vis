@@ -72,7 +72,9 @@ Element which draws lines series onto the chart
       PxVisBehavior.serieToRedrawOnTop,
       PxVisBehaviorD3.domainUpdate,
       PxColorsBehavior.baseColors,
-      PxVisBehavior.preventInitialDrawing
+      PxVisBehavior.preventInitialDrawing,
+      PxVisBehavior.cleanOnDetached,
+      PxVisBehavior.isAttached
     ],
 
     /**
@@ -174,6 +176,18 @@ Element which draws lines series onto the chart
       '_drawOnTop(serieToRedrawOnTop)'
     ],
 
+    attached: function() {
+      //if we haven't clean on detached assume we just move the element and
+      //all config is still ok, redraw
+      if(!this.cleanOnDetached && this._isDirty) {
+        this._redraw();
+      }
+    },
+    detached: function() {
+
+      this._isDirty = true;
+    },
+
     _redraw: function() {
       if(!this.preventInitialDrawing) {
         this.drawCanvas(true);
@@ -198,8 +212,8 @@ Element which draws lines series onto the chart
     _drawCanvasDebounced: function(allowCanvasClearing) {
       if(this.domainChanged !== null &&
             this.chartData.length > 0 &&
-            this._doesObjHaveValues(this.completeSeriesConfig)
-          ) {
+            this._doesObjHaveValues(this.completeSeriesConfig) &&
+            this._isAttached) {
           var data;
           // we need to wrap the data differently depending on if we are drawing many lines or just one line
           if(this.parallelCoordinates) {
@@ -248,7 +262,7 @@ Element which draws lines series onto the chart
             this._renderAtOnce(data);
           } else {
             //get number of frames
-            var numberOfSeries = Object.keys(this.completeSeriesConfig).length;
+            var numberOfSeries = this.multiPath ? this.completeSeriesConfig[this.seriesId]['x'].length : Object.keys(this.completeSeriesConfig).length;
             var frames = Math.ceil(Math.max(((this.chartData.length*numberOfSeries)/this.progressiveRenderingPointsPerFrame), this.progressiveRenderingMinimumFrames));
             this._renderProgressively(data, frames);
           }

@@ -468,8 +468,11 @@ PxVisBehavior.progressiveRendering = {
     },
     /**
      * Number of points to be drawn per progressive rendering frame.
-     * The higher the value the fastest the processing but the more
-     * likely the UI will stutter/freeze.
+     * Increase progressiveRenderingPointsPerFrame for better performance and
+     * decrease for smoother drawing. When at the right value no performance cost
+     * incurs and drawing is smooth but if value is too small can incur a
+     * performance cost (i.e the drawing will take longer but will still start at
+     * the same time, also the UI won't be frozen)
      */
     progressiveRenderingPointsPerFrame: {
       type: Number,
@@ -1963,8 +1966,20 @@ PxVisBehavior.isAttached = {
 PxVisBehavior.cleanOnDetached = {
   properties: {
     /**
-     * Whether the chart/element should clean itself on detached to
-     * be ready for reuse
+     * Whether the chart/element should clean itself on detached to be
+     * ready for reuse. This is aimed at applications creating charts dynamically
+     * so that they can keep a pool of charts (simple array of charts) when removing
+     * them from the dom and reusing them later on with new data and config,
+     * improving performance . Turning cleanOnDetached on will make sure the chart
+     * will clear everything needed so that it draws properly with any new config.
+     * If using this strategy one thing to keep in mind is making sure the chart is
+     * re-appended in the dom *before* changing its properties to their new values.
+     * In most cases it would work even if appending it after, but some edge cases
+     * scenarios might fail to clean some visual artifact (for example switching
+     * from canvas to svg while deleting a few series at the same time). When moving
+     * the chart around the dom do not turn it on for performance boost and making
+     * sure you don't needthe chart to force redrawing. This can bechanged
+     * dynamically
      */
     cleanOnDetached: {
       type: Boolean,
