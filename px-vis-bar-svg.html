@@ -3,9 +3,9 @@
 <link rel="import" href="px-vis-behavior-common.html" />
 
 <!--
-Element which draws area series onto the chart
+Element which draws bar series onto the chart
 
-Unlike most other drawing elements which can use chartData directly, area requires that data first be passed through d3.stack: https://github.com/d3/d3-shape/blob/master/README.md#stack
+Unlike most other drawing elements which can use chartData directly, bar requires that data first be passed through d3.stack: https://github.com/d3/d3-shape/blob/master/README.md#stack
 
 ##### Usage
 
@@ -16,7 +16,7 @@ Unlike most other drawing elements which can use chartData directly, area requir
       svg="{{svg}}">
     </px-vis-svg>
     <px-vis-scale
-      x-axis-type="time"
+      x-axis-type="scaleBand"
       y-axis-type="linear"
       complete-series-config="[[seriesConfig]]"
       data-extents="[[dataExtents]]"
@@ -29,24 +29,24 @@ Unlike most other drawing elements which can use chartData directly, area requir
       selected-domain="[[selectedDomain]]">
     </px-vis-scale>
 
-    <px-vis-area-svg
+    <px-vis-bar-svg
       svg="[[svg]]"
       complete-series-config="[[seriesConfig]]"
       chart-data="[[stackedChartData]]"
-      x="[[x]]"
-      y="[[y]]"
+      iScale="[[x]]"
+      dScale="[[y]]"
       domain-changed="[[domainChanged]]">
-    </px-vis-area-svg>
+    </px-vis-bar-svg>
 
-@element px-vis-area-svg
-@blurb Element which draws area series onto the chart
+@element px-vis-bar-svg
+@blurb Element which draws bar series onto the chart
 @homepage index.html
 @demo demo.html
 -->
 
 <link rel="import" href="css/px-vis-styles.html">
 
-<dom-module id="px-vis-area-svg">
+<dom-module id="px-vis-bar-svg">
     <template>
       <style include="px-vis-styles"></style>
 
@@ -56,7 +56,7 @@ Unlike most other drawing elements which can use chartData directly, area requir
 
 <script>
   Polymer({
-    is: 'px-vis-area-svg',
+    is: 'px-vis-bar-svg',
 
     behaviors: [
       PxVisBehaviorD3.svg,
@@ -82,7 +82,7 @@ Unlike most other drawing elements which can use chartData directly, area requir
        * A holder object for the series object
        *
        */
-      areaPath:{
+      barRects:{
         type:Object
       },
       /**
@@ -91,14 +91,14 @@ Unlike most other drawing elements which can use chartData directly, area requir
        * @property linePath
        * @type String
        */
-      areaBuilder:{
+      barBuilder:{
         type:Object
       },
       /**
        * A holder object for the series group
        *
        */
-      areaGroup:{
+      barGroup:{
         type:Object
       },
 
@@ -110,27 +110,52 @@ Unlike most other drawing elements which can use chartData directly, area requir
         value: 10
       },
 
-      _xKey: {
+      _iKey: {
         type: String
       },
 
       _keySeriesDict: {
         type: Object,
         computed: '_computekeySeriesDict(completeSeriesConfig.*)'
+      },
+      _funcsWereSet: {
+        type: Number,
+        value: 0
+      },
+      type: {
+        type: String,
+        value: 'column'
+      },
+
+      _returnX: {
+        type: Function
+      },
+      _returnY: {
+        type: Function
+      },
+      _returnWidth: {
+        type: Function
+      },
+      _returnHeight: {
+        type: Function
+      },
+      seriesKey: {
+        type: String
       }
     },
 
     observers: [
-      'drawElement(svg, y, domainChanged, chartData.*, completeSeriesConfig.*, _keySeriesDict,  preventInitialDrawing)',
-      '_addClipPath(clipPath)'
+      'drawElement(svg, y, domainChanged, chartData.*, completeSeriesConfig.*, _keySeriesDict,  preventInitialDrawing, _funcsWereSet)',
+      '_addClipPath(clipPath)',
+      '_setFuncs(type)'
     ],
 
     detached: function() {
-      if(this._doesD3HaveValues(this.areaPath)) {
-        this.areaPath.remove();
+      if(this._doesD3HaveValues(this.barPath)) {
+        this.barPath.remove();
       }
-      if(this._doesD3HaveValues(this.areaGroup)) {
-        this.areaGroup.remove();
+      if(this._doesD3HaveValues(this.barGroup)) {
+        this.barGroup.remove();
       }
     },
     /**
@@ -145,12 +170,13 @@ Unlike most other drawing elements which can use chartData directly, area requir
         //if 0 don't debounce at all
         if(this.drawDebounceTime > 0) {
           this.debounce('draw',function() {
-            if(this.domainChanged !== null &&
+            if(this._funcsWereSet &&
+                this.domainChanged !== null &&
                 this._doesD3HaveValues(this.svg) &&
                 this.y &&
                 this.chartData.length > 0 &&
                 this._doesObjHaveValues(this.completeSeriesConfig)) {
-                  
+
               this._drawElementDebounced();
             }
           }.bind(this), this.drawDebounceTime);
@@ -161,58 +187,64 @@ Unlike most other drawing elements which can use chartData directly, area requir
     },
 
     _drawElementDebounced: function() {
-      this._defineArea();
-
       // checks to see if the group already exists. If not, create; if so, update
-      if(this._isObjEmpty(this.areaGroup)) {
+      if(this._isObjEmpty(this.barGroup)) {
         // draw the path
-        this.areaGroup = this.svg.append('g')
-          .attr('series-id', 'areas')
-          .attr('class', 'series-area');
+        this.barGroup = this.svg.append('g')
+          .attr('series-id', 'bars')
+          .attr('class', 'series-bars');
       }
 
       // set our data
-      var areaBuilder = this.areaGroup.selectAll('path.series-area')
+      var barBuilder = this.barGroup.selectAll('rect.series-bar')
         .data(this.chartData);
 
       // When datapoints disappear from our data, remove them
-      areaBuilder.exit().remove();
+      barBuilder.exit().remove();
 
       // When datapoints are added to our data, add stuff
-      areaBuilder.enter()
-        .append('path')
-        .attr('class', 'series-area')
+      barBuilder.enter()
+        .append('rect')
+        .attr('class', 'series-bar')
       // When datapoints are added OR this funtion is run, draw stuff
-      .merge(areaBuilder)
+      .merge(barBuilder)
         .attr('series-id', function(d, i) {
-          var series = this._keySeriesDict[d.key];
-          return 'area_' + series;
+          var series = this._keySeriesDict[this.seriesKey];
+          return 'bar_' + series;
         }.bind(this))
-        .attr('series-keys', function(d, i) {
-          return this._keySeriesDict[d.key];
-        }.bind(this))
-        .attr('d', function(d) {
-          return this.area(d);
-        }.bind(this))
+        .attr('series-keys', function(d, i) { return this._keySeriesDict[this.seriesKey]; }.bind(this))
+        .attr('x', this._returnX.bind(this))
+        .attr('y', this._returnY.bind(this))
+        .attr('width', this._returnWidth.bind(this))
+        .attr('height', this._returnHeight.bind(this))
         .attr('fill', function(d,i) {
-          var series = this._keySeriesDict[d.key];
+          var series = this._keySeriesDict[this.seriesKey];
           return this.completeSeriesConfig[series]['color'];
-        }.bind(this))
-      // Make it easy to get our areas again
-      this.areaPath = this.areaGroup.selectAll('path.series-area');
+        }.bind(this));
+
+      // Make it easy to get our bars again
+      this.barRects = this.barGroup.selectAll('rect.series-bar');
 
       this._addClipPath();
 
-      this.fire('areafinished');
+      this.fire('barfinished');
     },
 
-    _defineArea: function() {
-      this.area = Px.d3.area()
-        .x(function(d, i) {
-          return this.x(d.data[this._xKey]);
-        }.bind(this))
-        .y0(function(d) { return ~~this.y(d[0]); }.bind(this))
-        .y1(function(d) { return ~~this.y(d[1]); }.bind(this));
+    _setFuncs: function() {
+      if(this.type === 'bar') {
+        this._returnX = function(d) { return this.x(d[0]); }
+        this._returnY = function(d) { return this.y(d.data[this._iKey]); }
+        this._returnWidth = function(d) { return this.x(d[1]) - this.x(d[0]); }
+        this._returnHeight = function(d) { return this.y.bandwidth(); }
+
+      } else {
+        this._returnX = function(d) { return this.x(d.data[this._iKey]); }
+        this._returnY = function(d) { return this.y(d[1]); }
+        this._returnWidth = function(d) { return this.x.bandwidth(); }
+        this._returnHeight = function(d) { return this.y(d[0]) - this.y(d[1]); }
+      }
+
+      this._funcsWereSet += 1;
     },
 
     /**
@@ -221,7 +253,7 @@ Unlike most other drawing elements which can use chartData directly, area requir
      * @method _addClipPath
      */
     _addClipPath: function() {
-      this.addClipPath(this.areaGroup);
+      this.addClipPath(this.barGroup);
     },
 
     _computekeySeriesDict: function(completeSeriesConfig) {
@@ -234,7 +266,7 @@ Unlike most other drawing elements which can use chartData directly, area requir
         dict[y] = k;
       }
 
-      this._xKey = this.completeSeriesConfig[keys[0]]['x'];
+      this._iKey = this.completeSeriesConfig[keys[0]]['x'];
 
       return dict;
     }

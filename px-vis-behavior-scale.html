@@ -168,6 +168,8 @@ PxVisBehaviorScale.scale = [{
     } else if(type === 'linear') {
       result = Px.d3.scaleLinear().nice().range(range);
       result._scaleType = "linear";
+    } else if(type === 'scaleBand') {
+      result = Px.d3.scaleBand().range(range).round(true).paddingInner(0.5);
     } else { //ordinal
       result = Px.d3.scalePoint().range(range).padding(0.5);
       result._scaleType = "ordinal";
@@ -239,8 +241,8 @@ PxVisBehaviorScale.scale = [{
    */
   _determineExtents: function() {
     //check our axis types so we know if we are doing ordinal
-    var xOrd = this.xAxisType === 'ordinal',
-        yOrd = this.yAxisType === 'ordinal',
+    var xOrd = (this.xAxisType === 'ordinal' || this.xAxisType === 'scaleBand'),
+        yOrd = (this.yAxisType === 'ordinal' || this.yAxisType === 'scaleBand'),
         // are we doing time?
         xTime = this.xAxisType === 'time' || this.xAxisType === 'timeLocal',
         //doX if we are not doing time
@@ -329,7 +331,7 @@ PxVisBehaviorScale.scale = [{
       //did we get extents from chartExtents?
       fromChartExtents = exts.length === 2 ? true : false;
 
-      exts = this._checkDataExtents(dataExtents, chartExtents, axis, fromChartExtents);
+      exts = this._checkDataExtents(dataExtents, chartExtents, axis, fromChartExtents, exts);
 
       // if nothing gets assigned, then stick in defaults
       if(exts.length < 2){
@@ -359,8 +361,8 @@ PxVisBehaviorScale.scale = [{
    * Looks at dataExtents for extents values per axis; resolves chartExtents
    *
    */
-  _checkDataExtents: function(dExts, cExts, axis, bool) {
-    var exts = [];
+  _checkDataExtents: function(dExts, cExts, axis, bool, exts) {
+    var exts = exts || [];
 
     //if there are dataExtents, use them if they dont overwrite the chartExtents
     if(dExts && dExts[axis] && dExts[axis].length === 2) {
