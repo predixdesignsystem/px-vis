@@ -277,7 +277,7 @@ Custom property | Description | Default
 
           if(this.drawnTickValues && this.drawnTickValues.length > 0) {
             this.set('drawnTickValues', []);
-            this.fire('px-vis-axis-drawn-tick-values-changed', { drawnTickValues: []});
+            this.fire('px-vis-axis-drawn-tick-values-changed', { drawnTickValues: [] });
           }
         },
 
@@ -574,13 +574,13 @@ Custom property | Description | Default
 
           switch(this.orientation) {
             case 'bottom':
-              label.x = this.labelTypeSize / 4;
+              label.x = 5;
               label.y = this.labelTypeSize / 4;
               label.anchor = (this.labelPosition === 'after') ? 'start' : 'end';
               break;
 
             case 'top':
-              label.x = this.labelTypeSize / -4;
+              label.x = 5;
               label.y = this.labelTypeSize / -4;
               label.anchor = (this.labelPosition === 'after') ? 'start' : 'end';
               break;
@@ -610,6 +610,7 @@ Custom property | Description | Default
             .style('font-family',this._checkThemeVariable("--px-font-family", 'GE Inspira Sans'))
             .attr('font-style', this._checkThemeVariable("--px-font-family", 'GE Inspira Sans'));
 
+          // if we are not inline, apply default colors
           if(this.labelPosition !== 'inline') {
             elem.selectAll('text')
               .attr('fill',this._checkThemeVariable("--px-vis-axis-color", this.colors[this.axisColor]));
@@ -618,6 +619,8 @@ Custom property | Description | Default
               .attr('stroke',this._checkThemeVariable("--px-vis-axis-color", this.colors[this.axisColor]));
             }
 
+          // if we are not default centering our label, then do calcs to figure out where to put it
+          // TODO Right now, you cannot have a label center and apply a custom offset. Possible enhancement?
           if(this.labelPosition !== 'center') {
             var label = this.setLabelDims();
 
@@ -629,6 +632,7 @@ Custom property | Description | Default
               .attr('transform','rotate(' + this.labelRotation + ') translate(' + this.labelTranslation.join(',') + ')');
           }
 
+          // If wer are inlining our label, apply the boxes behind the label
           if(this.labelPosition === 'inline') {
             var gTick = elem.selectAll('g.tick'),
                 tickText = gTick.select('text');
@@ -681,6 +685,55 @@ Custom property | Description | Default
           }
           return ext;
         },
+
+        _calcTopBottomLabelSize: function() {
+          return this.labelPosition === 'center' ? this.labelTypeSize : 0;
+        },
+
+        _calcLeftRightLabelSize: function() {
+          var size = 0;
+
+          // if we are dealing with longer names, just measure
+          if(this.axisType === 'time' || this.axisType === 'timeLocal' || this.axisType === 'ordinal') {
+            size = parseFloat(his._getAxisGroupSize()['width']);
+          } else {
+            // NOTE: If this is not exact enough, we can use PxVisBehavior.measureText to measure
+            // Cheat and assume text chars are all the same width.
+
+              // ticks = null is default for d3
+              var ticks = null;
+
+              // check if dev specified a number of ticks; dont care about functions
+              if(this.ticks && typeof this.ticks === 'number') {
+                ticks = this.ticks;
+              } else if(this.ticks && typeof this.ticks === 'object' && this.ticks.interval) {
+                ticks = this.ticks.interval;
+              }
+
+              // need to figure out our ticks and how they are formatted
+              var chars = 0,
+                  ticksVals = this.tickValues ? this.tickValues : this.axis.ticks(ticks),
+                  formatter = this.tickFormat ? this._axis.tickFormat() : this.axis.tickFormat(),
+                  // Could iterate through all ticks, but min and max are probably going to have the most chars...
+                  // formatted = ticksVals.map(formatter);
+                  formattedMin = formatter(ticksVals[0]),
+                  formattedMax = formatter(ticksVals[ ticksVals.length-1 ]);
+
+              // now figure out which is longest
+              // for(var i = 0; i < formatted.length; i++) {
+              //   chars = Math.max(formatted[i].length, chars);
+              // }
+
+              chars = Math.max(formattedMin.length, chars);
+              chars = Math.max(formattedMax.length, chars);
+
+              //give us a full typesize + half each additional
+              size = chars * this.labelTypeSize * 0.5 + this.labelTypeSize * 0.5;
+          }
+
+          return size;
+        },
+
         /**
          * Draws the axis title
          *
@@ -689,39 +742,65 @@ Custom property | Description | Default
 
           this.removeTitle();
 
-          var ext,
+          var ext = {},
               location = this._doesObjHaveValues(this.titleLocation) ? 'custom' : this.orientation,
               x,y,r,anchor;
 
           switch(location) {
             case 'bottom':
-              ext = this._getAxisGroupSize();
-              x = parseFloat(ext['width']) / 2 + this.translateAmt[0];
-              y = this.labelTypeSize * 1.5 + parseFloat(ext['height']) + this.translateAmt[1];
+              //range of axis = length of axis
+              ext["width"] = (this.axis.range()[1] - this.axis.range()[0])/2;
+
+              //if we have a label rotation, calcs are complicated; just take the perf hit and measure
+              //if normal, then size is: tick length + label size + label offset + title size + designed margin
+              ext["height"] = this.labelRotation ? parseFloat(this._getAxisGroupSize()["height"]) :
+                  this._axis.tickSizeInner() + this._calcTopBottomLabelSize() + this.labelTranslation[1] + this.titleTypeSize + 5;
+
+              x = ext['width'] + this.translateAmt[0];
+              y = ext['height'] + this.translateAmt[1];
               r = 0;
               anchor = 'middle';
               break;
 
             case 'top':
-              ext = this._getAxisGroupSize();
-              x = parseFloat(ext['width']) / 2 + this.translateAmt[0];
-              y = this.translateAmt[1];
+              //range of axis = length of axis
+              ext["width"] = (this.axis.range()[1] - this.axis.range()[0])/2;
+
+              //if we have a label rotation, calcs are complicated; just take the perf hit and measure
+              //if normal, then size is: tick length + label size + label offset + title size + designed margin
+              ext["height"] = this.labelRotation ? parseFloat(this._getAxisGroupSize()["height"]) :
+                  this._axis.tickSizeInner() + this._calcTopBottomLabelSize() + this.labelTranslation[1] + 5;
+
+              x = ext['width'] + this.translateAmt[0];
+              y = -ext["height"] + this.translateAmt[1];
               r = 0;
               anchor = 'middle';
               break;
 
             case 'left':
-              ext = this._getAxisGroupSize();
-              x = (this.labelTypeSize + parseFloat(ext['width'])) * -1 + this.translateAmt[0];
-              y = parseFloat(ext['height']) / 2 + this.translateAmt[1];
+              //if we have a label rotation, calcs are complicated; just take the perf hit and measure
+              //if normal, then size is: tick length + label size + label offset + designed margin
+              ext["width"] = this.labelRotation ? parseFloat(this._getAxisGroupSize()["width"]) * -1 :
+                  (this._axis.tickSizeInner() + this._calcLeftRightLabelSize() + this.labelTranslation[0] + 5);
+              //range of axis = length of axis
+              ext["height"] = (this.axis.range()[1] - this.axis.range()[0]) / 2;
+
+              x = -ext["width"] + this.translateAmt[0];
+              y = -ext['height'] + this.translateAmt[1];
               r = -90;
               anchor = 'middle';
               break;
 
             case 'right':
-              ext = this._getAxisGroupSize();
-              x = this.labelTypeSize + parseFloat(ext['width']) + 4 + this.translateAmt[0];
-              y = parseFloat(ext['height']) / 2 + this.translateAmt[1];
+              //if we have a label rotation, calcs are complicated; just take the perf hit and measure
+              //if normal, then size is: tick length + label size + label offset + title size + offset to get to designed margin
+              ext["width"] = this.labelRotation ? parseFloat(this._getAxisGroupSize()["width"]) :
+                  this._axis.tickSizeInner() + this._calcLeftRightLabelSize() + this.labelTranslation[0] + this.titleTypeSize - 3;
+              //range of axis = length of axis
+              ext["height"] = (this.axis.range()[1] - this.axis.range()[0]) / 2;
+
+              x = ext["width"] + this.translateAmt[0];
+              y = -ext['height'] + this.translateAmt[1];
               r = -90;
               anchor = 'middle';
               break;

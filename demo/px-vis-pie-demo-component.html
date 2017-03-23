@@ -2,6 +2,9 @@
 <link rel="import" href="../px-vis-pie.html">
 <link rel="import" href="../px-vis-svg.html">
 
+<link rel="import" href="../px-vis-behavior-common.html">
+<link rel="import" href="../bower_components/px-colors-design/colors.html" />
+
 <dom-module id="px-vis-pie-demo-component">
   <template>
     <!--add demo tag-->
@@ -21,7 +24,7 @@
     radius="[[radius]]"
     chart-data="[[chartData]]"
     margin="[[margin]]"
-    complete-series-config="[[seriesConfig]]"
+    complete-series-config="[[completeSeriesConfig]]"
     series-id="[[seriesId]]"
     px-svg-elem="[[pxSvgElem]]"></px-vis-pie>
   </template>
@@ -30,6 +33,13 @@
 <script>
 Polymer({
   is: 'px-vis-pie-demo-component',
+
+  behaviors: [
+    PxColorsBehavior.dataVisColors,
+    PxColorsBehavior.dataVisColorTheming,
+    PxVisBehavior.getSeriesColors
+  ],
+
   properties: {
     description: {
       type: String,
@@ -57,24 +67,73 @@ Polymer({
       value: 250
     },
     chartData: {
-      value: [{"x":15,"y":"IPA","colorIndex":0,"percentage":"26","backgroundColor":"rgb(93,165,218)"},{"x":1,"y":"Pils","colorIndex":1,"percentage":"2","backgroundColor":"rgb(250,164,58)"},{"x":1,"y":"Lager","colorIndex":2,"percentage":"2","backgroundColor":"rgb(96,189,104)"},{"x":8,"y":"Lambic","colorIndex":3,"percentage":"14","backgroundColor":"rgb(241,124,176)"},{"x":12,"y":"Stout","colorIndex":4,"percentage":"21","backgroundColor":"rgb(178,145,47)"},{"x":7,"y":"Pale Ale","colorIndex":5,"percentage":"12","backgroundColor":"rgb(178,118,178)"},{"x":9,"y":"Porter","colorIndex":6,"percentage":"16","backgroundColor":"rgb(222,207,63)"},{"x":4,"y":"Heffeweisse","colorIndex":7,"percentage":"7","backgroundColor":"rgb(241,88,84)"}],
       type: Array
     },
-    seriesConfig: {
+    completeSeriesConfig: {
       type: Object,
       value: {
         "y":{
-          "type":"line",
           "y": "y",
           "x": "x",
           "name":"mySeries",
-          "xAxisUnit":"pint"}
+          "xAxisUnit":"pint"
         }
-      },
-      seriesId: {
-        value: 'y',
-        type: String
       }
+    },
+    seriesId: {
+      value: 'y',
+      type: String
+    }
+  },
+
+  listeners: {
+    "px-data-vis-colors-applied" : '_returnChartData'
+  },
+
+  _returnChartData: function() {
+    this.set('chartData', [
+      {
+        "x":15,
+        "y":"IPA",
+        "colorIndex":0,
+        "percentage":"26"
+      },{
+        "x":1,
+        "y":"Pils",
+        "colorIndex":1,
+        "percentage":"2"
+      },{
+        "x":1,
+        "y":"Lager",
+        "colorIndex":2,
+        "percentage":"2"
+      },{
+        "x":8,
+        "y":"Lambic",
+        "colorIndex":3,
+        "percentage":"14"
+      },{
+        "x":12,
+        "y":"Stout",
+        "colorIndex":4,
+        "percentage":"21"
+      },{
+        "x":7,
+        "y":"Pale Ale",
+        "colorIndex":5,
+        "percentage":"12"
+      },{
+        "x":9,
+        "y":"Porter",
+        "colorIndex":6,
+        "percentage":"16"
+      },{
+        "x":4,
+        "y":"Heffeweisse",
+        "colorIndex":7,
+        "percentage":"7"
+      }
+    ]);
   }
 });
 </script>

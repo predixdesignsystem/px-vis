@@ -168,8 +168,8 @@ function runTests(){
           re = new RegExp(/(\w+)\((-?\d+\.?\d*)[,\s](-?\d+\.?\d*)\)/),
           arr = re.exec(attr);
       assert.equal(arr[1],'translate');
-      assert.closeTo(parseFloat(arr[2]),222.5,7);
-      assert.closeTo(parseFloat(arr[3]),278,2);
+      assert.closeTo(parseFloat(arr[2]),222.5,10);
+      assert.closeTo(parseFloat(arr[3]),278,10);
     });
 
     test('Title _titleGroup text font-size', function() {
@@ -270,8 +270,8 @@ function runTests(){
           re = new RegExp(/(\w+)\((-?\d+\.?\d*)[,\s](-?\d+\.?\d*)\)/),
           arr = re.exec(attr);
       assert.equal(arr[1],'translate');
-      assert.closeTo(parseFloat(arr[2]),-33,4.5);
-      assert.closeTo(parseFloat(arr[3]),126,4.5);
+      assert.closeTo(parseFloat(arr[2]),-33,10);
+      assert.closeTo(parseFloat(arr[3]),126,10);
     });
 
     test('Title _titleGroup text font-size', function() {
@@ -324,7 +324,7 @@ function runTests(){
         label = baseXAxis.setLabelDims();
       });
       test('label x', function() {
-        assert.equal(label.x, 3);
+        assert.equal(label.x, 5);
       });
       test('label y', function() {
         assert.equal(label.y, 3);
@@ -342,7 +342,7 @@ function runTests(){
         label = baseXAxis.setLabelDims();
       });
       test('label x', function() {
-        assert.equal(label.x, 3);
+        assert.equal(label.x, 5);
       });
       test('label y', function() {
         assert.equal(label.y, 3);
@@ -360,7 +360,7 @@ function runTests(){
         label = baseXAxis.setLabelDims();
       });
       test('label x', function() {
-        assert.equal(label.x, -3);
+        assert.equal(label.x, 5);
       });
       test('label y', function() {
         assert.equal(label.y, -3);
@@ -378,7 +378,7 @@ function runTests(){
         label = baseXAxis.setLabelDims();
       });
       test('label x', function() {
-        assert.equal(label.x, -3);
+        assert.equal(label.x, 5);
       });
       test('label y', function() {
         assert.equal(label.y, -3);
@@ -563,8 +563,8 @@ function runTests(){
           re = new RegExp(/(\w+)\((-?\d+\.?\d*)[,\s](-?\d+\.?\d*)\)/),
           arr = re.exec(attr);
       assert.equal(arr[1],'translate');
-      assert.closeTo(parseFloat(arr[2]),0,7);
-      assert.closeTo(parseFloat(arr[3]),260,2);
+      assert.closeTo(parseFloat(arr[2]),0,10);
+      assert.closeTo(parseFloat(arr[3]),260,10);
     });
 
     test('Title _titleGroup text font-size', function() {
@@ -649,8 +649,8 @@ function runTests(){
           re = new RegExp(/(\w+)\((-?\d+\.?\d*)[,\s](-?\d+\.?\d*)\)/),
           arr = re.exec(attr);
       assert.equal(arr[1],'translate');
-      assert.closeTo(parseFloat(arr[2]),0,7);
-      assert.closeTo(parseFloat(arr[3]),260,2);
+      assert.closeTo(parseFloat(arr[2]),0,10);
+      assert.closeTo(parseFloat(arr[3]),260,10);
     });
 
     test('Title _titleGroup text font-size', function() {
@@ -735,8 +735,8 @@ function runTests(){
           re = new RegExp(/(\w+)\((-?\d+\.?\d*)[,\s](-?\d+\.?\d*)\)/),
           arr = re.exec(attr);
       assert.equal(arr[1],'translate');
-      assert.closeTo(parseFloat(arr[2]),0,7);
-      assert.closeTo(parseFloat(arr[3]),260,2);
+      assert.closeTo(parseFloat(arr[2]),0,10);
+      assert.closeTo(parseFloat(arr[3]),260,10);
     });
 
     test('Title _titleGroup text font-size', function() {
@@ -827,8 +827,8 @@ function runTests(){
           re = new RegExp(/(\w+)\((-?\d+\.?\d*)[,\s](-?\d+\.?\d*)\)/),
           arr = re.exec(attr);
       assert.equal(arr[1],'translate');
-      assert.closeTo(parseFloat(arr[2]),0,7);
-      assert.closeTo(parseFloat(arr[3]),260,2);
+      assert.closeTo(parseFloat(arr[2]),0,10);
+      assert.closeTo(parseFloat(arr[3]),260,10);
     });
 
     test('Title _titleGroup text font-size', function() {
@@ -920,8 +920,8 @@ function runTests(){
           re = new RegExp(/(\w+)\((-?\d+\.?\d*)[,\s](-?\d+\.?\d*)\)/),
           arr = re.exec(attr);
       assert.equal(arr[1],'translate');
-      assert.closeTo(parseFloat(arr[2]),0,7);
-      assert.closeTo(parseFloat(arr[3]),200,2);
+      assert.closeTo(parseFloat(arr[2]),0,10);
+      assert.closeTo(parseFloat(arr[3]),200,10);
     });
 
     test('Title _titleGroup text font-size', function() {

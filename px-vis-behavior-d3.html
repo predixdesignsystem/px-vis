@@ -373,7 +373,7 @@ PxVisBehaviorD3.renderToCanvas = {
       this.canvasContext.clearCanvas();
     }
   }
-}
+};
 
 /*
     Name:
@@ -1049,17 +1049,59 @@ PxVisBehaviorD3.interpolationFunction = {
     /**
     * A d3 function used to interpolate the series lines.
     *
+    * Can also be a string referencing simple, built in d3 functions:
+    * - `"curveBasis"`
+    * - `"curveBasisClosed"`
+    * - `"curveBasisOpen"`
+    * - `"curveLinear"`
+    * - `"curveLinearClosed"`
+    * - `"curveMonotoneX"`
+    * - `"curveMonotoneY"`
+    * - `"curveNatural"`
+    * - `"curveStep"`
+    * - `"curveStepAfter"`
+    * - `"curveStepBefore"`
+    *
     * See: https://github.com/d3/d3-shape/blob/master/README.md#curves
     */
     interpolationFunction: {
       type: Function
+    },
+
+    _basicInterpolators: {
+      type: Object,
+      value: function() {
+        return {
+          "curveBasis" : Px.d3.curveBasis,
+          "curveBasisClosed" : Px.d3.curveBasisClosed,
+          "curveBasisOpen" : Px.d3.curveBasisOpen,
+          "curveLinear" : Px.d3.curveLinear,
+          "curveLinearClosed" : Px.d3.curveLinearClosed,
+          "curveMonotoneX" : Px.d3.curveMonotoneX,
+          "curveMonotoneY" : Px.d3.curveMonotoneY,
+          "curveNatural" : Px.d3.curveNatural,
+          "curveStep" : Px.d3.curveStep,
+          "curveStepAfter" : Px.d3.curveStepAfter,
+          "curveStepBefore" : Px.d3.curveStepBefore
+        }
+      }
     }
   },
 
   _checkInterpolation: function() {
     var interpolate = null;
     //see if there is a universal interpolationFunction
-    interpolate = typeof this.interpolationFunction === 'function' ? this.interpolationFunction : null;
+    // is it a reference to _basicInterpolators?
+    interpolate = typeof this.interpolationFunction === 'string' && this._basicInterpolators[this.interpolationFunction] ? this._basicInterpolators[this.interpolationFunction] : interpolate;
+    // is it a function
+    interpolate = typeof this.interpolationFunction === 'function' ? this.interpolationFunction : interpolate;
+
+    //see if there is a series specific reference to _basicInterpolators; fallback to previous value if not
+    interpolate = this.completeSeriesConfig[this.seriesId]['interpolationFunction'] &&
+                  typeof this.completeSeriesConfig[this.seriesId]['interpolationFunction'] === 'string' &&
+                  this._basicInterpolators[this.completeSeriesConfig[this.seriesId]['interpolationFunction']] ?
+                  this._basicInterpolators[this.completeSeriesConfig[this.seriesId]['interpolationFunction']] : interpolate;
+
     //see if there is a series specific function; fallback to previous value if not
     interpolate = this.completeSeriesConfig[this.seriesId]['interpolationFunction'] &&
                   typeof this.completeSeriesConfig[this.seriesId]['interpolationFunction'] === 'function' ?

@@ -1,6 +1,6 @@
 v1.1.0
 ==================
-* Fixed line drawing from 0,0 if start of data is empty. Now leaves a break until first valud data
+* Fixed line drawing from 0,0 if start of data is empty. Now leaves a break until first valid data
 * Updated to use px-d3-imports
 * Fixed gridline demo
 * Made thresholds dynamic
@@ -20,6 +20,10 @@ v1.1.0
 * added px-vis-line-svg-rendering-ended and px-vis-scatter-rendering-ended events
 * made auto resize debounce timing 250ms by default for every chart (from 50 or 100). Exposed the timing through debounceResizeTiming
 * ensure that dynamically switching between svg and canvas rendering cleans the previous drawing
+* Fixed demos to support dark theme
+* Added bar / column component.
+* Fix to behavior scale to work with chartExtents but improper dataExtents
+* Fix to behavior scale for dataExtents with ordinal values
 
 v1.0.1
 ==================

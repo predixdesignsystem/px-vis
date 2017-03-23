@@ -1,6 +1,9 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../px-vis-line-canvas.html">
 
+<link rel="import" href="../px-vis-behavior-common.html">
+<link rel="import" href="../bower_components/px-colors-design/colors.html" />
+
 <dom-module id="px-vis-line-canvas-demo-component">
   <template>
     <!--add demo tag-->
@@ -13,7 +16,7 @@
       <px-vis-scale
         x-axis-type="time"
         y-axis-type="linear"
-        complete-series-config="[[seriesConfig]]"
+        complete-series-config="[[completeSeriesConfig]]"
         data-extents="[[dataExtents]]"
         width="[[width]]"
         height="[[height]]"
@@ -26,7 +29,7 @@
       </px-vis-scale>
       <px-vis-line-canvas
         series-id="mySeries"
-        complete-series-config="[[seriesConfig]]"
+        complete-series-config="[[completeSeriesConfig]]"
         chart-data="[[chartData]]"
         x="[[x]]"
         y="[[y]]"
@@ -41,6 +44,13 @@
 <script>
 Polymer({
   is: 'px-vis-line-canvas-demo-component',
+
+  behaviors: [
+    PxColorsBehavior.dataVisColors,
+    PxColorsBehavior.dataVisColorTheming,
+    PxVisBehavior.getSeriesColors
+  ],
+
   properties: {
     description: {
       type: String,
@@ -108,17 +118,8 @@ Polymer({
             'y': 0.32
         }]
       },
-      seriesConfig:{
-        type : Object,
-        value: {
-          'mySeries': {
-            "name":"My-Series",
-            "type": "line",
-            "x": 'x',
-            "y": 'y',
-            'color': "rgb(93,165,218)"
-          }
-        }
+      completeSeriesConfig:{
+        type : Object
       },
       //dataExtents
       dataExtents:{
@@ -128,6 +129,22 @@ Polymer({
           "y": [0,-Infinity]
         }
       }
+    },
+
+    listeners: {
+      "px-data-vis-colors-applied" : '_returnCompleteSeriesConfig'
+    },
+
+    _returnCompleteSeriesConfig: function() {
+      this.set('completeSeriesConfig', {
+        'mySeries': {
+          "name":"My-Series",
+          "type": "area",
+          "x": 'x',
+          "y": 'y',
+          'color': this._getColor(0)
+        }
+      });
     }
 });
 </script>
