@@ -35,8 +35,9 @@ function buildCSS(){
   return combiner.obj([
     $.sass(sassOptions),
     $.autoprefixer({
-      browsers: ['last 2 versions', 'Safari 8.0'],
-      cascade: false
+      browsers: ['last 2 versions'],
+      cascade: false,
+      flexbox: false
     }),
     gulpif(!argv.debug, $.cssmin())
   ]).on('error', handleError);
