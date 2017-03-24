@@ -14,10 +14,12 @@ v1.1.0
 * px-vis-chart-navigator now supports canvas rendering
 * progressive rendering now can be customized through progressiveRenderingPointsPerFrame (16000 by default for lines, 2000 byy default for scatter) and progressiveRenderingMinimumFrames. Increase progressiveRenderingPointsPerFrame for better performance and decrease for smoother drawing. When at the right value no performance cost incurs and drawing is smooth but if value is too small can incur a performance cost (i.e the drawing will take longer, but will always start at the same time, also the UI won't be frozen)
 * fix issue where progressive rendering could miss 1 point per frame, potentially a lot for big dataset
-* added cleanOnDetached to ensure a chart is cleaned after detached so that it can be properly reused with other data and config
+* added cleanOnDetached to allow reuse of the chart after detaching it from the dom. This is aimed at applications creating charts dynamically so that they can keep a pool of charts (simple array of charts) when removing them from the dom and reusing them later on with new data and config, improving performance . Turning cleanOnDetached on will make sure the chart will clear everything needed so that it draws properly with any new config. If using this strategy one thing to keep in mind is making sure the chart is re-appended in the dom *before* changing its properties to their new values. In most cases it would work even if appending it after, but some edge cases scenarios might fail to clean some visual artifact (for example switching from canvas to svg while deleting a few series at the same time). When moving the chart around the dom do not turn it on for performance boost and making sure you don't need the chart to force redrawing. This can be changed dynamically
 * ensure canvas and svg clean themselves up on detached (they will redraw on attached if needed)
 * ensure gridlines will redraw when moving/removing a chart in/from the dom
 * added px-vis-line-svg-rendering-ended and px-vis-scatter-rendering-ended events
+* made auto resize debounce timing 250ms by default for every chart (from 50 or 100). Exposed the timing through debounceResizeTiming
+* ensure that dynamically switching between svg and canvas rendering cleans the previous drawing
 * Fixed demos to support dark theme
 * Added bar / column component.
 * Fix to behavior scale to work with chartExtents but improper dataExtents

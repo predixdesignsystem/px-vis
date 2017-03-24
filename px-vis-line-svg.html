@@ -73,7 +73,9 @@ Element which draws lines series onto the chart
       PxVisBehaviorD3.serieToRedrawOnTopSVG,
       PxVisBehaviorD3.domainUpdate,
       PxColorsBehavior.baseColors,
-      PxVisBehavior.preventInitialDrawing
+      PxVisBehavior.preventInitialDrawing,
+      PxVisBehavior.cleanOnDetached,
+      PxVisBehavior.isAttached
     ],
 
     /**
@@ -149,15 +151,37 @@ Element which draws lines series onto the chart
     ready: function() {
       this._watchConfigProperty('mutedOpacity', 0.3);
     },
+    attached: function() {
+      //if we haven't clean on detached assume we just move the element and
+      //all config is still ok, redraw
+      if(!this.cleanOnDetached) {
+        if(this._isDirty) {
+          this.drawElement();
+        }
+      } else {
+        if(this._doesD3HaveValues(this.linePath)) {
+          this.linePath.remove();
+          this.linePath = null;
+        }
+        if(this._doesD3HaveValues(this.lineGroup)) {
+          this.lineGroup.remove();
+          this.lineGroup = null;
+        }
+      }
+      this._isDirty = false;
+    },
     detached: function() {
 
-      if(this._doesD3HaveValues(this.linePath)) {
-        this.linePath.remove();
-        this.linePath = null;
-      }
-      if(this._doesD3HaveValues(this.lineGroup)) {
-        this.lineGroup.remove();
-        this.lineGroup = null;
+      this._isDirty = true;
+      if(this.cleanOnDetached) {
+        if(this._doesD3HaveValues(this.linePath)) {
+          this.linePath.remove();
+          this.linePath = null;
+        }
+        if(this._doesD3HaveValues(this.lineGroup)) {
+          this.lineGroup.remove();
+          this.lineGroup = null;
+        }
       }
     },
     /**
@@ -185,7 +209,8 @@ Element which draws lines series onto the chart
             this._doesD3HaveValues(this.svg) &&
             this.y &&
             this.chartData.length > 0 &&
-            this._doesObjHaveValues(this.completeSeriesConfig)
+            this._doesObjHaveValues(this.completeSeriesConfig) &&
+            this._isAttached
           ) {
 
           // we need to wrap the data differently depending on if we are drawing many lines or just one line

@@ -77,7 +77,9 @@ Element which draws a scatter series onto the chart
       PxVisBehavior.progressiveRendering,
       PxVisBehavior.serieToRedrawOnTop,
       PxColorsBehavior.baseColors,
-      PxVisBehavior.preventInitialDrawing
+      PxVisBehavior.preventInitialDrawing,
+      PxVisBehavior.cleanOnDetached,
+      PxVisBehavior.isAttached
     ],
     /**
      * px-vis-scatter-progressive-rendering-started, fired when a canvas with progressive rendering
@@ -288,6 +290,18 @@ Element which draws a scatter series onto the chart
       '_drawOnTop(serieToRedrawOnTop)'
      ],
 
+     attached: function() {
+      //if we haven't clean on detached assume we just move the element and
+      //all config is still ok, redraw
+      if(!this.cleanOnDetached && this._isDirty) {
+        this._redraw();
+      }
+    },
+    detached: function() {
+
+      this._isDirty = true;
+    },
+
     ready:function() {
       //generate properties dynamically
       this._watchConfigProperty('markerSymbol', 'circle');
@@ -320,7 +334,10 @@ Element which draws a scatter series onto the chart
     },
     _drawCanvasDebounced: function(allowCanvasClearing) {
 
-      if(this.y && typeof this.domainChanged !== 'undefined' && this.domainChanged !== null) {
+      if(this.y &&
+         typeof this.domainChanged !== 'undefined' &&
+         this.domainChanged !== null &&
+         this._isAttached) {
 
         var data = this.chartData;
 

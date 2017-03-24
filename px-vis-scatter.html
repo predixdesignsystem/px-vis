@@ -74,7 +74,9 @@ Element which draws a scatter series onto the chart
       PxVisBehavior.dynamicConfigProperties,
       PxVisBehaviorD3.serieToRedrawOnTopSVG,
       PxColorsBehavior.baseColors,
-      PxVisBehavior.tooltipOnHover
+      PxVisBehavior.tooltipOnHover,
+      PxVisBehavior.cleanOnDetached,
+      PxVisBehavior.isAttached
     ],
 
     /**
@@ -230,11 +232,29 @@ Element which draws a scatter series onto the chart
       this._watchConfigProperty('markerStrokeOpacity', 1);
       this._watchConfigProperty('mutedOpacity', 0.3);
     },
-    detached: function() {
-      if(this._doesD3HaveValues(this.scatterGroup)) {
-        this.scatterGroup.remove();
+    attached: function() {
+      //if we haven't clean on detached assume we just move the element and
+      //all config is still ok, redraw
+      if(!this.cleanOnDetached) {
+        if(this._isDirty) {
+          this.drawElement();
+        }
+      } else {
+        if(this._doesD3HaveValues(this.scatterGroup)) {
+          this.scatterGroup.remove();
+        }
+        this.scatterGroup = null;
       }
-      this.scatterGroup = null;
+      this._isDirty = false;
+    },
+    detached: function() {
+      this._isDirty = true;
+      if(this.cleanOnDetached) {
+        if(this._doesD3HaveValues(this.scatterGroup)) {
+          this.scatterGroup.remove();
+        }
+        this.scatterGroup = null;
+      }
     },
      /**
      * Draws or updates the scatter element.
@@ -262,7 +282,10 @@ Element which draws a scatter series onto the chart
      * @method drawElement
      */
     _drawElementDebounced: function() {
-      if(this.y && typeof this.domainChanged !== 'undefined' && this.domainChanged !== null) {
+      if(this.y &&
+         typeof this.domainChanged !== 'undefined' &&
+         this.domainChanged !== null &&
+         this._isAttached) {
 
         var data = this.chartData;
 

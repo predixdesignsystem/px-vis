@@ -155,12 +155,6 @@ PxVisBehaviorChart.chartCommon = [{
       '_setCompleteSeriesConfig(_defaultSeriesConfig.*,chartData.*,seriesConfig.*,dataVisColors.*,seriesColorOrder.*)'
     ],
 
-    detached: function() {
-      if(this.cleanOnDetached) {
-        this.set('seriesConfig', {});
-      }
-    },
-
     /**
     * Calcs the extents of the charts
     */
@@ -596,6 +590,14 @@ PxVisBehaviorChart.chartAutoResize = [{
       _chartWrapperClass: {
         type: String,
         computed: '_getChartWrapperClass(chartHorizontalAlignment, chartVerticalAlignment)'
+      },
+      /**
+       * Timing (in ms) to be used for iron resize when the chart auto size
+       * (preventResize = false)
+       */
+      debounceResizeTiming: {
+        type: Number,
+        value: 250
       }
     },
     _preventResizeChanged: function() {

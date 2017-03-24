@@ -111,7 +111,7 @@ Custom property | Description | Default
 
         <template is="dom-repeat" items="[[_seriesKeys]]">
           <template is="dom-if" if="[[_limitSeries(index,navSeriesLimit)]]">
-            <template is="dom-if" if="[[_chartTypeLine(item,completeSeriesConfig)]]">
+            <template is="dom-if" if="[[_chartTypeLine(item,completeSeriesConfig)]]" restamp>
               <template is="dom-if" if="[[renderToCanvas]]" restamp>
                 <px-vis-line-canvas
                   id="lineCanvas"
@@ -129,7 +129,8 @@ Custom property | Description | Default
                   width="[[width]]"
                   height="[[height]]"
                   margin="[[margin]]"
-                  clip-path>
+                  clip-path
+                  clean-on-detached="[[cleanOnDetached]]">
                 </px-vis-line-canvas>
               </template>
               <template is="dom-if" if="[[!renderToCanvas]]" restamp>
@@ -141,11 +142,12 @@ Custom property | Description | Default
                   x="[[x]]"
                   y="[[y]]"
                   domain-changed="[[domainChanged]]"
-                  muted-series="[[mutedSeries]]">
+                  muted-series="[[mutedSeries]]"
+                  clean-on-detached="[[cleanOnDetached]]">
                 </px-vis-line-svg>
               </template>
             </template>
-            <template is="dom-if" if="[[_chartTypeScatter(item,completeSeriesConfig)]]">
+            <template is="dom-if" if="[[_chartTypeScatter(item,completeSeriesConfig)]]" restamp>
               <template is="dom-if" if="[[renderToCanvas]]" restamp>
                 <px-vis-scatter-canvas
                   canvas-context="[[canvasContext]]"
@@ -162,7 +164,8 @@ Custom property | Description | Default
                   progressive-rendering-points-per-frame="[[progressiveRenderingPointsPerFrame]]"
                   progressive-rendering-minimum-frames="[[progressiveRenderingMinimumFrames]]"
                   domain-changed="[[domainChanged]]"
-                  marker-size="2">
+                  marker-size="2"
+                  clean-on-detached="[[cleanOnDetached]]">
                 </px-vis-scatter-canvas>
               </template>
               <template is="dom-if" if="[[!renderToCanvas]]" restamp>
@@ -175,7 +178,8 @@ Custom property | Description | Default
                   x="[[x]]"
                   y="[[y]]"
                   domain-changed="[[domainChanged]]"
-                  muted-series="[[mutedSeries]]">
+                  muted-series="[[mutedSeries]]"
+                  clean-on-detached="[[cleanOnDetached]]">
                 </px-vis-scatter>
               </template>
             </template>
