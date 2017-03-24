@@ -1,3 +1,7 @@
+v1.1.1
+==================
+* Fixed axis unit empty string doesnt clear previous unit
+
 v1.1.0
 ==================
 * Fixed line drawing from 0,0 if start of data is empty. Now leaves a break until first valid data
