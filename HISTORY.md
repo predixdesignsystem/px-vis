@@ -1,3 +1,8 @@
+v1.1.2
+==================
+* Added check to scatter checkign scatterDots defined before running isIdInMuted.
+* Fixed typo in scatter props
+
 v1.1.1
 ==================
 * Fixed axis unit empty string doesnt clear previous unit
