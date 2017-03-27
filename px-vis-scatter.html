@@ -118,56 +118,56 @@ Element which draws a scatter series onto the chart
           'star': Px.d3.symbolStar,
           'wye': Px.d3.symbolWye
         },
-        /**
-         * The symbol used for the marker. Supported symbols:
-         * - 'circle'
-         * - 'cross'
-         * - 'diamond'
-         * - 'square'
-         * - 'triangle-up'
-         * - 'star'
-         * - 'wye'
-         * more info at https://github.com/d3/d3-shape/blob/master/README.md#symbols
-         * This property will be read from the completeSeriesConfig
-         */
-        markerSymbol: {
-          type: String
-        },
-        /**
-         * Scales the size of the scatter marker
-         * This property will be read from the completeSeriesConfig
-         */
-        markerScale: {
-          type: Number
-        },
-        /**
-         * the size of the markers
-         * This property will be read from the completeSeriesConfig
-         */
-        markerSize: {
-          type: Number
-        },
-        /**
-         * The opacity of the fill (inside) of the marker
-         * This property will be read from the completeSeriesConfig
-         */
-        markerFillOpacity: {
-          type: Number
-        },
-        /**
-         * The opacity of the stroke (outside) of the marker
-         * This property will be read from the completeSeriesConfig
-         */
-        markerStrokeOpacity: {
-          type: Number
-        },
-        /**
-         * the opacity value of the fill to be used when muting a serie (stroke is not drawn on mute)
-         * This property will be read from the completeSeriesConfig
-         */
-        mutedOpacity: {
-          type: Number
-        },
+      },
+      /**
+       * The symbol used for the marker. Supported symbols:
+       * - 'circle'
+       * - 'cross'
+       * - 'diamond'
+       * - 'square'
+       * - 'triangle-up'
+       * - 'star'
+       * - 'wye'
+       * more info at https://github.com/d3/d3-shape/blob/master/README.md#symbols
+       * This property will be read from the completeSeriesConfig
+       */
+      markerSymbol: {
+        type: String
+      },
+      /**
+       * Scales the size of the scatter marker
+       * This property will be read from the completeSeriesConfig
+       */
+      markerScale: {
+        type: Number
+      },
+      /**
+       * the size of the markers
+       * This property will be read from the completeSeriesConfig
+       */
+      markerSize: {
+        type: Number
+      },
+      /**
+       * The opacity of the fill (inside) of the marker
+       * This property will be read from the completeSeriesConfig
+       */
+      markerFillOpacity: {
+        type: Number
+      },
+      /**
+       * The opacity of the stroke (outside) of the marker
+       * This property will be read from the completeSeriesConfig
+       */
+      markerStrokeOpacity: {
+        type: Number
+      },
+      /**
+       * the opacity value of the fill to be used when muting a serie (stroke is not drawn on mute)
+       * This property will be read from the completeSeriesConfig
+       */
+      mutedOpacity: {
+        type: Number
       },
       /**
        * A holder object for the series group
@@ -335,6 +335,8 @@ Element which draws a scatter series onto the chart
 
         this._addClipPath();
 
+        this.isIdInMuted();
+
         this.fire('px-vis-scatter-rendering-ended');
       }
     },
@@ -429,7 +431,7 @@ Element which draws a scatter series onto the chart
      * @method isIdInMuted
      */
     isIdInMuted: function() {
-      if(this.mutedSeries.hasOwnProperty(this.seriesId)){
+      if(this.mutedSeries.hasOwnProperty(this.seriesId) && this._doesD3HaveValues(this.scatterDots)) {
 
         this._colorScatter();
       }
