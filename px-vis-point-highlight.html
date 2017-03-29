@@ -6,7 +6,7 @@
 
 <!--
 Element which draws crosshairs around mouse pointer / data points and highlights adjacent datapoints.
-- Uses tooltipData property.
+- Uses crosshairData property.
 
 ##### Usage
 
@@ -38,7 +38,7 @@ Element which draws crosshairs around mouse pointer / data points and highlights
     margin="[[margin]]"
     complete-series-config="[[seriesConfig]]"
     chart-data="[[chartData]]"
-    tooltip-data={{tooltipData}}
+    crosshair-data={{crosshairData}}
     series-keys="[[seriesKeys]]"
     extents-data={{extentsData}}
     x="[[x]]"
@@ -52,7 +52,7 @@ Element which draws crosshairs around mouse pointer / data points and highlights
     margin="[[margin]]"
     complete-series-config="[[seriesConfig]]"
     chart-data="[[chartData]]"
-    tooltip-data="[[tooltipData]]"
+    crosshair-data="[[crosshairData]]"
     selection-type=[[selectionType]]>
   </px-vis-cursor>
 
@@ -90,8 +90,9 @@ Custom property | Description | Default
       PxVisBehavior.sizing,
       PxVisBehaviorD3.svg,
       PxVisBehaviorD3.axes,
+      PxVisBehavior.dataset,
       PxVisBehavior.commonMethods,
-      PxVisBehavior.tooltipData,
+      PxVisBehavior.crosshairData,
       PxVisBehavior.completeSeriesConfig,
       PxVisBehaviorD3.clipPath,
       PxColorsBehavior.baseColors,
@@ -116,7 +117,7 @@ Custom property | Description | Default
         type:Object
       },
       /**
-       * Holder for the tooltip circle drawing objects
+       * Holder for the crosshair circle drawing objects
        *
        * @property _circles
        * @type Object
@@ -124,47 +125,46 @@ Custom property | Description | Default
       _circles:{
         type:Object
       },
-      /**
-       * Holder for the tooltip circle drawing objects
-       *
-       * @property _circles
-       * @type Object
-       */
-      _circleBuilder:{
-        type:Object
-      },
 
-      xKey: {
-        type: String,
-        value: 'x'
-      },
+      /**
+       * Boolean indicating if the dataset on this chart is different than the one on the crosshairData's origin chart.
+       *
+       * NOTE: The chartData passed into the chart MUST be sorted by the sharedKey for differentDataset to work. This component will not work with unsorted data.
+       */
+      differentDataset: {
+        type: Boolean,
+        value: false
+      }
     }, //properties
 
     observers: [
-      'drawElement(svg, tooltipData.rawPoints.*, completeSeriesConfig.*, width, height)'
+      'drawElement(svg, crosshairData.xPoints.*, completeSeriesConfig.*, width, height)'
     ],
     ready: function() {
 
     },
     /**
-     * Draws the tooltip elements and sets up listeners and callbacks on chart hover
-     * Sets the tooltipData property which gets passed to the register.
+     * Draws the crosshair elements and sets up listeners and callbacks on chart hover
+     * Sets the crosshairData property which gets passed to the register.
      *
      * @method drawElement
      */
     drawElement: function() {
-      var _this = this;
+      var _this = this,
+          xKey = this._getXKey(),
+          dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawPoints,
+          circleBuilder;
+// console.log(dataset)
+      circleBuilder = this.svg.selectAll('g.highlightPoint')
+        .data(dataset, function(d) { return d[xKey]}.bind(this));
 
-      this._circleBuilder = this.svg.selectAll('g.highlightPoint')
-        .data(this.tooltipData.rawPoints, function(d) { return d[this.xKey]}.bind(this));
+      circleBuilder.exit().remove();
 
-      this._circleBuilder.exit().remove();
-
-      this._circleBuilder
+      circleBuilder
         .enter()
           .append('g')
           .attr('class', 'highlightPoint')
-          .each(function(data,index) {
+          .each(function(data, index) {
             _this._createCircles(data, this);
           });
 
@@ -195,10 +195,10 @@ Custom property | Description | Default
         }).bind(this))
       .merge(c)
         .attr('cx', function(k) {
-          return !isNaN(data[this.xKey]) && !isNaN(data[this.completeSeriesConfig[k]['y']]) ? this.x(data[this.xKey]) : '';
+          return !isNaN(data[this.completeSeriesConfig[k]['x']]) && !isNaN(data[this.completeSeriesConfig[k]['y']]) ? this.x(data[this.completeSeriesConfig[k]['x']]) : '';
         }.bind(this))
         .attr('cy', function(k) {
-          if(isNaN(data[this.xKey]) || isNaN(data[this.completeSeriesConfig[k]['y']])) {
+          if(isNaN(data[this.completeSeriesConfig[k]['x']]) || isNaN(data[this.completeSeriesConfig[k]['y']])) {
             return '';
           }
           return  typeof this.y === 'function' ? this.y(d[k]) : this.y[this.completeSeriesConfig[k]["axis"]["id"]](data[this.completeSeriesConfig[k]['y']]);
@@ -206,11 +206,19 @@ Custom property | Description | Default
     },
 
     _addClipPath: function() {
-      if(this.clipPath) {
-        if(this.circlePoint !== 'no' && this._circles) {
-          this.addClipPath(this._circles);
-        }
+      if(this.clipPath && this._doesD3HaveValues(this._circles)) {
+        this.addClipPath(this._circles);
       }
+    },
+
+    _calcDataset: function() {
+      var d = [];
+
+      for(var i = 0; i < this.crosshairData.xPoints.length; i++) {
+        d.push(this._binarySearch(this.chartData, this.sharedKey, this.crosshairData.xPoints[i], null, null));
+      }
+      console.log(d)
+      return d;
     },
 
     _processOpacity: function() {
@@ -247,6 +255,11 @@ Custom property | Description | Default
           this.setAttribute('stroke-opacity', strokeOpacity);
         });
       }
+    },
+
+    _getXKey: function() {
+      var k = Object.keys(this.completeSeriesConfig);
+      return this.completeSeriesConfig[k[0]]['x'];
     }
   });
 </script>

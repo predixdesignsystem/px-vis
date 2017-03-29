@@ -562,6 +562,54 @@ PxVisBehavior.tooltipData = {
 
 /*
     Name:
+    PxVisBehavior.crosshairData
+
+    Description:
+    Polymer behavior that provides the crosshairData property px-vis components.
+
+    Dependencies:
+    -
+
+    @polymerBehavior PxVisBehavior.crosshairData
+*/
+PxVisBehavior.crosshairData = {
+  properties: {
+    /**
+     * Data reported back by the interaction space component so charts can share a crosshair. Has two sets of data: 1) the full data retreived at the shared key so if all charts use the same datasets, this data can just be displayed on all the charts. 2) a list of just the shared key so if they use different datasets, a search for the closest data at each point can be made. crosshairData is in the form:
+     *
+     *```
+     *    {
+     *        "rawData":[{
+     *            "[[sharedKey]]": [[sharedKeyVal1]],
+     *            "[[key1]]":[[val]],
+     *            "[[key2]]":[[val]]
+     *        },{
+     *            "[[sharedKey]]": [[sharedKeyVal2]],
+     *            "[[key1]]":[[val]],
+     *            "[[key2]]":[[val]]
+     *        }],
+     *        "xPoints":[ sharedKeyVal1, sharedKeyVal1 ]
+     *    }
+     *```
+     * @property crosshairData
+     * @type Object
+     */
+    crosshairData: {
+      type: Object
+    },
+
+    /**
+    *  The name of the shared key which should be used to populate crosshairData.
+    *
+    **/
+    sharedKey: {
+      type: String
+    }
+  }
+};
+
+/*
+    Name:
     PxVisBehavior.extentsData
 
     Description:
@@ -737,6 +785,24 @@ PxVisBehavior.commonMethods = {
       return result ? 'rgb(' + parseInt(result[1], 16) + ',' +
                                parseInt(result[2], 16)+ ',' +
                                parseInt(result[3], 16) + ')' : null;
+  },
+
+  /**
+   * Binary search through sorted chartData
+   */
+  _binarySearch: function(data, key, val, upperIndex, lowerIndex) {
+    var upperIndex = upperIndex || data.length,
+        lowerIndex = lowerIndex || 0,
+        index = Math.floor((upperIndex - lowerIndex) / 2) + lowerIndex;
+
+    if(data[index][key] === val) {
+      return data[index];
+    } else if(val < data[index][key]) {
+      return this._binarySearch(data, key, val, index, lowerIndex);
+    } else if(val > data[index][key]) {
+      return this._binarySearch(data, key, val, upperIndex, index);
+    }
+    return null;
   }
 };
 
