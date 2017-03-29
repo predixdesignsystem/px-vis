@@ -1,0 +1,252 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
+<link rel="import" href="../px-colors-design/colors.html" />
+
+
+<!--
+Element which draws crosshairs around mouse pointer / data points and highlights adjacent datapoints.
+- Uses tooltipData property.
+
+##### Usage
+
+  <px-vis-svg
+    width="[[width]]"
+    height="[[height]]"
+    margin="[[margin]]"
+    svg="{{svg}}">
+  </px-vis-svg>
+  <px-vis-scale
+    x-axis-type="time"
+    y-axis-type="linear"
+    complete-series-config="[[seriesConfig]]"
+    data-extents="[[dataExtents]]"
+    width="[[width]]"
+    height="[[height]]"
+    margin="[[margin]]"
+    chart-data={{chartData}}
+    x="{{x}}"
+    y="{{y}}"
+    domain-changed="{{domainChanged}}"
+    selected-domain="[[selectedDomain]]">
+  </px-vis-scale>
+  <px-vis-interaction-space
+    x-axis-type="time"
+    svg="[[svg]]"
+    width="[[width]]"
+    height="[[height]]"
+    margin="[[margin]]"
+    complete-series-config="[[seriesConfig]]"
+    chart-data="[[chartData]]"
+    tooltip-data={{tooltipData}}
+    series-keys="[[seriesKeys]]"
+    extents-data={{extentsData}}
+    x="[[x]]"
+    y="[[y]]"
+    domain-changed="[[domainChanged]]">
+  </px-vis-interaction-space>
+  <px-vis-cursor
+    svg="[[svg]]"
+    width="[[width]]"
+    height="[[height]]"
+    margin="[[margin]]"
+    complete-series-config="[[seriesConfig]]"
+    chart-data="[[chartData]]"
+    tooltip-data="[[tooltipData]]"
+    selection-type=[[selectionType]]>
+  </px-vis-cursor>
+
+### Styling
+The following custom properties are available for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+  `--px-vis-cursor-line-color` | The color for the lines which track the cursor/data | `$gray5`
+
+
+@element px-vis-cursor
+@blurb Element which draws crosshairs around mouse pointer / data points and highlight adjacent datapoints.
+@homepage index.html
+@demo demo/index.html
+
+//TODO implement a dev setting to choose between only showing data at that x, snapping to nearest data, or interpolating value at x
+
+-->
+
+<link rel="import" href="css/px-vis-styles.html">
+
+<dom-module id="px-vis-point-highlight">
+    <template>
+      <style include="px-vis-styles"></style>
+    </template>
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'px-vis-point-highlight',
+
+    behaviors: [
+      PxVisBehavior.sizing,
+      PxVisBehaviorD3.svg,
+      PxVisBehaviorD3.axes,
+      PxVisBehavior.commonMethods,
+      PxVisBehavior.tooltipData,
+      PxVisBehavior.completeSeriesConfig,
+      PxVisBehaviorD3.clipPath,
+      PxColorsBehavior.baseColors,
+      PxVisBehavior.mutedSeries,
+      PxVisBehavior.dynamicConfigProperties
+    ],
+
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      /**
+       * Holder for the cursor drawing objects
+       *
+       * @property _cursor
+       * @type Object
+       */
+      _cursor:{
+        type:Object
+      },
+      /**
+       * Holder for the tooltip circle drawing objects
+       *
+       * @property _circles
+       * @type Object
+       */
+      _circles:{
+        type:Object
+      },
+      /**
+       * Holder for the tooltip circle drawing objects
+       *
+       * @property _circles
+       * @type Object
+       */
+      _circleBuilder:{
+        type:Object
+      },
+
+      xKey: {
+        type: String,
+        value: 'x'
+      },
+    }, //properties
+
+    observers: [
+      'drawElement(svg, tooltipData.rawPoints.*, completeSeriesConfig.*, width, height)'
+    ],
+    ready: function() {
+
+    },
+    /**
+     * Draws the tooltip elements and sets up listeners and callbacks on chart hover
+     * Sets the tooltipData property which gets passed to the register.
+     *
+     * @method drawElement
+     */
+    drawElement: function() {
+      var _this = this;
+
+      this._circleBuilder = this.svg.selectAll('g.highlightPoint')
+        .data(this.tooltipData.rawPoints, function(d) { return d[this.xKey]}.bind(this));
+
+      this._circleBuilder.exit().remove();
+
+      this._circleBuilder
+        .enter()
+          .append('g')
+          .attr('class', 'highlightPoint')
+          .each(function(data,index) {
+            _this._createCircles(data, this);
+          });
+
+      this._circles = this.svg.selectAll('circle.highlightPoint');
+
+      this._addClipPath();
+      // this._processOpacity();
+
+    },  //drawElement
+
+    _createCircles: function(data, elem) {
+      var c = Px.d3.select(elem).selectAll('circle.highlightPoint')
+        .data(Object.keys(this.completeSeriesConfig));
+
+      c.exit().remove();
+
+      c.enter()
+        .append('circle')
+        .attr('class', 'highlightPoint')
+        .attr('r', 3)
+        .attr('stroke-width', 12)
+        .attr('stroke-opacity', 0.3)
+        .attr('fill', (function(k) {
+          return 'red'; //this.completeSeriesConfig[d]['color']
+        }).bind(this))
+        .attr('stroke', (function(k) {
+          return 'red'; //this.completeSeriesConfig[d]['color']
+        }).bind(this))
+      .merge(c)
+        .attr('cx', function(k) {
+          return !isNaN(data[this.xKey]) && !isNaN(data[this.completeSeriesConfig[k]['y']]) ? this.x(data[this.xKey]) : '';
+        }.bind(this))
+        .attr('cy', function(k) {
+          if(isNaN(data[this.xKey]) || isNaN(data[this.completeSeriesConfig[k]['y']])) {
+            return '';
+          }
+          return  typeof this.y === 'function' ? this.y(d[k]) : this.y[this.completeSeriesConfig[k]["axis"]["id"]](data[this.completeSeriesConfig[k]['y']]);
+        }.bind(this));
+    },
+
+    _addClipPath: function() {
+      if(this.clipPath) {
+        if(this.circlePoint !== 'no' && this._circles) {
+          this.addClipPath(this._circles);
+        }
+      }
+    },
+
+    _processOpacity: function() {
+      var allMuted = true,
+          keys = Object.keys(this.completeSeriesConfig),
+          vLineOpacity,
+          _this = this,
+          isMultiSerie = keys.length > 1;
+
+      for(var i=0; i<keys.length; i++) {
+        if(!this.mutedSeries[keys[i]]) {
+          allMuted = false;
+          break;
+        }
+      }
+
+      if(this._circles) {
+        this._circles.each(function(d) {
+          var muted = _this.mutedSeries && _this.mutedSeries[d] === true,
+              mutedOpacity,
+              opacity,
+              strokeOpacity;
+
+          if(muted) {
+            mutedOpacity = _this.completeSeriesConfig[d].mutedOpacity ? _this.completeSeriesConfig[d].mutedOpacity : _this._defaultmutedOpacity;
+          } else {
+            mutedOpacity = 1;
+          }
+
+          opacity = muted ? mutedOpacity * 1 : 1,
+          strokeOpacity = muted ? mutedOpacity * 0.3 : 0.3;
+
+          this.setAttribute('opacity', opacity);
+          this.setAttribute('stroke-opacity', strokeOpacity);
+        });
+      }
+    }
+  });
+</script>

@@ -304,7 +304,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             'series': [],
             'mouse': null,
             'xArr': null,
-            'yArr': null
+            'yArr': null,
+            'rawPoints': [],
+            'xPoints': []
           },
           keys = (this.seriesKeys) ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
           len = keys.length,
@@ -351,7 +353,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       // now we can set our data that we want to pass out
       if(this._calculatingTooltipData) {
-
+        // console.log(dataObj.rawPoints)
+        console.log(dataObj.xPoints)
         this.set('tooltipData',dataObj);
         this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
         this.set('_calculatingTooltipData', false);
@@ -409,7 +412,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         'series': [],
         'mouse': mousePos,
         'xArr': null,
-        'yArr': null
+        'yArr': null,
+        "rawPoints": [],
+        'xPoints': []
       }
     },
 
@@ -422,7 +427,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       var yKey = this.completeSeriesConfig[k]['y'],
           xKey = this.completeSeriesConfig[k]['x'],
           axisKey = (this.completeSeriesConfig[k]['axis'] && this.completeSeriesConfig[k]['axis']['id']) ? this.completeSeriesConfig[k]['axis']['id'] : null,
-          result = {},
+          result = {
+            "series": {},
+            "raw": {},
+            'xPoints': []
+          },
           xCoord,
           yCoord,
           y1;
@@ -430,19 +439,19 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       //ordinal are specials...
       if(this.xAxisType === 'ordinal') {
         //find ordinal value for X
-        result[xKey] = this._getOrdinalValue(true, mousePos[0], axisKey);
+        result.series[xKey] = this._getOrdinalValue(true, mousePos[0], axisKey);
 
         //now get Y
         if(this.yAxisType === 'ordinal') {
-          result[yKey] = this._getOrdinalValue(false, mousePos[1], axisKey);
+          result.series[yKey] = this._getOrdinalValue(false, mousePos[1], axisKey);
         } else {
           y1 = this._isMultiY ? this.y[axisKey].invert(mousePos[1]) : this.y.invert(mousePos[1]);
-          result[yKey] = this._getClosestValue(false, y1, this.chartData, xKey, yKey, result[xKey]);
+          result.series[yKey] = this._getClosestValue(false, y1, this.chartData, xKey, yKey, result.series[xKey]);
         }
 
       } else if(this.yAxisType === 'ordinal') {
-        result[yKey] = this._getOrdinalValue(false, mousePos[1], axisKey);
-        result[xKey] = this._getClosestValue(true, x1, this.chartData, xKey, yKey, result[yKey]);
+        result.series[yKey] = this._getOrdinalValue(false, mousePos[1], axisKey);
+        result.series[xKey] = this._getClosestValue(true, x1, this.chartData, xKey, yKey, result.series[yKey]);
 
       //time based X axis
       } else if(this.xAxisType === 'time' || this.xAxisType === 'timeLocal') {
@@ -453,13 +462,15 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       }
 
       // get the pixel coords for that data
-      xCoord = this.x(result[xKey]);
-      yCoord = this._isMultiY ? this.y[axisKey](result[yKey]) : this.y(result[yKey]);
+      xCoord = this.x(result.series[xKey]);
+      yCoord = this._isMultiY ? this.y[axisKey](result.series[yKey]) : this.y(result.series[yKey]);
 
       xArr.push(xCoord);
       yArr.push(yCoord);
 
-      dataObj.series.push({'name': k, 'value': result, 'coord': [xCoord,yCoord] });
+      dataObj.series.push({'name': k, 'value': result.series, 'coord': [xCoord,yCoord] });
+      dataObj.rawPoints = dataObj.rawPoints.concat(result.raw);
+      dataObj.xPoints = dataObj.xPoints.concat(result.xPoints);
     },
 
     /**
@@ -467,7 +478,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * Gets the data for timeseries type datasets
      *
      */
-    _searchTimeData: function(x1, k, xKey, yKey) {
+    _searchTimeData: function(x1, k, xKey, yKey, rawResult) {
       /*
         d3.bisector returns index in our array that corresponds to the horizontal position of the mouse pointer.
         Specifically this returns the date that falls to the left of the mouse cursor.
@@ -481,10 +492,18 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           d1 = (this.chartData[index]) ? this.chartData[index] : this.chartData[index - 1],
           // sets result as the closest date to the mouse
           r = (x1 - d0[xKey] > d1[xKey] - x1) ? d1 : d0,
-          result = {};
+          result = {
+            "series": {},
+            "raw": [],
+            'xPoints': []
+          };
 
-      result[xKey] = r[xKey];
-      result[yKey] = r[yKey];
+      result.series[xKey] = r[xKey];
+      result.series[yKey] = r[yKey];
+
+// FIXME creates multiple copies of the same data...
+      result.raw.push(r);
+      result.xPoints.push(r[xKey]);
 
       return result
     },
@@ -494,7 +513,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * Iterates through all the data and returns our closest datapoints for all non-timeseries, non-ordinal data
      *
      */
-    _searchContinuousData: function(searchTimeStamp, closestTimestamp, mousePos, xKey, yKey, axisKey) {
+    _searchContinuousData: function(searchTimeStamp, closestTimestamp, mousePos, xKey, yKey, axisKey, rawResult) {
 // TODO add option to pick closet point or closest x
       var currX = this.x.domain(),
           currY = this._isMultiY ? this.y[axisKey].domain() : this.y.domain(),
@@ -503,9 +522,13 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           x2,
           y2,
           d,
-          index,
+          index = [],
           minDist = Number.MAX_VALUE,
-          result = {};
+          result = {
+            "series": {},
+            "raw": [],
+            'xPoints': []
+          };
 
       for(var i = 0; i < this.chartData.length; i++) {
 
@@ -527,11 +550,15 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           //keep the closest point
           if(d < minDist) {
             minDist = d;
-            index = i;
+
+            index = [];
+            index.push(i);
 
             //store this point
-            result[xKey] = dataX;
-            result[yKey] = dataY;
+            result.series[xKey] = dataX;
+            result.series[yKey] = dataY;
+          } else if(d === minDist) {
+            index.push(i);
           }
         }
       }
@@ -539,7 +566,16 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       //store the timestamp and distance
       if(searchTimeStamp && closestTimestamp.distance > minDist) {
         closestTimestamp.distance = minDist;
-        closestTimestamp.time = this.chartData[index][this.timeData];
+        closestTimestamp.time = this.chartData[index[0]][this.timeData];
+      }
+
+      //get all raw data
+      for(var i = 0; i < index.length; i++) {
+        result.raw.push(this.chartData[index[i]]);
+
+        if(this.timeData) {
+          result.xPoints.push([this.chartData[index[i]][this.timeData]]);
+        }
       }
 
       return result
@@ -586,6 +622,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       return domain[result];
     },
+
     /**
      * Gets the range of all ordinal values between from and to (both being values of the axis)
      *
