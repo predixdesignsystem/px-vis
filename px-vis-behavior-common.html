@@ -791,6 +791,10 @@ PxVisBehavior.commonMethods = {
    * Binary search through sorted chartData
    */
   _binarySearch: function(data, key, val, lowerIndex, upperIndex) {
+    if(lowerIndex && upperIndex && lowerIndex === upperIndex) {
+      return null;
+    }
+
     var upperIndex = upperIndex || data.length,
         lowerIndex = lowerIndex || 0,
         index = Math.floor((upperIndex - lowerIndex) / 2) + lowerIndex;
@@ -809,11 +813,15 @@ PxVisBehavior.commonMethods = {
    * Binary search through sorted chartData returning all vals within a window
    */
   _fuzzyBinarySearch: function(data, key, lowerFuzz, upperFuzz, lowerIndex, upperIndex) {
+    if(lowerIndex && upperIndex && lowerIndex === upperIndex) {
+      return null;
+    }
+
     var upperIndex = upperIndex || data.length,
         lowerIndex = lowerIndex || 0,
         index = Math.floor((upperIndex - lowerIndex) / 2) + lowerIndex;
 
-    if(data[index][key] > lowerFuzz && data[index][key] < upperFuzz) {
+    if(data[index][key] >= lowerFuzz && data[index][key] <= upperFuzz) {
       return this._getAdjacentValues(data, key, lowerFuzz, upperFuzz, lowerIndex, upperIndex, index);
     } else if(upperFuzz < data[index][key]) {
       return this._fuzzyBinarySearch(data, key, lowerFuzz, upperFuzz, lowerIndex, index);

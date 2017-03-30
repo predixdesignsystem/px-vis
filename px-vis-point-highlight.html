@@ -126,10 +126,12 @@ Custom property | Description | Default
         type:Object
       },
 
+
+
       /**
        * Boolean indicating if the dataset on this chart is different than the one on the crosshairData's origin chart.
        *
-       * NOTE: The chartData passed into the chart MUST be sorted by the sharedKey for differentDataset to work. This component will not work with unsorted data.
+       * NOTE: The chartData passed into the chart MUST be sorted by the timeData for differentDataset to work. This component will not work with unsorted data.
        */
       differentDataset: {
         type: Boolean,
@@ -139,7 +141,20 @@ Custom property | Description | Default
       fuzz: {
         type: Number,
         value: 0
-      }
+      },
+
+      /**
+       * Name of the variable holding the time stamp in the data
+       */
+      timeData: {
+        type: String,
+        value: 'Timestamp'
+      },
+
+      type: {
+        type: String,
+        value: 'point'
+      },
     }, //properties
 
     observers: [
@@ -159,7 +174,7 @@ Custom property | Description | Default
           xKey = this._getXKey(),
           dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawPoints,
           circleBuilder;
-// console.log(dataset)
+
       circleBuilder = this.svg.selectAll('g.highlightPoint')
         .data(dataset, function(d) { return d[xKey]}.bind(this));
 
@@ -225,10 +240,10 @@ Custom property | Description | Default
           lowerFuzz = this.crosshairData.xPoints[i] - this.fuzz;
           upperFuzz = this.crosshairData.xPoints[i] + this.fuzz;
 
-          d = d.concat(this._fuzzyBinarySearch(this.chartData, this.sharedKey, lowerFuzz, upperFuzz, null, null));
+          d = d.concat(this._fuzzyBinarySearch(this.chartData, this.timeData, lowerFuzz, upperFuzz, null, null));
 
         } else {
-          d.push(this._binarySearch(this.chartData, this.sharedKey, this.crosshairData.xPoints[i], null, null));
+          d.push(this._binarySearch(this.chartData, this.timeData, this.crosshairData.xPoints[i], null, null));
         }
       }
 
