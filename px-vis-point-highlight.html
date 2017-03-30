@@ -174,9 +174,7 @@ Custom property | Description | Default
           });
 
       this._circles = this.svg.selectAll('circle.highlightPoint');
-
       this._addClipPath();
-      // this._processOpacity();
 
     },  //drawElement
 
@@ -207,7 +205,8 @@ Custom property | Description | Default
             return '';
           }
           return  typeof this.y === 'function' ? this.y(d[k]) : this.y[this.completeSeriesConfig[k]["axis"]["id"]](data[this.completeSeriesConfig[k]['y']]);
-        }.bind(this));
+        }.bind(this))
+        .style("display", function(k) { return isNaN(data[this.completeSeriesConfig[k]['x']]) || isNaN(data[this.completeSeriesConfig[k]['y']]) ? "none" : null; }.bind(this));
     },
 
     _addClipPath: function() {
@@ -233,7 +232,6 @@ Custom property | Description | Default
         }
       }
 
-      console.log(d)
       return d;
     },
 
