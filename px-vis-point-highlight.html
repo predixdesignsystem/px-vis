@@ -134,6 +134,11 @@ Custom property | Description | Default
       differentDataset: {
         type: Boolean,
         value: false
+      },
+
+      fuzz: {
+        type: Number,
+        value: 0
       }
     }, //properties
 
@@ -218,8 +223,9 @@ Custom property | Description | Default
 
       for(var i = 0; i < this.crosshairData.xPoints.length; i++) {
         if(this.fuzz) {
-          lowerFuzz = this.crosshairData.xPoints[i] - fuzz;
-          upperFuzz = this.crosshairData.xPoints[i] + fuzz;
+          lowerFuzz = this.crosshairData.xPoints[i] - this.fuzz;
+          upperFuzz = this.crosshairData.xPoints[i] + this.fuzz;
+
           d = d.concat(this._fuzzyBinarySearch(this.chartData, this.sharedKey, lowerFuzz, upperFuzz, null, null));
 
         } else {
