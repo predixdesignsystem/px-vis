@@ -212,11 +212,21 @@ Custom property | Description | Default
     },
 
     _calcDataset: function() {
-      var d = [];
+      var d = [],
+          lowerFuzz,
+          upperFuzz;
 
       for(var i = 0; i < this.crosshairData.xPoints.length; i++) {
-        d.push(this._binarySearch(this.chartData, this.sharedKey, this.crosshairData.xPoints[i], null, null));
+        if(this.fuzz) {
+          lowerFuzz = this.crosshairData.xPoints[i] - fuzz;
+          upperFuzz = this.crosshairData.xPoints[i] + fuzz;
+          d = d.concat(this._fuzzyBinarySearch(this.chartData, this.sharedKey, lowerFuzz, upperFuzz, null, null));
+
+        } else {
+          d.push(this._binarySearch(this.chartData, this.sharedKey, this.crosshairData.xPoints[i], null, null));
+        }
       }
+
       console.log(d)
       return d;
     },

@@ -790,7 +790,7 @@ PxVisBehavior.commonMethods = {
   /**
    * Binary search through sorted chartData
    */
-  _binarySearch: function(data, key, val, upperIndex, lowerIndex) {
+  _binarySearch: function(data, key, val, lowerIndex, upperIndex) {
     var upperIndex = upperIndex || data.length,
         lowerIndex = lowerIndex || 0,
         index = Math.floor((upperIndex - lowerIndex) / 2) + lowerIndex;
@@ -798,11 +798,51 @@ PxVisBehavior.commonMethods = {
     if(data[index][key] === val) {
       return data[index];
     } else if(val < data[index][key]) {
-      return this._binarySearch(data, key, val, index, lowerIndex);
+      return this._binarySearch(data, key, val, lowerIndex, index);
     } else if(val > data[index][key]) {
-      return this._binarySearch(data, key, val, upperIndex, index);
+      return this._binarySearch(data, key, val, index, upperIndex);
     }
     return null;
+  },
+
+  /**
+   * Binary search through sorted chartData returning all vals within a window
+   */
+  _fuzzyBinarySearch: function(data, key, lowerFuzz, upperFuzz, lowerIndex, upperIndex) {
+    var upperIndex = upperIndex || data.length,
+        lowerIndex = lowerIndex || 0,
+        index = Math.floor((upperIndex - lowerIndex) / 2) + lowerIndex;
+
+    if(data[index][key] > lowerFuzz && data[index][key] < upperFuzz) {
+      return this._getAdjacentValues(data, key, lowerFuzz, upperFuzz, lowerIndex, upperIndex, index);
+    } else if(upperFuzz < data[index][key]) {
+      return this._binarySearch(data, key, lowerFuzz, upperFuzz, lowerIndex, index);
+    } else if(lowerFuzz > data[index][key]) {
+      return this._binarySearch(data, key, lowerFuzz, upperFuzz, index, upperIndex);
+    }
+    return null;
+  },
+
+  _getAdjacentValues: function(data, key, lowerFuzz, upperFuzz, lowerIndex, upperIndex, index) {
+    var d = [];
+
+    d.push(data[index]);
+
+    for(var i = index+1; i < upperIndex; i++) {
+      if(data[i][key] > upperFuzz) {
+        break;
+      }
+      d.push(data[i]);
+    }
+
+    for(var i = index-1; i < lowerIndex; i--) {
+      if(data[i][key] < lowerFuzz) {
+        break;
+      }
+      d.push(data[i]);
+    }
+
+    return d;
   }
 };
 
