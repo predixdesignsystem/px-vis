@@ -1891,7 +1891,7 @@ PxVisBehavior.selectionType = {
 
 /*
     Name:
-<<<<<<< HEAD
+
     PxVisBehavior.measureText
 
     Description:
@@ -1908,15 +1908,23 @@ PxVisBehavior.measureText = {
      */
     _measurementCanvas: {
       type: Object
+    },
+    _measurementCanvasContext: {
+      type: Object
     }
   },
 
-  _createMeasurementCanvas: function(width, height) {
+  _createMeasurementCanvas: function(width, height, font) {
     var canvas = document.createElement('canvas');
     canvas.height = height || this.height;
     canvas.width = width || 9999;
 
     this._measurementCanvas = canvas;
+
+    if(font) {
+      var ctx = this._measurementCanvas.getContext('2d');
+      ctx.font = font;
+    }
   },
 
   _measureTextOnCanvas: function(text) {
