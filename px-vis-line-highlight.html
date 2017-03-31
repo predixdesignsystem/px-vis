@@ -2,7 +2,7 @@
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="../px-colors-design/colors.html" />
-
+<link rel="import" href="px-vis-line-svg.html" />
 
 <!--
 Element which draws crosshairs around mouse pointer / data points and highlights adjacent datapoints.
@@ -75,9 +75,22 @@ Custom property | Description | Default
 
 <link rel="import" href="css/px-vis-styles.html">
 
-<dom-module id="px-vis-point-highlight">
+<dom-module id="px-vis-line-highlight">
     <template>
       <style include="px-vis-styles"></style>
+
+      <px-vis-line-svg
+        id="lineSVG"
+        svg="[[svg]]"
+        parallel-coordinates
+        multi-path
+        series-id="highlights"
+        chart-data="[[_lineData]]"
+        complete-series-config="[[_highlightConfig]]"
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]">
+      </px-vis-line-svg>
 
     </template>
 </dom-module>
@@ -85,7 +98,7 @@ Custom property | Description | Default
 <script>
   Polymer({
 
-    is: 'px-vis-point-highlight',
+    is: 'px-vis-line-highlight',
 
     behaviors: [
       PxVisBehavior.sizing,
@@ -98,6 +111,8 @@ Custom property | Description | Default
       PxVisBehaviorD3.clipPath,
       PxColorsBehavior.baseColors,
       PxVisBehavior.mutedSeries,
+      PxVisBehavior.dimensions,
+      PxVisBehaviorD3.domainUpdate,
       PxVisBehavior.dynamicConfigProperties
     ],
 
@@ -108,27 +123,6 @@ Custom property | Description | Default
      * @type Object
      */
     properties: {
-      /**
-       * Holder for the cursor drawing objects
-       *
-       * @property _cursor
-       * @type Object
-       */
-      _cursor:{
-        type:Object
-      },
-      /**
-       * Holder for the crosshair circle drawing objects
-       *
-       * @property _circles
-       * @type Object
-       */
-      _circles:{
-        type:Object
-      },
-
-
-
       /**
        * Boolean indicating if the dataset on this chart is different than the one on the crosshairData's origin chart.
        *
@@ -150,15 +144,37 @@ Custom property | Description | Default
       timeData: {
         type: String,
         value: 'Timestamp'
+      },
+
+      _lineData: {
+        type: Object,
+        notify: true
+      },
+
+      _highlightConfig: {
+        type: Object,
+        notify: true,
+        computed: '_computeConfig(dimensions.*)'
       }
     }, //properties
 
     observers: [
-      'drawElement(svg, crosshairData.xPoints.*, completeSeriesConfig.*)'
+      'drawElement(crosshairData.xPoints.*, _highlightConfig)'
     ],
     ready: function() {
 
     },
+
+    _computeConfig: function() {
+      return {
+        "highlights": {
+          "x": this.dimensions,
+          "y": this.dimensions,
+          "color": "rgb(255,0,0)"
+        }
+      };
+    },
+
     /**
      * Draws the crosshair elements and sets up listeners and callbacks on chart hover
      * Sets the crosshairData property which gets passed to the register.
@@ -166,65 +182,10 @@ Custom property | Description | Default
      * @method drawElement
      */
     drawElement: function() {
-      var _this = this,
-          xKey = this._getXKey(),
-          dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawPoints,
-          svgBuilder;
-
-      svgBuilder = this.svg.selectAll('g.highlightPoint')
-        .data(dataset, function(d) { return d[xKey]}.bind(this));
-
-      svgBuilder.exit().remove();
-
-      svgBuilder
-        .enter()
-          .append('g')
-          .attr('class', 'highlightPoint')
-          .each(function(data, index) {
-            _this._createCircles(data, this);
-          });
-
-      this._circles = this.svg.selectAll('circle.highlightPoint');
-      this._addClipPath();
-
+      var dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawPoints;
+      this.set('_lineData', dataset);
+      console.log(this._lineData)
     },  //drawElement
-
-    _createCircles: function(data, elem) {
-      var c = Px.d3.select(elem).selectAll('circle.highlightPoint')
-        .data(Object.keys(this.completeSeriesConfig));
-
-      c.exit().remove();
-
-      c.enter()
-        .append('circle')
-        .attr('class', 'highlightPoint')
-        .attr('r', 3)
-        .attr('stroke-width', 12)
-        .attr('stroke-opacity', 0.3)
-        .attr('fill', (function(k) {
-          return 'red'; //this.completeSeriesConfig[d]['color']
-        }).bind(this))
-        .attr('stroke', (function(k) {
-          return 'red'; //this.completeSeriesConfig[d]['color']
-        }).bind(this))
-      .merge(c)
-        .attr('cx', function(k) {
-          return !isNaN(data[this.completeSeriesConfig[k]['x']]) && !isNaN(data[this.completeSeriesConfig[k]['y']]) ? this.x(data[this.completeSeriesConfig[k]['x']]) : '';
-        }.bind(this))
-        .attr('cy', function(k) {
-          if(isNaN(data[this.completeSeriesConfig[k]['x']]) || isNaN(data[this.completeSeriesConfig[k]['y']])) {
-            return '';
-          }
-          return  typeof this.y === 'function' ? this.y(d[k]) : this.y[this.completeSeriesConfig[k]["axis"]["id"]](data[this.completeSeriesConfig[k]['y']]);
-        }.bind(this))
-        .style("display", function(k) { return isNaN(data[this.completeSeriesConfig[k]['x']]) || isNaN(data[this.completeSeriesConfig[k]['y']]) ? "none" : null; }.bind(this));
-    },
-
-    _addClipPath: function() {
-      if(this.clipPath && this._doesD3HaveValues(this._circles)) {
-        this.addClipPath(this._circles);
-      }
-    },
 
     _calcDataset: function() {
       var d = [],
@@ -244,47 +205,6 @@ Custom property | Description | Default
       }
 
       return d;
-    },
-
-    _processOpacity: function() {
-      var allMuted = true,
-          keys = Object.keys(this.completeSeriesConfig),
-          vLineOpacity,
-          _this = this,
-          isMultiSerie = keys.length > 1;
-
-      for(var i=0; i<keys.length; i++) {
-        if(!this.mutedSeries[keys[i]]) {
-          allMuted = false;
-          break;
-        }
-      }
-
-      if(this._circles) {
-        this._circles.each(function(d) {
-          var muted = _this.mutedSeries && _this.mutedSeries[d] === true,
-              mutedOpacity,
-              opacity,
-              strokeOpacity;
-
-          if(muted) {
-            mutedOpacity = _this.completeSeriesConfig[d].mutedOpacity ? _this.completeSeriesConfig[d].mutedOpacity : _this._defaultmutedOpacity;
-          } else {
-            mutedOpacity = 1;
-          }
-
-          opacity = muted ? mutedOpacity * 1 : 1,
-          strokeOpacity = muted ? mutedOpacity * 0.3 : 0.3;
-
-          this.setAttribute('opacity', opacity);
-          this.setAttribute('stroke-opacity', strokeOpacity);
-        });
-      }
-    },
-
-    _getXKey: function() {
-      var k = Object.keys(this.completeSeriesConfig);
-      return this.completeSeriesConfig[k[0]]['x'];
     }
   });
 </script>
