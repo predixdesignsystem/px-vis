@@ -62,6 +62,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehaviorD3.axes,
       PxVisBehavior.dataset,
       PxVisBehavior.tooltipData,
+      PxVisBehavior.crosshairData,
       PxVisBehavior.extentsData,
       PxVisBehavior.commonMethods,
       PxVisBehavior.axisTypes,
@@ -137,6 +138,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           'startZooming': '_drawActionBox',
           'stopZooming': '_finishActionBox',
           'calcTooltipData': '_calcTooltipData',
+          'calcCrosshairData': '_calcCrosshairData',
+          'calcTooltipAndCrosshairData': '_calcTooltipAndCrosshairData',
           'resetTooltip': '_resetTooltipData',
           'startPanning': '_startPanning',
           'stopPanning': '_stopPanning'
@@ -173,7 +176,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         type: Boolean,
         value: true
       },
-      _calculatingTooltipData: {
+      _calculatingData: {
         type: Boolean,
         value: false
       },
@@ -181,6 +184,20 @@ TODO implement a dev setting to choose between only showing data at that x, snap
        * Whether the scatter plot is using radial coiordinates (x=phase, y=amplitude)
        */
       radial: {
+        type: Boolean,
+        value: false
+      },
+      /**
+       *  Whether we're searching for tooltip data
+       */
+      _calcTooltip: {
+        type: Boolean,
+        value: false
+      },
+      /**
+       *  Whether we're searching for crosshair data
+       */
+      _calcCrosshair: {
         type: Boolean,
         value: false
       }
@@ -316,7 +333,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      */
     _resetTooltipData: function() {
 
-      this.set('_calculatingTooltipData', false);
+      this.set('_calculatingData', false);
       var ttD = {
             'time': null,
             'hidden': true,
@@ -325,7 +342,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             'xArr': null,
             'yArr': null,
             'rawPoints': [],
-            'xPoints': []
+            'timeStamps': []
           },
           keys = (this.seriesKeys) ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
           len = keys.length,
@@ -338,15 +355,36 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': ttD, 'method':'set' });
     },
 
+    _calcTooltipAndCrosshairData: function() {
+      this._calcTooltip = true;
+      this._calcCrosshair = true;
+
+      this._calcData();
+    },
+
+    _calcTooltipData: function() {
+      this._calcTooltip = true;
+      this._calcCrosshair = false;
+
+      this._calcData();
+    },
+
+    _calcCrosshairData: function() {
+      this._calcTooltip = false;
+      this._calcCrosshair = true;
+
+      this._calcData();
+    },
+
     /**
      * Helper function called on mousemove
      * Calculates the mouse position and associated x & y values. Then sets the d3 elements and sets tooltipData for consumption elsewhere
      *
      * @method _calcTooltipData
      */
-    _calcTooltipData:function() {
+    _calcData:function() {
 
-      this.set('_calculatingTooltipData', true);
+      this.set('_calculatingData', true);
 
       if(!this.mouseDown && this.chartData.length > 0 && this.y) {
 
@@ -355,9 +393,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         var mousePos = Px.d3.mouse(this._rect.node());
 
         this.debounce('move',function() {
-          this._calcTooltipDataDebounced(mousePos);
+          this._calcDataDebounced(mousePos);
         }, 10);
-
       }
     },
 
@@ -366,15 +403,15 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * Calculates the mouse position and associated x & y values. Then sets the d3 elements and sets tooltipData for consumption elsewhere
      *
      */
-    _calcTooltipDataDebounced: function(mousePos) {
+    _calcDataDebounced: function(mousePos) {
       //calc all the series: returns updated dataObj
       var dataObj = this._getDataForAllSeries(mousePos);
 
       // now we can set our data that we want to pass out
-      if(this._calculatingTooltipData) {
+      if(this._calculatingData) {
         this.set('tooltipData',dataObj);
         this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
-        this.set('_calculatingTooltipData', false);
+        this.set('_calculatingData', false);
       }
     },
 
@@ -392,22 +429,16 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           //search for timestamp if we don't have it already (non time based chart)
           //and we know the data has some notion of time -- !! --> turn into a bool
           searchTimeStamp = dataObj.time === null && !!this.chartData[0][this.timeData];
-          xArr = [],  //temp holder for all x coordinates
-          yArr = [];  //temp holder for all y coordinates
 
       for(var i = 0; i < keys.length; i++) {
         //if we had a request to reset tooltip stop calculating
-        if(!this._calculatingTooltipData) {
+        if(!this._calculatingData) {
           break;
         }
 
         //calc this series: returns updated dataObj, xArr, yArr & closestTimestamp
-        this._calcSerieData(dataObj, xArr, yArr, searchTimeStamp, closestTimestamp, x1, keys[i], mousePos);
+        this._calcSerieData(dataObj, searchTimeStamp, closestTimestamp, x1, keys[i], mousePos);
       } //for
-
-      //save our x and y coord list
-      dataObj['xArr'] = xArr;
-      dataObj['yArr'] = yArr;
 
       // add the timestamp
       if(searchTimeStamp) {
@@ -428,10 +459,10 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         'hidden': !this.showTooltip,
         'series': [],
         'mouse': mousePos,
-        'xArr': null,
-        'yArr': null,
-        "rawPoints": [],
-        'xPoints': []
+        'xArr': [],
+        'yArr': [],
+        'rawPoints': [],
+        'timeStamps': []
       }
     },
 
@@ -440,18 +471,19 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * Returns the tooltipData values for a single series
      *
      */
-    _calcSerieData: function(dataObj, xArr, yArr, searchTimeStamp, closestTimestamp, x1, k, mousePos) {
+    _calcSerieData: function(dataObj, searchTimeStamp, closestTimestamp, x1, k, mousePos) {
       var yKey = this.completeSeriesConfig[k]['y'],
           xKey = this.completeSeriesConfig[k]['x'],
           axisKey = (this.completeSeriesConfig[k]['axis'] && this.completeSeriesConfig[k]['axis']['id']) ? this.completeSeriesConfig[k]['axis']['id'] : null,
           result = {
             "series": {},
             "raw": {},
-            'xPoints': []
+            'timeStamps': []
           },
           xCoord,
           yCoord,
-          y1;
+          y1,
+          isContinuous = false;
 
       //ordinal are specials...
       if(this.xAxisType === 'ordinal') {
@@ -472,27 +504,24 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       //time based X axis
       } else if(this.xAxisType === 'time' || this.xAxisType === 'timeLocal') {
-        result = this._searchTimeData(x1, k, xKey, yKey);
+        result = this._searchTimeData(x1, k, xKey, yKey, axisKey);
 
-      } else if(this.radial) {  //radial: iterate over points and find the closest
-        result = this._searchContinuousDataRadial(searchTimeStamp, closestTimestamp, mousePos, xKey, yKey, axisKey, xArr, yArr);
       } else  {  //non time based: iterate over points and find the closest
         result = this._searchContinuousData(searchTimeStamp, closestTimestamp, mousePos, xKey, yKey, axisKey);
+        isContinuous = true;
       }
 
-
-      if(!this.radial) {
-        // get the pixel coords for that data
-        xCoord = this.x(result.series[xKey]);
-        yCoord = this._isMultiY ? this.y[axisKey](result.series[yKey]) : this.y(result.series[yKey]);
-
-        xArr.push(xCoord);
-        yArr.push(yCoord);
+      //we already got the pixel coords in continuous
+      if(!isContinuous) {
+        result.coords = [this.x(r[xKey]), this._isMultiY ? this.y[axisKey](r[yKey]) : this.y(r[yKey])]
       }
+      //also keep pixel coords in array
+      dataObj.xArr.push(result.coords[0]);
+      dataObj.yArr.push(result.coords[1]);
 
-      dataObj.series.push({'name': k, 'value': result.series, 'coord': [xCoord,yCoord] });
+      dataObj.series.push({'name': k, 'value': result.series, 'coord': result.coords });
       dataObj.rawPoints = dataObj.rawPoints.concat(result.raw);
-      dataObj.xPoints = dataObj.xPoints.concat(result.xPoints);
+      dataObj.timeStamps = dataObj.timeStamps.concat(result.timeStamps);
     },
 
     /**
@@ -500,7 +529,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * Gets the data for timeseries type datasets
      *
      */
-    _searchTimeData: function(x1, k, xKey, yKey, rawResult) {
+    _searchTimeData: function(x1, k, xKey, yKey, rawResult, axisKey) {
       /*
         d3.bisector returns index in our array that corresponds to the horizontal position of the mouse pointer.
         Specifically this returns the date that falls to the left of the mouse cursor.
@@ -517,7 +546,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           result = {
             "series": {},
             "raw": [],
-            'xPoints': []
+            'timeStamps': []
           };
 
       result.series[xKey] = r[xKey];
@@ -525,7 +554,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
 // FIXME creates multiple copies of the same data...
       result.raw.push(r);
-      result.xPoints.push(r[xKey]);
+      result.timeStamps.push(r[xKey]);
 
       return result
     },
@@ -537,19 +566,23 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      */
     _searchContinuousData: function(searchTimeStamp, closestTimestamp, mousePos, xKey, yKey, axisKey, rawResult) {
 // TODO add option to pick closet point or closest x
-      var currX = this.x.domain(),
-          currY = this._isMultiY ? this.y[axisKey].domain() : this.y.domain(),
+      var xDomain = this.x.domain(),
+          yDomain = this._isMultiY ? this.y[axisKey].domain() : this.y.domain(),
+          yDomainTot = yDomain[1] - yDomain[0],
+          yRange = this.y.range()[1] - this.y.range()[0],
           dataX,
           dataY,
-          x2,
-          y2,
+          pixelX,
+          pixelY,
+          pixelXCopy,
+          pixelYCopy,
           d,
           index = [],
           minDist = Number.MAX_VALUE,
           result = {
             "series": {},
             "raw": [],
-            'xPoints': []
+            'timeStamps': []
           };
 
       for(var i = 0; i < this.chartData.length; i++) {
@@ -559,15 +592,25 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         dataY = this.chartData[i][yKey];
 
         // check if data is in our domain
-        if(dataX >= currX[0] && dataX <= currX[1] && dataY >= currY[0] && dataY <= currY[1]) {
+        if(dataX >= xDomain[0] && dataX <= xDomain[1] && dataY >= yDomain[0] && dataY <= yDomain[1]) {
 
           //get pixel coords
-          x2 = this.x(dataX);
-          y2 = this._isMultiY ? this.y[axisKey](dataY) : this.y(dataY);
+          if(this.radial) {
+            var tmp = this._getPixelCoordForRadialData(dataX, dataY, yRange, yDomain, yDomainTot);
+            pixelX = tmp[0];
+            pixelY = tmp[1];
+          } else {
+            pixelX = this.x(dataX);
+            pixelY = this._isMultiY ? this.y[axisKey](dataY) : this.y(dataY);
+          }
+
+          //keep a copy in case we need this point
+          pixelXCopy = pixelX;
+          pixelYCopy = pixelY;
 
           //distance between the two points
-          //! x2 and y2 are changed during this calculation
-          d = Math.sqrt( (x2-=mousePos[0])*x2 + (y2-=mousePos[1])*y2 );
+          //! pixelX and pixelY are changed during this calculation
+          d = Math.sqrt( (pixelX-=mousePos[0])*pixelX + (pixelY-=mousePos[1])*pixelY );
 
           //keep the closest point
           if(d < minDist) {
@@ -579,6 +622,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             //store this point
             result.series[xKey] = dataX;
             result.series[yKey] = dataY;
+            result.coords = [pixelXCopy, pixelYCopy]
           } else if(d === minDist) {
             index.push(i);
           }
@@ -591,115 +635,45 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         closestTimestamp.time = this.chartData[index[0]][this.timeData];
       }
 
-      //get all raw data
-      for(var i = 0; i < index.length; i++) {
-        result.raw.push(this.chartData[index[i]]);
-// FIXME Should make this a sharedKey prop instead of just time
-        if(this.timeData) {
-          result.xPoints.push(this.chartData[index[i]][this.timeData]);
+      if(this._calcCrosshair) {
+        //get all raw data
+        for(var i = 0; i < index.length; i++) {
+          result.raw.push(this.chartData[index[i]]);
+
+          if(this.timeData) {
+            result.timeStamps.push(this.chartData[index[i]][this.timeData]);
+          }
         }
       }
 
       return result
     },
 
-    /**
-     *
-     * Iterates through all the data and returns our closest datapoints for all non-timeseries, non-ordinal data
-     *
-     */
-    _searchContinuousDataRadial: function(searchTimeStamp, closestTimestamp, mousePos, xKey, yKey, axisKey, xArr, yArr) {
-// TODO add option to pick closet point or closest x
-      var currX = this.x.domain(),
-          currY = this.y.domain(),
-          yTot = currY[1] - currY[0],
-          yRange = this.y.range()[1] - this.y.range()[0],
-          minXPix,
-          minYPix,
-          dataX,
-          dataY,
-          x2,
-          y2,
-          d,
-          index = [],
-          minDist = Number.MAX_VALUE,
-          result = {
-            "series": {},
-            "raw": [],
-            'xPoints': []
-          };
+    _getPixelCoordForRadialData: function(dataX, dataY, yRange, yDomain, yDomainTot) {
+      var result = [];
 
-      for(var i = 0; i < this.chartData.length; i++) {
+      //process angle and amplitude in pxel
+      var angle = dataX,
+          pixelAmplitude = yRange * (dataY - yDomain[0])/yDomainTot;
 
-        //get point values
-        dataX = this.chartData[i][xKey];
-        dataY = this.chartData[i][yKey];
-
-        // check if data is in our domain
-        if(dataX >= currX[0] && dataX <= currX[1] && dataY >= currY[0] && dataY <= currY[1]) {
-
-          //process angle and amplitude in pxel
-          var angle = dataX,
-              pixelAmplitude = yRange * (dataY - currY[0])/yTot;
-
-          if(this.useDegrees) {
-            angle *= 2 * Math.PI / 360;
-          }
-
-          if(!this.counterClockwise) {
-            angle *= -1;
-          }
-
-          //0 is on top
-          angle += Math.PI/2;
-
-          //sin * pixel range * percentage of data range
-          y2 = Math.sin(angle) * pixelAmplitude;
-          x2 = Math.cos(angle) * pixelAmplitude;
-
-          //distance between the two points
-          //! x2 and y2 are changed during this calculation
-          d = Math.sqrt( (x2-=mousePos[0])*x2 + (y2-=mousePos[1])*y2 );
-
-          //keep the closest point
-          if(d < minDist) {
-            minDist = d;
-
-            index = [];
-            index.push(i);
-
-            //store this point
-            result.series[xKey] = dataX;
-            result.series[yKey] = dataY;
-            minXPix = Math.cos(angle) * pixelAmplitude;
-            minYPix = Math.sin(angle) * pixelAmplitude;
-
-          } else if(d === minDist) {
-            index.push(i);
-          }
-        }
+      if(this.useDegrees) {
+        angle *= 2 * Math.PI / 360;
       }
 
-      //store the timestamp and distance
-      if(searchTimeStamp && closestTimestamp.distance > minDist) {
-        closestTimestamp.distance = minDist;
-        closestTimestamp.time = this.chartData[index[0]][this.timeData];
+      if(!this.counterClockwise) {
+        angle *= -1;
       }
 
-      xArr.push(minXPix);
-      yArr.push(minYPix);
+      //0 is on top
+      angle += Math.PI;
 
-      //get all raw data
-      for(var i = 0; i < index.length; i++) {
-        result.raw.push(this.chartData[index[i]]);
+      //sin * pixel range * percentage of data range
+      result[1] = Math.cos(angle) * pixelAmplitude;
+      result[0] = Math.sin(angle) * pixelAmplitude;
 
-        if(this.timeData) {
-          result.xPoints.push([this.chartData[index[i]][this.timeData]]);
-        }
-      }
-
-      return result
+      return result;
     },
+
 
     /**
      * Tries to find the ordinal value for the mouse position on the X (xAxis=true)
