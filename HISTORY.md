@@ -1,3 +1,7 @@
+v1.1.4
+==================
+* fixed issue with tooltip on common axis
+
 v1.1.3
 ==================
 * fixed theming issue on dark tooltip
