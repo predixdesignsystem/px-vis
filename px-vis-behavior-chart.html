@@ -971,7 +971,8 @@ PxVisBehaviorChart.circleChart = [{
       * Min between width and height
       */
      _smallerSide: {
-        type: Number
+        type: Number,
+        computed: '_computeSmallerSide(width, height)'
       },
       /**
        * diameter of the chart drawing, adjusted with margins
@@ -1002,29 +1003,30 @@ PxVisBehaviorChart.circleChart = [{
         }
       }
   },
-  observers: ['_sizeChanged(width, height, margin.*, _internalCircleMargins.*)'],
-  _sizeChanged: function(width, height, margin, internalMargin) {
+  observers: [
+    '_sizeChanged(_smallerSide, margin.*, _internalCircleMargins.*)'
+      ],
+  _computeSmallerSide: function(width, height) {
+    return Math.max(Math.min(height,width), 0);
+  },
+  _sizeChanged: function(_smallerSide, margin, internalMargin) {
 
-    //get the limiting side
-    this.set('_smallerSide', Math.max(Math.min(height,width), 0));
+      //measure appropriate width and height based on the smaller sides and margins
+      var ml = Number(this.margin.left) + Number(this._internalCircleMargins.left),
+          mr = Number(this.margin.right) + Number(this._internalCircleMargins.right),
+          mt = Number(this.margin.top) + Number(this._internalCircleMargins.top),
+          mb = Number(this.margin.bottom) + Number(this._internalCircleMargins.bottom),
+          adjWidth = Math.max(0, this._smallerSide - ml - mr),
+          adjHeight =  Math.max(0, this._smallerSide - mt - mb),
+          diameter = Math.min(adjWidth,adjHeight) ,
+          radius = diameter / 2,
+          center = [];
+      center[0] = ml + adjWidth/2;
+      center[1] = mt + adjHeight/2;
 
-    //measure appropriate width and height based on the smaller sides and margins
-    var ml = Number(this.margin.left) + Number(this._internalCircleMargins.left),
-        mr = Number(this.margin.right) + Number(this._internalCircleMargins.right),
-        mt = Number(this.margin.top) + Number(this._internalCircleMargins.top),
-        mb = Number(this.margin.bottom) + Number(this._internalCircleMargins.bottom),
-        adjWidth = Math.max(0, this._smallerSide - ml - mr),
-        adjHeight =  Math.max(0, this._smallerSide - mt - mb),
-        diameter = Math.min(adjWidth,adjHeight) ,
-        radius = diameter / 2,
-        center = [];
-    center[0] = ml + adjWidth/2;
-    center[1] = mt + adjHeight/2;
-
-    this.set('_diameter', diameter);
-    this.set('_radius', radius);
-    this.set('_center', center);
-
+      this.set('_diameter', diameter);
+      this.set('_radius', radius);
+      this.set('_center', center);
   }
 }, PxVisBehavior.sizing];
 

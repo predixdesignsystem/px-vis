@@ -1,3 +1,13 @@
+v1.1.4
+==================
+* fixed issue with tooltip on common axis
+
+v1.1.3
+==================
+* fixed theming issue on dark tooltip
+* fixed sizing for circle charts
+* added font to measureText
+
 v1.1.2
 ==================
 * Added check to scatter checkign scatterDots defined before running isIdInMuted.

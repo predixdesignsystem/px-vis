@@ -348,7 +348,7 @@ Custom property | Description | Default
       'px-axis-done': '_setAxisStyles',
       "dom-change": '_axisConfigChanged'
     },
-    
+
     _setDragBehavior: function() {
       if(this.cartesianDragBehavior) {
         this.createCartesianDrag();
@@ -408,7 +408,8 @@ Custom property | Description | Default
                   'elem': this,
                   'mousePos': Px.d3.mouse(this)
                 }
-                _this.fire('px-vis-multi-axis-mouseleave', deets);
+                //timeout until after out move debounce to make sure the move doesnt fire after
+                setTimeout(function(){ _this.fire('px-vis-multi-axis-mouseleave', deets); }, 11);
               })
               .style("cursor","move")
               .call(this.dragBehavior);
@@ -476,7 +477,7 @@ Custom property | Description | Default
           this._interactiveGroup.on('mouseover',function(){
             _this._interactiveGroup.selectAll('.hideCommon').style('display',null)
             _this._interactiveGroup.selectAll('.hideCommon').style('fill',_this.colors.grey3)
-          }).on('mouseleave',function(){
+          }).on('mouseout',function(){
             _this._interactiveGroup.selectAll('.hideCommon').style('display','none')
             _this._interactiveGroup.selectAll('.hideCommon').style('fill',"black")
           });

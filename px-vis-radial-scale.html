@@ -192,23 +192,29 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @method _currentDomain
      */
      _currentDomain: function() {
-      // check to make sure there is data
-      if(this._doesObjHaveValues(this.x) && this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this._calculatedExtents)){
 
-        var exts = this._calculatedExtents;
+      //need to debounce this to avoid running it twice when X and Y change (size change). Also radar ends up runnignthis way too much on resize
+       this.debounce('_currentDomain', function() {
 
-        this.x.domain(exts.x);
-        this.y.domain(exts.y);
 
-        // Set the domains
-        this.set('currentDomainX', this.x.domain());
-        this.set('currentDomainY', this.y.domain());
-        this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+        // check to make sure there is data
+        if(this._doesObjHaveValues(this.x) && this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this._calculatedExtents)){
 
-        this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
-        this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
-        this.fire('px-vis-domain-changed-updated', { 'dataVar': 'domainChanged', 'data': this.domainChanged, 'method':'set' });
-      }
+          var exts = this._calculatedExtents;
+
+          this.x.domain(exts.x);
+          this.y.domain(exts.y);
+
+          // Set the domains
+          this.set('currentDomainX', this.x.domain());
+          this.set('currentDomainY', this.y.domain());
+          this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+
+          this.fire('px-vis-current-domain-x-updated', { 'dataVar': 'currentDomainX', 'data': this.currentDomainX, 'method':'set' });
+          this.fire('px-vis-current-domain-y-updated', { 'dataVar': 'currentDomainY', 'data': this.currentDomainY, 'method':'set' });
+          this.fire('px-vis-domain-changed-updated', { 'dataVar': 'domainChanged', 'data': this.domainChanged, 'method':'set' });
+        }
+      }.bind(this), 10);
     }
   });
 </script>
