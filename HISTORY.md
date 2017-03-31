@@ -1,3 +1,7 @@
+v1.1.3
+==================
+* fixed theming issue on dark tooltip
+
 v1.1.2
 ==================
 * Added check to scatter checkign scatterDots defined before running isIdInMuted.
