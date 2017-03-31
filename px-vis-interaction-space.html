@@ -70,7 +70,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehavior.zoomSelection,
       PxVisBehavior.seriesKeys,
       PxColorsBehavior.baseColors,
-      PxVisBehavior.selectionType
+      PxVisBehavior.selectionType,
+      PxVisBehavior.polarData
     ],
     /***EVENTS****
     /*
@@ -181,7 +182,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         value: false
       },
       /**
-       * Whether the scatter plot is using radial coiordinates (x=phase, y=amplitude)
+       * Whether the scatter plot is using radial coordinates (x=phase, y=amplitude)
        */
       radial: {
         type: Boolean,
@@ -364,7 +365,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
     _calcTooltipData: function() {
       this._calcTooltip = true;
-      this._calcCrosshair = false;
+      //TODO FIXME: MAKE SURE WE CHANGE THAT TO FALSE BEFORE RELEASE (and add preconfigured toolbar options)
+      this._calcCrosshair = true;
 
       this._calcData();
     },
@@ -409,8 +411,20 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       // now we can set our data that we want to pass out
       if(this._calculatingData) {
-        this.set('tooltipData',dataObj);
-        this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
+
+        if(this._calcCrosshair) {
+          this.set('crosshairData', {'rawData': dataObj.rawData, 'timeStamps': dataObj.timeStamps});
+        }
+
+        if(this._calcTooltip) {
+
+          delete dataObj.rawData;
+          delete dataObj.timeStamps;
+          this.set('tooltipData',dataObj);
+          this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
+        }
+
+
         this.set('_calculatingData', false);
       }
     },
@@ -552,9 +566,12 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       result.series[xKey] = r[xKey];
       result.series[yKey] = r[yKey];
 
-// FIXME creates multiple copies of the same data...
+      //TODO: pixel search? Should the fuzzy time be applied here instead
       result.raw.push(r);
-      result.timeStamps.push(r[xKey]);
+      //only add timestamp if not already in there
+      if(result.timeStamps.indexOf(r[xKey]) === -1) {
+        result.timeStamps.push(r[xKey]);
+      }
 
       return result
     },
@@ -576,8 +593,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           pixelY,
           pixelXCopy,
           pixelYCopy,
+          closestPointIndex,
           d,
-          index = [],
+          crosshairResultIndices = [],
           minDist = Number.MAX_VALUE,
           result = {
             "series": {},
@@ -612,36 +630,45 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           //! pixelX and pixelY are changed during this calculation
           d = Math.sqrt( (pixelX-=mousePos[0])*pixelX + (pixelY-=mousePos[1])*pixelY );
 
-          //keep the closest point
-          if(d < minDist) {
-            minDist = d;
+          //keep the closest(s) point
+          //searching for tt data or crosshair with 0px radius => find closest value
+          if(this._calcTooltip || (this._calcCrosshair && this.crosshairPixelSearch === 0)) {
+            if(d < minDist) {
+              minDist = d;
 
-            index = [];
-            index.push(i);
+              crosshairResultIndices = [];
+              crosshairResultIndices.push(i);
+              closestPointIndex = i;
 
-            //store this point
-            result.series[xKey] = dataX;
-            result.series[yKey] = dataY;
-            result.coords = [pixelXCopy, pixelYCopy]
-          } else if(d === minDist) {
-            index.push(i);
+              //store this point
+              result.series[xKey] = dataX;
+              result.series[yKey] = dataY;
+              result.coords = [pixelXCopy, pixelYCopy]
+            } else if(d === minDist) {
+              crosshairResultIndices.push(i);
+            }
+          } else if(this._calcCrosshair) {
+            //search crosshair with radius
+            if(d <= this.crosshairPixelSearch) {
+              crosshairResultIndices.push(i);
+            }
           }
         }
       }
 
-      //store the timestamp and distance
-      if(searchTimeStamp && closestTimestamp.distance > minDist) {
+      //store the closest timestamp and distance
+      if(this._calcTooltip && searchTimeStamp && closestTimestamp.distance > minDist) {
         closestTimestamp.distance = minDist;
-        closestTimestamp.time = this.chartData[index[0]][this.timeData];
+        closestTimestamp.time = this.chartData[closestPointIndex][this.timeData];
       }
 
       if(this._calcCrosshair) {
         //get all raw data
-        for(var i = 0; i < index.length; i++) {
-          result.raw.push(this.chartData[index[i]]);
+        for(var i = 0; i < crosshairResultIndices.length; i++) {
+          result.raw.push(this.chartData[crosshairResultIndices[i]]);
 
           if(this.timeData) {
-            result.timeStamps.push(this.chartData[index[i]][this.timeData]);
+            result.timeStamps.push(this.chartData[crosshairResultIndices[i]][this.timeData]);
           }
         }
       }
@@ -656,16 +683,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       var angle = dataX,
           pixelAmplitude = yRange * (dataY - yDomain[0])/yDomainTot;
 
-      if(this.useDegrees) {
-        angle *= 2 * Math.PI / 360;
-      }
-
-      if(!this.counterClockwise) {
-        angle *= -1;
-      }
-
-      //0 is on top
-      angle += Math.PI;
+      angle = this._adjustAngleForPolarChart(angle, false);
 
       //sin * pixel range * percentage of data range
       result[1] = Math.cos(angle) * pixelAmplitude;
@@ -1028,9 +1046,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           this._actionArea.remove();
         }
       }
-    },
-    _applyFunctionToY: function(fn) {
-
     }
   });
 </script>

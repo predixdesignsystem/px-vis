@@ -97,7 +97,8 @@ Custom property | Description | Default
       PxVisBehaviorD3.clipPath,
       PxColorsBehavior.baseColors,
       PxVisBehavior.mutedSeries,
-      PxVisBehavior.dynamicConfigProperties
+      PxVisBehavior.dynamicConfigProperties,
+      PxVisBehavior.polarData
     ],
 
     /**
@@ -205,6 +206,13 @@ Custom property | Description | Default
       mutedOpacity: {
         type: Number
       },
+      /**
+       * Whether the scatter plot is using radial coordinates (x=phase, y=amplitude)
+       */
+      radial: {
+        type: Boolean,
+        value: false
+      },
     }, //properties
 
     observers: [
@@ -237,19 +245,35 @@ Custom property | Description | Default
 
         this._hLinesBuilder.exit().remove();
 
-        this._hLines = this._hLinesBuilder
-          .enter()
-            .append('line')
-            .attr('class', 'xline')
-            .attr('stroke', this._checkThemeVariable("--px-vis-cursor-line-color", this.colors.gray5))
-            .attr('stroke-dasharray', '3,3')
-            .attr('opacity', 1)
-            .attr('x1', 0)
-          .merge(this._hLinesBuilder)
-            .attr('x2', this.width);
+        if(!this.radial) {
+          this._hLines = this._hLinesBuilder
+            .enter()
+              .append('line')
+              .attr('class', 'xline')
+              .attr('stroke', this._checkThemeVariable("--px-vis-cursor-line-color", this.colors.gray5))
+              .attr('stroke-dasharray', '3,3')
+              .attr('opacity', 1)
+              .attr('x1', 0)
+            .merge(this._hLinesBuilder)
+              .attr('x2', this.width);
+        } else {
+          this._hLines = this._hLinesBuilder
+            .enter()
+              .append('circle')
+              .attr('class', 'xline')
+              .attr('stroke', this._checkThemeVariable("--px-vis-cursor-line-color", this.colors.gray5))
+              .attr('stroke-dasharray', '3,3')
+              .attr('fill', 'none')
+              .attr('opacity', 1)
+              .attr('cx', 0)
+              .attr('cy', 0)
+            .merge(this._hLinesBuilder)
+              .attr('r', 0);
+        }
       }
 
       if(this.verticalLine !== 'none') {
+
         // append the y line
         if(!this._vLine) {
           this._vLine = this._cursor
@@ -264,7 +288,6 @@ Custom property | Description | Default
           //just update the size
           this._vLine.attr('y2', this.height);
         }
-
       }
 
       if(this.circlePoint === 'yes') {
@@ -340,7 +363,17 @@ Custom property | Description | Default
      * @method _moveCursor
      */
     _moveCursor:function() {
-      // move the circles into position
+
+      this._moveCircles();
+
+      // move the horizontal lines into position
+      this._moveHorizontalLines();
+
+      this._moveVerticalLines();
+    }, //mousemove
+
+    _moveCircles: function() {
+       // move the circles into position
       if(this.circlePoint === 'yes') {
         // this._circles.attr('transform', function(d,i) {
         //   return 'translate(' + this.tooltipData.series[i]['coord'][0] + ',' + this.tooltipData.series[i]['coord'][1] + ')'
@@ -359,8 +392,37 @@ Custom property | Description | Default
           }
         }.bind(this));
       }
+    },
 
-      // move the horizontal lines into position
+    _moveHorizontalLines: function() {
+      if(this.radial) {
+        this._moveHorizontalLinesRadial();
+      } else {
+        this._moveHorizontalLinesCartesian();
+      }
+    },
+
+    _moveHorizontalLinesRadial: function() {
+      if(this.horizontalLine !== 'none') {
+        this._hLines
+          .attr('r', function(d,i) {
+
+            var x = this.tooltipData.series[i]['coord'][0],
+                y = this.tooltipData.series[i]['coord'][1];
+            if(x && y) {
+              x = Math.abs(x);
+              y = Math.abs(y);
+
+              //thank you pythagore
+              return Math.sqrt(x*x + y*y);
+            } else {
+              return '';
+            }
+          }.bind(this))
+      }
+    },
+
+    _moveHorizontalLinesCartesian: function() {
       if(this.horizontalLine === 'full') {
         this._hLines
           .attr('y1', function(d,i) {
@@ -395,7 +457,33 @@ Custom property | Description | Default
           }.bind(this));
 
       }
+    },
 
+    _moveVerticalLines: function() {
+      if(this.radial) {
+        this._moveVerticalLinesRadial();
+      } else {
+        this._moveVerticalLinesCartesian();
+      }
+    },
+
+    _moveVerticalLinesRadial: function() {
+      if(this.verticalLine !== 'none') {
+        this._vLine.attr('transform', function(d, i) {
+          var xKey = this.completeSeriesConfig[this.tooltipData.series[i].name]['x'],
+              angle = this.tooltipData.series[i]['value'][xKey];
+
+          angle = this._adjustAngleForPolarChart(angle, true);
+          // if(this.counterClockwise) {
+          //   angle *= -1;
+          // }
+          // angle = (angle+180) %360;
+          return 'rotate(' + angle + ')';
+        }.bind(this));
+      }
+    },
+
+    _moveVerticalLinesCartesian: function() {
       /*
         Move the vertical line into position;
         If bottom, just take the lowest datapoint
@@ -411,7 +499,7 @@ Custom property | Description | Default
         this._vLine.attr('transform','translate(' + this.tooltipData.xArr[this.tooltipData.yArr.indexOf(minY)] + ',' + minY + ')')
           .attr('y2', -this.height);
       }
-    }, //mousemove
+    },
 
     _addClipPath: function() {
       if(this.clipPath) {
