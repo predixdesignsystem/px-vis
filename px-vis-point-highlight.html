@@ -166,27 +166,28 @@ Custom property | Description | Default
      * @method drawElement
      */
     drawElement: function() {
-      var _this = this,
-          xKey = this._getXKey(),
-          dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawPoints,
-          svgBuilder;
+      if(!this.generatingCrosshairData) {
+        var _this = this,
+            xKey = this._getXKey(),
+            dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawPoints,
+            svgBuilder;
 
-      svgBuilder = this.svg.selectAll('g.highlightPoint')
-        .data(dataset, function(d) { return d[xKey]}.bind(this));
+        svgBuilder = this.svg.selectAll('g.highlightPoint')
+          .data(dataset, function(d) { return d[xKey]}.bind(this));
 
-      svgBuilder.exit().remove();
+        svgBuilder.exit().remove();
 
-      svgBuilder
-        .enter()
-          .append('g')
-          .attr('class', 'highlightPoint')
-          .each(function(data, index) {
-            _this._createCircles(data, this);
-          });
+        svgBuilder
+          .enter()
+            .append('g')
+            .attr('class', 'highlightPoint')
+            .each(function(data, index) {
+              _this._createCircles(data, this);
+            });
 
-      this._circles = this.svg.selectAll('circle.highlightPoint');
-      this._addClipPath();
-
+        this._circles = this.svg.selectAll('circle.highlightPoint');
+        this._addClipPath();
+      }
     },  //drawElement
 
     _createCircles: function(data, elem) {

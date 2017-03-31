@@ -180,9 +180,10 @@ Custom property | Description | Default
      * @method drawElement
      */
     drawElement: function() {
-      var dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawPoints;
-      this.set('_lineData', dataset);
-      console.log(this._lineData)
+      if(!this.generatingCrosshairData) {
+        var dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawPoints;
+        this.set('_lineData', dataset);
+      }
     },  //drawElement
 
     _calcDataset: function() {
