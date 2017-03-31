@@ -1,6 +1,8 @@
 v1.1.3
 ==================
 * fixed theming issue on dark tooltip
+* fixed sizing for circle charts
+* added font to measureText
 
 v1.1.2
 ==================
