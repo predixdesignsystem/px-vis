@@ -73,7 +73,6 @@ Element which draws lines series onto the chart
       PxVisBehaviorD3.domainUpdate,
       PxColorsBehavior.baseColors,
       PxVisBehavior.preventInitialDrawing,
-      PxVisBehavior.cleanOnDetached,
       PxVisBehavior.isAttached
     ],
 
@@ -177,10 +176,11 @@ Element which draws lines series onto the chart
     ],
 
     attached: function() {
-      //if we haven't clean on detached assume we just move the element and
-      //all config is still ok, redraw
-      if(!this.cleanOnDetached && this._isDirty) {
+
+      //if we've been detached and reattached make sure we redraw (canvas clears on detached)
+      if(this._isDirty) {
         this._redraw();
+        this._isDirty = false;
       }
     },
     detached: function() {

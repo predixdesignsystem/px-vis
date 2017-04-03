@@ -75,7 +75,6 @@ Element which draws a scatter series onto the chart
       PxVisBehaviorD3.serieToRedrawOnTopSVG,
       PxColorsBehavior.baseColors,
       PxVisBehavior.tooltipOnHover,
-      PxVisBehavior.cleanOnDetached,
       PxVisBehavior.isAttached
     ],
 
@@ -233,26 +232,20 @@ Element which draws a scatter series onto the chart
       this._watchConfigProperty('mutedOpacity', 0.3);
     },
     attached: function() {
-      //if we haven't clean on detached assume we just move the element and
-      //all config is still ok, redraw
-      if(!this.cleanOnDetached) {
-        if(this._isDirty) {
-          this.drawElement();
-        }
-      } else {
-        if(this._doesD3HaveValues(this.scatterGroup)) {
-          this.scatterGroup.remove();
-        }
-        this.scatterGroup = null;
+
+      //if we've been detached and reattached make sure we redraw
+      if(this._isDirty) {
+        this.drawElement();
       }
+
       this._isDirty = false;
     },
     detached: function() {
       this._isDirty = true;
-      if(this.cleanOnDetached) {
-        if(this._doesD3HaveValues(this.scatterGroup)) {
-          this.scatterGroup.remove();
-        }
+
+      this.scatterDots = null;
+      if(this._doesD3HaveValues(this.scatterGroup)) {
+        this.scatterGroup.remove();
         this.scatterGroup = null;
       }
     },
@@ -287,8 +280,6 @@ Element which draws a scatter series onto the chart
          this.domainChanged !== null &&
          this._isAttached) {
 
-        var data = this.chartData;
-
         // checks to see if the group already exists. If not, create; if so, update
         if(this._isObjEmpty(this.scatterGroup)) {
 
@@ -306,10 +297,8 @@ Element which draws a scatter series onto the chart
           this._defineRadialLine(false, this.multiPath, this.counterClockwise, this.useDegrees);
         }
 
-        var _this = this;
-
         this.scatterBuilder = this.scatterGroup.selectAll('path.symbol')
-          .data(data);
+          .data(this.chartData);
 
         this.scatterBuilder.exit().remove();
 
@@ -321,13 +310,14 @@ Element which draws a scatter series onto the chart
         .merge(this.scatterBuilder)
           .attr('d', Px.d3.symbol().type(this._markerMapping[this.markerSymbol]).size(this.markerSize))
           .attr('transform', this._applyTransform.bind(this))
-          .each(function(d,i) {
+          .each(function(d,i,paths) {
+
             // if this series is missing a datapoint, remove that point
-            if(!_this._isValidData(d[_this.completeSeriesConfig[_this.seriesId]['y']]) ||
-              !_this._isValidData(d[_this.completeSeriesConfig[_this.seriesId]['x']])) {
-              this.remove();
+            if(!this._isValidData(d[this.completeSeriesConfig[this.seriesId]['y']]) ||
+              !this._isValidData(d[this.completeSeriesConfig[this.seriesId]['x']])) {
+              paths[i].remove();
             }
-          });
+          }.bind(this));
 
         this.scatterDots = this.scatterGroup.selectAll('path.symbol');
 
@@ -481,8 +471,7 @@ Element which draws a scatter series onto the chart
      * @method _colorScatter
      */
     _colorScatter:function() {
-      var index = this.seriesNumber,
-          muted = this.mutedSeries[this.seriesId];
+      var muted = this.mutedSeries[this.seriesId];
       this.scatterDots
         .attr('fill',this.completeSeriesConfig[this.seriesId]['color'])
         .attr('fill-opacity', muted ? this.mutedOpacity : this.markerFillOpacity)
