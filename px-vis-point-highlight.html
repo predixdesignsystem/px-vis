@@ -166,7 +166,8 @@ Custom property | Description | Default
      * @method drawElement
      */
     drawElement: function() {
-      if(!this.generatingCrosshairData) {
+      //if we are generating data locally and not being told to draw anyways, dont draw
+      if(!(this.generatingCrosshairData && this.drawWithLocalCrosshairData) || this.drawWithLocalCrosshairData) {
         var _this = this,
             xKey = this._getXKey(),
             dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawPoints,
