@@ -2928,7 +2928,7 @@ function runTests(){
         assert.equal(linePath4.attr('stroke').split(' ').join(''),colorSet[ colorOrder[3] ]);
       });
       test('domRepeatLine4 line d', function() {
-        assert.equal(linePath4.attr('d').split(/[\s,]+/).join(''),'M0260L120235L120210L360185L480160');
+        assert.equal(linePath4.attr('d').split(/[\s,]+/).join(''),'M0260L120240L240210L360180L480150');
       });
 
       test('domRepeatLine3 linePath created', function() {
