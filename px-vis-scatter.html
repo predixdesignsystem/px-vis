@@ -67,14 +67,12 @@ Element which draws a scatter series onto the chart
       PxVisBehaviorD3.clipPath,
       PxVisBehavior.completeSeriesConfig,
       PxVisBehaviorD3.radialLineGenerator,
-      PxVisBehavior.tooltipData,
       PxVisBehaviorD3.domainUpdate,
       PxVisBehavior.polarData,
       PxVisBehavior.seriesId,
       PxVisBehavior.dynamicConfigProperties,
       PxVisBehaviorD3.serieToRedrawOnTopSVG,
       PxColorsBehavior.baseColors,
-      PxVisBehavior.tooltipOnHover,
       PxVisBehavior.cleanOnDetached,
       PxVisBehavior.isAttached
     ],
@@ -296,10 +294,6 @@ Element which draws a scatter series onto the chart
           this.scatterGroup = this.svg.append('g')
             .attr('series-id', 'scatter_' + this.seriesId)
             .attr('class', 'series-scatter');
-
-          //send empty tooltip data so the register shows up
-          //TODO: this should not be here....
-          this._hideTooltip();
         }
 
         if(this.radial) {
@@ -316,8 +310,6 @@ Element which draws a scatter series onto the chart
         this.scatterBuilder.enter()
           .append('path')
           .attr('class', 'symbol')
-          .on('mouseover', this._mouseEnterSymbol.bind(this))
-          .on('mouseleave', this._mouseLeaveSymbol.bind(this))
         .merge(this.scatterBuilder)
           .attr('d', Px.d3.symbol().type(this._markerMapping[this.markerSymbol]).size(this.markerSize))
           .attr('transform', this._applyTransform.bind(this))
@@ -339,80 +331,6 @@ Element which draws a scatter series onto the chart
 
         this.fire('px-vis-scatter-rendering-ended');
       }
-    },
-
-    /**
-     * Mouseevent when mouse enters
-     *
-     */
-    _mouseEnterSymbol: function(d, i, paths) {
-
-      if(this.tooltipOnHover) {
-        this._showTooltip(d, i, paths);
-      }
-      if(!this.mutedSeries[this.seriesId]) {
-
-        //if radial make sur eon hover we have 100% opacity
-        Px.d3.event.currentTarget.setAttribute('fill-opacity', 1);
-      }
-    },
-    /**
-     * generates tooltipData
-     */
-    _showTooltip: function(d, i, paths) {
-
-      // setup a holder for our data to pass out
-      var dataObj = {
-        'time': d[this.timeData],
-        'hidden': false,
-        'series': [],
-        'mouse': [],
-        'xArr': null,
-        'yArr': null
-      },
-      values = {},
-      xKey = this.completeSeriesConfig[this.seriesId].x,
-      yKey = this.completeSeriesConfig[this.seriesId].y,
-      box = paths[i].getBoundingClientRect(),
-      center = [window.pageXOffset + box.left + box.width/2, window.pageYOffset + box.top + box.height/2];
-
-      //TODO: boolean to convert this to radians if someone wants radians in their tooltip
-      values[xKey] = d[xKey];
-      values[yKey] = d[yKey];
-
-      dataObj.series.push({'name': this.seriesId, 'value': values});
-
-      this.fire('px-vis-scatter-request-tooltip', {'show': true, 'mouseCoords': center});
-      this.set('tooltipData',dataObj);
-      this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
-    },
-    /**
-     * Mousevent on leave
-     */
-    _mouseLeaveSymbol: function(d) {
-      this._hideTooltip(d);
-
-      if(!this.mutedSeries[this.seriesId]) {
-
-        //if radial make sur eon hover we have 100% opacity
-        Px.d3.event.currentTarget.setAttribute('fill-opacity', this.markerFillOpacity);
-      }
-    },
-
-    /**
-     * Resets tooltipData
-     */
-    _hideTooltip: function(d) {
-      var dataObj = {
-        'time': null,
-        'hidden': true,
-        'series': [{'name': this.seriesId, 'value':null}],
-        'mouse': [],
-        'xArr': null,
-        'yArr': null
-      };
-      this.set('tooltipData',dataObj);
-      this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
     },
 
     /**

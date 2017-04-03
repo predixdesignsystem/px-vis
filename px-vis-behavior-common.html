@@ -588,14 +588,15 @@ PxVisBehavior.crosshairData = {
      *            "[[key1]]":[[val]],
      *            "[[key2]]":[[val]]
      *        }],
-     *        "xPoints":[ sharedKeyVal1, sharedKeyVal1 ]
+     *        "timeStamps":[ timeStamp1, timeStamp2 ]
      *    }
      *```
      * @property crosshairData
      * @type Object
      */
     crosshairData: {
-      type: Object
+      type: Object,
+      notify: true
     },
 
     /**
@@ -605,6 +606,15 @@ PxVisBehavior.crosshairData = {
     generatingCrosshairData: {
       type: String,
       value: false
+    },
+
+    /**
+     * Allows the crosshair to search all datapoints within a pixel radius. If set
+     * to 0 will only pick up the closest point
+     */
+    crosshairPixelSearch: {
+      type: Number,
+      value: 0
     }
   }
 };
@@ -844,7 +854,7 @@ PxVisBehavior.commonMethods = {
       d.push(data[i]);
     }
 
-    for(var i = index-1; i > lowerIndex; i--) {
+    for(var i = index-1; i < lowerIndex; i--) {
       if(data[i][key] < lowerFuzz) {
         break;
       }
@@ -1433,6 +1443,35 @@ PxVisBehavior.polarData = {
       type: Boolean,
       value: false
     }
+  },
+  /**
+   * adjusts the angle for the polar chart, taking counterClockwise into account
+   * and returning it in the asked unit (degrees if toDegrees is true)
+   */
+  _adjustAngleForPolarChart(angle, toDegrees) {
+
+    //add 180 deg to offset chart 0 being on top
+    var offset = toDegrees ? 180 : Math.PI;
+
+    if((!this.counterClockwise && !toDegrees) ||
+       (this.counterClockwise && toDegrees)) {
+      angle *= -1;
+    }
+
+    //convert to appropriate unit and
+    if(this.useDegrees) {
+      if(toDegrees) {
+        return angle + offset;
+      } else {
+        return angle / 360 * 2 * Math.PI + offset;
+      }
+    } else {
+      if(toDegrees) {
+        return angle / (2 * Math.PI) * 360 + offset;
+      } else {
+        return angle + offset;
+      }
+    }
   }
 };
 
@@ -2006,7 +2045,7 @@ PxVisBehavior.selectionType = {
 
 /*
     Name:
-<<<<<<< HEAD
+
     PxVisBehavior.measureText
 
     Description:
