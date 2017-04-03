@@ -480,5 +480,38 @@
         domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
+
+    <div>
+      <template id="domRepeatDomBind" is="dom-bind">
+        <px-vis-scale
+          id="domRepeatScale"
+          x-axis-type="time"
+          y-axis-type="linear"
+          x="{{x}}"
+          y="{{y}}"
+          domain-changed="{{domainChanged}}"
+          chart-data="[[chartData]]"
+          complete-series-config="[[completeSeriesConfig]]">
+        </px-vis-scale>
+        <px-vis-svg
+          id="domRepeatSVG"
+          svg="{{svg}}">
+        </px-vis-svg>
+
+        <template is="dom-repeat" items="[[seriesKeys]]">
+          <px-vis-line-svg
+            class$="[[_myClass(item)]]"
+            svg="[[svg]]"
+            x="[[x]]"
+            y="[[y]]"
+            domain-changed="[[domainChanged]]"
+            chart-data="[[chartData]]"
+            complete-series-config="[[completeSeriesConfig]]"
+            series-id="[[item]]">
+          </px-vis-line-svg>
+        </template>
+      </template>
+    </div>
+
   </body>
 </html>
