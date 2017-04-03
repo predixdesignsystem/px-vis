@@ -1,12 +1,11 @@
 v1.1.4
 ==================
-* fixed issue with tooltip on common axis
+* removed cleanOnDetached property and mae all elements always clean on detached. This has proven to be a necessary change to avoid unforeseen consequences of notc cleaning up with the config and/or data changing
 
 v1.1.3
 ==================
 * fixed theming issue on dark tooltip
-* fixed sizing for circle charts
-* added font to measureText
+* fixed issue where the tooltip could "stick" to an interactive axis
 
 v1.1.2
 ==================
