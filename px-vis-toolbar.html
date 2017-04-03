@@ -9,7 +9,7 @@ Element providing an on-chart zoom.
 
 ##### Usage
 
-    <px-vis-toolbar 
+    <px-vis-toolbar
       additional-detail="[[item]]"
       dynamic-menu-config="[[dynamicMenuConfig]]">
     </px-vis-toolbar>
@@ -33,7 +33,7 @@ Element providing an on-chart zoom.
             <i class$="fa [[_getIcon(item)]]" value="{{index}}">
             </i>{{item.title}}
             <template is="dom-if" if="[[_hasTooltip(item)]]">
-              <px-tooltip 
+              <px-tooltip
                 tooltip-message="[[item.tooltipLabel]]"
                 orientation="top"
                 smart-orientation>
@@ -50,7 +50,7 @@ Element providing an on-chart zoom.
                 <i class$="fa [[_getIcon(item)]]" value="{{index}}">
                 </i>{{item.title}}
                 <template is="dom-if" if="[[_hasTooltip(item)]]">
-                  <px-tooltip 
+                  <px-tooltip
                     tooltip-message="[[item.tooltipLabel]]"
                     orientation="top"
                     smart-orientation>
@@ -99,6 +99,20 @@ Element providing an on-chart zoom.
         type: Object,
         value: function() {
           return {
+            'crosshair': {
+              'tooltipLabel': 'Crosshair',
+              'icon': 'fa-crosshairs',
+              'buttonGroup': 1,
+              'selected': true,
+              'onClick': 'function() {this.set("showTooltip", true);}',
+              'onClickContext': "toolbar",
+              'actionConfig': {
+                'mouseout': 'resetTooltipAndCrosshairData',
+                'mousemove': 'calcTooltipAndCrosshairData',
+                'mousedown': 'null',
+                'mouseup': 'null'
+              }
+            },
             'tooltip': {
               'tooltipLabel': 'Tooltip',
               'icon': 'fa-crosshairs',
@@ -249,13 +263,13 @@ Element providing an on-chart zoom.
        * alignment of the sub toolbar. Accepted values:
        * - horizontal
        * - vertical
-       */ 
+       */
       subToolbarAlignment: {
         type: String,
         value: 'horizontal'
       },
       /**
-       * Configuration object for the toolbar. This object drives what buttons are available on 
+       * Configuration object for the toolbar. This object drives what buttons are available on
        * the toolbar and what they do. Three actions can be used out of the box by passing them
        * as keys in this config: 'zoom', 'pan' and 'tooltip'.
        * Any other kind of actions and buttons can be defined through this object.
@@ -269,17 +283,17 @@ Element providing an on-chart zoom.
        *     "onClickContext': "toolbar",   //context to be used on `onClick`. If "toolbar"
        * is specified then the context will be this toolbar
        *     "buttonGroup": 1,              //if a button is part of a button group then it
-       * becomes blue when clicked and all other buttons with the same button group in the 
+       * becomes blue when clicked and all other buttons with the same button group in the
        * same row become deselected (not blue)
-       *     "selected": true,                //force this button to be selected at start 
+       *     "selected": true,                //force this button to be selected at start
        *(including applying its actionConfig and subConfig)
-       *     "actionConfig": {                //this config will be propagated to 
+       *     "actionConfig": {                //this config will be propagated to
        * px-vis-interaction-space
-       *       "mousedown": "startZooming",   //key is an event, value is either a  
-       * predefined action defined in `actionMapping` in px-vis-interaction-space or a 
+       *       "mousedown": "startZooming",   //key is an event, value is either a
+       * predefined action defined in `actionMapping` in px-vis-interaction-space or a
        * function which context is bound to the chart
        *         "mouseup": "stopZooming",
-       *         "mouseout": "null",          //by specifying null it ensures previous 
+       *         "mouseout": "null",          //by specifying null it ensures previous
        * actions registered against this event will be removed
        *         "mousemove": "function() { console.log(\"Mouse moved on the chart!\");}"
        *       },
@@ -293,9 +307,9 @@ Element providing an on-chart zoom.
        * this button
        *           "selectable": true,
        *           "selected": true,
-       *           "onClick": "function() { this.set(\"selectionType\", \"xAxis\");}" //this 
-       * function will be run when clicking the button. The chart will be the context of this 
-       * function unless `onClickContext` is defined. If defined in HTML this needs to be a 
+       *           "onClick": "function() { this.set(\"selectionType\", \"xAxis\");}" //this
+       * function will be run when clicking the button. The chart will be the context of this
+       * function unless `onClickContext` is defined. If defined in HTML this needs to be a
        * string, but if defined in javascript this can be a function
        *         },
        *         "y": {
@@ -313,7 +327,7 @@ Element providing an on-chart zoom.
        *         "zoomIn": {
        *           "icon": "fa-plus",
        *           "tooltipLabel": "zoom in",
-       *           "eventName": "px-vis-toolbar-zoom-in" //those events are vis specific 
+       *           "eventName": "px-vis-toolbar-zoom-in" //those events are vis specific
        * events and are automatically caught by the chart to do something
        *         },
        *         "zoomOut": {
@@ -403,16 +417,16 @@ Element providing an on-chart zoom.
       this.set('_internalConfig', internalConf);
     },
     /**
-     * Called when clicking an item of the main toolbar. 
+     * Called when clicking an item of the main toolbar.
      */
     _clickItem: function(evt) {
       evt = Polymer.dom(evt);
       var index = evt.localTarget.value,
           conf = this._internalConfig[index];
-      
+
       //make it the current selection if it is in a buttonGroup
       if(conf.buttonGroup) {
-        
+
          //ensure we remember selection, deselect others and select this one
         for(var i =0; i<this._internalConfig.length; i++) {
           if(index !== i && this._internalConfig[i].buttonGroup === conf.buttonGroup) {
@@ -441,14 +455,14 @@ Element providing an on-chart zoom.
             subConf.push(conf.subConfig[keys[i]]);
           }
         }
-        
+
         this.set('currentSubConfig', subConf);
       } else {
         this.set('currentSubConfig', []);
       }
     },
     /**
-     * Called when clicking an item of the secondary toolbar. 
+     * Called when clicking an item of the secondary toolbar.
      */
     _clickSubItem: function(evt) {
       evt = Polymer.dom(evt);
@@ -459,7 +473,7 @@ Element providing an on-chart zoom.
       if(conf.buttonGroup) {
 
         //ensure we remember selection, deselect others and select this one
-        
+
         for(var i =0; i<this.currentSubConfig.length; i++) {
           if(i !== index && this.currentSubConfig[i].buttonGroup === conf.buttonGroup) {
             this.set('currentSubConfig.#' + i + '.selected', false);
@@ -467,7 +481,7 @@ Element providing an on-chart zoom.
         }
         this.set('currentSubConfig.#' + index + '.selected', true);
       }
-      
+
       this._processItem(conf);
     },
 
@@ -503,7 +517,7 @@ Element providing an on-chart zoom.
           } else {
             fn = fn.bind(conf.onClickContext);
           }
-          
+
           fn(conf);
         } else {
           //run it from the chart's context
@@ -551,7 +565,7 @@ Element providing an on-chart zoom.
       } else {
         base += ' flex--col flex--bottom';
       }
-      
+
       return base;
     },
     _isWithinChart: function(withinChart) {

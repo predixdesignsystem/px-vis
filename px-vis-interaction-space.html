@@ -141,7 +141,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           'calcTooltipData': '_calcTooltipData',
           'calcCrosshairData': '_calcCrosshairData',
           'calcTooltipAndCrosshairData': '_calcTooltipAndCrosshairData',
+          'resetTooltipAndCrosshairData': '_resetTooltipAndCrosshairData',
           'resetTooltip': '_resetTooltipData',
+          'resetCrosshair': '_resetCrosshairData',
           'startPanning': '_startPanning',
           'stopPanning': '_stopPanning'
         }
@@ -326,6 +328,12 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         this._resetTooltipData();
       }
     },
+
+    _resetTooltipAndCrosshairData: function() {
+      this._resetTooltipData();
+      this._resetCrosshairData();
+    },
+
     /**
      * Helper function called on mouseout
      * resets tooltipData
@@ -341,19 +349,29 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             'series': [],
             'mouse': null,
             'xArr': null,
-            'yArr': null,
-            'rawPoints': [],
-            'timeStamps': []
+            'yArr': null
           },
           keys = (this.seriesKeys) ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
           len = keys.length,
           i;
 
       for(i = 0; i < len; i++){
-        ttD.series.push({'name':keys[i],'value': null });
+        ttD.series.push({'name': keys[i],'value': null });
       }
       this.set('tooltipData',ttD);
       this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': ttD, 'method':'set' });
+    },
+
+    _resetCrosshairData: function() {
+
+      this.set('_calculatingData', false);
+      var ttD = {
+            'rawData': [],
+            'timeStamps': []
+          }
+
+      this.set('crosshairData',ttD);
+      this.generatingCrosshairData = false;
     },
 
     _calcTooltipAndCrosshairData: function() {
@@ -413,6 +431,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       if(this._calculatingData) {
 
         if(this._calcCrosshair) {
+          this.generatingCrosshairData = true;
           this.set('crosshairData', {'rawData': dataObj.rawData, 'timeStamps': dataObj.timeStamps});
         }
 
@@ -475,7 +494,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         'mouse': mousePos,
         'xArr': [],
         'yArr': [],
-        'rawPoints': [],
+        'rawData': [],
         'timeStamps': []
       }
     },
@@ -527,14 +546,14 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       //we already got the pixel coords in continuous
       if(!isContinuous) {
-        result.coords = [this.x(r[xKey]), this._isMultiY ? this.y[axisKey](r[yKey]) : this.y(r[yKey])]
+        result.coords = [this.x(result.series[xKey]), this._isMultiY ? this.y[axisKey](result.series[yKey]) : this.y(result.series[yKey])]
       }
       //also keep pixel coords in array
       dataObj.xArr.push(result.coords[0]);
       dataObj.yArr.push(result.coords[1]);
 
       dataObj.series.push({'name': k, 'value': result.series, 'coord': result.coords });
-      dataObj.rawPoints = dataObj.rawPoints.concat(result.raw);
+      dataObj.rawData = dataObj.rawData.concat(result.raw);
       dataObj.timeStamps = dataObj.timeStamps.concat(result.timeStamps);
     },
 
@@ -586,7 +605,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       var xDomain = this.x.domain(),
           yDomain = this._isMultiY ? this.y[axisKey].domain() : this.y.domain(),
           yDomainTot = yDomain[1] - yDomain[0],
-          yRange = this.y.range()[1] - this.y.range()[0],
+          yRange = this._isMultiY ? this.y[axisKey].range()[1] - this.y[axisKey].range()[0] : this.y.range()[1] - this.y.range()[0],
           dataX,
           dataY,
           pixelX,
