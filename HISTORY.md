@@ -1,3 +1,7 @@
+v1.1.6
+==================
+* fixed scale searching for extents. Added check so 0 values passes the filter.
+
 v1.1.5
 ==================
 * removed cleanOnDetached property and mae all elements always clean on detached. This has proven to be a necessary change to avoid unforeseen consequences of notc cleaning up with the config and/or data changing
