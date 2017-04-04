@@ -84,7 +84,7 @@ Custom property | Description | Default
       <!-- don't double bind drawnTickValues or each axis update will trigger multi axis to reset the prop on every axis. Use event instead-->
       <template id="bof" is="dom-repeat" items="[[_internalDimensions]]" >
         <px-vis-interactive-axis
-          id="[[item]]"
+          id="ia_[[item]]"
           prevent-initial-drawing="[[preventInitialDrawing]]"
           class="multiAxis"
           svg="[[svg]]"
@@ -426,8 +426,8 @@ Custom property | Description | Default
           for(var i =0; i < axesConfigs.length; i++) {
             var obj = axesConfigs[i],
                 a = Object.keys(obj);
-            if(this.$$('#' + a)) {
-              this.$$('#' + a).set('axisConfig', obj);
+            if(this.$$('#ia_' + a)) {
+              this.$$('#ia_' + a).set('axisConfig', obj);
             }
           }
 
@@ -460,8 +460,8 @@ Custom property | Description | Default
         // apply the configs
         for(var i = 0; i < this.dimensions.length; i++) {
           var a = this.dimensions[i]
-          if(this.$$('#' + a)) {
-            this.$$('#' + a).set('axisConfig', configs[a]);
+          if(this.$$('#ia_' + a)) {
+            this.$$('#ia_' + a).set('axisConfig', configs[a]);
           }
         }
       }
@@ -490,7 +490,7 @@ Custom property | Description | Default
 
       }
 
-      this.$$('px-vis-interactive-axis#' + e.detail.swappedDim).recalcTranform();
+      this.$$('px-vis-interactive-axis#ia_' + e.detail.swappedDim).recalcTranform();
     },
 
     _updateBrushDomains: function(e) {
