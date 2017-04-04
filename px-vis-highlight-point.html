@@ -10,51 +10,33 @@ Element which draws crosshairs around mouse pointer / data points and highlights
 
 ##### Usage
 
-  <px-vis-svg
-    width="[[width]]"
-    height="[[height]]"
-    margin="[[margin]]"
-    svg="{{svg}}">
-  </px-vis-svg>
-  <px-vis-scale
-    x-axis-type="time"
-    y-axis-type="linear"
-    complete-series-config="[[seriesConfig]]"
-    data-extents="[[dataExtents]]"
-    width="[[width]]"
-    height="[[height]]"
-    margin="[[margin]]"
-    chart-data={{chartData}}
-    x="{{x}}"
-    y="{{y}}"
-    domain-changed="{{domainChanged}}"
-    selected-domain="[[selectedDomain]]">
-  </px-vis-scale>
-  <px-vis-interaction-space
-    x-axis-type="time"
-    svg="[[svg]]"
-    width="[[width]]"
-    height="[[height]]"
-    margin="[[margin]]"
-    complete-series-config="[[seriesConfig]]"
-    chart-data="[[chartData]]"
-    crosshair-data={{crosshairData}}
-    series-keys="[[seriesKeys]]"
-    extents-data={{extentsData}}
-    x="[[x]]"
-    y="[[y]]"
-    domain-changed="[[domainChanged]]">
-  </px-vis-interaction-space>
-  <px-vis-cursor
-    svg="[[svg]]"
-    width="[[width]]"
-    height="[[height]]"
-    margin="[[margin]]"
-    complete-series-config="[[seriesConfig]]"
-    chart-data="[[chartData]]"
-    crosshair-data="[[crosshairData]]"
-    selection-type=[[selectionType]]>
-  </px-vis-cursor>
+    <px-vis-svg
+        ...
+        svg="{{svg}}">
+    </px-vis-svg>
+    <px-vis-scale
+        ...
+        x="{{x}}"
+        y="{{y}}"
+        domain-changed="{{domainChanged}}">
+    </px-vis-scale>
+    <px-vis-interaction-space
+        ...
+        generating-crosshair-data="{{generatingCrosshairData}}"
+        crosshair-data="{{crosshairData}}">
+    </px-vis-interaction-space>
+
+    <px-vis-highlight-point
+        svg="[[svg]]"
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        time-data="[[key]]"
+        complete-series-config="[[completeSeriesConfig]]"
+        chart-data="[[chartData]]"
+        generating-crosshair-data="[[generatingCrosshairData]]"
+        crosshair-data="[[crosshairData]]">
+    </px-vis-highlight-point>
 
 ### Styling
 The following custom properties are available for styling:
@@ -98,7 +80,8 @@ Custom property | Description | Default
       PxVisBehaviorD3.clipPath,
       PxColorsBehavior.baseColors,
       PxVisBehavior.mutedSeries,
-      PxVisBehavior.dynamicConfigProperties
+      PxVisBehavior.dynamicConfigProperties,
+      PxVisBehavior.highlightShared
     ],
 
     /**
@@ -125,36 +108,6 @@ Custom property | Description | Default
        */
       _circles:{
         type:Object
-      },
-
-
-
-      /**
-       * Boolean indicating if the dataset on this chart is different than the one on the crosshairData's origin chart.
-       *
-       * NOTE: The chartData passed into the chart MUST be sorted by the timeData for differentDataset to work. This component will not work with unsorted data.
-       */
-      differentDataset: {
-        type: Boolean,
-        value: false
-      },
-
-      fuzz: {
-        type: Number,
-        value: 0
-      },
-
-      /**
-       * Name of the variable holding the time stamp in the data
-       */
-      timeData: {
-        type: String,
-        value: 'Timestamp'
-      },
-
-      debug: {
-        type: Boolean,
-        value: false
       }
     }, //properties
 
@@ -175,7 +128,6 @@ Custom property | Description | Default
       //if we are generating data locally and not being told to draw anyways, dont draw
       // but if we have cleared our dataset, then we do want to clear our datapoints
       if(this.generatingCrosshairData && !this.drawWithLocalCrosshairData && this.crosshairData.rawData.length > 0) {
-        console.log("return")
         return;
       }
 
@@ -236,26 +188,6 @@ Custom property | Description | Default
       if(this.clipPath && this._doesD3HaveValues(this._circles)) {
         this.addClipPath(this._circles);
       }
-    },
-
-    _calcDataset: function() {
-      var d = [],
-          lowerFuzz,
-          upperFuzz;
-
-      for(var i = 0; i < this.crosshairData.timeStamps.length; i++) {
-        if(this.fuzz) {
-          lowerFuzz = this.crosshairData.timeStamps[i] - this.fuzz;
-          upperFuzz = this.crosshairData.timeStamps[i] + this.fuzz;
-
-          d = d.concat(this._fuzzyBinarySearch(this.chartData, this.timeData, lowerFuzz, upperFuzz, null, null));
-
-        } else {
-          d.push(this._binarySearch(this.chartData, this.timeData, this.crosshairData.timeStamps[i], null, null));
-        }
-      }
-
-      return d;
     },
 
     _processOpacity: function() {

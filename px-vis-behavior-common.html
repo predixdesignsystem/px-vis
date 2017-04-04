@@ -2165,4 +2165,64 @@ PxVisBehavior.waitForAnimationFrame = {
   }
 };
 
+/*
+    PxVisBehavior.highlightShared
+
+    Description:
+    Behavior providing shared methods and props for highligh compoennts
+    @polymerBehavior PxVisBehavior.highlightShared
+*/
+PxVisBehavior.highlightShared = {
+  properties: {
+    /**
+     * Boolean indicating if the dataset on this chart is different than the one on the crosshairData's origin chart.
+     *
+     * NOTE: The chartData passed into the chart MUST be sorted by the timeData for differentDataset to work. This component will not work with unsorted data.
+     */
+    differentDataset: {
+      type: Boolean,
+      value: false
+    },
+
+    /**
+     * The amount +/- around the datapoint
+     */
+    fuzz: {
+      type: Number,
+      value: 0
+    },
+
+    /**
+     * Name of the variable holding the time stamp in the data
+     */
+    timeData: {
+      type: String,
+      value: 'Timestamp'
+    }
+  },
+
+  /**
+   * Determines if we should do a regular binary search or a fuzzy binary search
+   */
+  _calcDataset: function() {
+    var d = [],
+        lowerFuzz,
+        upperFuzz;
+
+    for(var i = 0; i < this.crosshairData.timeStamps.length; i++) {
+      if(this.fuzz) {
+        lowerFuzz = this.crosshairData.timeStamps[i] - this.fuzz;
+        upperFuzz = this.crosshairData.timeStamps[i] + this.fuzz;
+
+        d = d.concat(this._fuzzyBinarySearch(this.chartData, this.timeData, lowerFuzz, upperFuzz, null, null));
+
+      } else {
+        d.push(this._binarySearch(this.chartData, this.timeData, this.crosshairData.timeStamps[i], null, null));
+      }
+    }
+
+    return d;
+  },
+};
+
 </script>
