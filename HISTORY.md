@@ -1,3 +1,7 @@
+v1.1.7
+==================
+* make sure radial gridline radius can't be negative
+
 v1.1.6
 ==================
 * fixed scale searching for extents. Added check so 0 values passes the filter.
