@@ -176,6 +176,9 @@ Custom property | Description | Default
             b.call(
               this._brush = Px.d3.brushY()
                 .extent(range)
+                .filter(function() {
+                  return 1
+                })
                 .on("start.brush", this.brushstart.bind(this))
                 // TODO make a flag so brushing is dynamic instead of just at the end
                 // .on("brush.brush", this.brush.bind(this))
@@ -199,6 +202,23 @@ Custom property | Description | Default
           }
         }, 10);
       }
+    },
+
+    _disableBrush: function() {
+      this._brushD3.call(
+        this._brush.filter(function(e) {
+          console.log(event)
+          return 0;
+        })
+      );
+    },
+
+    _enableBrush: function() {
+      this._brushD3.call(
+        this._brush.filter(function() {
+          return 1;
+        })
+      );
     },
 
     /**
