@@ -170,9 +170,24 @@ Custom property | Description | Default
             );
 
           } else {
+            var _this = this;
             // create a new brush
             var b = this.svg.append("g")
               .attr("class", "brush");
+
+            // b.append("rect")
+            //   .attr("class", "drag")
+            //   .attr("x", range[0][0])
+            //   .attr("y", range[0][1])
+            //   .attr("width", range[1][0] + 10)
+            //   .attr("height", range[1][1] + this.margin.bottom)
+            //   .attr("fill", "transparent")
+            //   .attr("stroke", "transparent")
+            //   .on('mousemove', function() { _this._onAxisDrag(this) })
+            //   .on('mouseleave', function() { _this._onAxisDragEnd(this) })
+            //   .style("cursor","move")
+            //   .call(this.dragBehavior);
+
             b.call(
               this._brush = Px.d3.brushY()
                 .extent(range)
@@ -204,13 +219,39 @@ Custom property | Description | Default
       }
     },
 
+    _onAxisDrag: function(elem) {
+      // TODO add a check that we want it to fire these events?
+
+      // We need to do this calc before the debounce
+      var m = Px.d3.mouse(elem);
+
+      this.debounce('axisMouseMove', function() {
+        var deets = {
+          'axis': this.dimension,
+          'elem': elem,
+          'mousePos': m
+        }
+        this.fire('px-vis-multi-axis-mousemove', deets);
+      }, 10);
+    },
+
+    _onAxisDragEnd: function(elem) {
+      var deets = {
+        'axis': this.dimension,
+        'elem': elem,
+        'mousePos': Px.d3.mouse(elem)
+      }
+      this.fire('px-vis-multi-axis-mouseleave', deets);
+    },
+
     _disableBrush: function() {
       this._brushD3.call(
-        this._brush.filter(function(e) {
-          console.log(event)
+        this._brush.filter(function() {
+          // console.log(event)
           return 0;
         })
       );
+      this._brushD3.call(this.dragBehavior);
     },
 
     _enableBrush: function() {
@@ -218,7 +259,21 @@ Custom property | Description | Default
         this._brush.filter(function() {
           return 1;
         })
+        .on("start.brush", this.brushstart.bind(this))
+        .on("end.brush", this.brushEnd.bind(this))
       );
+    },
+
+    _disableDrag: function() {
+      this._brushD3.call(
+        this.dragBehavior.filter(function() {
+          return 0;
+        })
+      );
+    },
+
+    _disableAllAction: function() {
+      this._brushD3.call(function() {return null; });
     },
 
     /**

@@ -84,6 +84,7 @@ PxVisBehaviorDrag.parallelAxisDrag = [{
     createParallelAxisDrag: function() {
 
       this.dragBehavior = Px.d3.drag()
+        .container(this.dragContainerElem)
         .on("start.drag", this._onDragStart.bind(this))
         .on("drag.drag", this._onDrag.bind(this))
         .on("end.drag", this._onDragEnd.bind(this));
@@ -125,7 +126,7 @@ PxVisBehaviorDrag.parallelAxisDrag = [{
         this._interactiveGroup.attr("transform", this._radialOrLinear.bind(this));
 
         this.fire('px-vis-recalc-title-location');
-      }.bind(this,Px.d3.event),10);
+      }.bind(this, Px.d3.event), 10);
     },
 
     _onDragEnd: function() {
@@ -317,6 +318,7 @@ PxVisBehaviorDrag.parallelAxisDrag = [{
 PxVisBehaviorDrag.cartesianDrag = [{
     createCartesianDrag: function() {
       var dragBehavior = Px.d3.drag()
+        .container(this.dragContainerElem)
         .on("start.drag", this._onCartesianDragStart.bind(this))
         .on("drag.drag", this._onCartesianDrag.bind(this))
         .on("end.drag",this._onCartesianDragEnd.bind(this));
