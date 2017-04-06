@@ -4,7 +4,6 @@
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="px-vis-axis.html"/>
 <link rel="import" href="px-vis-axis-brush.html"/>
-<link rel="import" href="px-vis-behavior-axis-drag.html"/>
 <link rel="import" href="../px-colors-design/colors.html" />
 
 <!--
@@ -127,18 +126,24 @@ Custom property | Description | Default
           id="axisBrush"
           svg="[[_interactiveGroup]]"
           parent-svg="[[svg]]"
+          width="[[width]]"
           height="[[height]]"
+          x="[[x]]"
+          y="[[y]]"
           axis="[[y]]"
           margin="[[margin]]"
           chart-data="[[chartData]]"
           dimension="[[dimension]]"
+          dimensions="[[dimensions]]"
           series-key="[[seriesKey]]"
           domain-changed="[[domainChanged]]"
           muted-series="{{mutedSeries}}"
           radial="[[radial]]"
           center-offset="[[centerOffset]]"
           brush-to-remove="[[brushToRemove]]"
-          brush-domains="[[brushDomains]]">
+          brush-domains="[[brushDomains]]"
+          drag-container-elem="[[_returnDragContainer(svg)]]"
+          cartesian-drag-behavior="[[dragContainerElem]]">
         </px-vis-axis-brush>
       </template>
     </template>
@@ -165,8 +170,6 @@ Custom property | Description | Default
       PxVisBehavior.radial,
       PxVisBehaviorD3.radialAxisConfig,
       PxVisBehavior.seriesToAxes,
-      PxVisBehaviorDrag.parallelAxisDrag,
-      PxVisBehaviorDrag.cartesianDrag,
       PxColorsBehavior.baseColors,
       PxVisBehaviorChart.subConfiguration,
       PxVisBehavior.preventInitialDrawing
@@ -200,13 +203,6 @@ Custom property | Description | Default
        *
        */
       brushElems: {
-        type: Object
-      },
-      /**
-       * A holder for the drag behavior
-       *
-       */
-      dragBehavior: {
         type: Object
       },
 
@@ -297,8 +293,7 @@ Custom property | Description | Default
       },
       cartesianDragBehavior: {
         type: Boolean,
-        value: false,
-        observer: '_setDragBehavior'
+        value: false
       },
       _pokeOrientation: {
         type: Boolean,
@@ -341,20 +336,16 @@ Custom property | Description | Default
 
     observers: [
       '_axisConfigChanged(axisConfig.*)',
-      '_createGroup(domainChanged, x, svg, dragBehavior)'
+      '_createGroup(domainChanged, x, svg)'
     ],
 
     listeners:{
       'px-axis-done': '_setAxisStyles',
       "dom-change": '_axisConfigChanged'
     },
-    
-    _setDragBehavior: function() {
-      if(this.cartesianDragBehavior) {
-        this.createCartesianDrag();
-      } else {
-        this.createParallelAxisDrag();
-      }
+
+    _returnDragContainer: function() {
+      return this.svg.node();
     },
 
     _axisConfigChanged: function(conf) {
@@ -371,47 +362,37 @@ Custom property | Description | Default
       // this.debounce('createInteractiveGroup', function() {
         if(this._doesD3HaveValues(this.svg)) {
           var _this = this;
-              // resetTitles = false,
-              // removed = this.svg.selectAll(".dimension").data().filter(function(d){
-              //   if(_this.dimensions.indexOf(d) === -1){
-              //     // _this.$.axisBrush.clearBrush(d);
-              //     delete _this.displayedValues[d];
-              //     resetTitles = true;
-              //     return true
-              //   }
-              //   return false
-              // });
+
           if(this._isD3Empty(this._interactiveGroup)) {
             var g = this.svg.append('g')
               .attr("class", "dimension")
-              // .attr("axis-number", function(d,i) { return i; })
               .attr("dimension", this.dimension)
-              .on('mousemove', function() {
-                // TODO add a check that we want it to fire these events?
-
-                // Dont know why, but need to do this calc before the debounce
-                var m = Px.d3.mouse(this),
-                    elem = this;
-
-                _this.debounce('axisMouseMove', function() {
-                  var deets = {
-                    'axis': _this.dimension,
-                    'elem': elem,
-                    'mousePos': m
-                  }
-                  _this.fire('px-vis-multi-axis-mousemove', deets);
-                }, 10);
-              })
-              .on('mouseleave',function(){
-                var deets = {
-                  'axis': _this.dimension,
-                  'elem': this,
-                  'mousePos': Px.d3.mouse(this)
-                }
-                _this.fire('px-vis-multi-axis-mouseleave', deets);
-              })
-              .style("cursor","move")
-              .call(this.dragBehavior);
+              // .on('mousemove', function() {
+              //   // TODO add a check that we want it to fire these events?
+              //
+              //   // Dont know why, but need to do this calc before the debounce
+              //   var m = Px.d3.mouse(this),
+              //       elem = this;
+              //
+              //   _this.debounce('axisMouseMove', function() {
+              //     var deets = {
+              //       'axis': _this.dimension,
+              //       'elem': elem,
+              //       'mousePos': m
+              //     }
+              //     _this.fire('px-vis-multi-axis-mousemove', deets);
+              //   }, 10);
+              // })
+              // .on('mouseleave',function(){
+              //   var deets = {
+              //     'axis': _this.dimension,
+              //     'elem': this,
+              //     'mousePos': Px.d3.mouse(this)
+              //   }
+              //   _this.fire('px-vis-multi-axis-mouseleave', deets);
+              // })
+              // .style("cursor","move")
+              // .call(this.dragBehavior);
 
             this._interactiveGroup = g;
           }

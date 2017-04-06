@@ -84,6 +84,7 @@ PxVisBehaviorDrag.parallelAxisDrag = [{
     createParallelAxisDrag: function() {
 
       this.dragBehavior = Px.d3.drag()
+        .container(this.dragContainerElem)
         .on("start.drag", this._onDragStart.bind(this))
         .on("drag.drag", this._onDrag.bind(this))
         .on("end.drag", this._onDragEnd.bind(this));
@@ -94,9 +95,12 @@ PxVisBehaviorDrag.parallelAxisDrag = [{
      * When an axis starts being dragged
      *
      */
-    _onDragStart: function(d) {
+    _onDragStart: function() {
+      var d = this.dimension;
+
       //reset dragging var
       this._dragging = {};
+
       //set equal to our axis
       this._dragging[d] = this.x(d);
     },
@@ -122,10 +126,10 @@ PxVisBehaviorDrag.parallelAxisDrag = [{
         }
 
         // move the currently grabed axis (and reorder the others if above is active)
-        this._interactiveGroup.attr("transform", this._radialOrLinear.bind(this));
+        this.svg.attr("transform", this._radialOrLinear.bind(this));
 
         this.fire('px-vis-recalc-title-location');
-      }.bind(this,Px.d3.event),10);
+      }.bind(this, Px.d3.event), 10);
     },
 
     _onDragEnd: function() {
@@ -133,7 +137,7 @@ PxVisBehaviorDrag.parallelAxisDrag = [{
       this._dragging = {};
 
       // make the axis snap into place
-      this.transition(this._interactiveGroup)
+      this.transition(this.svg)
         .attr("transform", function() {
           return this.radial ? "rotate(" + (this.x(this.dimension) * 180 / Math.PI + 180) + ")" : "translate(" + this.x(this.dimension) + ",0)";
         }.bind(this));
@@ -317,6 +321,7 @@ PxVisBehaviorDrag.parallelAxisDrag = [{
 PxVisBehaviorDrag.cartesianDrag = [{
     createCartesianDrag: function() {
       var dragBehavior = Px.d3.drag()
+        .container(this.dragContainerElem)
         .on("start.drag", this._onCartesianDragStart.bind(this))
         .on("drag.drag", this._onCartesianDrag.bind(this))
         .on("end.drag",this._onCartesianDragEnd.bind(this));
@@ -458,7 +463,7 @@ PxVisBehaviorDrag.cartesianDrag = [{
         }
 
         // move the currently grabed axis (and reorder the others if above is active)
-        this._interactiveGroup.attr("transform", function() {
+        this.svg.attr("transform", function() {
           return "translate(" + this._position(this.dimension) + ",0)";
         }.bind(this));
 
@@ -469,7 +474,7 @@ PxVisBehaviorDrag.cartesianDrag = [{
       this._dragging = {};
 
       // make the axis snap into place
-      this.transition(this._interactiveGroup)
+      this.transition(this.svg)
         .attr("transform", function() {
           return "translate(" + this.x(this.dimension) + ",0)";
         }.bind(this));
