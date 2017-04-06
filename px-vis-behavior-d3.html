@@ -313,18 +313,7 @@ PxVisBehaviorD3.canvas = [{
     '_renderToSvgChanged(renderToSvg)'
   ],
   _renderToSvgChanged: function(renderToSvg) {
-    if(!this.renderToSvg) {
-      //svg => canvas. Make sure svgs that will be deleted clean themselves
-      var lines = Polymer.dom(this.root).querySelectorAll('px-vis-line-svg'),
-          scatter = Polymer.dom(this.root).querySelectorAll('px-vis-scatter');
-
-      for(var i=0; i<lines.length; i++) {
-        lines[i].set('cleanOnDetached', true);
-      }
-      for(var i=0; i<scatter.length; i++) {
-        scatter[i].set('cleanOnDetached', true);
-      }
-    } else if(this.canvasContext) {
+    if(this.renderToSvg && this.canvasContext) {
       //make sure the canvas cleans itself
       this.canvasContext.clearCanvas();
     }
@@ -357,18 +346,7 @@ PxVisBehaviorD3.renderToCanvas = {
     '_renderToCanvasChanged(renderToCanvas)'
   ],
   _renderToCanvasChanged: function(renderToCanvas) {
-    if(this.renderToCanvas) {
-      //svg => canvas. Make sure svgs that will be deleted clean themselves
-      var lines = Polymer.dom(this.root).querySelectorAll('px-vis-line-svg'),
-          scatter = Polymer.dom(this.root).querySelectorAll('px-vis-scatter');
-
-      for(var i=0; i<lines.length; i++) {
-        lines[i].set('cleanOnDetached', true);
-      }
-      for(var i=0; i<scatter.length; i++) {
-        scatter[i].set('cleanOnDetached', true);
-      }
-    } else if(this.canvasContext) {
+    if(!this.renderToCanvas && this.canvasContext) {
       //make sure the canvas cleans itself
       this.canvasContext.clearCanvas();
     }

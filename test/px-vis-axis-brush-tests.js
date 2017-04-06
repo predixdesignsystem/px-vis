@@ -464,7 +464,7 @@ function runTests(){
       brush2.deleteBrush();
       brush3.deleteBrush();
 
-      setTimeout(function(){ done() }, 100);
+      setTimeout(function(){ done() }, 500);
     });
 
     test('brush1._brush brush deleted', function() {
@@ -870,7 +870,7 @@ function runTests(){
       radialBrush2.deleteBrush();
       radialBrush3.deleteBrush();
 
-      setTimeout(function(){ done() }, 100);
+      setTimeout(function(){ done() }, 500);
     });
 
     test('radialBrush1._brush brush deleted', function() {
