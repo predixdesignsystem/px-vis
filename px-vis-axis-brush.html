@@ -2,6 +2,7 @@
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="../px-colors-design/colors.html" />
+<link rel="import" href="px-vis-behavior-axis-drag.html"/>
 
 
 <!--
@@ -57,7 +58,7 @@ Custom property | Description | Default
 
     behaviors: [
       PxVisBehaviorD3.svg,
-      PxVisBehaviorD3.axis,
+      PxVisBehaviorD3.axes,
       PxVisBehavior.commonMethods,
       PxVisBehavior.dimensions,
       PxVisBehavior.dataset,
@@ -66,7 +67,9 @@ Custom property | Description | Default
       PxVisBehaviorD3.domainUpdate,
       PxVisBehaviorD3.radialAxisConfig,
       PxVisBehavior.radial,
-      PxColorsBehavior.baseColors
+      PxColorsBehavior.baseColors,
+      PxVisBehaviorDrag.parallelAxisDrag,
+      PxVisBehaviorDrag.cartesianDrag
     ],
 
     /**
@@ -127,13 +130,42 @@ Custom property | Description | Default
       brushToRemove: {
         type: Boolean,
         value: false
+      },
+
+      dragContainerElem: {
+        type: HTMLElement
+      },
+
+      cartesianDragBehavior: {
+        type: Boolean,
+        value: false
+      },
+
+      /**
+       * A holder for the drag behavior
+       *
+       */
+      dragBehavior: {
+        type: Object
       }
     },
 
     observers: [
       'drawElement(svg, margin.* , height, domainChanged)',
       'recalcBrush(domainChanged)',
+      '_setDragBehavior(cartesianDragBehavior, dragContainerElem)'
     ],
+
+    _setDragBehavior: function() {
+      if(this._doesD3HaveValues(this.svg)) {
+
+        if(this.cartesianDragBehavior) {
+          this.createCartesianDrag();
+        } else {
+          this.createParallelAxisDrag();
+        }
+      }
+    },
 
     /**
      * Creates the brushes
@@ -328,7 +360,7 @@ Custom property | Description | Default
           if(this.brushDomains[this.dimension] && this.brushDomains[this.dimension].length > 0) {
             // if the axis exists, then lets check out the extents
             var oldBrushDomain = this.brushDomains[this.dimension],
-                newAxisDomain = this.axis.domain(),
+                newAxisDomain = this.y.domain(),
                 newBrushRange;
 
             newBrushRange = this._checkBrushSize(this.dimension, newAxisDomain, oldBrushDomain, this._brushD3);
@@ -389,8 +421,8 @@ Custom property | Description | Default
           upper = 1
         }
 
-        y0 = this.axis.invert(extents[lower]);
-        y1 = this.axis.invert(extents[upper]);
+        y0 = this.y.invert(extents[lower]);
+        y1 = this.y.invert(extents[upper]);
 
         for(var i = 0; i < this.chartData.length; i++) {
           if(this.brushToRemove) {
@@ -487,8 +519,8 @@ Custom property | Description | Default
         domain2 = d2;
       }
 
-      newRange[0] = this.axis(domain1);
-      newRange[1] = this.axis(domain2);
+      newRange[0] = this.y(domain1);
+      newRange[1] = this.y(domain2);
 
       return newRange;
     },

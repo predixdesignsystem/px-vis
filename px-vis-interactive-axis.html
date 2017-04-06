@@ -4,7 +4,6 @@
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="px-vis-axis.html"/>
 <link rel="import" href="px-vis-axis-brush.html"/>
-<link rel="import" href="px-vis-behavior-axis-drag.html"/>
 <link rel="import" href="../px-colors-design/colors.html" />
 
 <!--
@@ -127,8 +126,10 @@ Custom property | Description | Default
           id="axisBrush"
           svg="[[_interactiveGroup]]"
           parent-svg="[[svg]]"
+          width="[[width]]"
           height="[[height]]"
           x="[[x]]"
+          y="[[y]]"
           axis="[[y]]"
           margin="[[margin]]"
           chart-data="[[chartData]]"
@@ -141,7 +142,8 @@ Custom property | Description | Default
           center-offset="[[centerOffset]]"
           brush-to-remove="[[brushToRemove]]"
           brush-domains="[[brushDomains]]"
-          drag-behavior="[[dragBehavior]]">
+          drag-container-elem="[[_returnDragContainer(svg)]]"
+          cartesian-drag-behavior="[[dragContainerElem]]">
         </px-vis-axis-brush>
       </template>
     </template>
@@ -168,8 +170,6 @@ Custom property | Description | Default
       PxVisBehavior.radial,
       PxVisBehaviorD3.radialAxisConfig,
       PxVisBehavior.seriesToAxes,
-      PxVisBehaviorDrag.parallelAxisDrag,
-      PxVisBehaviorDrag.cartesianDrag,
       PxColorsBehavior.baseColors,
       PxVisBehaviorChart.subConfiguration,
       PxVisBehavior.preventInitialDrawing
@@ -203,13 +203,6 @@ Custom property | Description | Default
        *
        */
       brushElems: {
-        type: Object
-      },
-      /**
-       * A holder for the drag behavior
-       *
-       */
-      dragBehavior: {
         type: Object
       },
 
@@ -338,17 +331,12 @@ Custom property | Description | Default
       hideAndShowOnHover: {
         type: Boolean,
         value: false
-      },
-
-      dragContainerElem: {
-        type: HTMLElement
       }
     },
 
     observers: [
       '_axisConfigChanged(axisConfig.*)',
-      '_createGroup(domainChanged, x, svg, dragBehavior)',
-      '_setDragBehavior(cartesianDragBehavior, svg)'
+      '_createGroup(domainChanged, x, svg)'
     ],
 
     listeners:{
@@ -356,17 +344,8 @@ Custom property | Description | Default
       "dom-change": '_axisConfigChanged'
     },
 
-    _setDragBehavior: function() {
-      if(this._doesD3HaveValues(this.svg)) {
-
-        this.dragContainerElem = this.svg.node();
-
-        if(this.cartesianDragBehavior) {
-          this.createCartesianDrag();
-        } else {
-          this.createParallelAxisDrag();
-        }
-      }
+    _returnDragContainer: function() {
+      return this.svg.node();
     },
 
     _axisConfigChanged: function(conf) {
@@ -383,20 +362,10 @@ Custom property | Description | Default
       // this.debounce('createInteractiveGroup', function() {
         if(this._doesD3HaveValues(this.svg)) {
           var _this = this;
-              // resetTitles = false,
-              // removed = this.svg.selectAll(".dimension").data().filter(function(d){
-              //   if(_this.dimensions.indexOf(d) === -1){
-              //     // _this.$.axisBrush.clearBrush(d);
-              //     delete _this.displayedValues[d];
-              //     resetTitles = true;
-              //     return true
-              //   }
-              //   return false
-              // });
+
           if(this._isD3Empty(this._interactiveGroup)) {
             var g = this.svg.append('g')
               .attr("class", "dimension")
-              // .attr("axis-number", function(d,i) { return i; })
               .attr("dimension", this.dimension)
               // .on('mousemove', function() {
               //   // TODO add a check that we want it to fire these events?
