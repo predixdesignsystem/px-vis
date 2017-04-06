@@ -73,8 +73,8 @@ Element which draws lines series onto the chart
       PxVisBehaviorD3.domainUpdate,
       PxColorsBehavior.baseColors,
       PxVisBehavior.preventInitialDrawing,
-      PxVisBehavior.cleanOnDetached,
-      PxVisBehavior.isAttached
+      PxVisBehavior.isAttached,
+      PxVisBehavior.polarData,
     ],
 
     /**
@@ -219,11 +219,11 @@ Element which draws lines series onto the chart
             this._defineMultiLine(true);
             data = this.chartData;
           } else if(this.radialLine) {
-            this._defineRadialLine(true, this.multiPath);
-            data = this.chartData;
+            this._defineRadialLine(true, this.multiPath, this.counterClockwise, this.useDegrees);
+            data = this.multiPath ? this.chartData : [this.chartData];
           } else {
             this._defineSingleLine(true);
-            data = this.chartData;
+            data = [this.chartData];
           }
 
           //make sure we have the right muted opacity
@@ -342,11 +342,6 @@ Element which draws lines series onto the chart
     *
     */
     _renderAtOnce: function(data) {
-
-      //data format
-      if(!this.parallelCoordinates && !this.radialLine) {
-        data = [data];
-      }
 
       if(this.gradientLine) {
         //if gradient, regardless of category or not

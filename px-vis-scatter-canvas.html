@@ -358,9 +358,6 @@ Element which draws a scatter series onto the chart
             this.canvasContext.clearRect(-this.canvasContext._translation[0], -this.canvasContext._translation[1] , this.canvasContext.canvas.width, this.canvasContext.canvas.height);
           }
         }
-          //send empty tooltip data so the register shows up
-          //TODO: this should not be here....
-         // this._hideTooltip();
 
         if(this.radial) {
           this._defineRadialLine(false, this.multiPath, this.counterClockwise, this.useDegrees);
@@ -598,7 +595,8 @@ Element which draws a scatter series onto the chart
         if (line) {
           var coors = line.slice(1).slice(0, -1);
           if (coors !== 'NaN,NaN') {
-            return [coors.slice(coors.indexOf(0,',')), coors];
+            var commaIndex = coors.indexOf(',') + 1;
+            return [coors.slice(0,commaIndex -1), coors.slice(commaIndex)];
           }
         }
         return [0,0];
