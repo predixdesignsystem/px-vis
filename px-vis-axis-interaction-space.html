@@ -176,6 +176,7 @@ Custom property | Description | Default
           'callAxisDrag': '_enableDrag',
           'calcTooltipData': '_calcTooltipData',
           'calcCrosshairData': '_calcCrosshairData',
+          'calcTooltipAndCrosshairData': '_calcTooltipAndCrosshairData',
           'resetTooltipAndCrosshairData': '_resetTooltipAndCrosshairData',
           'resetTooltip': '_resetTooltipData',
           'resetCrosshair': '_resetCrosshairData'
@@ -302,10 +303,6 @@ Custom property | Description | Default
 
       this._setupActions();
 
-      //sometime after draw (doesnt entirely matter when since it is for an interaction piece), move the brushes on top of everything so they dont get interrupted by other things drawn on top
-      setTimeout(function() {
-        this._brushD3.raise();
-      }.bind(this), 250);
     },
 
     /**
@@ -485,7 +482,7 @@ Custom property | Description | Default
     },
 
     _resetTooltipData: function() {
-      var d = {
+      var ttD = {
         "mouse": null,
         "dataPos": [-1000, -1000],
         "time": null,
@@ -497,24 +494,27 @@ Custom property | Description | Default
 
       // make timeout larger than the debounce on _calcHoverData
       setTimeout(function() {
-        this.fire('px-vis-axis-interaction-space-mouseleave', d);
+        this.set('tooltipData',ttD);
+        this.fire('px-vis-axis-interaction-space-reset-tooltip', ttD);
       }.bind(this), 11);
     },
 
     _resetCrosshairData: function() {
-
-      this.set('_calculatingData', false);
-      var ttD = {
+      var chD = {
             'rawData': [],
             'timeStamps': []
           }
 
-      this.set('crosshairData',ttD);
-      this.generatingCrosshairData = false;
+      // make timeout larger than the debounce on _calcHoverData
+      setTimeout(function() {
+        this.set('crosshairData',chD);
+        this.generatingCrosshairData = false;
+        this.fire('px-vis-axis-interaction-space-reset-crosshair', chD);
+      }.bind(this), 11);
     },
 
     /**
-     * Creates the tooltipData
+     * Creates the tooltipData & crosshairData
      *
      * Takes the dimension (aid), the raw elem, and the mouse position
      */
@@ -527,17 +527,28 @@ Custom property | Description | Default
             "yVal" : null,                    //the data value we've found
             "time" : null,                    //time at data value
             "group" : null,                   //the group if categoryKey is being used
+            'rawData': [],                    //datasets for crosshair
+            'timeStamps': []                  //list of timeStamps for crosshair
           },
-          ttD;
+          ttD,chD;
 
       //loop through our chart data and find a closetest match
       for(var i = 0; i < this.chartData.length; i++) {
         this._searchData(aid, mouseVal, result, this.chartData[i])
       }
 
-      ttD = this._createTooltipData(aid, elem, mousePos, result);
+      if(this._calcTooltip) {
+        ttD = this._createTooltipData(aid, elem, mousePos, result);
+        this.set('tooltipData', ttD);
+        this.fire('px-vis-axis-interaction-space-tooltip-data', ttD);
+      }
 
-      this.fire('px-vis-axis-interaction-space-mousemove', ttD);
+      if(this._calcCrosshair) {
+        chD = this._createCrosshairData(result);
+        this.generatingCrosshairData = true;
+        this.set('crosshairData', chD);
+        this.fire('px-vis-axis-interaction-space-crosshair-data', chD);
+      }
 
     },
 
@@ -551,14 +562,22 @@ Custom property | Description | Default
 
       // if it is smaller than last time, save the data info
       if(result.distance < result.minDistance) {
-        result.dataset = d;
-        yVal = d[aid];
-        result.minDistance = result.distance;
-        result.time = d[this.seriesKey];
+        result.dataset = d;     //save the whole dataset for the register
+        yVal = d[aid];          //save just the point for the tooltip
+        result.minDistance = result.distance;   //track our minDistance for later
+        result.time = d[this.seriesKey];        //save the time for display if relevant
 
         if(this.categoryKey) {
-          result.group = d[this.categoryKey];
+          result.group = d[this.categoryKey];   //save the category so we can get the color
         }
+
+        //reset our crosshairData
+        result.rawData = [d];
+        result.timeStamps = [d[this.seriesKey]];
+
+      } else if(this._calcCrosshair && result.distance === result.minDistance) {
+        result.rawData.push(d);
+        result.timeStamps.push(d[this.seriesKey]);
       }
     },
 
@@ -623,6 +642,14 @@ Custom property | Description | Default
           "tooltipConfig": null
         };
       }
+
+      return data;
+    },
+
+    _createCrosshairData: function(result) {
+      var data = {};
+      data.rawData = result.rawData;
+      data.timeStamps = result.timeStamps;
 
       return data;
     },

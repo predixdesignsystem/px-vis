@@ -87,7 +87,7 @@ Custom property | Description | Default
       <px-vis-axis
         id="axis_[[dimension]]"
         class="interactiveAxis"
-        svg="[[_interactiveGroup]]"
+        svg="[[_axisGroup]]"
         axis="[[y]]"
         series-id="[[dimension]]"
         height="[[height]]"
@@ -341,6 +341,9 @@ Custom property | Description | Default
 
       multiY: {
         type: Object
+      },
+      _axisGroup: {
+        type: Object
       }
     },
 
@@ -376,26 +379,23 @@ Custom property | Description | Default
      *
      */
     _createGroup: function() {
-      // this.debounce('createInteractiveGroup', function() {
-        if(this._doesD3HaveValues(this.svg)) {
-          var _this = this;
+      if(this._doesD3HaveValues(this.svg)) {
+        var _this = this;
 
-          if(this._isD3Empty(this._interactiveGroup)) {
-            var g = this.svg.append('g')
-              .attr("class", "dimension")
-              .attr("dimension", this.dimension);
+        if(this._isD3Empty(this._interactiveGroup)) {
+          var g = this.svg.append('g')
+            .attr("class", "dimension")
+            .attr("dimension", this.dimension);
 
-            this._interactiveGroup = g;
-          }
+          this._interactiveGroup = g;
 
-          this._interactiveGroup.attr("transform", this._calcTransformation.bind(this));
-
-          //sometime after draw (doesnt entirely matter when since it is for an interaction piece), move the brushes on top of everything so they dont get interrupted by other things drawn on top
-          setTimeout(function() {
-            this._interactiveGroup.select('g.brush').raise();
-          }.bind(this), 200);
+          //create a separate subgroup for the axis so it doesnt interfere with our interaction-space
+          this._axisGroup = this._interactiveGroup.append('g')
+            .attr("class", "axis-g");
         }
-      // }, 10);
+
+        this._interactiveGroup.attr("transform", this._calcTransformation.bind(this));
+      }
     },
 
     _calcTransformation: function() {

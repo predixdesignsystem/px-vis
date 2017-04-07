@@ -138,6 +138,10 @@ Element which draws lines series onto the chart
       drawDebounceTime: {
         type: Number,
         value: 10
+      },
+      disablePointerEvents: {
+        type: Boolean,
+        value: false
       }
     },
 
@@ -145,7 +149,8 @@ Element which draws lines series onto the chart
       'drawElement(svg, y, domainChanged, chartData.*, completeSeriesConfig.*, counterClockwise, preventInitialDrawing)',
       'isIdInMuted(mutedSeries.*, completeSeriesConfig)',
       '_addClipPath(clipPath)',
-      '_drawOnTop(serieToRedrawOnTop)'
+      '_drawOnTop(serieToRedrawOnTop)',
+      '_disablePointerEvents(disablePointerEvents)'
     ],
     ready: function() {
       this._watchConfigProperty('mutedOpacity', 0.3);
@@ -215,6 +220,10 @@ Element which draws lines series onto the chart
             this.lineGroup = this.svg.append('g')
               .attr('series-id', 'line_' + this.seriesId)
               .attr('class', 'series-line');
+
+            if(this.disablePointerEvents) {
+              this.lineGroup.style("pointer-events", "none");
+            }
           } else {
             this.lineGroup.attr('series-id', 'line_' + this.seriesId)
           }
@@ -337,6 +346,12 @@ Element which draws lines series onto the chart
     _drawOnTop: function(serieToRedrawOnTop) {
       if(this.lineGroup && this.seriesId) {
         this._drawSVGOnTop(serieToRedrawOnTop, this.seriesId, this.lineGroup);
+      }
+    },
+
+    _disablePointerEvents: function() {
+      if(this._doesD3HaveValues(this.lineGroup)) {
+        this.lineGroup.style("pointer-events", "none");
       }
     }
   });
