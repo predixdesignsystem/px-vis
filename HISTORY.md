@@ -1,3 +1,14 @@
+v2.0.0
+==================
+* created a point highlighter and line highlighter for crosshair
+* created ability to generate crosshair data in interaction-space
+* major refactoring of interaction-space
+* crosshair highlighters have ability to highlight same point or fuzzy search around that point
+* Converted axis-brush to axis-interaction-space
+* Moved axis drag into axis-interaction-space
+* Moved tooltip calcs from parallel and radar into axis-interaction-space
+* Set up action config and action mapping to enable toolbar configuration for axis-interaction-space
+
 v1.1.7
 ==================
 * make sure radial gridline radius can't be negative
