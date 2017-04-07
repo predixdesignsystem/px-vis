@@ -1,3 +1,26 @@
+v1.1.7
+==================
+* make sure radial gridline radius can't be negative
+
+v1.1.6
+==================
+* fixed scale searching for extents. Added check so 0 values passes the filter.
+
+v1.1.5
+==================
+* removed cleanOnDetached property and mae all elements always clean on detached. This has proven to be a necessary change to avoid unforeseen consequences of notc cleaning up with the config and/or data changing
+* bug fix for line with seriesID
+
+v1.1.4
+==================
+* fixed issue with tooltip on common axis
+
+v1.1.3
+==================
+* fixed theming issue on dark tooltip
+* fixed sizing for circle charts
+* added font to measureText
+
 v1.1.2
 ==================
 * Added check to scatter checkign scatterDots defined before running isIdInMuted.

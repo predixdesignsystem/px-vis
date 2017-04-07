@@ -63,8 +63,7 @@ Custom property | Description | Default
           PxVisBehaviorD3.axis,
           PxVisBehaviorD3.axisConfig,
           PxColorsBehavior.baseColors,
-          PxVisBehaviorD3.domainUpdate,
-          PxVisBehavior.cleanOnDetached
+          PxVisBehaviorD3.domainUpdate
         ],
 
         /**
@@ -124,6 +123,10 @@ Custom property | Description | Default
           _drawGrid:  {
             type: Boolean,
             value: true
+          },
+          _isDirty: {
+            type: Boolean,
+            value: false
           }
         },
 
@@ -140,17 +143,20 @@ Custom property | Description | Default
         },
         attached: function() {
           this._drawGrid = true;
+          if(this._isDirty) {
+            this.drawElement();
+            this._isDirty = false;
+          }
         },
 
         detached: function() {
-          if(this.cleanOnDetached) {
-            if(this._doesObjHaveValues(this._gridGroup)){
-              this._gridGroup.remove();
-              this._gridGroup = null;
-            }
+          if(this._doesObjHaveValues(this._gridGroup)){
+            this._gridGroup.remove();
+            this._gridGroup = null;
           }
 
           this._drawGrid = false;
+          this._isDirty = true;
         },
 
         /**

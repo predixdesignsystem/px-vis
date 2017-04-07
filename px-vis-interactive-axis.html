@@ -357,6 +357,13 @@ Custom property | Description | Default
     _returnDragContainer: function() {
       return this.svg.node();
     },
+    _setDragBehavior: function() {
+      if(this.cartesianDragBehavior) {
+        this.createCartesianDrag();
+      } else {
+        this.createParallelAxisDrag();
+      }
+    },
 
     _axisConfigChanged: function(conf) {
       if(this.axisConfig && this.dimension) {
@@ -428,7 +435,7 @@ Custom property | Description | Default
           this._interactiveGroup.on('mouseover',function(){
             _this._interactiveGroup.selectAll('.hideCommon').style('display',null)
             _this._interactiveGroup.selectAll('.hideCommon').style('fill',_this.colors.grey3)
-          }).on('mouseleave',function(){
+          }).on('mouseout',function(){
             _this._interactiveGroup.selectAll('.hideCommon').style('display','none')
             _this._interactiveGroup.selectAll('.hideCommon').style('fill',"black")
           });

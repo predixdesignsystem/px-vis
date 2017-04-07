@@ -177,10 +177,11 @@ Element which draws lines series onto the chart
     ],
 
     attached: function() {
-      //if we haven't clean on detached assume we just move the element and
-      //all config is still ok, redraw
-      if(!this.cleanOnDetached && this._isDirty) {
+
+      //if we've been detached and reattached make sure we redraw (canvas clears on detached)
+      if(this._isDirty) {
         this._redraw();
+        this._isDirty = false;
       }
     },
     detached: function() {
@@ -239,11 +240,10 @@ Element which draws lines series onto the chart
 
           // if we have previously drawn the same number of lines as series, then let's start over; Clear the drawing canvas
           if(this.canvasContext._pxLinesRedraw === this.canvasContext._pxLinesTotal) {
-            this.canvasContext._pxLinesRedraw = 0;
 
-            if(allowCanvasClearing) {
+            if(allowCanvasClearing && !this.canvasContext._pxLinesCleared) {
               // (x1,y1,x2,y2)
-              this.canvasContext.clearRect(-this.canvasContext._translation[0], -this.canvasContext._translation[1] , this.canvasContext.canvas.width, this.canvasContext.canvas.height);
+              this.canvasContext.pxClearCanvas();
             }
           }
 
@@ -391,6 +391,8 @@ Element which draws lines series onto the chart
 
         }
         this.canvasContext.stroke();
+
+        this.canvasContext._pxLinesCleared = false;
 
         //clean up drawing
         this._renderingEnded(false);
@@ -562,6 +564,7 @@ Element which draws lines series onto the chart
         processFunction = processGenericDataSlice;
       }
 
+      this.canvasContext._pxLinesCleared = false;
       timer(processFunction);
     },
 

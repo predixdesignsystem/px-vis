@@ -64,37 +64,21 @@ Custom property | Description | Default
          */
         properties: {
 
-          /**
-           * Holder for the instantiated d3 grid
-           *
-           * @property _grid
-           * @type Object
-           */
-          gridSvg: {
-            type: Object
-          },
-          /**
-           * An x,y amount to move the grid to allow for labels and titles
-           *
-           * @property translateAmt
-           * @type Array
-           */
-          translateAmt: {
-            type: Array,
-            value: function() { return [0,0]; }
-          },
           tickValues: {
               type: Array,
               value: function() { return []; }
           },
-          currentDomainY: {
-              type: Array,
-              value: function() { return []; }
+
+          _radialGroup: {
+            type: Object
+          },
+          _lineGroup: {
+            type: Object
           }
         },
 
         observers: [
-          'drawElement(domainChanged, axis, margin, svg, tickValues, currentDomainY)'
+          'drawElement(domainChanged, axis, margin, svg, tickValues)'
         ],
 
         /**
@@ -104,46 +88,53 @@ Custom property | Description | Default
          */
         drawElement: function() {
           this.debounce('draw_grid', function() {
-            //clean the svg
-            //remove everything in the svg so we can start a clean draw
 
-            var radius = this.axis.range()[1] - this.axis.range()[0];
+            var radius = Math.max(0, this.axis.range()[1] - this.axis.range()[0]);
+
+            if(!this._radialGroup) {
+              this._lineGroup = this.svg.append('g')
+                .attr('class', 'axisGridLines')
+                .attr('stroke', this._checkThemeVariable("--px-vis-gridlines-color", this.colors.grey4))
+                .attr('stroke-width', '1');
+            }
 
             //draw the lines
-            var ga = this.svg.append('g')
-                .attr('class', 'a axis')
-                .attr('stroke', this._checkThemeVariable("--px-vis-gridlines-color", this.colors.grey4))
-                .attr('stroke-width', '1')
-            .selectAll('g')
+            var lineBuilder = this._lineGroup.selectAll('line')
                 //data is our degree markings that are not occupied by axes
-                .data([30,60,120,150,210,240,310,340])
-            .enter().append('g')
-                .attr('transform', function(d) { return 'rotate(' + -d + ')'; });
+                .data([30,60,120,150,210,240,310,340]);
 
-            ga.append('line')
-                .attr('x2', radius);
+            lineBuilder.enter()
+              .append('line')
+              .attr('transform', function(d) { return 'rotate(' + -d + ')'; })
+            .merge(lineBuilder)
+              .attr('x2', radius);
+
 
             //draw the circles
             //if we have ticks, use them, otherwise generate some from the scale
-            var tickValues = this.tickValues.length > 0 ? this.tickValues : this.axis.ticks(5).slice(1),
-            gr;
+            var tickValues = this.tickValues.length > 0 ? this.tickValues : this.axis.ticks(5).slice(1);
 
             //make sure we have an outer circle.
-            if(this.currentDomainY.length > 1) {
-                tickValues.push(this.currentDomainY[1]);
+            if(this.axis.domain()) {
+              tickValues.push(this.axis.domain()[1]);
             }
 
-            gr = this.svg.append('g')
+            if(!this._radialGroup) {
+
+              this._radialGroup = this.svg.append('g')
                 .attr('class', 'r axis')
                 .attr('fill', 'none')
-                .attr('stroke', this._checkThemeVariable("--px-vis-gridlines-color", this.colors.grey4))
-                .selectAll('g')
-                    .data(tickValues)
-                .enter().append('g');
+                .attr('stroke', this._checkThemeVariable("--px-vis-gridlines-color", this.colors.grey4));
+            }
 
-                gr.exit().remove();
+            var circleBuilder = this._radialGroup.selectAll('circle')
+                                                  .data(tickValues);
 
-            gr.append('circle')
+            circleBuilder.exit().remove();
+
+            circleBuilder.enter()
+              .append('circle')
+            .merge(circleBuilder)
                 // pass in our scale to use as a callback function
                 .attr('r', this.axis);
           },5);

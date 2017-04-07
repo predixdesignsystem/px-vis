@@ -74,7 +74,6 @@ Element which draws lines series onto the chart
       PxVisBehaviorD3.domainUpdate,
       PxColorsBehavior.baseColors,
       PxVisBehavior.preventInitialDrawing,
-      PxVisBehavior.cleanOnDetached,
       PxVisBehavior.isAttached
     ],
 
@@ -152,36 +151,22 @@ Element which draws lines series onto the chart
       this._watchConfigProperty('mutedOpacity', 0.3);
     },
     attached: function() {
-      //if we haven't clean on detached assume we just move the element and
-      //all config is still ok, redraw
-      if(!this.cleanOnDetached) {
-        if(this._isDirty) {
-          this.drawElement();
-        }
-      } else {
-        if(this._doesD3HaveValues(this.linePath)) {
-          this.linePath.remove();
-          this.linePath = null;
-        }
-        if(this._doesD3HaveValues(this.lineGroup)) {
-          this.lineGroup.remove();
-          this.lineGroup = null;
-        }
+
+      //if we've been detached and reattached make sure we redraw
+      if(this._isDirty) {
+        this.drawElement();
       }
+
       this._isDirty = false;
     },
     detached: function() {
 
       this._isDirty = true;
-      if(this.cleanOnDetached) {
-        if(this._doesD3HaveValues(this.linePath)) {
-          this.linePath.remove();
-          this.linePath = null;
-        }
-        if(this._doesD3HaveValues(this.lineGroup)) {
-          this.lineGroup.remove();
-          this.lineGroup = null;
-        }
+
+      this.linePath = null;
+      if(this._doesD3HaveValues(this.lineGroup)) {
+        this.lineGroup.remove();
+        this.lineGroup = null;
       }
     },
     /**
@@ -230,6 +215,8 @@ Element which draws lines series onto the chart
             this.lineGroup = this.svg.append('g')
               .attr('series-id', 'line_' + this.seriesId)
               .attr('class', 'series-line');
+          } else {
+            this.lineGroup.attr('series-id', 'line_' + this.seriesId)
           }
 
           // set our data
@@ -243,14 +230,14 @@ Element which draws lines series onto the chart
           lineBuilder.enter()
             .append('path')
             .attr('class', 'series-line')
-            .attr('series-id', function(d,i) {
-              return this.multiPath ? 'line_' + d[this.seriesId] : 'line_' + this.seriesId
-            }.bind(this))
             .attr('fill','none')
           // When datapoints are added OR this funtion is run, draw stuff
           .merge(lineBuilder)
             .attr('d', function(d) {
               return this.line(d);
+            }.bind(this))
+            .attr('series-id', function(d,i) {
+              return this.multiPath ? 'line_' + d[this.seriesId] : 'line_' + this.seriesId
             }.bind(this))
             .attr('stroke-width',this.strokeWidth)
             .attr('stroke',function(d,i) {

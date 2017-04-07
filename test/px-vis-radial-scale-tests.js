@@ -75,8 +75,9 @@ function runTests(){
     var radialScale = document.getElementById('radialScale'),
         chartExtents = {"x":["y","y1","y2"],"y":[10,25] };
 
-    suiteSetup(function() {
+    suiteSetup(function(done) {
       radialScale.set('chartExtents',chartExtents);
+      setTimeout(function() { done(); }, 100);
     });
 
     test('radialScale creates an x', function() {
