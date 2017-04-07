@@ -114,7 +114,10 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
             this.x.range(range).domain(domain).padding(0.5).align(0);
           }
 
-          this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+          if(this.domainChanged !== null) {
+            this.set('domainChanged', !this.domainChanged);
+          }
+
         } else {
           if(this.radar) {
             x = Px.d3.scalePoint().range(domain).padding(0.5).align(0);
@@ -194,7 +197,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       //   }.bind(this), 10);
       // }
 
-this.debounce('_currentDomain', function() {
+      this.debounce('_currentDomain', function() {
         // check to make sure there is data
         if(this._doesObjHaveValues(this.x) && this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this._calculatedExtents)){
 
