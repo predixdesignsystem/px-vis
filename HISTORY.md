@@ -8,6 +8,8 @@ v2.0.0
 * Moved axis drag into axis-interaction-space
 * Moved tooltip calcs from parallel and radar into axis-interaction-space
 * Set up action config and action mapping to enable toolbar configuration for axis-interaction-space
+* fixed canvas clearing issue when using scatter and line at the same time
+* added canvas support for radial line and radial scatter
 
 v1.1.7
 ==================

@@ -95,10 +95,7 @@ Element which creates an Canvas element and context
         },
         detached: function() {
           if(this.canvasContext) {
-            this.canvasContext.save()
-            this.canvasContext.setTransform(1, 0, 0, 1, 0, 0);
-            this.canvasContext.clearRect(0,0, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
-            this.canvasContext.restore();
+            this.canvasContext.pxClearCanvas();
           }
         },
         /**
@@ -106,7 +103,7 @@ Element which creates an Canvas element and context
          *
          */
         _setCanvas: function(){
-          if(this.width && this.height && this._doesObjHaveValues(this.margin)){
+          if(this.width && this.height && this._doesObjHaveValues(this.margin)) {
 
             var context;
 
@@ -119,12 +116,10 @@ Element which creates an Canvas element and context
             context.translate(this.margin.left + this.offset[0], this.margin.top + this.offset[1]);
 
             //create some base tracking info so we know how many lines we draw later
-            context._pxLinesSeries = {};
-            context._pxLinesTotal = 0;
+            context._pxLinesSeries = [];
             context._pxLinesRedraw = 0;
             context._pxLinesCleared = true;
-            context._pxScatterSeries = {};
-            context._pxScatterTotal = 0;
+            context._pxScatterSeries = [];
             context._pxScatterRedraw = 0;
             context._pxScatterCleared = true;
             context._translation = [this.margin.left + this.offset[0], this.margin.top + this.offset[1]];
@@ -136,7 +131,9 @@ Element which creates an Canvas element and context
               this.restore();
 
               context._pxLinesRedraw = 0;
+              context._pxLinesSeries = [];
               context._pxLinesCleared = true;
+              context._pxScatterSeries = [];
               context._pxScatterRedraw = 0;
               context._pxScatterCleared = true;
             }.bind(context);

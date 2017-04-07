@@ -233,17 +233,18 @@ Element which draws lines series onto the chart
 
           // We need to track which lines we have drawn and which we want to draw.
           // If a line is not currently in our list, add it
-          if(!this.canvasContext._pxLinesSeries[this.seriesId]) {
-            this.canvasContext._pxLinesSeries[this.seriesId] = true;
-            this.canvasContext._pxLinesTotal += 1;
+          if(this.canvasContext._pxLinesSeries.indexOf(this.seriesId) === -1) {
+            this.canvasContext._pxLinesSeries.push(this.seriesId);
           }
 
           // if we have previously drawn the same number of lines as series, then let's start over; Clear the drawing canvas
-          if(this.canvasContext._pxLinesRedraw === this.canvasContext._pxLinesTotal) {
+          if(this.canvasContext._pxLinesRedraw === this.canvasContext._pxLinesSeries.length) {
 
             if(allowCanvasClearing && !this.canvasContext._pxLinesCleared) {
               // (x1,y1,x2,y2)
               this.canvasContext.pxClearCanvas();
+              //re add this serie since we're going to draw it now
+              this.canvasContext._pxLinesSeries.push(this.seriesId);
             }
           }
 
