@@ -2140,6 +2140,94 @@ PxVisBehavior.waitForAnimationFrame = {
 };
 
 /*
+    PxVisBehavior.applyActionConfig
+
+    Description:
+    Intended for the interaction spaces, method to apply the actionConfig to the listener elem
+    @polymerBehavior PxVisBehavior.applyActionConfig
+*/
+PxVisBehavior.applyActionConfig = {
+  /**
+   * Set up normal listener actions
+   *
+   */
+  _setupRegularActions: function(d3Elem, elem, dontDoUpDown) {
+    var keys = Object.keys(this.actionConfig),
+        mouseEvent,
+        action,
+        bindingContext = this,
+        toBeUsed,
+        noChartContext;
+
+    for(var i=0; i<keys.length; i++) {
+      mouseEvent = keys[i];
+
+      // if we already setup mousedown && up via our d3 caller, skip it
+      if(dontDoUpDown && (mouseEvent === 'mousedown' || mouseEvent === 'mouseup')) {
+        continue;
+      }
+
+      action = this.actionConfig[keys[i]];
+      mappedAction = this[this.actionMapping[action]];
+      noChartContext = false;
+
+      //is this a function defined here
+      if(mappedAction && typeof mappedAction === 'function') {
+        //we don't need to remove previous handlers as if they have the same
+        //mouseEVent name then they will be overriden
+        toBeUsed = mappedAction;
+        noChartContext = true;
+      } else if(typeof action === 'function') {
+        toBeUsed = action;
+      } else if(typeof action === 'string') {
+        toBeUsed = eval('var f = function() { return ' + action + ';}; f();');
+      }
+
+      if(toBeUsed) {
+        var wrapper;
+        if(noChartContext) {
+          wrapper = toBeUsed.bind(this);
+        } else {
+          //now ensure the action will be run within the context of the chart
+         var _this = this;
+
+         wrapper = function(evt) {
+            _this.fire('px-vis-action-request', {'function': this, 'data': Px.d3.mouse(elem)});
+          }.bind(toBeUsed);
+        }
+
+        d3Elem.on(mouseEvent, wrapper);
+      }  else {
+        //remove listener
+        d3Elem.on(mouseEvent, null);
+      }
+    }
+  }
+};
+
+
+/*
+    PxVisBehavior.actionConfigGeneric
+
+    Description:
+    Behavior providing the actionConfig property
+    @polymerBehavior PxVisBehavior.actionConfigGeneric
+*/
+PxVisBehavior.actionConfigGeneric = {
+  properties: {
+    /**
+    * Configuration used to define what actions happen on events. Each key represents an event,
+    * each value can be:
+    * - a predefined action found in px-vis-interaction-space `actionMapping`
+    * - a function which context will be bound to the chart. The function argument will be the mouse position on the chart
+    */
+    actionConfig: {
+      type: Object
+    }
+  }
+};
+
+/*
     PxVisBehavior.highlightShared
 
     Description:
@@ -2196,7 +2284,7 @@ PxVisBehavior.highlightShared = {
     }
 
     return d;
-  },
+  }
 };
 
 </script>

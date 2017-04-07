@@ -3,7 +3,7 @@
 <link rel="import" href="px-vis-behavior-chart.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="px-vis-axis.html"/>
-<link rel="import" href="px-vis-axis-brush.html"/>
+<link rel="import" href="px-vis-axis-interaction-space.html"/>
 <link rel="import" href="../px-colors-design/colors.html" />
 
 <!--
@@ -121,31 +121,35 @@ Custom property | Description | Default
         rebuild-on-draw="[[_rebuildOnDraw]]"
         prevent-initial-drawing="[[preventInitialDrawing]]">
       </px-vis-axis>
-      <template is="dom-if" if="[[!disableBrush]]">
-        <px-vis-axis-brush
-          id="axisBrush"
+      <!-- <template is="dom-if" if="[[!disableBrush]]"> -->
+        <px-vis-axis-interaction-space
+          id="axisIS"
           svg="[[_interactiveGroup]]"
-          parent-svg="[[svg]]"
           width="[[width]]"
           height="[[height]]"
+          margin="[[margin]]"
           x="[[x]]"
           y="[[y]]"
-          axis="[[y]]"
-          margin="[[margin]]"
-          chart-data="[[chartData]]"
+          multi-y="[[multiY]]"
+          domain-changed="[[domainChanged]]"
+          complete-series-config="[[completeSeriesConfig]]"
           dimension="[[dimension]]"
           dimensions="[[dimensions]]"
           series-key="[[seriesKey]]"
-          domain-changed="[[domainChanged]]"
+          category-key="[[categoryKey]]"
+          chart-data="[[chartData]]"
           muted-series="{{mutedSeries}}"
           radial="[[radial]]"
           center-offset="[[centerOffset]]"
           brush-to-remove="[[brushToRemove]]"
           brush-domains="[[brushDomains]]"
           drag-container-elem="[[_returnDragContainer(svg)]]"
-          cartesian-drag-behavior="[[dragContainerElem]]">
-        </px-vis-axis-brush>
-      </template>
+          cartesian-drag-behavior="[[cartesianDragBehavior]]"
+          redraw-series="[[redrawSeries]]"
+          dynamic-redraw="[[dynamicRedraw]]"
+          action-config="[[actionConfig]]">
+        </px-vis-axis-interaction-space>
+      <!-- </template> -->
     </template>
 </dom-module>
 
@@ -172,7 +176,9 @@ Custom property | Description | Default
       PxVisBehavior.seriesToAxes,
       PxColorsBehavior.baseColors,
       PxVisBehaviorChart.subConfiguration,
-      PxVisBehavior.preventInitialDrawing
+      PxVisBehavior.preventInitialDrawing,
+      PxVisBehavior.categories,
+      PxVisBehavior.actionConfigGeneric
     ],
 
     /**
@@ -331,6 +337,10 @@ Custom property | Description | Default
       hideAndShowOnHover: {
         type: Boolean,
         value: false
+      },
+
+      multiY: {
+        type: Object
       }
     },
 
@@ -366,51 +376,12 @@ Custom property | Description | Default
           if(this._isD3Empty(this._interactiveGroup)) {
             var g = this.svg.append('g')
               .attr("class", "dimension")
-              .attr("dimension", this.dimension)
-              // .on('mousemove', function() {
-              //   // TODO add a check that we want it to fire these events?
-              //
-              //   // Dont know why, but need to do this calc before the debounce
-              //   var m = Px.d3.mouse(this),
-              //       elem = this;
-              //
-              //   _this.debounce('axisMouseMove', function() {
-              //     var deets = {
-              //       'axis': _this.dimension,
-              //       'elem': elem,
-              //       'mousePos': m
-              //     }
-              //     _this.fire('px-vis-multi-axis-mousemove', deets);
-              //   }, 10);
-              // })
-              // .on('mouseleave',function(){
-              //   var deets = {
-              //     'axis': _this.dimension,
-              //     'elem': this,
-              //     'mousePos': Px.d3.mouse(this)
-              //   }
-              //   _this.fire('px-vis-multi-axis-mouseleave', deets);
-              // })
-              // .style("cursor","move")
-              // .call(this.dragBehavior);
+              .attr("dimension", this.dimension);
 
             this._interactiveGroup = g;
           }
 
           this._interactiveGroup.attr("transform", this._calcTransformation.bind(this));
-
-          // if we removed titles from the array make sure we notify
-          // if(resetTitles) {
-          //   var newValues = this.displayedValues;
-          //   this.displayedValues = {};
-          //   this.set('displayedValues', newValues);
-          // }
-
-          // this.set('axisGroups', this.svg.selectAll(".dimension"));
-          // this.set('brushElems', this.axisGroups.selectAll('g.brush').nodes());
-
-          //poke the titles
-          // this.set('_pokeTitleLocation',!this._pokeTitleLocation);
 
           //sometime after draw (doesnt entirely matter when since it is for an interaction piece), move the brushes on top of everything so they dont get interrupted by other things drawn on top
           setTimeout(function() {
@@ -462,26 +433,14 @@ Custom property | Description | Default
             _this._interactiveGroup.selectAll('.hideCommon').style('fill',"black")
           });
 
-          // this.set('recalcTicks', !this.recalcTicks);
         } else if(this._commonAxisRanAtLeastOnce) {
 
           this._interactiveGroup.selectAll('.hideCommon').style('display',null);
           this._interactiveGroup.selectAll('.hideCommon').classed('hideCommon',false);
 
-          // this.set('recalcTicks', !this.recalcTicks);
         }
       }
     },
-
-    // /*
-    //  * Deletes the brushes on its children axes
-    //  *
-    //  */
-    // deleteBrush: function() {
-    //   this.$.axisBrush.deleteAllBrushes();
-    // },
-
-
 
     recalcTranform: function() {
       this._interactiveGroup.attr("transform", this._calcTransformation.bind(this));

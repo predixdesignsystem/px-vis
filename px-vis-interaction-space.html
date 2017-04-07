@@ -71,7 +71,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehavior.seriesKeys,
       PxColorsBehavior.baseColors,
       PxVisBehavior.selectionType,
-      PxVisBehavior.polarData
+      PxVisBehavior.polarData,
+      PxVisBehavior.applyActionConfig
     ],
     /***EVENTS****
     /*
@@ -272,54 +273,55 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
     _setupActions: function() {
       if(this._rect) {
+        this._setupRegularActions(this._rect, this._rect.node(), false);
 
-        var keys = Object.keys(this.actionConfig),
-            mouseEvent,
-            action,
-            bindingContext = this,
-            toBeUsed,
-            noChartContext;
-
-        for(var i=0; i<keys.length; i++) {
-
-          mouseEvent = keys[i];
-          action = this.actionConfig[keys[i]];
-          mappedAction = this[this.actionMapping[action]];
-          //toBeUsed = null;
-          noChartContext = false;
-
-          //is this a function defined here
-          if(mappedAction && typeof mappedAction === 'function') {
-            //we don't need to remove previous handlers as if they have the same
-            //mouseEVent name then they will be overriden
-            toBeUsed = mappedAction;
-            noChartContext = true;
-          } else if(typeof action === 'function') {
-            toBeUsed = action;
-          } else if(typeof action === 'string') {
-            toBeUsed = eval('var f = function() { return ' + action + ';}; f();');
-          }
-
-          if(toBeUsed) {
-
-            var wrapper;
-            if(noChartContext) {
-              wrapper = toBeUsed.bind(this);
-            } else {
-              //now ensure the action will be run within the context of the chart
-             var _this = this;
-
-             wrapper = function(evt) {
-                _this.fire('px-vis-action-request', {'function': this, 'data': Px.d3.mouse(_this._rect.node())});
-              }.bind(toBeUsed);
-            }
-
-            this._rect.on(mouseEvent, wrapper);
-          } else {
-            //remove listener
-            this._rect.on(mouseEvent, null);
-          }
-        }
+        // var keys = Object.keys(this.actionConfig),
+        //     mouseEvent,
+        //     action,
+        //     bindingContext = this,
+        //     toBeUsed,
+        //     noChartContext;
+        //
+        // for(var i=0; i<keys.length; i++) {
+        //
+        //   mouseEvent = keys[i];
+        //   action = this.actionConfig[keys[i]];
+        //   mappedAction = this[this.actionMapping[action]];
+        //   //toBeUsed = null;
+        //   noChartContext = false;
+        //
+        //   //is this a function defined here
+        //   if(mappedAction && typeof mappedAction === 'function') {
+        //     //we don't need to remove previous handlers as if they have the same
+        //     //mouseEVent name then they will be overriden
+        //     toBeUsed = mappedAction;
+        //     noChartContext = true;
+        //   } else if(typeof action === 'function') {
+        //     toBeUsed = action;
+        //   } else if(typeof action === 'string') {
+        //     toBeUsed = eval('var f = function() { return ' + action + ';}; f();');
+        //   }
+        //
+        //   if(toBeUsed) {
+        //
+        //     var wrapper;
+        //     if(noChartContext) {
+        //       wrapper = toBeUsed.bind(this);
+        //     } else {
+        //       //now ensure the action will be run within the context of the chart
+        //      var _this = this;
+        //
+        //      wrapper = function(evt) {
+        //         _this.fire('px-vis-action-request', {'function': this, 'data': Px.d3.mouse(_this._rect.node())});
+        //       }.bind(toBeUsed);
+        //     }
+        //
+        //     this._rect.on(mouseEvent, wrapper);
+        //   } else {
+        //     //remove listener
+        //     this._rect.on(mouseEvent, null);
+        //   }
+        // }
       }
     },
 
