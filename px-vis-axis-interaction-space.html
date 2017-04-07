@@ -301,6 +301,11 @@ Custom property | Description | Default
       this._brushElem = b.node();
 
       this._setupActions();
+
+      //sometime after draw (doesnt entirely matter when since it is for an interaction piece), move the brushes on top of everything so they dont get interrupted by other things drawn on top
+      setTimeout(function() {
+        this._brushD3.raise();
+      }.bind(this), 250);
     },
 
     /**
@@ -337,6 +342,10 @@ Custom property | Description | Default
       if(this._doesD3HaveValues(this._brushD3)) {
         // reset everything
         this._disableAllAction();
+
+        //setup a default cursor setup
+        this._brushD3.selectAll("rect")
+          .attr("cursor","crosshair");
 
         // check if we have special actions and if so, run their caller
         var dontDoUpDown = this._setupSpecialActions();
@@ -401,12 +410,12 @@ Custom property | Description | Default
         .on("end.brush", this.brushEnd.bind(this))
       );
 
-      // this._brushD3.select("rect.overlay")
-      //   .attr("cursor","crosshair");
-      // this._brushD3.select("rect.selection")
-      //   .attr("cursor","move");
-      // this._brushD3.selectAll("rect.handle")
-      //   .attr("cursor","ns-resize");
+      this._brushD3.select("rect.overlay")
+        .attr("cursor","crosshair");
+      this._brushD3.select("rect.selection")
+        .attr("cursor","move");
+      this._brushD3.selectAll("rect.handle")
+        .attr("cursor","ns-resize");
     },
 
     _disableDrag: function() {
@@ -424,8 +433,8 @@ Custom property | Description | Default
         })
       );
 
-      // this._brushD3.selectAll("rect")
-      //   .attr("cursor","move");
+      this._brushD3.selectAll("rect")
+        .attr("cursor","move");
     },
 
     _disableAllAction: function() {
@@ -486,7 +495,10 @@ Custom property | Description | Default
         "tooltipConfig": null
       };
 
-      this.fire('px-vis-axis-interaction-space-mouseleave', d);
+      // make timeout larger than the debounce on _calcHoverData
+      setTimeout(function() {
+        this.fire('px-vis-axis-interaction-space-mouseleave', d);
+      }.bind(this), 11);
     },
 
     _resetCrosshairData: function() {
