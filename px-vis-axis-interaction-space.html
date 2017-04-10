@@ -16,7 +16,6 @@ Element providing user interaction on an axis.
         margin="[[margin]]"
         x="[[x]]"
         y="[[y]]"
-        multi-y="[[multiY]]"
         domain-changed="[[domainChanged]]"
         complete-series-config="[[completeSeriesConfig]]"
         dimension="[[dimension]]"
@@ -161,10 +160,6 @@ Custom property | Description | Default
         type: Object
       },
 
-      multiY: {
-        type: Object
-      },
-
       /**
        * set of predefined action that can be used out of the box
        */
@@ -199,6 +194,10 @@ Custom property | Description | Default
             'mousemove': 'calcTooltipData'
           };
         }
+      },
+      smallerSide: {
+        type: Number,
+        value: 0
       }
     },
 
@@ -563,7 +562,7 @@ Custom property | Description | Default
       // if it is smaller than last time, save the data info
       if(result.distance < result.minDistance) {
         result.dataset = d;     //save the whole dataset for the register
-        yVal = d[aid];          //save just the point for the tooltip
+        result.yVal = d[aid];          //save just the point for the tooltip
         result.minDistance = result.distance;   //track our minDistance for later
         result.time = d[this.seriesKey];        //save the time for display if relevant
 
@@ -594,12 +593,19 @@ Custom property | Description | Default
           value = {};          //the series obj within tooltipData
 
       //only update if the value is on the screen
-      if(this.multiY[aid].domain()[0] < result.yVal && result.yVal < this.multiY[aid].domain()[1]) {
+      if(this.y.domain()[0] <= result.yVal && result.yVal <= this.y.domain()[1]) {
 
         svgBounding = elem.ownerSVGElement.getBoundingClientRect();
+
         //calc the screen positions for the tooltip
-        screenX = this.x(aid) + svgBounding.left + window.pageXOffset + 15;
-        screenY = this.multiY[aid](result.yVal) + this.margin.top + svgBounding.top + window.pageYOffset;
+        if(this.radial) {
+          screenX = this.y(result.yVal) * Math.sin(this.x(aid)) + this.width/2 + svgBounding.left + window.pageXOffset;
+          screenY = this.y(result.yVal) * Math.cos(Math.PI - this.x(aid)) + this.smallerSide/2 + svgBounding.top + window.pageYOffset;
+
+        } else {
+          screenX = this.x(aid) + svgBounding.left + window.pageXOffset + 15;
+          screenY = this.y(result.yVal) + this.margin.top + svgBounding.top + window.pageYOffset;
+        }
 
         //create our fake configuration object
         tooltipConfig[aid] = {};

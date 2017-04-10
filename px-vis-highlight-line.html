@@ -63,7 +63,8 @@ Custom property | Description | Default
       <px-vis-line-svg
         id="myHighlighter"
         svg="[[svg]]"
-        parallel-coordinates
+        parallel-coordinates="[[parallelCoordinates]]"
+        radial-line="[[radialLine]]"
         multi-path
         disable-pointer-events
         series-id="highlights"
@@ -71,7 +72,8 @@ Custom property | Description | Default
         complete-series-config="[[_highlightConfig]]"
         x="[[x]]"
         y="[[y]]"
-        domain-changed="[[domainChanged]]">
+        domain-changed="[[domainChanged]]"
+        interpolation-function="[[interpolationFunction]]">
       </px-vis-line-svg>
 
     </template>
@@ -95,7 +97,8 @@ Custom property | Description | Default
       PxVisBehavior.dimensions,
       PxVisBehaviorD3.domainUpdate,
       PxVisBehavior.dynamicConfigProperties,
-      PxVisBehavior.highlightShared
+      PxVisBehavior.highlightShared,
+      PxVisBehaviorD3.interpolationFunction
     ],
 
     /**
@@ -115,6 +118,23 @@ Custom property | Description | Default
         type: Object,
         notify: true,
         computed: '_computeConfig(dimensions.*)'
+      },
+
+      /**
+      * A dev set boolean specifying if the chart is for a parallel coordinates chart
+      *
+      */
+      parallelCoordinates: {
+        type: Boolean,
+        value: false
+      },
+      /**
+      * A dev set boolean specifying if the line is using radial(polar) data
+      *
+      */
+      radialLine: {
+        type: Boolean,
+        value: false
       }
     }, //properties
 
