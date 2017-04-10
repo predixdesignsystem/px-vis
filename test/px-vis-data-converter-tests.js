@@ -170,7 +170,8 @@ function runTests(){
           [1397219100000, 6]
         ],
         "tag": "myTest",
-        "title": "My Test"
+        "title": "My Test",
+        "interpolationFunction": "curveStepAfter"
       }];
 
       singleConverterOptions.set('originalData',d);
@@ -210,13 +211,14 @@ function runTests(){
 
       test('singleConverterOptions seriesConfig has correct keys', function() {
         var keys = Object.keys(singleConverterOptions.seriesConfig['myTest'])
-        assert.deepEqual(keys, ['name','x','y']);
+        assert.deepEqual(keys, ['name','x','y', 'interpolationFunction']);
       });
 
       test('singleConverterOptions seriesConfig has correct values', function() {
         assert.equal(singleConverterOptions.seriesConfig['myTest']['name'], 'My Test');
         assert.equal(singleConverterOptions.seriesConfig['myTest']['x'], 'time');
         assert.equal(singleConverterOptions.seriesConfig['myTest']['y'], 'myTest');
+        assert.equal(singleConverterOptions.seriesConfig['myTest']['interpolationFunction'], 'curveStepAfter');
       });
     });
   });
