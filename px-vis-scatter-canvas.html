@@ -343,13 +343,12 @@ Element which draws a scatter series onto the chart
 
         // We need to track which scatter we have drawn and which we want to draw.
         // If a scatter is not currently in our list, add it
-        if(!this.canvasContext._pxScatterSeries[this.seriesId]) {
-          this.canvasContext._pxScatterSeries[this.seriesId] = true;
-          this.canvasContext._pxScatterTotal += 1;
+        if(this.canvasContext._pxScatterSeries.indexOf(this.seriesId) === -1) {
+          this.canvasContext._pxScatterSeries.push(this.seriesId);
         }
 
         // if we have previously drawn the same number of scatter as series, then let's start over; Clear the drawing canvas
-        if(this.canvasContext._pxScatterRedraw === this.canvasContext._pxScatterTotal) {
+        if(this.canvasContext._pxScatterRedraw === this.canvasContext._pxScatterSeries.length) {
 
           //only cleared if nobody else already cleared us
           if(allowCanvasClearing && !this.canvasContext._pxScatterCleared) {
