@@ -209,6 +209,13 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       searchRadius: {
         type: Number,
         value: Number.MAX_VALUE
+      },
+
+      voronoiData: {
+        type: Object,
+        value: function() {
+          return {};
+        }
       }
     },
 
@@ -216,7 +223,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       'drawElement(domainChanged, chartData.*, svg, width, height, completeSeriesConfig, offset.*)',
       '_setupActions(actionConfig.*)',
       '_resetTooltipDataLegacy(completeSeriesConfig.*)',
-      '_resetTooltipData(seriesKeys.*)'
+      '_resetTooltipData(seriesKeys.*)',
+      '_createVoronoiData(chartData.*, width, height, margin.*, domainChanged)'
      ],
 
     /**
@@ -279,54 +287,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     _setupActions: function() {
       if(this._rect) {
         this._setupRegularActions(this._rect, this._rect.node(), false);
-
-        // var keys = Object.keys(this.actionConfig),
-        //     mouseEvent,
-        //     action,
-        //     bindingContext = this,
-        //     toBeUsed,
-        //     noChartContext;
-        //
-        // for(var i=0; i<keys.length; i++) {
-        //
-        //   mouseEvent = keys[i];
-        //   action = this.actionConfig[keys[i]];
-        //   mappedAction = this[this.actionMapping[action]];
-        //   //toBeUsed = null;
-        //   noChartContext = false;
-        //
-        //   //is this a function defined here
-        //   if(mappedAction && typeof mappedAction === 'function') {
-        //     //we don't need to remove previous handlers as if they have the same
-        //     //mouseEVent name then they will be overriden
-        //     toBeUsed = mappedAction;
-        //     noChartContext = true;
-        //   } else if(typeof action === 'function') {
-        //     toBeUsed = action;
-        //   } else if(typeof action === 'string') {
-        //     toBeUsed = eval('var f = function() { return ' + action + ';}; f();');
-        //   }
-        //
-        //   if(toBeUsed) {
-        //
-        //     var wrapper;
-        //     if(noChartContext) {
-        //       wrapper = toBeUsed.bind(this);
-        //     } else {
-        //       //now ensure the action will be run within the context of the chart
-        //      var _this = this;
-        //
-        //      wrapper = function(evt) {
-        //         _this.fire('px-vis-action-request', {'function': this, 'data': Px.d3.mouse(_this._rect.node())});
-        //       }.bind(toBeUsed);
-        //     }
-        //
-        //     this._rect.on(mouseEvent, wrapper);
-        //   } else {
-        //     //remove listener
-        //     this._rect.on(mouseEvent, null);
-        //   }
-        // }
       }
     },
 
@@ -436,7 +396,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       // now we can set our data that we want to pass out
       if(this._calculatingData) {
+
         delete dataObj.timeStampsTracker;
+
         if(this._calcCrosshair) {
           this.generatingCrosshairData = true;
           this.set('crosshairData', {'rawData': dataObj.rawData, 'timeStamps': dataObj.timeStamps});
@@ -469,21 +431,29 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           //and we know the data has some notion of time -- !! --> turn into a bool
           searchTimeStamp = dataObj.time === null && !!this.chartData[0][this.timeData];
 
-      for(var i = 0; i < keys.length; i++) {
-        //if we had a request to reset tooltip stop calculating
-        if(!this._calculatingData) {
-          break;
-        }
 
-        //calc this series: returns updated dataObj, xArr, yArr & closestTimestamp
-        this._calcSerieData(dataObj, searchTimeStamp, closestTimestamp, x1, keys[i], mousePos);
-      } //for
+      if(this.xAxisType !== 'time' && this.xAxisType !== 'timeLocal' && this.xAxisType !== 'ordinal') {
+        this._returnClosestsPoints(mousePos, dataObj);
+
+      } else {
+
+        for(var i = 0; i < keys.length; i++) {
+          //if we had a request to reset tooltip stop calculating
+          if(!this._calculatingData) {
+            break;
+          }
+
+          //calc this series: returns updated dataObj, xArr, yArr & closestTimestamp
+          this._calcSerieData(dataObj, searchTimeStamp, closestTimestamp, x1, keys[i], mousePos);
+        } //for
+
+      }
 
       // add the timestamp
       if(searchTimeStamp) {
         dataObj.time = closestTimestamp.time;
       }
-
+console.log(dataObj)
       return dataObj;
     },
 
@@ -609,6 +579,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      *
      */
     _searchContinuousData: function(searchTimeStamp, closestTimestamp, mousePos, xKey, yKey, axisKey, dataObj) {
+
 // TODO add option to pick closet point or closest x
       var xDomain = this.x.domain(),
           yDomain = this._isMultiY ? this.y[axisKey].domain() : this.y.domain(),
@@ -1083,6 +1054,97 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           this._actionArea.remove();
         }
       }
+    },
+
+    _createVoronoiData: function() {
+      if(this.domainChanged !== null) {
+        var w = this.width - this.margin.right - this.margin.left,
+            h = this.height - this.margin.top - this.margin.bottom,
+            ext = [[0,0], [w, h]],
+            keys = this.seriesKeys ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
+            xKey,
+            yKey,
+            axis,
+            k,
+            voronoi = d3.voronoi()
+              .extent(ext)
+              .x(function(d) { return this._getVoronoiVal(d, 'x', xKey) }.bind(this))
+              .y(function(d) { return this._getVoronoiVal(d, 'y', yKey, axis); }.bind(this)),
+              data = {};
+
+        for(var i = 0; i < keys.length; i++) {
+          k = keys[i];
+          xKey = this.completeSeriesConfig[k]['x'];
+          yKey = this.completeSeriesConfig[k]['y'];
+          axis = this.completeSeriesConfig[k]['axis'] ? this.completeSeriesConfig[k]['axis']['id'] : null;
+
+          data[k] = voronoi(this.chartData);
+        }
+
+        this.voronoiData = data;
+      }
+    },
+
+    _getVoronoiVal: function(d, scale, key, axis) {
+      return axis ? this[scale][axis](d[key]) : this[scale](d[key]);
+    },
+
+    _returnClosestsPoints: function(mousePos, dataObj) {
+      // 'xArr': [],
+      // 'yArr': [],
+
+      var keys = this.seriesKeys ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
+          result,
+          k;
+      for(var i = 0; i < keys.length; i++) {
+        k = keys[i];
+
+        result = this.voronoiData[k].find(mousePos[0],mousePos[1]);
+
+        dataObj.time;
+        dataObj.series.push(this._calcDataSeries(result, k));
+
+
+        if(this._calcCrosshair) {
+          dataObj = this._addCrosshairData(dataObj, result.data);
+        }
+      }
+    },
+
+    _calcDataSeries: function(d, k) {
+      return {
+        "coords": [ d[0], d[1] ],
+        "name": k,
+        "value": this._calcValue(d, k)
+      }
+    },
+
+
+    _calcValue: function(d, k) {
+      var x = this.completeSeriesConfig[k]['x'],
+          y = this.completeSeriesConfig[k]['y'],
+          o = {};
+
+      o[x] = d.data[x];
+      o[y] = d.data[y];
+
+      return o;
+    },
+
+    _addCrosshairData: function(dataObj, d) {
+      // FIXME we can dedupe datasets with timeData this way. Need to make a way to do it for non-timedata datasets...
+      if((this.timeData && !dataObj.timeStampsTracker[d[this.timeData]])) {
+        dataObj.rawData.push(d);
+        dataObj.timeStamps.push(d[this.timeData]);
+        dataObj.timeStampsTracker[d[this.timeData]] = true;
+
+      } else if(!this.timeData) {
+        dataObj.rawData.push(d);
+
+      }
+
+      return dataObj;
     }
+
   });
 </script>
