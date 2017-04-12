@@ -1,0 +1,143 @@
+<script>
+
+//keep a ref to d3 if it's loaded already, we're going to load it ourselves right after this
+if(typeof Px === 'undefined') {
+  Px = {};
+}
+
+Px.vis = Px.vis || {};
+if(!Px.vis.scheduler) {
+
+  //get number of cores
+  var scheduler = {},
+      threadCount = 2,//navigator.hardwareConcurrency || 4,
+      initCounter = 0,
+      processDone,
+      startWork;
+
+  scheduler.workers = [];
+  scheduler.queue = [];
+
+  startWork = function(worker, actionName, data, callback) {
+    worker.inUse = true;
+
+    console.log('start work for ' + actionName + ' on worker ' + worker.index);
+    //don't copy the callback around, just remember it
+    worker.callback = callback;
+    worker.postMessage({ 'action': actionName, 'data': data});
+  }
+
+  //To be called by external people wanting to do work
+  scheduler.process = function(actionName, data, callback) {
+
+    var worker;
+    //search for a free thread
+    for(var i=0; i<scheduler.workers.length; i++) {
+      if(!scheduler.workers[i].inUse) {
+        worker = scheduler.workers[i];
+        break;
+      }
+    }
+
+    if(worker) {
+      startWork(worker, actionName, data, callback);
+    } else {
+      //no free thread, wait for one to finish
+      console.log('queing work ' + actionName);
+      scheduler.queue.push({ 'action': actionName, 'data': data, 'callback': callback});
+    }
+  };
+
+  //called once a worker has finished a piece of work
+  processDone = function(e) {
+
+    console.log('done work on thread ' + this.index);
+    //run callback with the result
+    //TODO: this is "blocking"
+    if(this.callback) {
+      this.callback(e.data);
+    }
+
+    //use thread if work queued
+    if(scheduler.queue.length) {
+
+      //get and do work
+      var initData = scheduler.queue.splice(0, 1)[0];
+       console.log('popping work ' + initData.action);
+      startWork(this, initData.action, initData.data, initData.callback);
+    } else {
+      this.inUse = false;
+    }
+  };
+
+
+
+  window.performance.mark('initWebWorkers');
+  //create workers
+  for(var i=0; i<threadCount; i++) {
+
+    // Build a worker from an anonymous function body
+  //   var blobURL = URL.createObjectURL( new Blob([ '(',
+
+  //   function(){
+  //       //Long-running work here
+  //       function reply(webWorkerIndex, data) {
+
+  //       if(data) {
+  //         postMessage({'webWorkerIndex': webWorkerIndex, 'data': data});
+  //       } else {
+  //         postMessage({'webWorkerIndex': webWorkerIndex});
+  //       }
+  //     }
+
+  //     onmessage = function(e) {
+
+  //       switch(e.data.action) {
+  //         case 'dummy':
+  //           reply(e.data.webWorkerIndex);
+  //           break;
+  //       }
+  //     }
+
+  //   }.toString(),
+
+  //   ')()' ], { type: 'application/javascript' } ) );
+
+  //  var worker = new Worker( blobURL );
+
+  //   // Won't be needing this anymore
+  //   URL.revokeObjectURL( blobURL );
+
+    var worker = new Worker('../px-vis/px-vis-worker.js');
+    //we can load the worker through a data uri if needed
+    scheduler.workers.push(worker);
+
+    //kick a first dummy communication for each worker.
+    //The first comm for each worker is slow (browser initializing stuff?)
+    //so do it now in order not to suffer the slowdown when actually needing it
+    worker.onmessage = function(e) {
+
+      initCounter++;
+      console.log('worker ' + this.index + ' done init')
+      if(initCounter >= threadCount) {
+        window.performance.mark('initWebWorkersEnd');
+        window.performance.measure('webWorkerInitTime', 'initWebWorkers', 'initWebWorkersEnd');
+        var duration = window.performance.getEntriesByName('webWorkerInitTime')[0].duration;
+        console.log('init webworkers: ' + duration + ' ms');
+      }
+      this.inUse = false;
+
+      //now add our true handling function
+      this.onmessage = processDone;
+    };
+    worker.inUse = true;
+    worker.index = i;
+    worker.postMessage({'action': 'dummy',
+                                      'workerIndex': i});
+  }
+
+  Px.vis.scheduler = scheduler;
+
+}
+
+</script>
