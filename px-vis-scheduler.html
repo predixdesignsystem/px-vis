@@ -1,143 +1,184 @@
 <script>
 
-//keep a ref to d3 if it's loaded already, we're going to load it ourselves right after this
-if(typeof Px === 'undefined') {
-  Px = {};
-}
 
-Px.vis = Px.vis || {};
-if(!Px.vis.scheduler) {
+(function(){
 
-  //get number of cores
-  var scheduler = {},
-      threadCount = 2,//navigator.hardwareConcurrency || 4,
-      initCounter = 0,
-      processDone,
-      startWork;
-
-  scheduler.workers = [];
-  scheduler.queue = [];
-
-  startWork = function(worker, actionName, data, callback) {
-    worker.inUse = true;
-
-    console.log('start work for ' + actionName + ' on worker ' + worker.index);
-    //don't copy the callback around, just remember it
-    worker.callback = callback;
-    worker.postMessage({ 'action': actionName, 'data': data});
+  if(typeof Px === 'undefined') {
+    Px = {};
   }
+  Px.vis = Px.vis || {};
+  if(!Px.vis.scheduler) {
 
-  //To be called by external people wanting to do work
-  scheduler.process = function(actionName, data, callback) {
+    //get number of cores
+    var scheduler = {},
+        threadCount = navigator.hardwareConcurrency || 4,
+        initCounter = 0,
+        processDone,
+        startWork;
 
-    var worker;
-    //search for a free thread
-    for(var i=0; i<scheduler.workers.length; i++) {
-      if(!scheduler.workers[i].inUse) {
-        worker = scheduler.workers[i];
-        break;
+    scheduler.workers = [];
+    scheduler.queue = [];
+    //mapping between chart and webworker: {chartId: webWorkerIndex}
+    scheduler.chartWorkerMapping = {};
+
+    //each chart will always use the same web worker. This is to get around
+    //the problem of passing a lot of data around, so the thread will have
+    //to keep the data for charts in sync
+    getWorkerIndexForChart = function(chartId) {
+
+      //if this chart  hasn't been registered yet do it
+      if(!scheduler.chartWorkerMapping[chartId]) {
+        //crudely "balance" workload by distributing charts equally among threads.
+        var mappingKeys = Object.keys(scheduler.chartWorkerMapping),
+            workerChartCount = [],
+            minCount = Number.MAX_VALUE,
+            workerIndex = 0;
+
+        for(var k=0; k<scheduler.workers.length; k++) {
+          workerChartCount.push(0);
+        }
+
+        for(var i=0; i<mappingKeys.length; i++) {
+          //count the number of charts for each worker
+            workerChartCount[scheduler.chartWorkerMapping[mappingKeys[i]]]++;
+        }
+
+        //pick the web worker with the least charts
+        for(var j=0; j<workerChartCount.length; j++) {
+          if(workerChartCount[j] < minCount) {
+            minCount = workerChartCount[j];
+            workerIndex = j;
+          }
+        }
+
+        //finally assign the worker index for the chart
+        scheduler.chartWorkerMapping[chartId] = workerIndex;
       }
+
+      return scheduler.chartWorkerMapping[chartId];
     }
 
-    if(worker) {
-      startWork(worker, actionName, data, callback);
-    } else {
-      //no free thread, wait for one to finish
-      console.log('queing work ' + actionName);
-      scheduler.queue.push({ 'action': actionName, 'data': data, 'callback': callback});
-    }
-  };
+    startWork = function(worker, actionName, data, chartId, callback) {
+      worker.inUse = true;
 
-  //called once a worker has finished a piece of work
-  processDone = function(e) {
+      //don't copy the callback around, just remember it
+      worker.callback = callback;
+      worker.startTime = window.performance.now();
 
-    console.log('done work on thread ' + this.index);
-    //run callback with the result
-    //TODO: this is "blocking"
-    if(this.callback) {
-      this.callback(e.data);
+      worker.postMessage({ 'action': actionName, 'data': data, 'chartId': chartId});
     }
 
-    //use thread if work queued
-    if(scheduler.queue.length) {
+    //To be called by external people wanting to do work
+    scheduler.process = function(actionName, data, chartId, callback) {
 
-      //get and do work
-      var initData = scheduler.queue.splice(0, 1)[0];
-       console.log('popping work ' + initData.action);
-      startWork(this, initData.action, initData.data, initData.callback);
-    } else {
-      this.inUse = false;
-    }
-  };
+      //find worker for this chart
+      var worker = scheduler.workers[getWorkerIndexForChart(chartId)];
 
-
-
-  window.performance.mark('initWebWorkers');
-  //create workers
-  for(var i=0; i<threadCount; i++) {
-
-    // Build a worker from an anonymous function body
-  //   var blobURL = URL.createObjectURL( new Blob([ '(',
-
-  //   function(){
-  //       //Long-running work here
-  //       function reply(webWorkerIndex, data) {
-
-  //       if(data) {
-  //         postMessage({'webWorkerIndex': webWorkerIndex, 'data': data});
-  //       } else {
-  //         postMessage({'webWorkerIndex': webWorkerIndex});
-  //       }
-  //     }
-
-  //     onmessage = function(e) {
-
-  //       switch(e.data.action) {
-  //         case 'dummy':
-  //           reply(e.data.webWorkerIndex);
-  //           break;
-  //       }
-  //     }
-
-  //   }.toString(),
-
-  //   ')()' ], { type: 'application/javascript' } ) );
-
-  //  var worker = new Worker( blobURL );
-
-  //   // Won't be needing this anymore
-  //   URL.revokeObjectURL( blobURL );
-
-    var worker = new Worker('../px-vis/px-vis-worker.js');
-    //we can load the worker through a data uri if needed
-    scheduler.workers.push(worker);
-
-    //kick a first dummy communication for each worker.
-    //The first comm for each worker is slow (browser initializing stuff?)
-    //so do it now in order not to suffer the slowdown when actually needing it
-    worker.onmessage = function(e) {
-
-      initCounter++;
-      console.log('worker ' + this.index + ' done init')
-      if(initCounter >= threadCount) {
-        window.performance.mark('initWebWorkersEnd');
-        window.performance.measure('webWorkerInitTime', 'initWebWorkers', 'initWebWorkersEnd');
-        var duration = window.performance.getEntriesByName('webWorkerInitTime')[0].duration;
-        console.log('init webworkers: ' + duration + ' ms');
+      //start work or queue
+      if(!worker.inUse) {
+        startWork(worker, actionName, data, chartId, callback);
+      } else {
+        //worker not available, queue
+        scheduler.queue[worker.index].push({ 'action': actionName, 'data': data, 'chartId': chartId, 'callback': callback});
       }
-      this.inUse = false;
-
-      //now add our true handling function
-      this.onmessage = processDone;
     };
-    worker.inUse = true;
-    worker.index = i;
-    worker.postMessage({'action': 'dummy',
-                                      'workerIndex': i});
+
+    //called once a worker has finished a piece of work
+    processDone = function(e) {
+
+      var now = window.performance.now();
+
+      console.log('passing IN ww took: ' + (e.data.timeIn - this.startTime));
+      console.log('passing OUT ww took: ' + (now - e.data.timeOut));
+      console.log('passing total ww took: ' + (now - this.startTime));
+
+      //run callback with the result
+      //TODO: this is "blocking"
+      if(this.callback) {
+        this.callback(e.data);
+      }
+
+      //use thread if work queued
+      if(scheduler.queue[this.index].length) {
+
+        //get and do work
+        var initData = scheduler.queue[this.index].splice(0, 1)[0];
+        startWork(this, initData.action, initData.data, initData.chartId, initData.callback);
+      } else {
+        this.inUse = false;
+      }
+    };
+
+
+
+    window.performance.mark('initWebWorkers');
+    //create workers and init queue
+    for(var i=0; i<threadCount; i++) {
+
+      // Build a worker from an anonymous function body
+    //   var blobURL = URL.createObjectURL( new Blob([ '(',
+
+    //   function(){
+    //       //Long-running work here
+    //       function reply(webWorkerIndex, data) {
+
+    //       if(data) {
+    //         postMessage({'webWorkerIndex': webWorkerIndex, 'data': data});
+    //       } else {
+    //         postMessage({'webWorkerIndex': webWorkerIndex});
+    //       }
+    //     }
+
+    //     onmessage = function(e) {
+
+    //       switch(e.data.action) {
+    //         case 'dummy':
+    //           reply(e.data.webWorkerIndex);
+    //           break;
+    //       }
+    //     }
+
+    //   }.toString(),
+
+    //   ')()' ], { type: 'application/javascript' } ) );
+
+    //  var worker = new Worker( blobURL );
+
+    //   // Won't be needing this anymore
+    //   URL.revokeObjectURL( blobURL );
+
+      var worker = new Worker('../px-vis/px-vis-worker.js');
+      //we can load the worker through a data uri if needed
+      scheduler.workers.push(worker);
+
+      //kick a first dummy communication for each worker.
+      //The first comm for each worker is slow (browser initializing stuff?)
+      //so do it now in order not to suffer the slowdown when actually needing it
+      worker.onmessage = function(e) {
+
+        initCounter++;
+        console.log('worker ' + this.index + ' done init')
+        if(initCounter >= threadCount) {
+          window.performance.mark('initWebWorkersEnd');
+          window.performance.measure('webWorkerInitTime', 'initWebWorkers', 'initWebWorkersEnd');
+          var duration = window.performance.getEntriesByName('webWorkerInitTime')[0].duration;
+          console.log('init webworkers: ' + duration + ' ms');
+        }
+        this.inUse = false;
+
+        //now add our true handling function
+        this.onmessage = processDone;
+      };
+      worker.inUse = true;
+      worker.index = i;
+      worker.postMessage({'action': 'dummy',
+                                        'workerIndex': i});
+      scheduler.queue.push([]);
+    }
+
+    Px.vis.scheduler = scheduler;
   }
+}())
 
-  Px.vis.scheduler = scheduler;
-
-}
 
 </script>

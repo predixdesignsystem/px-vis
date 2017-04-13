@@ -414,8 +414,37 @@ PxVisBehaviorChart.chartCommon = [{
       }
 
       this.notifyPath('_defaultSeriesConfig');
-    }
+    },
 }, PxColorsBehavior.dataVisColors , PxVisBehaviorChart.chartCommonMethods, PxVisBehavior.commonMethods, PxVisBehavior.completeSeriesConfig, PxVisBehavior.axisTypes];
+
+/*
+    Name:
+    PxVisBehaviorChart.webWorkerSynchonization
+
+    Description:
+    Polymer behavior that allows the chart to keep its data synced in a web worker
+
+    @polymerBehavior PxVisBehaviorChart.webWorkerSynchonization
+*/
+PxVisBehaviorChart.webWorkerSynchonization = [{
+    properties: {
+      /**
+       * Internal unique ID
+       */
+      _chartId: {
+        type: String
+      }
+    },
+    observers: [
+      '_keepDataInSync(chartData.*, _chartId)'
+    ],
+    ready: function() {
+      this._chartId = this.generateRandomID('chart');
+    },
+    _keepDataInSync: function(chartData, id) {
+      Px.vis.scheduler.process('updateData', {'chartData': this.chartData}, this._chartId);
+    }
+}, PxVisBehavior.uniqueIds, PxVisBehavior.dataset];
 
 /*
     Name:
