@@ -11,6 +11,11 @@ v2.0.0
 * fixed canvas clearing issue when using scatter and line at the same time
 * added canvas support for radial line and radial scatter
 
+v1.1.8
+==================
+* Allows data converter to have a interpolator passed in.
+* Changes to completeSeriesConfig computation so it does a proper deep clone of seriesConfig to allow functions and special values to be passed in. 
+
 v1.1.7
 ==================
 * make sure radial gridline radius can't be negative

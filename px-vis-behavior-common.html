@@ -863,6 +863,24 @@ PxVisBehavior.commonMethods = {
     }
 
     return d;
+  },
+
+  /*
+   * deep-copy object
+  */
+  clone: function(object, newObject) {
+    var newObject = newObject || {};
+    for (i in object) {
+      if (object.hasOwnProperty(i)) {
+        if (typeof object[i] === 'object') {
+          newObject[i] = Array.isArray(object[i]) ? [] : {};
+          this.clone(object[i], newObject[i])
+        } else {
+          newObject[i] = object[i];
+        }
+      }
+    }
+    return newObject;
   }
 };
 
@@ -2020,7 +2038,6 @@ PxVisBehavior.selectionType = {
 
 /*
     Name:
-
     PxVisBehavior.measureText
 
     Description:

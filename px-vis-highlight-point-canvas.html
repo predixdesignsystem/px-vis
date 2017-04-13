@@ -2,7 +2,8 @@
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="../px-colors-design/colors.html" />
-<link rel="import" href="px-vis-line-svg.html" />
+<link rel="import" href="px-vis-scatter-canvas.html" />
+
 
 <!--
 Element which draws crosshairs around mouse pointer / data points and highlights adjacent datapoints.
@@ -26,7 +27,7 @@ Element which draws crosshairs around mouse pointer / data points and highlights
         crosshair-data="{{crosshairData}}">
     </px-vis-interaction-space>
 
-    <px-vis-highlight-line
+    <px-vis-highlight-point-canvas
         svg="[[svg]]"
         x="[[x]]"
         y="[[y]]"
@@ -36,7 +37,7 @@ Element which draws crosshairs around mouse pointer / data points and highlights
         chart-data="[[chartData]]"
         generating-crosshair-data="[[generatingCrosshairData]]"
         crosshair-data="[[crosshairData]]">
-    </px-vis-highlight-line>
+    </px-vis-highlight-point-canvas>
 
 ### Styling
 The following custom properties are available for styling:
@@ -51,41 +52,42 @@ Custom property | Description | Default
 @homepage index.html
 @demo demo/index.html
 
+//TODO implement a dev setting to choose between only showing data at that x, snapping to nearest data, or interpolating value at x
 
 -->
 
 <link rel="import" href="css/px-vis-styles.html">
 
-<dom-module id="px-vis-highlight-line">
+<dom-module id="px-vis-highlight-point-canvas">
     <template>
       <style include="px-vis-styles"></style>
 
-      <px-vis-line-svg
-        id="myHighlighter"
-        svg="[[svg]]"
-        parallel-coordinates="[[parallelCoordinates]]"
-        radial-line="[[radialLine]]"
-        multi-path
-        disable-pointer-events
-        series-id="highlights"
-        chart-data="[[_lineData]]"
-        complete-series-config="[[_highlightConfig]]"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]"
-        interpolation-function="[[interpolationFunction]]">
-      </px-vis-line-svg>
-
+      <template is="dom-repeat" items="[[seriesKeys]]">
+        <px-vis-scatter-canvas
+          canvas-context="[[canvasContext]]"
+          series-id="[[item]]"
+          chart-data="[[_highlightData]]"
+          complete-series-config="[[_highlightConfig]]"
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          x="[[x]]"
+          y="[[_returnYScale(item, completeSeriesConfig, domainChanged)]]"
+          domain-changed="[[domainChanged]]"
+          progressive-rendering-points-per-frame="5">
+        </px-vis-scatter-canvas>
+      </template>
     </template>
 </dom-module>
 
 <script>
   Polymer({
 
-    is: 'px-vis-highlight-line',
+    is: 'px-vis-highlight-point-canvas',
 
     behaviors: [
-      PxVisBehaviorD3.svg,
+      PxVisBehavior.sizing,
+      PxVisBehaviorD3.canvas,
       PxVisBehaviorD3.axes,
       PxVisBehavior.dataset,
       PxVisBehavior.commonMethods,
@@ -94,11 +96,8 @@ Custom property | Description | Default
       PxVisBehaviorD3.clipPath,
       PxColorsBehavior.baseColors,
       PxVisBehavior.mutedSeries,
-      PxVisBehavior.dimensions,
-      PxVisBehaviorD3.domainUpdate,
       PxVisBehavior.dynamicConfigProperties,
-      PxVisBehavior.highlightShared,
-      PxVisBehaviorD3.interpolationFunction
+      PxVisBehavior.highlightShared
     ],
 
     /**
@@ -108,9 +107,8 @@ Custom property | Description | Default
      * @type Object
      */
     properties: {
-
-      _lineData: {
-        type: Object,
+      _highlightData: {
+        type:Object,
         notify: true,
         computed: '_computeChartData(crosshairData.timeStamps.*, _highlightConfig)'
       },
@@ -118,51 +116,47 @@ Custom property | Description | Default
       _highlightConfig: {
         type: Object,
         notify: true,
-        computed: '_computeConfig(dimensions.*)'
+        computed: '_computeConfig(completeSeriesConfig.*, seriesKeys.*)'
       },
 
-      /**
-      * A dev set boolean specifying if the chart is for a parallel coordinates chart
-      *
-      */
-      parallelCoordinates: {
-        type: Boolean,
-        value: false
-      },
-      /**
-      * A dev set boolean specifying if the line is using radial(polar) data
-      *
-      */
-      radialLine: {
-        type: Boolean,
-        value: false
+      seriesKeys: {
+        type: Object
       }
+
     }, //properties
 
     _computeConfig: function() {
-      return {
-        "highlights": {
-          "x": this.dimensions,
-          "y": this.dimensions,
-          "color": "rgb(255,0,0)"
-        }
-      };
+      var c = this.clone(this.completeSeriesConfig),
+          k;
+
+      for(var i = 0; i < this.seriesKeys.length; i++) {
+        k = this.seriesKeys[i];
+        c[k]['color'] = 'rgb(255,0,0)';
+      }
+
+      return c
     },
 
-    /**
-     * Draws the crosshair elements and sets up listeners and callbacks on chart hover
-     * Sets the crosshairData property which gets passed to the register.
-     *
-     */
-     _computeChartData: function() {
-       //if we are generating data locally and not being told to draw anyways, dont draw
-       // but if we have cleared our dataset, then we do want to clear our datapoints
-       if(this.generatingCrosshairData && !this.drawWithLocalCrosshairData && this.crosshairData.rawData.length > 0) {
-         return [];
-       }
+    _computeChartData: function() {
+      if(this.generatingCrosshairData && !this.drawWithLocalCrosshairData && this.crosshairData.rawData.length > 0) {
+        return [];
+      }
 
-       return this.differentDataset ? this._calcDataset() : this.crosshairData.rawData;
+      return this.differentDataset ? this._calcDataset() : this.crosshairData.rawData;
+    },
 
-     }
+    _returnYScale: function(seriesId, config) {
+      if(this.domainChanged !== null) {
+        if(typeof this.y === 'object') {
+          var d = config[seriesId]['axis']['id'];
+          if(this.y && this.y[d]) {
+            return this.y[d];
+          }
+        } else if(typeof this.y === 'function') {
+          return this.y;
+        }
+      }
+      return;
+    }
   });
 </script>
