@@ -30,6 +30,11 @@ Element which creates 2 SVG elements, and a canvas element between the two svg e
 <dom-module id="px-vis-svg-canvas">
   <template>
     <style include="px-vis-svg-canvas-styles"></style>
+    <style>
+      .noPointer {
+        pointer-events: none;
+      }
+    </style>
 
     <div
       class="rel-container"
@@ -51,6 +56,16 @@ Element which creates 2 SVG elements, and a canvas element between the two svg e
         margin="[[margin]]"
         offset="[[offset]]">
       </px-vis-canvas>
+
+      <px-vis-canvas
+        class="abs-elem inline--flex noPointer"
+        canvas-context="{{canvasContextTop}}"
+        width="[[width]]"
+        height="[[height]]"
+        margin="[[margin]]"
+        offset="[[offset]]">
+      </px-vis-canvas>
+
       <px-vis-svg
         class="abs-elem inline--flex"
         svg="{{svg}}"
@@ -93,6 +108,11 @@ Element which creates 2 SVG elements, and a canvas element between the two svg e
           * @type Object
           */
           svg: {
+            type: Object,
+            notify: true
+          },
+
+          canvasContextTop: {
             type: Object,
             notify: true
           }

@@ -2,7 +2,7 @@
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="../px-colors-design/colors.html" />
-<link rel="import" href="px-vis-line-svg.html" />
+<link rel="import" href="px-vis-line-canvas.html" />
 
 <!--
 Element which draws crosshairs around mouse pointer / data points and highlights adjacent datapoints.
@@ -56,13 +56,13 @@ Custom property | Description | Default
 
 <link rel="import" href="css/px-vis-styles.html">
 
-<dom-module id="px-vis-highlight-line">
+<dom-module id="px-vis-highlight-line-canvas">
     <template>
       <style include="px-vis-styles"></style>
 
-      <px-vis-line-svg
+      <px-vis-line-canvas
         id="myHighlighter"
-        svg="[[svg]]"
+        canvas-context="[[canvasContext]]"
         parallel-coordinates="[[parallelCoordinates]]"
         radial-line="[[radialLine]]"
         multi-path
@@ -73,8 +73,9 @@ Custom property | Description | Default
         x="[[x]]"
         y="[[y]]"
         domain-changed="[[domainChanged]]"
-        interpolation-function="[[interpolationFunction]]">
-      </px-vis-line-svg>
+        interpolation-function="[[interpolationFunction]]"
+        progressive-rendering-points-per-frame="5">
+      </px-vis-line-canvas>
 
     </template>
 </dom-module>
@@ -82,10 +83,10 @@ Custom property | Description | Default
 <script>
   Polymer({
 
-    is: 'px-vis-highlight-line',
+    is: 'px-vis-highlight-line-canvas',
 
     behaviors: [
-      PxVisBehaviorD3.svg,
+      PxVisBehaviorD3.canvas,
       PxVisBehaviorD3.axes,
       PxVisBehavior.dataset,
       PxVisBehavior.commonMethods,
@@ -154,15 +155,15 @@ Custom property | Description | Default
      * Sets the crosshairData property which gets passed to the register.
      *
      */
-     _computeChartData: function() {
-       //if we are generating data locally and not being told to draw anyways, dont draw
-       // but if we have cleared our dataset, then we do want to clear our datapoints
-       if(this.generatingCrosshairData && !this.drawWithLocalCrosshairData && this.crosshairData.rawData.length > 0) {
-         return [];
-       }
+    _computeChartData: function() {
+      //if we are generating data locally and not being told to draw anyways, dont draw
+      // but if we have cleared our dataset, then we do want to clear our datapoints
+      if(this.generatingCrosshairData && !this.drawWithLocalCrosshairData && this.crosshairData.rawData.length > 0) {
+        return [];
+      }
 
-       return this.differentDataset ? this._calcDataset() : this.crosshairData.rawData;
+      return this.differentDataset ? this._calcDataset() : this.crosshairData.rawData;
 
-     }
+    }
   });
 </script>
