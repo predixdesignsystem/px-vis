@@ -434,9 +434,13 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
 
       if(this.xAxisType !== 'time' && this.xAxisType !== 'timeLocal' && this.xAxisType !== 'ordinal') {
+        console.time("search");
+        // var t0 = window.performance.now();
         // this._returnClosestsVoronoiPoints(mousePos, dataObj);
         this._returnClosestsQuadtreePoints(mousePos, dataObj);
-
+        // var t1 = window.performance.now();
+        // console.log(t1-t0);
+        console.timeEnd("search");
       } else {
 
         for(var i = 0; i < keys.length; i++) {
@@ -1116,7 +1120,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
     _calcDataSeries: function(d, k) {
       return {
-        "coords": [ d[0], d[1] ],
+        "coord": [ d[0], d[1] ],
         "name": k,
         "value": this._calcValue(d, k)
       }
@@ -1160,21 +1164,23 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             yKey,
             axis,
             k,
-            // voronoi = d3.voronoi()
-            voronoi = d3.quadtree()
-              .extent(ext)
-              .x(function(d) { return this._getVoronoiVal(d, 'x', xKey) }.bind(this))
-              .y(function(d) { return this._getVoronoiVal(d, 'y', yKey, axis); }.bind(this)),
-              data = {};
+            data = {},
+            quadtree;
 
         for(var i = 0; i < keys.length; i++) {
+          quadtree = d3.quadtree()
+            .extent(ext)
+            .x(function(d) { return this._getVoronoiVal(d, 'x', xKey) }.bind(this))
+            .y(function(d) { return this._getVoronoiVal(d, 'y', yKey, axis); }.bind(this));
+
           k = keys[i];
           xKey = this.completeSeriesConfig[k]['x'];
           yKey = this.completeSeriesConfig[k]['y'];
           axis = this.completeSeriesConfig[k]['axis'] ? this.completeSeriesConfig[k]['axis']['id'] : null;
 
-          data[k] = voronoi.addAll(this.chartData);
-          // data[k] = voronoi(this.chartData);
+          quadtree.addAll(this.chartData);
+
+          data[k] = quadtree;
         }
 
         var t1 = window.performance.now();
@@ -1199,24 +1205,17 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
         if(this._calcCrosshair) {
           dataObj = this._addCrosshairDataQuadtree(dataObj, result);
-          // dataObj = this._addCrosshairData(dataObj, result.data);
         }
       }
-      console.log(dataObj);
     },
 
     _calcDataSeriesQuadtree: function(d, k) {
 
       return {
-        // "coords": [ d[0], d[1] ],  //calc coords
+        // "coord": [ d[0], d[1] ],  //calc coords
         "name": k,
         "value": this._calcValueQuadtree(d, k)
       }
-      // return {
-      //   "coords": [ d[0], d[1] ],
-      //   "name": k,
-      //   "value": this._calcValue(d, k)
-      // }
     },
 
 
@@ -1224,10 +1223,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       var x = this.completeSeriesConfig[k]['x'],
           y = this.completeSeriesConfig[k]['y'],
           o = {};
+
       o[x] = d[x];
       o[y] = d[y];
-      // o[x] = d.data[x];
-      // o[y] = d.data[y];
 
       return o;
     },

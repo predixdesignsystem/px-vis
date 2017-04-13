@@ -1165,7 +1165,7 @@ PxVisBehaviorD3.radialLineGenerator = [{
         //for each datapoint, iterate through the dimensions
         return path(dims.map(function(p) {
           //check that we have data; if not, return false so it doesnt draw a line
-          if(typeof(d[p]) === 'undefined' || d[p] === null) {
+          if(!d || typeof(d[p]) === 'undefined' || d[p] === null) {
             return false
           }
           //return [x,y] to path: x is ordinal based on dim; get the y-scale for the dim and use that particular scale on the data
@@ -1447,7 +1447,7 @@ PxVisBehaviorD3.lineShared = [{
           //for each datapoint, iterate through the dimensions
           return path(dims.map(function(p) {
             //check that we have data; if not, return false so it doesnt draw a line
-            if(!d[p]) {
+            if(!d || !d[p]) {
               return false
             }
             //return [x,y] to path: x is ordinal based on dim; get the y-scale for the dim and use that particular scale on the data
