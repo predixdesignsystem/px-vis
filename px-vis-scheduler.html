@@ -16,6 +16,16 @@
         processDone,
         startWork;
 
+    // NOTE: see http://www.2ality.com/2014/05/current-script.html
+    var currentScript = document._currentScript || document.currentScript ||
+        (function() {
+          var scripts = document.getElementsByTagName('script');
+          return scripts[scripts.length - 1];
+        })();
+    var BASE_URI = currentScript.ownerDocument.baseURI;
+    var WORKER_SCOPE_URL =
+        Polymer.ResolveUrl.resolveUrl('px-vis-worker.js', BASE_URI);
+
     scheduler.workers = [];
     scheduler.queue = [];
     //mapping between chart and webworker: {chartId: webWorkerIndex}
@@ -27,7 +37,7 @@
     getWorkerIndexForChart = function(chartId) {
 
       //if this chart  hasn't been registered yet do it
-      if(!scheduler.chartWorkerMapping[chartId]) {
+      if(!scheduler.chartWorkerMapping[chartId] && scheduler.chartWorkerMapping[chartId] !== 0) {
         //crudely "balance" workload by distributing charts equally among threads.
         var mappingKeys = Object.keys(scheduler.chartWorkerMapping),
             workerChartCount = [],
@@ -92,11 +102,9 @@
       console.log('passing OUT ww took: ' + (now - e.data.timeOut));
       console.log('passing total ww took: ' + (now - this.startTime));
 
-      //run callback with the result
-      //TODO: this is "blocking"
-      if(this.callback) {
-        this.callback(e.data);
-      }
+
+      //store callback and kick off new work before processing results
+      var callback = this.callback;
 
       //use thread if work queued
       if(scheduler.queue[this.index].length) {
@@ -107,6 +115,11 @@
       } else {
         this.inUse = false;
       }
+
+      //run callback with the result
+      if(callback) {
+        callback(e.data);
+      }
     };
 
 
@@ -116,38 +129,38 @@
     for(var i=0; i<threadCount; i++) {
 
       // Build a worker from an anonymous function body
-    //   var blobURL = URL.createObjectURL( new Blob([ '(',
+      // var blobURL = URL.createObjectURL( new Blob([ '(',
 
-    //   function(){
-    //       //Long-running work here
-    //       function reply(webWorkerIndex, data) {
+      // function(){
+      //     //Long-running work here
+      //     function reply(webWorkerIndex, data) {
 
-    //       if(data) {
-    //         postMessage({'webWorkerIndex': webWorkerIndex, 'data': data});
-    //       } else {
-    //         postMessage({'webWorkerIndex': webWorkerIndex});
-    //       }
-    //     }
+      //     if(data) {
+      //       postMessage({'webWorkerIndex': webWorkerIndex, 'data': data});
+      //     } else {
+      //       postMessage({'webWorkerIndex': webWorkerIndex});
+      //     }
+      //   }
 
-    //     onmessage = function(e) {
+      //   onmessage = function(e) {
 
-    //       switch(e.data.action) {
-    //         case 'dummy':
-    //           reply(e.data.webWorkerIndex);
-    //           break;
-    //       }
-    //     }
+      //     switch(e.data.action) {
+      //       case 'dummy':
+      //         reply(e.data.webWorkerIndex);
+      //         break;
+      //     }
+      //   }
 
-    //   }.toString(),
+      // }.toString(),
 
-    //   ')()' ], { type: 'application/javascript' } ) );
+      // ')()' ], { type: 'application/javascript' } ) );
 
     //  var worker = new Worker( blobURL );
 
     //   // Won't be needing this anymore
     //   URL.revokeObjectURL( blobURL );
 
-      var worker = new Worker('../px-vis/px-vis-worker.js');
+      var worker = new Worker(WORKER_SCOPE_URL);
       //we can load the worker through a data uri if needed
       scheduler.workers.push(worker);
 
@@ -171,8 +184,7 @@
       };
       worker.inUse = true;
       worker.index = i;
-      worker.postMessage({'action': 'dummy',
-                                        'workerIndex': i});
+      worker.postMessage({'action': 'init'});
       scheduler.queue.push([]);
     }
 

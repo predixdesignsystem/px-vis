@@ -216,6 +216,12 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         value: function() {
           return {};
         }
+      },
+      /**
+       * Unique Id of the chart owning this interaction space
+       */
+      chartId: {
+        type: String
       }
     },
 
@@ -1156,36 +1162,35 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     _createQuadtreeData: function() {
       if(this.domainChanged !== null) {
         var t0 = window.performance.now();
+
         var w = this.width - this.margin.right - this.margin.left,
             h = this.height - this.margin.top - this.margin.bottom,
             ext = [[0,0], [w, h]],
             keys = this.seriesKeys ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
-            xKey,
-            yKey,
-            axis,
-            k,
             data = {},
-            quadtree;
+            yAxisKeys = Object.keys(this.y);
 
-        for(var i = 0; i < keys.length; i++) {
-          quadtree = d3.quadtree()
-            .extent(ext)
-            .x(function(d) { return this._getVoronoiVal(d, 'x', xKey) }.bind(this))
-            .y(function(d) { return this._getVoronoiVal(d, 'y', yKey, axis); }.bind(this));
-
-          k = keys[i];
-          xKey = this.completeSeriesConfig[k]['x'];
-          yKey = this.completeSeriesConfig[k]['y'];
-          axis = this.completeSeriesConfig[k]['axis'] ? this.completeSeriesConfig[k]['axis']['id'] : null;
-
-          quadtree.addAll(this.chartData);
-
-          data[k] = quadtree;
+        data.width = w;
+        data.height = h;
+        data.keys = keys;
+        data.completeSeriesConfig = this.completeSeriesConfig;
+        data.extents = ext;
+        data.x = this.x.toString();
+        data.y = [];
+        data.x.range = this.x.range();
+        data.x.domain = this.x.domain();
+        data.x.type = this.x._scaleType;
+        for(var i=0; i<yAxisKeys.length; i++) {
+          data.y[yAxisKeys[i]] = {
+              'range': this.y[yAxisKeys[i]].range(),
+              'domain': this.y[yAxisKeys[i]].domain(),
+              'type': this.y[yAxisKeys[i]]._scaleType};
         }
 
-        var t1 = window.performance.now();
-        console.log(t1-t0);
-        this.voronoiData = data;
+        Px.vis.scheduler.process('createQuadtree', data, this.chartId, function(data) {
+          var t1 = window.performance.now();
+          console.log('built quadtree in ' + (t1-t0));
+        }.bind(this));
       }
     },
 
