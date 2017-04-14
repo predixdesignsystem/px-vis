@@ -216,6 +216,13 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         value: function() {
           return {};
         }
+      },
+
+      quadtreeData: {
+        type: Object,
+        value: function() {
+          return {};
+        }
       }
     },
 
@@ -224,8 +231,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       '_setupActions(actionConfig.*)',
       '_resetTooltipDataLegacy(completeSeriesConfig.*)',
       '_resetTooltipData(seriesKeys.*)',
-      '_createQuadtreeData(chartData.*, width, height, margin.*, domainChanged)'
-      // '_createVoronoiData(chartData.*, width, height, margin.*, domainChanged)'
+      // '_createQuadtreeData(chartData.*, width, height, margin.*, domainChanged)',
+      '_createVoronoiData(chartData.*, width, height, margin.*, domainChanged)'
      ],
 
     /**
@@ -432,15 +439,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           //and we know the data has some notion of time -- !! --> turn into a bool
           searchTimeStamp = dataObj.time === null && !!this.chartData[0][this.timeData];
 
-
       if(this.xAxisType !== 'time' && this.xAxisType !== 'timeLocal' && this.xAxisType !== 'ordinal') {
-        console.time("search");
-        // var t0 = window.performance.now();
-        // this._returnClosestsVoronoiPoints(mousePos, dataObj);
-        this._returnClosestsQuadtreePoints(mousePos, dataObj);
-        // var t1 = window.performance.now();
-        // console.log(t1-t0);
-        console.timeEnd("search");
+
+        this._returnClosestsVoronoiPoints(mousePos, dataObj);
+        // this._returnClosestsQuadtreePoints(mousePos, dataObj);
+
       } else {
 
         for(var i = 0; i < keys.length; i++) {
@@ -1073,7 +1076,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             yKey,
             axis,
             k,
-            voronoi = d3.voronoi()
+            voronoi = Px.d3.voronoi()
               .extent(ext)
               .x(function(d) { return this._getVoronoiVal(d, 'x', xKey) }.bind(this))
               .y(function(d) { return this._getVoronoiVal(d, 'y', yKey, axis); }.bind(this)),
@@ -1168,7 +1171,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             quadtree;
 
         for(var i = 0; i < keys.length; i++) {
-          quadtree = d3.quadtree()
+          quadtree = Px.d3.quadtree()
             .extent(ext)
             .x(function(d) { return this._getVoronoiVal(d, 'x', xKey) }.bind(this))
             .y(function(d) { return this._getVoronoiVal(d, 'y', yKey, axis); }.bind(this));
@@ -1185,7 +1188,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
         var t1 = window.performance.now();
         console.log(t1-t0);
-        this.voronoiData = data;
+        this.quadtreeData = data;
       }
     },
 
@@ -1197,7 +1200,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       for(var i = 0; i < keys.length; i++) {
         k = keys[i];
 
-        result = this.voronoiData[k].find(mousePos[0],mousePos[1]);
+        result = this.quadtreeData[k].find(mousePos[0],mousePos[1]);
 
         dataObj.time;
         dataObj.series.push(this._calcDataSeriesQuadtree(result, k));
@@ -1210,19 +1213,28 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     _calcDataSeriesQuadtree: function(d, k) {
+      var x = this.completeSeriesConfig[k]['x'],
+          y = this.completeSeriesConfig[k]['y'],
+          scale = this.completeSeriesConfig[k]['axis'] ? this.y[this.completeSeriesConfig[k]['axis']['id']] : this.y;
 
       return {
-        // "coord": [ d[0], d[1] ],  //calc coords
+        "coord": this._calcCoordQuadtree(d, x, y, scale),
         "name": k,
-        "value": this._calcValueQuadtree(d, k)
+        "value": this._calcValueQuadtree(d, x, y)
       }
     },
 
+    _calcCoordQuadtree: function(d, x, y, scale) {
+      var a = [];
 
-    _calcValueQuadtree: function(d, k) {
-      var x = this.completeSeriesConfig[k]['x'],
-          y = this.completeSeriesConfig[k]['y'],
-          o = {};
+      a[0] = this.x(d[x]);
+      a[1] = scale(d[y]);
+
+      return a;
+    },
+
+    _calcValueQuadtree: function(d, x, y) {
+      var o = {};
 
       o[x] = d[x];
       o[y] = d[y];
