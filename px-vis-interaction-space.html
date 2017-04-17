@@ -230,8 +230,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       '_setupActions(actionConfig.*)',
       '_resetTooltipDataLegacy(completeSeriesConfig.*)',
       '_resetTooltipData(seriesKeys.*)',
-      '_createQuadtreeData(chartData.*, width, height, margin.*, domainChanged)'
-      // '_createVoronoiData(chartData.*, width, height, margin.*, domainChanged)'
+      '_createQuadtreeData(chartData.*, width, height, margin.*, domainChanged)',
+     // '_createVoronoiData(chartData.*, width, height, margin.*, domainChanged)'
      ],
 
     /**
@@ -400,7 +400,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     _calcDataDebounced: function(mousePos) {
       //calc all the series: returns updated dataObj
       var dataObj = this._getDataForAllSeries(mousePos);
+    },
 
+    _calcDataFinished: function(dataObj) {
       // now we can set our data that we want to pass out
       if(this._calculatingData) {
 
@@ -438,15 +440,22 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           //and we know the data has some notion of time -- !! --> turn into a bool
           searchTimeStamp = dataObj.time === null && !!this.chartData[0][this.timeData];
 
-
       if(this.xAxisType !== 'time' && this.xAxisType !== 'timeLocal' && this.xAxisType !== 'ordinal') {
-        console.time("search");
-        // var t0 = window.performance.now();
-        // this._returnClosestsVoronoiPoints(mousePos, dataObj);
-        this._returnClosestsQuadtreePoints(mousePos, dataObj);
-        // var t1 = window.performance.now();
-        // console.log(t1-t0);
-        console.timeEnd("search");
+
+       // this._returnClosestsVoronoiPoints(mousePos, dataObj);
+        // this._returnClosestsQuadtreePoints(mousePos, dataObj);
+         var data = this._createBaseDataObjForWebWorker();
+         data.mousePos = mousePos;
+         data.calcCrosshair = this._calcCrosshair;
+         data.timeData = this.timeData;
+
+         Px.vis.scheduler.process('findQuadTreePoints', data, this.chartId, function(e) {
+          dataObj.series = e.data.series;
+          dataObj.rawData = e.data.rawData;
+          dataObj.timeStamps = e.data.timeStamps;
+          this._calcDataFinished(dataObj);
+         }.bind(this));
+         return;
       } else {
 
         for(var i = 0; i < keys.length; i++) {
@@ -466,7 +475,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         dataObj.time = closestTimestamp.time;
       }
 
-      return dataObj;
+      this._calcDataFinished(dataObj);
     },
 
     /**
@@ -1079,7 +1088,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             yKey,
             axis,
             k,
-            voronoi = d3.voronoi()
+            voronoi = Px.d3.voronoi()
               .extent(ext)
               .x(function(d) { return this._getVoronoiVal(d, 'x', xKey) }.bind(this))
               .y(function(d) { return this._getVoronoiVal(d, 'y', yKey, axis); }.bind(this)),
@@ -1166,32 +1175,44 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         var w = this.width - this.margin.right - this.margin.left,
             h = this.height - this.margin.top - this.margin.bottom,
             ext = [[0,0], [w, h]],
-            keys = this.seriesKeys ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
-            data = {},
-            yAxisKeys = Object.keys(this.y);
+            data = this._createBaseDataObjForWebWorker();
 
         data.width = w;
         data.height = h;
-        data.keys = keys;
-        data.completeSeriesConfig = this.completeSeriesConfig;
         data.extents = ext;
-        data.x = this.x.toString();
-        data.y = [];
-        data.x.range = this.x.range();
-        data.x.domain = this.x.domain();
-        data.x.type = this.x._scaleType;
-        for(var i=0; i<yAxisKeys.length; i++) {
-          data.y[yAxisKeys[i]] = {
-              'range': this.y[yAxisKeys[i]].range(),
-              'domain': this.y[yAxisKeys[i]].domain(),
-              'type': this.y[yAxisKeys[i]]._scaleType};
-        }
 
         Px.vis.scheduler.process('createQuadtree', data, this.chartId, function(data) {
           var t1 = window.performance.now();
           console.log('built quadtree in ' + (t1-t0));
         }.bind(this));
       }
+    },
+
+    _createBaseDataObjForWebWorker: function() {
+      var data = {},
+          yAxisKeys = Object.keys(this.y);
+
+      data.completeSeriesConfig = this.completeSeriesConfig;
+      data.keys = this.seriesKeys ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
+      data.x = {};
+
+      data.x.range = this.x.range();
+      data.x.domain = this.x.domain();
+      data.x.type = this.x._scaleType;
+
+      if(this._isMultiY) {
+        data.y = [];
+        for(var i=0; i<yAxisKeys.length; i++) {
+          data.y[yAxisKeys[i]] = {
+              'range': this.y[yAxisKeys[i]].range(),
+              'domain': this.y[yAxisKeys[i]].domain(),
+              'type': this.y[yAxisKeys[i]]._scaleType};
+        }
+      } else {
+        data.y = this.y;
+      }
+
+      return data;
     },
 
     _returnClosestsQuadtreePoints: function(mousePos, dataObj) {
@@ -1202,7 +1223,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       for(var i = 0; i < keys.length; i++) {
         k = keys[i];
 
-        result = this.voronoiData[k].find(mousePos[0],mousePos[1]);
+        result = this.quadtreeData[k].find(mousePos[0],mousePos[1]);
 
         dataObj.time;
         dataObj.series.push(this._calcDataSeriesQuadtree(result, k));
@@ -1215,19 +1236,28 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     _calcDataSeriesQuadtree: function(d, k) {
+      var x = this.completeSeriesConfig[k]['x'],
+          y = this.completeSeriesConfig[k]['y'],
+          scale = this.completeSeriesConfig[k]['axis'] ? this.y[this.completeSeriesConfig[k]['axis']['id']] : this.y;
 
       return {
-        // "coord": [ d[0], d[1] ],  //calc coords
+        "coord": this._calcCoordQuadtree(d, x, y, scale),
         "name": k,
-        "value": this._calcValueQuadtree(d, k)
+        "value": this._calcValueQuadtree(d, x, y)
       }
     },
 
+    _calcCoordQuadtree: function(d, x, y, scale) {
+      var a = [];
 
-    _calcValueQuadtree: function(d, k) {
-      var x = this.completeSeriesConfig[k]['x'],
-          y = this.completeSeriesConfig[k]['y'],
-          o = {};
+      a[0] = this.x(d[x]);
+      a[1] = scale(d[y]);
+
+      return a;
+    },
+
+    _calcValueQuadtree: function(d, x, y) {
+      var o = {};
 
       o[x] = d[x];
       o[y] = d[y];

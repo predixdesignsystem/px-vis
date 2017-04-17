@@ -89,6 +89,24 @@
         startWork(worker, actionName, data, chartId, callback);
       } else {
         //worker not available, queue
+
+        var obj,
+            found;
+        //if we already have an action of this type for this chart cancel it
+        for(var i=0; i<scheduler.queue[worker.index].length; i++) {
+
+          var obj = scheduler.queue[worker.index][i];
+          if(obj.chartId === chartId && obj.action === actionName) {
+            found = i;
+            break;
+          }
+        }
+
+        if(found || found === 0) {
+          scheduler.queue[worker.index].splice(found, 1);
+        }
+
+        //now queue
         scheduler.queue[worker.index].push({ 'action': actionName, 'data': data, 'chartId': chartId, 'callback': callback});
       }
     };
@@ -98,9 +116,9 @@
 
       var now = window.performance.now();
 
-      console.log('passing IN ww took: ' + (e.data.timeIn - this.startTime));
-      console.log('passing OUT ww took: ' + (now - e.data.timeOut));
-      console.log('passing total ww took: ' + (now - this.startTime));
+      //  console.log('passing IN ww took: ' + (e.data.timeIn - this.startTime));
+      //  console.log('passing OUT ww took: ' + (now - e.data.timeOut));
+       console.log('passing total ww took: ' + (now - this.startTime));
 
 
       //store callback and kick off new work before processing results
@@ -170,12 +188,11 @@
       worker.onmessage = function(e) {
 
         initCounter++;
-        console.log('worker ' + this.index + ' done init')
         if(initCounter >= threadCount) {
           window.performance.mark('initWebWorkersEnd');
           window.performance.measure('webWorkerInitTime', 'initWebWorkers', 'initWebWorkersEnd');
           var duration = window.performance.getEntriesByName('webWorkerInitTime')[0].duration;
-          console.log('init webworkers: ' + duration + ' ms');
+          console.log('init ' + scheduler.workers.length + ' webworkers: ' + duration + ' ms');
         }
         this.inUse = false;
 
