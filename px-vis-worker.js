@@ -39,6 +39,22 @@ function recreateD3Scale(scaleObj) {
   return result;
 }
 
+function getMultiScale(visData) {
+  var o = {},
+      k,
+      axis;
+  for(var i = 0; i < visData.keys.length; i++) {
+    k = visData.keys[i];
+    axis = visData.completeSeriesConfig[k]['axis'] ? visData.completeSeriesConfig[k]['axis']['id'] : "default";
+
+    if(!o[axis]) {
+      o[axis] = recreateD3Scale(visData.y[axis]);
+    }
+  }
+
+  return o;
+}
+
 function createDataStub() {
   return {
     "series" : [],
@@ -54,51 +70,95 @@ function createDataStub() {
  * @method createQuadtree
  */
 function createQuadtree(data, time) {
+  quadtrees[data.chartId] = data.data.searchType === 'closestPoint' ?
+    createSingleQuadtree(data) :
+    createSeriesQuadtree(data);
+
+  reply(null, time);
+}
+
+function createSingleQuadtree(data) {
   var visData = data.data,
       chartData = dataMapping[data.chartId],
-      result = {},
+      xScale = recreateD3Scale(visData.x),
+      yScale = getMultiScale(visData),
+      flatData,
+      quadtree = d3.quadtree()
+        .extent(visData.extents)
+        .x(function(d) { return xScale(d.x); })
+        .y(function(d) { return yScale[d.axis](d.y); });
+
+    for(var i = 0; i < chartData.length; i++) {
+      flatData = flattenData(visData, chartData[i]);
+      
+      quadtree.addAll(flatData);
+    }
+
+    console.log(quadtree);
+
+    return quadtree;
+}
+
+function flattenData(visData, d) {
+  var arr = [];
+  for(var i = 0; i < visData.keys.length; i++) {
+    var o = {}, 
+        k = visData.keys[i];
+
+    o["data"] = d;
+    o["key"] = k;
+    o["x"] = d[visData.completeSeriesConfig[k]['x']];
+    o["y"] = d[visData.completeSeriesConfig[k]['y']];
+    o["axis"] = visData.completeSeriesConfig[k]['axis'] ? visData.completeSeriesConfig[k]['axis']['id'] : "default";
+
+    arr.push(o);
+  }
+
+  return arr;
+}
+
+function createSeriesQuadtree(data) {
+  var visData = data.data,
+      chartData = dataMapping[data.chartId],
       k,
       xKey,
       yKey,
       axis,
-      quadtree = visData.searchType === 'closestPoint' ? d3.quadtree() : null,
+      quadtree = {},
       // we can't pass d3 scales around so we need to recretate them
       xScale = recreateD3Scale(visData.x),
       yScale;
 
   for(var i = 0; i < visData.keys.length; i++) {
+    k = visData.keys[i];
+
     //create an object and bind it to the x and y accessors so that the scales
     //won't be overriden by the next iteration of the loop
-    var obj = {};
-
-    k = visData.keys[i];
-    obj.xKey = visData.completeSeriesConfig[k]['x'];
-    obj.yKey = visData.completeSeriesConfig[k]['y'];
-    axis = visData.completeSeriesConfig[k]['axis'] ? visData.completeSeriesConfig[k]['axis']['id'] : null;
-    //TODO: check if same scale
-    obj.yScale = recreateD3Scale(visData.y[axis]);
-    obj.yScale.index = i;
+    var obj = buildQuadtreeHelperObj(visData, k, i);
 
     // if we are just doing closestPoint, then do not reset the quadtree
-    quadtree = visData.searchType === 'closestPoint' ? quadtree : d3.quadtree();
-
-    quadtree.extent(visData.extents)
-    .x(function(d) { return xScale(d[this.xKey]); }.bind(obj))
-    .y(function(d) { return this.yScale(d[this.yKey]); }.bind(obj));
-
-    quadtree.addAll(chartData);
-
-    if(visData.searchType === 'closestPoint') {
-      result = quadtree;
-    } else {
-      result[k] = quadtree;
-    }
+    quadtree[k] = d3.quadtree()
+      .extent(visData.extents)
+      .x(function(d) { return xScale(d[this.xKey]); }.bind(obj))
+      .y(function(d) { return this.yScale(d[this.yKey]); }.bind(obj))
+      .addAll(chartData);
   }
 
-  quadtrees[data.chartId] = result;
-  reply(null, time);
+  return quadtree;
 }
 
+function buildQuadtreeHelperObj(visData, k, index) {
+  var obj = {};
+
+  obj.xKey = visData.completeSeriesConfig[k]['x'];
+  obj.yKey = visData.completeSeriesConfig[k]['y'];
+  axis = visData.completeSeriesConfig[k]['axis'] ? visData.completeSeriesConfig[k]['axis']['id'] : null;
+  //TODO: check if same scale
+  obj.yScale = recreateD3Scale(visData.y[axis]);
+  obj.yScale.index = index;
+
+  return obj;
+}
 
 /**
  * Updates the local data with new data
@@ -212,7 +272,7 @@ function searchQuadtreeSingle(visData, dataObj, quadtreeData, xScale) {
   for(var i = 0; i < visData.keys.length; i++) {
     k = visData.keys[i];
 
-    dataObj = constructDataObj(result, dataObj, k, visData, xScale);
+    dataObj = constructDataObj(result.data, dataObj, k, visData, xScale);
   }
 
   return dataObj;
