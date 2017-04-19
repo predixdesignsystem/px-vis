@@ -70,9 +70,9 @@ function createDataStub() {
  * @method createQuadtree
  */
 function createQuadtree(data, time) {
-  quadtrees[data.chartId] = data.data.searchType === 'closestPoint' ?
-    createSingleQuadtree(data) :
-    createSeriesQuadtree(data);
+  quadtrees[data.chartId] = data.data.searchType === 'pointPerSeries' ?
+    createSeriesQuadtree(data) :
+    createSingleQuadtree(data);
 
   reply(null, time);
 }
@@ -107,6 +107,7 @@ function flattenData(visData, d) {
 
     o["data"] = d;
     o["key"] = k;
+    o["time"] = visData.timeData ? d[visData.timeData] : null;
     o["x"] = d[visData.completeSeriesConfig[k]['x']];
     o["y"] = d[visData.completeSeriesConfig[k]['y']];
     o["axis"] = visData.completeSeriesConfig[k]['axis'] ? visData.completeSeriesConfig[k]['axis']['id'] : "default";
@@ -255,24 +256,24 @@ function returnClosestsQuadtreePoints(eventData, time) {
       quadtreeData = quadtrees[eventData.chartId],
       xScale = recreateD3Scale(visData.x);
 
-  dataObj = visData.searchType === 'closestPoint' ?
-    searchQuadtreeSingle(visData, dataObj, quadtreeData, xScale) :
-    searchQuadtreeSeries(visData, dataObj, quadtreeData, xScale);
+  dataObj = visData.searchType === 'pointPerSeries' ?
+    searchQuadtreeSeries(visData, dataObj, quadtreeData, xScale) :
+    searchQuadtreeSingle(visData, dataObj, quadtreeData, xScale);
 
   delete dataObj.timeStampsTracker;
   reply(dataObj, time);
 }
 
 function searchQuadtreeSingle(visData, dataObj, quadtreeData, xScale) {
-  var result,
+  var result = quadtreeData.find(visData.mousePos[0], visData.mousePos[1], visData.radius),
       k;
 
-  result = quadtreeData.find(visData.mousePos[0], visData.mousePos[1]);
-
+  result = result && result.data ? result.data : result;
+  
   for(var i = 0; i < visData.keys.length; i++) {
     k = visData.keys[i];
 
-    dataObj = constructDataObj(result.data, dataObj, k, visData, xScale);
+    dataObj = constructDataObj(result, dataObj, k, visData, xScale);
   }
 
   return dataObj;
@@ -285,7 +286,7 @@ function searchQuadtreeSeries(visData, dataObj, quadtreeData, xScale) {
   for(var i = 0; i < visData.keys.length; i++) {
     k = visData.keys[i];
 
-    result = quadtreeData[k].find(visData.mousePos[0], visData.mousePos[1]);
+    result = quadtreeData[k].find(visData.mousePos[0], visData.mousePos[1], visData.radius);
 
     dataObj = constructDataObj(result, dataObj, k, visData, xScale);
   }
@@ -314,6 +315,58 @@ function constructDataObj(result, dataObj, k, visData, xScale) {
 
   return dataObj;
 }
+
+/**
+ * Finds all the Quadtree nodes in an area. Returns fully constructed tooltip/crosshair data obj
+ *
+ * @method returnQuadtreePointsInArea
+ */
+function returnQuadtreePointsInArea(eventData, time) {
+  var visData = eventData.data,
+      ext = visData.extents,
+      quadtreeData = quadtrees[eventData.chartId],
+      dataObj = searchAreaQuadtree(quadtreeData, ext[0][0], ext[0][1], ext[1][0], ext[1][1], visData.timeData);
+
+  reply(dataObj, time);
+}
+
+/**
+ * Performs the tree search for nodes within an area.
+ *
+ * @method searchAreaQuadtree
+ */
+function searchAreaQuadtree(quadtree, x0, y0, x3, y3, t) {
+  var result = {
+    'rawData': [],
+    'timeStamps': [],
+    'timeStampsTracker': {}
+  };
+
+// FIXME This is not checked yet. Need to implement on IS before I can see if it works
+
+  quadtree.visit(function(node, x1, y1, x2, y2) {
+    if (!node.length) {
+      do {
+        var d = node.data;
+        // if our point is inside our box, save it if not a copy
+        if((d[0] >= x0) && (d[0] < x3) && (d[1] >= y0) && (d[1] < y3))  {
+          if(t && result.timeStampsTracker.hasOwnProperty(d[t])) {
+            result.timeStampsTracker[d[t]] = true;
+            result.timeStamps.push(d[t]);
+            result.rawData.push(d.data);
+          } else if(!t) {
+            result.rawData.push(d.data);
+          }
+        }
+      } while (node = node.next);
+    }
+    //return true  ==> skip the children nodes so we dont search unnessary bits of the tree
+    return x1 >= x3 || y1 >= y3 || x2 < x0 || y2 < y0;
+  });
+
+  return result;
+}
+
 
 /**
  * Creates the voronoi data structure which we will use to search later
@@ -440,6 +493,10 @@ onmessage = function(e) {
 
     case 'findQuadtreePoints':
       returnClosestsQuadtreePoints(e.data, time);
+      break;
+
+    case 'findQuadtreePointsInArea':
+      returnQuadtreePointsInArea(e.data, time);
       break;
 
     case 'returnQuadtreeData':
