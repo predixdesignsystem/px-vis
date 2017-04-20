@@ -17,6 +17,17 @@ function reply(data, time) {
 }
 
 /**
+ * Updates the local data with new data
+ *
+ * @method updateData
+ */
+function updateData(eventData, time) {
+
+  dataMapping[eventData.chartId] = eventData.data.chartData;
+  reply(null, time);
+}
+
+/**
  * Creates the d3 scales based on passed in type, range, and domain
  *
  * This method must be kept in sync with the types available to the rest of the framework...
@@ -148,14 +159,9 @@ function adjustAngleForPolarChart(angle, toDegrees, visData) {
   }
 }
 
-function getPixelCoordForRadialData(d, visData, whichVal) {
-  //process angle and amplitude in pxel
-  var angle = d.x,
-      dataY = d.y,
-      yRange = visData.y[d.axis]['range'][1] - visData.y[d.axis]['range'][0],
-      yDomain = visData.y[d.axis]['domain'],
-      yDomainTot = yDomain[1] - yDomain[0],
-      pixelAmplitude = yRange * (dataY - yDomain[0])/yDomainTot;
+function calcPixelCoordForRadial(angle, amp, yRange, yDomain, visData, whichVal) {
+  var yDomainTot = yDomain[1] - yDomain[0],
+      pixelAmplitude = yRange * (amp - yDomain[0])/yDomainTot;
 
   angle = adjustAngleForPolarChart(angle, false, visData);
 
@@ -167,21 +173,52 @@ function getPixelCoordForRadialData(d, visData, whichVal) {
   return Math.cos(angle) * pixelAmplitude;
 }
 
-/**
- * Sets the x & y props on the quadtree
- *
- * @method addXYToQuadtree
- */
-function addXYToQuadtree(quadtree, visData) {
-  if(visData.radial) {
-    quadtree.x(function(d) { return getPixelCoordForRadialData(d, visData, 'x'); });
-    quadtree.y(function(d) { return getPixelCoordForRadialData(d, visData, 'y'); });
-  } else {
-    var xScale = recreateD3Scale(visData.x),
-        yScale = getMultiScale(visData);
+function getPixelCoordForRadialData(d, visData, whichVal, xKey, yKey) {
+  //process angle and amplitude in pixel
+  var angle = d[xKey],
+      amp = d[yKey],
+      yRange = visData.y[d.axis]['range'][1] - visData.y[d.axis]['range'][0],
+      yDomain = visData.y[d.axis]['domain'];
+  return calcPixelCoordForRadial(angle, amp, yRange, yDomain, visData, whichVal);
+}
 
-    quadtree.x(function(d) { return xScale(d.x); });
-    quadtree.y(function(d) { return yScale[d.axis](d.y); });
+// /**
+//  * Sets the x & y props on the quadtree
+//  *
+//  * @method addXYToQuadtree
+//  */
+// function addXYToQuadtree(quadtree, visData) {
+//   if(visData.radial) {
+//     quadtree.x(function(d) { return getPixelCoordForRadialData(d, visData, 'x'); });
+//     quadtree.y(function(d) { return getPixelCoordForRadialData(d, visData, 'y'); });
+//   } else {
+//     var xScale = recreateD3Scale(visData.x),
+//         yScale = getMultiScale(visData);
+
+//     quadtree.x(function(d) { return xScale(d.x); });
+//     quadtree.y(function(d) { return yScale[d.axis](d.y); });
+//   }
+// }
+
+function getRadialScale(visData, axis, xKey, yKey) {
+  return function(d) { return getPixelCoordForRadialData(d, visData, axis, this.xKey, this.yKey); }.bind({'xKey': xKey, 'yKey': yKey });
+}
+
+function calcXScale(visData) {
+  if(visData.radial) {
+    return getRadialScale(visData, 'x', 'x', 'y');
+  } else {
+    var x = recreateD3Scale(visData.x);
+    return function(d) { return x(d.x) };
+  }
+}
+
+function calcYScale(visData) {
+  if(visData.radial) {
+    return getRadialScale(visData, 'y', 'x', 'y');
+  } else {
+    var y = getMultiScale(visData);
+    return function(d) { return y[d.axis](d.y) };
   }
 }
 
@@ -194,11 +231,15 @@ function createSingleQuadtree(data) {
   var visData = data.data,
       chartData = dataMapping[data.chartId],
       flatData,
+      xScale = calcXScale(visData),
+      yScale = calcYScale(visData),
       quadtree = d3.quadtree()
-        .extent(visData.extents);
+        .extent(visData.extents)
+        .x(xScale)
+        .y(yScale);
 
     // Set the x & y props on the quadtree
-    addXYToQuadtree(quadtree, visData);
+    // addXYToQuadtree(quadtree, visData);
 
     // To add all datapoints to our quadtree, we need to break each dataset up.
     // Iterate though all data, flatten our datasets, and add them to the quadtree
@@ -219,14 +260,11 @@ function createSeriesQuadtree(data) {
   var visData = data.data,
       chartData = dataMapping[data.chartId],
       k,
-      xKey,
-      yKey,
-      axis,
       quadtree = {},
       // we can't pass d3 scales around so we need to recretate them
       xScale = recreateD3Scale(visData.x),
       yScale;
-
+// FIXME Make work for POLAR
   for(var i = 0; i < visData.keys.length; i++) {
     k = visData.keys[i];
 
@@ -259,17 +297,6 @@ function createQuadtree(data, time) {
 }
 
 /**
- * Updates the local data with new data
- *
- * @method updateData
- */
-function updateData(eventData, time) {
-
-  dataMapping[eventData.chartId] = eventData.data.chartData;
-  reply(null, time);
-}
-
-/**
  * Returns the pixel space value for a datapoint
  *
  * @method _getPixelSpaceVal
@@ -297,11 +324,18 @@ function calcValueQuadtree(d, x, y) {
  *
  * @method calcCoordQuadtree
  */
-function calcCoordQuadtree(d, x, y, xScale, yScale) {
+function calcCoordQuadtree(d, x, y, xScale, yScale, visData, axis) {
   var a = [];
 
-  a[0] = xScale(d[x]);
-  a[1] = yScale(d[y]);
+  if(visData.radial) {
+    var yRange = visData.y[axis]['range'][1] - visData.y[axis]['range'][0],
+        yDomain = visData.y[axis]['domain'];
+    a[0] = calcPixelCoordForRadial(d[x], d[y], yRange, yDomain, visData, 'x');
+    a[1] = calcPixelCoordForRadial(d[x], d[y], yRange, yDomain, visData, 'y');
+  } else {
+    a[0] = xScale(d[x]);
+    a[1] = yScale(d[y]);
+  }
 
   return a;
 }
@@ -311,14 +345,14 @@ function calcCoordQuadtree(d, x, y, xScale, yScale) {
  *
  * @method calcDataSeriesQuadtree
  */
-function calcDataSeriesQuadtree(d, k, xScale, yScale, completeSeriesConfig) {
-  var x = completeSeriesConfig[k]['x'],
-      y = completeSeriesConfig[k]['y'];
+function calcDataSeriesQuadtree(d, k, xScale, yScale, visData, axis) {
+  var x = visData.completeSeriesConfig[k]['x'],
+      y = visData.completeSeriesConfig[k]['y'];
 
   return {
-    "coord": calcCoordQuadtree(d, x, y, xScale, yScale),
+    "coord": calcCoordQuadtree(d, x, y, xScale, yScale, visData, axis),
     "name": k,
-    "value": calcValueQuadtree(d, x, y, xScale, yScale)
+    "value": calcValueQuadtree(d, x, y)
   }
 }
 
@@ -342,19 +376,23 @@ function addCrosshairDataQuadtree(dataObj, d, timeData) {
   return dataObj;
 }
 
-function constructDataObj(result, dataObj, k, visData, xScale) {
+function constructDataObj(result, dataObj, k, visData, xScale, visData) {
   var yScale,
-      axis;
+      axis,
+      xKey,
+      yKey;
 
   if(!result) {
     dataObj.series.push(emptySeries(k));
 
   } else {
     axis = visData.completeSeriesConfig[k]['axis'] ? visData.completeSeriesConfig[k]['axis']['id'] : null;
-    yScale = recreateD3Scale(visData.y[axis]);
+    xKey = visData.completeSeriesConfig[k]['x'],
+    yKey = visData.completeSeriesConfig[k]['y'],
+    yScale = visData.radial ? null : recreateD3Scale(visData.y[axis]);
 
 // TODO Add time
-    dataObj.series.push(calcDataSeriesQuadtree(result, k, xScale, yScale, visData.completeSeriesConfig));
+    dataObj.series.push(calcDataSeriesQuadtree(result, k, xScale, yScale, visData, axis));
 
     if(visData.calcCrosshair) {
       dataObj = addCrosshairDataQuadtree(dataObj, result, visData.timeData);
@@ -364,7 +402,7 @@ function constructDataObj(result, dataObj, k, visData, xScale) {
   return dataObj;
 }
 
-function searchQuadtreeSingle(visData, dataObj, quadtreeData, xScale) {
+function searchQuadtreeSingle(visData, dataObj, quadtreeData, xScale, visData) {
   var result = quadtreeData.find(visData.mousePos[0], visData.mousePos[1], visData.radius),
       k;
 
@@ -373,22 +411,22 @@ function searchQuadtreeSingle(visData, dataObj, quadtreeData, xScale) {
   for(var i = 0; i < visData.keys.length; i++) {
     k = visData.keys[i];
 
-    dataObj = constructDataObj(result, dataObj, k, visData, xScale);
+    dataObj = constructDataObj(result, dataObj, k, visData, xScale, visData);
   }
 
   return dataObj;
 }
 
-function searchQuadtreeSeries(visData, dataObj, quadtreeData, xScale) {
+function searchQuadtreeSeries(visData, dataObj, quadtreeData, xScale, visData) {
   var result,
       k;
-
+// FIXME make work with multi series polar
   for(var i = 0; i < visData.keys.length; i++) {
     k = visData.keys[i];
 
     result = quadtreeData[k].find(visData.mousePos[0], visData.mousePos[1], visData.radius);
 
-    dataObj = constructDataObj(result, dataObj, k, visData, xScale);
+    dataObj = constructDataObj(result, dataObj, k, visData, xScale, visData);
   }
 
   return dataObj;
@@ -403,11 +441,11 @@ function returnClosestsQuadtreePoints(eventData, time) {
   var visData = eventData.data,
       dataObj = createDataStub(),
       quadtreeData = quadtrees[eventData.chartId],
-      xScale = recreateD3Scale(visData.x);
+      xScale = visData.radial ? null : recreateD3Scale(visData.x);
 
   dataObj = visData.searchType === 'pointPerSeries' ?
-    searchQuadtreeSeries(visData, dataObj, quadtreeData, xScale) :
-    searchQuadtreeSingle(visData, dataObj, quadtreeData, xScale);
+    searchQuadtreeSeries(visData, dataObj, quadtreeData, xScale, visData) :
+    searchQuadtreeSingle(visData, dataObj, quadtreeData, xScale, visData);
 
   delete dataObj.timeStampsTracker;
   reply(dataObj, time);
