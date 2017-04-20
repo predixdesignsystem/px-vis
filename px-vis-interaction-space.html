@@ -392,7 +392,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         //  d3.mouse: returns the x position on the screen of the mouse
         // must be outside debounce or else the elem wont have the proper info anymore
         var mousePos = Px.d3.mouse(this._rect.node());
-
+console.log(mousePos);
         this.debounce('move',function() {
           this._calcDataDebounced(mousePos);
         }, 10);
@@ -457,6 +457,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
          data.searchType = this.searchType;
 
          Px.vis.scheduler.process('findQuadtreePoints', data, this.chartId, function(e) {
+           console.log(e.data)
           dataObj.series = e.data.series;
           dataObj.rawData = e.data.rawData;
           dataObj.timeStamps = e.data.timeStamps;
@@ -1092,10 +1093,12 @@ TODO implement a dev setting to choose between only showing data at that x, snap
            h = this.height - this.margin.top - this.margin.bottom,
            ext = [[0,0], [w, h]],
            data = this._createBaseDataObjForWebWorker();
+
        data.width = w;
        data.height = h;
        data.extents = ext;
        data.searchType = this.searchType;
+
        Px.vis.scheduler.process('createQuadtree', data, this.chartId, function(data) {
          var t1 = window.performance.now();
          console.log('built quadtree in ' + (t1-t0));
@@ -1110,9 +1113,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           h = this.height - this.margin.top - this.margin.bottom,
           ext = [[0,0], [w, h]],
           data = this._createBaseDataObjForWebWorker();
+
       data.width = w;
       data.height = h;
       data.extents = ext;
+
       Px.vis.scheduler.process('createVoronoi', data, this.chartId, function(data) {
         var t1 = window.performance.now();
         console.log('built voronoi in ' + (t1-t0));
@@ -1122,26 +1127,38 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
     _createBaseDataObjForWebWorker: function() {
       var data = {},
-          yAxisKeys = Object.keys(this.y);
+          yAxisKeys = this._isMultiY ? Object.keys(this.y) : 'defaultAxis';
 
       data.completeSeriesConfig = this.completeSeriesConfig;
-      data.keys = this.seriesKeys ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
-      data.x = {};
+      data.keys = this.seriesKeys ? this.seriesKeys : Object.keys(this.completeSeriesConfig);
 
+      data.radial = this.radial;
+      data.counterClockwise = this.counterClockwise;
+      data.useDegrees = this.useDegrees;
+
+      data.isMultiY = this._isMultiY;
+
+      data.x = {};
       data.x.range = this.x.range();
       data.x.domain = this.x.domain();
       data.x.type = this.x._scaleType;
 
+      data.y = [];
+
       if(this._isMultiY) {
-        data.y = [];
         for(var i=0; i<yAxisKeys.length; i++) {
           data.y[yAxisKeys[i]] = {
-              'range': this.y[yAxisKeys[i]].range(),
-              'domain': this.y[yAxisKeys[i]].domain(),
-              'type': this.y[yAxisKeys[i]]._scaleType};
+            'range': this.y[yAxisKeys[i]].range(),
+            'domain': this.y[yAxisKeys[i]].domain(),
+            'type': this.y[yAxisKeys[i]]._scaleType
+          };
         }
       } else {
-        data.y = this.y;
+        data.y[yAxisKeys] = {
+          'range': this.y.range(),
+          'domain': this.y.domain(),
+          'type': this.y._scaleType
+        };
       }
 
       return data;
@@ -1172,7 +1189,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       } //for
     },
 
-    _drawQuadtree: function() {
+    _drawQuadtree: function(quadtree) {
       function nodes(qt) {
         var nodes = [];
         qt.visit(function(node, x0, y0, x1, y1) {
@@ -1187,7 +1204,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       var g = this.svg.insert('g', 'rect');
       g.selectAll(".node")
-        .data(nodes(quadtree['y13']))
+        .data(nodes(quadtree))
         .enter().append("rect")
           .attr("class", "node")
           .attr('fill', 'none')

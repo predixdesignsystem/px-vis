@@ -121,8 +121,10 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
         } else {
           if(this.radar) {
             x = Px.d3.scalePoint().range(domain).padding(0.5).align(0);
+            x._scaleType = "ordinal";
           } else {
             x = Px.d3.scaleLinear().range(range).domain(domain);
+            x._scaleType = "linear";
           }
 
           this.set('x', x);
@@ -137,7 +139,9 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       var range = [centerOffset, width],
           y = Px.d3.scaleLinear().nice().range(range);
 
-        this.set('y', y);
+      y._scaleType = "linear";
+
+      this.set('y', y);
     },
 
     /**
