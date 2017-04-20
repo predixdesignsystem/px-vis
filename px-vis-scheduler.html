@@ -1,3 +1,4 @@
+<!--<link rel="import" href="px-vis-worker.js" />-->
 <script>
 
 
@@ -16,15 +17,19 @@
         processDone,
         startWork;
 
-    // NOTE: see http://www.2ality.com/2014/05/current-script.html
-    var currentScript = document._currentScript || document.currentScript ||
-        (function() {
-          var scripts = document.getElementsByTagName('script');
-          return scripts[scripts.length - 1];
-        })();
-    var BASE_URI = currentScript.ownerDocument.baseURI;
-    var WORKER_SCOPE_URL =
-        Polymer.ResolveUrl.resolveUrl('px-vis-worker.js', BASE_URI);
+
+    if(!Px.vis.workerUrl) {
+      // NOTE: see http://www.2ality.com/2014/05/current-script.html
+      var currentScript = document._currentScript || document.currentScript ||
+          (function() {
+            var scripts = document.getElementsByTagName('script');
+            return scripts[scripts.length - 1];
+          })();
+      var BASE_URI = currentScript.ownerDocument.baseURI;
+      Px.vis.workerUrl =  Polymer.ResolveUrl.resolveUrl('px-vis-worker.js', BASE_URI);
+    }
+
+
 
     scheduler.workers = [];
     scheduler.queue = [];
@@ -178,7 +183,18 @@
     //   // Won't be needing this anymore
     //   URL.revokeObjectURL( blobURL );
 
-      var worker = new Worker(WORKER_SCOPE_URL);
+      try {
+        var worker = new Worker(Px.vis.workerUrl);
+      } catch(e) {
+
+        //failure
+        console.warn('failed to find px-vis web worker file at ' + Px.vis.workerUrl);
+        console.warn('the charts will fall back to not using web workers which will have a negative impact on performance')
+        return;
+      }
+
+
+
       //we can load the worker through a data uri if needed
       scheduler.workers.push(worker);
 
