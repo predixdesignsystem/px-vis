@@ -209,7 +209,9 @@ PxVisBehaviorChart.chartCommon = [{
           }
 
           if(!fullConfig[k[i]].hasOwnProperty('x')) {
-            console.warn("(｡◕‿◕｡) Configuration " + k[i] + " does not have a x-value associated with it. Falling back to default (｡◕‿◕｡)");
+            if(!this.defaultSeriesConfig['x']) {
+              console.warn("(｡◕‿◕｡) Configuration " + k[i] + " does not have a x-value associated with it. Falling back to default (｡◕‿◕｡)");
+            }
             fullConfig[k[i]]['x'] = this._defaultSeriesConfig['x'];
           }
 
@@ -781,6 +783,10 @@ PxVisBehaviorChart.waitForAttach = {
       _loadedOnPage: {
         type: Boolean
       }
+    },
+
+    attached: function() {
+      this._loadedOnPage = true;
     },
 
     /**
