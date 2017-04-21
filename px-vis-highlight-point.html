@@ -81,7 +81,8 @@ Custom property | Description | Default
       PxColorsBehavior.baseColors,
       PxVisBehavior.mutedSeries,
       PxVisBehavior.dynamicConfigProperties,
-      PxVisBehavior.highlightShared
+      PxVisBehavior.highlightShared,
+      PxVisBehaviorD3.radialPixelCalc
     ],
 
     /**
@@ -108,6 +109,13 @@ Custom property | Description | Default
        */
       _circles:{
         type:Object
+      },
+      /**
+       * Whether the scatter plot is using radial coiordinates (x=phase, y=amplitude)
+       */
+      radial: {
+        type: Boolean,
+        value: false
       }
     }, //properties
 
@@ -208,46 +216,14 @@ Custom property | Description | Default
             this.y[this.completeSeriesConfig[k]["axis"]["id"]](data[this.completeSeriesConfig[k]['y']]);
 
         }.bind(this))
-        .style("display", function(k) { return isNaN(data[this.completeSeriesConfig[k]['x']]) || isNaN(data[this.completeSeriesConfig[k]['y']]) ? "none" : null; }.bind(this));
-    },
+        .style("display", function(k) {
 
-    calcPixelCoordForRadial: function(angle, amp, yRange, yDomain, whichVal) {
-      var yDomainTot = yDomain[1] - yDomain[0],
-          pixelAmplitude = yRange * (amp - yDomain[0])/yDomainTot;
+          if(isNaN(data[this.completeSeriesConfig[k]['x']]) || isNaN(data[this.completeSeriesConfig[k]['y']])) {
+            return 'none';
+          }
 
-      angle = this.adjustAngleForPolarChart(angle, false);
-
-      //sin * pixel range * percentage of data range
-      if(whichVal === 'x') {
-        return Math.sin(angle) * pixelAmplitude;
-      }
-      // else
-      return Math.cos(angle) * pixelAmplitude;
-    },
-
-    adjustAngleForPolarChart: function(angle, toDegrees) {
-      //add 180 deg to offset chart 0 being on top
-      var offset = toDegrees ? 180 : Math.PI;
-
-      if((!this.counterClockwise && !toDegrees) ||
-          (this.counterClockwise && toDegrees)) {
-        angle *= -1;
-      }
-
-      //convert to appropriate unit and
-      if(this.useDegrees) {
-        if(toDegrees) {
-          return angle + offset;
-        } else {
-          return angle / 360 * 2 * Math.PI + offset;
-        }
-      } else {
-        if(toDegrees) {
-          return angle / (2 * Math.PI) * 360 + offset;
-        } else {
-          return angle + offset;
-        }
-      }
+          return null;
+        }.bind(this));
     },
 
     _addClipPath: function() {
