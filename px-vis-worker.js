@@ -1,3 +1,4 @@
+importScripts("px-vis-worker-scale.js");
 importScripts("../pxd3/d3.min.js");
 
 // Global storage vars

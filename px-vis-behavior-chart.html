@@ -435,6 +435,24 @@ PxVisBehaviorChart.webWorkerSynchonization = [{
        */
       _chartId: {
         type: String
+      },
+      _wwSyncRequestDataDeletion: {
+        type: Boolean,
+        value: false
+      },
+      _wwSyncDataDeleted: {
+        type: Boolean,
+        value: false
+      },
+      /**
+       * After detaching the chart time after which we will delete
+       * the synced data of the chart from the webworker. If the
+       * chart is re-attached in the meantime the deletion will
+       * be canceled to avoid a re-sync
+       */
+      _wwSyncDataDeletionTimeout: {
+        type: Number,
+        value: 1500
       }
     },
     observers: [
@@ -443,7 +461,35 @@ PxVisBehaviorChart.webWorkerSynchonization = [{
     ready: function() {
       this._chartId = this.generateRandomID('chart');
     },
+    attached: function() {
+      this._wwSyncRequestDataDeletion = false;
+
+      //request a data update if we have been detached, data has
+      //been deleted and then re attached
+      if(this.chartData && this._wwSyncDataDeleted) {
+
+        this._keepDataInSync();
+      }
+    },
+    detached: function() {
+      this._wwSyncRequestDataDeletion = true;
+
+      setTimeout(function() {
+
+        //only process if we haven't been re attached
+        if(this._wwSyncRequestDataDeletion) {
+        Px.vis.scheduler.process('deleteData', this._chartId);
+
+          //async, the data hasn't been actually deleted yet but we
+          //don't have a way to cancel it anymore and an update
+          //request would always queue after this request
+          this._wwSyncDataDeleted = true;
+        }
+      }.bind(this), this._wwSyncDataDeletionTimeout);
+    },
     _keepDataInSync: function(chartData, id) {
+
+      this._wwSyncDataDeleted = false;
       Px.vis.scheduler.process('updateData', {'chartData': this.chartData}, this._chartId);
     }
 }, PxVisBehavior.uniqueIds, PxVisBehavior.dataset];
