@@ -173,15 +173,81 @@ Custom property | Description | Default
         }).bind(this))
       .merge(c)
         .attr('cx', function(k) {
-          return !isNaN(data[this.completeSeriesConfig[k]['x']]) && !isNaN(data[this.completeSeriesConfig[k]['y']]) ? this.x(data[this.completeSeriesConfig[k]['x']]) : '';
+          if(isNaN(data[this.completeSeriesConfig[k]['x']]) || isNaN(data[this.completeSeriesConfig[k]['y']])) {
+            return '';
+          }
+
+          if(this.radial) {
+            var angle = data[this.completeSeriesConfig[k]['x']],
+                amp = data[this.completeSeriesConfig[k]['y']],
+                yRange = this.y.range()[1] - this.y.range()[0];
+
+            return this.calcPixelCoordForRadial(angle, amp, yRange, this.y.domain(), 'x')
+          }
+
+          // else
+          return this.x(data[this.completeSeriesConfig[k]['x']]);
+
         }.bind(this))
         .attr('cy', function(k) {
           if(isNaN(data[this.completeSeriesConfig[k]['x']]) || isNaN(data[this.completeSeriesConfig[k]['y']])) {
             return '';
           }
-          return  typeof this.y === 'function' ? this.y(d[k]) : this.y[this.completeSeriesConfig[k]["axis"]["id"]](data[this.completeSeriesConfig[k]['y']]);
+
+          if(this.radial) {
+            var angle = data[this.completeSeriesConfig[k]['x']],
+                amp = data[this.completeSeriesConfig[k]['y']],
+                yRange = this.y.range()[1] - this.y.range()[0];
+
+            return this.calcPixelCoordForRadial(angle, amp, yRange, this.y.domain(), 'y')
+          }
+
+          // else
+          return  typeof this.y === 'function' ?
+            this.y(data[this.completeSeriesConfig[k]['y']]) :
+            this.y[this.completeSeriesConfig[k]["axis"]["id"]](data[this.completeSeriesConfig[k]['y']]);
+
         }.bind(this))
         .style("display", function(k) { return isNaN(data[this.completeSeriesConfig[k]['x']]) || isNaN(data[this.completeSeriesConfig[k]['y']]) ? "none" : null; }.bind(this));
+    },
+
+    calcPixelCoordForRadial: function(angle, amp, yRange, yDomain, whichVal) {
+      var yDomainTot = yDomain[1] - yDomain[0],
+          pixelAmplitude = yRange * (amp - yDomain[0])/yDomainTot;
+
+      angle = this.adjustAngleForPolarChart(angle, false);
+
+      //sin * pixel range * percentage of data range
+      if(whichVal === 'x') {
+        return Math.sin(angle) * pixelAmplitude;
+      }
+      // else
+      return Math.cos(angle) * pixelAmplitude;
+    },
+
+    adjustAngleForPolarChart: function(angle, toDegrees) {
+      //add 180 deg to offset chart 0 being on top
+      var offset = toDegrees ? 180 : Math.PI;
+
+      if((!this.counterClockwise && !toDegrees) ||
+          (this.counterClockwise && toDegrees)) {
+        angle *= -1;
+      }
+
+      //convert to appropriate unit and
+      if(this.useDegrees) {
+        if(toDegrees) {
+          return angle + offset;
+        } else {
+          return angle / 360 * 2 * Math.PI + offset;
+        }
+      } else {
+        if(toDegrees) {
+          return angle / (2 * Math.PI) * 360 + offset;
+        } else {
+          return angle + offset;
+        }
+      }
     },
 
     _addClipPath: function() {
