@@ -414,6 +414,8 @@ function constructDataObj(result, dataObj, k, visData, isSingle, xScale) {
 
     dataObj.series.push(calcDataSingleQuadtree(result, k, visData));
 
+    // if we need to add crosshair data and are not doing all in area...
+    // all in area gets calced else where rather than iteratively here
     if(visData.calcCrosshair && !visData.searchType === 'allInArea') {
       dataObj = addCrosshairDataQuadtree(dataObj, result.data, visData.timeData);
     }
@@ -428,38 +430,6 @@ function constructDataObj(result, dataObj, k, visData, isSingle, xScale) {
 
   }
 // TODO Add time
-
-  return dataObj;
-}
-
-function searchQuadtreeSingle(visData, dataObj, quadtreeData, visData) {
-  var result = quadtreeData.find(visData.mousePos[0], visData.mousePos[1], visData.radius),
-      k;
-
-  for(var i = 0; i < visData.keys.length; i++) {
-    k = visData.keys[i];
-
-    dataObj = constructDataObj(result, dataObj, k, visData, true, null);
-  }
-
-  if(visData.calcCrosshair && visData.searchType === 'allInArea') {
-    searchAreaQuadtree(quadtreeData, visData);
-  }
-
-  return dataObj;
-}
-
-function searchQuadtreeSeries(visData, dataObj, quadtreeData, xScale, visData) {
-  var result,
-      k;
-// FIXME make work with multi series polar
-  for(var i = 0; i < visData.keys.length; i++) {
-    k = visData.keys[i];
-
-    result = quadtreeData[k].find(visData.mousePos[0], visData.mousePos[1], visData.radius);
-
-    dataObj = constructDataObj(result, dataObj, k, visData, false, xScale);
-  }
 
   return dataObj;
 }
@@ -484,13 +454,8 @@ function calcBoxSize(visData) {
  *
  * @method searchAreaQuadtree
  */
-function searchAreaQuadtree(quadtree, visData, box) {
-  var dataObj = {
-        'rawData': [],
-        'timeStamps': [],
-        'timeStampsTracker': {}
-      },
-      boxSize = box || calcBoxSize(visData);
+function searchAreaQuadtree(quadtree, visData, dataObj, box) {
+  var boxSize = box || calcBoxSize(visData);
 
 // FIXME This is not checked yet. Need to implement on IS before I can see if it works
   // via https://bl.ocks.org/mbostock/4343214
@@ -511,6 +476,40 @@ function searchAreaQuadtree(quadtree, visData, box) {
   return dataObj;
 }
 
+function searchQuadtreeSingle(visData, dataObj, quadtreeData, visData) {
+  var result = quadtreeData.find(visData.mousePos[0], visData.mousePos[1], visData.radius),
+      k;
+
+  for(var i = 0; i < visData.keys.length; i++) {
+    k = visData.keys[i];
+
+    dataObj = constructDataObj(result, dataObj, k, visData, true, null);
+  }
+
+  // if we want to do all in area crosshair data, do it outside our loop
+  if(visData.calcCrosshair && visData.searchType === 'allInArea') {
+    dataObj = searchAreaQuadtree(quadtreeData, visData, dataObj, null);
+
+  }
+
+  return dataObj;
+}
+
+function searchQuadtreeSeries(visData, dataObj, quadtreeData, xScale, visData) {
+  var result,
+      k;
+// FIXME make work with multi series polar
+  for(var i = 0; i < visData.keys.length; i++) {
+    k = visData.keys[i];
+
+    result = quadtreeData[k].find(visData.mousePos[0], visData.mousePos[1], visData.radius);
+
+    dataObj = constructDataObj(result, dataObj, k, visData, false, xScale);
+  }
+
+  return dataObj;
+}
+
 /**
  * Finds the closest Quadtree nodes to the mouse. Returns fully constructed tooltip/crosshair data obj
  *
@@ -527,7 +526,7 @@ function returnClosestsQuadtreePoints(eventData, time) {
 
     dataObj = searchQuadtreeSeries(visData, dataObj, quadtreeData, xScale, visData);
 
-  } else {  //closestPoint
+  } else {  //closestPoint && allInArea
     dataObj = searchQuadtreeSingle(visData, dataObj, quadtreeData, visData);
   }
 
