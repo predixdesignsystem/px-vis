@@ -443,7 +443,7 @@ function searchQuadtreeSingle(visData, dataObj, quadtreeData, visData) {
   }
 
   if(visData.calcCrosshair && visData.searchType === 'allInArea') {
-    searchAreaQuadtree(quadtreeData, visData);)
+    searchAreaQuadtree(quadtreeData, visData);
   }
 
   return dataObj;
