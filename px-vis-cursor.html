@@ -414,6 +414,13 @@ Custom property | Description | Default
     _moveHorizontalLinesRadial: function() {
       if(this.horizontalLine !== 'none') {
         this._hLines
+          .style("visibility", function(d,i) {
+            if(this.tooltipData.series[i]['coord'] && !isNaN(this.tooltipData.series[i]['coord'][0]) && !isNaN(this.tooltipData.series[i]['coord'][1])) {
+              return 'visible'
+            } else {
+              return 'hidden';
+            }
+          }.bind(this))
           .attr('r', function(d,i) {
 
             var x = this.tooltipData.series[i]['coord'][0],
@@ -478,15 +485,20 @@ Custom property | Description | Default
 
     _moveVerticalLinesRadial: function() {
       if(this.verticalLine !== 'none') {
-        this._vLine.attr('transform', function(d, i) {
+        this._vLine
+         .style("visibility", function(d,i) {
+            if(this.tooltipData.series[i]['coord'] && !isNaN(this.tooltipData.series[i]['coord'][0]) && !isNaN(this.tooltipData.series[i]['coord'][1])) {
+              return 'visible'
+            } else {
+              return 'hidden';
+            }
+          }.bind(this))
+        .attr('transform', function(d, i) {
           var xKey = this.completeSeriesConfig[this.tooltipData.series[i].name]['x'],
               angle = this.tooltipData.series[i]['value'][xKey];
 
-          angle = this._adjustAngleForPolarChart(angle, true);
-          // if(this.counterClockwise) {
-          //   angle *= -1;
-          // }
-          // angle = (angle+180) %360;
+          angle = angle || angle === 0 ? this._adjustAngleForPolarChart(angle, true) : 0;
+
           return 'rotate(' + angle + ')';
         }.bind(this));
       }

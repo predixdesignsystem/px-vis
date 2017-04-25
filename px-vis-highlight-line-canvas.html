@@ -67,9 +67,12 @@ Custom property | Description | Default
         radial-line="[[radialLine]]"
         multi-path
         disable-pointer-events
-        series-id="highlights"
-        chart-data="[[_lineData]]"
-        complete-series-config="[[_highlightConfig]]"
+        series-id="[[seriesId]]"
+        category-key="[[categoryKey]]"
+        categories="[[categories]]"
+        chart-data="[[_highlightData]]"
+        complete-series-config="[[completeSeriesConfig]]"
+        stroke-width="2"
         x="[[x]]"
         y="[[y]]"
         domain-changed="[[domainChanged]]"
@@ -92,13 +95,15 @@ Custom property | Description | Default
       PxVisBehavior.commonMethods,
       PxVisBehavior.crosshairData,
       PxVisBehavior.completeSeriesConfig,
+      PxVisBehavior.seriesId,
+      PxVisBehavior.categories,
       PxVisBehaviorD3.clipPath,
       PxColorsBehavior.baseColors,
       PxVisBehavior.mutedSeries,
       PxVisBehavior.dimensions,
       PxVisBehaviorD3.domainUpdate,
       PxVisBehavior.dynamicConfigProperties,
-      PxVisBehavior.highlightShared,
+      PxVisBehavior.highlightCanvasShared,
       PxVisBehaviorD3.interpolationFunction
     ],
 
@@ -110,16 +115,10 @@ Custom property | Description | Default
      */
     properties: {
 
-      _lineData: {
+      _highlightData: {
         type: Object,
         notify: true,
-        computed: '_computeChartData(crosshairData.timeStamps.*, _highlightConfig)'
-      },
-
-      _highlightConfig: {
-        type: Object,
-        notify: true,
-        computed: '_computeConfig(dimensions.*)'
+        computed: '_computeChartData(crosshairData.timeStamps.*)'
       },
 
       /**
@@ -140,15 +139,6 @@ Custom property | Description | Default
       }
     }, //properties
 
-    _computeConfig: function() {
-      return {
-        "highlights": {
-          "x": this.dimensions,
-          "y": this.dimensions,
-          "color": "rgb(255,0,0)"
-        }
-      };
-    },
 
     /**
      * Draws the crosshair elements and sets up listeners and callbacks on chart hover

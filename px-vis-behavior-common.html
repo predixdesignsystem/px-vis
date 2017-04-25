@@ -2253,6 +2253,21 @@ PxVisBehavior.highlightShared = {
     timeData: {
       type: String,
       value: 'Timestamp'
+    },
+
+    /**
+     * They layer where the series are drawn if you want them to mute on crosshair data
+     */
+    layerToMask: {
+      type: Object
+    },
+
+    /**
+     * The opacity of the data series after the mask is applied
+     */
+    maskOpacity: {
+      type: Number,
+      value: 0.4
     }
   },
 
@@ -2279,5 +2294,58 @@ PxVisBehavior.highlightShared = {
     return d;
   }
 };
+
+/*
+    PxVisBehavior.highlightCanvasShared
+
+    Description:
+    Behavior providing shared methods and props for highligh compoennts
+    @polymerBehavior PxVisBehavior.highlightCanvasShared
+*/
+PxVisBehavior.highlightCanvasShared = [{
+
+  observers: [
+    '_muteDataSeries(_highlightData)',
+    '_addTransition(layerToMask)'
+  ],
+
+  _muteDataSeries: function() {
+    if(this.layerToMask) {
+      this.layerToMask.canvas.style.opacity = this._highlightData.length ? this.maskOpacity : 1;
+    }
+  },
+
+  _addTransition: function() {
+    this.layerToMask.canvas.style.transition = 'opacity 0.2s';
+  }
+
+}, PxVisBehavior.highlightShared];
+
+
+/*
+    PxVisBehavior.highlightSvgShared
+
+    Description:
+    Behavior providing shared methods and props for highligh compoennts
+    @polymerBehavior PxVisBehavior.highlightSvgShared
+*/
+PxVisBehavior.highlightSvgShared = [{
+
+  observers: [
+    '_addTransition(layerToMask)'
+  ],
+
+  _muteDataSeries: function(data) {
+    if(this.layerToMask) {
+      this.layerToMask.node().style.opacity = data.length ? this.maskOpacity : 1;
+    }
+  },
+
+  _addTransition: function() {
+    this.layerToMask.node().style.transition = 'opacity 0.2s';
+  }
+
+}, PxVisBehavior.highlightShared];
+
 
 </script>

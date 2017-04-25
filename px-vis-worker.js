@@ -416,7 +416,7 @@ function constructDataObj(result, dataObj, k, visData, isSingle, xScale) {
 
     // if we need to add crosshair data and are not doing all in area...
     // all in area gets calced else where rather than iteratively here
-    if(visData.calcCrosshair && !visData.searchType === 'allInArea') {
+    if(visData.calcCrosshair && visData.searchType !== 'allInArea') {
       dataObj = addCrosshairDataQuadtree(dataObj, result.data, visData.timeData);
     }
 

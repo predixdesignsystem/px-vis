@@ -81,7 +81,7 @@ Custom property | Description | Default
       PxColorsBehavior.baseColors,
       PxVisBehavior.mutedSeries,
       PxVisBehavior.dynamicConfigProperties,
-      PxVisBehavior.highlightShared,
+      PxVisBehavior.highlightSvgShared,
       PxVisBehaviorD3.radialPixelCalc
     ],
 
@@ -144,6 +144,8 @@ Custom property | Description | Default
           dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawData,
           svgBuilder;
 
+      this._muteDataSeries(dataset);
+
       svgBuilder = this.svg.selectAll('g.highlightPoint')
         .data(dataset, function(d) { return d[xKey]}.bind(this));
 
@@ -174,10 +176,10 @@ Custom property | Description | Default
         .attr('stroke-width', 12)
         .attr('stroke-opacity', 0.3)
         .attr('fill', (function(k) {
-          return 'red'; //this.completeSeriesConfig[d]['color']
+          return this.completeSeriesConfig[k]['color'];
         }).bind(this))
         .attr('stroke', (function(k) {
-          return 'red'; //this.completeSeriesConfig[d]['color']
+          return this.completeSeriesConfig[k]['color'];
         }).bind(this))
       .merge(c)
         .attr('cx', function(k) {
