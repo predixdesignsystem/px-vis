@@ -102,18 +102,32 @@ function createDataStub() {
  *
  * @method flattenData
  */
-function flattenData(visData, d) {
-  var arr = [];
+function flattenData(visData, d, xScale, yScale) {
+  var arr = [],
+      pixels = {};
+
   for(var i = 0; i < visData.keys.length; i++) {
     var o = {},
-        k = visData.keys[i];
+        k = visData.keys[i],
+        xKey = visData.completeSeriesConfig[k]['x'];
+        yKey = visData.completeSeriesConfig[k]['y'];
+
 
     o["data"] = d;
     o["key"] = k;
+    o["key"] = k;
     o["time"] = visData.timeData ? d[visData.timeData] : null;
-    o["x"] = d[visData.completeSeriesConfig[k]['x']];
-    o["y"] = d[visData.completeSeriesConfig[k]['y']];
+    o["x"] = d[xKey];
+    o["y"] = d[yKey];
     o["axis"] = visData.completeSeriesConfig[k]['axis'] ? visData.completeSeriesConfig[k]['axis']['id'] : "default";
+
+    o["px"] = xScale(o);
+    o["py"] = yScale(o);
+
+    pixels[xKey] = o.px;
+    pixels[yKey] = o.py;
+
+    o['pixels'] = pixels;
 
     arr.push(o);
   }
@@ -248,17 +262,15 @@ function createSingleQuadtree(data) {
 
     if(chartData) {
         quadtree = d3.quadtree()
-          .extent(visData.extents)
-          .x(xScale)
-          .y(yScale);
-
-      // Set the x & y props on the quadtree
-      // addXYToQuadtree(quadtree, visData);
+        .extent(visData.extents)
+        .x(function(d) { return d.px; })
+        .y(function(d) { return d.py; });
 
       // To add all datapoints to our quadtree, we need to break each dataset up.
       // Iterate though all data, flatten our datasets, and add them to the quadtree
       for(var i = 0; i < chartData.length; i++) {
-        flatData = flattenData(visData, chartData[i]);
+        flatData = flattenData(visData, chartData[i], xScale, yScale);
+
         quadtree.addAll(flatData);
       }
 
@@ -313,6 +325,7 @@ function createSeriesQuadtree(data) {
 function createQuadtree(data, time) {
   quadtrees[data.chartId] = data.data.searchType === 'pointPerSeries' ?
     createSeriesQuadtree(data) :
+    // closestPoint & allInArea
     createSingleQuadtree(data);
 
   reply(null, time);
@@ -379,6 +392,22 @@ function calcDataSeriesQuadtree(d, k, xScale, yScale, visData, axis) {
 }
 
 /**
+ * Calcs and returns the tooltipData.series obj
+ *
+ * @method calcDataSeriesQuadtree
+ */
+function calcDataSingleQuadtree(d, k, visData) {
+  var x = visData.completeSeriesConfig[k]['x'],
+      y = visData.completeSeriesConfig[k]['y'];
+
+  return {
+    "coord": [ d.pixels[x], d.pixels[y] ],
+    "name": k,
+    "value": calcValueQuadtree(d.data, x, y)
+  }
+}
+
+/**
  * Calcs and returns the crosshair data objs
  *
  * @method addCrosshairDataQuadtree
@@ -398,42 +427,91 @@ function addCrosshairDataQuadtree(dataObj, d, timeData) {
   return dataObj;
 }
 
-function constructDataObj(result, dataObj, k, visData, xScale, visData) {
-  var yScale,
-      axis,
-      xKey,
-      yKey;
+function constructDataObj(result, dataObj, k, visData, isSingle, xScale) {
 
   if(!result) {
     dataObj.series.push(emptySeries(k));
 
-  } else {
-    axis = visData.completeSeriesConfig[k]['axis'] ? visData.completeSeriesConfig[k]['axis']['id'] : null;
-    xKey = visData.completeSeriesConfig[k]['x'],
-    yKey = visData.completeSeriesConfig[k]['y'],
-    yScale = visData.radial ? null : recreateD3Scale(visData.y[axis]);
+  } else if(isSingle) {
 
-// TODO Add time
+    dataObj.series.push(calcDataSingleQuadtree(result, k, visData));
+
+    // if we need to add crosshair data and are not doing all in area...
+    // all in area gets calced else where rather than iteratively here
+    if(visData.calcCrosshair && visData.searchType !== 'allInArea') {
+      dataObj = addCrosshairDataQuadtree(dataObj, result.data, visData.timeData);
+    }
+
+  } else {
+
     dataObj.series.push(calcDataSeriesQuadtree(result, k, xScale, yScale, visData, axis));
 
     if(visData.calcCrosshair) {
       dataObj = addCrosshairDataQuadtree(dataObj, result, visData.timeData);
     }
+
   }
+// TODO Add time
 
   return dataObj;
 }
 
-function searchQuadtreeSingle(visData, dataObj, quadtreeData, xScale, visData) {
+
+function calcBoxSize(visData) {
+  var x0 = visData.mousePos[0] - visData.radius,
+      x1 = visData.mousePos[0] + visData.radius,
+      y0 = visData.mousePos[1] - visData.radius,
+      y1 = visData.mousePos[1] + visData.radius;
+
+  return {
+    "x0" : x0,
+    "x1" : x1,
+    "y0" : y0,
+    "y1" : y1
+  };
+}
+
+/**
+ * Performs the tree search for nodes within an area.
+ *
+ * @method searchAreaQuadtree
+ */
+function searchAreaQuadtree(quadtree, visData, dataObj, box) {
+  var boxSize = box || calcBoxSize(visData);
+
+// FIXME This is not checked yet. Need to implement on IS before I can see if it works
+  // via https://bl.ocks.org/mbostock/4343214
+  quadtree.visit(function(node, nodeX0, nodeY0, nodeX1, nodeY1) {
+    if(!node.length) {
+      do {
+        var d = node.data;
+        // if our point is inside our box, save it if not a copy
+        if((d.px >= boxSize.x0) && (d.px < boxSize.x1) && (d.py >= boxSize.y0) && (d.py < boxSize.y1))  {
+          dataObj = addCrosshairData(dataObj, d.data, visData.timeData);
+        }
+      } while(node = node.next);
+    }
+    //return true  ==> skip the children nodes so we dont search unnessary bits of the tree
+    return nodeX0 >= boxSize.x1 || nodeY0 >= boxSize.y1 || nodeX1 < boxSize.x0 || nodeY1 < boxSize.y0;
+  });
+
+  return dataObj;
+}
+
+function searchQuadtreeSingle(visData, dataObj, quadtreeData, visData) {
   var result = quadtreeData.find(visData.mousePos[0], visData.mousePos[1], visData.radius),
       k;
-
-  result = result && result.data ? result.data : result;
 
   for(var i = 0; i < visData.keys.length; i++) {
     k = visData.keys[i];
 
-    dataObj = constructDataObj(result, dataObj, k, visData, xScale, visData);
+    dataObj = constructDataObj(result, dataObj, k, visData, true, null);
+  }
+
+  // if we want to do all in area crosshair data, do it outside our loop
+  if(visData.calcCrosshair && visData.searchType === 'allInArea') {
+    dataObj = searchAreaQuadtree(quadtreeData, visData, dataObj, null);
+
   }
 
   return dataObj;
@@ -448,7 +526,7 @@ function searchQuadtreeSeries(visData, dataObj, quadtreeData, xScale, visData) {
 
     result = quadtreeData[k].find(visData.mousePos[0], visData.mousePos[1], visData.radius);
 
-    dataObj = constructDataObj(result, dataObj, k, visData, xScale, visData);
+    dataObj = constructDataObj(result, dataObj, k, visData, false, xScale);
   }
 
   return dataObj;
@@ -463,51 +541,19 @@ function returnClosestsQuadtreePoints(eventData, time) {
   var visData = eventData.data,
       dataObj = createDataStub(),
       quadtreeData = quadtrees[eventData.chartId],
-      xScale = visData.radial ? null : recreateD3Scale(visData.x);
+      xScale;
 
-  dataObj = visData.searchType === 'pointPerSeries' ?
-    searchQuadtreeSeries(visData, dataObj, quadtreeData, xScale, visData) :
-    searchQuadtreeSingle(visData, dataObj, quadtreeData, xScale, visData);
+  if(visData.searchType === 'pointPerSeries') {
+    xScale = !visData.radial ? recreateD3Scale(visData.x) : null;
+
+    dataObj = searchQuadtreeSeries(visData, dataObj, quadtreeData, xScale, visData);
+
+  } else {  //closestPoint && allInArea
+    dataObj = searchQuadtreeSingle(visData, dataObj, quadtreeData, visData);
+  }
 
   delete dataObj.timeStampsTracker;
   reply(dataObj, time);
-}
-
-/**
- * Performs the tree search for nodes within an area.
- *
- * @method searchAreaQuadtree
- */
-function searchAreaQuadtree(quadtree, x0, y0, x3, y3, t) {
-  var result = {
-    'rawData': [],
-    'timeStamps': [],
-    'timeStampsTracker': {}
-  };
-
-// FIXME This is not checked yet. Need to implement on IS before I can see if it works
-
-  quadtree.visit(function(node, x1, y1, x2, y2) {
-    if (!node.length) {
-      do {
-        var d = node.data;
-        // if our point is inside our box, save it if not a copy
-        if((d[0] >= x0) && (d[0] < x3) && (d[1] >= y0) && (d[1] < y3))  {
-          if(t && result.timeStampsTracker.hasOwnProperty(d[t])) {
-            result.timeStampsTracker[d[t]] = true;
-            result.timeStamps.push(d[t]);
-            result.rawData.push(d.data);
-          } else if(!t) {
-            result.rawData.push(d.data);
-          }
-        }
-      } while (node = node.next);
-    }
-    //return true  ==> skip the children nodes so we dont search unnessary bits of the tree
-    return x1 >= x3 || y1 >= y3 || x2 < x0 || y2 < y0;
-  });
-
-  return result;
 }
 
 /**

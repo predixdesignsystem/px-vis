@@ -1492,4 +1492,57 @@ PxVisBehaviorD3.serieToRedrawOnTopSVG = [{
   }
 }, PxVisBehavior.serieToRedrawOnTop, PxVisBehaviorD3.svg];
 
+/*
+    Name:
+    PxVisBehaviorD3.radialPixelCalc
+
+    Description:
+    Polymer behavior that provides the mechanism to calculate pixel space vals for polar charts
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorD3.radialPixelCalc
+*/
+PxVisBehaviorD3.radialPixelCalc = {
+  calcPixelCoordForRadial: function(angle, amp, yRange, yDomain, whichVal) {
+    var yDomainTot = yDomain[1] - yDomain[0],
+        pixelAmplitude = yRange * (amp - yDomain[0])/yDomainTot;
+
+    angle = this.adjustAngleForPolarChart(angle, false);
+
+    //sin * pixel range * percentage of data range
+    if(whichVal === 'x') {
+      return Math.sin(angle) * pixelAmplitude;
+    }
+    // else
+    return Math.cos(angle) * pixelAmplitude;
+  },
+
+  adjustAngleForPolarChart: function(angle, toDegrees) {
+    //add 180 deg to offset chart 0 being on top
+    var offset = toDegrees ? 180 : Math.PI;
+
+    if((!this.counterClockwise && !toDegrees) ||
+        (this.counterClockwise && toDegrees)) {
+      angle *= -1;
+    }
+
+    //convert to appropriate unit and
+    if(this.useDegrees) {
+      if(toDegrees) {
+        return angle + offset;
+      } else {
+        return angle / 360 * 2 * Math.PI + offset;
+      }
+    } else {
+      if(toDegrees) {
+        return angle / (2 * Math.PI) * 360 + offset;
+      } else {
+        return angle + offset;
+      }
+    }
+  }
+};
+
 </script>

@@ -81,7 +81,8 @@ Custom property | Description | Default
       PxColorsBehavior.baseColors,
       PxVisBehavior.mutedSeries,
       PxVisBehavior.dynamicConfigProperties,
-      PxVisBehavior.highlightShared
+      PxVisBehavior.highlightSvgShared,
+      PxVisBehaviorD3.radialPixelCalc
     ],
 
     /**
@@ -108,6 +109,13 @@ Custom property | Description | Default
        */
       _circles:{
         type:Object
+      },
+      /**
+       * Whether the scatter plot is using radial coiordinates (x=phase, y=amplitude)
+       */
+      radial: {
+        type: Boolean,
+        value: false
       }
     }, //properties
 
@@ -135,6 +143,8 @@ Custom property | Description | Default
           xKey = this._getXKey(),
           dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawData,
           svgBuilder;
+
+      this._muteDataSeries(dataset);
 
       svgBuilder = this.svg.selectAll('g.highlightPoint')
         .data(dataset, function(d) { return d[xKey]}.bind(this));
@@ -166,22 +176,56 @@ Custom property | Description | Default
         .attr('stroke-width', 12)
         .attr('stroke-opacity', 0.3)
         .attr('fill', (function(k) {
-          return 'red'; //this.completeSeriesConfig[d]['color']
+          return this.completeSeriesConfig[k]['color'];
         }).bind(this))
         .attr('stroke', (function(k) {
-          return 'red'; //this.completeSeriesConfig[d]['color']
+          return this.completeSeriesConfig[k]['color'];
         }).bind(this))
       .merge(c)
         .attr('cx', function(k) {
-          return !isNaN(data[this.completeSeriesConfig[k]['x']]) && !isNaN(data[this.completeSeriesConfig[k]['y']]) ? this.x(data[this.completeSeriesConfig[k]['x']]) : '';
+          if(isNaN(data[this.completeSeriesConfig[k]['x']]) || isNaN(data[this.completeSeriesConfig[k]['y']])) {
+            return '';
+          }
+
+          if(this.radial) {
+            var angle = data[this.completeSeriesConfig[k]['x']],
+                amp = data[this.completeSeriesConfig[k]['y']],
+                yRange = this.y.range()[1] - this.y.range()[0];
+
+            return this.calcPixelCoordForRadial(angle, amp, yRange, this.y.domain(), 'x')
+          }
+
+          // else
+          return this.x(data[this.completeSeriesConfig[k]['x']]);
+
         }.bind(this))
         .attr('cy', function(k) {
           if(isNaN(data[this.completeSeriesConfig[k]['x']]) || isNaN(data[this.completeSeriesConfig[k]['y']])) {
             return '';
           }
-          return  typeof this.y === 'function' ? this.y(d[k]) : this.y[this.completeSeriesConfig[k]["axis"]["id"]](data[this.completeSeriesConfig[k]['y']]);
+
+          if(this.radial) {
+            var angle = data[this.completeSeriesConfig[k]['x']],
+                amp = data[this.completeSeriesConfig[k]['y']],
+                yRange = this.y.range()[1] - this.y.range()[0];
+
+            return this.calcPixelCoordForRadial(angle, amp, yRange, this.y.domain(), 'y')
+          }
+
+          // else
+          return  typeof this.y === 'function' ?
+            this.y(data[this.completeSeriesConfig[k]['y']]) :
+            this.y[this.completeSeriesConfig[k]["axis"]["id"]](data[this.completeSeriesConfig[k]['y']]);
+
         }.bind(this))
-        .style("display", function(k) { return isNaN(data[this.completeSeriesConfig[k]['x']]) || isNaN(data[this.completeSeriesConfig[k]['y']]) ? "none" : null; }.bind(this));
+        .style("display", function(k) {
+
+          if(isNaN(data[this.completeSeriesConfig[k]['x']]) || isNaN(data[this.completeSeriesConfig[k]['y']])) {
+            return 'none';
+          }
+
+          return null;
+        }.bind(this));
     },
 
     _addClipPath: function() {

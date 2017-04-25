@@ -64,10 +64,13 @@ Custom property | Description | Default
 
       <template is="dom-repeat" items="[[seriesKeys]]">
         <px-vis-scatter-canvas
+          radial="[[radial]]"
+          force-radial-calculation
           canvas-context="[[canvasContext]]"
           series-id="[[item]]"
           chart-data="[[_highlightData]]"
-          complete-series-config="[[_highlightConfig]]"
+          complete-series-config="[[completeSeriesConfig]]"
+          stroke-width="2"
           width="[[width]]"
           height="[[height]]"
           margin="[[margin]]"
@@ -97,7 +100,7 @@ Custom property | Description | Default
       PxColorsBehavior.baseColors,
       PxVisBehavior.mutedSeries,
       PxVisBehavior.dynamicConfigProperties,
-      PxVisBehavior.highlightShared
+      PxVisBehavior.highlightCanvasShared
     ],
 
     /**
@@ -121,6 +124,14 @@ Custom property | Description | Default
 
       seriesKeys: {
         type: Object
+      },
+
+      /**
+       * Whether the scatter plot is using radial coiordinates (x=phase, y=amplitude)
+       */
+      radial: {
+        type: Boolean,
+        value: false
       }
 
     }, //properties
