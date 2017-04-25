@@ -122,10 +122,10 @@ Custom property | Description | Default
       <div
         id="registerWrap"
         class$="[[_getMinSizeClass(preventMinSize)]] inline--flex flex--col"
-        style$="{{_returnHeight(height,margin, type)}}; [[_returnWidth(chartWidth, width, margin, type)]]">
+        style$="[[_returnHeight(height,margin, type)]]; [[_returnWidth(chartWidth, width, margin, type)]]">
 
         <template is="dom-if" if="{{_displayTime(xAxisType, forceDateTimeDisplay)}}">
-          <div class$="{{_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)}}">
+          <div class$="[[_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)]]">
             <px-vis-register-datetime
               class$="[[tooltipStyle]]"
               first-date-time="[[_firstDateTime]]"
@@ -136,11 +136,11 @@ Custom property | Description | Default
           </div>
         </template>
 
-        <div id="seriesWrap" class$="{{_getSeriesWrapperClassReverse(type)}}">
-          <template is="dom-if" if="{{!_isOfType(xAxisType, 'pie')}}">
-            <template is="dom-repeat" items="{{_series}}" as="_groups">
-              <div class$="{{_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)}}">
-                <template is="dom-repeat" id="itemRepeat" items="{{_groups}}" on-dom-change="_scrollBarsPresent">
+        <div id="seriesWrap" class$="[[_getSeriesWrapperClassReverse(type)]]">
+          <template is="dom-if" if="[[!_isOfType(xAxisType, 'pie')]]">
+            <template is="dom-repeat" items="[[_series]]" as="_groups">
+              <div class$="[[_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)]]">
+                <template is="dom-repeat" id="itemRepeat" items="[[_groups]]" on-dom-change="_scrollBarsPresent">
                   <px-vis-register-item
                     class$="[[tooltipStyle]]"
                     item="[[item]]"
@@ -165,10 +165,10 @@ Custom property | Description | Default
             </template>
           </template>
           <!-- For pie charts -->
-          <template is="dom-if" if="{{_isOfType(yAxisType, 'pie')}}">
-            <div class$="{{_getSeriesWrapperClassReverse(type)}}">
-              <div class$="{{_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)}}">
-                <template is="dom-repeat" id="pieItemRepeat" items="{{chartData}}" on-dom-change="_scrollBarsPresentPie">
+          <template is="dom-if" if="[[_isOfType(yAxisType, 'pie')]]">
+            <div class$="[[_getSeriesWrapperClassReverse(type)]]">
+              <div class$="[[_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)]]">
+                <template is="dom-repeat" id="pieItemRepeat" items="[[chartData]]" on-dom-change="_scrollBarsPresentPie">
                   <px-vis-register-item-pie
                     item="[[item]]"
                     item-index="[[index]]"
@@ -292,6 +292,13 @@ Custom property | Description | Default
       _itemCount: {
         type: Number,
         value: 0
+      },
+      /**
+       * If inert the register won't process any new data coming in. Useful when the register is hidden
+       */
+      inert: {
+        type: Boolean,
+        value: false
       }
     },
 
@@ -312,25 +319,28 @@ Custom property | Description | Default
      * @method _formatDateTime
      */
     _formatDateTime: function() {
-      if(this.tooltipData.time) {
-        var momentObj1 = this.formatTimestamp(
-          this.tooltipData.time,
-          this.timezone,
-          this.firstDateTimeFormat
-        );
-        var momentObj2 = this.formatTimestamp(
-          this.tooltipData.time,
-          this.timezone,
-          this.secondDateTimeFormat
-        );
-        this.set('_firstDateTime', momentObj1);
-        this.set('_secondDateTime', momentObj2);
-        this.set('_separator', this.separator);
 
-      } else {
-        this.set('_firstDateTime', '');
-        this.set('_secondDateTime', '');
-        this.set('_separator', '');
+      if(!this.inert) {
+        if(this.tooltipData.time) {
+          var momentObj1 = this.formatTimestamp(
+            this.tooltipData.time,
+            this.timezone,
+            this.firstDateTimeFormat
+          );
+          var momentObj2 = this.formatTimestamp(
+            this.tooltipData.time,
+            this.timezone,
+            this.secondDateTimeFormat
+          );
+          this.set('_firstDateTime', momentObj1);
+          this.set('_secondDateTime', momentObj2);
+          this.set('_separator', this.separator);
+
+        } else {
+          this.set('_firstDateTime', '');
+          this.set('_secondDateTime', '');
+          this.set('_separator', '');
+        }
       }
     },
     /**
@@ -340,21 +350,23 @@ Custom property | Description | Default
     */
     _computeSeries: function() {
       this.debounce('computeSeries', function() {
-        var allSeries = this.tooltipData.series,
-            pivot = Math.ceil(allSeries.length / this.groupings),
-            groupedSeries = [],
-            s = 0,
-            e = pivot;
+        if(!this.inert) {
+          var allSeries = this.tooltipData.series,
+              pivot = Math.ceil(allSeries.length / this.groupings),
+              groupedSeries = [],
+              s = 0,
+              e = pivot;
 
-        for(var i = 0; i < this.groupings; i++) {
-          //copy the section of the series
-          groupedSeries.push(allSeries.slice(s,e));
+          for(var i = 0; i < this.groupings; i++) {
+            //copy the section of the series
+            groupedSeries.push(allSeries.slice(s,e));
 
-          //calc our next start and end
-          s = e;
-          e = s + pivot;
+            //calc our next start and end
+            s = e;
+            e = s + pivot;
+          }
+          this.set('_series', groupedSeries);
         }
-        this.set('_series', groupedSeries);
       }, 1);
     },
 

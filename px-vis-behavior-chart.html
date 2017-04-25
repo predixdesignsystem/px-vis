@@ -419,6 +419,28 @@ PxVisBehaviorChart.chartCommon = [{
     },
 }, PxColorsBehavior.dataVisColors , PxVisBehaviorChart.chartCommonMethods, PxVisBehavior.commonMethods, PxVisBehavior.completeSeriesConfig, PxVisBehavior.axisTypes];
 
+
+/*
+    Name:
+    PxVisBehaviorChart.chartId
+
+    Description:
+    Polymer behavior that allows the chart to have a unique ID
+
+    @polymerBehavior PxVisBehaviorChart.chartId
+*/
+PxVisBehaviorChart.chartId = [{
+
+  properties: {
+      /**
+       * Internal unique ID
+       */
+      chartId: {
+        type: String
+      },
+  }
+},  PxVisBehavior.uniqueIds];
+
 /*
     Name:
     PxVisBehaviorChart.webWorkerSynchonization
@@ -430,11 +452,9 @@ PxVisBehaviorChart.chartCommon = [{
 */
 PxVisBehaviorChart.webWorkerSynchonization = [{
     properties: {
-      /**
-       * Internal unique ID
-       */
-      _chartId: {
-        type: String
+      preventWwSynchronization: {
+        type: Boolean,
+        value: false
       },
       _wwSyncRequestDataDeletion: {
         type: Boolean,
@@ -456,43 +476,52 @@ PxVisBehaviorChart.webWorkerSynchonization = [{
       }
     },
     observers: [
-      '_keepDataInSync(chartData.*, _chartId)'
+      '_keepDataInSync(chartData.*, chartId)'
     ],
     ready: function() {
-      this._chartId = this.generateRandomID('chart');
+      if(!this.preventWwSynchronization) {
+        this.chartId = this.generateRandomID('chart');
+      }
     },
     attached: function() {
-      this._wwSyncRequestDataDeletion = false;
+      if(!this.preventWwSynchronization) {
+        this._wwSyncRequestDataDeletion = false;
 
-      //request a data update if we have been detached, data has
-      //been deleted and then re attached
-      if(this.chartData && this._wwSyncDataDeleted) {
+        //request a data update if we have been detached, data has
+        //been deleted and then re attached
+        if(this.chartData && this._wwSyncDataDeleted) {
 
-        this._keepDataInSync();
+          this._keepDataInSync();
+        }
       }
     },
     detached: function() {
-      this._wwSyncRequestDataDeletion = true;
+      if(!this.preventWwSynchronization) {
 
-      setTimeout(function() {
+        this._wwSyncRequestDataDeletion = true;
 
-        //only process if we haven't been re attached
-        if(this._wwSyncRequestDataDeletion) {
-        Px.vis.scheduler.process('deleteData', this._chartId);
+        setTimeout(function() {
 
-          //async, the data hasn't been actually deleted yet but we
-          //don't have a way to cancel it anymore and an update
-          //request would always queue after this request
-          this._wwSyncDataDeleted = true;
-        }
-      }.bind(this), this._wwSyncDataDeletionTimeout);
+          //only process if we haven't been re attached
+          if(this._wwSyncRequestDataDeletion) {
+          Px.vis.scheduler.process('unregisterChart', null, this.chartId);
+
+            //async, the data hasn't been actually deleted yet but we
+            //don't have a way to cancel it anymore and an update
+            //request would always queue after this request
+            this._wwSyncDataDeleted = true;
+          }
+        }.bind(this), this._wwSyncDataDeletionTimeout);
+      }
     },
     _keepDataInSync: function(chartData, id) {
 
-      this._wwSyncDataDeleted = false;
-      Px.vis.scheduler.process('updateData', {'chartData': this.chartData}, this._chartId);
+      if(!this.preventWwSynchronization) {
+        this._wwSyncDataDeleted = false;
+        Px.vis.scheduler.process('updateData', {'chartData': this.chartData}, this.chartId);
+      }
     }
-}, PxVisBehavior.uniqueIds, PxVisBehavior.dataset];
+}, PxVisBehavior.dataset];
 
 /*
     Name:

@@ -78,6 +78,8 @@
 
       //don't copy the callback around, just remember it
       worker.callback = callback;
+      worker.action = actionName;
+      worker.chartId = chartId;
       worker.startTime = window.performance.now();
 
       worker.postMessage({ 'action': actionName, 'data': data, 'chartId': chartId});
@@ -123,11 +125,17 @@
 
       //  console.log('passing IN ww took: ' + (e.data.timeIn - this.startTime));
       //  console.log('passing OUT ww took: ' + (now - e.data.timeOut));
-       console.log('passing total ww took: ' + (now - this.startTime));
+      //  console.log('passing total ww took: ' + (now - this.startTime));
 
 
       //store callback and kick off new work before processing results
       var callback = this.callback;
+
+      //cleanup if chart has been unregistered
+      if(this.action === 'unregisterChart') {
+        //TODO: clean queues in case something has been added while deleting?
+        delete scheduler.chartWorkerMapping[this.chartId];
+      }
 
       //use thread if work queued
       if(scheduler.queue[this.index].length) {
@@ -214,6 +222,7 @@
 
         //now add our true handling function
         this.onmessage = processDone;
+        this.onerror = processDone;
       };
       worker.inUse = true;
       worker.index = i;
