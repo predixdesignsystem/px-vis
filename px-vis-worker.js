@@ -1,3 +1,4 @@
+importScripts("px-vis-worker-scale.js");
 importScripts("../pxd3/d3.min.js");
 
 // Global storage vars
@@ -24,6 +25,16 @@ function reply(data, time) {
 function updateData(eventData, time) {
 
   dataMapping[eventData.chartId] = eventData.data.chartData;
+  reply(null, time);
+}
+
+
+function deleteData(eventData, time) {
+
+  delete dataMapping[eventData.chartId];
+  delete quadtrees[eventData.chartId];
+  delete voronois[eventData.chartId];
+
   reply(null, time);
 }
 
@@ -247,20 +258,26 @@ function createSingleQuadtree(data) {
       flatData,
       xScale = calcXScale(visData),
       yScale = calcYScale(visData),
-      quadtree = d3.quadtree()
+      quadtree;
+
+    if(chartData) {
+        quadtree = d3.quadtree()
         .extent(visData.extents)
         .x(function(d) { return d.px; })
         .y(function(d) { return d.py; });
 
-    // To add all datapoints to our quadtree, we need to break each dataset up.
-    // Iterate though all data, flatten our datasets, and add them to the quadtree
-    for(var i = 0; i < chartData.length; i++) {
-      flatData = flattenData(visData, chartData[i], xScale, yScale);
+      // To add all datapoints to our quadtree, we need to break each dataset up.
+      // Iterate though all data, flatten our datasets, and add them to the quadtree
+      for(var i = 0; i < chartData.length; i++) {
+        flatData = flattenData(visData, chartData[i], xScale, yScale);
 
-      quadtree.addAll(flatData);
+        quadtree.addAll(flatData);
+      }
+
+      return quadtree;
+    } else {
+      return null;
     }
-
-    return quadtree;
 }
 
 /**
@@ -276,23 +293,28 @@ function createSeriesQuadtree(data) {
       // we can't pass d3 scales around so we need to recretate them
       xScale = recreateD3Scale(visData.x),
       yScale;
-// FIXME Make work for POLAR
-  for(var i = 0; i < visData.keys.length; i++) {
-    k = visData.keys[i];
 
-    //create an object and bind it to the x and y accessors so that the scales
-    //won't be overriden by the next iteration of the loop
-    var obj = buildQuadtreeHelperObj(visData, k, i);
+  if(chartData) {
+  // FIXME Make work for POLAR
+    for(var i = 0; i < visData.keys.length; i++) {
+      k = visData.keys[i];
 
-    // if we are just doing closestPoint, then do not reset the quadtree
-    quadtree[k] = d3.quadtree()
-      .extent(visData.extents)
-      .x(function(d) { return xScale(d[this.xKey]); }.bind(obj))
-      .y(function(d) { return this.yScale(d[this.yKey]); }.bind(obj))
-      .addAll(chartData);
+      //create an object and bind it to the x and y accessors so that the scales
+      //won't be overriden by the next iteration of the loop
+      var obj = buildQuadtreeHelperObj(visData, k, i);
+
+      // if we are just doing closestPoint, then do not reset the quadtree
+      quadtree[k] = d3.quadtree()
+        .extent(visData.extents)
+        .x(function(d) { return xScale(d[this.xKey]); }.bind(obj))
+        .y(function(d) { return this.yScale(d[this.yKey]); }.bind(obj))
+        .addAll(chartData);
+    }
+
+    return quadtree;
+  } else {
+    return null;
   }
-
-  return quadtree;
 }
 
 /**
@@ -688,6 +710,26 @@ function addCrosshairData(dataObj, d) {
   return dataObj;
 }
 
+function determineExtents(eventData, time) {
+  var visData = eventData.data,
+      extents;
+
+  extentCalc.xAxisType = visData.xAxisType;
+  extentCalc.yAxisType = visData.yAxisType;
+  extentCalc.completeSeriesConfig = visData.completeSeriesConfig;
+  extentCalc.chartData = dataMapping[eventData.chartId];
+  extentCalc.chartExtents = visData.chartExtents;
+  extentCalc.dataExtents = visData.dataExtents;
+  extentCalc.axes = visData.axes;
+  extentCalc.seriesToAxes = visData.seriesToAxes;
+  extentCalc.isYAxisObject = visData.isYAxisObject;
+
+  extents = extentCalc.determineExtents();
+
+  reply(extents, time);
+
+}
+
 onmessage = function(e) {
 
  // var time = this.performance.now();
@@ -728,6 +770,14 @@ onmessage = function(e) {
 
     case 'returnVoronoiData':
       reply(voronois[e.data.chartId], time);
+      break;
+
+    case 'determineExtents':
+      determineExtents(e.data, time);
+      break;
+
+    case 'unregisterChart':
+      deleteData(e.data.chartId, time);
       break;
 
     default:

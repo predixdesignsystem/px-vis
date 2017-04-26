@@ -1,3 +1,4 @@
+<!--<link rel="import" href="px-vis-worker.js" />-->
 <script>
 
 
@@ -16,15 +17,19 @@
         processDone,
         startWork;
 
-    // NOTE: see http://www.2ality.com/2014/05/current-script.html
-    var currentScript = document._currentScript || document.currentScript ||
-        (function() {
-          var scripts = document.getElementsByTagName('script');
-          return scripts[scripts.length - 1];
-        })();
-    var BASE_URI = currentScript.ownerDocument.baseURI;
-    var WORKER_SCOPE_URL =
-        Polymer.ResolveUrl.resolveUrl('px-vis-worker.js', BASE_URI);
+
+    if(!Px.vis.workerUrl) {
+      // NOTE: see http://www.2ality.com/2014/05/current-script.html
+      var currentScript = document._currentScript || document.currentScript ||
+          (function() {
+            var scripts = document.getElementsByTagName('script');
+            return scripts[scripts.length - 1];
+          })();
+      var BASE_URI = currentScript.ownerDocument.baseURI;
+      Px.vis.workerUrl =  Polymer.ResolveUrl.resolveUrl('px-vis-worker.js', BASE_URI);
+    }
+
+
 
     scheduler.workers = [];
     scheduler.queue = [];
@@ -73,6 +78,8 @@
 
       //don't copy the callback around, just remember it
       worker.callback = callback;
+      worker.action = actionName;
+      worker.chartId = chartId;
       worker.startTime = window.performance.now();
 
       worker.postMessage({ 'action': actionName, 'data': data, 'chartId': chartId});
@@ -118,11 +125,17 @@
 
       //  console.log('passing IN ww took: ' + (e.data.timeIn - this.startTime));
       //  console.log('passing OUT ww took: ' + (now - e.data.timeOut));
-       console.log('passing total ww took: ' + (now - this.startTime));
+      //  console.log('passing total ww took: ' + (now - this.startTime));
 
 
       //store callback and kick off new work before processing results
       var callback = this.callback;
+
+      //cleanup if chart has been unregistered
+      if(this.action === 'unregisterChart') {
+        //TODO: clean queues in case something has been added while deleting?
+        delete scheduler.chartWorkerMapping[this.chartId];
+      }
 
       //use thread if work queued
       if(scheduler.queue[this.index].length) {
@@ -178,7 +191,18 @@
     //   // Won't be needing this anymore
     //   URL.revokeObjectURL( blobURL );
 
-      var worker = new Worker(WORKER_SCOPE_URL);
+      try {
+        var worker = new Worker(Px.vis.workerUrl);
+      } catch(e) {
+
+        //failure
+        console.warn('failed to find px-vis web worker file at ' + Px.vis.workerUrl);
+        console.warn('the charts will fall back to not using web workers which will have a negative impact on performance')
+        return;
+      }
+
+
+
       //we can load the worker through a data uri if needed
       scheduler.workers.push(worker);
 
@@ -198,6 +222,7 @@
 
         //now add our true handling function
         this.onmessage = processDone;
+        this.onerror = processDone;
       };
       worker.inUse = true;
       worker.index = i;

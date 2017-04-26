@@ -198,41 +198,57 @@ PxVisBehaviorScale.scale = [{
       // indicate we are calculating the domain
       this._calculatingDomain = true;
 
-      var extents = this._determineExtents();
+      //get what info we need for the web worker to get our extents
+      var wwInfo = {};
 
-      if(typeof this.y === 'object') {
-        for(var i = 0; i < this.axes.length; i++){
-          if(!this.y[this.axes[i]]) {
-            continue;
+      wwInfo.xAxisType = this.xAxisType;
+      wwInfo.yAxisType = this.yAxisType;
+      wwInfo.completeSeriesConfig = this.completeSeriesConfig;
+      wwInfo.chartExtents = this.chartExtents;
+      wwInfo.dataExtents = this.dataExtents;
+      wwInfo.axes = this.axes;
+      wwInfo.seriesToAxes = this.seriesToAxes;
+      wwInfo.isYAxisObject = typeof this.y === 'object'
+
+      Px.vis.scheduler.process('determineExtents', wwInfo, this.chartId, function(e) {
+
+        var extents = e.data;
+
+        if(typeof this.y === 'object') {
+          for(var i = 0; i < this.axes.length; i++){
+            if(!this.y[this.axes[i]]) {
+              continue;
+            }
+
+            if(this.matchTicks && !this.singleDomain) {
+              var min = Math.floor(extents.y[this.axes[i]][0]/10)*10,
+                  max = Math.ceil(extents.y[this.axes[i]][1]/10)*10;
+
+              this.y[this.axes[i]].domain([min,max]);
+            } else {
+              this.y[this.axes[i]].domain(extents.y[this.axes[i]]);
+            }
           }
-
-          if(this.matchTicks && !this.singleDomain) {
-            var min = Math.floor(extents.y[this.axes[i]][0]/10)*10,
-                max = Math.ceil(extents.y[this.axes[i]][1]/10)*10;
-
-            this.y[this.axes[i]].domain([min,max]);
-          } else {
-            this.y[this.axes[i]].domain(extents.y[this.axes[i]]);
-          }
+        } else {
+          this.y.domain(extents.y);
         }
-      } else {
-        this.y.domain(extents.y);
-      }
 
-      // if we are streaming data, dont keep updating x
-      if(this.disableDynamicUpdate) {
-        if(!this.runOnce) {
+        // if we are streaming data, dont keep updating x
+        if(this.disableDynamicUpdate) {
+          if(!this.runOnce) {
+            this.x.domain(extents.x);
+            this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+
+            this.runOnce = true;
+          }
+        } else {
           this.x.domain(extents.x);
           this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
-
-          this.runOnce = true;
         }
-      } else {
-        this.x.domain(extents.x);
-        this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
-      }
 
-      this._calculatingDomain = false;
+        this._calculatingDomain = false;
+
+    }.bind(this));
     }
   },
 
