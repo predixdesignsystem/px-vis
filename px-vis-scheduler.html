@@ -153,6 +153,24 @@
       }
     };
 
+    webWorkerError = function(e) {
+
+      //cleanup if chart has been unregistered
+      if(this.action === 'unregisterChart') {
+        //TODO: clean queues in case something has been added while deleting?
+        delete scheduler.chartWorkerMapping[this.chartId];
+      }
+
+      //use thread if work queued
+      if(scheduler.queue[this.index].length) {
+
+        //get and do work
+        var initData = scheduler.queue[this.index].splice(0, 1)[0];
+        startWork(this, initData.action, initData.data, initData.chartId, initData.callback);
+      } else {
+        this.inUse = false;
+      }
+    };
 
 
     window.performance.mark('initWebWorkers');
@@ -222,7 +240,7 @@
 
         //now add our true handling function
         this.onmessage = processDone;
-        this.onerror = processDone;
+        this.onerror = webWorkerError;
       };
       worker.inUse = true;
       worker.index = i;

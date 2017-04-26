@@ -222,6 +222,7 @@ Custom property | Description | Default
             this.$.xSpan.textContent = item.value[xKey];
           }
           this.set('_slash', ' / ');
+          this.set('_xUnit', this.completeSeriesConfig[item.name]['xAxisUnit']);
         } else {
           if(this.$.xFormatter) {
             this.$.xFormatter.set('value', null);
@@ -229,6 +230,7 @@ Custom property | Description | Default
             this.$.xSpan.textContent = null;
           }
           this.set('_slash', '');
+          this.set('_xUnit', '');
         }
 
         //process Y val
@@ -242,17 +244,15 @@ Custom property | Description | Default
           } else if(this.$.ySpan) {
             this.$.ySpan.textContent = item.value[yKey];
           }
+          this.set('_yUnit', this.completeSeriesConfig[item.name]['yAxisUnit']);
         } else {
           if(this.$.yFormatter) {
             this.$.yFormatter.set('value', null);
           } else if(this.$.ySpan) {
             this.$.ySpan.textContent = null;
           }
+          this.set('_yUnit', '');
         }
-
-        //Units
-        this.set('_xUnit', this.completeSeriesConfig[item.name]['xAxisUnit']);
-        this.set('_yUnit', this.completeSeriesConfig[item.name]['yAxisUnit']);
       }
     },
 
