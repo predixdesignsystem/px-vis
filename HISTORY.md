@@ -1,7 +1,11 @@
+v1.1.9
+==================
+* Ensure zoom in and zoom out features take the selection type into account
+
 v1.1.8
 ==================
 * Allows data converter to have a interpolator passed in.
-* Changes to completeSeriesConfig computation so it does a proper deep clone of seriesConfig to allow functions and special values to be passed in. 
+* Changes to completeSeriesConfig computation so it does a proper deep clone of seriesConfig to allow functions and special values to be passed in.
 
 v1.1.7
 ==================
