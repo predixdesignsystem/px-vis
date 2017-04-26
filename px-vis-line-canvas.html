@@ -206,6 +206,8 @@ Element which draws lines series onto the chart
      * @method drawElement
      */
     drawCanvas: function(allowCanvasClearing) {
+      this._progressiveRenderingCounter++;
+
       if(this.drawDebounceTime > 0) {
         this.debounce('drawCanvas',function() {
           this._drawCanvasDebounced(allowCanvasClearing);
@@ -428,8 +430,7 @@ Element which draws lines series onto the chart
             processFunction,
             currentRenderingCounter;
 
-      //new request
-      this._progressiveRenderingCounter++;
+
       currentRenderingCounter = this._progressiveRenderingCounter;
 
       //make sure canvas is clean

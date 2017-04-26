@@ -17,7 +17,6 @@
         processDone,
         startWork;
 
-
     if(!Px.vis.workerUrl) {
       // NOTE: see http://www.2ality.com/2014/05/current-script.html
       var currentScript = document._currentScript || document.currentScript ||
@@ -28,8 +27,6 @@
       var BASE_URI = currentScript.ownerDocument.baseURI;
       Px.vis.workerUrl =  Polymer.ResolveUrl.resolveUrl('px-vis-worker.js', BASE_URI);
     }
-
-
 
     scheduler.workers = [];
     scheduler.queue = [];
@@ -153,6 +150,24 @@
       }
     };
 
+    webWorkerError = function(e) {
+
+      //cleanup if chart has been unregistered
+      if(this.action === 'unregisterChart') {
+        //TODO: clean queues in case something has been added while deleting?
+        delete scheduler.chartWorkerMapping[this.chartId];
+      }
+
+      //use thread if work queued
+      if(scheduler.queue[this.index].length) {
+
+        //get and do work
+        var initData = scheduler.queue[this.index].splice(0, 1)[0];
+        startWork(this, initData.action, initData.data, initData.chartId, initData.callback);
+      } else {
+        this.inUse = false;
+      }
+    };
 
 
     window.performance.mark('initWebWorkers');
@@ -197,7 +212,7 @@
 
         //failure
         console.warn('failed to find px-vis web worker file at ' + Px.vis.workerUrl);
-        console.warn('the charts will fall back to not using web workers which will have a negative impact on performance')
+        console.warn('the charts won\'t be able to determine their extents or find values')
         return;
       }
 
@@ -222,7 +237,7 @@
 
         //now add our true handling function
         this.onmessage = processDone;
-        this.onerror = processDone;
+        this.onerror = webWorkerError;
       };
       worker.inUse = true;
       worker.index = i;

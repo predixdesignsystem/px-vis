@@ -324,6 +324,10 @@ Element which draws a scatter series onto the chart
      * @method drawElement
      */
     drawCanvas: function(allowCanvasClearing) {
+
+      //new request
+      this._progressiveRenderingCounter++;
+
       if(this.drawDebounceTime > 0) {
         this.debounce('drawCanvasScatter',function() {
           this._drawCanvasDebounced(allowCanvasClearing);
@@ -448,8 +452,6 @@ Element which draws a scatter series onto the chart
               || function(callback) { setTimeout(callback, 17); },
             currentRenderingCounter;
 
-        //new request
-        this._progressiveRenderingCounter++;
         currentRenderingCounter = this._progressiveRenderingCounter;
 
         //split the data in the number of frames desired.
