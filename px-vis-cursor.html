@@ -278,8 +278,10 @@ Custom property | Description | Default
             .append('line')
             .attr('class', 'yline')
             .attr('stroke', this._checkThemeVariable("--px-vis-cursor-line-color", this.colors.gray5))
-            .attr('stroke-width', '2')
+            .attr('stroke-width', 2)
             .attr('opacity', 1)
+            .attr('x1', 0)
+            .attr('x2', 0)
             .attr('y1', 0)
             .attr('y2', this.height);
         } else {
@@ -508,13 +510,23 @@ Custom property | Description | Default
         If top, take the highest
       */
       if(this.verticalLine === 'full') {
-        this._vLine.attr('transform','translate(' + this.tooltipData.mouse[0] + ',0)');
+        this._vLine
+          .attr('x1',this.tooltipData.mouse[0])
+          .attr('x2',this.tooltipData.mouse[0]);
+
       } else if(this.verticalLine === 'bottom') {
         var maxY = Px.d3.max(this.tooltipData.yArr);
-        this._vLine.attr('transform','translate(' + this.tooltipData.xArr[this.tooltipData.yArr.indexOf(maxY)] + ',' + maxY + ')');
+        this._vLine
+          .attr('x1',this.tooltipData.xArr[this.tooltipData.yArr.indexOf(maxY)])
+          .attr('x2',this.tooltipData.xArr[this.tooltipData.yArr.indexOf(maxY)])
+          .attr('y1',maxY);
+
       } else if(this.verticalLine === 'top') {
         var minY = Px.d3.min(this.tooltipData.yArr);
-        this._vLine.attr('transform','translate(' + this.tooltipData.xArr[this.tooltipData.yArr.indexOf(minY)] + ',' + minY + ')')
+        this._vLine
+          .attr('x1',this.tooltipData.xArr[this.tooltipData.yArr.indexOf(minY)])
+          .attr('x2',this.tooltipData.xArr[this.tooltipData.yArr.indexOf(minY)])
+          .attr('y1',minY)
           .attr('y2', -this.height);
       }
     },

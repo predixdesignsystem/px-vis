@@ -486,7 +486,7 @@ function searchAreaBoxQuadtree(quadtree, visData, dataObj) {
         var d = node.data;
         // if our point is inside our box, save it if not a copy
         if((d.px >= boxSize.x0) && (d.px < boxSize.x1) && (d.py >= boxSize.y0) && (d.py < boxSize.y1)) {
-          dataObj = addCrosshairData(dataObj, d.data, visData.timeData);
+          dataObj = addCrosshairDataQuadtree(dataObj, d.data, visData.timeData);
         }
       } while(node = node.next);
     }
@@ -512,7 +512,7 @@ function searchAreaRadiusQuadtree(quadtree, visData, dataObj) {
       do {
         // Thank you Pythagore
         if((Math.pow(node.data.px - visData.mousePos[0], 2) + Math.pow(node.data.py - visData.mousePos[1], 2)) <= r2 ) {
-          dataObj = addCrosshairData(dataObj, node.data.data, visData.timeData);
+          dataObj = addCrosshairDataQuadtree(dataObj, node.data.data, visData.timeData);
         }
       } while(node = node.next);
     }
