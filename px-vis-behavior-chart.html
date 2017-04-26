@@ -452,6 +452,11 @@ PxVisBehaviorChart.chartId = [{
 */
 PxVisBehaviorChart.webWorkerSynchonization = [{
     properties: {
+      /**
+       * Prevents the chart from synchronizing its data with a webworker.
+       * WARNING: turning that on might prevent the chart from calculating its
+       * extents, finding tooltip/crosshair data
+       */
       preventWwSynchronization: {
         type: Boolean,
         value: false
@@ -473,11 +478,16 @@ PxVisBehaviorChart.webWorkerSynchonization = [{
       _wwSyncDataDeletionTimeout: {
         type: Number,
         value: 1500
+      },
+      /**
+       * Name of the property to be kept in sync. Usually chartData but can
+       * be overriden for a filtered dataset instead for example
+       */
+      _wwSyncDataPropName: {
+        type: String,
+        value: 'chartData'
       }
     },
-    observers: [
-      '_keepDataInSync(chartData.*, chartId)'
-    ],
     ready: function() {
       if(!this.preventWwSynchronization) {
         this.chartId = this.generateRandomID('chart');
@@ -514,11 +524,11 @@ PxVisBehaviorChart.webWorkerSynchonization = [{
         }.bind(this), this._wwSyncDataDeletionTimeout);
       }
     },
-    _keepDataInSync: function(chartData, id) {
+    _keepDataInSync: function() {
 
-      if(!this.preventWwSynchronization) {
+      if(!this.preventWwSynchronization && this[this._wwSyncDataPropName]) {
         this._wwSyncDataDeleted = false;
-        Px.vis.scheduler.process('updateData', {'chartData': this.chartData}, this.chartId);
+        Px.vis.scheduler.process('updateData', {'chartData': this[this._wwSyncDataPropName]}, this.chartId);
       }
     }
 }, PxVisBehavior.dataset];
@@ -1978,7 +1988,7 @@ PxVisBehaviorChart.multiAxis = [{
       } else if(typeof this.y === 'function') {
         return this.y;
       }
-    }
+   }
     return;
   }
 
