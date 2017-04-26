@@ -345,6 +345,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     _resetCrosshairData: function() {
+      if(this.searchRadius) {
+        this._hideSearchRadiusCursor();
+      }
 
       this.set('_calculatingData', false);
       var ttD = {
@@ -384,7 +387,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      *
      * @method _calcTooltipData
      */
-    _calcData:function() {
+    _calcData: function() {
 
       this.set('_calculatingData', true);
 
@@ -395,6 +398,10 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         var mousePos = Px.d3.mouse(this._rect.node());
 
         this.debounce('move',function() {
+          if(this._calcCrosshair && this.searchRadius) {
+            this._showSearchRadiusCursor(mousePos);
+          }
+
           this._calcDataDebounced(mousePos);
         }, 10);
       }
@@ -1217,6 +1224,28 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           .attr("y", function(d) { return d.y0; })
           .attr("width", function(d) { return d.y1 - d.y0; })
           .attr("height", function(d) { return d.x1 - d.x0; });
+    },
+
+    _showSearchRadiusCursor: function(mousePos) {
+      if(!this._radiusCursor) {
+        this._radiusCursor = this.svg.append('circle')
+          .attr('pointer-events', 'none')
+          .style('pointer-events', 'none')
+          .attr('fill', 'rgba(0,0,0, 0.1')
+          .attr('stroke', 'rgba(0,0,0, 0.2');
+      }
+
+      this._radiusCursor
+        .style('display', null)
+        .attr('r', this.searchRadius)
+        .attr('cx', mousePos[0])
+        .attr('cy', mousePos[1]);
+    },
+
+    _hideSearchRadiusCursor: function() {
+      if(this._radiusCursor) {
+        this._radiusCursor.style('display', 'none');
+      }
     }
   });
 </script>
