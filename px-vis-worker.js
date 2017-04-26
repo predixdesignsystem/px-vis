@@ -450,21 +450,20 @@ function calcBoxSize(visData) {
 }
 
 /**
- * Performs the tree search for nodes within an area.
+ * Performs the tree search for nodes within an rectilinear area.
  *
- * @method searchAreaQuadtree
+ * @method searchAreaBoxQuadtree
  */
-function searchAreaQuadtree(quadtree, visData, dataObj, box) {
-  var boxSize = box || calcBoxSize(visData);
+function searchAreaBoxQuadtree(quadtree, visData, dataObj) {
+  var boxSize = calcBoxSize(visData);
 
-// FIXME This is not checked yet. Need to implement on IS before I can see if it works
   // via https://bl.ocks.org/mbostock/4343214
   quadtree.visit(function(node, nodeX0, nodeY0, nodeX1, nodeY1) {
     if(!node.length) {
       do {
         var d = node.data;
         // if our point is inside our box, save it if not a copy
-        if((d.px >= boxSize.x0) && (d.px < boxSize.x1) && (d.py >= boxSize.y0) && (d.py < boxSize.y1))  {
+        if((d.px >= boxSize.x0) && (d.px < boxSize.x1) && (d.py >= boxSize.y0) && (d.py < boxSize.y1)) {
           dataObj = addCrosshairData(dataObj, d.data, visData.timeData);
         }
       } while(node = node.next);
@@ -474,6 +473,43 @@ function searchAreaQuadtree(quadtree, visData, dataObj, box) {
   });
 
   return dataObj;
+}
+
+/**
+ * Performs the tree search for nodes within an circle area.
+ *
+ * @method searchAreaRadiusQuadtree
+ */
+function searchAreaRadiusQuadtree(quadtree, visData, dataObj) {
+  var r2 = visData.radius * visData.radius,
+      boxSize = calcBoxSize(visData);
+
+  // via https://bl.ocks.org/mbostock/4343214
+  quadtree.visit(function(node, nodeX0, nodeY0, nodeX1, nodeY1) {
+    if(!node.length) {
+      do {
+        // Thank you Pythagore
+        if((Math.pow(node.data.px - visData.mousePos[0], 2) + Math.pow(node.data.py - visData.mousePos[1], 2)) <= r2 ) {
+          dataObj = addCrosshairData(dataObj, node.data.data, visData.timeData);
+        }
+      } while(node = node.next);
+    }
+    //return true  ==> skip the children nodes so we dont search unnessary bits of the tree
+    return nodeX0 >= boxSize.x1 || nodeY0 >= boxSize.y1 || nodeX1 < boxSize.x0 || nodeY1 < boxSize.y0;
+  });
+
+  return dataObj;
+}
+
+/**
+ * Performs the tree search for nodes within an area.
+ *
+ * @method searchAreaQuadtree
+ */
+function searchAreaQuadtree(quadtree, visData, dataObj) {
+  return visData.radius ?
+    searchAreaRadiusQuadtree(quadtree, visData, dataObj) :
+    searchAreaBoxQuadtree(quadtree, visData, dataObj);
 }
 
 function searchQuadtreeSingle(visData, dataObj, quadtreeData, visData) {
@@ -488,7 +524,8 @@ function searchQuadtreeSingle(visData, dataObj, quadtreeData, visData) {
 
   // if we want to do all in area crosshair data, do it outside our loop
   if(visData.calcCrosshair && visData.searchType === 'allInArea') {
-    dataObj = searchAreaQuadtree(quadtreeData, visData, dataObj, null);
+    // dataObj = searchAreaBoxQuadtree(quadtreeData, visData, dataObj);
+    dataObj = searchAreaRadiusQuadtree(quadtreeData, visData, dataObj);
 
   }
 
@@ -541,9 +578,8 @@ function returnClosestsQuadtreePoints(eventData, time) {
  */
 function returnQuadtreePointsInArea(eventData, time) {
   var visData = eventData.data,
-      ext = visData.extents,
       quadtreeData = quadtrees[eventData.chartId],
-      dataObj = searchAreaQuadtree(quadtreeData, ext[0][0], ext[0][1], ext[1][0], ext[1][1], visData.timeData);
+      dataObj = searchAreaBoxQuadtree(quadtreeData, visData, createDataStub());
 
   reply(dataObj, time);
 }
