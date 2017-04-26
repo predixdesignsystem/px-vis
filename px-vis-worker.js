@@ -580,13 +580,15 @@ function returnClosestsQuadtreePoints(eventData, time) {
       quadtreeData = quadtrees[eventData.chartId],
       xScale;
 
-  if(visData.searchType === 'pointPerSeries') {
-    xScale = !visData.radial ? recreateD3Scale(visData.x) : null;
+  if(quadtreeData) {
+    if(visData.searchType === 'pointPerSeries') {
+      xScale = !visData.radial ? recreateD3Scale(visData.x) : null;
 
-    dataObj = searchQuadtreeSeries(visData, dataObj, quadtreeData, xScale, visData);
+      dataObj = searchQuadtreeSeries(visData, dataObj, quadtreeData, xScale, visData);
 
-  } else {  //closestPoint && allInArea
-    dataObj = searchQuadtreeSingle(visData, dataObj, quadtreeData, visData);
+    } else {  //closestPoint && allInArea
+      dataObj = searchQuadtreeSingle(visData, dataObj, quadtreeData, visData);
+    }
   }
 
   delete dataObj.timeStampsTracker;
@@ -601,7 +603,11 @@ function returnClosestsQuadtreePoints(eventData, time) {
 function returnQuadtreePointsInArea(eventData, time) {
   var visData = eventData.data,
       quadtreeData = quadtrees[eventData.chartId],
-      dataObj = searchAreaBoxQuadtree(quadtreeData, visData, createDataStub());
+      dataObj = createDataStub();
+
+      if(quadtreeData) {
+        dataObj = searchAreaBoxQuadtree(quadtreeData, visData, dataObj);
+      }
 
   reply(dataObj, time);
 }
