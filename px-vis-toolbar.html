@@ -158,26 +158,31 @@ Element providing an on-chart zoom.
                   'tooltipLabel': 'Closest Point',
                   'buttonGroup': 1,
                   'selectable': true,
-                  'onClick': 'function() { this.set("searchType", "closestPoint");}'
+                  'onClick': 'function() { this.set("interactionSpaceConfig.searchType", "closestPoint");}'
                 },
                 'pointPerSeries': {
                   'icon': 'fa-magic',
                   'tooltipLabel': 'Point Per Series',
                   'buttonGroup': 1,
                   'selectable': true,
-                  'onClick': 'function() { this.set("searchType", "pointPerSeries");}'
+                  'onClick': 'function() { this.set("interactionSpaceConfig.searchType", "pointPerSeries");}'
                 },
                 'allInArea': {
                   'icon': 'fa-beer',
                   'tooltipLabel': 'All in area',
                   'buttonGroup': 1,
                   'selectable': true,
-                  'onClick': 'function() { this.set("searchType", "allInArea");}'
+                  'onClick': 'function() { this.set("interactionSpaceConfig.searchType", "allInArea");}'
                 },
-                'radius': {
-                  'icon': 'fa-beer',
+                'radiusUp': {
+                  'icon': 'fa-plus-circle',
                   'tooltipLabel': 'Radius',
-                  'onClick': 'function() { this.set("searchRadius", "20");}'
+                  'onClick': 'function() { var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0; this.set("interactionSpaceConfig.searchRadius", sr + 5);}'
+                },
+                'radiusDown': {
+                  'icon': 'fa-minus-circle ',
+                  'tooltipLabel': 'Radius',
+                  'onClick': 'function() { var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0; this.set("interactionSpaceConfig.searchRadius", Math.max(sr - 5, 0));}'
                 }
               }
             },
@@ -264,21 +269,21 @@ Element providing an on-chart zoom.
                   'tooltipLabel': 'Zoom on X axis only',
                   'eventName': 'my-custom-click',
                   'selectable': true,
-                  'onClick': 'function() { this.set("selectionType", "xAxis");}'
+                  'onClick': 'function() { this.set("interactionSpaceConfig.selectionType", "xAxis");}'
                 },
                 'y': {
                   'title': 'Y',
                   'buttonGroup': 1,
                   'tooltipLabel': 'Zoom on Y axis only',
                   'selectable': true,
-                  'onClick': 'function() { this.set("selectionType", "yAxis");}'
+                  'onClick': 'function() { this.set("interactionSpaceConfig.selectionType", "yAxis");}'
                 },
                 'xy': {
                   'title': 'XY',
                   'tooltipLabel': 'Zoom on X and Y axis',
                   'buttonGroup': 1,
                   'selectable': true,
-                  'onClick': 'function() { this.set("selectionType", "xy");}'
+                  'onClick': 'function() { this.set("interactionSpaceConfig.selectionType", "xy");}'
                 },
                 'zoomIn': {
                   'icon': 'fa-plus',
