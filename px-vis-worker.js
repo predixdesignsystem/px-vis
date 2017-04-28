@@ -629,8 +629,10 @@ function searchQuadtreeSingle(visData, dataObj, quadtreeData, visData) {
   }
 
   // when we constructed our data objs, we saved this
-  dataObj.time = result.time;
-  dataObj.timeSeriesKey = result.key;
+  if(result) {
+    dataObj.time = result.time;
+    dataObj.timeSeriesKey = result.key;
+  }
 
   return dataObj;
 }

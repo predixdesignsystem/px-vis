@@ -102,6 +102,7 @@ Element providing an on-chart zoom.
             'axisBrush': {
               'tooltipLabel': 'Axis Brush',
               'icon': 'fa-eraser',
+              'cursorIcon': 'fa-eraser',
               'buttonGroup': 1,
               'onClick': 'function() {this.set("showTooltip", false);}',
               'onClickContext': "toolbar",
@@ -115,6 +116,7 @@ Element providing an on-chart zoom.
             'axisDrag': {
               'tooltipLabel': 'Axis Drag',
               'icon': 'fa-arrows-h',
+              'cursorIcon': 'fa-arrows-h',
               'buttonGroup': 1,
               'onClick': 'function() {this.set("showTooltip", false);}',
               'onClickContext': "toolbar",
@@ -155,6 +157,7 @@ Element providing an on-chart zoom.
               'subConfig': {
                 'closestPoint': {
                   'icon': 'fa-times-circle-o',
+                  'cursorIcon': 'fa-times-circle-o',
                   'tooltipLabel': 'Closest Point',
                   'buttonGroup': 1,
                   'selectable': true,
@@ -162,6 +165,7 @@ Element providing an on-chart zoom.
                 },
                 'pointPerSeries': {
                   'icon': 'fa-magic',
+                  'cursorIcon': 'fa-magic',
                   'tooltipLabel': 'Point Per Series',
                   'buttonGroup': 1,
                   'selectable': true,
@@ -169,6 +173,7 @@ Element providing an on-chart zoom.
                 },
                 'allInArea': {
                   'icon': 'fa-beer',
+                  'cursorIcon': 'fa-beer',
                   'tooltipLabel': 'All in area',
                   'buttonGroup': 1,
                   'selectable': true,
@@ -176,7 +181,7 @@ Element providing an on-chart zoom.
                 },
                 'radiusUp': {
                   'icon': 'fa-plus-circle',
-                  'tooltipLabel': 'Radius',
+                  'tooltipLabel': 'Radius', //FIXME cant rely on this not chaning...
                   'onClick': 'function() { var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0; this.set("interactionSpaceConfig.searchRadius", sr + 5);}'
                 },
                 'radiusDown': {
@@ -501,7 +506,7 @@ Element providing an on-chart zoom.
       if(conf.buttonGroup) {
 
          //ensure we remember selection, deselect others and select this one
-        for(var i =0; i<this._internalConfig.length; i++) {
+        for(var i=0; i<this._internalConfig.length; i++) {
           if(index !== i && this._internalConfig[i].buttonGroup === conf.buttonGroup) {
             this.set('_internalConfig.#' + i + '.selected', false);
           }
@@ -512,6 +517,7 @@ Element providing an on-chart zoom.
       this._tryProcessSubConfig(conf);
       this._processItem(conf);
     },
+
     _tryProcessSubConfig: function(conf) {
       //process sub config if existing
       if(conf.subConfig) {
@@ -597,6 +603,30 @@ Element providing an on-chart zoom.
           this.fire('px-vis-action-request', {'function': fn, 'data': conf});
         }
       }
+
+      this._setMouseCursor(conf);
+
+    },
+
+    _setMouseCursor: function(conf, resetIcon) {
+      var config = {},
+          fn;
+
+          // In general if a acton doesnt have a cursor icon, we want to use the last
+          // if we are forcing a reset, then start off null and overwrite if there is a cursorIcon
+          if(resetIcon) {
+            config["iconType"] = null;
+          }
+
+          if(conf.cursorIcon) {
+           config["iconType"] = conf.cursorIcon;
+          }
+
+
+          fn = function() { this.set('interactionSpaceConfig', config); };
+
+      this.fire('px-vis-action-request', {'function': fn, 'data': null });
+
     },
 
     _getIcon: function(item) {
