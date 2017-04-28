@@ -231,7 +231,7 @@ Element which draws lines series onto the chart
             data = this.multiPath ? this.chartData : [this.chartData];
           } else {
             this._defineSingleLine(true);
-            data = this.chartData;
+            data = this.noCanvasProgressiveRendering ? [this.chartData] : this.chartData;
           }
 
           //make sure we have the right muted opacity
@@ -394,10 +394,9 @@ Element which draws lines series onto the chart
           if(opacity !== 0) {
             this.line(data[i]);
           }
-          // Apply our styles and draw all the lines to the canvas
-          this.canvasContext.strokeStyle = this.rgbToRgba(this.completeSeriesConfig[this.seriesId]['color'], opacity);
-
         }
+        // Apply our styles and draw all the lines to the canvas
+        this.canvasContext.strokeStyle = this.rgbToRgba(this.completeSeriesConfig[this.seriesId]['color'], opacity);
         this.canvasContext.stroke();
 
         this.canvasContext._pxLinesCleared = false;
