@@ -325,6 +325,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       this.set('_calculatingData', false);
       var ttD = {
             'time': null,
+            'timeSeriesKey': null,
             'hidden': true,
             'series': [],
             'mouse': null,
@@ -343,9 +344,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     _resetCrosshairData: function() {
-      if(this.searchRadius) {
-        this._hideSearchRadiusCursor();
-      }
 
       this.set('_calculatingData', false);
       var ttD = {
@@ -396,10 +394,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         var mousePos = Px.d3.mouse(this._rect.node());
 
         this.debounce('move',function() {
-          if(this._calcCrosshair && this.searchRadius) {
-            this._showSearchRadiusCursor(mousePos);
-          }
-
           this._calcDataDebounced(mousePos);
         }, 10);
       }
@@ -459,7 +453,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
          var data = this._createBaseDataObjForWebWorker();
          data.mousePos = mousePos;
          data.calcCrosshair = this._calcCrosshair;
-         data.timeData = this.timeData;
          data.radius = this.searchRadius;
          data.searchType = this.searchType;
 
@@ -467,6 +460,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           dataObj.series = e.data.series;
           dataObj.rawData = e.data.rawData;
           dataObj.timeStamps = e.data.timeStamps;
+          dataObj.time =  e.data.time ? e.data.time : dataObj.time;
+          dataObj.timeSeriesKey =  e.data.timeSeriesKey ? e.data.timeSeriesKey : dataObj.timeSeriesKey;
           this._calcDataFinished(dataObj);
          }.bind(this));
          return;
@@ -501,6 +496,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     _returnTooltipDataStub: function(mousePos, x1) {
       return {
         'time': (this.xAxisType === 'time' || this.xAxisType === 'timeLocal') ? x1 : null,
+        'timeSeriesKey': null,
         'hidden': !this.showTooltip,
         'series': [],
         'mouse': mousePos,
@@ -1096,7 +1092,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      if(this.domainChanged !== null) {
        this.debounce('buildQuadtree', function() {
 
-        var t0 = window.performance.now();
         var w = this.width - this.margin.right - this.margin.left,
             h = this.height - this.margin.top - this.margin.bottom,
             ext = [[0,0], [w, h]],
@@ -1108,10 +1103,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         data.searchType = this.searchType;
 
         Px.vis.scheduler.process('createQuadtree', data, this.chartId, function(data) {
-          var t1 = window.performance.now();
-          //console.log('built quadtree in ' + (t1-t0));
+          // TODO Provide some feedback before and after built??
         }.bind(this));
-       }.bind(this), 50);
+      }.bind(this), 50);
      }
    },
 
@@ -1140,6 +1134,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       data.completeSeriesConfig = this.completeSeriesConfig;
       data.keys = this.seriesKeys ? this.seriesKeys : Object.keys(this.completeSeriesConfig);
+      data.timeData = this.timeData;
 
       data.radial = this.radial;
       data.counterClockwise = this.counterClockwise;
@@ -1152,7 +1147,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       data.x.domain = this.x.domain();
       data.x.type = this.x._scaleType;
 
-      data.y = [];
+      data.y = {};
 
       if(this._isMultiY) {
         for(var i=0; i<yAxisKeys.length; i++) {
@@ -1222,28 +1217,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           .attr("y", function(d) { return d.y0; })
           .attr("width", function(d) { return d.y1 - d.y0; })
           .attr("height", function(d) { return d.x1 - d.x0; });
-    },
-
-    _showSearchRadiusCursor: function(mousePos) {
-      if(!this._radiusCursor) {
-        this._radiusCursor = this.svg.append('circle')
-          .attr('pointer-events', 'none')
-          .style('pointer-events', 'none')
-          .attr('fill', 'rgba(0,0,0, 0.1')
-          .attr('stroke', 'rgba(0,0,0, 0.2');
-      }
-
-      this._radiusCursor
-        .style('display', null)
-        .attr('r', this.searchRadius)
-        .attr('cx', mousePos[0])
-        .attr('cy', mousePos[1]);
-    },
-
-    _hideSearchRadiusCursor: function() {
-      if(this._radiusCursor) {
-        this._radiusCursor.style('display', 'none');
-      }
     }
+
   });
 </script>

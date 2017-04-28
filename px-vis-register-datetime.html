@@ -1,5 +1,6 @@
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="px-vis-behavior-register.html"/>
+<link rel="import" href="px-vis-behavior-common.html"/>
 
 <!--
 Element providing a date formating for the resgister.
@@ -28,8 +29,12 @@ Formatting for the timestamps,the data values, and the series names can be contr
 <dom-module id="px-vis-register-datetime">
   <template>
     <style include="px-vis-register-styles"></style>
-    
+
     <div id="dateTime">
+      <span
+        class="seriesMarker"
+        style$="background-color:[[_computeItemColor(seriesKey, completeSeriesConfig.*)]]">&nbsp;
+      </span>
       <span id="firstDateTime">[[firstDateTime]]</span> <span>[[separator]]</span> <span id="secondDateTime">[[secondDateTime]]</span>  &nbsp;
     </div>
   </template>
@@ -40,9 +45,18 @@ Formatting for the timestamps,the data values, and the series names can be contr
     is: 'px-vis-register-datetime',
 
     behaviors: [
-      PxVisBehaviorRegister.datetime
+      PxVisBehaviorRegister.datetime,
+      PxVisBehavior.completeSeriesConfig
     ],
 
-    properties: {}
+    properties: {
+      seriesKey: {
+        type: String
+      }
+    },
+
+    _computeItemColor: function(seriesKey) {
+      return this.completeSeriesConfig[seriesKey] ? this.completeSeriesConfig[seriesKey]['color'] : '';
+    }
   });
 </script>

@@ -213,6 +213,15 @@ Custom property | Description | Default
         type: Boolean,
         value: false
       },
+
+      _radiusCursor: {
+        type: Object
+      },
+
+      radialAreaCursor: {
+        type: Boolean,
+        value: false
+      },
     }, //properties
 
     observers: [
@@ -237,89 +246,111 @@ Custom property | Description | Default
             .attr('display', 'none');
       }
 
-      // TODO add a cursor option for horizontal?
       if(this.horizontalLine !== 'none') {
-        // append the x line
-        this._hLinesBuilder = this._cursor.selectAll('line.xline')
-          .data(Object.keys(this.completeSeriesConfig));
-
-        this._hLinesBuilder.exit().remove();
-
-        if(!this.radial) {
-          this._hLines = this._hLinesBuilder
-            .enter()
-              .append('line')
-              .attr('class', 'xline')
-              .attr('stroke', this._checkThemeVariable("--px-vis-cursor-line-color", this.colors.gray5))
-              .attr('opacity', 1)
-              .attr('x1', 0)
-            .merge(this._hLinesBuilder)
-              .attr('x2', this.width);
-        } else {
-          this._hLines = this._hLinesBuilder
-            .enter()
-              .append('circle')
-              .attr('class', 'xline')
-              .attr('stroke', this._checkThemeVariable("--px-vis-cursor-line-color", this.colors.gray5))
-              .attr('fill', 'none')
-              .attr('opacity', 1)
-              .attr('cx', 0)
-              .attr('cy', 0)
-            .merge(this._hLinesBuilder)
-              .attr('r', 0);
-        }
+        this._drawHorizontalLines();
       }
 
       if(this.verticalLine !== 'none') {
+        this._drawVerticalLines();
+      }
 
-        // append the y line
-        if(!this._vLine) {
-          this._vLine = this._cursor
-            .append('line')
-            .attr('class', 'yline')
-            .attr('stroke', this._checkThemeVariable("--px-vis-cursor-line-color", this.colors.gray5))
-            .attr('stroke-width', 2)
-            .attr('opacity', 1)
-            .attr('x1', 0)
-            .attr('x2', 0)
-            .attr('y1', 0)
-            .attr('y2', this.height);
-        } else {
-          //just update the size
-          this._vLine.attr('y2', this.height);
-        }
+      if(this.radialAreaCursor) {
+        this._drawRadiusCursor();
       }
 
       if(this.circlePoint === 'yes') {
-        // append the circle
-        this._circles = this._cursor.selectAll('circle.tooltipPoint')
-          .data(Object.keys(this.completeSeriesConfig));
-
-        this._circles.exit().remove();
-
-        this._circles
-          .enter()
-            .append('circle')
-            .attr('class', 'tooltipPoint')
-            .attr('r', 3)
-            .attr('stroke-width', 12)
-            .attr('stroke-opacity', 0.3)
-          .merge(this._circles)
-            .attr('fill', (function(d) {
-              return this.completeSeriesConfig[d]['color']
-            }).bind(this))
-            .attr('stroke', (function(d) {
-              return this.completeSeriesConfig[d]['color']
-            }).bind(this));
-
-          this._circles = this._cursor.selectAll('circle.tooltipPoint');
-
+        this._drawPointCircles();
       }
 
       this._addClipPath();
       this._processOpacity();
 
     },  //drawElement
+
+    _drawHorizontalLines: function() {
+      // append the x line
+      this._hLinesBuilder = this._cursor.selectAll('line.xline')
+        .data(Object.keys(this.completeSeriesConfig));
+
+      this._hLinesBuilder.exit().remove();
+
+      if(!this.radial) {
+        this._hLines = this._hLinesBuilder
+          .enter()
+            .append('line')
+            .attr('class', 'xline')
+            .attr('stroke', this._checkThemeVariable("--px-vis-cursor-line-color", this.colors.gray5))
+            .attr('opacity', 1)
+            .attr('x1', 0)
+          .merge(this._hLinesBuilder)
+            .attr('x2', this.width);
+      } else {
+        this._hLines = this._hLinesBuilder
+          .enter()
+            .append('circle')
+            .attr('class', 'xline')
+            .attr('stroke', this._checkThemeVariable("--px-vis-cursor-line-color", this.colors.gray5))
+            .attr('fill', 'none')
+            .attr('opacity', 1)
+            .attr('cx', 0)
+            .attr('cy', 0)
+          .merge(this._hLinesBuilder)
+            .attr('r', 0);
+      }
+    },
+
+    _drawVerticalLines: function() {
+      // append the y line
+      if(!this._vLine) {
+        this._vLine = this._cursor
+          .append('line')
+          .attr('class', 'yline')
+          .attr('stroke', this._checkThemeVariable("--px-vis-cursor-line-color", this.colors.gray5))
+          .attr('stroke-width', 2)
+          .attr('opacity', 1)
+          .attr('x1', 0)
+          .attr('x2', 0)
+          .attr('y1', 0);
+      }
+      //always update the size
+      this._vLine.attr('y2', this.height);
+    },
+
+    _drawPointCircles: function() {
+      // append the circle
+      this._circles = this._cursor.selectAll('circle.tooltipPoint')
+        .data(Object.keys(this.completeSeriesConfig));
+
+      this._circles.exit().remove();
+
+      this._circles
+        .enter()
+          .append('circle')
+          .attr('class', 'tooltipPoint')
+          .attr('r', 3)
+          .attr('stroke-width', 12)
+          .attr('stroke-opacity', 0.3)
+        .merge(this._circles)
+          .attr('fill', (function(d) {
+            return this.completeSeriesConfig[d]['color']
+          }).bind(this))
+          .attr('stroke', (function(d) {
+            return this.completeSeriesConfig[d]['color']
+          }).bind(this));
+
+      this._circles = this._cursor.selectAll('circle.tooltipPoint');
+    },
+
+    _drawRadiusCursor: function() {
+      if(this._isD3Empty(this._radiusCursor)) {
+        this._radiusCursor = this.svg.append('circle')
+          .attr('fill', 'rgba(0,0,0, 0.1')
+          .attr('stroke', 'rgba(0,0,0, 0.2');
+      }
+
+      this._radiusCursor.attr('r', this.searchRadius)
+    },
+
     /**
      * Function called by observer
      * Determins if the cursor should be shown or hidden
@@ -531,6 +562,12 @@ Custom property | Description | Default
       }
     },
 
+    _moveRadialAreaCursor: function() {
+      this._radiusCursor
+        .attr('cx', mousePos[0])
+        .attr('cy', mousePos[1]);
+    },
+
     _addClipPath: function() {
       if(this.clipPath) {
         if(this.verticalLine !== 'none' && this._vLine) {
@@ -546,6 +583,10 @@ Custom property | Description | Default
 
         if(this.circlePoint !== 'no' && this._circles) {
           this.addClipPath(this._circles);
+        }
+
+        if(this.radialAreaCursor && this._radiusCursor) {
+          this.addClipPath(this._radiusCursor);
         }
       }
     },
