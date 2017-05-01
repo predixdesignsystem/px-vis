@@ -74,22 +74,40 @@ PxVisBehaviorScale.scale = [{
     }
   },
 
+  _recreateScales: function(width, height, margin) {
+
+    //prevent domain update
+    this._calculatingDomain = true;
+
+    if(this.x) {
+      this._setXScale(width, margin,true);
+    }
+    if(this.y) {
+      if(this._isMultiY) {
+        this._setMultiYScale(height, margin, this.axes, true);
+      } else {
+        this._setYScale(height, margin, true);
+      }
+    }
+
+    this._calculatingDomain = false;
+  },
+
   /**
    *  Sets the x scale or update its range if already existing
    *
    * @method _setXScale
    */
-  _setXScale: function(width, margin) {
+  _setXScale: function(width, margin, forceRecreation) {
     var w = Math.max(width - margin.left - margin.right, 0);
 
     //create or update
-    if(this.x && this.x._scaleType === this.xAxisType) {
+    if(this.x && this.x._scaleType === this.xAxisType && !forceRecreation) {
       this.x.range([0,w]);
       this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
     } else {
       this.set('x', this._setScale(this.xAxisType,[0, w], this.x));
     }
-
   },
 
   /**
@@ -97,11 +115,11 @@ PxVisBehaviorScale.scale = [{
    *
    * @method _setYScale
    */
-  _setYScale: function(height, margin) {
+  _setYScale: function(height, margin, forceRecreation) {
     var h = Math.max(height - margin.top - margin.bottom, 0);
 
     //create or update
-    if(this.y && this.y._scaleType === this.yAxisType) {
+    if(this.y && this.y._scaleType === this.yAxisType && !forceRecreation) {
       this.y.range([h, 0]);
       this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
     } else {
@@ -114,7 +132,7 @@ PxVisBehaviorScale.scale = [{
    *
    * @method _setYScale
    */
-  _setMultiYScale: function(height, margin, axes) {
+  _setMultiYScale: function(height, margin, axes, forceRecreation) {
     var h = Math.max(height - margin.top - margin.bottom, 0),
         newY,
         copy,
@@ -129,7 +147,7 @@ PxVisBehaviorScale.scale = [{
 
     //create or update
     for(var i = 0; i < this.axes.length; i++) {
-      if(copy[this.axes[i]] && copy[this.axes[i]]._scaleType === this.yAxisType) {
+      if(copy[this.axes[i]] && copy[this.axes[i]]._scaleType === this.yAxisType && !forceRecreation) {
         copy[this.axes[i]].range([h, 0]);
         updated = true;
       } else {
