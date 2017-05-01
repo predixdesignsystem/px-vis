@@ -102,12 +102,12 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      *
      * @method _setXScale
      */
-    _setXScale: function() {
+    _setXScale: function(width, useDegrees, forceRecreation) {
         var range = [0, this.width],
             domain = this.useDegrees ? [0, 360] : [0, 2*Math.PI],
             x;
 
-        if(this.x) {
+        if(this.x && !forceRecreation) {
           if(this.radar) {
             this.x.range(domain);
           } else {
@@ -142,6 +142,17 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       y._scaleType = "linear";
 
       this.set('y', y);
+    },
+
+    _recreateScales: function() {
+
+      if(this.x) {
+        this._setXScale(this.width, this.useDegrees, true);
+      }
+
+      if(this.y) {
+        this._setYScale(this.width, this.margin, this.centerOffset);
+      }
     },
 
     /**

@@ -6,12 +6,12 @@
 <!--
 Interpreter component which creates x & y interpreters which act as data converters.
 
-The component translates data points into their corresponding pixel coordinate. 
+The component translates data points into their corresponding pixel coordinate.
 
-To do this, the interpreter needs to understand 
-  
+To do this, the interpreter needs to understand
+
   1. what type of data you have (xScale, yScale)
-  2. the size of the drawing area you have (width, height, margin) 
+  2. the size of the drawing area you have (width, height, margin)
   3. The extents of your data / domain (chartData, selectedDomain)
 
 It then returns an array for currentDomain and interpreter functions for `x` and `y` which use the currentDomain array.
@@ -103,16 +103,25 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       }
     },
 
+    _recreateScales: function() {
+      if(this.x) {
+        this._setXScale(this.width, this.margin, true);
+      }
+      if(this.y) {
+        this._setYScale(this.height, this.margin, this.axes);
+      }
+    },
+
     /**
      *  Sets the x scale to a single ordinal scale
      *
      * @method _setXScale
      */
-    _setXScale: function(width, margin) {
+    _setXScale: function(width, margin, forceRecreating) {
       var w = Math.max(width - margin.left - margin.right,0),
           range = [0, w];
 
-      if(this.x) {
+      if(this.x && !forceRecreating) {
         var oldDomain = this.x.domain();
         this.x = Px.d3.scalePoint().range(range).domain(oldDomain).padding(0.5);
       } else {
@@ -128,7 +137,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      *
      * @method _setYScale
      */
-    _setYScale: function(height,margin,axes) {
+    _setYScale: function(height, margin, axes) {
       var h = Math.max(height - margin.top - margin.bottom,0),
           range = [h, 0],
           newY = {};// y is an object with multiple scales
