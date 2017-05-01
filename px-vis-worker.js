@@ -1,6 +1,42 @@
 importScripts("px-vis-worker-scale.js");
 importScripts("../pxd3/d3.min.js");
 
+/*
+  VISDATA Example:
+  {
+    "completeSeriesConfig": completeSeriesConfig from chart,
+    "keys": Obj.keys(completeSeriesConfig),
+    "timeData" = chart.timeData;
+
+    "radial": if a radial chart  (IE Polar),
+    "counterClockwise": polar.counterClockwise,
+    "useDegrees": polar.useDegrees,
+
+    "isMultiY": chart._isMultiY
+
+    "x": {
+      "range": x.range(),
+      "domain": x.domain(),
+      "type": x._scaleType
+    },
+
+    "y": {
+      "defaultAxis": {
+        "range": y.defaultAxis.range(),
+        "domain": y.defaultAxis.domain(),
+        "type": y.defaultAxis._scaleType
+      }
+    },
+
+    // On hover
+    "mousePos": mousePos,
+    "calcCrosshair": chart._calcCrosshair;
+    "radius" = chart.searchRadius;
+    "searchType" = chart.searchType;
+  }
+*/
+
+
 // Global storage vars
 var dataMapping = {},
     quadtrees = {},
@@ -89,6 +125,8 @@ function getMultiScale(visData) {
  */
 function createDataStub() {
   return {
+    'time': null,
+    'timeSeriesKey': null,
     "series" : [],
     "rawData" : [],
     "timeStamps" : [],
@@ -99,7 +137,20 @@ function createDataStub() {
 
 /**
  * Flattens a single data set into individual data obj so the quadtree can properly create build itself
- *
+ * Example:
+ * ```
+ *  {
+ *    "data": {x: 1, y0: 10, y1: 30, "timestamp": 123456789},
+ *    "key": "y0",
+ *    "time": 123456789 || null,
+ *    "x": 1,
+ *    "y": 10,
+ *    "axis": y0AxisId || "default",
+ *    "px": pixel val,
+ *    "py": pixel val,
+ *    "pixels": {"x": pixelVal, "y0": pixelVal, "y1": pixelVal}
+ *  }
+ *```
  * @method flattenData
  */
 function flattenData(visData, d, xScale, yScale) {
@@ -114,7 +165,6 @@ function flattenData(visData, d, xScale, yScale) {
 
 
     o["data"] = d;
-    o["key"] = k;
     o["key"] = k;
     o["time"] = visData.timeData ? d[visData.timeData] : null;
     o["x"] = d[xKey];
@@ -391,6 +441,24 @@ function calcDataSeriesQuadtree(d, k, xScale, yScale, visData, axis) {
   }
 }
 
+function calcClosestPoint(mousePos, foundPoint, series, time) {
+  var pixelX = series.coord[0],
+      pixelY = series.coord[1],
+      currDist = (pixelX-=mousePos[0])*pixelX + (pixelY-=mousePos[1])*pixelY; //Pythagorean, but dont care about sqrt
+
+  // if first time, our current point is our closest
+  // is not first, then if currDist is closer
+  if(!foundPoint || foundPoint.dist > currDist) {
+    return {
+      "dist": currDist,
+      "time": time,
+      "key": series.name
+    }
+  }
+
+  return foundPoint;
+}
+
 /**
  * Calcs and returns the tooltipData.series obj
  *
@@ -443,8 +511,15 @@ function constructDataObj(result, dataObj, k, visData, isSingle, xScale) {
     }
 
   } else {
+    var axis = visData.completeSeriesConfig[k]['axis']['id'],
+        yScale = recreateD3Scale(visData.y[axis]),
+        series = calcDataSeriesQuadtree(result, k, xScale, yScale, visData, axis);
 
-    dataObj.series.push(calcDataSeriesQuadtree(result, k, xScale, yScale, visData, axis));
+    dataObj.series.push(series);
+
+    if(visData.timeData) {
+      dataObj.closest = calcClosestPoint(visData.mousePos, dataObj.closest, series, result[visData.timeData]);
+    }
 
     if(visData.calcCrosshair) {
       dataObj = addCrosshairDataQuadtree(dataObj, result, visData.timeData);
@@ -510,7 +585,7 @@ function searchAreaRadiusQuadtree(quadtree, visData, dataObj) {
   quadtree.visit(function(node, nodeX0, nodeY0, nodeX1, nodeY1) {
     if(!node.length) {
       do {
-        // Thank you Pythagore
+        // Thank you Πυθαγόρας ὁ Σάμιος   :)
         if((Math.pow(node.data.px - visData.mousePos[0], 2) + Math.pow(node.data.py - visData.mousePos[1], 2)) <= r2 ) {
           dataObj = addCrosshairDataQuadtree(dataObj, node.data.data, visData.timeData);
         }
@@ -535,9 +610,12 @@ function searchAreaQuadtree(quadtree, visData, dataObj) {
 }
 
 function searchQuadtreeSingle(visData, dataObj, quadtreeData, visData) {
-  var result = quadtreeData.find(visData.mousePos[0], visData.mousePos[1], visData.radius),
+  var r = visData.radius ? visData.radius : Infinity,
+      result = quadtreeData.find(visData.mousePos[0], visData.mousePos[1], r),
       k;
 
+  //result will consist of one dataset
+  // we want to iterate through our keys and get each series within that single dataset
   for(var i = 0; i < visData.keys.length; i++) {
     k = visData.keys[i];
 
@@ -546,24 +624,38 @@ function searchQuadtreeSingle(visData, dataObj, quadtreeData, visData) {
 
   // if we want to do all in area crosshair data, do it outside our loop
   if(visData.calcCrosshair && visData.searchType === 'allInArea') {
-    // dataObj = searchAreaBoxQuadtree(quadtreeData, visData, dataObj);
     dataObj = searchAreaRadiusQuadtree(quadtreeData, visData, dataObj);
 
+  }
+
+  // when we constructed our data objs, we saved this
+  if(result) {
+    dataObj.time = result.time;
+    dataObj.timeSeriesKey = result.key;
   }
 
   return dataObj;
 }
 
-function searchQuadtreeSeries(visData, dataObj, quadtreeData, xScale, visData) {
-  var result,
+function searchQuadtreeSeries(visData, dataObj, quadtreeData, visData) {
+  var r = visData.radius ? visData.radius : Infinity,
+      xScale = !visData.radial ? recreateD3Scale(visData.x) : null,
+      result,
       k;
 // FIXME make work with multi series polar
   for(var i = 0; i < visData.keys.length; i++) {
     k = visData.keys[i];
 
-    result = quadtreeData[k].find(visData.mousePos[0], visData.mousePos[1], visData.radius);
+    result = quadtreeData[k].find(visData.mousePos[0], visData.mousePos[1], r);
 
     dataObj = constructDataObj(result, dataObj, k, visData, false, xScale);
+  }
+
+  if(dataObj.closest) {
+    dataObj.time = dataObj.closest.time;
+    dataObj.timeSeriesKey = dataObj.closest.key;
+
+    delete dataObj.closest;
   }
 
   return dataObj;
@@ -577,14 +669,11 @@ function searchQuadtreeSeries(visData, dataObj, quadtreeData, xScale, visData) {
 function returnClosestsQuadtreePoints(eventData, time) {
   var visData = eventData.data,
       dataObj = createDataStub(),
-      quadtreeData = quadtrees[eventData.chartId],
-      xScale;
+      quadtreeData = quadtrees[eventData.chartId];
 
   if(quadtreeData) {
     if(visData.searchType === 'pointPerSeries') {
-      xScale = !visData.radial ? recreateD3Scale(visData.x) : null;
-
-      dataObj = searchQuadtreeSeries(visData, dataObj, quadtreeData, xScale, visData);
+      dataObj = searchQuadtreeSeries(visData, dataObj, quadtreeData, visData);
 
     } else {  //closestPoint && allInArea
       dataObj = searchQuadtreeSingle(visData, dataObj, quadtreeData, visData);
