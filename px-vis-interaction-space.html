@@ -74,6 +74,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehavior.selectionType,
       PxVisBehavior.polarData,
       PxVisBehavior.applyActionConfig,
+      PxVisBehavior.interactionSpaceShared,
       faCodes
     ],
     /***EVENTS****
@@ -254,7 +255,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
        * Holder for the drawing object
        *
        */
-      _cursorGroup:{
+      _cursorGroup: {
         type:Object
       },
 
@@ -290,8 +291,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
     observers: [
       'drawElement(domainChanged, chartData.*, svg, width, height, completeSeriesConfig, offset.*)',
-      '_drawCursorIcon(svg, iconType)',
-      '_drawCursor(svg, cursorType)',
+      '_drawCursorIcon(_cursorGroup, iconType)',
+      '_drawCursor(_icon, cursorType)',
       '_updateRadius(searchRadius)',
       '_setupActions(actionConfig.*)',
       '_resetTooltipDataLegacy(completeSeriesConfig.*)',
@@ -344,7 +345,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         }
 
         this._rect.on("mousemove.cursor", this._updateCursor.bind(this));
+        this._rect.on("mouseout.cursor", this._hideCursor.bind(this));
 
+        this._drawCursorGroup();
 
         if(this.actionConfig) {
           this._setupActions();
@@ -361,14 +364,14 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     _drawCursorGroup: function() {
       if(!this._cursorGroup) {
         this._cursorGroup = this.svg.append('g')
-          .attr("display", "none");
+          .attr("display", "none")
+          .attr('pointer-events', 'none');
       }
     },
 
     _drawCursorIcon: function() {
       var icon = this.iconType && this.iconType !== 'none'  ? String.fromCharCode(parseInt(this.fa[this.iconType],16)) : '';
 
-      this._drawCursorGroup();
 
       if(!this._icon) {
         this._icon = this._cursorGroup.append("text")
@@ -384,7 +387,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     _drawCursor: function() {
-      this._drawCursorGroup();
 
       if(!this.cursorType && this._doesD3HaveValues(this._cursor)) {
         this._cursor.remove();
@@ -392,7 +394,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       if(this.cursorType === 'circle') {
         this._cursorGroup
-          .append("circle")
+          .insert("circle", ":first-child")
           .attr("class", "mouseCursor")
           .attr('fill', this._checkThemeVariable('--px-vis-zoom-brush-fill-color', this.colors.grey2))
           .attr('fill-opacity', this._checkThemeVariable('--px-vis-zoom-brush-fill-opacity', 0.5))
@@ -400,12 +402,12 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           .attr("r", this.searchRadius)
           .attr("cx", 0)
           .attr("cy", 0)
-          .attr('pointer-events', 'all');
+          .attr('pointer-events', 'none');
       }
 
       if(this.cursorType === 'crosshair') {
         this._cursorGroup
-          .append('line')
+          .insert('line', ":first-child")
           .attr('class', 'mouseCursor')
           .attr('stroke', this._checkThemeVariable("--px-vis-cursor-line-color", this.colors.gray5))
           .attr('stroke-width', 2)
@@ -414,10 +416,10 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           .attr('x2', 0)
           .attr('y1', 0)
           .attr('y2', 0)
-          .attr('pointer-events', 'all');
+          .attr('pointer-events', 'none');
 
         this._cursorGroup
-          .append('line')
+          .insert('line', ":first-child")
           .attr('class', 'mouseCursor')
           .attr('stroke', this._checkThemeVariable("--px-vis-cursor-line-color", this.colors.gray5))
           .attr('stroke-width', 2)
@@ -426,7 +428,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           .attr('x2', 0)
           .attr('y1', 0)
           .attr('y2', 0)
-          .attr('pointer-events', 'all');
+          .attr('pointer-events', 'none');
 
       }
 
@@ -435,7 +437,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     _updateRadius: function() {
-      console.log(this.searchRadius)
       if(this.cursorType !== 'circle') {
         this.cursorType = 'circle';
         this._drawCursor();
@@ -455,7 +456,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       var mousePos = Px.d3.mouse(this._rect.node());
 
       this._cursorGroup
-        .attr('display', function() { return mousePos ? null : 'none' }.bind(this));
+        .attr('display',null);
 
       this._icon
         .attr("x", mousePos[0] + 5)
@@ -466,6 +467,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           .attr("cx", mousePos[0])
           .attr("cy", mousePos[1]);
       }
+    },
+
+    _hideCursor: function() {
+      this._cursorGroup
+        .attr('display', 'none');
     },
 
     _setupActions: function() {
@@ -483,35 +489,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     _resetTooltipAndCrosshairData: function() {
       this._resetTooltipData();
       this._resetCrosshairData();
-    },
-
-    /**
-     * Helper function called on mouseout
-     * resets tooltipData
-     *
-     * @method _resetTooltipData
-     */
-    _resetTooltipData: function() {
-
-      this.set('_calculatingData', false);
-      var ttD = {
-            'time': null,
-            'timeSeriesKey': null,
-            'hidden': true,
-            'series': [],
-            'mouse': null,
-            'xArr': null,
-            'yArr': null
-          },
-          keys = (this.seriesKeys) ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
-          len = keys.length,
-          i;
-
-      for(i = 0; i < len; i++){
-        ttD.series.push({'name': keys[i],'value': null });
-      }
-      this.set('tooltipData',ttD);
-      this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': ttD, 'method':'set' });
     },
 
     _resetCrosshairData: function() {
@@ -665,18 +642,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      *
      */
     _returnTooltipDataStub: function(mousePos, x1) {
-      return {
-        'time': (this.xAxisType === 'time' || this.xAxisType === 'timeLocal') ? x1 : null,
-        'timeSeriesKey': null,
-        'hidden': !this.showTooltip,
-        'series': [],
-        'mouse': mousePos,
-        'xArr': [],
-        'yArr': [],
-        'rawData': [],
-        'timeStamps': [],
-        'timeStampsTracker': {}
-      }
+      return this._createTooltipDataStub(mousePos, null, !this.showTooltip)
     },
 
     /**
@@ -714,6 +680,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       //time based X axis
       } else if(this.xAxisType === 'time' || this.xAxisType === 'timeLocal') {
         result = this._searchTimeData(x1, k, xKey, yKey, dataObj);
+
+        dataObj.time = result.series[xKey]
 
       } else  {  //non time based: iterate over points and find the closest
         result = this._searchContinuousData(searchTimeStamp, closestTimestamp, mousePos, xKey, yKey, axisKey, dataObj);

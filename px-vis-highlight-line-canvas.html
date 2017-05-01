@@ -152,7 +152,13 @@ Custom property | Description | Default
         return [];
       }
 
-      return this.differentDataset ? this._calcDataset() : this.crosshairData.rawData;
+      var dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawData;
+
+      if(this.showTooltipData) {
+        this._setTooltipData(dataset);
+      }
+
+      return dataset;
 
     }
   });

@@ -120,10 +120,8 @@ Custom property | Description | Default
       /**
        * Holder for the vertical line drawing object
        *
-       * @property _vLine
-       * @type Object
        */
-      _vLine:{
+      _vLines:{
         type:Object
       },
       /**
@@ -148,6 +146,12 @@ Custom property | Description | Default
        * Object used to build the horizontal lines
        */
       _hLinesBuilder: {
+        type: Object
+      },
+      /**
+       * Object used to build the horizontal lines
+       */
+      _vLinesBuilder: {
         type: Object
       },
       /**
@@ -300,20 +304,25 @@ Custom property | Description | Default
     },
 
     _drawVerticalLines: function() {
+
       // append the y line
-      if(!this._vLine) {
-        this._vLine = this._cursor
-          // .append('line')
-          // .attr('class', 'yline')
-          // .attr('stroke', this._checkThemeVariable("--px-vis-cursor-line-color", this.colors.gray5))
-          // .attr('stroke-width', 2)
-          // .attr('opacity', 1)
-          // .attr('x1', 0)
-          // .attr('x2', 0)
-          // .attr('y1', 0);
-      }
-      //always update the size
-      this._vLine.attr('y2', this.height);
+      this._vLinesBuilder = this._cursor.selectAll('line.yline')
+        .data(Object.keys(this.completeSeriesConfig));
+
+      this._vLinesBuilder.exit().remove();
+
+      this._vLines = this._vLinesBuilder
+        .enter()
+          .append('line')
+          .attr('class', 'yline')
+          .attr('stroke', this._checkThemeVariable("--px-vis-cursor-line-color", this.colors.gray5))
+          .attr('opacity', 1)
+          .attr('x1', 0)
+          .attr('x2', 0)
+          .attr('y1', 0)
+        .merge(this._vLinesBuilder)
+          .attr('y2', this.height);
+
     },
 
     _drawPointCircles: function() {
@@ -339,16 +348,6 @@ Custom property | Description | Default
           }).bind(this));
 
       this._circles = this._cursor.selectAll('circle.tooltipPoint');
-    },
-
-    _drawRadiusCursor: function() {
-      if(this._isD3Empty(this._radiusCursor)) {
-        this._radiusCursor = this.svg.append('circle')
-          .attr('fill', 'rgba(0,0,0, 0.1')
-          .attr('stroke', 'rgba(0,0,0, 0.2');
-      }
-
-      this._radiusCursor.attr('r', this.searchRadius)
     },
 
     /**
@@ -515,7 +514,7 @@ Custom property | Description | Default
 
     _moveVerticalLinesRadial: function() {
       if(this.verticalLine !== 'none') {
-        this._vLine
+        this._vLines
          .style("visibility", function(d,i) {
             if(this.tooltipData.series[i]['coord'] && !isNaN(this.tooltipData.series[i]['coord'][0]) && !isNaN(this.tooltipData.series[i]['coord'][1])) {
               return 'visible'
@@ -540,38 +539,31 @@ Custom property | Description | Default
         If bottom, just take the lowest datapoint
         If top, take the highest
       */
-      if(this.verticalLine === 'full') {
-        this._vLine
-          .attr('x1',this.tooltipData.mouse[0])
-          .attr('x2',this.tooltipData.mouse[0]);
+      if(this.verticalLine !== 'none') {
+        this._vLines
+          .attr('x1', function(d,i) {
+            return this.tooltipData.series[i]['coord'][0] ? this.tooltipData.series[i]['coord'][0] : '';
+          }.bind(this))
+          .attr('x2',function(d,i) {
+            return this.tooltipData.series[i]['coord'][0] ? this.tooltipData.series[i]['coord'][0] : '';
+          }.bind(this));
+      }
 
-      } else if(this.verticalLine === 'bottom') {
-        var maxY = Px.d3.max(this.tooltipData.yArr);
-        this._vLine
-          .attr('x1',this.tooltipData.xArr[this.tooltipData.yArr.indexOf(maxY)])
-          .attr('x2',this.tooltipData.xArr[this.tooltipData.yArr.indexOf(maxY)])
+      if(this.verticalLine === 'bottom') {
+        this._vLines
           .attr('y1',maxY);
 
       } else if(this.verticalLine === 'top') {
-        var minY = Px.d3.min(this.tooltipData.yArr);
-        this._vLine
-          .attr('x1',this.tooltipData.xArr[this.tooltipData.yArr.indexOf(minY)])
-          .attr('x2',this.tooltipData.xArr[this.tooltipData.yArr.indexOf(minY)])
+        this._vLines
           .attr('y1',minY)
           .attr('y2', -this.height);
       }
     },
 
-    _moveRadialAreaCursor: function() {
-      this._radiusCursor
-        .attr('cx', mousePos[0])
-        .attr('cy', mousePos[1]);
-    },
-
     _addClipPath: function() {
       if(this.clipPath) {
-        if(this.verticalLine !== 'none' && this._vLine) {
-          this.addClipPath(this._vLine);
+        if(this.verticalLine !== 'none' && this._vLines) {
+          this.addClipPath(this._vLines);
         }
 
         if(this.horizontalLine !== 'none' && this._hLines) {
@@ -605,9 +597,9 @@ Custom property | Description | Default
         }
       }
 
-      if(this._vLine) {
+      if(this._vLines) {
         //should we average all muted opacities for all series?
-        this._vLine.attr('opacity', allMuted ? this._defaultmutedOpacity : 1);
+        this._vLines.attr('opacity', allMuted ? this._defaultmutedOpacity : 1);
       }
 
       if(this._hLines) {

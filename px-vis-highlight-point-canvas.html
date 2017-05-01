@@ -100,7 +100,9 @@ Custom property | Description | Default
       PxColorsBehavior.baseColors,
       PxVisBehavior.mutedSeries,
       PxVisBehavior.dynamicConfigProperties,
-      PxVisBehavior.highlightCanvasShared
+      PxVisBehavior.highlightCanvasShared,
+      PxVisBehavior.interactionSpaceShared,
+      PxVisBehavior.tooltipData
     ],
 
     /**
@@ -113,13 +115,7 @@ Custom property | Description | Default
       _highlightData: {
         type:Object,
         notify: true,
-        computed: '_computeChartData(crosshairData.timeStamps.*, _highlightConfig)'
-      },
-
-      _highlightConfig: {
-        type: Object,
-        notify: true,
-        computed: '_computeConfig(completeSeriesConfig.*, seriesKeys.*)'
+        computed: '_computeChartData(crosshairData.timeStamps.*, completeSeriesConfig)'
       },
 
       seriesKeys: {
@@ -136,24 +132,19 @@ Custom property | Description | Default
 
     }, //properties
 
-    _computeConfig: function() {
-      var c = this.clone(this.completeSeriesConfig),
-          k;
-
-      for(var i = 0; i < this.seriesKeys.length; i++) {
-        k = this.seriesKeys[i];
-        c[k]['color'] = 'rgb(255,0,0)';
-      }
-
-      return c
-    },
 
     _computeChartData: function() {
       if(this.generatingCrosshairData && !this.drawWithLocalCrosshairData && this.crosshairData.rawData.length > 0) {
         return [];
       }
 
-      return this.differentDataset ? this._calcDataset() : this.crosshairData.rawData;
+      var dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawData;
+
+      if(this.showTooltipData) {
+        this._setTooltipData(dataset);
+      }
+
+      return dataset;
     },
 
     _returnYScale: function(seriesId, config) {
