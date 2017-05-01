@@ -195,7 +195,7 @@ PxVisBehavior.formatting = [{
      * Provide localization for currency formatting
      *
      * For valid formats and features, see: http://numbrojs.com/languages.html
-     * For docs on the component, see: https://metanov.github.io/numbro-element/components/numbro-element/
+     * For docs on the component, see: https://www.predix-ui.com/#/components/px-number-formatter/
      *
      * @property numberFormatCulture
      * @type String
@@ -210,7 +210,7 @@ PxVisBehavior.formatting = [{
      * Specify whether the value should be formatted as a currency
      *
      * For valid formats and features, see: http://numbrojs.com/format.html
-     * For docs on the component, see: https://metanov.github.io/numbro-element/components/numbro-element/
+     * For docs on the component, see: https://www.predix-ui.com/#/components/px-number-formatter/
      *
      * @property numberFormatIsCurrency
      * @type Boolean
@@ -225,7 +225,7 @@ PxVisBehavior.formatting = [{
      * Provide a new default format for currency
      *
      * For valid formats and features, see: http://numbrojs.com/format.html
-     * For docs on the component, see: https://metanov.github.io/numbro-element/components/numbro-element/
+     * For docs on the component, see: https://www.predix-ui.com/#/components/px-number-formatter/
      *
      * @property numberFormatCurrency
      * @type String
@@ -240,7 +240,7 @@ PxVisBehavior.formatting = [{
      * Provides a new default format
      *
      * For valid formats and features, see: http://numbrojs.com/format.html
-     * For docs on the component, see: https://metanov.github.io/numbro-element/components/numbro-element/
+     * For docs on the component, see: https://www.predix-ui.com/#/components/px-number-formatter/
      *
      * @property numberFormatDefault
      * @type String
@@ -255,7 +255,7 @@ PxVisBehavior.formatting = [{
      * The format used to generate the output
      *
      * For valid formats and features, see: http://numbrojs.com/format.html
-     * For docs on the component, see: https://metanov.github.io/numbro-element/components/numbro-element/
+     * For docs on the component, see: https://www.predix-ui.com/#/components/px-number-formatter/
      *
      * @property numberFormat
      * @type String
@@ -270,7 +270,7 @@ PxVisBehavior.formatting = [{
      * A formatted String to extract a value from
      *
      * For valid formats and features, see: http://numbrojs.com/format.html#unformat
-     * For docs on the component, see: https://metanov.github.io/numbro-element/components/numbro-element/
+     * For docs on the component, see: https://www.predix-ui.com/#/components/px-number-formatter/
      *
      * @property numberFormatUnformat
      * @type String
@@ -284,7 +284,7 @@ PxVisBehavior.formatting = [{
      * Defines how to display 0 values
      *
      * For valid formats and features, see: http://numbrojs.com/format.html
-     * For docs on the component, see: https://metanov.github.io/numbro-element/components/numbro-element/
+     * For docs on the component, see: https://www.predix-ui.com/#/components/px-number-formatter/
      *
      * @property numberFormatZero
      * @type String
@@ -2292,7 +2292,50 @@ PxVisBehavior.highlightShared = {
     }
 
     return d;
-  }
+  },
+
+
+    _generateSeries: function(dataset) {
+      var keys = this.seriesKeys ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
+          arr = [];
+
+      for(var i = 0; i < keys.length; i++) {
+        var val = {},
+            x = this.completeSeriesConfig[keys[i]]["x"],
+            y = this.completeSeriesConfig[keys[i]]["y"],
+            coords = [],
+            axis = typeof this.y === 'function' ? this.y : this.y[this.completeSeriesConfig[keys[i]]["axis"]['id']];
+
+        val[x] = dataset[x];
+        val[y] = dataset[y];
+
+        coords.push(this.x(val[x]));
+        coords.push(axis(val[y]));
+
+        arr.push({
+          "name": keys[i],
+          "value": val,
+          "coord": coords
+        })
+      }
+
+      return arr;
+    },
+
+    _setTooltipData: function(dataset) {
+      if(dataset.length) {
+        var timestamp = this.timeData ? dataset[0][this.timeData] : null;
+            series = this._generateSeries(dataset[0]);
+            ttd = this._createTooltipDataStub(series[0]["coord"], timestamp, !this.hideTooltip);
+
+        ttd["series"] = series;
+
+        this.set("tooltipData", ttd);
+
+      } else {
+        this._resetTooltipData();
+      }
+    }
 };
 
 /*
@@ -2346,6 +2389,59 @@ PxVisBehavior.highlightSvgShared = [{
   }
 
 }, PxVisBehavior.highlightShared];
+
+/*
+    PxVisBehavior.interactionSpaceShared
+
+    Description:
+    Behavior providing shared methods and props for interaction space
+    @polymerBehavior PxVisBehavior.interactionSpaceShared
+*/
+PxVisBehavior.interactionSpaceShared = {
+  /**
+   * Helper function called on mouseout
+   * resets tooltipData
+   *
+   * @method _resetTooltipData
+   */
+  _resetTooltipData: function() {
+
+    this.set('_calculatingData', false);
+    var ttD = {
+          'time': null,
+          'timeSeriesKey': null,
+          'hidden': true,
+          'series': [],
+          'mouse': null,
+          'xArr': null,
+          'yArr': null
+        },
+        keys = (this.seriesKeys) ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
+        len = keys.length,
+        i;
+
+    for(i = 0; i < len; i++){
+      ttD.series.push({'name': keys[i],'value': null });
+    }
+    this.set('tooltipData',ttD);
+    this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': ttD, 'method':'set' });
+  },
+
+  _createTooltipDataStub: function(mousePos, timestamp, showTooltip) {
+    return {
+      'time': timestamp,
+      'timeSeriesKey': null,
+      'hidden': showTooltip,
+      'series': [],
+      'mouse': mousePos,
+      'xArr': [],
+      'yArr': [],
+      'rawData': [],
+      'timeStamps': [],
+      'timeStampsTracker': {}
+    }
+  }
+};
 
 
 </script>

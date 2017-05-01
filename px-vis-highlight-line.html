@@ -147,15 +147,21 @@ Custom property | Description | Default
      * Sets the crosshairData property which gets passed to the register.
      *
      */
-     _computeChartData: function() {
-       //if we are generating data locally and not being told to draw anyways, dont draw
-       // but if we have cleared our dataset, then we do want to clear our datapoints
-       if(this.generatingCrosshairData && !this.drawWithLocalCrosshairData && this.crosshairData.rawData.length > 0) {
-         return [];
-       }
+    _computeChartData: function() {
+      //if we are generating data locally and not being told to draw anyways, dont draw
+      // but if we have cleared our dataset, then we do want to clear our datapoints
+      if(this.generatingCrosshairData && !this.drawWithLocalCrosshairData && this.crosshairData.rawData.length > 0) {
+        return [];
+      }
 
-       return this.differentDataset ? this._calcDataset() : this.crosshairData.rawData;
+      var dataset =  this.differentDataset ? this._calcDataset() : this.crosshairData.rawData;
 
-     }
+      if(this.showTooltipData) {
+        this._setTooltipData(dataset);
+      }
+
+      return dataset;
+
+    }
   });
 </script>
