@@ -2260,14 +2260,6 @@ PxVisBehavior.highlightShared = {
      */
     layerToMask: {
       type: Object
-    },
-
-    /**
-     * The opacity of the data series after the mask is applied
-     */
-    maskOpacity: {
-      type: Number,
-      value: 0.4
     }
   },
 
@@ -2354,7 +2346,7 @@ PxVisBehavior.highlightCanvasShared = [{
 
   _muteDataSeries: function() {
     if(this.layerToMask) {
-      this.layerToMask.canvas.style.opacity = this._highlightData.length ? this.maskOpacity : 1;
+      this.toggleClass('secondaryDataMask', this._highlightData.length, this.layerToMask.canvas);
     }
   },
 
@@ -2380,7 +2372,7 @@ PxVisBehavior.highlightSvgShared = [{
 
   _muteDataSeries: function(data) {
     if(this.layerToMask) {
-      this.layerToMask.node().style.opacity = data.length ? this.maskOpacity : 1;
+      this.toggleClass('secondaryDataMask', data.length, this.layerToMask.node());
     }
   },
 

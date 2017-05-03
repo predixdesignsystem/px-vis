@@ -30,9 +30,36 @@ Predix branding rules go in px-vis-predix.scss, not in this file.
 @import "px-flexbox-design/_base.flexbox.scss";
 @import "px-viewport-design/_base.viewport.scss";
 
-
 *,text{
   user-select:none;
+}
+
+/*
+  This is a bit funky:
+  basically, we want to be able to dim our data series for crosshair and for cursors for some charts
+  since both cursor and crosshair highlighting can happen at the same time,
+  they need separate classes so as not to interfere with one another.
+
+  Also, since the canvas and the layers svg live in different components, I'm putting them here so they are always accessible.
+*/
+
+$dataMaskOpacity: var(--px-vis-data-mask-opacity, 0.3);
+$overlayMaskOpacity: var(--px-vis-overlay-mask-opacity, 0.5);
+
+.primaryDataMask {
+  opacity: $dataMaskOpacity;
+}
+
+.primaryOverlayMask {
+  opacity: $overlayMaskOpacity;
+}
+
+.secondaryDataMask {
+  opacity: $dataMaskOpacity;
+}
+
+.secondaryOverlayMask {
+  opacity: $overlayMaskOpacity;
 }
 
 @import "px-meta-buttons-design/_meta.buttons.scss";

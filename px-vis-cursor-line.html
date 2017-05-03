@@ -147,18 +147,7 @@ Custom property | Description | Default
       canvasOverlayLayer: {
         type: Object,
         observer: '_applyTransitionCanvas'
-      },
-
-      dataMaskOpacity: {
-        type: Number,
-        value: 0.3
-      },
-
-      overlayMaskOpacity: {
-        type: Number,
-        value: 0.5
       }
-
     }, //properties
 
     observers: [
@@ -180,21 +169,19 @@ Custom property | Description | Default
     _updateLayers: function() {
 
       if(this.svgDataLayer) {
-        this.svgDataLayer.node().style.opacity = this.tooltipData ? this.dataMaskOpacity : 1;
+        this.toggleClass('primaryDataMask', this.tooltipData, this.svgDataLayer.node());
       }
 
       if(this.svgOverlayLayer) {
-        this.svgDataLayer.node().style.opacity = this.tooltipData ? this.overlayMaskOpacity : 1;
+        this.toggleClass('primaryOverlayMask', this.tooltipData, this.svgOverlayLayer.node());
       }
 
       if(this.canvasDataLayer) {
-        console.log("in")
-        this.canvasDataLayer.canvas.style.opacity = this.tooltipData ? this.dataMaskOpacity : 1;
-        console.log(this.canvasDataLayer)
+        this.toggleClass('primaryDataMask', this.tooltipData, this.canvasDataLayer.canvas);
       }
 
       if(this.canvasOverlayLayer) {
-        this.canvasOverlayLayer.canvas.style.opacity = this.tooltipData ? this.overlayMaskOpacity : 1;
+        this.toggleClass('primaryOverlayMask', this.tooltipData, this.canvasOverlayLayer.canvas);
       }
     },
 
