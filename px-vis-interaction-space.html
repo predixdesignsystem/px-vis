@@ -285,6 +285,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       cursorType: {
         type: String,
         value: 'none'
+      },
+
+      useQuadtree: {
+        type: Boolean,
+        value: false
       }
 
     },
@@ -297,7 +302,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       '_setupActions(actionConfig.*)',
       '_resetTooltipDataLegacy(completeSeriesConfig.*)',
       '_resetTooltipData(seriesKeys.*)',
-      '_createQuadtreeData(chartData.*, width, height, margin.*, domainChanged, searchType)'
+      '_createQuadtreeData(chartData.*, width, height, margin.*, domainChanged, searchType, useQuadtree)'
      ],
 
     /**
@@ -1228,25 +1233,25 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     _createQuadtreeData: function() {
-     if(this.domainChanged !== null) {
-       this.debounce('buildQuadtree', function() {
+      if(this.domainChanged !== null && this.useQuadtree) {
+        this.debounce('buildQuadtree', function() {
 
-        var w = this.width - this.margin.right - this.margin.left,
-            h = this.height - this.margin.top - this.margin.bottom,
-            ext = [[0,0], [w, h]],
-            data = this._createBaseDataObjForWebWorker();
+          var w = this.width - this.margin.right - this.margin.left,
+              h = this.height - this.margin.top - this.margin.bottom,
+              ext = [[0,0], [w, h]],
+              data = this._createBaseDataObjForWebWorker();
 
-        data.width = w;
-        data.height = h;
-        data.extents = ext;
-        data.searchType = this.searchType;
+          data.width = w;
+          data.height = h;
+          data.extents = ext;
+          data.searchType = this.searchType;
 
-        Px.vis.scheduler.process('createQuadtree', data, this.chartId, function(data) {
-          // TODO Provide some feedback before and after built??
-        }.bind(this));
-      }.bind(this), 50);
-     }
-   },
+          Px.vis.scheduler.process('createQuadtree', data, this.chartId, function(data) {
+            // TODO Provide some feedback before and after built??
+          }.bind(this));
+        }.bind(this), 50);
+      }
+    },
 
    _createVoronoiData: function() {
     if(this.domainChanged !== null) {

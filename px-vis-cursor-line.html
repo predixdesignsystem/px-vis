@@ -1,0 +1,209 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
+<link rel="import" href="../px-colors-design/colors.html" />
+<link rel="import" href="px-vis-line-svg.html" />
+
+<!--
+Element which draws crosshairs around mouse pointer / data points and highlights adjacent datapoints.
+- Uses crosshairData property.
+
+##### Usage
+
+    <px-vis-svg
+        ...
+        svg="{{svg}}">
+    </px-vis-svg>
+    <px-vis-scale
+        ...
+        x="{{x}}"
+        y="{{y}}"
+        domain-changed="{{domainChanged}}">
+    </px-vis-scale>
+    <px-vis-interaction-space
+        ...
+        generating-crosshair-data="{{generatingCrosshairData}}"
+        crosshair-data="{{crosshairData}}">
+    </px-vis-interaction-space>
+
+    <px-vis-cursor-line
+        svg="[[svg]]"
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        time-data="[[key]]"
+        complete-series-config="[[completeSeriesConfig]]"
+        chart-data="[[chartData]]"
+        generating-crosshair-data="[[generatingCrosshairData]]"
+        crosshair-data="[[crosshairData]]">
+    </px-vis-cursor-line>
+
+### Styling
+The following custom properties are available for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+  `--px-vis-cursor-line-color` | The color for the lines which track the cursor/data | `$gray5`
+
+
+@element px-vis-cursor
+@blurb Element which draws crosshairs around mouse pointer / data points and highlight adjacent datapoints.
+@homepage index.html
+@demo demo/index.html
+
+
+-->
+
+<link rel="import" href="css/px-vis-styles.html">
+
+<dom-module id="px-vis-cursor-line">
+    <template>
+      <style include="px-vis-styles"></style>
+
+      <px-vis-line-svg
+        id="myHighlighter"
+        svg="[[svg]]"
+        parallel-coordinates="[[parallelCoordinates]]"
+        radial-line="[[radialLine]]"
+        multi-path
+        disable-pointer-events
+        series-id="[[seriesId]]"
+        category-key="[[categoryKey]]"
+        categories="[[categories]]"
+        chart-data="[[_returnData(tooltipData.*)]]"
+        complete-series-config="[[completeSeriesConfig]]"
+        stroke-width="2"
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        interpolation-function="[[interpolationFunction]]">
+      </px-vis-line-svg>
+
+    </template>
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'px-vis-cursor-line',
+
+    behaviors: [
+      PxVisBehaviorD3.svg,
+      PxVisBehaviorD3.axes,
+      PxVisBehavior.dataset,
+      PxVisBehavior.commonMethods,
+      PxVisBehavior.tooltipData,
+      PxVisBehavior.completeSeriesConfig,
+      PxVisBehavior.seriesId,
+      PxVisBehavior.categories,
+      PxVisBehaviorD3.clipPath,
+      PxColorsBehavior.baseColors,
+      PxVisBehavior.mutedSeries,
+      PxVisBehavior.dimensions,
+      PxVisBehaviorD3.domainUpdate,
+      PxVisBehavior.dynamicConfigProperties,
+      PxVisBehaviorD3.interpolationFunction
+    ],
+
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+
+      /**
+      * A dev set boolean specifying if the chart is for a parallel coordinates chart
+      *
+      */
+      parallelCoordinates: {
+        type: Boolean,
+        value: false
+      },
+      /**
+      * A dev set boolean specifying if the line is using radial(polar) data
+      *
+      */
+      radialLine: {
+        type: Boolean,
+        value: false
+      },
+
+      svgDataLayer: {
+        type: Object,
+        observer: '_applyTransition'
+      },
+
+      svgOverlayLayer: {
+        type: Object,
+        observer: '_applyTransition'
+      },
+
+      canvasDataLayer: {
+        type: Object,
+        observer: '_applyTransitionCanvas'
+      },
+      canvasOverlayLayer: {
+        type: Object,
+        observer: '_applyTransitionCanvas'
+      },
+
+      dataMaskOpacity: {
+        type: Number,
+        value: 0.3
+      },
+
+      overlayMaskOpacity: {
+        type: Number,
+        value: 0.5
+      }
+
+    }, //properties
+
+    observers: [
+      '_updateLayers(tooltipData.*)'
+    ],
+
+    _applyTransition: function(layer) {
+      layer.node().style.transition = 'opacity 0.2s';
+    },
+
+    _applyTransitionCanvas: function(layer) {
+      layer.canvas.style.transition = 'opacity 0.2s';
+    },
+
+    /**
+     * mutes and unmutes the other chart layers
+     *
+     */
+    _updateLayers: function() {
+
+      if(this.svgDataLayer) {
+        this.svgDataLayer.node().style.opacity = this.tooltipData ? this.dataMaskOpacity : 1;
+      }
+
+      if(this.svgOverlayLayer) {
+        this.svgDataLayer.node().style.opacity = this.tooltipData ? this.overlayMaskOpacity : 1;
+      }
+
+      if(this.canvasDataLayer) {
+        console.log("in")
+        this.canvasDataLayer.canvas.style.opacity = this.tooltipData ? this.dataMaskOpacity : 1;
+        console.log(this.canvasDataLayer)
+      }
+
+      if(this.canvasOverlayLayer) {
+        this.canvasOverlayLayer.canvas.style.opacity = this.tooltipData ? this.overlayMaskOpacity : 1;
+      }
+    },
+
+    /**
+     * Passes the data to the line generator if exists
+     *
+     */
+    _returnData: function() {
+      return this.tooltipData ? [this.tooltipData] : [];
+    }
+  });
+</script>

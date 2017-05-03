@@ -465,8 +465,7 @@ Element providing an on-chart zoom.
       '_positionSubRow(withinChart, chartMargin, horizontalAlignment)',
       '_positionMainRow(chartMargin, horizontalAlignment)'
     ],
-    listeners: {
-    },
+
     _configChanged: function() {
       var internalConf = [],
           keys = Object.keys(this.config);
@@ -507,10 +506,20 @@ Element providing an on-chart zoom.
 
          //ensure we remember selection, deselect others and select this one
         for(var i=0; i<this._internalConfig.length; i++) {
+
+          // if we are changing groups
           if(index !== i && this._internalConfig[i].buttonGroup === conf.buttonGroup) {
+            // if we have a onDeselect func, run it
+            if(this._internalConfig[i]["onDeselect"]) {
+              var fn = this._returnFn(this._internalConfig[i]["onDeselect"]);
+              this._setupContext(this._internalConfig[i], fn);
+            }
+            // change styles on the old button
             this.set('_internalConfig.#' + i + '.selected', false);
           }
         }
+
+        // change styles on the new button
         this.set('_internalConfig.#' + index + '.selected', true);
       }
 
@@ -583,29 +592,35 @@ Element providing an on-chart zoom.
       }
 
       if(conf.onClick) {
-        var fn;
-        if(typeof conf.onClick === 'function') {
-          fn = conf.onClick;
-        } else if (typeof conf.onClick === 'string') {
-          fn = eval('var f = function() { return ' + conf.onClick + ';}; f();');
-        }
-
-        if(conf.onClickContext) {
-          if(conf.onClickContext === "toolbar") {
-            fn = fn.bind(this);
-          } else {
-            fn = fn.bind(conf.onClickContext);
-          }
-
-          fn(conf);
-        } else {
-          //run it from the chart's context
-          this.fire('px-vis-action-request', {'function': fn, 'data': conf});
-        }
+        var fn = this._returnFn(conf.onClick);
+        this._setupContext(conf, fn);
       }
 
       this._setMouseCursor(conf);
 
+    },
+
+    _returnFn: function(fn) {
+      if(typeof fn === 'function') {
+        return conf.onClick;
+      } else if (typeof fn === 'string') {
+        return eval('var f = function() { return ' + fn + ';}; f();');
+      }
+    },
+
+    _setupContext: function(conf, fn) {
+      if(conf.onClickContext) {
+        if(conf.onClickContext === "toolbar") {
+          fn = fn.bind(this);
+        } else {
+          fn = fn.bind(conf.onClickContext);
+        }
+
+        fn(conf);
+      } else {
+        //run it from the chart's context
+        this.fire('px-vis-action-request', {'function': fn, 'data': conf});
+      }
     },
 
     _setMouseCursor: function(conf, resetIcon) {

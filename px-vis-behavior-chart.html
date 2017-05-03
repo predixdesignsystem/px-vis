@@ -2068,6 +2068,10 @@ PxVisBehaviorChart.axisRegister = [{
   },
   observers: ['_computedAxisRegisterConf(axes, completeSeriesConfig)'],
 
+  /**
+  *
+  * configures the register config and empty data series
+  */
   _computedAxisRegisterConf: function(axes, completeSeriesConfig) {
 // TODO maybe need an axes check?
     //first set new config
@@ -2078,10 +2082,10 @@ PxVisBehaviorChart.axisRegister = [{
     tooltipData.series = [];
 
     for(var i=0; i<axes.length; i++) {
-      configTitle = completeSeriesConfig[axes[i]] ? completeSeriesConfig[axes[i]].title : null;
+      configTitle = completeSeriesConfig[axes[i]] ? completeSeriesConfig[axes[i]].title : axes[i];
 
       axisConfig[axes[i]] = {
-        'name': configTitle ? configTitle : axes[i],
+        'name': configTitle,
         'y': axes[i],
         'yAxisUnit': completeSeriesConfig[axes[i]] && completeSeriesConfig[axes[i]]['yAxisUnit'] ? completeSeriesConfig[axes[i]]['yAxisUnit'] : ''
       };
@@ -2099,6 +2103,10 @@ PxVisBehaviorChart.axisRegister = [{
     return '';
   },
 
+  /**
+  *
+  * Resuses existing register dataset for series names and adds or removes values
+  */
   _buildAxisTooltipData: function(values, time) {
     //update axis register with the value
     if(this._axisRegisterTooltipData && this._axisRegisterTooltipData.series && !this.hideAxisRegister) {
