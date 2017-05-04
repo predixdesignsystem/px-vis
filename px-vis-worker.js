@@ -700,14 +700,13 @@ function determineExtents(eventData, time) {
   extentCalc.xAxisType = visData.xAxisType;
   extentCalc.yAxisType = visData.yAxisType;
   extentCalc.completeSeriesConfig = visData.completeSeriesConfig;
-  extentCalc.chartData = dataMapping[eventData.chartId];
   extentCalc.chartExtents = visData.chartExtents;
   extentCalc.dataExtents = visData.dataExtents;
   extentCalc.axes = visData.axes;
   extentCalc.seriesToAxes = visData.seriesToAxes;
   extentCalc.isYAxisObject = visData.isYAxisObject;
 
-  extents = extentCalc.determineExtents();
+  extents = extentCalc.determineExtents(dataMapping[eventData.chartId]);
 
   reply(extents, time);
 
@@ -728,6 +727,7 @@ onmessage = function(e) {
       break;
 
     case 'createQuadtree':
+   // reply(null, time);
       createQuadtree(e.data, time);
       break;
 
@@ -748,7 +748,7 @@ onmessage = function(e) {
       break;
 
     case 'unregisterChart':
-      deleteData(e.data.chartId, time);
+      deleteData(e.data, time);
       break;
 
     default:
