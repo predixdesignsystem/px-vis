@@ -221,17 +221,14 @@ Element which draws lines series onto the chart
       if(this.domainChanged !== null &&
             this._doesObjHaveValues(this.completeSeriesConfig) &&
             this._isAttached) {
-          var data;
-          // we need to wrap the data differently depending on if we are drawing many lines or just one line
+
+          //create our line generator
           if(this.parallelCoordinates) {
             this._defineMultiLine(true);
-            data = this.chartData;
           } else if(this.radialLine) {
             this._defineRadialLine(true, this.multiPath, this.counterClockwise, this.useDegrees);
-            data = this.multiPath ? this.chartData : [this.chartData];
           } else {
             this._defineSingleLine(true);
-            data = this.noCanvasProgressiveRendering ? [this.chartData] : this.chartData;
           }
 
           //make sure we have the right muted opacity
@@ -266,12 +263,12 @@ Element which draws lines series onto the chart
           //Render data progressively
           this.canvasContext.lineWidth = this.strokeWidth;  //TODO make per series?
           if(this.noCanvasProgressiveRendering) {
-            this._renderAtOnce(data);
+            this._renderAtOnce([this.chartData]);
           } else {
             //get number of frames
             var numberOfSeries = this.multiPath ? this.completeSeriesConfig[this.seriesId]['x'].length : Object.keys(this.completeSeriesConfig).length;
             var frames = Math.ceil(Math.max(((this.chartData.length*numberOfSeries)/this.progressiveRenderingPointsPerFrame), this.progressiveRenderingMinimumFrames));
-            this._renderProgressively(data, frames);
+            this._renderProgressively(this.chartData, frames);
           }
 
           this.canvasContext._pxLinesRedraw += 1;
@@ -443,7 +440,7 @@ Element which draws lines series onto the chart
       //we also need to make sure that the batches are "connected"
       //between each other, hence prepending the last point of the previous
       //batch to each batch > 0
-      if(this.parallelCoordinates || this.radialLine) {
+      if(this.multiPath) {
         for(j=0; j< numberOfFrames; j++) {
 
           if(j > 0) {

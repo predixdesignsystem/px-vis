@@ -21,7 +21,7 @@ extentCalc._defaultScaleValue = {
  * Calculates the extents based on chartExtents, dataExtents, and the data.
  *
  */
-extentCalc.determineExtents = function determineExtents() {
+extentCalc.determineExtents = function determineExtents(data) {
   //check our axis types so we know if we are doing ordinal
   var xOrd = (this.xAxisType === 'ordinal' || this.xAxisType === 'scaleBand'),
       yOrd = (this.yAxisType === 'ordinal' || this.yAxisType === 'scaleBand'),
@@ -39,7 +39,7 @@ extentCalc.determineExtents = function determineExtents() {
 
   // look at our chartExtents and dataExtents for values
   extents.x = this._checkForExtents(xOrd, this.chartExtents, this.dataExtents, "x");
-  extents.y =  this.isYAxisObject ? this._calcMultiAxisExtents() : this._checkForExtents(yOrd, this.chartExtents, this.dataExtents, "y");
+  extents.y =  this.isYAxisObject ? this._calcMultiAxisExtents(data) : this._checkForExtents(yOrd, this.chartExtents, this.dataExtents, "y");
 
   //if our chart data has not changed, then dont go through all the data. Just use the extents we have
   if(extents.x.length > 0 && extents.x[0] !== Infinity && extents.x[1] !== -Infinity) {
@@ -52,7 +52,7 @@ extentCalc.determineExtents = function determineExtents() {
   }
 
   //if we have no chartData, dont look for new extents
-  if(this.chartData.length === 0) {
+  if(data.length === 0) {
     xTime = false;
     doX = false;
     doY = false;
@@ -60,7 +60,7 @@ extentCalc.determineExtents = function determineExtents() {
 
   //if we need, Chug through the data to max and min
   if(doX || doY || xTime) {
-    this._findMinMax(this.chartData, doX, doY, xOrd, yOrd, xTime, extents, keys);
+    this._findMinMax(data, doX, doY, xOrd, yOrd, xTime, extents, keys);
   }
 
   // check that we found something for x
@@ -278,7 +278,7 @@ extentCalc._processDataValues = function _processDataValues(isOrd, r, d, axis, k
  * calculates chart extents for multi axis
  *
  */
-extentCalc._calcMultiAxisExtents = function _calcMultiAxisExtents() {
+extentCalc._calcMultiAxisExtents = function _calcMultiAxisExtents(data) {
   // TODO integrate this into the other calcs
   var search = false,
       exts = {},
@@ -337,17 +337,17 @@ extentCalc._calcMultiAxisExtents = function _calcMultiAxisExtents() {
   // if we indicated we need to search for extent values
   if(search) {
     var seriesList = Object.keys(seriesToSearch);
-    for(var i = 0; i < this.chartData.length; i++) {
+    for(var i = 0; i < data.length; i++) {
       for(var j = 0; j < seriesList.length; j++) {
         var s = seriesList[j],
             sY = this.completeSeriesConfig[s]['y'],
             series = seriesToSearch[s],
             axis = series['axis'];
-        if(series.min && (this.chartData[i][sY] || this.chartData[i][sY] === 0)) {
-          exts[axis][0] = Math.min(this.chartData[i][sY], exts[axis][0]);
+        if(series.min && (data[i][sY] || data[i][sY] === 0)) {
+          exts[axis][0] = Math.min(data[i][sY], exts[axis][0]);
         }
-        if(series.max && (this.chartData[i][sY] || this.chartData[i][sY] === 0)) {
-          exts[axis][1] = Math.max(this.chartData[i][sY], exts[axis][1]);
+        if(series.max && (data[i][sY] || data[i][sY] === 0)) {
+          exts[axis][1] = Math.max(data[i][sY], exts[axis][1]);
         }
       }
     }
