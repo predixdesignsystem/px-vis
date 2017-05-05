@@ -263,11 +263,11 @@ Element which draws lines series onto the chart
           //Render data progressively
           this.canvasContext.lineWidth = this.strokeWidth;  //TODO make per series?
           if(this.noCanvasProgressiveRendering) {
-            this._renderAtOnce([this.chartData]);
+            this._renderAtOnce(this.multiPath ? this.chartData : [this.chartData]);
           } else {
             //get number of frames
             var numberOfSeries = this.multiPath ? this.completeSeriesConfig[this.seriesId]['x'].length : Object.keys(this.completeSeriesConfig).length;
-            var frames = Math.ceil(Math.max(((this.chartData.length*numberOfSeries)/this.progressiveRenderingPointsPerFrame), this.progressiveRenderingMinimumFrames));
+            var frames = Math.min(this.chartData.length, Math.ceil(Math.max(((this.chartData.length*numberOfSeries)/this.progressiveRenderingPointsPerFrame), this.progressiveRenderingMinimumFrames)));
             this._renderProgressively(this.chartData, frames);
           }
 
@@ -348,6 +348,7 @@ Element which draws lines series onto the chart
     */
     _renderAtOnce: function(data) {
 
+      this.canvasContext._pxLinesCleared = false;
       if(this.gradientLine) {
         //if gradient, regardless of category or not
         // Iterate over our data:
@@ -395,8 +396,6 @@ Element which draws lines series onto the chart
         // Apply our styles and draw all the lines to the canvas
         this.canvasContext.strokeStyle = this.rgbToRgba(this.completeSeriesConfig[this.seriesId]['color'], opacity);
         this.canvasContext.stroke();
-
-        this.canvasContext._pxLinesCleared = false;
 
         //clean up drawing
         this._renderingEnded(false);
@@ -455,6 +454,7 @@ Element which draws lines series onto the chart
 
       } else {
         for(j=0; j< numberOfFrames; j++) {
+
           //find end of this batch
           if(j > 0) {
             //add previous last point so that the batches are connected

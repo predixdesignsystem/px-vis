@@ -138,21 +138,15 @@ function createDataStub() {
  * Example:
  * ```
  *  {
- *    "data": index of the data in chartData
- *    "key": "y0",
- *    "time": 123456789 || null,
- *    "x": 1,
- *    "y": 10,
- *    "axis": y0AxisId || "default",
+ *    "i": index of the data in chartData
+ *    "k": "y0",
  *    "px": pixel val,
  *    "py": pixel val,
- *    "pixels": {"x": pixelVal, "y0": pixelVal, "y1": pixelVal}
  *  }
  *```
  * @method flattenData
  */
-function flattenData(visData, d, xScale, yScale, index) {
-  var arr = [];
+function flattenData(visData, d, xScale, yScale, index, arr) {
 
   for(var i = 0; i < visData.keys.length; i++) {
     var o = {},
@@ -166,11 +160,11 @@ function flattenData(visData, d, xScale, yScale, index) {
     if(visData.radial) {
 
       var pix = calcPixelCoordForRadial(d[visData.completeSeriesConfig[k]['x']], d[visData.completeSeriesConfig[k]['y']], axis, visData);
-      o['px'] = pix[0];
-      o['py'] = pix[1];
+      o['px'] = ~~pix[0];
+      o['py'] = ~~pix[1];
     } else {
-      o['px'] = xScale(d[visData.completeSeriesConfig[k]['x']], axis);
-      o['py'] = yScale(d[visData.completeSeriesConfig[k]['y']], axis);
+      o['px'] = ~~xScale(d[visData.completeSeriesConfig[k]['x']], axis);
+      o['py'] = ~~yScale(d[visData.completeSeriesConfig[k]['y']], axis);
     }
 
     arr.push(o);
@@ -275,13 +269,13 @@ function createSingleQuadtree(data) {
       // To add all datapoints to our quadtree, we need to break each dataset up.
       // Iterate though all data, flatten our datasets, and add them to the quadtree
       var before = this.performance.now(),
-          during, after;
+          during, allFlat = [];
       for(var i = 0; i < chartData.length; i++) {
 
-        flatData = flattenData(visData, chartData[i], xScale, yScale, i);
-
-        quadtree.addAll(flatData);
+       flattenData(visData, chartData[i], xScale, yScale, i, allFlat);
       }
+
+      quadtree.addAll(allFlat);
       console.log('build quadtree: ' + (this.performance.now() - before));
 
       return quadtree;
