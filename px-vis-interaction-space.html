@@ -302,7 +302,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       '_setupActions(actionConfig.*)',
       '_resetTooltipDataLegacy(completeSeriesConfig.*)',
       '_resetTooltipData(seriesKeys.*)',
-      '_createQuadtreeData(chartData.*, width, height, margin.*, domainChanged, searchType, useQuadtree, counterClockwise)'
+      '_createQuadtreeData(chartData.*, width, height, margin.*, domainChanged, searchType, useQuadtree, counterClockwise, xAxisType)'
      ],
 
     /**
@@ -481,6 +481,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
     _setupActions: function() {
       if(this._rect) {
+        console.log(this.actionConfig)
         this._setupRegularActions(this._rect, this._rect.node(), false);
       }
     },
@@ -547,19 +548,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         var mousePos = Px.d3.mouse(this._rect.node());
 
         this.debounce('move',function() {
-          this._calcDataDebounced(mousePos);
+          this._getDataForAllSeries(mousePos);
         }, 10);
       }
-    },
-
-    /**
-     * Helper function called from within the debouce in _calcTooltipData
-     * Calculates the mouse position and associated x & y values. Then sets the d3 elements and sets tooltipData for consumption elsewhere
-     *
-     */
-    _calcDataDebounced: function(mousePos) {
-      //calc all the series: returns updated dataObj
-      var dataObj = this._getDataForAllSeries(mousePos);
     },
 
     _calcDataFinished: function(dataObj) {
@@ -603,35 +594,21 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       // if we want to do a quadtree / voronoi search
       if(this.xAxisType !== 'time' && this.xAxisType !== 'timeLocal' && this.xAxisType !== 'ordinal') {
-         var data = this._createBaseDataObjForWebWorker();
-         data.mousePos = mousePos;
-         data.calcCrosshair = this._calcCrosshair;
-         data.radius = this.searchRadius;
-         data.searchType = this.searchType;
-
-         Px.vis.scheduler.process('findQuadtreePoints', data, this.chartId, function(e) {
-          dataObj.series = e.data.series;
-          dataObj.rawData = e.data.rawData;
-          dataObj.timeStamps = e.data.timeStamps;
-          dataObj.time =  e.data.time ? e.data.time : dataObj.time;
-          dataObj.timeSeriesKey =  e.data.timeSeriesKey ? e.data.timeSeriesKey : dataObj.timeSeriesKey;
-          this._calcDataFinished(dataObj);
-         }.bind(this));
-         return;
-
-      } else {
-
-        for(var i = 0; i < keys.length; i++) {
-          //if we had a request to reset tooltip stop calculating
-          if(!this._calculatingData) {
-            break;
-          }
-
-          //calc this series: returns updated dataObj, xArr, yArr & closestTimestamp
-          this._calcSerieData(dataObj, searchTimeStamp, closestTimestamp, x1, keys[i], mousePos);
-        } //for
+        this._searchOnWebWorker(mousePos, dataObj);
+        return;
 
       }
+      // else
+
+      for(var i = 0; i < keys.length; i++) {
+        //if we had a request to reset tooltip stop calculating
+        if(!this._calculatingData) {
+          break;
+        }
+
+        //calc this series: returns updated dataObj, xArr, yArr & closestTimestamp
+        this._calcSerieData(dataObj, searchTimeStamp, closestTimestamp, x1, keys[i], mousePos);
+      } //for
 
       // add the timestamp
       if(searchTimeStamp) {
@@ -639,6 +616,24 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       }
 
       this._calcDataFinished(dataObj);
+    },
+
+    _searchOnWebWorker: function(mousePos, dataObj) {
+      var data = this._createBaseDataObjForWebWorker();
+          data.mousePos = mousePos;
+          data.calcCrosshair = this._calcCrosshair;
+          data.radius = this.searchRadius;
+          data.searchType = this.searchType;
+
+      Px.vis.scheduler.process('findQuadtreePoints', data, this.chartId, function(e) {
+        dataObj.series = e.data.series;
+        dataObj.rawData = e.data.rawData;
+        dataObj.timeStamps = e.data.timeStamps;
+        dataObj.time =  e.data.time ? e.data.time : dataObj.time;
+        dataObj.timeSeriesKey =  e.data.timeSeriesKey ? e.data.timeSeriesKey : dataObj.timeSeriesKey;
+
+        this._calcDataFinished(dataObj);
+      }.bind(this));
     },
 
     /**
@@ -659,7 +654,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       var yKey = this.completeSeriesConfig[k]['y'],
           xKey = this.completeSeriesConfig[k]['x'],
           axisKey = (this.completeSeriesConfig[k]['axis'] && this.completeSeriesConfig[k]['axis']['id']) ? this.completeSeriesConfig[k]['axis']['id'] : null,
-          result,
+          result = { "series": {} },
           xCoord,
           yCoord,
           y1,
@@ -905,14 +900,14 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           distance = Number.MAX_VALUE,
           minDistance = Number.MAX_VALUE,
           result = -1;
-      for(var index=0; index<domain.length; index++) {
+      for(var i=0; i<domain.length; i++) {
 
-        axisPos = (index+0.5)*rangeInterval;
+        axisPos = (i+0.5)*rangeInterval;
         distance = Math.abs(axisPos - mousePos);
 
         if(distance < minDistance) {
           minDistance = distance;
-          result = index;
+          result = i;
         }
       }
 
@@ -1233,7 +1228,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     _createQuadtreeData: function() {
-      if(this.domainChanged !== null && this.useQuadtree) {
+      if(this.domainChanged !== null && this.useQuadtree && this.xAxisType !== 'ordinal') {
         this.debounce('buildQuadtree', function() {
 
           var w = this.width - this.margin.right - this.margin.left,

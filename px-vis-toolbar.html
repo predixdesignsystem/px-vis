@@ -466,6 +466,18 @@ Element providing an on-chart zoom.
       '_positionMainRow(chartMargin, horizontalAlignment)'
     ],
 
+    _extendConfig: function(defaultConfig, customConfig) {
+      var keys = Object.keys(customConfig),
+          obj = defaultConfig || {};
+
+      for(var i=0; i<keys.length; i++) {
+        obj[keys[i]] = typeof customConfig[keys[i]] === 'object' ?
+          this._extendConfig(obj[keys[i]], customConfig[keys[i]]) : customConfig[keys[i]]
+      }
+
+      return obj;
+    },
+
     _configChanged: function() {
       var internalConf = [],
           keys = Object.keys(this.config);
@@ -475,7 +487,9 @@ Element providing an on-chart zoom.
         var toPush;
         //if this is a default action use it
         if(this._defaultActionsMapping[keys[i]]) {
-          toPush = this._defaultActionsMapping[keys[i]];
+          toPush = typeof this.config[keys[i]] === 'object' ?
+            this._extendConfig(this._defaultActionsMapping[keys[i]], this.config[keys[i]]) :
+            this._defaultActionsMapping[keys[i]];
         } else {
           toPush = this.config[keys[i]];
         }
