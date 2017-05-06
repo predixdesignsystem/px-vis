@@ -260,17 +260,17 @@ Element which draws lines series onto the chart
             this.drawClipPath();
           }
 
-          //Render data progressively
-          this.canvasContext.lineWidth = this.strokeWidth;  //TODO make per series?
-          if(this.noCanvasProgressiveRendering) {
-            this._renderAtOnce(this.multiPath ? this.chartData : [this.chartData]);
-          } else {
-            //get number of frames
-            var numberOfSeries = this.multiPath ? this.completeSeriesConfig[this.seriesId]['x'].length : Object.keys(this.completeSeriesConfig).length;
-            var frames = Math.min(this.chartData.length, Math.ceil(Math.max(((this.chartData.length*numberOfSeries)/this.progressiveRenderingPointsPerFrame), this.progressiveRenderingMinimumFrames)));
-            this._renderProgressively(this.chartData, frames);
+          if(this.chartData.length) {
+            this.canvasContext.lineWidth = this.strokeWidth;  //TODO make per series?
+            if(this.noCanvasProgressiveRendering) {
+              this._renderAtOnce(this.multiPath ? this.chartData : [this.chartData]);
+            } else {
+              //get number of frames
+              var numberOfSeries = this.multiPath ? this.completeSeriesConfig[this.seriesId]['x'].length : Object.keys(this.completeSeriesConfig).length;
+              var frames = Math.min(this.chartData.length, Math.ceil(Math.max(((this.chartData.length*numberOfSeries)/this.progressiveRenderingPointsPerFrame), this.progressiveRenderingMinimumFrames)));
+              this._renderProgressively(this.chartData, frames);
+            }
           }
-
           this.canvasContext._pxLinesRedraw += 1;
         }
     },
