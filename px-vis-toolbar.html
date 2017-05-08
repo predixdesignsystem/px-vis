@@ -29,10 +29,10 @@ Element providing an on-chart zoom.
       <!--main row-->
       <span id="mainRow" class$="flex [[_getRowDirection(horizontalAlignment)]]">
         <template id="mainRepeat" is="dom-repeat" items="{{_internalConfig}}" strip-whitespace>
-          <span class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]]" on-tap="_clickItem" value="{{index}}">
+          <span class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]]" style$="{{item.customButtonStyle}}" on-tap="_clickItem" value="{{index}}">
             <i class$="fa [[_getIcon(item)]]" value="{{index}}">
             </i>{{item.title}}
-            <template is="dom-if" if="[[_hasTooltip(item)]]">
+            <template is="dom-if" if="[[_hasTooltip(item)]]" restamp>
               <px-tooltip
                 tooltip-message="[[item.tooltipLabel]]"
                 orientation="top"
@@ -69,6 +69,7 @@ Element providing an on-chart zoom.
     is: 'px-vis-toolbar',
 
     behaviors: [
+      PxVisBehavior.commonMethods,
       PxVisBehavior.actionConfig
     ],
 
@@ -131,7 +132,6 @@ Element providing an on-chart zoom.
               'tooltipLabel': 'Crosshair',
               'icon': 'fa-crosshairs',
               'buttonGroup': 1,
-              'selected': true,
               'onClick': 'function() {this.set("showTooltip", true);}',
               'onClickContext': "toolbar",
               'actionConfig': {
@@ -145,7 +145,6 @@ Element providing an on-chart zoom.
               'tooltipLabel': 'Crosshair',
               'icon': 'fa-crosshairs',
               'buttonGroup': 1,
-              'selected': true,
               'onClick': 'function() {this.set("showTooltip", true);}',
               'onClickContext': "toolbar",
               'actionConfig': {
@@ -466,6 +465,21 @@ Element providing an on-chart zoom.
       '_positionMainRow(chartMargin, horizontalAlignment)'
     ],
 
+    clearAllActions: function() {
+      var keys = Object.keys(this.actionConfig),
+          o = {};
+
+      for(var i = 0; i < keys.length; i++) {
+        o[keys[i]] = null;
+      }
+
+      for(var i=0; i<this._internalConfig.length; i++) {
+        this.set('_internalConfig.#' + i + '.selected', false);
+      }
+
+      this.set('actionConfig', o);
+    },
+
     _extendConfig: function(defaultConfig, customConfig) {
       var keys = Object.keys(customConfig),
           obj = defaultConfig || {};
@@ -513,7 +527,7 @@ Element providing an on-chart zoom.
     _clickItem: function(evt) {
       evt = Polymer.dom(evt);
       var index = evt.localTarget.value,
-          conf = this._internalConfig[index];
+          conf = this.clone(this._internalConfig[index]);
 
       //make it the current selection if it is in a buttonGroup
       if(conf.buttonGroup) {
@@ -563,6 +577,7 @@ Element providing an on-chart zoom.
         this.set('currentSubConfig', []);
       }
     },
+
     /**
      * Called when clicking an item of the secondary toolbar.
      */
