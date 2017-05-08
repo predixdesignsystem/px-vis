@@ -178,15 +178,27 @@ function flattenData(visData, d, xScale, yScale, index, arr) {
  *
  * @method buildQuadtreeHelperObj
  */
-function buildQuadtreeHelperObj(visData, k, index) {
-  var obj = {};
+function buildQuadtreeHelperObj(visData, k, index, xScale) {
+  var obj = {},
+      axis = visData.completeSeriesConfig[k]['axis'] ? visData.completeSeriesConfig[k]['axis']['id'] : null;
 
   obj.xKey = visData.completeSeriesConfig[k]['x'];
   obj.yKey = visData.completeSeriesConfig[k]['y'];
-  axis = visData.completeSeriesConfig[k]['axis'] ? visData.completeSeriesConfig[k]['axis']['id'] : null;
-  //TODO: check if same scale
-  obj.yScale = recreateD3Scale(visData.y[axis]);
-  obj.yScale.index = index;
+
+  if(visData.radial) {
+
+    var calcPx = function (d) {
+      return calcPixelCoordForRadial(d[obj.xKey], d[obj.yKey] , axis, visData);
+    };
+
+    obj.xScale = function(d) {return calcPx(d)[0];};
+    obj.yScale = function(d) {return calcPx(d)[1];};
+    obj.yScale.index = index;
+  } else {
+    obj.yScale = recreateD3Scale(visData.y[axis]);
+    obj.yScale.index = index;
+    obj.xScale = recreateD3Scale(visData.x);
+  }
 
   return obj;
 }
@@ -294,9 +306,15 @@ function createSeriesQuadtree(data) {
       chartData = dataMapping[data.chartId],
       k,
       quadtree = {},
-      // we can't pass d3 scales around so we need to recretate them
-      xScale = recreateD3Scale(visData.x),
-      yScale;
+      // we can't pass d3 scales around so we need to recretate them+
+      //for radial we need both X and Y values to calculate either X or
+      //Y in pix because we need to convert everyhting in a cartesian plan
+      xScale = function(d) {
+        return visData.radial ? this.xScale(d) : this.xScale(d[this.xKey]);
+      },
+      yScale = function(d) {
+        return visData.radial ? this.yScale(d) : this.yScale(d[this.yKey]);
+      };
 
   if(chartData) {
   // FIXME Make work for POLAR
@@ -310,8 +328,8 @@ function createSeriesQuadtree(data) {
       // if we are just doing closestPoint, then do not reset the quadtree
       quadtree[k] = d3.quadtree()
         .extent(visData.extents)
-        .x(function(d) { return xScale(d[this.xKey]); }.bind(obj))
-        .y(function(d) { return this.yScale(d[this.yKey]); }.bind(obj))
+        .x(xScale.bind(obj))
+        .y(yScale.bind(obj))
         .addAll(chartData);
     }
 
@@ -601,7 +619,7 @@ function searchQuadtreeSeries(visData, dataObj, quadtreeData) {
       xScale = !visData.radial ? recreateD3Scale(visData.x) : null,
       result,
       k;
-// FIXME make work with multi series polar
+
   for(var i = 0; i < visData.keys.length; i++) {
     k = visData.keys[i];
 
