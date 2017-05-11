@@ -485,7 +485,7 @@ Element providing an on-chart zoom.
           obj = defaultConfig || {};
 
       for(var i=0; i<keys.length; i++) {
-        obj[keys[i]] = typeof customConfig[keys[i]] === 'object' ?
+        obj[keys[i]] = typeof customConfig[keys[i]] === 'object' && customConfig[keys[i]] !== null ?
           this._extendConfig(obj[keys[i]], customConfig[keys[i]]) : customConfig[keys[i]]
       }
 
@@ -528,7 +528,7 @@ Element providing an on-chart zoom.
       evt = Polymer.dom(evt);
       var index = evt.localTarget.value,
           conf = this._internalConfig[index];
-
+console.log(conf.actionConfig)
       //make it the current selection if it is in a buttonGroup
       if(conf.buttonGroup) {
 
@@ -588,7 +588,7 @@ Element providing an on-chart zoom.
 
       //make it the current selection if it is selectable
       if(conf.buttonGroup) {
-
+console.log("sub")
         //ensure we remember selection, deselect others and select this one
 
         for(var i =0; i<this.currentSubConfig.length; i++) {
@@ -606,11 +606,12 @@ Element providing an on-chart zoom.
      * Processes an item click: fire event if needed and set action config appropriately
      */
     _processItem: function(conf) {
+      console.log(conf.actionConfig)
       if(conf.actionConfig) {
         if(typeof conf.actionConfig === 'string') {
           this.set('actionConfig', JSON.parse(conf.actionConfig));
         } else {
-          this.set('actionConfig', conf.actionConfig);
+          this.set('actionConfig', this.clone(conf.actionConfig));
         }
       }
 
@@ -680,7 +681,7 @@ Element providing an on-chart zoom.
       return selected ? 'selected ' : '';
     },
     _hasTooltip: function(item) {
-      return item.tooltipLabel && item.tooltipLabel.length;
+      return item.tooltipLabel && !!item.tooltipLabel.length;
     },
     _alignRow: function(row) {
       if(this.horizontalAlignment === 'left') {
