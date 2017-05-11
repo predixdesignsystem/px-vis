@@ -32,7 +32,7 @@ Element providing an on-chart zoom.
           <span class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]]" style$="{{item.customButtonStyle}}" on-tap="_clickItem" value="{{index}}">
             <i class$="fa [[_getIcon(item)]]" value="{{index}}">
             </i>{{item.title}}
-            <template is="dom-if" if="[[_hasTooltip(item)]]" restamp>
+            <template is="dom-if" if="[[_hasTooltip(item)]]">
               <px-tooltip
                 tooltip-message="[[item.tooltipLabel]]"
                 orientation="top"
@@ -527,7 +527,7 @@ Element providing an on-chart zoom.
     _clickItem: function(evt) {
       evt = Polymer.dom(evt);
       var index = evt.localTarget.value,
-          conf = this.clone(this._internalConfig[index]);
+          conf = this._internalConfig[index];
 
       //make it the current selection if it is in a buttonGroup
       if(conf.buttonGroup) {
