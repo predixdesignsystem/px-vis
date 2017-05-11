@@ -1,5 +1,4 @@
 importScripts("px-vis-worker-scale.js");
-importScripts("../pxd3/d3.min.js");
 
 /*
   VISDATA Example:
@@ -43,8 +42,8 @@ var dataMapping = {},
 
 function reply(data, time) {
 
-  var time2 = this.performance.now();
-  //var time2 = null;
+  //var time2 = this.performance.now();
+  var time2 = null;
   if(data) {
     postMessage({'data': data, 'timeIn': time, 'timeOut': time2});
   } else {
@@ -280,15 +279,15 @@ function createSingleQuadtree(data) {
 
       // To add all datapoints to our quadtree, we need to break each dataset up.
       // Iterate though all data, flatten our datasets, and add them to the quadtree
-      var before = this.performance.now(),
-          during, allFlat = [];
+      // var before = this.performance.now(),
+        var  during, allFlat = [];
       for(var i = 0; i < chartData.length; i++) {
 
        flattenData(visData, chartData[i], xScale, yScale, i, allFlat);
       }
 
       quadtree.addAll(allFlat);
-      console.log('build quadtree: ' + (this.performance.now() - before));
+   //   console.log('build quadtree: ' + (this.performance.now() - before));
 
       return quadtree;
     } else {
@@ -726,11 +725,17 @@ function determineExtents(eventData, time) {
 
 onmessage = function(e) {
 
-  var time = this.performance.now();
- //var time = null;
+  //var time = this.performance.now();
+ var time = null;
   switch(e.data.action) {
 
     case 'init':
+      if(e.data.d3Url) {
+        importScripts(e.data.d3Url);
+      } else {
+        importScripts("../pxd3/d3.min.js");
+      }
+
       reply(null, time);
       break;
 

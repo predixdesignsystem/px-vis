@@ -10,9 +10,11 @@
   Px.vis = Px.vis || {};
   if(!Px.vis.scheduler) {
 
+    window.dispatchEvent(new Event('px-vis-worker-init'));
+
     //get number of cores
     var scheduler = {},
-        threadCount = navigator.hardwareConcurrency || 4,
+        threadCount = Px.vis.maxWorkerCount || navigator.hardwareConcurrency || 4,
         initCounter = 0,
         processDone,
         startWork;
@@ -241,7 +243,7 @@
       };
       worker.inUse = true;
       worker.index = i;
-      worker.postMessage({'action': 'init'});
+      worker.postMessage({'action': 'init', 'd3Url': Px.vis.workerD3Url});
       scheduler.queue.push([]);
     }
 
