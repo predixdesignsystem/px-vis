@@ -81,6 +81,8 @@
       worker.chartId = chartId;
       worker.startTime = window.performance.now();
 
+      this.dispatchEvent('px-vis-scheduler-work-start', { 'action': actionName, 'data': data, 'chartId': chartId});
+
       worker.postMessage({ 'action': actionName, 'data': data, 'chartId': chartId});
     }
 
@@ -120,6 +122,8 @@
     //called once a worker has finished a piece of work
     processDone = function(e) {
 
+      this.dispatchEvent('px-vis-scheduler-work-end', { 'action': this.action, 'data': e.data, 'chartId': this.chartId});
+
       var now = window.performance.now();
 
       //  console.log('passing IN ww took: ' + (e.data.timeIn - this.startTime));
@@ -153,6 +157,8 @@
     };
 
     webWorkerError = function(e) {
+
+      this.dispatchEvent('px-vis-scheduler-work-error', { 'action': this.action, 'chartId': this.chartId});
 
       //cleanup if chart has been unregistered
       if(this.action === 'unregisterChart') {

@@ -2164,7 +2164,9 @@ PxVisBehavior.applyActionConfig = {
       mappedAction = this[this.actionMapping[action]];
       noChartContext = false;
 
-      //is this a function defined here
+
+
+      //is this a function defined heere
       if(mappedAction && typeof mappedAction === 'function') {
         //we don't need to remove previous handlers as if they have the same
         //mouseEVent name then they will be overriden
@@ -2172,8 +2174,10 @@ PxVisBehavior.applyActionConfig = {
         noChartContext = true;
       } else if(typeof action === 'function') {
         toBeUsed = action;
-      } else if(typeof action === 'string') {
+      } else if(typeof action === 'string' && action && action != 'null') {
         toBeUsed = eval('var f = function() { return ' + action + ';}; f();');
+      } else {
+        toBeUsed = null;
       }
 
       if(toBeUsed) {
@@ -2182,9 +2186,9 @@ PxVisBehavior.applyActionConfig = {
           wrapper = toBeUsed.bind(this);
         } else {
           //now ensure the action will be run within the context of the chart
-         var _this = this;
+        var _this = this;
 
-         wrapper = function(evt) {
+        wrapper = function(evt) {
             _this.fire('px-vis-action-request', {'function': this, 'data': Px.d3.mouse(elem)});
           }.bind(toBeUsed);
         }
@@ -2194,6 +2198,7 @@ PxVisBehavior.applyActionConfig = {
         //remove listener
         d3Elem.on(mouseEvent, null);
       }
+
     }
   }
 };
