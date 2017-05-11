@@ -22,7 +22,7 @@ d3 element which draws a line and icon on the chart representing an event.
         event-config="[[eventConfig]]">
     </px-vis-event>
 
-The configuration object allows developers to set the icon used for each event type. 
+The configuration object allows developers to set the icon used for each event type.
 
 It should follow the following form:
 
@@ -75,18 +75,19 @@ Custom property | Description | Default
 <dom-module id="px-vis-event">
     <template>
       <style include="px-vis-styles"></style>
-
-      <px-tooltip
-        id="eventTooltip"
-        smart-orientation
-        delay="10"
-        orientation="[[tooltipOrientation]]">
-        <span>
-          <b>Event</b>: [[eventData.label]] <br/>
-          <b>ID</b>: [[eventData.id]] <br/>
-          <b>[[_getValueTitle(xAxisType)]]</b>[[_getValue(xAxisType, eventData)]]<br/>
-        </span>
-      </px-tooltip>
+      <template is="dom-if" if="[[_thisConfig.enableTooltip]]">
+        <px-tooltip
+          id="eventTooltip"
+          smart-orientation
+          delay="10"
+          orientation="[[tooltipOrientation]]">
+          <span>
+            <b>Event</b>: [[eventData.label]] <br/>
+            <b>ID</b>: [[eventData.id]] <br/>
+            <b>[[_getValueTitle(xAxisType)]]</b>[[_getValue(xAxisType, eventData)]]<br/>
+          </span>
+        </px-tooltip>
+      </template>
     </template>
 </dom-module>
 
@@ -247,7 +248,8 @@ Custom property | Description | Default
           'offset': this._defaultDefaultEventConfig.offset,
           'size': this._defaultDefaultEventConfig.size,
           'lineColor': lineColor,
-          "lineWeight": this._defaultDefaultEventConfig.lineWeight
+          'lineWeight': this._defaultDefaultEventConfig.lineWeight,
+          'enableTooltip': true
         };
       }
 
@@ -261,40 +263,39 @@ Custom property | Description | Default
      * @method drawElement
      */
     drawElement: function() {
-      this.debounce('drawEvent', function() {
-        if(this.svg && this._doesObjHaveValues(this.eventData) && this._animationFrameDone) {
+      if(this.svg && this._doesObjHaveValues(this.eventData) && this._animationFrameDone) {
 
-          if(this.eventGroup && this._doesD3HaveValues(this.eventGroup)) {
-            this._eventDrawn = false;
-            this.eventGroup.remove();
-            this.eventGroup = null;
-          }
+        if(this.eventGroup && this._doesD3HaveValues(this.eventGroup)) {
+          this._eventDrawn = false;
+          this.eventGroup.remove();
+          this.eventGroup = null;
+        }
 
-          this._processConfiguration();
-
-
-          this.eventGroup = this.svg.append('g')
-            .attr('class','event')
-            .attr('event-id',this.eventId)
-            .attr('id','event_' + this.eventId);
-
-          // draw the path
-          this.eventLine = this.eventGroup.append("line")
-            .attr('stroke', this._checkColorType(this._thisConfig.lineColor))
-            .attr('stroke-width', this._thisConfig.lineWeight);
-
-          this._addIcon();
-
-          this._eventDrawn = true;
-
-          this.positionElement();
-
-          this._addClipPath();
+        this._processConfiguration();
 
 
+        this.eventGroup = this.svg.append('g')
+          .attr('class','event')
+          .attr('event-id',this.eventId)
+          .attr('id','event_' + this.eventId);
+
+        // draw the path
+        this.eventLine = this.eventGroup.append("line")
+          .attr('stroke', this._checkColorType(this._thisConfig.lineColor))
+          .attr('stroke-width', this._thisConfig.lineWeight);
+
+        this._addIcon();
+
+        this._eventDrawn = true;
+
+        this.positionElement();
+
+        this._addClipPath();
+
+        if(this._thisConfig.enableTooltip) {
           this._addTooltip();
         }
-      }, 5);
+      }
     },
 
 
@@ -398,7 +399,10 @@ Custom property | Description | Default
      * @method _addTooltip
      */
     _addTooltip:function() {
-      this.$.eventTooltip.set('for',this.eventIcon.node());
+      this.$.tooltip = this.$.tooltip || this.$$('px-tooltip');
+      if(this.$.tooltip) {
+        this.$.tooltip.set('for',this.eventIcon.node());
+      }
     },
     /**
      * Formats the datetime to match the dev set format

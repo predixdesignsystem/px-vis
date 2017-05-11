@@ -1,3 +1,7 @@
+v1.1.10
+==================
+* added 'enableTooltip' (on by default) to eventConfig
+
 v1.1.9
 ==================
 * Ensure zoom in and zoom out features take the selection type into account
