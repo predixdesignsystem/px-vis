@@ -5,6 +5,7 @@
 <link rel="import" href="../px-colors-design/colors.html" />
 <link rel="import" href="fa_codes.html" />
 <link rel="import" href="../px-tooltip/px-tooltip.html"/>
+<link rel="import" href="../app-localize-behavior/app-localize-behavior.html"/>
 
 <!--
 d3 element which draws a line and icon on the chart representing an event.
@@ -260,10 +261,6 @@ Custom property | Description | Default
 
     ready: function() {
       window.requestAnimationFrame(this._calcThemeOrConfig.bind(this));
-      // if there is no dev set unique ID, generate one
-      if(!this.eventId) {
-        this.set('eventId', this.generateRandomID('event_'));
-      }
     },
 
     _calcThemeOrConfig: function() {
@@ -293,41 +290,39 @@ Custom property | Description | Default
      * @method drawElement
      */
     drawElement: function() {
-      this.debounce('drawEvent', function() {
 
-        if(this.svg && this._doesObjHaveValues(this.eventData) && this._animationFrameDone) {
+      if(this.svg && this._doesObjHaveValues(this.eventData) && this._animationFrameDone) {
 
-          if(this.eventGroup && this._doesD3HaveValues(this.eventGroup)) {
-            this._eventDrawn = false;
-            this.eventGroup.remove();
-            this.eventGroup = null;
-          }
-
-          this._processConfiguration();
-
-
-          this.eventGroup = this.svg.append('g')
-            .attr('class','event')
-            .attr('event-id',this.eventId)
-            .attr('id','event_' + this.eventId);
-
-          // draw the path
-          this.eventLine = this.eventGroup.append("line")
-            .attr('stroke', this._checkColorType(this._thisConfig.lineColor))
-            .attr('stroke-width', this._thisConfig.lineWeight);
-
-          this._addIcon();
-
-          this._eventDrawn = true;
-
-          this.positionElement();
-
-          this._addClipPath();
-
-
-          this._addTooltip();
+        if(this.eventGroup && this._doesD3HaveValues(this.eventGroup)) {
+          this._eventDrawn = false;
+          this.eventGroup.remove();
+          this.eventGroup = null;
         }
-      }, 5);
+
+        this._processConfiguration();
+
+
+        this.eventGroup = this.svg.append('g')
+          .attr('class','event')
+          .attr('event-id',this.eventId)
+          .attr('id','event_' + this.eventId);
+
+        // draw the path
+        this.eventLine = this.eventGroup.append("line")
+          .attr('stroke', this._checkColorType(this._thisConfig.lineColor))
+          .attr('stroke-width', this._thisConfig.lineWeight);
+
+        this._addIcon();
+
+        this._eventDrawn = true;
+
+        this.positionElement();
+
+        this._addClipPath();
+
+
+        this._addTooltip();
+      }
     },
 
 

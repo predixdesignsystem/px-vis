@@ -481,7 +481,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
     _setupActions: function() {
       if(this._rect) {
-        console.log(this.actionConfig)
+        //console.log(this.actionConfig)
         this._setupRegularActions(this._rect, this._rect.node(), false);
       }
     },
@@ -1234,7 +1234,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           var w = this.width - this.margin.right - this.margin.left,
               h = this.height - this.margin.top - this.margin.bottom,
               ext = [[0,0], [w, h]],
-              data = this._createBaseDataObjForWebWorker();
+              data = this._createBaseDataObjForWebWorker(),
+              time = window.performance.now();
 
           data.width = w;
           data.height = h;
@@ -1243,6 +1244,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
           Px.vis.scheduler.process('createQuadtree', data, this.chartId, function(data) {
             // TODO Provide some feedback before and after built??
+           // console.log('built quad: ' + (window.performance.now() - time));
           }.bind(this));
         }.bind(this), 50);
       }
