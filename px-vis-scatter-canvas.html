@@ -519,10 +519,16 @@ Element which draws a scatter series onto the chart
       if(this.chartData.length > 0 && this.completeSeriesConfig[this.seriesId]["x"].length > 0) {
         this.canvasContext.beginPath();
 
-        var w = Math.max(this.width - this.margin.left - this.margin.right,0),
+        if(!this.radial) {
+          var w = Math.max(this.width - this.margin.left - this.margin.right,0),
             h = Math.max(this.height - this.margin.top - this.margin.bottom,0);
 
-        this.canvasContext.rect(0, 0, w, h);
+          this.canvasContext.rect(0, 0, w, h);
+        } else {
+          //width = height = diameter
+          this.canvasContext.arc(0, 0, this.height/2, 0, Math.PI * 2, false);
+        }
+
         this.canvasContext.clip();
       }
     },

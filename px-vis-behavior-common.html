@@ -2261,10 +2261,10 @@ PxVisBehavior.highlightShared = {
     },
 
     /**
-     * They layer where the series are drawn if you want them to mute on crosshair data
+     * The layers where the series are drawn if you want them to mute on crosshair data
      */
-    layerToMask: {
-      type: Object
+    layersToMask: {
+      type: Array
     }
   },
 
@@ -2339,24 +2339,40 @@ PxVisBehavior.highlightShared = {
     PxVisBehavior.highlightCanvasShared
 
     Description:
-    Behavior providing shared methods and props for highligh compoennts
+    Behavior providing shared methods and props for highligh components
     @polymerBehavior PxVisBehavior.highlightCanvasShared
 */
 PxVisBehavior.highlightCanvasShared = [{
 
   observers: [
     '_muteDataSeries(_highlightData)',
-    '_addTransition(layerToMask)'
+    '_addTransition(layersToMask)'
   ],
 
   _muteDataSeries: function() {
-    if(this.layerToMask) {
-      this.toggleClass('secondaryDataMask', this._highlightData.length, this.layerToMask.canvas);
+    if(this.layersToMask) {
+
+      if(!Array.isArray(this.layersToMask)) {
+        this.toggleClass('secondaryDataMask', this._highlightData.length,
+          this.layersToMask.canvas);
+      } else {
+        for(var i=0; i<this.layersToMask.length; i++) {
+          this.toggleClass('secondaryDataMask', this._highlightData.length,
+          this.layersToMask[i].canvas);
+        }
+      }
     }
   },
 
   _addTransition: function() {
-    this.layerToMask.canvas.style.transition = 'opacity 0.2s';
+
+    if(!Array.isArray(this.layersToMask)) {
+      for(var i=0; i<this.layersToMask.length; i++) {
+        this.layersToMask[i].canvas.style.transition = 'opacity 0.2s';
+      }
+    } else {
+      this.layersToMask.canvas.style.transition = 'opacity 0.2s';
+    }
   }
 
 }, PxVisBehavior.highlightShared];
@@ -2372,17 +2388,33 @@ PxVisBehavior.highlightCanvasShared = [{
 PxVisBehavior.highlightSvgShared = [{
 
   observers: [
-    '_addTransition(layerToMask)'
+    '_addTransition(layersToMask)'
   ],
 
   _muteDataSeries: function(data) {
-    if(this.layerToMask) {
-      this.toggleClass('secondaryDataMask', data.length, this.layerToMask.node());
+    if(this.layersToMask) {
+
+      if(!Array.isArray(this.layersToMask)) {
+        this.toggleClass('secondaryDataMask', data.length,
+          this.layersToMask.node());
+      } else {
+        for(var i=0; i<this.layersToMask.length; i++) {
+          this.toggleClass('secondaryDataMask', data.length,
+          this.layersToMask[i].node());
+        }
+      }
     }
   },
 
   _addTransition: function() {
-    this.layerToMask.node().style.transition = 'opacity 0.2s';
+
+    if(!Array.isArray(this.layersToMask)) {
+      this.layersToMask.node().style.transition = 'opacity 0.2s';
+    } else {
+      for(var i=0; i<this.layersToMask.length; i++) {
+        this.layersToMask[i].node().style.transition = 'opacity 0.2s';
+      }
+    }
   }
 
 }, PxVisBehavior.highlightShared];
