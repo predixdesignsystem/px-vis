@@ -556,6 +556,15 @@ PxVisBehavior.tooltipData = {
     tooltipData:{
       type:Object,
       notify:true
+    },
+
+    /**
+     * The "empty" dataset that should be used for tooltipData when not hovering
+     */
+    defaultEmptyData: {
+      type: Object,
+      value: null,
+      notify:true
     }
   }
 };
@@ -2225,6 +2234,67 @@ PxVisBehavior.actionConfigGeneric = {
   }
 };
 
+
+/*
+    PxVisBehavior.interactionSpaceShared
+
+    Description:
+    Behavior providing shared methods and props for interaction space
+    @polymerBehavior PxVisBehavior.interactionSpaceShared
+*/
+PxVisBehavior.interactionSpaceShared = {
+  /**
+   * Helper function called on mouseout
+   * resets tooltipData
+   *
+   * @method _resetTooltipData
+   */
+  _resetTooltipData: function() {
+    var ttD;
+    this.set('_calculatingData', false);
+
+    if(this.defaultEmptyData) {
+      ttD = this.defaultEmptyData;
+
+    } else {
+      ttD = {
+            'time': null,
+            'timeSeriesKey': null,
+            'hidden': true,
+            'series': [],
+            'mouse': null,
+            'xArr': null,
+            'yArr': null
+          },
+          keys = (this.seriesKeys) ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
+          len = keys.length,
+          i;
+
+      for(i = 0; i < len; i++){
+        ttD.series.push({'name': keys[i],'value': null });
+      }
+    }
+
+    this.set('tooltipData',ttD);
+    this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': ttD, 'method':'set' });
+  },
+
+  _createTooltipDataStub: function(mousePos, timestamp, showTooltip) {
+    return {
+      'time': timestamp,
+      'timeSeriesKey': null,
+      'hidden': showTooltip,
+      'series': [],
+      'mouse': mousePos,
+      'xArr': [],
+      'yArr': [],
+      'rawData': [],
+      'timeStamps': [],
+      'timeStampsTracker': {}
+    }
+  }
+};
+
 /*
     PxVisBehavior.highlightShared
 
@@ -2232,7 +2302,7 @@ PxVisBehavior.actionConfigGeneric = {
     Behavior providing shared methods and props for highligh compoennts
     @polymerBehavior PxVisBehavior.highlightShared
 */
-PxVisBehavior.highlightShared = {
+PxVisBehavior.highlightShared = [{
   properties: {
     /**
      * Boolean indicating if the dataset on this chart is different than the one on the crosshairData's origin chart.
@@ -2319,21 +2389,47 @@ PxVisBehavior.highlightShared = {
       return arr;
     },
 
-    _setTooltipData: function(dataset) {
+    _generateMultiLine: function(dataset) {
+      var arr = [];
+debugger
+      for(var i = 0; i < this.dimensions.length; i++) {
+        var val = {},
+            x = this.dimensions[i],
+            y = this.completeSeriesConfig[this.seriesId]["y"],
+            coords = [],
+            axis = this.y[this.dimensions[i]];
+
+        val[x] = dataset[x];
+        val[y] = dataset[y];
+
+        coords.push(this.x(val[x]));
+        coords.push(axis(val[y]));
+
+        arr.push({
+          "name": this.dimensions[i],
+          "value": val,
+          "coord": coords
+        })
+      }
+
+      return arr;
+    },
+
+    _setTooltipData: function(dataset, multiline) {
       if(dataset.length) {
         var timestamp = this.timeData ? dataset[0][this.timeData] : null;
-            series = this._generateSeries(dataset[0]);
+            series =  multiline ? this._generateMultiLine(dataset[0]) : this._generateSeries(dataset[0]);
             ttd = this._createTooltipDataStub(series[0]["coord"], timestamp, !this.hideTooltip);
 
         ttd["series"] = series;
 
-        this.set("tooltipData", ttd);
+        this.set("defaultEmptyData", ttd);
 
       } else {
-        this._resetTooltipData();
+        this.set("defaultEmptyData", null);
       }
     }
-};
+}, PxVisBehavior.interactionSpaceShared];
 
 /*
     PxVisBehavior.highlightCanvasShared
@@ -2418,59 +2514,5 @@ PxVisBehavior.highlightSvgShared = [{
   }
 
 }, PxVisBehavior.highlightShared];
-
-/*
-    PxVisBehavior.interactionSpaceShared
-
-    Description:
-    Behavior providing shared methods and props for interaction space
-    @polymerBehavior PxVisBehavior.interactionSpaceShared
-*/
-PxVisBehavior.interactionSpaceShared = {
-  /**
-   * Helper function called on mouseout
-   * resets tooltipData
-   *
-   * @method _resetTooltipData
-   */
-  _resetTooltipData: function() {
-
-    this.set('_calculatingData', false);
-    var ttD = {
-          'time': null,
-          'timeSeriesKey': null,
-          'hidden': true,
-          'series': [],
-          'mouse': null,
-          'xArr': null,
-          'yArr': null
-        },
-        keys = (this.seriesKeys) ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
-        len = keys.length,
-        i;
-
-    for(i = 0; i < len; i++){
-      ttD.series.push({'name': keys[i],'value': null });
-    }
-    this.set('tooltipData',ttD);
-    this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': ttD, 'method':'set' });
-  },
-
-  _createTooltipDataStub: function(mousePos, timestamp, showTooltip) {
-    return {
-      'time': timestamp,
-      'timeSeriesKey': null,
-      'hidden': showTooltip,
-      'series': [],
-      'mouse': mousePos,
-      'xArr': [],
-      'yArr': [],
-      'rawData': [],
-      'timeStamps': [],
-      'timeStampsTracker': {}
-    }
-  }
-};
-
 
 </script>

@@ -155,7 +155,13 @@ Custom property | Description | Default
       var dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawData;
 
       if(this.showTooltipData) {
-        this._setTooltipData(dataset);
+        this._setTooltipData(dataset, this.parallelCoordinates);
+        console.log(this.defaultEmptyData);
+        if(dataset.length) {
+          this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-tooltip-data', { detail: this.defaultEmptyData }));
+        } else {
+          this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-reset-tooltip', { detail: this.defaultEmptyData }));
+        }
       }
 
       return dataset;

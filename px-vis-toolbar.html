@@ -212,7 +212,7 @@ Element providing an on-chart zoom.
               'buttonGroup': 1,
               'actionConfig': {
                 'mousedown': 'startPanning',
-                'mouseup': 'stopPanning',
+                'mouseup': 'stopPanning'
               },
               'subConfig': {
                 'resetZoom': {
@@ -528,7 +528,7 @@ Element providing an on-chart zoom.
       evt = Polymer.dom(evt);
       var index = evt.localTarget.value,
           conf = this._internalConfig[index];
-console.log(conf.actionConfig)
+
       //make it the current selection if it is in a buttonGroup
       if(conf.buttonGroup) {
 
@@ -588,7 +588,6 @@ console.log(conf.actionConfig)
 
       //make it the current selection if it is selectable
       if(conf.buttonGroup) {
-console.log("sub")
         //ensure we remember selection, deselect others and select this one
 
         for(var i =0; i<this.currentSubConfig.length; i++) {
@@ -606,7 +605,6 @@ console.log("sub")
      * Processes an item click: fire event if needed and set action config appropriately
      */
     _processItem: function(conf) {
-      console.log(conf.actionConfig)
       if(conf.actionConfig) {
         if(typeof conf.actionConfig === 'string') {
           this.set('actionConfig', JSON.parse(conf.actionConfig));
