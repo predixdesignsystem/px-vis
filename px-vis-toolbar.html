@@ -146,8 +146,9 @@ Element providing an on-chart zoom.
               'tooltipLabel': 'Crosshair',
               'icon': 'fa-crosshairs',
               'buttonGroup': 1,
-              'onClick': 'function() {this.set("showTooltip", true);}',
+              'onClick': 'function() {this.set("showTooltip", true); this.domHost.set("interactionSpaceConfig.cursorType", "circle"); }',
               'onClickContext': "toolbar",
+              'onDeselect': 'function() { this.domHost.set("interactionSpaceConfig.cursorType", "none");}',
               'actionConfig': {
                 'mouseout': 'resetTooltipAndCrosshairData',
                 'mousemove': 'calcTooltipAndCrosshairData',
@@ -194,6 +195,7 @@ Element providing an on-chart zoom.
             'tooltip': {
               'tooltipLabel': 'Tooltip',
               'icon': 'fa-list-alt',
+              'cursorIcon': 'fa-list-alt',
               'buttonGroup': 1,
               'selected': true,
               'onClick': 'function() {this.set("showTooltip", true);}',
@@ -208,6 +210,7 @@ Element providing an on-chart zoom.
             'pan': {
               'tooltipLabel': 'Pan',
               'icon': 'fa-arrows',
+              'cursorIcon': 'fa-arrows',
               'onClick': 'function() {this.set("showTooltip", false);}',
               'onClickContext': "toolbar",
               'buttonGroup': 1,
@@ -226,6 +229,7 @@ Element providing an on-chart zoom.
             'zoom': {
               'tooltipLabel': 'Zoom',
               'icon': 'fa-search',
+              'cursorIcon': 'fa-search',
               'onClick': 'function() {this.set("showTooltip", false);}',
               'onClickContext': "toolbar",
               'buttonGroup': 1,
@@ -259,6 +263,7 @@ Element providing an on-chart zoom.
             'advancedZoom': {
               'tooltipLabel': 'Zoom',
               'icon': 'fa-search',
+              'cursorIcon': 'fa-search',
               'buttonGroup': 1,
               'selectable': true,
               'onClick': 'function() {this.set("showTooltip", false);}',
@@ -653,7 +658,7 @@ Element providing an on-chart zoom.
     },
 
     _setMouseCursor: function(conf, resetIcon) {
-      var icon,
+      var icon = null,
           fn;
 
           // In general if a acton doesnt have a cursor icon, we want to use the last
@@ -667,7 +672,7 @@ Element providing an on-chart zoom.
           }
 
 
-          fn = function() { this.set('interactionSpaceConfig.iconType', icon); };
+          fn = function() { console.log("icon"); this.set('interactionSpaceConfig.iconType', icon); };
 
       this.fire('px-vis-action-request', {'function': fn, 'data': null });
 
