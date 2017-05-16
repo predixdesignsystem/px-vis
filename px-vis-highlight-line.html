@@ -103,73 +103,9 @@ Custom property | Description | Default
       PxVisBehaviorD3.domainUpdate,
       PxVisBehavior.dynamicConfigProperties,
       PxVisBehavior.highlightSvgShared,
+      PxVisBehavior.highlightLineShared,  //core functionality
       PxVisBehavior.tooltipData,
       PxVisBehaviorD3.interpolationFunction
-    ],
-
-    /**
-     * Properties block, expose attribute values to the DOM via 'reflect'
-     *
-     * @property properties
-     * @type Object
-     */
-    properties: {
-
-      _highlightData: {
-        type: Object,
-        notify: true,
-        computed: '_computeChartData(crosshairData.timeStamps.*)'
-      },
-
-      /**
-      * A dev set boolean specifying if the chart is for a parallel coordinates chart
-      *
-      */
-      parallelCoordinates: {
-        type: Boolean,
-        value: false
-      },
-      /**
-      * A dev set boolean specifying if the line is using radial(polar) data
-      *
-      */
-      radialLine: {
-        type: Boolean,
-        value: false
-      }
-    }, //properties
-
-    observers: [
-      '_muteDataSeries(_highlightData)'
-    ],
-
-    /**
-     * Draws the crosshair elements and sets up listeners and callbacks on chart hover
-     * Sets the crosshairData property which gets passed to the register.
-     *
-     */
-    _computeChartData: function() {
-      //if we are generating data locally and not being told to draw anyways, dont draw
-      // but if we have cleared our dataset, then we do want to clear our datapoints
-      if(this.generatingCrosshairData && !this.drawWithLocalCrosshairData && this.crosshairData.rawData.length > 0) {
-        return [];
-      }
-
-      var dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawData;
-
-      if(this.showTooltipData) {
-        if(dataset.length) {
-          this.set('defaultEmptyData', this._createMultilineTooltipData(dataset[0], false));
-          this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-tooltip-data', { detail: this.defaultEmptyData }));
-        } else {
-          console.log("clear")
-          this.set('defaultEmptyData', this._resetMultilineTooltipData());
-          this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-reset-tooltip', { detail: this.defaultEmptyData}));
-        }
-      }
-
-      return dataset;
-
-    }
+    ]
   });
 </script>

@@ -2362,121 +2362,47 @@ PxVisBehavior.highlightShared = [{
   },
 
 
-    _generateSeries: function(dataset) {
-      var keys = this.seriesKeys ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
-          arr = [];
+  _generateSeries: function(dataset) {
+    var keys = this.seriesKeys ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
+        arr = [];
 
-      for(var i = 0; i < keys.length; i++) {
-        var val = {},
-            x = this.completeSeriesConfig[keys[i]]["x"],
-            y = this.completeSeriesConfig[keys[i]]["y"],
-            coords = [],
-            axis = typeof this.y === 'function' ? this.y : this.y[this.completeSeriesConfig[keys[i]]["axis"]['id']];
+    for(var i = 0; i < keys.length; i++) {
+      var val = {},
+          x = this.completeSeriesConfig[keys[i]]["x"],
+          y = this.completeSeriesConfig[keys[i]]["y"],
+          coords = [],
+          axis = typeof this.y === 'function' ? this.y : this.y[this.completeSeriesConfig[keys[i]]["axis"]['id']];
 
-        val[x] = dataset[x];
-        val[y] = dataset[y];
+      val[x] = dataset[x];
+      val[y] = dataset[y];
 
-        coords.push(this.x(val[x]));
-        coords.push(axis(val[y]));
+      coords.push(this.x(val[x]));
+      coords.push(axis(val[y]));
 
-        arr.push({
-          "name": keys[i],
-          "value": val,
-          "coord": coords
-        })
-      }
-
-      return arr;
-    },
-
-    _resetMultilineTooltipData: function() {
-
-      return {
-          "mouse": null,
-          "dataPos": [-1000, -1000],
-          "time": null,
-          "dataset": null,
-          'series': [],
-          "color": null,
-          "tooltipConfig": null
-        };
-    },
-
-    _createMultilineTooltipData: function(dataset, svg) {
-      var last = this.dimensions[this.dimensions.length-1],
-          data,     //our tooltipData obj
-          screenX,  //the mouse x on the scree
-          screenY,  //the mouse y on the scree
-          svgBounding,  //bounding rect of our svg
-          tooltipConfig = {},  //a fake configuration object we will build
-          value = {},          //the series obj within tooltipData
-          series = [];
-
-        // FIXME run on resize and wrap in animationFrame. Maybe at chart level?
-        svgBounding = this.svg ? this.svg.node().ownerSVGElement.getBoundingClientRect() : this.canvasContext.canvas.getBoundingClientRect();
-
-        //calc the screen positions for the tooltip
-        if(this.radialLine) {
-          screenX = this.y(dataset.yVal) * Math.sin(this.x(last)) + this.width/2 + svgBounding.left + window.pageXOffset;
-          screenY = this.y(dataset.yVal) * Math.cos(Math.PI - this.x(last)) + this.smallerSide/2 + svgBounding.top + window.pageYOffset;
-
-        } else {
-          screenX = this.x(last) + svgBounding.left + window.pageXOffset + 15;
-          screenY = this.y[last](dataset.yVal) + this.domHost.margin.top + svgBounding.top + window.pageYOffset;
-        }
-
-        for(var i = 0; i < this.dimensions.length; i++) {
-          var aid = this.dimensions[i];
-          //create our fake configuration object
-          tooltipConfig[aid] = {};
-
-          //if using categories, use it, otherwise default
-          tooltipConfig[aid]["color"] = this.categoryKey ? this.completeSeriesConfig[this.categoryKey]["color"] : this.completeSeriesConfig[this.seriesId]["color"];
-
-          //if title is specified, use it, otherwiuse id
-          tooltipConfig[aid]["name"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]['title'] ? this.completeSeriesConfig[aid]["title"] : aid;
-
-          //if there is a unit, add it
-          tooltipConfig[aid]["yAxisUnit"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]["yAxisUnit"] ? this.completeSeriesConfig[aid]["yAxisUnit"] : '';
-
-          //add the y series id
-          tooltipConfig[aid]['y'] = aid;
-
-          //create our value obj
-          value[aid] = dataset[aid];
-          series.push({ 'name': tooltipConfig[aid]["name"], 'value': value });
-
-        }
-        //create our tooltipData obj
-        data = {
-          "mouse": null,
-          "dataPos": [screenX, screenY],
-          "time": dataset[this.timeData],
-          "dataset": dataset,
-          'series': series,
-          "color": tooltipConfig[aid]["color"],
-          "tooltipConfig": tooltipConfig
-        };
-
-
-      return data;
-
-    },
-
-    _setTooltipData: function(dataset) {
-      if(dataset.length) {
-        var timestamp = this.timeData ? dataset[0][this.timeData] : null;
-            series = this._generateSeries(dataset[0]);
-            ttd = this._createTooltipDataStub(series[0]["coord"], timestamp, !this.hideTooltip);
-
-        ttd["series"] = series;
-
-        this.set("defaultEmptyData", ttd);
-
-      } else {
-        this.set("defaultEmptyData", null);
-      }
+      arr.push({
+        "name": keys[i],
+        "value": val,
+        "coord": coords
+      })
     }
+
+    return arr;
+  },
+
+  _setTooltipData: function(dataset) {
+    if(dataset.length) {
+      var timestamp = this.timeData ? dataset[0][this.timeData] : null;
+          series = this._generateSeries(dataset[0]);
+          ttd = this._createTooltipDataStub(series[0]["coord"], timestamp, !this.hideTooltip);
+
+      ttd["series"] = series;
+
+      this.set("defaultEmptyData", ttd);
+
+    } else {
+      this.set("defaultEmptyData", null);
+    }
+  }
 }, PxVisBehavior.interactionSpaceShared];
 
 /*
@@ -2561,6 +2487,150 @@ PxVisBehavior.highlightSvgShared = [{
     }
   }
 
+}, PxVisBehavior.highlightShared];
+
+/*
+    PxVisBehavior.highlightLineShared
+
+    Description:
+    Behavior providing shared methods and props for highlight line compoennts
+    @polymerBehavior PxVisBehavior.highlightLineShared
+*/
+PxVisBehavior.highlightLineShared = [{
+  properties: {
+    _highlightData: {
+      type: Object,
+      notify: true,
+      computed: '_computeChartData(crosshairData.timeStamps.*)'
+    },
+
+    /**
+    * A dev set boolean specifying if the chart is for a parallel coordinates chart
+    *
+    */
+    parallelCoordinates: {
+      type: Boolean,
+      value: false
+    },
+    /**
+    * A dev set boolean specifying if the line is using radial(polar) data
+    *
+    */
+    radialLine: {
+      type: Boolean,
+      value: false
+    }
+  },
+
+  /**
+   * Draws the crosshair elements and sets up listeners and callbacks on chart hover
+   * Sets the crosshairData property which gets passed to the register.
+   *
+   */
+  _computeChartData: function() {
+    //if we are generating data locally and not being told to draw anyways, dont draw
+    // but if we have cleared our dataset, then we do want to clear our datapoints
+    if(this.generatingCrosshairData && !this.drawWithLocalCrosshairData && this.crosshairData.rawData.length > 0) {
+      return [];
+    }
+
+    var dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawData;
+
+    if(this.showTooltipData) {
+      this._setTooltipDataMultiLine(dataset);
+    }
+
+    return dataset;
+  },
+
+
+  _setTooltipDataMultiLine: function(dataset) {
+    var d;
+    if(dataset.length) {
+      d = this._createMultilineTooltipData(dataset[0], false);
+      this.set('defaultEmptyData', d);
+      this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-tooltip-data', { detail: this.defaultEmptyData }));
+
+    } else {
+      d = this._resetMultilineTooltipData();
+      this.set('defaultEmptyData', d);
+      this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-reset-tooltip', { detail: this.defaultEmptyData}));
+    }
+  },
+
+  _resetMultilineTooltipData: function() {
+
+    return {
+        "mouse": null,
+        "dataPos": [-1000, -1000],
+        "time": null,
+        "dataset": null,
+        'series': [],
+        "color": null,
+        "tooltipConfig": null
+      };
+  },
+
+  _createMultilineTooltipData: function(dataset, svg) {
+    var last = this.dimensions[this.dimensions.length-1],
+        data,     //our tooltipData obj
+        screenX,  //the mouse x on the scree
+        screenY,  //the mouse y on the scree
+        svgBounding,  //bounding rect of our svg
+        tooltipConfig = {},  //a fake configuration object we will build
+        value = {},          //the series obj within tooltipData
+        series = [];
+
+      // FIXME run on resize and wrap in animationFrame. Maybe at chart level?
+      svgBounding = this.svg ? this.svg.node().ownerSVGElement.getBoundingClientRect() : this.canvasContext.canvas.getBoundingClientRect();
+
+      //calc the screen positions for the tooltip
+      if(this.radialLine) {
+        screenX = this.y(dataset.yVal) * Math.sin(this.x(last)) + this.width/2 + svgBounding.left + window.pageXOffset;
+        screenY = this.y(dataset.yVal) * Math.cos(Math.PI - this.x(last)) + this.smallerSide/2 + svgBounding.top + window.pageYOffset;
+
+      } else {
+        screenX = this.x(last) + svgBounding.left + window.pageXOffset + 15;
+        screenY = this.y[last](dataset.yVal) + this.domHost.margin.top + svgBounding.top + window.pageYOffset;
+      }
+
+      for(var i = 0; i < this.dimensions.length; i++) {
+        var aid = this.dimensions[i];
+        //create our fake configuration object
+        tooltipConfig[aid] = {};
+
+        //if using categories, use it, otherwise default
+        tooltipConfig[aid]["color"] = this.categoryKey ? this.completeSeriesConfig[this.categoryKey]["color"] : this.completeSeriesConfig[this.seriesId]["color"];
+
+        //if title is specified, use it, otherwiuse id
+        tooltipConfig[aid]["name"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]['title'] ? this.completeSeriesConfig[aid]["title"] : aid;
+
+        //if there is a unit, add it
+        tooltipConfig[aid]["yAxisUnit"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]["yAxisUnit"] ? this.completeSeriesConfig[aid]["yAxisUnit"] : '';
+
+        //add the y series id
+        tooltipConfig[aid]['y'] = aid;
+
+        //create our value obj
+        value[aid] = dataset[aid];
+        series.push({ 'name': tooltipConfig[aid]["name"], 'value': value });
+
+      }
+      //create our tooltipData obj
+      data = {
+        "mouse": null,
+        "dataPos": [screenX, screenY],
+        "time": dataset[this.timeData],
+        "dataset": dataset,
+        'series': series,
+        "color": tooltipConfig[aid]["color"],
+        "tooltipConfig": tooltipConfig
+      };
+
+
+    return data;
+
+  }
 }, PxVisBehavior.highlightShared];
 
 </script>
