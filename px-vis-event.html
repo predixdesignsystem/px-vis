@@ -85,7 +85,7 @@ Custom property | Description | Default
           <span>
             <b>Event</b>: [[eventData.label]] <br/>
             <b>ID</b>: [[eventData.id]] <br/>
-            <b>[[_getValueTitle(xAxisType)]]</b>[[_getValue(xAxisType, eventData)]]<br/>
+            <b>[[_getValueTitle(xAxisType)]]</b>[[_value]]<br/>
           </span>
         </px-tooltip>
       </template>
@@ -195,13 +195,32 @@ Custom property | Description | Default
         type: Boolean,
         value: false
       },
+
+      _hasBeenDetached: {
+        type: Boolean,
+        value: false
+      },
+
+      _reCalcValue: {
+        type: Boolean,
+        value: true
+      },
+
+      _value: {
+        type: String
+      }
     },
 
     observers: [
       'drawElement(svg, eventData.*, eventConfig.*, _animationFrameDone, height)',
+      '_eventConfigChanged(eventCOnfig.*)',
       'positionElement(x, domainChanged)',
-      '_addClipPath(clipPath)'
+      '_addClipPath(clipPath)',
+      '_recalcValue(eventData, xAxisType, eventConfig.*)'
      ],
+     listeners: {
+      'px-tooltip-request-show': '_tooltipRequest'
+     },
 
      detached: function() {
        this._eventDrawn = false;
@@ -211,11 +230,36 @@ Custom property | Description | Default
          this.eventGroup = null;
          this.eventLine = null;
          this.eventIcon = null;
+         this._hasBeenDetached = true
        }
      },
 
+    attached: function() {
+      if(this._hasBeenDetached) {
+        this._hasBeenDetached = false;
+        this.drawElement();
+      }
+    },
+
     ready: function() {
       window.requestAnimationFrame(this._calcThemeOrConfig.bind(this));
+    },
+
+    _tooltipRequest: function() {
+      //only format the value when we're actually about to show it
+      if(this._reCalcValue) {
+        this.set('_value', this._getValue());
+        this._reCalcValue = false;
+      }
+    },
+
+    _eventConfigChanged: function() {
+      this._processConfiguration();
+    },
+
+    _recalcValue: function() {
+      //recalc/format the value next time we show the tooltip
+      this._reCalcValue = true;
     },
 
     _getTooltiptarget: function() {
@@ -236,7 +280,12 @@ Custom property | Description | Default
           'size': this._defaultDefaultEventConfig.size,
           'lineColor': lineColor,
           'lineWeight': this._defaultDefaultEventConfig.lineWeight,
-          'enableTooltip': this._defaultDefaultEventConfig.enableTooltip
+          'enableTooltip': this._defaultDefaultEventConfig.enableTooltip,
+          'firstDateTimeFormat': this._defaultDefaultEventConfig.firstDateTimeFormat,
+          'secondDateTimeFormat': this._defaultDefaultEventConfig.secondDateTimeFormat,
+          'separator': this._defaultDefaultEventConfig.separator,
+          'timezone': this._defaultDefaultEventConfig.timezone,
+          'tooltipOrientation': this._defaultDefaultEventConfig.tooltipOrientation
         };
       }
 
@@ -259,7 +308,6 @@ Custom property | Description | Default
         }
 
         this._processConfiguration();
-
 
         this.eventGroup = this.svg.append('g')
           .attr('class','event');
@@ -352,6 +400,7 @@ Custom property | Description | Default
      * @method _processConfiguration
      */
     _processConfiguration:function() {
+
       // is there a configuration object for this event type?
       if(this.eventConfig[this.eventData.label]) {
         /*
@@ -362,6 +411,26 @@ Custom property | Description | Default
             len = k.length;
         for(i = 0; i < len; i++){
           this._thisConfig[k[i]] =  this.eventConfig[this.eventData.label][k[i]] || this.eventConfig[this.eventData.label][k[i]] === 0 || this.eventConfig[this.eventData.label][k[i]] === false ? this.eventConfig[this.eventData.label][k[i]] : this.defaultEventConfig[k[i]];
+        }
+
+        //process special config........................
+        if(this._thisConfig.firstDateTimeFormat) {
+          this.firstDateTimeFormat = this._thisConfig.firstDateTimeFormat;
+        }
+        if(this._thisConfig.secondDateTimeFormat) {
+          this.secondDateTimeFormat = this._thisConfig.secondDateTimeFormat;
+        }
+        if(this._thisConfig.timezone) {
+          this.timezone = this._thisConfig.timezone;
+        }
+        if(this._thisConfig.tooltipOrientation) {
+          this.set('tooltipOrientation', this._thisConfig.tooltipOrientation);
+        }
+        if(this._thisConfig.separator) {
+          this.separator = this._thisConfig.separator;
+        }
+        if(typeof this._thisConfig.enableTooltip !== "undefined") {
+          this.notifyPath('_thisConfig.enableTooltip');
         }
       } else {
         // else, set everything to default
@@ -403,7 +472,7 @@ Custom property | Description | Default
      *
      */
     _getValue: function(xAxisType) {
-      if(xAxisType === 'time' || xAxisType === 'timeLocal') {
+      if(this.xAxisType === 'time' || this.xAxisType === 'timeLocal') {
         return ': ' + this._formatDatetime(this.eventData[this.xKey], this.firstDateTimeFormat) +
           ' ' + this.separator + ' ' + this._formatDatetime(this.eventData[this.xKey], this.secondDateTimeFormat);
       } else {
