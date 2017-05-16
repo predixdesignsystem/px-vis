@@ -2242,7 +2242,7 @@ PxVisBehavior.actionConfigGeneric = {
     Behavior providing shared methods and props for interaction space
     @polymerBehavior PxVisBehavior.interactionSpaceShared
 */
-PxVisBehavior.interactionSpaceShared = {
+PxVisBehavior.interactionSpaceShared = [{
   /**
    * Helper function called on mouseout
    * resets tooltipData
@@ -2292,8 +2292,24 @@ PxVisBehavior.interactionSpaceShared = {
       'timeStamps': [],
       'timeStampsTracker': {}
     }
-  }
-};
+  },
+
+  _getPixelCoordForRadialData: function(dataX, dataY, yRange, yDomain, yDomainTot) {
+      var result = [];
+
+      //process angle and amplitude in pxel
+      var angle = dataX,
+          pixelAmplitude = yRange * (dataY - yDomain[0])/yDomainTot;
+
+      angle = this._adjustAngleForPolarChart(angle, false);
+
+      //sin * pixel range * percentage of data range
+      result[1] = Math.cos(angle) * pixelAmplitude;
+      result[0] = Math.sin(angle) * pixelAmplitude;
+
+      return result;
+    },
+}, PxVisBehavior.polarData];
 
 /*
     PxVisBehavior.highlightShared
@@ -2376,8 +2392,16 @@ PxVisBehavior.highlightShared = [{
       val[x] = dataset[x];
       val[y] = dataset[y];
 
-      coords.push(this.x(val[x]));
-      coords.push(axis(val[y]));
+      if(this.radial) {
+        var domain = axis.domain(),
+            range = axis.range(),
+            dr = range[1] - range[0]
+            dd = domain[1]-domain[0];
+        coords = this._getPixelCoordForRadialData(dataset[x], dataset[y], dr, domain, dd);
+      } else {
+        coords.push(this.x(val[x]));
+        coords.push(axis(val[y]));
+      }
 
       arr.push({
         "name": keys[i],

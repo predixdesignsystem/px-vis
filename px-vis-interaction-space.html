@@ -520,7 +520,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
     _calcTooltipData: function() {
       this._calcTooltip = true;
-      //TODO FIXME: MAKE SURE WE CHANGE THAT TO FALSE BEFORE RELEASE (and add preconfigured toolbar options)
       this._calcCrosshair = false;
 
       this._calcData();
@@ -856,23 +855,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       return result
     },
-
-    _getPixelCoordForRadialData: function(dataX, dataY, yRange, yDomain, yDomainTot) {
-      var result = [];
-
-      //process angle and amplitude in pxel
-      var angle = dataX,
-          pixelAmplitude = yRange * (dataY - yDomain[0])/yDomainTot;
-
-      angle = this._adjustAngleForPolarChart(angle, false);
-
-      //sin * pixel range * percentage of data range
-      result[1] = Math.cos(angle) * pixelAmplitude;
-      result[0] = Math.sin(angle) * pixelAmplitude;
-
-      return result;
-    },
-
 
     /**
      * Tries to find the ordinal value for the mouse position on the X (xAxis=true)
