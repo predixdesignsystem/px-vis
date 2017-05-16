@@ -1,3 +1,13 @@
+v1.1.11
+==================
+* ensure tooltip can still be shown in events
+* added more config to `eventsConfig`:
+      - `firstDateTimeFormat`: moment.js format string for the first part of the timestamp if the x Axis is time based
+      - `separator`: the separator character between the two datetime strings
+      - `secondDateTimeFormat`: moment.js format string for the second part of the timestamp if the x Axis is time based
+      - `tooltipOrientation`: orientation of the tooltip
+      - `timezone`: the moment.js timezone to be used for the timestamp
+
 v1.1.10
 ==================
 * added 'enableTooltip' (on by default) to eventConfig
