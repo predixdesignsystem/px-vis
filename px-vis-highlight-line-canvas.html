@@ -104,6 +104,7 @@ Custom property | Description | Default
       PxVisBehaviorD3.domainUpdate,
       PxVisBehavior.dynamicConfigProperties,
       PxVisBehavior.highlightCanvasShared,
+      PxVisBehavior.tooltipData,
       PxVisBehaviorD3.interpolationFunction
     ],
 
@@ -139,7 +140,6 @@ Custom property | Description | Default
       }
     }, //properties
 
-
     /**
      * Draws the crosshair elements and sets up listeners and callbacks on chart hover
      * Sets the crosshairData property which gets passed to the register.
@@ -155,12 +155,11 @@ Custom property | Description | Default
       var dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawData;
 
       if(this.showTooltipData) {
-        this._setTooltipData(dataset, this.parallelCoordinates);
-        console.log(this.defaultEmptyData);
         if(dataset.length) {
+          this.set('defaultEmptyData', this._createMultilineTooltipData(dataset[0], false));
           this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-tooltip-data', { detail: this.defaultEmptyData }));
         } else {
-          this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-reset-tooltip', { detail: this.defaultEmptyData }));
+          this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-reset-tooltip', { detail: this._resetMultilineTooltipData() }));
         }
       }
 

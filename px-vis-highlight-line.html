@@ -103,6 +103,7 @@ Custom property | Description | Default
       PxVisBehaviorD3.domainUpdate,
       PxVisBehavior.dynamicConfigProperties,
       PxVisBehavior.highlightSvgShared,
+      PxVisBehavior.tooltipData,
       PxVisBehaviorD3.interpolationFunction
     ],
 
@@ -154,15 +155,16 @@ Custom property | Description | Default
         return [];
       }
 
-      var dataset =  this.differentDataset ? this._calcDataset() : this.crosshairData.rawData;
+      var dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawData;
 
       if(this.showTooltipData) {
-        this._setTooltipData(dataset, this.parallelCoordinates);
-
         if(dataset.length) {
+          this.set('defaultEmptyData', this._createMultilineTooltipData(dataset[0], false));
           this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-tooltip-data', { detail: this.defaultEmptyData }));
         } else {
-          this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-reset-tooltip', { detail: this.defaultEmptyData }));
+          console.log("clear")
+          this.set('defaultEmptyData', this._resetMultilineTooltipData());
+          this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-reset-tooltip', { detail: this.defaultEmptyData}));
         }
       }
 

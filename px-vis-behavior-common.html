@@ -2389,36 +2389,84 @@ PxVisBehavior.highlightShared = [{
       return arr;
     },
 
-    _generateMultiLine: function(dataset) {
-      var arr = [];
-debugger
-      for(var i = 0; i < this.dimensions.length; i++) {
-        var val = {},
-            x = this.dimensions[i],
-            y = this.completeSeriesConfig[this.seriesId]["y"],
-            coords = [],
-            axis = this.y[this.dimensions[i]];
+    _resetMultilineTooltipData: function() {
 
-        val[x] = dataset[x];
-        val[y] = dataset[y];
-
-        coords.push(this.x(val[x]));
-        coords.push(axis(val[y]));
-
-        arr.push({
-          "name": this.dimensions[i],
-          "value": val,
-          "coord": coords
-        })
-      }
-
-      return arr;
+      return {
+          "mouse": null,
+          "dataPos": [-1000, -1000],
+          "time": null,
+          "dataset": null,
+          'series': [],
+          "color": null,
+          "tooltipConfig": null
+        };
     },
 
-    _setTooltipData: function(dataset, multiline) {
+    _createMultilineTooltipData: function(dataset, svg) {
+      var last = this.dimensions[this.dimensions.length-1],
+          data,     //our tooltipData obj
+          screenX,  //the mouse x on the scree
+          screenY,  //the mouse y on the scree
+          svgBounding,  //bounding rect of our svg
+          tooltipConfig = {},  //a fake configuration object we will build
+          value = {},          //the series obj within tooltipData
+          series = [];
+
+        // FIXME run on resize and wrap in animationFrame. Maybe at chart level?
+        svgBounding = this.svg ? this.svg.node().ownerSVGElement.getBoundingClientRect() : this.canvasContext.canvas.getBoundingClientRect();
+
+        //calc the screen positions for the tooltip
+        if(this.radialLine) {
+          screenX = this.y(dataset.yVal) * Math.sin(this.x(last)) + this.width/2 + svgBounding.left + window.pageXOffset;
+          screenY = this.y(dataset.yVal) * Math.cos(Math.PI - this.x(last)) + this.smallerSide/2 + svgBounding.top + window.pageYOffset;
+
+        } else {
+          screenX = this.x(last) + svgBounding.left + window.pageXOffset + 15;
+          screenY = this.y[last](dataset.yVal) + this.domHost.margin.top + svgBounding.top + window.pageYOffset;
+        }
+
+        for(var i = 0; i < this.dimensions.length; i++) {
+          var aid = this.dimensions[i];
+          //create our fake configuration object
+          tooltipConfig[aid] = {};
+
+          //if using categories, use it, otherwise default
+          tooltipConfig[aid]["color"] = this.categoryKey ? this.completeSeriesConfig[this.categoryKey]["color"] : this.completeSeriesConfig[this.seriesId]["color"];
+
+          //if title is specified, use it, otherwiuse id
+          tooltipConfig[aid]["name"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]['title'] ? this.completeSeriesConfig[aid]["title"] : aid;
+
+          //if there is a unit, add it
+          tooltipConfig[aid]["yAxisUnit"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]["yAxisUnit"] ? this.completeSeriesConfig[aid]["yAxisUnit"] : '';
+
+          //add the y series id
+          tooltipConfig[aid]['y'] = aid;
+
+          //create our value obj
+          value[aid] = dataset[aid];
+          series.push({ 'name': tooltipConfig[aid]["name"], 'value': value });
+
+        }
+        //create our tooltipData obj
+        data = {
+          "mouse": null,
+          "dataPos": [screenX, screenY],
+          "time": dataset[this.timeData],
+          "dataset": dataset,
+          'series': series,
+          "color": tooltipConfig[aid]["color"],
+          "tooltipConfig": tooltipConfig
+        };
+
+
+      return data;
+
+    },
+
+    _setTooltipData: function(dataset) {
       if(dataset.length) {
         var timestamp = this.timeData ? dataset[0][this.timeData] : null;
-            series =  multiline ? this._generateMultiLine(dataset[0]) : this._generateSeries(dataset[0]);
+            series = this._generateSeries(dataset[0]);
             ttd = this._createTooltipDataStub(series[0]["coord"], timestamp, !this.hideTooltip);
 
         ttd["series"] = series;
