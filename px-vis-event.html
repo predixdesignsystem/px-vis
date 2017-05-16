@@ -78,6 +78,7 @@ Custom property | Description | Default
       <template is="dom-if" if="[[_thisConfig.enableTooltip]]">
         <px-tooltip
           id="eventTooltip"
+          for="[[_getTooltiptarget(eventIcon)]]"
           smart-orientation
           delay="10"
           orientation="[[tooltipOrientation]]">
@@ -117,18 +118,6 @@ Custom property | Description | Default
      * @type Object
      */
     properties: {
-      /**
-       * The ID of the event. Either dev set or auto-generated
-       *
-       * @property eventId
-       * @type String
-       */
-      eventId: {
-        type:String,
-        value: '',
-        notify: true,
-        reflectToAttribute: true
-      },
 
       /**
        * Holder object for the event svg "g" element
@@ -178,8 +167,7 @@ Custom property | Description | Default
        */
       tooltipOrientation: {
         type: String,
-        value: 'left',
-        notify:true
+        value: 'left'
       },
       /**
        * Specifies the x key for the event data
@@ -206,12 +194,11 @@ Custom property | Description | Default
       _eventDrawn: {
         type: Boolean,
         value: false
-      }
+      },
     },
 
     observers: [
-      '_eventConfigHasChanged(eventConfig.*)',
-      'drawElement(svg, eventData.*, eventConfig.*, _animationFrameDone)',
+      'drawElement(svg, eventData.*, eventConfig.*, _animationFrameDone, height)',
       'positionElement(x, domainChanged)',
       '_addClipPath(clipPath)'
      ],
@@ -229,10 +216,10 @@ Custom property | Description | Default
 
     ready: function() {
       window.requestAnimationFrame(this._calcThemeOrConfig.bind(this));
-      // if there is no dev set unique ID, generate one
-      if(!this.eventId) {
-        this.set('eventId', this.generateRandomID('event_'));
-      }
+    },
+
+    _getTooltiptarget: function() {
+      return (this.eventIcon && this.eventIcon.node) ? this.eventIcon.node() : null;
     },
 
     _calcThemeOrConfig: function() {
@@ -249,7 +236,7 @@ Custom property | Description | Default
           'size': this._defaultDefaultEventConfig.size,
           'lineColor': lineColor,
           'lineWeight': this._defaultDefaultEventConfig.lineWeight,
-          'enableTooltip': true
+          'enableTooltip': this._defaultDefaultEventConfig.enableTooltip
         };
       }
 
@@ -275,9 +262,7 @@ Custom property | Description | Default
 
 
         this.eventGroup = this.svg.append('g')
-          .attr('class','event')
-          .attr('event-id',this.eventId)
-          .attr('id','event_' + this.eventId);
+          .attr('class','event');
 
         // draw the path
         this.eventLine = this.eventGroup.append("line")
@@ -292,9 +277,8 @@ Custom property | Description | Default
 
         this._addClipPath();
 
-        if(this._thisConfig.enableTooltip) {
-          this._addTooltip();
-        }
+        //check if we want a tooltip
+        this.notifyPath('_thisConfig.enableTooltip')
       }
     },
 
@@ -309,14 +293,6 @@ Custom property | Description | Default
       if(this.x && this._eventDrawn) {
         this._positionEvent();
       }
-    },
-
-    /**
-     * Sets a boolean to true when run
-     *
-     */
-    _eventConfigHasChanged: function() {
-      this._eventConfigChanged = true;
     },
 
     /**
@@ -366,8 +342,7 @@ Custom property | Description | Default
       }
 
       this.eventIcon
-        .style("cursor","pointer")
-        .attr('id','ei_' + this.eventId);
+        .style("cursor","pointer");
 
     },
 
@@ -386,7 +361,7 @@ Custom property | Description | Default
             i,
             len = k.length;
         for(i = 0; i < len; i++){
-          this._thisConfig[k[i]] =  this.eventConfig[this.eventData.label][k[i]] || this.eventConfig[this.eventData.label][k[i]] === 0 ? this.eventConfig[this.eventData.label][k[i]] : this.defaultEventConfig[k[i]];
+          this._thisConfig[k[i]] =  this.eventConfig[this.eventData.label][k[i]] || this.eventConfig[this.eventData.label][k[i]] === 0 || this.eventConfig[this.eventData.label][k[i]] === false ? this.eventConfig[this.eventData.label][k[i]] : this.defaultEventConfig[k[i]];
         }
       } else {
         // else, set everything to default
