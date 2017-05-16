@@ -72,7 +72,7 @@ function runTests(){
       setTimeout(function(){
         linePath =  baseLine.lineGroup.select('path.series-line');
         done();
-      },100);;
+      },250);;
     });
 
     test('baseLine fixture is created', function() {
@@ -1349,7 +1349,7 @@ function runTests(){
       setTimeout(function(){
         linePath =  polarLine.lineGroup.select('path.series-line');
         done();
-      },100);
+      },250);
     });
 
     test('polarLine fixture is created', function() {
@@ -1464,7 +1464,7 @@ function runTests(){
       setTimeout(function(){
         linePath =  polarDegreeLine.lineGroup.select('path.series-line');
         done();
-      },100);
+      },250);
     });
 
     test('polarDegreeLine fixture is created', function() {
@@ -1578,7 +1578,7 @@ function runTests(){
       setTimeout(function(){
         linePath =  polarCCWLine.lineGroup.select('path.series-line');
         done();
-      },100);
+      },250);
     });
 
     test('polarCCWLine fixture is created', function() {
@@ -1693,7 +1693,7 @@ function runTests(){
       setTimeout(function(){
         linePath =  polarDegreeCCWLine.lineGroup.select('path.series-line');
         done();
-      },100);
+      },250);
     });
 
     test('polarDegreeCCWLine fixture is created', function() {
@@ -1806,7 +1806,7 @@ function runTests(){
       setTimeout(function(){
         linePath =  polarMissingLine.lineGroup.select('path.series-line');
         done();
-      },100);
+      },250);
     });
 
     test('polarMissingLine fixture is created', function() {
