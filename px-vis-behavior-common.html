@@ -2234,6 +2234,21 @@ PxVisBehavior.actionConfigGeneric = {
   }
 };
 
+/*
+    PxVisBehavior.interactionSpaceConfigGeneric
+
+    Description:
+    Behavior providing the interactionSpaceConfig property
+    @polymerBehavior PxVisBehavior.interactionSpaceConfigGeneric
+*/
+PxVisBehavior.interactionSpaceConfigGeneric = {
+  properties: {
+    interactionSpaceConfig: {
+      type: Object
+    }
+  }
+};
+
 
 /*
     PxVisBehavior.interactionSpaceShared
@@ -2351,6 +2366,12 @@ PxVisBehavior.highlightShared = [{
      */
     layersToMask: {
       type: Array
+    },
+
+    drawWithLocalCrosshairData: {
+      type: Boolean,
+      value: false,
+      notify: true
     }
   },
 
@@ -2396,7 +2417,7 @@ PxVisBehavior.highlightShared = [{
         var domain = axis.domain(),
             range = axis.range(),
             dr = range[1] - range[0]
-            dd = domain[1]-domain[0];
+            dd = domain[1] - domain[0];
         coords = this._getPixelCoordForRadialData(dataset[x], dataset[y], dr, domain, dd);
       } else {
         coords.push(this.x(val[x]));
@@ -2525,7 +2546,7 @@ PxVisBehavior.highlightLineShared = [{
     _highlightData: {
       type: Object,
       notify: true,
-      computed: '_computeChartData(crosshairData.timeStamps.*)'
+      computed: '_computeChartData(crosshairData.timeStamps.*, drawWithLocalCrosshairData)'
     },
 
     /**

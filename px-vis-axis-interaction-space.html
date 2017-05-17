@@ -3,6 +3,7 @@
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="../px-colors-design/colors.html" />
 <link rel="import" href="px-vis-behavior-axis-drag.html"/>
+<link rel="import" href="fa_codes.html" />
 
 
 <!--
@@ -80,7 +81,8 @@ Custom property | Description | Default
       PxVisBehaviorDrag.cartesianDrag,
       PxVisBehavior.categories,
       PxVisBehavior.completeSeriesConfig,
-      PxVisBehavior.applyActionConfig
+      PxVisBehavior.applyActionConfig,
+      faCodes
     ],
 
     /**
@@ -205,7 +207,8 @@ Custom property | Description | Default
       'drawElement(svg, margin.* , height, domainChanged)',
       'recalcBrush(domainChanged)',
       '_setupActions(actionConfig.*)',
-      '_setDragBehavior(cartesianDragBehavior, dragContainerElem)'
+      '_setDragBehavior(cartesianDragBehavior, dragContainerElem)',
+      '_drawCursorIcon(svg, iconType)'
     ],
 
     /**
@@ -341,7 +344,9 @@ Custom property | Description | Default
 
         //setup a default cursor setup
         this._brushD3.selectAll("rect")
-          .attr("cursor","crosshair");
+          .attr("cursor","crosshair")
+          .on("mousemove.cursor", this._updateCursor.bind(this))
+          .on("mouseout.cursor", this._hideCursor.bind(this));
 
         // check if we have special actions and if so, run their caller
         var dontDoUpDown = this._setupSpecialActions();
@@ -899,6 +904,53 @@ Custom property | Description | Default
         //delete
         this._brushD3.call(this._brush.move, null);
       }
+    },
+
+    _drawCursorIcon: function() {
+      var icon = this.iconType && this.iconType !== 'none'  ? String.fromCharCode(parseInt(this.fa[this.iconType], 16)) : '';
+
+      if(!this._cursorGroup) {
+        if(!this._cursorGroup) {
+          this._cursorGroup = this.svg.append('g')
+            .attr("display", "none")
+            .attr('pointer-events', 'none');
+        }
+      }
+
+      if(!this._icon) {
+        this._icon = this._cursorGroup.append("text")
+          .attr('font-family', 'FontAwesome')
+          .attr('font-size', '12px')
+          .attr('fill', this._checkThemeVariable("--px-vis-cursor-line-color", this.colors.black))
+          .attr('pointer-events', 'none');
+      }
+
+      this._icon.text(icon);
+    },
+
+    _updateCursor: function() {
+      if(this._isD3Empty(this._cursorGroup)) {
+        return;
+      }
+
+      var mousePos = Px.d3.mouse(this._brushD3.node());
+
+      this._cursorGroup
+        .attr('display',null);
+
+      this._icon
+        .attr("x", mousePos[0] + 5)
+        .attr("y", mousePos[1] - 5);
+
+    },
+
+    _hideCursor: function() {
+      if(this._isD3Empty(this._cursorGroup)) {
+        return;
+      }
+
+      this._cursorGroup
+        .attr('display', 'none');
     }
   });
 </script>

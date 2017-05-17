@@ -176,7 +176,8 @@ Custom property | Description | Default
       PxVisBehaviorChart.subConfiguration,
       PxVisBehavior.preventInitialDrawing,
       PxVisBehavior.categories,
-      PxVisBehavior.actionConfigGeneric
+      PxVisBehavior.actionConfigGeneric,
+      PxVisBehavior.interactionSpaceConfigGeneric
     ],
 
     /**
@@ -348,7 +349,8 @@ Custom property | Description | Default
 
     observers: [
       '_axisConfigChanged(axisConfig.*)',
-      '_createGroup(domainChanged, x, svg)'
+      '_createGroup(domainChanged, x, svg)',
+      '_interactionSpaceConfigChanged(interactionSpaceConfig.*)'
     ],
 
     listeners:{
@@ -372,6 +374,13 @@ Custom property | Description | Default
         this._applyConfigToElement(this.axisConfig, this.$$('#axis_' + this.dimension));
       }
     },
+
+    _interactionSpaceConfigChanged(conf) {
+      if(this.interactionSpaceConfig && this.dimension) {
+        this._applyConfigToElement(this.interactionSpaceConfig, this.$$('#axisIS'));
+      }
+    },
+
 
     /**
      * Generates a group elem for each dimension and moves it into the correct x coordinate
@@ -451,6 +460,5 @@ Custom property | Description | Default
     recalcTranform: function() {
       this._interactiveGroup.attr("transform", this._calcTransformation.bind(this));
     }
-
   });
 </script>
