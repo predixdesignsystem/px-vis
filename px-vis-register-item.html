@@ -67,10 +67,24 @@ Custom property | Description | Default
         class$="flex [[_itemMutedToStart]]"
         on-tap="_seriesClicked"
         id="regWithoutMenu">
-        <span
-          class="seriesMarker"
-          style$="background-color:[[_itemColor]]"
-          name$="R{{item.name}}">&nbsp;</span>
+        <template is="dom-if" if="[[_isDashed(_dashPattern)]]">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink"
+            class="seriesMarker" overflow="hidden">
+            <line
+              x1="0" y1="0" x2="0" y2="20" stroke-width="2"
+              style$="stroke:[[_itemColor]]"
+              transform="translate(2.5)"
+              stroke-dasharray$="[[_dashPattern]]" />
+          </svg>
+        </template>
+        <template is="dom-if" if="[[!_isDashed(_dashPattern)]]">
+          <span
+                  class="seriesMarker"
+                  style$="background-color:[[_itemColor]]"
+                  name$="R{{item.name}}">&nbsp;</span>
+        </template>
         <span class$="[[_wrapperClass]]">
           <div
             class="seriesName flex__item--msfix"
@@ -199,6 +213,10 @@ Custom property | Description | Default
       */
       _ttStyle: {
         type: String
+      },
+      _dashArray: {
+        type: String,
+        value: ''
       }
     },
 
@@ -257,6 +275,10 @@ Custom property | Description | Default
       if(disableClick) {
         this.unlisten(this.$.regWithoutMenu, "tap", '_seriesClicked');
       }
+    },
+
+    _isDashed: function(pattern) {
+        return typeof pattern === 'string' && pattern.length > 0;
     }
   });
 </script>

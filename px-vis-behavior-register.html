@@ -391,6 +391,13 @@ PxVisBehaviorRegister.generalItem = [{
       computed: '_computeItemColor(item, completeSeriesConfig.*)'
     },
     /**
+     * calculates the dash pattern of the item
+     */
+    _dashPattern: {
+      type: String,
+      computed: '_computeItemDashPattern(item, completeSeriesConfig.*)'
+    },
+    /**
       * Prevents the mute on click behavior
       */
     preventMuting: {
@@ -422,6 +429,20 @@ PxVisBehaviorRegister.generalItem = [{
   },
 
   /**
+   * Function which takes an index and returns the appropriate dash pattern
+   *
+   * `e.g. pattern = "5,2"` return the appropriate svg stroke-dasharray value.
+   *
+   * @method _computeItemDashPattern
+   * @return {pattern}
+   */
+  _computeItemDashPattern: function() {
+      return this.completeSeriesConfig[this.item.name] && this.completeSeriesConfig[this.item.name]['dashPattern'] ?
+          this.completeSeriesConfig[this.item.name]['dashPattern'] :
+          '';
+  },
+
+    /**
    * helper function to set initial classes
    *
    * Adds or removes muted class to those series in the register

@@ -254,7 +254,10 @@ Element which draws lines series onto the chart
               //do nothing if not
               return
             }.bind(this))
-            .attr('stroke-opacity',this._svgLineOpacity.bind(this));
+            .attr('stroke-opacity',this._svgLineOpacity.bind(this))
+            .attr('stroke-dasharray',function() {
+                return this.completeSeriesConfig[this.seriesId]['dashPattern'];
+            }.bind(this));
 
           // Make it easy to get our lines again
           this.linePath = this.lineGroup.selectAll('path.series-line');
