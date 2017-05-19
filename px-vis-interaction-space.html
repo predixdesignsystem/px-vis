@@ -1314,6 +1314,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       } //for
     },
 
+// ===================================================================================
+// For visualizing the Quadtree / demos
+
     _drawQuadtree: function(quadtree) {
       function nodes(qt) {
         var nodes = [];
@@ -1338,7 +1341,56 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           .attr("y", function(d) { return d.y0; })
           .attr("width", function(d) { return d.y1 - d.y0; })
           .attr("height", function(d) { return d.x1 - d.x0; });
+    },
+
+    _removeQuadtree: function() {
+      this.svg.selectAll(".node").remove();
+    },
+
+
+    _createQuadtreeDataForDrawing: function() {
+      if(this.domainChanged !== null) {
+        var w = this.width - this.margin.right - this.margin.left,
+            h = this.height - this.margin.top - this.margin.bottom,
+            ext = [[0,0], [w, h]],
+            keys = this.seriesKeys ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
+            xKey,
+            yKey,
+            axis,
+            k,
+            data = {},
+            quadtree = {};
+
+        for(var i = 0; i < keys.length; i++) {
+          k = keys[i];
+          xKey = this.completeSeriesConfig[k]['x'];
+          yKey = this.completeSeriesConfig[k]['y'];
+          axis = this.completeSeriesConfig[k]['axis'] ? this.completeSeriesConfig[k]['axis']['id'] : null;
+
+          quadtree[k] = Px.d3.quadtree()
+            .extent(ext)
+            .x(function(d) { return this.x(d[xKey]) }.bind(this))
+            .y(function(d) { return this.y["defaultAxis"](d[yKey]) }.bind(this))
+            .addAll(this.chartData);
+        }
+
+        this._drawQuadtree(quadtree[k]);
+      }
+    },
+
+    _qtDemo: function() {
+      this._createQuadtreeDataForDrawing();
+
+      setTimeout(function(){
+        this._removeQuadtree();
+        this.set("extentsData", {"x1":0,"y1":56,"w":79,"h":57,"x2":79,"y2":113,"eX":[-43.04371317836934,-35.211421500422254],"eY":{"defaultAxis":[3.1866258138594112,8.373620981563445]}});
+
+        setTimeout(function(){
+          this._createQuadtreeDataForDrawing();
+        }.bind(this), 1000)
+      }.bind(this), 5000)
     }
+// ===================================================================================
 
   });
 </script>
