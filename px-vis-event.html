@@ -76,18 +76,20 @@ Custom property | Description | Default
 <dom-module id="px-vis-event">
     <template>
       <style include="px-vis-styles"></style>
-
-      <px-tooltip
-        id="eventTooltip"
-        smart-orientation
-        delay="10"
-        orientation="[[tooltipOrientation]]">
-        <span>
-          <b>[[localize('Event')]]</b>: [[eventData.label]] <br/>
-          <b>[[localize('ID')]]</b>: [[eventData.id]] <br/>
-          <b>[[_getValueTitle(xAxisType, localize)]]</b>[[_getValue(xAxisType, eventData)]]<br/>
-        </span>
-      </px-tooltip>
+      <template is="dom-if" if="[[_thisConfig.enableTooltip]]">
+        <px-tooltip
+          id="eventTooltip"
+          for="[[_getTooltiptarget(eventIcon)]]"
+          smart-orientation
+          delay="10"
+          orientation="[[tooltipOrientation]]">
+          <span>
+            <b>Event</b>: [[eventData.label]] <br/>
+            <b>ID</b>: [[eventData.id]] <br/>
+            <b>[[_getValueTitle(xAxisType)]]</b>[[_value]]<br/>
+          </span>
+        </px-tooltip>
+      </template>
     </template>
 </dom-module>
 
@@ -118,18 +120,6 @@ Custom property | Description | Default
      * @type Object
      */
     properties: {
-      /**
-       * The ID of the event. Either dev set or auto-generated
-       *
-       * @property eventId
-       * @type String
-       */
-      eventId: {
-        type:String,
-        value: '',
-        notify: true,
-        reflectToAttribute: true
-      },
 
       /**
        * Holder object for the event svg "g" element
@@ -179,8 +169,7 @@ Custom property | Description | Default
        */
       tooltipOrientation: {
         type: String,
-        value: 'left',
-        notify:true
+        value: 'left'
       },
       /**
        * Specifies the x key for the event data
@@ -208,6 +197,7 @@ Custom property | Description | Default
         type: Boolean,
         value: false
       },
+
       /**
        * List of key/values to be included for translating this component
        */
@@ -238,15 +228,35 @@ Custom property | Description | Default
      useKeyIfMissing: {
        type: Boolean,
        value: true
-     }
+     },
+
+
+      _hasBeenDetached: {
+        type: Boolean,
+        value: false
+      },
+
+      _reCalcValue: {
+        type: Boolean,
+        value: true
+      },
+
+      _value: {
+        type: String
+      }
+
     },
 
     observers: [
-      '_eventConfigHasChanged(eventConfig.*)',
-      'drawElement(svg, eventData.*, eventConfig.*, _animationFrameDone)',
+      'drawElement(svg, eventData.*, eventConfig.*, _animationFrameDone, height)',
+      '_eventConfigChanged(eventCOnfig.*)',
       'positionElement(x, domainChanged)',
-      '_addClipPath(clipPath)'
+      '_addClipPath(clipPath)',
+      '_recalcValue(eventData, xAxisType, eventConfig.*)'
      ],
+     listeners: {
+      'px-tooltip-request-show': '_tooltipRequest'
+     },
 
      detached: function() {
        this._eventDrawn = false;
@@ -256,11 +266,40 @@ Custom property | Description | Default
          this.eventGroup = null;
          this.eventLine = null;
          this.eventIcon = null;
+         this._hasBeenDetached = true
        }
      },
 
+    attached: function() {
+      if(this._hasBeenDetached) {
+        this._hasBeenDetached = false;
+        this.drawElement();
+      }
+    },
+
     ready: function() {
       window.requestAnimationFrame(this._calcThemeOrConfig.bind(this));
+    },
+
+    _tooltipRequest: function() {
+      //only format the value when we're actually about to show it
+      if(this._reCalcValue) {
+        this.set('_value', this._getValue());
+        this._reCalcValue = false;
+      }
+    },
+
+    _eventConfigChanged: function() {
+      this._processConfiguration();
+    },
+
+    _recalcValue: function() {
+      //recalc/format the value next time we show the tooltip
+      this._reCalcValue = true;
+    },
+
+    _getTooltiptarget: function() {
+      return (this.eventIcon && this.eventIcon.node) ? this.eventIcon.node() : null;
     },
 
     _calcThemeOrConfig: function() {
@@ -276,7 +315,13 @@ Custom property | Description | Default
           'offset': this._defaultDefaultEventConfig.offset,
           'size': this._defaultDefaultEventConfig.size,
           'lineColor': lineColor,
-          "lineWeight": this._defaultDefaultEventConfig.lineWeight
+          'lineWeight': this._defaultDefaultEventConfig.lineWeight,
+          'enableTooltip': this._defaultDefaultEventConfig.enableTooltip,
+          'firstDateTimeFormat': this._defaultDefaultEventConfig.firstDateTimeFormat,
+          'secondDateTimeFormat': this._defaultDefaultEventConfig.secondDateTimeFormat,
+          'separator': this._defaultDefaultEventConfig.separator,
+          'timezone': this._defaultDefaultEventConfig.timezone,
+          'tooltipOrientation': this._defaultDefaultEventConfig.tooltipOrientation
         };
       }
 
@@ -290,7 +335,6 @@ Custom property | Description | Default
      * @method drawElement
      */
     drawElement: function() {
-
       if(this.svg && this._doesObjHaveValues(this.eventData) && this._animationFrameDone) {
 
         if(this.eventGroup && this._doesD3HaveValues(this.eventGroup)) {
@@ -301,11 +345,8 @@ Custom property | Description | Default
 
         this._processConfiguration();
 
-
         this.eventGroup = this.svg.append('g')
-          .attr('class','event')
-          .attr('event-id',this.eventId)
-          .attr('id','event_' + this.eventId);
+          .attr('class','event');
 
         // draw the path
         this.eventLine = this.eventGroup.append("line")
@@ -320,8 +361,8 @@ Custom property | Description | Default
 
         this._addClipPath();
 
-
-        this._addTooltip();
+        //check if we want a tooltip
+        this.notifyPath('_thisConfig.enableTooltip')
       }
     },
 
@@ -336,14 +377,6 @@ Custom property | Description | Default
       if(this.x && this._eventDrawn) {
         this._positionEvent();
       }
-    },
-
-    /**
-     * Sets a boolean to true when run
-     *
-     */
-    _eventConfigHasChanged: function() {
-      this._eventConfigChanged = true;
     },
 
     /**
@@ -393,8 +426,7 @@ Custom property | Description | Default
       }
 
       this.eventIcon
-        .style("cursor","pointer")
-        .attr('id','ei_' + this.eventId);
+        .style("cursor","pointer");
 
     },
 
@@ -404,6 +436,7 @@ Custom property | Description | Default
      * @method _processConfiguration
      */
     _processConfiguration:function() {
+
       // is there a configuration object for this event type?
       if(this.eventConfig[this.eventData.label]) {
         /*
@@ -413,20 +446,32 @@ Custom property | Description | Default
             i,
             len = k.length;
         for(i = 0; i < len; i++){
-          this._thisConfig[k[i]] =  this.eventConfig[this.eventData.label][k[i]] || this.eventConfig[this.eventData.label][k[i]] === 0 ? this.eventConfig[this.eventData.label][k[i]] : this.defaultEventConfig[k[i]];
+          this._thisConfig[k[i]] =  this.eventConfig[this.eventData.label][k[i]] || this.eventConfig[this.eventData.label][k[i]] === 0 || this.eventConfig[this.eventData.label][k[i]] === false ? this.eventConfig[this.eventData.label][k[i]] : this.defaultEventConfig[k[i]];
+        }
+
+        //process special config........................
+        if(this._thisConfig.firstDateTimeFormat) {
+          this.firstDateTimeFormat = this._thisConfig.firstDateTimeFormat;
+        }
+        if(this._thisConfig.secondDateTimeFormat) {
+          this.secondDateTimeFormat = this._thisConfig.secondDateTimeFormat;
+        }
+        if(this._thisConfig.timezone) {
+          this.timezone = this._thisConfig.timezone;
+        }
+        if(this._thisConfig.tooltipOrientation) {
+          this.set('tooltipOrientation', this._thisConfig.tooltipOrientation);
+        }
+        if(this._thisConfig.separator) {
+          this.separator = this._thisConfig.separator;
+        }
+        if(typeof this._thisConfig.enableTooltip !== "undefined") {
+          this.notifyPath('_thisConfig.enableTooltip');
         }
       } else {
         // else, set everything to default
         this._thisConfig = this.defaultEventConfig;
       }
-    },
-    /**
-     * Configures the tooltip for that particuar event
-     *
-     * @method _addTooltip
-     */
-    _addTooltip:function() {
-      this.$.eventTooltip.set('for',this.eventIcon.node());
     },
     /**
      * Formats the datetime to match the dev set format
@@ -452,7 +497,7 @@ Custom property | Description | Default
      *
      */
     _getValue: function(xAxisType) {
-      if(xAxisType === 'time' || xAxisType === 'timeLocal') {
+      if(this.xAxisType === 'time' || this.xAxisType === 'timeLocal') {
         return ': ' + this._formatDatetime(this.eventData[this.xKey], this.firstDateTimeFormat) +
           ' ' + this.separator + ' ' + this._formatDatetime(this.eventData[this.xKey], this.secondDateTimeFormat);
       } else {

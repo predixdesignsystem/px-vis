@@ -219,7 +219,19 @@ function runTests(){
       linearEvent.set('eventData',dE[6]);
       ordinalEvent.set('eventData',dE[7]);
 
-      setTimeout(function(){ done() }.bind(this), 500);
+      setTimeout(function(){
+
+        //fake showing tooltip so it calculates its value
+        defaultEvent._tooltipRequest();
+        faEvent._tooltipRequest();
+        uniEvent._tooltipRequest();
+        imgEvent._tooltipRequest();
+        noLabelEvent._tooltipRequest();
+        offsetEvent._tooltipRequest();
+        linearEvent._tooltipRequest();
+        ordinalEvent._tooltipRequest();
+        done();
+      }.bind(this), 1500);
     });
 
     test('defaultEvent fixture is created', function() {
@@ -252,17 +264,8 @@ function runTests(){
     test('defaultEvent eventGroup has class', function() {
       assert.equal(defaultEvent.eventGroup.attr('class'),'event');
     });
-    test('defaultEvent has random event-id', function() {
-      assert.equal(defaultEvent.eventId.length,16);
-    });
-    test('defaultEvent has random event-id', function() {
-      assert.equal(defaultEvent.eventId.split('_')[0],'event');
-    });
     test('defaultEvent eventGroup set event-id', function() {
       assert.equal(defaultEvent.eventGroup.attr('event-id'),defaultEvent.eventId);
-    });
-    test('defaultEvent eventGroup set id', function() {
-      assert.equal(defaultEvent.eventGroup.attr('id'),'event_' + defaultEvent.eventId);
     });
 
     test('defaultEvent eventIcon created', function() {
@@ -311,10 +314,10 @@ function runTests(){
     });
 
     test('tooltip exists', function() {
-      assert.isTrue(defaultEvent.$.eventTooltip !== null);
+      assert.isTrue(defaultEvent.$$('px-tooltip') !== null);
     });
     test('tooltip content is correct', function() {
-      assert.equal(defaultEvent.$.eventTooltip.$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: DefaultID: 333Timestamp: 20:13:00 +0000 | 10 Apr 2014');
+      assert.equal(defaultEvent.$$('px-tooltip').$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: DefaultID: 333Timestamp: 20:13:00 +0000 | 10 Apr 2014');
     });
   }); //suite
 
@@ -330,15 +333,6 @@ function runTests(){
     });
     test('faEvent eventGroup has class', function() {
       assert.equal(faEvent.eventGroup.attr('class'),'event');
-    });
-    test('faEvent has random event-id', function() {
-      assert.equal(faEvent.eventId,'faEvent');
-    });
-    test('faEvent eventGroup set event-id', function() {
-      assert.equal(faEvent.eventGroup.attr('event-id'),'faEvent');
-    });
-    test('faEvent eventGroup set id', function() {
-      assert.equal(faEvent.eventGroup.attr('id'),'event_faEvent');
     });
 
     test('faEvent eventIcon created', function() {
@@ -387,10 +381,10 @@ function runTests(){
     });
 
     test('tooltip exists', function() {
-      assert.isTrue(faEvent.$.eventTooltip !== null);
+      assert.isTrue(faEvent.$$('px-tooltip') !== null);
     });
     test('tooltip content is correct', function() {
-      assert.equal(faEvent.$.eventTooltip.$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: font awesomeID: 789Timestamp: 04:19:00 +0000 | 11 Apr 2014');
+      assert.equal(faEvent.$$('px-tooltip').$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: font awesomeID: 789Timestamp: 04:19:00 +0000 | 11 Apr 2014');
     });
   }); //suite
 
@@ -406,15 +400,6 @@ function runTests(){
     });
     test('uniEvent eventGroup has class', function() {
       assert.equal(uniEvent.eventGroup.attr('class'),'event');
-    });
-    test('uniEvent has random event-id', function() {
-      assert.equal(uniEvent.eventId,'uniEvent');
-    });
-    test('uniEvent eventGroup set event-id', function() {
-      assert.equal(uniEvent.eventGroup.attr('event-id'),'uniEvent');
-    });
-    test('uniEvent eventGroup set id', function() {
-      assert.equal(uniEvent.eventGroup.attr('id'),'event_uniEvent');
     });
 
     test('uniEvent eventIcon created', function() {
@@ -463,10 +448,10 @@ function runTests(){
     });
 
     test('tooltip exists', function() {
-      assert.isTrue(uniEvent.$.eventTooltip !== null);
+      assert.isTrue(uniEvent.$$('px-tooltip') !== null);
     });
     test('tooltip content is correct', function() {
-      assert.equal(uniEvent.$.eventTooltip.$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: unicodeID: 456Timestamp: 04:01:00 +0000 | 10 Apr 2014');
+      assert.equal(uniEvent.$$('px-tooltip').$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: unicodeID: 456Timestamp: 04:01:00 +0000 | 10 Apr 2014');
     });
   }); //suite
 
@@ -482,15 +467,6 @@ function runTests(){
     });
     test('imgEvent eventGroup has class', function() {
       assert.equal(imgEvent.eventGroup.attr('class'),'event');
-    });
-    test('imgEvent has random event-id', function() {
-      assert.equal(imgEvent.eventId,'imgEvent');
-    });
-    test('imgEvent eventGroup set event-id', function() {
-      assert.equal(imgEvent.eventGroup.attr('event-id'),'imgEvent');
-    });
-    test('imgEvent eventGroup set id', function() {
-      assert.equal(imgEvent.eventGroup.attr('id'),'event_imgEvent');
     });
 
 
@@ -536,10 +512,10 @@ function runTests(){
     });
 
     test('tooltip exists', function() {
-      assert.isTrue(imgEvent.$.eventTooltip !== null);
+      assert.isTrue(imgEvent.$$('px-tooltip') !== null);
     });
     test('tooltip content is correct', function() {
-      assert.equal(imgEvent.$.eventTooltip.$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: imageID: 123Timestamp: 12:07:00 +0000 | 10 Apr 2014');
+      assert.equal(imgEvent.$$('px-tooltip').$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: imageID: 123Timestamp: 12:07:00 +0000 | 10 Apr 2014');
     });
   }); //suite
 
@@ -555,18 +531,6 @@ function runTests(){
     });
     test('noLabelEvent eventGroup has class', function() {
       assert.equal(noLabelEvent.eventGroup.attr('class'),'event');
-    });
-    test('noLabelEvent has random event-id', function() {
-      assert.equal(noLabelEvent.eventId.length,16);
-    });
-    test('noLabelEvent has random event-id', function() {
-      assert.equal(noLabelEvent.eventId.split('_')[0],'event');
-    });
-    test('noLabelEvent eventGroup set event-id', function() {
-      assert.equal(noLabelEvent.eventGroup.attr('event-id'),noLabelEvent.eventId);
-    });
-    test('noLabelEvent eventGroup set id', function() {
-      assert.equal(noLabelEvent.eventGroup.attr('id'),'event_' + noLabelEvent.eventId);
     });
 
     test('noLabelEvent eventIcon created', function() {
@@ -615,10 +579,10 @@ function runTests(){
     });
 
     test('tooltip exists', function() {
-      assert.isTrue(noLabelEvent.$.eventTooltip !== null);
+      assert.isTrue(noLabelEvent.$$('px-tooltip') !== null);
     });
     test('tooltip content is correct', function() {
-      assert.equal(noLabelEvent.$.eventTooltip.$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event:ID: 42Timestamp: 06:30:51 +0000 | 10 Apr 2014');
+      assert.equal(noLabelEvent.$$('px-tooltip').$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event:ID: 42Timestamp: 06:30:51 +0000 | 10 Apr 2014');
     });
   }); //suite
 
@@ -634,18 +598,6 @@ function runTests(){
     });
     test('offsetEvent eventGroup has class', function() {
       assert.equal(offsetEvent.eventGroup.attr('class'),'event');
-    });
-    test('offsetEvent has random event-id', function() {
-      assert.equal(offsetEvent.eventId.length,16);
-    });
-    test('offsetEvent has random event-id', function() {
-      assert.equal(offsetEvent.eventId.split('_')[0],'event');
-    });
-    test('offsetEvent eventGroup set event-id', function() {
-      assert.equal(offsetEvent.eventGroup.attr('event-id'),offsetEvent.eventId);
-    });
-    test('offsetEvent eventGroup set id', function() {
-      assert.equal(offsetEvent.eventGroup.attr('id'),'event_' + offsetEvent.eventId);
     });
 
     test('offsetEvent eventIcon created', function() {
@@ -694,10 +646,10 @@ function runTests(){
     });
 
     test('tooltip exists', function() {
-      assert.isTrue(offsetEvent.$.eventTooltip !== null);
+      assert.isTrue(offsetEvent.$$('px-tooltip') !== null);
     });
     test('tooltip content is correct', function() {
-      assert.equal(offsetEvent.$.eventTooltip.$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: offsetID: 444Timestamp: 22:46:54 +0000 | 10 Apr 2014');
+      assert.equal(offsetEvent.$$('px-tooltip').$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: offsetID: 444Timestamp: 22:46:54 +0000 | 10 Apr 2014');
     });
   }); //suite
 
@@ -714,18 +666,6 @@ function runTests(){
     });
     test('linearEvent eventGroup has class', function() {
       assert.equal(linearEvent.eventGroup.attr('class'),'event');
-    });
-    test('linearEvent has random event-id', function() {
-      assert.equal(linearEvent.eventId.length,16);
-    });
-    test('linearEvent has random event-id', function() {
-      assert.equal(linearEvent.eventId.split('_')[0],'event');
-    });
-    test('linearEvent eventGroup set event-id', function() {
-      assert.equal(linearEvent.eventGroup.attr('event-id'),linearEvent.eventId);
-    });
-    test('linearEvent eventGroup set id', function() {
-      assert.equal(linearEvent.eventGroup.attr('id'),'event_' + linearEvent.eventId);
     });
 
     test('linearEvent eventIcon created', function() {
@@ -753,10 +693,10 @@ function runTests(){
     });
 
     test('tooltip exists', function() {
-      assert.isTrue(linearEvent.$.eventTooltip !== null);
+      assert.isTrue(linearEvent.$$('px-tooltip') !== null);
     });
     test('tooltip content is correct', function() {
-      assert.equal(linearEvent.$.eventTooltip.$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: linearID: 666X: 3');
+      assert.equal(linearEvent.$$('px-tooltip').$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: linearID: 666X: 3');
     });
   }); //suite
 
@@ -772,18 +712,6 @@ function runTests(){
     });
     test('ordinalEvent eventGroup has class', function() {
       assert.equal(ordinalEvent.eventGroup.attr('class'),'event');
-    });
-    test('ordinalEvent has random event-id', function() {
-      assert.equal(ordinalEvent.eventId.length,16);
-    });
-    test('ordinalEvent has random event-id', function() {
-      assert.equal(ordinalEvent.eventId.split('_')[0],'event');
-    });
-    test('ordinalEvent eventGroup set event-id', function() {
-      assert.equal(ordinalEvent.eventGroup.attr('event-id'),ordinalEvent.eventId);
-    });
-    test('ordinalEvent eventGroup set id', function() {
-      assert.equal(ordinalEvent.eventGroup.attr('id'),'event_' + ordinalEvent.eventId);
     });
 
     test('ordinalEvent eventIcon created', function() {
@@ -811,10 +739,10 @@ function runTests(){
     });
 
     test('tooltip exists', function() {
-      assert.isTrue(ordinalEvent.$.eventTooltip !== null);
+      assert.isTrue(ordinalEvent.$$('px-tooltip') !== null);
     });
     test('tooltip content is correct', function() {
-      assert.equal(ordinalEvent.$.eventTooltip.$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: ordinalID: 6666X: low');
+      assert.equal(ordinalEvent.$$('px-tooltip').$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: ordinalID: 6666X: low');
     });
   }); //suite
 } //runTests

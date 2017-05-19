@@ -1524,41 +1524,57 @@ PxVisBehaviorChart.zooming = [{
 
     var xMin = this.x.domain()[0],
         xMax = this.x.domain()[1],
-        newExtents = {};
+        newExtents = {},
+        zoomSelection = this.selectionType || 'xy';
 
     this._saveOrdinalOriginalExtents();
 
-    if(this.xAxisType === 'ordinal') {
-      //add and remove values for ordinal
-      newExtents.eX = this._calcNewOrdinalExtents(this.x.domain(), this._originalOrdinalExtents[0], isZoomIn);
+    if(zoomSelection === 'xy' || zoomSelection === 'xAxis') {
+
+      if(this.xAxisType === 'ordinal') {
+        //add and remove values for ordinal
+        newExtents.eX = this._calcNewOrdinalExtents(this.x.domain(), this._originalOrdinalExtents[0], isZoomIn);
+      } else {
+
+        //because we're going to apply a percentage to values we need to
+        //make sure those values are linear
+        xMin = this._convertValue(xMin, this.xAxisType, true);
+        xMax = this._convertValue(xMax, this.xAxisType, true);
+
+        newExtents.eX = this._calcNewLinearExtents(xMin, xMax, isZoomIn);
+
+        //make sure values are in the right format
+        newExtents.eX[0] = this._convertValue(newExtents.eX[0], this.xAxisType, false);
+        newExtents.eX[1] = this._convertValue(newExtents.eX[1], this.xAxisType, false);
+      }
     } else {
 
-      //because we're going to apply a percentage to values we need to
-      //make sure those values are linear
-      xMin = this._convertValue(xMin, this.xAxisType, true);
-      xMax = this._convertValue(xMax, this.xAxisType, true);
-
-      newExtents.eX = this._calcNewLinearExtents(xMin, xMax, isZoomIn);
-
-      //make sure values are in the right format
-      newExtents.eX[0] = this._convertValue(newExtents.eX[0], this.xAxisType, false);
-      newExtents.eX[1] = this._convertValue(newExtents.eX[1], this.xAxisType, false);
+      //preserve current extents
+      newExtents.eX = [xMin, xMax];
     }
 
-    if(this.yAxisType === 'ordinal') {
-      //add and remove values for ordinal
-      newExtents.eY = this._processYValues(function(axis, index) {
-        var originalDomain = this._originalOrdinalExtents[1];
-        //multi Y
-        if(index || index === 0) {
-          originalDomain = originalDomain[index];
-        }
-        return this._calcNewOrdinalExtents(axis.domain(), originalDomain, isZoomIn);
-      });
+    if(zoomSelection === 'xy' || zoomSelection === 'yAxis') {
+      if(this.yAxisType === 'ordinal') {
+        //add and remove values for ordinal
+        newExtents.eY = this._processYValues(function(axis, index) {
+          var originalDomain = this._originalOrdinalExtents[1];
+          //multi Y
+          if(index || index === 0) {
+            originalDomain = originalDomain[index];
+          }
+          return this._calcNewOrdinalExtents(axis.domain(), originalDomain, isZoomIn);
+        });
+      } else {
+        //linear
+        newExtents.eY = this._processYValues(function(axis, index) {
+          return this._calcNewLinearExtents(axis.domain()[0], axis.domain()[1], isZoomIn);
+        });
+      }
     } else {
-      //linear
+
+      //preserver current extents
       newExtents.eY = this._processYValues(function(axis, index) {
-        return this._calcNewLinearExtents(axis.domain()[0], axis.domain()[1], isZoomIn);
+        return [axis.domain()[0], axis.domain()[1]];
       });
     }
 
@@ -1676,7 +1692,7 @@ PxVisBehaviorChart.zooming = [{
   _intSpaceStopPan: function() {
     this.set('_isPanning', false);
   },
-}, PxVisBehavior.extentsData, PxVisBehaviorD3.selectedDomain, PxVisBehavior.axisTypes, PxVisBehaviorD3.axes];
+}, PxVisBehavior.extentsData, PxVisBehaviorD3.selectedDomain, PxVisBehavior.axisTypes, PxVisBehaviorD3.axes, PxVisBehavior.zoomSelection];
 
 /*
     Name:

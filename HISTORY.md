@@ -11,10 +11,28 @@ v2.0.0
 * fixed canvas clearing issue when using scatter and line at the same time
 * added canvas support for radial line and radial scatter
 
+v1.1.11
+==================
+* ensure tooltip can still be shown in events
+* added more config to `eventsConfig`:
+      - `firstDateTimeFormat`: moment.js format string for the first part of the timestamp if the x Axis is time based
+      - `separator`: the separator character between the two datetime strings
+      - `secondDateTimeFormat`: moment.js format string for the second part of the timestamp if the x Axis is time based
+      - `tooltipOrientation`: orientation of the tooltip
+      - `timezone`: the moment.js timezone to be used for the timestamp
+
+v1.1.10
+==================
+* added 'enableTooltip' (on by default) to eventConfig
+
+v1.1.9
+==================
+* Ensure zoom in and zoom out features take the selection type into account
+
 v1.1.8
 ==================
 * Allows data converter to have a interpolator passed in.
-* Changes to completeSeriesConfig computation so it does a proper deep clone of seriesConfig to allow functions and special values to be passed in. 
+* Changes to completeSeriesConfig computation so it does a proper deep clone of seriesConfig to allow functions and special values to be passed in.
 
 v1.1.7
 ==================

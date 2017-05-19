@@ -197,7 +197,8 @@ function basicAttrs(elem, elemName, w,h,m){
   //   assert.isTrue(elem.canvasContext.getTransform() === "translate("+m.left+","+m.top+")" || elem._canvas.attr('transform').trim() === "translate("+m.left+" "+m.top+")");
   // });
 
-  test(elemName + ' canvasContext has correct line trackers',function(){
+  test(elemName + ' canvasContext has correct line trackers',function() {
+    debugger
     assert.equal(JSON.stringify(elem.canvasContext._pxLinesSeries), '{}');
     assert.equal(elem.canvasContext._pxLinesTotal, 0);
     assert.equal(elem.canvasContext._pxLinesRedraw, 0);
