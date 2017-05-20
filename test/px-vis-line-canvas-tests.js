@@ -101,7 +101,7 @@ function runTests(){
     });
 
     test('context has correct total lines ', function() {
-      assert.equal(baseCanvas.canvasContext._pxLinesTotal, 2);
+      assert.equal(baseCanvas.canvasContext._pxLinesSeries.length, 2);
     });
 
     test('context has drawn 2 lines ', function() {
@@ -109,9 +109,8 @@ function runTests(){
     });
 
     test('context has added both to its list', function() {
-      assert.equal(Object.keys(baseCanvas.canvasContext._pxLinesSeries).length, 2);
-      assert.equal(baseCanvas.canvasContext._pxLinesSeries['mySeries'], true);
-      assert.equal(baseCanvas.canvasContext._pxLinesSeries['mySeries2'], true);
+      assert.equal(baseCanvas.canvasContext._pxLinesSeries[0], 'mySeries');
+      assert.equal(baseCanvas.canvasContext._pxLinesSeries[1], 'mySeries2');
     });
   }); //suite
 
@@ -228,7 +227,7 @@ function runTests(){
     });
 
     test('context has correct total lines ', function() {
-      assert.equal(progressiveCanvas.canvasContext._pxLinesTotal, 2);
+      assert.equal(progressiveCanvas.canvasContext._pxLinesSeries.length, 2);
     });
 
     test('context has drawn 2 lines ', function() {
@@ -236,10 +235,10 @@ function runTests(){
     });
 
     test('context has added both to its list', function() {
-      assert.equal(Object.keys(progressiveCanvas.canvasContext._pxLinesSeries).length, 2);
-      assert.equal(progressiveCanvas.canvasContext._pxLinesSeries['mySeries'], true);
-      assert.equal(progressiveCanvas.canvasContext._pxLinesSeries['mySeries2'], true);
+      assert.equal(progressiveCanvas.canvasContext._pxLinesSeries[0], 'mySeries');
+      assert.equal(progressiveCanvas.canvasContext._pxLinesSeries[1], 'mySeries2');
     });
+
   }); //suite
 
 
@@ -324,7 +323,7 @@ function runTests(){
         linePath1 = canvasOnceLine1.lineGroup;
         linePath2 = canvasOnceLine2.lineGroup;
         done();
-      },100);;
+      },100);
     });
 
     test('canvasOnceLine1 fixture is created', function() {
@@ -335,7 +334,7 @@ function runTests(){
     });
 
     test('context has correct total lines ', function() {
-      assert.equal(canvasOnce.canvasContext._pxLinesTotal, 2);
+      assert.equal(canvasOnce.canvasContext._pxLinesSeries.length, 2);
     });
 
     test('context has drawn 2 lines ', function() {
@@ -343,10 +342,10 @@ function runTests(){
     });
 
     test('context has added both to its list', function() {
-      assert.equal(Object.keys(canvasOnce.canvasContext._pxLinesSeries).length, 2);
-      assert.equal(canvasOnce.canvasContext._pxLinesSeries['mySeries'], true);
-      assert.equal(canvasOnce.canvasContext._pxLinesSeries['mySeries2'], true);
+      assert.equal(canvasOnce.canvasContext._pxLinesSeries[0], 'mySeries');
+      assert.equal(canvasOnce.canvasContext._pxLinesSeries[1], 'mySeries2');
     });
+
   }); //suite
 
   suite('px-vis-line-canvas mutes correctly', function() {
@@ -375,7 +374,7 @@ function runTests(){
     });
 
     test('context has correct total lines ', function() {
-      assert.equal(canvasOnce.canvasContext._pxLinesTotal, 2);
+      assert.equal(canvasOnce.canvasContext._pxLinesSeries.length, 2);
     });
 
     test('context has drawn 2 lines ', function() {
@@ -383,9 +382,8 @@ function runTests(){
     });
 
     test('context has added both to its list', function() {
-      assert.equal(Object.keys(canvasOnce.canvasContext._pxLinesSeries).length, 2);
-      assert.equal(canvasOnce.canvasContext._pxLinesSeries['mySeries'], true);
-      assert.equal(canvasOnce.canvasContext._pxLinesSeries['mySeries2'], true);
+      assert.equal(canvasOnce.canvasContext._pxLinesSeries[0], 'mySeries');
+      assert.equal(canvasOnce.canvasContext._pxLinesSeries[1], 'mySeries2');
     });
   }); //suite
 
@@ -415,7 +413,7 @@ function runTests(){
     });
 
     test('context has correct total lines ', function() {
-      assert.equal(canvasOnce.canvasContext._pxLinesTotal, 2);
+      assert.equal(canvasOnce.canvasContext._pxLinesSeries.length, 2);
     });
 
     test('context has drawn 2 lines ', function() {
@@ -423,9 +421,8 @@ function runTests(){
     });
 
     test('context has added both to its list', function() {
-      assert.equal(Object.keys(canvasOnce.canvasContext._pxLinesSeries).length, 2);
-      assert.equal(canvasOnce.canvasContext._pxLinesSeries['mySeries'], true);
-      assert.equal(canvasOnce.canvasContext._pxLinesSeries['mySeries2'], true);
+      assert.equal(canvasOnce.canvasContext._pxLinesSeries[0], 'mySeries');
+      assert.equal(canvasOnce.canvasContext._pxLinesSeries[1], 'mySeries2');
     });
   }); //suite
 
@@ -457,7 +454,7 @@ function runTests(){
     });
 
     test('context has correct total lines ', function() {
-      assert.equal(canvasOnce.canvasContext._pxLinesTotal, 2);
+      assert.equal(canvasOnce.canvasContext._pxLinesSeries.length, 2);
     });
 
     test('context has drawn 2 lines ', function() {
@@ -465,9 +462,8 @@ function runTests(){
     });
 
     test('context has added both to its list', function() {
-      assert.equal(Object.keys(canvasOnce.canvasContext._pxLinesSeries).length, 2);
-      assert.equal(canvasOnce.canvasContext._pxLinesSeries['mySeries'], true);
-      assert.equal(canvasOnce.canvasContext._pxLinesSeries['mySeries2'], true);
+      assert.equal(canvasOnce.canvasContext._pxLinesSeries[0], 'mySeries');
+      assert.equal(canvasOnce.canvasContext._pxLinesSeries[1], 'mySeries2');
     });
   }); //suite
 
@@ -552,7 +548,7 @@ function runTests(){
     });
 
     test('context has correct total lines ', function() {
-      assert.equal(parallelCanvasSVG.canvasContext._pxLinesTotal, 1);
+      assert.equal(parallelCanvasSVG.canvasContext._pxLinesSeries.length, 1);
     });
 
     test('context has drawn 2 lines ', function() {
@@ -560,8 +556,7 @@ function runTests(){
     });
 
     test('context has added both to its list', function() {
-      assert.equal(Object.keys(parallelCanvasSVG.canvasContext._pxLinesSeries).length, 1);
-      assert.equal(parallelCanvasSVG.canvasContext._pxLinesSeries['x'], true);
+      assert.equal(parallelCanvasSVG.canvasContext._pxLinesSeries[0], 'x');
     });
 
   }); //suite
@@ -646,16 +641,15 @@ function runTests(){
     });
 
     test('context has correct total lines ', function() {
-      assert.equal(parallelGradientCanvasSVG.canvasContext._pxLinesTotal, 1);
+      assert.equal(parallelGradientCanvasLine.canvasContext._pxLinesSeries.length, 1);
     });
 
     test('context has drawn 2 lines ', function() {
-      assert.equal(parallelGradientCanvasSVG.canvasContext._pxLinesRedraw, 1);
+      assert.equal(parallelGradientCanvasLine.canvasContext._pxLinesRedraw, 1);
     });
 
     test('context has added both to its list', function() {
-      assert.equal(Object.keys(parallelCanvasSVG.canvasContext._pxLinesSeries).length, 1);
-      assert.equal(parallelGradientCanvasSVG.canvasContext._pxLinesSeries['x'], true);
+      assert.equal(parallelGradientCanvasLine.canvasContext._pxLinesSeries[0], 'x');
     });
 
   }); //suite
@@ -762,16 +756,15 @@ function runTests(){
     });
 
     test('context has correct total lines ', function() {
-      assert.equal(parallelCategoryCanvasSVG.canvasContext._pxLinesTotal, 1);
+      assert.equal(parallelCategoryCanvasLine.canvasContext._pxLinesSeries.length, 1);
     });
 
     test('context has drawn 2 lines ', function() {
-      assert.equal(parallelCategoryCanvasSVG.canvasContext._pxLinesRedraw, 1);
+      assert.equal(parallelCategoryCanvasLine.canvasContext._pxLinesRedraw, 1);
     });
 
     test('context has added both to its list', function() {
-      assert.equal(Object.keys(parallelCategoryCanvasSVG.canvasContext._pxLinesSeries).length, 1);
-      assert.equal(parallelCategoryCanvasSVG.canvasContext._pxLinesSeries['x'], true);
+      assert.equal(parallelCategoryCanvasLine.canvasContext._pxLinesSeries[0], 'x');
     });
 
   }); //suite
@@ -877,17 +870,16 @@ function runTests(){
       assert.isTrue(parallelCategoryGradientCanvasLine !== null);
     });
 
-    test('context has correct total lines ', function() {
-      assert.equal(parallelCategoryGradientCanvasSVG.canvasContext._pxLinesTotal, 1);
+     test('context has correct total lines ', function() {
+      assert.equal(parallelCategoryGradientCanvasLine.canvasContext._pxLinesSeries.length, 1);
     });
 
     test('context has drawn 2 lines ', function() {
-      assert.equal(parallelCategoryGradientCanvasSVG.canvasContext._pxLinesRedraw, 1);
+      assert.equal(parallelCategoryGradientCanvasLine.canvasContext._pxLinesRedraw, 1);
     });
 
     test('context has added both to its list', function() {
-      assert.equal(Object.keys(parallelCategoryGradientCanvasSVG.canvasContext._pxLinesSeries).length, 1);
-      assert.equal(parallelCategoryGradientCanvasSVG.canvasContext._pxLinesSeries['x'], true);
+      assert.equal(parallelCategoryGradientCanvasLine.canvasContext._pxLinesSeries[0], 'x');
     });
   }); //suite
 
@@ -1512,7 +1504,7 @@ function runTests(){
     });
 
     test('context has correct total lines ', function() {
-      assert.equal(radarCanvas.canvasContext._pxLinesTotal, 1);
+      assert.equal(radarCanvas.canvasContext._pxLinesSeries.length, 1);
     });
 
     test('context has drawn 2 lines ', function() {
@@ -1520,8 +1512,7 @@ function runTests(){
     });
 
     test('context has added both to its list', function() {
-      assert.equal(Object.keys(radarCanvas.canvasContext._pxLinesSeries).length, 1);
-      assert.equal(radarCanvas.canvasContext._pxLinesSeries['x'], true);
+      assert.equal(radarCanvas.canvasContext._pxLinesSeries[0], 'x');
     });
   }); //suite
 
@@ -1544,16 +1535,15 @@ function runTests(){
     });
 
     test('context has correct total lines ', function() {
-      assert.equal(radarCanvas.canvasContext._pxLinesTotal, 1);
+      assert.equal(radarLine.canvasContext._pxLinesSeries.length, 1);
     });
 
     test('context has drawn 2 lines ', function() {
-      assert.equal(radarCanvas.canvasContext._pxLinesRedraw, 1);
+      assert.equal(radarLine.canvasContext._pxLinesRedraw, 1);
     });
 
     test('context has added both to its list', function() {
-      assert.equal(Object.keys(radarCanvas.canvasContext._pxLinesSeries).length, 1);
-      assert.equal(radarCanvas.canvasContext._pxLinesSeries['x'], true);
+      assert.equal(radarLine.canvasContext._pxLinesSeries[0], 'x');
     });
 
   }); //suite
@@ -1640,16 +1630,15 @@ function runTests(){
     });
 
     test('context has correct total lines ', function() {
-      assert.equal(radarMissingSVG.canvasContext._pxLinesTotal, 1);
+      assert.equal(radarMissingLine.canvasContext._pxLinesSeries.length, 1);
     });
 
     test('context has drawn 2 lines ', function() {
-      assert.equal(radarMissingSVG.canvasContext._pxLinesRedraw, 1);
+      assert.equal(radarMissingLine.canvasContext._pxLinesRedraw, 1);
     });
 
     test('context has added both to its list', function() {
-      assert.equal(Object.keys(radarMissingSVG.canvasContext._pxLinesSeries).length, 1);
-      assert.equal(radarMissingSVG.canvasContext._pxLinesSeries['x'], true);
+      assert.equal(radarMissingLine.canvasContext._pxLinesSeries[0], 'x');
     });
 
   }); //suite
@@ -1740,16 +1729,15 @@ function runTests(){
     });
 
     test('context has correct total lines ', function() {
-      assert.equal(clipPathCanvas.canvasContext._pxLinesTotal, 1);
+      assert.equal(clipPathLine.canvasContext._pxLinesSeries.length, 1);
     });
 
     test('context has drawn 2 lines ', function() {
-      assert.equal(clipPathCanvas.canvasContext._pxLinesRedraw, 1);
+      assert.equal(clipPathLine.canvasContext._pxLinesRedraw, 1);
     });
 
     test('context has added both to its list', function() {
-      assert.equal(Object.keys(clipPathCanvas.canvasContext._pxLinesSeries).length, 1);
-      assert.equal(clipPathCanvas.canvasContext._pxLinesSeries['x'], true);
+      assert.equal(clipPathLine.canvasContext._pxLinesSeries[0], 'x');
     });
 
     test('visual check with mask', function() {

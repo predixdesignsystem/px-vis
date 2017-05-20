@@ -372,15 +372,6 @@ function basicTests(registerID,dir){
         assert.equal(series[i].querySelector('.seriesName').firstChild.textContent.trim(), data.completeSeriesConfig['series_'+i]['name']);
       }
     });
-
-    test(registerID + ' values are blank', function() {
-      var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item'),
-          numForm;
-      for(var i = 0; i < series.length; i++){
-        numForm = series[i].querySelector('.seriesData').querySelector('px-number-formatter');
-        assert.equal(numForm.style["display"], "none");
-      }
-    });
   });
 
   suite('px-vis-register ' + registerID + ' clicking on series', function() {
@@ -544,7 +535,7 @@ function setData(series, data, done){
   // pause and let the dom repeate chug away
   setTimeout(function() {
     if(done){ done(); }
-  }, 10);
+  }, 50);
 }
 
 function setMutedSeries(series, name, done){
@@ -554,5 +545,5 @@ function setMutedSeries(series, name, done){
   // pause and let the dom repeate chug away
   setTimeout(function(){
     if(done){ done(); }
-  },10);
+  },50);
 }

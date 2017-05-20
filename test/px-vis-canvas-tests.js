@@ -198,10 +198,14 @@ function basicAttrs(elem, elemName, w,h,m){
   // });
 
   test(elemName + ' canvasContext has correct line trackers',function() {
-    debugger
-    assert.equal(JSON.stringify(elem.canvasContext._pxLinesSeries), '{}');
-    assert.equal(elem.canvasContext._pxLinesTotal, 0);
+    assert.equal(JSON.stringify(elem.canvasContext._pxLinesSeries), '[]');
     assert.equal(elem.canvasContext._pxLinesRedraw, 0);
+    assert.equal(elem.canvasContext._pxLinesCleared, true);
+    assert.equal(JSON.stringify(elem.canvasContext._pxScatterSeries), '[]');
+    assert.equal(elem.canvasContext._pxScatterRedraw, 0);
+    assert.equal(elem.canvasContext._pxScatterCleared, true);
+    assert.equal(elem.canvasContext._translation[0], m.left);
+    assert.equal(elem.canvasContext._translation[1], m.top);
   });
 
 }

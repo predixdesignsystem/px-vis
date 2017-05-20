@@ -39,7 +39,7 @@ extentCalc.determineExtents = function determineExtents(data) {
 
   // look at our chartExtents and dataExtents for values
   extents.x = this._checkForExtents(xOrd, this.chartExtents, this.dataExtents, "x");
-  extents.y =  this.isYAxisObject ? this._calcMultiAxisExtents(data) : this._checkForExtents(yOrd, this.chartExtents, this.dataExtents, "y");
+  extents.y =  this.axes && this.axes.length ? this._calcMultiAxisExtents(data) : this._checkForExtents(yOrd, this.chartExtents, this.dataExtents, "y");
 
   //if our chart data has not changed, then dont go through all the data. Just use the extents we have
   if(extents.x.length > 0 && extents.x[0] !== Infinity && extents.x[1] !== -Infinity) {

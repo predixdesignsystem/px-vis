@@ -2304,12 +2304,11 @@ PxVisBehavior.interactionSpaceShared = [{
             'mouse': null,
             'xArr': null,
             'yArr': null
-          },
-          keys = (this.seriesKeys) ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
-          len = keys.length,
-          i;
+          };
+      var keys = (this.seriesKeys) ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
+          len = keys.length;
 
-      for(i = 0; i < len; i++){
+      for(var i = 0; i < len; i++){
         ttD.series.push({'name': keys[i],'value': null });
       }
     }
@@ -2660,7 +2659,8 @@ PxVisBehavior.highlightLineShared = [{
 
       } else {
         screenX = this.x(last) + svgBounding.left + window.pageXOffset + 15;
-        screenY = this.y[last](dataset.yVal) + this.domHost.margin.top + svgBounding.top + window.pageYOffset;
+        // FIXME? Yeah, getRootNode().host isnt the best, but otherwise we have to pass down the whole margin obj just for this. Dunno...
+        screenY = this.y[last](dataset.yVal) + this.getRootNode().host.margin.top + svgBounding.top + window.pageYOffset;
       }
 
       for(var i = 0; i < this.dimensions.length; i++) {

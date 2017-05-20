@@ -1106,8 +1106,7 @@ function runTests(){
       radialAxis.set('axes',dim);
       radialAxis.set('chartData',d);
 
-      setTimeout(function(){done()},300);
-     // done();
+      setTimeout(function() { done(); }, 300);
     });
 
     test('radialAxis fixture is created', function() {
@@ -1175,7 +1174,6 @@ function runTests(){
 
     test('radialAxis drawnTickValues', function() {
       var axes = radialAxis.getElementsByTagName('px-vis-axis');
-
       assert.equal(JSON.stringify(axes[0].drawnTickValues), '[2,4,6,8,10,12,14,16,18,20,22,24,26]');
     });
 

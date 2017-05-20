@@ -192,68 +192,72 @@ Custom property | Description | Default
 
     _xFormatterChanged: function() {
       this.$.xFormatter = Polymer.dom(this.root).querySelector('#xFormatter');
+      this._computeItem(this.item, this.completeSeriesConfig);
     },
     _yFormatterChanged: function() {
       this.$.yFormatter = Polymer.dom(this.root).querySelector('#yFormatter');
+      this._computeItem(this.item, this.completeSeriesConfig);
     },
     _xSpanChanged: function() {
       this.$.xSpan = Polymer.dom(this.root).querySelector('#xSpan');
+      this._computeItem(this.item, this.completeSeriesConfig);
     },
     _ySpanChanged: function() {
       this.$.ySpan = Polymer.dom(this.root).querySelector('#ySpan');
+      this._computeItem(this.item, this.completeSeriesConfig);
     },
 
     _computeItem: function(item, completeSeriesConfig) {
+      // this was moved to manual instead of a binding for performance reasons which may or may not legit. One day we should revisit and see if it really matters
+      this.debounce("numberFormatterValues", function() {
+        if(this.completeSeriesConfig && this.completeSeriesConfig[item.name]) {
 
-      if(this.completeSeriesConfig && this.completeSeriesConfig[item.name]) {
+          var xKey = this.completeSeriesConfig[item.name]['x'],
+              yKey = this.completeSeriesConfig[item.name]['y'];
 
-        var xKey = this.completeSeriesConfig[item.name]['x'],
-            yKey = this.completeSeriesConfig[item.name]['y'];
-
-        //process X val
-        if(item.value && (item.value[xKey] || item.value[xKey] === 0)) {
-
-          //manually assign value rather than bind because we needs the
-          //perf boost here (this might me called a lot wqhen hovering the
-          //chart and having a lot of different series
-          if(this.$.xFormatter) {
-            this.$.xFormatter.set('value', item.value[xKey]);
-          } else if(this.$.xSpan) {
-            this.$.xSpan.textContent = item.value[xKey];
+          //process X val
+          if(item.value && (item.value[xKey] || item.value[xKey] === 0)) {
+            //manually assign value rather than bind because we needs the
+            //perf boost here (this might me called a lot wqhen hovering the
+            //chart and having a lot of different series
+            if(this.$.xFormatter) {
+              this.$.xFormatter.set('value', item.value[xKey]);
+            } else if(this.$.xSpan) {
+              this.$.xSpan.textContent = item.value[xKey];
+            }
+            this.set('_slash', ' / ');
+            this.set('_xUnit', this.completeSeriesConfig[item.name]['xAxisUnit']);
+          } else {
+            if(this.$.xFormatter) {
+              this.$.xFormatter.set('value', null);
+            } else if(this.$.xSpan) {
+              this.$.xSpan.textContent = null;
+            }
+            this.set('_slash', '');
+            this.set('_xUnit', '');
           }
-          this.set('_slash', ' / ');
-          this.set('_xUnit', this.completeSeriesConfig[item.name]['xAxisUnit']);
-        } else {
-          if(this.$.xFormatter) {
-            this.$.xFormatter.set('value', null);
-          } else if(this.$.xSpan) {
-            this.$.xSpan.textContent = null;
+
+          //process Y val
+          if(item.value && (item.value[yKey] || item.value[yKey] === 0)) {
+            //manually assign value rather than bind because we needs the
+            //perf boost here (this might me called a lot wqhen hovering the
+            //chart and having a lot of different series
+            if(this.$.yFormatter) {
+              this.$.yFormatter.set('value', item.value[yKey]);
+            } else if(this.$.ySpan) {
+              this.$.ySpan.textContent = item.value[yKey];
+            }
+            this.set('_yUnit', this.completeSeriesConfig[item.name]['yAxisUnit']);
+          } else {
+            if(this.$.yFormatter) {
+              this.$.yFormatter.set('value', null);
+            } else if(this.$.ySpan) {
+              this.$.ySpan.textContent = null;
+            }
+            this.set('_yUnit', '');
           }
-          this.set('_slash', '');
-          this.set('_xUnit', '');
         }
-
-        //process Y val
-        if(item.value && (item.value[yKey] || item.value[yKey] === 0)) {
-
-          //manually assign value rather than bind because we needs the
-          //perf boost here (this might me called a lot wqhen hovering the
-          //chart and having a lot of different series
-          if(this.$.yFormatter) {
-            this.$.yFormatter.set('value', item.value[yKey]);
-          } else if(this.$.ySpan) {
-            this.$.ySpan.textContent = item.value[yKey];
-          }
-          this.set('_yUnit', this.completeSeriesConfig[item.name]['yAxisUnit']);
-        } else {
-          if(this.$.yFormatter) {
-            this.$.yFormatter.set('value', null);
-          } else if(this.$.ySpan) {
-            this.$.ySpan.textContent = null;
-          }
-          this.set('_yUnit', '');
-        }
-      }
+      }, 10);
     },
 
     _disableClickFunc: function(disableClick) {

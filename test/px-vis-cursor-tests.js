@@ -52,35 +52,35 @@ function runTests(){
   });
 
   baseTests('baseCursor','full','full','yes',[0,500],[0,300]);
-  addTooltipTests('baseCursor',true,true,true,500,[170,240],['translate(260,0)','translate(260)'],[['240','170'],['240','240']]);
+  addTooltipTests('baseCursor',true,true,true,500,[170,240],240,[['240','170'],['240','240']]);
   removeTooltipTests('baseCursor');
 
   baseTests('hLineLeftCursor','left','full','yes',[0,500],[0,300]);
-  addTooltipTests('hLineLeftCursor',true,true,true,240,[170,240],['translate(260,0)','translate(260)'],[['240','170'],['240','240']]);
+  addTooltipTests('hLineLeftCursor',true,true,true,240,[170,240],240,[['240','170'],['240','240']]);
   removeTooltipTests('hLineLeftCursor');
 
   baseTests('hLineRightCursor','right','full','yes',[0,500],[0,300]);
-  addTooltipTests('hLineRightCursor',true,true,true,500,[170,240],['translate(260,0)','translate(260)'],[['240','170'],['240','240']]);
+  addTooltipTests('hLineRightCursor',true,true,true,500,[170,240],240,[['240','170'],['240','240']]);
   removeTooltipTests('hLineRightCursor');
 
   baseTests('hLineNoneCursor','none','full','yes',[0,500],[0,300]);
-  addTooltipTests('hLineNoneCursor',false,true,true,500,[170,240],['translate(260,0)','translate(260)'],[['240','170'],['240','240']]);
+  addTooltipTests('hLineNoneCursor',false,true,true,500,[170,240],240,[['240','170'],['240','240']]);
   removeTooltipTests('hLineNoneCursor');
 
   baseTests('vLineTopCursor','full','top','yes',[0,500],[0,300]);
-  addTooltipTests('vLineTopCursor',true,true,true,500,[170,240],'translate(240,170)',[['240','170'],['240','240']]);
+  addTooltipTests('vLineTopCursor',true,true,true,500,[170,240],240,[['240','170'],['240','240']]);
   removeTooltipTests('vLineTopCursor');
 
   baseTests('vLineBottomCursor','full','bottom','yes',[0,500],[0,300]);
-  addTooltipTests('vLineBottomCursor',true,true,true,500,[170,240],'translate(240,240)',[['240','170'],['240','240']]);
+  addTooltipTests('vLineBottomCursor',true,true,true,500,[170,240],240,[['240','170'],['240','240']]);
   removeTooltipTests('vLineBottomCursor');
 
   baseTests('vLineNoneCursor','full','none','yes',[0,500],[0,300]);
-  addTooltipTests('vLineNoneCursor',true,false,true,500,[170,240],['translate(260,0)','translate(260)'],[['240','170'],['240','240']]);
+  addTooltipTests('vLineNoneCursor',true,false,true,500,[170,240],240,[['240','170'],['240','240']]);
   removeTooltipTests('vLineNoneCursor');
 
   baseTests('circleNoCursor','full','full','no',[0,500],[0,300]);
-  addTooltipTests('circleNoCursor',true,true,false,500,[170,240],['translate(260,0)','translate(260)'],[['240','170'],['240','240']]);
+  addTooltipTests('circleNoCursor',true,true,false,500,[170,240],240,[['240','170'],['240','240']]);
   removeTooltipTests('circleNoCursor');
 } //runTests
 
@@ -174,15 +174,16 @@ function baseTests(elem,hLine,vLine,circle,hArr,yArr){
       });
     }
     if(vLine === 'none'){
+
     } else {
       test(elem + ' _vLines tag', function() {
-        assert.equal(cursor._vLine.node().tagName,'line');
+        assert.equal(cursor._vLines.node().tagName,'line');
       });
-      test(elem + ' _vLine y1', function() {
-        assert.equal(cursor._vLine.attr('y1'),yArr[0]);
+      test(elem + ' _vLines y1', function() {
+        assert.equal(cursor._vLines.attr('y1'),yArr[0]);
       });
-      test(elem + ' _vLine y2', function() {
-        assert.equal(cursor._vLine.attr('y2'),yArr[1]);
+      test(elem + ' _vLines y2', function() {
+        assert.equal(cursor._vLines.attr('y2'),yArr[1]);
       });
     }
 
@@ -259,13 +260,9 @@ function addTooltipTests(elem,hLine,vLine,circle,hX2,hTransformArr,vTransform,cA
     }
 
     if(vLine) {
-      test(elem + ' _vLine transform', function() {
-        if(typeof(vTransform)==='object'){
-          // Stupid MS IE/Edge
-          assert.isTrue(cursor._vLine.attr('transform').split(" ").join(',') === vTransform[0] || cursor._vLine.attr('transform').split(" ").join(',') === vTransform[1]);
-        } else {
-          assert.equal(cursor._vLine.attr('transform').split(" ").join(','),vTransform);
-        }
+      test(elem + ' _vLines transform', function() {
+      assert.equal(cursor._vLines.attr('x1'),vTransform);
+      assert.equal(cursor._vLines.attr('x2'),vTransform);
       });
     }
 

@@ -74,14 +74,14 @@ function runTests(){
     });
 
     test('radialGrid lines are created', function() {
-      var g = baseSVG.svg.select('g.a.axis'),
+      var g = baseSVG.svg.select('g.axisGridLines'),
           lines = g.selectAll('line');
 
       assert.lengthOf(lines.nodes(),8);
     });
 
     test('radialGrid lines are the correct length', function() {
-      var g = baseSVG.svg.select('g.a.axis'),
+      var g = baseSVG.svg.select('g.axisGridLines'),
           lines = g.selectAll('line');
 
       assert.equal(Px.d3.select(lines.nodes()[0]).attr('x2'),240);
@@ -89,33 +89,8 @@ function runTests(){
     });
 
     test('radialGrid lines are rotated correctly', function() {
-      var g = baseSVG.svg.select('g.a.axis'),
-          lineG = g.selectAll('g').nodes(),
-          re = /rotate\((-?\d+)\)/,
-          m0,m1,m2,m3,m4,m5,m6,m7;
-
-          m0 = re.exec(Px.d3.select(lineG[0]).attr('transform'));
-          m1 = re.exec(Px.d3.select(lineG[1]).attr('transform'));
-          m2 = re.exec(Px.d3.select(lineG[2]).attr('transform'));
-          m3 = re.exec(Px.d3.select(lineG[3]).attr('transform'));
-          m4 = re.exec(Px.d3.select(lineG[4]).attr('transform'));
-          m5 = re.exec(Px.d3.select(lineG[5]).attr('transform'));
-          m6 = re.exec(Px.d3.select(lineG[6]).attr('transform'));
-          m7 = re.exec(Px.d3.select(lineG[7]).attr('transform'));
-
-      assert.equal(m0[1],"-30");
-      assert.equal(m1[1],"-60");
-      assert.equal(m2[1],"-120");
-      assert.equal(m3[1],"-150");
-      assert.equal(m4[1],"-210");
-      assert.equal(m5[1],"-240");
-      assert.equal(m6[1],"-310");
-      assert.equal(m7[1],"-340");
-    });
-
-    test('radialGrid lines are rotated correctly', function() {
-      var g = baseSVG.svg.select('g.a.axis'),
-          lineG = g.selectAll('g').nodes(),
+      var g = baseSVG.svg.select('g.axisGridLines'),
+          lineG = g.selectAll('line').nodes(),
           re = /rotate\((-?\d+)\)/,
           m0,m1,m2,m3,m4,m5,m6,m7;
 
@@ -139,14 +114,14 @@ function runTests(){
     });
 
     test('radialGrid circles are created', function() {
-      var g = baseSVG.svg.select('g.r.axis'),
+      var g = baseSVG.svg.select('g.radialGridlines'),
           circle = g.selectAll('circle');
 
-      assert.lengthOf(circle.nodes(),5);
+      assert.lengthOf(circle.nodes(), 6);
     });
 
     test('radialGrid circles have correct radius', function() {
-      var g = baseSVG.svg.select('g.r.axis'),
+      var g = baseSVG.svg.select('g.radialGridlines'),
           circle = g.selectAll('circle');
 
       assert.closeTo(Number(Px.d3.select(circle.nodes()[0]).attr('r')), 48, 1);
@@ -175,14 +150,14 @@ function runTests(){
     });
 
     test('radialGrid lines are created', function() {
-      var g = baseSVG.svg.select('g.a.axis'),
+      var g = baseSVG.svg.select('g.axisGridLines'),
           lines = g.selectAll('line');
 
       assert.lengthOf(lines.nodes(),8);
     });
 
     test('radialGrid lines are the correct length', function() {
-      var g = baseSVG.svg.select('g.a.axis'),
+      var g = baseSVG.svg.select('g.axisGridLines'),
           lines = g.selectAll('line');
 
       assert.equal(Px.d3.select(lines.nodes()[0]).attr('x2'),240);
@@ -190,33 +165,8 @@ function runTests(){
     });
 
     test('radialGrid lines are rotated correctly', function() {
-      var g = baseSVG.svg.select('g.a.axis'),
-          lineG = g.selectAll('g').nodes(),
-          re = /rotate\((-?\d+)\)/,
-          m0,m1,m2,m3,m4,m5,m6,m7;
-
-          m0 = re.exec(Px.d3.select(lineG[0]).attr('transform'));
-          m1 = re.exec(Px.d3.select(lineG[1]).attr('transform'));
-          m2 = re.exec(Px.d3.select(lineG[2]).attr('transform'));
-          m3 = re.exec(Px.d3.select(lineG[3]).attr('transform'));
-          m4 = re.exec(Px.d3.select(lineG[4]).attr('transform'));
-          m5 = re.exec(Px.d3.select(lineG[5]).attr('transform'));
-          m6 = re.exec(Px.d3.select(lineG[6]).attr('transform'));
-          m7 = re.exec(Px.d3.select(lineG[7]).attr('transform'));
-
-      assert.equal(m0[1],"-30");
-      assert.equal(m1[1],"-60");
-      assert.equal(m2[1],"-120");
-      assert.equal(m3[1],"-150");
-      assert.equal(m4[1],"-210");
-      assert.equal(m5[1],"-240");
-      assert.equal(m6[1],"-310");
-      assert.equal(m7[1],"-340");
-    });
-
-    test('radialGrid lines are rotated correctly', function() {
-      var g = baseSVG.svg.select('g.a.axis'),
-          lineG = g.selectAll('g').nodes(),
+      var g = baseSVG.svg.select('g.axisGridLines'),
+          lineG = g.selectAll('line').nodes(),
           re = /rotate\((-?\d+)\)/,
           m0,m1,m2,m3,m4,m5,m6,m7;
 
@@ -240,14 +190,14 @@ function runTests(){
     });
 
     test('radialGrid circles are created', function() {
-      var g = baseSVG.svg.select('g.r.axis'),
+      var g = baseSVG.svg.select('g.radialGridlines'),
           circle = g.selectAll('circle');
 
-      assert.lengthOf(circle.nodes(),3);
+      assert.lengthOf(circle.nodes(),4);
     });
 
     test('radialGrid circles have correct radius', function() {
-      var g = baseSVG.svg.select('g.r.axis'),
+      var g = baseSVG.svg.select('g.radialGridlines'),
           circle = g.selectAll('circle');
 
       assert.closeTo(Number(Px.d3.select(circle.nodes()[0]).attr('r')), 72, 1);

@@ -65,11 +65,9 @@ function runTests(){
 
   suite('px-vis-scale runs with basic declarative bindings', function() {
     var decTLScale = document.getElementById('decTLScale');
-    suiteSetup(function(done){
-      setTimeout(function() {
-        done();
-      },500);
-    })
+    suiteSetup(function(done) {
+      setTimeout(function() { done(); }, 500);
+    });
 
     test('decTLScale fixture is created', function() {
       assert.isTrue(decTLScale !== null);
@@ -123,75 +121,6 @@ function runTests(){
       assert.equal( decTLScale.y(5), 135);
     });
   }); //suite
-
-  // suite('px-vis-scale events fire', function() {
-  //   var eventsScale = document.getElementById('eventsScale'),
-  //       w = 500,
-  //       h = 300;
-  //   var eventX,eventY,eventDC;
-  //
-  //   suiteSetup(function(done){
-  //     document.addEventListener('px-vis-x-updated',function(evt){
-  //       eventX = evt.detail;
-  //     });
-  //     document.addEventListener('px-vis-y-updated',function(evt){
-  //       eventY = evt.detail;
-  //     });
-  //     document.addEventListener('px-vis-domain-changed-updated',function(evt){
-  //       eventDC = evt.detail;
-  //     });
-  //     eventsScale.set('width',w);
-  //     eventsScale.set('height',h);
-  //
-  //     setTimeout(function() {
-  //       done();
-  //     }, 100);
-  //   });
-  //
-  //   test('eventsScale fixture is created', function() {
-  //     assert.isTrue(eventsScale !== null);
-  //   });
-  //
-  //   test('eventsScale fires x event', function() {
-  //     assert.isDefined(eventX);
-  //   });
-  //   test('eventX eventObj has a data var', function() {
-  //     assert.equal(eventX.data(1397219100000), 480);
-  //   });
-  //   test('eventX eventObj has a dataVar var', function() {
-  //     assert.equal(eventX.dataVar , 'x');
-  //   });
-  //   test('eventX eventObj has a method var', function() {
-  //     assert.equal(eventX.method , 'set');
-  //   });
-  //
-  //   test('eventsScale fires y event', function() {
-  //     assert.isDefined(eventY);
-  //   });
-  //   test('eventY eventObj has a data var', function() {
-  //     assert.equal(eventY.data(5), 135);
-  //   });
-  //   test('eventY eventObj has a dataVar var', function() {
-  //     assert.equal(eventY.dataVar , 'y');
-  //   });
-  //   test('eventY eventObj has a method var', function() {
-  //     assert.equal(eventY.method , 'set');
-  //   });
-  //
-  //   test('eventsScale fires domainChanged event', function() {
-  //     assert.isDefined(eventDC);
-  //   });
-  //   test('eventDC eventObj has a data var', function() {
-  //     assert.equal( eventDC.data, false);
-  //   });
-  //   test('eventDC eventObj has a dataVar var', function() {
-  //     assert.equal(eventDC.dataVar , 'domainChanged');
-  //   });
-  //   test('eventDC eventObj has a method var', function() {
-  //     assert.equal(eventDC.method , 'set');
-  //   });
-  // }); //suite
-
 
   suite('px-vis-scale calcs extents', function() {
     var findExtents = document.getElementById('findExtents');
@@ -796,6 +725,95 @@ function runTests(){
 
     test('cExts y returns correct value 5', function() {
       assert.equal( cExts.y(11), 135);
+    });
+  }); //suite
+
+  suite('px-vis-scale runs with web worker', function() {
+    var webWorker = document.getElementById('webWorker');
+    suiteSetup(function(done) {
+      var chartData = [
+          {
+            "x": 1397102460000,
+            "y": 1
+          },{
+            "x": 1397131620000,
+            "y": 6
+          },{
+            "x": 1397160780000,
+            "y": 10
+          },{
+            "x": 1397189940000,
+            "y": 4
+          },{
+            "x": 1397219100000,
+            "y": 6
+          }
+        ],
+        ext = {
+          "x":[Infinity,-Infinity], "y": [Infinity,-Infinity]
+          }
+
+      Px.vis.scheduler.process('updateData', {'chartData': chartData}, 'webWorker');
+
+      setTimeout(function() {
+
+        webWorker.set('dataExtents',ext);
+        webWorker.set('chartData', chartData);
+        setTimeout(function() { done(); }, 500);
+
+      }, 500);
+    });
+
+    test('webWorker fixture is created', function() {
+      assert.isTrue(webWorker !== null);
+    });
+
+    test('webWorker sets x-scale', function() {
+      assert.equal(webWorker.xAxisType, 'time');
+    });
+
+    test('webWorker sets y-scale', function() {
+      assert.equal(webWorker.yAxisType, 'linear');
+    });
+
+    test('webWorker creates an x', function() {
+      assert.isDefined(webWorker.x);
+    });
+
+    test('webWorker creates an y', function() {
+      assert.isDefined(webWorker.y);
+    });
+
+    test('webWorker x domain is correct', function() {
+      assert.equal( Number(webWorker.x.domain()[0]), 1397102460000);
+      assert.equal( Number(webWorker.x.domain()[1]), 1397219100000);
+    });
+    test('webWorker y domain is correct', function() {
+      assert.equal( JSON.stringify(webWorker.y.domain()), JSON.stringify([0,10]));
+    });
+
+    test('webWorker x returns correct value 1397102460000', function() {
+      assert.equal( webWorker.x(1397102460000), 0);
+    });
+
+    test('webWorker x returns correct value 1397291280000', function() {
+      assert.equal( webWorker.x(1397219100000), 480);
+    });
+
+    test('webWorker x returns correct value 1397160780000', function() {
+      assert.equal( webWorker.x(1397160780000), 240);
+    });
+
+    test('webWorker y returns correct value 0', function() {
+      assert.equal( webWorker.y(0), 270);
+    });
+
+    test('webWorker y returns correct value 10', function() {
+      assert.equal( webWorker.y(10), 0);
+    });
+
+    test('webWorker y returns correct value 5', function() {
+      assert.equal( webWorker.y(5), 135);
     });
   }); //suite
 

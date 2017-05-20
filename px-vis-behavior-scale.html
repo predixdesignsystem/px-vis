@@ -33,7 +33,8 @@ PxVisBehaviorScale.scale = [{
      *
      */
     _chartDataHasChanged: {
-      type: Boolean
+      type: Number,
+      value: 0
     },
     /**
      * Bolean to indicate if we are currently calculating the domain
@@ -69,6 +70,18 @@ PxVisBehaviorScale.scale = [{
     },
 
     _runOnce: {
+      type: Boolean,
+      value: false
+    },
+
+    /**
+     * Internal unique ID
+     */
+    chartId: {
+      type: String
+    },
+
+    dontUseWebWorker: {
       type: Boolean,
       value: false
     }
@@ -211,63 +224,76 @@ PxVisBehaviorScale.scale = [{
    * @method _setDomain
    */
    _setDomain: function() {
-    if(!this._calculatingDomain && this._doesObjHaveValues(this.chartData) && this.x && this.y && this._doesObjHaveValues(this.completeSeriesConfig)) {
-
-      // indicate we are calculating the domain
-      this._calculatingDomain = true;
-
-      //get what info we need for the web worker to get our extents
-      var wwInfo = {};
-
-      wwInfo.xAxisType = this.xAxisType;
-      wwInfo.yAxisType = this.yAxisType;
-      wwInfo.completeSeriesConfig = this.completeSeriesConfig;
-      wwInfo.chartExtents = this.chartExtents;
-      wwInfo.dataExtents = this.dataExtents;
-      wwInfo.axes = this.axes;
-      wwInfo.seriesToAxes = this.seriesToAxes;
-      wwInfo.isYAxisObject = typeof this.y === 'object'
-
-      Px.vis.scheduler.process('determineExtents', wwInfo, this.chartId, function(e) {
-
-        var extents = e.data;
-
-        if(typeof this.y === 'object') {
-          for(var i = 0; i < this.axes.length; i++){
-            if(!this.y[this.axes[i]]) {
-              continue;
-            }
-
-            if(this.matchTicks && !this.singleDomain) {
-              var min = Math.floor(extents.y[this.axes[i]][0]/10)*10,
-                  max = Math.ceil(extents.y[this.axes[i]][1]/10)*10;
-
-              this.y[this.axes[i]].domain([min,max]);
-            } else {
-              this.y[this.axes[i]].domain(extents.y[this.axes[i]]);
-            }
-          }
-        } else {
-          this.y.domain(extents.y);
-        }
-
-        // if we are streaming data, dont keep updating x
-        if(this.disableDynamicUpdate) {
-          if(!this.runOnce) {
-            this.x.domain(extents.x);
-            this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
-
-            this.runOnce = true;
-          }
-        } else {
-          this.x.domain(extents.x);
-          this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
-        }
-
-        this._calculatingDomain = false;
-
-    }.bind(this));
+    // escape if we dont have everything we need
+    if(this._calculatingDomain || this._isObjEmpty(this.chartData) || !this.x || !this.y || this._isObjEmpty(this.completeSeriesConfig)) {
+      return
     }
+
+    // indicate we are calculating the domain
+    this._calculatingDomain = true;
+
+    // Fallback if specified or we dont have an id
+    if(!this.chartId || this.dontUseWebWorker ) {
+      var extents = this._determineExtents();
+      this._applyExtents(extents);
+      return;
+    }
+
+    //get what info we need for the web worker to get our extents
+    var wwInfo = {};
+
+    wwInfo.xAxisType = this.xAxisType;
+    wwInfo.yAxisType = this.yAxisType;
+    wwInfo.completeSeriesConfig = this.completeSeriesConfig;
+    wwInfo.chartExtents = this.chartExtents;
+    wwInfo.dataExtents = this.dataExtents;
+    wwInfo.axes = this.axes;
+    wwInfo.seriesToAxes = this.seriesToAxes;
+    wwInfo.isYAxisObject = typeof this.y === 'object'
+
+    Px.vis.scheduler.process('determineExtents', wwInfo, this.chartId, function(e) {
+      this._applyExtents(e.data);
+    }.bind(this));
+  },
+
+  _applyExtents: function(extents) {
+    if(typeof this.y === 'object') {
+      for(var i = 0; i < this.axes.length; i++){
+        if(!this.y[this.axes[i]]) {
+          continue;
+        }
+
+        if(this.matchTicks && !this.singleDomain) {
+          var min = Math.floor(extents.y[this.axes[i]][0]/10)*10,
+              max = Math.ceil(extents.y[this.axes[i]][1]/10)*10;
+
+          this.y[this.axes[i]].domain([min,max]);
+
+        } else {
+          this.y[this.axes[i]].domain(extents.y[this.axes[i]]);
+
+        }
+      }
+
+    } else {
+      this.y.domain(extents.y);
+
+    }
+
+    // if we are streaming data, dont keep updating x
+    if(this.disableDynamicUpdate) {
+      if(!this.runOnce) {
+        this.x.domain(extents.x);
+        this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+
+        this.runOnce = true;
+      }
+    } else {
+      this.x.domain(extents.x);
+      this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+    }
+
+    this._calculatingDomain = false;
   },
 
   /**
@@ -316,7 +342,7 @@ PxVisBehaviorScale.scale = [{
       this._findMinMax(this.chartData, doX, doY, xOrd, yOrd, xTime, extents, keys);
     }
 
-    this._chartDataHasChanged = false;
+    this._chartDataHasChanged = 0;
 
     // check that we found something for x
     if(extents.x[0] === Infinity) {
@@ -641,7 +667,7 @@ PxVisBehaviorScale.scale = [{
   },
   _chartDataChanged: function() {
 
-    this.set('_chartDataHasChanged', true);
+    this.set('_chartDataHasChanged', this._chartDataHasChanged++);
   },
 
   _setAxisScale: function(leftDims, rightDims, leftAxisSize, rightAxisSize) {

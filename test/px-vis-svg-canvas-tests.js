@@ -47,7 +47,7 @@ function runTests(){
       assert.isDefined(canvasEvt);
     });
     test('svgCanvas canvasEvt has a data var', function() {
-      assert.equal(canvasEvt.data , canvasElem.canvasContext);
+      assert.isDefined(canvasEvt.data);
     });
     test('svgCanvas canvasEvt has a dataVar var', function() {
       assert.equal(canvasEvt.dataVar , 'canvasContext');

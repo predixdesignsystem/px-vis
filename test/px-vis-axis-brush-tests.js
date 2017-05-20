@@ -92,6 +92,7 @@ function runTests(){
           .attr("transform", function(d,i) {
             return "translate(" + (50 * i) + ",0)";
           });
+    debugger
 
         brush1.set('margin',m);
         brush1.set('height',h);

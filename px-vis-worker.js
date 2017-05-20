@@ -57,7 +57,6 @@ function reply(data, time) {
  * @method updateData
  */
 function updateData(eventData, time) {
-
   dataMapping[eventData.chartId] = eventData.data.chartData;
   reply(null, time);
 }
@@ -287,7 +286,6 @@ function createSingleQuadtree(data) {
       }
 
       quadtree.addAll(allFlat);
-   //   console.log('build quadtree: ' + (this.performance.now() - before));
 
       return quadtree;
     } else {
