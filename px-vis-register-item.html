@@ -67,24 +67,12 @@ Custom property | Description | Default
         class$="flex [[_itemMutedToStart]]"
         on-tap="_seriesClicked"
         id="regWithoutMenu">
-        <template is="dom-if" if="[[_isDashed(_dashPattern)]]">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            xmlns:xlink="http://www.w3.org/1999/xlink"
-            class="seriesMarker" overflow="hidden">
-            <line
-              x1="0" y1="0" x2="0" y2="20" stroke-width="2"
-              style$="stroke:[[_itemColor]]"
-              transform="translate(2.5)"
-              stroke-dasharray$="[[_dashPattern]]" />
-          </svg>
-        </template>
-        <template is="dom-if" if="[[!_isDashed(_dashPattern)]]">
+        <span class="seriesMarker  flex">
           <span
-                  class="seriesMarker"
-                  style$="background-color:[[_itemColor]]"
-                  name$="R{{item.name}}">&nbsp;</span>
-        </template>
+            class$="[[_isDashedClass(_dashPattern)]]"
+            style$="background:linear-gradient([[_calcDashPattern(_itemColor,_dashPattern)]])"
+            name$="R{{item.name}}">&nbsp;</span>
+        </span>
         <span class$="[[_wrapperClass]]">
           <div
             class="seriesName flex__item--msfix"
@@ -214,6 +202,9 @@ Custom property | Description | Default
       _ttStyle: {
         type: String
       },
+      /**
+       * Optional: Specifies if the series is represented by a dashed pattern.
+       */
       _dashArray: {
         type: String,
         value: ''
@@ -277,8 +268,34 @@ Custom property | Description | Default
       }
     },
 
-    _isDashed: function(pattern) {
-        return typeof pattern === 'string' && pattern.length > 0;
+    /**
+     * returns a striped pattern that can be used by background:linear-gradient(...) to represent a dashed vertical line.
+     *
+     * example:  'to bottom, red 0px, red 5px, transparent 5px, transparent 10px, [repeat]'
+     */
+    _calcDashPattern: function(color, pattern) {
+      var patternItems = pattern.split(',');
+      var HEIGHT = 25;
+      if (!patternItems || patternItems.length < 2) {
+          return `to bottom, ${color}, ${color}`;
+      } else {
+          var result = 'to bottom';
+          var position = 0;
+          while (position < HEIGHT) {
+              for (var i=0;i<patternItems.length;i++) {
+                  var item = patternItems[i];
+                  var stripeColor = i % 2 ? 'transparent' : color;
+                  result += `, ${stripeColor} ${position}px`;
+                  position += parseInt(item, 10);
+                  result += `, ${stripeColor} ${position}px`;
+              }
+          }
+          return result;
+      }
+    },
+
+    _isDashedClass: function(pattern) {
+        return typeof pattern === 'string' && pattern.length > 1 ? 'seriesMarker--dashed' : '';
     }
   });
 </script>

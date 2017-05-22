@@ -797,7 +797,7 @@ Custom property | Description | Default
               //if we have a label rotation, calcs are complicated; just take the perf hit and measure
               //if normal, then size is: tick length + label size + label offset + title size + offset to get to designed margin
               ext["width"] = this.labelRotation ? parseFloat(this._getAxisGroupSize()["width"]) :
-                  this._axis.tickSizeInner() + this._calcLeftRightLabelSize() + this.labelTranslation[0] + this.titleTypeSize - 3;
+                  this._axis.tickSizeInner() + this._calcLeftRightLabelSize() + this.labelTranslation[0] + this.titleTypeSize;
               //range of axis = length of axis
               ext["height"] = (this.axis.range()[1] - this.axis.range()[0]) / 2;
 
@@ -882,28 +882,19 @@ Custom property | Description | Default
           var translate = 'translate(-12,' + ( -w/2 - 10 - 8 * index) + ')';
           var mutedSeriesValue = (this.mutedSeries && this.mutedSeries[sid]) ? 0.5 : 1;
 
-          var elm;
-          if (!dashPattern || dashPattern === '') {
-            elm = elem.append('rect')
-            // .attr('height', 2)
-              .attr('height',3)
-              .attr('width',15)
-              .attr('fill', color)
-          } else {
-            elm = elem.append('line')
-              .attr('x1',-3)
-              .attr('x2',17)
-              .attr('y1',0)
-              .attr('y2',0)
-              .attr('stroke',color)
-              .attr('stroke-width',2)
-              .attr('stroke-dasharray',dashPattern)
-          }
-          elm.attr('series-bar-id','bar_' + sid)
-            .attr('transform', translate)
-            .attr('opacity', function() {
-              return mutedSeriesValue;
-            }.bind(this));
+            elem.append('line')
+                .attr('x1',-3)
+                .attr('x2',17)
+                .attr('y1',0)
+                .attr('y2',0)
+                .attr('stroke',color)
+                .attr('stroke-width',2)
+                .attr('stroke-dasharray',dashPattern)
+                .attr('series-bar-id','bar_' + sid)
+                .attr('transform', translate)
+                .attr('opacity', function() {
+                    return mutedSeriesValue;
+                }.bind(this));
 
         },
 
