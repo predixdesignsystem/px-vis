@@ -48,7 +48,8 @@ function runTests(){
             "name":"mySeries",
             "x":"x",
             "y":"y",
-            "color": "rgb(93,165,218)"
+            "color": "rgb(93,165,218)",
+            "dashPattern": "5,2"
           },
           "mySeries2":{
             "type":"line",
@@ -90,7 +91,7 @@ function runTests(){
         linePath1 = baseLine1.lineGroup;
         linePath2 = baseLine2.lineGroup;
         done();
-      },100);;
+      },100);
     });
 
     test('baseLine1 fixture is created', function() {
@@ -175,7 +176,9 @@ function runTests(){
             "name":"mySeries",
             "x":"x",
             "y":"y",
-            "color": "rgb(93,165,218)"
+            "color": "rgb(93,165,218)",
+            "dashPattern": "5,2"
+
           },
           "mySeries2":{
             "type":"line",
@@ -217,7 +220,7 @@ function runTests(){
         linePath1 = progressiveLine1.lineGroup;
         linePath2 = progressiveLine2.lineGroup;
         done();
-      },100);;
+      },100);
     });
 
     test('progressiveLine1 fixture is created', function() {
@@ -282,7 +285,8 @@ function runTests(){
             "name":"mySeries",
             "x":"x",
             "y":"y",
-            "color": "rgb(93,165,218)"
+            "color": "rgb(93,165,218)",
+            "dashPattern": "5,2"
           },
           "mySeries2":{
             "type":"line",
@@ -324,7 +328,7 @@ function runTests(){
         linePath1 = canvasOnceLine1.lineGroup;
         linePath2 = canvasOnceLine2.lineGroup;
         done();
-      },100);;
+      },100);
     });
 
     test('canvasOnceLine1 fixture is created', function() {
@@ -371,7 +375,7 @@ function runTests(){
         linePath1 = canvasOnceLine1.lineGroup;
         linePath2 = canvasOnceLine2.lineGroup;
         done();
-      },100);;
+      },100);
     });
 
     test('context has correct total lines ', function() {
@@ -411,7 +415,7 @@ function runTests(){
         linePath1 = canvasOnceLine1.lineGroup;
         linePath2 = canvasOnceLine2.lineGroup;
         done();
-      },100);;
+      },100);
     });
 
     test('context has correct total lines ', function() {
@@ -453,7 +457,7 @@ function runTests(){
         linePath1 = canvasOnceLine1.lineGroup;
         linePath2 = canvasOnceLine2.lineGroup;
         done();
-      },100);;
+      },100);
     });
 
     test('context has correct total lines ', function() {
@@ -544,7 +548,7 @@ function runTests(){
       setTimeout(function(){
         linePath1 = parallelCanvasLine.lineGroup;
         done();
-      },1000);;
+      },1000);
     });
 
     test('parallelCanvasLine fixture is created', function() {
@@ -638,7 +642,7 @@ function runTests(){
       setTimeout(function(){
         linePath1 = parallelGradientCanvasLine.lineGroup;
         done();
-      },1000);;
+      },1000);
     });
 
     test('parallelCanvasLine fixture is created', function() {
@@ -754,7 +758,7 @@ function runTests(){
       setTimeout(function(){
         linePath1 = parallelCategoryCanvasLine.lineGroup;
         done();
-      },1000);;
+      },1000);
     });
 
     test('parallelCanvasLine fixture is created', function() {
@@ -1504,7 +1508,7 @@ function runTests(){
       setTimeout(function(){
         linePath = radarLine.lineGroup;
         done();
-      },500);;
+      },500);
     });
 
     test('radarLine fixture is created', function() {
@@ -1536,7 +1540,7 @@ function runTests(){
       setTimeout(function(){
         linePath = radarLine.lineGroup;
         done();
-      },500);;
+      },500);
     });
 
     test('radarLine fixture is created', function() {
@@ -1632,7 +1636,7 @@ function runTests(){
       setTimeout(function(){
         linePath = radarMissingLine.lineGroup;
         done();
-      },500);;
+      },500);
     });
 
     test('radarMissingLine fixture is created', function() {
@@ -1732,7 +1736,7 @@ function runTests(){
       setTimeout(function(){
         linePath = clipPathLine.lineGroup;
         done();
-      },500);;
+      },500);
     });
 
     test('clipPathLine fixture is created', function() {

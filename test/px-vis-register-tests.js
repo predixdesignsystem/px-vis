@@ -306,12 +306,14 @@ function basicTests(registerID,dir){
       }
     });
 
-    test(registerID + ' colors are correct', function() {
+    test(registerID + ' colors and pattern are correct', function() {
       var colorOrder = dataVisColors.properties.seriesColorOrder.value;
       var colorSet = dataVisColors.properties.dataVisColors.value;
       var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item');
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].querySelector('.seriesMarker').getAttribute('style').split(' ').join('').split(';')[0], 'background-color:' + colorSet[ colorOrder[i] ]);
+        var color = colorSet[ colorOrder[i]];
+        var pattern = register.completeSeriesConfig['series_' + i].dashPattern || '';
+        assert.equal(series[i].querySelector('.qa-series-marker').getAttribute('style').split(' ').join('').split(';')[0], ('background:linear-gradient(' +calcDashPattern(color, pattern) +')').split(' ').join('') );
       }
     });
 
@@ -488,7 +490,8 @@ function generateEmptyData(num,str){
       'x': 'x',
       'y': 'y',
       'xAxisUnit': 'xUnit',
-      'yAxisUnit': 'yUnit'
+      'yAxisUnit': 'yUnit',
+      'dashPattern': i % 2 ? '' : '5,2'
     };
 
     dataObj.series[i] = {
@@ -555,4 +558,25 @@ function setMutedSeries(series, name, done){
   setTimeout(function(){
     if(done){ done(); }
   },10);
+}
+
+function calcDashPattern(color, pattern) {
+    var patternItems = pattern ? pattern.split(',') : '';
+    var HEIGHT = 25;
+    if (!patternItems || patternItems.length < 2) {
+        return 'to bottom, ' +color +', ' +color;
+    } else {
+        var result = 'to bottom';
+        var position = 0;
+        while (position < HEIGHT) {
+            for (var i=0;i<patternItems.length;i++) {
+                var item = patternItems[i];
+                var stripeColor = i % 2 ? 'transparent' : color;
+                result += ', ' +stripeColor +' ' +position +'px';
+                position += parseInt(item, 10);
+                result += ', ' +stripeColor +' ' +position +'px';
+            }
+        }
+        return result;
+    }
 }
