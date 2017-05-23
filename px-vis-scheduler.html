@@ -34,6 +34,7 @@
     scheduler.queue = [];
     //mapping between chart and webworker: {chartId: webWorkerIndex}
     scheduler.chartWorkerMapping = {};
+    scheduler.hasChartData = {};
 
     //each chart will always use the same web worker. This is to get around
     //the problem of passing a lot of data around, so the thread will have
@@ -92,9 +93,14 @@
       //find worker for this chart
       var worker = scheduler.workers[getWorkerIndexForChart(chartId)];
 
+      // check if we have run updateData before so we can stick stuff in a queue if not
+      scheduler.hasChartData[chartId] = scheduler.hasChartData[chartId] ?
+        scheduler.hasChartData[chartId] : (actionName === 'updateData');
+
       //start work or queue
-      if(!worker.inUse) {
+      if(!worker.inUse && scheduler.hasChartData[chartId]) {
         startWork(worker, actionName, data, chartId, callback);
+
       } else {
         //worker not available, queue
 
