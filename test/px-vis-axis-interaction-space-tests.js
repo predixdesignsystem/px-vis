@@ -3,13 +3,13 @@ document.addEventListener("WebComponentsReady", function() {
 });
 
 function runTests(){
-  suite('px-vis-axis-brush does Polymer exist?', function() {
+  suite('px-vis-axis-interaction-space does Polymer exist?', function() {
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
   });
 
-  suite('px-vis-axis-brush basic setup works', function() {
+  suite('px-vis-axis-interaction-space basic setup works', function() {
     var multiScale = document.getElementById('multiScale'),
         multiSVG = document.getElementById('multiSVG'),
         brush1 = document.getElementById('brush1'),
@@ -92,13 +92,13 @@ function runTests(){
           .attr("transform", function(d,i) {
             return "translate(" + (50 * i) + ",0)";
           });
-    debugger
 
         brush1.set('margin',m);
         brush1.set('height',h);
         brush1.set('seriesKey',"x");
         brush1.set('dimension',dim[0]);
         brush1.set('chartData',d);
+        brush1.set('iconType',"fa-eraser");
 
         brush2.set('margin',m);
         brush2.set('height',h);
@@ -112,9 +112,9 @@ function runTests(){
         brush3.set('dimension',dim[2]);
         brush3.set('chartData',d);
 
-        brush1.set('axis', multiScale.y['y']);
-        brush2.set('axis', multiScale.y['y1']);
-        brush3.set('axis', multiScale.y['y2']);
+        brush1.set('y', multiScale.y['y']);
+        brush2.set('y', multiScale.y['y1']);
+        brush3.set('y', multiScale.y['y2']);
 
         brush1.set('svg', multiSVG.svg.select('g.dimension0'));
         brush2.set('svg', multiSVG.svg.select('g.dimension1'));
@@ -147,9 +147,13 @@ function runTests(){
       assert.deepEqual(brush2.mutedSeries, {});
       assert.deepEqual(brush3.mutedSeries, {});
     });
+
+    test('icon applied', function() {
+      assert.equal(brush1._icon.text().codePointAt(), 61741);
+    });
   });
 
-  suite('px-vis-axis-brush brush resizes to the inputed domain', function() {
+  suite('px-vis-axis-interaction-space brush resizes to the inputed domain', function() {
     var brush1 = document.getElementById('brush1'),
         brush2 = document.getElementById('brush2'),
         brush3 = document.getElementById('brush3');
@@ -157,7 +161,7 @@ function runTests(){
     var d;
 
     suiteSetup(function(done) {
-      d = [brush2.axis(16),brush2.axis(9)];
+      d = [brush2.y(16),brush2.y(9)];
       brush2._brushD3.call(brush2._brush.move,d);
 
       setTimeout(function(){ done() }, 300);
@@ -198,15 +202,15 @@ function runTests(){
     });
   });
 
-  suite('px-vis-axis-brush min size', function() {
+  suite('px-vis-axis-interaction-space min size', function() {
     var brush1 = document.getElementById('brush1'),
         brush2 = document.getElementById('brush2'),
         brush3 = document.getElementById('brush3');
     var d1, d2;
 
     suiteSetup(function(done) {
-      d1 = [brush1.axis(1.01),brush1.axis(1)];
-      d2 = [brush3.axis(27),brush3.axis(26.9)];
+      d1 = [brush1.y(1.01),brush1.y(1)];
+      d2 = [brush3.y(27),brush3.y(26.9)];
 
       brush1._brushD3.call(brush1._brush.move, d1);
       brush3._brushD3.call(brush3._brush.move, d2);
@@ -262,15 +266,15 @@ function runTests(){
     });
   });
 
-  suite('px-vis-axis-brush resize', function() {
+  suite('px-vis-axis-interaction-space resize', function() {
     var brush1 = document.getElementById('brush1'),
         brush2 = document.getElementById('brush2'),
         brush3 = document.getElementById('brush3');
     var d1, d2;
 
     suiteSetup(function(done) {
-      d1 = [brush1.axis(5),brush1.axis(1)];
-      d2 = [brush3.axis(27),brush3.axis(15)];
+      d1 = [brush1.y(5),brush1.y(1)];
+      d2 = [brush3.y(27),brush3.y(15)];
 
       brush1._brushD3.call(brush1._brush.move, d1);
       brush3._brushD3.call(brush3._brush.move, d2);
@@ -318,7 +322,7 @@ function runTests(){
     });
   });
 
-  suite('px-vis-axis-brush domain change', function() {
+  suite('px-vis-axis-interaction-space domain change', function() {
     var multiScale = document.getElementById('multiScale');
     var brush1 = document.getElementById('brush1'),
         brush2 = document.getElementById('brush2'),
@@ -393,7 +397,7 @@ function runTests(){
     });
   });
 
-  suite('px-vis-axis-brush domain change so brush falls outside', function() {
+  suite('px-vis-axis-interaction-space domain change so brush falls outside', function() {
     var multiScale = document.getElementById('multiScale');
     var brush1 = document.getElementById('brush1'),
         brush2 = document.getElementById('brush2'),
@@ -455,7 +459,7 @@ function runTests(){
     });
   });
 
-  suite('px-vis-axis-brush delete works', function() {
+  suite('px-vis-axis-interaction-space delete works', function() {
     var brush1 = document.getElementById('brush1'),
         brush2 = document.getElementById('brush2'),
         brush3 = document.getElementById('brush3');
@@ -487,13 +491,13 @@ function runTests(){
     });
   });
 
-  suite('px-vis-axis-brush draw still works after delete', function() {
+  suite('px-vis-axis-interaction-space draw still works after delete', function() {
     var brush1 = document.getElementById('brush1'),
         brush2 = document.getElementById('brush2'),
         brush3 = document.getElementById('brush3');
 
     suiteSetup(function(done) {
-      d = [brush2.axis(16),brush2.axis(9)];
+      d = [brush2.y(16),brush2.y(9)];
       brush2._brushD3.call(brush2._brush.move,d);
 
       setTimeout(function(){ done() }, 300);
@@ -506,7 +510,7 @@ function runTests(){
   });
 
 
-  suite('px-vis-axis-brush radial setup works', function() {
+  suite('px-vis-axis-interaction-space radial setup works', function() {
     var radialScale = document.getElementById('radialScale'),
         radialSVG = document.getElementById('radialSVG'),
         radialBrush1 = document.getElementById('radialBrush1'),
@@ -582,42 +586,44 @@ function runTests(){
         radialScale.set('chartExtents',ext);
         radialScale.set('chartData',d);
 
-        var g = radialSVG.svg.selectAll('g.dimension')
-            .data(dim);
-        g.enter()
-          .append("g")
-          .attr("class", function(d,i) { return "dimension" + i })
-          .attr("dimension", function(d) { return d })
-          .attr("transform", function(d) {
-            return "rotate(" + (radialScale.x(d) * 180 / Math.PI + 180) + ")";
-          });
+        setTimeout(function() {
+          var g = radialSVG.svg.selectAll('g.dimension')
+              .data(dim);
+          g.enter()
+            .append("g")
+            .attr("class", function(d,i) { return "dimension" + i })
+            .attr("dimension", function(d) { return d })
+            .attr("transform", function(d) {
+              return "rotate(" + (radialScale.x(d) * 180 / Math.PI + 180) + ")";
+            });
 
-        radialBrush1.set('margin',m);
-        radialBrush1.set('height',h/2);
-        radialBrush1.set('centerOffset',20);
-        radialBrush1.set('seriesKey',"x");
-        radialBrush1.set('dimension',dim[0]);
-        radialBrush1.set('chartData',d);
+          radialBrush1.set('margin',m);
+          radialBrush1.set('height',h/2);
+          radialBrush1.set('centerOffset',20);
+          radialBrush1.set('seriesKey',"x");
+          radialBrush1.set('dimension',dim[0]);
+          radialBrush1.set('chartData',d);
 
-        radialBrush2.set('margin',m);
-        radialBrush2.set('height',h/2);
-        radialBrush2.set('centerOffset',20);
-        radialBrush2.set('seriesKey',"x");
-        radialBrush2.set('dimension',dim[1]);
-        radialBrush2.set('chartData',d);
+          radialBrush2.set('margin',m);
+          radialBrush2.set('height',h/2);
+          radialBrush2.set('centerOffset',20);
+          radialBrush2.set('seriesKey',"x");
+          radialBrush2.set('dimension',dim[1]);
+          radialBrush2.set('chartData',d);
 
-        radialBrush3.set('margin',m);
-        radialBrush3.set('height',h/2);
-        radialBrush3.set('centerOffset',20);
-        radialBrush3.set('seriesKey',"x");
-        radialBrush3.set('dimension',dim[2]);
-        radialBrush3.set('chartData',d);
+          radialBrush3.set('margin',m);
+          radialBrush3.set('height',h/2);
+          radialBrush3.set('centerOffset',20);
+          radialBrush3.set('seriesKey',"x");
+          radialBrush3.set('dimension',dim[2]);
+          radialBrush3.set('chartData',d);
 
-        radialBrush1.set('svg', radialSVG.svg.select('g.dimension0'));
-        radialBrush2.set('svg', radialSVG.svg.select('g.dimension1'));
-        radialBrush3.set('svg', radialSVG.svg.select('g.dimension2'));
+          radialBrush1.set('svg', radialSVG.svg.select('g.dimension0'));
+          radialBrush2.set('svg', radialSVG.svg.select('g.dimension1'));
+          radialBrush3.set('svg', radialSVG.svg.select('g.dimension2'));
 
-      setTimeout(function(){done()}, 500);
+          setTimeout(function() { done(); }, 500);
+        }, 100);
     });
 
     test('radialBrush fixture is created', function() {
@@ -645,14 +651,14 @@ function runTests(){
     });
   });
 
-  suite('px-vis-axis-brush brush resizes to the inputed domain', function() {
+  suite('px-vis-axis-interaction-space brush resizes to the inputed domain', function() {
     var radialBrush1 = document.getElementById('radialBrush1'),
         radialBrush2 = document.getElementById('radialBrush2'),
         radialBrush3 = document.getElementById('radialBrush3');
     var colors = baseColors.properties.colors.value;
     var d;
     suiteSetup(function(done) {
-      d = [radialBrush2.axis(9), radialBrush2.axis(16)];
+      d = [radialBrush2.y(9), radialBrush2.y(16)];
       radialBrush2._brushD3.call(radialBrush2._brush.move, d);
       setTimeout(function() { done() }, 100);
     });
@@ -691,15 +697,15 @@ function runTests(){
     });
   });
 
-  suite('px-vis-axis-brush resize', function() {
+  suite('px-vis-axis-interaction-space resize', function() {
     var radialBrush1 = document.getElementById('radialBrush1'),
         radialBrush2 = document.getElementById('radialBrush2'),
         radialBrush3 = document.getElementById('radialBrush3');
     var d1, d2;
 
     suiteSetup(function(done) {
-      d1 = [radialBrush1.axis(1),radialBrush1.axis(5)];
-      d2 = [radialBrush3.axis(15),radialBrush3.axis(27)];
+      d1 = [radialBrush1.y(1),radialBrush1.y(5)];
+      d2 = [radialBrush3.y(15),radialBrush3.y(27)];
 
       radialBrush1._brushD3.call(radialBrush1._brush.move,d1);
       radialBrush3._brushD3.call(radialBrush3._brush.move,d2);
@@ -743,7 +749,7 @@ function runTests(){
     });
   });
 
-  suite('px-vis-axis-brush domain change', function() {
+  suite('px-vis-axis-interaction-space domain change', function() {
     var radialScale = document.getElementById('radialScale');
     var radialBrush1 = document.getElementById('radialBrush1'),
         radialBrush2 = document.getElementById('radialBrush2'),
@@ -806,7 +812,7 @@ function runTests(){
     });
   });
 
-  suite('px-vis-axis-brush domain change so brush falls outside', function() {
+  suite('px-vis-axis-interaction-space domain change so brush falls outside', function() {
     var radialScale = document.getElementById('radialScale');
     var radialBrush1 = document.getElementById('radialBrush1'),
         radialBrush2 = document.getElementById('radialBrush2'),
@@ -861,7 +867,7 @@ function runTests(){
     });
   });
 
-  suite('px-vis-axis-brush delete works', function() {
+  suite('px-vis-axis-interaction-space delete works', function() {
     var radialBrush1 = document.getElementById('radialBrush1'),
         radialBrush2 = document.getElementById('radialBrush2'),
         radialBrush3 = document.getElementById('radialBrush3');
@@ -893,13 +899,13 @@ function runTests(){
     });
   });
 
-  suite('px-vis-axis-brush draw still works after delete', function() {
+  suite('px-vis-axis-interaction-space draw still works after delete', function() {
     var radialBrush1 = document.getElementById('radialBrush1'),
         radialBrush2 = document.getElementById('radialBrush2'),
         radialBrush3 = document.getElementById('radialBrush3');
 
     suiteSetup(function(done) {
-      d = [radialBrush2.axis(9),radialBrush2.axis(16)];
+      d = [radialBrush2.y(9),radialBrush2.y(16)];
       radialBrush2._brushD3.call(radialBrush2._brush.move,d);
 
       setTimeout(function(){ done() }, 300);

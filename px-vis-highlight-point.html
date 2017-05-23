@@ -241,42 +241,6 @@ Custom property | Description | Default
       }
     },
 
-    _processOpacity: function() {
-      var allMuted = true,
-          keys = Object.keys(this.completeSeriesConfig),
-          vLineOpacity,
-          _this = this,
-          isMultiSerie = keys.length > 1;
-
-      for(var i=0; i<keys.length; i++) {
-        if(!this.mutedSeries[keys[i]]) {
-          allMuted = false;
-          break;
-        }
-      }
-
-      if(this._circles) {
-        this._circles.each(function(d) {
-          var muted = _this.mutedSeries && _this.mutedSeries[d] === true,
-              mutedOpacity,
-              opacity,
-              strokeOpacity;
-
-          if(muted) {
-            mutedOpacity = _this.completeSeriesConfig[d].mutedOpacity ? _this.completeSeriesConfig[d].mutedOpacity : _this._defaultmutedOpacity;
-          } else {
-            mutedOpacity = 1;
-          }
-
-          opacity = muted ? mutedOpacity * 1 : 1,
-          strokeOpacity = muted ? mutedOpacity * 0.3 : 0.3;
-
-          this.setAttribute('opacity', opacity);
-          this.setAttribute('stroke-opacity', strokeOpacity);
-        });
-      }
-    },
-
     _getXKey: function() {
       var k = Object.keys(this.completeSeriesConfig);
       return this.completeSeriesConfig[k[0]]['x'];
