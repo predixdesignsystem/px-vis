@@ -841,7 +841,7 @@ PxVisBehavior.commonMethods = {
     var upperIndex = upperIndex || data.length,
         lowerIndex = lowerIndex || 0,
         index = Math.floor((upperIndex - lowerIndex) / 2) + lowerIndex;
-
+console.warn(lowerFuzz)
     if(data[index][key] >= lowerFuzz && data[index][key] <= upperFuzz) {
       return this._getAdjacentValues(data, key, lowerFuzz, upperFuzz, lowerIndex, upperIndex, index);
     } else if(upperFuzz < data[index][key]) {
@@ -864,7 +864,7 @@ PxVisBehavior.commonMethods = {
       d.push(data[i]);
     }
 
-    for(var i = index-1; i < lowerIndex; i--) {
+    for(var i = index-1; i > lowerIndex; i--) {
       if(data[i][key] < lowerFuzz) {
         break;
       }
@@ -2415,6 +2415,7 @@ PxVisBehavior.highlightShared = [{
 
       } else {
         d.push(this._binarySearch(this.chartData, this.timeData, this.crosshairData.timeStamps[i], null, null));
+
       }
     }
 
