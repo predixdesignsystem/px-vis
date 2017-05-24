@@ -1,3 +1,7 @@
+v1.1.13
+==================
+* ensure spaces in register item are always consistent
+
 v1.1.12
 ==================
 * fix check for properties on object to check for array before checking all keys
