@@ -1,0 +1,842 @@
+document.addEventListener("WebComponentsReady", function() {
+  runTests();
+});
+
+function runTests(){
+  suite('px-vis-highlight-point-canvas does Polymer exist?', function() {
+    test('Polymer exists', function() {
+      assert.isTrue(Polymer !== null);
+    });
+  });
+
+  suite('px-vis-highlight-point-canvas basic', function() {
+    suite('px-vis-highlight-point-canvas setup works', function() {
+      var baseScale = document.getElementById('baseScale'),
+          baseSVG = document.getElementById('baseSVG'),
+          basePoint = document.getElementById('basePoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = [{
+              "x": 1,
+              "timeStamp": 1397102460000,
+              "y0": 1,
+              "y1": 1
+            },{
+              "x": 2,
+              "timeStamp": 1397131620000,
+              "y0": 6,
+              "y1": 3
+            },{
+              "x": 3,
+              "timeStamp": 1397160780000,
+              "y0": 4,
+              "y1": 8
+            },{
+              "x": 4,
+              "timeStamp": 1397189940000,
+              "y0": 8,
+              "y1": 4
+            },{
+              "x": 5,
+              "timeStamp": 1397219100000,
+              "y0": 6,
+              "y1": 6
+            }
+          ],
+          completeSeriesConfig = {
+            "mySeries":{
+              "type":"line",
+              "name":"mySeries",
+              "x":"x",
+              "y":"y0",
+              "color": colorSet[colorOrder[0]]
+            },
+            "mySeries2":{
+              "type":"line",
+              "name":"mySeries2",
+              "x":"x",
+              "y":"y1",
+              "color": colorSet[colorOrder[1]]
+            },
+          },
+          chartExtents = {"x":[1,5],"y":[0,10]},
+          w = 500,
+          h = 300,
+          m = {
+            "top": 10,
+            "right": 5,
+            "bottom": 20,
+            "left": 15
+          };
+
+        baseSVG.set('width',w);
+        baseSVG.set('height',h);
+        baseSVG.set('margin',m);
+
+        baseScale.set('width',w);
+        baseScale.set('height',h);
+        baseScale.set('margin',m);
+        baseScale.set('completeSeriesConfig',completeSeriesConfig);
+        baseScale.set('chartExtents',chartExtents);
+        baseScale.set('dataExtents',chartExtents);
+        baseScale.set('chartData',d);
+
+        basePoint.set('timeData', 'timeStamp');
+        basePoint.set('completeSeriesConfig',completeSeriesConfig);
+
+        setTimeout(function() { done(); }, 100);
+      });
+
+      test('basePoint fixture is created', function() {
+        assert.isTrue(basePoint !== null);
+      });
+
+      test('basePoint highlightData not created', function() {
+        assert.isUndefined(basePoint._highlightData);
+      });
+
+      test('basePoint base layer is not muted', function() {
+        assert.isFalse(baseSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
+
+      });
+    }); //suite
+
+    suite('px-vis-highlight-point-canvas mutes and draws', function() {
+      var baseScale = document.getElementById('baseScale'),
+          baseSVG = document.getElementById('baseSVG'),
+          basePoint = document.getElementById('basePoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = {
+            "rawData":[{
+              "timeStamp": 1397160780000,
+              "x": 3,
+              "y0": 4,
+              "y1": 8
+            }],
+            "timeStamps": [1397160780000]
+          };
+
+        basePoint.set('crosshairData',d);
+
+        setTimeout(function() { done(); }, 100);
+      });
+
+      test('basePoint create highlightData', function() {
+        assert.deepEqual(basePoint._highlightData, [{
+              "timeStamp": 1397160780000,
+              "x": 3,
+              "y0": 4,
+              "y1": 8
+            }]);
+      });
+
+      test('basePoint base layer mutes', function() {
+        assert.isTrue(baseSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
+
+      });
+    }); //suite
+
+    suite('px-vis-highlight-point-canvas mutes and draws', function() {
+      var baseScale = document.getElementById('baseScale'),
+          baseSVG = document.getElementById('baseSVG'),
+          basePoint = document.getElementById('basePoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = {
+            "rawData":[],
+            "timeStamps": []
+          };
+
+        basePoint.set('crosshairData',d);
+
+        setTimeout(function() { done(); }, 100);
+      });
+
+      test('basePoint highlightData removed', function() {
+        assert.deepEqual(basePoint._highlightData, []);
+      });
+
+      test('basePoint base layer unmutes', function() {
+        assert.isFalse(baseSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
+      });
+    }); //suite
+  }); //suite
+
+
+
+   suite('px-vis-highlight-point-canvas different dataset', function() {
+    suite('px-vis-highlight-point-canvas setup works', function() {
+      var differentScale = document.getElementById('differentScale'),
+          differentSVG = document.getElementById('differentSVG'),
+          differentPoint = document.getElementById('differentPoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = [{
+              "x": 1,
+              "timeStamp": 1397102460000,
+              "y0": 1,
+              "y1": 1
+            },{
+              "x": 2,
+              "timeStamp": 1397131620000,
+              "y0": 6,
+              "y1": 3
+            },{
+              "x": 3,
+              "timeStamp": 1397160780000,
+              "y0": 4,
+              "y1": 8
+            },{
+              "x": 4,
+              "timeStamp": 1397189940000,
+              "y0": 8,
+              "y1": 4
+            },{
+              "x": 5,
+              "timeStamp": 1397219100000,
+              "y0": 6,
+              "y1": 6
+            }
+          ],
+          completeSeriesConfig = {
+            "mySeries":{
+              "type":"line",
+              "name":"mySeries",
+              "x":"x",
+              "y":"y0",
+              "color": colorSet[colorOrder[0]]
+            },
+            "mySeries2":{
+              "type":"line",
+              "name":"mySeries2",
+              "x":"x",
+              "y":"y1",
+              "color": colorSet[colorOrder[1]]
+            },
+          },
+          chartExtents = {"x":[1,5],"y":[0,10]},
+          w = 500,
+          h = 300,
+          m = {
+            "top": 10,
+            "right": 5,
+            "bottom": 20,
+            "left": 15
+          };
+
+        differentSVG.set('width',w);
+        differentSVG.set('height',h);
+        differentSVG.set('margin',m);
+
+        differentScale.set('width',w);
+        differentScale.set('height',h);
+        differentScale.set('margin',m);
+        differentScale.set('completeSeriesConfig',completeSeriesConfig);
+        differentScale.set('chartExtents',chartExtents);
+        differentScale.set('dataExtents',chartExtents);
+        differentScale.set('chartData',d);
+
+        differentPoint.set('timeData', 'timeStamp');
+        differentPoint.set('completeSeriesConfig',completeSeriesConfig);
+        differentPoint.set('chartData',d);
+
+        setTimeout(function() { done(); }, 100);
+
+      });
+
+      test('differentPoint fixture is created', function() {
+        assert.isTrue(differentPoint !== null);
+      });
+
+      test('basePoint highlightData not created', function() {
+        assert.isUndefined(differentPoint._highlightData);
+      });
+
+      test('differentPoint different layer is not muted', function() {
+        assert.isFalse(differentSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
+      });
+    }); //suite
+
+    suite('px-vis-highlight-point-canvas mutes and draws', function() {
+      var differentScale = document.getElementById('differentScale'),
+          differentSVG = document.getElementById('differentSVG'),
+          differentPoint = document.getElementById('differentPoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = {
+            "rawData":[{
+              "timeStamp": 1397160780000,
+              "x": 15,
+              "y0": 10,
+              "y1": 20
+            }],
+            "timeStamps": [1397160780000]
+          };
+
+        differentPoint.set('crosshairData',d);
+
+        setTimeout(function() { done(); }, 100);
+      });
+
+      test('basePoint create highlightData', function() {
+        assert.deepEqual(differentPoint._highlightData, [{
+              "timeStamp": 1397160780000,
+              "x": 3,
+              "y0": 4,
+              "y1": 8
+            }]);
+      });
+
+      test('differentPoint different layer mutes', function() {
+        assert.isTrue(differentSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
+      });
+    }); //suite
+
+    suite('px-vis-highlight-point-canvas mutes and draws', function() {
+      var differentScale = document.getElementById('differentScale'),
+          differentSVG = document.getElementById('differentSVG'),
+          differentPoint = document.getElementById('differentPoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = {
+            "rawData":[],
+            "timeStamps": []
+          };
+
+        differentPoint.set('crosshairData',d);
+
+        setTimeout(function() { done(); }, 100);
+      });
+
+      test('differentPoint highlightData removed', function() {
+        assert.deepEqual(differentPoint._highlightData, []);
+      });
+
+      test('differentPoint different layer unmutes', function() {
+        assert.isFalse(differentSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
+      });
+    }); //suite
+  }); //suite
+
+
+
+  suite('px-vis-highlight-point-canvas fuzz', function() {
+    suite('px-vis-highlight-point-canvas setup works', function() {
+      var fuzzScale = document.getElementById('fuzzScale'),
+          fuzzSVG = document.getElementById('fuzzSVG'),
+          fuzzPoint = document.getElementById('fuzzPoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = [{
+              "x": 1,
+              "timeStamp": 1397102460000,
+              "y0": 1,
+              "y1": 1
+            },{
+              "x": 2,
+              "timeStamp": 1397131620000,
+              "y0": 6,
+              "y1": 3
+            },{
+              "x": 3,
+              "timeStamp": 1397160780000,
+              "y0": 4,
+              "y1": 8
+            },{
+              "x": 4,
+              "timeStamp": 1397189940000,
+              "y0": 8,
+              "y1": 4
+            },{
+              "x": 5,
+              "timeStamp": 1397219100000,
+              "y0": 6,
+              "y1": 6
+            }
+          ],
+          completeSeriesConfig = {
+            "mySeries":{
+              "type":"line",
+              "name":"mySeries",
+              "x":"x",
+              "y":"y0",
+              "color": colorSet[colorOrder[0]]
+            },
+            "mySeries2":{
+              "type":"line",
+              "name":"mySeries2",
+              "x":"x",
+              "y":"y1",
+              "color": colorSet[colorOrder[1]]
+            },
+          },
+          chartExtents = {"x":[1,5],"y":[0,10]},
+          w = 500,
+          h = 300,
+          m = {
+            "top": 10,
+            "right": 5,
+            "bottom": 20,
+            "left": 15
+          };
+
+        fuzzSVG.set('width',w);
+        fuzzSVG.set('height',h);
+        fuzzSVG.set('margin',m);
+
+        fuzzScale.set('width',w);
+        fuzzScale.set('height',h);
+        fuzzScale.set('margin',m);
+        fuzzScale.set('completeSeriesConfig',completeSeriesConfig);
+        fuzzScale.set('chartExtents',chartExtents);
+        fuzzScale.set('dataExtents',chartExtents);
+        fuzzScale.set('chartData',d);
+
+        fuzzPoint.set('timeData', 'timeStamp');
+        fuzzPoint.set('completeSeriesConfig',completeSeriesConfig);
+        fuzzPoint.set('chartData',d);
+
+        setTimeout(function() { done(); }, 100);
+
+      });
+
+      test('fuzzPoint fixture is created', function() {
+        assert.isTrue(fuzzPoint !== null);
+      });
+
+      test('fuzzPoint highlightData not created', function() {
+        assert.isUndefined(fuzzPoint._highlightData);
+      });
+
+      test('fuzzPoint fuzz layer is not muted', function() {
+        assert.isFalse(fuzzSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
+
+      });
+    }); //suite
+
+    suite('px-vis-highlight-point-canvas mutes and draws', function() {
+      var fuzzScale = document.getElementById('fuzzScale'),
+          fuzzSVG = document.getElementById('fuzzSVG'),
+          fuzzPoint = document.getElementById('fuzzPoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = {
+            "rawData":[{
+              "timeStamp": 1397160780000,
+              "x": 15,
+              "y0": 10,
+              "y1": 20
+            }],
+            "timeStamps": [1397160780000]
+          };
+
+        fuzzPoint.set('crosshairData',d);
+
+        setTimeout(function() { done(); }, 100);
+      });
+
+      test('fuzzPoint highlightData removed', function() {
+        assert.deepEqual(fuzzPoint._highlightData, [{
+              "timeStamp": 1397160780000,
+              "x": 3,
+              "y0": 4,
+              "y1": 8
+            },{
+              "timeStamp": 1397189940000,
+              "x": 4,
+              "y0": 8,
+              "y1": 4
+            },{
+              "timeStamp": 1397131620000,
+              "x": 2,
+              "y0": 6,
+              "y1": 3
+            }]);
+      });
+
+      test('fuzzPoint fuzz layer mutes', function() {
+        assert.isTrue(fuzzSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
+      });
+    }); //suite
+
+    suite('px-vis-highlight-point-canvas mutes and draws', function() {
+      var fuzzScale = document.getElementById('fuzzScale'),
+          fuzzSVG = document.getElementById('fuzzSVG'),
+          fuzzPoint = document.getElementById('fuzzPoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = {
+            "rawData":[],
+            "timeStamps": []
+          };
+
+        fuzzPoint.set('crosshairData',d);
+
+        setTimeout(function() { done(); }, 100);
+      });
+
+      test('fuzzPoint scatters removed', function() {
+        assert.deepEqual(fuzzPoint._highlightData, []);
+      });
+
+      test('fuzzPoint fuzz layer unmutes', function() {
+        assert.isFalse(fuzzSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
+      });
+    }); //suite
+  }); //suite
+
+
+  suite('px-vis-highlight-point-canvas generating crosshair data', function() {
+    suite('px-vis-highlight-point-canvas setup works', function() {
+      var generatingScale = document.getElementById('generatingScale'),
+          generatingSVG = document.getElementById('generatingSVG'),
+          generatingPoint = document.getElementById('generatingPoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = [{
+              "x": 1,
+              "timeStamp": 1397102460000,
+              "y0": 1,
+              "y1": 1
+            },{
+              "x": 2,
+              "timeStamp": 1397131620000,
+              "y0": 6,
+              "y1": 3
+            },{
+              "x": 3,
+              "timeStamp": 1397160780000,
+              "y0": 4,
+              "y1": 8
+            },{
+              "x": 4,
+              "timeStamp": 1397189940000,
+              "y0": 8,
+              "y1": 4
+            },{
+              "x": 5,
+              "timeStamp": 1397219100000,
+              "y0": 6,
+              "y1": 6
+            }
+          ],
+          completeSeriesConfig = {
+            "mySeries":{
+              "type":"line",
+              "name":"mySeries",
+              "x":"x",
+              "y":"y0",
+              "color": colorSet[colorOrder[0]]
+            },
+            "mySeries2":{
+              "type":"line",
+              "name":"mySeries2",
+              "x":"x",
+              "y":"y1",
+              "color": colorSet[colorOrder[1]]
+            },
+          },
+          chartExtents = {"x":[1,5],"y":[0,10]},
+          w = 500,
+          h = 300,
+          m = {
+            "top": 10,
+            "right": 5,
+            "bottom": 20,
+            "left": 15
+          };
+
+        generatingSVG.set('width',w);
+        generatingSVG.set('height',h);
+        generatingSVG.set('margin',m);
+
+        generatingScale.set('width',w);
+        generatingScale.set('height',h);
+        generatingScale.set('margin',m);
+        generatingScale.set('completeSeriesConfig',completeSeriesConfig);
+        generatingScale.set('chartExtents',chartExtents);
+        generatingScale.set('dataExtents',chartExtents);
+        generatingScale.set('chartData',d);
+
+        generatingPoint.set('timeData', 'timeStamp');
+        generatingPoint.set('completeSeriesConfig',completeSeriesConfig);
+
+        setTimeout(function() { done(); }, 100);
+      });
+
+      test('generatingPoint fixture is created', function() {
+        assert.isTrue(generatingPoint !== null);
+      });
+
+      test('generatingPoint highlightData not created', function() {
+        assert.isUndefined(generatingPoint._highlightData);
+      });
+
+      test('generatingPoint generating layer is not muted', function() {
+        assert.isFalse(generatingSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
+
+      });
+    }); //suite
+
+    suite('px-vis-highlight-point-canvas mutes and draws', function() {
+      var generatingScale = document.getElementById('generatingScale'),
+          generatingSVG = document.getElementById('generatingSVG'),
+          generatingPoint = document.getElementById('generatingPoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = {
+            "rawData":[{
+              "timeStamp": 1397160780000,
+              "x": 3,
+              "y0": 4,
+              "y1": 8
+            }],
+            "timeStamps": [1397160780000]
+          };
+
+        generatingPoint.set('generatingCrosshairData',true);
+        generatingPoint.set('crosshairData',d);
+
+        setTimeout(function() { done(); }, 100);
+      });
+
+      test('generatingPoint does not create highlightData', function() {
+        assert.deepEqual(generatingPoint._highlightData, []);
+      });
+
+      test('generatingPoint generating layer does not mute', function() {
+        assert.isFalse(generatingSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
+
+      });
+    }); //suite
+
+    suite('px-vis-highlight-point-canvas mutes and draws', function() {
+      var generatingScale = document.getElementById('generatingScale'),
+          generatingSVG = document.getElementById('generatingSVG'),
+          generatingPoint = document.getElementById('generatingPoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = {
+            "rawData":[],
+            "timeStamps": []
+          };
+
+        generatingPoint.set('crosshairData',d);
+
+        setTimeout(function() { done(); }, 100);
+      });
+
+      test('generatingPoint highlightData removed', function() {
+        assert.deepEqual(generatingPoint._highlightData, []);
+      });
+
+      test('generatingPoint generating layer unmutes', function() {
+        assert.isFalse(generatingSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
+      });
+    }); //suite
+  }); //suite
+
+
+  suite('px-vis-highlight-point-canvas drawWithLocalCrosshairData ', function() {
+    suite('px-vis-highlight-point-canvas setup works', function() {
+      var forceScale = document.getElementById('forceScale'),
+          forceSVG = document.getElementById('forceSVG'),
+          forcePoint = document.getElementById('forcePoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = [{
+              "x": 1,
+              "timeStamp": 1397102460000,
+              "y0": 1,
+              "y1": 1
+            },{
+              "x": 2,
+              "timeStamp": 1397131620000,
+              "y0": 6,
+              "y1": 3
+            },{
+              "x": 3,
+              "timeStamp": 1397160780000,
+              "y0": 4,
+              "y1": 8
+            },{
+              "x": 4,
+              "timeStamp": 1397189940000,
+              "y0": 8,
+              "y1": 4
+            },{
+              "x": 5,
+              "timeStamp": 1397219100000,
+              "y0": 6,
+              "y1": 6
+            }
+          ],
+          completeSeriesConfig = {
+            "mySeries":{
+              "type":"line",
+              "name":"mySeries",
+              "x":"x",
+              "y":"y0",
+              "color": colorSet[colorOrder[0]]
+            },
+            "mySeries2":{
+              "type":"line",
+              "name":"mySeries2",
+              "x":"x",
+              "y":"y1",
+              "color": colorSet[colorOrder[1]]
+            },
+          },
+          chartExtents = {"x":[1,5],"y":[0,10]},
+          w = 500,
+          h = 300,
+          m = {
+            "top": 10,
+            "right": 5,
+            "bottom": 20,
+            "left": 15
+          };
+
+        forceSVG.set('width',w);
+        forceSVG.set('height',h);
+        forceSVG.set('margin',m);
+
+        forceScale.set('width',w);
+        forceScale.set('height',h);
+        forceScale.set('margin',m);
+        forceScale.set('completeSeriesConfig',completeSeriesConfig);
+        forceScale.set('chartExtents',chartExtents);
+        forceScale.set('dataExtents',chartExtents);
+        forceScale.set('chartData',d);
+
+        forcePoint.set('timeData', 'timeStamp');
+        forcePoint.set('drawWithLocalCrosshairData',true);
+        forcePoint.set('completeSeriesConfig',completeSeriesConfig);
+
+        setTimeout(function() { done(); }, 100);
+      });
+
+      test('forcePoint fixture is created', function() {
+        assert.isTrue(forcePoint !== null);
+      });
+
+      test('forcePoint highlightData not created', function() {
+        assert.isUndefined(forcePoint._highlightData);
+      });
+
+      test('forcePoint force layer is not muted', function() {
+        assert.isFalse(forceSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
+
+      });
+    }); //suite
+
+    suite('px-vis-highlight-point-canvas mutes and draws', function() {
+      var forceScale = document.getElementById('forceScale'),
+          forceSVG = document.getElementById('forceSVG'),
+          forcePoint = document.getElementById('forcePoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = {
+            "rawData":[{
+              "timeStamp": 1397160780000,
+              "x": 3,
+              "y0": 4,
+              "y1": 8
+            }],
+            "timeStamps": [1397160780000]
+          };
+
+        forcePoint.set('generatingCrosshairData',true);
+        forcePoint.set('crosshairData',d);
+
+        setTimeout(function() { done(); }, 100);
+      });
+
+      test('forcePoint create highlightData', function() {
+        assert.deepEqual(forcePoint._highlightData, [{
+              "timeStamp": 1397160780000,
+              "x": 3,
+              "y0": 4,
+              "y1": 8
+            }]);
+      });
+
+      test('forcePoint force layer mutes', function() {
+        assert.isTrue(forceSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
+
+      });
+    }); //suite
+
+    suite('px-vis-highlight-point-canvas mutes and draws', function() {
+      var forceScale = document.getElementById('forceScale'),
+          forceSVG = document.getElementById('forceSVG'),
+          forcePoint = document.getElementById('forcePoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = {
+            "rawData":[],
+            "timeStamps": []
+          };
+
+        forcePoint.set('crosshairData',d);
+
+        setTimeout(function() { done(); }, 100);
+      });
+
+      test('forcePoint highlightData removed', function() {
+        assert.deepEqual(forcePoint._highlightData, []);
+      });
+
+      test('forcePoint force layer unmutes', function() {
+        assert.isFalse(forceSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
+      });
+    }); //suite
+  }); //suite
+
+} //runTests

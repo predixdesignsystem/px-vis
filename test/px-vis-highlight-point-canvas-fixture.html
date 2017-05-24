@@ -1,0 +1,155 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Web Component Test : Fixture for px-vis-highlight-point-canvas</title>
+
+    <!-- Requires Webcomponents.js polyfill is provided by the page for browsers that don't support html imports -->
+    <script src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <!-- web-component-tester automatically provides local copy of brower.js below
+         for any URL ending with "/web-component-tester/browser.js"
+         when wct is run from the command line -->
+    <script src="../web-component-tester/browser.js"></script>
+    <link rel="import" href="../bower_components/px-colors-design/colors.html" />
+
+    <link rel="import" href="../px-vis-scale.html" />
+    <link rel="import" href="../px-vis-svg-canvas.html" />
+    <link rel="import" href="../px-vis-highlight-point-canvas.html" />
+    <!-- Retain this link for px-theme.html -->
+    <!-- px-theme is needed for WCT to run without errors -->
+    <link rel="import" href="../../px-theme/px-theme-styles.html">
+    <style include="px-theme-styles" is="custom-style"></style>
+
+    <script src="px-vis-highlight-point-canvas-tests.js"></script>
+  </head>
+
+  <body>
+    <h3>Web Component Test : Fixture for px-vis-highlight-point-canvas</h3>
+    <!--Basic-->
+    <template is="dom-bind">
+      <px-vis-scale
+        id="baseScale"
+        x-axis-type="linear"
+        y-axis-type="linear"
+        x="{{x}}"
+        y="{{y}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-scale>
+      <px-vis-svg-canvas
+        id="baseSVG"
+        canvas-context="{{canvasContext}}"
+        canvas-context-top="{{canvasContextTop}}">
+      </px-vis-svg-canvas>
+      <px-vis-highlight-point-canvas
+        id="basePoint"
+        canvas-context="[[canvasContextTop]]"
+        layers-to-mask="[[canvasContext]]"
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]">
+      </px-vis-highlight-point-canvas>
+    </template>
+
+    <!--Different dataset-->
+    <template is="dom-bind">
+      <px-vis-scale
+        id="differentScale"
+        x-axis-type="linear"
+        y-axis-type="linear"
+        x="{{x}}"
+        y="{{y}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-scale>
+      <px-vis-svg-canvas
+        id="differentSVG"
+        canvas-context="{{canvasContext}}"
+        canvas-context-top="{{canvasContextTop}}">
+      </px-vis-svg-canvas>
+      <px-vis-highlight-point-canvas
+        id="differentPoint"
+        canvas-context="[[canvasContextTop]]"
+        layers-to-mask="[[canvasContext]]"
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        different-dataset>
+      </px-vis-highlight-point-canvas>
+    </template>
+
+    <!--fuzzy dataset-->
+    <template is="dom-bind">
+      <px-vis-scale
+        id="fuzzScale"
+        x-axis-type="linear"
+        y-axis-type="linear"
+        x="{{x}}"
+        y="{{y}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-scale>
+      <px-vis-svg-canvas
+        id="fuzzSVG"
+        canvas-context="{{canvasContext}}"
+        canvas-context-top="{{canvasContextTop}}">
+      </px-vis-svg-canvas>
+      <px-vis-highlight-point-canvas
+        id="fuzzPoint"
+        canvas-context="[[canvasContextTop]]"
+        layers-to-mask="[[canvasContext]]"
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        different-dataset
+        fuzz="30000000">
+      </px-vis-highlight-point-canvas>
+    </template>
+
+    <template is="dom-bind">
+      <px-vis-scale
+        id="generatingScale"
+        x-axis-type="linear"
+        y-axis-type="linear"
+        x="{{x}}"
+        y="{{y}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-scale>
+      <px-vis-svg-canvas
+        id="generatingSVG"
+        canvas-context="{{canvasContext}}"
+        canvas-context-top="{{canvasContextTop}}">
+      </px-vis-svg-canvas>
+      <px-vis-highlight-point-canvas
+        id="generatingPoint"
+        canvas-context="[[canvasContextTop]]"
+        layers-to-mask="[[canvasContext]]"
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]">
+      </px-vis-highlight-point-canvas>
+    </template>
+
+    <template is="dom-bind">
+      <px-vis-scale
+        id="forceScale"
+        x-axis-type="linear"
+        y-axis-type="linear"
+        x="{{x}}"
+        y="{{y}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-scale>
+      <px-vis-svg-canvas
+        id="forceSVG"
+        canvas-context="{{canvasContext}}"
+        canvas-context-top="{{canvasContextTop}}">
+      </px-vis-svg-canvas>
+      <px-vis-highlight-point-canvas
+        id="forcePoint"
+        canvas-context="[[canvasContextTop]]"
+        layers-to-mask="[[canvasContext]]"
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]">
+      </px-vis-highlight-point-canvas>
+    </template>
+  </body>
+</html>
