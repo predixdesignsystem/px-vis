@@ -602,4 +602,387 @@ function runTests(){
     }); //suite
   }); //suite
 
+
+
+
+  suite('px-vis-highlight-point generatingCrosshairData', function() {
+    suite('px-vis-highlight-point setup works', function() {
+      var generatingScale = document.getElementById('generatingScale'),
+          generatingSVG = document.getElementById('generatingSVG'),
+          generatingPoint = document.getElementById('generatingPoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = [{
+              "x": 1,
+              "timeStamp": 1397102460000,
+              "y0": 1,
+              "y1": 1
+            },{
+              "x": 2,
+              "timeStamp": 1397131620000,
+              "y0": 6,
+              "y1": 3
+            },{
+              "x": 3,
+              "timeStamp": 1397160780000,
+              "y0": 4,
+              "y1": 8
+            },{
+              "x": 4,
+              "timeStamp": 1397189940000,
+              "y0": 8,
+              "y1": 4
+            },{
+              "x": 5,
+              "timeStamp": 1397219100000,
+              "y0": 6,
+              "y1": 6
+            }
+          ],
+          completeSeriesConfig = {
+            "mySeries":{
+              "type":"line",
+              "name":"mySeries",
+              "x":"x",
+              "y":"y0",
+              "color": colorSet[colorOrder[0]]
+            },
+            "mySeries2":{
+              "type":"line",
+              "name":"mySeries2",
+              "x":"x",
+              "y":"y1",
+              "color": colorSet[colorOrder[1]]
+            },
+          },
+          chartExtents = {"x":[1,5],"y":[0,10]},
+          w = 500,
+          h = 300,
+          m = {
+            "top": 10,
+            "right": 5,
+            "bottom": 20,
+            "left": 15
+          };
+
+        generatingSVG.set('width',w);
+        generatingSVG.set('height',h);
+        generatingSVG.set('margin',m);
+
+        generatingScale.set('width',w);
+        generatingScale.set('height',h);
+        generatingScale.set('margin',m);
+        generatingScale.set('completeSeriesConfig',completeSeriesConfig);
+        generatingScale.set('chartExtents',chartExtents);
+        generatingScale.set('dataExtents',chartExtents);
+        generatingScale.set('chartData',d);
+
+        setTimeout(function() {
+            var g = generatingSVG.svg.selectAll('g.layer')
+                .data([0,1]);
+            g.enter()
+              .append("g")
+              .attr("class", function(d,i) { return "layer" + i });
+
+          generatingPoint.set('svg', generatingSVG.svg.select('.layer1'));
+          generatingPoint.set('layersToMask', generatingSVG.svg.select('.layer0'));
+          generatingPoint.set('timeData', 'timeStamp');
+          generatingPoint.set('completeSeriesConfig',completeSeriesConfig);
+
+          setTimeout(function() {
+            done();
+          }, 100);
+
+        }, 100);
+
+      });
+
+      test('generatingPoint fixture is created', function() {
+        assert.isTrue(generatingPoint !== null);
+      });
+
+      test('generatingPoint scatters not created', function() {
+        assert.isUndefined(generatingPoint._circles);
+      });
+
+      test('generatingPoint generating layer is not muted', function() {
+        assert.isFalse(generatingSVG.svg.select('.layer0').node().classList.contains("secondaryDataMask"));
+
+      });
+    }); //suite
+
+    suite('px-vis-highlight-point mutes and draws', function() {
+      var generatingScale = document.getElementById('generatingScale'),
+          generatingSVG = document.getElementById('generatingSVG'),
+          generatingPoint = document.getElementById('generatingPoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = {
+            "rawData":[{
+              "timeStamp": 1397160780000,
+              "x": 3,
+              "y0": 4,
+              "y1": 8
+            }],
+            "timeStamps": [1397160780000]
+          };
+
+        generatingPoint.set('crosshairData',d);
+
+        setTimeout(function() { done(); }, 100);
+      });
+
+      test('generatingPoint scatters created', function() {
+        assert.equal(generatingPoint._circles.node().tagName,'circle');
+        assert.equal(generatingPoint._circles.nodes().length,2);
+      });
+
+      test('generatingPoint scatters have the right color', function() {
+        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[0]).attr('fill'), colorSet[colorOrder[0]]);
+        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[0]).attr('stroke'), colorSet[colorOrder[0]]);
+        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[1]).attr('fill'), colorSet[colorOrder[1]]);
+        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[1]).attr('stroke'), colorSet[colorOrder[1]]);
+      });
+
+      test('generatingPoint scatters x & y', function() {
+        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[0]).attr('cx'), 240);
+        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[0]).attr('cy'), 162);
+        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[1]).attr('cx'), 240);
+        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[1]).attr('cy'), 54);
+      });
+
+      test('generatingPoint generating layer mutes', function() {
+        assert.isTrue(generatingSVG.svg.select('.layer0').node().classList.contains("secondaryDataMask"));
+
+      });
+    }); //suite
+
+    suite('px-vis-highlight-point mutes and draws', function() {
+      var generatingScale = document.getElementById('generatingScale'),
+          generatingSVG = document.getElementById('generatingSVG'),
+          generatingPoint = document.getElementById('generatingPoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = {
+            "rawData":[],
+            "timeStamps": []
+          };
+
+        generatingPoint.set('generatingCrosshairData',true);
+        generatingPoint.set('crosshairData',d);
+
+        setTimeout(function() { done(); }, 100);
+      });
+
+      test('generatingPoint scatters removed', function() {
+        assert.equal(generatingPoint._circles.nodes().length, 0);
+      });
+
+      test('generatingPoint generating layer unmutes', function() {
+        assert.isFalse(generatingSVG.svg.select('.layer0').node().classList.contains("secondaryDataMask"));
+
+      });
+    }); //suite
+  }); //suite
+
+
+  suite('px-vis-highlight-point drawWithLocalCrosshairData', function() {
+    suite('px-vis-highlight-point setup works', function() {
+      var forceScale = document.getElementById('forceScale'),
+          forceSVG = document.getElementById('forceSVG'),
+          forcePoint = document.getElementById('forcePoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = [{
+              "x": 1,
+              "timeStamp": 1397102460000,
+              "y0": 1,
+              "y1": 1
+            },{
+              "x": 2,
+              "timeStamp": 1397131620000,
+              "y0": 6,
+              "y1": 3
+            },{
+              "x": 3,
+              "timeStamp": 1397160780000,
+              "y0": 4,
+              "y1": 8
+            },{
+              "x": 4,
+              "timeStamp": 1397189940000,
+              "y0": 8,
+              "y1": 4
+            },{
+              "x": 5,
+              "timeStamp": 1397219100000,
+              "y0": 6,
+              "y1": 6
+            }
+          ],
+          completeSeriesConfig = {
+            "mySeries":{
+              "type":"line",
+              "name":"mySeries",
+              "x":"x",
+              "y":"y0",
+              "color": colorSet[colorOrder[0]]
+            },
+            "mySeries2":{
+              "type":"line",
+              "name":"mySeries2",
+              "x":"x",
+              "y":"y1",
+              "color": colorSet[colorOrder[1]]
+            },
+          },
+          chartExtents = {"x":[1,5],"y":[0,10]},
+          w = 500,
+          h = 300,
+          m = {
+            "top": 10,
+            "right": 5,
+            "bottom": 20,
+            "left": 15
+          };
+
+        forceSVG.set('width',w);
+        forceSVG.set('height',h);
+        forceSVG.set('margin',m);
+
+        forceScale.set('width',w);
+        forceScale.set('height',h);
+        forceScale.set('margin',m);
+        forceScale.set('completeSeriesConfig',completeSeriesConfig);
+        forceScale.set('chartExtents',chartExtents);
+        forceScale.set('dataExtents',chartExtents);
+        forceScale.set('chartData',d);
+
+        setTimeout(function() {
+            var g = forceSVG.svg.selectAll('g.layer')
+                .data([0,1]);
+            g.enter()
+              .append("g")
+              .attr("class", function(d,i) { return "layer" + i });
+
+          forcePoint.set('svg', forceSVG.svg.select('.layer1'));
+          forcePoint.set('layersToMask', forceSVG.svg.select('.layer0'));
+          forcePoint.set('timeData', 'timeStamp');
+          forcePoint.set('completeSeriesConfig',completeSeriesConfig);
+          forcePoint.set('drawWithLocalCrosshairData',true);
+
+          setTimeout(function() {
+            done();
+          }, 100);
+
+        }, 100);
+
+      });
+
+      test('forcePoint fixture is created', function() {
+        assert.isTrue(forcePoint !== null);
+      });
+
+      test('forcePoint scatters not created', function() {
+        assert.isUndefined(forcePoint._circles);
+      });
+
+      test('forcePoint force layer is not muted', function() {
+        assert.isFalse(forceSVG.svg.select('.layer0').node().classList.contains("secondaryDataMask"));
+
+      });
+    }); //suite
+
+    suite('px-vis-highlight-point mutes and draws', function() {
+      var forceScale = document.getElementById('forceScale'),
+          forceSVG = document.getElementById('forceSVG'),
+          forcePoint = document.getElementById('forcePoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = {
+            "rawData":[{
+              "timeStamp": 1397160780000,
+              "x": 3,
+              "y0": 4,
+              "y1": 8
+            }],
+            "timeStamps": [1397160780000]
+          };
+
+        forcePoint.set('generatingCrosshairData',true);
+        forcePoint.set('crosshairData',d);
+
+        setTimeout(function() { done(); }, 100);
+      });
+
+      test('forcePoint scatters created', function() {
+        assert.equal(forcePoint._circles.node().tagName,'circle');
+        assert.equal(forcePoint._circles.nodes().length,2);
+      });
+
+      test('forcePoint scatters have the right color', function() {
+        assert.equal(Px.d3.select(forcePoint._circles.nodes()[0]).attr('fill'), colorSet[colorOrder[0]]);
+        assert.equal(Px.d3.select(forcePoint._circles.nodes()[0]).attr('stroke'), colorSet[colorOrder[0]]);
+        assert.equal(Px.d3.select(forcePoint._circles.nodes()[1]).attr('fill'), colorSet[colorOrder[1]]);
+        assert.equal(Px.d3.select(forcePoint._circles.nodes()[1]).attr('stroke'), colorSet[colorOrder[1]]);
+      });
+
+      test('forcePoint scatters x & y', function() {
+        assert.equal(Px.d3.select(forcePoint._circles.nodes()[0]).attr('cx'), 240);
+        assert.equal(Px.d3.select(forcePoint._circles.nodes()[0]).attr('cy'), 162);
+        assert.equal(Px.d3.select(forcePoint._circles.nodes()[1]).attr('cx'), 240);
+        assert.equal(Px.d3.select(forcePoint._circles.nodes()[1]).attr('cy'), 54);
+      });
+
+      test('forcePoint force layer mutes', function() {
+        assert.isTrue(forceSVG.svg.select('.layer0').node().classList.contains("secondaryDataMask"));
+
+      });
+    }); //suite
+
+    suite('px-vis-highlight-point mutes and draws', function() {
+      var forceScale = document.getElementById('forceScale'),
+          forceSVG = document.getElementById('forceSVG'),
+          forcePoint = document.getElementById('forcePoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = {
+            "rawData":[],
+            "timeStamps": []
+          };
+
+        forcePoint.set('crosshairData',d);
+
+        setTimeout(function() { done(); }, 100);
+      });
+
+      test('forcePoint scatters removed', function() {
+        assert.equal(forcePoint._circles.nodes().length, 0);
+      });
+
+      test('forcePoint force layer unmutes', function() {
+        assert.isFalse(forceSVG.svg.select('.layer0').node().classList.contains("secondaryDataMask"));
+
+      });
+    }); //suite
+  }); //suite
+
 } //runTests
