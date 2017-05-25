@@ -88,7 +88,7 @@
     }
 
     //To be called by external people wanting to do work
-    scheduler.process = function(actionName, data, chartId, callback) {
+    scheduler.process = function(actionName, originatorName, data, chartId, callback) {
 
       //find worker for this chart
       var worker = scheduler.workers[getWorkerIndexForChart(chartId)];
@@ -103,14 +103,13 @@
 
       } else {
         //worker not available, queue
-
         var obj,
             found;
-        //if we already have an action of this type for this chart cancel it
+        //if we already have an action of this type for this chart remove the old one and replace it with this one
         for(var i=0; i<scheduler.queue[worker.index].length; i++) {
 
           var obj = scheduler.queue[worker.index][i];
-          if(obj.chartId === chartId && obj.action === actionName) {
+          if(obj.chartId === chartId && obj.action === actionName && obj.originatorName === originatorName) {
             found = i;
             break;
           }
@@ -121,7 +120,7 @@
         }
 
         //now queue
-        scheduler.queue[worker.index].push({ 'action': actionName, 'data': data, 'chartId': chartId, 'callback': callback});
+        scheduler.queue[worker.index].push({ 'action': actionName, 'originatorName': originatorName, 'data': data, 'chartId': chartId, 'callback': callback});
       }
     };
 
@@ -144,6 +143,7 @@
       if(this.action === 'unregisterChart') {
         //TODO: clean queues in case something has been added while deleting?
         delete scheduler.chartWorkerMapping[this.chartId];
+        delete scheduler.hasChartData[this.chartId];
       }
 
       //use thread if work queued
@@ -153,6 +153,7 @@
         var initData = scheduler.queue[this.index].splice(0, 1)[0];
         startWork(this, initData.action, initData.data, initData.chartId, initData.callback);
       } else {
+
         this.inUse = false;
       }
 

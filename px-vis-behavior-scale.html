@@ -251,7 +251,8 @@ PxVisBehaviorScale.scale = [{
     wwInfo.seriesToAxes = this.seriesToAxes;
     wwInfo.isYAxisObject = typeof this.y === 'object'
 
-    Px.vis.scheduler.process('determineExtents', wwInfo, this.chartId, function(e) {
+    Px.vis.scheduler.process('determineExtents', this.nodeName, wwInfo, this.chartId, function(e) {
+
       this._applyExtents(e.data);
     }.bind(this));
   },
@@ -367,6 +368,7 @@ PxVisBehaviorScale.scale = [{
     if(Array.isArray(extents.y) && extents.y[1] === extents.y[0]) {
       extents.y[1] += 1;
     }
+
     return extents
   },
 
