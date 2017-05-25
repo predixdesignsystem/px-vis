@@ -1,3 +1,13 @@
+v1.1.13
+==================
+* ensure spaces in register item are always consistent
+
+v1.1.12
+==================
+* fix check for properties on object to check for array before checking all keys
+* refactor progressive rendering
+* fix missing space in register item after vulcanization
+
 v1.1.11
 ==================
 * ensure tooltip can still be shown in events

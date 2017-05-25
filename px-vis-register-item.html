@@ -83,6 +83,7 @@ Custom property | Description | Default
             </template>
           </div>
           <!-- Display serie data differently depending on x and y axis types -->
+          <!-- Use inline flex to avoid the browser adding spaces between our sub elements-->
           <div class="seriesData flex__item--msfix" name$="R{{item.name}}">
             <!-- if x axis is number format and show it -->
             <template is="dom-if" if="{{_isOfType(xAxisType, 'linear')}}">
@@ -96,10 +97,10 @@ Custom property | Description | Default
                   default-currency-format="[[numberFormatCurrency]]"
                   zero-format="[[numberFormatZero]]">
                 </px-number-formatter>
-                <template is="dom-if" if="[[_checkItem(_itemX)]]">
-                  {{_xUnit}}
+                <template is="dom-if" if="[[_checkUnitXItem(_itemX)]]" strip-whitespace>
+                  &nbsp;{{_xUnit}}
                 </template>
-                <template is="dom-if" if="[[_checkItem(_itemX)]]">
+                <template is="dom-if" if="[[_checkItem(_itemX)]]" strip-whitespace>
                   &nbsp;/&nbsp
                 </template>
               </template>
@@ -107,17 +108,17 @@ Custom property | Description | Default
             <!-- if x axis is ordinal just display it -->
             <template is="dom-if" if="{{_isOfType(xAxisType, 'ordinal')}}">
               <span>[[_itemX]]</span>
-              <template is="dom-if" if="[[_checkItem(_itemX)]]">
-                {{_xUnit}}
+              <template is="dom-if" if="[[_checkUnitXItem(_itemX)]]" strip-whitespace>
+                &nbsp;{{_xUnit}}
               </template>
-              <template is="dom-if" if="[[_checkItem(_itemX)]]">
+              <template is="dom-if" if="[[_checkItem(_itemX)]]" strip-whitespace>
                 &nbsp;/&nbsp
               </template>
             </template>
             <!-- if x axis is time don't display it -->
             <!-- if y axis is number format and show it -->
               <template is="dom-if" if="{{_isOfType(yAxisType, 'linear')}}">
-                <template is="dom-if" if="{{_checkItem(_itemY)}}">
+                <template is="dom-if" if="{{_checkItem(_itemY)}}" strip-whitespace>
                   <px-number-formatter
                     class$="[[_ttStyle]]"
                     value="[[_itemY]]"
@@ -133,8 +134,8 @@ Custom property | Description | Default
               <template is="dom-if" if="{{_isOfType(yAxisType, 'ordinal')}}">
                 <span>[[_itemY]]</span>
               </template>
-              <template is="dom-if" if="[[_checkItem(_itemY)]]">
-                {{_yUnit}}
+              <template is="dom-if" if="[[_checkItem(_itemY)]]" strip-whitespace>
+                &nbsp;{{_yUnit}}
               </template>
             </div>
           </span>
@@ -240,6 +241,10 @@ Custom property | Description | Default
      */
     _computeItemX: function() {
       return this._returnVal(this.item, 'x');
+    },
+
+    _checkUnitXItem: function() {
+      return (!!this._returnVal(this.item, 'x') && !!this._computeXUnit(this.item));
     },
 
     /**
