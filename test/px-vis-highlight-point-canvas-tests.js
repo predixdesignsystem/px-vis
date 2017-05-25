@@ -100,7 +100,10 @@ function runTests(){
 
       test('basePoint base layer is not muted', function() {
         assert.isFalse(baseSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
+      });
 
+      test('basePoint didnt create defaultEmptyData', function() {
+        assert.isNull(basePoint.defaultEmptyData);
       });
     }); //suite
 
@@ -139,7 +142,10 @@ function runTests(){
 
       test('basePoint base layer mutes', function() {
         assert.isTrue(baseSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
+      });
 
+      test('basePoint didnt create defaultEmptyData', function() {
+        assert.isNull(basePoint.defaultEmptyData);
       });
     }); //suite
 
@@ -836,6 +842,160 @@ function runTests(){
       test('forcePoint force layer unmutes', function() {
         assert.isFalse(forceSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
       });
+    }); //suite
+  }); //suite
+
+
+
+
+    suite('px-vis-highlight-point creates tooltip data', function() {
+    suite('px-vis-highlight-point setup works', function() {
+      var tooltipScale = document.getElementById('tooltipScale'),
+          tooltipSVG = document.getElementById('tooltipSVG'),
+          tooltipPoint = document.getElementById('tooltipPoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = [{
+              "x": 1,
+              "timeStamp": 1397102460000,
+              "y0": 1,
+              "y1": 1
+            },{
+              "x": 2,
+              "timeStamp": 1397131620000,
+              "y0": 6,
+              "y1": 3
+            },{
+              "x": 3,
+              "timeStamp": 1397160780000,
+              "y0": 4,
+              "y1": 8
+            },{
+              "x": 4,
+              "timeStamp": 1397189940000,
+              "y0": 8,
+              "y1": 4
+            },{
+              "x": 5,
+              "timeStamp": 1397219100000,
+              "y0": 6,
+              "y1": 6
+            }
+          ],
+          completeSeriesConfig = {
+            "mySeries":{
+              "type":"line",
+              "name":"mySeries",
+              "x":"x",
+              "y":"y0",
+              "color": colorSet[colorOrder[0]]
+            },
+            "mySeries2":{
+              "type":"line",
+              "name":"mySeries2",
+              "x":"x",
+              "y":"y1",
+              "color": colorSet[colorOrder[1]]
+            },
+          },
+          chartExtents = {"x":[1,5],"y":[0,10]},
+          w = 500,
+          h = 300,
+          m = {
+            "top": 10,
+            "right": 5,
+            "bottom": 20,
+            "left": 15
+          };
+
+        tooltipSVG.set('width',w);
+        tooltipSVG.set('height',h);
+        tooltipSVG.set('margin',m);
+
+        tooltipScale.set('width',w);
+        tooltipScale.set('height',h);
+        tooltipScale.set('margin',m);
+        tooltipScale.set('completeSeriesConfig',completeSeriesConfig);
+        tooltipScale.set('chartExtents',chartExtents);
+        tooltipScale.set('dataExtents',chartExtents);
+        tooltipScale.set('chartData',d);
+
+        tooltipPoint.set('timeData', 'timeStamp');
+        tooltipPoint.set('completeSeriesConfig',completeSeriesConfig);
+        tooltipPoint.set('showTooltipData',true);
+
+        setTimeout(function() { done(); }, 100);
+      });
+
+      test('tooltipPoint didnt create defaultEmptyData', function() {
+        assert.isNull(tooltipPoint.defaultEmptyData);
+      });
+    }); //suite
+
+    suite('px-vis-highlight-point mutes and draws', function() {
+      var tooltipScale = document.getElementById('tooltipScale'),
+          tooltipSVG = document.getElementById('tooltipSVG'),
+          tooltipPoint = document.getElementById('tooltipPoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = {
+            "rawData":[{
+              "timeStamp": 1397160780000,
+              "x": 3,
+              "y0": 4,
+              "y1": 8
+            }],
+            "timeStamps": [1397160780000]
+          };
+
+        tooltipPoint.set('crosshairData',d);
+
+        setTimeout(function() { done(); }, 100);
+      });
+
+      test('tooltipPoint created defaultEmptyData', function() {
+        assert.deepEqual(tooltipPoint.defaultEmptyData, {"time":1397160780000,"timeSeriesKey":null,"hidden":true,"series":[{"name":"mySeries","value":{"x":3,"y0":4},"coord":[240,162]},{"name":"mySeries2","value":{"x":3,"y1":8},"coord":[240,54]}],"mouse":[240,162],"xArr":[],"yArr":[],"rawData":[],"timeStamps":[],"timeStampsTracker":{}});
+      });
+
+      test('tooltipPoint created tooltipData', function() {
+        assert.deepEqual(tooltipPoint.tooltipData, {"time":1397160780000,"timeSeriesKey":null,"hidden":true,"series":[{"name":"mySeries","value":{"x":3,"y0":4},"coord":[240,162]},{"name":"mySeries2","value":{"x":3,"y1":8},"coord":[240,54]}],"mouse":[240,162],"xArr":[],"yArr":[],"rawData":[],"timeStamps":[],"timeStampsTracker":{}});
+      });
+
+    }); //suite
+
+    suite('px-vis-highlight-point mutes and draws', function() {
+      var tooltipScale = document.getElementById('tooltipScale'),
+          tooltipSVG = document.getElementById('tooltipSVG'),
+          tooltipPoint = document.getElementById('tooltipPoint');
+
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      suiteSetup(function(done) {
+        var d = {
+            "rawData":[],
+            "timeStamps": []
+          };
+
+        tooltipPoint.set('crosshairData',d);
+
+        setTimeout(function() { done(); }, 100);
+      });
+
+      test('tooltipPoint emptied defaultEmptyData', function() {
+        assert.isNull(tooltipPoint.defaultEmptyData);
+      });
+
+      test('tooltipPoint emptied tooltipData', function() {
+        assert.deepEqual(tooltipPoint.tooltipData, {"time":null,"timeSeriesKey":null,"hidden":true,"series":[{"name":"mySeries","value":null},{"name":"mySeries2","value":null}],"mouse":null,"xArr":null,"yArr":null});
+      });
+
     }); //suite
   }); //suite
 
