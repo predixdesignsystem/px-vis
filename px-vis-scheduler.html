@@ -183,42 +183,8 @@
       }
     };
 
-
-    window.performance.mark('initWebWorkers');
     //create workers and init queue
     for(var i=0; i<threadCount; i++) {
-
-      // Build a worker from an anonymous function body
-      // var blobURL = URL.createObjectURL( new Blob([ '(',
-
-      // function(){
-      //     //Long-running work here
-      //     function reply(webWorkerIndex, data) {
-
-      //     if(data) {
-      //       postMessage({'webWorkerIndex': webWorkerIndex, 'data': data});
-      //     } else {
-      //       postMessage({'webWorkerIndex': webWorkerIndex});
-      //     }
-      //   }
-
-      //   onmessage = function(e) {
-
-      //     switch(e.data.action) {
-      //       case 'dummy':
-      //         reply(e.data.webWorkerIndex);
-      //         break;
-      //     }
-      //   }
-
-      // }.toString(),
-
-      // ')()' ], { type: 'application/javascript' } ) );
-
-    //  var worker = new Worker( blobURL );
-
-    //   // Won't be needing this anymore
-    //   URL.revokeObjectURL( blobURL );
 
       try {
         var worker = new Worker(Px.vis.workerUrl);
@@ -230,23 +196,14 @@
         return;
       }
 
-
-
       //we can load the worker through a data uri if needed
       scheduler.workers.push(worker);
 
       //kick a first dummy communication for each worker.
-      //The first comm for each worker is slow (browser initializing stuff?)
+      //The first comm for each worker is slow (needs to parse script)
       //so do it now in order not to suffer the slowdown when actually needing it
       worker.onmessage = function(e) {
 
-        initCounter++;
-        if(initCounter >= threadCount) {
-          window.performance.mark('initWebWorkersEnd');
-          window.performance.measure('webWorkerInitTime', 'initWebWorkers', 'initWebWorkersEnd');
-          var duration = window.performance.getEntriesByName('webWorkerInitTime')[0].duration;
-          console.log('init ' + scheduler.workers.length + ' webworkers: ' + duration + ' ms');
-        }
         this.inUse = false;
 
         //now add our true handling function
