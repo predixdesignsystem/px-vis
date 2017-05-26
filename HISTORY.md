@@ -1,3 +1,7 @@
+v1.1.14
+==================
+* ensure x Axis unit is still displayed in register when value is 0
+
 v1.1.13
 ==================
 * ensure spaces in register item are always consistent
