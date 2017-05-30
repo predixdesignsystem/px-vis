@@ -487,7 +487,9 @@ PxVisBehaviorChart.webWorkerSynchonization = [{
         type: String,
         value: 'chartData'
       },
-
+      /**
+       * Will prevent the data synchronization to the webworker
+       */
       dontUseWebWorker: {
         type: Boolean,
         value: false
@@ -519,7 +521,7 @@ PxVisBehaviorChart.webWorkerSynchonization = [{
 
           //only process if we haven't been re attached
           if(this._wwSyncRequestDataDeletion) {
-          Px.vis.scheduler.process('unregisterChart', null, this.chartId);
+          Px.vis.scheduler.process('unregisterChart', this.nodeName, null, this.chartId);
 
             //async, the data hasn't been actually deleted yet but we
             //don't have a way to cancel it anymore and an update
@@ -533,7 +535,7 @@ PxVisBehaviorChart.webWorkerSynchonization = [{
 
       if(!this.preventWwSynchronization && this[this._wwSyncDataPropName] && !this.dontUseWebWorker) {
         this._wwSyncDataDeleted = false;
-        Px.vis.scheduler.process('updateData', {'chartData': this[this._wwSyncDataPropName]}, this.chartId);
+        Px.vis.scheduler.process('updateData', this.nodeName, {'chartData': this[this._wwSyncDataPropName]}, this.chartId);
       }
     }
 }, PxVisBehavior.dataset];

@@ -88,7 +88,7 @@
     }
 
     //To be called by external people wanting to do work
-    scheduler.process = function(actionName, data, chartId, callback) {
+    scheduler.process = function(actionName, originatorName, data, chartId, callback) {
 
       //find worker for this chart
       var worker = scheduler.workers[getWorkerIndexForChart(chartId)];
@@ -103,14 +103,13 @@
 
       } else {
         //worker not available, queue
-
         var obj,
             found;
-        //if we already have an action of this type for this chart cancel it
+        //if we already have an action of this type for this chart remove the old one and replace it with this one
         for(var i=0; i<scheduler.queue[worker.index].length; i++) {
 
           var obj = scheduler.queue[worker.index][i];
-          if(obj.chartId === chartId && obj.action === actionName) {
+          if(obj.chartId === chartId && obj.action === actionName && obj.originatorName === originatorName) {
             found = i;
             break;
           }
@@ -121,7 +120,7 @@
         }
 
         //now queue
-        scheduler.queue[worker.index].push({ 'action': actionName, 'data': data, 'chartId': chartId, 'callback': callback});
+        scheduler.queue[worker.index].push({ 'action': actionName, 'originatorName': originatorName, 'data': data, 'chartId': chartId, 'callback': callback});
       }
     };
 
@@ -144,6 +143,7 @@
       if(this.action === 'unregisterChart') {
         //TODO: clean queues in case something has been added while deleting?
         delete scheduler.chartWorkerMapping[this.chartId];
+        delete scheduler.hasChartData[this.chartId];
       }
 
       //use thread if work queued
@@ -153,6 +153,7 @@
         var initData = scheduler.queue[this.index].splice(0, 1)[0];
         startWork(this, initData.action, initData.data, initData.chartId, initData.callback);
       } else {
+
         this.inUse = false;
       }
 
@@ -183,42 +184,8 @@
       }
     };
 
-
-    window.performance.mark('initWebWorkers');
     //create workers and init queue
     for(var i=0; i<threadCount; i++) {
-
-      // Build a worker from an anonymous function body
-      // var blobURL = URL.createObjectURL( new Blob([ '(',
-
-      // function(){
-      //     //Long-running work here
-      //     function reply(webWorkerIndex, data) {
-
-      //     if(data) {
-      //       postMessage({'webWorkerIndex': webWorkerIndex, 'data': data});
-      //     } else {
-      //       postMessage({'webWorkerIndex': webWorkerIndex});
-      //     }
-      //   }
-
-      //   onmessage = function(e) {
-
-      //     switch(e.data.action) {
-      //       case 'dummy':
-      //         reply(e.data.webWorkerIndex);
-      //         break;
-      //     }
-      //   }
-
-      // }.toString(),
-
-      // ')()' ], { type: 'application/javascript' } ) );
-
-    //  var worker = new Worker( blobURL );
-
-    //   // Won't be needing this anymore
-    //   URL.revokeObjectURL( blobURL );
 
       try {
         var worker = new Worker(Px.vis.workerUrl);
@@ -230,23 +197,14 @@
         return;
       }
 
-
-
       //we can load the worker through a data uri if needed
       scheduler.workers.push(worker);
 
       //kick a first dummy communication for each worker.
-      //The first comm for each worker is slow (browser initializing stuff?)
+      //The first comm for each worker is slow (needs to parse script)
       //so do it now in order not to suffer the slowdown when actually needing it
       worker.onmessage = function(e) {
 
-        initCounter++;
-        if(initCounter >= threadCount) {
-          window.performance.mark('initWebWorkersEnd');
-          window.performance.measure('webWorkerInitTime', 'initWebWorkers', 'initWebWorkersEnd');
-          var duration = window.performance.getEntriesByName('webWorkerInitTime')[0].duration;
-          console.log('init ' + scheduler.workers.length + ' webworkers: ' + duration + ' ms');
-        }
         this.inUse = false;
 
         //now add our true handling function

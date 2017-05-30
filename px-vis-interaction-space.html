@@ -622,7 +622,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           data.radius = this.searchRadius;
           data.searchType = this.searchType;
 
-      Px.vis.scheduler.process('findQuadtreePoints', data, this.chartId, function(e) {
+      Px.vis.scheduler.process('findQuadtreePoints', this.nodeName, data, this.chartId, function(e) {
         dataObj.series = e.data.series;
         dataObj.rawData = e.data.rawData;
         dataObj.timeStamps = e.data.timeStamps;
@@ -859,7 +859,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      *
      */
     _getOrdinalValue: function(xAxis, mousePos, axisKey) {
-      //TODO: try getting the closest one rather than the one directly on the left
+
       var domain,
           range;
 
@@ -1222,32 +1222,13 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           data.extents = ext;
           data.searchType = this.searchType;
 
-          Px.vis.scheduler.process('createQuadtree', data, this.chartId, function(data) {
+          Px.vis.scheduler.process('createQuadtree', this.nodeName, data, this.chartId, function(data) {
             // TODO Provide some feedback before and after built??
             console.log('built quad: ' + (window.performance.now() - time));
           }.bind(this));
         }.bind(this), 50);
       }
     },
-
-   _createVoronoiData: function() {
-    if(this.domainChanged !== null) {
-      var t0 = window.performance.now();
-      var w = this.width - this.margin.right - this.margin.left,
-          h = this.height - this.margin.top - this.margin.bottom,
-          ext = [[0,0], [w, h]],
-          data = this._createBaseDataObjForWebWorker();
-
-      data.width = w;
-      data.height = h;
-      data.extents = ext;
-
-      Px.vis.scheduler.process('createVoronoi', data, this.chartId, function(data) {
-        var t1 = window.performance.now();
-        console.log('built voronoi in ' + (t1-t0));
-      }.bind(this));
-    }
-  },
 
     _createBaseDataObjForWebWorker: function() {
       var data = {},
@@ -1287,110 +1268,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       }
 
       return data;
-    },
-
-    _returnClosestsQuadtreePoints: function(mousePos, dataObj) {
-      var keys = this.seriesKeys ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
-          result,
-          k;
-
-      for(var i = 0; i < keys.length; i++) {
-        k = keys[i];
-
-        result = this.quadtreeData[k].find(mousePos[0],mousePos[1]);
-
-        if(!result) {
-          dataObj.series.push(this._emptySeries(k));
-
-        // if we find stuff, process the data and stick it in our object
-        } else {
-          dataObj.time;
-          dataObj.series.push(this._calcDataSeriesQuadtree(result, k));
-
-          if(this._calcCrosshair) {
-            dataObj = this._addCrosshairDataQuadtree(dataObj, result);
-          }
-        } //else result === null
-      } //for
-    },
-
-// ===================================================================================
-// For visualizing the Quadtree / demos
-
-    _drawQuadtree: function(quadtree) {
-      function nodes(qt) {
-        var nodes = [];
-        qt.visit(function(node, x0, y0, x1, y1) {
-          node.x0 = x0, node.y0 = y0;
-          node.x1 = x1, node.y1 = y1;
-          nodes.push(node);
-        });
-        return nodes;
-      }
-
-      // Call thingy and get data
-
-      var g = this.svg.insert('g', 'rect');
-      g.selectAll(".node")
-        .data(nodes(quadtree))
-        .enter().append("rect")
-          .attr("class", "node")
-          .attr('fill', 'none')
-          .attr('stroke', 'red')
-          .attr("x", function(d) { return d.x0; })
-          .attr("y", function(d) { return d.y0; })
-          .attr("width", function(d) { return d.y1 - d.y0; })
-          .attr("height", function(d) { return d.x1 - d.x0; });
-    },
-
-    _removeQuadtree: function() {
-      this.svg.selectAll(".node").remove();
-    },
-
-
-    _createQuadtreeDataForDrawing: function() {
-      if(this.domainChanged !== null) {
-        var w = this.width - this.margin.right - this.margin.left,
-            h = this.height - this.margin.top - this.margin.bottom,
-            ext = [[0,0], [w, h]],
-            keys = this.seriesKeys ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
-            xKey,
-            yKey,
-            axis,
-            k,
-            data = {},
-            quadtree = {};
-
-        for(var i = 0; i < keys.length; i++) {
-          k = keys[i];
-          xKey = this.completeSeriesConfig[k]['x'];
-          yKey = this.completeSeriesConfig[k]['y'];
-          axis = this.completeSeriesConfig[k]['axis'] ? this.completeSeriesConfig[k]['axis']['id'] : null;
-
-          quadtree[k] = Px.d3.quadtree()
-            .extent(ext)
-            .x(function(d) { return this.x(d[xKey]) }.bind(this))
-            .y(function(d) { return this.y["defaultAxis"](d[yKey]) }.bind(this))
-            .addAll(this.chartData);
-        }
-
-        this._drawQuadtree(quadtree[k]);
-      }
-    },
-
-    _qtDemo: function() {
-      this._createQuadtreeDataForDrawing();
-
-      setTimeout(function(){
-        this._removeQuadtree();
-        this.set("extentsData", {"x1":0,"y1":56,"w":79,"h":57,"x2":79,"y2":113,"eX":[-43.04371317836934,-35.211421500422254],"eY":{"defaultAxis":[3.1866258138594112,8.373620981563445]}});
-
-        setTimeout(function(){
-          this._createQuadtreeDataForDrawing();
-        }.bind(this), 1000)
-      }.bind(this), 5000)
     }
-// ===================================================================================
 
   });
 </script>
