@@ -2527,12 +2527,12 @@ PxVisBehavior.highlightCanvasShared = [{
 PxVisBehavior.highlightSvgShared = [{
 
   observers: [
+    '_muteDataSeries(_highlightData)',
     '_addTransition(layersToMask)'
   ],
 
   _muteDataSeries: function(data) {
     if(this.layersToMask) {
-
       if(!Array.isArray(this.layersToMask)) {
         this.toggleClass('secondaryDataMask', data.length,
           this.layersToMask.node());
@@ -2546,7 +2546,6 @@ PxVisBehavior.highlightSvgShared = [{
   },
 
   _addTransition: function() {
-
     if(!Array.isArray(this.layersToMask)) {
       this.layersToMask.node().style.transition = 'opacity 0.2s';
     } else {
@@ -2660,8 +2659,7 @@ PxVisBehavior.highlightLineShared = [{
 
       } else {
         screenX = this.x(last) + svgBounding.left + window.pageXOffset + 15;
-        // FIXME? Yeah, getRootNode().host isnt the best, but otherwise we have to pass down the whole margin obj just for this. Dunno...
-        screenY = this.y[last](dataset.yVal) + this.getRootNode().host.margin.top + svgBounding.top + window.pageYOffset;
+        screenY = this.y[last](dataset.yVal) + this.margin.top + svgBounding.top + window.pageYOffset;
       }
 
       for(var i = 0; i < this.dimensions.length; i++) {
@@ -2701,6 +2699,6 @@ PxVisBehavior.highlightLineShared = [{
     return data;
 
   }
-}, PxVisBehavior.highlightShared];
+}, PxVisBehavior.highlightShared, PxVisBehavior.margins];
 
 </script>
