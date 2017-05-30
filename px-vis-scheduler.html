@@ -14,7 +14,7 @@
 
     //get number of cores
     var scheduler = {},
-        threadCount = Px.vis.maxWorkerCount || navigator.hardwareConcurrency || 4,
+        threadCount = 1,//Px.vis.maxWorkerCount || navigator.hardwareConcurrency || 4,
         initCounter = 0,
         processDone,
         startWork;
@@ -105,6 +105,7 @@
         //worker not available, queue
         var obj,
             found;
+
         //if we already have an action of this type for this chart remove the old one and replace it with this one
         for(var i=0; i<scheduler.queue[worker.index].length; i++) {
 
@@ -200,19 +201,14 @@
       //we can load the worker through a data uri if needed
       scheduler.workers.push(worker);
 
+      worker.inUse = true;
+      worker.index = i;
+      worker.onmessage = processDone;
+      worker.onerror = webWorkerError;
+
       //kick a first dummy communication for each worker.
       //The first comm for each worker is slow (needs to parse script)
       //so do it now in order not to suffer the slowdown when actually needing it
-      worker.onmessage = function(e) {
-
-        this.inUse = false;
-
-        //now add our true handling function
-        this.onmessage = processDone;
-        this.onerror = webWorkerError;
-      };
-      worker.inUse = true;
-      worker.index = i;
       worker.postMessage({'action': 'init', 'd3Url': Px.vis.workerD3Url});
       scheduler.queue.push([]);
     }
