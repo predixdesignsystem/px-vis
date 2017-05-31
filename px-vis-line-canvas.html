@@ -510,6 +510,10 @@ Element which draws lines series onto the chart
           }
         }
 
+        var dashPattern = this.completeSeriesConfig[this.seriesId] && this.completeSeriesConfig[this.seriesId]["dashPattern"] ? this.completeSeriesConfig[this.seriesId]["dashPattern"] : '';
+        dashPattern = JSON.parse('[' + dashPattern +']');
+        this.canvasContext.setLineDash(dashPattern);
+
         //only strike once
         this.canvasContext.strokeStyle = this.rgbToRgba(this.completeSeriesConfig[this.seriesId]['color'], opacity);
         this.canvasContext.stroke();

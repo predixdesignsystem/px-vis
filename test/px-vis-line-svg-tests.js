@@ -41,7 +41,8 @@ function runTests(){
           "name":"mySeries",
           "x":"x",
           "y":"y",
-          "color": "rgb(93,165,218)"
+          "color": "rgb(93,165,218)",
+          "dashPattern": "5,2"
         }},
         chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
@@ -89,6 +90,10 @@ function runTests(){
 
     test('baseLine line series has the right color', function() {
       assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+    });
+
+    test('baseLine line series has the right dash pattern', function() {
+        assert.equal(linePath.attr('stroke-dasharray').split(' ').join(''),baseLine.completeSeriesConfig.mySeries.dashPattern);
     });
 
     test('baseLine line d', function() {
