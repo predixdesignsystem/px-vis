@@ -297,7 +297,6 @@ function runTests(){
       assert.equal(bar.attr('stroke').split(' ').join(''),colorSet[colorOrder[0]]);
     });
     test('Title series bars dash pattern', function() {
-        debugger;
         var bar = baseYAxis._titleGroup.select('line');
         assert.equal(bar.attr('stroke-dasharray').split(' ').join(''),baseYAxis.completeSeriesConfig.mySeries.dashPattern);
     });

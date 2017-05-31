@@ -171,7 +171,6 @@ function runTests(){
       .attr('fill', '#999')
       .attr("clip-path", 'url(#' + clipPath2.attr('id') + ')');
 
-      // debugger
       assert.isTrue(true);
     });
   }); //suite
