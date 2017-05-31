@@ -3,6 +3,7 @@ v1.2.0
 * Merge PR removing clearfix
 * Merge PR adding dash line options
 * style changes for dash line to match spec
+* added --px-register-series-marker-width so devs can control thickness of register markers
 
 v1.1.14
 ==================
