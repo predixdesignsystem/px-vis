@@ -1617,6 +1617,7 @@ function runTests() {
         tooltiphighlight.set('seriesId',"x");
         tooltiphighlight.set('chartData',d);
         tooltiphighlight.set('showTooltipData',true);
+        tooltiphighlight.set('margin',m);
 
         setTimeout(function() { done(); }, 100);
 
@@ -1674,14 +1675,16 @@ function runTests() {
     });
 
     test('tooltiphighlight created defaultEmptyData', function() {
-      debugger
-      assert.deepEqual(tooltiphighlight.defaultEmptyData, {"time":1397160780000,"timeSeriesKey":null,"hidden":true,"series":[{"name":"mySeries","value":{"x":3,"y0":4},"coord":[240,162]},{"name":"mySeries2","value":{"x":3,"y1":8},"coord":[240,54]}],"mouse":[240,162],"xArr":[],"yArr":[],"rawData":[],"timeStamps":[],"timeStampsTracker":{}});
-    });
 
-    test('tooltiphighlight created tooltipData', function() {
-      assert.deepEqual(tooltiphighlight.tooltipData, {"time":1397160780000,"timeSeriesKey":null,"hidden":true,"series":[{"name":"mySeries","value":{"x":3,"y0":4},"coord":[240,162]},{"name":"mySeries2","value":{"x":3,"y1":8},"coord":[240,54]}],"mouse":[240,162],"xArr":[],"yArr":[],"rawData":[],"timeStamps":[],"timeStampsTracker":{}});
+      assert.equal(tooltiphighlight.defaultEmptyData.mouse, null);
+      assert.equal(tooltiphighlight.defaultEmptyData.dataPos[0], 423);
+      assert.closeTo(tooltiphighlight.defaultEmptyData.dataPos[1], 2182, 1);
+      assert.equal(tooltiphighlight.defaultEmptyData.time, 1397160780000);
+      assert.deepEqual(tooltiphighlight.defaultEmptyData.dataset, {"x":1397160780000,"y":10,"y2":3,"y3":8,"cat":"b"});
+      assert.deepEqual(tooltiphighlight.defaultEmptyData.series, [{"name":"y","value":{"y":10,"y2":3,"y3":8}},{"name":"y2","value":{"y":10,"y2":3,"y3":8}},{"name":"y3","value":{"y":10,"y2":3,"y3":8}}]);
+      assert.equal(tooltiphighlight.defaultEmptyData.color.split(" ").join(""), "rgb(93,165,218)");
+      assert.deepEqual(tooltiphighlight.defaultEmptyData.tooltipConfig, {"y":{"color":"rgb(93,165,218)","name":"y","yAxisUnit":"","y":"y"},"y2":{"color":"rgb(93,165,218)","name":"y2","yAxisUnit":"","y":"y2"},"y3":{"color":"rgb(93,165,218)","name":"y3","yAxisUnit":"","y":"y3"}});
     });
-
   }); //suite
 
   suite('px-vis-highlight-line clears the highlight', function() {
