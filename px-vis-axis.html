@@ -877,24 +877,23 @@ Custom property | Description | Default
          *
          */
         _drawBar:function(elem,sid,color,index,dashPattern) {
+          // FIXME change with measuring on canvas!!
           var w = elem.select('.axis-title').node().getComputedTextLength();
 //        var translate = 'translate(-12,' + (-3 -w - 5 * index) + ')';
           var translate = 'translate(-12,' + ( -w/2 - 10 - 8 * index) + ')';
           var mutedSeriesValue = (this.mutedSeries && this.mutedSeries[sid]) ? 0.5 : 1;
-
+          // TODO make configurable?
             elem.append('line')
-                .attr('x1',-3)
-                .attr('x2',17)
+                .attr('x1',0)
+                .attr('x2',15)
                 .attr('y1',0)
                 .attr('y2',0)
-                .attr('stroke',color)
-                .attr('stroke-width',2)
+                .attr('stroke', color)
+                .attr('stroke-width', 3)
                 .attr('stroke-dasharray',dashPattern)
                 .attr('series-bar-id','bar_' + sid)
                 .attr('transform', translate)
-                .attr('opacity', function() {
-                    return mutedSeriesValue;
-                }.bind(this));
+                .attr('opacity', mutedSeriesValue);
 
         },
 

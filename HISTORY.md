@@ -1,3 +1,9 @@
+v1.2.0
+==================
+* Merge PR removing clearfix
+* Merge PR adding dash line options
+* style changes for dash line to match spec
+
 v1.1.14
 ==================
 * ensure x Axis unit is still displayed in register when value is 0

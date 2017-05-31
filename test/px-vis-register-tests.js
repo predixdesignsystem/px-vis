@@ -313,7 +313,7 @@ function basicTests(registerID,dir){
       for(var i = 0; i < series.length; i++){
         var color = colorSet[ colorOrder[i]];
         var pattern = register.completeSeriesConfig['series_' + i].dashPattern || '';
-        assert.equal(series[i].querySelector('.qa-series-marker').getAttribute('style').split(' ').join('').split(';')[0], ('background:linear-gradient(' +calcDashPattern(color, pattern) +')').split(' ').join('') );
+        assert.equal(series[i].querySelector('.seriesMarkerIcon').getAttribute('style').split(' ').join('').split(';')[0], ('background:linear-gradient(' +calcDashPattern(color, pattern) +')').split(' ').join('') );
       }
     });
 
