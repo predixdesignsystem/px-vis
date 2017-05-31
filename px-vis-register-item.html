@@ -275,9 +275,12 @@ Custom property | Description | Default
      */
     _calcDashPattern: function(color, pattern) {
       var patternItems = pattern.split(',');
+      // FIXME need to find a better way of doing this so it matches the SASS set height...
+      // Does the height of hte dash pattern really matter? What happens is it goes to 100 and height is only 25?
       var HEIGHT = 25;
       if (!patternItems || patternItems.length < 2) {
-          return `to bottom, ${color}, ${color}`;
+          return 'to bottom, ' + color + ', ' + color;
+          // return `to bottom, ${color}, ${color}`;
       } else {
           var result = 'to bottom';
           var position = 0;
@@ -285,9 +288,11 @@ Custom property | Description | Default
               for (var i=0;i<patternItems.length;i++) {
                   var item = patternItems[i];
                   var stripeColor = i % 2 ? 'transparent' : color;
-                  result += `, ${stripeColor} ${position}px`;
+                  result += ", " + stripeColor + " " + position + "px";
+                  // result += `, ${stripeColor} ${position}px`;
                   position += parseInt(item, 10);
-                  result += `, ${stripeColor} ${position}px`;
+                  result += ", " + stripeColor + " " + position + "px";
+                  // result += `, ${stripeColor} ${position}px`;
               }
           }
           return result;
