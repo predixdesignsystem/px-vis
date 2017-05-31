@@ -140,12 +140,19 @@ Custom property | Description | Default
       drawDebounceTime: {
         type: Number,
         value: 10
+      },
+      /**
+      * set a default for localizing
+      */
+      language: {
+        type: String,
+        value: 'en'
       }
     },
 
     observers: [
 
-      'drawElement(svg, y, domainChanged, completeSeriesConfig.*, thresholdData.*, width, margin.*, _animationFrameDone)'
+      'drawElement(svg, y, domainChanged, completeSeriesConfig.*, thresholdData.*, width, margin.*, _animationFrameDone, language)'
      ],
 
     ready:function() {
@@ -375,13 +382,25 @@ Custom property | Description | Default
     },
 
     _calcTitle: function(d) {
-      var val = (d.value).toFixed(2),
+
+      //default is 2 decimals
+      var format = '.2f',
           title = '';
-      if(this.thresholdConfig[d.type] && this.thresholdConfig[d.type].title) {
-        title = this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['title'] ?
+
+      if(this.thresholdConfig[d.type]) {
+
+        //format title if defined in config
+        if(this.thresholdConfig[d.type].title) {
+          title = this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['title'] ?
           ' (' + this.thresholdConfig[d.type]['title'] + ')': ' (' + d.type + ')';
+        }
+
+        //format value if defined in config
+        if(this.thresholdConfig[d.type].format) {
+          format = this.thresholdConfig[d.type].format;
+        }
       }
-      return val + title;
+      return Px.d3.format(format)(d.value) + title;
     }
   });
 </script>
