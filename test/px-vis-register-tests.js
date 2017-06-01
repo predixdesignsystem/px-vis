@@ -310,8 +310,7 @@ function runTests(){
             '(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?',
             'transparent\\s?(\\d+)px,\\s?transparent\\s?(\\d+)px,\\s?',
             '(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?',
-            'transparent\\s?(\\d+)px,\\s?transparent\\s?(\\d+)px\\);\\s?',
-            'border-bottom:\\s?1px\\s?solid\\s?(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\));'
+            'transparent\\s?(\\d+)px,\\s?transparent\\s?(\\d+)px\\);'
           ].join('')),
 
           // "background:linear-gradient(to bottom, rgb(250,164,58) 0px, rgb(250,164,58) 10px, transparent 10px, transparent 15px, rgb(250,164,58) 15px, rgb(250,164,58) 25px, transparent 25px, transparent 30px); border-bottom: 1px solid rgb(250,164,58);"
@@ -320,8 +319,7 @@ function runTests(){
             '(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?',
             'transparent\\s?(\\d+)px,\\s?transparent\\s?(\\d+)px,\\s?',
             '(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?',
-            'transparent\\s?(\\d+)px,\\s?transparent\\s?(\\d+)px\\);\\s?',
-            'border-bottom:\\s?1px\\s?solid\\s?(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\));'
+            'transparent\\s?(\\d+)px,\\s?transparent\\s?(\\d+)px\\);'
           ].join('')),
           matches0 = re0.exec(pattern0),
           matches1 = re1.exec(pattern1);
@@ -333,14 +331,13 @@ function runTests(){
       assert.equal(matches0[4], 5);
       assert.equal(matches0[5], 5);
       assert.equal(matches0[6], 7);
-      assert.equal(matches0[25].split(' ').join(''), color0.split(' ').join(''));
 
       assert.equal(matches1[1].split(' ').join(''), color1.split(' ').join(''));
       assert.equal(matches1[2], 0);
       assert.equal(matches1[4], 10);
       assert.equal(matches1[5], 10);
       assert.equal(matches1[6], 15);
-      assert.equal(matches1[13].split(' ').join(''), color1.split(' ').join(''));
+
     });
   });
 }
