@@ -1,4 +1,7 @@
-v1.2.0
+v1.2.1
+==================
+* bumping version for date-time-common
+
 ==================
 * Merge PR removing clearfix
 * Merge PR adding dash line options
