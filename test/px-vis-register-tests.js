@@ -326,6 +326,8 @@ function runTests(){
           matches0 = re0.exec(pattern0),
           matches1 = re1.exec(pattern1);
 
+      assert.equal(pattern0, color0.split(' ').join(''));
+
       assert.equal(matches0[1].split(' ').join(''), color0.split(' ').join(''));
       assert.equal(matches0[2], 0);
       assert.equal(matches0[4], 5);
