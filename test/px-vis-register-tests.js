@@ -273,6 +273,74 @@ function runTests(){
       });
     });
   });
+
+
+  suite('px-vis-register with dashPattern', function() {
+    var dashPattern = document.getElementById('dashPattern');
+
+    suiteSetup(function(done) {
+      var data = generateDataValues( generateEmptyData(2) );
+      data.completeSeriesConfig["series_0"]["dashPattern"] = "5,2";
+      data.completeSeriesConfig["series_1"]["dashPattern"] = "10,5";
+      setData(dashPattern, data, done);
+    });
+
+    test('dashPattern fixtures are created', function() {
+      assert.isTrue(dashPattern !== null);
+    });
+
+    test('dashPattern is correct', function() {
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value,
+          colorSet = dataVisColors.properties.dataVisColors.value,
+          series = Polymer.dom(dashPattern.root).querySelectorAll('px-vis-register-item'),
+
+          color0 = colorSet[ colorOrder[0]],
+          color1 = colorSet[ colorOrder[1]],
+
+          pattern0 = series[0].querySelector('.seriesMarkerIcon').getAttribute('style'),
+          pattern1 = series[1].querySelector('.seriesMarkerIcon').getAttribute('style'),
+
+          // "background:linear-gradient(to bottom, rgb(93,165,218) 0px, rgb(93,165,218) 5px, transparent 5px, transparent 7px, rgb(93,165,218) 7px, rgb(93,165,218) 12px, transparent 12px, transparent 14px, rgb(93,165,218) 14px, rgb(93,165,218) 19px, transparent 19px, transparent 21px, rgb(93,165,218) 21px, rgb(93,165,218) 26px, transparent 26px, transparent 28px); border-bottom: 1px solid rgb(93,165,218);"
+          re0 = new RegExp([
+            'background:\\s?linear-gradient\\((?:to bottom,)?\\s?',
+            '(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?',
+            'transparent\\s?(\\d+)px,\\s?transparent\\s?(\\d+)px,\\s?',
+            '(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?',
+            'transparent\\s?(\\d+)px,\\s?transparent\\s?(\\d+)px,\\s?',
+            '(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?',
+            'transparent\\s?(\\d+)px,\\s?transparent\\s?(\\d+)px,\\s?',
+            '(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?',
+            'transparent\\s?(\\d+)px,\\s?transparent\\s?(\\d+)px\\);\\s?',
+            'border-bottom:\\s?1px\\s?solid\\s?(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\));'
+          ].join('')),
+
+          // "background:linear-gradient(to bottom, rgb(250,164,58) 0px, rgb(250,164,58) 10px, transparent 10px, transparent 15px, rgb(250,164,58) 15px, rgb(250,164,58) 25px, transparent 25px, transparent 30px); border-bottom: 1px solid rgb(250,164,58);"
+          re1 = new RegExp([
+            'background:\\s?linear-gradient\\((?:to bottom,)?\\s?',
+            '(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?',
+            'transparent\\s?(\\d+)px,\\s?transparent\\s?(\\d+)px,\\s?',
+            '(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?',
+            'transparent\\s?(\\d+)px,\\s?transparent\\s?(\\d+)px\\);\\s?',
+            'border-bottom:\\s?1px\\s?solid\\s?(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\));'
+          ].join('')),
+          matches0 = re0.exec(pattern0),
+          matches1 = re1.exec(pattern1);
+
+      assert.equal(matches0[1].split(' ').join(''), color0.split(' ').join(''));
+      assert.equal(matches0[2], 0);
+      assert.equal(matches0[4], 5);
+      assert.equal(matches0[5], 5);
+      assert.equal(matches0[6], 7);
+      assert.equal(matches0[25].split(' ').join(''), color0.split(' ').join(''));
+
+      assert.equal(matches1[1].split(' ').join(''), color1.split(' ').join(''));
+      assert.equal(matches1[2], 0);
+      assert.equal(matches1[4], 10);
+      assert.equal(matches1[5], 10);
+      assert.equal(matches1[6], 15);
+      assert.equal(matches1[13].split(' ').join(''), color1.split(' ').join(''));
+    });
+  });
 }
 
 function basicTests(registerID,dir){
@@ -306,16 +374,14 @@ function basicTests(registerID,dir){
       }
     });
 
-    // test(registerID + ' colors and pattern are correct', function() {
-    //   var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    //   var colorSet = dataVisColors.properties.dataVisColors.value;
-    //   var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item');
-    //   for(var i = 0; i < series.length; i++){
-    //     var color = colorSet[ colorOrder[i]];
-    //     var pattern = register.completeSeriesConfig['series_' + i].dashPattern || '';
-    //     assert.equal(series[i].querySelector('.seriesMarkerIcon').getAttribute('style').split(' ').join('').split(';')[0], ('background:linear-gradient(' +calcDashPattern(color, pattern) +')').split(' ').join('') );
-    //   }
-    // });
+    test(registerID + ' colors are correct', function() {
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
+      var colorSet = dataVisColors.properties.dataVisColors.value;
+      var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item');
+      for(var i = 0; i < series.length; i++){
+        assert.equal(series[i].querySelector('.seriesMarkerIcon').getAttribute('style').split(' ').join('').split(';')[0], 'background-color:' + colorSet[ colorOrder[i] ]);
+      }
+    });
 
   });
 
@@ -491,8 +557,7 @@ function generateEmptyData(num,str){
       'x': 'x',
       'y': 'y',
       'xAxisUnit': 'xUnit',
-      'yAxisUnit': 'yUnit',
-      'dashPattern': i % 2 ? '' : '5,2'
+      'yAxisUnit': 'yUnit'
     };
 
     dataObj.series[i] = {
@@ -560,24 +625,3 @@ function setMutedSeries(series, name, done){
     if(done){ done(); }
   },10);
 }
-
-// function calcDashPattern(color, pattern) {
-//     var patternItems = pattern ? pattern.split(',') : '';
-//     var HEIGHT = 25;
-//     if (!patternItems || patternItems.length < 2) {
-//         return 'to bottom, ' +color +', ' +color;
-//     } else {
-//         var result = 'to bottom';
-//         var position = 0;
-//         while (position < HEIGHT) {
-//             for (var i=0;i<patternItems.length;i++) {
-//                 var item = patternItems[i];
-//                 var stripeColor = i % 2 ? 'transparent' : color;
-//                 result += ', ' +stripeColor +' ' +position +'px';
-//                 position += parseInt(item, 10);
-//                 result += ', ' +stripeColor +' ' +position +'px';
-//             }
-//         }
-//         return result;
-//     }
-// }

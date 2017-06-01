@@ -71,7 +71,7 @@ Custom property | Description | Default
         <span class="seriesMarker flex">
           <span
             class="seriesMarkerIcon"
-            style$="background:linear-gradient([[_calcDashPattern(_itemColor,_dashPattern)]]); border-bottom: 1px solid [[_itemColor]];"
+            style$="[[_calcDashPattern(_itemColor,_dashPattern)]];"
             name$="R{{item.name}}">&nbsp;</span>
         </span>
         <span class$="[[_wrapperClass]]">
@@ -280,8 +280,8 @@ Custom property | Description | Default
       // Does the height of hte dash pattern really matter? What happens is it goes to 100 and height is only 25?
       var HEIGHT = 25;
       if (!patternItems || patternItems.length < 2) {
-          return 'to bottom, ' + color + ', ' + color;
-          // return `to bottom, ${color}, ${color}`;
+          return 'background-color:' + color;
+
       } else {
           var result = 'to bottom';
           var position = 0;
@@ -296,7 +296,7 @@ Custom property | Description | Default
                   // result += `, ${stripeColor} ${position}px`;
               }
           }
-          return result;
+          return 'background:linear-gradient(' + result + '); border-bottom: 1px solid ' + color;
       }
     }
   });
