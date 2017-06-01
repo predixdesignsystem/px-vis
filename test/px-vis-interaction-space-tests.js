@@ -320,6 +320,15 @@ function runTests() {
         ttObj = evt.detail;
       });
 
+      var sc = JSON.parse(JSON.stringify(baseIS.completeSeriesConfig));
+      sc["anotherSeries"] = {
+        color:"rgb(93,165,218)",
+        name:"mySeries",
+        type:"line",
+        x:"x",
+        y:"y1"
+      };
+      baseIS.set("completeSeriesConfig", sc);
       baseIS.set("seriesKeys", ["mySeries", "anotherSeries"]);
 
       // give event time to process and fire
@@ -359,6 +368,59 @@ function runTests() {
     test('event data series.coord', function() {
       assert.equal(ttObj.data.series[0]['coord'], null);
       assert.equal(ttObj.data.series[1]['coord'], null);
+    });
+  }); //suite
+
+  suite('px-vis-interaction-space defaultEmptyData', function() {
+    var baseIS = document.getElementById('baseIS');
+    var ttObj;
+
+    suiteSetup(function(done){
+      document.addEventListener('px-vis-tooltip-updated',function(evt){
+        ttObj = evt.detail;
+      });
+
+      var empty = {"time":1397160780000,"timeSeriesKey":null,"hidden":true,"series":[{"name":"mySeries","value":{"x":3,"y":4},"coord":[240,162]},{"name":"anotherSeries","value":{"x":3,"y":8},"coord":[240,54]}],"mouse":[240,162],"xArr":[],"yArr":[],"rawData":[],"timeStamps":[],"timeStampsTracker":{}};
+
+      baseIS.set("defaultEmptyData", empty);
+      baseIS._resetTooltipData();
+      // give event time to process and fire
+      setTimeout(function(){ done(); }, 500);
+    });
+
+    test('event fired', function() {
+      assert.isTrue(ttObj !== null);
+    });
+    test('event dataVar', function() {
+      assert.equal(ttObj.dataVar, 'tooltipData');
+    });
+    test('event method', function() {
+      assert.equal(ttObj.method, 'set');
+    });
+    test('event data time', function() {
+      assert.equal(ttObj.data.time, 1397160780000);
+    });
+    test('event data mousePos', function() {
+      assert.deepEqual(ttObj.data.mouse, [240,162]);
+    });
+    // maybe should be using 2 series data?
+    test('event data xArr', function() {
+      assert.deepEqual(ttObj.data.xArr, []);
+    });
+    test('event data yArr', function() {
+      assert.deepEqual(ttObj.data.yArr, []);
+    });
+    test('event data series.name', function() {
+      assert.equal(ttObj.data.series[0]['name'], 'mySeries');
+      assert.equal(ttObj.data.series[1]['name'], 'anotherSeries');
+    });
+    test('event data series.value', function() {
+      assert.deepEqual(ttObj.data.series[0]['value'], {"x":3,"y":4});
+      assert.deepEqual(ttObj.data.series[1]['value'], {"x":3,"y":8});
+    });
+    test('event data series.coord', function() {
+      assert.deepEqual(ttObj.data.series[0]['coord'], [240,162]);
+      assert.deepEqual(ttObj.data.series[1]['coord'], [240,54]);
     });
   }); //suite
 } //runTests
