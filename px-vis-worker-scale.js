@@ -173,30 +173,31 @@ extentCalc._checkDataExtents = function _checkDataExtents(dExts, cExts, axis, bo
  *
  */
 extentCalc._findMinMax = function _findMinMax(data, doX, doY, ordX, ordY, timeX, result, keys) {
-  var j,xVal,yVal,
-    jLen = data.length,
-    x = this.completeSeriesConfig[keys[0]].x,
-    y = this.completeSeriesConfig[keys[0]].y,
-    //check which individual parts need calculation
-    doX0 = (!ordX && result.x[0] === Infinity) ? true : false,
-    doX1 = (!ordX && result.x[1] === -Infinity) ? true : false,
-    doY0 = (!ordY && result.y[0] === Infinity) ? true : false,
-    doY1 = (!ordY && result.y[1] === -Infinity) ? true : false;
+  var xVal, yVal,
+      dLen = data.length,
+      x = this.completeSeriesConfig[keys[0]].x,
+      y = this.completeSeriesConfig[keys[0]].y, //only used if ordinal
+      //check which individual parts need calculation
+      doX0 = (!ordX && result.x[0] === Infinity) ? true : false,
+      doX1 = (!ordX && result.x[1] === -Infinity) ? true : false,
+      doY0 = (!ordY && result.y[0] === Infinity) ? true : false,
+      doY1 = (!ordY && result.y[1] === -Infinity) ? true : false;
 
   if(timeX) {
-    this._findTimeMM(result,data,jLen,x,doX0,doX1);
+    this._findTimeMM(result,data,dLen,x,doX0,doX1);
   }
   if(doX || doY) {
-    for(j = 0; j < jLen; j++) {
+    for(var i = 0; i < dLen; i++) {
       //make sure we're dealing with numbers
-      xVal = (typeof(data[j][x]) === 'string') ? parseFloat(data[j][x]) : data[j][x];
-      yVal = this._getDataExtents(data[j], keys);
+      // TODO xKeys and use _getDataExtents to support multi x keys on XY
+      xVal = (typeof(data[i][x]) === 'string') ? parseFloat(data[i][x]) : data[i][x];
+      yVal = this._getDataExtents(data[i], keys);
 
       if(doX) {
-        this._processDataValues(ordX, result, data, 'x', x, j, doX0, doX1, xVal, xVal);
+        this._processDataValues(ordX, result, data, 'x', x, i, doX0, doX1, xVal, xVal);
       }
       if(doY) {
-        this._processDataValues(ordY, result, data, 'y', y, j, doY0, doY1, yVal[0], yVal[1]);
+        this._processDataValues(ordY, result, data, 'y', y, i, doY0, doY1, yVal[0], yVal[1]);
       }
     }
   }
@@ -237,6 +238,8 @@ extentCalc._findTimeMM = function _findTimeMM(result,d,l,x,doMin,doMax) {
  *
  */
 extentCalc._setMin = function _setMin(r,d) {
+  if(d === null) { return; }
+
   if(isNaN(r[0]) || r[0] > d) {
     r[0] = d;
   }
@@ -247,6 +250,8 @@ extentCalc._setMin = function _setMin(r,d) {
  *
  */
 extentCalc._setMax = function _setMax(r,d) {
+  if(d === null) { return; }
+
   if(isNaN(r[1]) || r[1] < d) {
     r[1] = d;
   }

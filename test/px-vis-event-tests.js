@@ -23,7 +23,7 @@ function runTests(){
         linearEvent = document.getElementById('linearEvent'),
         ordinalEvent = document.getElementById('ordinalEvent');
 
-    suiteSetup(function(done){
+    suiteSetup(function(done) {
       var w = 500,
         h = 300,
         m = {
