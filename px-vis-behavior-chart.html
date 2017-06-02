@@ -1679,7 +1679,13 @@ PxVisBehaviorChart.zooming = [{
    *
    */
   resetZoom: function() {
-    this.set('selectedDomain', 'reset');
+
+    //we still want to reset even if we were already reset, in case data has been filtered
+    if(this.selectedDomain === 'reset') {
+      this.set('selectedDomain', 'rereset');
+    } else {
+      this.set('selectedDomain', 'reset');
+    }
 
     //ensure the zoom stack is reset
     this.splice('zoomStack', 0, this.zoomStack.length);
