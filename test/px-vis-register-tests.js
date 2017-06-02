@@ -144,7 +144,7 @@ function runTests(){
     test('numberFormat formated', function() {
       var series = Polymer.dom(numberFormat.root).querySelectorAll('px-vis-register-item');
 
-      assert.equal(series[0].querySelector('.seriesData').textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join(''),'1015.20000yUnit');
+      assert.equal(series[0].querySelector('.seriesData').textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join(''),'1015.20000'  + String.fromCharCode(160) +  'yUnit');
     });
   });
 
@@ -162,7 +162,7 @@ function runTests(){
 
     test('numberFormatCulture formated', function() {
       var series = Polymer.dom(numberFormatCulture.root).querySelectorAll('px-vis-register-item');
-      assert.equal(series[0].querySelector('.seriesData').textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join(''),'1.015,20yUnit');
+      assert.equal(series[0].querySelector('.seriesData').textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join(''),'1.015,20'  + String.fromCharCode(160) +  'yUnit');
     });
   });
 
@@ -186,8 +186,8 @@ function runTests(){
       var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item'),
           texts = series[0].querySelector('.seriesData').textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join('').split('/');
 
-      assert.equal(texts[0].trim(),'1,419,064,667,000.00xUnit');
-      assert.equal(texts[1].trim(),'1,015.20yUnit');
+      assert.equal(texts[0].trim(),'1,419,064,667,000.00'  + String.fromCharCode(160) +  'xUnit');
+      assert.equal(texts[1].trim(),'1,015.20'  + String.fromCharCode(160) +  'yUnit');
     });
   });
 
@@ -211,8 +211,8 @@ function runTests(){
       var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item'),
           texts = series[0].querySelector('.seriesData').textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join('').split('/');
 
-      assert.equal(texts[0].trim(),'StringyStringxUnit');
-      assert.equal(texts[1].trim(),'1,015.20yUnit');
+      assert.equal(texts[0].trim(),'StringyString'  + String.fromCharCode(160) +  'xUnit');
+      assert.equal(texts[1].trim(),'1,015.20'  + String.fromCharCode(160) +  'yUnit');
     });
   });
 
@@ -236,8 +236,8 @@ function runTests(){
       var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item'),
           texts = series[0].querySelector('.seriesData').textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join('').split('/');
 
-      assert.equal(texts[0].trim(),'1,419,064,667,000.00xUnit');
-      assert.equal(texts[1].trim(),'1,015.20yUnit');
+      assert.equal(texts[0].trim(),'1,419,064,667,000.00'  + String.fromCharCode(160) +  'xUnit');
+      assert.equal(texts[1].trim(),'1,015.20'  + String.fromCharCode(160) +  'yUnit');
     });
   });
 
@@ -271,6 +271,71 @@ function runTests(){
         assert.equal(texts,'12%');
         done();
       });
+    });
+  });
+
+
+  suite('px-vis-register with dashPattern', function() {
+    var dashPattern = document.getElementById('dashPattern');
+
+    suiteSetup(function(done) {
+      var data = generateDataValues( generateEmptyData(2) );
+      data.completeSeriesConfig["series_0"]["dashPattern"] = "5,2";
+      data.completeSeriesConfig["series_1"]["dashPattern"] = "10,5";
+      setData(dashPattern, data, done);
+    });
+
+    test('dashPattern fixtures are created', function() {
+      assert.isTrue(dashPattern !== null);
+    });
+
+    test('dashPattern is correct', function() {
+      var colorOrder = dataVisColors.properties.seriesColorOrder.value,
+          colorSet = dataVisColors.properties.dataVisColors.value,
+          series = Polymer.dom(dashPattern.root).querySelectorAll('px-vis-register-item'),
+
+          color0 = colorSet[ colorOrder[0]],
+          color1 = colorSet[ colorOrder[1]],
+
+          pattern0 = series[0].querySelector('.seriesMarkerIcon').getAttribute('style'),
+          pattern1 = series[1].querySelector('.seriesMarkerIcon').getAttribute('style'),
+
+          // "background:linear-gradient(to bottom, rgb(93,165,218) 0px, rgb(93,165,218) 5px, transparent 5px, transparent 7px, rgb(93,165,218) 7px, rgb(93,165,218) 12px, transparent 12px, transparent 14px, rgb(93,165,218) 14px, rgb(93,165,218) 19px, transparent 19px, transparent 21px, rgb(93,165,218) 21px, rgb(93,165,218) 26px, transparent 26px, transparent 28px); border-bottom: 1px solid rgb(93,165,218);"
+          re0 = new RegExp([
+            'background:\\s?linear-gradient\\((?:to bottom,)?\\s?',
+            '(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?',
+            'transparent\\s?(\\d+)px,\\s?transparent\\s?(\\d+)px,\\s?',
+            '(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?',
+            'transparent\\s?(\\d+)px,\\s?transparent\\s?(\\d+)px,\\s?',
+            '(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?',
+            'transparent\\s?(\\d+)px,\\s?transparent\\s?(\\d+)px,\\s?',
+            '(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?',
+            'transparent\\s?(\\d+)px,\\s?transparent\\s?(\\d+)px\\);'
+          ].join('')),
+
+          // "background:linear-gradient(to bottom, rgb(250,164,58) 0px, rgb(250,164,58) 10px, transparent 10px, transparent 15px, rgb(250,164,58) 15px, rgb(250,164,58) 25px, transparent 25px, transparent 30px); border-bottom: 1px solid rgb(250,164,58);"
+          re1 = new RegExp([
+            'background:\\s?linear-gradient\\((?:to bottom,)?\\s?',
+            '(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?',
+            'transparent\\s?(\\d+)px,\\s?transparent\\s?(\\d+)px,\\s?',
+            '(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?(rgb\\(\\d+,\\s?\\d+,\\s?\\d+\\))\\s?(\\d+)px,\\s?',
+            'transparent\\s?(\\d+)px,\\s?transparent\\s?(\\d+)px\\);'
+          ].join('')),
+          matches0 = re0.exec(pattern0),
+          matches1 = re1.exec(pattern1);
+
+      assert.equal(matches0[1].split(' ').join(''), color0.split(' ').join(''));
+      assert.equal(matches0[2], 0);
+      assert.equal(matches0[4], 5);
+      assert.equal(matches0[5], 5);
+      assert.equal(matches0[6], 7);
+
+      assert.equal(matches1[1].split(' ').join(''), color1.split(' ').join(''));
+      assert.equal(matches1[2], 0);
+      assert.equal(matches1[4], 10);
+      assert.equal(matches1[5], 10);
+      assert.equal(matches1[6], 15);
+
     });
   });
 }
@@ -311,7 +376,7 @@ function basicTests(registerID,dir){
       var colorSet = dataVisColors.properties.dataVisColors.value;
       var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item');
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].querySelector('.seriesMarker').getAttribute('style').split(' ').join('').split(';')[0], 'background-color:' + colorSet[ colorOrder[i] ]);
+        assert.equal(series[i].querySelector('.seriesMarkerIcon').getAttribute('style').split(' ').join('').split(';')[0], 'background-color:' + colorSet[ colorOrder[i] ]);
       }
     });
 
@@ -344,7 +409,8 @@ function basicTests(registerID,dir){
     test(registerID + ' values match', function() {
       var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item');
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].querySelector('.seriesData').textContent.replace(/\r?\n|\r/g, "").split(' ').join('').trim(), '1,015.20yUnit');
+        //we have a non breaking space, char 160, instead of a space
+        assert.equal(series[i].querySelector('.seriesData').textContent.replace(/\r?\n|\r/g, "").split(' ').join('').trim(), '1,015.20' + String.fromCharCode(160) + 'yUnit');
       }
     });
   });
@@ -454,8 +520,8 @@ function basicTests(registerID,dir){
       var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item'),
           texts = series[0].querySelector('.seriesData').textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join('').split('/');
 
-      assert.equal(texts[0].trim(),'0xUnit');
-      assert.equal(texts[1].trim(),'0yUnit');
+      assert.equal(texts[0].trim(),'0' + String.fromCharCode(160) + 'xUnit');
+      assert.equal(texts[1].trim(),'0' + String.fromCharCode(160) + 'yUnit');
     });
   });
 

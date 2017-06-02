@@ -265,6 +265,15 @@ Element which draws a scatter series onto the chart
         }
       },
       /**
+       * Current context for rendering: points per frame, number of frames, rendering counter
+       */
+      _renderingContext: {
+        type: Object,
+        value:function() {
+          return {};
+        }
+      },
+      /**
       * Number of points to be drawn per progressive rendering frame.
       * The higher the value the fastest the processing but the more
       * likely the UI will stutter/freeze.
@@ -310,6 +319,7 @@ Element which draws a scatter series onto the chart
       this._watchConfigProperty('markerFillOpacity', 0.6);
       this._watchConfigProperty('markerStrokeOpacity', 1);
       this._watchConfigProperty('mutedOpacity', 0.3);
+      this._processOneBatchBound = this._processOneBatch.bind(this);
     },
 
     _redraw: function() {
@@ -443,52 +453,39 @@ Element which draws a scatter series onto the chart
 
         this.fire('px-vis-scatter-progressive-rendering-started', {numberOfFrames: numberOfFrames});
 
-        var batches = [],
-            currentIndex = 0,
-            j = 0,
-            size = Math.ceil(this.chartData.length/numberOfFrames),
-            timer = window.requestAnimationFrame
-              || window.webkitRequestAnimationFrame
-              || window.mozRequestAnimationFrame
-              || window.oRequestAnimationFrame
-              || window.msRequestAnimationFrame
-              || function(callback) { setTimeout(callback, 17); },
-            currentRenderingCounter;
-
-        currentRenderingCounter = this._progressiveRenderingCounter;
-
-        //split the data in the number of frames desired.
-        for(j=0; j< numberOfFrames; j++) {
-
-          //add data for this batch
-          batches[j] = this.chartData.slice(j*size, (j+1)*size);
-        }
+        this._renderingContext = {
+          'index': 0,
+          //new request
+          'requestCounter': ++this._progressiveRenderingCounter,
+          'size': Math.ceil(this.chartData.length/numberOfFrames),
+          'numberOfFrames': numberOfFrames
+        };
 
         //called every animation frame
-        var processData = function() {
+        window.requestAnimationFrame(this._processOneBatchBound);
+      }
+    },
 
-          if(currentRenderingCounter !== this._progressiveRenderingCounter) {
-            //new request came in, cancel this drawing. Don't reset the counter as we want
-            //the new request to finish
-            return;
-          }
+    _processOneBatch: function() {
 
-          var d = batches[currentIndex];
-          this._renderOneBatch(d);
+      if(this._renderingContext.requestCounter !== this._progressiveRenderingCounter) {
+        //new request came in, cancel this drawing. Don't reset the counter as we want
+        //the new request to finish
+        return;
+      }
 
-          currentIndex++;
+      //get the number of points requested
+      this._renderOneBatch();
 
-          if(currentIndex < numberOfFrames) {
-            //continue processing
-            this.fire('px-vis-scatter-canvas-progressive-batch', { "numberOfFrames": numberOfFrames, "currentFrame":currentIndex });
-            timer(processData);
-          } else {
-            //finished drawing, reset drawing request counter
-            this._renderingEnded(true, numberOfFrames);
-          }
-        }.bind(this);
+      this._renderingContext.index++;
 
-        timer(processData);
+      if(this._renderingContext.index < this._renderingContext.numberOfFrames) {
+        //continue processing
+        this.fire('px-vis-scatter-canvas-progressive-batch', { "numberOfFrames": this._renderingContext.numberOfFrames, "currentFrame": this._renderingContext.index });
+        window.requestAnimationFrame(this._processOneBatchBound);
+      } else {
+        //finished drawing, reset drawing request counter
+        this._renderingEnded(true, this._renderingContext.numberOfFrames);
       }
     },
 
@@ -538,7 +535,7 @@ Element which draws a scatter series onto the chart
      * Renders one batch of scatter data (can be one batch during progressive rendering
      * or all data during render at once)
      */
-    _renderOneBatch : function(data) {
+    _renderOneBatch : function() {
 
       //save and restore context for safety
       this.canvasContext.save();
@@ -553,19 +550,15 @@ Element which draws a scatter series onto the chart
       this.canvasContext.fillStyle = this.completeSeriesConfig[this.seriesId]['color'];
       this.canvasContext.strokeStyle = this.completeSeriesConfig[this.seriesId]['color'];
       this.canvasContext.globalAlpha = this._currentDrawingOptions.fillOpacity;
-      var previousTranslate = [0,0];
+      var previousTranslate = [0,0],
+          translate,
+          start = this._renderingContext.size * this._renderingContext.index,
+          stop = start + this._renderingContext.size;
 
-      for(var i = 0; i < data.length; i++) {
-
-        // var xValue = data[i][this.completeSeriesConfig[this.seriesId]['x']],
-        //     yValue = data[i][this.completeSeriesConfig[this.seriesId]['y']];
-        // if(xValue > this._currentDrawingOptions.xDomain[0] &&
-        //    xValue < this._currentDrawingOptions.xDomain[1] &&
-        //    yValue > this._currentDrawingOptions.yDomain[0] &&
-        //    yValue < this._currentDrawingOptions.yDomain[1]) {
+      for(var i = start; i < stop; i++) {
 
         //get the position of the symbol
-        var translate = this._getTransform(data[i]);
+        translate = this._getTransform(this.chartData[i]);
 
         //move canvas to new pos
         this.canvasContext.translate(translate[0] - previousTranslate[0], translate[1] - previousTranslate[1]);
@@ -579,7 +572,6 @@ Element which draws a scatter series onto the chart
         //remember pos so that we can move to the next point in 1 translate
         //instead of restoring the translate here
         previousTranslate = translate;
-          //  }
       }
 
       //restore canvas pos

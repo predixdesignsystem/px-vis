@@ -38,7 +38,8 @@ function runTests(){
           "name":"mySeries",
           "x":"x",
           "y":"y",
-          "color": "rgb(93,165,218)"
+          "color": "rgb(93,165,218)",
+          "dashPattern": "5,2"
         }},
         dataExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
@@ -288,23 +289,27 @@ function runTests(){
     });
 
     test('Title series bars draw', function() {
-      var bar = baseYAxis._titleGroup.select('rect');
+      var bar = baseYAxis._titleGroup.select('line');
       assert.equal(bar.nodes().length,1);
     });
     test('Title series bars fill', function() {
-      var bar = baseYAxis._titleGroup.select('rect');
-      assert.equal(bar.attr('fill').split(' ').join(''),colorSet[colorOrder[0]]);
+      var bar = baseYAxis._titleGroup.select('line');
+      assert.equal(bar.attr('stroke').split(' ').join(''),colorSet[colorOrder[0]]);
+    });
+    test('Title series bars dash pattern', function() {
+        var bar = baseYAxis._titleGroup.select('line');
+        assert.equal(bar.attr('stroke-dasharray').split(' ').join(''),baseYAxis.completeSeriesConfig.mySeries.dashPattern);
     });
     test('Title series bars opacity', function() {
-      var bar = baseYAxis._titleGroup.select('rect');
+      var bar = baseYAxis._titleGroup.select('line');
       assert.equal(bar.attr('opacity'), 1);
     });
     test('Title series bars id', function() {
-      var bar = baseYAxis._titleGroup.select('rect');
+      var bar = baseYAxis._titleGroup.select('line');
       assert.equal(bar.attr('series-bar-id'),'bar_mySeries');
     });
     test('Title series bars translate', function() {
-      var bar = baseYAxis._titleGroup.select('rect'),
+      var bar = baseYAxis._titleGroup.select('line'),
           re = new RegExp(/(\w+)\((-?\d+\.?\d*)[,\s](-?\d+\.?\d*)\)/),
           s = bar.attr('transform'),
           arr = re.exec(s);
@@ -472,7 +477,7 @@ function runTests(){
     });
 
     test('baseYAxis series box mutes', function() {
-      var bar = baseYAxis._titleGroup.select('rect');
+      var bar = baseYAxis._titleGroup.select('line');
       assert.equal(bar.attr('opacity'),0.5);
     });
   });
@@ -489,7 +494,7 @@ function runTests(){
     });
 
     test('baseYAxis series box mutes', function() {
-      var bar = baseYAxis._titleGroup.select('rect');
+      var bar = baseYAxis._titleGroup.select('line');
       assert.equal(bar.attr('opacity'),1);
     });
   });
@@ -1101,6 +1106,11 @@ function runTests(){
     });
     test('tickFormatYAxis fixture is created', function() {
       assert.isTrue(tickFormatYAxis !== null);
+    });
+
+    test('tickFormatYAxis series bar is not dashed', function() {
+        var bar = tickFormatYAxis._titleGroup.select('line');
+        assert.isNull(bar.attr('stroke-dasharray'));
     });
 
     suite('_axisGroup has correct number of ticks', function() {

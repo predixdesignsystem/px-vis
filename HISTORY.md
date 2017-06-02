@@ -10,6 +10,28 @@ v2.0.0
 * Set up action config and action mapping to enable toolbar configuration for axis-interaction-space
 * fixed canvas clearing issue when using scatter and line at the same time
 * added canvas support for radial line and radial scatter
+* Merge PR removing clearfix
+* Merge PR adding dash line options
+* style changes for dash line to match spec
+* added --px-register-series-marker-width so devs can control thickness of register markers
+
+v1.2.1
+==================
+* bumping version for date-time-common
+
+v1.1.14
+==================
+* ensure x Axis unit is still displayed in register when value is 0
+
+v1.1.13
+==================
+* ensure spaces in register item are always consistent
+
+v1.1.12
+==================
+* fix check for properties on object to check for array before checking all keys
+* refactor progressive rendering
+* fix missing space in register item after vulcanization
 
 v1.1.11
 ==================

@@ -465,7 +465,7 @@ function runTests(){
           "bottom": 10,
           "left": 10
         };
-debugger
+
       multiScale.set('axes',dim);
       multiAxis.set('dimensions',dim);
       multiAxis.set('axes',dim);
