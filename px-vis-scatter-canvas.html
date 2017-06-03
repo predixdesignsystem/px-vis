@@ -354,8 +354,6 @@ Element which draws a scatter series onto the chart
          this._isAttached &&
          this.chartData) {
 
-        var data = this.chartData;
-
         // We need to track which scatter we have drawn and which we want to draw.
         // If a scatter is not currently in our list, add it
         if(this.canvasContext._pxScatterSeries.indexOf(this.seriesId) === -1) {
@@ -435,8 +433,14 @@ Element which draws a scatter series onto the chart
 
       //don't actually draw if invisible
       if(!(this._currentDrawingOptions.sameOpacity && this._currentDrawingOptions.fillOpacity === 0)) {
-
-        this._renderOneBatch(this.chartData);
+        this._renderingContext = {
+          'index': 0,
+          //new request
+          'requestCounter': ++this._progressiveRenderingCounter,
+          'size': this.chartData.length,
+          'numberOfFrames': 1
+        };
+        this._renderOneBatch();
       }
 
       this._renderingEnded(false);
