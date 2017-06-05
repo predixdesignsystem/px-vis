@@ -108,6 +108,16 @@ Custom property | Description | Default
           canvas-context="{{canvasContext}}">
         </px-vis-svg-canvas>
 
+        <template is="dom-if" if="[[!renderToCanvas]]">
+          <px-vis-clip-path
+            svg="[[layer.1]]"
+            width="[[width]]"
+            height="[[height]]"
+            margin="[[margin]]"
+            series-clip-path="{{seriesClipPath}}">
+          </px-vis-clip-path>
+        </template>
+
         <template is="dom-repeat" items="[[_seriesKeys]]">
           <template is="dom-if" if="[[_limitSeries(index,navSeriesLimit)]]">
             <template is="dom-if" if="[[_chartTypeLine(item,completeSeriesConfig)]]" restamp>
@@ -139,6 +149,7 @@ Custom property | Description | Default
                   complete-series-config="[[completeSeriesConfig]]"
                   x="[[x]]"
                   y="[[y]]"
+                  clip-path="[[seriesClipPath]]"
                   domain-changed="[[domainChanged]]"
                   muted-series="[[mutedSeries]]">
                 </px-vis-line-svg>
@@ -173,6 +184,7 @@ Custom property | Description | Default
                   marker-size="2"
                   x="[[x]]"
                   y="[[y]]"
+                  clip-path="[[seriesClipPath]]"
                   domain-changed="[[domainChanged]]"
                   muted-series="[[mutedSeries]]">
                 </px-vis-scatter>
@@ -242,7 +254,8 @@ Custom property | Description | Default
           PxVisBehaviorChart.subConfiguration,
           PxVisBehaviorChart.layers,
           PxColorsBehavior.dataVisColorTheming,
-          PxVisBehaviorChart.webWorkerSynchonization
+          PxVisBehaviorChart.webWorkerSynchonization,
+          PxVisBehaviorD3.clipPath
         ],
 
         /**
