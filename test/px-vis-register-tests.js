@@ -144,7 +144,7 @@ function runTests(){
     test('numberFormat formated', function() {
       var series = Polymer.dom(numberFormat.root).querySelectorAll('px-vis-register-item');
 
-      assert.equal(series[0].querySelector('.seriesData').textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join(''),'1015.20000'  + String.fromCharCode(160) +  'yUnit');
+      assert.equal(series[0].querySelector('.seriesData').textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join(''),'1015.20000yUnit');
     });
   });
 
@@ -162,7 +162,7 @@ function runTests(){
 
     test('numberFormatCulture formated', function() {
       var series = Polymer.dom(numberFormatCulture.root).querySelectorAll('px-vis-register-item');
-      assert.equal(series[0].querySelector('.seriesData').textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join(''),'1.015,20'  + String.fromCharCode(160) +  'yUnit');
+      assert.equal(series[0].querySelector('.seriesData').textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join(''),'1.015,20yUnit');
     });
   });
 
@@ -186,8 +186,8 @@ function runTests(){
       var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item'),
           texts = series[0].querySelector('.seriesData').textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join('').split('/');
 
-      assert.equal(texts[0].trim(),'1,419,064,667,000.00'  + String.fromCharCode(160) +  'xUnit');
-      assert.equal(texts[1].trim(),'1,015.20'  + String.fromCharCode(160) +  'yUnit');
+      assert.equal(texts[0].trim(),'1,419,064,667,000.00xUnit');
+      assert.equal(texts[1].trim(),'1,015.20yUnit');
     });
   });
 
@@ -211,8 +211,8 @@ function runTests(){
       var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item'),
           texts = series[0].querySelector('.seriesData').textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join('').split('/');
 
-      assert.equal(texts[0].trim(),'StringyString'  + String.fromCharCode(160) +  'xUnit');
-      assert.equal(texts[1].trim(),'1,015.20'  + String.fromCharCode(160) +  'yUnit');
+      assert.equal(texts[0].trim(),'StringyStringxUnit');
+      assert.equal(texts[1].trim(),'1,015.20yUnit');
     });
   });
 
@@ -236,8 +236,8 @@ function runTests(){
       var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item'),
           texts = series[0].querySelector('.seriesData').textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join('').split('/');
 
-      assert.equal(texts[0].trim(),'1,419,064,667,000.00'  + String.fromCharCode(160) +  'xUnit');
-      assert.equal(texts[1].trim(),'1,015.20'  + String.fromCharCode(160) +  'yUnit');
+      assert.equal(texts[0].trim(),'1,419,064,667,000.00xUnit');
+      assert.equal(texts[1].trim(),'1,015.20yUnit');
     });
   });
 
@@ -409,8 +409,7 @@ function basicTests(registerID,dir){
     test(registerID + ' values match', function() {
       var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item');
       for(var i = 0; i < series.length; i++){
-        //we have a non breaking space, char 160, instead of a space
-        assert.equal(series[i].querySelector('.seriesData').textContent.replace(/\r?\n|\r/g, "").split(' ').join('').trim(), '1,015.20' + String.fromCharCode(160) + 'yUnit');
+        assert.equal(series[i].querySelector('.seriesData').textContent.replace(/\r?\n|\r/g, "").split(' ').join('').trim(), '1,015.20yUnit');
       }
     });
   });
@@ -520,8 +519,8 @@ function basicTests(registerID,dir){
       var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item'),
           texts = series[0].querySelector('.seriesData').textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join('').split('/');
 
-      assert.equal(texts[0].trim(),'0' + String.fromCharCode(160) + 'xUnit');
-      assert.equal(texts[1].trim(),'0' + String.fromCharCode(160) + 'yUnit');
+      assert.equal(texts[0].trim(),'0xUnit');
+      assert.equal(texts[1].trim(),'0yUnit');
     });
   });
 
