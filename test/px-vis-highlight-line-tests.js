@@ -132,7 +132,7 @@ function runTests() {
     });
 
     test('parallelhighlight has transition', function() {
-      assert.equal(parallelSVG.svg.select('.layer0').node().style.transition, 'opacity 0.2s');
+      assert.equal(parallelSVG.svg.select('.layer0').node().style.transition.slice(0,12), 'opacity 0.2s');
     });
 
     test('parallelhighlight didnt create defaultEmptyData', function() {
@@ -645,7 +645,7 @@ function runTests() {
     });
 
     test('differenthighlight has transition', function() {
-      assert.equal(differentSVG.svg.select('.layer0').node().style.transition, 'opacity 0.2s');
+      assert.equal(differentSVG.svg.select('.layer0').node().style.transition.slice(0,12), 'opacity 0.2s');
     });
 
     test('differenthighlight didnt create defaultEmptyData', function() {
@@ -894,7 +894,7 @@ function runTests() {
     });
 
     test('fuzzhighlight has transition', function() {
-      assert.equal(fuzzSVG.svg.select('.layer0').node().style.transition, 'opacity 0.2s');
+      assert.equal(fuzzSVG.svg.select('.layer0').node().style.transition.slice(0,12), 'opacity 0.2s');
     });
 
     test('fuzzhighlight didnt create defaultEmptyData', function() {
@@ -1161,7 +1161,7 @@ function runTests() {
     });
 
     test('generatinghighlight has transition', function() {
-      assert.equal(generatingSVG.svg.select('.layer0').node().style.transition, 'opacity 0.2s');
+      assert.equal(generatingSVG.svg.select('.layer0').node().style.transition.slice(0,12), 'opacity 0.2s');
     });
 
     test('generatinghighlight didnt create defaultEmptyData', function() {
@@ -1386,7 +1386,7 @@ function runTests() {
     });
 
     test('forcehighlight has transition', function() {
-      assert.equal(forceSVG.svg.select('.layer0').node().style.transition, 'opacity 0.2s');
+      assert.equal(forceSVG.svg.select('.layer0').node().style.transition.slice(0,12), 'opacity 0.2s');
     });
 
     test('forcehighlight didnt create defaultEmptyData', function() {

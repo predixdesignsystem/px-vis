@@ -151,10 +151,10 @@ function runTests(){
       });
 
       test('basePoint scatters have the right color', function() {
-        assert.equal(Px.d3.select(basePoint._circles.nodes()[0]).attr('fill'), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(basePoint._circles.nodes()[0]).attr('stroke'), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(basePoint._circles.nodes()[1]).attr('fill'), colorSet[colorOrder[1]]);
-        assert.equal(Px.d3.select(basePoint._circles.nodes()[1]).attr('stroke'), colorSet[colorOrder[1]]);
+        assert.equal(Px.d3.select(basePoint._circles.nodes()[0]).attr('fill').split(' ').join(''), colorSet[colorOrder[0]]);
+        assert.equal(Px.d3.select(basePoint._circles.nodes()[0]).attr('stroke').split(' ').join(''), colorSet[colorOrder[0]]);
+        assert.equal(Px.d3.select(basePoint._circles.nodes()[1]).attr('fill').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(Px.d3.select(basePoint._circles.nodes()[1]).attr('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
       });
 
       test('basePoint scatters x & y', function() {
@@ -345,10 +345,10 @@ function runTests(){
       });
 
       test('differentPoint scatters have the right color', function() {
-        assert.equal(Px.d3.select(differentPoint._circles.nodes()[0]).attr('fill'), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(differentPoint._circles.nodes()[0]).attr('stroke'), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(differentPoint._circles.nodes()[1]).attr('fill'), colorSet[colorOrder[1]]);
-        assert.equal(Px.d3.select(differentPoint._circles.nodes()[1]).attr('stroke'), colorSet[colorOrder[1]]);
+        assert.equal(Px.d3.select(differentPoint._circles.nodes()[0]).attr('fill').split(' ').join(''), colorSet[colorOrder[0]]);
+        assert.equal(Px.d3.select(differentPoint._circles.nodes()[0]).attr('stroke').split(' ').join(''), colorSet[colorOrder[0]]);
+        assert.equal(Px.d3.select(differentPoint._circles.nodes()[1]).attr('fill').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(Px.d3.select(differentPoint._circles.nodes()[1]).attr('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
       });
 
       test('differentPoint scatters x & y', function() {
@@ -536,20 +536,20 @@ function runTests(){
       });
 
       test('fuzzPoint scatters have the right color', function() {
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[0]).attr('fill'), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[0]).attr('stroke'), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[1]).attr('fill'), colorSet[colorOrder[1]]);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[1]).attr('stroke'), colorSet[colorOrder[1]]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[0]).attr('fill').split(' ').join(''), colorSet[colorOrder[0]]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[0]).attr('stroke').split(' ').join(''), colorSet[colorOrder[0]]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[1]).attr('fill').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[1]).attr('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
 
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[2]).attr('fill'), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[2]).attr('stroke'), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[3]).attr('fill'), colorSet[colorOrder[1]]);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[3]).attr('stroke'), colorSet[colorOrder[1]]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[2]).attr('fill').split(' ').join(''), colorSet[colorOrder[0]]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[2]).attr('stroke').split(' ').join(''), colorSet[colorOrder[0]]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[3]).attr('fill').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[3]).attr('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
 
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[4]).attr('fill'), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[4]).attr('stroke'), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[5]).attr('fill'), colorSet[colorOrder[1]]);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[5]).attr('stroke'), colorSet[colorOrder[1]]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[4]).attr('fill').split(' ').join(''), colorSet[colorOrder[0]]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[4]).attr('stroke').split(' ').join(''), colorSet[colorOrder[0]]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[5]).attr('fill').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[5]).attr('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
       });
 
       test('fuzzPoint scatters x & y', function() {
@@ -750,10 +750,10 @@ function runTests(){
       });
 
       test('generatingPoint scatters have the right color', function() {
-        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[0]).attr('fill'), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[0]).attr('stroke'), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[1]).attr('fill'), colorSet[colorOrder[1]]);
-        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[1]).attr('stroke'), colorSet[colorOrder[1]]);
+        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[0]).attr('fill').split(' ').join(''), colorSet[colorOrder[0]]);
+        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[0]).attr('stroke').split(' ').join(''), colorSet[colorOrder[0]]);
+        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[1]).attr('fill').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[1]).attr('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
       });
 
       test('generatingPoint scatters x & y', function() {
@@ -942,10 +942,10 @@ function runTests(){
       });
 
       test('forcePoint scatters have the right color', function() {
-        assert.equal(Px.d3.select(forcePoint._circles.nodes()[0]).attr('fill'), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(forcePoint._circles.nodes()[0]).attr('stroke'), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(forcePoint._circles.nodes()[1]).attr('fill'), colorSet[colorOrder[1]]);
-        assert.equal(Px.d3.select(forcePoint._circles.nodes()[1]).attr('stroke'), colorSet[colorOrder[1]]);
+        assert.equal(Px.d3.select(forcePoint._circles.nodes()[0]).attr('fill').split(' ').join(''), colorSet[colorOrder[0]]);
+        assert.equal(Px.d3.select(forcePoint._circles.nodes()[0]).attr('stroke').split(' ').join(''), colorSet[colorOrder[0]]);
+        assert.equal(Px.d3.select(forcePoint._circles.nodes()[1]).attr('fill').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(Px.d3.select(forcePoint._circles.nodes()[1]).attr('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
       });
 
       test('forcePoint scatters x & y', function() {

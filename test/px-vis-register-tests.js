@@ -386,7 +386,10 @@ function basicTests(registerID,dir){
     var data;
     suiteSetup(function(done) {
       data = generateDataValues( generateEmptyData(5) );
-      setData(register, data, done);
+      setData(register, data);
+      setTimeout(function() {
+        done();
+      }, 200);
     });
 
     test(registerID + ' still has 5 series', function() {
