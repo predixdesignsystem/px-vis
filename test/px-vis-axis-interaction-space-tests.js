@@ -877,11 +877,7 @@ function runTests(){
       radialBrush2.deleteBrush();
       radialBrush3.deleteBrush();
 
-<<<<<<< HEAD:test/px-vis-axis-interaction-space-tests.js
-      setTimeout(function(){ done() }, 100);
-=======
       setTimeout(function(){ done() }, 1000);
->>>>>>> master:test/px-vis-axis-brush-tests.js
     });
 
     test('radialBrush1._brush brush deleted', function() {
