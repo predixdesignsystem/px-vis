@@ -79,11 +79,6 @@ PxVisBehaviorScale.scale = [{
      */
     chartId: {
       type: String
-    },
-
-    dontUseWebWorker: {
-      type: Boolean,
-      value: false
     }
   },
 
@@ -241,7 +236,7 @@ PxVisBehaviorScale.scale = [{
       this._calculatingDomain = true;
 
       // Fallback if specified or we dont have an id
-      if(!this.chartId || this.dontUseWebWorker ) {
+      if(!this.chartId || this.preventWebWorkerSynchronization ) {
         var extents = this._determineExtents();
         this._applyExtents(extents);
         return;
@@ -731,7 +726,8 @@ PxVisBehaviorScale.scale = [{
   PxVisBehavior.completeSeriesConfig,
   PxVisBehavior.chartExtents,
   PxVisBehavior.dataExtents,
-  PxVisBehaviorD3.domainUpdateNotify
+  PxVisBehaviorD3.domainUpdateNotify,
+  PxVisBehavior.preventWebWorkerSynchronization
 ];
 
 </script>
