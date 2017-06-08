@@ -134,7 +134,10 @@ function runTests(){
 
     suiteSetup(function(done) {
       var data = generateDataValues( generateEmptyData(2) );
-      setData(numberFormat, data,done);
+      setData(numberFormat, data);
+      window.setTimeout(function() {
+        done();
+      }, 150);
     });
 
     test('numberFormat fixtures are created', function() {

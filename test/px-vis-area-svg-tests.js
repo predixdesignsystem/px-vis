@@ -58,6 +58,14 @@ function runTests() {
 
         var stackData = stack(d);
 
+      var rendered = function() {
+        areaPath =  baseArea.areaGroup.select('path.series-area');
+        baseArea.removeEventListener('px-vis-area-svg-rendering-ended', rendered);
+        done();
+      };
+
+      baseArea.addEventListener('px-vis-area-svg-rendering-ended', rendered);
+
       baseSVG.set('width',w);
       baseSVG.set('height',h);
       baseSVG.set('margin',m);
@@ -73,12 +81,6 @@ function runTests() {
       baseArea.set('seriesId',"mySeries");
       baseArea.set('completeSeriesConfig',completeSeriesConfig);
       baseArea.set('chartData',stackData);
-
-      // needed for the debounce in area
-      setTimeout(function(){
-        areaPath =  baseArea.areaGroup.select('path.series-area');
-        done();
-      },100);
     });
 
     test('baseArea fixture is created', function() {
@@ -171,10 +173,30 @@ function runTests() {
           "bottom": 20,
           "left": 15
         },
-        stack = Px.d3.stack();
+        stack = Px.d3.stack(),
+        counter = 0;
 
       stack.keys(["y","y1","y2"]);
       var stackData = stack(d);
+
+
+      var rendered = function() {
+        counter++;
+
+        if(counter === 3) {
+          areaPath1 = multiArea.areaGroup.select('[series-id="area_mySeries"]');
+          areaPath2 = multiArea.areaGroup.select('[series-id="area_mySeries2"]')
+          areaPath3 = multiArea.areaGroup.select('[series-id="area_mySeries3"]');
+          areaPath1.removeEventListener('px-vis-area-svg-rendering-ended', rendered);
+          areaPath2.removeEventListener('px-vis-area-svg-rendering-ended', rendered);
+          areaPath3.removeEventListener('px-vis-area-svg-rendering-ended', rendered);
+          done();
+        }
+      };
+
+      areaPath1.addEventListener('px-vis-area-svg-rendering-ended', rendered);
+      areaPath2.addEventListener('px-vis-area-svg-rendering-ended', rendered);
+      areaPath3.addEventListener('px-vis-area-svg-rendering-ended', rendered);
 
       multiSVG.set('width',w);
       multiSVG.set('height',h);
@@ -191,13 +213,6 @@ function runTests() {
       multiArea.set('completeSeriesConfig',completeSeriesConfig);
       multiArea.set('seriesId',"mySeries");
       multiArea.set('chartData',stackData);
-
-      setTimeout(function() {
-        areaPath1 = multiArea.areaGroup.select('[series-id="area_mySeries"]');
-        areaPath2 = multiArea.areaGroup.select('[series-id="area_mySeries2"]')
-        areaPath3 = multiArea.areaGroup.select('[series-id="area_mySeries3"]');
-        done();
-      }, 100);;
     });
 
     test('multiArea fixture is created', function() {
