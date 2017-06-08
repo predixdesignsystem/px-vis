@@ -17,7 +17,6 @@ function runTests(){
 
     var colorOrder = dataVisColors.properties.seriesColorOrder.value;
     var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath1,linePath2;
 
     suiteSetup(function(done){
       var d = [{
@@ -67,7 +66,20 @@ function runTests(){
           "right": 5,
           "bottom": 20,
           "left": 15
-        };
+        },
+        counter = 0;
+
+      var rendered =function() {
+        counter++;
+        if(counter === 2) {
+          baseLine1.removeEventListener('px-vis-line-canvas-rendering-ended', rendered);
+          baseLine2.removeEventListener('px-vis-line-canvas-rendering-ended', rendered);
+          done();
+        }
+      };
+
+      baseLine1.addEventListener('px-vis-line-canvas-rendering-ended', rendered);
+      baseLine2.addEventListener('px-vis-line-canvas-rendering-ended', rendered);
 
       baseCanvas.set('width',w);
       baseCanvas.set('height',h);
@@ -87,11 +99,6 @@ function runTests(){
       baseLine2.set('completeSeriesConfig',completeSeriesConfig);
       baseLine2.set('seriesId',"mySeries2");
       baseLine2.set('chartData',d);
-      setTimeout(function(){
-        linePath1 = baseLine1.lineGroup;
-        linePath2 = baseLine2.lineGroup;
-        done();
-      },100);
     });
 
     test('baseLine1 fixture is created', function() {
@@ -124,7 +131,6 @@ function runTests(){
 
     var colorOrder = dataVisColors.properties.seriesColorOrder.value;
     var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath1,linePath2;
 
     suiteSetup(function(done){
       var d = [{
@@ -195,7 +201,20 @@ function runTests(){
           "right": 5,
           "bottom": 20,
           "left": 15
-        };
+        },
+        counter = 0;
+
+      var rendered =function() {
+        counter++;
+        if(counter === 2) {
+          progressiveLine1.removeEventListener('px-vis-line-canvas-rendering-ended', rendered);
+          progressiveLine2.removeEventListener('px-vis-line-canvas-rendering-ended', rendered);
+          done();
+        }
+      };
+
+      progressiveLine1.addEventListener('px-vis-line-canvas-rendering-ended', rendered);
+      progressiveLine2.addEventListener('px-vis-line-canvas-rendering-ended', rendered);
 
       progressiveCanvas.set('width',w);
       progressiveCanvas.set('height',h);
@@ -215,11 +234,6 @@ function runTests(){
       progressiveLine2.set('completeSeriesConfig',completeSeriesConfig);
       progressiveLine2.set('seriesId',"mySeries2");
       progressiveLine2.set('chartData',d);
-      setTimeout(function(){
-        linePath1 = progressiveLine1.lineGroup;
-        linePath2 = progressiveLine2.lineGroup;
-        done();
-      },100);
     });
 
     test('progressiveLine1 fixture is created', function() {
@@ -253,7 +267,6 @@ function runTests(){
 
     var colorOrder = dataVisColors.properties.seriesColorOrder.value;
     var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath1,linePath2;
 
     suiteSetup(function(done){
       var d = [{
@@ -303,7 +316,20 @@ function runTests(){
           "right": 5,
           "bottom": 20,
           "left": 15
-        };
+        },
+        counter = 0;
+
+      var rendered =function() {
+        counter++;
+        if(counter === 2) {
+          canvasOnceLine1.removeEventListener('px-vis-line-canvas-rendering-ended', rendered);
+          canvasOnceLine2.removeEventListener('px-vis-line-canvas-rendering-ended', rendered);
+          done();
+        }
+      };
+
+      canvasOnceLine1.addEventListener('px-vis-line-canvas-rendering-ended', rendered);
+      canvasOnceLine2.addEventListener('px-vis-line-canvas-rendering-ended', rendered);
 
       canvasOnce.set('width',w);
       canvasOnce.set('height',h);
@@ -323,11 +349,6 @@ function runTests(){
       canvasOnceLine2.set('completeSeriesConfig',completeSeriesConfig);
       canvasOnceLine2.set('seriesId',"mySeries2");
       canvasOnceLine2.set('chartData',d);
-      setTimeout(function(){
-        linePath1 = canvasOnceLine1.lineGroup;
-        linePath2 = canvasOnceLine2.lineGroup;
-        done();
-      },100);
     });
 
     test('canvasOnceLine1 fixture is created', function() {
@@ -358,23 +379,26 @@ function runTests(){
         canvasOnceLine1 = document.getElementById('canvasOnceLine1'),
         canvasOnceLine2 = document.getElementById('canvasOnceLine2');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath1,linePath2;
-
     suiteSetup(function(done){
       var mutedSeries = {
         "mySeries" : false,
         "mySeries2" : true
+      },
+      counter = 0;
+
+      var rendered =function() {
+        counter++;
+        if(counter === 2) {
+          canvasOnceLine1.removeEventListener('px-vis-line-canvas-rendering-ended', rendered);
+          canvasOnceLine2.removeEventListener('px-vis-line-canvas-rendering-ended', rendered);
+          done();
+        }
       };
+
+      canvasOnceLine1.addEventListener('px-vis-line-canvas-rendering-ended', rendered);
+      canvasOnceLine2.addEventListener('px-vis-line-canvas-rendering-ended', rendered);
       canvasOnceLine1.set('mutedSeries',mutedSeries);
       canvasOnceLine2.set('mutedSeries',mutedSeries);
-
-      setTimeout(function(){
-        linePath1 = canvasOnceLine1.lineGroup;
-        linePath2 = canvasOnceLine2.lineGroup;
-        done();
-      },100);
     });
 
     test('context has correct total lines ', function() {
@@ -397,23 +421,26 @@ function runTests(){
         canvasOnceLine1 = document.getElementById('canvasOnceLine1'),
         canvasOnceLine2 = document.getElementById('canvasOnceLine2');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath1,linePath2;
-
     suiteSetup(function(done){
       var mutedSeries = {
         "mySeries" : false,
         "mySeries2" : false
+      },
+      counter = 0;
+
+      var rendered =function() {
+        counter++;
+        if(counter === 2) {
+          canvasOnceLine1.removeEventListener('px-vis-line-canvas-rendering-ended', rendered);
+          canvasOnceLine2.removeEventListener('px-vis-line-canvas-rendering-ended', rendered);
+          done();
+        }
       };
+
+      canvasOnceLine1.addEventListener('px-vis-line-canvas-rendering-ended', rendered);
+      canvasOnceLine2.addEventListener('px-vis-line-canvas-rendering-ended', rendered);
       canvasOnceLine1.set('mutedSeries',mutedSeries);
       canvasOnceLine2.set('mutedSeries',mutedSeries);
-
-      setTimeout(function(){
-        linePath1 = canvasOnceLine1.lineGroup;
-        linePath2 = canvasOnceLine2.lineGroup;
-        done();
-      },100);
     });
 
     test('context has correct total lines ', function() {
@@ -436,25 +463,28 @@ function runTests(){
         canvasOnceLine1 = document.getElementById('canvasOnceLine1'),
         canvasOnceLine2 = document.getElementById('canvasOnceLine2');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath1,linePath2;
-
     suiteSetup(function(done){
       var mutedSeries = {
         "mySeries" : false,
         "mySeries2" : true
+      },
+      counter = 0;
+
+      var rendered =function() {
+        counter++;
+        if(counter === 2) {
+          canvasOnceLine1.removeEventListener('px-vis-line-canvas-rendering-ended', rendered);
+          canvasOnceLine2.removeEventListener('px-vis-line-canvas-rendering-ended', rendered);
+          done();
+        }
       };
+
+      canvasOnceLine1.addEventListener('px-vis-line-canvas-rendering-ended', rendered);
+      canvasOnceLine2.addEventListener('px-vis-line-canvas-rendering-ended', rendered);
       canvasOnceLine1.set('mutedOpacity',0);
       canvasOnceLine2.set('mutedOpacity',0);
       canvasOnceLine1.set('mutedSeries',mutedSeries);
       canvasOnceLine2.set('mutedSeries',mutedSeries);
-
-      setTimeout(function(){
-        linePath1 = canvasOnceLine1.lineGroup;
-        linePath2 = canvasOnceLine2.lineGroup;
-        done();
-      },100);
     });
 
     test('context has correct total lines ', function() {
@@ -476,10 +506,6 @@ function runTests(){
     var parallelCanvasScale = document.getElementById('parallelCanvasScale'),
         parallelCanvasSVG = document.getElementById('parallelCanvasSVG'),
         parallelCanvasLine = document.getElementById('parallelCanvasLine');
-
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath1;
 
     suiteSetup(function(done){
       var d = [{
@@ -522,7 +548,18 @@ function runTests(){
           "right": 5,
           "bottom": 20,
           "left": 15
-        };
+        },
+        counter = 0;
+
+      var rendered =function() {
+        counter++;
+        if(counter === 1) {
+          parallelCanvasLine.removeEventListener('px-vis-line-canvas-rendering-ended', rendered);
+          done();
+        }
+      };
+
+      parallelCanvasLine.addEventListener('px-vis-line-canvas-rendering-ended', rendered);
 
       parallelCanvasSVG.set('width',w);
       parallelCanvasSVG.set('height',h);
@@ -540,11 +577,6 @@ function runTests(){
       parallelCanvasLine.set('completeSeriesConfig',completeSeriesConfig);
       parallelCanvasLine.set('seriesId',"x");
       parallelCanvasLine.set('chartData',d);
-
-      setTimeout(function(){
-        linePath1 = parallelCanvasLine.lineGroup;
-        done();
-      },1000);
     });
 
     test('parallelCanvasLine fixture is created', function() {
@@ -570,10 +602,6 @@ function runTests(){
         parallelGradientCanvasSVG = document.getElementById('parallelGradientCanvasSVG'),
         parallelGradientCanvasLine = document.getElementById('parallelGradientCanvasLine');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath1;
-
     suiteSetup(function(done){
       var d = [{
             "x": 1397102460000,
@@ -617,6 +645,14 @@ function runTests(){
           "left": 15
         };
 
+      var rendered =function() {
+
+        parallelGradientCanvasLine.removeEventListener('px-vis-line-canvas-rendering-ended', rendered);
+        done();
+      };
+
+      parallelGradientCanvasLine.addEventListener('px-vis-line-canvas-rendering-ended', rendered);
+
       parallelGradientCanvasSVG.set('width',w);
       parallelGradientCanvasSVG.set('height',h);
       parallelGradientCanvasSVG.set('margin',m);
@@ -633,11 +669,6 @@ function runTests(){
       parallelGradientCanvasLine.set('completeSeriesConfig',completeSeriesConfig);
       parallelGradientCanvasLine.set('seriesId',"x");
       parallelGradientCanvasLine.set('chartData',d);
-
-      setTimeout(function(){
-        linePath1 = parallelGradientCanvasLine.lineGroup;
-        done();
-      },1000);
     });
 
     test('parallelCanvasLine fixture is created', function() {
@@ -663,10 +694,6 @@ function runTests(){
         parallelCategoryCanvasSVG = document.getElementById('parallelCategoryCanvasSVG'),
         parallelCategoryCanvasLine = document.getElementById('parallelCategoryCanvasLine');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath1;
-
     suiteSetup(function(done){
       var d = [{
             "x": 1397102460000,
@@ -730,6 +757,14 @@ function runTests(){
           "left": 15
         };
 
+      var rendered =function() {
+
+        parallelCategoryCanvasLine.removeEventListener('px-vis-line-canvas-rendering-ended', rendered);
+        done();
+      };
+
+      parallelCategoryCanvasLine.addEventListener('px-vis-line-canvas-rendering-ended', rendered);
+
       parallelCategoryCanvasSVG.set('width',w);
       parallelCategoryCanvasSVG.set('height',h);
       parallelCategoryCanvasSVG.set('margin',m);
@@ -748,11 +783,6 @@ function runTests(){
       parallelCategoryCanvasLine.set('categoryKey','cat');
       parallelCategoryCanvasLine.set('categories',categories);
       parallelCategoryCanvasLine.set('chartData',d);
-
-      setTimeout(function(){
-        linePath1 = parallelCategoryCanvasLine.lineGroup;
-        done();
-      },1000);
     });
 
     test('parallelCanvasLine fixture is created', function() {
@@ -778,10 +808,6 @@ function runTests(){
         parallelCategoryGradientCanvasSVG = document.getElementById('parallelCategoryGradientCanvasSVG'),
         parallelCategoryGradientCanvasLine = document.getElementById('parallelCategoryGradientCanvasLine');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath1;
-
     suiteSetup(function(done){
       var d = [{
             "x": 1397102460000,
@@ -845,6 +871,14 @@ function runTests(){
           "left": 15
         };
 
+      var rendered =function() {
+
+        parallelCategoryGradientCanvasLine.removeEventListener('px-vis-line-canvas-rendering-ended', rendered);
+        done();
+      };
+
+      parallelCategoryGradientCanvasLine.addEventListener('px-vis-line-canvas-rendering-ended', rendered);
+
       parallelCategoryGradientCanvasSVG.set('width',w);
       parallelCategoryGradientCanvasSVG.set('height',h);
       parallelCategoryGradientCanvasSVG.set('margin',m);
@@ -864,10 +898,6 @@ function runTests(){
       parallelCategoryGradientCanvasLine.set('categories',categories);
       parallelCategoryGradientCanvasLine.set('chartData',d);
 
-      setTimeout(function(){
-        linePath1 = parallelCategoryGradientCanvasLine.lineGroup;
-        done();
-      },1000);
     });
 
     test('parallelCanvasLine fixture is created', function() {
@@ -1429,10 +1459,6 @@ function runTests(){
         radarCanvas = document.getElementById('radarCanvas'),
         radarLine = document.getElementById('radarLine');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
-
     suiteSetup(function(done){
       var d = [{
             "x": 1397102460000,
@@ -1482,6 +1508,14 @@ function runTests(){
           "left": 10
         };
 
+      var rendered =function() {
+
+        radarLine.removeEventListener('px-vis-line-canvas-rendering-ended', rendered);
+        done();
+      };
+
+      radarLine.addEventListener('px-vis-line-canvas-rendering-ended', rendered);
+
       radarCanvas.set('width',w);
       radarCanvas.set('height',h);
       radarCanvas.set('margin',m);
@@ -1496,11 +1530,6 @@ function runTests(){
       radarLine.set('completeSeriesConfig',completeSeriesConfig);
       radarLine.set('seriesId',"x");
       radarLine.set('chartData',d);
-
-      setTimeout(function(){
-        linePath = radarLine.lineGroup;
-        done();
-      },500);
     });
 
     test('radarLine fixture is created', function() {
@@ -1520,46 +1549,10 @@ function runTests(){
     });
   }); //suite
 
-  suite('px-vis-line radar small lines stop at 25', function() {
-    var radarScale = document.getElementById('radarScale'),
-        chartExtents = {"x":["y","y1","y2"],"y":[15,20] },
-        linePath;
-
-    suiteSetup(function(done) {
-      radarScale.set('chartExtents',chartExtents);
-
-      setTimeout(function(){
-        linePath = radarLine.lineGroup;
-        done();
-      },500);
-    });
-
-    test('radarLine fixture is created', function() {
-      assert.isTrue(radarLine !== null);
-    });
-
-    test('context has correct total lines ', function() {
-      assert.equal(radarLine.canvasContext._pxLinesSeries.length, 1);
-    });
-
-    test('context has drawn 2 lines ', function() {
-      assert.equal(radarLine.canvasContext._pxLinesRedraw, 1);
-    });
-
-    test('context has added both to its list', function() {
-      assert.equal(radarLine.canvasContext._pxLinesSeries[0], 'x');
-    });
-
-  }); //suite
-
   suite('px-vis-line-canvas radar with missing data', function() {
     var radarMissingScale = document.getElementById('radarMissingScale'),
         radarMissingSVG = document.getElementById('radarMissingSVG'),
         radarMissingLine = document.getElementById('radarMissingLine');
-
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
 
     suiteSetup(function(done){
       var d = [{
@@ -1608,6 +1601,14 @@ function runTests(){
           "left": 10
         };
 
+      var rendered =function() {
+
+        radarMissingLine.removeEventListener('px-vis-line-canvas-rendering-ended', rendered);
+        done();
+      };
+
+      radarMissingLine.addEventListener('px-vis-line-canvas-rendering-ended', rendered);
+
       radarMissingSVG.set('width',w);
       radarMissingSVG.set('height',h);
       radarMissingSVG.set('margin',m);
@@ -1622,11 +1623,6 @@ function runTests(){
       radarMissingLine.set('completeSeriesConfig',completeSeriesConfig);
       radarMissingLine.set('seriesId',"x");
       radarMissingLine.set('chartData',d);
-
-      setTimeout(function(){
-        linePath = radarMissingLine.lineGroup;
-        done();
-      },500);
     });
 
     test('radarMissingLine fixture is created', function() {
@@ -1651,10 +1647,6 @@ function runTests(){
     var clipPathScale = document.getElementById('clipPathScale'),
         clipPathCanvas = document.getElementById('clipPathCanvas'),
         clipPathLine = document.getElementById('clipPathLine');
-
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
 
     suiteSetup(function(done){
       var d = [{
@@ -1706,6 +1698,14 @@ function runTests(){
         },
         chartExtents = {"x":["y","y1","y2"], 'y': [2,20]};
 
+      var rendered =function() {
+
+        clipPathLine.removeEventListener('px-vis-line-canvas-rendering-ended', rendered);
+        done();
+      };
+
+      clipPathLine.addEventListener('px-vis-line-canvas-rendering-ended', rendered);
+
       clipPathCanvas.set('width',w);
       clipPathCanvas.set('height',h);
       clipPathCanvas.set('margin',m);
@@ -1721,11 +1721,6 @@ function runTests(){
       clipPathLine.set('completeSeriesConfig',completeSeriesConfig);
       clipPathLine.set('seriesId',"x");
       clipPathLine.set('chartData',d);
-
-      setTimeout(function(){
-        linePath = clipPathLine.lineGroup;
-        done();
-      },500);
     });
 
     test('clipPathLine fixture is created', function() {
