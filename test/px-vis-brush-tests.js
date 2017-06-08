@@ -458,12 +458,12 @@ function runTests(){
     test('gradientBrush._brushGroup.rect attr stroke', function() {
       assert.equal(gradientBrush._brushGroup.select('rect.selection').attr('stroke').split(" ").join(''), colors.gray5);
     });
-    test('gradientBrush._brushGroup.rect attr fill', function() {
-      assert.equal(gradientBrush._brushGroup.select('rect.selection').attr('fill'), "url(#overlayGradient)");
-    });
-    test('gradientBrush._brushGroup.rect attr fill-opacity', function() {
-      assert.equal(gradientBrush._brushGroup.select('rect.selection').attr('fill-opacity'), 1);
-    });
+    // test('gradientBrush._brushGroup.rect attr fill', function() {
+    //   assert.equal(gradientBrush._brushGroup.select('rect.selection').attr('fill'), "url(#overlayGradient)");
+    // });
+    // test('gradientBrush._brushGroup.rect attr fill-opacity', function() {
+    //   assert.equal(gradientBrush._brushGroup.select('rect.selection').attr('fill-opacity'), 1);
+    // });
 
     test('def is created', function() {
       assert.equal(gradientBrush.svg.select('defs').node().tagName, 'defs');
