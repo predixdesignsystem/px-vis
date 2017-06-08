@@ -1106,7 +1106,7 @@ function runTests(){
       radialAxis.set('axes',dim);
       radialAxis.set('chartData',d);
 
-      setTimeout(function() { done(); }, 300);
+      setTimeout(function() { done(); }, 600);
     });
 
     test('radialAxis fixture is created', function() {
