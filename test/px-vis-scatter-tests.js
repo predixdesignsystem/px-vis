@@ -52,6 +52,12 @@ function runTests(){
           "left": 15
         };
 
+      var rendered = function() {
+        done();
+        baseScatter.removeEventListener('px-vis-scatter-rendering-ended', rendered);
+      };
+      baseScatter.addEventListener('px-vis-scatter-rendering-ended', rendered);
+
       baseSVG.set('width',w);
       baseSVG.set('height',h);
       baseSVG.set('margin',m);
@@ -67,11 +73,6 @@ function runTests(){
       baseScatter.set('completeSeriesConfig',completeSeriesConfig);
       baseScatter.set('seriesId',"mySeries");
       baseScatter.set('chartData',d);
-
-      setTimeout(function() {
-        done();
-      }, 100);
-
     });
 
     test('baseScatter fixture is created', function() {
@@ -170,7 +171,19 @@ function runTests(){
             "right": 5,
             "bottom": 20,
             "left": 15
-          };
+          },
+          counter = 0;
+
+      var rendered = function() {
+        counter++;
+        if(counter === 2) {
+          mutedScatter1.removeEventListener('px-vis-scatter-rendering-ended', rendered);
+          mutedScatter2.removeEventListener('px-vis-scatter-rendering-ended', rendered);
+          done();
+        }
+      };
+      mutedScatter1.addEventListener('px-vis-scatter-rendering-ended', rendered);
+      mutedScatter2.addEventListener('px-vis-scatter-rendering-ended', rendered);
 
       mutedSVG.set('width',w);
       mutedSVG.set('height',h);
@@ -193,10 +206,6 @@ function runTests(){
       mutedScatter2.set('completeSeriesConfig',completeSeriesConfig);
       mutedScatter2.set('seriesId',"mySeries2");
       mutedScatter2.set('chartData',d);
-
-      setTimeout(function() {
-        done();
-      }, 100);
     });
 
     test('mutedScatter1 fixture is created', function() {
@@ -298,12 +307,13 @@ function runTests(){
         "mySeries":false,
         "mySeries2":true
       };
+
       mutedScatter1.set('mutedSeries',m);
       mutedScatter2.set('mutedSeries',m);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         done();
-      }, 100);
+      }, 400);
     });
 
     test('mutedScatter1 scatter series has the right stroke opacity', function() {
@@ -347,12 +357,13 @@ function runTests(){
         "mySeries":false,
         "mySeries2":false
       };
+
       mutedScatter1.set('mutedSeries',m);
       mutedScatter2.set('mutedSeries',m);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         done();
-      }, 100);
+      }, 400);
     });
 
     test('mutedScatter1 scatter series has the right stroke opacity', function() {
@@ -473,7 +484,29 @@ function runTests(){
             "right": 5,
             "bottom": 20,
             "left": 15
-          };
+          },
+          counter = 0;
+
+      var rendered = function() {
+        counter++;
+        if(counter === 7) {
+          markerCircle.removeEventListener('px-vis-scatter-rendering-ended', rendered);
+          markerCross.removeEventListener('px-vis-scatter-rendering-ended', rendered);
+          markerWye.removeEventListener('px-vis-scatter-rendering-ended', rendered);
+          markerDiamond.removeEventListener('px-vis-scatter-rendering-ended', rendered);
+          markerSquare.removeEventListener('px-vis-scatter-rendering-ended', rendered);
+          markerTriangle.removeEventListener('px-vis-scatter-rendering-ended', rendered);
+          markerStar.removeEventListener('px-vis-scatter-rendering-ended', rendered);
+          done();
+        }
+      };
+      markerCircle.addEventListener('px-vis-scatter-rendering-ended', rendered);
+      markerCross.addEventListener('px-vis-scatter-rendering-ended', rendered);
+      markerWye.addEventListener('px-vis-scatter-rendering-ended', rendered);
+      markerDiamond.addEventListener('px-vis-scatter-rendering-ended', rendered);
+      markerSquare.addEventListener('px-vis-scatter-rendering-ended', rendered);
+      markerTriangle.addEventListener('px-vis-scatter-rendering-ended', rendered);
+      markerStar.addEventListener('px-vis-scatter-rendering-ended', rendered);
 
       markerSVG.set('width',w);
       markerSVG.set('height',h);
@@ -521,10 +554,6 @@ function runTests(){
       markerWye.set('markerSymbol',"wye");
       markerWye.set('seriesId',"wye");
       markerWye.set('chartData',d);
-
-      setTimeout(function() {
-        done();
-      }, 100);
     });
 
     test('correct number of circles', function() {

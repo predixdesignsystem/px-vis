@@ -174,7 +174,10 @@ function runTests(){
 
     suiteSetup(function(done) {
       var data = generateDataValues( generateEmptyData(2) );
-      setData(register, data,done);
+      setData(register, data);
+      window.setTimeout(function() {
+        done();
+      }, 150);
     });
 
     test('nonTime fixtures are created', function() {
@@ -199,7 +202,10 @@ function runTests(){
 
     suiteSetup(function(done) {
       var data = generateOrdinalDataValues( generateEmptyData(2) );
-      setData(register, data,done);
+      setData(register, data);
+      window.setTimeout(function() {
+        done();
+      }, 150);
     });
 
     test('ordinal fixtures are created', function() {
@@ -224,7 +230,10 @@ function runTests(){
 
     suiteSetup(function(done) {
       var data = generateDataValues( generateEmptyData(2) );
-      setData(register, data,done);
+      setData(register, data);
+      window.setTimeout(function() {
+        done();
+      }, 150);
     });
 
     test('nonTime fixtures are created', function() {
@@ -249,7 +258,10 @@ function runTests(){
 
     suiteSetup(function(done) {
       var data = generatePieDataValues( generateEmptyData(2) );
-      setData(register, data,done);
+      setData(register, data);
+      window.setTimeout(function() {
+        done();
+      }, 150);
     });
 
     test('pie doesnt show date', function() {
@@ -510,7 +522,10 @@ function basicTests(registerID,dir){
 
       data.data.series[0]['value']['x'] = 0;
       data.data.series[0]['value']['y'] = 0;
-      setData(register, data,done);
+      setData(register, data);
+      window.setTimeout(function() {
+        done();
+      }, 150);
     });
 
     test('showZero fixtures are created', function() {

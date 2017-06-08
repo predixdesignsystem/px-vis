@@ -115,10 +115,14 @@ function runTests(){
 
     suite('_gridGroup lines and path styles', function() {
       var lines,path;
-      suiteSetup(function(){
-        lines = baseXGrid._gridGroup.selectAll('line');
-        path = baseXGrid._gridGroup.selectAll('path');
-      })
+      suiteSetup(function(done){
+
+        window.setTimeout(function() {
+          lines = baseXGrid._gridGroup.selectAll('line');
+          path = baseXGrid._gridGroup.selectAll('path');
+          done();
+        }, 200);
+      });
 
       // test('correct number of lines', function() {
       //   assert.equal(lines[0].length,11);
