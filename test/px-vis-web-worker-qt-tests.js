@@ -12,20 +12,13 @@ function runTests(){
   suite('px-vis-worker setup', function() {
 
     suiteSetup(function(){
-      var w = 500,
-        h = 300,
-        m = {
-          "top": 10,
-          "right": 5,
-          "bottom": 20,
-          "left": 15
-        };
+
 
 
     });
 
-    test('baseZoom fixture is created', function() {
-      assert.isTrue(baseZoom !== null);
+    test('dummy', function() {
+
     });
   }); //suite
 } //runTests

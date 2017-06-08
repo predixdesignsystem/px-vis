@@ -782,7 +782,7 @@ PxVisBehavior.commonMethods = {
    */
   _checkThemeVariable: function(varName, defaultValue) {
     var themeVar = this.getComputedStyleValue(varName);
-    return (themeVar.length === 0) ? defaultValue : themeVar;
+    return (!themeVar || themeVar.length === 0) ? defaultValue : themeVar;
   },
 
   /**
@@ -2697,10 +2697,39 @@ PxVisBehavior.highlightLineShared = [{
         "tooltipConfig": tooltipConfig
       };
 
-
     return data;
-
   }
 }, PxVisBehavior.highlightShared, PxVisBehavior.margins];
+
+/*
+    Name:
+    PxVisBehavior.preventWebWorkerSynchronization
+
+    Description:
+    Polymer behavior that provides the preventWebWorkerSynchronization property
+
+    @polymerBehavior PxVisBehavior.preventWebWorkerSynchronization
+*/
+PxVisBehavior.preventWebWorkerSynchronization = {
+  properties: {
+      /**
+       * Prevents the chart from synchronizing its data with a webworker.
+       * This can be turned on to minimize the memory footprint of the
+       * chart
+       * WARNING: turning the synchronization off will:
+       * - prevent the chart from being able to use crosshair feature
+       * - slow down data search for tooltip/register
+       * - slow down calculating extents for the chart if it needs to
+       *
+       * We advise against turning it off but it might be beneficial in
+       * specific scenarios (high number of small charts with minimum
+       * interaction for example)
+       */
+      preventWebWorkerSynchronization: {
+        type: Boolean,
+        value: false
+      }
+  }
+};
 
 </script>

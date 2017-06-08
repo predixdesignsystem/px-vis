@@ -314,9 +314,9 @@ PxVisBehaviorD3.canvas = [{
     '_renderToSvgChanged(renderToSvg)'
   ],
   _renderToSvgChanged: function(renderToSvg) {
-    if(this.renderToSvg && this.canvasContext && this.canvasContext.clearCanvas) {
+    if(this.renderToSvg && this.canvasContext && this.canvasContext.pxClearCanvas) {
       //make sure the canvas cleans itself
-      this.canvasContext.clearCanvas();
+      this.canvasContext.pxClearCanvas();
     }
   }
 }, PxVisBehaviorD3.canvasContext]
@@ -347,9 +347,9 @@ PxVisBehaviorD3.renderToCanvas = {
     '_renderToCanvasChanged(renderToCanvas)'
   ],
   _renderToCanvasChanged: function(renderToCanvas) {
-    if(!this.renderToCanvas && this.canvasContext && this.canvasContext.clearCanvas) {
+    if(!this.renderToCanvas && this.canvasContext && this.canvasContext.pxClearCanvas) {
       //make sure the canvas cleans itself
-      this.canvasContext.clearCanvas();
+      this.canvasContext.pxClearCanvas();
     }
   }
 };
@@ -1090,6 +1090,29 @@ PxVisBehaviorD3.interpolationFunction = {
   }
 };
 
+/*
+    Name:
+    PxVisBehaviorD3.lineRadiusLimit
+
+    Description:
+    Polymer behavior that provides the lineRadiusLimit property
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorD3.lineRadiusLimit
+*/
+PxVisBehaviorD3.lineRadiusLimit = {
+  properties: {
+    /**
+    * sets a minimum value for the line amplitude. Points less than the lineRadiusLimit will be set to the limit
+    *
+    */
+    lineRadiusLimit: {
+      type: Number
+    }
+  }
+};
 
 /*
     Name:
@@ -1218,7 +1241,7 @@ PxVisBehaviorD3.radialLineGenerator = [{
     }
     this.set('line', line);
   }
-}, PxVisBehavior.completeSeriesConfig, PxVisBehavior.dataset, PxVisBehaviorD3.interpolationFunction];
+}, PxVisBehavior.completeSeriesConfig, PxVisBehavior.dataset, PxVisBehaviorD3.interpolationFunction, PxVisBehaviorD3.lineRadiusLimit];
 
 
 /*

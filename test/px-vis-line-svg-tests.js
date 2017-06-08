@@ -158,7 +158,21 @@ function runTests(){
           "right": 5,
           "bottom": 20,
           "left": 15
-        };
+        },
+        counter = 0;
+
+      var rendered = function() {
+        counter++;
+
+        if(counter === 2) {
+          linePath1 = mutedLine1.lineGroup.select('path.series-line');
+          linePath2 = mutedLine2.lineGroup.select('path.series-line');
+          done();
+        }
+      };
+
+      mutedLine1.addEventListener('px-vis-line-svg-rendering-ended', rendered);
+      mutedLine2.addEventListener('px-vis-line-svg-rendering-ended', rendered);
 
       mutedSVG.set('width',w);
       mutedSVG.set('height',h);
@@ -179,11 +193,9 @@ function runTests(){
       mutedLine2.set('completeSeriesConfig',completeSeriesConfig);
       mutedLine2.set('seriesId',"mySeries2");
       mutedLine2.set('chartData',d);
-      setTimeout(function(){
-        linePath1 = mutedLine1.lineGroup.select('path.series-line');
-        linePath2 = mutedLine2.lineGroup.select('path.series-line');
-        done();
-      },100);;
+
+
+
     });
 
     test('mutedLine1 fixture is created', function() {
@@ -391,7 +403,25 @@ function runTests(){
           "right": 5,
           "bottom": 20,
           "left": 15
-        };
+        },
+        counter=0;
+
+       var rendered = function() {
+
+        counter++;
+        if(counter === 2) {
+          linePath1 = missingDataPointLine1.lineGroup.select('path.series-line');
+          linePath2 = missingDataPointLine2.lineGroup.select('path.series-line');
+
+          missingDataPointLine1.removeEventListener('px-vis-line-svg-rendering-ended', rendered);
+          missingDataPointLine2.removeEventListener('px-vis-line-svg-rendering-ended', rendered);
+
+          done();
+        }
+      };
+
+      missingDataPointLine1.addEventListener('px-vis-line-svg-rendering-ended', rendered);
+      missingDataPointLine2.addEventListener('px-vis-line-svg-rendering-ended', rendered);
 
       missingDataPointSVG.set('width',w);
       missingDataPointSVG.set('height',h);
@@ -412,11 +442,6 @@ function runTests(){
       missingDataPointLine2.set('completeSeriesConfig',completeSeriesConfig);
       missingDataPointLine2.set('seriesId',"mySeries2");
       missingDataPointLine2.set('chartData',d);
-      setTimeout(function(){
-        linePath1 = missingDataPointLine1.lineGroup.select('path.series-line');
-        linePath2 = missingDataPointLine2.lineGroup.select('path.series-line');
-        done();
-      },100);;
     });
 
     test('missingDataPointLine1 fixture is created', function() {
@@ -492,7 +517,25 @@ function runTests(){
           "right": 5,
           "bottom": 20,
           "left": 15
-        };
+        },
+        counter =0;
+
+      var rendered = function() {
+
+        counter++;
+        if(counter === 2) {
+          linePath1 = missingDataPointLine1Null.lineGroup.select('path.series-line');
+          linePath2 = missingDataPointLine2Null.lineGroup.select('path.series-line');
+
+          missingDataPointLine1Null.removeEventListener('px-vis-line-svg-rendering-ended', rendered);
+          missingDataPointLine2Null.removeEventListener('px-vis-line-svg-rendering-ended', rendered);
+
+          done();
+        }
+      };
+
+      missingDataPointLine1Null.addEventListener('px-vis-line-svg-rendering-ended', rendered);
+      missingDataPointLine2Null.addEventListener('px-vis-line-svg-rendering-ended', rendered);
 
       missingDataPointSVGNull.set('width',w);
       missingDataPointSVGNull.set('height',h);
@@ -513,11 +556,6 @@ function runTests(){
       missingDataPointLine2Null.set('completeSeriesConfig',completeSeriesConfig);
       missingDataPointLine2Null.set('seriesId',"mySeries2");
       missingDataPointLine2Null.set('chartData',d);
-      setTimeout(function(){
-        linePath1 = missingDataPointLine1Null.lineGroup.select('path.series-line');
-        linePath2 = missingDataPointLine2Null.lineGroup.select('path.series-line');
-        done();
-      },100);;
     });
 
     test('missingDataPointLine1Null fixture is created', function() {
@@ -592,7 +630,25 @@ function runTests(){
           "right": 5,
           "bottom": 20,
           "left": 15
-        };
+        },
+        counter = 0;
+
+      var rendered = function() {
+
+        counter++;
+        if(counter === 2) {
+          linePath1 = missingDataPointLine1Gap.lineGroup.select('path.series-line');
+          linePath2 = missingDataPointLine2Gap.lineGroup.select('path.series-line');
+
+          missingDataPointLine1Gap.removeEventListener('px-vis-line-svg-rendering-ended', rendered);
+          missingDataPointLine2Gap.removeEventListener('px-vis-line-svg-rendering-ended', rendered);
+
+          done();
+        }
+      };
+
+      missingDataPointLine1Gap.addEventListener('px-vis-line-svg-rendering-ended', rendered);
+      missingDataPointLine2Gap.addEventListener('px-vis-line-svg-rendering-ended', rendered);
 
       missingDataPointSVGGap.set('width',w);
       missingDataPointSVGGap.set('height',h);
@@ -613,11 +669,6 @@ function runTests(){
       missingDataPointLine2Gap.set('completeSeriesConfig',completeSeriesConfig);
       missingDataPointLine2Gap.set('seriesId',"mySeries2");
       missingDataPointLine2Gap.set('chartData',d);
-      setTimeout(function(){
-        linePath1 = missingDataPointLine1Gap.lineGroup.select('path.series-line');
-        linePath2 = missingDataPointLine2Gap.lineGroup.select('path.series-line');
-        done();
-      },100);;
     });
 
     test('missingDataPointLine1Gap fixture is created', function() {
@@ -688,6 +739,18 @@ function runTests(){
           "left": 15
         };
 
+
+      var rendered = function() {
+
+        linePath = parallelLine.lineGroup.selectAll('path.series-line');
+
+        parallelLine.removeEventListener('px-vis-line-svg-rendering-ended', rendered);
+
+        done();
+      };
+
+      parallelLine.addEventListener('px-vis-line-svg-rendering-ended', rendered);
+
       parallelSVG.set('width',w);
       parallelSVG.set('height',h);
       parallelSVG.set('margin',m);
@@ -704,11 +767,6 @@ function runTests(){
       parallelLine.set('completeSeriesConfig',completeSeriesConfig);
       parallelLine.set('seriesId',"x");
       parallelLine.set('chartData',d);
-
-      setTimeout(function(){
-        linePath = parallelLine.lineGroup.selectAll('path.series-line');
-        done();
-      },1000);;
     });
 
     test('parallelLine fixture is created', function() {
@@ -806,6 +864,17 @@ function runTests(){
           "left": 15
         };
 
+      var rendered = function() {
+
+        linePath = parallelGradientLine.lineGroup.selectAll('path.series-line');
+
+        parallelGradientLine.removeEventListener('px-vis-line-svg-rendering-ended', rendered);
+
+        done();
+      };
+
+      parallelGradientLine.addEventListener('px-vis-line-svg-rendering-ended', rendered);
+
       parallelGradientSVG.set('width',w);
       parallelGradientSVG.set('height',h);
       parallelGradientSVG.set('margin',m);
@@ -822,11 +891,6 @@ function runTests(){
       parallelGradientLine.set('completeSeriesConfig',completeSeriesConfig);
       parallelGradientLine.set('seriesId',"x");
       parallelGradientLine.set('chartData',d);
-
-      setTimeout(function(){
-        linePath = parallelGradientLine.lineGroup.selectAll('path.series-line');
-        done();
-      },1000);;
     });
 
     test('parallelLine fixture is created', function() {
@@ -956,6 +1020,17 @@ function runTests(){
           "left": 15
         };
 
+      var rendered = function() {
+
+        linePath = parallelCategoryLine.lineGroup.selectAll('path.series-line');
+
+        parallelCategoryLine.removeEventListener('px-vis-line-svg-rendering-ended', rendered);
+
+        done();
+      };
+
+      parallelCategoryLine.addEventListener('px-vis-line-svg-rendering-ended', rendered);
+
       parallelCategorySVG.set('width',w);
       parallelCategorySVG.set('height',h);
       parallelCategorySVG.set('margin',m);
@@ -974,11 +1049,6 @@ function runTests(){
       parallelCategoryLine.set('categoryKey',"cat");
       parallelCategoryLine.set('categories',categories);
       parallelCategoryLine.set('chartData',d);
-
-      setTimeout(function(){
-        linePath = parallelCategoryLine.lineGroup.selectAll('path.series-line');
-        done();
-      },1000);;
     });
 
     test('parallelLine fixture is created', function() {
@@ -1100,6 +1170,17 @@ function runTests(){
           "left": 15
         };
 
+      var rendered = function() {
+
+        linePath = parallelCategoryGradientLine.lineGroup.selectAll('path.series-line');
+
+        parallelCategoryGradientLine.removeEventListener('px-vis-line-svg-rendering-ended', rendered);
+
+        done();
+      };
+
+      parallelCategoryGradientLine.addEventListener('px-vis-line-svg-rendering-ended', rendered);
+
       parallelCategoryGradientSVG.set('width',w);
       parallelCategoryGradientSVG.set('height',h);
       parallelCategoryGradientSVG.set('margin',m);
@@ -1119,10 +1200,6 @@ function runTests(){
       parallelCategoryGradientLine.set('categories',categories);
       parallelCategoryGradientLine.set('chartData',d);
 
-      setTimeout(function(){
-        linePath = parallelCategoryGradientLine.lineGroup.selectAll('path.series-line');
-        done();
-      },1000);
     });
 
     test('parallelLine fixture is created', function() {
@@ -1324,6 +1401,18 @@ function runTests(){
           "bottom": 10,
           "left": 10
         };
+
+      var rendered = function() {
+
+        linePath =  polarLine.lineGroup.select('path.series-line');
+
+        polarLine.removeEventListener('px-vis-line-svg-rendering-ended', rendered);
+
+        done();
+      };
+
+      polarLine.addEventListener('px-vis-line-svg-rendering-ended', rendered);
+
       polarSVG.set('width',w);
       polarSVG.set('height',h);
       polarSVG.set('margin',m);
@@ -1337,12 +1426,6 @@ function runTests(){
       polarLine.set('seriesId',"mySeries");
       polarLine.set('completeSeriesConfig',completeSeriesConfig);
       polarLine.set('chartData',d);
-
-      // needed for the debounce in line
-      setTimeout(function(){
-        linePath =  polarLine.lineGroup.select('path.series-line');
-        done();
-      }, 1000);
     });
 
     test('polarLine fixture is created', function() {
@@ -1439,6 +1522,19 @@ function runTests(){
           "bottom": 10,
           "left": 10
         };
+
+
+      var rendered = function() {
+
+        linePath =  polarDegreeLine.lineGroup.select('path.series-line');
+
+        polarDegreeLine.removeEventListener('px-vis-line-svg-rendering-ended', rendered);
+
+        done();
+      };
+
+      polarDegreeLine.addEventListener('px-vis-line-svg-rendering-ended', rendered);
+
       polarDegreeSVG.set('width',w);
       polarDegreeSVG.set('height',h);
       polarDegreeSVG.set('margin',m);
@@ -1452,12 +1548,6 @@ function runTests(){
       polarDegreeLine.set('seriesId',"mySeries");
       polarDegreeLine.set('completeSeriesConfig',completeSeriesConfig);
       polarDegreeLine.set('chartData',d);
-
-      // needed for the debounce in line
-      setTimeout(function(){
-        linePath =  polarDegreeLine.lineGroup.select('path.series-line');
-        done();
-      },250);
     });
 
     test('polarDegreeLine fixture is created', function() {
@@ -1553,6 +1643,18 @@ function runTests(){
           "bottom": 10,
           "left": 10
         };
+
+      var rendered = function() {
+
+        linePath =  polarCCWLine.lineGroup.select('path.series-line');
+
+        polarCCWLine.removeEventListener('px-vis-line-svg-rendering-ended', rendered);
+
+        done();
+      };
+
+      polarCCWLine.addEventListener('px-vis-line-svg-rendering-ended', rendered);
+
       polarCCWSVG.set('width',w);
       polarCCWSVG.set('height',h);
       polarCCWSVG.set('margin',m);
@@ -1566,12 +1668,6 @@ function runTests(){
       polarCCWLine.set('seriesId',"mySeries");
       polarCCWLine.set('completeSeriesConfig',completeSeriesConfig);
       polarCCWLine.set('chartData',d);
-
-      // needed for the debounce in line
-      setTimeout(function(){
-        linePath =  polarCCWLine.lineGroup.select('path.series-line');
-        done();
-      },250);
     });
 
     test('polarCCWLine fixture is created', function() {
@@ -1668,6 +1764,18 @@ function runTests(){
           "bottom": 10,
           "left": 10
         };
+
+      var rendered = function() {
+
+        linePath =  polarDegreeCCWLine.lineGroup.select('path.series-line');
+
+        polarDegreeCCWLine.removeEventListener('px-vis-line-svg-rendering-ended', rendered);
+
+        done();
+      };
+
+      polarDegreeCCWLine.addEventListener('px-vis-line-svg-rendering-ended', rendered);
+
       polarDegreeCCWSVG.set('width',w);
       polarDegreeCCWSVG.set('height',h);
       polarDegreeCCWSVG.set('margin',m);
@@ -1682,11 +1790,6 @@ function runTests(){
       polarDegreeCCWLine.set('completeSeriesConfig',completeSeriesConfig);
       polarDegreeCCWLine.set('chartData',d);
 
-      // needed for the debounce in line
-      setTimeout(function(){
-        linePath =  polarDegreeCCWLine.lineGroup.select('path.series-line');
-        done();
-      },250);
     });
 
     test('polarDegreeCCWLine fixture is created', function() {
@@ -1781,6 +1884,18 @@ function runTests(){
           "bottom": 10,
           "left": 10
         };
+
+      var rendered = function() {
+
+        linePath =  polarMissingLine.lineGroup.select('path.series-line');
+
+        polarMissingLine.removeEventListener('px-vis-line-svg-rendering-ended', rendered);
+
+        done();
+      };
+
+      polarMissingLine.addEventListener('px-vis-line-svg-rendering-ended', rendered);
+
       polarMissingSVG.set('width',w);
       polarMissingSVG.set('height',h);
       polarMissingSVG.set('margin',m);
@@ -1794,12 +1909,6 @@ function runTests(){
       polarMissingLine.set('seriesId',"mySeries");
       polarMissingLine.set('completeSeriesConfig',completeSeriesConfig);
       polarMissingLine.set('chartData',d);
-
-      // needed for the debounce in line
-      setTimeout(function(){
-        linePath =  polarMissingLine.lineGroup.select('path.series-line');
-        done();
-      },250);
     });
 
     test('polarMissingLine fixture is created', function() {
@@ -1899,6 +2008,17 @@ function runTests(){
           "left": 10
         };
 
+      var rendered = function() {
+
+        linePath = radarLine.lineGroup.selectAll('path.series-line');
+
+        radarLine.removeEventListener('px-vis-line-svg-rendering-ended', rendered);
+
+        done();
+      };
+
+      radarLine.addEventListener('px-vis-line-svg-rendering-ended', rendered);
+
       radarSVG.set('width',w);
       radarSVG.set('height',h);
       radarSVG.set('margin',m);
@@ -1913,11 +2033,6 @@ function runTests(){
       radarLine.set('completeSeriesConfig',completeSeriesConfig);
       radarLine.set('seriesId',"x");
       radarLine.set('chartData',d);
-
-      setTimeout(function(){
-        linePath = radarLine.lineGroup.selectAll('path.series-line');
-        done();
-      }, 1000);
     });
 
     test('radarLine fixture is created', function() {
@@ -2136,6 +2251,17 @@ function runTests(){
           "left": 10
         };
 
+      var rendered = function() {
+
+        linePath = radarMissingLine.lineGroup.selectAll('path.series-line');
+
+        radarMissingLine.removeEventListener('px-vis-line-svg-rendering-ended', rendered);
+
+        done();
+      };
+
+      radarMissingLine.addEventListener('px-vis-line-svg-rendering-ended', rendered);
+
       radarMissingSVG.set('width',w);
       radarMissingSVG.set('height',h);
       radarMissingSVG.set('margin',m);
@@ -2150,11 +2276,6 @@ function runTests(){
       radarMissingLine.set('completeSeriesConfig',completeSeriesConfig);
       radarMissingLine.set('seriesId',"x");
       radarMissingLine.set('chartData',d);
-
-      setTimeout(function(){
-        linePath = radarMissingLine.lineGroup.selectAll('path.series-line');
-        done();
-      }, 500);;
     });
 
     test('radarMissingLine fixture is created', function() {
@@ -2323,7 +2444,26 @@ function runTests(){
           "bottom": 20,
           "left": 15
         },
-        iFnc = Px.d3.curveStep;
+        iFnc = Px.d3.curveStep,
+        counter = 0;
+
+      var rendered = function() {
+
+        counter++;
+
+        if(counter === 2) {
+          linePath1 = interpolationLine1.lineGroup.select('path.series-line');
+          linePath2 = interpolationLine2.lineGroup.select('path.series-line');
+
+          interpolationLine1.removeEventListener('px-vis-line-svg-rendering-ended', rendered);
+          interpolationLine2.removeEventListener('px-vis-line-svg-rendering-ended', rendered);
+
+          done();
+        }
+      };
+
+      interpolationLine1.addEventListener('px-vis-line-svg-rendering-ended', rendered);
+      interpolationLine2.addEventListener('px-vis-line-svg-rendering-ended', rendered);
 
       interpolationSVG.set('width',w);
       interpolationSVG.set('height',h);
@@ -2346,12 +2486,6 @@ function runTests(){
       interpolationLine2.set('completeSeriesConfig',completeSeriesConfig);
       interpolationLine2.set('seriesId',"mySeries2");
       interpolationLine2.set('chartData',d);
-
-      setTimeout(function(){
-        linePath1 = interpolationLine1.lineGroup.select('path.series-line');
-        linePath2 = interpolationLine2.lineGroup.select('path.series-line');
-        done();
-      },100);;
     });
 
     test('interpolationLine1 fixture is created', function() {
@@ -2483,6 +2617,17 @@ function runTests(){
             "left": 15
           };
 
+        var rendered = function() {
+          domRepeatLines = document.querySelectorAll('.domRepeatLines');
+          linePath1 =  domRepeatLines[0].lineGroup.select('path.series-line');
+
+          document.getElementById('domRepeatDiv').removeEventListener('px-vis-line-svg-rendering-ended', rendered);
+
+          done();
+        };
+
+        document.getElementById('domRepeatDiv').addEventListener('px-vis-line-svg-rendering-ended', rendered);
+
         domRepeatDomBind._myClass = function() { return 'domRepeatLines' };
 
         domRepeatSVG.set('width',w);
@@ -2498,12 +2643,6 @@ function runTests(){
         domRepeatDomBind.set('completeSeriesConfig',completeSeriesConfig);
         domRepeatDomBind.set('seriesKeys',seriesKeys);
         domRepeatDomBind.set('chartData',d);
-
-        setTimeout(function() {
-          domRepeatLines = document.querySelectorAll('.domRepeatLines');
-          linePath1 =  domRepeatLines[0].lineGroup.select('path.series-line');
-          done();
-        }, 100);
       });
 
       test('domRepeatLine1 fixture is created', function() {
@@ -2601,7 +2740,25 @@ function runTests(){
             "right": 5,
             "bottom": 20,
             "left": 15
-          };
+          },
+          counter =0;
+
+        var rendered = function() {
+          counter++;
+
+          if(counter === 3) {
+            domRepeatLines = document.querySelectorAll('.domRepeatLines');
+            linePath1 =  domRepeatLines[0].lineGroup.select('path.series-line');
+            linePath2 =  domRepeatLines[1].lineGroup.select('path.series-line');
+            linePath3 =  domRepeatLines[2].lineGroup.select('path.series-line');
+
+            document.getElementById('domRepeatDiv').removeEventListener('px-vis-line-svg-rendering-ended', rendered);
+
+            done();
+          }
+        };
+
+        document.getElementById('domRepeatDiv').addEventListener('px-vis-line-svg-rendering-ended', rendered);
 
         domRepeatDomBind._myClass = function(item) { return 'domRepeatLines' };
 
@@ -2609,14 +2766,6 @@ function runTests(){
         domRepeatDomBind.set('completeSeriesConfig',completeSeriesConfig);
         domRepeatDomBind.set('seriesKeys',seriesKeys);
         domRepeatDomBind.set('chartData',d);
-
-        setTimeout(function() {
-          domRepeatLines = document.querySelectorAll('.domRepeatLines');
-          linePath1 =  domRepeatLines[0].lineGroup.select('path.series-line');
-          linePath2 =  domRepeatLines[1].lineGroup.select('path.series-line');
-          linePath3 =  domRepeatLines[2].lineGroup.select('path.series-line');
-          done();
-        }, 100);
       });
 
       test('domRepeatLine fixture is created', function() {
@@ -2735,7 +2884,25 @@ function runTests(){
             "right": 5,
             "bottom": 20,
             "left": 15
-          };
+          },
+          counter = 0;
+
+        var rendered = function() {
+          counter++;
+
+          if(counter === 2) {
+            domRepeatLines = document.querySelectorAll('.domRepeatLines');
+            linePath1 =  domRepeatLines[0].lineGroup.select('path.series-line');
+            linePath3 =  domRepeatLines[1].lineGroup.select('path.series-line');
+
+            document.getElementById('domRepeatDiv').removeEventListener('px-vis-line-svg-rendering-ended', rendered);
+
+            done();
+          }
+        };
+
+        document.getElementById('domRepeatDiv').addEventListener('px-vis-line-svg-rendering-ended', rendered);
+
 
         domRepeatDomBind._myClass = function(item) { return 'domRepeatLines' };
 
@@ -2745,12 +2912,6 @@ function runTests(){
           domRepeatDomBind.set('completeSeriesConfig',completeSeriesConfig);
         },10);
 
-        setTimeout(function() {
-          domRepeatLines = document.querySelectorAll('.domRepeatLines');
-          linePath1 =  domRepeatLines[0].lineGroup.select('path.series-line');
-          linePath3 =  domRepeatLines[1].lineGroup.select('path.series-line');
-          done();
-        }, 100);
       });
 
       test('domRepeatLine fixture is created', function() {
@@ -2865,21 +3026,32 @@ function runTests(){
             "right": 5,
             "bottom": 20,
             "left": 15
-          };
+          },
+          counter =0;
+
+         var rendered = function() {
+          counter++;
+
+          if(counter === 3) {
+            domRepeatLines = document.querySelectorAll('.domRepeatLines');
+            linePath1 =  domRepeatLines[0].lineGroup.select('path.series-line');
+            linePath4 =  domRepeatLines[1].lineGroup.select('path.series-line');
+            linePath3 =  domRepeatLines[2].lineGroup.select('path.series-line');
+
+            document.getElementById('domRepeatDiv').removeEventListener('px-vis-line-svg-rendering-ended', rendered);
+
+            done();
+          }
+        };
+
+        document.getElementById('domRepeatDiv').addEventListener('px-vis-line-svg-rendering-ended', rendered);
+
 
         domRepeatDomBind._myClass = function(item) { return 'domRepeatLines' };
 
         domRepeatDomBind.set('completeSeriesConfig',completeSeriesConfig);
         domRepeatDomBind.set('seriesKeys',seriesKeys);
         domRepeatDomBind.set('chartData',d);
-
-        setTimeout(function() {
-          domRepeatLines = document.querySelectorAll('.domRepeatLines');
-          linePath1 =  domRepeatLines[0].lineGroup.select('path.series-line');
-          linePath4 =  domRepeatLines[1].lineGroup.select('path.series-line');
-          linePath3 =  domRepeatLines[2].lineGroup.select('path.series-line');
-          done();
-        }, 100);
       });
 
       test('domRepeatLine fixture is created', function() {

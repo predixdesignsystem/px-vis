@@ -16,6 +16,52 @@ function runTests(){
         brush2 = document.getElementById('brush2'),
         brush3 = document.getElementById('brush3');
 
+        //Polyfill for IE 11 codePointAt
+    if (!String.prototype.codePointAt) {
+        (function() {
+          'use strict'; // needed to support `apply`/`call` with `undefined`/`null`
+          var codePointAt = function(position) {
+            if (this == null) {
+              throw TypeError();
+            }
+            var string = String(this);
+            var size = string.length;
+            // `ToInteger`
+            var index = position ? Number(position) : 0;
+            if (index != index) { // better `isNaN`
+              index = 0;
+            }
+            // Account for out-of-bounds indices:
+            if (index < 0 || index >= size) {
+              return undefined;
+            }
+            // Get the first code unit
+            var first = string.charCodeAt(index);
+            var second;
+            if ( // check if it’s the start of a surrogate pair
+              first >= 0xD800 && first <= 0xDBFF && // high surrogate
+              size > index + 1 // there is a next code unit
+            ) {
+              second = string.charCodeAt(index + 1);
+              if (second >= 0xDC00 && second <= 0xDFFF) { // low surrogate
+                // http://mathiasbynens.be/notes/javascript-encoding#surrogate-formulae
+                return (first - 0xD800) * 0x400 + second - 0xDC00 + 0x10000;
+              }
+            }
+            return first;
+          };
+          if (Object.defineProperty) {
+            Object.defineProperty(String.prototype, 'codePointAt', {
+              'value': codePointAt,
+              'configurable': true,
+              'writable': true
+            });
+          } else {
+            String.prototype.codePointAt = codePointAt;
+          }
+        }());
+      }
+
     suiteSetup(function(done){
       var d = [{
             "x": 1397102460000,
@@ -877,11 +923,7 @@ function runTests(){
       radialBrush2.deleteBrush();
       radialBrush3.deleteBrush();
 
-<<<<<<< HEAD:test/px-vis-axis-interaction-space-tests.js
-      setTimeout(function(){ done() }, 100);
-=======
       setTimeout(function(){ done() }, 1000);
->>>>>>> master:test/px-vis-axis-brush-tests.js
     });
 
     test('radialBrush1._brush brush deleted', function() {

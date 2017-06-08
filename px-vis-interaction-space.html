@@ -75,6 +75,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehavior.polarData,
       PxVisBehavior.applyActionConfig,
       PxVisBehavior.interactionSpaceShared,
+      PxVisBehavior.preventWebWorkerSynchronization,
       faCodes
     ],
     /***EVENTS****
@@ -210,17 +211,10 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       },
 
       /**
-       *  The search radius for voronoi and quadtree searches. Only points inside this radius will be returned
+       *  The search radius for quadtree searches. Only points inside this radius will be returned
        */
       searchRadius: {
         type: Number
-      },
-
-      voronoiData: {
-        type: Object,
-        value: function() {
-          return {};
-        }
       },
       /**
        * Unique Id of the chart owning this interaction space
@@ -304,7 +298,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       '_setupActions(actionConfig.*)',
       '_resetTooltipDataLegacy(completeSeriesConfig.*)',
       '_resetTooltipData(seriesKeys.*)',
-      '_createQuadtreeData(chartData.*, width, height, margin.*, domainChanged, searchType, useQuadtree, counterClockwise, xAxisType)'
+      '_createQuadtreeData(chartData.*, width, height, margin.*, domainChanged, searchType, useQuadtree, counterClockwise, xAxisType, preventWebWorkerSynchronization)'
      ],
 
     /**
@@ -589,11 +583,10 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           //and we know the data has some notion of time -- !! --> turn into a bool
           searchTimeStamp = dataObj.time === null && !!this.chartData[0][this.timeData];
 
-      // if we want to do a quadtree / voronoi search
-      if(this.xAxisType !== 'time' && this.xAxisType !== 'timeLocal' && this.xAxisType !== 'ordinal') {
+      // if we want to do a quadtree
+      if(this.xAxisType !== 'time' && this.xAxisType !== 'timeLocal' && this.xAxisType !== 'ordinal' && !this.preventWebWorkerSynchronization) {
         this._searchOnWebWorker(mousePos, dataObj);
         return;
-
       }
       // else
 
@@ -762,7 +755,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           closestPointIndex,
           d,
           crosshairResultIndices = [],
-          minDist = this.searchRadius,
+          minDist = this.searchRadius ? this.searchRadius : Number.MAX_VALUE,
           result = {
             "series": {},
             "rawData": dataObj.rawData,
@@ -1208,7 +1201,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     _createQuadtreeData: function() {
-      if(this.domainChanged !== null && this.useQuadtree && this.xAxisType !== 'ordinal') {
+      if(this.domainChanged !== null && this.useQuadtree && !this.preventWebWorkerSynchronization && this.xAxisType !== 'ordinal') {
         this.debounce('buildQuadtree', function() {
 
           var w = this.width - this.margin.right - this.margin.left,

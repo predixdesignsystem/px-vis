@@ -125,7 +125,7 @@ function runTests() {
     });
 
     test('parallelhighlight has transition', function() {
-      assert.equal(parallelSVG.canvasContext.canvas.style.transition, 'opacity 0.2s');
+      assert.equal(parallelSVG.canvasContext.canvas.style.transition.slice(0,12), 'opacity 0.2s');
     });
 
     test('parallelhighlight didnt create defaultEmptyData', function() {
@@ -538,7 +538,7 @@ function runTests() {
     });
 
     test('differenthighlight has transition', function() {
-      assert.equal(differentSVG.canvasContext.canvas.style.transition, 'opacity 0.2s');
+      assert.equal(differentSVG.canvasContext.canvas.style.transition.slice(0,12), 'opacity 0.2s');
     });
 
     test('differenthighlight didnt create defaultEmptyData', function() {
@@ -743,7 +743,7 @@ function runTests() {
     });
 
     test('fuzzhighlight has transition', function() {
-      assert.equal(fuzzSVG.canvasContext.canvas.style.transition, 'opacity 0.2s');
+      assert.equal(fuzzSVG.canvasContext.canvas.style.transition.slice(0,12), 'opacity 0.2s');
     });
 
     test('fuzzhighlight didnt create defaultEmptyData', function() {
@@ -960,7 +960,7 @@ function runTests() {
     });
 
     test('generatinghighlight has transition', function() {
-      assert.equal(generatingSVG.canvasContext.canvas.style.transition, 'opacity 0.2s');
+      assert.equal(generatingSVG.canvasContext.canvas.style.transition.slice(0,12), 'opacity 0.2s');
     });
 
     test('generatinghighlight didnt create defaultEmptyData', function() {
@@ -1167,7 +1167,7 @@ function runTests() {
     });
 
     test('forcehighlight has transition', function() {
-      assert.equal(forceSVG.canvasContext.canvas.style.transition, 'opacity 0.2s');
+      assert.equal(forceSVG.canvasContext.canvas.style.transition.slice(0,12), 'opacity 0.2s');
     });
 
     test('forcehighlight didnt create defaultEmptyData', function() {
@@ -1417,7 +1417,7 @@ function runTests() {
 
       assert.equal(tooltiphighlight.defaultEmptyData.mouse, null);
       assert.equal(tooltiphighlight.defaultEmptyData.dataPos[0], 423);
-      assert.closeTo(tooltiphighlight.defaultEmptyData.dataPos[1], 2182, 1);
+      assert.closeTo(tooltiphighlight.defaultEmptyData.dataPos[1], 2182, 2);
       assert.equal(tooltiphighlight.defaultEmptyData.time, 1397160780000);
       assert.deepEqual(tooltiphighlight.defaultEmptyData.dataset, {"x":1397160780000,"y":10,"y2":3,"y3":8,"cat":"b"});
       assert.deepEqual(tooltiphighlight.defaultEmptyData.series, [{"name":"y","value":{"y":10,"y2":3,"y3":8}},{"name":"y2","value":{"y":10,"y2":3,"y3":8}},{"name":"y3","value":{"y":10,"y2":3,"y3":8}}]);

@@ -441,26 +441,18 @@ PxVisBehaviorChart.chartId = [{
   }
 },  PxVisBehavior.uniqueIds];
 
+
 /*
     Name:
-    PxVisBehaviorChart.webWorkerSynchonization
+    PxVisBehaviorChart.webWorkerSynchronization
 
     Description:
     Polymer behavior that allows the chart to keep its data synced in a web worker
 
-    @polymerBehavior PxVisBehaviorChart.webWorkerSynchonization
+    @polymerBehavior PxVisBehaviorChart.webWorkerSynchronization
 */
-PxVisBehaviorChart.webWorkerSynchonization = [{
+PxVisBehaviorChart.webWorkerSynchronization = [{
     properties: {
-      /**
-       * Prevents the chart from synchronizing its data with a webworker.
-       * WARNING: turning that on might prevent the chart from calculating its
-       * extents, finding tooltip/crosshair data
-       */
-      preventWwSynchronization: {
-        type: Boolean,
-        value: false
-      },
       _wwSyncRequestDataDeletion: {
         type: Boolean,
         value: false
@@ -486,22 +478,15 @@ PxVisBehaviorChart.webWorkerSynchonization = [{
       _wwSyncDataPropName: {
         type: String,
         value: 'chartData'
-      },
-      /**
-       * Will prevent the data synchronization to the webworker
-       */
-      dontUseWebWorker: {
-        type: Boolean,
-        value: false
       }
     },
     ready: function() {
-      if(!this.preventWwSynchronization) {
+      if(!this.preventWebWorkerSynchronization) {
         this.chartId = this.generateRandomID('chart');
       }
     },
     attached: function() {
-      if(!this.preventWwSynchronization && !this.dontUseWebWorker) {
+      if(!this.preventWebWorkerSynchronization) {
         this._wwSyncRequestDataDeletion = false;
 
         //request a data update if we have been detached, data has
@@ -513,7 +498,7 @@ PxVisBehaviorChart.webWorkerSynchonization = [{
       }
     },
     detached: function() {
-      if(!this.preventWwSynchronization && !this.dontUseWebWorker) {
+      if(!this.preventWebWorkerSynchronization) {
 
         this._wwSyncRequestDataDeletion = true;
 
@@ -533,12 +518,12 @@ PxVisBehaviorChart.webWorkerSynchonization = [{
     },
     _keepDataInSync: function() {
 
-      if(!this.preventWwSynchronization && this[this._wwSyncDataPropName] && !this.dontUseWebWorker) {
+      if(!this.preventWebWorkerSynchronization && this[this._wwSyncDataPropName]) {
         this._wwSyncDataDeleted = false;
         Px.vis.scheduler.process('updateData', this.nodeName, {'chartData': this[this._wwSyncDataPropName]}, this.chartId);
       }
     }
-}, PxVisBehavior.dataset];
+}, PxVisBehavior.dataset, PxVisBehavior.preventWebWorkerSynchronization];
 
 /*
     Name:

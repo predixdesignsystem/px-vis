@@ -79,11 +79,6 @@ PxVisBehaviorScale.scale = [{
      */
     chartId: {
       type: String
-    },
-
-    dontUseWebWorker: {
-      type: Boolean,
-      value: false
     }
   },
 
@@ -224,37 +219,46 @@ PxVisBehaviorScale.scale = [{
    * @method _setDomain
    */
    _setDomain: function() {
-    // escape if we dont have everything we need
-    if(this._calculatingDomain || this._isObjEmpty(this.chartData) || !this.x || !this.y || this._isObjEmpty(this.completeSeriesConfig)) {
-      return
-    }
 
-    // indicate we are calculating the domain
-    this._calculatingDomain = true;
+    //we need to debounce because when we update completeSeriesConfig
+    //then we set dataExtents and then completeSeriesConfig which
+    //kicks this twice (and once with the wrong completeSeriesConfig)
+    //we can probably remove the debounce once we have batch updates in
+    //Polymer 2
+    this.debounce('_setDomain', function() {
 
-    // Fallback if specified or we dont have an id
-    if(!this.chartId || this.dontUseWebWorker ) {
-      var extents = this._determineExtents();
-      this._applyExtents(extents);
-      return;
-    }
+      // escape if we dont have everything we need
+      if(this._calculatingDomain || this._isObjEmpty(this.chartData) || !this.x || !this.y || this._isObjEmpty(this.completeSeriesConfig)) {
+        return
+      }
 
-    //get what info we need for the web worker to get our extents
-    var wwInfo = {};
+      // indicate we are calculating the domain
+      this._calculatingDomain = true;
 
-    wwInfo.xAxisType = this.xAxisType;
-    wwInfo.yAxisType = this.yAxisType;
-    wwInfo.completeSeriesConfig = this.completeSeriesConfig;
-    wwInfo.chartExtents = this.chartExtents;
-    wwInfo.dataExtents = this.dataExtents;
-    wwInfo.axes = this.axes;
-    wwInfo.seriesToAxes = this.seriesToAxes;
-    wwInfo.isYAxisObject = typeof this.y === 'object'
+      // Fallback if specified or we dont have an id
+      if(!this.chartId || this.preventWebWorkerSynchronization ) {
+        var extents = this._determineExtents();
+        this._applyExtents(extents);
+        return;
+      }
 
-    Px.vis.scheduler.process('determineExtents', this.nodeName, wwInfo, this.chartId, function(e) {
+      //get what info we need for the web worker to get our extents
+      var wwInfo = {};
 
-      this._applyExtents(e.data);
-    }.bind(this));
+      wwInfo.xAxisType = this.xAxisType;
+      wwInfo.yAxisType = this.yAxisType;
+      wwInfo.completeSeriesConfig = this.completeSeriesConfig;
+      wwInfo.chartExtents = this.chartExtents;
+      wwInfo.dataExtents = this.dataExtents;
+      wwInfo.axes = this.axes;
+      wwInfo.seriesToAxes = this.seriesToAxes;
+      wwInfo.isYAxisObject = typeof this.y === 'object'
+
+      Px.vis.scheduler.process('determineExtents', this.nodeName, wwInfo, this.chartId, function(e) {
+
+        this._applyExtents(e.data);
+      }.bind(this));
+    }.bind(this), 10);
   },
 
   _applyExtents: function(extents) {
@@ -722,7 +726,8 @@ PxVisBehaviorScale.scale = [{
   PxVisBehavior.completeSeriesConfig,
   PxVisBehavior.chartExtents,
   PxVisBehavior.dataExtents,
-  PxVisBehaviorD3.domainUpdateNotify
+  PxVisBehaviorD3.domainUpdateNotify,
+  PxVisBehavior.preventWebWorkerSynchronization
 ];
 
 </script>

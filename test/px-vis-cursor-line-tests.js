@@ -125,11 +125,11 @@ function runTests() {
     });
 
     test('datalayer has transition', function() {
-      assert.equal(parallelSVG.svg.select('.layer0').node().style.transition, 'opacity 0.2s');
+      assert.equal(parallelSVG.svg.select('.layer0').node().style.transition.slice(0,12), 'opacity 0.2s');
     });
 
     test('overlay layer has transition', function() {
-      assert.equal(parallelSVG.svg.select('.layer1').node().style.transition, 'opacity 0.2s');
+      assert.equal(parallelSVG.svg.select('.layer1').node().style.transition.slice(0,12), 'opacity 0.2s');
     });
 
   }); //suite
@@ -351,11 +351,11 @@ function runTests() {
     });
 
     test('datalayer has transition', function() {
-      assert.equal(parallelSVGCanvas.canvasContext.canvas.style.transition, 'opacity 0.2s');
+      assert.equal(parallelSVGCanvas.canvasContext.canvas.style.transition.slice(0,12), 'opacity 0.2s');
     });
 
     test('overlay layer has transition', function() {
-      assert.equal(parallelSVGCanvas.canvasContextTop.canvas.style.transition, 'opacity 0.2s');
+      assert.equal(parallelSVGCanvas.canvasContextTop.canvas.style.transition.slice(0,12), 'opacity 0.2s');
     });
 
   }); //suite
@@ -589,11 +589,11 @@ function runTests() {
     });
 
     test('datalayer has transition', function() {
-      assert.equal(radarSVG.svg.select('.layer0').node().style.transition, 'opacity 0.2s');
+      assert.equal(radarSVG.svg.select('.layer0').node().style.transition.slice(0,12), 'opacity 0.2s');
     });
 
     test('overlay layer has transition', function() {
-      assert.equal(radarSVG.svg.select('.layer1').node().style.transition, 'opacity 0.2s');
+      assert.equal(radarSVG.svg.select('.layer1').node().style.transition.slice(0,12), 'opacity 0.2s');
     });
 
   }); //suite
