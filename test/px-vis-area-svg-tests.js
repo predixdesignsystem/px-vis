@@ -183,20 +183,16 @@ function runTests() {
       var rendered = function() {
         counter++;
 
-        if(counter === 3) {
+        if(counter === 1) {
           areaPath1 = multiArea.areaGroup.select('[series-id="area_mySeries"]');
           areaPath2 = multiArea.areaGroup.select('[series-id="area_mySeries2"]')
           areaPath3 = multiArea.areaGroup.select('[series-id="area_mySeries3"]');
-          areaPath1.removeEventListener('px-vis-area-svg-rendering-ended', rendered);
-          areaPath2.removeEventListener('px-vis-area-svg-rendering-ended', rendered);
-          areaPath3.removeEventListener('px-vis-area-svg-rendering-ended', rendered);
+          multiArea.removeEventListener('px-vis-area-svg-rendering-ended', rendered);
           done();
         }
       };
 
-      areaPath1.addEventListener('px-vis-area-svg-rendering-ended', rendered);
-      areaPath2.addEventListener('px-vis-area-svg-rendering-ended', rendered);
-      areaPath3.addEventListener('px-vis-area-svg-rendering-ended', rendered);
+      multiArea.addEventListener('px-vis-area-svg-rendering-ended', rendered);
 
       multiSVG.set('width',w);
       multiSVG.set('height',h);

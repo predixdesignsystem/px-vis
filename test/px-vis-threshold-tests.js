@@ -91,6 +91,17 @@ function runTests(){
           }
         };
 
+      var rendered = function() {
+        thresholdGroups = defaultThreshold.thresholdGroup.selectAll('g.threshold');
+        thresholdLines = thresholdGroups.selectAll('line.threshold-line');
+        thresholdRects = thresholdGroups.selectAll('rect.threshold-rect');
+        thresholdTexts = thresholdGroups.selectAll('text.threshold-text');
+        defaultThreshold.removeEventListener('px-vis-threshold-rendering-ended', rendered);
+        done();
+      };
+
+      defaultThreshold.addEventListener('px-vis-threshold-rendering-ended', rendered);
+
       baseSVG.set('width',w);
       baseSVG.set('height',h);
       baseSVG.set('margin',m);
@@ -108,16 +119,6 @@ function runTests(){
       defaultThreshold.set('completeSeriesConfig',completeSeriesConfig);
       defaultThreshold.set('thresholdData',dT);
       defaultThreshold.set('thresholdConfig',tConf);
-
-      // need a small delay for stuff to work
-      setTimeout(function() {
-        thresholdGroups = defaultThreshold.thresholdGroup.selectAll('g.threshold');
-        thresholdLines = thresholdGroups.selectAll('line.threshold-line');
-        thresholdRects = thresholdGroups.selectAll('rect.threshold-rect');
-        thresholdTexts = thresholdGroups.selectAll('text.threshold-text');
-
-        done();
-      }.bind(this), testTimeout);
     });
 
     suite('px-vis-threshold everything drew', function() {
@@ -331,17 +332,18 @@ function runTests(){
           "color": colorSet[colorOrder[1]]
         }};
 
-      defaultThreshold.set('completeSeriesConfig', completeSeriesConfig);
-
-      // need a small delay for stuff to work
-      setTimeout(function() {
+      var rendered = function() {
         thresholdGroups = defaultThreshold.thresholdGroup.selectAll('g.threshold');
         thresholdLines = thresholdGroups.selectAll('line.threshold-line');
         thresholdRects = thresholdGroups.selectAll('rect.threshold-rect');
         thresholdTexts = thresholdGroups.selectAll('text.threshold-text');
-
+        defaultThreshold.removeEventListener('px-vis-threshold-rendering-ended', rendered);
         done();
-      }.bind(this), testTimeout);
+      };
+
+      defaultThreshold.addEventListener('px-vis-threshold-rendering-ended', rendered);
+
+      defaultThreshold.set('completeSeriesConfig', completeSeriesConfig);
     });
 
     suite('px-vis-threshold everything drew', function() {
@@ -556,17 +558,18 @@ function runTests(){
           { "for":"", "type":"custom", "value": 2 },
         ];
 
-      defaultThreshold.set('thresholdData',dT);
-
-      // need a small delay for stuff to work
-      setTimeout(function() {
+      var rendered = function() {
         thresholdGroups = defaultThreshold.thresholdGroup.selectAll('g.threshold');
         thresholdLines = thresholdGroups.selectAll('line.threshold-line');
         thresholdRects = thresholdGroups.selectAll('rect.threshold-rect');
         thresholdTexts = thresholdGroups.selectAll('text.threshold-text');
-
+        defaultThreshold.removeEventListener('px-vis-threshold-rendering-ended', rendered);
         done();
-      }.bind(this), testTimeout);
+      };
+
+      defaultThreshold.addEventListener('px-vis-threshold-rendering-ended', rendered);
+
+      defaultThreshold.set('thresholdData',dT);
     });
 
     suite('px-vis-threshold everything drew', function() {
@@ -780,17 +783,18 @@ function runTests(){
           { "for":"", "type":"custom", "value": 2 },
         ];
 
-      defaultThreshold.set('thresholdData',dT);
-
-      // need a small delay for stuff to work
-      setTimeout(function() {
+      var rendered = function() {
         thresholdGroups = defaultThreshold.thresholdGroup.selectAll('g.threshold');
         thresholdLines = thresholdGroups.selectAll('line.threshold-line');
         thresholdRects = thresholdGroups.selectAll('rect.threshold-rect');
         thresholdTexts = thresholdGroups.selectAll('text.threshold-text');
-
+        defaultThreshold.removeEventListener('px-vis-threshold-rendering-ended', rendered);
         done();
-      }.bind(this), testTimeout);
+      };
+
+      defaultThreshold.addEventListener('px-vis-threshold-rendering-ended', rendered);
+
+      defaultThreshold.set('thresholdData',dT);
     });
 
     suite('px-vis-threshold everything drew', function() {
@@ -1001,17 +1005,18 @@ function runTests(){
           { "for":"", "type":"custom", "value": 2 },
         ];
 
-      defaultThreshold.set('thresholdData', dT);
-
-      // need a small delay for stuff to work
-      setTimeout(function() {
+      var rendered = function() {
         thresholdGroups = defaultThreshold.thresholdGroup.selectAll('g.threshold');
         thresholdLines = thresholdGroups.selectAll('line.threshold-line');
         thresholdRects = thresholdGroups.selectAll('rect.threshold-rect');
         thresholdTexts = thresholdGroups.selectAll('text.threshold-text');
-
+        defaultThreshold.removeEventListener('px-vis-threshold-rendering-ended', rendered);
         done();
-      }.bind(this), testTimeout);
+      };
+
+      defaultThreshold.addEventListener('px-vis-threshold-rendering-ended', rendered);
+
+      defaultThreshold.set('thresholdData', dT);
     });
 
     suite('px-vis-threshold everything drew', function() {
@@ -1188,16 +1193,18 @@ function runTests(){
           { "for":"", "type":"defaultSeries", "value": 3 }
         ];
 
-      defaultThreshold.set('thresholdData', dT);
-
-      // need a small delay for stuff to work
-      setTimeout(function() {
+      var rendered = function() {
         thresholdGroups = defaultThreshold.thresholdGroup.selectAll('g.threshold');
         thresholdLines = thresholdGroups.selectAll('line.threshold-line');
         thresholdRects = thresholdGroups.selectAll('rect.threshold-rect');
         thresholdTexts = thresholdGroups.selectAll('text.threshold-text');
+        defaultThreshold.removeEventListener('px-vis-threshold-rendering-ended', rendered);
         done();
-      }.bind(this), testTimeout);
+      };
+
+      defaultThreshold.addEventListener('px-vis-threshold-rendering-ended', rendered);
+
+      defaultThreshold.set('thresholdData', dT);
     });
 
     suite('px-vis-threshold everything drew', function() {

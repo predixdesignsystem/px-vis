@@ -57,6 +57,13 @@ function runTests() {
 
         var stackData = stack(d);
 
+      var rendered = function() {
+        barRect =  singleColumnBar.barGroup.selectAll('rect.series-bar');
+        done();
+        singleColumnBar.removeEventListener('px-vis-bar-svg-rendering-ended', rendered);
+      };
+      singleColumnBar.addEventListener('px-vis-bar-svg-rendering-ended', rendered);
+
       singleColumnSVG.set('width',w);
       singleColumnSVG.set('height',h);
       singleColumnSVG.set('margin',m);
@@ -72,12 +79,6 @@ function runTests() {
       singleColumnBar.set('seriesKey',"y");
       singleColumnBar.set('completeSeriesConfig',completeSeriesConfig);
       singleColumnBar.set('chartData',stackData[0]);
-
-      // needed for the debounce in bar
-      setTimeout(function() {
-        barRect =  singleColumnBar.barGroup.selectAll('rect.series-bar');
-        done();
-      }, 100);
     });
 
     test('singleColumnBar fixture is created', function() {
@@ -201,11 +202,29 @@ function runTests() {
           "bottom": 20,
           "left": 15
         },
-        stack = Px.d3.stack();
+        stack = Px.d3.stack(),
+        counter = 0;
 
         stack.keys(["y", "y1", "y2"]);
 
         var stackData = stack(d);
+
+      var rendered = function() {
+        counter++;
+
+        if(counter === 3) {
+          barRect =  multiColumnBar1.barGroup.selectAll('rect.series-bar');
+          barRect2 =  multiColumnBar2.barGroup.selectAll('rect.series-bar');
+          barRect3 =  multiColumnBar3.barGroup.selectAll('rect.series-bar');
+          multiColumnBar1.removeEventListener('px-vis-bar-svg-rendering-ended', rendered);
+          multiColumnBar2.removeEventListener('px-vis-bar-svg-rendering-ended', rendered);
+          multiColumnBar3.removeEventListener('px-vis-bar-svg-rendering-ended', rendered);
+          done();
+        }
+      };
+      multiColumnBar1.addEventListener('px-vis-bar-svg-rendering-ended', rendered);
+      multiColumnBar2.addEventListener('px-vis-bar-svg-rendering-ended', rendered);
+      multiColumnBar3.addEventListener('px-vis-bar-svg-rendering-ended', rendered);
 
       multiColumnSVG.set('width',w);
       multiColumnSVG.set('height',h);
@@ -230,14 +249,6 @@ function runTests() {
       multiColumnBar3.set('seriesKey',"y2");
       multiColumnBar3.set('completeSeriesConfig',completeSeriesConfig);
       multiColumnBar3.set('chartData',stackData[2]);
-
-      // needed for the debounce in bar
-      setTimeout(function() {
-        barRect =  multiColumnBar1.barGroup.selectAll('rect.series-bar');
-        barRect2 =  multiColumnBar2.barGroup.selectAll('rect.series-bar');
-        barRect3 =  multiColumnBar3.barGroup.selectAll('rect.series-bar');
-        done();
-      }, 100);
     });
 
     test('multiColumnBar fixture is created', function() {
@@ -428,6 +439,14 @@ function runTests() {
 
         var stackData = stack(d);
 
+      var rendered = function() {
+
+        barRect =  singleBarBar.barGroup.selectAll('rect.series-bar');
+        singleBarBar.removeEventListener('px-vis-bar-svg-rendering-ended', rendered);
+        done();
+      };
+      singleBarBar.addEventListener('px-vis-bar-svg-rendering-ended', rendered);
+
       singleBarSVG.set('width',w);
       singleBarSVG.set('height',h);
       singleBarSVG.set('margin',m);
@@ -443,12 +462,6 @@ function runTests() {
       singleBarBar.set('seriesKey',"y");
       singleBarBar.set('completeSeriesConfig',completeSeriesConfig);
       singleBarBar.set('chartData',stackData[0]);
-
-      // needed for the debounce in bar
-      setTimeout(function() {
-        barRect =  singleBarBar.barGroup.selectAll('rect.series-bar');
-        done();
-      }, 100);
     });
 
     test('singleBarBar fixture is created', function() {
@@ -572,11 +585,29 @@ function runTests() {
           "bottom": 20,
           "left": 15
         },
-        stack = Px.d3.stack();
+        stack = Px.d3.stack(),
+        counter = 0;
 
         stack.keys(["y", "y1", "y2"]);
 
         var stackData = stack(d);
+
+      var rendered = function() {
+        counter++;
+
+        if(counter === 3) {
+          barRect =  multiBarBar1.barGroup.selectAll('rect.series-bar');
+          barRect2 =  multiBarBar2.barGroup.selectAll('rect.series-bar');
+          barRect3 =  multiBarBar3.barGroup.selectAll('rect.series-bar');
+          multiBarBar1.removeEventListener('px-vis-bar-svg-rendering-ended', rendered);
+          multiBarBar2.removeEventListener('px-vis-bar-svg-rendering-ended', rendered);
+          multiBarBar3.removeEventListener('px-vis-bar-svg-rendering-ended', rendered);
+          done();
+        }
+      };
+      multiBarBar1.addEventListener('px-vis-bar-svg-rendering-ended', rendered);
+      multiBarBar2.addEventListener('px-vis-bar-svg-rendering-ended', rendered);
+      multiBarBar3.addEventListener('px-vis-bar-svg-rendering-ended', rendered);
 
       multiBarSVG.set('width',w);
       multiBarSVG.set('height',h);
@@ -601,14 +632,6 @@ function runTests() {
       multiBarBar3.set('seriesKey',"y2");
       multiBarBar3.set('completeSeriesConfig',completeSeriesConfig);
       multiBarBar3.set('chartData',stackData[2]);
-
-      // needed for the debounce in bar
-      setTimeout(function() {
-        barRect =  multiBarBar1.barGroup.selectAll('rect.series-bar');
-        barRect2 =  multiBarBar2.barGroup.selectAll('rect.series-bar');
-        barRect3 =  multiBarBar3.barGroup.selectAll('rect.series-bar');
-        done();
-      }, 100);
     });
 
     test('multiBarBar fixture is created', function() {
