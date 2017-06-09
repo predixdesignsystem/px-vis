@@ -13,23 +13,217 @@ function runTests(){
   });
 
   suite('determineExtents', function() {
+    var sandbox, checkForExtents, calcMultiAxisExtents, findMinMax,
+        data = [{
+            "timeStamp": 1234567890,
+            "y0": 1,
+            "y1": 2,
+            "y2": 3
+          }, {
+            "timeStamp": 1234567891,
+            "y0": 5,
+            "y1": 6,
+            "y2": 7
+          }, {
+            "timeStamp": 1234567892,
+            "y0": 2,
+            "y1": 3,
+            "y2": 4
+          }];
 
-    // suiteSetup(function(){
-    //   var w = 500,
-    //     h = 300,
-    //     m = {
-    //       "top": 10,
-    //       "right": 5,
-    //       "bottom": 20,
-    //       "left": 15
-    //     };
+    suiteSetup(function(){
+      sandbox = sinon.sandbox.create();
+
+      var checkForExtentsFn = function(ord, chartExtents, dataExtents, axis) {
+        if(ord && axis === 'x') {
+          return ['a','b','c'];
+        }
+
+        if(ord && axis === 'y') {
+          return ['d','e','f'];
+        }
+
+        if(chartExtents && chartExtents.x && chartExtents.y) {
+          return chartExtents[axis];
+        }
+
+        if(!ord) {
+          return [Infinity, -Infinity];
+        }
+
+        return "error"
+      };
+
+      var findMinMaxFn = function(data, doX, doY, xOrd, yOrd, xTime, extents, keys) {
+        if(xTime) {
+          extents.x = [1234567890, 1234567892];
+        }
+      };
 
 
-    // });
+      checkForExtents = sandbox.stub(extentCalc, '_checkForExtents', checkForExtentsFn);
+      calcMultiAxisExtents = sandbox.stub(extentCalc, '_calcMultiAxisExtents');
+      findMinMax = sandbox.stub(extentCalc, '_findMinMax', findMinMaxFn);
 
-    // test('baseZoom fixture is created', function() {
-    //   assert.isTrue(baseZoom !== null);
-    // });
+      calcMultiAxisExtents.returns({ a1: [ -10, 10], a2: [0, 100] })
+
+      extentCalc.completeSeriesConfig = {
+        y0: { x: 'timeStamp', y: 'y0' },
+        y1: { x: 'timeStamp', y: 'y1' },
+        y2: { x: 'timeStamp', y: 'y2' }
+      };
+
+      extentCalc.chartExtents = [];
+      extentCalc.dataExtents = [];
+    });
+
+    suiteTeardown(function() {
+      sandbox.restore();
+    })
+
+    test('ordinal x and y', function() {
+      sandbox.reset();
+      extentCalc.xAxisType = 'ordinal';
+      extentCalc.yAxisType = 'ordinal';
+      extentCalc.axes = [];
+
+      var exts = extentCalc.determineExtents(data);
+
+      assert.isTrue(checkForExtents.called);
+      assert.isFalse(calcMultiAxisExtents.called);
+      assert.isFalse(findMinMax.called);
+
+      assert.deepEqual(exts, {
+        x: ['a','b','c'],
+        y: ['d','e','f']
+      });
+    });
+
+    test('scaleBand x and y', function() {
+      sandbox.reset();
+      extentCalc.xAxisType = 'scaleBand';
+      extentCalc.yAxisType = 'scaleBand';
+      extentCalc.axes = [];
+
+      var exts = extentCalc.determineExtents(data);
+
+      assert.isTrue(checkForExtents.called);
+      assert.isFalse(calcMultiAxisExtents.called);
+      assert.isFalse(findMinMax.called);
+
+      assert.deepEqual(exts, {
+        x: ['a','b','c'],
+        y: ['d','e','f']
+      });
+    });
+
+    test('ordinal x and linear y', function() {
+      sandbox.reset();
+      extentCalc.xAxisType = 'ordinal';
+      extentCalc.yAxisType = 'linear';
+      extentCalc.axes = [];
+
+      var exts = extentCalc.determineExtents(data);
+
+      assert.isTrue(checkForExtents.called);
+      assert.isFalse(calcMultiAxisExtents.called);
+      assert.isTrue(findMinMax.called);
+
+      assert.isFalse(findMinMax.args[0][1]);
+      assert.isTrue(findMinMax.args[0][2]);
+      assert.isTrue(findMinMax.args[0][3]);
+      assert.isFalse(findMinMax.args[0][4]);
+      assert.isFalse(findMinMax.args[0][5]);
+
+      assert.deepEqual(exts, {
+        x: ['a','b','c'],
+        y: [0,1]
+      });
+    });
+
+    test('time x and linear y', function() {
+      sandbox.reset();
+      extentCalc.xAxisType = 'time';
+      extentCalc.yAxisType = 'linear';
+      extentCalc.axes = [];
+
+      var exts = extentCalc.determineExtents(data);
+
+      assert.isTrue(checkForExtents.called);
+      assert.isFalse(calcMultiAxisExtents.called);
+      assert.isTrue(findMinMax.called);
+
+      assert.isFalse(findMinMax.args[0][1]);
+      assert.isTrue(findMinMax.args[0][2]);
+      assert.isFalse(findMinMax.args[0][3]);
+      assert.isFalse(findMinMax.args[0][4]);
+      assert.isTrue(findMinMax.args[0][5]);
+
+      assert.deepEqual(exts, {
+        x: [1234567890, 1234567892],
+        y: [0,1]
+      });
+    });
+
+    test('linear x and linear y: sets Infinite to a default val', function() {
+      sandbox.reset();
+      extentCalc.xAxisType = 'linear';
+      extentCalc.yAxisType = 'linear';
+      extentCalc.axes = [];
+
+      var exts = extentCalc.determineExtents(data);
+
+      assert.isTrue(checkForExtents.called);
+      assert.isFalse(calcMultiAxisExtents.called);
+      assert.isTrue(findMinMax.called);
+
+      assert.isTrue(findMinMax.args[0][1]);
+      assert.isTrue(findMinMax.args[0][2]);
+      assert.isFalse(findMinMax.args[0][3]);
+      assert.isFalse(findMinMax.args[0][4]);
+      assert.isFalse(findMinMax.args[0][5]);
+
+      assert.deepEqual(exts, {
+        x: [0,1],
+        y: [0,1]
+      });
+    });
+
+    test('linear x and linear y: sets same val to new val', function() {
+      sandbox.reset();
+      extentCalc.xAxisType = 'linear';
+      extentCalc.yAxisType = 'linear';
+      extentCalc.axes = [];
+      extentCalc.chartExtents = { x: [20, 20], y: [10, 10] };
+
+      var exts = extentCalc.determineExtents(data);
+
+      assert.isTrue(checkForExtents.called);
+      assert.isFalse(calcMultiAxisExtents.called);
+      assert.isFalse(findMinMax.called);
+
+      assert.deepEqual(exts, {
+        x: [20,21],
+        y: [10,11]
+      });
+    });
+
+
+    test('_calcMultiAxisExtents', function() {
+      sandbox.reset();
+      extentCalc.xAxisType = 'linear';
+      extentCalc.yAxisType = 'linear';
+      extentCalc.axes = ['a1', 'a2'];
+
+      var exts = extentCalc.determineExtents(data);
+
+      assert.isTrue(checkForExtents.called);
+      assert.isTrue(calcMultiAxisExtents.called);
+      assert.isFalse(findMinMax.called);
+
+      assert.deepEqual(exts.y, { a1: [ -10, 10], a2: [0, 100] });
+    });
+
   }); //suite
 
   suite('_checkForExtents', function() {

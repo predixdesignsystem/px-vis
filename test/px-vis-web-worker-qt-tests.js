@@ -9,16 +9,16 @@ function runTests(){
     });
   });
 
-  suite('px-vis-worker setup', function() {
+  // suite('px-vis-worker setup', function() {
 
-    suiteSetup(function(){
+  //   suiteSetup(function(){
 
 
 
-    });
+  //   });
 
-    test('dummy', function() {
+  //   test('dummy', function() {
 
-    });
-  }); //suite
+  //   });
+  // }); //suite
 } //runTests
