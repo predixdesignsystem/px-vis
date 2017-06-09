@@ -478,6 +478,16 @@ PxVisBehaviorChart.webWorkerSynchronization = [{
       _wwSyncDataPropName: {
         type: String,
         value: 'chartData'
+      },
+      /**
+       *  Updated every time the chart gets new data and a sync request
+       * to the web worker happened. Use it for triggering observers
+       * instead of chartData if the observer needs the data in the webworker
+       * (i.e kicking another webworker processing)
+       */
+      _wwDataSyncCounter: {
+        type: Number,
+        value: 0
       }
     },
     ready: function() {
@@ -512,6 +522,9 @@ PxVisBehaviorChart.webWorkerSynchronization = [{
             //don't have a way to cancel it anymore and an update
             //request would always queue after this request
             this._wwSyncDataDeleted = true;
+
+            //do we need this?
+            //this.set('_wwDataSyncCounter', 0);
           }
         }.bind(this), this._wwSyncDataDeletionTimeout);
       }
@@ -521,6 +534,7 @@ PxVisBehaviorChart.webWorkerSynchronization = [{
       if(!this.preventWebWorkerSynchronization && this[this._wwSyncDataPropName]) {
         this._wwSyncDataDeleted = false;
         Px.vis.scheduler.process('updateData', this.nodeName, {'chartData': this[this._wwSyncDataPropName]}, this.chartId);
+        this.set('_wwDataSyncCounter', this._wwDataSyncCounter+1);
       }
     }
 }, PxVisBehavior.dataset, PxVisBehavior.preventWebWorkerSynchronization];
