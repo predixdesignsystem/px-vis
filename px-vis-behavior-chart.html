@@ -2106,6 +2106,7 @@ PxVisBehaviorChart.axisRegister = [{
         'y': axes[i],
         'yAxisUnit': completeSeriesConfig[axes[i]] && completeSeriesConfig[axes[i]]['yAxisUnit'] ? completeSeriesConfig[axes[i]]['yAxisUnit'] : ''
       };
+
       tooltipData.series.push({ 'name': axes[i]});
     }
 
@@ -2207,11 +2208,18 @@ PxVisBehaviorChart.categoryRegister = [{
 
       for(var i = 0; i < this.categories.length; i ++) {
 
-        //TODO: what text do we want to display
-        config[this.categories[i].toString()] = {
-          'name': this.categoryKey + ' - ' + this.categories[i].toString(),
-          "color": this._getColor(this.startColorIndex + i),
-        };
+        //if config defined try to reuse color
+        if(this.completeSeriesConfig[this.categories[i].toString()]) {
+          config[this.categories[i].toString()] = {};
+          config[this.categories[i].toString()].name = this.categoryKey + ' - ' + this.categories[i].toString();
+          config[this.categories[i].toString()].color = this.completeSeriesConfig[this.categories[i].toString()].color ? this.completeSeriesConfig[this.categories[i].toString()].color : this._getColor(this.startColorIndex + i);
+        } else {
+          config[this.categories[i].toString()] = {
+            'name': this.categoryKey + ' - ' + this.categories[i].toString(),
+            "color": this._getColor(this.startColorIndex + i),
+          };
+        }
+
         tooltipData.series.push({"name": this.categories[i].toString()})
       }
 

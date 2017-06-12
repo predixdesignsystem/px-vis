@@ -358,8 +358,12 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           this.set('mouseRect', this._rect.node());
           this.fire('px-vis-mouse-rect-updated', {'data': this.mouseRect, 'dataVar': 'mouseRect', 'method': 'set'});
       } else {
-        this._rect.attr('width', Math.max(0, this.width - this.margin.left - this.margin.right))
-        .attr('height', Math.max(0, this.height - this.margin.bottom - this.margin.top));
+        if(!this.radial) {
+          this._rect.attr('width', Math.max(0, this.width - this.margin.left - this.margin.right))
+          .attr('height', Math.max(0, this.height - this.margin.bottom - this.margin.top));
+        } else {
+          this._rect.attr('r', Math.max(this.width,0));
+        }
       }
     },  //drawElement
 
