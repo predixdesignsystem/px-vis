@@ -1,3 +1,7 @@
+v2.0.1
+==================
+* ensure getImage() doesn't throw error when trying to render registers and no completeSeriesConfig is defined
+
 v2.0.0
 ==================
 * created a point highlighter and line highlighter for crosshair
