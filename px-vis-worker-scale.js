@@ -279,6 +279,87 @@ extentCalc._processDataValues = function _processDataValues(isOrd, r, d, axis, k
   }
 }.bind(extentCalc);
 
+
+/**
+ * Loop through each series and see if it has mins and maxes in seriesConfig
+ *
+ */
+extentCalc._checkInSeriesConfig = function _checkInSeriesConfig(exts, a) {
+  for(var i = 0; i < this.seriesToAxes[a].length; i++) {
+    var s = this.seriesToAxes[a][i];
+
+    exts[a][0] = (this.completeSeriesConfig[s]['yMin'] || this.completeSeriesConfig[s]['yMin'] === 0) ?
+        Math.min(this.completeSeriesConfig[s]['yMin'], exts[a][0]) : exts[a][0];
+
+    exts[a][1] = (this.completeSeriesConfig[s]['yMax'] || this.completeSeriesConfig[s]['yMax'] === 0) ?
+        Math.max(this.completeSeriesConfig[s]['yMax'], exts[a][1]) : exts[a][1];
+  }
+}.bind(extentCalc);
+
+/**
+ * Apply chart extents
+ *
+ */
+extentCalc._applyChartExtents = function _applyChartExtents(exts, a) {
+  // for backwards compatibility, if they dont specify an axis apply to all
+  var k = this.chartExtents[a] ? a : 'y';
+
+  if(this.chartExtents[k]) {
+
+    if(this.chartExtents[k][0] === 'dynamic') {
+      //if we got a value from seriesConfig, use it, otherwise Infinity
+      exts[a][0] = exts[a][0] || exts[a][0] === 0 ? exts[a][0] : Infinity;
+    } else {
+      exts[a][0] = this.chartExtents[k][0];
+    }
+
+
+    if(this.chartExtents[k][1] === 'dynamic') {
+      exts[a][1] = exts[a][1] || exts[a][1] === 0 ? exts[a][1] : -Infinity;
+    } else {
+      exts[a][1] = this.chartExtents[k][1];
+    }
+
+  }
+}.bind(extentCalc);
+
+/**
+ * Seach for multi axis extents
+ *
+ */
+extentCalc._searchForExtents = function _searchForExtents(exts, seriesToSearch, data) {
+  var seriesList = Object.keys(seriesToSearch);
+  for(var i = 0; i < data.length; i++) {
+    for(var j = 0; j < seriesList.length; j++) {
+      var s = seriesList[j],
+          sY = this.completeSeriesConfig[s]['y'],
+          series = seriesToSearch[s],
+          axis = series['axis'];
+      if(series.min && (data[i][sY] || data[i][sY] === 0)) {
+        exts[axis][0] = Math.min(data[i][sY], exts[axis][0]);
+      }
+      if(series.max && (data[i][sY] || data[i][sY] === 0)) {
+        exts[axis][1] = Math.max(data[i][sY], exts[axis][1]);
+      }
+    }
+  }
+}.bind(extentCalc);
+
+/**
+ * Seach for multi axis extents
+ *
+ */
+extentCalc._calcSeriesToSearch = function _calcSeriesToSearch(exts, a, seriesToSearch) {
+  for(var i = 0; i < this.seriesToAxes[a].length; i++) {
+    var s = this.seriesToAxes[a][i];
+    seriesToSearch[s] = {
+      "axis": a,
+      "min": exts[a][0] === Infinity ? true : false,
+      "max": exts[a][1] === -Infinity ? true : false
+    };
+  }
+}.bind(extentCalc);
+
 /**
  * calculates chart extents for multi axis
  *
@@ -298,64 +379,23 @@ extentCalc._calcMultiAxisExtents = function _calcMultiAxisExtents(data) {
 
     // does it exist in the seriesConfig
     // need to look at each series instead of each axis
-    for(var j = 0; j < this.seriesToAxes[a].length; j++) {
-      var s = this.seriesToAxes[a][j];
-
-      exts[a][0] = (this.completeSeriesConfig[s]['yMin'] || this.completeSeriesConfig[s]['yMin'] === 0) ?
-          Math.min(this.completeSeriesConfig[s]['yMin'], exts[a][0]) : exts[a][0];
-      exts[a][1] = (this.completeSeriesConfig[s]['yMax'] || this.completeSeriesConfig[s]['yMax'] === 0) ?
-          Math.max(this.completeSeriesConfig[s]['yMax'], exts[a][1]) : exts[a][1];
-    }
+    this._checkInSeriesConfig(exts, a);
 
     // does it exist in chartExtents, if so, overwrite
     if(this.chartExtents) {
-      if(this.chartExtents[a]) {
-        exts[a][0] = (this.chartExtents[a][0] === 'dynamic') ?
-          //if we got a value from seriesConfig, use it, otherwise Infinity
-          (exts[a][0] ? exts[a][0] : Infinity) :
-          this.chartExtents[a][0];
-        exts[a][1] = (this.chartExtents[a][1] === 'dynamic') ? exts[a][1] : this.chartExtents[a][1];
-
-      // for backwards compatibility, if they dont specify an axis apply to all
-      } else if(this.chartExtents['y']) {
-        exts[a][0] = (this.chartExtents['y'][0] === 'dynamic') ?
-          (exts[a][0] ? exts[a][0] : Infinity) :
-          this.chartExtents['y'][0];
-        exts[a][1] = (this.chartExtents['y'][1] === 'dynamic') ? exts[a][1] : this.chartExtents['y'][1];
-      }
+      this._applyChartExtents(exts, a);
     }
 
     // check if we need to search chartData for extents
     if(exts[a][0] === Infinity || exts[a][1] === -Infinity) {
       search = true;
-      for(var j = 0; j < this.seriesToAxes[a].length; j++) {
-        var s = this.seriesToAxes[a][j];
-        seriesToSearch[s] = {
-          "axis": a,
-          "min": exts[a][0] === Infinity ? true : false,
-          "max": exts[a][1] === -Infinity ? true : false
-        };
-      }
+      this._calcSeriesToSearch(exts, a, seriesToSearch);
     }
   }
 
   // if we indicated we need to search for extent values
   if(search) {
-    var seriesList = Object.keys(seriesToSearch);
-    for(var i = 0; i < data.length; i++) {
-      for(var j = 0; j < seriesList.length; j++) {
-        var s = seriesList[j],
-            sY = this.completeSeriesConfig[s]['y'],
-            series = seriesToSearch[s],
-            axis = series['axis'];
-        if(series.min && (data[i][sY] || data[i][sY] === 0)) {
-          exts[axis][0] = Math.min(data[i][sY], exts[axis][0]);
-        }
-        if(series.max && (data[i][sY] || data[i][sY] === 0)) {
-          exts[axis][1] = Math.max(data[i][sY], exts[axis][1]);
-        }
-      }
-    }
+    this._searchForExtents(exts, seriesToSearch, data);
   }
 
   return exts;

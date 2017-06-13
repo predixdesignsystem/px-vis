@@ -79,7 +79,7 @@ function runTests(){
 
     suiteTeardown(function() {
       sandbox.restore();
-    })
+    });
 
     test('ordinal x and y', function() {
       sandbox.reset();
@@ -963,22 +963,335 @@ function runTests(){
     });
   }); //suite
 
+  suite('_checkInSeriesConfig', function() {
+    suiteSetup(function() {
+      extentCalc.seriesToAxes = {
+        axis1: ['y0', 'y2'],
+        axis2: ['y1', 'y3']
+      };
+    });
+
+    test('complete series config has no min or max', function() {
+      extentCalc.completeSeriesConfig = {
+        y0: { 'y': 'y0' },
+        y1: { 'y': 'y1' },
+        y2: { 'y': 'y2' },
+        y3: { 'y': 'y3' }
+      };
+
+      var exts = {
+          axis1: [0, -Infinity],
+          axis2: [0, 100]
+        }
+
+      extentCalc._checkInSeriesConfig(exts, "axis2");
+
+      assert.deepEqual(exts, {
+          axis1: [0, -Infinity],
+          axis2: [0, 100]
+        });
+    });
+
+    test('complete series config has a max and min', function() {
+      extentCalc.completeSeriesConfig = {
+        y0: { 'y': 'y0' },
+        y1: { 'y': 'y1' },
+        y2: { 'y': 'y2', yMax: 10 },
+        y3: { 'y': 'y3', yMin: 10 }
+      };
+
+      var exts = {
+          axis1: [0, -Infinity],
+          axis2: [Infinity, 100]
+        };
+
+      extentCalc._checkInSeriesConfig(exts, "axis1");
+      extentCalc._checkInSeriesConfig(exts, "axis2");
+
+      assert.deepEqual(exts, {
+          axis1: [0, 10],
+          axis2: [10, 100]
+        });
+    });
+
+  }); //suite
+
+  suite('_applyChartExtents', function() {
+    test('chartExtents are dynamic', function() {
+      var exts = {
+          axis1: [null, null],
+          axis2: [0, 1]
+        };
+
+      extentCalc.chartExtents = {
+          x: ["dynamic", "dynamic"],
+          axis1: ["dynamic", "dynamic"]
+        };
+
+      extentCalc._applyChartExtents(exts, "axis1");
+
+      assert.deepEqual(exts, {
+          axis1: [Infinity, -Infinity],
+          axis2: [0, 1]
+        });
+    });
+
+    test('chartExtents are dynamic with default of y', function() {
+      var exts = {
+          axis1: [null, null],
+          axis2: [0, 1]
+        };
+
+      extentCalc.chartExtents = {
+          x: ["dynamic", "dynamic"],
+          y: ["dynamic", "dynamic"]
+        };
+
+      extentCalc._applyChartExtents(exts, "axis1");
+
+      assert.deepEqual(exts, {
+          axis1: [Infinity, -Infinity],
+          axis2: [0, 1]
+        });
+    });
+
+    test('chartExtents are are set if dynamic and exts has vals', function() {
+      var exts = {
+          axis1: [0, 1],
+          axis2: [0, 1]
+        };
+
+      extentCalc.chartExtents = {
+          x: ["dynamic", "dynamic"],
+          axis1: ["dynamic", "dynamic"]
+        };
+
+      extentCalc._applyChartExtents(exts, "axis1");
+
+      assert.deepEqual(exts, {
+          axis1: [0, 1],
+          axis2: [0, 1]
+        });
+    });
+
+    test('chartExtents are are set if not dynamic', function() {
+      var exts = {
+          axis1: [0, 1],
+          axis2: [0, 1]
+        };
+
+      extentCalc.chartExtents = {
+          x: ["dynamic", "dynamic"],
+          y: [5, 50]
+        };
+
+      extentCalc._applyChartExtents(exts, "axis1");
+
+      assert.deepEqual(exts, {
+          axis1: [5, 50],
+          axis2: [0, 1]
+        });
+    });
+  }); //suite
+
+  suite('_searchForExtents', function() {
+    var data = [{
+            "timeStamp": 1234567890,
+            "y0": 1,
+            "y1": 2,
+            "y2": 3
+          }, {
+            "timeStamp": 1234567891,
+            "y0": 5,
+            "y1": 6,
+            "y2": 7
+          }, {
+            "timeStamp": 1234567892,
+            "y0": 2,
+            "y1": 3,
+            "y2": 4
+          }];
+
+    suiteSetup(function(){
+      extentCalc.completeSeriesConfig = {
+        y0: { 'y': 'y0' },
+        y1: { 'y': 'y1' },
+        y2: { 'y': 'y2' }
+      };
+    });
+
+    test('searches the specified series for min', function() {
+      var exts = {
+            axis1: [Infinity, -Infinity],
+            axis2: [Infinity, -Infinity]
+          },
+          search = {
+            y1: {
+              "axis": "axis2",
+              "min": true,
+              "max": false
+            },
+            y2: {
+              "axis": "axis2",
+              "min": true,
+              "max": false
+            }
+          };
+
+      extentCalc._searchForExtents(exts, search, data);
+
+      assert.deepEqual(exts, {
+        axis1: [Infinity, -Infinity],
+        axis2: [2, -Infinity]
+      });
+    });
+
+    test('searches the specified series for max', function() {
+      var exts = {
+            axis1: [Infinity, -Infinity],
+            axis2: [Infinity, -Infinity]
+          },
+          search = {
+            y1: {
+              "axis": "axis2",
+              "min": false,
+              "max": true
+            },
+            y2: {
+              "axis": "axis2",
+              "min": false,
+              "max": true
+            }
+          };
+
+      extentCalc._searchForExtents(exts, search, data);
+
+      assert.deepEqual(exts, {
+        axis1: [Infinity, -Infinity],
+        axis2: [Infinity, 7]
+      });
+    });
+  }); //suite
+
+  suite('_calcSeriesToSearch', function() {
+    suiteSetup(function() {
+      extentCalc.seriesToAxes = {
+        axis1: ['y0', 'y2'],
+        axis2: ['y1', 'y3']
+      };
+    });
+
+    test('creates seriesToSearch with Infinities', function() {
+       var exts = {
+            axis1: [Infinity, -Infinity],
+            axis2: [Infinity, -Infinity]
+          },
+          seriesToSearch = {};
+
+      extentCalc._calcSeriesToSearch(exts, "axis1", seriesToSearch);
+
+       assert.deepEqual(seriesToSearch, {
+        y0: {
+          "axis": "axis1",
+          "min": true,
+          "max": true
+        },
+        y2: {
+          "axis": "axis1",
+          "min": true,
+          "max": true
+        }
+      });
+    });
+
+    test('creates seriesToSearch with vals', function() {
+       var exts = {
+            axis1: [0,1],
+            axis2: [0,1]
+          },
+          seriesToSearch = {};
+
+      extentCalc._calcSeriesToSearch(exts, "axis1", seriesToSearch);
+
+       assert.deepEqual(seriesToSearch, {
+        y0: {
+          "axis": "axis1",
+          "min": false,
+          "max": false
+        },
+        y2: {
+          "axis": "axis1",
+          "min": false,
+          "max": false
+        }
+      });
+    });
+  }); //suite
+
   suite('_calcMultiAxisExtents', function() {
-    // suiteSetup(function(){
-    //   var w = 500,
-    //     h = 300,
-    //     m = {
-    //       "top": 10,
-    //       "right": 5,
-    //       "bottom": 20,
-    //       "left": 15
-    //     };
+    var data = [{
+      "timeStamp": 1234567890,
+      "y0": 1,
+      "y1": 2,
+      "y2": 3
+    }, {
+      "timeStamp": 1234567891,
+      "y0": 5,
+      "y1": 6,
+      "y2": 7
+    }, {
+      "timeStamp": 1234567892,
+      "y0": 2,
+      "y1": 3,
+      "y2": 4
+    }];
 
+    var sandbox, checkInSeriesConfig, applyChartExtents, calcSeriesToSearch, searchForExtents;
 
-    // });
+    suiteSetup(function(){
+      extentCalc.axes = ["axis1", "axis2"];
 
-    // test('baseZoom fixture is created', function() {
-    //   assert.isTrue(baseZoom !== null);
-    // });
+      sandbox = sinon.sandbox.create();
+
+      checkInSeriesConfig = sandbox.stub(extentCalc, '_checkInSeriesConfig');
+      applyChartExtents = sandbox.stub(extentCalc, '_applyChartExtents');
+      calcSeriesToSearch = sandbox.stub(extentCalc, '_calcSeriesToSearch');
+      searchForExtents = sandbox.stub(extentCalc, '_searchForExtents');
+
+    });
+
+    suiteTeardown(function() {
+      sandbox.restore();
+    });
+
+    test('runs with no chartExtents', function() {
+      sandbox.reset();
+
+      extentCalc.chartExtents = null;
+
+      var exts = extentCalc._calcMultiAxisExtents(data);
+
+      assert.isTrue(checkInSeriesConfig.calledTwice);
+      assert.isFalse(applyChartExtents.called);
+      assert.isTrue(calcSeriesToSearch.calledTwice);
+      assert.isTrue(searchForExtents.called);
+
+       assert.deepEqual(exts, {
+          "axis1": [0, -Infinity],
+          "axis2": [0, -Infinity]
+        });
+    });
+
+    test('runs with chartExtents', function() {
+      sandbox.reset();
+
+      extentCalc.chartExtents = { "y": [5, 10] };
+
+      var exts = extentCalc._calcMultiAxisExtents(data);
+
+      assert.isTrue(checkInSeriesConfig.calledTwice);
+      assert.isTrue(applyChartExtents.called);
+
+    });
   }); //suite
 } //runTests
