@@ -441,7 +441,6 @@ PxVisBehaviorChart.chartId = [{
   }
 },  PxVisBehavior.uniqueIds];
 
-
 /*
     Name:
     PxVisBehaviorChart.webWorkerSynchronization
@@ -512,6 +511,9 @@ PxVisBehaviorChart.webWorkerSynchronization = [{
             //don't have a way to cancel it anymore and an update
             //request would always queue after this request
             this._wwSyncDataDeleted = true;
+
+            //do we need this?
+            //this.set('wwDataSyncCounter', 0);
           }
         }.bind(this), this._wwSyncDataDeletionTimeout);
       }
@@ -521,9 +523,10 @@ PxVisBehaviorChart.webWorkerSynchronization = [{
       if(!this.preventWebWorkerSynchronization && this[this._wwSyncDataPropName]) {
         this._wwSyncDataDeleted = false;
         Px.vis.scheduler.process('updateData', this.nodeName, {'chartData': this[this._wwSyncDataPropName]}, this.chartId);
+        this.set('wwDataSyncCounter', this.wwDataSyncCounter+1);
       }
     }
-}, PxVisBehavior.dataset, PxVisBehavior.preventWebWorkerSynchronization];
+}, PxVisBehavior.dataset, PxVisBehavior.preventWebWorkerSynchronization, PxVisBehavior.wwDataSyncCounter];
 
 /*
     Name:
@@ -2103,6 +2106,7 @@ PxVisBehaviorChart.axisRegister = [{
         'y': axes[i],
         'yAxisUnit': completeSeriesConfig[axes[i]] && completeSeriesConfig[axes[i]]['yAxisUnit'] ? completeSeriesConfig[axes[i]]['yAxisUnit'] : ''
       };
+
       tooltipData.series.push({ 'name': axes[i]});
     }
 
@@ -2204,11 +2208,18 @@ PxVisBehaviorChart.categoryRegister = [{
 
       for(var i = 0; i < this.categories.length; i ++) {
 
-        //TODO: what text do we want to display
-        config[this.categories[i].toString()] = {
-          'name': this.categoryKey + ' - ' + this.categories[i].toString(),
-          "color": this._getColor(this.startColorIndex + i),
-        };
+        //if config defined try to reuse color
+        if(this.completeSeriesConfig[this.categories[i].toString()]) {
+          config[this.categories[i].toString()] = {};
+          config[this.categories[i].toString()].name = this.categoryKey + ' - ' + this.categories[i].toString();
+          config[this.categories[i].toString()].color = this.completeSeriesConfig[this.categories[i].toString()].color ? this.completeSeriesConfig[this.categories[i].toString()].color : this._getColor(this.startColorIndex + i);
+        } else {
+          config[this.categories[i].toString()] = {
+            'name': this.categoryKey + ' - ' + this.categories[i].toString(),
+            "color": this._getColor(this.startColorIndex + i),
+          };
+        }
+
         tooltipData.series.push({"name": this.categories[i].toString()})
       }
 
