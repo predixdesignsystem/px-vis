@@ -588,19 +588,21 @@ PxVisBehaviorChart.saveImage = [{
       }
     },
     _getRegisterWidth: function() {
-      var canvas = document.createElement('canvas');
-      canvas.height = this.height;
-      canvas.width = 9999;
+      if(this.completeSeriesConfig) {
 
-      var curY = 0,
-          curX = this.width + 5,
-          keys = Object.keys(this.completeSeriesConfig),
-          maxWidth = 0,
-          maxTotalWidth = 5,
-          context = canvas.getContext('2d');
-          curTextWidth = 0;
+        var canvas = document.createElement('canvas');
+        canvas.height = this.height;
+        canvas.width = 9999;
 
-      for(var i=0; i<keys.length; i++) {
+        var curY = 0,
+            curX = this.width + 5,
+            keys = Object.keys(this.completeSeriesConfig),
+            maxWidth = 0,
+            maxTotalWidth = 5,
+            context = canvas.getContext('2d');
+            curTextWidth = 0;
+
+        for(var i=0; i<keys.length; i++) {
           curY += 30;
 
           curTextWidth = context.measureText(this.completeSeriesConfig[keys[i]].name).width;
@@ -616,18 +618,23 @@ PxVisBehaviorChart.saveImage = [{
         maxTotalWidth += maxWidth + 15;
 
         return maxTotalWidth;
+      } else {
+        return 0;
+      }
     },
     /**
      * Draws a fake representation of the registers
      */
     _drawRegister: function(context) {
-      var curY = 0,
-          lineLength = 25,
-          strokeWidth = 3,
-          curX = this.width + 5,
-          keys = Object.keys(this.completeSeriesConfig),
-          maxWidth = 0,
-          curTextWidth = 0;
+
+      if(this.completeSeriesConfig) {
+        var curY = 0,
+            lineLength = 25,
+            strokeWidth = 3,
+            curX = this.width + 5,
+            keys = Object.keys(this.completeSeriesConfig),
+            maxWidth = 0,
+            curTextWidth = 0;
 
         //draw each serie
         for(var i=0; i<keys.length; i++) {
@@ -645,6 +652,7 @@ PxVisBehaviorChart.saveImage = [{
             curY = 0;
           }
         }
+      }
     }
 }, PxVisBehavior.completeSeriesConfig];
 
