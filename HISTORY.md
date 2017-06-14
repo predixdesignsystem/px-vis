@@ -1,3 +1,7 @@
+v2.0.1
+==================
+* Fix for scale bug
+
 v2.0.0
 ==================
 * created a point highlighter and line highlighter for crosshair
