@@ -7,7 +7,7 @@ function runTests(){
     test('worker exists', function() {
       assert.deepEqual(extentCalc._defaultScaleValue, {
           "x": [Infinity, -Infinity],
-          "y": [0, -Infinity]
+          "y": [Infinity, -Infinity]
         });
     });
   });
@@ -254,7 +254,7 @@ function runTests(){
           isOrd = false;
 
       var exts = extentCalc._checkForExtents(isOrd, chartExtents, dataExtents, axis);
-      assert.deepEqual(exts, [0, -Infinity]);
+      assert.deepEqual(exts, [Infinity, -Infinity]);
     });
 
     test('_checkForExtents works with data extents', function() {
@@ -340,7 +340,7 @@ function runTests(){
     });
 
     test('_checkDataExtents is compared to the _defaultScaleValue', function() {
-      var dataExtents = { "y": [5, 20] },
+      var dataExtents = { "y": [0, 20] },
           chartExtents = { },
           axis = "y",
           extsFromCE = false;
@@ -1277,8 +1277,8 @@ function runTests(){
       assert.isTrue(searchForExtents.called);
 
        assert.deepEqual(exts, {
-          "axis1": [0, -Infinity],
-          "axis2": [0, -Infinity]
+          "axis1": [Infinity, -Infinity],
+          "axis2": [Infinity, -Infinity]
         });
     });
 
