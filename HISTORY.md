@@ -1,3 +1,8 @@
+v2.0.3
+==================
+* Permenant fix for scale bug - changes default extents to all dynamic
+* fixed scale fallback to be in sync with ww scale
+
 v2.0.2
 ==================
 * Fix for scale bug
