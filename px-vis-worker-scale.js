@@ -14,7 +14,7 @@ var extentCalc = {};
 
 extentCalc._defaultScaleValue = {
           "x": [Infinity, -Infinity],
-          "y": [0, -Infinity]
+          "y": [Infinity, -Infinity]
         };
 
 /**

@@ -94,7 +94,7 @@ function runTests(){
       assert.equal( Number(decTLScale.x.domain()[1]), 1397219100000);
     });
     test('decTLScale y domain is correct', function() {
-      assert.equal( JSON.stringify(decTLScale.y.domain()), JSON.stringify([0,10]));
+      assert.deepEqual( decTLScale.y.domain(), [0,10]);
     });
 
     test('decTLScale x returns correct value 1397102460000', function() {
@@ -153,7 +153,7 @@ function runTests(){
       assert.equal( Number(findExtents.x.domain()[1]), 1397219100000);
     });
     test('findExtents y domain is correct', function() {
-      assert.equal( JSON.stringify(findExtents.y.domain()), JSON.stringify([0,10]));
+      assert.deepEqual(findExtents.y.domain(), [0,10]);
     });
 
     test('findExtents x returns correct value 1397102460000', function() {
@@ -428,7 +428,7 @@ function runTests(){
       assert.equal( Number(findYExtents.x.domain()[1]), 1397300000000);
     });
     test('findYExtents y domain is correct', function() {
-      assert.equal( JSON.stringify(findYExtents.y.domain()), JSON.stringify([0,10]));
+      assert.deepEqual(findYExtents.y.domain(), [1,10]);
     });
 
     test('findYExtents x returns correct value 1397100000000', function() {
@@ -444,8 +444,8 @@ function runTests(){
       assert.equal( findYExtents.x(n), 240);
     });
 
-    test('findYExtents y returns correct value 0', function() {
-      assert.equal( findYExtents.y(0), 270);
+    test('findYExtents y returns correct value 1', function() {
+      assert.equal( findYExtents.y(1), 270);
     });
 
     test('findYExtents y returns correct value 10', function() {
@@ -453,7 +453,7 @@ function runTests(){
     });
 
     test('findYExtents y returns correct value 5', function() {
-      assert.equal( findYExtents.y(5), 135);
+      assert.equal( findYExtents.y(5), 150);
     });
   }); //suite
 
@@ -528,7 +528,7 @@ function runTests(){
       assert.equal( findOrdinalX.x.domain()[2], 'b');
     });
     test('findOrdinalX y domain is correct', function() {
-      assert.equal( JSON.stringify(findOrdinalX.y.domain()), JSON.stringify([0,10]));
+      assert.deepEqual(findOrdinalX.y.domain(), [1,10]);
     });
 
     test('findOrdinalX x returns correct value a', function() {
@@ -543,8 +543,8 @@ function runTests(){
       assert.equal( findOrdinalX.x("b"), 400);
     });
 
-    test('findOrdinalX y returns correct value 0', function() {
-      assert.equal( findOrdinalX.y(0), 270);
+    test('findOrdinalX y returns correct value 1', function() {
+      assert.equal( findOrdinalX.y(1), 270);
     });
 
     test('findOrdinalX y returns correct value 10', function() {
@@ -552,7 +552,7 @@ function runTests(){
     });
 
     test('findOrdinalX y returns correct value 5', function() {
-      assert.equal( findOrdinalX.y(5), 135);
+      assert.equal( findOrdinalX.y(5), 150);
     });
   }); //suite
 
@@ -635,7 +635,7 @@ function runTests(){
       assert.equal( Number(diffXforY.x.domain()[1]), 1397300000000);
     });
     test('diffXforY y domain is correct', function() {
-      assert.equal( JSON.stringify(diffXforY.y.domain()), JSON.stringify([0,10]));
+      assert.deepEqual(diffXforY.y.domain(), [1,10]);
     });
 
     test('diffXforY x returns correct value 1397100000000', function() {
@@ -651,8 +651,8 @@ function runTests(){
       assert.equal( diffXforY.x(n), 240);
     });
 
-    test('diffXforY y returns correct value 0', function() {
-      assert.equal( diffXforY.y(0), 270);
+    test('diffXforY y returns correct value 1', function() {
+      assert.equal( diffXforY.y(1), 270);
     });
 
     test('diffXforY y returns correct value 10', function() {
@@ -660,7 +660,7 @@ function runTests(){
     });
 
     test('diffXforY y returns correct value 5', function() {
-      assert.equal( diffXforY.y(5), 135);
+      assert.equal( diffXforY.y(5), 150);
     });
   }); //suite
 
@@ -789,7 +789,7 @@ function runTests(){
       assert.equal( Number(webWorker.x.domain()[1]), 1397219100000);
     });
     test('webWorker y domain is correct', function() {
-      assert.equal( JSON.stringify(webWorker.y.domain()), JSON.stringify([0,10]));
+      assert.deepEqual( webWorker.y.domain(), [1,10]);
     });
 
     test('webWorker x returns correct value 1397102460000', function() {
@@ -804,8 +804,8 @@ function runTests(){
       assert.equal( webWorker.x(1397160780000), 240);
     });
 
-    test('webWorker y returns correct value 0', function() {
-      assert.equal( webWorker.y(0), 270);
+    test('webWorker y returns correct value 1', function() {
+      assert.equal( webWorker.y(1), 270);
     });
 
     test('webWorker y returns correct value 10', function() {
@@ -813,7 +813,7 @@ function runTests(){
     });
 
     test('webWorker y returns correct value 5', function() {
-      assert.equal( webWorker.y(5), 135);
+      assert.equal( webWorker.y(5), 150);
     });
   }); //suite
 
