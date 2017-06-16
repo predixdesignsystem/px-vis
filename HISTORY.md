@@ -1,3 +1,8 @@
+v2.0.4
+==================
+* Fixed line drawing issue on canvas with undefined values while doing progressive rendering with no showGaps
+* Fixed single radial line for canvas (polar)
+
 v2.0.3
 ==================
 * Permenant fix for scale bug - changes default extents to all dynamic
