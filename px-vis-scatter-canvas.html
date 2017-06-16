@@ -407,10 +407,16 @@ Element which draws a scatter series onto the chart
       //opacity all the time
       if(!this._currentDrawingOptions.sameOpacity) {
         this._currentDrawingOptions.drawingFunction = function() {
+          if(this._currentDrawingOptions.fillOpacity) {
           this.canvasContext.globalAlpha = this._currentDrawingOptions.fillOpacity;
           this.canvasContext.fill();
+          }
+          if(this._currentDrawingOptions.strokeOpacity) {
+
+
           this.canvasContext.globalAlpha = this._currentDrawingOptions.strokeOpacity;
           this.canvasContext.stroke();
+          }
         }.bind(this);
       } else {
         this._currentDrawingOptions.drawingFunction = function() {
@@ -557,7 +563,8 @@ Element which draws a scatter series onto the chart
       var previousTranslate = [0,0],
           translate,
           start = this._renderingContext.size * this._renderingContext.index,
-          stop = Math.min(start + this._renderingContext.size, this.chartData.length);
+          stop = Math.min(start + this._renderingContext.size, this.chartData.length),
+          halfPi = Math.PI/4;
 
       for(var i = start; i < stop; i++) {
 
@@ -572,10 +579,17 @@ Element which draws a scatter series onto the chart
         this._currentDrawingOptions.symbol();
         this.canvasContext.closePath();
         this._currentDrawingOptions.drawingFunction();
+       // this.canvasContext.strokeRect(0,0,5,5);
+        // this.canvasContext.fillRect(0,0,5,5);
+        //  this.canvasContext.translate(2.5,-1.25);
+        //  this.canvasContext.rotate(halfPi);
+        //  this.canvasContext.fillRect(0,0,5,5);
+        //  this.canvasContext.rotate(-halfPi);
 
         //remember pos so that we can move to the next point in 1 translate
         //instead of restoring the translate here
         previousTranslate = translate;
+        // previousTranslate = [translate[0] + 2.5, translate[1]-1.25];
       }
 
       //restore canvas pos

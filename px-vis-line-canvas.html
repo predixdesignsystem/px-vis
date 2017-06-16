@@ -224,6 +224,8 @@ Element which draws lines series onto the chart
             this._isAttached &&
             this.chartData) {
 
+          this._resetRenderingContext();
+
           //create our line generator
           if(this.parallelCoordinates) {
             this._defineMultiLine(true);
@@ -418,9 +420,11 @@ Element which draws lines series onto the chart
         'index': 0,
         //new request
         'requestCounter': ++this._progressiveRenderingCounter,
-        'size': Math.ceil(this.chartData.length/numberOfFrames),
-        'numberOfFrames': numberOfFrames,
-        'offset': 0
+        'size': 2088,//Math.ceil(this.chartData.length/numberOfFrames),
+        'numberOfFrames': 4,
+        'offset': 0,
+        'lastPointRenderedIndex': null,
+        'currentBatchStartIndex': 0
       };
 
       //make sure canvas is clean
@@ -464,21 +468,22 @@ Element which draws lines series onto the chart
         return;
       }
 
-      //slice will end at the end of the array if the 'end' index is bigger
-      //than the chartdata length (last batch)
-      var d = this.chartData.slice(this._renderingContext.index * this._renderingContext.size - this._renderingContext.offset, (this._renderingContext.index + 1) * this._renderingContext.size);
+      this._renderingContext.currentBatchStartIndex = this._renderingContext.lastPointRenderedIndex;
+
+      //ensure weprepend the last defined point
+      var skipped = Math.max(this._renderingContext.index * this._renderingContext.size - (this._renderingContext.lastPointRenderedIndex + 1), 0);
+          //slice will end at the end of the array if the 'end' index is bigger
+          //than the chartdata length (last batch)
+          d = this.chartData.slice(this._renderingContext.lastPointRenderedIndex, (this._renderingContext.index + 1) * this._renderingContext.size + skipped);
 
       //if it's a single line make sure we can loop around it
-      if(!this.parallelCoordinates && !this.radialLine) {
+      if(!this.multiPath) {
         d = [d];
       }
 
       this._renderOneBatch(d);
 
       this._renderingContext.index++;
-
-      //after first render add offset so that next line includes the previous last point to avoid gaps
-      this._renderingContext.offset = 1;
 
       if(this._renderingContext.index < this._renderingContext.numberOfFrames) {
           //continue processing
@@ -536,7 +541,6 @@ Element which draws lines series onto the chart
     _renderingEnded: function(progressive,numberOfFrames) {
       //restore our context for safety
       this.canvasContext.restore();
-      this._renderingContext = {};
 
       if(progressive) {
         this._progressiveRenderingCounter = 0;
