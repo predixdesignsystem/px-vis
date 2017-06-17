@@ -1,3 +1,8 @@
+v2.0.5
+==================
+* Improved performance of scatter canvas rendering
+* removed debugging values from line canvas
+
 v2.0.4
 ==================
 * Fixed line drawing issue on canvas with undefined values while doing progressive rendering with no showGaps
