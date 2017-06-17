@@ -1462,6 +1462,10 @@ PxVisBehaviorChart.zooming = [{
     _isPanning: {
       type: Boolean,
       value: false
+    },
+
+    extentsAction: {
+      type: String
     }
   },
   observers: [
@@ -1660,6 +1664,9 @@ PxVisBehaviorChart.zooming = [{
    *
    */
   zoom: function(extentsData) {
+    if(this.extentsAction !== 'zoom') {
+      return;
+    }
 
     if(!this._isPanning) {
       this._saveZoomState();

@@ -105,8 +105,7 @@ Element providing an on-chart zoom.
               'icon': 'fa-eraser',
               'cursorIcon': 'fa-eraser',
               'buttonGroup': 1,
-              'onClick': 'function() {this.set("showTooltip", false);}',
-              'onClickContext': "toolbar",
+              'onClick': 'function() {this.set("_internalShowTooltip", false);}',
               'actionConfig': {
                 'mouseout': 'null',
                 'mousemove': 'null',
@@ -119,8 +118,7 @@ Element providing an on-chart zoom.
               'icon': 'fa-arrows-h',
               'cursorIcon': 'fa-arrows-h',
               'buttonGroup': 1,
-              'onClick': 'function() {this.set("showTooltip", false);}',
-              'onClickContext': "toolbar",
+              'onClick': 'function() {this.set("_internalShowTooltip", false);}',
               'actionConfig': {
                 'mouseout': 'null',
                 'mousemove': 'null',
@@ -133,8 +131,7 @@ Element providing an on-chart zoom.
               'icon': 'fa-crosshairs',
               'cursorIcon': 'fa-crosshairs',
               'buttonGroup': 1,
-              'onClick': 'function() {this.set("showTooltip", true);}',
-              'onClickContext': "toolbar",
+              'onClick': 'function() {this.set("_internalShowTooltip", true);}',
               'actionConfig': {
                 'mouseout': 'resetTooltipAndCrosshairData',
                 'mousemove': 'calcTooltipAndCrosshairData',
@@ -197,8 +194,7 @@ Element providing an on-chart zoom.
               'cursorIcon': 'fa-list-alt',
               'buttonGroup': 1,
               'selected': true,
-              'onClick': 'function() {this.set("showTooltip", true);}',
-              'onClickContext': "toolbar",
+              'onClick': 'function() {this.set("_internalShowTooltip", true);}',
               'actionConfig': {
                 'mouseout': 'resetTooltip',
                 'mousemove': 'calcTooltipData',
@@ -210,8 +206,7 @@ Element providing an on-chart zoom.
               'tooltipLabel': 'Pan',
               'icon': 'fa-arrows',
               'cursorIcon': 'fa-arrows',
-              'onClick': 'function() {this.set("showTooltip", false);}',
-              'onClickContext': "toolbar",
+              'onClick': 'function() {this.set("_internalShowTooltip", false);}',
               'buttonGroup': 1,
               'actionConfig': {
                 'mousedown': 'startPanning',
@@ -229,8 +224,7 @@ Element providing an on-chart zoom.
               'tooltipLabel': 'Zoom',
               'icon': 'fa-search',
               'cursorIcon': 'fa-search',
-              'onClick': 'function() {this.set("showTooltip", false);}',
-              'onClickContext': "toolbar",
+              'onClick': 'function() {this.set("_internalShowTooltip", false); this.set("extentsAction", "zoom");}',
               'buttonGroup': 1,
               'actionConfig': {
                 'mousedown': 'startZooming',
@@ -265,8 +259,7 @@ Element providing an on-chart zoom.
               'cursorIcon': 'fa-search',
               'buttonGroup': 1,
               'selectable': true,
-              'onClick': 'function() {this.set("showTooltip", false);}',
-              'onClickContext': 'toolbar',
+              'onClick': 'function() {this.set("_internalShowTooltip", false); this.set("extentsAction", "zoom");}',
               'actionConfig': {
                 'mousedown': 'startZooming',
                 'mouseup': 'stopZooming'
@@ -315,6 +308,63 @@ Element providing an on-chart zoom.
                   'eventName': 'px-vis-toolbar-reset-zoom'
                 }
               }
+            },
+            'stripe': {
+              'tooltipLabel': 'Draw Stripe',
+              'icon': 'fa-paint-brush',
+              'cursorIcon': 'fa-paint-brush',
+              'buttonGroup': 1,
+              'selectable': true,
+              'onClick': 'function() {this.set("_internalShowTooltip", false); this.set("extentsAction", "stripe");}',
+              'subConfig': {
+                'inclusion': {
+                  'title': 'Inclusion',
+                  'buttonGroup': 1,
+                  'tooltipLabel': 'Zoom on X axis only',
+                  'eventName': 'my-custom-click',
+                  'selectable': true,
+                  'selected': true,
+                  'onClick': 'function() { this.set("interactionSpaceConfig.selectionType", "xAxis"); this.set("stripeType", "inclusion");}'
+                },
+                'exclusion': {
+                  'title': 'Exclusion',
+                  'buttonGroup': 1,
+                  'tooltipLabel': 'Zoom on Y axis only',
+                  'selectable': true,
+                  'onClick': 'function() { this.set("interactionSpaceConfig.selectionType", "xAxis"); this.set("stripeType", "exclusion"); }'
+                },
+                'add': {
+                  'icon': 'fa-paint-brush',
+                  'tooltipLabel': 'Add stripe',
+                  'buttonGroup': 2,
+                  'selected': true,
+                  'selectable': true,
+                  'actionConfig': {
+                    'mousedown': 'startZooming',
+                    'mouseup': 'stopZooming'
+                  },
+                },
+                'remove': {
+                  'icon': 'fa-trash',
+                  'buttonGroup': 2,
+                  'selectable': true,
+                  'tooltipLabel': 'Zoom out',
+                  'actionConfig': {
+                    'mousedown': null,
+                    'mouseup': 'reportMouseCoords'
+                  },
+                },
+                'edit': {
+                  'icon': 'fa-pencil',
+                  'buttonGroup': 2,
+                  'selectable': true,
+                  'tooltipLabel': 'Edit stripe',
+                  'actionConfig': {
+                    'mousedown': 'startAreaEdit',
+                    'mouseup': 'stopAreaEdit'
+                  },
+                }
+              }
             }
           };
         }
@@ -361,7 +411,7 @@ Element providing an on-chart zoom.
        *   "customzoom": {
        *     "tooltipLabel": "zoom",          //label used for the tooltip for this button
        *     "icon": "fa-search",             //font-awesome icon used for this button
-       *     "onClick": "function() {this.set(\"showTooltip\", false);}",
+       *     "onClick": "function() {this.set(\"_internalShowTooltip\", false);}",
        *     "onClickContext': "toolbar",   //context to be used on `onClick`. If "toolbar"
        * is specified then the context will be this toolbar
        *     "buttonGroup": 1,              //if a button is part of a button group then it
@@ -435,15 +485,6 @@ Element providing an on-chart zoom.
        */
       config: {
         type: Object
-      },
-      /**
-       *
-       * Allows to show the tooltip
-       */
-      showTooltip: {
-        type: Boolean,
-        value: true,
-        notify: true
       },
       /**
       * Configuration used to define what actions happen on events. Each key represents an event,
@@ -558,6 +599,8 @@ Element providing an on-chart zoom.
 
       this._tryProcessSubConfig(conf);
       this._processItem(conf);
+
+      this._tryApplySelectedSub(conf);
     },
 
     _tryProcessSubConfig: function(conf) {
@@ -580,6 +623,18 @@ Element providing an on-chart zoom.
         this.set('currentSubConfig', subConf);
       } else {
         this.set('currentSubConfig', []);
+      }
+    },
+
+    _tryApplySelectedSub: function(conf) {
+      if(conf.subConfig) {
+        var subs = Object.keys(conf.subConfig);
+
+        for(var i=0; i<subs.length; i++) {
+          if(conf.subConfig[subs[i]]["selected"]) {
+            this._processItem(conf.subConfig[subs[i]]);
+          }
+        }
       }
     },
 

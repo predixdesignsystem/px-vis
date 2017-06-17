@@ -64,58 +64,13 @@ Element which draws a striping series onto the chart
     behaviors: [
       PxVisBehaviorD3.canvas,
       PxVisBehaviorD3.axes,
-      PxVisBehavior.dataset,
-      PxVisBehavior.mutedSeries,
       PxVisBehavior.commonMethods,
-      PxVisBehavior.completeSeriesConfig,
       PxVisBehaviorD3.domainUpdate,
-      PxVisBehavior.seriesId,
       PxVisBehavior.dynamicConfigProperties,
-      PxVisBehavior.progressiveRendering,
-      PxVisBehavior.serieToRedrawOnTop,
       PxColorsBehavior.baseColors,
-      PxVisBehavior.preventInitialDrawing,
-      PxVisBehavior.isAttached
+      PxVisBehavior.stripProperties
     ],
-    /**
-     * px-vis-striping-progressive-rendering-started, fired when a canvas with progressive rendering
-     * enabled starts rendering
-     * evt.details contains:
-     * { numberOfFrames: the number of frames that will be used to render,
-     * }
-     *
-     * @event px-vis-striping-progressive-rendering-started
-     */
-    /**
-     * px-vis-striping-progressive-batch, fired when a canvas with progressive rendering
-     * has finished rendering one batch of data
-     * evt.details contains:
-     * { numberOfFrames: the number of frames that will be used to render,
-     *  currentFrame: index of the frame that has just been rendered
-     * }
-     *
-     * @event px-vis-striping-progressive-batch
-     */
 
-    /**
-     * px-vis-striping-progressive-rendering-ended, fired when a canvas with progressive rendering
-     * enabled has finished rendering
-     * evt.details contains:
-     * { numberOfFrames: the number of frames that have been used to render,
-     * }
-     *
-     * @event px-vis-striping-progressive-rendering-ended
-     */
-
-    /**
-     * px-vis-striping-rendering-ended, fired when a canvas has finished rendering,
-     * whether it had progressive rendering or not
-     * evt.details contains:
-     * { progressiveRending: whether progressive rendering was enabled,
-     * }
-     *
-     * @event px-vis-striping-rendering-ended
-     */
     /**
      * Properties block, expose attribute values to the DOM via 'reflect'
      *
@@ -123,30 +78,6 @@ Element which draws a striping series onto the chart
      * @type Object
      */
     properties: {
-      /**
-       * An index of the series used for calculating its color
-       *
-       * @type String
-       */
-      seriesNumber:{
-        type:Number,
-        value:0
-      },
-
-      stripeConfig: {
-        type: Object
-      },
-
-      /**
-       * A holder object for the series group
-       *
-       * @property stripingGroup
-       * @type Object
-       */
-      stripingGroup:{
-        type:Object,
-        value: function() { return{}; }
-      },
 
       /**
        * Debounce time to use for drawing
@@ -155,40 +86,7 @@ Element which draws a striping series onto the chart
         type: Number,
         value: 10
       },
-      /**
-      * Counter to track progressive rendering requests and only draw the latest one
-      */
-      _progressiveRenderingCounter: {
-        type: Number,
-        value: 0
-      },
-      /**
-       * options currently in use for drawing striping: opacity, symbol, drawing function....
-       */
-      _currentDrawingOptions: {
-        type: Object,
-        value:function() {
-          return {};
-        }
-      },
-      /**
-       * Current context for rendering: points per frame, number of frames, rendering counter
-       */
-      _renderingContext: {
-        type: Object,
-        value:function() {
-          return {};
-        }
-      },
-      /**
-      * Number of points to be drawn per progressive rendering frame.
-      * The higher the value the fastest the processing but the more
-      * likely the UI will stutter/freeze.
-      */
-      progressiveRenderingPointsPerFrame: {
-        type: Number,
-        value: 2000
-      },
+
       /**
        * Whether to use the clippath to avoid drawing outside of axes
        *
@@ -200,8 +98,7 @@ Element which draws a striping series onto the chart
     },
 
     observers: [
-      '_redraw(canvasContext, domainChanged, chartData.*, completeSeriesConfig.*, _canvasRedraw, preventInitialDrawing, radial, counterClockwise,markerSymbol, markerScale, markerSize, markerFillOpacity, markerStrokeOpacity)',
-      'mutedChanged(mutedSeries.*, completeSeriesConfig)',
+      '_redraw(canvasContext, domainChanged, stripeData.*, stripeConfig.*)',
       '_drawOnTop(serieToRedrawOnTop)'
      ],
 
@@ -218,10 +115,6 @@ Element which draws a striping series onto the chart
       this._isDirty = true;
     },
 
-    ready:function() {
-      this._processOneBatchBound = this._processOneBatch.bind(this);
-    },
-
     _redraw: function() {
       if(!this.preventInitialDrawing) {
         this.drawCanvas(true);
@@ -234,10 +127,6 @@ Element which draws a striping series onto the chart
      * @method drawElement
      */
     drawCanvas: function(allowCanvasClearing) {
-
-      //new request
-      this._progressiveRenderingCounter++;
-
       if(this.drawDebounceTime > 0) {
         this.debounce('drawCanvasStriping',function() {
           this._drawCanvasDebounced(allowCanvasClearing);
@@ -247,138 +136,43 @@ Element which draws a striping series onto the chart
       }
     },
     _drawCanvasDebounced: function(allowCanvasClearing) {
-
-      if(!this.y ||
+      if(!this.x ||
          typeof this.domainChanged === 'undefined' ||
          this.domainChanged === null ||
-         !this._isAttached ||
-         !this.chartData) {
+         !this.stripeData) {
            return;
          }
 
-      // (x1,y1,x2,y2)
       this.canvasContext.pxClearCanvas();
-
-      if(this.chartData.length) {
-        //prepare values and draw
-        this._initiateRendering();
-      }
+      this._initiateRendering();
     },
 
 
     _initiateRendering: function() {
+      var keys = Object.keys(this.stripeConfig);
 
-      this._currentDrawingOptions.fillOpacity = this._currentDrawingOptions.muted  ? this.mutedOpacity : this.markerFillOpacity;
-      this._currentDrawingOptions.strokeOpacity = this._currentDrawingOptions.muted  ? 0 : this.markerStrokeOpacity;
-      this._currentDrawingOptions.sameOpacity = this._currentDrawingOptions.fillOpacity === this._currentDrawingOptions.strokeOpacity;
-      this._currentDrawingOptions.drawingFunction;
-      this._currentDrawingOptions.oldAlpha = this.canvasContext.globalAlpha;
-      this._currentDrawingOptions.previousTranslate = [0,0];
-      //TODO: ordinal?......
-      this._currentDrawingOptions.xDomain = this.x.domain();
-      this._currentDrawingOptions.yDomain = this.y.domain();
+      if(this.clipPath) {
+        this.drawClipPath();
+      }
 
-      //small optimization if we have the same opacity values, no need to change
-      //opacity all the time
-      if(!this._currentDrawingOptions.sameOpacity) {
-        this._currentDrawingOptions.drawingFunction = function() {
-          this.canvasContext.globalAlpha = this._currentDrawingOptions.fillOpacity;
-          this.canvasContext.fill();
-          this.canvasContext.globalAlpha = this._currentDrawingOptions.strokeOpacity;
-          this.canvasContext.stroke();
-        }.bind(this);
-      } else {
-        this._currentDrawingOptions.drawingFunction = function() {
-          this.canvasContext.fill();
-          this.canvasContext.stroke();
-        }.bind(this);
-      };
+      for(var i = 0; i < keys.length; i++) {
+        this.canvasContext.fillStyle = this.stripeConfig[keys[i]]['fillColor'];
+        this.canvasContext.globalAlpha = this.stripeConfig[keys[i]]['fillOpacity'];
 
-      if(this.noCanvasProgressiveRendering) {
-        this._renderAtOnce();
-      } else {
-        //get number of frames
-        var numberOfSeries = Object.keys(this.completeSeriesConfig).length;
-        var frames = Math.min(this.chartData.length, Math.ceil(Math.max(((this.chartData.length*numberOfSeries)/this.progressiveRenderingPointsPerFrame), this.progressiveRenderingMinimumFrames)));
-        this._renderProgressively(frames);
+        if(this.stripeData[keys[i]] && this.stripeData[keys[i]].length) {
+          this._renderStripes(this.stripeData[keys[i]]);
+        }
       }
     },
 
-    _renderAtOnce: function() {
+    _renderStripes: function(data) {
+      var x, w;
+      for(var i = 0; i < data.length; i++) {
+        x = this.x(data[i][0]),
+        w = this.x(data[i][1]) - x;
 
-      //don't actually draw if invisible
-      if(!(this._currentDrawingOptions.sameOpacity && this._currentDrawingOptions.fillOpacity === 0)) {
-        this._renderingContext = {
-          'index': 0,
-          //new request
-          'requestCounter': ++this._progressiveRenderingCounter,
-          'size': this.chartData.length,
-          'numberOfFrames': 1
-        };
-        this._renderOneBatch();
+        this.canvasContext.fillRect(x, 0, w, this.height);
       }
-
-      this._renderingEnded(false);
-    },
-
-    /**
-     * Renders data in a specific number of frames, splitting the batch
-     *
-     */
-    _renderProgressively: function(numberOfFrames) {
-
-      //don't actually draw if invisible
-      if(!(this._currentDrawingOptions.sameOpacity && this._currentDrawingOptions.fillOpacity === 0)) {
-
-        this.fire('px-vis-striping-progressive-rendering-started', {numberOfFrames: numberOfFrames});
-
-        this._renderingContext = {
-          'index': 0,
-          //new request
-          'requestCounter': ++this._progressiveRenderingCounter,
-          'size': Math.ceil(this.chartData.length/numberOfFrames),
-          'numberOfFrames': numberOfFrames
-        };
-
-        //called every animation frame
-        window.requestAnimationFrame(this._processOneBatchBound);
-      }
-    },
-
-    _processOneBatch: function() {
-
-      if(this._renderingContext.requestCounter !== this._progressiveRenderingCounter) {
-        //new request came in, cancel this drawing. Don't reset the counter as we want
-        //the new request to finish
-        return;
-      }
-
-      //get the number of points requested
-      this._renderOneBatch();
-
-      this._renderingContext.index++;
-
-      if(this._renderingContext.index < this._renderingContext.numberOfFrames) {
-        //continue processing
-        this.fire('px-vis-striping-progressive-batch', { "numberOfFrames": this._renderingContext.numberOfFrames, "currentFrame": this._renderingContext.index });
-        window.requestAnimationFrame(this._processOneBatchBound);
-      } else {
-        //finished drawing, reset drawing request counter
-        this._renderingEnded(true, this._renderingContext.numberOfFrames);
-      }
-    },
-
-    /**
-     * progressive or normal rendering is completely done
-     */
-    _renderingEnded: function(progressive,numberOfFrames) {
-
-      if(progressive) {
-        this._progressiveRenderingCounter = 0;
-        this.fire('px-vis-striping-progressive-rendering-ended', {"numberOfFrames": numberOfFrames });
-      }
-
-      this.fire('px-vis-striping-rendering-ended', { "progressiveRending": progressive });
     },
 
     /**
@@ -386,130 +180,14 @@ Element which draws a striping series onto the chart
      *
      */
     drawClipPath: function() {
-      /* not sure why this if statement bandaid is needed
-         if you have chartData with all the same value (such as all 0) and some axes and you clear axes first, then clear chartData
-         (not chartData and then axes), then reload the same data and axes (order doesnt matter), series do not plot.
-         Clearly related to the clip path, but cannot isolate.
-         If you load data that is not 100% 0, or change the chartData or axes on reload, doesnt happen.
-         This if statement prevents clipPath from running under these circumstances and everything is fine
-      */
-      if(this.chartData.length > 0 && this.completeSeriesConfig[this.seriesId]["x"].length > 0) {
-        this.canvasContext.beginPath();
+      this.canvasContext.beginPath();
 
-        if(!this.radial) {
-          var w = Math.max(this.width - this.margin.left - this.margin.right,0),
-            h = Math.max(this.height - this.margin.top - this.margin.bottom,0);
+      var w = Math.max(this.width - this.margin.left - this.margin.right, 0),
+          h = Math.max(this.height - this.margin.top - this.margin.bottom, 0);
 
-          this.canvasContext.rect(0, 0, w, h);
-        } else {
-          //width = height = diameter
-          this.canvasContext.arc(0, 0, this.height/2, 0, Math.PI * 2, false);
-        }
+      this.canvasContext.rect(0, 0, w, h);
 
-        this.canvasContext.clip();
-      }
-    },
-
-    /**
-     * Renders one batch of striping data (can be one batch during progressive rendering
-     * or all data during render at once)
-     */
-    _renderOneBatch : function() {
-
-      //save and restore context for safety
-      this.canvasContext.save();
-
-      if(this.clipPath) {
-        this.drawClipPath();
-      }
-
-      //get serie specific values. stroke and fill opacities
-      //are handled in the options.drawingFunction
-      this.canvasContext.scale(this.markerScale, this.markerScale);
-      this.canvasContext.fillStyle = this.completeSeriesConfig[this.seriesId]['color'];
-      this.canvasContext.strokeStyle = this.completeSeriesConfig[this.seriesId]['color'];
-      this.canvasContext.globalAlpha = this._currentDrawingOptions.fillOpacity;
-      var previousTranslate = [0,0],
-          translate,
-          start = this._renderingContext.size * this._renderingContext.index,
-          stop = Math.min(start + this._renderingContext.size, this.chartData.length);
-
-      for(var i = start; i < stop; i++) {
-
-        //get the position of the symbol
-        translate = this._getTransform(this.chartData[i]);
-
-        //move canvas to new pos
-        this.canvasContext.translate(translate[0] - previousTranslate[0], translate[1] - previousTranslate[1]);
-
-        //draw
-        this.canvasContext.beginPath();
-        this._currentDrawingOptions.symbol();
-        this.canvasContext.closePath();
-        this._currentDrawingOptions.drawingFunction();
-
-        //remember pos so that we can move to the next point in 1 translate
-        //instead of restoring the translate here
-        previousTranslate = translate;
-      }
-
-      //restore canvas pos
-      this.canvasContext.translate(-previousTranslate[0], -previousTranslate[1]);
-
-      this.canvasContext.restore();
-      this.canvasContext._pxStripingCleared = false;
-    },
-
-    _getTransform: function(d) {
-/*
-  FIXME
-  1) Unify the isValidData and lines(d) checks.
-  2) Figure out better default instead of 0,0 for transform
-  3) Think about using cx & cy instead of transform.
-*/
-      if(!this._isValidData(d[this.completeSeriesConfig[this.seriesId]['y']]) ||
-         !this._isValidData(d[this.completeSeriesConfig[this.seriesId]['x']])) {
-        return [0,0];
-      }
-
-      if(this.radial) {
-        var line = this.line([d]);
-        if (line) {
-          var coors = line.slice(1).slice(0, -1);
-          if (coors !== 'NaN,NaN') {
-            var commaIndex = coors.indexOf(',') + 1;
-            return [coors.slice(0,commaIndex -1), coors.slice(commaIndex)];
-          }
-        }
-        return [0,0];
-      } else {
-
-        var xTrans = this.x(d[this.completeSeriesConfig[this.seriesId]['x']]),
-            yTrans = this.y(d[this.completeSeriesConfig[this.seriesId]['y']]);
-
-        //make sure we have a value
-        xTrans = xTrans ? xTrans : 0;
-        yTrans = yTrans ? yTrans : 0;
-
-        return [xTrans, yTrans];
-      }
-    },
-
-    _isSerieMuted: function(d) {
-      if(this.multiPath) {
-        return this.mutedSeries[d[this.seriesId]] ? true : false;
-      } else {
-        return this.mutedSeries[this.seriesId] ? true : false;
-      }
-    },
-    /**
-     * Checks mutedSeries to see if this ID is in there
-     * Called from an observer watching mutedSeries
-     *
-     * @method mutedChanged
-     */
-    mutedChanged: function() {
-      this.set('_canvasRedraw', !this._canvasRedraw);
+      this.canvasContext.clip();
     },
 
     /**
