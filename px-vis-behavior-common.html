@@ -2422,7 +2422,7 @@ PxVisBehavior.highlightShared = [{
       }
     }
 
-    return d;
+    return d[0] === null ? [] : d ;
   },
 
 
@@ -2462,7 +2462,7 @@ PxVisBehavior.highlightShared = [{
   },
 
   _setTooltipData: function(dataset) {
-    if(dataset.length && dataset[0] !== null) {
+    if(dataset.length) {
       var timestamp = this.timeData ? dataset[0][this.timeData] : null;
           series = this._generateSeries(dataset[0]);
           ttd = this._createTooltipDataStub(series[0]["coord"], timestamp, !this.hideTooltip);
