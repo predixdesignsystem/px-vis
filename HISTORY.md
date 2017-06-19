@@ -1,3 +1,7 @@
+v2.0.6
+==================
+* Fixes to binary search in crosshair
+
 v2.0.5
 ==================
 * Improved performance of scatter canvas rendering
