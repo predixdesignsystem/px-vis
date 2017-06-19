@@ -319,6 +319,8 @@ Element providing an on-chart zoom.
               'subConfig': {
                 'inclusion': {
                   'title': 'Inclusion',
+                  'cursorIcon': 'fa-paint-brush',
+                  'customButtonStyle': 'color: salmon;',
                   'buttonGroup': 1,
                   'tooltipLabel': 'Zoom on X axis only',
                   'eventName': 'my-custom-click',
@@ -328,6 +330,8 @@ Element providing an on-chart zoom.
                 },
                 'exclusion': {
                   'title': 'Exclusion',
+                  'cursorIcon': 'fa-paint-brush',
+                  'customButtonStyle': 'color: salmon;',
                   'buttonGroup': 1,
                   'tooltipLabel': 'Zoom on Y axis only',
                   'selectable': true,
@@ -335,33 +339,45 @@ Element providing an on-chart zoom.
                 },
                 'add': {
                   'icon': 'fa-paint-brush',
+                  'cursorIcon': 'fa-paint-brush',
                   'tooltipLabel': 'Add stripe',
                   'buttonGroup': 2,
                   'selected': true,
                   'selectable': true,
+                  'onClick': 'function() {this.set("extentsSubAction", "add");}',
                   'actionConfig': {
                     'mousedown': 'startZooming',
-                    'mouseup': 'stopZooming'
+                    'mouseup': 'stopZooming',
+                    'mouseout': 'resetTooltip',
+                    'mousemove': 'calcTooltipData'
                   },
                 },
                 'remove': {
                   'icon': 'fa-trash',
+                  'cursorIcon': 'fa-trash',
                   'buttonGroup': 2,
                   'selectable': true,
                   'tooltipLabel': 'Zoom out',
+                  'onClick': 'function() {this.set("extentsSubAction", "remove");}',
                   'actionConfig': {
                     'mousedown': null,
-                    'mouseup': 'reportMouseCoords'
+                    'mouseup': 'reportMouseCoords',
+                    'mouseout': 'reportMouseCoords',
+                    'mousemove': 'reportMouseCoords'
                   },
                 },
                 'edit': {
                   'icon': 'fa-pencil',
+                  'cursorIcon': 'fa-pencil',
                   'buttonGroup': 2,
                   'selectable': true,
                   'tooltipLabel': 'Edit stripe',
+                  'onClick': 'function() {this.set("extentsSubAction", "edit");}',
                   'actionConfig': {
-                    'mousedown': 'startAreaEdit',
-                    'mouseup': 'stopAreaEdit'
+                    'mousedown': null,
+                    'mouseup': null,
+                    'mouseout': 'reportMouseCoords',
+                    'mousemove': 'reportMouseCoords'
                   },
                 }
               }
