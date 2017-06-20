@@ -1335,7 +1335,7 @@ PxVisBehaviorD3.lineShared = [{
     /**
      * Object used to store various info about current rendering state
      */
-    _renderingContext: {
+    _currentDrawingOptions: {
       type: Object,
       value: function() {
         return {
@@ -1347,8 +1347,8 @@ PxVisBehaviorD3.lineShared = [{
   },
 
   _resetRenderingContext: function() {
-    this._renderingContext.lastPointRenderedIndex = null;
-    this._renderingContext.currentBatchStartIndex = 0;
+    this._currentDrawingOptions.lastPointRenderedIndex = null;
+    this._currentDrawingOptions.currentBatchStartIndex = 0;
   },
 
   _computeColorArr: function(categories,completeSeriesConfig,seriesId){
@@ -1444,24 +1444,24 @@ PxVisBehaviorD3.lineShared = [{
           } else if(!renderToCanvas) {
 
             //svg needs to have a point defined where canvas will just ignore this point if no value
-            return ~~_this.x(_this.chartData[_this._renderingContext.lastPointRenderedIndex][xKey]);
+            return ~~_this.x(_this.chartData[_this._currentDrawingOptions.lastPointRenderedIndex][xKey]);
           }
         })
         .y(function(d,i) {
           if((d[xKey] || d[xKey] === 0) && (d[yKey] || d[yKey] === 0 )) {
-            _this._renderingContext.lastPointRenderedIndex = _this._renderingContext.currentBatchStartIndex + i;
+            _this._currentDrawingOptions.lastPointRenderedIndex = _this._currentDrawingOptions.currentBatchStartIndex + i;
             return ~~_this.y(d[yKey]);
           } else if(!renderToCanvas) {
 
             //svg needs to have a point defined where canvas will just ignore this point if no value
-            return ~~_this.y(_this.chartData[_this._renderingContext.lastPointRenderedIndex][yKey]);
+            return ~~_this.y(_this.chartData[_this._currentDrawingOptions.lastPointRenderedIndex][yKey]);
           }
         })
         .defined(function(d,i) {
 
           //at first don't accept undefined since we don't have a previous point
           //to attach to
-          return _this._renderingContext.lastPointRenderedIndex === null ? _this._isValidData(d[yKey]) : _this._isDataNotNull(d[yKey]);
+          return _this._currentDrawingOptions.lastPointRenderedIndex === null ? _this._isValidData(d[yKey]) : _this._isDataNotNull(d[yKey]);
         });
     }
 
