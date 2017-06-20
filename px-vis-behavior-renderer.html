@@ -1,0 +1,297 @@
+<link rel="import" href="px-vis-behavior-common.html">
+<link rel="import" href="px-vis-behavior-d3.html">
+
+<script>
+var PxVisBehaviorRenderer = PxVisBehaviorRenderer || {};
+
+/*
+    Name:
+    PxVisBehaviorRenderer.base
+
+    Description:
+    Polymer behavior that provides
+
+    Dependencies:
+    - none
+
+    @polymerBehavior PxVisBehaviorRenderer.base
+*/
+PxVisBehaviorRenderer.base = [{
+  properties: {
+    /**
+     * Debounce time to use for drawing
+     */
+    drawDebounceTime: {
+      type: Number,
+      value: 10
+    },
+    /**
+    * Counter to track progressive rendering requests and only draw the latest one
+    */
+    _progressiveRenderingCounter: {
+      type: Number,
+      value: 0
+    },
+    /**
+     * Object used to store various info about current rendering state
+     */
+    _renderingContext: {
+      type: Object,
+      value: function() {
+        return {
+          'lastPointRenderedIndex': null,
+          'currentBatchStartIndex': 0
+        };
+      }
+    },
+    /**
+     * Current targets to draw during rendering. Cleared after
+     * drawing done
+     */
+    _renderingTargets: {
+      type: Array
+    },
+    /**
+     * The minimum number of points to render per frame
+     * even if the chart is laggy
+     */
+    _minimumPointsPerFrame: {
+      type: Number,
+      value: 50
+    },
+    /**
+     * Number of previous frames to average for the adaptive
+     * progressive rendering
+     */
+    _frameCountToAverage: {
+      type: Number,
+      value: 15
+    }
+  },
+  observers: ['_renderData(domainChanged, canvasContext, chartData.*, completeSeriesConfig.*, preventInitialDrawing, radial, counterClockwise, renderToCanvas)'],
+
+
+  ready: function() {
+    this._processRenderingBound = this._processRendering.bind(this);
+  },
+  attached: function() {
+
+      //if we've been detached and reattached make sure we redraw (canvas clears on detached)
+      if(this._isDirty) {
+        this._renderData();
+        this._isDirty = false;
+      }
+    },
+  detached: function() {
+
+    this._isDirty = true;
+
+    //reset counter so it cancels current drawing
+    this._progressiveRenderingCounter = 0;
+  },
+
+  _renderData: function() {
+
+    if(!this.preventInitialDrawing) {
+      //new request
+      this._progressiveRenderingCounter++;
+
+      if(this.drawDebounceTime > 0) {
+        this.debounce('drawCanvasScatter',function() {
+          this._renderDataDebounced(true);
+        }.bind(this), this.drawDebounceTime);
+      } else {
+        this._renderDataDebounced(true);
+      }
+    } else {
+      //reset counter so it cancels current drawing
+      this._progressiveRenderingCounter = 0;
+    }
+  },
+
+  _renderDataDebounced: function(allowCanvasClearing) {
+    if(this.y &&
+         typeof this.domainChanged !== 'undefined' &&
+         this.domainChanged !== null &&
+         this._isAttached &&
+         this.chartData) {
+
+
+      //TODO: deal with svg
+      if(this.renderToCanvas || !this.renderToSvg) {
+
+        //clear canvas first
+        if(allowCanvasClearing) {
+          this.canvasContext.pxClearCanvas();
+        }
+
+        //find all lines and scatter and initialize them for drawing
+        this._renderingTargets = Polymer.dom(this.root).querySelectorAll('px-vis-line-canvas');
+        this._renderingTargets = this._renderingTargets.concat(Polymer.dom(this.root).querySelectorAll('px-vis-scatter-canvas'));
+
+        //todo: configurable initial values?
+        this._renderingContext = {
+          'frameIndex': 0,
+          //new request
+          'requestCounter': ++this._progressiveRenderingCounter,
+          'size': {},
+          'previousFramesTiming': [],
+          'targetIndex': 0,
+          'currentRenderingCounter': 0
+        };
+
+        for(var i=0; i<this._renderingTargets.length; i++) {
+          this._renderingTargets[i].initializeDrawingSession();
+        }
+
+        //now start actual drawing
+        this._processRendering();
+      }
+    }
+  },
+
+  _processRendering: function(timing) {
+
+    if(this._renderingContext.requestCounter !== this._progressiveRenderingCounter) {
+      //new request came in, cancel this drawing. Don't reset the counter as we want
+      //the new request to finish
+      return;
+    }
+
+    var now = window.performance.now();
+    //TODO: logic for selecting drawing order
+    if(this._renderingContext.frameIndex === 0) {
+
+      this._renderingContext.previousStartTime = window.performance.now();
+      this._firstRender(this._getCurrentRenderingTarget());
+      window.requestAnimationFrame(this._processRenderingBound);
+    } else {
+
+      //update how long the previous frame took
+      this._renderingContext.previousFramesTiming[this._renderingContext.previousFramesTiming.length-1].duration = now - this._renderingContext.previousStartTime;
+
+      console.log('frame ' + this._renderingContext.frameIndex + ', render: ' +JSON.stringify(this._renderingContext.previousFramesTiming[this._renderingContext.previousFramesTiming.length-1]));
+
+      //find out how many points we can render this frame
+      var toRender = this._calculatePointsAllowance(),
+          target = this._getCurrentRenderingTarget();
+
+      //store what we are going to render this frame so it's
+      //available next frame
+      this._renderingContext.previousFramesTiming.push({
+        'points': toRender
+      });
+
+      //keep rendering while we can
+      while(toRender > 1 && target) {
+
+        toRender = this._renderToTarget(target, toRender);
+        target = this._getCurrentRenderingTarget();
+      }
+
+
+      this._renderingContext.previousStartTime = now;
+
+      //only average the last 10 frames
+      if(this._renderingContext.previousFramesTiming.length > this._frameCountToAverage) {
+        this._renderingContext.previousFramesTiming.shift();
+      }
+    }
+    this._renderingContext.frameIndex++;
+
+    if(this._renderingContext.targetIndex > this._renderingTargets.length-1) {
+
+      //Everything done
+      this.fire('px-vis-chart-canvas-rendering-ended');
+    } else {
+      //keep rendering
+      window.requestAnimationFrame(this._processRenderingBound);
+    }
+    //event?
+  },
+
+  _getCurrentRenderingTarget: function() {
+
+    if(this._renderingTargets.length) {
+      return this._renderingTargets[this._renderingContext.targetIndex];
+    }
+
+    return null;
+  },
+
+  _firstRender: function(target, isScatter) {
+
+    //try estimating how much we can render.
+    var duration,
+        multiplier,
+        targetTiming = 8,
+        pointsRendered = 0,
+        toRender = Math.min(target.nodeName === 'PX-VIS-SCATTER-CANVAS' ? 200 : 1000, this.chartData.length);
+
+    //start by rendering 50 pts
+    this._renderToTarget(target, toRender)
+    pointsRendered = toRender;
+
+    duration = window.performance.now() - this._renderingContext.previousStartTime;
+
+    //target 8ms: 16ms (60 fps) - 8ms for the browser to
+    //actually draw. Crude but this is only for the first frame
+    if(duration < targetTiming) {
+      //find how much more we can render
+      multiplier = Math.floor(targetTiming / duration);
+
+      this._renderToTarget(target, multiplier * 10);
+      pointsRendered += multiplier * 10;
+    }
+
+    this._renderingContext.previousFramesTiming.push({
+      'points': pointsRendered
+    });
+  },
+
+  _renderToTarget: function(target, toRender) {
+
+    var leftInCurrentSeries = this.chartData.length - this._renderingContext.currentRenderingCounter,
+        start = this._renderingContext.currentRenderingCounter,
+        stop = Math.min(start + toRender, this.chartData.length);
+
+
+    target.renderOneBatch(start, stop);
+
+    if(toRender > leftInCurrentSeries) {
+
+      //this series is done
+      this._renderingContext.currentRenderingCounter = 0;
+      this._renderingContext.targetIndex++;
+
+      return toRender - leftInCurrentSeries;
+    } else {
+      this._renderingContext.currentRenderingCounter += toRender;
+      return 0;
+    }
+  },
+
+  _calculatePointsAllowance: function() {
+    var totPoints = 0,
+        totDuration = 0,
+        avgPoints,
+        avgDuration,
+        pointsAddition;
+
+      //calculate averages
+      for(var i=0; i<this._renderingContext.previousFramesTiming.length; i++) {
+        totPoints += this._renderingContext.previousFramesTiming[i].points;
+        totDuration += this._renderingContext.previousFramesTiming[i].duration;
+      }
+
+      //adjust batch size
+      avgPoints = Math.floor(totPoints/this._renderingContext.previousFramesTiming.length);
+      avgDuration = totDuration/this._renderingContext.previousFramesTiming.length;
+      //16ms => 60fps
+      pointsAddition = Math.floor((16 - avgDuration) * (avgPoints/avgDuration));
+
+      return Math.max(this._minimumPointsPerFrame, avgPoints + pointsAddition);
+  }
+}, PxVisBehaviorD3.renderToCanvas, PxVisBehavior.dataset, PxVisBehavior.polarData, PxVisBehavior.radial, PxVisBehavior.preventInitialDrawing];
+
+</script>
