@@ -189,14 +189,19 @@ Element which draws lines series onto the chart
       '_drawOnTop(serieToRedrawOnTop)'
     ],
 
+    attached: function() {
+      this.fire('px-vis-renderer-register', {'type': 'line', 'renderMode': 'canvas'});
+    },
+
+    detached: function() {
+      this.fire('px-vis-renderer-unregister',{'renderMode': 'canvas'});
+    },
+
     /**
      * Defines the appropriate line generator and update drawing
      * variables: opacity, colors...
      */
     initializeDrawingSession: function() {
-
-      //TODO
-      //this._resetRenderingContext();
 
       //create our line generator
       if(this.parallelCoordinates) {
@@ -211,9 +216,6 @@ Element which draws lines series onto the chart
       this._currentDrawingOptions.mutedOpacity = this.completeSeriesConfig[this.seriesId].mutedOpacity || this.completeSeriesConfig[this.seriesId].mutedOpacity === 0 ?
                             this.completeSeriesConfig[this.seriesId].mutedOpacity : this.mutedOpacity;
       this._currentDrawingOptions.strokeWidth = this.strokeWidth;
-
-      //restore our empty state
-      //this.canvasContext.restore();
 
 //FIXME Clip Path can be optimized. Currently draws with every TS line. Can be drawn once.
       if(this.clipPath) {

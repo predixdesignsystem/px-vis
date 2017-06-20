@@ -288,8 +288,6 @@ Element which draws a scatter series onto the chart
       '_drawOnTop(serieToRedrawOnTop)'
      ],
 
-
-
     ready:function() {
       //generate properties dynamically
       this._watchConfigProperty('markerSymbol', 'circle');
@@ -299,6 +297,14 @@ Element which draws a scatter series onto the chart
       this._watchConfigProperty('markerStrokeOpacity', 1);
       this._watchConfigProperty('mutedOpacity', 0.3);
       this._processOneBatchBound = this._processOneBatch.bind(this);
+    },
+
+    attached: function() {
+      this.fire('px-vis-renderer-register', {'type': 'scatter', 'renderMode': 'canvas'});
+    },
+
+    detached: function() {
+      this.fire('px-vis-renderer-unregister', {'renderMode': 'canvas'});
     },
 
     /**
