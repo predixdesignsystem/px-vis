@@ -581,7 +581,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      */
     _getDataForAllSeries: function(mousePos) {
       // invert: takes position on the screen and converts it into an equivalent date
-      var x1 = this.xAxisType !== 'ordinal' ? this.x.invert(mousePos[0]) : null,
+      var x1 = this.xAxisType !== 'ordinal' && this.xAxisType !== 'scaleBand' ? this.x.invert(mousePos[0]) : null,
           dataObj = this._returnTooltipDataStub(mousePos, x1), // setup a holder for our data
           keys = this.seriesKeys ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
           closestTimestamp = { "distance": Number.MAX_VALUE, "time": null },
@@ -590,7 +590,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           searchTimeStamp = dataObj.time === null && !!this.chartData[0][this.timeData];
 
       // if we want to do a quadtree
-      if(this.xAxisType !== 'time' && this.xAxisType !== 'timeLocal' && this.xAxisType !== 'ordinal' && !this.preventWebWorkerSynchronization) {
+      if(this.xAxisType !== 'time' && this.xAxisType !== 'timeLocal' && this.xAxisType !== 'ordinal' && this.xAxisType !== 'scaleBand' && !this.preventWebWorkerSynchronization) {
         this._searchOnWebWorker(mousePos, dataObj);
         return;
       }
@@ -657,19 +657,19 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           isContinuous = false;
 
       //ordinal are specials...
-      if(this.xAxisType === 'ordinal') {
+      if(this.xAxisType === 'ordinal' || this.xAxisType === 'scaleBand') {
         //find ordinal value for X
         result.series[xKey] = this._getOrdinalValue(true, mousePos[0], axisKey);
 
         //now get Y
-        if(this.yAxisType === 'ordinal') {
+        if(this.yAxisType === 'ordinal' || this.yAxisType === 'scaleBand') {
           result.series[yKey] = this._getOrdinalValue(false, mousePos[1], axisKey);
         } else {
           y1 = this._isMultiY ? this.y[axisKey].invert(mousePos[1]) : this.y.invert(mousePos[1]);
           result.series[yKey] = this._getClosestValue(false, y1, this.chartData, xKey, yKey, result.series[xKey]);
         }
 
-      } else if(this.yAxisType === 'ordinal') {
+      } else if(this.yAxisType === 'ordinal' || this.yAxisType === 'scaleBand') {
         result.series[yKey] = this._getOrdinalValue(false, mousePos[1], axisKey);
         result.series[xKey] = this._getClosestValue(true, x1, this.chartData, xKey, yKey, result.series[yKey]);
 
@@ -968,13 +968,13 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         var mousePos = Px.d3.mouse(this._rect.node());
 
         //for ordinal axis store mouse pos, for others the corresponding value
-        if(this.xAxisType === 'ordinal') {
+        if(this.xAxisType === 'ordinal'||this.xAxisType === 'scaleBand') {
           this._panningStartVal[0] = mousePos[0];
         } else {
           this._panningStartVal[0] = this.x.invert(mousePos[0]);
         }
 
-        if(this.yAxisType === 'ordinal') {
+        if(this.yAxisType === 'ordinal'||this.yAxisType === 'scaleBand') {
           this._panningStartVal[1] = mousePos[1];
         } else {
           this._panningStartVal[1] = this._processYValues(function(axis, index) {
@@ -997,7 +997,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         //for now ignore ordinal axis but allow panning along the other axis
         //if it's not ordinal as well
         //X
-        if(this.xAxisType !== 'ordinal') {
+        if(this.xAxisType !== 'ordinal' && this.xAxisType !== 'scaleBand') {
           currentPanningVal = this.x.invert(mousePos[0]);
           diff = currentPanningVal - this._panningStartVal[0];
           newExtents.eX = [xDomain[0] - diff, xDomain[1] - diff];
@@ -1009,7 +1009,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         }
 
         //Y
-        if(this.yAxisType !== 'ordinal') {
+        if(this.yAxisType !== 'ordinal' && this.yAxisType !== 'scaleBand') {
 
           newExtents.eY = this._processYValues(function(axis, index) {
             currentPanningVal = axis.invert(mousePos[1]);
@@ -1179,13 +1179,13 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             extents.x2 = extents.x1 + extents.w;
             extents.y2 = extents.y1 + extents.h;
 
-            if(this.xAxisType === 'ordinal') {
+            if(this.xAxisType === 'ordinal'||this.xAxisType === 'scaleBand') {
               extents.eX = this._getOrdinalRange(true, extents.x1, extents.x2);
             } else {
               extents.eX = [this.x.invert(extents.x1), this.x.invert(extents.x2)];
             }
 
-            if(this.yAxisType === 'ordinal') {
+            if(this.yAxisType === 'ordinal'||this.yAxisType === 'scaleBand') {
               //Y axis is top to bottom
               extents.eY = this._getOrdinalRange(false, extents.y2, extents.y1);
             } else {
@@ -1213,7 +1213,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     _createQuadtreeData: function() {
-      if(this.domainChanged !== null && this.useQuadtree && !this.preventWebWorkerSynchronization && this.xAxisType !== 'ordinal') {
+      if(this.domainChanged !== null && this.useQuadtree && !this.preventWebWorkerSynchronization && this.xAxisType !== 'ordinal' && this.xAxisType !== 'scaleBand') {
         this.debounce('buildQuadtree', function() {
 
           var w = this.width - this.margin.right - this.margin.left,
