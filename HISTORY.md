@@ -1,3 +1,8 @@
+
+==================
+* Add striping component
+* Edits to toolbar and interaction space for striping
+
 v2.0.6
 ==================
 * Fixes to binary search in crosshair
