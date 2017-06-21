@@ -407,10 +407,14 @@ Element which draws a scatter series onto the chart
       //opacity all the time
       if(!this._currentDrawingOptions.sameOpacity) {
         this._currentDrawingOptions.drawingFunction = function() {
-          this.canvasContext.globalAlpha = this._currentDrawingOptions.fillOpacity;
-          this.canvasContext.fill();
-          this.canvasContext.globalAlpha = this._currentDrawingOptions.strokeOpacity;
-          this.canvasContext.stroke();
+          if(this._currentDrawingOptions.fillOpacity) {
+            this.canvasContext.globalAlpha = this._currentDrawingOptions.fillOpacity;
+            this.canvasContext.fill();
+          }
+          if(this._currentDrawingOptions.strokeOpacity) {
+            this.canvasContext.globalAlpha = this._currentDrawingOptions.strokeOpacity;
+            this.canvasContext.stroke();
+          }
         }.bind(this);
       } else {
         this._currentDrawingOptions.drawingFunction = function() {
@@ -557,8 +561,10 @@ Element which draws a scatter series onto the chart
       var previousTranslate = [0,0],
           translate,
           start = this._renderingContext.size * this._renderingContext.index,
-          stop = Math.min(start + this._renderingContext.size, this.chartData.length);
+          stop = Math.min(start + this._renderingContext.size, this.chartData.length),
+          halfPi = Math.PI/4;
 
+      this.canvasContext.beginPath();
       for(var i = start; i < stop; i++) {
 
         //get the position of the symbol
@@ -568,15 +574,15 @@ Element which draws a scatter series onto the chart
         this.canvasContext.translate(translate[0] - previousTranslate[0], translate[1] - previousTranslate[1]);
 
         //draw
-        this.canvasContext.beginPath();
         this._currentDrawingOptions.symbol();
-        this.canvasContext.closePath();
-        this._currentDrawingOptions.drawingFunction();
 
         //remember pos so that we can move to the next point in 1 translate
         //instead of restoring the translate here
         previousTranslate = translate;
+        // previousTranslate = [translate[0] + 2.5, translate[1]-1.25];
       }
+      this.canvasContext.closePath();
+      this._currentDrawingOptions.drawingFunction();
 
       //restore canvas pos
       this.canvasContext.translate(-previousTranslate[0], -previousTranslate[1]);

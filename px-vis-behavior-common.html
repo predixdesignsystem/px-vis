@@ -815,12 +815,12 @@ PxVisBehavior.commonMethods = {
    * Binary search through sorted chartData
    */
   _binarySearch: function(data, key, val, lowerIndex, upperIndex) {
-    if(lowerIndex && upperIndex && lowerIndex === upperIndex) {
+    if(this.isVarNumber(lowerIndex) && this.isVarNumber(upperIndex) && lowerIndex === upperIndex) {
       return null;
     }
 
-    var upperIndex = upperIndex || data.length,
-        lowerIndex = lowerIndex || 0,
+    var upperIndex = this.isVarNumber(upperIndex) ? upperIndex : data.length,
+        lowerIndex = this.isVarNumber(lowerIndex) ? lowerIndex : 0,
         index = Math.floor((upperIndex - lowerIndex) / 2) + lowerIndex;
 
     if(data[index][key] === val) {
@@ -828,7 +828,7 @@ PxVisBehavior.commonMethods = {
     } else if(val < data[index][key]) {
       return this._binarySearch(data, key, val, lowerIndex, index);
     } else if(val > data[index][key]) {
-      return this._binarySearch(data, key, val, index, upperIndex);
+      return this._binarySearch(data, key, val, index+1, upperIndex);
     }
     return null;
   },
@@ -837,12 +837,12 @@ PxVisBehavior.commonMethods = {
    * Binary search through sorted chartData returning all vals within a window
    */
   _fuzzyBinarySearch: function(data, key, lowerFuzz, upperFuzz, lowerIndex, upperIndex) {
-    if(lowerIndex && upperIndex && lowerIndex === upperIndex) {
+    if(this.isVarNumber(lowerIndex) && this.isVarNumber(upperIndex) && lowerIndex === upperIndex) {
       return null;
     }
 
-    var upperIndex = upperIndex || data.length,
-        lowerIndex = lowerIndex || 0,
+    var upperIndex = this.isVarNumber(upperIndex) ? upperIndex : data.length,
+        lowerIndex = this.isVarNumber(lowerIndex) ? lowerIndex : 0,
         index = Math.floor((upperIndex - lowerIndex) / 2) + lowerIndex;
 
     if(data[index][key] >= lowerFuzz && data[index][key] <= upperFuzz) {
@@ -850,7 +850,7 @@ PxVisBehavior.commonMethods = {
     } else if(upperFuzz < data[index][key]) {
       return this._fuzzyBinarySearch(data, key, lowerFuzz, upperFuzz, lowerIndex, index);
     } else if(lowerFuzz > data[index][key]) {
-      return this._fuzzyBinarySearch(data, key, lowerFuzz, upperFuzz, index, upperIndex);
+      return this._fuzzyBinarySearch(data, key, lowerFuzz, upperFuzz, index+1, upperIndex);
     }
     return null;
   },
@@ -893,6 +893,10 @@ PxVisBehavior.commonMethods = {
       }
     }
     return newObject;
+  },
+
+  isVarNumber: function(n) {
+    return n || n === 0 ? true : false;
   }
 };
 
@@ -2422,7 +2426,7 @@ PxVisBehavior.highlightShared = [{
       }
     }
 
-    return d;
+    return d[0] === null ? [] : d ;
   },
 
 
