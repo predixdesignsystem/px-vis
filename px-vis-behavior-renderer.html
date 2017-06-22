@@ -6,6 +6,78 @@ var PxVisBehaviorRenderer = PxVisBehaviorRenderer || {};
 
 /*
     Name:
+    PxVisBehaviorRenderer.debounceOnPanning
+
+    Description:
+    Polymer behavior that provides ability to control debouncing on panning
+
+    Dependencies:
+    - none
+
+    @polymerBehavior PxVisBehaviorRenderer.debounceOnPanning
+*/
+PxVisBehaviorRenderer.debounceOnPanning = {
+
+  properties: {
+    /**
+     * Debounce time to use for different types of rendering
+     */
+    drawDebounceTime: {
+      type: Object,
+      value: function() {
+        return {
+          'chartData': 10,
+          'filteredChartData': 10,
+          'highlightData': 10
+        };
+      }
+    },
+    _oldDrawDebounceTime: {
+      type: Object
+    },
+    /**
+     * Whether the drawings will be debounced on panning the chart.
+     * When not debounced the redraw will happen more often on panning,
+     * which should result in a smoother experience. However if rendering
+     * a big number of points this can have the opposite effect since
+     * it wil redraw too often comapred tot he time taken to re render everything
+     */
+    debounceOnPanning: {
+      type: Boolean,
+      value: false
+    }
+  },
+
+  attached: function() {
+    this.listen(this, 'px-vis-interaction-space-start-panning', '_panningStarted');
+    this.listen(this, 'px-vis-interaction-space-stop-panning', '_panningStopped');
+  },
+
+  detached: function() {
+    this.unlisten(this, 'px-vis-interaction-space-start-panning', '_panningStarted');
+    this.unlisten(this, 'px-vis-interaction-space-stop-panning', '_panningStopped');
+  },
+
+  _panningStarted: function() {
+    if(!this.debounceOnPanning) {
+      this._oldDrawDebounceTime = this.drawDebounceTime;
+      this.drawDebounceTime = {
+        'chartData': 0,
+        'filteredChartData': 0,
+        'highlightData': this._oldDrawDebounceTime.highlightData
+      };
+    }
+  },
+
+  _panningStopped: function() {
+    if(!this.debounceOnPanning) {
+      this.drawDebounceTime = this._oldDrawDebounceTime;
+    }
+  }
+};
+
+/*
+    Name:
     PxVisBehaviorRenderer.base
 
     Description:
@@ -19,47 +91,30 @@ var PxVisBehaviorRenderer = PxVisBehaviorRenderer || {};
 PxVisBehaviorRenderer.base = [{
   properties: {
     /**
-     * Debounce time to use for drawing
-     */
-    drawDebounceTime: {
-      type: Number,
-      value: 10
-    },
-    /**
     * Counter to track progressive rendering requests and only draw the latest one
     */
     _progressiveRenderingCounter: {
-      type: Number,
-      value: 0
-    },
-    /**
-     * Object used to store various info about current rendering state
-     */
-    _renderingContext: {
       type: Object,
       value: function() {
-        return {
-          'lastPointRenderedIndex': null,
-          'currentBatchStartIndex': 0
-        };
+        return this._initializeRendererTypeObject(0);
       }
     },
     /**
      * Current registered targets to draw on canvas during rendering
      */
     _canvasTargets: {
-      type: Array,
+      type: Object,
       value: function() {
-        return [];
+        return this._initializeRendererTypeObject([]);
       }
     },
     /**
      * Current registered targets to draw on svg during rendering
      */
     _svgTargets: {
-      type: Array,
+      type: Object,
       value: function() {
-        return [];
+        return this._initializeRendererTypeObject([]);
       }
     },
     /**
@@ -76,44 +131,68 @@ PxVisBehaviorRenderer.base = [{
      */
     _frameCountToAverage: {
       type: Number,
-      value: 15
+      value: 10
+    },
+    /**
+     * For each renderer type the previous frames number of points and duration for line and scatter
+     */
+    _previousFramesTiming: {
+      type: Object,
+      value: function() {
+        return this._initializeRendererTypeObject({
+          'line': [],
+          'scatter': []
+        });
+      }
     }
   },
-  observers: ['_renderData(domainChanged, canvasContext, chartData.*, completeSeriesConfig.*, preventInitialDrawing, radial, counterClockwise, renderToCanvas)'],
+  observers: ['_renderChartData(domainChanged, canvasContext, chartData.*, mutedSeries.*, completeSeriesConfig.*, preventInitialDrawing, radial, counterClockwise, renderToCanvas)',
+              '_renderFilteredChartData(domainChanged, canvasContext, _filteredData.*, completeSeriesConfig.*, preventInitialDrawing, radial, counterClockwise, renderToCanvas)',
+              '_renderHighlight(domainChanged, canvasContext, _highlightData.*, completeSeriesConfig.*, preventInitialDrawing, radial, counterClockwise, renderToCanvas)',
+              '_mutedChanged(_combinedMutedSeries)',
+              '_serieToRedrawOnTopChanged(serieToRedrawOnTop)'],
 
+  //TODO: low priority: include SVG drawings
+  //TODO: benchamrks
+  //TODO: make the first render of a type more flexible so that we can us it in our rendering loop (i.e when switching targets within the same frame and having a new type that hasn't been rendered yet, need to do a first render based on how much of the budget for the frame is left.)
+  //TODO: first render should be able to switch targets and render more than 1 target. This should be implemented while doing the TODO above, rendering always kicking the same loop
 
-  ready: function() {
-    this._processCanvasRenderingBound = this._processCanvasRendering.bind(this);
-  },
   attached: function() {
 
     this.listen(this, 'px-vis-renderer-register', '_registerDrawingElement');
     this.listen(this, 'px-vis-renderer-unregister', '_unregisterDrawingElement');
-
-    //if we've been detached and reattached make sure we redraw (canvas clears on detached)
-    if(this._isDirty) {
-      this._renderData();
-      this._isDirty = false;
-    }
+    this.listen(this, 'px-vis-highlight-data-changed', '_renderHighlight');
+    this.listen(this, 'px-vis-redraw-lines', '_renderAllLines');
   },
   detached: function() {
 
-    this._isDirty = true;
-
     //reset counter so it cancels current drawing
-    this._progressiveRenderingCounter = 0;
+    this._progressiveRenderingCounter = this._initializeRendererTypeObject(0);
 
-    this.unlisten(this, 'px-vis-renderer-register', '_registerDrawingElement');
-    this.unlisten(this, 'px-vis-renderer-unregister', '_unregisterDrawingElement');
+    // this.unlisten(this, 'px-vis-renderer-register', '_registerDrawingElement');
+    // this.unlisten(this, 'px-vis-renderer-unregister', '_unregisterDrawingElement');
+    this.unlisten(this, 'px-vis-highlight-data-changed', '_renderHighlight');
+    this.unlisten(this, 'px-vis-redraw-lines', '_renderAllLines');
+  },
+
+  /**
+   * Creates an object with all renderer types and a default value for each
+   */
+  _initializeRendererTypeObject: function(initialVal) {
+    return {
+      'chartData': initialVal,
+      'filteredChartData': JSON.parse(JSON.stringify(initialVal)),
+      'highlightData': JSON.parse(JSON.stringify(initialVal))
+    }
   },
 
   _registerDrawingElement: function(e) {
     var evt = Polymer.dom(e);
 
     if(e.detail.renderMode === 'canvas') {
-      this._canvasTargets.push({'target': evt.rootTarget, 'type': e.detail.type});
+      this._canvasTargets[e.detail.rendererType].push({'target': evt.rootTarget, 'type': e.detail.type});
     } else {
-      this._svgTargets.push({'target': evt.rootTarget, 'type': e.detail.type});
+      this._svgTargets[e.detail.rendererType].push({'target': evt.rootTarget, 'type': e.detail.type});
     }
   },
 
@@ -122,242 +201,411 @@ PxVisBehaviorRenderer.base = [{
         index = -1;
 
     if(e.detail.renderMode === 'canvas') {
-      for(var i=0; i<this._canvasTargets.length; i++) {
-        if(evt.rootTarget === this._canvasTargets[i].target) {
+      for(var i=0; i<this._canvasTargets[e.detail.rendererType].length; i++) {
+        if(evt.rootTarget === this._canvasTargets[e.detail.rendererType][i].target) {
           index = i;
           break;
         }
       }
       if(i !== -1) {
-        this._canvasTargets.splice(i,1);
+        this._canvasTargets[e.detail.rendererType].splice(i,1);
       }
     } else {
-      for(var i=0; i<this._svgTargets.length; i++) {
-        if(evt.rootTarget === this._svgTargets[i].target) {
+      for(var i=0; i<this._svgTargets[e.detail.rendererType].length; i++) {
+        if(evt.rootTarget === this._svgTargets[e.detail.rendererType][i].target) {
           index = i;
           break;
         }
       }
       if(i !== -1) {
-        this._svgTargets.splice(i,1);
+        this._svgTargets[e.detail.renderType].splice(i,1);
       }
     }
   },
 
-  _renderData: function() {
+  _mutedChanged: function() {
+    this._renderChartData();
+  },
+
+  _serieToRedrawOnTopChanged: function() {
+    var targets = [],
+        ctx;
+
+    //search for the series we want to redraw
+
+    for(var j=0; j<this._canvasTargets['chartData'].length; j++) {
+      if(this._canvasTargets['chartData'][j].target.seriesId === this.serieToRedrawOnTop) {
+        targets.push(this._canvasTargets['chartData'][j]);
+      }
+    }
+
+    if(targets.length) {
+      var ctx = {
+        'lastPointRenderedIndex': null,
+        'currentBatchStartIndex': 0,
+        'renderType': 'chartData',
+        'canvasTargets': targets,
+        'svgTargets': this._svgTargets['chartData'],
+        'canvasToClear': [],
+        'drawDebounceTime': 0
+      }
+      this._renderData(ctx);
+    }
+  },
+
+  _renderChartData: function() {
+    var ctx = {
+      'lastPointRenderedIndex': null,
+      'currentBatchStartIndex': 0,
+      'renderType': 'chartData',
+      'canvasTargets': this._canvasTargets['chartData'],
+      'svgTargets': this._svgTargets['chartData'],
+      'canvasToClear': [this.canvasContext],
+      'drawDebounceTime': this.drawDebounceTime['chartData']
+    }
+    this._renderData(ctx);
+  },
+
+  _renderFilteredChartData: function() {
+    var ctx = {
+      'lastPointRenderedIndex': null,
+      'currentBatchStartIndex': 0,
+      'renderType': 'filteredChartData',
+      'canvasTargets': this._canvasTargets['filteredChartData'],
+      'svgTargets': this._svgTargets['filteredChartData'],
+      'canvasToClear': [this.canvasContext],
+      'drawDebounceTime': this.drawDebounceTime['filteredChartData']
+    }
+    this._renderData(ctx);
+  },
+
+  _renderHighlight: function() {
+    var ctx = {
+      'lastPointRenderedIndex': null,
+      'currentBatchStartIndex': 0,
+      'renderType': 'highlightData',
+      'canvasTargets': this._canvasTargets['highlightData'],
+      'svgTargets': this._svgTargets['highlightData'],
+      'canvasToClear': [this.canvasContextTop],
+      'drawDebounceTime': this.drawDebounceTime['highlightData']
+    }
+    this._renderData(ctx);
+  },
+
+  _renderAllLines: function() {
+
+    var canvasTargets = [],
+        keys = Object.keys(this._canvasTargets),
+        ctx;
+
+    //search all lines in highlight and data
+    for(var i=0; i<keys.length;i++) {
+      var cur = this._canvasTargets[keys[i]];
+      for(var j=0; j<cur.length; j++) {
+        if(cur[j].type === 'line') {
+          canvasTargets.push(cur[j]);
+        }
+      }
+    }
+
+    ctx = {
+      'lastPointRenderedIndex': null,
+      'currentBatchStartIndex': 0,
+      'renderType': 'chartData',
+      'canvasTargets': canvasTargets,
+      'svgTargets': this._svgTargets['chartData'],
+      'canvasToClear': [this.canvasContext, this.canvasContextTop],
+      'drawDebounceTime': this.drawDebounceTime['chartData']
+    }
+    this._renderData(ctx);
+  },
+
+
+  _renderData: function(ctx) {
 
     if(!this.preventInitialDrawing) {
       //new request
-      this._progressiveRenderingCounter++;
+      this._progressiveRenderingCounter[ctx.renderType]++;
 
-      if(this.drawDebounceTime > 0) {
-        this.debounce('drawCanvasChart',function() {
-          this._renderDataDebounced(true);
-        }.bind(this), this.drawDebounceTime);
+      if(ctx.drawDebounceTime > 0) {
+        this.debounce(ctx.renderType, function() {
+          this._renderDataDebounced(ctx, true);
+        }.bind(this), ctx.drawDebounceTime);
       } else {
-        this._renderDataDebounced(true);
+        this._renderDataDebounced(ctx, true);
       }
     } else {
       //reset counter so it cancels current drawing
-      this._progressiveRenderingCounter = 0;
+      this._progressiveRenderingCounter[ctx.renderType] = 0;
     }
   },
 
-  _renderDataDebounced: function(allowCanvasClearing) {
+  _renderDataDebounced: function(ctx, allowCanvasClearing) {
     if(this.y &&
          typeof this.domainChanged !== 'undefined' &&
          this.domainChanged !== null &&
-         this._isAttached &&
-         this.chartData) {
+         this._isAttached) {
 
-      this._initializeCanvasRendering(allowCanvasClearing);
-      this._initializeSvgRendering();
+      this._initializeCanvasRendering(ctx, allowCanvasClearing);
+      this._initializeSvgRendering(ctx);
     }
   },
 
-  _initializeCanvasRendering: function(allowCanvasClearing) {
+  _initializeCanvasRendering: function(ctx, allowCanvasClearing) {
+
     //clear canvas first
-    if(allowCanvasClearing) {
-      this.canvasContext.pxClearCanvas();
+    for(var i=0; i<ctx.canvasToClear.length; i++) {
+      ctx.canvasToClear[i].pxClearCanvas();
     }
 
-    //todo: configurable initial values?
-    this._renderingContext = {
-      'frameIndex': 0,
-      //new request
-      'requestCounter': ++this._progressiveRenderingCounter,
-      'size': {},
-      'previousFramesTiming': [],
-      'targetIndex': 0,
-      'currentRenderingCounter': 0
-    };
+    ctx.frameIndex=  0;
+    //new request
+    ctx.requestCounter = ++this._progressiveRenderingCounter[ctx.renderType],
+    ctx.targetIndex = 0,
+    ctx.currentRenderingCounter = 0
 
     //initialize all elements that need to draw
-    if(this._canvasTargets.length) {
-      for(var i=0; i<this._canvasTargets.length; i++) {
-        this._canvasTargets[i].target.initializeDrawingSession();
+    if(ctx.canvasTargets.length) {
+      for(var i=0; i<ctx.canvasTargets.length; i++) {
+        ctx.canvasTargets[i].target.initializeDrawingSession();
       }
 
       //now start actual drawing
-      this._processCanvasRendering();
+      this._processCanvasRendering(ctx);
     }
   },
 
-  _processCanvasRendering: function(timing) {
+  _processCanvasRendering: function(ctx) {
 
-    if(this._renderingContext.requestCounter !== this._progressiveRenderingCounter) {
+     var now = window.performance.now(),
+        previousTargetsFrames,
+        pointsRendered = 0,
+        allRenderedTargetSameType = true;
+
+    this._updatePreviousFrameTiming(ctx, now);
+
+    if(ctx.requestCounter !== this._progressiveRenderingCounter[ctx.renderType]) {
       //new request came in, cancel this drawing. Don't reset the counter as we want
       //the new request to finish
       return;
     }
 
-    var now = window.performance.now();
-    //TODO: logic for selecting drawing order
-    if(this._renderingContext.frameIndex === 0) {
+    ctx.currentTarget = this._getCurrentCanvasRenderingTarget(ctx);
+    ctx.previousStartTime = now;
 
-      this._renderingContext.previousStartTime = window.performance.now();
-      this._firstCanvasRender(this._getCurrentCanvasRenderingTarget());
-      window.requestAnimationFrame(this._processCanvasRenderingBound);
+    //first frame for this type, guess how much we can render
+    if(this._previousFramesTiming[ctx.renderType][ctx.currentTarget.type].length === 0) {
+
+      //do a first render and update how many points have been rendered
+      ctx.previousFrameStats.pointsCount[ctx.currentTarget.type] = this._firstCanvasRender(ctx);
+      ctx.previousFrameStats.totPoints = ctx.previousFrameStats.pointsCount[ctx.currentTarget.type];
     } else {
 
-      //update how long the previous frame took
-      this._renderingContext.previousFramesTiming[this._renderingContext.previousFramesTiming.length-1].duration = now - this._renderingContext.previousStartTime;
-
-      console.log('frame ' + this._renderingContext.frameIndex + ', render: ' +JSON.stringify(this._renderingContext.previousFramesTiming[this._renderingContext.previousFramesTiming.length-1]));
-
       //find out how many points we can render this frame
-      var toRender = this._calculatePointsAllowance(),
-          target = this._getCurrentCanvasRenderingTarget();
-
-      //store what we are going to render this frame so it's
-      //available next frame
-      this._renderingContext.previousFramesTiming.push({
-        'points': toRender
-      });
-
-      //keep rendering while we can
-      while(toRender > 1 && target) {
-
-        toRender = this._renderTargetToCanvas(target, toRender);
-        target = this._getCurrentCanvasRenderingTarget();
-      }
+      var toRender = this._calculatePointsAllowance(ctx),
+          previousToRender = toRender;
+      ctx.currentTarget = this._getCurrentCanvasRenderingTarget(ctx);
+    //  currType = ctx.currentTarget.type;
 
 
-      this._renderingContext.previousStartTime = now;
+      //keep rendering while we can, we might be able to do more than 1 target
+      //TODO: new target isn't of the same type! theoretically we should recalculate
+      //the toRender count if the type is different, based on a "percentage" of the frame that has
+      //already been used
+      while(toRender > 1 && ctx.currentTarget) {
 
-      //only average the last 10 frames
-      if(this._renderingContext.previousFramesTiming.length > this._frameCountToAverage) {
-        this._renderingContext.previousFramesTiming.shift();
+        toRender = this._renderTargetToCanvas(toRender, ctx);
+
+        //update how many points have been rendered for this type during this frame
+        ctx.previousFrameStats.pointsCount[ctx.currentTarget.type] = ctx.previousFrameStats.pointsCount[ctx.currentTarget.type] ? ctx.previousFrameStats.pointsCount[ctx.currentTarget.type] + previousToRender - toRender : previousToRender - toRender;
+        ctx.previousFrameStats.totPoints += previousToRender - toRender;
+
+        //get next target and keep rendering if we can
+        ctx.currentTarget = this._getCurrentCanvasRenderingTarget(ctx);
       }
     }
-    this._renderingContext.frameIndex++;
+    ctx.frameIndex++;
 
-    if(this._renderingContext.targetIndex > this._canvasTargets.length-1) {
+    if(ctx.targetIndex > ctx.canvasTargets.length-1) {
+
+      console.log('finished rendering in ' + ctx.frameIndex + ' frames, points: ' + pointsRendered);
 
       //Everything done
       this.fire('px-vis-chart-canvas-rendering-ended');
     } else {
       //keep rendering
-      window.requestAnimationFrame(this._processCanvasRenderingBound);
+
+      //remember how many points we have rendered and update duration on next frame
+    //  this._registerCurrentTargetFrameTiming(ctx, pointsRendered, allRenderedTargetSameType);
+
+      //wrap function so that we can still pass the render type
+      window.requestAnimationFrame(function() { this._processCanvasRendering(ctx); }.bind(this));
     }
     //event?
   },
 
-  _getCurrentCanvasRenderingTarget: function() {
+  _updatePreviousFrameTiming: function(ctx, now) {
 
-    if(this._canvasTargets.length) {
-      return this._canvasTargets[this._renderingContext.targetIndex].target;
+    if(ctx.previousFrameStats) {
+      //update how long the previous frame took. Ugly syntax, sorry
+
+      var keys = Object.keys(ctx.previousFrameStats.pointsCount),
+          targetType;
+
+      //find each type of render that happened last frame
+      for(var i=0; i< keys.length; i++) {
+        targetType = keys[i];
+        if(ctx.previousFrameStats.pointsCount[targetType]) {
+
+          //if we rendered different types prorata the duration
+          this._previousFramesTiming[ctx.renderType][targetType].push({
+            'points': ctx.previousFrameStats.pointsCount[targetType],
+            'duration': (now - ctx.previousStartTime)*(ctx.previousFrameStats.pointsCount[targetType]/ctx.previousFrameStats.totPoints)
+          });
+
+          //only keep a certain number of frame timing to average
+          if(this._previousFramesTiming[ctx.renderType][targetType].length > this._frameCountToAverage) {
+            this._previousFramesTiming[ctx.renderType][targetType].shift();
+          }
+          console.log('frame ' + ctx.frameIndex + ', type: ' + targetType + ', render: ' +JSON.stringify(this._previousFramesTiming[ctx.renderType][targetType][this._previousFramesTiming[ctx.renderType][targetType].length-1]));
+        }
+      }
+    }
+
+    //reset stat object
+    ctx.previousFrameStats = {};
+    ctx.previousFrameStats.pointsCount = {};
+    ctx.previousFrameStats.totPoints = 0;
+  },
+
+  _registerCurrentTargetFrameTiming: function(ctx, pointsRendered, renderedAllSameType) {
+
+    if(renderedAllSameType) {
+      //store what we are going to render this frame so it's
+      //available next frame
+      this._previousFramesTiming[ctx.renderType][ctx.currentTarget.type].push({
+        'points': pointsRendered
+      });
+      //only average the last X frames (per render type, per drawing type)
+      if(this._previousFramesTiming[ctx.renderType][ctx.currentTarget.type].length > this._frameCountToAverage) {
+        this._previousFramesTiming[ctx.renderType][ctx.currentTarget.type].shift();
+      }
+
+      //store type of rendering so that we can complete duration on next frame
+      ctx.previousTargetType = ctx.currentTarget.type;
+    } else {
+      ctx.previousTargetType = null;
+    }
+  },
+
+  _getCurrentCanvasRenderingTarget: function(ctx) {
+
+    if(ctx.canvasTargets.length) {
+      return ctx.canvasTargets[ctx.targetIndex];
     }
 
     return null;
   },
 
-  _firstCanvasRender: function(target, isScatter) {
+  _firstCanvasRender: function(ctx) {
 
     //try estimating how much we can render.
     var duration,
         multiplier,
         targetTiming = 8,
         pointsRendered = 0,
-        toRender = Math.min(target.nodeName === 'PX-VIS-SCATTER-CANVAS' ? 200 : 1000, this.chartData.length);
+        toRender = Math.min(ctx.currentTarget.type === 'scatter' ? 200 : 1000, ctx.currentTarget.target.chartData ? ctx.currentTarget.target.chartData.length : 0);
 
-    //start by rendering 50 pts
-    this._renderTargetToCanvas(target, toRender)
-    pointsRendered = toRender;
+    if(toRender) {
+      //start by rendering X pts
+      this._renderTargetToCanvas(toRender, ctx)
+      pointsRendered = toRender;
 
-    duration = window.performance.now() - this._renderingContext.previousStartTime;
+      duration = window.performance.now() - ctx.previousStartTime;
 
-    //target 8ms: 16ms (60 fps) - 8ms for the browser to
-    //actually draw. Crude but this is only for the first frame
-    if(duration < targetTiming) {
-      //find how much more we can render
-      multiplier = Math.floor(targetTiming / duration);
+      //target 8ms: 16ms (60 fps) - 8ms for the browser to
+      //actually draw. Crude but this is only for the first frame
+      if(duration < targetTiming) {
+        //find how much more we can render
+        multiplier = Math.floor(targetTiming / duration);
 
-      this._renderTargetToCanvas(target, multiplier * 10);
-      pointsRendered += multiplier * 10;
-    }
+        //render more
+        this._renderTargetToCanvas(multiplier * 10, ctx);
+        pointsRendered += multiplier * 10;
+      }
 
-    this._renderingContext.previousFramesTiming.push({
-      'points': pointsRendered
-    });
-  },
-
-  _renderTargetToCanvas: function(target, toRender) {
-
-    var leftInCurrentSeries = this.chartData.length - this._renderingContext.currentRenderingCounter,
-        start = this._renderingContext.currentRenderingCounter,
-        stop = Math.min(start + toRender, this.chartData.length);
-
-
-    target.renderOneBatch(start, stop);
-
-    if(toRender > leftInCurrentSeries) {
-
-      //this series is done
-      this._renderingContext.currentRenderingCounter = 0;
-      this._renderingContext.targetIndex++;
-
-      return toRender - leftInCurrentSeries;
+      return pointsRendered;
     } else {
-      this._renderingContext.currentRenderingCounter += toRender;
+      //nothing to render, keep going
+      ctx.currentRenderingCounter = 0;
+      ctx.targetIndex++;
       return 0;
     }
   },
 
-  _calculatePointsAllowance: function() {
+  _renderTargetToCanvas: function(toRender, ctx) {
+
+    var leftInCurrentSeries = ctx.currentTarget.target.chartData ? ctx.currentTarget.target.chartData.length - ctx.currentRenderingCounter : 0,
+        start,
+        stop;
+
+    if(leftInCurrentSeries > 0) {
+      start = ctx.currentRenderingCounter;
+      stop = Math.min(start + toRender, ctx.currentTarget.target.chartData.length);
+      ctx.currentTarget.target.renderOneBatch(start, stop);
+    }
+
+    if(toRender > leftInCurrentSeries) {
+
+      //this series is done
+      ctx.currentRenderingCounter = 0;
+      ctx.targetIndex++;
+
+      //return how many points left
+      return toRender - leftInCurrentSeries;
+    } else {
+      ctx.currentRenderingCounter += toRender;
+      return 0;
+    }
+  },
+
+  _calculatePointsAllowance: function(ctx) {
     var totPoints = 0,
         totDuration = 0,
         avgPoints,
         avgDuration,
-        pointsAddition;
+        pointsAddition,
+        ptsPerMs,
+        framesArray = this._previousFramesTiming[ctx.renderType][ctx.currentTarget.type];
 
       //calculate averages
-      for(var i=0; i<this._renderingContext.previousFramesTiming.length; i++) {
-        totPoints += this._renderingContext.previousFramesTiming[i].points;
-        totDuration += this._renderingContext.previousFramesTiming[i].duration;
+      for(var i=0; i<framesArray.length; i++) {
+        totPoints += framesArray[i].points;
+        totDuration += framesArray[i].duration;
       }
 
       //adjust batch size
-      avgPoints = Math.floor(totPoints/this._renderingContext.previousFramesTiming.length);
-      avgDuration = totDuration/this._renderingContext.previousFramesTiming.length;
-      //16ms => 60fps
-      pointsAddition = Math.floor((16 - avgDuration) * (avgPoints/avgDuration));
+      avgPoints = Math.floor(totPoints/framesArray.length);
+      avgDuration = totDuration/framesArray.length;
 
-      return Math.max(this._minimumPointsPerFrame, avgPoints + pointsAddition);
+      ptsPerMs = totPoints/totDuration;
+
+      //aim for 18ms. This is crucial since when no busy requestanimationframe will give us a callback
+      //every ~16 ms, so we HAVE to aim a bit higher to be sure we keep the browser busy
+      pointsAddition = Math.floor((20 - avgDuration) * (avgPoints/avgDuration));
+
+      return Math.max(this._minimumPointsPerFrame, Math.floor(ptsPerMs*20));
   },
 
-  _initializeSvgRendering: function() {
+  _initializeSvgRendering: function(ctx) {
 
-    //TODO, use requestanimationframe
-    if(this._svgTargets.length) {
-      for(var i=0; i<this._svgTargets.length; i++) {
-        this._svgTargets[i].target.initializeDrawingSession();
-      }
-
-
-    }
-
+    // //TODO, use requestanimationframe
+    // if(ctx.svgTargets.length) {
+    //   for(var i=0; i<ctx.svgTargets.length; i++) {
+    //     ctx.svgTargets[i].target.initializeDrawingSession();
+    //   }
+    // }
   }
-}, PxVisBehaviorD3.renderToCanvas, PxVisBehavior.dataset, PxVisBehavior.polarData, PxVisBehavior.radial, PxVisBehavior.preventInitialDrawing, PxVisBehavior.isAttached];
+}, PxVisBehaviorD3.renderToCanvas, PxVisBehavior.dataset, PxVisBehavior.polarData, PxVisBehavior.radial, PxVisBehavior.preventInitialDrawing, PxVisBehavior.isAttached, PxVisBehaviorRenderer.debounceOnPanning];
 
 </script>

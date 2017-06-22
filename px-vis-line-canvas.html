@@ -68,54 +68,14 @@ Element which draws lines series onto the chart
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.categories,
       PxVisBehaviorD3.selectedDomain,
-      PxVisBehavior.progressiveRendering,
       PxVisBehavior.serieToRedrawOnTop,
       PxVisBehaviorD3.domainUpdate,
       PxColorsBehavior.baseColors,
       PxVisBehavior.preventInitialDrawing,
       PxVisBehavior.isAttached,
       PxVisBehavior.polarData,
+      PxVisBehavior.rendererType
     ],
-
-    /**
-     * px-vis-line-progressive-rendering-started, fired when a canvas with progressive rendering
-     * enabled starts rendering
-     * evt.details contains:
-     * { numberOfFrames: the number of frames that will be used to render,
-     * }
-     *
-     * @event px-vis-line-progressive-rendering-started
-     */
-    /**
-     * px-vis-line-canvas-progressive-batch, fired when a canvas with progressive rendering
-     * has finished rendering one batch of data
-     * evt.details contains:
-     * { numberOfFrames: the number of frames that will be used to render,
-     *  currentFrame: index of the frame that has just been rendered
-     * }
-     *
-     * @event px-vis-line-canvas-progressive-batch
-     */
-
-    /**
-     * px-vis-line-progressive-rendering-ended, fired when a canvas with progressive rendering
-     * enabled has finished rendering
-     * evt.details contains:
-     * { numberOfFrames: the number of frames that have been used to render,
-     * }
-     *
-     * @event px-vis-line-progressive-rendering-ended
-     */
-
-    /**
-     * px-vis-line-canvas-rendering-ended, fired when a canvas has finished rendering,
-     * whether it had progressive rendering or not
-     * evt.details contains:
-     * { progressiveRending: whether progressive rendering was enabled,
-     * }
-     *
-     * @event px-vis-line-canvas-rendering-ended
-     */
 
     /**
      * Properties block, expose attribute values to the DOM via 'reflect'
@@ -124,21 +84,6 @@ Element which draws lines series onto the chart
      * @type Object
      */
     properties: {
-       /**
-        * Boolean to trigger a redraw of the canvas
-        *
-        */
-       _canvasRedraw: {
-         type: Boolean,
-         value: false
-       },
-       /**
-        * Counter to track progressive rendering requests and only draw the latest one
-        */
-       _progressiveRenderingCounter: {
-         type: Number,
-         value: 0
-       },
        /**
        * the opacity value of the fill to be used when muting a serie (stroke is not drawn on mute)
        */
@@ -161,13 +106,6 @@ Element which draws lines series onto the chart
         type: Boolean,
         value: false
       },
-      /**
-       * Debounce time to use for drawing
-       */
-      drawDebounceTime: {
-        type: Number,
-        value: 20
-      },
 
       strokeWidth: {
         type: Number,
@@ -184,17 +122,12 @@ Element which draws lines series onto the chart
       }
     },
 
-    observers: [
-      'mutedChanged(mutedSeries.*, completeSeriesConfig)',
-      '_drawOnTop(serieToRedrawOnTop)'
-    ],
-
     attached: function() {
-      this.fire('px-vis-renderer-register', {'type': 'line', 'renderMode': 'canvas'});
+      this.fire('px-vis-renderer-register', {'type': 'line', 'renderMode': 'canvas', 'rendererType': this.rendererType});
     },
 
     detached: function() {
-      this.fire('px-vis-renderer-unregister',{'renderMode': 'canvas'});
+      this.fire('px-vis-renderer-unregister',{'renderMode': 'canvas','rendererType': this.rendererType});
     },
 
     /**
@@ -383,16 +316,6 @@ Element which draws lines series onto the chart
       }
     },
 
-    /**
-     * Checks mutedSeries to see if this ID is in there
-     * Called from an observer watching mutedSeries
-     *
-     * @method mutedChanged
-     */
-    mutedChanged: function() {
-      //TODO: muted
-      this.set('_canvasRedraw', !this._canvasRedraw);
-    },
     _isSerieMuted: function(d) {
       if(this.multiPath) {
         return this.mutedSeries[d[this.seriesId]] ? true : false;
@@ -427,11 +350,6 @@ Element which draws lines series onto the chart
       //add 'a' for 'rgba'
       result = 'rgba' + result.slice(3);
       return result + ',' + opacity + ')';
-    },
-    _drawOnTop: function(serieToRedraw) {
-      if(serieToRedraw === this.seriesId) {
-        this.drawCanvas(false);
-      }
     }
   });
 </script>

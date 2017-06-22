@@ -74,51 +74,13 @@ Element which draws a scatter series onto the chart
       PxVisBehavior.polarData,
       PxVisBehavior.seriesId,
       PxVisBehavior.dynamicConfigProperties,
-      PxVisBehavior.progressiveRendering,
       PxVisBehavior.serieToRedrawOnTop,
       PxColorsBehavior.baseColors,
       PxVisBehavior.preventInitialDrawing,
-      PxVisBehavior.isAttached
+      PxVisBehavior.isAttached,
+      PxVisBehavior.rendererType
     ],
-    /**
-     * px-vis-scatter-progressive-rendering-started, fired when a canvas with progressive rendering
-     * enabled starts rendering
-     * evt.details contains:
-     * { numberOfFrames: the number of frames that will be used to render,
-     * }
-     *
-     * @event px-vis-scatter-progressive-rendering-started
-     */
-    /**
-     * px-vis-scatter-canvas-progressive-batch, fired when a canvas with progressive rendering
-     * has finished rendering one batch of data
-     * evt.details contains:
-     * { numberOfFrames: the number of frames that will be used to render,
-     *  currentFrame: index of the frame that has just been rendered
-     * }
-     *
-     * @event px-vis-scatter-canvas-progressive-batch
-     */
 
-    /**
-     * px-vis-scatter-progressive-rendering-ended, fired when a canvas with progressive rendering
-     * enabled has finished rendering
-     * evt.details contains:
-     * { numberOfFrames: the number of frames that have been used to render,
-     * }
-     *
-     * @event px-vis-scatter-progressive-rendering-ended
-     */
-
-    /**
-     * px-vis-scatter-canvas-rendering-ended, fired when a canvas has finished rendering,
-     * whether it had progressive rendering or not
-     * evt.details contains:
-     * { progressiveRending: whether progressive rendering was enabled,
-     * }
-     *
-     * @event px-vis-scatter-canvas-rendering-ended
-     */
     /**
      * Properties block, expose attribute values to the DOM via 'reflect'
      *
@@ -151,57 +113,57 @@ Element which draws a scatter series onto the chart
           'triangle-up': Px.d3.symbolTriangle,
           'star': Px.d3.symbolStar,
           'wye': Px.d3.symbolWye
-        },
-        /**
-         * The symbol used for the marker. Supported symbols:
-         * - 'circle'
-         * - 'cross'
-         * - 'diamond'
-         * - 'square'
-         * - 'triangle-up'
-         * - 'star'
-         * - 'wye'
-         * more info at https://github.com/d3/d3-shape/blob/master/README.md#symbols
-         * This property will be read from the completeSeriesConfig
-         */
-        markerSymbol: {
-          type: String
-        },
-        /**
-         * Scales the size of the scatter marker
-         * This property will be read from the completeSeriesConfig
-         */
-        markerScale: {
-          type: Number
-        },
-        /**
-         * the size of the markers
-         * This property will be read from the completeSeriesConfig
-         */
-        markerSize: {
-          type: Number
-        },
-        /**
-         * The opacity of the fill (inside) of the marker
-         * This property will be read from the completeSeriesConfig
-         */
-        markerFillOpacity: {
-          type: Number
-        },
-        /**
-         * The opacity of the stroke (outside) of the marker
-         * This property will be read from the completeSeriesConfig
-         */
-        markerStrokeOpacity: {
-          type: Number
-        },
-        /**
-         * the opacity value of the fill to be used when muting a serie (stroke is not drawn on mute)
-         * This property will be read from the completeSeriesConfig
-         */
-        mutedOpacity: {
-          type: Number
-        },
+        }
+      },
+      /**
+       * The symbol used for the marker. Supported symbols:
+       * - 'circle'
+       * - 'cross'
+       * - 'diamond'
+       * - 'square'
+       * - 'triangle-up'
+       * - 'star'
+       * - 'wye'
+       * more info at https://github.com/d3/d3-shape/blob/master/README.md#symbols
+       * This property will be read from the completeSeriesConfig
+       */
+      markerSymbol: {
+        type: String
+      },
+      /**
+       * Scales the size of the scatter marker
+       * This property will be read from the completeSeriesConfig
+       */
+      markerScale: {
+        type: Number
+      },
+      /**
+       * the size of the markers
+       * This property will be read from the completeSeriesConfig
+       */
+      markerSize: {
+        type: Number
+      },
+      /**
+       * The opacity of the fill (inside) of the marker
+       * This property will be read from the completeSeriesConfig
+       */
+      markerFillOpacity: {
+        type: Number
+      },
+      /**
+       * The opacity of the stroke (outside) of the marker
+       * This property will be read from the completeSeriesConfig
+       */
+      markerStrokeOpacity: {
+        type: Number
+      },
+      /**
+       * the opacity value of the fill to be used when muting a serie (stroke is not drawn on mute)
+       * This property will be read from the completeSeriesConfig
+       */
+      mutedOpacity: {
+        type: Number
       },
       /**
        * A holder object for the series group
@@ -242,20 +204,6 @@ Element which draws a scatter series onto the chart
         value: 'Timestamp'
       },
       /**
-       * Debounce time to use for drawing
-       */
-      drawDebounceTime: {
-        type: Number,
-        value: 10
-      },
-      /**
-      * Counter to track progressive rendering requests and only draw the latest one
-      */
-      _progressiveRenderingCounter: {
-        type: Number,
-        value: 0
-      },
-      /**
        * options currently in use for drawing scatter: opacity, symbol, drawing function....
        */
       _currentDrawingOptions: {
@@ -263,15 +211,6 @@ Element which draws a scatter series onto the chart
         value:function() {
           return {};
         }
-      },
-      /**
-      * Number of points to be drawn per progressive rendering frame.
-      * The higher the value the fastest the processing but the more
-      * likely the UI will stutter/freeze.
-      */
-      progressiveRenderingPointsPerFrame: {
-        type: Number,
-        value: 2000
       },
       /**
        * Whether to use the clippath to avoid drawing outside of axes
@@ -283,11 +222,6 @@ Element which draws a scatter series onto the chart
       }
     },
 
-    observers: [
-      'mutedChanged(mutedSeries.*, completeSeriesConfig)',
-      '_drawOnTop(serieToRedrawOnTop)'
-     ],
-
     ready:function() {
       //generate properties dynamically
       this._watchConfigProperty('markerSymbol', 'circle');
@@ -296,15 +230,14 @@ Element which draws a scatter series onto the chart
       this._watchConfigProperty('markerFillOpacity', 0.6);
       this._watchConfigProperty('markerStrokeOpacity', 1);
       this._watchConfigProperty('mutedOpacity', 0.3);
-      this._processOneBatchBound = this._processOneBatch.bind(this);
     },
 
     attached: function() {
-      this.fire('px-vis-renderer-register', {'type': 'scatter', 'renderMode': 'canvas'});
+      this.fire('px-vis-renderer-register', {'type': 'scatter', 'renderMode': 'canvas', 'rendererType': this.rendererType});
     },
 
     detached: function() {
-      this.fire('px-vis-renderer-unregister', {'renderMode': 'canvas'});
+      this.fire('px-vis-renderer-unregister', {'renderMode': 'canvas', 'rendererType': this.rendererType});
     },
 
     /**
@@ -354,66 +287,6 @@ Element which draws a scatter series onto the chart
           this.canvasContext.stroke();
         }.bind(this);
       };
-    },
-
-    /**
-     * Renders data in a specific number of frames, splitting the batch
-     *
-     */
-    _renderProgressively: function(numberOfFrames) {
-
-      //don't actually draw if invisible
-      if(!(this._currentDrawingOptions.sameOpacity && this._currentDrawingOptions.fillOpacity === 0)) {
-
-        this.fire('px-vis-scatter-progressive-rendering-started', {numberOfFrames: numberOfFrames});
-
-        this._renderingContext = {
-          'index': 0,
-          //new request
-          'requestCounter': ++this._progressiveRenderingCounter,
-          'size': Math.ceil(this.chartData.length/numberOfFrames),
-          'numberOfFrames': numberOfFrames
-        };
-
-        //called every animation frame
-        window.requestAnimationFrame(this._processOneBatchBound);
-      }
-    },
-
-    _processOneBatch: function() {
-
-      if(this._renderingContext.requestCounter !== this._progressiveRenderingCounter) {
-        //new request came in, cancel this drawing. Don't reset the counter as we want
-        //the new request to finish
-        return;
-      }
-
-      //get the number of points requested
-      this._renderOneBatch();
-
-      this._renderingContext.index++;
-
-      if(this._renderingContext.index < this._renderingContext.numberOfFrames) {
-        //continue processing
-        this.fire('px-vis-scatter-canvas-progressive-batch', { "numberOfFrames": this._renderingContext.numberOfFrames, "currentFrame": this._renderingContext.index });
-        window.requestAnimationFrame(this._processOneBatchBound);
-      } else {
-        //finished drawing, reset drawing request counter
-        this._renderingEnded(true, this._renderingContext.numberOfFrames);
-      }
-    },
-
-    /**
-     * progressive or normal rendering is completely done
-     */
-    _renderingEnded: function(progressive,numberOfFrames) {
-
-      if(progressive) {
-        this._progressiveRenderingCounter = 0;
-        this.fire('px-vis-scatter-progressive-rendering-ended', {"numberOfFrames": numberOfFrames });
-      }
-
-      this.fire('px-vis-scatter-canvas-rendering-ended', { "progressiveRending": progressive });
     },
 
     /**
@@ -533,24 +406,6 @@ Element which draws a scatter series onto the chart
         return this.mutedSeries[d[this.seriesId]] ? true : false;
       } else {
         return this.mutedSeries[this.seriesId] ? true : false;
-      }
-    },
-    /**
-     * Checks mutedSeries to see if this ID is in there
-     * Called from an observer watching mutedSeries
-     *
-     * @method mutedChanged
-     */
-    mutedChanged: function() {
-      this.set('_canvasRedraw', !this._canvasRedraw);
-    },
-
-    /**
-     * Redraw this serie on top if needed
-     */
-    _drawOnTop: function(serieToRedraw) {
-      if(serieToRedraw === this.seriesId) {
-        this.drawCanvas(false);
       }
     }
   });

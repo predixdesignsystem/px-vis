@@ -65,6 +65,7 @@ Custom property | Description | Default
       <template is="dom-repeat" items="[[seriesKeys]]">
         <px-vis-scatter-canvas
           radial="[[radial]]"
+          renderer-type="highlightData"
           force-radial-calculation
           canvas-context="[[canvasContext]]"
           series-id="[[item]]"
@@ -77,8 +78,7 @@ Custom property | Description | Default
           clip-path
           x="[[x]]"
           y="[[_returnYScale(item, completeSeriesConfig, domainChanged)]]"
-          domain-changed="[[domainChanged]]"
-          progressive-rendering-points-per-frame="500">
+          domain-changed="[[domainChanged]]">
         </px-vis-scatter-canvas>
       </template>
     </template>
@@ -107,7 +107,6 @@ Custom property | Description | Default
     ],
 
     /**
-     * Properties block, expose attribute values to the DOM via 'reflect'
      *
      * @property properties
      * @type Object
@@ -115,8 +114,7 @@ Custom property | Description | Default
     properties: {
       _highlightData: {
         type:Object,
-        notify: true,
-        computed: '_computeChartData(crosshairData.timeStamps.*, completeSeriesConfig, drawWithLocalCrosshairData)'
+        notify: true
       },
 
       seriesKeys: {
@@ -124,7 +122,7 @@ Custom property | Description | Default
       },
 
       /**
-       * Whether the scatter plot is using radial coiordinates (x=phase, y=amplitude)
+       * Whether the scatter plot is using radial coordinates (x=phase, y=amplitude)
        */
       radial: {
         type: Boolean,
@@ -132,6 +130,7 @@ Custom property | Description | Default
       }
 
     }, //properties
+    observers: ['_computeChartData(crosshairData.timeStamps.*, completeSeriesConfig, drawWithLocalCrosshairData)'],
 
 
     _computeChartData: function() {
@@ -146,7 +145,8 @@ Custom property | Description | Default
         this._resetTooltipData();
       }
 
-      return dataset;
+      this.set('_highlightData', dataset);
+      this.fire('px-vis-highlight-data-changed');
     },
 
     _returnYScale: function(seriesId, config) {
