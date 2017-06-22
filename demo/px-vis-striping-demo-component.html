@@ -1,0 +1,178 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../px-vis-axis.html">
+<link rel="import" href="../px-vis-scale.html">
+<link rel="import" href="../px-vis-striping.html">
+<link rel="import" href="../px-vis-line-svg.html">
+<link rel="import" href="../px-vis-svg-canvas.html">
+
+<dom-module id="px-vis-striping-demo-component">
+  <template>
+    <px-vis-scale
+      x-axis-type="time"
+      y-axis-type="linear"
+      complete-series-config="[[completeSeriesConfig]]"
+      data-extents='{}'
+      chart-extents="[[chartExtents]]"
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      chart-data="[[chartData]]"
+      x="{{x}}"
+      y="{{y}}"
+      domain-changed="{{domainChanged}}"
+      selected-domain="[[selectedDomain]]">
+    </px-vis-scale>
+    <px-vis-line-svg
+      id="line1"
+      svg="[[svg]]"
+      series-id="y"
+      complete-series-config="[[completeSeriesConfig]]"
+      chart-data="[[chartData]]"
+      x="[[x]]"
+      y="[[y]]"
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      domain-changed="[[domainChanged]]">
+    </px-vis-line-svg>
+
+    <px-vis-axis
+      id="axis1"
+      svg="[[svg]]"
+      axis="[[x]]"
+      margin="[[margin]]"
+      width="[[width]]"
+      height="[[height]]"
+      orientation="bottom"
+      label-position="center"
+      complete-series-config="[[completeSeriesConfig]]"
+      domain-changed="[[domainChanged]]"
+      prevent-series-bar>
+    </px-vis-axis>
+    <px-vis-axis
+      id="axis2"
+      svg="[[svg]]"
+      axis="[[y]]"
+      margin="[[margin]]"
+      width="[[width]]"
+      height="[[height]]"
+      orientation="left"
+      label-position="center"
+      complete-series-config="[[completeSeriesConfig]]"
+      muted-series=[[mutedSeries]]
+      domain-changed="[[domainChanged]]">
+    </px-vis-axis>
+
+    <px-vis-svg-canvas
+      id="svg"
+      width="[[width]]"
+      height="[[height]]"
+      svg="{{svg}}"
+      canvas-context-top="{{canvasContextTop}}"
+      margin="[[margin]]">
+    </px-vis-svg>
+
+
+    <px-vis-striping
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      canvas-context="[[canvasContextTop]]"
+      x="[[x]]"
+      domain-changed="[[domainChanged]]"
+      stripe-config="[[stripeConfig]]"
+      stripe-data="[[stripeData]]">
+    </px-vis-striping>
+  </template>
+</dom-module>
+
+<script>
+Polymer({
+  is: 'px-vis-striping-demo-component',
+  properties: {
+    description: {
+      type: String,
+      value: "d3 element which stripes/highlights a region"
+    },
+    chartData: {
+      value: [{
+            "x": 1397102460000,
+            "y": 1
+          },{
+            "x": 1397131620000,
+            "y": 6
+          },{
+            "x": 1397160780000,
+            "y": 10
+          },{
+            "x": 1397189940000,
+            "y": 4
+          },{
+            "x": 1397219100000,
+            "y": 6
+          }
+        ],
+      type: Array
+    },
+    completeSeriesConfig: {
+      value: {
+          "y": {
+            "type":"line",
+            "name":"mySeries1",
+            "x":'x',
+            "y":'y',
+            "color": "rgb(93,165,218)"
+          }
+        },
+      type: Object
+    },
+    width: {
+      type: Number,
+      value: 500
+    },
+    height: {
+      type: Number,
+      value: 250
+    },
+    chartExtents: {
+      type: Object,
+      value: {'x': [1397102460000,1397219100000], 'y':[1,10]}
+    },
+    margin: {
+      type: Object,
+      value: {
+        "top": 10,
+        "right": 10,
+        "bottom": 10,
+        "left": 10
+      }
+    },
+
+    stripeData: {
+      type: Object,
+      value: function() {
+        return {
+          "type1":[ [1397131620000, 1397160780000] ],
+          "type2":[ [1397189940000, 1397200000000] ]
+        }
+      }
+    },
+
+    stripeConfig: {
+      type: Object,
+      value: function() {
+        return {
+          "type1": {
+            'fillColor': 'rgb(117,216,53)',
+            'fillOpacity': 0.5
+          },
+          "type2": {
+            'fillColor': 'rgb(255,92,92)',
+            'fillOpacity': 0.5
+          },
+        }
+      }
+    }
+  }
+});
+</script>

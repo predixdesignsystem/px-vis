@@ -20,22 +20,23 @@ Element which draws crosshairs around mouse pointer / data points and highlights
         y="{{y}}"
         domain-changed="{{domainChanged}}">
     </px-vis-scale>
-    <px-vis-interaction-space
-        ...
-        generating-crosshair-data="{{generatingCrosshairData}}"
-        crosshair-data="{{crosshairData}}">
-    </px-vis-interaction-space>
-
     <px-vis-cursor-line
-        svg="[[svg]]"
+        svg="[[layer.2]]"
+        svg-data-layer="[[layer.0]]"
+        svg-overlay-layer="[[layer.1]]"
+        canvas-data-layer="[[canvasContext]]"
+        canvas-overlay-layer="[[canvasContextTop]]"
         x="[[x]]"
         y="[[y]]"
+        parallel-coordinates
+        dimensions="[[dimensions]]"
         domain-changed="[[domainChanged]]"
-        time-data="[[key]]"
+        time-data="[[seriesKey]]"
         complete-series-config="[[completeSeriesConfig]]"
-        chart-data="[[chartData]]"
-        generating-crosshair-data="[[generatingCrosshairData]]"
-        crosshair-data="[[crosshairData]]">
+        series-id="[[seriesKey]]"
+        category-key="[[categoryKey]]"
+        categories="[[categories]]"
+        tooltip-data="[[tooltipData.dataset]]">
     </px-vis-cursor-line>
 
 ### Styling
@@ -172,19 +173,31 @@ Custom property | Description | Default
     _updateLayers: function() {
 
       if(this.svgDataLayer) {
+        // this.svgDataLayer.node().style.opacity = this.tooltipData ? 'var(--px-vis-data-mask-opacity, 0.4)' : '';
         this.toggleClass('primaryDataMask', this.tooltipData, this.svgDataLayer.node());
+
       }
 
       if(this.svgOverlayLayer) {
+        // this.svgOverlayLayer.node().style.opacity = this.tooltipData ? 'var(--px-vis-overlay-mask-opacity, 0.5)' : '';
+
         this.toggleClass('primaryOverlayMask', this.tooltipData, this.svgOverlayLayer.node());
+
+
       }
 
       if(this.canvasDataLayer) {
+        this.canvasDataLayer.canvas.style.opacity = this.tooltipData ? 'var(--px-vis-data-mask-opacity, 0.4)' : '';
+
         this.toggleClass('primaryDataMask', this.tooltipData, this.canvasDataLayer.canvas);
+
       }
 
       if(this.canvasOverlayLayer) {
+        // this.canvasOverlayLayer.canvas.style.opacity = this.tooltipData ? 'var(--px-vis-overlay-mask-opacity, 0.5)' : '';
+
         this.toggleClass('primaryOverlayMask', this.tooltipData, this.canvasOverlayLayer.canvas);
+
       }
     },
 

@@ -1,0 +1,241 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../px-vis-axis.html">
+<link rel="import" href="../px-vis-scale.html">
+<link rel="import" href="../px-vis-highlight-point-canvas.html">
+<link rel="import" href="../px-vis-line-canvas.html">
+<link rel="import" href="../px-vis-svg-canvas.html">
+
+<link rel="import" href="../bower_components/px-buttons-design/css/px-buttons-design-demo-styles.html" defer>
+
+<dom-module id="px-vis-highlight-point-canvas-demo-component">
+  <template>
+    <style include="px-buttons-design-demo-styles" is="custom-style"></style>
+    <!--add demo tag-->
+    <px-vis-scale
+      x-axis-type="time"
+      y-axis-type="linear"
+      complete-series-config="[[completeSeriesConfig]]"
+      data-extents='{}'
+      chart-extents="[[chartExtents]]"
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      chart-data="[[chartData]]"
+      x="{{x}}"
+      y="{{y}}"
+      domain-changed="{{domainChanged}}"
+      selected-domain="[[selectedDomain]]">
+    </px-vis-scale>
+    <px-vis-line-canvas
+      series-id="y"
+      complete-series-config="[[completeSeriesConfig]]"
+      chart-data="[[chartData]]"
+      x="[[x]]"
+      y="[[y]]"
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      canvas-context="[[canvasContext]]"
+      domain-changed="[[domainChanged]]">
+    </px-vis-line-canvas>
+    <px-vis-line-canvas
+      series-id="y1"
+      complete-series-config="[[completeSeriesConfig]]"
+      chart-data="[[chartData]]"
+      x="[[x]]"
+      y="[[y]]"
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      canvas-context="[[canvasContext]]"
+      domain-changed="[[domainChanged]]">
+    </px-vis-line-canvas>
+    <px-vis-line-canvas
+      series-id="y2"
+      complete-series-config="[[completeSeriesConfig]]"
+      chart-data="[[chartData]]"
+      x="[[x]]"
+      y="[[y]]"
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      canvas-context="[[canvasContext]]"
+      domain-changed="[[domainChanged]]">
+    </px-vis-line-canvas>
+
+    <px-vis-axis
+      svg="[[svg]]"
+      axis="[[x]]"
+      margin="[[margin]]"
+      width="[[width]]"
+      height="[[height]]"
+      orientation="bottom"
+      label-position="center"
+      complete-series-config="[[completeSeriesConfig]]"
+      domain-changed="[[domainChanged]]"
+      prevent-series-bar>
+    </px-vis-axis>
+
+    <px-vis-axis
+      svg="[[svg]]"
+      axis="[[y]]"
+      margin="[[margin]]"
+      width="[[width]]"
+      height="[[height]]"
+      orientation="left"
+      label-position="center"
+      complete-series-config="[[completeSeriesConfig]]"
+      muted-series=[[mutedSeries]]
+      domain-changed="[[domainChanged]]">
+    </px-vis-axis>
+
+    <px-vis-svg-canvas
+      id="svg"
+      width="[[width]]"
+      height="[[height]]"
+      svg="{{svg}}"
+      canvas-context="{{canvasContext}}"
+      canvas-context-top="{{canvasContextTop}}"
+      margin="[[margin]]">
+    </px-vis-svg-canvas>
+
+    <px-vis-highlight-point-canvas
+      id="pointhighlight"
+      canvas-context="{{canvasContextTop}}"
+      layers-to-mask="[[canvasContext]]"
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      x="[[x]]"
+      y="[[y]]"
+      dimensions="[[dimensions]]"
+      domain-changed="[[domainChanged]]"
+      time-data="x"
+      complete-series-config="[[completeSeriesConfig]]"
+      series-keys='["y","y1","y2"]'
+      chart-data="[[chartData]]">
+    </px-vis-highlight-point-canvas>
+
+    <br />
+    <br />
+    <br />
+    <div>
+      <button on-click="highlightData" class="btn btn--primary u-mt-">Toggle Highlight Data</button>
+    </div>
+  </template>
+</dom-module>
+
+<script>
+Polymer({
+  is: 'px-vis-highlight-point-canvas-demo-component',
+  properties: {
+    description: {
+      type: String,
+      value: "d3 element which highlights data"
+    },
+    chartData: {
+      value: [{
+            "x": 1397102460000,
+            "y": 1,
+            "y1": 1,
+            "y2": 1
+          },{
+            "x": 1397131620000,
+            "y": 6,
+            "y1": 15,
+            "y2": 21
+          },{
+            "x": 1397160780000,
+            "y": 10,
+            "y1": 8,
+            "y2": 3
+          },{
+            "x": 1397189940000,
+            "y": 4,
+            "y1": 10,
+            "y2": 10
+          },{
+            "x": 1397219100000,
+            "y": 6,
+            "y1": 20,
+            "y2": 27
+          }
+        ],
+      type: Array
+    },
+    completeSeriesConfig: {
+      value: {
+          "y": {
+            "type":"line",
+            "name":"mySeries1",
+            "x":'x',
+            "y":'y',
+            "color": "rgb(93,165,218)"
+          },
+          "y1": {
+            "type":"line",
+            "name":"mySeries2",
+            "x":'x',
+            "y":'y1',
+            "color": "rgb(250,164,58"
+          },
+          "y2": {
+            "type":"line",
+            "name":"mySeries3",
+            "x":'x',
+            "y":'y2',
+            "color": "rgb(96,189,104)"
+          }
+        },
+      type: Object
+    },
+    width: {
+      type: Number,
+      value: 500
+    },
+    height: {
+      type: Number,
+      value: 250
+    },
+    chartExtents: {
+      type: Object,
+      value: {'x': [1397102460000,1397219100000], 'y':[1,27]}
+    },
+    margin: {
+      type: Object,
+      value: {
+        "top": 10,
+        "right": 10,
+        "bottom": 10,
+        "left": 10
+      }
+    },
+
+    crosshairData: {
+      type: Object,
+      value: {
+          "rawData":[{
+            "x": 1397131620000,
+            "y": 6,
+            "y1": 15,
+            "y2": 21
+          },{
+            "x": 1397160780000,
+            "y": 10,
+            "y1": 8,
+            "y2": 3
+          }],
+          "timeStamps":[ 1397131620000, 1397160780000 ]
+      }
+    }
+  },
+
+  highlightData: function() {
+    if(this.$.pointhighlight.crosshairData && this.$.pointhighlight.crosshairData.timeStamps.length) {
+      this.$.pointhighlight.set('crosshairData', {rawData: [], timeStamps: []});
+    } else {
+      this.$.pointhighlight.set('crosshairData', this.crosshairData);
+    }
+  }
+});
+</script>

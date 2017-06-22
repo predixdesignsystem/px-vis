@@ -1,0 +1,220 @@
+<link rel="import" href="../../polymer/polymer.html">
+<link rel="import" href="../px-vis-multi-axis.html">
+<link rel="import" href="../px-vis-multi-scale.html">
+<link rel="import" href="../px-vis-cursor-line.html">
+<link rel="import" href="../px-vis-line-svg.html">
+<link rel="import" href="../px-vis-svg.html">
+
+<dom-module id="px-vis-cursor-line-demo-component">
+  <template>
+
+    <!--add demo tag-->
+    <px-vis-multi-scale
+      id="multiScale"
+      axes="[[axes]]"
+      chart-data="[[chartData]]"
+      chart-extents="[[chartExtents]]"
+      x="{{x}}"
+      y="{{y}}"
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      dimensions="[[dimensions]]"
+      domain-changed="{{domainChanged}}">
+    </px-vis-multi-scale>
+    <px-vis-multi-axis
+      id="multiAxis"
+      dimensions="[[dimensions]]"
+      axes="[[axes]]"
+      prevent-series-bar
+      x="[[x]]"
+      y="[[y]]"
+      redraw-series="true"
+      stroke-width="2"
+      match-ticks
+      outer-tick-size="6"
+      label-type-size="10"
+      title-type-size="12"
+      displayed-values="{{displayedValues}}"
+      append-unit-in-title
+      domain-changed="[[domainChanged]]"
+      axis-groups="{{axisGroups}}"
+      brush-elems="{{brushElems}}"
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      chart-data="[[chartData]]"
+      complete-series-config="[[completeSeriesConfig]]"
+      series-key="x">
+    </px-vis-multi-axis>
+    <px-vis-svg
+      id="svg"
+      width="[[width]]"
+      height="[[height]]"
+      svg="{{svg}}"
+      margin="[[margin]]">
+    </px-vis-svg>
+
+    <px-vis-line-svg
+      id="lineSVG"
+      parallel-coordinates
+      multi-path
+      series-id="x"
+      chart-data="[[chartData]]"
+      complete-series-config="[[completeSeriesConfig]]"
+      x="[[x]]"
+      y="[[y]]"
+      domain-changed="[[domainChanged]]"
+      selected-domain="[[selectedDomain]]"
+      muted-series="[[_combineMutes(mutedSeriesBrush,mutedSeriesDomain)]]"
+      prevent-initial-drawing="[[_preventInitialDrawing]]">
+    </px-vis-line-svg>
+
+    <px-vis-cursor-line
+      id="lineCursor"
+      x="[[x]]"
+      y="[[y]]"
+      parallel-coordinates
+      dimensions="[[dimensions]]"
+      domain-changed="[[domainChanged]]"
+      time-data="x"
+      complete-series-config="[[completeSeriesConfig]]"
+      series-id="x"
+      tooltip-data="[[tooltipData.dataset]]">
+    </px-vis-cursor-line>
+  </template>
+</dom-module>
+
+<script>
+Polymer({
+  is: 'px-vis-cursor-line-demo-component',
+  properties: {
+    description: {
+      type: String,
+      value: "d3 element which highlights a line of data"
+    },
+    chartData: {
+      value: [{
+            "x": 1397102460000,
+            "y": 1,
+            "y1": 1,
+            "y2": 1
+          },{
+            "x": 1397131620000,
+            "y": 6,
+            "y1": 15,
+            "y2": 21
+          },{
+            "x": 1397160780000,
+            "y": 10,
+            "y1": 8,
+            "y2": 3
+          },{
+            "x": 1397189940000,
+            "y": 4,
+            "y1": 10,
+            "y2": 10
+          },{
+            "x": 1397219100000,
+            "y": 6,
+            "y1": 20,
+            "y2": 27
+          }
+        ],
+      type: Array
+    },
+    completeSeriesConfig: {
+      value: {
+          "x":{
+            "type":"line",
+            "name":"mySeries",
+            "x":['y','y1','y2'],
+            "y":['y','y1','y2'],
+            "color": "rgb(93,165,218)"
+          },
+          "y": {
+            "title": " "
+          },
+          "y1": {
+            "title": " "
+          },
+          "y2": {
+            "title": " "
+          }
+        },
+      type: Object
+    },
+    dimensions: {
+      type :Array,
+      value: ['y','y1','y2']
+    },
+    axes: {
+      type :Array,
+      value: ['y','y1','y2']
+    },
+    width: {
+      type: Number,
+      value: 500
+    },
+    height: {
+      type: Number,
+      value: 250
+    },
+    chartExtents: {
+      type: Object,
+      value: {'x': ['y','y1','y2'], 'y':{'y':[1,10], 'y1':[1,20], 'y2':[1,27]}}
+    },
+    margin: {
+      type: Object,
+      value: {
+        "top": 10,
+        "right": 10,
+        "bottom": 10,
+        "left": 10
+      }
+    },
+
+    layers: {
+      type: Array,
+      value: function() { return []; }
+    },
+
+    tooltipData: {
+      type: Object
+    }
+
+  },
+
+  listeners:{
+    'px-vis-axis-interaction-space-tooltip-data': 'setTooltipData',
+    'px-vis-axis-interaction-space-reset-tooltip': 'hideTooltip',
+  },
+
+  observers: [
+    'generateLayers(svg)'
+  ],
+
+  generateLayers: function() {
+    var div = document.createElement('div');
+
+    var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    var layer = Px.d3.select(Polymer.dom(this.svg.node()).appendChild(g));
+
+    this.layers.push(this.svg.append('g'));
+    this.layers.push(layer);
+    this.layers.push(this.svg.append('g'));
+
+    this.$.multiAxis.set('svg', this.layers[0]);
+    this.$.lineSVG.set('svg', this.layers[1]);
+    this.$.lineCursor.set('svg', this.layers[2]);
+    this.$.lineCursor.set('svgDataLayer', this.layers[1]);
+  },
+
+  setTooltipData: function(evt) {
+    this.set('tooltipData', evt.detail);
+  },
+  hideTooltip: function(evt) {
+    this.set('tooltipData', {dataset: null});
+  }
+});
+</script>
