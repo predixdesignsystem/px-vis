@@ -3,6 +3,10 @@
 * Add striping component
 * Edits to toolbar and interaction space for striping
 
+v2.0.7
+==================
+* Reset uniqueIds array to empty on detached instead of null
+
 v2.0.6
 ==================
 * Fixes to binary search in crosshair
