@@ -2,6 +2,8 @@
 ==================
 * Add striping component
 * Edits to toolbar and interaction space for striping
+* Added to highlight, striping, and line-cursor to overview and demos
+* Moved data converter methods into behavior
 
 v2.0.7
 ==================
