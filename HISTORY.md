@@ -1,7 +1,6 @@
-
+v2.0.8
 ==================
-* Add striping component
-* Edits to toolbar and interaction space for striping
+* Emsure markeScale is only applied to the marker size itself rather than the whole canvas
 
 v2.0.7
 ==================
