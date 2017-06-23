@@ -1,3 +1,7 @@
+v2.0.8
+==================
+* Ensure markerScale is only applied to the actual marker size rather than the whole canvas
+
 v2.0.7
 ==================
 * Reset uniqueIds array to empty on detached instead of null
