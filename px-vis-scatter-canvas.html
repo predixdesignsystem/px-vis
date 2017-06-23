@@ -391,7 +391,7 @@ Element which draws a scatter series onto the chart
     _initiateRendering: function() {
 
       //create symbol, retrieve opacity values
-      this._currentDrawingOptions.symbol = Px.d3.symbol().type(this._markerMapping[this.markerSymbol]).size(this.markerSize).context(this.canvasContext);
+      this._currentDrawingOptions.symbol = Px.d3.symbol().type(this._markerMapping[this.markerSymbol]).size(this.markerSize * this.markerScale).context(this.canvasContext);
       this._currentDrawingOptions.muted = this.mutedSeries[this.seriesId];
       this._currentDrawingOptions.fillOpacity = this._currentDrawingOptions.muted  ? this.mutedOpacity : this.markerFillOpacity;
       this._currentDrawingOptions.strokeOpacity = this._currentDrawingOptions.muted  ? 0 : this.markerStrokeOpacity;
@@ -554,7 +554,6 @@ Element which draws a scatter series onto the chart
 
       //get serie specific values. stroke and fill opacities
       //are handled in the options.drawingFunction
-      this.canvasContext.scale(this.markerScale, this.markerScale);
       this.canvasContext.fillStyle = this.completeSeriesConfig[this.seriesId]['color'];
       this.canvasContext.strokeStyle = this.completeSeriesConfig[this.seriesId]['color'];
       this.canvasContext.globalAlpha = this._currentDrawingOptions.fillOpacity;
@@ -589,6 +588,7 @@ Element which draws a scatter series onto the chart
 
       this.canvasContext.restore();
       this.canvasContext._pxScatterCleared = false;
+
     },
 
     _getTransform: function(d) {
