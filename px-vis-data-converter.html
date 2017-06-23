@@ -1,5 +1,5 @@
 <link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-data-converter.html" />
 
 <!--
 Converts data from Array form to Object form.
@@ -80,7 +80,7 @@ It will reformat the data into the object format and create a seriesConfig file.
     is: 'px-vis-data-converter',
 
     behaviors: [
-      PxVisBehavior.commonMethods
+      PxVisBehavior.dataConverterMethods
     ],
 
     /**
@@ -210,92 +210,11 @@ It will reformat the data into the object format and create a seriesConfig file.
     },
 
     /**
-    * returns the correct id for the series
-    *
-    */
-    _calcId: function(d,i){
-      if(this.dataIds[i]){
-        return this.dataIds[i];
-      } else if(d[this.idKey]){
-        return d[this.idKey];
-      } else {
-        return 'y' + i;
-      }
-    },
-
-    /**
     * Merges n sorted arrays into an array of objects
     *
     */
     _computeChartData: function() {
-      if(this.originalData.length > 0) {
-        // put in check to see if we have sorted data or not
-        var chartData = [],
-            numArrs = this.originalData.length, // how many arrays we have
-            indexes = Array(numArrs).fill(0), // create starting index for each
-            iter = 0, // how many series we have reached the end
-            id = Array.prototype.map.call(this.originalData,function(d,i){
-              // since we are iterating over the data...
-              if(d[this.dataKey].length === 0){
-                var id = this._calcId(this.originalData[i],i);
-                this.emptySets[id] = true;
-                this.fire('px-vis-data-converter-empty-data', { "id": id });
-              }
-              // add infinity to the end so we have a stop point
-              d[this.dataKey].push([Infinity,Infinity]);
-
-              // figure out if we should use user input ID or the series key
-              return this._calcId(d,i);
-            }.bind(this));
-
-        // keep going until we reach the end of each series
-        while(iter < numArrs){
-          var lowest = Number.MAX_VALUE,  //Number.MAX_VALUE < Infinity
-              obj = {},       //our new merged data unit
-              indicies = [],  //which indexes got incremented
-              iter = 0;       //reset iter with each pass
-
-          for(var i = 0; i < numArrs; i++){
-            if(this.originalData[i][this.dataKey][indexes[i]][0] < lowest){
-              // reset obj
-              obj = {};
-              // set our lowest for reference on the next pass
-              lowest = this.originalData[i][this.dataKey][indexes[i]][0];
-              // set our obj x value
-              obj[this.newXKey] = lowest;
-              // set our obj y value
-              obj[id[i]] = this.originalData[i][this.dataKey][indexes[i]][1];
-              // track in index we are at
-              indicies = [i];
-            } else if (this.originalData[i][this.dataKey][indexes[i]][0] === lowest){
-              // add our y val
-              obj[id[i]] = this.originalData[i][this.dataKey][indexes[i]][1];
-              // add our index
-              indicies.push(i);
-            }
-          }
-          // add our new object to our dataset
-          chartData.push(obj);
-          // increment out indexes
-          for(var j = 0; j < numArrs; j++){
-            // increase the index for any series we merged
-            var k = indicies[j]
-            indexes[k] += 1;
-
-            // check to see we hit the end of each series, increment iter if we do
-            if(this.originalData[j][this.dataKey][indexes[j]][0] === Infinity){
-              iter += 1;
-            }
-          }
-        }
-
-        this.fire('px-vis-empty-sets', { 'dataVar': 'emptySets', 'data': this.emptySets, 'method':'set' });
-        this.fire('px-vis-chart-data', { 'dataVar': 'chartData', 'data': chartData, 'method':'set' });
-
-        return chartData;
-      }
-      // else return empty array
-      return [];
+      return this.computeChartData(this.originalData, this, this.emptySets);
     },
 
     /**
@@ -303,46 +222,7 @@ It will reformat the data into the object format and create a seriesConfig file.
     *
     */
     _computeSeriesConfig: function(){
-      if(this.originalData.length > 0) {
-        var seriesConfig = {},
-            id,
-            y1,
-            y2;
-        for(var i = 0; i < this.originalData.length; i++){
-          id = this._calcId(this.originalData[i],i);
-          seriesConfig[id] = {};
-          seriesConfig[id]['name'] = this.dataNames[i] ? this.dataNames[i] : this.originalData[i][this.nameKey] ? this.originalData[i][this.nameKey] : id;
-          seriesConfig[id]['x'] = this.newXKey;
-          seriesConfig[id]['y'] = id;
-
-          if(this.originalData[i]['min']){
-            seriesConfig[id]['yMin'] = this.originalData[i]['min'];
-          }
-
-          if(this.originalData[i]['max']){
-            seriesConfig[id]['yMax'] = this.originalData[i]['max'];
-          }
-
-          if(this.originalData[i][this.yUnitKey]){
-            seriesConfig[id]['yAxisUnit'] = this.originalData[i][this.yUnitKey];
-          }
-
-          if(this.originalData[i][this.xUnitKey]){
-            seriesConfig[id]['xAxisUnit'] = this.originalData[i][this.xUnitKey];
-          }
-
-          if(this.originalData[i]['axis']){
-            seriesConfig[id]['axis'] = this.originalData[i]['axis'];
-          }
-
-          if(this.originalData[i]['interpolationFunction']) {
-            seriesConfig[id]['interpolationFunction'] = this.originalData[i]['interpolationFunction'];
-          }
-        }
-
-        this.fire('px-vis-series-config', { 'dataVar': 'seriesConfig', 'data': seriesConfig, 'method':'set' });
-        return seriesConfig;
-      }
+      return this.computeSeriesConfig(this.originalData, this);
     }
   });
 </script>

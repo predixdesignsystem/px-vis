@@ -1,0 +1,230 @@
+<script>
+
+var PxVisBehavior = PxVisBehavior || {};
+
+/*
+    Name:
+    PxVisBehavior.dataConverterMethods
+
+    Description:
+    Converts data from Array form to Object form.
+
+    px-vis charts expect data in the following array of objects format:
+
+    ```
+    [
+        {
+            x: 10,
+            y: 50
+        },{
+            x: 20,
+            y: 40
+        }
+    ]
+    ```
+
+    Keys are flexible - multiple keys can be added to the same object:
+
+    ```
+    [
+        {
+            timestamp: 1413930600000,
+            tag1: 15,
+            tag2: 16,
+            tag3: 11
+        },{
+            timestamp: 1414080000000,
+            tag1: 14,
+            tag2: 17,
+            tag3: 13
+        }
+    ]
+    ```
+
+    This component accepts data in the following format:
+
+    ```
+    [{
+        "id":"myTagID",
+        "name":"My Favorite Tag",
+        "minValue":0,
+        "maxValue":293,
+        "data":[
+            [1464562720308,41],
+            [1464571360308,170]
+        ]
+    }]
+    ```
+
+    It will reformat the data into the object format and create a seriesConfig file.
+
+    @polymerBehavior PxVisBehavior.dataConverterMethods
+*/
+PxVisBehavior.dataConverterMethods = {
+  /**
+  * returns the correct id for the series
+  *
+  */
+  _calcId: function(context, d,i) {
+    if(context.dataIds[i]){
+      return context.dataIds[i];
+    } else if(d[context.idKey]){
+      return d[context.idKey];
+    } else {
+      return 'y' + i;
+    }
+  },
+
+  /**
+  * Merges n sorted arrays into an array of objects
+  *
+  * @param {Array} originalData - An array of dataset arrays (returned from the timeseries database) to be merged together.
+  * @param {Object} context - Holder for a variety of configs:
+  * @param {string} context.dataKey - The access key accessing the actual dataset array in an originalData item.
+  * @param {string} context.newXKey - What you want the `x` key to be in the returned chartData
+  * @param {Array} context.dataIds - An optional array of data IDs matching the order of the data array. The returned chartData will use these keys for your data.
+  * @param {string} context.idKey - If your originalData has an id, the key to access the id.
+  * @param {Object} emptySets - An object with keys for each empty set in the oringinalData
+  * @returns {Array} Merged datasets as an Array of Objects
+  */
+  computeChartData: function(originalData, context, emptySets) {
+    if(originalData.length > 0) {
+      // put in check to see if we have sorted data or not
+      var dataKey = context.dataKey ? context.dataKey : 'data'
+          newXKey = context.newXKey ? context.newXKey : 'x',
+          emptySets = emptySets || {},
+          chartData = [],
+          numArrs = originalData.length, // how many arrays we have
+          indexes = Array(numArrs).fill(0), // create starting index for each
+          iter = 0, // how many series we have reached the end
+          id = Array.prototype.map.call(originalData, function(d,i) {
+            // since we are iterating over the data...
+            if(d[dataKey].length === 0) {
+              var id = this._calcId(context, originalData[i],i);
+              emptySets[id] = true;
+              this.fire('px-vis-data-converter-empty-data', { "id": id });
+            }
+            // add infinity to the end so we have a stop point
+            d[dataKey].push([Infinity,Infinity]);
+
+            // figure out if we should use user input ID or the series key
+            return this._calcId(context, d, i);
+          }.bind(this));
+
+      // keep going until we reach the end of each series
+      while(iter < numArrs) {
+        var lowest = Number.MAX_VALUE,  //Number.MAX_VALUE < Infinity
+            obj = {},       //our new merged data unit
+            indicies = [],  //which indexes got incremented
+            iter = 0;       //reset iter with each pass
+
+        for(var i = 0; i < numArrs; i++) {
+          if(originalData[i][dataKey][indexes[i]][0] < lowest) {
+            // reset obj
+            obj = {};
+            // set our lowest for reference on the next pass
+            lowest = originalData[i][dataKey][indexes[i]][0];
+            // set our obj x value
+            obj[this.newXKey] = lowest;
+            // set our obj y value
+            obj[id[i]] = originalData[i][dataKey][indexes[i]][1];
+            // track in index we are at
+            indicies = [i];
+          } else if (originalData[i][dataKey][indexes[i]][0] === lowest) {
+            // add our y val
+            obj[id[i]] = originalData[i][dataKey][indexes[i]][1];
+            // add our index
+            indicies.push(i);
+          }
+        }
+        // add our new object to our dataset
+        chartData.push(obj);
+        // increment out indexes
+        for(var j = 0; j < numArrs; j++) {
+          // increase the index for any series we merged
+          var k = indicies[j]
+          indexes[k] += 1;
+
+          // check to see we hit the end of each series, increment iter if we do
+          if(originalData[j][dataKey][indexes[j]][0] === Infinity) {
+            iter += 1;
+          }
+        }
+      }
+
+      this.fire('px-vis-empty-sets', { 'dataVar': 'emptySets', 'data': emptySets, 'method':'set' });
+        this.fire('px-vis-chart-data', { 'dataVar': 'chartData', 'data': chartData, 'method':'set' });
+
+      return chartData;
+    }
+    // else return empty array
+    return [];
+  },
+
+  /**
+  * bundles info in the original dataset into a new series config
+  *
+  * @param {Array} originalData - An array of dataset arrays (returned from the timeseries database) to be merged together.
+  * @param {Object} context - Holder for a variety of configs:
+  * @param {Array} context.dataNames - An optional array of names/titles you want to be applied to the seriesConfig. Order matches the order of the series in originalData
+  * @param {string} context.nameKey - Optional key to access the name / title for the dataset in originalData
+  * @param {string} context.newXKey - What you want the `x` key to be in the returned chartData
+  * @param {string} context.xUnitKey - Optional key to access the x-units in originalData
+  * @param {string} context.yUnitKey - Optional key to access the y-units in originalData
+  * @param {Array} context.dataIds - An optional array of data IDs matching the order of the data array. The returned chartData will use these keys for your data.
+  * @param {string} context.idKey - If your originalData has an id, the key to access the id.
+  * @returns {Object} An Object with all configuration found in the originalData
+  */
+  computeSeriesConfig: function(originalData, context) {
+    if(originalData.length > 0) {
+      var dataNames = context.dataNames ? context.dataNames : [],
+          nameKey = context.nameKey ? context.nameKey : 'name',
+          newXKey = context.newXKey ? context.newXKey : 'x',
+          xUnitKey = context.xUnitKey ? context.xUnitKey : 'xAxisUnit',
+          yUnitKey = context.yUnitKey ? context.yUnitKey : 'units',
+          seriesConfig = {},
+          id,
+          y1,
+          y2;
+
+      for(var i = 0; i < originalData.length; i++) {
+        id = this._calcId(context, originalData[i], i);
+        seriesConfig[id] = {};
+
+        seriesConfig[id]['name'] = dataNames[i] ? dataNames[i] : originalData[i][nameKey] ? originalData[i][nameKey] : id;
+
+        seriesConfig[id]['x'] = newXKey;
+        seriesConfig[id]['y'] = id;
+
+        if(originalData[i]['min']) {
+          seriesConfig[id]['yMin'] = originalData[i]['min'];
+        }
+
+        if(originalData[i]['max']) {
+          seriesConfig[id]['yMax'] = originalData[i]['max'];
+        }
+
+        if(originalData[i][yUnitKey]) {
+          seriesConfig[id]['yAxisUnit'] = originalData[i][yUnitKey];
+        }
+
+        if(originalData[i][xUnitKey]) {
+          seriesConfig[id]['xAxisUnit'] = originalData[i][xUnitKey];
+        }
+
+        if(originalData[i]['axis']) {
+          seriesConfig[id]['axis'] = originalData[i]['axis'];
+        }
+
+        if(originalData[i]['interpolationFunction']) {
+          seriesConfig[id]['interpolationFunction'] = originalData[i]['interpolationFunction'];
+        }
+      }
+
+      this.fire('px-vis-series-config', { 'dataVar': 'seriesConfig', 'data': seriesConfig, 'method':'set' });
+
+      return seriesConfig;
+    }
+  }
+}
+</script>

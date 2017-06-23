@@ -1,3 +1,10 @@
+
+=======
+* Add striping component
+* Edits to toolbar and interaction space for striping
+* Added to highlight, striping, and line-cursor to overview and demos
+* Moved data converter methods into behavior
+
 v2.0.8
 ==================
 * Emsure markeScale is only applied to the marker size itself rather than the whole canvas

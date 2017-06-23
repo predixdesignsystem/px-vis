@@ -1289,8 +1289,19 @@ PxVisBehaviorChart.layers = [{
         name = propName ? propName : 'layer';
 
     for(var i = 0; i < numberOfLayers; i++) {
-      var layer = svg.append('g');
-      layer.attr('id', "layer" + i);
+      var layer;
+
+      /*
+        if we are in shady dom, need to use Polymer.dom append child to get the shady scope. Matters for these elements because they can have classes applied by highlight and cursor components and using the Polymer.dom method is twice as slow as the d3 method.
+      */
+      if(Polymer.Settings.useNativeShadow) {
+        layer = svg.append('g');
+      } else {
+        var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+        layer = Px.d3.select(Polymer.dom(svg.node()).appendChild(g));
+      }
+
+      layer.attr('id', "layer" + i)
       layers.push(layer);
     }
 

@@ -5,7 +5,7 @@
 <link rel="import" href="px-vis-line-svg.html" />
 
 <!--
-Element which draws crosshairs around mouse pointer / data points and highlights adjacent datapoints.
+Element which highlight specific line datasets
 - Uses crosshairData property.
 
 ##### Usage
@@ -27,27 +27,28 @@ Element which draws crosshairs around mouse pointer / data points and highlights
     </px-vis-interaction-space>
 
     <px-vis-highlight-line
-        svg="[[svg]]"
+        id="highlighter"
+        margin="[[margin]]"
+        svg="[[layer.1]]"
+        layers-to-mask="[[layer.0]]"
         x="[[x]]"
         y="[[y]]"
+        parallel-coordinates
+        dimensions="[[dimensions]]"
         domain-changed="[[domainChanged]]"
-        time-data="[[key]]"
+        time-data="[[seriesKey]]"
         complete-series-config="[[completeSeriesConfig]]"
+        series-id="[[seriesKey]]"
+        category-key="[[categoryKey]]"
+        categories="[[categories]]"
         chart-data="[[chartData]]"
         generating-crosshair-data="[[generatingCrosshairData]]"
-        crosshair-data="[[crosshairData]]">
+        crosshair-data="[[crosshairData]]"
+        default-empty-data="{{defaultEmptyData}}">
     </px-vis-highlight-line>
 
-### Styling
-The following custom properties are available for styling:
-
-Custom property | Description | Default
-----------------|-------------|----------
-  `--px-vis-cursor-line-color` | The color for the lines which track the cursor/data | `$gray5`
-
-
-@element px-vis-cursor
-@blurb Element which draws crosshairs around mouse pointer / data points and highlight adjacent datapoints.
+@element px-vis-highlight-line
+@blurb Element which highlight specific line datasets
 @homepage index.html
 @demo demo/index.html
 

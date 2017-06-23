@@ -2499,12 +2499,14 @@ PxVisBehavior.highlightCanvasShared = [{
     if(this.layersToMask) {
 
       if(!Array.isArray(this.layersToMask)) {
-        this.toggleClass('secondaryDataMask', this._highlightData.length,
-          this.layersToMask.canvas);
+        // this.layersToMask.canvas.style.opacity = this._highlightData.length ? 'var(--px-vis-data-mask-opacity, 0.4)' : '';
+
+        this.toggleClass('secondaryDataMask', this._highlightData.length,this.layersToMask.canvas);
       } else {
         for(var i=0; i<this.layersToMask.length; i++) {
-          this.toggleClass('secondaryDataMask', this._highlightData.length,
-          this.layersToMask[i].canvas);
+          // this.layersToMask[i].canvas.style.opacity = this._highlightData.length ? 'var(--px-vis-data-mask-opacity, 0.4)' : '';
+
+          this.toggleClass('secondaryDataMask', this._highlightData.length, this.layersToMask[i].canvas);
         }
       }
     }
@@ -2540,12 +2542,13 @@ PxVisBehavior.highlightSvgShared = [{
   _muteDataSeries: function(data) {
     if(this.layersToMask) {
       if(!Array.isArray(this.layersToMask)) {
-        this.toggleClass('secondaryDataMask', data.length,
-          this.layersToMask.node());
+        this.layersToMask.node().style.opacity = data.length ? 'var(--px-vis-data-mask-opacity, 0.4)' : '';
+        // this.toggleClass('secondaryDataMask', data.length, this.layersToMask.node());
       } else {
         for(var i=0; i<this.layersToMask.length; i++) {
-          this.toggleClass('secondaryDataMask', data.length,
-          this.layersToMask[i].node());
+          this.layersToMask[i].node().style.opacity = data.length ? 'var(--px-vis-data-mask-opacity, 0.4)' : '';
+
+          // this.toggleClass('secondaryDataMask', data.length, this.layersToMask[i].node());
         }
       }
     }
