@@ -1271,6 +1271,92 @@ PxVisBehavior.events = {
 
 /*
      Name:
+    PxVisBehavior.markers
+
+    Description:
+    Polymer behavior that provides config and data to manage "markers" (px-vis-event) on the chart
+
+
+    @polymerBehavior PxVisBehavior.markers
+*/
+
+PxVisBehavior.markers = {
+  properties: {
+    /**
+     * Configuration object to define what marker should map to what icon, color, and row.
+     * The object has a key being the marker name, the value being a configuration object for that marker. The configuration object has four properties:
+     * - `color`: A rgb color value for the fill or stroke.
+     * - "fillOpacity": the opacity of the inside of the marker
+     * - "strokeOpacity": the opacity of the outside of the marker
+     * - `markerSymbol`: the symbol type; see below
+     * - "markerSize": specifies the size of markers
+     * - "markerScale": allows to scale the size of markers
+     * - "location": "top" or "bottom"
+     * - "row": the row number on the top or the bottom, starting at 0
+     * - "priority": the higher the number, the greater the priority.
+     *
+     * The symbol used for the marker. Supported symbols:
+     * - 'circle'
+     * - 'cross'
+     * - 'diamond'
+     * - 'square'
+     * - 'triangle-up'
+     * - 'star'
+     * - 'wye'
+     * more info at https://github.com/d3/d3-shape/blob/master/README.md#symbols
+     *
+     * ```
+     * Example: {
+     *   "myMarkerType":{
+     *       "fillColor": "rgb(123,0,0)",
+     *       "markerFillOpacity": 0.5,
+     *       "markerSymbol": "square",
+     *       "markerSize": 4,
+     *       "location": "top",
+     *       "row": 1,
+     *       "priority": 10
+     *   }
+     * }
+     * ```
+     *
+     */
+    markerConfig: {
+      type: Object
+    },
+    /**
+     * Data representing the markers. Example:
+     * [
+     *    {
+     *      "id": "123",
+     *      "x": 2,
+     *      "label": "Recalibrate"
+     *    },
+     *    {
+     *      "id": "456",
+     *      "x": 3,
+     *      "label": "Fan start"
+     *    },
+     *    {
+     *      "id": "789",
+     *      "x": 4,
+     *      "label": "Fan stop"
+     *    },
+     *    {
+     *      "id": "333",
+     *      "x": 8,
+     *      "label": "Default"
+     *    }
+     *  ]
+     */
+    markerData: {
+      type: Array
+    }
+  }
+};
+
+
+/*
+     Name:
     PxVisBehavior.thresholds
 
     Description:

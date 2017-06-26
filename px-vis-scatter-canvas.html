@@ -78,7 +78,8 @@ Element which draws a scatter series onto the chart
       PxVisBehavior.serieToRedrawOnTop,
       PxColorsBehavior.baseColors,
       PxVisBehavior.preventInitialDrawing,
-      PxVisBehavior.isAttached
+      PxVisBehavior.isAttached,
+      PxVisBehaviorD3.scatterMarkers
     ],
     /**
      * px-vis-scatter-progressive-rendering-started, fired when a canvas with progressive rendering
@@ -133,100 +134,10 @@ Element which draws a scatter series onto the chart
        * @type String
        */
       seriesNumber:{
-        type:Number,
-        value:0
+        type: Number,
+        value: 0
       },
-      /**
-       * Maps dev input markers to d3 symbols
-       *
-       */
-      _markerMapping: {
-        type: Object,
-        readOnly: true,
-        value: {
-          'circle': Px.d3.symbolCircle,
-          'cross': Px.d3.symbolCross,
-          'diamond': Px.d3.symbolDiamond,
-          'square': Px.d3.symbolSquare,
-          'triangle-up': Px.d3.symbolTriangle,
-          'star': Px.d3.symbolStar,
-          'wye': Px.d3.symbolWye
-        },
-        /**
-         * The symbol used for the marker. Supported symbols:
-         * - 'circle'
-         * - 'cross'
-         * - 'diamond'
-         * - 'square'
-         * - 'triangle-up'
-         * - 'star'
-         * - 'wye'
-         * more info at https://github.com/d3/d3-shape/blob/master/README.md#symbols
-         * This property will be read from the completeSeriesConfig
-         */
-        markerSymbol: {
-          type: String
-        },
-        /**
-         * Scales the size of the scatter marker
-         * This property will be read from the completeSeriesConfig
-         */
-        markerScale: {
-          type: Number
-        },
-        /**
-         * the size of the markers
-         * This property will be read from the completeSeriesConfig
-         */
-        markerSize: {
-          type: Number
-        },
-        /**
-         * The opacity of the fill (inside) of the marker
-         * This property will be read from the completeSeriesConfig
-         */
-        markerFillOpacity: {
-          type: Number
-        },
-        /**
-         * The opacity of the stroke (outside) of the marker
-         * This property will be read from the completeSeriesConfig
-         */
-        markerStrokeOpacity: {
-          type: Number
-        },
-        /**
-         * the opacity value of the fill to be used when muting a serie (stroke is not drawn on mute)
-         * This property will be read from the completeSeriesConfig
-         */
-        mutedOpacity: {
-          type: Number
-        },
-      },
-      /**
-       * A holder object for the series group
-       *
-       * @property scatterGroup
-       * @type Object
-       */
-      scatterGroup:{
-        type:Object,
-        value: function() {return{};}
-      },
-      /**
-       * A holder object for the series objects
-       *
-       */
-      scatterDots:{
-        type:Object
-      },
-      /**
-       * A holder object for the series builder
-       *
-       */
-      scatterBuilder: {
-        type: Object
-      },
+
       /**
        * Whether the scatter plot is using radial coiordinates (x=phase, y=amplitude)
        */
@@ -391,7 +302,7 @@ Element which draws a scatter series onto the chart
     _initiateRendering: function() {
 
       //create symbol, retrieve opacity values
-      this._currentDrawingOptions.symbol = Px.d3.symbol().type(this._markerMapping[this.markerSymbol]).size(this.markerSize * this.markerScale).context(this.canvasContext);
+      this._currentDrawingOptions.symbol = Px.d3.symbol().type(this.markerMapping[this.markerSymbol]).size(this.markerSize * this.markerScale).context(this.canvasContext);
       this._currentDrawingOptions.muted = this.mutedSeries[this.seriesId];
       this._currentDrawingOptions.fillOpacity = this._currentDrawingOptions.muted  ? this.mutedOpacity : this.markerFillOpacity;
       this._currentDrawingOptions.strokeOpacity = this._currentDrawingOptions.muted  ? 0 : this.markerStrokeOpacity;
@@ -527,7 +438,7 @@ Element which draws a scatter series onto the chart
 
         if(!this.radial) {
           var w = Math.max(this.width - this.margin.left - this.margin.right,0),
-            h = Math.max(this.height - this.margin.top - this.margin.bottom,0);
+              h = Math.max(this.height - this.margin.top - this.margin.bottom,0);
 
           this.canvasContext.rect(0, 0, w, h);
         } else {
