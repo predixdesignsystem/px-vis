@@ -471,14 +471,22 @@ Element which draws lines series onto the chart
       this._renderingContext.currentBatchStartIndex = this._renderingContext.lastPointRenderedIndex;
 
       //ensure weprepend the last defined point
-      var skipped = Math.max(this._renderingContext.index * this._renderingContext.size - (this._renderingContext.lastPointRenderedIndex + 1), 0);
-          //slice will end at the end of the array if the 'end' index is bigger
-          //than the chartdata length (last batch)
-          d = this.chartData.slice(this._renderingContext.lastPointRenderedIndex, (this._renderingContext.index + 1) * this._renderingContext.size + skipped);
+      var prevRenderedCount = this._renderingContext.index * this._renderingContext.size,
+          skipped = Math.max(prevRenderedCount - (this._renderingContext.lastPointRenderedIndex + 1), 0),
+          d;
 
       //if it's a single line make sure we can loop around it
       if(!this.multiPath) {
+
+        //slice will end at the end of the array if the 'end' index is bigger
+        //than the chartdata length (last batch)
+        d = this.chartData.slice(this._renderingContext.lastPointRenderedIndex, (this._renderingContext.index + 1) * this._renderingContext.size + skipped);
         d = [d];
+      } else {
+
+        //we don't have to deal with prepending previous point and skipped
+        //points in multiline
+        d = this.chartData.slice(prevRenderedCount, (this._renderingContext.index + 1) * this._renderingContext.size);
       }
 
       this._renderOneBatch(d);

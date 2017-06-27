@@ -1,0 +1,291 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
+<link rel="import" href="../px-colors-design/colors.html" />
+<link rel="import" href="px-vis-scatter-canvas.html" />
+
+
+<!--
+Element which draws crosshairs around mouse pointer / data points and highlights adjacent datapoints.
+- Uses crosshairData property.
+
+##### Usage
+
+    <px-vis-svg
+        ...
+        svg="{{svg}}">
+    </px-vis-svg>
+    <px-vis-scale
+        ...
+        x="{{x}}"
+        y="{{y}}"
+        domain-changed="{{domainChanged}}">
+    </px-vis-scale>
+    <px-vis-interaction-space
+        ...
+        generating-crosshair-data="{{generatingCrosshairData}}"
+        crosshair-data="{{crosshairData}}">
+    </px-vis-interaction-space>
+
+    <px-vis-markers
+        svg="[[svg]]"
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        time-data="[[key]]"
+        complete-series-config="[[completeSeriesConfig]]"
+        chart-data="[[chartData]]"
+        generating-crosshair-data="[[generatingCrosshairData]]"
+        crosshair-data="[[crosshairData]]">
+    </px-vis-markers>
+
+### Styling
+The following custom properties are available for styling:
+
+Custom property | Description | Default
+----------------|-------------|----------
+  `--px-vis-cursor-line-color` | The color for the lines which track the cursor/data | `$gray5`
+
+
+@element px-vis-cursor
+@blurb Element which draws crosshairs around mouse pointer / data points and highlight adjacent datapoints.
+@homepage index.html
+@demo demo/index.html
+
+//TODO implement a dev setting to choose between only showing data at that x, snapping to nearest data, or interpolating value at x
+
+-->
+
+<link rel="import" href="css/px-vis-styles.html">
+
+<dom-module id="px-vis-markers">
+    <template>
+      <style include="px-vis-styles"></style>
+
+      <template is="dom-repeat" items="[[_markerTypes]]">
+        <px-vis-scatter-canvas
+          canvas-context="[[canvasContext]]"
+          series-id="[[item]]"
+          chart-data="[[_returnMarkerData(item, _markerData)]]"
+          complete-series-config="[[_markerConfig]]"
+          width="[[width]]"
+          height="[[_returnHeight(height, margin.*)]]"
+          margin="[[margin]]"
+          clip-path
+          x="[[x]]"
+          y="[[_returnYScale(item, _topDomain, _bottomDomain)]]"
+          domain-changed="[[_returnDomain(item, _topDomain, _bottomDomain, domainChanged)]]"
+          progressive-rendering-points-per-frame="500">
+        </px-vis-scatter-canvas>
+      </template>
+    </template>
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'px-vis-markers',
+
+    behaviors: [
+      PxVisBehavior.sizing,
+      PxVisBehaviorD3.canvas,
+      PxVisBehaviorD3.axes,
+      PxVisBehavior.dataset,
+      PxVisBehavior.commonMethods,
+      PxVisBehaviorD3.clipPath,
+      PxColorsBehavior.baseColors,
+      PxVisBehavior.dynamicConfigProperties,
+      PxVisBehavior.markers
+    ],
+
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      _markerData: {
+        type:Object,
+        computed: '_computeMarkerData(markerData.*, _markerTypes.*)'
+      },
+
+      _markerConfig: {
+        type:Object,
+        computed: '_computeMarkerConfig(markerConfig.*)'
+      },
+
+      _markerTypes: {
+        type: Array
+      },
+
+      _topScale: {
+        type: Function
+      },
+
+      _bottomScale: {
+        type: Function
+      },
+
+      _topDomain: {
+        type: Boolean,
+        value: null
+      },
+
+      _bottomDomain: {
+        type: Boolean,
+        value: null
+      }
+
+    }, //properties
+
+    observers: [
+      '_createScales(height, margin.*, _markerTypes.*)',
+      '_redraw(domainChanged)'
+    ],
+
+    _computeMarkerConfig: function() {
+      var types = Object.keys(this.markerConfig),
+          type,
+          config = {};
+
+      for(var i=0; i < types.length; i++) {
+        type = types[i];
+        config[type] = {
+          x: 'x',
+          y: type
+        };
+
+        config[type]['color'] = this.markerConfig[type].color ? this.markerConfig[type].color : 'rgb(123,123,123)';
+        config[type]['strokeOpacity'] = this.markerConfig[type].strokeOpacity ? this.markerConfig[type].strokeOpacity : 0;
+        config[type]['fillOpacity'] = this._getFillOpacity(this.markerConfig[type].fillOpacity, config[type]['strokeOpacity']);
+        config[type]['markerSymbol'] = this.markerConfig[type].markerSymbol ? this.markerConfig[type].markerSymbol : 'square';
+        config[type]["markerSize"] = this.markerConfig[type].markerSize ? this.markerConfig[type].markerSize : 64;
+        config[type]["markerScale"] = this.markerConfig[type].markerScale ? this.markerConfig[type].markerScale : 1;
+
+      }
+
+      this.set('_markerTypes', types);
+
+      return config;
+    },
+
+    _getFillOpacity: function(fill,stroke) {
+      // if we have a fill, use it
+      if(fill) { return fill; }
+      // if we dont have a fill or stroke, set fill to 1
+      if(!stroke) { return 1}
+      // else, set to 0
+      return 0
+    },
+
+    _computeMarkerData: function() {
+      if(!this.markerData || this.markerData.length === 0) {
+        return [];
+      }
+
+      var data = this._prepDataObject(this._markerTypes),
+          type,
+          row,
+          time,
+          o;
+
+      for(var i=0; i<this.markerData.length; i++) {
+        time = this.markerData[i]['time'];
+        type = this.markerData[i]['label'];
+        row = this.markerConfig[type]['row'] ? this.markerConfig[type]['row'] : 0;
+
+        o = {};
+        o.x = time;
+        o[type] = row;
+        data[type].push(o);
+      }
+
+      return data;
+    },
+
+    _prepDataObject: function(types) {
+      var data = {};
+
+      for(var i=0; i<types.length; i++) {
+        data[types[i]] = [];
+      }
+
+      return data;
+    },
+
+    _createScales: function() {
+      this.debounce('createScalesMarker', function() {
+        this._createScalesDebounced();
+      }, 10);
+    },
+
+    _createScalesDebounced: function() {
+      var tH = this.margin.top,
+          bH = this.height + this.margin.bottom,
+          tRowSet = {},
+          bRowSet = {},
+          tRow,
+          bRow,
+          tScale,
+          bScale,
+          type;
+
+      for(var i=0; i<this._markerTypes.length; i++) {
+        type = this._markerTypes[i];
+        row = this.markerConfig[type]["row"];
+
+        if(type.location === "bottom") {
+          bRowSet[row] = true;
+        } else {
+          tRowSet[row] = true;
+        }
+      }
+
+      bRow = Object.keys(bRowSet);
+      tRow = Object.keys(tRowSet);
+
+      bScale = Px.d3.scalePoint()
+        .range([this.height, bH])
+        .padding(0.5)
+        .domain(bRow);
+      tScale = Px.d3.scalePoint()
+        .range([0, tH])
+        .padding(0.5)
+        .domain(tRow);
+
+      this.set('_bottomScale', bScale);
+      this.set('_topScale', tScale);
+
+      this.set('_bottomDomain', (this._bottomDomain === null) ? true : !this._bottomDomain);
+      this.set('_topDomain', (this._topDomain === null) ? true : !this._topDomain);
+    },
+
+    _returnYScale: function(item) {
+      if(this._topDomain !== null && this._bottomDomain !== null) {
+        return this.markerConfig[item]["location"] === "bottom" ? this._bottomScale : this._topScale;
+      }
+    },
+
+    _returnDomain: function(item) {
+      if(this._topDomain !== null && this._bottomDomain !== null && this.domainChanged !== null) {
+        return this.markerConfig[item]["location"] === "bottom" ? this._bottomDomain : this._topDomain;
+      }
+    },
+
+    _returnMarkerData: function(item) {
+      return this._markerData[item];
+    },
+
+    _returnHeight: function() {
+      return this.height + this.margin.top + this.margin.bottom;
+    },
+
+    _redraw: function() {
+      if(this._topDomain !== null && this._bottomDomain !== null && this.domainChanged !== null) {
+        this.set('_bottomDomain', !this._bottomDomain);
+        this.set('_topDomain', !this._topDomain);
+      }
+    }
+  });
+</script>

@@ -1594,4 +1594,136 @@ PxVisBehaviorD3.radialPixelCalc = {
   }
 };
 
+
+/*
+    Name:
+    PxVisBehaviorD3.scatterMarkers
+
+    Description:
+    Polymer behavior that provides the definition for scatter markers
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorD3.scatterMarkers
+*/
+PxVisBehaviorD3.scatterMarkers = {
+  properties: {
+    /**
+     * Maps dev input marker string to d3 symbols.
+     *
+     * To add additional, custom icons, provide a draw function wrapped in an object and draw your shape using canvas drawing methods. See 'bar' or 'x' as examples
+     */
+    markerMapping: {
+      type: Object,
+      readOnly: true,
+      value: {
+        'circle': Px.d3.symbolCircle,
+        'cross': Px.d3.symbolCross,
+        'diamond': Px.d3.symbolDiamond,
+        'square': Px.d3.symbolSquare,
+        'triangle-up': Px.d3.symbolTriangle,
+        'star': Px.d3.symbolStar,
+        'wye': Px.d3.symbolWye,
+        'bar': {
+          draw: function(context, size) {
+            var w = Math.sqrt(size),
+                t = w/4;
+            context.rect(-w, -t, w, t);
+          }
+        },
+        'thin-bar': {
+          draw: function(context, size) {
+            var w = Math.sqrt(size),
+                t = w/16;
+            context.rect(-w, -t, w, t);
+          }
+        },
+        'thick-bar': {
+          draw: function(context, size) {
+            var w = Math.sqrt(size),
+                t = w/2;
+            context.rect(-w, -t, w, t);
+          }
+        },
+        'x': {
+          draw: function(context, size) {
+            var t = 0.5,
+                c = 0.01,
+                l = Math.sqrt(size) / 2;
+            context.moveTo(0, -c);
+            context.lineTo(l - t, -l + t);
+            context.lineTo(l + t, -l - t);
+            context.lineTo(c, 0);
+            context.lineTo(l + t, l + t);
+            context.lineTo(l - t, l - t);
+            context.lineTo(0, c);
+            context.lineTo(-l + t, l - t);
+            context.lineTo(-l - t, l + t);
+            context.lineTo(-c, 0);
+            context.lineTo(-l - t, -l - t);
+            context.lineTo(-l + t, -l + t);
+            context.closePath();
+          }
+        },
+      }
+    },
+    /**
+     * The symbol used for the marker. Supported symbols:
+     * - 'circle'
+     * - 'cross'
+     * - 'diamond'
+     * - 'square'
+     * - 'triangle-up'
+     * - 'star'
+     * - 'wye'
+     * more info at https://github.com/d3/d3-shape/blob/master/README.md#symbols
+     * This property will be read from the completeSeriesConfig
+     *
+     * Some additional "custom" types are also available:
+     * - 'bar'
+     * - 'thin-bar'
+     * - 'thick-bar'
+     * - 'x'
+     */
+    markerSymbol: {
+      type: String
+    },
+    /**
+     * Scales the size of the scatter marker
+     * This property will be read from the completeSeriesConfig
+     */
+    markerScale: {
+      type: Number
+    },
+    /**
+     * the size of the markers
+     * This property will be read from the completeSeriesConfig
+     */
+    markerSize: {
+      type: Number
+    },
+    /**
+     * The opacity of the fill (inside) of the marker
+     * This property will be read from the completeSeriesConfig
+     */
+    markerFillOpacity: {
+      type: Number
+    },
+    /**
+     * The opacity of the stroke (outside) of the marker
+     * This property will be read from the completeSeriesConfig
+     */
+    markerStrokeOpacity: {
+      type: Number
+    },
+    /**
+     * the opacity value of the fill to be used when muting a serie (stroke is not drawn on mute)
+     * This property will be read from the completeSeriesConfig
+     */
+    mutedOpacity: {
+      type: Number
+    },
+  }
+};
 </script>
