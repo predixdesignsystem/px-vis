@@ -737,6 +737,36 @@ onmessage = function(e) {
       reply(null, time);
       break;
 
+    case 'registerCustomScript':
+
+      if(e.data.data.url) {
+        importScripts(e.data.data.url);
+      }
+
+      reply(null, time);
+      break;
+
+    case 'runCustomFunction':
+
+      var obj = this[e.data.data.objectName],
+          func,
+          result;
+      if(obj) {
+
+        func = obj[e.data.data.functionName];
+        if(func) {
+          //.data.data.data.data.data
+          result = func(e.data.data.data, e.data.chartId);
+        } else {
+          throw 'Couldn\'t run custom function ' + e.data.data.functionName + ' on custom Object ' + e.data.data.objectName + ' because the specified function doesn\'t exist on the specified Object.';
+        }
+      } else {
+        throw 'Couldn\'t run custom function ' + e.data.data.functionName + ' on custom Object ' + e.data.data.objectName + ' because the specified Object doesn\'t exist. Make sure you have loaded your custom script defining the custom object.';
+      }
+
+      reply(result, time);
+      break;
+
     case 'updateData':
       updateData(e.data, time);
       break;

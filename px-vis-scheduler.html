@@ -10,7 +10,7 @@
   Px.vis = Px.vis || {};
   if(!Px.vis.scheduler) {
 
-    window.dispatchEvent(new Event('px-vis-worker-init'));
+    window.dispatchEvent(new CustomEvent('px-vis-worker-init'));
 
     //get number of cores
     var scheduler = {},
@@ -73,25 +73,36 @@
       return scheduler.chartWorkerMapping[chartId];
     }
 
-    startWork = function(worker, actionName, data, chartId, callback) {
+    startWork = function(worker, ctx) {
       worker.inUse = true;
 
       //don't copy the callback around, just remember it
-      worker.callback = callback;
-      worker.action = actionName;
-      worker.chartId = chartId;
-      worker.startTime = window.performance.now();
+      worker.ctx = {};
+      worker.ctx.successCallback = ctx.successCallback;
+      worker.ctx.errorCallback = ctx.errorCallback;
+      worker.ctx.action = ctx.action;
+      worker.ctx.chartId = ctx.chartId;
+      worker.ctx.originatorName = ctx.originatorName;
+      //DEBUG TIMING worker.startTime = window.performance.now();
 
-      window.dispatchEvent(new Event('px-vis-scheduler-work-start'), { 'action': actionName, 'data': data, 'chartId': chartId});
+      window.dispatchEvent(new CustomEvent('px-vis-scheduler-work-start', {'detail': { 'action': ctx.action, 'data': ctx.data, 'chartId': ctx.chartId, 'originatorName': ctx.originatorName}}));
 
-      worker.postMessage({ 'action': actionName, 'data': data, 'chartId': chartId});
+      worker.postMessage({ 'action': ctx.action, 'data': ctx.data, 'chartId': ctx.chartId});
     }
 
     //To be called by external people wanting to do work
-    scheduler.process = function(actionName, originatorName, data, chartId, callback) {
+    scheduler.process = function(actionName, originatorName, data, chartId, successCallback, errorCallback) {
 
       //find worker for this chart
-      var worker = scheduler.workers[getWorkerIndexForChart(chartId)];
+      var worker = scheduler.workers[getWorkerIndexForChart(chartId)],
+          ctx = {
+            'action': actionName,
+            'originatorName': originatorName,
+            'data': data,
+            'chartId': chartId,
+            'successCallback': successCallback,
+            'errorCallback': errorCallback
+          };
 
       // check if we have run updateData before so we can stick stuff in a queue if not
       scheduler.hasChartData[chartId] = scheduler.hasChartData[chartId] ?
@@ -99,7 +110,7 @@
 
       //start work or queue
       if(!worker.inUse && scheduler.hasChartData[chartId]) {
-        startWork(worker, actionName, data, chartId, callback);
+        startWork(worker, ctx);
 
       } else {
         //worker not available, queue
@@ -121,14 +132,14 @@
         }
 
         //now queue
-        scheduler.queue[worker.index].push({ 'action': actionName, 'originatorName': originatorName, 'data': data, 'chartId': chartId, 'callback': callback});
+        scheduler.queue[worker.index].push(ctx);
       }
     };
 
     //called once a worker has finished a piece of work
     processDone = function(e) {
 
-      window.dispatchEvent(new Event('px-vis-scheduler-work-end'), { 'action': this.action, 'data': e.data, 'chartId': this.chartId});
+      window.dispatchEvent(new CustomEvent('px-vis-scheduler-work-end', {'detail': { 'action': this.ctx.action, 'data': e.data.data, 'chartId': this.ctx.chartId, 'originatorName': this.ctx.originatorName}}));
 
       var now = window.performance.now();
 
@@ -138,21 +149,21 @@
 
 
       //store callback and kick off new work before processing results
-      var callback = this.callback;
+      var callback = this.ctx.successCallback;
 
       //cleanup if chart has been unregistered
-      if(this.action === 'unregisterChart') {
+      if(this.ctx.action === 'unregisterChart') {
         //TODO: clean queues in case something has been added while deleting?
-        delete scheduler.chartWorkerMapping[this.chartId];
-        delete scheduler.hasChartData[this.chartId];
+        delete scheduler.chartWorkerMapping[this.ctx.chartId];
+        delete scheduler.hasChartData[this.ctx.chartId];
       }
 
       //use thread if work queued
       if(scheduler.queue[this.index].length) {
 
         //get and do work
-        var initData = scheduler.queue[this.index].splice(0, 1)[0];
-        startWork(this, initData.action, initData.data, initData.chartId, initData.callback);
+        var ctx = scheduler.queue[this.index].splice(0, 1)[0];
+        startWork(this, ctx);
       } else {
 
         this.inUse = false;
@@ -166,22 +177,29 @@
 
     webWorkerError = function(e) {
 
-      window.dispatchEvent(new Event('px-vis-scheduler-work-error'), { 'action': this.action, 'chartId': this.chartId});
+      window.dispatchEvent(new CustomEvent('px-vis-scheduler-work-error', { 'detail': { 'action': this.ctx.action, 'chartId': this.ctx.chartId, 'originatorName': this.ctx.originatorName}}));
 
       //cleanup if chart has been unregistered
-      if(this.action === 'unregisterChart') {
+      if(this.ctx.action === 'unregisterChart') {
         //TODO: clean queues in case something has been added while deleting?
-        delete scheduler.chartWorkerMapping[this.chartId];
+        delete scheduler.chartWorkerMapping[this.ctx.chartId];
       }
+
+      //store callback and kick off new work before processing results
+      var callback = this.ctx.errorCallback;
 
       //use thread if work queued
       if(scheduler.queue[this.index].length) {
 
         //get and do work
-        var initData = scheduler.queue[this.index].splice(0, 1)[0];
-        startWork(this, initData.action, initData.data, initData.chartId, initData.callback);
+        var ctx = scheduler.queue[this.index].splice(0, 1)[0];
+        startWork(this, ctx);
       } else {
         this.inUse = false;
+      }
+
+      if(callback) {
+        callback();
       }
     };
 
@@ -205,6 +223,8 @@
       worker.index = i;
       worker.onmessage = processDone;
       worker.onerror = webWorkerError;
+      worker.ctx = {};
+      worker.ctx.action = 'init';
 
       //kick a first dummy communication for each worker.
       //The first comm for each worker is slow (needs to parse script)
@@ -213,7 +233,61 @@
       scheduler.queue.push([]);
     }
 
+    scheduler.registerCustomScript = function(scriptUrl, successCallback, errorCallback) {
+
+      var regCallback,
+          errCallback,
+          successCounter = 0,
+          errCounter = 0,
+          ctx;
+
+      //it should be either all registration will fail or all will succeed
+      regCallback = function() {
+        successCounter++;
+        console.log('ok')
+        if(successCounter === scheduler.workers.length) {
+          //registration on all ww done
+          if(successCallback) {
+            successCallback();
+          }
+        } else if(errCounter > 0 && errorCallback) {
+          //got some error, some success... just fire error
+          errorCallback();
+        }
+      };
+
+      errCallback = function() {
+        errCounter++;
+        console.log('error')
+        if(errCounter === scheduler.workers.length) {
+          //all reg failed
+          if(errorCallback) {
+            errorCallback();
+          }
+
+        } else if(successCounter > 0 && errorCallback) {
+          //got some error, some success... just fire error
+          errorCallback();
+        }
+      };
+
+      ctx = {
+            'action': 'registerCustomScript',
+            'data': {
+              'url': scriptUrl
+            },
+            'successCallback': regCallback,
+            'errorCallback': errCallback
+          };
+
+      //run registration on each worker
+      for(var i=0; i<scheduler.workers.length; i++) {
+        startWork(scheduler.workers[i], ctx);
+      }
+    }
+
     Px.vis.scheduler = scheduler;
+    window.dispatchEvent(new CustomEvent('px-vis-worker-ready'));
   }
 }())
 
