@@ -858,6 +858,17 @@ PxVisBehavior.commonMethods = {
   _getAdjacentValues: function(data, key, lowerFuzz, upperFuzz, lowerIndex, upperIndex, index) {
     var d = [];
 
+    //Make sure we keep the ordered so that the fuzzy search
+    //can rely on the last item the be the latest in time
+    //start by "going back in time"
+    for(var i = index-1; i > lowerIndex; i--) {
+      if(data[i][key] < lowerFuzz) {
+        break;
+      }
+      //prepend point
+      d.splice(0, 0, data[i]);
+    }
+
     d.push(data[index]);
 
     for(var i = index+1; i < upperIndex; i++) {
@@ -867,12 +878,10 @@ PxVisBehavior.commonMethods = {
       d.push(data[i]);
     }
 
-    for(var i = index-1; i > lowerIndex; i--) {
-      if(data[i][key] < lowerFuzz) {
-        break;
-      }
-      d.push(data[i]);
-    }
+    // console.log('==========================')
+    // for(var i=0; i<d.length; i++ ) {
+    //   console.log(new Date(d[i][key]));
+    // }
 
     return d;
   },
@@ -2504,11 +2513,20 @@ PxVisBehavior.highlightShared = [{
         lowerFuzz = this.crosshairData.timeStamps[i] - this.fuzz;
         upperFuzz = this.crosshairData.timeStamps[i] + this.fuzz;
 
-        d = d.concat(this._fuzzyBinarySearch(this.chartData, this.timeData, lowerFuzz, upperFuzz, null, null));
+        if(d.length) {
+          lowerFuzz = lowerFuzz <= d[d.length-1][this.timeData] ? d[d.length-1][this.timeData] + 1 : lowerFuzz;
+        }
 
+        //merge 2 arrays without creating a new one. DON'T use concat here as the GC implications + array
+        //duplication are killing perf
+        //the only limitation is if the fuzzy search returns more than a few tens of thousands
+        //of points since argument length is arbitrarily limite din different  browsers:
+        //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply
+        //in practice we should be ok since each fuzzy search returns result for 1 point, if each point
+        //returns tens of thousands we are in an absolutely crazy scenario
+        Array.prototype.push.apply(d,this._fuzzyBinarySearch(this.chartData, this.timeData, lowerFuzz, upperFuzz, null, null));
       } else {
         d.push(this._binarySearch(this.chartData, this.timeData, this.crosshairData.timeStamps[i], null, null));
-
       }
     }
 
