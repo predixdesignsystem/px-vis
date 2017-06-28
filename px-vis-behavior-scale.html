@@ -254,10 +254,14 @@ PxVisBehaviorScale.scale = [{
       wwInfo.seriesToAxes = this.seriesToAxes;
       wwInfo.isYAxisObject = typeof this.y === 'object'
 
-      Px.vis.scheduler.process('determineExtents', this.nodeName, wwInfo, this.chartId, function(e) {
-
-        this._applyExtents(e.data);
-      }.bind(this));
+      Px.vis.scheduler.process({
+            'action': 'determineExtents',
+            'originatorName': this.nodeName,
+            'chartId': this.chartId,
+            'data': wwInfo,
+            'successCallback': function(e) {
+              this._applyExtents(e.data);
+            }.bind(this)});
     }.bind(this), 10);
   },
 

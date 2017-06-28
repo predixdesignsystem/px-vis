@@ -753,7 +753,12 @@ function runTests(){
           "x":[Infinity,-Infinity], "y": [Infinity,-Infinity]
           }
 
-      Px.vis.scheduler.process('updateData', this.nodeName,{'chartData': chartData}, 'webWorker');
+      Px.vis.scheduler.process({
+        'action': 'updateData',
+        'originatorName': 'this.nodeName',
+        'data': {'chartData': chartData},
+        'chartId': 'webWorker'}
+        );
 
       setTimeout(function() {
 
