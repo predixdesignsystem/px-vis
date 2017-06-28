@@ -172,9 +172,15 @@ function runTests(){
     });
 
     test('load unexisting script', function(done) {
-      Px.vis.scheduler.registerCustomScript('dummyUrl', null, function() {
+      try {
+        Px.vis.scheduler.registerCustomScript('dummyUrl', null, function() {
+          done();
+        });
+      } catch(e) {
+
+        //some browsers
         done();
-      });
+      }
     });
 
     test('run function on undefined object trigger error event and callback', function(done) {
