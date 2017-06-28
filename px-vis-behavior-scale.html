@@ -88,13 +88,13 @@ PxVisBehaviorScale.scale = [{
     this._calculatingDomain = true;
 
     if(this.x) {
-      this._setXScale(width, margin,true);
+      this._internalSetXScale(width, margin, true);
     }
     if(this.y) {
       if(this._isMultiY) {
-        this._setMultiYScale(height, margin, this.axes, true);
+        this._internalSetMultiYScale(height, margin, this.axes, true);
       } else {
-        this._setYScale(height, margin, true);
+        this._internalSetYScale(height, margin, true);
       }
     }
 
@@ -106,7 +106,10 @@ PxVisBehaviorScale.scale = [{
    *
    * @method _setXScale
    */
-  _setXScale: function(width, margin, forceRecreation) {
+  _setXScale: function(width, margin) {
+    this._internalSetXScale(width, margin, false);
+  },
+  _internalSetXScale: function(width, margin, forceRecreation) {
     var w = Math.max(width - margin.left - margin.right, 0);
 
     //create or update
@@ -123,7 +126,10 @@ PxVisBehaviorScale.scale = [{
    *
    * @method _setYScale
    */
-  _setYScale: function(height, margin, forceRecreation) {
+  _setYScale: function(height, margin) {
+    this._internalSetYScale(height, margin, false);
+  },
+  _internalSetYScale: function(height, margin, forceRecreation) {
     var h = Math.max(height - margin.top - margin.bottom, 0);
 
     //create or update
@@ -140,7 +146,10 @@ PxVisBehaviorScale.scale = [{
    *
    * @method _setYScale
    */
-  _setMultiYScale: function(height, margin, axes, forceRecreation) {
+  _setMultiYScale: function(height, margin, axes) {
+    this._internalSetMultiYScale(height, margin, axes, false);
+  },
+  _internalSetMultiYScale: function(height, margin, axes, forceRecreation) {
     var h = Math.max(height - margin.top - margin.bottom, 0),
         newY,
         copy,
@@ -254,10 +263,14 @@ PxVisBehaviorScale.scale = [{
       wwInfo.seriesToAxes = this.seriesToAxes;
       wwInfo.isYAxisObject = typeof this.y === 'object'
 
-      Px.vis.scheduler.process('determineExtents', this.nodeName, wwInfo, this.chartId, function(e) {
-
-        this._applyExtents(e.data);
-      }.bind(this));
+      Px.vis.scheduler.process({
+            'action': 'determineExtents',
+            'originatorName': this.nodeName,
+            'chartId': this.chartId,
+            'data': wwInfo,
+            'successCallback': function(e) {
+              this._applyExtents(e.data);
+            }.bind(this)});
     }.bind(this), 10);
   },
 

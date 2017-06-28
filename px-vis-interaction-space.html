@@ -615,13 +615,16 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     _searchOnWebWorker: function(mousePos, dataObj) {
-      var data = this._createBaseDataObjForWebWorker();
-          data.mousePos = mousePos;
-          data.calcCrosshair = this._calcCrosshair;
-          data.radius = this.searchRadius;
-          data.searchType = this.searchType;
-
-      Px.vis.scheduler.process('findQuadtreePoints', this.nodeName, data, this.chartId, function(e) {
+      var ctx = {};
+      ctx.action = 'findQuadtreePoints';
+      ctx.originatorName = this.nodeName;
+      ctx.chartId = this.chartId;
+      ctx.data = this._createBaseDataObjForWebWorker();
+      ctx.data.mousePos = mousePos;
+      ctx.data.calcCrosshair = this._calcCrosshair;
+      ctx.data.radius = this.searchRadius;
+      ctx.data.searchType = this.searchType;
+      ctx.successCallback = function(e) {
         dataObj.series = e.data.series;
         dataObj.rawData = e.data.rawData;
         dataObj.timeStamps = e.data.timeStamps;
@@ -629,7 +632,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         dataObj.timeSeriesKey =  e.data.timeSeriesKey ? e.data.timeSeriesKey : dataObj.timeSeriesKey;
 
         this._calcDataFinished(dataObj);
-      }.bind(this));
+      }.bind(this);
+
+      Px.vis.scheduler.process(ctx);
     },
 
     /**
@@ -1227,10 +1232,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           data.extents = ext;
           data.searchType = this.searchType;
 
-          Px.vis.scheduler.process('createQuadtree', this.nodeName, data, this.chartId, function(data) {
-            // TODO Provide some feedback before and after built??
-           // console.log('built quad: ' + (window.performance.now() - time));
-          }.bind(this));
+          Px.vis.scheduler.process({
+            'action' : 'createQuadtree',
+            'originatorName': this.nodeName,
+            'data': data,
+            'chartId': this.chartId});
         }.bind(this), 50);
       }
     },

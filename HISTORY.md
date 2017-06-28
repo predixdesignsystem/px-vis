@@ -4,7 +4,9 @@
 * Edits to toolbar and interaction space for striping
 * Added to highlight, striping, and line-cursor to overview and demos
 * Moved data converter methods into behavior
-* Fix axis brush bug
+* Added muting capabilities for categories registers
+* ensure fuzz factor for crosshair is always coerced to a number
+* Ensure scales are not recreated when not needed (solving a reset zoom problem on resize)
 
 v2.0.8
 ==================

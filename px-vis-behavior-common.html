@@ -2505,8 +2505,8 @@ PxVisBehavior.highlightShared = [{
 
     for(var i = 0; i < this.crosshairData.timeStamps.length; i++) {
       if(this.fuzz) {
-        lowerFuzz = this.crosshairData.timeStamps[i] - this.fuzz;
-        upperFuzz = this.crosshairData.timeStamps[i] + this.fuzz;
+        lowerFuzz = this.crosshairData.timeStamps[i] - Number(this.fuzz);
+        upperFuzz = this.crosshairData.timeStamps[i] + Number(this.fuzz);
 
         if(d.length) {
           lowerFuzz = lowerFuzz <= d[d.length-1][this.timeData] ? d[d.length-1][this.timeData] + 1 : lowerFuzz;
@@ -2515,7 +2515,7 @@ PxVisBehavior.highlightShared = [{
         //merge 2 arrays without creating a new one. DON'T use concat here as the GC implications + array
         //duplication are killing perf
         //the only limitation is if the fuzzy search returns more than a few tens of thousands
-        //of points since argument length is arbitrarily limite din different  browsers:
+        //of points since argument length is arbitrarily limited in different  browsers:
         //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply
         //in practice we should be ok since each fuzzy search returns result for 1 point, if each point
         //returns tens of thousands we are in an absolutely crazy scenario

@@ -90,27 +90,46 @@
       worker.postMessage({ 'action': ctx.action, 'data': ctx.data, 'chartId': ctx.chartId});
     }
 
-    //To be called by external people wanting to do work
-    scheduler.process = function(actionName, originatorName, data, chartId, successCallback, errorCallback) {
+    /**
+     * Method to request some work from the web worker. The context object
+     * can have the following properties:
+     * - action: action to be run in the webworker. See below for list of actions
+     * - originatorName: arbitrary string representing who sent the request
+     * - chartId: Id of the chart this request relates to. Used to identify which webworker to use and what dataset to use in the webworker
+     * - successCallback (optional): callback after successfully running an action in the webworker. The callback will have one parameter holding the result of that action
+     * - errorCallback (optional): Callback after an error has been fired during the webworker.
+     *
+     * Please note successCallback and errorCallback are mutually exclusive:
+     * one will be called or the other. If both are defined you are guaranteed
+     * to have feedback on your request
+     *
+     * Each request is uniquely identified through the triplet "action
+     * originatorName chartId". When a webworker is busy and a request comes
+     * in for this webworker then the request will be queued. If another
+     * request with the same triplet identifier comes in it will trump the
+     * previously queued request: the request initially queued will be
+     * destroyed and the new one will be queued
+     *
+     * The current list of significant actions is as follows (more can be
+     * found by inspecting px-vis-worker.js but are usually meant to be used
+     * internally):
+     * - runCustomFunction: used to run a function on a custom script that you
+ explicitely loaded in the web workers through Px.vis.registerCustomScript. Pass "functionName" and "objectName" in the "data" object of the context
+     * - updateData: register a new dataset or update a dataset in the web worker. It will be stored in the dataMapping object, the key being chartId and the value the dataset. pass "chartData" in the data object
+     *
+     */
+    scheduler.process = function(context) {
 
       //find worker for this chart
-      var worker = scheduler.workers[getWorkerIndexForChart(chartId)],
-          ctx = {
-            'action': actionName,
-            'originatorName': originatorName,
-            'data': data,
-            'chartId': chartId,
-            'successCallback': successCallback,
-            'errorCallback': errorCallback
-          };
+      var worker = scheduler.workers[getWorkerIndexForChart(context.chartId)]
 
       // check if we have run updateData before so we can stick stuff in a queue if not
-      scheduler.hasChartData[chartId] = scheduler.hasChartData[chartId] ?
-        scheduler.hasChartData[chartId] : (actionName === 'updateData');
+      scheduler.hasChartData[context.chartId] = scheduler.hasChartData[context.chartId] ?
+        scheduler.hasChartData[context.chartId] : (context.action === 'updateData');
 
       //start work or queue
-      if(!worker.inUse && scheduler.hasChartData[chartId]) {
-        startWork(worker, ctx);
+      if(!worker.inUse && scheduler.hasChartData[context.chartId]) {
+        startWork(worker, context);
 
       } else {
         //worker not available, queue
@@ -121,7 +140,7 @@
         for(var i=0; i<scheduler.queue[worker.index].length; i++) {
 
           var obj = scheduler.queue[worker.index][i];
-          if(obj.chartId === chartId && obj.action === actionName && obj.originatorName === originatorName) {
+          if(obj.chartId === context.chartId && obj.action === context.action && obj.originatorName === context.originatorName) {
             found = i;
             break;
           }
@@ -132,7 +151,7 @@
         }
 
         //now queue
-        scheduler.queue[worker.index].push(ctx);
+        scheduler.queue[worker.index].push(context);
       }
     };
 

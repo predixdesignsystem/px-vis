@@ -505,7 +505,11 @@ PxVisBehaviorChart.webWorkerSynchronization = [{
 
           //only process if we haven't been re attached
           if(this._wwSyncRequestDataDeletion) {
-          Px.vis.scheduler.process('unregisterChart', this.nodeName, null, this.chartId);
+          Px.vis.scheduler.process({
+            'action': 'unregisterChart',
+            'originatorName': this.nodeName,
+            'chartId': this.chartId,
+            'data': null});
 
             //async, the data hasn't been actually deleted yet but we
             //don't have a way to cancel it anymore and an update
@@ -522,7 +526,11 @@ PxVisBehaviorChart.webWorkerSynchronization = [{
 
       if(!this.preventWebWorkerSynchronization && this[this._wwSyncDataPropName]) {
         this._wwSyncDataDeleted = false;
-        Px.vis.scheduler.process('updateData', this.nodeName, {'chartData': this[this._wwSyncDataPropName]}, this.chartId);
+        Px.vis.scheduler.process({
+            'action': 'updateData',
+            'originatorName': this.nodeName,
+            'chartId': this.chartId,
+            'data': {'chartData': this[this._wwSyncDataPropName]}});
         this.set('wwDataSyncCounter', this.wwDataSyncCounter+1);
       }
     }

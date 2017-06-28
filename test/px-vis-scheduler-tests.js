@@ -27,7 +27,7 @@ function runTests(){
       window.addEventListener('px-vis-worker-ready', function() {
 
         var count = 0,
-            callBackCount = function() {
+            callBackCount = function(e) {
               count++;
               if(count === 4) {
                 done();
@@ -35,10 +35,30 @@ function runTests(){
             };
 
         //register 4 datasets
-        Px.vis.scheduler.process('updateData', 'aChart', {'chartData': new Array(63)}, 'chartId1', callBackCount, function() {debugger});
-        Px.vis.scheduler.process('updateData', 'aChart', {'chartData': new Array(67)}, 'chartId2', callBackCount);
-        Px.vis.scheduler.process('updateData', 'aChart', {'chartData': new Array(75)}, 'chartId3', callBackCount);
-        Px.vis.scheduler.process('updateData', 'aChart', {'chartData': new Array(82)}, 'chartId4', callBackCount);
+        Px.vis.scheduler.process({
+          'action' : 'updateData',
+          'originatorName' : 'aChart',
+          'data' : {'chartData': new Array(63)},
+          'chartId': 'chartId1',
+          'successCallback': callBackCount});
+        Px.vis.scheduler.process({
+          'action' : 'updateData',
+          'originatorName' : 'aChart',
+          'data' : {'chartData': new Array(67)},
+          'chartId': 'chartId2',
+          'successCallback': callBackCount});
+        Px.vis.scheduler.process({
+          'action' : 'updateData',
+          'originatorName' : 'aChart',
+          'data' : {'chartData': new Array(75)},
+          'chartId': 'chartId3',
+          'successCallback': callBackCount});
+        Px.vis.scheduler.process({
+          'action' : 'updateData',
+          'originatorName' : 'aChart',
+          'data' : {'chartData': new Array(82)},
+          'chartId': 'chartId4',
+          'successCallback': callBackCount});
       });
 
       //load the scheduler
@@ -70,9 +90,15 @@ function runTests(){
 
     suiteSetup(function() {
 
-      Px.vis.scheduler.process('unexistingAction', 'aChart', {}, 'chartId5', function() {
+      Px.vis.scheduler.process(
+        {
+          'action' : 'unexistingAction',
+          'originatorName' : 'aChart',
+          'data' : {},
+          'chartId': 'chartId5',
+          'successCallback': function() {
         hasRun = true;
-      });
+      }});
     });
 
     test('funciton didn\'t run', function() {
@@ -94,10 +120,15 @@ function runTests(){
 
     test('after registering data the action is processed', function() {
 
-      Px.vis.scheduler.process('updateData', 'aChart', {'chartData': new Array(93)}, 'chartId5', function() {
-        //action has been dequeued
-        assert.equal(Px.vis.scheduler.queue[1].length, 0);
-      });
+      Px.vis.scheduler.process({
+          'action' : 'updateData',
+          'originatorName' : 'aChart',
+          'data' : {'chartData': new Array(93)},
+          'chartId': 'chartId5',
+          'successCallback': function() {
+            //action has been dequeued
+            assert.equal(Px.vis.scheduler.queue[1].length, 0);
+          }});
     });
 
     test('initial action has been run', function(done) {
@@ -119,10 +150,15 @@ function runTests(){
       };
 
       window.addEventListener('px-vis-scheduler-work-start', handler);
-      Px.vis.scheduler.process('unexistingAction', 'aChart', {}, 'chartId5', function() {
-         window.removeEventListener('px-vis-scheduler-work-start', handler);
-         done();
-      });
+      Px.vis.scheduler.process({
+          'action' : 'unexistingAction',
+          'originatorName' : 'aChart',
+          'data' : {},
+          'chartId': 'chartId5',
+          'successCallback': function() {
+            window.removeEventListener('px-vis-scheduler-work-start', handler);
+            done();
+          }});
     });
   });
 
@@ -136,9 +172,15 @@ function runTests(){
     });
 
     test('load unexisting script', function(done) {
-      Px.vis.scheduler.registerCustomScript('dummyUrl', null, function() {
+      try {
+        Px.vis.scheduler.registerCustomScript('dummyUrl', null, function() {
+          done();
+        });
+      } catch(e) {
+
+        //some browsers
         done();
-      });
+      }
     });
 
     test('run function on undefined object trigger error event and callback', function(done) {
@@ -152,10 +194,15 @@ function runTests(){
 
       window.addEventListener('px-vis-scheduler-work-error', handler);
 
-      Px.vis.scheduler.process('runCustomFunction', 'aChart', {'objectName': 'myScriapt', 'functionName': 'dataLength'}, 'chartId1', null, function() {
-        window.removeEventListener('px-vis-scheduler-work-error', handler);
-        done();
-      });
+      Px.vis.scheduler.process({
+          'action' : 'runCustomFunction',
+          'originatorName' : 'aChart',
+          'data' : {'objectName': 'myScriapt', 'functionName': 'dataLength'},
+          'chartId': 'chartId1',
+          'errorCallback': function() {
+            window.removeEventListener('px-vis-scheduler-work-error', handler);
+            done();
+          }});
     });
 
     test('run custom function trigger success event and callback', function(done) {
@@ -170,46 +217,143 @@ function runTests(){
 
       window.addEventListener('px-vis-scheduler-work-end', handler);
 
-      Px.vis.scheduler.process('runCustomFunction', 'aChart', {'objectName': 'myScript', 'functionName': 'dataLength'}, 'chartId1', function() {
-        window.removeEventListener('px-vis-scheduler-work-end', handler);
-        done();
-      });
+      Px.vis.scheduler.process({
+        'action': 'runCustomFunction',
+        'originatorName' : 'aChart',
+        'data': {'objectName': 'myScript', 'functionName': 'dataLength'},
+        'chartId': 'chartId1',
+        'successCallback': function() {
+          window.removeEventListener('px-vis-scheduler-work-end', handler);
+          done();
+        }});
     });
 
     test('run custom function against several datasets', function(done) {
 
       var counter = 0;
-      Px.vis.scheduler.process('runCustomFunction', 'aChart', {'objectName': 'myScript', 'functionName': 'dataLength'}, 'chartId1', function(e) {
-        assert.equal(e.data, 63);
-        counter++;
-        if(counter === 4) {
-          done();
-        }
-      });
-      Px.vis.scheduler.process('runCustomFunction', 'aChart', {'objectName': 'myScript', 'functionName': 'dataLength'}, 'chartId2', function(e) {
-        assert.equal(e.data, 67);
-        counter++;
-        if(counter === 4) {
-          done();
-        }
-      });
-      Px.vis.scheduler.process('runCustomFunction', 'aChart', {'objectName': 'myScript', 'functionName': 'dataLength'}, 'chartId3', function(e) {
-        assert.equal(e.data, 75);
-        counter++;
-        if(counter === 4) {
-          done();
-        }
-      });
-      Px.vis.scheduler.process('runCustomFunction', 'aChart', {'objectName': 'myScript', 'functionName': 'dataLength'}, 'chartId4', function(e) {
-        assert.equal(e.data, 82);
-        counter++;
-        if(counter === 4) {
-          done();
-        }
-      });
+      Px.vis.scheduler.process({
+          'action' : 'runCustomFunction',
+          'originatorName' : 'aChart',
+          'data' : {'objectName': 'myScript', 'functionName': 'dataLength'},
+          'chartId': 'chartId1',
+          'successCallback': function(e) {
+            assert.equal(e.data, 63);
+            counter++;
+            if(counter === 4) {
+              done();
+            }
+          }});
+      Px.vis.scheduler.process({
+          'action' : 'runCustomFunction',
+          'originatorName' : 'aChart',
+          'data' : {'objectName': 'myScript', 'functionName': 'dataLength'},
+          'chartId': 'chartId2',
+          'successCallback': function(e) {
+            assert.equal(e.data, 67);
+            counter++;
+            if(counter === 4) {
+              done();
+            }
+          }});
+      Px.vis.scheduler.process({
+          'action' : 'runCustomFunction',
+          'originatorName' : 'aChart',
+          'data' : {'objectName': 'myScript', 'functionName': 'dataLength'},
+          'chartId': 'chartId3',
+          'successCallback': function(e) {
+            assert.equal(e.data, 75);
+            counter++;
+            if(counter === 4) {
+              done();
+            }
+          }});
+      Px.vis.scheduler.process({
+          'action' : 'runCustomFunction',
+          'originatorName' : 'aChart',
+          'data' : {'objectName': 'myScript', 'functionName': 'dataLength'},
+          'chartId': 'chartId4',
+          'successCallback': function(e) {
+            assert.equal(e.data, 82);
+            counter++;
+            if(counter === 4) {
+              done();
+            }
+          }});
     });
   });
 
+
+  suite('Register custom data', function() {
+
+    var data = [{'blah': 'blouh'}, {'zlop': 'glob'}];
+
+    test('update custom data', function(done) {
+
+      Px.vis.scheduler.process({
+          'action' : 'updateData',
+          'originatorName' : 'aChart',
+          'data' : {'chartData': data},
+          'chartId': 'custom',
+          'successCallback': function() {done()}});
+    });
+
+    test('retrieve custom data', function(done) {
+
+      Px.vis.scheduler.process({
+          'action' : 'runCustomFunction',
+          'originatorName' : 'aChart',
+          'data' : {'objectName': 'myScript', 'functionName': 'returnData'},
+          'chartId': 'custom',
+          'successCallback': function(e) {
+            assert.deepEqual(e.data, data);
+            done();
+          }});
+    });
+
+  });
+
+    suite('queueing several same request', function() {
+
+    test('queuing 4 requests, only 2 running', function(done) {
+
+      var counter = 0,
+          callback = function(e) {
+            counter++;
+            if(counter >= 2) {
+
+              //ensure the last result was the last request which asks for
+              //length rather than data
+              assert.equal(e.data, 2);
+              done();
+            }
+          };
+
+      Px.vis.scheduler.process({
+          'action' : 'runCustomFunction',
+          'originatorName' : 'aChart',
+          'data' : {'objectName': 'myScript', 'functionName': 'returnData'},
+          'chartId': 'custom',
+          'successCallback': callback});
+      Px.vis.scheduler.process({
+          'action' : 'runCustomFunction',
+          'originatorName' : 'aChart',
+          'data' : {'objectName': 'myScript', 'functionName': 'returnData'},
+          'chartId': 'custom',
+          'successCallback': callback});
+      Px.vis.scheduler.process({
+          'action' : 'runCustomFunction',
+          'originatorName' : 'aChart',
+          'data' : {'objectName': 'myScript', 'functionName': 'returnData'},
+          'chartId': 'custom',
+          'successCallback': callback});
+      Px.vis.scheduler.process({
+          'action' : 'runCustomFunction',
+          'originatorName' : 'aChart',
+          'data' : {'objectName': 'myScript', 'functionName': 'dataLength'},
+          'chartId': 'custom',
+          'successCallback': callback});
+    });
+  });
 
 //   Px.vis.scheduler.registerCustomScript('test-worker.js', function() {
 //   console.log('script loaded');
