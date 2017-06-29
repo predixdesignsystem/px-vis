@@ -584,7 +584,7 @@ PxVisBehavior.tooltipData = {
 PxVisBehavior.crosshairData = {
   properties: {
     /**
-     * Data reported back by the interaction space component so charts can share a crosshair. Has two sets of data: 1) the full data retreived at the shared key so if all charts use the same datasets, this data can just be displayed on all the charts. 2) a list of just the shared key so if they use different datasets, a search for the closest data at each point can be made. crosshairData is in the form:
+     * Data reported back by the interaction space component so charts can share a crosshair. Has two sets of data: 1) the full data retrieved at the shared key so if all charts use the same datasets, this data can just be displayed on all the charts. 2) a list of just the shared key so if they use different datasets, a search for the closest data at each point can be made. crosshairData is in the form:
      *
      *```
      *    {
@@ -837,7 +837,7 @@ PxVisBehavior.commonMethods = {
    * Binary search through sorted chartData returning all vals within a window
    */
   _fuzzyBinarySearch: function(data, key, lowerFuzz, upperFuzz, lowerIndex, upperIndex) {
-    if(this.isVarNumber(lowerIndex) && this.isVarNumber(upperIndex) && lowerIndex === upperIndex) {
+    if(this.isVarNumber(lowerIndex) && this.isVarNumber(upperIndex) && lowerIndex >= upperIndex) {
       return null;
     }
 
@@ -877,11 +877,6 @@ PxVisBehavior.commonMethods = {
       }
       d.push(data[i]);
     }
-
-    // console.log('==========================')
-    // for(var i=0; i<d.length; i++ ) {
-    //   console.log(new Date(d[i][key]));
-    // }
 
     return d;
   },
@@ -2493,6 +2488,9 @@ PxVisBehavior.highlightShared = [{
       type: Array
     },
 
+    /**
+     * By default, a highlighter will not react to crosshairData if generatingCrosshairData is true. This boolean forces it to draw the crosshairData regardless of the value of generatingCrosshairData
+     */
     drawWithLocalCrosshairData: {
       type: Boolean,
       value: false,
@@ -2575,7 +2573,7 @@ PxVisBehavior.highlightShared = [{
           series = this._generateSeries(dataset[0]);
           ttd = this._createTooltipDataStub(series[0]["coord"], timestamp, !this.hideTooltip);
 
-      ttd["series"] = series;
+      ttd.series = series;
 
       this.set("defaultEmptyData", ttd);
 
@@ -2646,13 +2644,13 @@ PxVisBehavior.highlightSvgShared = [{
   _muteDataSeries: function(data) {
     if(this.layersToMask) {
       if(!Array.isArray(this.layersToMask)) {
-        this.layersToMask.node().style.opacity = data.length ? 'var(--px-vis-data-mask-opacity, 0.4)' : '';
-        // this.toggleClass('secondaryDataMask', data.length, this.layersToMask.node());
+        // this.layersToMask.node().style.opacity = data.length ? 'var(--px-vis-data-mask-opacity, 0.4)' : '';
+        this.toggleClass('secondaryDataMask', data.length, this.layersToMask.node());
       } else {
         for(var i=0; i<this.layersToMask.length; i++) {
-          this.layersToMask[i].node().style.opacity = data.length ? 'var(--px-vis-data-mask-opacity, 0.4)' : '';
+          // this.layersToMask[i].node().style.opacity = data.length ? 'var(--px-vis-data-mask-opacity, 0.4)' : '';
 
-          // this.toggleClass('secondaryDataMask', data.length, this.layersToMask[i].node());
+          this.toggleClass('secondaryDataMask', data.length, this.layersToMask[i].node());
         }
       }
     }

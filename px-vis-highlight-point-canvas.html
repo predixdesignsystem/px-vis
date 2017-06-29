@@ -122,6 +122,10 @@ Element which highlight specific points on the dataset
 
     }, //properties
 
+    observers: [
+      '_updateTooltipData(domainChanged)'
+    ],
+
 
     _computeChartData: function() {
       if(this.generatingCrosshairData && !this.drawWithLocalCrosshairData && this.crosshairData.rawData.length > 0) {
@@ -136,6 +140,12 @@ Element which highlight specific points on the dataset
       }
 
       return dataset;
+    },
+
+    _updateTooltipData: function() {
+      if(this.defaultEmptyData) {
+        this._setTooltipData(this._highlightData);
+      }
     },
 
     _returnYScale: function(seriesId, config) {

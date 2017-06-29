@@ -246,13 +246,6 @@ function runTests() {
   }); //suite
 
 
-
-
-
-
-
-
-
   suite('px-vis-highlight-line renders radar axis highlight', function() {
     var radarScale = document.getElementById('radarScale'),
         radarSVG = document.getElementById('radarSVG'),
@@ -938,24 +931,24 @@ function runTests() {
 
      test('_highlightData is created', function() {
       assert.deepEqual(fuzzhighlight._highlightData, [{
-              "x": 1397160780000,
-              "y": 10,
-              "y2": 3,
-              "y3": 8,
-              'cat': 'b'
-            },{
-            "x": 1397189940000,
-            "y": 4,
-            "y2": 10,
-            "y3": 12,
-            'cat': 'a'
-          },{
-            "x": 1397131620000,
-            "y": 6,
-            "y2": 21,
-            "y3": 14,
-            'cat': 'a'
-          }]);
+          "x": 1397131620000,
+          "y": 6,
+          "y2": 21,
+          "y3": 14,
+          'cat': 'a'
+        },{
+          "x": 1397160780000,
+          "y": 10,
+          "y2": 3,
+          "y3": 8,
+          'cat': 'b'
+        },{
+          "x": 1397189940000,
+          "y": 4,
+          "y2": 10,
+          "y3": 12,
+          'cat': 'a'
+        }]);
       });
 
 
@@ -968,14 +961,14 @@ function runTests() {
     });
 
     test('baseLine lines have a series ID', function() {
-      assert.equal(Px.d3.select(linePath.nodes()[0]).attr('series-id'),'line_1397160780000');
-      assert.equal(Px.d3.select(linePath.nodes()[1]).attr('series-id'),'line_1397189940000');
-      assert.equal(Px.d3.select(linePath.nodes()[2]).attr('series-id'),'line_1397131620000');
+      assert.equal(Px.d3.select(linePath.nodes()[0]).attr('series-id'),'line_1397131620000');
+      assert.equal(Px.d3.select(linePath.nodes()[1]).attr('series-id'),'line_1397160780000');
+      assert.equal(Px.d3.select(linePath.nodes()[2]).attr('series-id'),'line_1397189940000');
     });
 
     test('baseLine line series has the right color', function() {
-      assert.equal(Px.d3.select(linePath.nodes()[0]).attr('stroke').split(' ').join(''), colorSet[ colorOrder[1] ]);
-      assert.equal(Px.d3.select(linePath.nodes()[1]).attr('stroke').split(' ').join(''), colorSet[ colorOrder[0] ]);
+      assert.equal(Px.d3.select(linePath.nodes()[0]).attr('stroke').split(' ').join(''), colorSet[ colorOrder[0] ]);
+      assert.equal(Px.d3.select(linePath.nodes()[1]).attr('stroke').split(' ').join(''), colorSet[ colorOrder[1] ]);
       assert.equal(Px.d3.select(linePath.nodes()[2]).attr('stroke').split(' ').join(''), colorSet[ colorOrder[0] ]);
     });
 
@@ -984,9 +977,9 @@ function runTests() {
     });
 
     test('baseLine line d', function() {
-      assert.equal(Px.d3.select(linePath.nodes()[0]).attr('d').split(/[\s,]+/).join(''),'M800L240240L400115');
-      assert.equal(Px.d3.select(linePath.nodes()[1]).attr('d').split(/[\s,]+/).join(''),'M80162L240170L40038');
-      assert.equal(Px.d3.select(linePath.nodes()[2]).attr('d').split(/[\s,]+/).join(''),'M80108L24060L4000');
+      assert.equal(Px.d3.select(linePath.nodes()[0]).attr('d').split(/[\s,]+/).join(''),'M80108L24060L4000');
+      assert.equal(Px.d3.select(linePath.nodes()[1]).attr('d').split(/[\s,]+/).join(''),'M800L240240L400115');
+      assert.equal(Px.d3.select(linePath.nodes()[2]).attr('d').split(/[\s,]+/).join(''),'M80162L240170L40038');
     });
   }); //suite
 
@@ -1678,7 +1671,7 @@ function runTests() {
 
       assert.equal(tooltiphighlight.defaultEmptyData.mouse, null);
       assert.equal(tooltiphighlight.defaultEmptyData.dataPos[0], 423);
-      assert.closeTo(tooltiphighlight.defaultEmptyData.dataPos[1], 2182, 1);
+      assert.closeTo(tooltiphighlight.defaultEmptyData.dataPos[1], 2182, 2);
       assert.equal(tooltiphighlight.defaultEmptyData.time, 1397160780000);
       assert.deepEqual(tooltiphighlight.defaultEmptyData.dataset, {"x":1397160780000,"y":10,"y2":3,"y3":8,"cat":"b"});
       assert.deepEqual(tooltiphighlight.defaultEmptyData.series, [{"name":"y","value":{"y":10,"y2":3,"y3":8}},{"name":"y2","value":{"y":10,"y2":3,"y3":8}},{"name":"y3","value":{"y":10,"y2":3,"y3":8}}]);

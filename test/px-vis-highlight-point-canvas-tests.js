@@ -468,6 +468,11 @@ function runTests(){
 
       test('fuzzPoint highlightData removed', function() {
         assert.deepEqual(fuzzPoint._highlightData, [{
+              "timeStamp": 1397131620000,
+              "x": 2,
+              "y0": 6,
+              "y1": 3
+            },{
               "timeStamp": 1397160780000,
               "x": 3,
               "y0": 4,
@@ -477,11 +482,6 @@ function runTests(){
               "x": 4,
               "y0": 8,
               "y1": 4
-            },{
-              "timeStamp": 1397131620000,
-              "x": 2,
-              "y0": 6,
-              "y1": 3
             }]);
       });
 

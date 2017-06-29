@@ -84,6 +84,9 @@ Element which highlight specific points on the dataset
      * @type Object
      */
     properties: {
+      _highlightData: {
+        type:Object
+      },
       /**
        * Holder for the cursor drawing objects
        *
@@ -112,7 +115,8 @@ Element which highlight specific points on the dataset
     }, //properties
 
     observers: [
-      'drawElement(svg, crosshairData.timeStamps.*, completeSeriesConfig.*, drawWithLocalCrosshairData)'
+      'drawElement(svg, crosshairData.timeStamps.*, completeSeriesConfig.*, drawWithLocalCrosshairData)',
+      '_updateTooltipData(domainChanged)'
     ],
 
     ready: function() {
@@ -158,6 +162,8 @@ Element which highlight specific points on the dataset
         this._setTooltipData(dataset);
         this._resetTooltipData();
       }
+
+      this._highlightData = dataset;
     },  //drawElement
 
     _createCircles: function(data, elem) {
@@ -228,6 +234,12 @@ Element which highlight specific points on the dataset
     _addClipPath: function() {
       if(this.clipPath && this._doesD3HaveValues(this._circles)) {
         this.addClipPath(this._circles);
+      }
+    },
+
+    _updateTooltipData: function() {
+      if(this.defaultEmptyData) {
+        this._setTooltipData(this._highlightData);
       }
     },
 
