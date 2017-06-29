@@ -2488,6 +2488,9 @@ PxVisBehavior.highlightShared = [{
       type: Array
     },
 
+    /**
+     * By default, a highlighter will not react to crosshairData if generatingCrosshairData is true. This boolean forces it to draw the crosshairData regardless of the value of generatingCrosshairData
+     */
     drawWithLocalCrosshairData: {
       type: Boolean,
       value: false,
@@ -2641,13 +2644,13 @@ PxVisBehavior.highlightSvgShared = [{
   _muteDataSeries: function(data) {
     if(this.layersToMask) {
       if(!Array.isArray(this.layersToMask)) {
-        this.layersToMask.node().style.opacity = data.length ? 'var(--px-vis-data-mask-opacity, 0.4)' : '';
-        // this.toggleClass('secondaryDataMask', data.length, this.layersToMask.node());
+        // this.layersToMask.node().style.opacity = data.length ? 'var(--px-vis-data-mask-opacity, 0.4)' : '';
+        this.toggleClass('secondaryDataMask', data.length, this.layersToMask.node());
       } else {
         for(var i=0; i<this.layersToMask.length; i++) {
-          this.layersToMask[i].node().style.opacity = data.length ? 'var(--px-vis-data-mask-opacity, 0.4)' : '';
+          // this.layersToMask[i].node().style.opacity = data.length ? 'var(--px-vis-data-mask-opacity, 0.4)' : '';
 
-          // this.toggleClass('secondaryDataMask', data.length, this.layersToMask[i].node());
+          this.toggleClass('secondaryDataMask', data.length, this.layersToMask[i].node());
         }
       }
     }

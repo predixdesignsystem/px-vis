@@ -553,23 +553,23 @@ function runTests(){
       });
 
       test('fuzzPoint scatters x & y', function() {
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[0]).attr('cx'), 240);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[0]).attr('cy'), 162);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[0]).attr('cx'), 120);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[0]).attr('cy'), 108);
 
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[1]).attr('cx'), 240);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[1]).attr('cy'), 54);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[1]).attr('cx'), 120);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[1]).attr('cy'), 189);
 
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[2]).attr('cx'), 360);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[2]).attr('cy'), 54);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[2]).attr('cx'), 240);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[2]).attr('cy'), 162);
 
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[3]).attr('cx'), 360);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[3]).attr('cy'), 162);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[3]).attr('cx'), 240);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[3]).attr('cy'), 54);
 
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[4]).attr('cx'), 120);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[4]).attr('cy'), 108);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[4]).attr('cx'), 360);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[4]).attr('cy'), 54);
 
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[5]).attr('cx'), 120);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[5]).attr('cy'), 189);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[5]).attr('cx'), 360);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[5]).attr('cy'), 162);
       });
 
       test('fuzzPoint fuzz layer mutes', function() {
