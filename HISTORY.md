@@ -10,6 +10,8 @@ v2.1.0
 * fixed bugs with brushes and axis interaction space
 * fixed zoom resetting on resize bug
 * fixed zoom toolbar bug/inconsistency
+* added ability to register custom scripts to the web workers
+  * scheduler will run said custom functions and they have access to the chartData
 
 v2.0.8
 ==================
