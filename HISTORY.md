@@ -7,10 +7,13 @@
 * Added muting capabilities for categories registers
 * ensure fuzz factor for crosshair is always coerced to a number
 * Ensure scales are not recreated when not needed (solving a reset zoom problem on resize)
+* fixed bugs with brushes and axis interaction space
+* fixed zoom resetting on resize bug
+* fixed zoom toolbar bug/inconsistency
 
 v2.0.8
 ==================
-* Emsure markeScale is only applied to the marker size itself rather than the whole canvas
+* Ensure markeScale is only applied to the marker size itself rather than the whole canvas
 
 v2.0.7
 ==================
