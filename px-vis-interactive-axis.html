@@ -358,6 +358,12 @@ Custom property | Description | Default
       "dom-change": '_axisConfigChanged'
     },
 
+    detached: function() {
+      if(this._doesD3HaveValues(this._interactiveGroup)) {
+        this._interactiveGroup.remove();
+      }
+    },
+
     _returnDragContainer: function() {
       return this.svg.node();
     },
@@ -400,6 +406,8 @@ Custom property | Description | Default
           //create a separate subgroup for the axis so it doesnt interfere with our interaction-space
           this._axisGroup = this._interactiveGroup.append('g')
             .attr("class", "axis-g");
+        } else {
+          this._interactiveGroup.attr("dimension", this.dimension);
         }
 
         this._interactiveGroup.attr("transform", this._calcTransformation.bind(this));
