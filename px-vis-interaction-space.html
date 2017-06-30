@@ -142,8 +142,10 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         type: Object,
         readOnly: true,
         value: {
-          'startZooming': '_drawActionBox',
+          'startZooming': '_startZooming',
           'stopZooming': '_finishActionBox',
+          'startStriping': '_startStriping',
+          'stopStriping': '_finishActionBox',
           'calcTooltipData': '_calcTooltipData',
           'calcCrosshairData': '_calcCrosshairData',
           'calcTooltipAndCrosshairData': '_calcTooltipAndCrosshairData',
@@ -367,6 +369,16 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         }
       }
     },  //drawElement
+
+    _startStriping: function() {
+      this.set('extentsAction', 'stripe');
+      this._drawActionBox();
+    },
+
+    _startZooming: function() {
+      this.set('extentsAction', 'zoom');
+      this._drawActionBox();
+    },
 
     _drawCursorGroup: function() {
       if(!this._cursorGroup) {

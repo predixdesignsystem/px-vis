@@ -38,25 +38,25 @@ function runTests(){
         Px.vis.scheduler.process({
           'action' : 'updateData',
           'originatorName' : 'aChart',
-          'data' : {'chartData': new Array(63)},
+          'data' : {'chartData': [1,2,3]},
           'chartId': 'chartId1',
           'successCallback': callBackCount});
         Px.vis.scheduler.process({
           'action' : 'updateData',
           'originatorName' : 'aChart',
-          'data' : {'chartData': new Array(67)},
+          'data' : {'chartData': [1,2,3,4]},
           'chartId': 'chartId2',
           'successCallback': callBackCount});
         Px.vis.scheduler.process({
           'action' : 'updateData',
           'originatorName' : 'aChart',
-          'data' : {'chartData': new Array(75)},
+          'data' : {'chartData': [1,2,3,4,5]},
           'chartId': 'chartId3',
           'successCallback': callBackCount});
         Px.vis.scheduler.process({
           'action' : 'updateData',
           'originatorName' : 'aChart',
-          'data' : {'chartData': new Array(82)},
+          'data' : {'chartData': [1,2,3,4,5,6]},
           'chartId': 'chartId4',
           'successCallback': callBackCount});
       });
@@ -123,7 +123,7 @@ function runTests(){
       Px.vis.scheduler.process({
           'action' : 'updateData',
           'originatorName' : 'aChart',
-          'data' : {'chartData': new Array(93)},
+          'data' : {'chartData': [1,2,3,4,5,6,7]},
           'chartId': 'chartId5',
           'successCallback': function() {
             //action has been dequeued
@@ -212,7 +212,7 @@ function runTests(){
         assert.equal(e.detail.action, 'runCustomFunction');
         assert.equal(e.detail.originatorName, 'aChart');
         assert.equal(e.detail.chartId, 'chartId1');
-        assert.equal(e.detail.data, 63);
+        assert.equal(e.detail.data, 3);
       };
 
       window.addEventListener('px-vis-scheduler-work-end', handler);
@@ -237,7 +237,7 @@ function runTests(){
           'data' : {'objectName': 'myScript', 'functionName': 'dataLength'},
           'chartId': 'chartId1',
           'successCallback': function(e) {
-            assert.equal(e.data, 63);
+            assert.equal(e.data, 3);
             counter++;
             if(counter === 4) {
               done();
@@ -249,7 +249,7 @@ function runTests(){
           'data' : {'objectName': 'myScript', 'functionName': 'dataLength'},
           'chartId': 'chartId2',
           'successCallback': function(e) {
-            assert.equal(e.data, 67);
+            assert.equal(e.data, 4);
             counter++;
             if(counter === 4) {
               done();
@@ -261,7 +261,7 @@ function runTests(){
           'data' : {'objectName': 'myScript', 'functionName': 'dataLength'},
           'chartId': 'chartId3',
           'successCallback': function(e) {
-            assert.equal(e.data, 75);
+            assert.equal(e.data, 5);
             counter++;
             if(counter === 4) {
               done();
@@ -273,7 +273,7 @@ function runTests(){
           'data' : {'objectName': 'myScript', 'functionName': 'dataLength'},
           'chartId': 'chartId4',
           'successCallback': function(e) {
-            assert.equal(e.data, 82);
+            assert.equal(e.data, 6);
             counter++;
             if(counter === 4) {
               done();

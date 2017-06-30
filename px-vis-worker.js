@@ -44,7 +44,7 @@ function reply(data, time) {
 
   //var time2 = this.performance.now();
   var time2 = null;
-  if(data) {
+  if(data || data === false || data === 0) {
     postMessage({'data': data, 'timeIn': time, 'timeOut': time2});
   } else {
     postMessage({'timeIn': time, 'timeOut': time2});
