@@ -1,5 +1,5 @@
-
-=======
+v2.1.0
+==================
 * Add striping component
 * Edits to toolbar and interaction space for striping
 * Added to highlight, striping, and line-cursor to overview and demos
