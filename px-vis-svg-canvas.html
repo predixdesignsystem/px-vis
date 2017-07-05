@@ -66,6 +66,16 @@ Element which creates 2 SVG elements, and a canvas element between the two svg e
         offset="[[offset]]">
       </px-vis-canvas>
 
+      <template id="canvasTemplate" is="dom-repeat" items="[[_returnKeys(canvasLayersConfig.*, width, height, margin.*, offset.*)]]">
+        <px-vis-canvas
+          class="abs-elem inline--flex noPointer"
+          width="[[_returnProp(item, 'width', canvasLayersConfig.*)]]"
+          height="[[_returnProp(item, 'height', canvasLayersConfig.*)]]"
+          margin="[[_returnProp(item, 'margin', canvasLayersConfig.*)]]"
+          offset="[[_returnProp(item, 'offset', canvasLayersConfig.*)]]">
+        </px-vis-canvas>
+      </template>
+
       <px-vis-svg
         class="abs-elem inline--flex"
         svg="{{svg}}"
@@ -85,7 +95,7 @@ Element which creates 2 SVG elements, and a canvas element between the two svg e
         is: 'px-vis-svg-canvas',
         behaviors: [
           PxVisBehavior.sizing,
-          PxVisBehaviorD3.canvas,
+          PxVisBehaviorD3.canvasContext,
           PxVisBehaviorD3.svg,
           PxVisBehaviorD3.svgLower
         ],
@@ -97,25 +107,33 @@ Element which creates 2 SVG elements, and a canvas element between the two svg e
          * @type Object
          */
         properties: {
-          //redefine svg prop so it can notify
-          /**
-          * svg is a holder for the d3 instantiated svg container to draw to.
-          * Must be set in ready and passed to all components so they know whom to draw to.
-          *
-          * FUTURE: when Polymer supports SVG, this only need be set on the SVG element.
-          *
-          * @property svg
-          * @type Object
-          */
-          svg: {
-            type: Object,
-            notify: true
-          },
-
           canvasContextTop: {
             type: Object,
             notify: true
           }
         },
+
+        listeners: {
+          'px-vis-canvas-context-updated': '_assignCanvas',
+        },
+
+        _assignCanvas: function(evt) {
+          var key = this.$.canvasTemplate.itemForElement(evt.target);
+
+          if(key) {
+            this.set('canvasLayers.' + key, evt.detail.data);
+          }
+        },
+
+        _returnKeys: function() {
+          return Object.keys(this.canvasLayersConfig)
+        },
+
+        _returnProp: function(item, prop) {
+          if(this.canvasLayersConfig[item][prop]) {
+            return this.canvasLayersConfig[item][prop];
+          }
+          return this[prop];
+        }
     });
 </script>

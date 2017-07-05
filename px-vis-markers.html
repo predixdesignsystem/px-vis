@@ -88,7 +88,7 @@ Custom property | Description | Default
 
     behaviors: [
       PxVisBehavior.sizing,
-      PxVisBehaviorD3.canvas,
+      PxVisBehaviorD3.canvasContext,
       PxVisBehaviorD3.axes,
       PxVisBehavior.dataset,
       PxVisBehavior.commonMethods,
@@ -140,6 +140,7 @@ Custom property | Description | Default
     }, //properties
 
     observers: [
+      '_requestCanvasCreation(markerConfig, height, margin.*)',
       '_createScales(height, margin.*, _markerTypes.*)',
       '_redraw(domainChanged)'
     ],
@@ -212,6 +213,13 @@ Custom property | Description | Default
       }
 
       return data;
+    },
+
+    _requestCanvasCreation: function() {
+      this.set('canvasLayersConfig.markers', {
+        height: this.height + this.margin.top + this.margin.bottom,
+        margin: {top: 0, bottom: 0, left: this.margin.left, right: this.margin.right }
+      });
     },
 
     _createScales: function() {

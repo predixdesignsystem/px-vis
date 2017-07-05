@@ -1,3 +1,8 @@
+v2.1.1
+==================
+* Add ability to dynamically add canvases.
+* Fixed behavor imports on several components
+
 v2.1.0
 ==================
 * Add striping component

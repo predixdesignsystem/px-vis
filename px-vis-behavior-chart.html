@@ -1282,7 +1282,7 @@ PxVisBehaviorChart.layers = [{
     generateLayers: {
       type: Boolean,
       value: true
-    },
+    }
     //TODIO: array of event allowed to pierce
   },
   observers: [
@@ -1330,15 +1330,13 @@ PxVisBehaviorChart.layers = [{
   _initMousePiercing: function() {
 
     var topLayer = this.layer[this.layer.length - 1],
-        _this = this,
         //TODO: proeprty
         events = ['mousedown', 'mouseover', 'click', 'hover'],
         handlers = [];
 
     //setup piercing for all events defined
     for(var i=0; i<events.length; i++) {
-      var eventName = events[i],
-          _this = this;
+      var eventName = events[i];
 
       handlers.push(this._createPiercingEventHandler(eventName, this, topLayer));
       topLayer.node().addEventListener(eventName, handlers[i]);
@@ -1346,46 +1344,45 @@ PxVisBehaviorChart.layers = [{
   },
   _createPiercingEventHandler: function(eventName, context, topLayer) {
     return function(evt) {
+      //recreate an event we will propagate
+      //This is true only for IE,firefox
+      var newEvt,
+          target;
 
-              //recreate an event we will propagate
-              //This is true only for IE,firefox
-              var newEvt,
-                  target;
+      if(document.createEvent) {
+      // To create a mouse event , first we need to create an event and then initialize it.
+          newEvt = document.createEvent('MouseEvent');
+          newEvt.initMouseEvent(eventName,
+          evt.bubbles,
+          evt.cancelable,
+          evt.view,evt.detail,evt.screenX,evt.screenY,evt.clientX,evt.clientY,
+          evt.ctrlKey,evt.altKey,evt.shiftKey,evt.metaKey,evt.button,evt.relatedTarget);
+      }
+      else {
+          newEvt = new MouseEvent(eventName, evt);
+      }
 
-              if(document.createEvent) {
-              // To create a mouse event , first we need to create an event and then initialize it.
-                  newEvt = document.createEvent('MouseEvent');
-                  newEvt.initMouseEvent(eventName,
-                  evt.bubbles,
-                  evt.cancelable,
-                  evt.view,evt.detail,evt.screenX,evt.screenY,evt.clientX,evt.clientY,
-                  evt.ctrlKey,evt.altKey,evt.shiftKey,evt.metaKey,evt.button,evt.relatedTarget);
-              }
-              else {
-                  newEvt = new MouseEvent(eventName, evt);
-              }
+      //hide current layer so we can find who we need to notify
+      topLayer.node().style['display'] = 'none';
 
-              //hide current layer so we can find who we need to notify
-              topLayer.node().style['display'] = 'none';
+      //chrome stops on custom elements when doing elementFromPoint so
+      //we need to recursively go down shadowRoots until we find the element
+      var findElem = function(elem) {
+        if(elem.shadowRoot) {
+          return findElem(elem.shadowRoot.elementFromPoint(evt.clientX, evt.clientY));
+        } else {
+          return elem;
+        }
+      }
 
-              //chrome stops on custom elements when doing elementFromPoint so
-              //we need to recursively go down shadowRoots until we find the element
-              var findElem = function(elem) {
-                if(elem.shadowRoot) {
-                  return findElem(elem.shadowRoot.elementFromPoint(evt.clientX, evt.clientY));
-                } else {
-                  return elem;
-                }
-              }
+      target = findElem(document.elementFromPoint(evt.clientX, evt.clientY));
 
-              target = findElem(document.elementFromPoint(evt.clientX, evt.clientY));
+      //restore our layer visiblity
+      topLayer.node().style['display'] = 'inline';
 
-              //restore our layer visiblity
-              topLayer.node().style['display'] = 'inline';
-
-              //and dispatch the event to the appropriate target
-              target.dispatchEvent(newEvt);
-          }.bind(context);
+      //and dispatch the event to the appropriate target
+      target.dispatchEvent(newEvt);
+  }.bind(context);
   }
 }, PxVisBehaviorD3.svg, PxVisBehavior.commonMethods];
 
@@ -2457,5 +2454,7 @@ PxVisBehaviorChart.thresholdConfig = {
     }
   }
 };
+
+
 
 </script>
