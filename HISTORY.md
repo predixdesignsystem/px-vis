@@ -1,3 +1,7 @@
+v2.1.3
+==================
+* Ensure striping component won't try to draw on empty data
+
 v2.1.2
 ==================
 * Fix for markers on the bottom
