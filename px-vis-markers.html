@@ -70,8 +70,7 @@ Custom property | Description | Default
           complete-series-config="[[_markerConfig]]"
           width="[[width]]"
           height="[[_returnHeight(height, margin.*)]]"
-          margin="[[margin]]"
-          clip-path
+          margin="[[_returnMargin(margin.*)]]"
           x="[[x]]"
           y="[[_returnYScale(item, _topDomain, _bottomDomain)]]"
           domain-changed="[[_returnDomain(item, _topDomain, _bottomDomain, domainChanged)]]"
@@ -243,7 +242,7 @@ Custom property | Description | Default
         type = this._markerTypes[i];
         row = this.markerConfig[type]["row"];
 
-        if(type.location === "bottom") {
+        if(this.markerConfig[type]['location'] === "bottom") {
           bRowSet[row] = true;
         } else {
           tRowSet[row] = true;
@@ -287,6 +286,10 @@ Custom property | Description | Default
 
     _returnHeight: function() {
       return this.height + this.margin.top + this.margin.bottom;
+    },
+
+    _returnMargin: function() {
+      return { top: 0, bottom: 0, left: this.margin.left, right: this.margin.right };
     },
 
     _redraw: function() {
