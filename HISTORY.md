@@ -1,3 +1,8 @@
+v2.1.2
+==================
+* Fix for markers on the bottom
+* fix for parallel and radar register color bug
+
 v2.1.1
 ==================
 * Add ability to dynamically add canvases.
