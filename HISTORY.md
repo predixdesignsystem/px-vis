@@ -1,3 +1,9 @@
+==================
+* new internal renderer for canvas (TODO doc)
+* removed events for line scatter and canvas scatter (TODO doc)
+* new events for rendering (TODO doc)
+* removed redrawElement function from highlightPoint and highlightLine
+
 v2.1.2
 ==================
 * Fix for markers on the bottom

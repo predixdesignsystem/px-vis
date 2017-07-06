@@ -446,51 +446,6 @@ PxVisBehavior.muteUnmuteSeries = [{
 
 /*
     Name:
-    PxVisBehavior.progressiveRendering
-
-    Description:
-    Polymer behavior that provides canvas progressive rendering options
-
-    Dependencies:
-    -
-
-    @polymerBehavior PxVisBehavior.progressiveRendering
-*/
-PxVisBehavior.progressiveRendering = {
-  properties: {
-    /**
-    * By default the lines are rendered progressively for a better user experience.
-    * Use this to prevent progressive rendering
-    */
-    noCanvasProgressiveRendering: {
-      type: Boolean,
-      value: false
-    },
-    /**
-     * Number of points to be drawn per progressive rendering frame.
-     * Increase progressiveRenderingPointsPerFrame for better performance and
-     * decrease for smoother drawing. When at the right value no performance cost
-     * incurs and drawing is smooth but if value is too small can incur a
-     * performance cost (i.e the drawing will take longer but will still start at
-     * the same time, also the UI won't be frozen)
-     */
-    progressiveRenderingPointsPerFrame: {
-      type: Number,
-      value: 16000
-    },
-    /**
-     * Minimum number of frames to be used if using progressive rendering
-     */
-    progressiveRenderingMinimumFrames: {
-      type: Number,
-      value: 1
-    }
-  }
-};
-
-
-/*
-    Name:
     PxVisBehavior.tooltipData
 
     Description:
@@ -2687,8 +2642,7 @@ PxVisBehavior.highlightLineShared = [{
   properties: {
     _highlightData: {
       type: Object,
-      notify: true,
-      computed: '_computeChartData(crosshairData.timeStamps.*, drawWithLocalCrosshairData)'
+      notify: true
     },
 
     /**
@@ -2708,6 +2662,7 @@ PxVisBehavior.highlightLineShared = [{
       value: false
     }
   },
+  observers: ['_computeChartData(crosshairData.timeStamps.*, drawWithLocalCrosshairData)'],
 
   /**
    * Draws the crosshair elements and sets up listeners and callbacks on chart hover
@@ -2727,7 +2682,8 @@ PxVisBehavior.highlightLineShared = [{
       this._setTooltipDataMultiLine(dataset);
     }
 
-    return dataset;
+    this.set('_highlightData', dataset);
+    this.fire('px-vis-highlight-data-changed');
   },
 
 
@@ -2927,4 +2883,33 @@ PxVisBehavior.stripProperties = {
     }
   }
 };
+
+/**
+     Name:
+    PxVisBehavior.rendererType
+
+    Description:
+    Polymer behavior that provides a rendererType property to components.
+
+
+    @polymerBehavior PxVisBehavior.rendererType
+*/
+
+
+PxVisBehavior.rendererType = {
+  properties: {
+    /**
+    * Type of renderer this drawing element should be using. Determines on what
+    * condition the element is going to be drawn
+    * - chartData
+    * - filteredChartData
+    * - highlightData
+    */
+    rendererType: {
+      type: String,
+      value: 'chartData'
+    }
+  }
+};
+
 </script>

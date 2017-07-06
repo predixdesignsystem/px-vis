@@ -54,6 +54,7 @@ Element which highlight specific points on the dataset
       <template is="dom-repeat" items="[[seriesKeys]]">
         <px-vis-scatter-canvas
           radial="[[radial]]"
+          renderer-type="highlightData"
           force-radial-calculation
           canvas-context="[[canvasContext]]"
           series-id="[[item]]"
@@ -66,8 +67,7 @@ Element which highlight specific points on the dataset
           clip-path
           x="[[x]]"
           y="[[_returnYScale(item, completeSeriesConfig, domainChanged)]]"
-          domain-changed="[[domainChanged]]"
-          progressive-rendering-points-per-frame="500">
+          domain-changed="[[domainChanged]]">
         </px-vis-scatter-canvas>
       </template>
     </template>
@@ -96,7 +96,6 @@ Element which highlight specific points on the dataset
     ],
 
     /**
-     * Properties block, expose attribute values to the DOM via 'reflect'
      *
      * @property properties
      * @type Object
@@ -104,8 +103,7 @@ Element which highlight specific points on the dataset
     properties: {
       _highlightData: {
         type:Object,
-        notify: true,
-        computed: '_computeChartData(crosshairData.timeStamps.*, completeSeriesConfig, drawWithLocalCrosshairData)'
+        notify: true
       },
 
       seriesKeys: {
@@ -113,7 +111,7 @@ Element which highlight specific points on the dataset
       },
 
       /**
-       * Whether the scatter plot is using radial coiordinates (x=phase, y=amplitude)
+       * Whether the scatter plot is using radial coordinates (x=phase, y=amplitude)
        */
       radial: {
         type: Boolean,
@@ -121,6 +119,7 @@ Element which highlight specific points on the dataset
       }
 
     }, //properties
+    observers: ['_computeChartData(crosshairData.timeStamps.*, completeSeriesConfig, drawWithLocalCrosshairData)'],
 
     observers: [
       '_updateTooltipData(domainChanged)'
@@ -139,7 +138,8 @@ Element which highlight specific points on the dataset
         this._resetTooltipData();
       }
 
-      return dataset;
+      this.set('_highlightData', dataset);
+      this.fire('px-vis-highlight-data-changed');
     },
 
     _updateTooltipData: function() {

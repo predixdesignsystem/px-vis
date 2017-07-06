@@ -1823,8 +1823,7 @@ PxVisBehaviorChart.noDebounceOnPanning = {
   _startPanning: function() {
 
     //remove draw debounce to have a smooth panning
-    var lineType = this.renderToCanvas ? 'px-vis-line-canvas' : 'px-vis-line-svg',
-        lines = Polymer.dom(this.root).querySelectorAll(lineType),
+    var lines = Polymer.dom(this.root).querySelectorAll('px-vis-line-svg'),
         scatter = Polymer.dom(this.root).querySelectorAll('px-vis-scatter'),
         threshold = Polymer.dom(this.root).querySelector('px-vis-threshold');
 
@@ -1849,8 +1848,7 @@ PxVisBehaviorChart.noDebounceOnPanning = {
   },
   _stopPanning: function() {
 
-    var lineType = this.renderToCanvas ? 'px-vis-line-canvas' : 'px-vis-line-svg',
-        lines = Polymer.dom(this.root).querySelectorAll(lineType),
+    var lines = Polymer.dom(this.root).querySelectorAll('px-vis-line-svg'),
         scatter = Polymer.dom(this.root).querySelectorAll('px-vis-scatter'),
         threshold = Polymer.dom(this.root).querySelector('px-vis-threshold');
 
@@ -2455,6 +2453,75 @@ PxVisBehaviorChart.thresholdConfig = {
   }
 };
 
+PxVisBehaviorChart.combineMutes = {
+  properties: {
+    _combinedMutedSeries: {
+      type: Object,
+    },
+    /**
+     * An object which holds the series lines that have been muted based on the selected domain
+     *
+     * @private
+     */
+    mutedSeriesDomain: {
+      type:Object,
+      value: function() { return {} }
+    },
+    /**
+     * An object which holds the series lines that have been muted based on the axes brushes
+     *
+     * @private
+     */
+    mutedSeriesBrush: {
+      type:Object
+    },
+    /**
+     * An object which holds the series lines that have been muted based on
+     * the categories
+     *
+     */
+    _mutedSeriesCategories: {
+      type:Object,
+      value: function() { return {} }
+    }
+  },
+  observers: ['_combineMutes(mutedSeriesBrush, mutedSeriesDomain)'],
 
+  /**
+   * Takes the muted series from the axis brush and the selected domain and returns a merged copy of them
+   *
+   */
+  _combineMutes: function(m1,m2) {
+    var muted = {},
+        mutedCategories = Object.keys(this._mutedSeriesCategories).filter(function(cat) {
+          return this._mutedSeriesCategories[cat];
+        }.bind(this));
+    // for these, we assume that "false" items will just have been removed
+    for(var k in m1) {
+      muted[k] = m1[k];
+    }
+    for(var k in m2) {
+      muted[k] = m2[k];
+    }
+
+    if(mutedCategories.length) {
+      //parse data to add points muted by category
+      var isMuted;
+      //for each point
+      for(var i=0; i<this.chartData.length; i++) {
+
+        //search for each muted category
+        for(var j=0; j<mutedCategories.length;j++) {
+          if(this.chartData[i][this.categoryKey] ===mutedCategories[j]) {
+            muted[this.chartData[i][this.seriesKey]] = true;
+            break;
+          }
+        }
+      }
+    }
+    this.set('_combinedMutedSeries', muted);
+    this.set('_combinedMutedChanged', this._combinedMutedChanged ? false : true);
+  },
+}
 
 </script>
