@@ -153,11 +153,9 @@ PxVisBehaviorRenderer.base = [{
               '_serieToRedrawOnTopChanged(serieToRedrawOnTop)'],
 
 
-  //TODO: filtered data chart also have the chart data kicking
+  //TODO: filtered data chart also have the chart data kicking but shouldnt
   //TODO: low priority: include SVG drawings
   //TODO: benchamrks
-  //TODO: make the first render of a type more flexible so that we can us it in our rendering loop (i.e when switching targets within the same frame and having a new type that hasn't been rendered yet, need to do a first render based on how much of the budget for the frame is left.)
-  //TODO: first render should be able to switch targets and render more than 1 target. This should be implemented while doing the TODO above, rendering always kicking the same loop
   //TODO: verify that multiline is not impacted by prepending last point of single line
 
   attached: function() {
@@ -166,6 +164,11 @@ PxVisBehaviorRenderer.base = [{
     this.listen(this, 'px-vis-renderer-unregister', '_unregisterDrawingElement');
     this.listen(this, 'px-vis-highlight-data-changed', '_renderHighlight');
     this.listen(this, 'px-vis-redraw-lines', '_renderAllLines');
+
+    //ensure we redraw
+    if(this.domainChanged === true || this.domainChanged === false) {
+      this.set('domainChanged', !this.domainChanged);
+    }
   },
   detached: function() {
 
