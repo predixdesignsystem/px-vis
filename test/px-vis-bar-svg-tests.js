@@ -14,8 +14,7 @@ function runTests() {
         singleColumnSVG = document.getElementById('singleColumnSVG'),
         singleColumnBar = document.getElementById('singleColumnBar');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var barRect;
 
     suiteSetup(function(done){
@@ -94,7 +93,7 @@ function runTests() {
     });
 
     test('singleColumnBar bar series has the right color', function() {
-      assert.equal(barRect.attr('fill').split(' ').join(''),colorSet[ colorOrder[0] ]);
+      assert.equal(barRect.attr('fill').split(' ').join(''),colorSet[0]);
     });
 
     test('singleColumnBar bar width', function() {
@@ -139,8 +138,7 @@ function runTests() {
         multiColumnBar2 = document.getElementById('multiColumnBar2'),
         multiColumnBar3 = document.getElementById('multiColumnBar3');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var barRect,barRect2,barRect3;
 
     suiteSetup(function(done){
@@ -176,21 +174,21 @@ function runTests() {
             "name":"mySeries",
             "x":"x",
             "y":"y",
-            "color": colorSet[ colorOrder[0] ]
+            "color": colorSet[0]
           },
           "mySeries2":{
             "type":"bar",
             "name":"mySeries2",
             "x":"x",
             "y":"y1",
-            "color": colorSet[ colorOrder[1] ]
+            "color": colorSet[1]
           },
           "mySeries3":{
             "type":"bar",
             "name":"mySeries3",
             "x":"x",
             "y":"y2",
-            "color": colorSet[ colorOrder[2] ]
+            "color": colorSet[2]
           },
         },
         chartExtents = {"x":["A","B","C","D","E"],"y":[0,1.6]},
@@ -268,7 +266,7 @@ function runTests() {
     });
 
     test('multiColumnBar1 bar series has the right color', function() {
-      assert.equal(barRect.attr('fill').split(' ').join(''),colorSet[ colorOrder[0] ]);
+      assert.equal(barRect.attr('fill').split(' ').join(''),colorSet[0]);
     });
 
     test('multiColumnBar1 bar width', function() {
@@ -310,7 +308,7 @@ function runTests() {
     });
 
     test('multiColumnBar2 bar series has the right color', function() {
-      assert.equal(barRect2.attr('fill').split(' ').join(''),colorSet[ colorOrder[1] ]);
+      assert.equal(barRect2.attr('fill').split(' ').join(''),colorSet[1]);
     });
 
     test('multiColumnBar2 bar width', function() {
@@ -352,7 +350,7 @@ function runTests() {
     });
 
     test('multiColumnBar3 bar series has the right color', function() {
-      assert.equal(barRect3.attr('fill').split(' ').join(''),colorSet[ colorOrder[2] ]);
+      assert.equal(barRect3.attr('fill').split(' ').join(''),colorSet[2]);
     });
 
     test('multiColumnBar3 bar width', function() {
@@ -396,8 +394,7 @@ function runTests() {
         singleBarSVG = document.getElementById('singleBarSVG'),
         singleBarBar = document.getElementById('singleBarBar');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var barRect;
 
     suiteSetup(function(done){
@@ -477,7 +474,7 @@ function runTests() {
     });
 
     test('singleBarBar bar series has the right color', function() {
-      assert.equal(barRect.attr('fill').split(' ').join(''),colorSet[ colorOrder[0] ]);
+      assert.equal(barRect.attr('fill').split(' ').join(''),colorSet[0]);
     });
 
     test('singleBarBar bar width', function() {
@@ -522,8 +519,7 @@ function runTests() {
         multiBarBar2 = document.getElementById('multiBarBar2'),
         multiBarBar3 = document.getElementById('multiBarBar3');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var barRect,barRect2,barRect3;
 
     suiteSetup(function(done){
@@ -559,21 +555,21 @@ function runTests() {
             "name":"mySeries",
             "x":"x",
             "y":"y",
-            "color": colorSet[ colorOrder[0] ]
+            "color": colorSet[0]
           },
           "mySeries2":{
             "type":"bar",
             "name":"mySeries2",
             "x":"x",
             "y":"y1",
-            "color": colorSet[ colorOrder[1] ]
+            "color": colorSet[1]
           },
           "mySeries3":{
             "type":"bar",
             "name":"mySeries3",
             "x":"x",
             "y":"y2",
-            "color": colorSet[ colorOrder[2] ]
+            "color": colorSet[2]
           },
         },
         chartExtents = {"x":[0,1.6],"y":["A","B","C","D","E"]},
@@ -651,7 +647,7 @@ function runTests() {
     });
 
     test('multiBarBar1 bar series has the right color', function() {
-      assert.equal(barRect.attr('fill').split(' ').join(''),colorSet[ colorOrder[0] ]);
+      assert.equal(barRect.attr('fill').split(' ').join(''),colorSet[0]);
     });
 
     test('multiBarBar1 bar width', function() {
@@ -693,7 +689,7 @@ function runTests() {
     });
 
     test('multiBarBar2 bar series has the right color', function() {
-      assert.equal(barRect2.attr('fill').split(' ').join(''),colorSet[ colorOrder[1] ]);
+      assert.equal(barRect2.attr('fill').split(' ').join(''),colorSet[1]);
     });
 
     test('multiBarBar2 bar width', function() {
@@ -735,7 +731,7 @@ function runTests() {
     });
 
     test('multiBarBar3 bar series has the right color', function() {
-      assert.equal(barRect3.attr('fill').split(' ').join(''),colorSet[ colorOrder[2] ]);
+      assert.equal(barRect3.attr('fill').split(' ').join(''),colorSet[2]);
     });
 
     test('multiBarBar3 bar width', function() {

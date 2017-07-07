@@ -15,8 +15,8 @@ function runTests(){
         baseLine1 = document.getElementById('baseLine1'),
         baseLine2 = document.getElementById('baseLine2');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
       var d = [{
@@ -129,8 +129,8 @@ function runTests(){
         progressiveLine1 = document.getElementById('progressiveLine1'),
         progressiveLine2 = document.getElementById('progressiveLine2');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
       var d = [{
@@ -265,8 +265,8 @@ function runTests(){
         canvasOnceLine1 = document.getElementById('canvasOnceLine1'),
         canvasOnceLine2 = document.getElementById('canvasOnceLine2');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
       var d = [{
@@ -922,8 +922,8 @@ function runTests(){
   // //       polarCanvas = document.getElementById('polarCanvas'),
   // //       polarLine = document.getElementById('polarLine');
   // //
-  // //   var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-  // //   var colorSet = dataVisColors.properties.dataVisColors.value;
+  // //
+  // //   var colorSet = dataVisColors.properties.seriesColorList.value;
   // //   var linePath;
   // //
   // //   suiteSetup(function(done){
@@ -1008,8 +1008,8 @@ function runTests(){
   // //       polarDegreeSVG = document.getElementById('polarDegreeSVG'),
   // //       polarDegreeLine = document.getElementById('polarDegreeLine');
   // //
-  // //   var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-  // //   var colorSet = dataVisColors.properties.dataVisColors.value;
+  // //
+  // //   var colorSet = dataVisColors.properties.seriesColorList.value;
   // //   var linePath;
   // //
   // //   suiteSetup(function(done){
@@ -1086,7 +1086,7 @@ function runTests(){
   // //   });
   // //
   // //   test('polarDegreeLine line series has the right color', function() {
-  // //     assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+  // //     assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[0]);
   // //   });
   // //
   // //   test('polarDegreeLine line d', function() {
@@ -1122,8 +1122,8 @@ function runTests(){
   // //       polarCCWSVG = document.getElementById('polarCCWSVG'),
   // //       polarCCWLine = document.getElementById('polarCCWLine');
   // //
-  // //   var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-  // //   var colorSet = dataVisColors.properties.dataVisColors.value;
+  // //
+  // //   var colorSet = dataVisColors.properties.seriesColorList.value;
   // //   var linePath;
   // //
   // //   suiteSetup(function(done){
@@ -1200,7 +1200,7 @@ function runTests(){
   // //   });
   // //
   // //   test('polarCCWLine line series has the right color', function() {
-  // //     assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+  // //     assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[0]);
   // //   });
   // //
   // //   test('polarCCWLine line d', function() {
@@ -1237,8 +1237,8 @@ function runTests(){
   // //       polarDegreeCCWSVG = document.getElementById('polarDegreeCCWSVG'),
   // //       polarDegreeCCWLine = document.getElementById('polarDegreeCCWLine');
   // //
-  // //   var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-  // //   var colorSet = dataVisColors.properties.dataVisColors.value;
+  // //
+  // //   var colorSet = dataVisColors.properties.seriesColorList.value;
   // //   var linePath;
   // //
   // //   suiteSetup(function(done){
@@ -1315,7 +1315,7 @@ function runTests(){
   // //   });
   // //
   // //   test('polarDegreeCCWLine line series has the right color', function() {
-  // //     assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+  // //     assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[0]);
   // //   });
   // //
   // //   test('polarDegreeCCWLine line d', function() {
@@ -1351,8 +1351,8 @@ function runTests(){
   // //       polarMissingSVG = document.getElementById('polarMissingSVG'),
   // //       polarMissingLine = document.getElementById('polarMissingLine');
   // //
-  // //   var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-  // //   var colorSet = dataVisColors.properties.dataVisColors.value;
+  // //
+  // //   var colorSet = dataVisColors.properties.seriesColorList.value;
   // //   var linePath;
   // //
   // //   suiteSetup(function(done){
@@ -1428,7 +1428,7 @@ function runTests(){
   // //   });
   // //
   // //   test('polarMissingLine line series has the right color', function() {
-  // //     assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+  // //     assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[0]);
   // //   });
   // //
   // //   test('polarMissingLine line d', function() {

@@ -512,7 +512,7 @@ Custom property | Description | Default
             }.bind(this))
             .call(this._axis);
 
-          g.select("path.domain").attr("stroke", this._checkThemeVariable("--px-vis-axis-color", this.colors[this.axisColor]))
+          g.select("path.domain").attr("stroke", this._checkThemeVariable("--px-vis-axis-color", this.axisColor))
           this.set('_axisGroup',g);
 
           this._setLineStyles(this._axisGroup,'line,path');
@@ -609,16 +609,16 @@ Custom property | Description | Default
         _setLabelStyles:function(elem) {
           elem.selectAll('text')
             .attr('font-size', this.labelTypeSize + 'px')
-            .style('font-family',this._checkThemeVariable("--px-font-family", 'GE Inspira Sans'))
-            .attr('font-style', this._checkThemeVariable("--px-font-family", 'GE Inspira Sans'));
+            .style('font-family',this._checkThemeVariable("--px-font-family", 'inherit'))
+            .attr('font-style', this._checkThemeVariable("--px-font-family", 'inherit'));
 
           // if we are not inline, apply default colors
           if(this.labelPosition !== 'inline') {
             elem.selectAll('text')
-              .attr('fill',this._checkThemeVariable("--px-vis-axis-color", this.colors[this.axisColor]));
+              .attr('fill',this._checkThemeVariable("--px-vis-axis-color", this.axisColor));
 
             elem.selectAll('g.tick').selectAll("line")
-              .attr('stroke',this._checkThemeVariable("--px-vis-axis-color", this.colors[this.axisColor]));
+              .attr('stroke',this._checkThemeVariable("--px-vis-axis-color", this.axisColor));
             }
 
           // if we are not default centering our label, then do calcs to figure out where to put it
@@ -650,10 +650,10 @@ Custom property | Description | Default
                 return tickText.nodes()[i].getBoundingClientRect().width + 6
               })
               .attr('height', this.labelTypeSize + 4)
-              .attr('fill',this._checkThemeVariable("--px-vis-axis-inline-box-color", this.colors[this.axisColor]))
+              .attr('fill',this._checkThemeVariable("--px-vis-axis-inline-box-color", this.axisColor))
               .attr('transform','rotate(' + this.labelRotation + ')');
 
-              tickText.attr('fill', this._checkThemeVariable("--px-vis-axis-inline-type-color", this.colors['white']));
+              tickText.attr('fill', this._checkThemeVariable("--px-vis-axis-inline-type-color", 'rbg(255,255,255)'));
           }
         },
         /**
@@ -663,7 +663,7 @@ Custom property | Description | Default
         _setLineStyles:function(elem,lines) {
           elem.selectAll(lines)
             .attr('fill','none')
-            .attr('stroke', this._checkThemeVariable("--px-vis-axis-color", this.colors[this.axisColor]))
+            .attr('stroke', this._checkThemeVariable("--px-vis-axis-color", this.axisColor))
             .attr('shape-rendering', 'crispEdges')
             .attr('stroke-width', this.strokeWidth);
         },
@@ -823,10 +823,10 @@ Custom property | Description | Default
             var themeVar = (this.labelPosition === 'inline') ? "--px-vis-axis-inline-title-color" : "--px-vis-axis-title-color";
             this._titleGroup.append('text')
               .attr('class','axis-title')
-              .attr('fill',this._checkThemeVariable(themeVar, this.colors[this.axisColor]))
+              .attr('fill',this._checkThemeVariable(themeVar, this.axisColor))
               .attr('font-size', this.titleTypeSize + 'px')
-              .style('font-family',this._checkThemeVariable("--px-font-family", 'GE Inspira Sans'))
-              .attr('font-style', this._checkThemeVariable("--px-font-family", 'GE Inspira Sans'))
+              .style('font-family',this._checkThemeVariable("--px-font-family", 'inherit'))
+              .attr('font-style', this._checkThemeVariable("--px-font-family", 'inherit'))
               .text(this.displayedTitle)
               .attr('text-anchor', anchor)
               .style('text-anchor', anchor)

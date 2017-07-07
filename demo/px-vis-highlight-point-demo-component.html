@@ -4,6 +4,7 @@
 <link rel="import" href="../px-vis-highlight-point.html">
 <link rel="import" href="../px-vis-line-svg.html">
 <link rel="import" href="../px-vis-svg.html">
+<link rel="import" href="../bower_components/px-colors-design/colors.html" />
 
 <link rel="import" href="../bower_components/px-buttons-design/css/px-buttons-design-demo-styles.html" defer>
 
@@ -123,6 +124,7 @@
 <script>
 Polymer({
   is: 'px-vis-highlight-point-demo-component',
+  behaviors: [PxVisBehavior.getSeriesColors,PxColorsBehavior.dataVisColorTheming],
   properties: {
     description: {
       type: String,
@@ -159,29 +161,6 @@ Polymer({
       type: Array
     },
     completeSeriesConfig: {
-      value: {
-          "y": {
-            "type":"line",
-            "name":"mySeries1",
-            "x":'x',
-            "y":'y',
-            "color": "rgb(93,165,218)"
-          },
-          "y1": {
-            "type":"line",
-            "name":"mySeries2",
-            "x":'x',
-            "y":'y1',
-            "color": "rgb(250,164,58"
-          },
-          "y2": {
-            "type":"line",
-            "name":"mySeries3",
-            "x":'x',
-            "y":'y2',
-            "color": "rgb(96,189,104)"
-          }
-        },
       type: Object
     },
     width: {
@@ -201,8 +180,8 @@ Polymer({
       value: {
         "top": 10,
         "right": 10,
-        "bottom": 10,
-        "left": 10
+        "bottom": 50,
+        "left": 50
       }
     },
 
@@ -228,6 +207,10 @@ Polymer({
           "timeStamps":[ 1397131620000, 1397160780000 ]
       }
     }
+  },
+
+  listeners:{
+    'px-data-vis-colors-applied': '_genCSC'
   },
 
   observers: [
@@ -261,6 +244,32 @@ Polymer({
     } else {
       this.$.pointhighlight.set('crosshairData', this.crosshairData);
     }
+  },
+
+  _genCSC: function() {
+    this.set('completeSeriesConfig', {
+      "y": {
+        "type":"line",
+        "name":"mySeries1",
+        "x":'x',
+        "y":'y',
+        "color": this._getColor(0)
+      },
+      "y1": {
+        "type":"line",
+        "name":"mySeries2",
+        "x":'x',
+        "y":'y1',
+        "color": this._getColor(1)
+      },
+      "y2": {
+        "type":"line",
+        "name":"mySeries3",
+        "x":'x',
+        "y":'y2',
+        "color": this._getColor(2)
+      }
+    });
   }
 });
 </script>

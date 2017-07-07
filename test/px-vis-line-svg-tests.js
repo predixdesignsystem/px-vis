@@ -14,8 +14,8 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         baseLine = document.getElementById('baseLine');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -89,7 +89,7 @@ function runTests(){
     });
 
     test('baseLine line series has the right color', function() {
-      assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+      assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[0]);
     });
 
     test('baseLine line series has the right dash pattern', function() {
@@ -107,8 +107,8 @@ function runTests(){
         mutedLine1 = document.getElementById('mutedLine1'),
         mutedLine2 = document.getElementById('mutedLine2');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath1,linePath2;
 
     suiteSetup(function(done){
@@ -215,7 +215,7 @@ function runTests(){
       assert.equal(linePath1.attr('stroke-opacity'),1);
     });
     test('mutedLine1 line series has the right color', function() {
-      assert.equal(linePath1.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+      assert.equal(linePath1.attr('stroke').split(' ').join(''),colorSet[0]);
     });
     test('mutedLine1 line d', function() {
       assert.equal(linePath1.attr('d').split(/[\s,]+/).join(''),'M0260L120210L240170L360230L480210');
@@ -231,7 +231,7 @@ function runTests(){
       assert.equal(linePath2.attr('stroke-opacity'),1);
     });
     test('mutedLine2 line series has the right color', function() {
-      assert.equal(linePath2.attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
+      assert.equal(linePath2.attr('stroke').split(' ').join(''),colorSet[1]);
     });
     test('mutedLine2 line d', function() {
       assert.equal(linePath2.attr('d').split(/[\s,]+/).join(''),'M0260L12060L240240L360170L4800');
@@ -244,8 +244,8 @@ function runTests(){
         mutedLine1 = document.getElementById('mutedLine1'),
         mutedLine2 = document.getElementById('mutedLine2');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
       var m = {
@@ -262,14 +262,14 @@ function runTests(){
       assert.equal(mutedLine1.linePath.attr('stroke-opacity'),1);
     });
     test('mutedLine1 line series has the right color', function() {
-      assert.equal(mutedLine1.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+      assert.equal(mutedLine1.linePath.attr('stroke').split(' ').join(''),colorSet[0]);
     });
 
     test('mutedLine2 line series has the right stroke opacity', function() {
       assert.equal(mutedLine2.linePath.attr('stroke-opacity'),0.3);
     });
     test('mutedLine2 line series has the right color', function() {
-      assert.equal(mutedLine2.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
+      assert.equal(mutedLine2.linePath.attr('stroke').split(' ').join(''),colorSet[1]);
     });
 
   }); //suite
@@ -280,8 +280,8 @@ function runTests(){
         mutedLine1 = document.getElementById('mutedLine1'),
         mutedLine2 = document.getElementById('mutedLine2');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
       var m = {
@@ -298,14 +298,14 @@ function runTests(){
       assert.equal(mutedLine1.linePath.attr('stroke-opacity'),1);
     });
     test('mutedLine1 line series has the right color', function() {
-      assert.equal(mutedLine1.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+      assert.equal(mutedLine1.linePath.attr('stroke').split(' ').join(''),colorSet[0]);
     });
 
     test('mutedLine2 line series has the right stroke opacity', function() {
       assert.equal(mutedLine2.linePath.attr('stroke-opacity'),1);
     });
     test('mutedLine2 line series has the right color', function() {
-      assert.equal(mutedLine2.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
+      assert.equal(mutedLine2.linePath.attr('stroke').split(' ').join(''),colorSet[1]);
     });
   }); //suite
 
@@ -315,8 +315,8 @@ function runTests(){
         mutedLine1 = document.getElementById('mutedLine1'),
         mutedLine2 = document.getElementById('mutedLine2');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
       var m = {
@@ -335,14 +335,14 @@ function runTests(){
       assert.equal(mutedLine1.linePath.attr('stroke-opacity'),0);
     });
     test('mutedLine1 line series has the right color', function() {
-      assert.equal(mutedLine1.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+      assert.equal(mutedLine1.linePath.attr('stroke').split(' ').join(''),colorSet[0]);
     });
 
     test('mutedLine2 line series has the right stroke opacity', function() {
       assert.equal(mutedLine2.linePath.attr('stroke-opacity'),0.6);
     });
     test('mutedLine2 line series has the right color', function() {
-      assert.equal(mutedLine2.linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
+      assert.equal(mutedLine2.linePath.attr('stroke').split(' ').join(''),colorSet[1]);
     });
 
   }); //suite
@@ -353,8 +353,8 @@ function runTests(){
         missingDataPointLine1 = document.getElementById('missingDataPointLine1'),
         missingDataPointLine2 = document.getElementById('missingDataPointLine2');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath1,linePath2;
 
     suiteSetup(function(done){
@@ -466,8 +466,8 @@ function runTests(){
         missingDataPointLine1Null = document.getElementById('missingDataPointLine1Null'),
         missingDataPointLine2Null = document.getElementById('missingDataPointLine2Null');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath1,linePath2;
 
     suiteSetup(function(done){
@@ -580,8 +580,8 @@ function runTests(){
         missingDataPointLine1Gap = document.getElementById('missingDataPointLine1Gap'),
         missingDataPointLine2Gap = document.getElementById('missingDataPointLine2Gap');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath1,linePath2;
 
     suiteSetup(function(done){
@@ -692,8 +692,8 @@ function runTests(){
         parallelSVG = document.getElementById('parallelSVG'),
         parallelLine = document.getElementById('parallelLine');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -790,7 +790,7 @@ function runTests(){
     });
 
     test('baseLine line series has the right color', function() {
-      assert.equal(d3.select(linePath.nodes()[0]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+      assert.equal(d3.select(linePath.nodes()[0]).attr('stroke').split(' ').join(''),colorSet[0]);
     });
 
     test('baseLine line d', function() {
@@ -817,8 +817,8 @@ function runTests(){
         parallelGradientSVG = document.getElementById('parallelGradientSVG'),
         parallelGradientLine = document.getElementById('parallelGradientLine');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -914,11 +914,11 @@ function runTests(){
     });
 
     test('baseLine line series has the right color', function() {
-      assert.equal(d3.select(linePath.nodes()[0]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
-      assert.equal(d3.select(linePath.nodes()[1]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
-      assert.equal(d3.select(linePath.nodes()[2]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
-      assert.equal(d3.select(linePath.nodes()[3]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
-      assert.equal(d3.select(linePath.nodes()[4]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+      assert.equal(d3.select(linePath.nodes()[0]).attr('stroke').split(' ').join(''),colorSet[0]);
+      assert.equal(d3.select(linePath.nodes()[1]).attr('stroke').split(' ').join(''),colorSet[0]);
+      assert.equal(d3.select(linePath.nodes()[2]).attr('stroke').split(' ').join(''),colorSet[0]);
+      assert.equal(d3.select(linePath.nodes()[3]).attr('stroke').split(' ').join(''),colorSet[0]);
+      assert.equal(d3.select(linePath.nodes()[4]).attr('stroke').split(' ').join(''),colorSet[0]);
     });
 
     test('baseLine line series has the right opacity', function() {
@@ -953,8 +953,8 @@ function runTests(){
         parallelCategorySVG = document.getElementById('parallelCategorySVG'),
         parallelCategoryLine = document.getElementById('parallelCategoryLine');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1072,11 +1072,11 @@ function runTests(){
     });
 
     test('baseLine line series has the right color', function() {
-      assert.equal(d3.select(linePath.nodes()[0]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
-      assert.equal(d3.select(linePath.nodes()[1]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
-      assert.equal(d3.select(linePath.nodes()[2]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
-      assert.equal(d3.select(linePath.nodes()[3]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
-      assert.equal(d3.select(linePath.nodes()[4]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
+      assert.equal(d3.select(linePath.nodes()[0]).attr('stroke').split(' ').join(''),colorSet[0]);
+      assert.equal(d3.select(linePath.nodes()[1]).attr('stroke').split(' ').join(''),colorSet[0]);
+      assert.equal(d3.select(linePath.nodes()[2]).attr('stroke').split(' ').join(''),colorSet[1]);
+      assert.equal(d3.select(linePath.nodes()[3]).attr('stroke').split(' ').join(''),colorSet[0]);
+      assert.equal(d3.select(linePath.nodes()[4]).attr('stroke').split(' ').join(''),colorSet[1]);
     });
 
     test('baseLine line d', function() {
@@ -1103,8 +1103,8 @@ function runTests(){
         parallelCategoryGradientSVG = document.getElementById('parallelCategoryGradientSVG'),
         parallelCategoryGradientLine = document.getElementById('parallelCategoryGradientLine');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1223,11 +1223,11 @@ function runTests(){
     });
 
     test('baseLine line series has the right color', function() {
-      assert.equal(d3.select(linePath.nodes()[0]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
-      assert.equal(d3.select(linePath.nodes()[1]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
-      assert.equal(d3.select(linePath.nodes()[2]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
-      assert.equal(d3.select(linePath.nodes()[3]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
-      assert.equal(d3.select(linePath.nodes()[4]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
+      assert.equal(d3.select(linePath.nodes()[0]).attr('stroke').split(' ').join(''),colorSet[0]);
+      assert.equal(d3.select(linePath.nodes()[1]).attr('stroke').split(' ').join(''),colorSet[0]);
+      assert.equal(d3.select(linePath.nodes()[2]).attr('stroke').split(' ').join(''),colorSet[1]);
+      assert.equal(d3.select(linePath.nodes()[3]).attr('stroke').split(' ').join(''),colorSet[0]);
+      assert.equal(d3.select(linePath.nodes()[4]).attr('stroke').split(' ').join(''),colorSet[1]);
     });
 
     test('baseLine line series has the right opacity', function() {
@@ -1262,8 +1262,8 @@ function runTests(){
         parallelCategoryGradientSVG = document.getElementById('parallelCategoryGradientSVG'),
         parallelCategoryGradientLine = document.getElementById('parallelCategoryGradientLine');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1283,11 +1283,11 @@ function runTests(){
     });
 
     test('baseLine line series has the right color', function() {
-      assert.equal(d3.select(linePath.nodes()[0]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
-      assert.equal(d3.select(linePath.nodes()[1]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
-      assert.equal(d3.select(linePath.nodes()[2]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
-      assert.equal(d3.select(linePath.nodes()[3]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
-      assert.equal(d3.select(linePath.nodes()[4]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
+      assert.equal(d3.select(linePath.nodes()[0]).attr('stroke').split(' ').join(''),colorSet[0]);
+      assert.equal(d3.select(linePath.nodes()[1]).attr('stroke').split(' ').join(''),colorSet[0]);
+      assert.equal(d3.select(linePath.nodes()[2]).attr('stroke').split(' ').join(''),colorSet[1]);
+      assert.equal(d3.select(linePath.nodes()[3]).attr('stroke').split(' ').join(''),colorSet[0]);
+      assert.equal(d3.select(linePath.nodes()[4]).attr('stroke').split(' ').join(''),colorSet[1]);
     });
 
     test('baseLine line series has the right opacity', function() {
@@ -1310,8 +1310,8 @@ function runTests(){
         parallelCategoryGradientSVG = document.getElementById('parallelCategoryGradientSVG'),
         parallelCategoryGradientLine = document.getElementById('parallelCategoryGradientLine');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1328,11 +1328,11 @@ function runTests(){
     });
 
     test('baseLine line series has the right color', function() {
-      assert.equal(d3.select(linePath.nodes()[0]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
-      assert.equal(d3.select(linePath.nodes()[1]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
-      assert.equal(d3.select(linePath.nodes()[2]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
-      assert.equal(d3.select(linePath.nodes()[3]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
-      assert.equal(d3.select(linePath.nodes()[4]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
+      assert.equal(d3.select(linePath.nodes()[0]).attr('stroke').split(' ').join(''),colorSet[0]);
+      assert.equal(d3.select(linePath.nodes()[1]).attr('stroke').split(' ').join(''),colorSet[0]);
+      assert.equal(d3.select(linePath.nodes()[2]).attr('stroke').split(' ').join(''),colorSet[1]);
+      assert.equal(d3.select(linePath.nodes()[3]).attr('stroke').split(' ').join(''),colorSet[0]);
+      assert.equal(d3.select(linePath.nodes()[4]).attr('stroke').split(' ').join(''),colorSet[1]);
     });
 
     test('baseLine line series has the right opacity', function() {
@@ -1357,8 +1357,8 @@ function runTests(){
         polarSVG = document.getElementById('polarSVG'),
         polarLine = document.getElementById('polarLine');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1441,7 +1441,7 @@ function runTests(){
     });
 
     test('polarLine line series has the right color', function() {
-      assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+      assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[0]);
     });
 
     test('polarLine line d', function() {
@@ -1478,8 +1478,8 @@ function runTests(){
         polarDegreeSVG = document.getElementById('polarDegreeSVG'),
         polarDegreeLine = document.getElementById('polarDegreeLine');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1563,7 +1563,7 @@ function runTests(){
     });
 
     test('polarDegreeLine line series has the right color', function() {
-      assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+      assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[0]);
     });
 
     test('polarDegreeLine line d', function() {
@@ -1599,8 +1599,8 @@ function runTests(){
         polarCCWSVG = document.getElementById('polarCCWSVG'),
         polarCCWLine = document.getElementById('polarCCWLine');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1683,7 +1683,7 @@ function runTests(){
     });
 
     test('polarCCWLine line series has the right color', function() {
-      assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+      assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[0]);
     });
 
     test('polarCCWLine line d', function() {
@@ -1720,8 +1720,8 @@ function runTests(){
         polarDegreeCCWSVG = document.getElementById('polarDegreeCCWSVG'),
         polarDegreeCCWLine = document.getElementById('polarDegreeCCWLine');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1805,7 +1805,7 @@ function runTests(){
     });
 
     test('polarDegreeCCWLine line series has the right color', function() {
-      assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+      assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[0]);
     });
 
     test('polarDegreeCCWLine line d', function() {
@@ -1841,8 +1841,8 @@ function runTests(){
         polarMissingSVG = document.getElementById('polarMissingSVG'),
         polarMissingLine = document.getElementById('polarMissingLine');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1924,7 +1924,7 @@ function runTests(){
     });
 
     test('polarMissingLine line series has the right color', function() {
-      assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+      assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[0]);
     });
 
     test('polarMissingLine line d', function() {
@@ -1955,8 +1955,8 @@ function runTests(){
         radarSVG = document.getElementById('radarSVG'),
         radarLine = document.getElementById('radarLine');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -2056,7 +2056,7 @@ function runTests(){
     });
 
     test('radarLine line series has the right color', function() {
-      assert.equal(d3.select(linePath.nodes()[0]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+      assert.equal(d3.select(linePath.nodes()[0]).attr('stroke').split(' ').join(''),colorSet[0]);
     });
 
     test('radarLine line d', function() {
@@ -2200,8 +2200,8 @@ function runTests(){
         radarMissingSVG = document.getElementById('radarMissingSVG'),
         radarMissingLine = document.getElementById('radarMissingLine');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -2299,7 +2299,7 @@ function runTests(){
     });
 
     test('radarMissingLine line series has the right color', function() {
-      assert.equal(d3.select(linePath.nodes()[0]).attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+      assert.equal(d3.select(linePath.nodes()[0]).attr('stroke').split(' ').join(''),colorSet[0]);
     });
 
     test('radarMissingLine full lines d', function() {
@@ -2391,8 +2391,8 @@ function runTests(){
         interpolationLine2 = document.getElementById('interpolationLine2'),
         interpolationLine3 = document.getElementById('interpolationLine3');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath1,linePath2,linePath3;
 
     suiteSetup(function(done) {
@@ -2505,7 +2505,7 @@ function runTests(){
       assert.equal(linePath1.attr('stroke-opacity'),1);
     });
     test('interpolationLine1 line series has the right color', function() {
-      assert.equal(linePath1.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+      assert.equal(linePath1.attr('stroke').split(' ').join(''),colorSet[0]);
     });
     test('interpolationLine1 line d', function() {
 
@@ -2522,7 +2522,7 @@ function runTests(){
       assert.equal(linePath2.attr('stroke-opacity'),1);
     });
     test('interpolationLine2 line series has the right color', function() {
-      assert.equal(linePath2.attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
+      assert.equal(linePath2.attr('stroke').split(' ').join(''),colorSet[1]);
     });
     test('interpolationLine2 line d', function() {
       var re =  new RegExp ([
@@ -2575,8 +2575,8 @@ function runTests(){
           domRepeatSVG = document.getElementById('domRepeatSVG'),
           domRepeatDomBind = document.getElementById('domRepeatDomBind');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
       var domRepeatLines, linePath1;
 
       suiteSetup(function(done){
@@ -2603,7 +2603,7 @@ function runTests(){
               "name":"mySeries",
               "x":"x",
               "y":"y",
-              "color": colorSet[colorOrder[0]]
+              "color": colorSet[0]
             }
           },
           seriesKeys = ['mySeries'],
@@ -2664,7 +2664,7 @@ function runTests(){
         assert.equal(linePath1.attr('stroke-opacity'),1);
       });
       test('domRepeatLine1 line series has the right color', function() {
-        assert.equal(linePath1.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+        assert.equal(linePath1.attr('stroke').split(' ').join(''),colorSet[0]);
       });
       test('domRepeatLine1 line d', function() {
         assert.equal(linePath1.attr('d').split(/[\s,]+/).join(''),'M0260L120210L240170L360230L480210');
@@ -2676,8 +2676,8 @@ function runTests(){
           domRepeatSVG = document.getElementById('domRepeatSVG'),
           domRepeatDomBind = document.getElementById('domRepeatDomBind');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
       var domRepeatLines, linePath1, linePath2, linePath3;
 
       suiteSetup(function(done){
@@ -2714,21 +2714,21 @@ function runTests(){
               "name":"mySeries",
               "x":"x",
               "y":"y",
-              "color": colorSet[ colorOrder[0] ]
+              "color": colorSet[0]
             },
             "mySeries2":{
               "type":"line",
               "name":"mySeries2",
               "x":"x",
               "y":"y2",
-              "color": colorSet[ colorOrder[1] ]
+              "color": colorSet[1]
             },
             "mySeries3":{
               "type":"line",
               "name":"mySeries3",
               "x":"x",
               "y":"y3",
-              "color": colorSet[ colorOrder[2] ]
+              "color": colorSet[2]
             }
           },
           seriesKeys = ['mySeries', 'mySeries2', 'mySeries3'],
@@ -2788,7 +2788,7 @@ function runTests(){
         assert.equal(linePath1.attr('stroke-opacity'),1);
       });
       test('domRepeatLine1 line series has the right color', function() {
-        assert.equal(linePath1.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+        assert.equal(linePath1.attr('stroke').split(' ').join(''),colorSet[0]);
       });
       test('domRepeatLine1 line d', function() {
         assert.equal(linePath1.attr('d').split(/[\s,]+/).join(''),'M0260L120210L240170L360230L480210');
@@ -2804,7 +2804,7 @@ function runTests(){
         assert.equal(linePath2.attr('stroke-opacity'),1);
       });
       test('domRepeatLine2 line series has the right color', function() {
-        assert.equal(linePath2.attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
+        assert.equal(linePath2.attr('stroke').split(' ').join(''),colorSet[1]);
       });
       test('domRepeatLine2 line d', function() {
         assert.equal(linePath2.attr('d').split(/[\s,]+/).join(''),'M0260L12060L240240L360170L4800');
@@ -2820,7 +2820,7 @@ function runTests(){
         assert.equal(linePath3.attr('stroke-opacity'),1);
       });
       test('domRepeatLine3 line series has the right color', function() {
-        assert.equal(linePath3.attr('stroke').split(' ').join(''),colorSet[ colorOrder[2] ]);
+        assert.equal(linePath3.attr('stroke').split(' ').join(''),colorSet[2]);
       });
       test('domRepeatLine3 line d', function() {
         assert.equal(linePath3.attr('d').split(/[\s,]+/).join(''),'M0260L120190L240170L360120L48070');
@@ -2832,8 +2832,8 @@ function runTests(){
           domRepeatSVG = document.getElementById('domRepeatSVG'),
           domRepeatDomBind = document.getElementById('domRepeatDomBind');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
       var domRepeatLines, linePath1, linePath2, linePath3;
 
       suiteSetup(function(done){
@@ -2865,14 +2865,14 @@ function runTests(){
               "name":"mySeries",
               "x":"x",
               "y":"y",
-              "color": colorSet[ colorOrder[0] ]
+              "color": colorSet[0]
             },
             "mySeries3":{
               "type":"line",
               "name":"mySeries3",
               "x":"x",
               "y":"y3",
-              "color": colorSet[ colorOrder[2] ]
+              "color": colorSet[2]
             }
           },
           seriesKeys = ['mySeries', 'mySeries3'],
@@ -2934,7 +2934,7 @@ function runTests(){
         assert.equal(linePath1.attr('stroke-opacity'),1);
       });
       test('domRepeatLine1 line series has the right color', function() {
-        assert.equal(linePath1.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+        assert.equal(linePath1.attr('stroke').split(' ').join(''),colorSet[0]);
       });
       test('domRepeatLine1 line d', function() {
         assert.equal(linePath1.attr('d').split(/[\s,]+/).join(''),'M0260L120210L240170L360230L480210');
@@ -2950,7 +2950,7 @@ function runTests(){
         assert.equal(linePath3.attr('stroke-opacity'),1);
       });
       test('domRepeatLine3 line series has the right color', function() {
-        assert.equal(linePath3.attr('stroke').split(' ').join(''),colorSet[ colorOrder[2] ]);
+        assert.equal(linePath3.attr('stroke').split(' ').join(''),colorSet[2]);
       });
       test('domRepeatLine3 line d', function() {
         assert.equal(linePath3.attr('d').split(/[\s,]+/).join(''),'M0260L120190L240170L360120L48070');
@@ -2962,8 +2962,8 @@ function runTests(){
           domRepeatSVG = document.getElementById('domRepeatSVG'),
           domRepeatDomBind = document.getElementById('domRepeatDomBind');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
       var domRepeatLines, linePath1, linePath4, linePath3;
 
       suiteSetup(function(done){
@@ -3000,21 +3000,21 @@ function runTests(){
               "name":"mySeries",
               "x":"x",
               "y":"y",
-              "color": colorSet[ colorOrder[0] ]
+              "color": colorSet[0]
             },
             "mySeries3":{
               "type":"line",
               "name":"mySeries3",
               "x":"x",
               "y":"y3",
-              "color": colorSet[ colorOrder[2] ]
+              "color": colorSet[2]
             },
             "mySeries4":{
               "type":"line",
               "name":"mySeries4",
               "x":"x",
               "y":"y4",
-              "color": colorSet[ colorOrder[3] ]
+              "color": colorSet[3]
             }
           },
           seriesKeys = ['mySeries', 'mySeries4', 'mySeries3'],
@@ -3074,7 +3074,7 @@ function runTests(){
         assert.equal(linePath1.attr('stroke-opacity'),1);
       });
       test('domRepeatLine1 line series has the right color', function() {
-        assert.equal(linePath1.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+        assert.equal(linePath1.attr('stroke').split(' ').join(''),colorSet[[0]);
       });
       test('domRepeatLine1 line d', function() {
         assert.equal(linePath1.attr('d').split(/[\s,]+/).join(''),'M0260L120210L240170L360230L480210');
@@ -3090,7 +3090,7 @@ function runTests(){
         assert.equal(linePath4.attr('stroke-opacity'),1);
       });
       test('domRepeatLine4 line series has the right color', function() {
-        assert.equal(linePath4.attr('stroke').split(' ').join(''),colorSet[ colorOrder[3] ]);
+        assert.equal(linePath4.attr('stroke').split(' ').join(''),colorSet[[3]);
       });
       test('domRepeatLine4 line d', function() {
         assert.equal(linePath4.attr('d').split(/[\s,]+/).join(''),'M0260L120240L240210L360180L480150');
@@ -3106,7 +3106,7 @@ function runTests(){
         assert.equal(linePath3.attr('stroke-opacity'),1);
       });
       test('domRepeatLine3 line series has the right color', function() {
-        assert.equal(linePath3.attr('stroke').split(' ').join(''),colorSet[ colorOrder[2] ]);
+        assert.equal(linePath3.attr('stroke').split(' ').join(''),colorSet[[2]);
       });
       test('domRepeatLine3 line d', function() {
         assert.equal(linePath3.attr('d').split(/[\s,]+/).join(''),'M0260L120190L240170L360120L48070');
@@ -3118,8 +3118,8 @@ function runTests(){
           domRepeatSVG = document.getElementById('domRepeatSVG'),
           domRepeatDomBind = document.getElementById('domRepeatDomBind');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
       var domRepeatLines;
 
       suiteSetup(function(done){

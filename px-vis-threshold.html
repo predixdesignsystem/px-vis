@@ -78,7 +78,7 @@ Custom property | Description | Default
        */
       _defaultDefaultColor: {
         type: String,
-        value:'grey8'
+        value:'rgb(0,0,0)'
       },
       /**
        * Default color of the threshold.
@@ -86,7 +86,7 @@ Custom property | Description | Default
        */
       defaultColor: {
         type: String,
-        value:'grey8'
+        value:'rgb(0,0,0)'
       },
       /**
        * Holder object for the event svg "g" element
@@ -169,7 +169,7 @@ Custom property | Description | Default
     _calcThemeOrConfig: function() {
       // if we have defaultColor has not changed, check theme
       if(this.defaultColor === this._defaultDefaultColor) {
-        this.defaultColor = this._checkThemeVariable("--px-vis-threshold-color", this.colors[this._defaultDefaultColor]);
+        this.defaultColor = this._checkThemeVariable("--px-vis-threshold-color", this._defaultDefaultColor);
       }
 
       this.set('_animationFrameDone', true);
@@ -285,8 +285,8 @@ Custom property | Description | Default
       Px.d3.select(elem).append("text")
         .attr("class", "threshold-text")
         .attr('font-size', '12px')
-        .style('font-family',this._checkThemeVariable("--px-font-family", 'GE Inspira Sans'))
-        .attr('font-style', this._checkThemeVariable("--px-font-family", 'GE Inspira Sans'))
+        .style('font-family',this._checkThemeVariable("--px-font-family", 'inherit'))
+        .attr('font-style', this._checkThemeVariable("--px-font-family", 'inherit'))
         .attr('x', 8);
     },
 

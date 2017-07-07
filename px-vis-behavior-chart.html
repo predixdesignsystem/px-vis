@@ -153,7 +153,7 @@ PxVisBehaviorChart.chartCommon = [{
     },
 
     observers: [
-      '_setCompleteSeriesConfig(_defaultSeriesConfig.*,chartData.*,seriesConfig.*,dataVisColors.*,seriesColorOrder.*)'
+      '_setCompleteSeriesConfig(_defaultSeriesConfig.*,chartData.*,seriesConfig.*,seriesColorList.*)'
     ],
 
     /**
@@ -175,7 +175,7 @@ PxVisBehaviorChart.chartCommon = [{
     *
     */
     _setCompleteSeriesConfig: function() {
-      if(this._doesObjHaveValues(this._defaultSeriesConfig) && this._doesObjHaveValues(this.chartData) && this._doesObjHaveValues(this.dataVisColors) && this.dataVisColors['pxVisSeriesColor0']) {
+      if(this._doesObjHaveValues(this._defaultSeriesConfig) && this._doesObjHaveValues(this.chartData) && this._doesObjHaveValues(this.seriesColorList)) {
         // FUTURE TODO refactor: use MAPs and SETs instead of Objects when IE has support / is no longer supported by us
         // We could use d3 sets and maps... worth it?
         var fullConfig = (this.seriesConfig) ? this.clone(this.seriesConfig) : {},
@@ -650,7 +650,7 @@ PxVisBehaviorChart.saveImage = [{
 
           context.fillStyle = this.completeSeriesConfig[keys[i]].color;
           context.fillRect(curX,curY,strokeWidth, lineLength);
-          context.fillStyle = this._checkThemeVariable("--px-vis-register-data-value", this.colors["black"]);
+          context.fillStyle = this._checkThemeVariable("--px-vis-register-data-value", 'rgb(0,0,0)');
           context.fillText(this.completeSeriesConfig[keys[i]].name, curX + strokeWidth + 5, curY + 10);
           curTextWidth = context.measureText(this.completeSeriesConfig[keys[i]].name).width;
           maxWidth = Math.max(maxWidth, curTextWidth);

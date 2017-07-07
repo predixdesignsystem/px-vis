@@ -4,6 +4,7 @@
 <link rel="import" href="../px-vis-cursor-line.html">
 <link rel="import" href="../px-vis-line-svg.html">
 <link rel="import" href="../px-vis-svg.html">
+<link rel="import" href="../bower_components/px-colors-design/colors.html" />
 
 <dom-module id="px-vis-cursor-line-demo-component">
   <template>
@@ -88,6 +89,7 @@
 <script>
 Polymer({
   is: 'px-vis-cursor-line-demo-component',
+  behaviors: [PxVisBehavior.getSeriesColors,PxColorsBehavior.dataVisColorTheming],
   properties: {
     description: {
       type: String,
@@ -124,24 +126,6 @@ Polymer({
       type: Array
     },
     completeSeriesConfig: {
-      value: {
-          "x":{
-            "type":"line",
-            "name":"mySeries",
-            "x":['y','y1','y2'],
-            "y":['y','y1','y2'],
-            "color": "rgb(93,165,218)"
-          },
-          "y": {
-            "title": " "
-          },
-          "y1": {
-            "title": " "
-          },
-          "y2": {
-            "title": " "
-          }
-        },
       type: Object
     },
     dimensions: {
@@ -188,6 +172,7 @@ Polymer({
   listeners:{
     'px-vis-axis-interaction-space-tooltip-data': 'setTooltipData',
     'px-vis-axis-interaction-space-reset-tooltip': 'hideTooltip',
+    'px-data-vis-colors-applied': '_genCSC'
   },
 
   observers: [
@@ -215,6 +200,27 @@ Polymer({
   },
   hideTooltip: function(evt) {
     this.set('tooltipData', {dataset: null});
+  },
+
+  _genCSC: function() {
+    this.set('completeSeriesConfig', {
+          "x":{
+            "type":"line",
+            "name":"mySeries",
+            "x":['y','y1','y2'],
+            "y":['y','y1','y2'],
+            "color": this._getColor(0)
+          },
+          "y": {
+            "title": " "
+          },
+          "y1": {
+            "title": " "
+          },
+          "y2": {
+            "title": " "
+          }
+        })
   }
 });
 </script>

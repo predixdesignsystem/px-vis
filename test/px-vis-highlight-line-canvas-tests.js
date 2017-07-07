@@ -8,9 +8,8 @@ function runTests() {
         parallelSVG = document.getElementById('parallelSVG'),
         parallelhighlight = document.getElementById('parallelhighlight');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
+
 
     suiteSetup(function(done) {
       var d = [{
@@ -51,21 +50,21 @@ function runTests() {
             "name":"mySeries",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[0]]
+            "color": colorSet[0]
           },
           "a":{
             "type":"line",
             "name":"a",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[0]]
+            "color": colorSet[0]
           },
           "b":{
             "type":"line",
             "name":"b",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[1]]
+            "color": colorSet[1]
           }
         },
         dim = ['y','y2', 'y3'],
@@ -139,10 +138,6 @@ function runTests() {
         parallelSVG = document.getElementById('parallelSVG'),
         parallelhighlight = document.getElementById('parallelhighlight');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
-
     suiteSetup(function(done){
       var d = {
             "rawData":[{
@@ -180,10 +175,6 @@ function runTests() {
         parallelSVG = document.getElementById('parallelSVG'),
         parallelhighlight = document.getElementById('parallelhighlight');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
-
     suiteSetup(function(done){
       var d = {
             "rawData":[],
@@ -217,9 +208,7 @@ function runTests() {
         radarSVG = document.getElementById('radarSVG'),
         radarhighlight = document.getElementById('radarhighlight');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done) {
       var d = [{
@@ -260,21 +249,21 @@ function runTests() {
             "name":"mySeries",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[0]]
+            "color": colorSet[0]
           },
           "a":{
             "type":"line",
             "name":"a",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[0]]
+            "color": colorSet[0]
           },
           "b":{
             "type":"line",
             "name":"b",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[1]]
+            "color": colorSet[1]
           }
         },
         dim = ['y','y2', 'y3'],
@@ -345,10 +334,6 @@ function runTests() {
         radarSVG = document.getElementById('radarSVG'),
         radarhighlight = document.getElementById('radarhighlight');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
-
     suiteSetup(function(done){
       var d = {
         "rawData":[{
@@ -386,10 +371,6 @@ function runTests() {
         radarSVG = document.getElementById('radarSVG'),
         radarhighlight = document.getElementById('radarhighlight');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
-
     suiteSetup(function(done){
       var d = {
             "rawData":[],
@@ -423,9 +404,8 @@ function runTests() {
         differentSVG = document.getElementById('differentSVG'),
         differenthighlight = document.getElementById('differenthighlight');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
+
 
     suiteSetup(function(done) {
       var d = [{
@@ -466,21 +446,21 @@ function runTests() {
             "name":"mySeries",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[0]]
+            "color": colorSet[0]
           },
           "a":{
             "type":"line",
             "name":"a",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[0]]
+            "color": colorSet[0]
           },
           "b":{
             "type":"line",
             "name":"b",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[1]]
+            "color": colorSet[1]
           }
         },
         dim = ['y','y2', 'y3'],
@@ -552,10 +532,6 @@ function runTests() {
         differentSVG = document.getElementById('differentSVG'),
         differenthighlight = document.getElementById('differenthighlight');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
-
     suiteSetup(function(done){
       var d = {
             "rawData":[{
@@ -593,10 +569,6 @@ function runTests() {
         differentSVG = document.getElementById('differentSVG'),
         differenthighlight = document.getElementById('differenthighlight');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
-
     suiteSetup(function(done){
       var d = {
             "rawData":[],
@@ -628,9 +600,8 @@ function runTests() {
         fuzzSVG = document.getElementById('fuzzSVG'),
         fuzzhighlight = document.getElementById('fuzzhighlight');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
+
 
     suiteSetup(function(done) {
       var d = [{
@@ -671,21 +642,21 @@ function runTests() {
             "name":"mySeries",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[0]]
+            "color": colorSet[0]
           },
           "a":{
             "type":"line",
             "name":"a",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[0]]
+            "color": colorSet[0]
           },
           "b":{
             "type":"line",
             "name":"b",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[1]]
+            "color": colorSet[1]
           }
         },
         dim = ['y','y2', 'y3'],
@@ -757,10 +728,6 @@ function runTests() {
         fuzzSVG = document.getElementById('fuzzSVG'),
         fuzzhighlight = document.getElementById('fuzzhighlight');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
-
     suiteSetup(function(done){
       var d = {
             "rawData":[{
@@ -810,10 +777,6 @@ function runTests() {
         fuzzSVG = document.getElementById('fuzzSVG'),
         fuzzhighlight = document.getElementById('fuzzhighlight');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
-
     suiteSetup(function(done){
       var d = {
             "rawData":[],
@@ -847,9 +810,8 @@ function runTests() {
         generatingSVG = document.getElementById('generatingSVG'),
         generatinghighlight = document.getElementById('generatinghighlight');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
+
 
     suiteSetup(function(done) {
       var d = [{
@@ -890,21 +852,21 @@ function runTests() {
             "name":"mySeries",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[0]]
+            "color": colorSet[0]
           },
           "a":{
             "type":"line",
             "name":"a",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[0]]
+            "color": colorSet[0]
           },
           "b":{
             "type":"line",
             "name":"b",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[1]]
+            "color": colorSet[1]
           }
         },
         dim = ['y','y2', 'y3'],
@@ -974,9 +936,6 @@ function runTests() {
         generatingSVG = document.getElementById('generatingSVG'),
         generatinghighlight = document.getElementById('generatinghighlight');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
 
     suiteSetup(function(done){
       var d = {
@@ -1010,10 +969,6 @@ function runTests() {
     var generatingScale = document.getElementById('generatingScale'),
         generatingSVG = document.getElementById('generatingSVG'),
         generatinghighlight = document.getElementById('generatinghighlight');
-
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
 
     suiteSetup(function(done){
       var d = {
@@ -1052,9 +1007,8 @@ function runTests() {
         forceSVG = document.getElementById('forceSVG'),
         forcehighlight = document.getElementById('forcehighlight');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
+
 
     suiteSetup(function(done) {
       var d = [{
@@ -1095,21 +1049,21 @@ function runTests() {
             "name":"mySeries",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[0]]
+            "color": colorSet[0]
           },
           "a":{
             "type":"line",
             "name":"a",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[0]]
+            "color": colorSet[0]
           },
           "b":{
             "type":"line",
             "name":"b",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[1]]
+            "color": colorSet[1]
           }
         },
         dim = ['y','y2', 'y3'],
@@ -1181,10 +1135,6 @@ function runTests() {
         forceSVG = document.getElementById('forceSVG'),
         forcehighlight = document.getElementById('forcehighlight');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
-
     suiteSetup(function(done){
       var d = {
             "rawData":[{
@@ -1223,10 +1173,6 @@ function runTests() {
         forceSVG = document.getElementById('forceSVG'),
         forcehighlight = document.getElementById('forcehighlight');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
-
     suiteSetup(function(done){
       var d = {
             "rawData":[],
@@ -1264,9 +1210,8 @@ function runTests() {
         tooltipSVG = document.getElementById('tooltipSVG'),
         tooltiphighlight = document.getElementById('tooltiphighlight');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
+
 
     suiteSetup(function(done) {
       var d = [{
@@ -1307,21 +1252,21 @@ function runTests() {
             "name":"mySeries",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[0]]
+            "color": colorSet[0]
           },
           "a":{
             "type":"line",
             "name":"a",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[0]]
+            "color": colorSet[0]
           },
           "b":{
             "type":"line",
             "name":"b",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[1]]
+            "color": colorSet[1]
           }
         },
         dim = ['y','y2', 'y3'],
@@ -1382,9 +1327,8 @@ function runTests() {
         tooltipSVG = document.getElementById('tooltipSVG'),
         tooltiphighlight = document.getElementById('tooltiphighlight');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
+
 
     suiteSetup(function(done){
       var d = {
@@ -1421,8 +1365,8 @@ function runTests() {
       assert.equal(tooltiphighlight.defaultEmptyData.time, 1397160780000);
       assert.deepEqual(tooltiphighlight.defaultEmptyData.dataset, {"x":1397160780000,"y":10,"y2":3,"y3":8,"cat":"b"});
       assert.deepEqual(tooltiphighlight.defaultEmptyData.series, [{"name":"y","value":{"y":10,"y2":3,"y3":8}},{"name":"y2","value":{"y":10,"y2":3,"y3":8}},{"name":"y3","value":{"y":10,"y2":3,"y3":8}}]);
-      assert.equal(tooltiphighlight.defaultEmptyData.color.split(" ").join(""), "rgb(93,165,218)");
-      assert.deepEqual(tooltiphighlight.defaultEmptyData.tooltipConfig, {"y":{"color":"rgb(93,165,218)","name":"y","yAxisUnit":"","y":"y"},"y2":{"color":"rgb(93,165,218)","name":"y2","yAxisUnit":"","y":"y2"},"y3":{"color":"rgb(93,165,218)","name":"y3","yAxisUnit":"","y":"y3"}});
+      assert.equal(tooltiphighlight.defaultEmptyData.color.split(" ").join(""), colorSet[0].split(" ").join(""));
+      assert.deepEqual(tooltiphighlight.defaultEmptyData.tooltipConfig, {"y":{"color":colorSet[0].split(" ").join(""),"name":"y","yAxisUnit":"","y":"y"},"y2":{"color":colorSet[0].split(" ").join(""),"name":"y2","yAxisUnit":"","y":"y2"},"y3":{"color":colorSet[0].split(" ").join(""),"name":"y3","yAxisUnit":"","y":"y3"}});
     });
   }); //suite
 
@@ -1430,10 +1374,6 @@ function runTests() {
     var tooltipScale = document.getElementById('tooltipScale'),
         tooltipSVG = document.getElementById('tooltipSVG'),
         tooltiphighlight = document.getElementById('tooltiphighlight');
-
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
-    var linePath;
 
     suiteSetup(function(done){
       var d = {

@@ -8,8 +8,7 @@ function runTests() {
         parallelSVG = document.getElementById('parallelSVG'),
         parallelCursor = document.getElementById('parallelCursor');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done) {
@@ -51,21 +50,21 @@ function runTests() {
             "name":"mySeries",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[0]]
+            "color": colorSet[0]
           },
           "a":{
             "type":"line",
             "name":"a",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[0]]
+            "color": colorSet[0]
           },
           "b":{
             "type":"line",
             "name":"b",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[1]]
+            "color": colorSet[1]
           }
         },
         dim = ['y','y2', 'y3'],
@@ -140,8 +139,7 @@ function runTests() {
         parallelSVG = document.getElementById('parallelSVG'),
         parallelCursor = document.getElementById('parallelCursor');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -182,7 +180,7 @@ function runTests() {
     });
 
     test('baseLine line series has the right color', function() {
-      assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[1] ]);
+      assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[1]);
     });
 
     test('baseLine line series has the right opacity', function() {
@@ -199,8 +197,7 @@ function runTests() {
         parallelSVG = document.getElementById('parallelSVG'),
         parallelCursor = document.getElementById('parallelCursor');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -244,8 +241,7 @@ function runTests() {
         parallelSVGCanvas = document.getElementById('parallelSVGCanvas'),
         parallelCursorCanvas = document.getElementById('parallelCursorCanvas');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done) {
@@ -287,21 +283,21 @@ function runTests() {
             "name":"mySeries",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[0]]
+            "color": colorSet[0]
           },
           "a":{
             "type":"line",
             "name":"a",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[0]]
+            "color": colorSet[0]
           },
           "b":{
             "type":"line",
             "name":"b",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[1]]
+            "color": colorSet[1]
           }
         },
         dim = ['y','y2', 'y3'],
@@ -366,8 +362,7 @@ function runTests() {
         parallelSVGCanvas = document.getElementById('parallelSVGCanvas'),
         parallelCursorCanvas = document.getElementById('parallelCursorCanvas');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -408,7 +403,7 @@ function runTests() {
     });
 
     test('baseLine line series has the right color', function() {
-      assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+      assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[0]);
     });
 
     test('baseLine line series has the right opacity', function() {
@@ -425,8 +420,7 @@ function runTests() {
         parallelSVGCanvas = document.getElementById('parallelSVGCanvas'),
         parallelCursorCanvas = document.getElementById('parallelCursorCanvas');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -471,8 +465,7 @@ function runTests() {
         radarSVG = document.getElementById('radarSVG'),
         radarCursor = document.getElementById('radarCursor');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done) {
@@ -514,21 +507,21 @@ function runTests() {
             "name":"mySeries",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[0]]
+            "color": colorSet[0]
           },
           "a":{
             "type":"line",
             "name":"a",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[0]]
+            "color": colorSet[0]
           },
           "b":{
             "type":"line",
             "name":"b",
             "x":['y','y2', 'y3'],
             "y":['y','y2', 'y3'],
-            "color": colorSet[colorOrder[1]]
+            "color": colorSet[1]
           }
         },
         dim = ['y','y2', 'y3'],
@@ -604,8 +597,7 @@ function runTests() {
         radarSVG = document.getElementById('radarSVG'),
         radarCursor = document.getElementById('radarCursor');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -646,7 +638,7 @@ function runTests() {
     });
 
     test('baseLine line series has the right color', function() {
-      assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[ colorOrder[0] ]);
+      assert.equal(linePath.attr('stroke').split(' ').join(''),colorSet[0]);
     });
 
     test('baseLine line series has the right opacity', function() {
@@ -678,8 +670,7 @@ function runTests() {
         radarSVG = document.getElementById('radarSVG'),
         radarCursor = document.getElementById('radarCursor');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){

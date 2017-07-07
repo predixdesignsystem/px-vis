@@ -14,8 +14,7 @@ function runTests() {
         baseSVG = document.getElementById('baseSVG'),
         baseArea = document.getElementById('baseArea');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var areaPath;
 
     suiteSetup(function(done){
@@ -96,7 +95,7 @@ function runTests() {
     });
 
     test('baseArea area series has the right color', function() {
-      assert.equal(areaPath.attr('fill').split(' ').join(''),colorSet[ colorOrder[0] ]);
+      assert.equal(areaPath.attr('fill').split(' ').join(''),colorSet[0]);
     });
 
     test('baseArea area d', function() {
@@ -109,8 +108,7 @@ function runTests() {
         multiSVG = document.getElementById('multiSVG'),
         multiArea = document.getElementById('multiArea')
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var areaPath1,areaPath2,areaPath3;
 
     suiteSetup(function(done){
@@ -161,7 +159,7 @@ function runTests() {
             "name":"mySeries3",
             "x":"x",
             "y":"y1",
-            "color": colorSet[colorOrder[2]]
+            "color": colorSet[2]
           }
         },
         chartExtents = {"x":[1397102460000,1397219100000],"y":[0,30]},
@@ -219,7 +217,7 @@ function runTests() {
       assert.equal(areaPath1.node().tagName,'path');
     });
     test('multiArea area series has the right color', function() {
-      assert.equal(areaPath1.attr('fill').split(' ').join(''),colorSet[ colorOrder[0] ]);
+      assert.equal(areaPath1.attr('fill').split(' ').join(''),colorSet[0]);
     });
     test('multiArea area d', function() {
       assert.equal(areaPath1.attr('d').split(/[\s,]+/).join(''),'M0261L120216L240180L360234L480216L480270L360270L240270L120270L0270Z');
@@ -229,7 +227,7 @@ function runTests() {
       assert.equal(areaPath2.node().tagName,'path');
     });
     test('multiArea2 area series has the right color', function() {
-      assert.equal(areaPath2.attr('fill').split(' ').join(''),colorSet[ colorOrder[1] ]);
+      assert.equal(areaPath2.attr('fill').split(' ').join(''),colorSet[1]);
     });
     test('multiArea2 area d', function() {
       assert.equal(areaPath2.attr('d').split(/[\s,]+/).join(''),'M0207L120-45L240126L36099L480-18L480207L360189L240153L120144L0216Z');
@@ -239,7 +237,7 @@ function runTests() {
       assert.equal(areaPath3.node().tagName,'path');
     });
     test('multiArea3 area series has the right color', function() {
-      assert.equal(areaPath3.attr('fill').split(' ').join(''),colorSet[ colorOrder[2] ]);
+      assert.equal(areaPath3.attr('fill').split(' ').join(''),colorSet[2]);
     });
     test('multiArea3 area d', function() {
       assert.equal(areaPath3.attr('d').split(/[\s,]+/).join(''),"M0216L120144L240153L360189L480207L480216L360234L240180L120216L0261Z"

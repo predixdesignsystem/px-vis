@@ -19,8 +19,8 @@ function runTests(){
         thresholdRects,
         thresholdTexts;
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var colors = baseColors.properties.colors.value;
 
     suiteSetup(function(done){
@@ -205,9 +205,9 @@ function runTests(){
         assert.equal(thresholdLines.nodes()[1].getAttribute('stroke').split(' ').join(''), colors["grey8"]);
         assert.equal(thresholdLines.nodes()[2].getAttribute('stroke').split(' ').join(''), colors["grey8"]);
         assert.equal(thresholdLines.nodes()[3].getAttribute('stroke').split(' ').join(''), 'red');
-        assert.equal(thresholdLines.nodes()[4].getAttribute('stroke').split(' ').join(''), colorSet[colorOrder[0]]);
-        assert.equal(thresholdLines.nodes()[5].getAttribute('stroke').split(' ').join(''), colorSet[colorOrder[0]]);
-        assert.equal(thresholdLines.nodes()[6].getAttribute('stroke').split(' ').join(''), colorSet[colorOrder[0]]);
+        assert.equal(thresholdLines.nodes()[4].getAttribute('stroke').split(' ').join(''), colorSet[0]);
+        assert.equal(thresholdLines.nodes()[5].getAttribute('stroke').split(' ').join(''), colorSet[0]);
+        assert.equal(thresholdLines.nodes()[6].getAttribute('stroke').split(' ').join(''), colorSet[0]);
       });
 
       test('defaultThreshold thresholdRect x', function() {
@@ -255,8 +255,8 @@ function runTests(){
         assert.equal(thresholdRects.nodes()[1].getAttribute('fill').split(' ').join(''), colors["grey8"]);
         assert.equal(thresholdRects.nodes()[2].getAttribute('fill').split(' ').join(''), colors["grey8"]);
         assert.equal(thresholdRects.nodes()[3].getAttribute('fill').split(' ').join(''), 'none');
-        assert.equal(thresholdRects.nodes()[4].getAttribute('fill').split(' ').join(''), colorSet[colorOrder[0]]);
-        assert.equal(thresholdRects.nodes()[5].getAttribute('fill').split(' ').join(''), colorSet[colorOrder[0]]);
+        assert.equal(thresholdRects.nodes()[4].getAttribute('fill').split(' ').join(''), colorSet[0]);
+        assert.equal(thresholdRects.nodes()[5].getAttribute('fill').split(' ').join(''), colorSet[0]);
         assert.equal(thresholdRects.nodes()[6].getAttribute('fill').split(' ').join(''), 'none');
       });
 
@@ -294,7 +294,7 @@ function runTests(){
         assert.equal(thresholdTexts.nodes()[3].getAttribute('fill').split(' ').join(''), 'red');
         assert.equal(thresholdTexts.nodes()[4].getAttribute('fill').split(' ').join(''), "white");
         assert.equal(thresholdTexts.nodes()[5].getAttribute('fill').split(' ').join(''), "white");
-        assert.equal(thresholdTexts.nodes()[6].getAttribute('fill').split(' ').join(''), colorSet[colorOrder[0]]);
+        assert.equal(thresholdTexts.nodes()[6].getAttribute('fill').split(' ').join(''), colorSet[0]);
       });
       test('defaultThreshold thresholdText text', function() {
         assert.equal(thresholdTexts.nodes()[0].textContent,'8.00');
@@ -318,8 +318,8 @@ function runTests(){
         thresholdRects,
         thresholdTexts;
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var colors = baseColors.properties.colors.value;
 
     suiteSetup(function(done) {
@@ -329,7 +329,7 @@ function runTests(){
           "name":"mySeries",
           "x":"x",
           "y":"y",
-          "color": colorSet[colorOrder[1]]
+          "color": colorSet[1]
         }};
 
       var rendered = function() {
@@ -430,9 +430,9 @@ function runTests(){
         assert.equal(thresholdLines.nodes()[1].getAttribute('stroke').split(' ').join(''), colors["grey8"]);
         assert.equal(thresholdLines.nodes()[2].getAttribute('stroke').split(' ').join(''), colors["grey8"]);
         assert.equal(thresholdLines.nodes()[3].getAttribute('stroke').split(' ').join(''), 'red');
-        assert.equal(thresholdLines.nodes()[4].getAttribute('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
-        assert.equal(thresholdLines.nodes()[5].getAttribute('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
-        assert.equal(thresholdLines.nodes()[6].getAttribute('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(thresholdLines.nodes()[4].getAttribute('stroke').split(' ').join(''), colorSet[1]);
+        assert.equal(thresholdLines.nodes()[5].getAttribute('stroke').split(' ').join(''), colorSet[1]);
+        assert.equal(thresholdLines.nodes()[6].getAttribute('stroke').split(' ').join(''), colorSet[1]);
       });
 
       test('defaultThreshold thresholdRect x', function() {
@@ -480,8 +480,8 @@ function runTests(){
         assert.equal(thresholdRects.nodes()[1].getAttribute('fill').split(' ').join(''), colors["grey8"]);
         assert.equal(thresholdRects.nodes()[2].getAttribute('fill').split(' ').join(''), colors["grey8"]);
         assert.equal(thresholdRects.nodes()[3].getAttribute('fill').split(' ').join(''), 'none');
-        assert.equal(thresholdRects.nodes()[4].getAttribute('fill').split(' ').join(''), colorSet[colorOrder[1]]);
-        assert.equal(thresholdRects.nodes()[5].getAttribute('fill').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(thresholdRects.nodes()[4].getAttribute('fill').split(' ').join(''), colorSet[1]);
+        assert.equal(thresholdRects.nodes()[5].getAttribute('fill').split(' ').join(''), colorSet[1]);
         assert.equal(thresholdRects.nodes()[6].getAttribute('fill').split(' ').join(''), 'none');
       });
 
@@ -519,7 +519,7 @@ function runTests(){
         assert.equal(thresholdTexts.nodes()[3].getAttribute('fill').split(' ').join(''), 'red');
         assert.equal(thresholdTexts.nodes()[4].getAttribute('fill').split(' ').join(''), "white");
         assert.equal(thresholdTexts.nodes()[5].getAttribute('fill').split(' ').join(''), "white");
-        assert.equal(thresholdTexts.nodes()[6].getAttribute('fill').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(thresholdTexts.nodes()[6].getAttribute('fill').split(' ').join(''), colorSet[1]);
       });
       test('defaultThreshold thresholdText text', function() {
         assert.equal(thresholdTexts.nodes()[0].textContent,'8.00');
@@ -543,8 +543,8 @@ function runTests(){
         thresholdRects,
         thresholdTexts;
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var colors = baseColors.properties.colors.value;
 
     suiteSetup(function(done){
@@ -651,9 +651,9 @@ function runTests(){
         assert.equal(thresholdLines.nodes()[6].getAttribute('y2'),220);
       });
       test('defaultThreshold thresholdLine stroke', function() {
-        assert.equal(thresholdLines.nodes()[0].getAttribute('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
-        assert.equal(thresholdLines.nodes()[1].getAttribute('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
-        assert.equal(thresholdLines.nodes()[2].getAttribute('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(thresholdLines.nodes()[0].getAttribute('stroke').split(' ').join(''), colorSet[1]);
+        assert.equal(thresholdLines.nodes()[1].getAttribute('stroke').split(' ').join(''), colorSet[1]);
+        assert.equal(thresholdLines.nodes()[2].getAttribute('stroke').split(' ').join(''), colorSet[1]);
         assert.equal(thresholdLines.nodes()[3].getAttribute('stroke').split(' ').join(''), colors["grey8"]);
         assert.equal(thresholdLines.nodes()[4].getAttribute('stroke').split(' ').join(''), colors["grey8"]);
         assert.equal(thresholdLines.nodes()[5].getAttribute('stroke').split(' ').join(''), colors["grey8"]);
@@ -701,8 +701,8 @@ function runTests(){
         assert.equal(thresholdRects.nodes()[6].getAttribute('height'),18);
       });
       test('defaultThreshold thresholdRect fill', function() {
-        assert.equal(thresholdRects.nodes()[0].getAttribute('fill').split(' ').join(''), colorSet[colorOrder[1]]);
-        assert.equal(thresholdRects.nodes()[1].getAttribute('fill').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(thresholdRects.nodes()[0].getAttribute('fill').split(' ').join(''), colorSet[1]);
+        assert.equal(thresholdRects.nodes()[1].getAttribute('fill').split(' ').join(''), colorSet[1]);
         assert.equal(thresholdRects.nodes()[2].getAttribute('fill').split(' ').join(''), 'none');
         assert.equal(thresholdRects.nodes()[3].getAttribute('fill').split(' ').join(''), colors["grey8"]);
         assert.equal(thresholdRects.nodes()[4].getAttribute('fill').split(' ').join(''), 'none');
@@ -740,7 +740,7 @@ function runTests(){
       test('defaultThreshold thresholdText color', function() {
         assert.equal(thresholdTexts.nodes()[0].getAttribute('fill').split(' ').join(''), 'white');
         assert.equal(thresholdTexts.nodes()[1].getAttribute('fill').split(' ').join(''), "white");
-        assert.equal(thresholdTexts.nodes()[2].getAttribute('fill').split(' ').join(''), colorSet[colorOrder[1]])
+        assert.equal(thresholdTexts.nodes()[2].getAttribute('fill').split(' ').join(''), colorSet[1])
         assert.equal(thresholdTexts.nodes()[3].getAttribute('fill').split(' ').join(''), 'white');
         assert.equal(thresholdTexts.nodes()[4].getAttribute('fill').split(' ').join(''), colors["grey8"]);
         assert.equal(thresholdTexts.nodes()[5].getAttribute('fill').split(' ').join(''), "white");
@@ -768,8 +768,8 @@ function runTests(){
         thresholdRects,
         thresholdTexts;
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var colors = baseColors.properties.colors.value;
 
     suiteSetup(function(done){
@@ -876,9 +876,9 @@ function runTests(){
         assert.equal(thresholdLines.nodes()[6].getAttribute('y2'),220);
       });
       test('defaultThreshold thresholdLine stroke', function() {
-        assert.equal(thresholdLines.nodes()[0].getAttribute('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
-        assert.equal(thresholdLines.nodes()[1].getAttribute('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
-        assert.equal(thresholdLines.nodes()[2].getAttribute('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(thresholdLines.nodes()[0].getAttribute('stroke').split(' ').join(''), colorSet[1]);
+        assert.equal(thresholdLines.nodes()[1].getAttribute('stroke').split(' ').join(''), colorSet[1]);
+        assert.equal(thresholdLines.nodes()[2].getAttribute('stroke').split(' ').join(''), colorSet[1]);
         assert.equal(thresholdLines.nodes()[3].getAttribute('stroke').split(' ').join(''), colors["grey8"]);
         assert.equal(thresholdLines.nodes()[4].getAttribute('stroke').split(' ').join(''), colors["grey8"]);
         assert.equal(thresholdLines.nodes()[5].getAttribute('stroke').split(' ').join(''), colors["grey8"]);
@@ -927,8 +927,8 @@ function runTests(){
       });
       test('defaultThreshold thresholdRect fill', function() {
         assert.equal(thresholdRects.nodes()[0].getAttribute('fill').split(' ').join(''), 'none');
-        assert.equal(thresholdRects.nodes()[1].getAttribute('fill').split(' ').join(''), colorSet[colorOrder[1]]);
-        assert.equal(thresholdRects.nodes()[2].getAttribute('fill').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(thresholdRects.nodes()[1].getAttribute('fill').split(' ').join(''), colorSet[1]);
+        assert.equal(thresholdRects.nodes()[2].getAttribute('fill').split(' ').join(''), colorSet[1]);
         assert.equal(thresholdRects.nodes()[3].getAttribute('fill').split(' ').join(''), colors["grey8"]);
         assert.equal(thresholdRects.nodes()[4].getAttribute('fill').split(' ').join(''), 'none');
         assert.equal(thresholdRects.nodes()[5].getAttribute('fill').split(' ').join(''), colors["grey8"]);
@@ -963,7 +963,7 @@ function runTests(){
         assert.equal(thresholdTexts.nodes()[6].getAttribute('y'),(220-17+13));
       });
       test('defaultThreshold thresholdText color', function() {
-        assert.equal(thresholdTexts.nodes()[0].getAttribute('fill').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(thresholdTexts.nodes()[0].getAttribute('fill').split(' ').join(''), colorSet[1]);
         assert.equal(thresholdTexts.nodes()[1].getAttribute('fill').split(' ').join(''), "white");
         assert.equal(thresholdTexts.nodes()[2].getAttribute('fill').split(' ').join(''), 'white')
         assert.equal(thresholdTexts.nodes()[3].getAttribute('fill').split(' ').join(''), 'white');
@@ -993,8 +993,8 @@ function runTests(){
         thresholdRects,
         thresholdTexts;
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var colors = baseColors.properties.colors.value;
     suiteSetup(function(done){
       var dT = [
@@ -1086,8 +1086,8 @@ function runTests(){
         assert.equal(thresholdLines.nodes()[4].getAttribute('y2'),220);
       });
       test('defaultThreshold thresholdLine stroke', function() {
-        assert.equal(thresholdLines.nodes()[0].getAttribute('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
-        assert.equal(thresholdLines.nodes()[1].getAttribute('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(thresholdLines.nodes()[0].getAttribute('stroke').split(' ').join(''), colorSet[1]);
+        assert.equal(thresholdLines.nodes()[1].getAttribute('stroke').split(' ').join(''), colorSet[1]);
         assert.equal(thresholdLines.nodes()[2].getAttribute('stroke').split(' ').join(''), colors["grey8"]);
         assert.equal(thresholdLines.nodes()[3].getAttribute('stroke').split(' ').join(''), colors["grey8"]);
         assert.equal(thresholdLines.nodes()[4].getAttribute('stroke').split(' ').join(''), 'red');
@@ -1125,7 +1125,7 @@ function runTests(){
       });
       test('defaultThreshold thresholdRect fill', function() {
         assert.equal(thresholdRects.nodes()[0].getAttribute('fill').split(' ').join(''), 'none');
-        assert.equal(thresholdRects.nodes()[1].getAttribute('fill').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(thresholdRects.nodes()[1].getAttribute('fill').split(' ').join(''), colorSet[1]);
         assert.equal(thresholdRects.nodes()[2].getAttribute('fill').split(' ').join(''), colors["grey8"]);
         assert.equal(thresholdRects.nodes()[3].getAttribute('fill').split(' ').join(''), 'none');
         assert.equal(thresholdRects.nodes()[4].getAttribute('fill').split(' ').join(''), 'none');
@@ -1153,7 +1153,7 @@ function runTests(){
         assert.equal(thresholdTexts.nodes()[4].getAttribute('y'),(220-17+13));
       });
       test('defaultThreshold thresholdText color', function() {
-        assert.equal(thresholdTexts.nodes()[0].getAttribute('fill').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(thresholdTexts.nodes()[0].getAttribute('fill').split(' ').join(''), colorSet[1]);
         assert.equal(thresholdTexts.nodes()[1].getAttribute('fill').split(' ').join(''), "white");
         assert.equal(thresholdTexts.nodes()[2].getAttribute('fill').split(' ').join(''), "white");
         assert.equal(thresholdTexts.nodes()[3].getAttribute('fill').split(' ').join(''), colors["grey8"]);
@@ -1179,8 +1179,8 @@ function runTests(){
         thresholdRects,
         thresholdTexts;
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var colors = baseColors.properties.colors.value;
     suiteSetup(function(done){
       var dT = [
@@ -1286,8 +1286,8 @@ function runTests(){
         assert.equal(thresholdLines.nodes()[6].getAttribute('y2'),192.5);
       });
       test('defaultThreshold thresholdLine stroke', function() {
-        assert.equal(thresholdLines.nodes()[0].getAttribute('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
-        assert.equal(thresholdLines.nodes()[1].getAttribute('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(thresholdLines.nodes()[0].getAttribute('stroke').split(' ').join(''), colorSet[1]);
+        assert.equal(thresholdLines.nodes()[1].getAttribute('stroke').split(' ').join(''), colorSet[1]);
         assert.equal(thresholdLines.nodes()[2].getAttribute('stroke').split(' ').join(''), colors["grey8"]);
         assert.equal(thresholdLines.nodes()[3].getAttribute('stroke').split(' ').join(''), colors["grey8"]);
         assert.equal(thresholdLines.nodes()[4].getAttribute('stroke').split(' ').join(''), 'red');
@@ -1335,7 +1335,7 @@ function runTests(){
       });
       test('defaultThreshold thresholdRect fill', function() {
         assert.equal(thresholdRects.nodes()[0].getAttribute('fill').split(' ').join(''), 'none');
-        assert.equal(thresholdRects.nodes()[1].getAttribute('fill').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(thresholdRects.nodes()[1].getAttribute('fill').split(' ').join(''), colorSet[1]);
         assert.equal(thresholdRects.nodes()[2].getAttribute('fill').split(' ').join(''), colors["grey8"]);
         assert.equal(thresholdRects.nodes()[3].getAttribute('fill').split(' ').join(''), 'none');
         assert.equal(thresholdRects.nodes()[4].getAttribute('fill').split(' ').join(''), 'none');
@@ -1371,7 +1371,7 @@ function runTests(){
         assert.equal(thresholdTexts.nodes()[6].getAttribute('y'),(192.5-17+13));
       });
       test('defaultThreshold thresholdText color', function() {
-        assert.equal(thresholdTexts.nodes()[0].getAttribute('fill').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(thresholdTexts.nodes()[0].getAttribute('fill').split(' ').join(''), colorSet[1]);
         assert.equal(thresholdTexts.nodes()[1].getAttribute('fill').split(' ').join(''), "white");
         assert.equal(thresholdTexts.nodes()[2].getAttribute('fill').split(' ').join(''), 'white');
         assert.equal(thresholdTexts.nodes()[3].getAttribute('fill').split(' ').join(''), colors["grey8"]);
