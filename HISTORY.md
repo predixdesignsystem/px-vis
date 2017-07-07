@@ -1,3 +1,7 @@
+v2.1.4
+==================
+* Ensure axis get redrawn when moving a chart around the dom
+
 v2.1.3
 ==================
 * Ensure striping component won't try to draw on empty data

@@ -344,6 +344,10 @@ Custom property | Description | Default
       smallerSide: {
         type: Number,
         value: 0
+      },
+      _isDirty: {
+        type: Boolean,
+        value: false
       }
     },
 
@@ -358,10 +362,19 @@ Custom property | Description | Default
       "dom-change": '_axisConfigChanged'
     },
 
+    attached: function() {
+      if(this._isDirty) {
+        this._createGroup();
+        this._isDirty = false;
+      }
+    },
+
     detached: function() {
       if(this._doesD3HaveValues(this._interactiveGroup)) {
         this._interactiveGroup.remove();
+        this._interactiveGroup = null;
       }
+      this._isDirty = true;
     },
 
     _returnDragContainer: function() {
