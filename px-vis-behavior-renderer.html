@@ -131,7 +131,7 @@ PxVisBehaviorRenderer.base = [{
      */
     _frameCountToAverage: {
       type: Number,
-      value: 10
+      value: 5
     },
     /**
      * For each renderer type the previous frames number of points and duration for line and scatter
@@ -182,6 +182,7 @@ PxVisBehaviorRenderer.base = [{
    * Creates an object with all renderer types and a default value for each
    */
   _initializeRendererTypeObject: function(initialVal) {
+    //make sure the values are not linked
     return {
       'chartData': initialVal,
       'filteredChartData': JSON.parse(JSON.stringify(initialVal)),
@@ -388,63 +389,69 @@ PxVisBehaviorRenderer.base = [{
     this._updatePreviousFrameTiming(ctx, now);
 
     if(ctx.requestCounter !== this._progressiveRenderingCounter[ctx.renderType]) {
-      //new request came in, cancel this drawing. Don't reset the counter as we want
-      //the new request to finish
+      //new request came in, cancel this drawing. Don't reset the counter as we
+      //want the new request to finish
       return;
     }
 
     ctx.currentTarget = this._getCurrentCanvasRenderingTarget(ctx);
     ctx.previousStartTime = now;
 
-    //first frame for this type, guess how much we can render
-    if(this._previousFramesTiming[ctx.renderType][ctx.currentTarget.type].length === 0) {
+    this._processCanvasOneFrame(ctx);
 
-      //do a first render and update how many points have been rendered
-      ctx.previousFrameStats.pointsCount[ctx.currentTarget.type] = this._firstCanvasRender(ctx);
-      ctx.previousFrameStats.totPoints = ctx.previousFrameStats.pointsCount[ctx.currentTarget.type];
-    } else {
-
-      //find out how many points we can render this frame
-      var toRender = this._calculatePointsAllowance(ctx),
-          previousToRender = toRender;
-      ctx.currentTarget = this._getCurrentCanvasRenderingTarget(ctx);
-    //  currType = ctx.currentTarget.type;
-
-
-      //keep rendering while we can, we might be able to do more than 1 target
-      //TODO: new target isn't of the same type! theoretically we should recalculate
-      //the toRender count if the type is different, based on a "percentage" of the frame that has
-      //already been used
-      while(toRender > 1 && ctx.currentTarget) {
-
-        toRender = this._renderTargetToCanvas(toRender, ctx);
-
-        //update how many points have been rendered for this type during this frame
-        ctx.previousFrameStats.pointsCount[ctx.currentTarget.type] = ctx.previousFrameStats.pointsCount[ctx.currentTarget.type] ? ctx.previousFrameStats.pointsCount[ctx.currentTarget.type] + previousToRender - toRender : previousToRender - toRender;
-        ctx.previousFrameStats.totPoints += previousToRender - toRender;
-
-        //get next target and keep rendering if we can
-        ctx.currentTarget = this._getCurrentCanvasRenderingTarget(ctx);
-      }
-    }
     ctx.frameIndex++;
 
     if(ctx.targetIndex > ctx.canvasTargets.length-1) {
 
-      console.log('finished rendering in ' + ctx.frameIndex + ' frames, points: ' + pointsRendered);
+      console.log('finished rendering in ' + ctx.frameIndex + ' frames');
 
       //Everything done
       this.fire('px-vis-chart-canvas-rendering-ended');
     } else {
+
       //keep rendering
-
-      //remember how many points we have rendered and update duration on next frame
-    //  this._registerCurrentTargetFrameTiming(ctx, pointsRendered, allRenderedTargetSameType);
-
-      //wrap function so that we can still pass the render type
+      //wrap function so that we can still pass the context
       window.requestAnimationFrame(function() { this._processCanvasRendering(ctx); }.bind(this));
     }
     //event?
+  },
+
+  _processCanvasOneFrame: function(ctx) {
+
+    //budget is how much we can do in our frame. keep rendering until we run
+    //out of budget or rendering target
+    var budget = 100,
+        previousRenderTargetType = null,
+        toRender,
+        totalRendered = 0,
+        drawingResult;
+// console.log('NEW FRAME')
+    while(budget > 0 && ctx.currentTarget) {
+
+      //get how many points we can render
+      if(previousRenderTargetType !== ctx.currentTarget.type) {
+        //different type of rendering, get allowance pro rated with what's left of our budget
+        toRender = this._calculatePointsAllowance(ctx);
+        previousRenderTargetType = ctx.currentTarget.type;
+      }
+
+//  console.log('NEW TARGET, torender: ' + toRender + ', budget left: ' + budget)
+      //wether we need to guess or have stats for this type of rendering
+      if(toRender === -1) {
+        drawingResult = this._firstCanvasRender(ctx);
+      } else {
+        drawingResult = this._renderTargetToCanvas(toRender, ctx, budget);
+      }
+
+      //update how many points have been rendered for this target type during this frame
+      ctx.previousFrameStats.pointsCount[ctx.currentTarget.type] = ctx.previousFrameStats.pointsCount[ctx.currentTarget.type] ? ctx.previousFrameStats.pointsCount[ctx.currentTarget.type] + drawingResult.points : drawingResult.points;
+      ctx.previousFrameStats.totPoints += drawingResult.points;
+      budget -= drawingResult.budgetUsed;
+
+      //get next target and keep rendering if we can
+      ctx.currentTarget = this._getCurrentCanvasRenderingTarget(ctx);
+    }
+     console.log('finished one frame: ' + JSON.stringify(ctx.previousFrameStats) + ' in: ' + (window.performance.now() - ctx.previousStartTime));
   },
 
   _updatePreviousFrameTiming: function(ctx, now) {
@@ -481,25 +488,25 @@ PxVisBehaviorRenderer.base = [{
     ctx.previousFrameStats.totPoints = 0;
   },
 
-  _registerCurrentTargetFrameTiming: function(ctx, pointsRendered, renderedAllSameType) {
+  // _registerCurrentTargetFrameTiming: function(ctx, pointsRendered, renderedAllSameType) {
 
-    if(renderedAllSameType) {
-      //store what we are going to render this frame so it's
-      //available next frame
-      this._previousFramesTiming[ctx.renderType][ctx.currentTarget.type].push({
-        'points': pointsRendered
-      });
-      //only average the last X frames (per render type, per drawing type)
-      if(this._previousFramesTiming[ctx.renderType][ctx.currentTarget.type].length > this._frameCountToAverage) {
-        this._previousFramesTiming[ctx.renderType][ctx.currentTarget.type].shift();
-      }
+  //   if(renderedAllSameType) {
+  //     //store what we are going to render this frame so it's
+  //     //available next frame
+  //     this._previousFramesTiming[ctx.renderType][ctx.currentTarget.type].push({
+  //       'points': pointsRendered
+  //     });
+  //     //only average the last X frames (per render type, per drawing type)
+  //     if(this._previousFramesTiming[ctx.renderType][ctx.currentTarget.type].length > this._frameCountToAverage) {
+  //       this._previousFramesTiming[ctx.renderType][ctx.currentTarget.type].shift();
+  //     }
 
-      //store type of rendering so that we can complete duration on next frame
-      ctx.previousTargetType = ctx.currentTarget.type;
-    } else {
-      ctx.previousTargetType = null;
-    }
-  },
+  //     //store type of rendering so that we can complete duration on next frame
+  //     ctx.previousTargetType = ctx.currentTarget.type;
+  //   } else {
+  //     ctx.previousTargetType = null;
+  //   }
+  // },
 
   _getCurrentCanvasRenderingTarget: function(ctx) {
 
@@ -517,14 +524,16 @@ PxVisBehaviorRenderer.base = [{
         multiplier,
         targetTiming = 8,
         pointsRendered = 0,
+        result,
+        before = window.performance.now(),
         toRender = Math.min(ctx.currentTarget.type === 'scatter' ? 200 : 1000, ctx.currentTarget.target.chartData ? ctx.currentTarget.target.chartData.length : 0);
 
     if(toRender) {
       //start by rendering X pts
-      this._renderTargetToCanvas(toRender, ctx)
+      this._renderTargetToCanvas(toRender, ctx, 100)
       pointsRendered = toRender;
 
-      duration = window.performance.now() - ctx.previousStartTime;
+      duration = window.performance.now() - before;
 
       //target 8ms: 16ms (60 fps) - 8ms for the browser to
       //actually draw. Crude but this is only for the first frame
@@ -533,42 +542,49 @@ PxVisBehaviorRenderer.base = [{
         multiplier = Math.floor(targetTiming / duration);
 
         //render more
-        this._renderTargetToCanvas(multiplier * 10, ctx);
-        pointsRendered += multiplier * 10;
+        result = this._renderTargetToCanvas(multiplier * toRender, ctx, 100);
+        pointsRendered += result.points;
       }
 
-      return pointsRendered;
+      //if we have rendered less points than the estimation don't use all the budget
+      return { 'points': pointsRendered, 'budgetUsed': (pointsRendered*100)/(toRender + multiplier*10)};
     } else {
       //nothing to render, keep going
       ctx.currentRenderingCounter = 0;
       ctx.targetIndex++;
-      return 0;
+      return { 'points': 0, 'budgetUsed': 0};
     }
   },
 
-  _renderTargetToCanvas: function(toRender, ctx) {
+  //Tries to render toRender number of points for the current target.
+  //returns the number of points actually rendered and how much of the budget this used
+  _renderTargetToCanvas: function(toRender, ctx, currentBudget) {
 
     var leftInCurrentSeries = ctx.currentTarget.target.chartData ? ctx.currentTarget.target.chartData.length - ctx.currentRenderingCounter : 0,
         start,
-        stop;
+        stop,
+        proRatedToRender = Math.floor(toRender * currentBudget /100);
 
     if(leftInCurrentSeries > 0) {
       start = ctx.currentRenderingCounter;
-      stop = Math.min(start + toRender, ctx.currentTarget.target.chartData.length);
+      stop = Math.min(start + proRatedToRender, ctx.currentTarget.target.chartData.length);
       ctx.currentTarget.target.renderOneBatch(start, stop);
+    } else {
+      start = 0;
+      stop = 0;
     }
 
-    if(toRender > leftInCurrentSeries) {
+    if(proRatedToRender > leftInCurrentSeries) {
 
       //this series is done
       ctx.currentRenderingCounter = 0;
       ctx.targetIndex++;
 
-      //return how many points left
-      return toRender - leftInCurrentSeries;
+      //return how many points we rendered
+      return { 'points': stop-start, 'budgetUsed': Math.floor((stop-start) * 100 / toRender)};
     } else {
-      ctx.currentRenderingCounter += toRender;
-      return 0;
+      ctx.currentRenderingCounter += proRatedToRender;
+      return { 'points': stop-start, 'budgetUsed': currentBudget};
     }
   },
 
@@ -581,23 +597,28 @@ PxVisBehaviorRenderer.base = [{
         ptsPerMs,
         framesArray = this._previousFramesTiming[ctx.renderType][ctx.currentTarget.type];
 
-      //calculate averages
-      for(var i=0; i<framesArray.length; i++) {
-        totPoints += framesArray[i].points;
-        totDuration += framesArray[i].duration;
+      if(framesArray.length > 0) {
+        //calculate averages
+        for(var i=0; i<framesArray.length; i++) {
+          totPoints += framesArray[i].points;
+          totDuration += framesArray[i].duration;
+        }
+
+        //adjust batch size
+        avgPoints = Math.floor(totPoints/framesArray.length);
+        avgDuration = totDuration/framesArray.length;
+
+        ptsPerMs = totPoints/totDuration;
+
+        //aim for 18ms. This is crucial since when not busy requestanimationframe will give us a callback
+        //every ~16 ms, so we HAVE to aim a bit higher to be sure we are keeping the browser busy
+        pointsAddition = Math.floor((20 - avgDuration) * (avgPoints/avgDuration));
+
+        return Math.max(this._minimumPointsPerFrame, Math.floor(ptsPerMs*20));
+      } else {
+        //no stats
+        return -1;
       }
-
-      //adjust batch size
-      avgPoints = Math.floor(totPoints/framesArray.length);
-      avgDuration = totDuration/framesArray.length;
-
-      ptsPerMs = totPoints/totDuration;
-
-      //aim for 18ms. This is crucial since when no busy requestanimationframe will give us a callback
-      //every ~16 ms, so we HAVE to aim a bit higher to be sure we keep the browser busy
-      pointsAddition = Math.floor((20 - avgDuration) * (avgPoints/avgDuration));
-
-      return Math.max(this._minimumPointsPerFrame, Math.floor(ptsPerMs*20));
   },
 
   _initializeSvgRendering: function(ctx) {
