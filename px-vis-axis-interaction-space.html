@@ -198,6 +198,10 @@ Custom property | Description | Default
       smallerSide: {
         type: Number,
         value: 0
+      },
+      _isDirty: {
+        type: Boolean,
+        value: false
       }
     },
 
@@ -209,11 +213,20 @@ Custom property | Description | Default
       '_drawCursorIcon(svg, iconType)'
     ],
 
+    attached: function() {
+      if(this._isDirty) {
+        this.drawElement();
+        this._isDirty = false;
+      }
+    },
+
     detached: function() {
       if(this._doesD3HaveValues(this._brushD3)) {
         this.deleteAndClearBrush(this._brushD3);
         this._brushD3.remove();
+        this._brushD3 = null;
       }
+      this._isDirty = true;
     },
 
     /**

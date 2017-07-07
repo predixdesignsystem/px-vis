@@ -1,3 +1,21 @@
+v3.0.0
+==================
+* Redesign
+
+v2.1.5
+==================
+* new internal renderer for canvas (TODO doc)
+* removed events for line scatter and canvas scatter (TODO doc)
+* new events for rendering (TODO doc)
+* removed redrawElement function from highlightPoint and highlightLine
+
+v2.1.4
+==================
+* Ensure axis get redrawn when moving a chart around the dom
+
+v2.1.3
+* Ensure striping component won't try to draw on empty data
+
 v2.1.2
 ==================
 * Fix for markers on the bottom

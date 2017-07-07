@@ -567,43 +567,82 @@ PxVisBehaviorChart.saveImage = [{
       var canvas = document.createElement('canvas'),
           context,
           result,
-          svgData;
+          svgData,
+          elementsToRender = [],
+          canvasKeys = Object.keys(this.canvasLayers),
+          drawingWidth = this._smallerSide ? this._smallerSide : this.width,
+          drawingHeight = this._smallerSide ? this._smallerSide : this.height;
 
-      canvas.width = this.width + (renderLegend ? this._getRegisterWidth() : 0);
+      canvas.width = drawingWidth + (renderLegend ? this._getRegisterWidth(drawingWidth, drawingHeight) : 0);
 
-      canvas.height = this.height;
+      canvas.height = drawingHeight;
       context = canvas.getContext('2d');
 
-      if(this.canvasContext) {
-        //draw current canvas on new canvas
-        context.drawImage(this.canvasContext.canvas, 0, 0);
+      //draw in the same order as px-vis-svg-canvas....
+      //true = svg, false = canvas
+      elementsToRender.push([this.pxSvgElemLower, true]);
+      elementsToRender.push([this.canvasContext, false]);
+      elementsToRender.push([this.canvasContextTop, false]);
+      for(var i=0; i<canvasKeys.length; i++) {
+        elementsToRender.push([this.canvasLayers[canvasKeys[i]], false]);
       }
+      elementsToRender.push([this.pxSvgElem, true]);
 
-     if(this.pxSvgElem) {
-       //drawing the svg bit
-        this._drawSVGOnCanvas(canvas, function(resultCanvas) {
-          if(renderLegend) {
-            this._drawRegister(resultCanvas.getContext('2d'), this.width);
+      //now render all elements found
+      var fn = function() {
+
+        if(elementsToRender.length>0) {
+          var target = elementsToRender.shift();
+
+          //if this element is defined
+          if(target[0]) {
+            if(!target[1]) {
+              //canvas
+              canvas.getContext('2d').drawImage(target[0].canvas, 0, 0);
+
+              //if we have more element keep drawing, else finish
+              if(elementsToRender.length > 0) {
+                fn();
+              } else {
+                this._finishGetImage(callback, canvas, renderLegend, drawingWidth, drawingHeight);
+              }
+              fn();
+            } else {
+              //svg
+              this._drawSVGOnCanvas(canvas, target[0], function(resultCanvas) {
+                canvas = resultCanvas;
+
+                //if we have more element keep drawing, else finish
+                if(elementsToRender.length > 0) {
+                  fn();
+                } else {
+                  this._finishGetImage(callback, canvas, renderLegend, drawingWidth, drawingHeight);
+                }
+              }.bind(this));
+            }
+          } else {
+            //ellement is null, continue iterating
+            fn();
           }
-          callback({canvas: resultCanvas, image: resultCanvas.toDataURL()});
-        }.bind(this));
-      } else if(this.canvasContext) {
-        //we have a canvas but no svg
-        if(renderLegend) {
-          this._drawRegister(context, this.width);
         }
-        callback({canvas: canvas, image: canvas.toDataURL()});
-      }
+      }.bind(this);
+      fn();
     },
-    _getRegisterWidth: function() {
+    _finishGetImage(callback, canvas, renderLegend, drawingWidth, drawingHeight) {
+      if(renderLegend) {
+        this._drawRegister(canvas.getContext('2d'), drawingWidth, drawingHeight);
+      }
+      callback({canvas: canvas, image: canvas.toDataURL()});
+    },
+    _getRegisterWidth: function(drawingWidth, drawingHeight) {
       if(this.completeSeriesConfig) {
 
         var canvas = document.createElement('canvas');
-        canvas.height = this.height;
+        canvas.height = drawingHeight;
         canvas.width = 9999;
 
         var curY = 0,
-            curX = this.width + 5,
+            curX = drawingWidth + 5,
             keys = Object.keys(this.completeSeriesConfig),
             maxWidth = 0,
             maxTotalWidth = 5,
@@ -616,14 +655,14 @@ PxVisBehaviorChart.saveImage = [{
           curTextWidth = context.measureText(this.completeSeriesConfig[keys[i]].name).width;
           maxWidth = Math.max(maxWidth, curTextWidth);
 
-          if( (curY + 30) > this.height ) {
+          if( (curY + 30) > drawingHeight) {
             curX += maxWidth + 15;
             curY = 0;
             maxTotalWidth += maxWidth + 15;
             maxWidth = 0;
           }
         }
-        maxTotalWidth += maxWidth + 15;
+        maxTotalWidth += maxWidth + 30;
 
         return maxTotalWidth;
       } else {
@@ -633,13 +672,13 @@ PxVisBehaviorChart.saveImage = [{
     /**
      * Draws a fake representation of the registers
      */
-    _drawRegister: function(context) {
+    _drawRegister: function(context, startWidth, drawingHeight) {
 
       if(this.completeSeriesConfig) {
         var curY = 0,
             lineLength = 25,
             strokeWidth = 3,
-            curX = this.width + 5,
+            curX = startWidth + 5,
             keys = Object.keys(this.completeSeriesConfig),
             maxWidth = 0,
             curTextWidth = 0;
@@ -655,7 +694,7 @@ PxVisBehaviorChart.saveImage = [{
           curTextWidth = context.measureText(this.completeSeriesConfig[keys[i]].name).width;
           maxWidth = Math.max(maxWidth, curTextWidth);
 
-          if( (curY + 30) > this.height ) {
+          if( (curY + 30) > drawingHeight ) {
             curX += maxWidth + 15;
             curY = 0;
           }
@@ -1823,8 +1862,7 @@ PxVisBehaviorChart.noDebounceOnPanning = {
   _startPanning: function() {
 
     //remove draw debounce to have a smooth panning
-    var lineType = this.renderToCanvas ? 'px-vis-line-canvas' : 'px-vis-line-svg',
-        lines = Polymer.dom(this.root).querySelectorAll(lineType),
+    var lines = Polymer.dom(this.root).querySelectorAll('px-vis-line-svg'),
         scatter = Polymer.dom(this.root).querySelectorAll('px-vis-scatter'),
         threshold = Polymer.dom(this.root).querySelector('px-vis-threshold');
 
@@ -1849,8 +1887,7 @@ PxVisBehaviorChart.noDebounceOnPanning = {
   },
   _stopPanning: function() {
 
-    var lineType = this.renderToCanvas ? 'px-vis-line-canvas' : 'px-vis-line-svg',
-        lines = Polymer.dom(this.root).querySelectorAll(lineType),
+    var lines = Polymer.dom(this.root).querySelectorAll('px-vis-line-svg'),
         scatter = Polymer.dom(this.root).querySelectorAll('px-vis-scatter'),
         threshold = Polymer.dom(this.root).querySelector('px-vis-threshold');
 
@@ -2455,6 +2492,75 @@ PxVisBehaviorChart.thresholdConfig = {
   }
 };
 
+PxVisBehaviorChart.combineMutes = {
+  properties: {
+    _combinedMutedSeries: {
+      type: Object,
+    },
+    /**
+     * An object which holds the series lines that have been muted based on the selected domain
+     *
+     * @private
+     */
+    mutedSeriesDomain: {
+      type:Object,
+      value: function() { return {} }
+    },
+    /**
+     * An object which holds the series lines that have been muted based on the axes brushes
+     *
+     * @private
+     */
+    mutedSeriesBrush: {
+      type:Object
+    },
+    /**
+     * An object which holds the series lines that have been muted based on
+     * the categories
+     *
+     */
+    _mutedSeriesCategories: {
+      type:Object,
+      value: function() { return {} }
+    }
+  },
+  observers: ['_combineMutes(mutedSeriesBrush, mutedSeriesDomain)'],
 
+  /**
+   * Takes the muted series from the axis brush and the selected domain and returns a merged copy of them
+   *
+   */
+  _combineMutes: function(m1,m2) {
+    var muted = {},
+        mutedCategories = Object.keys(this._mutedSeriesCategories).filter(function(cat) {
+          return this._mutedSeriesCategories[cat];
+        }.bind(this));
+    // for these, we assume that "false" items will just have been removed
+    for(var k in m1) {
+      muted[k] = m1[k];
+    }
+    for(var k in m2) {
+      muted[k] = m2[k];
+    }
+
+    if(mutedCategories.length) {
+      //parse data to add points muted by category
+      var isMuted;
+      //for each point
+      for(var i=0; i<this.chartData.length; i++) {
+
+        //search for each muted category
+        for(var j=0; j<mutedCategories.length;j++) {
+          if(this.chartData[i][this.categoryKey] ===mutedCategories[j]) {
+            muted[this.chartData[i][this.seriesKey]] = true;
+            break;
+          }
+        }
+      }
+    }
+    this.set('_combinedMutedSeries', muted);
+    this.set('_combinedMutedChanged', this._combinedMutedChanged ? false : true);
+  },
+}
 
 </script>

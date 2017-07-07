@@ -68,53 +68,13 @@ Element which draws lines series onto the chart
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.categories,
       PxVisBehaviorD3.selectedDomain,
-      PxVisBehavior.progressiveRendering,
       PxVisBehavior.serieToRedrawOnTop,
       PxVisBehaviorD3.domainUpdate,
       PxVisBehavior.preventInitialDrawing,
       PxVisBehavior.isAttached,
       PxVisBehavior.polarData,
+      PxVisBehavior.rendererType
     ],
-
-    /**
-     * px-vis-line-progressive-rendering-started, fired when a canvas with progressive rendering
-     * enabled starts rendering
-     * evt.details contains:
-     * { numberOfFrames: the number of frames that will be used to render,
-     * }
-     *
-     * @event px-vis-line-progressive-rendering-started
-     */
-    /**
-     * px-vis-line-canvas-progressive-batch, fired when a canvas with progressive rendering
-     * has finished rendering one batch of data
-     * evt.details contains:
-     * { numberOfFrames: the number of frames that will be used to render,
-     *  currentFrame: index of the frame that has just been rendered
-     * }
-     *
-     * @event px-vis-line-canvas-progressive-batch
-     */
-
-    /**
-     * px-vis-line-progressive-rendering-ended, fired when a canvas with progressive rendering
-     * enabled has finished rendering
-     * evt.details contains:
-     * { numberOfFrames: the number of frames that have been used to render,
-     * }
-     *
-     * @event px-vis-line-progressive-rendering-ended
-     */
-
-    /**
-     * px-vis-line-canvas-rendering-ended, fired when a canvas has finished rendering,
-     * whether it had progressive rendering or not
-     * evt.details contains:
-     * { progressiveRending: whether progressive rendering was enabled,
-     * }
-     *
-     * @event px-vis-line-canvas-rendering-ended
-     */
 
     /**
      * Properties block, expose attribute values to the DOM via 'reflect'
@@ -123,21 +83,6 @@ Element which draws lines series onto the chart
      * @type Object
      */
     properties: {
-       /**
-        * Boolean to trigger a redraw of the canvas
-        *
-        */
-       _canvasRedraw: {
-         type: Boolean,
-         value: false
-       },
-       /**
-        * Counter to track progressive rendering requests and only draw the latest one
-        */
-       _progressiveRenderingCounter: {
-         type: Number,
-         value: 0
-       },
        /**
        * the opacity value of the fill to be used when muting a serie (stroke is not drawn on mute)
        */
@@ -160,122 +105,82 @@ Element which draws lines series onto the chart
         type: Boolean,
         value: false
       },
-      /**
-       * Debounce time to use for drawing
-       */
-      drawDebounceTime: {
-        type: Number,
-        value: 20
-      },
 
       strokeWidth: {
         type: Number,
         value: 1
+      },
+      /**
+       * options currently in use for drawing lines: opacity, color...
+       */
+      _currentDrawingOptions: {
+        type: Object,
+        value:function() {
+          return {};
+        }
       }
     },
-
-    observers: [
-      '_redraw(canvasContext, domainChanged, chartData.*, completeSeriesConfig.*, _canvasRedraw, preventInitialDrawing)',
-      'mutedChanged(mutedSeries.*, completeSeriesConfig)',
-      '_drawOnTop(serieToRedrawOnTop)'
-    ],
 
     attached: function() {
-
-      //if we've been detached and reattached make sure we redraw (canvas clears on detached)
-      if(this._isDirty) {
-        this._redraw();
-        this._isDirty = false;
-      }
-      this._processOneBatchBound = this._processOneBatch.bind(this);
+      this.fire('px-vis-renderer-register', {'type': 'line', 'renderMode': 'canvas', 'rendererType': this.rendererType});
     },
+
     detached: function() {
-
-      this._isDirty = true;
+      this.fire('px-vis-renderer-unregister',{'renderMode': 'canvas','rendererType': this.rendererType});
     },
 
-    _redraw: function() {
-      if(!this.preventInitialDrawing) {
-        this.drawCanvas(true);
-      }
-    },
     /**
-     * Draws or updates the line element.
-     * Called from an observer watching for data and the necessary d3 objects
-     *
-     * @method drawElement
+     * Defines the appropriate line generator and update drawing
+     * variables: opacity, colors...
      */
-    drawCanvas: function(allowCanvasClearing) {
-      this._progressiveRenderingCounter++;
+    initializeDrawingSession: function() {
 
-      if(this.drawDebounceTime > 0) {
-        this.debounce('drawCanvas',function() {
-          this._drawCanvasDebounced(allowCanvasClearing);
-        }.bind(this), this.drawDebounceTime);
+      //create our line generator
+      if(this.parallelCoordinates) {
+        this._defineMultiLine(true);
+      } else if(this.radialLine) {
+        this._defineRadialLine(true, this.multiPath, this.counterClockwise, this.useDegrees);
       } else {
-        this._drawCanvasDebounced(allowCanvasClearing);
+        this._defineSingleLine(true);
       }
-    },
 
-    _drawCanvasDebounced: function(allowCanvasClearing) {
-      if(this.domainChanged !== null &&
-            this._doesObjHaveValues(this.completeSeriesConfig) &&
-            this._isAttached &&
-            this.chartData) {
-
-          this._resetRenderingContext();
-
-          //create our line generator
-          if(this.parallelCoordinates) {
-            this._defineMultiLine(true);
-          } else if(this.radialLine) {
-            this._defineRadialLine(true, this.multiPath, this.counterClockwise, this.useDegrees);
-          } else {
-            this._defineSingleLine(true);
-          }
-
-          //make sure we have the right muted opacity
-          this.mutedOpacity = this.completeSeriesConfig[this.seriesId].mutedOpacity || this.completeSeriesConfig[this.seriesId].mutedOpacity === 0 ?
-                                this.completeSeriesConfig[this.seriesId].mutedOpacity : this.mutedOpacity;
-
-          // We need to track which lines we have drawn and which we want to draw.
-          // If a line is not currently in our list, add it
-          if(this.canvasContext._pxLinesSeries.indexOf(this.seriesId) === -1) {
-            this.canvasContext._pxLinesSeries.push(this.seriesId);
-          }
-
-          // if we have previously drawn the same number of lines as series, then let's start over; Clear the drawing canvas
-          if(this.canvasContext._pxLinesRedraw >= this.canvasContext._pxLinesSeries.length) {
-
-            if(allowCanvasClearing && !this.canvasContext._pxLinesCleared) {
-              // (x1,y1,x2,y2)
-              this.canvasContext.pxClearCanvas();
-              //re add this serie since we're going to draw it now
-              this.canvasContext._pxLinesSeries.push(this.seriesId);
-            }
-          }
-
-          //restore our empty state
-          this.canvasContext.restore();
+      //make sure we have the right muted opacity
+      this._currentDrawingOptions.mutedOpacity = this.completeSeriesConfig[this.seriesId].mutedOpacity || this.completeSeriesConfig[this.seriesId].mutedOpacity === 0 ?
+                            this.completeSeriesConfig[this.seriesId].mutedOpacity : this.mutedOpacity;
+      this._currentDrawingOptions.strokeWidth = this.strokeWidth;
 
 //FIXME Clip Path can be optimized. Currently draws with every TS line. Can be drawn once.
-          if(this.clipPath) {
-            this.drawClipPath();
-          }
+      if(this.clipPath) {
+        this.drawClipPath();
+      }
 
-          if(this.chartData.length) {
-            this.canvasContext.lineWidth = this.strokeWidth;  //TODO make per series?
-            if(this.noCanvasProgressiveRendering) {
-              this._renderAtOnce(this.multiPath ? this.chartData : [this.chartData]);
-            } else {
-              //get number of frames
-              var numberOfSeries = this.multiPath ? this.completeSeriesConfig[this.seriesId]['x'].length : Object.keys(this.completeSeriesConfig).length;
-              var frames = Math.min(this.chartData.length, Math.ceil(Math.max(((this.chartData.length*numberOfSeries)/this.progressiveRenderingPointsPerFrame), this.progressiveRenderingMinimumFrames)));
-              this._renderProgressively(frames);
-            }
+      this._currentDrawingOptions.lastPointRenderedIndex = null;
+      this._currentDrawingOptions.currentBatchStartIndex = 0;
+
+      //render differently depending on the type of line
+      if(this.gradientLine) {
+        //gradient line
+        this._currentDrawingOptions.getColorValue = function(d) {
+          var opacity = this._isSerieMuted(d) ? this._currentDrawingOptions.mutedOpacity : this._opacityLine(d);
+          if(opacity !== 0) {
+            return this._canvasLineColor(d, opacity);
+          } else {
+            return null;
           }
-          this.canvasContext._pxLinesRedraw += 1;
-        }
+        }.bind(this);
+
+      } else if(this.categoryKey) {
+        //category color line
+        this._currentDrawingOptions.getColorValue = function(d) {
+          var opacity = this._isSerieMuted(d) ? this._currentDrawingOptions.mutedOpacity : 1;
+          if(opacity !== 0) {
+            return this._canvasLineColor(d, opacity);
+          } else {
+            return null;
+          }
+        }.bind(this);
+
+      }
     },
 
     /**
@@ -347,188 +252,58 @@ Element which draws lines series onto the chart
        this._clipData = clipData;
      },
 
-    /**
-    * if progressive rendering is disabled, draws all the lines and renders them in one batch
-    *
-    */
-    _renderAtOnce: function(data) {
+    renderOneBatch: function(start, stop) {
 
-      this.canvasContext._pxLinesCleared = false;
-      if(this.gradientLine) {
-        //if gradient, regardless of category or not
-        // Iterate over our data:
-        for(var i = 0; i < data.length; i++) {
+      var data;
+      this.canvasContext.lineWidth = this._currentDrawingOptions.strokeWidth
 
-          var opacity = this._isSerieMuted(data[i]) ? this.mutedOpacity : this._opacityLine(data[i]);
-          if(opacity !== 0) {
-            // start a path and reset the styles for this one path
-            this.canvasContext.beginPath();
-            this.canvasContext.strokeStyle = this._canvasLineColor(data[i],opacity);
-            // use the line generator to create the line
-            this.line(data[i]);
-            // draw it to the canvas; cant wait until the end or else they all have the same style
-            this.canvasContext.stroke();
-          }
-        }
-      // if categoryKey and no gradient
-      } else if(this.categoryKey) {
-        // Yes, this repeates the if above but I dont really want it checking an if 20k times to see if it should apply a gradient or not.
-        // Iterate over our data:
-        for(var i = 0; i < data.length; i++) {
-          var opacity = this._isSerieMuted(data[i]) ? this.mutedOpacity : 1;
-          // Check to see if it is "muted"; if not, draw a line
-          if(opacity !== 0) {
-            // start a path and reset the styles for this one path
-            this.canvasContext.beginPath();
-            this.canvasContext.strokeStyle = this._canvasLineColor(data[i],opacity);
-            // use the line generator to create the line
-            this.line(data[i]);
-            // draw it to the canvas; cant wait until the end or else they all have the same style
-            this.canvasContext.stroke();
-          }
-        }
-      } else { //not gradientLine and not category
-        // start the path
-        this.canvasContext.beginPath();
-        // iterate through the data
-        for(var i = 0; i < data.length; i++) {
-          var opacity = this._isSerieMuted(data[i]) ? this.mutedOpacity : 1;
-          // Check to see if it is "muted"; if not, draw a line
-          if(opacity !== 0) {
-            this.line(data[i]);
-          }
-        }
-        // Apply our styles and draw all the lines to the canvas
-        this.canvasContext.strokeStyle = this.rgbToRgba(this.completeSeriesConfig[this.seriesId]['color'], opacity);
-        this.canvasContext.stroke();
+      //adjust start based on last point drawned
+      this._currentDrawingOptions.currentBatchStartIndex = this._currentDrawingOptions.lastPointRenderedIndex;
 
-        //clean up drawing
-        this._renderingEnded(false);
-      }
-    },
-
-    /**
-     * Renders data in a specific number of frames, splitting the batch
-     *
-     */
-    _renderProgressively: function(numberOfFrames) {
-
-      this.fire('px-vis-line-progressive-rendering-started', {numberOfFrames: numberOfFrames});
-
-      this._renderingContext = {
-        'index': 0,
-        //new request
-        'requestCounter': ++this._progressiveRenderingCounter,
-        'size': Math.ceil(this.chartData.length/numberOfFrames),
-        'numberOfFrames': numberOfFrames,
-        'offset': 0,
-        'lastPointRenderedIndex': null,
-        'currentBatchStartIndex': 0
-      };
-
-      //make sure canvas is clean
-      if(this.parallelCoordinates) {
-        this.canvasContext.clearRect(0, -1, this.canvasContext.canvas.width, this.canvasContext.canvas.height);
-      }
-
-      //render differently depending on the type of line
-      if(this.gradientLine) {
-        //gradient line
-        this._renderingContext.getColorValue = function(d) {
-          var opacity = this._isSerieMuted(d) ? this.mutedOpacity : this._opacityLine(d);
-          if(opacity !== 0) {
-            return this._canvasLineColor(d, opacity);
-          } else {
-            return null;
-          }
-        }.bind(this);
-
-      } else if(this.categoryKey) {
-        //category color line
-        this._renderingContext.getColorValue = function(d) {
-          var opacity = this._isSerieMuted(d) ? this.mutedOpacity : 1;
-          if(opacity !== 0) {
-            return this._canvasLineColor(d, opacity);
-          } else {
-            return null;
-          }
-        }.bind(this);
-
-      }
-
-      window.requestAnimationFrame(this._processOneBatchBound);
-    },
-
-    _processOneBatch: function() {
-
-      if(this._renderingContext.requestCounter !== this._progressiveRenderingCounter) {
-        //new request came in, cancel this drawing. Don't reset the counter as we want
-        //the new request to finish
-        return;
-      }
-
-      this._renderingContext.currentBatchStartIndex = this._renderingContext.lastPointRenderedIndex;
-
-      //ensure weprepend the last defined point
-      var prevRenderedCount = this._renderingContext.index * this._renderingContext.size,
-          skipped = Math.max(prevRenderedCount - (this._renderingContext.lastPointRenderedIndex + 1), 0),
-          d;
-
-      //if it's a single line make sure we can loop around it
       if(!this.multiPath) {
-
-        //slice will end at the end of the array if the 'end' index is bigger
-        //than the chartdata length (last batch)
-        d = this.chartData.slice(this._renderingContext.lastPointRenderedIndex, (this._renderingContext.index + 1) * this._renderingContext.size + skipped);
-        d = [d];
-      } else {
-
-        //we don't have to deal with prepending previous point and skipped
-        //points in multiline
-        d = this.chartData.slice(prevRenderedCount, (this._renderingContext.index + 1) * this._renderingContext.size);
+        //ensure weprepend the last defined point
+        start = this._currentDrawingOptions.lastPointRenderedIndex;
+        //for single line we have to slice the array to pass it to the line function
+        data = this.chartData.slice(start, stop);
       }
-
-      this._renderOneBatch(d);
-
-      this._renderingContext.index++;
-
-      if(this._renderingContext.index < this._renderingContext.numberOfFrames) {
-          //continue processing
-          this.fire('px-vis-line-canvas-progressive-batch', { "numberOfFrames": this._renderingContext.numberOfFrames, "currentFrame": this._renderingContext.index });
-          window.requestAnimationFrame(this._processOneBatchBound);
-        } else {
-          //end, clean up
-          this._renderingEnded(true, this._renderingContext.numberOfFrames);
-        }
-    },
-
-    _renderOneBatch: function(data) {
 
       if(this.gradientLine || this.categoryKey) {
 
         var color;
-        //strike line by line since a rgadient and or color is applied
-        for(var i = 0; i < data.length; i++) {
-          color = this._renderingContext.getColorValue(data[i]);
+        //strike line by line since a gradient and or color is applied
+        //for multipath because each point is 1 line no need to slice the array,
+        //just access each point by the appropriate index
+        for(var i = start; i < stop; i++) {
+          color = this._currentDrawingOptions.getColorValue(this.chartData[i]);
           if(color) {
             this.canvasContext.beginPath();
             this.canvasContext.strokeStyle = color;
-            this.line(data[i]);
+            this.line(this.chartData[i]);
             this.canvasContext.stroke();
           }
         }
       } else {
 
-        //most likely a single line but keep the logic for multi line in case we need it
         this.canvasContext.beginPath();
 
-        for(var i = 0; i < data.length; i++) {
-
-          opacity = this._isSerieMuted(data) ? this.mutedOpacity : 1;
+        if(!this.multiPath) {
+          opacity = this._isSerieMuted(data) ? this._currentDrawingOptions.mutedOpacity : 1;
           if(opacity !== 0) {
-            this.line(data[i]);
+            this.line(data);
+          }
+        } else {
+
+          //for multipath because each point is 1 line no need to slice the array,
+          //just access each point by the appropriate index
+          for(var i = start; i < stop; i++) {
+
+            opacity = this._isSerieMuted(this.chartData[i]) ? this._currentDrawingOptions.mutedOpacity : 1;
+            if(opacity !== 0) {
+              this.line(this.chartData[i]);
+            }
           }
         }
+
 
         var dashPattern = this.completeSeriesConfig[this.seriesId] && this.completeSeriesConfig[this.seriesId]["dashPattern"] ? this.completeSeriesConfig[this.seriesId]["dashPattern"] : '';
         dashPattern = JSON.parse('[' + dashPattern +']');
@@ -538,34 +313,8 @@ Element which draws lines series onto the chart
         this.canvasContext.strokeStyle = this.rgbToRgba(this.completeSeriesConfig[this.seriesId]['color'], opacity);
         this.canvasContext.stroke();
       }
-      this.canvasContext._pxLinesCleared = false;
     },
 
-    /**
-     * Used to 'clear' the canvas fater drawing in case we drew outside our limits.
-     * We might want to consider using a clippath instead
-     */
-    _renderingEnded: function(progressive,numberOfFrames) {
-      //restore our context for safety
-      this.canvasContext.restore();
-
-      if(progressive) {
-        this._progressiveRenderingCounter = 0;
-        this.fire('px-vis-line-progressive-rendering-ended', {"numberOfFrames": numberOfFrames });
-      }
-
-      this.fire('px-vis-line-canvas-rendering-ended', { "progressiveRending": progressive });
-    },
-
-    /**
-     * Checks mutedSeries to see if this ID is in there
-     * Called from an observer watching mutedSeries
-     *
-     * @method mutedChanged
-     */
-    mutedChanged: function() {
-      this.set('_canvasRedraw', !this._canvasRedraw);
-    },
     _isSerieMuted: function(d) {
       if(this.multiPath) {
         return this.mutedSeries[d[this.seriesId]] ? true : false;
@@ -600,11 +349,6 @@ Element which draws lines series onto the chart
       //add 'a' for 'rgba'
       result = 'rgba' + result.slice(3);
       return result + ',' + opacity + ')';
-    },
-    _drawOnTop: function(serieToRedraw) {
-      if(serieToRedraw === this.seriesId) {
-        this.drawCanvas(false);
-      }
     }
   });
 </script>

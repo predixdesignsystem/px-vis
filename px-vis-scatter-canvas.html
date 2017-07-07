@@ -74,51 +74,13 @@ Element which draws a scatter series onto the chart
       PxVisBehavior.polarData,
       PxVisBehavior.seriesId,
       PxVisBehavior.dynamicConfigProperties,
-      PxVisBehavior.progressiveRendering,
       PxVisBehavior.serieToRedrawOnTop,
       PxVisBehavior.preventInitialDrawing,
       PxVisBehavior.isAttached,
-      PxVisBehaviorD3.scatterMarkers
+      PxVisBehaviorD3.scatterMarkers,
+      PxVisBehavior.rendererType
     ],
-    /**
-     * px-vis-scatter-progressive-rendering-started, fired when a canvas with progressive rendering
-     * enabled starts rendering
-     * evt.details contains:
-     * { numberOfFrames: the number of frames that will be used to render,
-     * }
-     *
-     * @event px-vis-scatter-progressive-rendering-started
-     */
-    /**
-     * px-vis-scatter-canvas-progressive-batch, fired when a canvas with progressive rendering
-     * has finished rendering one batch of data
-     * evt.details contains:
-     * { numberOfFrames: the number of frames that will be used to render,
-     *  currentFrame: index of the frame that has just been rendered
-     * }
-     *
-     * @event px-vis-scatter-canvas-progressive-batch
-     */
 
-    /**
-     * px-vis-scatter-progressive-rendering-ended, fired when a canvas with progressive rendering
-     * enabled has finished rendering
-     * evt.details contains:
-     * { numberOfFrames: the number of frames that have been used to render,
-     * }
-     *
-     * @event px-vis-scatter-progressive-rendering-ended
-     */
-
-    /**
-     * px-vis-scatter-canvas-rendering-ended, fired when a canvas has finished rendering,
-     * whether it had progressive rendering or not
-     * evt.details contains:
-     * { progressiveRending: whether progressive rendering was enabled,
-     * }
-     *
-     * @event px-vis-scatter-canvas-rendering-ended
-     */
     /**
      * Properties block, expose attribute values to the DOM via 'reflect'
      *
@@ -152,20 +114,6 @@ Element which draws a scatter series onto the chart
         value: 'Timestamp'
       },
       /**
-       * Debounce time to use for drawing
-       */
-      drawDebounceTime: {
-        type: Number,
-        value: 10
-      },
-      /**
-      * Counter to track progressive rendering requests and only draw the latest one
-      */
-      _progressiveRenderingCounter: {
-        type: Number,
-        value: 0
-      },
-      /**
        * options currently in use for drawing scatter: opacity, symbol, drawing function....
        */
       _currentDrawingOptions: {
@@ -173,24 +121,6 @@ Element which draws a scatter series onto the chart
         value:function() {
           return {};
         }
-      },
-      /**
-       * Current context for rendering: points per frame, number of frames, rendering counter
-       */
-      _renderingContext: {
-        type: Object,
-        value:function() {
-          return {};
-        }
-      },
-      /**
-      * Number of points to be drawn per progressive rendering frame.
-      * The higher the value the fastest the processing but the more
-      * likely the UI will stutter/freeze.
-      */
-      progressiveRenderingPointsPerFrame: {
-        type: Number,
-        value: 2000
       },
       /**
        * Whether to use the clippath to avoid drawing outside of axes
@@ -202,25 +132,6 @@ Element which draws a scatter series onto the chart
       }
     },
 
-    observers: [
-      '_redraw(canvasContext, domainChanged, chartData.*, completeSeriesConfig.*, _canvasRedraw, preventInitialDrawing, radial, counterClockwise,markerSymbol, markerScale, markerSize, markerFillOpacity, markerStrokeOpacity)',
-      'mutedChanged(mutedSeries.*, completeSeriesConfig)',
-      '_drawOnTop(serieToRedrawOnTop)'
-     ],
-
-     attached: function() {
-
-      //if we've been detached and reattached make sure we redraw (canvas clears on detached)
-      if(this._isDirty) {
-        this._redraw();
-        this._isDirty = false;
-      }
-    },
-    detached: function() {
-
-      this._isDirty = true;
-    },
-
     ready:function() {
       //generate properties dynamically
       this._watchConfigProperty('markerSymbol', 'circle');
@@ -229,76 +140,30 @@ Element which draws a scatter series onto the chart
       this._watchConfigProperty('markerFillOpacity', 0.6);
       this._watchConfigProperty('markerStrokeOpacity', 1);
       this._watchConfigProperty('mutedOpacity', 0.3);
-      this._processOneBatchBound = this._processOneBatch.bind(this);
     },
 
-    _redraw: function() {
-      if(!this.preventInitialDrawing) {
-        this.drawCanvas(true);
-      }
+    attached: function() {
+      this.fire('px-vis-renderer-register', {'type': 'scatter', 'renderMode': 'canvas', 'rendererType': this.rendererType});
     },
+
+    detached: function() {
+      this.fire('px-vis-renderer-unregister', {'renderMode': 'canvas', 'rendererType': this.rendererType});
+    },
+
     /**
-     * Draws or updates the line element.
-     * Called from an observer watching for data and the necessary d3 objects
-     *
-     * @method drawElement
+     * Defines the appropriate line and symbol generators
+     * and update drawing variables: opacity, colors...
      */
-    drawCanvas: function(allowCanvasClearing) {
+    initializeDrawingSession: function() {
 
-      //new request
-      this._progressiveRenderingCounter++;
-
-      if(this.drawDebounceTime > 0) {
-        this.debounce('drawCanvasScatter',function() {
-          this._drawCanvasDebounced(allowCanvasClearing);
-        }.bind(this), this.drawDebounceTime);
-      } else {
-        this._drawCanvasDebounced(allowCanvasClearing);
+      if(this.radial) {
+        this._defineRadialLine(false, this.multiPath, this.counterClockwise, this.useDegrees);
       }
-    },
-    _drawCanvasDebounced: function(allowCanvasClearing) {
 
-      if(this.y &&
-         typeof this.domainChanged !== 'undefined' &&
-         this.domainChanged !== null &&
-         this._isAttached &&
-         this.chartData) {
-
-        // We need to track which scatter we have drawn and which we want to draw.
-        // If a scatter is not currently in our list, add it
-        if(this.canvasContext._pxScatterSeries.indexOf(this.seriesId) === -1) {
-          this.canvasContext._pxScatterSeries.push(this.seriesId);
-        }
-
-        // if we have previously drawn the same number of scatter as series, then let's start over; Clear the drawing canvas
-        if(this.canvasContext._pxScatterRedraw >= this.canvasContext._pxScatterSeries.length) {
-
-          //only cleared if nobody else already cleared us
-          if(allowCanvasClearing && !this.canvasContext._pxScatterCleared) {
-            // (x1,y1,x2,y2)
-            this.canvasContext.pxClearCanvas();
-            //re add this serie since we're going to draw it now
-            this.canvasContext._pxScatterSeries.push(this.seriesId);
-          }
-        }
-
-        if(this.radial) {
-          this._defineRadialLine(false, this.multiPath, this.counterClockwise, this.useDegrees);
-        }
-
-        if(this.chartData.length) {
-          //prepare values and draw
-          this._initiateRendering();
-        }
-
-        if(allowCanvasClearing) {
-          this.canvasContext._pxScatterRedraw += 1;
-        }
-      }
+      this._initiateDrawingOptions();
     },
 
-
-    _initiateRendering: function() {
+    _initiateDrawingOptions: function() {
 
       //create symbol, retrieve opacity values
       this._currentDrawingOptions.symbol = Px.d3.symbol().type(this.markerMapping[this.markerSymbol]).size(this.markerSize * this.markerScale).context(this.canvasContext);
@@ -332,92 +197,6 @@ Element which draws a scatter series onto the chart
           this.canvasContext.stroke();
         }.bind(this);
       };
-
-      if(this.noCanvasProgressiveRendering) {
-        this._renderAtOnce();
-      } else {
-        //get number of frames
-        var numberOfSeries = Object.keys(this.completeSeriesConfig).length;
-        var frames = Math.min(this.chartData.length, Math.ceil(Math.max(((this.chartData.length*numberOfSeries)/this.progressiveRenderingPointsPerFrame), this.progressiveRenderingMinimumFrames)));
-        this._renderProgressively(frames);
-      }
-    },
-
-    _renderAtOnce: function() {
-
-      //don't actually draw if invisible
-      if(!(this._currentDrawingOptions.sameOpacity && this._currentDrawingOptions.fillOpacity === 0)) {
-        this._renderingContext = {
-          'index': 0,
-          //new request
-          'requestCounter': ++this._progressiveRenderingCounter,
-          'size': this.chartData.length,
-          'numberOfFrames': 1
-        };
-        this._renderOneBatch();
-      }
-
-      this._renderingEnded(false);
-    },
-
-    /**
-     * Renders data in a specific number of frames, splitting the batch
-     *
-     */
-    _renderProgressively: function(numberOfFrames) {
-
-      //don't actually draw if invisible
-      if(!(this._currentDrawingOptions.sameOpacity && this._currentDrawingOptions.fillOpacity === 0)) {
-
-        this.fire('px-vis-scatter-progressive-rendering-started', {numberOfFrames: numberOfFrames});
-
-        this._renderingContext = {
-          'index': 0,
-          //new request
-          'requestCounter': ++this._progressiveRenderingCounter,
-          'size': Math.ceil(this.chartData.length/numberOfFrames),
-          'numberOfFrames': numberOfFrames
-        };
-
-        //called every animation frame
-        window.requestAnimationFrame(this._processOneBatchBound);
-      }
-    },
-
-    _processOneBatch: function() {
-
-      if(this._renderingContext.requestCounter !== this._progressiveRenderingCounter) {
-        //new request came in, cancel this drawing. Don't reset the counter as we want
-        //the new request to finish
-        return;
-      }
-
-      //get the number of points requested
-      this._renderOneBatch();
-
-      this._renderingContext.index++;
-
-      if(this._renderingContext.index < this._renderingContext.numberOfFrames) {
-        //continue processing
-        this.fire('px-vis-scatter-canvas-progressive-batch', { "numberOfFrames": this._renderingContext.numberOfFrames, "currentFrame": this._renderingContext.index });
-        window.requestAnimationFrame(this._processOneBatchBound);
-      } else {
-        //finished drawing, reset drawing request counter
-        this._renderingEnded(true, this._renderingContext.numberOfFrames);
-      }
-    },
-
-    /**
-     * progressive or normal rendering is completely done
-     */
-    _renderingEnded: function(progressive,numberOfFrames) {
-
-      if(progressive) {
-        this._progressiveRenderingCounter = 0;
-        this.fire('px-vis-scatter-progressive-rendering-ended', {"numberOfFrames": numberOfFrames });
-      }
-
-      this.fire('px-vis-scatter-canvas-rendering-ended', { "progressiveRending": progressive });
     },
 
     /**
@@ -453,7 +232,7 @@ Element which draws a scatter series onto the chart
      * Renders one batch of scatter data (can be one batch during progressive rendering
      * or all data during render at once)
      */
-    _renderOneBatch : function() {
+    renderOneBatch : function(start, stop) {
 
       //save and restore context for safety
       this.canvasContext.save();
@@ -468,10 +247,7 @@ Element which draws a scatter series onto the chart
       this.canvasContext.strokeStyle = this.completeSeriesConfig[this.seriesId]['color'];
       this.canvasContext.globalAlpha = this._currentDrawingOptions.fillOpacity;
       var previousTranslate = [0,0],
-          translate,
-          start = this._renderingContext.size * this._renderingContext.index,
-          stop = Math.min(start + this._renderingContext.size, this.chartData.length),
-          halfPi = Math.PI/4;
+          translate;
 
       this.canvasContext.beginPath();
       for(var i = start; i < stop; i++) {
@@ -497,8 +273,6 @@ Element which draws a scatter series onto the chart
       this.canvasContext.translate(-previousTranslate[0], -previousTranslate[1]);
 
       this.canvasContext.restore();
-      this.canvasContext._pxScatterCleared = false;
-
     },
 
     _getTransform: function(d) {
@@ -541,24 +315,6 @@ Element which draws a scatter series onto the chart
         return this.mutedSeries[d[this.seriesId]] ? true : false;
       } else {
         return this.mutedSeries[this.seriesId] ? true : false;
-      }
-    },
-    /**
-     * Checks mutedSeries to see if this ID is in there
-     * Called from an observer watching mutedSeries
-     *
-     * @method mutedChanged
-     */
-    mutedChanged: function() {
-      this.set('_canvasRedraw', !this._canvasRedraw);
-    },
-
-    /**
-     * Redraw this serie on top if needed
-     */
-    _drawOnTop: function(serieToRedraw) {
-      if(serieToRedraw === this.seriesId) {
-        this.drawCanvas(false);
       }
     }
   });
