@@ -4,6 +4,7 @@
 <link rel="import" href="../px-vis-highlight-line-canvas.html">
 <link rel="import" href="../px-vis-line-canvas.html">
 <link rel="import" href="../px-vis-svg-canvas.html">
+<link rel="import" href="../bower_components/px-colors-design/colors.html" />
 
 <link rel="import" href="../bower_components/px-buttons-design/css/px-buttons-design-demo-styles.html" defer>
 
@@ -104,6 +105,7 @@
 <script>
 Polymer({
   is: 'px-vis-highlight-line-canvas-demo-component',
+  behaviors: [PxVisBehavior.getSeriesColors,PxColorsBehavior.dataVisColorTheming],
   properties: {
     description: {
       type: String,
@@ -140,24 +142,6 @@ Polymer({
       type: Array
     },
     completeSeriesConfig: {
-      value: {
-          "x":{
-            "type":"line",
-            "name":"mySeries",
-            "x":['y','y1','y2'],
-            "y":['y','y1','y2'],
-            "color": "rgb(93,165,218)"
-          },
-          "y": {
-            "title": " "
-          },
-          "y1": {
-            "title": " "
-          },
-          "y2": {
-            "title": " "
-          }
-        },
       type: Object
     },
     dimensions: {
@@ -210,6 +194,10 @@ Polymer({
 
   },
 
+  listeners:{
+    'px-data-vis-colors-applied': '_genCSC'
+  },
+
   observers: [
     'generateLayers(svg)'
   ],
@@ -220,6 +208,27 @@ Polymer({
     } else {
       this.$.linehighlight.set('crosshairData', this.crosshairData);
     }
+  },
+
+  _genCSC: function() {
+    this.set('completeSeriesConfig', {
+      "x":{
+        "type":"line",
+        "name":"mySeries",
+        "x":['y','y1','y2'],
+        "y":['y','y1','y2'],
+        "color": this._getColor(0)
+        },
+      "y": {
+        "title": " "
+      },
+      "y1": {
+        "title": " "
+      },
+      "y2": {
+        "title": " "
+      }
+    });
   }
 });
 </script>

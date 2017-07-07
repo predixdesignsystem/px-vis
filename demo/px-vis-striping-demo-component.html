@@ -4,6 +4,7 @@
 <link rel="import" href="../px-vis-striping.html">
 <link rel="import" href="../px-vis-line-svg.html">
 <link rel="import" href="../px-vis-svg-canvas.html">
+<link rel="import" href="../bower_components/px-colors-design/colors.html" />
 
 <dom-module id="px-vis-striping-demo-component">
   <template>
@@ -25,14 +26,11 @@
     <px-vis-line-svg
       id="line1"
       svg="[[svg]]"
-      series-id="y"
+      series-id="mySeries"
       complete-series-config="[[completeSeriesConfig]]"
       chart-data="[[chartData]]"
       x="[[x]]"
       y="[[y]]"
-      width="[[width]]"
-      height="[[height]]"
-      margin="[[margin]]"
       domain-changed="[[domainChanged]]">
     </px-vis-line-svg>
 
@@ -89,6 +87,10 @@
 <script>
 Polymer({
   is: 'px-vis-striping-demo-component',
+  behaviors: [
+    PxColorsBehavior.dataVisColorTheming,
+    PxVisBehavior.getSeriesColors
+  ],
   properties: {
     description: {
       type: String,
@@ -115,15 +117,6 @@ Polymer({
       type: Array
     },
     completeSeriesConfig: {
-      value: {
-          "y": {
-            "type":"line",
-            "name":"mySeries1",
-            "x":'x',
-            "y":'y',
-            "color": "rgb(93,165,218)"
-          }
-        },
       type: Object
     },
     width: {
@@ -143,8 +136,8 @@ Polymer({
       value: {
         "top": 10,
         "right": 10,
-        "bottom": 10,
-        "left": 10
+        "bottom": 30,
+        "left": 50
       }
     },
 
@@ -173,6 +166,22 @@ Polymer({
         }
       }
     }
+  },
+
+  listeners: {
+    "px-data-vis-colors-applied" : '_returnCompleteSeriesConfig'
+  },
+
+  _returnCompleteSeriesConfig: function() {
+    this.set('completeSeriesConfig', {
+      'mySeries': {
+        "name":"My-Series",
+        "type": "line",
+        "x": 'x',
+        "y": 'y',
+        'color': this._getColor(0)
+      }
+    });
   }
 });
 </script>

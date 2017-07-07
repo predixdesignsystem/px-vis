@@ -88,8 +88,7 @@ function baseTests(elem,hLine,vLine,circle,hArr,yArr){
   suite('px-vis-cursor ' + elem + ' setup works', function() {
     var baseScale = document.getElementById('baseScale');
     var cursor = document.getElementById(elem),
-        colorOrder = dataVisColors.properties.seriesColorOrder.value,
-        colorSet = dataVisColors.properties.dataVisColors.value;
+        colorSet = dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
       var d = [{
@@ -197,16 +196,16 @@ function baseTests(elem,hLine,vLine,circle,hArr,yArr){
         assert.equal(cursor._circles.node().tagName,'circle');
       });
       test(elem + ' _circles[0] fill', function() {
-        assert.equal(cursor._circles.nodes()[0].getAttribute('fill').split(' ').join(''),colorSet[colorOrder[0]]);
+        assert.equal(cursor._circles.nodes()[0].getAttribute('fill').split(' ').join(''),colorSet[0]);
       });
       test(elem + ' _circles[0] stroke', function() {
-        assert.equal(cursor._circles.nodes()[0].getAttribute('stroke').split(' ').join(''),colorSet[colorOrder[0]]);
+        assert.equal(cursor._circles.nodes()[0].getAttribute('stroke').split(' ').join(''),colorSet[0]);
       });
       test(elem + ' _circles[1] fill', function() {
-        assert.equal(cursor._circles.nodes()[1].getAttribute('fill').split(' ').join(''),colorSet[colorOrder[1]]);
+        assert.equal(cursor._circles.nodes()[1].getAttribute('fill').split(' ').join(''),colorSet[1]);
       });
       test(elem + ' _circles[0] stroke', function() {
-        assert.equal(cursor._circles.nodes()[1].getAttribute('stroke').split(' ').join(''),colorSet[colorOrder[1]]);
+        assert.equal(cursor._circles.nodes()[1].getAttribute('stroke').split(' ').join(''),colorSet[1]);
       });
     }
   }); //suite

@@ -86,8 +86,7 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         baseXAxis = document.getElementById('baseXAxis');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var colors = baseColors.properties.colors.value;
 
     test('baseXAxis ID is random', function() {
@@ -193,8 +192,7 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         baseYAxis = document.getElementById('baseYAxis');
 
-    var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-    var colorSet = dataVisColors.properties.dataVisColors.value;
+    var colorSet = dataVisColors.properties.seriesColorList.value;
     var colors = baseColors.properties.colors.value;
 
     test('baseYAxis ID is random', function() {
@@ -294,7 +292,7 @@ function runTests(){
     });
     test('Title series bars fill', function() {
       var bar = baseYAxis._titleGroup.select('line');
-      assert.equal(bar.attr('stroke').split(' ').join(''),colorSet[colorOrder[0]]);
+      assert.equal(bar.attr('stroke').split(' ').join(''),colorSet[0]);
     });
     test('Title series bars dash pattern', function() {
         var bar = baseYAxis._titleGroup.select('line');

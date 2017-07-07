@@ -15,8 +15,8 @@ function runTests(){
           baseSVG = document.getElementById('baseSVG'),
           basePoint = document.getElementById('basePoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = [{
@@ -52,14 +52,14 @@ function runTests(){
               "name":"mySeries",
               "x":"x",
               "y":"y0",
-              "color": colorSet[colorOrder[0]]
+              "color": colorSet[0]
             },
             "mySeries2":{
               "type":"line",
               "name":"mySeries2",
               "x":"x",
               "y":"y1",
-              "color": colorSet[colorOrder[1]]
+              "color": colorSet[1]
             },
           },
           chartExtents = {"x":[1,5],"y":[0,10]},
@@ -112,8 +112,8 @@ function runTests(){
           baseSVG = document.getElementById('baseSVG'),
           basePoint = document.getElementById('basePoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -154,8 +154,8 @@ function runTests(){
           baseSVG = document.getElementById('baseSVG'),
           basePoint = document.getElementById('basePoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -186,8 +186,8 @@ function runTests(){
           differentSVG = document.getElementById('differentSVG'),
           differentPoint = document.getElementById('differentPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = [{
@@ -223,14 +223,14 @@ function runTests(){
               "name":"mySeries",
               "x":"x",
               "y":"y0",
-              "color": colorSet[colorOrder[0]]
+              "color": colorSet[0]
             },
             "mySeries2":{
               "type":"line",
               "name":"mySeries2",
               "x":"x",
               "y":"y1",
-              "color": colorSet[colorOrder[1]]
+              "color": colorSet[1]
             },
           },
           chartExtents = {"x":[1,5],"y":[0,10]},
@@ -281,8 +281,8 @@ function runTests(){
           differentSVG = document.getElementById('differentSVG'),
           differentPoint = document.getElementById('differentPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -319,8 +319,8 @@ function runTests(){
           differentSVG = document.getElementById('differentSVG'),
           differentPoint = document.getElementById('differentPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -351,8 +351,8 @@ function runTests(){
           fuzzSVG = document.getElementById('fuzzSVG'),
           fuzzPoint = document.getElementById('fuzzPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = [{
@@ -388,14 +388,14 @@ function runTests(){
               "name":"mySeries",
               "x":"x",
               "y":"y0",
-              "color": colorSet[colorOrder[0]]
+              "color": colorSet[0]
             },
             "mySeries2":{
               "type":"line",
               "name":"mySeries2",
               "x":"x",
               "y":"y1",
-              "color": colorSet[colorOrder[1]]
+              "color": colorSet[1]
             },
           },
           chartExtents = {"x":[1,5],"y":[0,10]},
@@ -447,8 +447,8 @@ function runTests(){
           fuzzSVG = document.getElementById('fuzzSVG'),
           fuzzPoint = document.getElementById('fuzzPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -495,8 +495,8 @@ function runTests(){
           fuzzSVG = document.getElementById('fuzzSVG'),
           fuzzPoint = document.getElementById('fuzzPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -526,8 +526,8 @@ function runTests(){
           generatingSVG = document.getElementById('generatingSVG'),
           generatingPoint = document.getElementById('generatingPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = [{
@@ -563,14 +563,14 @@ function runTests(){
               "name":"mySeries",
               "x":"x",
               "y":"y0",
-              "color": colorSet[colorOrder[0]]
+              "color": colorSet[0]
             },
             "mySeries2":{
               "type":"line",
               "name":"mySeries2",
               "x":"x",
               "y":"y1",
-              "color": colorSet[colorOrder[1]]
+              "color": colorSet[1]
             },
           },
           chartExtents = {"x":[1,5],"y":[0,10]},
@@ -620,8 +620,8 @@ function runTests(){
           generatingSVG = document.getElementById('generatingSVG'),
           generatingPoint = document.getElementById('generatingPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -655,8 +655,8 @@ function runTests(){
           generatingSVG = document.getElementById('generatingSVG'),
           generatingPoint = document.getElementById('generatingPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -686,8 +686,8 @@ function runTests(){
           forceSVG = document.getElementById('forceSVG'),
           forcePoint = document.getElementById('forcePoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = [{
@@ -723,14 +723,14 @@ function runTests(){
               "name":"mySeries",
               "x":"x",
               "y":"y0",
-              "color": colorSet[colorOrder[0]]
+              "color": colorSet[0]
             },
             "mySeries2":{
               "type":"line",
               "name":"mySeries2",
               "x":"x",
               "y":"y1",
-              "color": colorSet[colorOrder[1]]
+              "color": colorSet[1]
             },
           },
           chartExtents = {"x":[1,5],"y":[0,10]},
@@ -781,8 +781,8 @@ function runTests(){
           forceSVG = document.getElementById('forceSVG'),
           forcePoint = document.getElementById('forcePoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -821,8 +821,8 @@ function runTests(){
           forceSVG = document.getElementById('forceSVG'),
           forcePoint = document.getElementById('forcePoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -854,8 +854,8 @@ function runTests(){
           tooltipSVG = document.getElementById('tooltipSVG'),
           tooltipPoint = document.getElementById('tooltipPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = [{
@@ -891,14 +891,14 @@ function runTests(){
               "name":"mySeries",
               "x":"x",
               "y":"y0",
-              "color": colorSet[colorOrder[0]]
+              "color": colorSet[0]
             },
             "mySeries2":{
               "type":"line",
               "name":"mySeries2",
               "x":"x",
               "y":"y1",
-              "color": colorSet[colorOrder[1]]
+              "color": colorSet[1]
             },
           },
           chartExtents = {"x":[1,5],"y":[0,10]},
@@ -940,8 +940,8 @@ function runTests(){
           tooltipSVG = document.getElementById('tooltipSVG'),
           tooltipPoint = document.getElementById('tooltipPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -974,8 +974,8 @@ function runTests(){
           tooltipSVG = document.getElementById('tooltipSVG'),
           tooltipPoint = document.getElementById('tooltipPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {

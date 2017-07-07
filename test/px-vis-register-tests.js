@@ -305,12 +305,11 @@ function runTests(){
     });
 
     test('dashPattern is correct', function() {
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value,
-          colorSet = dataVisColors.properties.dataVisColors.value,
+      var colorSet = dataVisColors.properties.seriesColorList.value,
           series = Polymer.dom(dashPattern.root).querySelectorAll('px-vis-register-item'),
 
-          color0 = colorSet[ colorOrder[0]],
-          color1 = colorSet[ colorOrder[1]],
+          color0 = colorSet[0],
+          color1 = colorSet[1],
 
           pattern0 = series[0].querySelector('.seriesMarkerIcon').getAttribute('style'),
           pattern1 = series[1].querySelector('.seriesMarkerIcon').getAttribute('style'),
@@ -387,11 +386,11 @@ function basicTests(registerID,dir){
     });
 
     test(registerID + ' colors are correct', function() {
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
       var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item');
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].querySelector('.seriesMarkerIcon').getAttribute('style').split(' ').join('').split(';')[0], 'background-color:' + colorSet[ colorOrder[i] ]);
+        assert.equal(series[i].querySelector('.seriesMarkerIcon').getAttribute('style').split(' ').join('').split(';')[0], 'background-color:' + colorSet[i]);
       }
     });
 
@@ -548,8 +547,8 @@ function basicTests(registerID,dir){
 }
 
 function generateEmptyData(num,str){
-  var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-  var colorSet = dataVisColors.properties.dataVisColors.value;
+
+  var colorSet = dataVisColors.properties.seriesColorList.value;
   var str = str || 'series_';
   var chartData = [];
   var dataObj = {
@@ -561,7 +560,7 @@ function generateEmptyData(num,str){
     var name = str + i;
     seriesConfig[name] = {
       'name': name,
-      'color': colorSet[colorOrder[i]],
+      'color': colorSet[i],
       'x': 'x',
       'y': 'y',
       'xAxisUnit': 'xUnit',

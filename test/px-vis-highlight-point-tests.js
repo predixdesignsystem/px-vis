@@ -15,8 +15,8 @@ function runTests(){
           baseSVG = document.getElementById('baseSVG'),
           basePoint = document.getElementById('basePoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = [{
@@ -52,14 +52,14 @@ function runTests(){
               "name":"mySeries",
               "x":"x",
               "y":"y0",
-              "color": colorSet[colorOrder[0]]
+              "color": colorSet[0]
             },
             "mySeries2":{
               "type":"line",
               "name":"mySeries2",
               "x":"x",
               "y":"y1",
-              "color": colorSet[colorOrder[1]]
+              "color": colorSet[1]
             },
           },
           chartExtents = {"x":[1,5],"y":[0,10]},
@@ -126,8 +126,8 @@ function runTests(){
           baseSVG = document.getElementById('baseSVG'),
           basePoint = document.getElementById('basePoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -151,10 +151,10 @@ function runTests(){
       });
 
       test('basePoint scatters have the right color', function() {
-        assert.equal(Px.d3.select(basePoint._circles.nodes()[0]).attr('fill').split(' ').join(''), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(basePoint._circles.nodes()[0]).attr('stroke').split(' ').join(''), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(basePoint._circles.nodes()[1]).attr('fill').split(' ').join(''), colorSet[colorOrder[1]]);
-        assert.equal(Px.d3.select(basePoint._circles.nodes()[1]).attr('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(Px.d3.select(basePoint._circles.nodes()[0]).attr('fill').split(' ').join(''), colorSet[0]);
+        assert.equal(Px.d3.select(basePoint._circles.nodes()[0]).attr('stroke').split(' ').join(''), colorSet[0]);
+        assert.equal(Px.d3.select(basePoint._circles.nodes()[1]).attr('fill').split(' ').join(''), colorSet[1]);
+        assert.equal(Px.d3.select(basePoint._circles.nodes()[1]).attr('stroke').split(' ').join(''), colorSet[1]);
       });
 
       test('basePoint scatters x & y', function() {
@@ -178,8 +178,8 @@ function runTests(){
           baseSVG = document.getElementById('baseSVG'),
           basePoint = document.getElementById('basePoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -211,8 +211,8 @@ function runTests(){
           differentSVG = document.getElementById('differentSVG'),
           differentPoint = document.getElementById('differentPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = [{
@@ -248,14 +248,14 @@ function runTests(){
               "name":"mySeries",
               "x":"x",
               "y":"y0",
-              "color": colorSet[colorOrder[0]]
+              "color": colorSet[0]
             },
             "mySeries2":{
               "type":"line",
               "name":"mySeries2",
               "x":"x",
               "y":"y1",
-              "color": colorSet[colorOrder[1]]
+              "color": colorSet[1]
             },
           },
           chartExtents = {"x":[1,5],"y":[0,10]},
@@ -320,8 +320,8 @@ function runTests(){
           differentSVG = document.getElementById('differentSVG'),
           differentPoint = document.getElementById('differentPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -345,10 +345,10 @@ function runTests(){
       });
 
       test('differentPoint scatters have the right color', function() {
-        assert.equal(Px.d3.select(differentPoint._circles.nodes()[0]).attr('fill').split(' ').join(''), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(differentPoint._circles.nodes()[0]).attr('stroke').split(' ').join(''), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(differentPoint._circles.nodes()[1]).attr('fill').split(' ').join(''), colorSet[colorOrder[1]]);
-        assert.equal(Px.d3.select(differentPoint._circles.nodes()[1]).attr('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(Px.d3.select(differentPoint._circles.nodes()[0]).attr('fill').split(' ').join(''), colorSet[0]);
+        assert.equal(Px.d3.select(differentPoint._circles.nodes()[0]).attr('stroke').split(' ').join(''), colorSet[0]);
+        assert.equal(Px.d3.select(differentPoint._circles.nodes()[1]).attr('fill').split(' ').join(''), colorSet[1]);
+        assert.equal(Px.d3.select(differentPoint._circles.nodes()[1]).attr('stroke').split(' ').join(''), colorSet[1]);
       });
 
       test('differentPoint scatters x & y', function() {
@@ -369,8 +369,8 @@ function runTests(){
           differentSVG = document.getElementById('differentSVG'),
           differentPoint = document.getElementById('differentPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -402,8 +402,8 @@ function runTests(){
           fuzzSVG = document.getElementById('fuzzSVG'),
           fuzzPoint = document.getElementById('fuzzPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = [{
@@ -439,14 +439,14 @@ function runTests(){
               "name":"mySeries",
               "x":"x",
               "y":"y0",
-              "color": colorSet[colorOrder[0]]
+              "color": colorSet[0]
             },
             "mySeries2":{
               "type":"line",
               "name":"mySeries2",
               "x":"x",
               "y":"y1",
-              "color": colorSet[colorOrder[1]]
+              "color": colorSet[1]
             },
           },
           chartExtents = {"x":[1,5],"y":[0,10]},
@@ -511,8 +511,8 @@ function runTests(){
           fuzzSVG = document.getElementById('fuzzSVG'),
           fuzzPoint = document.getElementById('fuzzPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -536,20 +536,20 @@ function runTests(){
       });
 
       test('fuzzPoint scatters have the right color', function() {
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[0]).attr('fill').split(' ').join(''), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[0]).attr('stroke').split(' ').join(''), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[1]).attr('fill').split(' ').join(''), colorSet[colorOrder[1]]);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[1]).attr('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[0]).attr('fill').split(' ').join(''), colorSet[0]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[0]).attr('stroke').split(' ').join(''), colorSet[0]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[1]).attr('fill').split(' ').join(''), colorSet[1]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[1]).attr('stroke').split(' ').join(''), colorSet[1]);
 
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[2]).attr('fill').split(' ').join(''), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[2]).attr('stroke').split(' ').join(''), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[3]).attr('fill').split(' ').join(''), colorSet[colorOrder[1]]);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[3]).attr('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[2]).attr('fill').split(' ').join(''), colorSet[0]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[2]).attr('stroke').split(' ').join(''), colorSet[0]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[3]).attr('fill').split(' ').join(''), colorSet[1]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[3]).attr('stroke').split(' ').join(''), colorSet[1]);
 
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[4]).attr('fill').split(' ').join(''), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[4]).attr('stroke').split(' ').join(''), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[5]).attr('fill').split(' ').join(''), colorSet[colorOrder[1]]);
-        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[5]).attr('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[4]).attr('fill').split(' ').join(''), colorSet[0]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[4]).attr('stroke').split(' ').join(''), colorSet[0]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[5]).attr('fill').split(' ').join(''), colorSet[1]);
+        assert.equal(Px.d3.select(fuzzPoint._circles.nodes()[5]).attr('stroke').split(' ').join(''), colorSet[1]);
       });
 
       test('fuzzPoint scatters x & y', function() {
@@ -583,8 +583,8 @@ function runTests(){
           fuzzSVG = document.getElementById('fuzzSVG'),
           fuzzPoint = document.getElementById('fuzzPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -617,8 +617,8 @@ function runTests(){
           generatingSVG = document.getElementById('generatingSVG'),
           generatingPoint = document.getElementById('generatingPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = [{
@@ -654,14 +654,14 @@ function runTests(){
               "name":"mySeries",
               "x":"x",
               "y":"y0",
-              "color": colorSet[colorOrder[0]]
+              "color": colorSet[0]
             },
             "mySeries2":{
               "type":"line",
               "name":"mySeries2",
               "x":"x",
               "y":"y1",
-              "color": colorSet[colorOrder[1]]
+              "color": colorSet[1]
             },
           },
           chartExtents = {"x":[1,5],"y":[0,10]},
@@ -725,8 +725,8 @@ function runTests(){
           generatingSVG = document.getElementById('generatingSVG'),
           generatingPoint = document.getElementById('generatingPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -750,10 +750,10 @@ function runTests(){
       });
 
       test('generatingPoint scatters have the right color', function() {
-        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[0]).attr('fill').split(' ').join(''), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[0]).attr('stroke').split(' ').join(''), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[1]).attr('fill').split(' ').join(''), colorSet[colorOrder[1]]);
-        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[1]).attr('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[0]).attr('fill').split(' ').join(''), colorSet[0]);
+        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[0]).attr('stroke').split(' ').join(''), colorSet[0]);
+        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[1]).attr('fill').split(' ').join(''), colorSet[1]);
+        assert.equal(Px.d3.select(generatingPoint._circles.nodes()[1]).attr('stroke').split(' ').join(''), colorSet[1]);
       });
 
       test('generatingPoint scatters x & y', function() {
@@ -774,8 +774,8 @@ function runTests(){
           generatingSVG = document.getElementById('generatingSVG'),
           generatingPoint = document.getElementById('generatingPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -807,8 +807,8 @@ function runTests(){
           forceSVG = document.getElementById('forceSVG'),
           forcePoint = document.getElementById('forcePoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = [{
@@ -844,14 +844,14 @@ function runTests(){
               "name":"mySeries",
               "x":"x",
               "y":"y0",
-              "color": colorSet[colorOrder[0]]
+              "color": colorSet[0]
             },
             "mySeries2":{
               "type":"line",
               "name":"mySeries2",
               "x":"x",
               "y":"y1",
-              "color": colorSet[colorOrder[1]]
+              "color": colorSet[1]
             },
           },
           chartExtents = {"x":[1,5],"y":[0,10]},
@@ -916,8 +916,8 @@ function runTests(){
           forceSVG = document.getElementById('forceSVG'),
           forcePoint = document.getElementById('forcePoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -942,10 +942,10 @@ function runTests(){
       });
 
       test('forcePoint scatters have the right color', function() {
-        assert.equal(Px.d3.select(forcePoint._circles.nodes()[0]).attr('fill').split(' ').join(''), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(forcePoint._circles.nodes()[0]).attr('stroke').split(' ').join(''), colorSet[colorOrder[0]]);
-        assert.equal(Px.d3.select(forcePoint._circles.nodes()[1]).attr('fill').split(' ').join(''), colorSet[colorOrder[1]]);
-        assert.equal(Px.d3.select(forcePoint._circles.nodes()[1]).attr('stroke').split(' ').join(''), colorSet[colorOrder[1]]);
+        assert.equal(Px.d3.select(forcePoint._circles.nodes()[0]).attr('fill').split(' ').join(''), colorSet[0]);
+        assert.equal(Px.d3.select(forcePoint._circles.nodes()[0]).attr('stroke').split(' ').join(''), colorSet[0]);
+        assert.equal(Px.d3.select(forcePoint._circles.nodes()[1]).attr('fill').split(' ').join(''), colorSet[1]);
+        assert.equal(Px.d3.select(forcePoint._circles.nodes()[1]).attr('stroke').split(' ').join(''), colorSet[1]);
       });
 
       test('forcePoint scatters x & y', function() {
@@ -966,8 +966,8 @@ function runTests(){
           forceSVG = document.getElementById('forceSVG'),
           forcePoint = document.getElementById('forcePoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -998,8 +998,8 @@ function runTests(){
           tooltipSVG = document.getElementById('tooltipSVG'),
           tooltipPoint = document.getElementById('tooltipPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = [{
@@ -1035,14 +1035,14 @@ function runTests(){
               "name":"mySeries",
               "x":"x",
               "y":"y0",
-              "color": colorSet[colorOrder[0]]
+              "color": colorSet[0]
             },
             "mySeries2":{
               "type":"line",
               "name":"mySeries2",
               "x":"x",
               "y":"y1",
-              "color": colorSet[colorOrder[1]]
+              "color": colorSet[1]
             },
           },
           chartExtents = {"x":[1,5],"y":[0,10]},
@@ -1098,8 +1098,8 @@ function runTests(){
           tooltipSVG = document.getElementById('tooltipSVG'),
           tooltipPoint = document.getElementById('tooltipPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -1132,8 +1132,8 @@ function runTests(){
           tooltipSVG = document.getElementById('tooltipSVG'),
           tooltipPoint = document.getElementById('tooltipPoint');
 
-      var colorOrder = dataVisColors.properties.seriesColorOrder.value;
-      var colorSet = dataVisColors.properties.dataVisColors.value;
+
+      var colorSet = dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
