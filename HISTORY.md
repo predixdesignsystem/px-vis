@@ -1,3 +1,12 @@
+v3.0.0
+==================
+* Redesign
+* all components load with default colors unless a theme is loaded
+* removed dataVisColors and seriesColorOrder
+  * replaced with seriesColorList which is just an array of colors rather than names and needed a lookup as before
+* Upgrade to hybrid polymerelements
+
+v2.1.5
 ==================
 * new internal renderer for canvas (TODO doc)
 * removed events for line scatter and canvas scatter (TODO doc)
