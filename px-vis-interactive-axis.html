@@ -4,7 +4,6 @@
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="px-vis-axis.html"/>
 <link rel="import" href="px-vis-axis-interaction-space.html"/>
-<link rel="import" href="../px-colors-design/colors.html" />
 
 <!--
 d3 element creating an axis for the chart
@@ -71,6 +70,7 @@ Custom property | Description | Default
   `--px-vis-axis-inline-title-color` | The color for the axis title  | `$gray9`
   `--px-vis-axis-inline-type-color` | The color for the axis lines, axis ticks, and axis tick labels when using 'inline' labelPosition | `$white`
   `--px-vis-axis-inline-box-color` | The color for the tick boxes when using 'inline' labelPosition | `$gray9`
+  `--px-vis-axis-common-tick-color`
 
 
 @element px-vis-axis
@@ -172,7 +172,6 @@ Custom property | Description | Default
       PxVisBehavior.radial,
       PxVisBehaviorD3.radialAxisConfig,
       PxVisBehavior.seriesToAxes,
-      PxColorsBehavior.baseColors,
       PxVisBehaviorChart.subConfiguration,
       PxVisBehavior.preventInitialDrawing,
       PxVisBehavior.categories,
@@ -437,7 +436,7 @@ Custom property | Description | Default
     },
 
     /*
-     * Sets styles and on hover for common axis
+     * Sets styles and on hover states for common axis
      *
      */
     _setAxisStyles: function(e) {
@@ -450,10 +449,10 @@ Custom property | Description | Default
           this._interactiveGroup.selectAll('.hideCommon').style('display','none');
           this._interactiveGroup.on('mouseover',function(){
             _this._interactiveGroup.selectAll('.hideCommon').style('display',null)
-            _this._interactiveGroup.selectAll('.hideCommon').style('fill',_this.colors.grey3)
+            _this._interactiveGroup.selectAll('.hideCommon').style('fill',_this._checkThemeVariable("--px-vis-axis-common-tick-color", _this.axisColor))
           }).on('mouseout',function(){
             _this._interactiveGroup.selectAll('.hideCommon').style('display','none')
-            _this._interactiveGroup.selectAll('.hideCommon').style('fill',"black")
+            _this._interactiveGroup.selectAll('.hideCommon').style('fill',_this._checkThemeVariable("--px-vis-axis-color", _this.axisColor))
           });
 
         } else if(this._commonAxisRanAtLeastOnce) {

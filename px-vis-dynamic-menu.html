@@ -1,4 +1,5 @@
 <link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="../web-animations-js/web-animations-next-lite.min.html"/>
 <link rel="import" href="../neon-animation/neon-animation-runner-behavior.html"/>
 <link rel="import" href="../neon-animation/animations/fade-in-animation.html"/>
 <link rel="import" href="../neon-animation/animations/fade-out-animation.html"/>
@@ -35,7 +36,7 @@ Custom property | Description | Default
   <template>
     <style include="px-vis-dynamic-menu-styles"></style>
 
-      <span id="button" class="dropdown-trigger" on-tap="_buttonClicked"><i class="fa fa-gear icon" aria-hidden="true"></i></span>
+      <span id="button" slot="dropdown-trigger" on-tap="_buttonClicked"><i class="fa fa-gear icon" aria-hidden="true"></i></span>
       <iron-dropdown
         id="dropdown"
         opened="[[_opened]]"
@@ -44,7 +45,7 @@ Custom property | Description | Default
         dynamic-align
         allow-outside-scroll
         no-overlap>
-        <div class="dropdown-content menu-wrapper">
+        <div slot="dropdown-content" class="menu-wrapper">
           <ul class="menu-list">
             <template is="dom-repeat" items="{{dynamicMenuConfig}}" strip-whitespace>
               <li class="menu-wrapper--item u-p--" on-tap="_clickItem" value="{{index}}"><i class$="fa [[_getIcon(item)]]" aria-hidden="true"></i>{{item.name}}</li>
