@@ -28,7 +28,8 @@ PxVisBehaviorRenderer.debounceOnPanning = {
         return {
           'chartData': 10,
           'filteredChartData': 10,
-          'highlightData': 10
+          'highlightData': 10,
+          'markers': 10
         };
       }
     },
@@ -148,7 +149,8 @@ PxVisBehaviorRenderer.base = [{
   },
   observers: ['_renderChartData(domainChanged, canvasContext, chartData.*, mutedSeries.*, completeSeriesConfig.*, preventInitialDrawing, radial, counterClockwise, renderToCanvas)',
               '_renderFilteredChartData(domainChanged, canvasContext, _filteredData.*, mutedSeries.*, completeSeriesConfig.*, preventInitialDrawing, radial, counterClockwise, renderToCanvas)',
-              '_renderHighlight(domainChanged, canvasContext, _highlightData.*, completeSeriesConfig.*, preventInitialDrawing, radial, counterClockwise, renderToCanvas)',
+              '_renderHighlight(domainChanged, canvasContextTop, _highlightData.*, completeSeriesConfig.*, preventInitialDrawing, radial, counterClockwise, renderToCanvas)',
+              '_renderMarkers(canvasLayers.markers, domainChanged, markerData, markerConfig, preventInitialDrawing)',
               '_mutedChanged(_combinedMutedSeries)',
               '_serieToRedrawOnTopChanged(serieToRedrawOnTop)'],
 
@@ -161,14 +163,14 @@ PxVisBehaviorRenderer.base = [{
   attached: function() {
 
     this.listen(this, 'px-vis-renderer-register', '_registerDrawingElement');
-    this.listen(this, 'px-vis-renderer-unregister', '_unregisterDrawingElement');
+
     this.listen(this, 'px-vis-highlight-data-changed', '_renderHighlight');
     this.listen(this, 'px-vis-redraw-lines', '_renderAllLines');
 
     //ensure we redraw
-    if(this.domainChanged === true || this.domainChanged === false) {
-      this.set('domainChanged', !this.domainChanged);
-    }
+    // if(this.domainChanged === true || this.domainChanged === false) {
+    //   this.set('domainChanged', !this.domainChanged);
+    // }
   },
   detached: function() {
 
@@ -189,7 +191,8 @@ PxVisBehaviorRenderer.base = [{
     return {
       'chartData': initialVal,
       'filteredChartData': JSON.parse(JSON.stringify(initialVal)),
-      'highlightData': JSON.parse(JSON.stringify(initialVal))
+      'highlightData': JSON.parse(JSON.stringify(initialVal)),
+      'markers': JSON.parse(JSON.stringify(initialVal))
     }
   },
 
@@ -201,6 +204,8 @@ PxVisBehaviorRenderer.base = [{
     } else {
       this._svgTargets[e.detail.rendererType].push({'target': evt.rootTarget, 'type': e.detail.type});
     }
+
+    this.listen(evt.rootTarget, 'px-vis-renderer-unregister', '_unregisterDrawingElement');
   },
 
   _unregisterDrawingElement: function(e) {
@@ -228,6 +233,8 @@ PxVisBehaviorRenderer.base = [{
         this._svgTargets[e.detail.renderType].splice(i,1);
       }
     }
+
+    this.unlisten(evt.rootTarget, 'px-vis-renderer-unregister', '_unregisterDrawingElement');
   },
 
   _mutedChanged: function() {
@@ -295,6 +302,19 @@ PxVisBehaviorRenderer.base = [{
       'svgTargets': this._svgTargets['highlightData'],
       'canvasToClear': [this.canvasContextTop],
       'drawDebounceTime': this.drawDebounceTime['highlightData']
+    }
+    this._renderData(ctx);
+  },
+
+  _renderMarkers: function() {
+    var ctx = {
+      'lastPointRenderedIndex': null,
+      'currentBatchStartIndex': 0,
+      'renderType': 'markers',
+      'canvasTargets': this._canvasTargets['markers'],
+      'svgTargets': this._svgTargets['markers'],
+      'canvasToClear': [this.canvasLayers.markers],
+      'drawDebounceTime': this.drawDebounceTime['markers']
     }
     this._renderData(ctx);
   },

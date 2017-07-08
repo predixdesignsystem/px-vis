@@ -118,7 +118,8 @@ Element which creates 2 SVG elements, and a canvas element between the two svg e
         },
 
         _assignCanvas: function(evt) {
-          var key = this.$.canvasTemplate.itemForElement(evt.target);
+          var normalized = Polymer.dom(evt),
+              key = this.$.canvasTemplate.itemForElement(normalized.rootTarget);
 
           if(key) {
             this.set('canvasLayers.' + key, evt.detail.data);
