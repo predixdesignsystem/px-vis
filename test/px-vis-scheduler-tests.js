@@ -136,7 +136,7 @@ function runTests(){
       window.setTimeout(function() {
         assert.isTrue(hasRun);
         done();
-      }, 200);
+      }, 500);
     });
 
     test('starting an action fires event', function(done) {
