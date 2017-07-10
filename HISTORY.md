@@ -1,3 +1,7 @@
+v2.1.6
+==================
+* fix semantic error preventing IE from  loading PxVisBehaviorChart
+
 v2.1.5
 ==================
 * Ensure + and - zooming button set the appropriate extentsAction
