@@ -6,13 +6,28 @@ v3.0.0
   * replaced with seriesColorList which is just an array of colors rather than names and needed a lookup as before
 * Upgrade to hybrid polymerelements
 * moved colors behavior from colors repo to vis repo
+* new internal renderer for canvas:
+  * renderer automatically adjust the number of points per frame rendered. This number will be adjusted every frame based on how long previous frame took, which should make the rendering smooth on different browsers and different hardware
+  * It will now render "series per series" rather than a batch of several series for each frame, i.e it won't move to rendering the second series until the first series has been completely rendered
+* removed properties for controlling number of points rendered in progressive rendering:
+  * noCanvasProgressiveRendering
+  * progressiveRenderingPointsPerFrame
+  * progressiveRenderingMinimumFrames
+* removed progressive rendering events for line scatter and canvas scatter:
+  * px-vis-scatter-progressive-rendering-started
+  * px-vis-scatter-canvas-progressive-batch
+  * px-vis-scatter-progressive-rendering-ended
+  * px-vis-scatter-canvas-rendering-ended
+  * px-vis-line-progressive-rendering-started
+  * px-vis-line-canvas-progressive-batch
+  * px-vis-line-progressive-rendering-ended
+  * px-vis-line-canvas-rendering-ended
+* new events for canvas rendering (TODO doc)
+* removed redrawElement function from highlightPoint and highlightLine
 
 v2.1.5
 ==================
-* new internal renderer for canvas (TODO doc)
-* removed events for line scatter and canvas scatter (TODO doc)
-* new events for rendering (TODO doc)
-* removed redrawElement function from highlightPoint and highlightLine
+* Ensure + and - zooming button set the appropriate extentsAction
 
 v2.1.4
 ==================

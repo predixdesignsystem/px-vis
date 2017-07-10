@@ -177,8 +177,7 @@ PxVisBehaviorRenderer.base = [{
     //reset counter so it cancels current drawing
     this._progressiveRenderingCounter = this._initializeRendererTypeObject(0);
 
-    // this.unlisten(this, 'px-vis-renderer-register', '_registerDrawingElement');
-    // this.unlisten(this, 'px-vis-renderer-unregister', '_unregisterDrawingElement');
+    this.unlisten(this, 'px-vis-renderer-register', '_registerDrawingElement');
     this.unlisten(this, 'px-vis-highlight-data-changed', '_renderHighlight');
     this.unlisten(this, 'px-vis-redraw-lines', '_renderAllLines');
   },
@@ -196,6 +195,10 @@ PxVisBehaviorRenderer.base = [{
     }
   },
 
+  /**
+   * Elements wanting to use the renderer need to fire an event which
+   * will be processed here
+   */
   _registerDrawingElement: function(e) {
     var evt = Polymer.dom(e);
 
@@ -208,6 +211,10 @@ PxVisBehaviorRenderer.base = [{
     this.listen(evt.rootTarget, 'px-vis-renderer-unregister', '_unregisterDrawingElement');
   },
 
+  /**
+   * Elements wanting to use the renderer need to fire an event (on detached)
+   * which will be processed here
+   */
   _unregisterDrawingElement: function(e) {
     var evt = Polymer.dom(e),
         index = -1;
@@ -237,6 +244,9 @@ PxVisBehaviorRenderer.base = [{
     this.unlisten(evt.rootTarget, 'px-vis-renderer-unregister', '_unregisterDrawingElement');
   },
 
+  /*****************************************************************
+   * Handlers for starting a render
+   *****************************************************************/
   _mutedChanged: function() {
     this._renderChartData();
   },
@@ -347,7 +357,12 @@ PxVisBehaviorRenderer.base = [{
     this._renderData(ctx);
   },
 
-
+  /*****************************************************************
+   * Rendering process
+   *****************************************************************/
+  /**
+   * Initial entry point, debouncing as needed or cancel
+   */
   _renderData: function(ctx) {
 
     if(!this.preventInitialDrawing) {
@@ -367,6 +382,10 @@ PxVisBehaviorRenderer.base = [{
     }
   },
 
+  /**
+   * Ensure we the basic conditions for allowign rendering
+   * and start it
+   */
   _renderDataDebounced: function(ctx, allowCanvasClearing) {
     if(this.y &&
          typeof this.domainChanged !== 'undefined' &&
@@ -378,6 +397,10 @@ PxVisBehaviorRenderer.base = [{
     }
   },
 
+  /**
+   * Resets var relating to 1 complete rendering, call initializeDrawingSession
+   * on all rendering targets and kick the process
+   */
   _initializeCanvasRendering: function(ctx, allowCanvasClearing) {
 
     //clear canvas first
@@ -402,6 +425,12 @@ PxVisBehaviorRenderer.base = [{
     }
   },
 
+  /**
+   * Called each frame.
+   * - Updates previous frame timings if there was one
+   * - Render what can be in the current frame
+   * - Exit or wait for next frame
+   */
   _processCanvasRendering: function(ctx) {
 
      var now = window.performance.now(),
@@ -439,6 +468,11 @@ PxVisBehaviorRenderer.base = [{
     //event?
   },
 
+  /**
+   * Rendering process during one frame. Calculate how many points can be
+   * rendered for the current target an render those. Keep rendering next
+   * targets if we have enough time, based on same process
+   */
   _processCanvasOneFrame: function(ctx) {
 
     //budget is how much we can do in our frame. keep rendering until we run
@@ -448,7 +482,8 @@ PxVisBehaviorRenderer.base = [{
         toRender,
         totalRendered = 0,
         drawingResult;
-// console.log('NEW FRAME')
+
+    // console.log('NEW FRAME')
     while(budget > 0 && ctx.currentTarget) {
 
       //get how many points we can render
@@ -458,7 +493,7 @@ PxVisBehaviorRenderer.base = [{
         previousRenderTargetType = ctx.currentTarget.type;
       }
 
-//  console.log('NEW TARGET, torender: ' + toRender + ', budget left: ' + budget)
+      //  console.log('NEW TARGET, torender: ' + toRender + ', budget left: ' + budget)
       //wether we need to guess or have stats for this type of rendering
       if(toRender === -1) {
         drawingResult = this._firstCanvasRender(ctx);
@@ -474,9 +509,13 @@ PxVisBehaviorRenderer.base = [{
       //get next target and keep rendering if we can
       ctx.currentTarget = this._getCurrentCanvasRenderingTarget(ctx);
     }
-     console.log('finished one frame: ' + JSON.stringify(ctx.previousFrameStats) + ' in: ' + (window.performance.now() - ctx.previousStartTime));
+    // console.log('finished one frame: ' + JSON.stringify(ctx.previousFrameStats) + ' in: ' + (window.performance.now() - ctx.previousStartTime));
   },
 
+  /**
+   * Updates stats of the previous frame: how many points have been
+   * rendered per type and how long it took
+   */
   _updatePreviousFrameTiming: function(ctx, now) {
 
     if(ctx.previousFrameStats) {
@@ -500,7 +539,7 @@ PxVisBehaviorRenderer.base = [{
           if(this._previousFramesTiming[ctx.renderType][targetType].length > this._frameCountToAverage) {
             this._previousFramesTiming[ctx.renderType][targetType].shift();
           }
-          console.log('frame ' + ctx.frameIndex + ', type: ' + targetType + ', render: ' +JSON.stringify(this._previousFramesTiming[ctx.renderType][targetType][this._previousFramesTiming[ctx.renderType][targetType].length-1]));
+          // console.log('frame ' + ctx.frameIndex + ', type: ' + targetType + ', render: ' +JSON.stringify(this._previousFramesTiming[ctx.renderType][targetType][this._previousFramesTiming[ctx.renderType][targetType].length-1]));
         }
       }
     }
@@ -511,26 +550,6 @@ PxVisBehaviorRenderer.base = [{
     ctx.previousFrameStats.totPoints = 0;
   },
 
-  // _registerCurrentTargetFrameTiming: function(ctx, pointsRendered, renderedAllSameType) {
-
-  //   if(renderedAllSameType) {
-  //     //store what we are going to render this frame so it's
-  //     //available next frame
-  //     this._previousFramesTiming[ctx.renderType][ctx.currentTarget.type].push({
-  //       'points': pointsRendered
-  //     });
-  //     //only average the last X frames (per render type, per drawing type)
-  //     if(this._previousFramesTiming[ctx.renderType][ctx.currentTarget.type].length > this._frameCountToAverage) {
-  //       this._previousFramesTiming[ctx.renderType][ctx.currentTarget.type].shift();
-  //     }
-
-  //     //store type of rendering so that we can complete duration on next frame
-  //     ctx.previousTargetType = ctx.currentTarget.type;
-  //   } else {
-  //     ctx.previousTargetType = null;
-  //   }
-  // },
-
   _getCurrentCanvasRenderingTarget: function(ctx) {
 
     if(ctx.canvasTargets.length) {
@@ -540,6 +559,10 @@ PxVisBehaviorRenderer.base = [{
     return null;
   },
 
+  /**
+   * Used when rendering a target we don't have stats about. Assumes a first
+   * number of points to render, measure that and render more if we think we can
+   */
   _firstCanvasRender: function(ctx) {
 
     //try estimating how much we can render.
@@ -579,8 +602,11 @@ PxVisBehaviorRenderer.base = [{
     }
   },
 
-  //Tries to render toRender number of points for the current target.
-  //returns the number of points actually rendered and how much of the budget this used
+  /**
+   * Tries to render toRender number of points for the current target.
+   * returns the number of points actually rendered and how much of the budget
+   * this used
+   */
   _renderTargetToCanvas: function(toRender, ctx, currentBudget) {
 
     var leftInCurrentSeries = ctx.currentTarget.target.chartData ? ctx.currentTarget.target.chartData.length - ctx.currentRenderingCounter : 0,
@@ -611,6 +637,11 @@ PxVisBehaviorRenderer.base = [{
     }
   },
 
+  /**
+   * Calculates how many points we can render in one frame for the
+   * context current target. Based on stats of previous rendering of same type.
+   * Returns -1 if we don't have stats about this type of rendering
+   */
   _calculatePointsAllowance: function(ctx) {
     var totPoints = 0,
         totDuration = 0,
