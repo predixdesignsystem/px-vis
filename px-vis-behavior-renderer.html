@@ -221,6 +221,7 @@ PxVisBehaviorRenderer.base = [{
     }
 
     this.listen(evt.rootTarget, 'px-vis-renderer-unregister', '_unregisterDrawingElement');
+    e.stopPropagation();
   },
 
   /**
@@ -254,6 +255,7 @@ PxVisBehaviorRenderer.base = [{
     }
 
     this.unlisten(evt.rootTarget, 'px-vis-renderer-unregister', '_unregisterDrawingElement');
+    e.stopPropagation();
   },
 
   /*****************************************************************
@@ -384,7 +386,7 @@ PxVisBehaviorRenderer.base = [{
          this.domainChanged !== null &&
          this._isAttached) {
 
-          console.log('START RENDER')
+          console.log('START RENDER ' + this.nodeName)
       this._initializeCanvasRendering(ctx, allowCanvasClearing);
       this._initializeSvgRendering(ctx);
     }
