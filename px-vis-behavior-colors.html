@@ -481,4 +481,35 @@ PxColorsBehavior.dataVisColorTheming = [{
     }
 
 }, PxColorsBehavior.dataVisColors];
+
+/*
+    Name:
+    PxColorsBehavior.getSeriesColors
+
+    Description:
+    Polymer behavior that provides the ability to retrieve the color of a serie given an index
+
+    Dependencies:
+    -
+
+    @polymerBehavior PxColorsBehavior.getSeriesColors
+*/
+PxColorsBehavior.getSeriesColors = [{
+  /**
+   * Helper function to return the correct color for a particular index.
+   **/
+  _getColor: function(i) {
+    var l = this.seriesColorList.length,
+        index = this._calcIndex(i,l);
+
+    return this.seriesColorList[ index ];
+  },
+
+  /**
+   * Helper function to calculate the index. When we run out of indcies, it loops back over valid indicies.
+   **/
+  _calcIndex: function(i, l) {
+    return i < l ? i : this._calcIndex(i - l,l);
+  }
+}, PxColorsBehavior.dataVisColors ];
 </script>
