@@ -1,3 +1,7 @@
+v2.1.5
+==================
+* Ensure + and - zooming button set the appropriate extentsAction
+
 v2.1.4
 ==================
 * Ensure axis get redrawn when moving a chart around the dom
