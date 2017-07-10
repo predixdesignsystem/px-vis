@@ -65,7 +65,8 @@ PxVisBehaviorRenderer.debounceOnPanning = {
       this.drawDebounceTime = {
         'chartData': 0,
         'filteredChartData': 0,
-        'highlightData': this._oldDrawDebounceTime.highlightData
+        'highlightData': this._oldDrawDebounceTime.highlightData,
+        'markers': 0
       };
     }
   },
@@ -145,6 +146,10 @@ PxVisBehaviorRenderer.base = [{
           'scatter': []
         });
       }
+    },
+    _hasBeenDetached: {
+      type: Boolean,
+      value: false
     }
   },
   observers: ['_renderChartData(domainChanged, canvasContext, chartData.*, mutedSeries.*, completeSeriesConfig.*, preventInitialDrawing, radial, counterClockwise, renderToCanvas)',
@@ -158,7 +163,6 @@ PxVisBehaviorRenderer.base = [{
   //TODO: filtered data chart also have the chart data kicking but shouldnt
   //TODO: low priority: include SVG drawings
   //TODO: benchamrks
-  //TODO: verify that multiline is not impacted by prepending last point of single line
 
   attached: function() {
 
@@ -168,18 +172,26 @@ PxVisBehaviorRenderer.base = [{
     this.listen(this, 'px-vis-redraw-lines', '_renderAllLines');
 
     //ensure we redraw
-    // if(this.domainChanged === true || this.domainChanged === false) {
-    //   this.set('domainChanged', !this.domainChanged);
-    // }
+    if(this._hasBeenDetached) {
+
+      //give some time for the elemnts to re register :(
+      window.setTimeout(function() {
+        this._renderChartData();
+        this._renderFilteredChartData();
+        this._renderMarkers();
+        this._renderHighlight();
+      }.bind(this), 50);
+    }
   },
   detached: function() {
 
     //reset counter so it cancels current drawing
     this._progressiveRenderingCounter = this._initializeRendererTypeObject(0);
 
-    this.unlisten(this, 'px-vis-renderer-register', '_registerDrawingElement');
+//this.unlisten(this, 'px-vis-renderer-register', '_registerDrawingElement');
     this.unlisten(this, 'px-vis-highlight-data-changed', '_renderHighlight');
     this.unlisten(this, 'px-vis-redraw-lines', '_renderAllLines');
+    this._hasBeenDetached = true;
   },
 
   /**
@@ -277,56 +289,36 @@ PxVisBehaviorRenderer.base = [{
     }
   },
 
-  _renderChartData: function() {
+  _renderTypedContext: function(renderType, canvasesToClear) {
     var ctx = {
       'lastPointRenderedIndex': null,
       'currentBatchStartIndex': 0,
-      'renderType': 'chartData',
-      'canvasTargets': this._canvasTargets['chartData'],
-      'svgTargets': this._svgTargets['chartData'],
-      'canvasToClear': [this.canvasContext],
-      'drawDebounceTime': this.drawDebounceTime['chartData']
+      'renderType': renderType,
+      'canvasTargets': this._canvasTargets[renderType],
+      'svgTargets': this._svgTargets[renderType],
+      'canvasToClear': canvasesToClear,
+      'drawDebounceTime': this.drawDebounceTime[renderType]
+    };
+
+    if(ctx.canvasTargets.length) {
+      this._renderData(ctx);
     }
-    this._renderData(ctx);
+  },
+
+  _renderChartData: function() {
+    this._renderTypedContext('chartData', [this.canvasContext]);
   },
 
   _renderFilteredChartData: function() {
-    var ctx = {
-      'lastPointRenderedIndex': null,
-      'currentBatchStartIndex': 0,
-      'renderType': 'filteredChartData',
-      'canvasTargets': this._canvasTargets['filteredChartData'],
-      'svgTargets': this._svgTargets['filteredChartData'],
-      'canvasToClear': [this.canvasContext],
-      'drawDebounceTime': this.drawDebounceTime['filteredChartData']
-    }
-    this._renderData(ctx);
+    this._renderTypedContext('filteredChartData', [this.canvasContext]);
   },
 
   _renderHighlight: function() {
-    var ctx = {
-      'lastPointRenderedIndex': null,
-      'currentBatchStartIndex': 0,
-      'renderType': 'highlightData',
-      'canvasTargets': this._canvasTargets['highlightData'],
-      'svgTargets': this._svgTargets['highlightData'],
-      'canvasToClear': [this.canvasContextTop],
-      'drawDebounceTime': this.drawDebounceTime['highlightData']
-    }
-    this._renderData(ctx);
+    this._renderTypedContext('highlightData', [this.canvasContextTop]);
   },
 
   _renderMarkers: function() {
-    var ctx = {
-      'lastPointRenderedIndex': null,
-      'currentBatchStartIndex': 0,
-      'renderType': 'markers',
-      'canvasTargets': this._canvasTargets['markers'],
-      'svgTargets': this._svgTargets['markers'],
-      'canvasToClear': [this.canvasLayers.markers],
-      'drawDebounceTime': this.drawDebounceTime['markers']
-    }
-    this._renderData(ctx);
+    this._renderTypedContext('markers', [this.canvasLayers.markers]);
   },
 
   _renderAllLines: function() {
@@ -392,6 +384,7 @@ PxVisBehaviorRenderer.base = [{
          this.domainChanged !== null &&
          this._isAttached) {
 
+          console.log('START RENDER')
       this._initializeCanvasRendering(ctx, allowCanvasClearing);
       this._initializeSvgRendering(ctx);
     }
