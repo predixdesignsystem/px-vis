@@ -2494,6 +2494,14 @@ PxVisBehaviorChart.thresholdConfig = {
   }
 };
 
+/*
+    Name:
+    PxVisBehaviorChart.combineMutes
+
+    Description:
+    Behavior providing ways to combine different type of muting into one array
+    @polymerBehavior PxVisBehaviorChart.combineMutes
+*/
 PxVisBehaviorChart.combineMutes = {
   properties: {
     _combinedMutedSeries: {
@@ -2521,12 +2529,12 @@ PxVisBehaviorChart.combineMutes = {
      * the categories
      *
      */
-    _mutedSeriesCategories: {
+    mutedSeriesCategories: {
       type:Object,
       value: function() { return {} }
     }
   },
-  observers: ['_combineMutes(mutedSeriesBrush, mutedSeriesDomain)'],
+  observers: ['_combineMutes(mutedSeriesBrush, mutedSeriesDomain, mutedSeriesCategories.*)'],
 
   /**
    * Takes the muted series from the axis brush and the selected domain and returns a merged copy of them
@@ -2534,8 +2542,8 @@ PxVisBehaviorChart.combineMutes = {
    */
   _combineMutes: function(m1,m2) {
     var muted = {},
-        mutedCategories = Object.keys(this._mutedSeriesCategories).filter(function(cat) {
-          return this._mutedSeriesCategories[cat];
+        mutedCategories = Object.keys(this.mutedSeriesCategories).filter(function(cat) {
+          return this.mutedSeriesCategories[cat];
         }.bind(this));
     // for these, we assume that "false" items will just have been removed
     for(var k in m1) {
