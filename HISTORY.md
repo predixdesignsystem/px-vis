@@ -5,6 +5,7 @@ v3.0.0
 * removed dataVisColors and seriesColorOrder
   * replaced with seriesColorList which is just an array of colors rather than names and needed a lookup as before
 * Upgrade to hybrid polymerelements
+* moved colors behavior from colors repo to vis repo
 
 v2.1.5
 ==================
