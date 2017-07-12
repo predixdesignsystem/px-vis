@@ -152,12 +152,6 @@ PxVisBehaviorRenderer.base = [{
       value: false
     }
   },
-  observers: ['_renderChartData(domainChanged, canvasContext, chartData.*, mutedSeries.*, completeSeriesConfig.*, preventInitialDrawing, radial, counterClockwise, renderToCanvas)',
-              '_renderFilteredChartData(domainChanged, canvasContext, _filteredData.*, mutedSeries.*, completeSeriesConfig.*, preventInitialDrawing, radial, counterClockwise, renderToCanvas)',
-              '_renderHighlight(domainChanged, canvasContextTop, _highlightData.*, completeSeriesConfig.*, preventInitialDrawing, radial, counterClockwise, renderToCanvas)',
-              '_renderMarkers(canvasLayers.markers, domainChanged, markerData, markerConfig, preventInitialDrawing)',
-              '_mutedChanged(_combinedMutedSeries)',
-              '_serieToRedrawOnTopChanged(serieToRedrawOnTop)'],
 
 
   //TODO: filtered data chart also have the chart data kicking but shouldnt
@@ -259,13 +253,14 @@ PxVisBehaviorRenderer.base = [{
   },
 
   /*****************************************************************
-   * Handlers for starting a render
+   * Handlers for starting a render,. observers to be defined at the
+   * chart level
    *****************************************************************/
   _mutedChanged: function() {
     this._renderChartData();
   },
 
-  _serieToRedrawOnTopChanged: function() {
+  _renderSeriesOnTop: function() {
     var targets = [],
         ctx;
 
