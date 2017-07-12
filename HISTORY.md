@@ -1,3 +1,8 @@
+v2.1.7
+==================
+* Fix for axis interaction space position on right and bottom axis (effectively fixing problem where right positioned axis couldn't be dragged in multi Y)
+* Ensure multi axis can handle changing all its axes to the same number of new axis
+
 v2.1.6
 ==================
 * fix semantic error preventing IE from  loading PxVisBehaviorChart
