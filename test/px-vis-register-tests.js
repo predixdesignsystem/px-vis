@@ -4,6 +4,7 @@ document.addEventListener("WebComponentsReady", function() {
 
 function runTests(){
   suite('px-vis-register does Polymer exist?', function() {
+
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
@@ -305,7 +306,7 @@ function runTests(){
     });
 
     test('dashPattern is correct', function() {
-      var colorSet = dataVisColors.properties.seriesColorList.value,
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value,
           series = Polymer.dom(dashPattern.root).querySelectorAll('px-vis-register-item'),
 
           color0 = colorSet[0],
@@ -387,11 +388,14 @@ function basicTests(registerID,dir){
 
     test(registerID + ' colors are correct', function() {
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
+
       var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item');
-      for(var i = 0; i < series.length; i++){
+      for(var i = 0; i < series.length-1; i++){
         assert.equal(series[i].querySelector('.seriesMarkerIcon').getAttribute('style').split(' ').join('').split(';')[0], 'background-color:' + colorSet[i]);
       }
+
+      assert.equal(series[series.length-1].querySelector('.seriesMarkerIcon').getAttribute('style').split(' ').join('').split(';')[0], 'background-color:transparent');
     });
 
   });
@@ -548,7 +552,7 @@ function basicTests(registerID,dir){
 
 function generateEmptyData(num,str){
 
-  var colorSet = dataVisColors.properties.seriesColorList.value;
+  var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
   var str = str || 'series_';
   var chartData = [];
   var dataObj = {
