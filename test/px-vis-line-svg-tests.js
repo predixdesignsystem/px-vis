@@ -15,7 +15,7 @@ function runTests(){
         baseLine = document.getElementById('baseLine');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -108,7 +108,7 @@ function runTests(){
         mutedLine2 = document.getElementById('mutedLine2');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath1,linePath2;
 
     suiteSetup(function(done){
@@ -245,7 +245,7 @@ function runTests(){
         mutedLine2 = document.getElementById('mutedLine2');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
       var m = {
@@ -281,7 +281,7 @@ function runTests(){
         mutedLine2 = document.getElementById('mutedLine2');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
       var m = {
@@ -316,7 +316,7 @@ function runTests(){
         mutedLine2 = document.getElementById('mutedLine2');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
       var m = {
@@ -354,7 +354,7 @@ function runTests(){
         missingDataPointLine2 = document.getElementById('missingDataPointLine2');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath1,linePath2;
 
     suiteSetup(function(done){
@@ -467,7 +467,7 @@ function runTests(){
         missingDataPointLine2Null = document.getElementById('missingDataPointLine2Null');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath1,linePath2;
 
     suiteSetup(function(done){
@@ -581,7 +581,7 @@ function runTests(){
         missingDataPointLine2Gap = document.getElementById('missingDataPointLine2Gap');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath1,linePath2;
 
     suiteSetup(function(done){
@@ -693,7 +693,7 @@ function runTests(){
         parallelLine = document.getElementById('parallelLine');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -818,7 +818,7 @@ function runTests(){
         parallelGradientLine = document.getElementById('parallelGradientLine');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -954,7 +954,7 @@ function runTests(){
         parallelCategoryLine = document.getElementById('parallelCategoryLine');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1104,7 +1104,7 @@ function runTests(){
         parallelCategoryGradientLine = document.getElementById('parallelCategoryGradientLine');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1263,7 +1263,7 @@ function runTests(){
         parallelCategoryGradientLine = document.getElementById('parallelCategoryGradientLine');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1311,7 +1311,7 @@ function runTests(){
         parallelCategoryGradientLine = document.getElementById('parallelCategoryGradientLine');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1358,7 +1358,7 @@ function runTests(){
         polarLine = document.getElementById('polarLine');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1479,7 +1479,7 @@ function runTests(){
         polarDegreeLine = document.getElementById('polarDegreeLine');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1600,7 +1600,7 @@ function runTests(){
         polarCCWLine = document.getElementById('polarCCWLine');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1721,7 +1721,7 @@ function runTests(){
         polarDegreeCCWLine = document.getElementById('polarDegreeCCWLine');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1842,7 +1842,7 @@ function runTests(){
         polarMissingLine = document.getElementById('polarMissingLine');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1956,7 +1956,7 @@ function runTests(){
         radarLine = document.getElementById('radarLine');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -2201,7 +2201,7 @@ function runTests(){
         radarMissingLine = document.getElementById('radarMissingLine');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -2392,7 +2392,7 @@ function runTests(){
         interpolationLine3 = document.getElementById('interpolationLine3');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath1,linePath2,linePath3;
 
     suiteSetup(function(done) {
@@ -2576,7 +2576,7 @@ function runTests(){
           domRepeatDomBind = document.getElementById('domRepeatDomBind');
 
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
       var domRepeatLines, linePath1;
 
       suiteSetup(function(done){
@@ -2677,7 +2677,7 @@ function runTests(){
           domRepeatDomBind = document.getElementById('domRepeatDomBind');
 
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
       var domRepeatLines, linePath1, linePath2, linePath3;
 
       suiteSetup(function(done){
@@ -2833,7 +2833,7 @@ function runTests(){
           domRepeatDomBind = document.getElementById('domRepeatDomBind');
 
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
       var domRepeatLines, linePath1, linePath2, linePath3;
 
       suiteSetup(function(done){
@@ -2963,7 +2963,7 @@ function runTests(){
           domRepeatDomBind = document.getElementById('domRepeatDomBind');
 
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
       var domRepeatLines, linePath1, linePath4, linePath3;
 
       suiteSetup(function(done){
@@ -3074,7 +3074,7 @@ function runTests(){
         assert.equal(linePath1.attr('stroke-opacity'),1);
       });
       test('domRepeatLine1 line series has the right color', function() {
-        assert.equal(linePath1.attr('stroke').split(' ').join(''),colorSet[[0]);
+        assert.equal(linePath1.attr('stroke').split(' ').join(''),colorSet[0]);
       });
       test('domRepeatLine1 line d', function() {
         assert.equal(linePath1.attr('d').split(/[\s,]+/).join(''),'M0260L120210L240170L360230L480210');
@@ -3090,7 +3090,7 @@ function runTests(){
         assert.equal(linePath4.attr('stroke-opacity'),1);
       });
       test('domRepeatLine4 line series has the right color', function() {
-        assert.equal(linePath4.attr('stroke').split(' ').join(''),colorSet[[3]);
+        assert.equal(linePath4.attr('stroke').split(' ').join(''),colorSet[3]);
       });
       test('domRepeatLine4 line d', function() {
         assert.equal(linePath4.attr('d').split(/[\s,]+/).join(''),'M0260L120240L240210L360180L480150');
@@ -3106,7 +3106,7 @@ function runTests(){
         assert.equal(linePath3.attr('stroke-opacity'),1);
       });
       test('domRepeatLine3 line series has the right color', function() {
-        assert.equal(linePath3.attr('stroke').split(' ').join(''),colorSet[[2]);
+        assert.equal(linePath3.attr('stroke').split(' ').join(''),colorSet[2]);
       });
       test('domRepeatLine3 line d', function() {
         assert.equal(linePath3.attr('d').split(/[\s,]+/).join(''),'M0260L120190L240170L360120L48070');
@@ -3119,7 +3119,7 @@ function runTests(){
           domRepeatDomBind = document.getElementById('domRepeatDomBind');
 
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
       var domRepeatLines;
 
       suiteSetup(function(done){
