@@ -41,7 +41,7 @@ function runTests(){
           "name":"mySeries",
           "x":"x",
           "y":"y",
-          "color": "rgb(93,165,218)",
+          "color": colorSet[0],
           "dashPattern": "5,2"
         }},
         chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
@@ -140,14 +140,14 @@ function runTests(){
             "name":"mySeries",
             "x":"x",
             "y":"y",
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           },
           "mySeries2":{
             "type":"line",
             "name":"mySeries2",
             "x":"x",
             "y":"y2",
-            "color": "rgb(250,164,58)"
+            "color": colorSet[1]
           }
         },
         chartExtents = {"x":[1397102460000,1397219100000],"y":[0,27]},
@@ -385,14 +385,14 @@ function runTests(){
             "name":"mySeries",
             "x":"x",
             "y":"y",
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           },
           "mySeries2":{
             "type":"line",
             "name":"mySeries2",
             "x":"x",
             "y":"y2",
-            "color": "rgb(250,164,58)"
+            "color": colorSet[1]
           }
         },
         chartExtents = {"x":[1397102460000,1397219100000],"y":[0,27]},
@@ -499,14 +499,14 @@ function runTests(){
             "name":"mySeries",
             "x":"x",
             "y":"y",
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           },
           "mySeries2":{
             "type":"line",
             "name":"mySeries2",
             "x":"x",
             "y":"y2",
-            "color": "rgb(250,164,58)"
+            "color": colorSet[1]
           }
         },
         chartExtents = {"x":[1397102460000,1397219100000],"y":[0,27]},
@@ -612,14 +612,14 @@ function runTests(){
             "name":"mySeries",
             "x":"x",
             "y":"y",
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           },
           "mySeries2":{
             "type":"line",
             "name":"mySeries2",
             "x":"x",
             "y":"y2",
-            "color": "rgb(250,164,58)"
+            "color": colorSet[1]
           }
         },
         chartExtents = {"x":[1397102460000,1397219100000],"y":[0,27]},
@@ -725,7 +725,7 @@ function runTests(){
             "name":"mySeries",
             "x":['y','y2'],
             "y":['y','y2'],
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           }
         },
         dim = ['y','y2'],
@@ -850,7 +850,7 @@ function runTests(){
             "name":"mySeries",
             "x":['y','y2'],
             "y":['y','y2'],
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           }
         },
         dim = ['y','y2'],
@@ -991,21 +991,21 @@ function runTests(){
             "name":"mySeries",
             "x":['y','y2'],
             "y":['y','y2'],
-            "color": "rgb(93,165,218)"
+            "color": colorSet[3]
           },
           "a":{
             "type":"line",
             "name":"a",
             "x":['y','y2'],
             "y":['y','y2'],
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           },
           "b":{
             "type":"line",
             "name":"b",
             "x":['y','y2'],
             "y":['y','y2'],
-            "color": "rgb(250,164,58)"
+            "color": colorSet[1]
           }
         },
         dim = ['y','y2'],
@@ -1141,21 +1141,21 @@ function runTests(){
             "name":"mySeries",
             "x":['y','y2'],
             "y":['y','y2'],
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           },
           "a":{
             "type":"line",
             "name":"a",
             "x":['y','y2'],
             "y":['y','y2'],
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           },
           "b":{
             "type":"line",
             "name":"b",
             "x":['y','y2'],
             "y":['y','y2'],
-            "color": "rgb(250,164,58)"
+            "color": colorSet[1]
           }
         },
         dim = ['y','y2'],
@@ -1388,7 +1388,7 @@ function runTests(){
             "name":"Data",
             "y":"y",
             "x":"x",
-            "color":"rgb(93,165,218)"
+            "color":colorSet[0]
           }
         },
         w = 500,
@@ -1509,7 +1509,7 @@ function runTests(){
             "name":"Data",
             "y":"y",
             "x":"x",
-            "color":"rgb(93,165,218)"
+            "color":colorSet[0]
           }
         },
         w = 500,
@@ -1630,7 +1630,7 @@ function runTests(){
             "name":"Data",
             "y":"y",
             "x":"x",
-            "color":"rgb(93,165,218)"
+            "color":colorSet[0]
           }
         },
         w = 500,
@@ -1751,7 +1751,7 @@ function runTests(){
             "name":"Data",
             "y":"y",
             "x":"x",
-            "color":"rgb(93,165,218)"
+            "color":colorSet[0]
           }
         },
         w = 500,
@@ -1871,7 +1871,7 @@ function runTests(){
             "name":"Data",
             "y":"y",
             "x":"x",
-            "color":"rgb(93,165,218)"
+            "color":colorSet[0]
           }
         },
         w = 500,
@@ -1993,7 +1993,7 @@ function runTests(){
             "name":"mySeries",
             "x":['y','y1','y2'],
             "y":['y','y1','y2'],
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           }
         },
         dim = ['y','y1','y2'],
@@ -2236,7 +2236,7 @@ function runTests(){
             "name":"mySeries",
             "x":['y','y1','y2'],
             "y":['y','y1','y2'],
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           }
         },
         dim = ['y','y1','y2'],
@@ -2424,14 +2424,14 @@ function runTests(){
             "name":"mySeries",
             "x":"x",
             "y":"y",
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           },
           "mySeries2":{
             "type":"line",
             "name":"mySeries2",
             "x":"x",
             "y":"y2",
-            "color": "rgb(250,164,58)",
+            "color": colorSet[1],
             "interpolationFunction": Px.d3.curveBasis
           }
         },
