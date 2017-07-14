@@ -2,9 +2,10 @@
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="px-vis-behavior-datetime.html"/>
-<link rel="import" href="fa_codes.html" />
 <link rel="import" href="../px-tooltip/px-tooltip.html"/>
+<link rel="import" href="../px-icon-set/px-icon-set-themable.html"/>
 <link rel="import" href="../app-localize-behavior/app-localize-behavior.html"/>
+<link rel="import" href="../iron-meta/iron-meta.html">
 
 <!--
 d3 element which draws a line and icon on the chart representing an event.
@@ -107,8 +108,7 @@ Custom property | Description
       PxVisBehavior.commonMethods,
       PxVisBehavior.events,
       PxVisBehaviorD3.domainUpdate,
-      Polymer.AppLocalizeBehavior,
-      faCodes
+      Polymer.AppLocalizeBehavior
     ],
 
     /**
@@ -241,6 +241,12 @@ Custom property | Description
 
       _value: {
         type: String
+      },
+      /**
+       * @type {!Polymer.IronMeta}
+       */
+      _meta: {
+        value: Polymer.Base.create('iron-meta', {type: 'iconset'})
       }
 
     },
@@ -252,6 +258,7 @@ Custom property | Description
       '_addClipPath(clipPath)',
       '_recalcValue(eventData, xAxisType, eventConfig.*)'
      ],
+
      listeners: {
       'px-tooltip-request-show': '_tooltipRequest'
      },
@@ -267,6 +274,7 @@ Custom property | Description
          this._hasBeenDetached = true
        }
      },
+
 
     attached: function() {
       if(this._hasBeenDetached) {
@@ -303,11 +311,11 @@ Custom property | Description
     _calcThemeOrConfig: function() {
 
       if(!this.defaultEventConfig) {
-        var eventColor = this._checkThemeVariable("--px-vis-event-icon-color", this._defaultDefaultEventConfig.color);
+        var eventColor = this._checkThemeVariable("--px-vis-event-icon-color", this._defaultDefaultEventConfig.fillColor);
         var lineColor = this._checkThemeVariable("--px-vis-event-line-color", this._defaultDefaultEventConfig.lineColor);
 
         this.defaultEventConfig = {
-          "color": eventColor,
+          'color': eventColor,
           'icon': this._defaultDefaultEventConfig.icon,
           'type': this._defaultDefaultEventConfig.type,
           'offset': this._defaultDefaultEventConfig.offset,
@@ -398,34 +406,53 @@ Custom property | Description
         .attr("x2", this.x(this.eventData[this.xKey]))
         .attr("y1", Math.max(this.height - this.margin.top, 0))
         .attr("y2", 0);
+
+      var x = this.x(this.eventData[this.xKey]) - Number(this._thisConfig.size)/2 + this._thisConfig.offset[0],
+          y = 0 - 5 + this._thisConfig.offset[1];
       this.eventIcon
-        .attr('x',this.x(this.eventData[this.xKey]) - Number(this._thisConfig.size)/2 + this._thisConfig.offset[0])
-        .attr("y", 0 - 5 + this._thisConfig.offset[1]);
+        .attr("transform", "translate(" + x + "," + y +")");
+        // .attr('x',this.x(this.eventData[this.xKey]) - Number(this._thisConfig.size)/2 + this._thisConfig.offset[0])
+        // .attr("y", 0 - 5 + this._thisConfig.offset[1]);
     },
 
     _addIcon: function() {
-      if(this._thisConfig.type === 'image'){
+      if(this._thisConfig.type === 'image') {
         this.eventIcon = this.eventGroup.append("image")
           .attr("xlink:href", this._thisConfig.icon)
           .attr("width", this._thisConfig.size + 'px')
           .attr("height", this._thisConfig.size + 'px');
-      } else if(this._thisConfig.type === 'unicode'){
-        this.eventIcon = this.eventGroup.append("text")
-          .attr('font-family', 'FontAwesome')
-          .attr('font-size', this._thisConfig.size + 'px')
-          .attr('fill', this._checkColorType(this._thisConfig.color))
-          .text(this._thisConfig.icon);
-      } else if(this._thisConfig.type === 'fa'){
-        this.eventIcon = this.eventGroup.append("text")
-          .attr('font-family', 'FontAwesome')
-          .attr('font-size', this._thisConfig.size + 'px')
-          .attr('fill', this._checkColorType(this._thisConfig.color))
-          .text(String.fromCharCode(parseInt(this.fa[this._thisConfig.icon],16)));
+      } else {
+        var icon = this._getIcon();
+        this.eventIcon = this.eventGroup.append('g');
+        this.eventIcon = Px.d3.select(this.eventIcon.node().appendChild(icon))
+          .attr('fill', 'transparent')
+          .attr('stroke', this._thisConfig.color);
       }
 
       this.eventIcon
         .style("cursor","pointer");
 
+    },
+
+    _getIcon: function() {
+      var key = this._thisConfig.type ? this._thisConfig.type : 'px',
+          iconSet = this._meta.byKey(key),
+          icon;
+          // iconDict = iconSet._createIconMap(),
+          // icon = this._thisConfig.icon && iconDict[this._thisConfig.icon] ? iconDict[this._thisConfig.icon] : 'default';
+      if(!iconSet) {
+        console.warn("Cant find set named: " + key);
+        iconSet = this._meta.byKey('px');
+      }
+
+      icon = Polymer.dom(iconSet).querySelector('[id="' + this._thisConfig.icon + '"]');
+
+      if(!icon) {
+        console.warn("Cant find icon named: " + this._thisConfig.icon);
+        icon = Polymer.dom(iconSet).querySelector('[id="car"]');
+      }
+
+      return icon.cloneNode(true);
     },
 
     /**

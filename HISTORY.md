@@ -24,6 +24,7 @@ v3.0.0
   * px-vis-line-canvas-rendering-ended
 * new events for canvas rendering (TODO doc)
 * removed redrawElement function from highlightPoint and highlightLine
+* Changed inert property on register to inertRegister so as to not conflic with w3c spec
 
 v2.1.6
 ==================
