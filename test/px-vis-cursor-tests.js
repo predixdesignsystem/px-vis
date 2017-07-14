@@ -11,6 +11,7 @@ function runTests(){
   suite('px-vis-cursor setup SVG', function() {
     var baseSVG = document.getElementById('baseSVG');
     var baseScale = document.getElementById('baseScale');
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(){
       var w = 500,
@@ -26,14 +27,14 @@ function runTests(){
           "name":"mySeries",
           "x":"x",
           "y":"y",
-          "color": "rgb(93,165,218)"
+          "color": colorSet[0]
         },
         "mySeries2":{
           "type":"line",
           "name":"mySeries2",
           "x":"x",
           "y":"y2",
-          "color": "rgb(250,164,58)"
+          "color": colorSet[1]
         }};
 
       baseScale.set('width',w);
@@ -88,7 +89,7 @@ function baseTests(elem,hLine,vLine,circle,hArr,yArr){
   suite('px-vis-cursor ' + elem + ' setup works', function() {
     var baseScale = document.getElementById('baseScale');
     var cursor = document.getElementById(elem),
-        colorSet = dataVisColors.properties.seriesColorList.value;
+        colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
       var d = [{

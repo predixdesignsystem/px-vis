@@ -2,6 +2,25 @@ document.addEventListener("WebComponentsReady", function() {
   runTests();
 });
 
+function componentFromStr(numStr, percent) {
+    var num = Math.max(0, parseInt(numStr, 10));
+    return percent ?
+        Math.floor(255 * Math.min(100, num) / 100) : Math.min(255, num);
+}
+
+function rgbToHex(rgb) {
+    var rgbRegex = /^rgb\(\s*(-?\d+)(%?)\s*,\s*(-?\d+)(%?)\s*,\s*(-?\d+)(%?)\s*\)$/;
+    var result, r, g, b, hex = "";
+    if ( (result = rgbRegex.exec(rgb)) ) {
+        r = componentFromStr(result[1], result[2]);
+        g = componentFromStr(result[3], result[4]);
+        b = componentFromStr(result[5], result[6]);
+
+        hex = "#" + (0x1000000 + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
+    return hex;
+}
+
 function runTests(){
   suite('px-vis-axis does Polymer exist?', function() {
     test('Polymer exists', function() {
@@ -14,6 +33,8 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         baseXAxis = document.getElementById('baseXAxis'),
         baseYAxis = document.getElementById('baseYAxis');
+
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
       var d = [{
@@ -38,7 +59,7 @@ function runTests(){
           "name":"mySeries",
           "x":"x",
           "y":"y",
-          "color": "rgb(93,165,218)",
+          "color": colorSet[0],
           "dashPattern": "5,2"
         }},
         dataExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
@@ -86,8 +107,8 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         baseXAxis = document.getElementById('baseXAxis');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
-    var colors = baseColors.properties.colors.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
+    var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     test('baseXAxis ID is random', function() {
       assert.equal(baseXAxis.axisId.length,15);
@@ -138,28 +159,28 @@ function runTests(){
         assert.equal(path.attr('fill'),'none');
       });
       test('path has correct stroke', function() {
-        assert.equal(path.attr('stroke').split(' ').join(''),colors['grey9']);
+        assert.equal(path.attr('stroke').split(' ').join(''),rgbToHex(colors['grey10']));
       });
 
       test('line0 has correct fill', function() {
         assert.equal(lines.nodes()[0].getAttribute('fill'),'none');
       });
       test('line0 has correct stroke', function() {
-        assert.equal(lines.nodes()[0].getAttribute('stroke').split(' ').join(''),colors['grey9']);
+        assert.equal(lines.nodes()[0].getAttribute('stroke').split(' ').join(''),rgbToHex(colors['grey10']));
       });
 
       test('line3 has correct fill', function() {
         assert.equal(lines.nodes()[3].getAttribute('fill'),'none');
       });
       test('line3 has correct stroke', function() {
-        assert.equal(lines.nodes()[3].getAttribute('stroke').split(' ').join(''),colors['grey9']);
+        assert.equal(lines.nodes()[3].getAttribute('stroke').split(' ').join(''),rgbToHex(colors['grey10']));
       });
 
       test('line9 has correct fill', function() {
         assert.equal(lines.nodes()[9].getAttribute('fill'),'none');
       });
       test('line3 has correct stroke', function() {
-        assert.equal(lines.nodes()[9].getAttribute('stroke').split(' ').join(''),colors['grey9']);
+        assert.equal(lines.nodes()[9].getAttribute('stroke').split(' ').join(''),rgbToHex(colors['grey10']));
       });
     });
 
@@ -192,8 +213,8 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         baseYAxis = document.getElementById('baseYAxis');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
-    var colors = baseColors.properties.colors.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
+    var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     test('baseYAxis ID is random', function() {
       assert.equal(baseYAxis.axisId.length,15);
@@ -239,28 +260,28 @@ function runTests(){
         assert.equal(path.attr('fill'),'none');
       });
       test('path has correct stroke', function() {
-        assert.equal(path.attr('stroke').split(' ').join(''),colors['grey9']);
+        assert.equal(path.attr('stroke').split(' ').join(''),rgbToHex(colors['grey10']));
       });
 
       test('line0 has correct fill', function() {
         assert.equal(lines.nodes()[0].getAttribute('fill'),'none');
       });
       test('line0 has correct stroke', function() {
-        assert.equal(lines.nodes()[0].getAttribute('stroke').split(' ').join(''),colors['grey9']);
+        assert.equal(lines.nodes()[0].getAttribute('stroke').split(' ').join(''),rgbToHex(colors['grey10']));
       });
 
       test('line3 has correct fill', function() {
         assert.equal(lines.nodes()[3].getAttribute('fill'),'none');
       });
       test('line3 has correct stroke', function() {
-        assert.equal(lines.nodes()[3].getAttribute('stroke').split(' ').join(''),colors['grey9']);
+        assert.equal(lines.nodes()[3].getAttribute('stroke').split(' ').join(''),rgbToHex(colors['grey10']));
       });
 
       test('line9 has correct fill', function() {
         assert.equal(lines.nodes()[9].getAttribute('fill'),'none');
       });
       test('line3 has correct stroke', function() {
-        assert.equal(lines.nodes()[9].getAttribute('stroke').split(' ').join(''),colors['grey9']);
+        assert.equal(lines.nodes()[9].getAttribute('stroke').split(' ').join(''),rgbToHex(colors['grey10']));
       });
     });
 
@@ -1134,7 +1155,7 @@ function runTests(){
         inlineXAxis,
         inlineYAxis,
         xLabels, yLabels, xRects, yRects;
-    var colors = baseColors.properties.colors.value;
+    var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     suiteSetup(function(done){
       var d = [{
@@ -1228,7 +1249,7 @@ function runTests(){
 
     test('X label color is correct', function() {
       var c = xLabels[0].attributes.fill.value.split(' ').join('');
-      assert.equal(c, 'rgb(255,255,255)');
+      assert.equal(c, 'white');
     });
 
     test('Y label count is correct', function() {
@@ -1247,7 +1268,7 @@ function runTests(){
 
     test('Y label color is correct', function() {
       var c = yLabels[0].attributes.fill.value.split(' ').join('');
-      assert.equal(c, 'rgb(255,255,255)');
+      assert.equal(c, 'white');
     });
 
     test('x rect count is correct', function() {
@@ -1262,7 +1283,7 @@ function runTests(){
     });
 
     test('x rect color is correct', function() {
-      assert.equal(xRects[0].attributes.fill.value.split(' ').join(''), colors['grey4']);
+      assert.equal(xRects[0].attributes.fill.value.split(' ').join(''), rgbToHex(colors['grey10']));
     });
 
     test('y rect count is correct', function() {
@@ -1277,7 +1298,7 @@ function runTests(){
     });
 
     test('y rect color is correct', function() {
-      assert.equal(yRects[0].attributes.fill.value.split(' ').join(''), colors['grey4']);
+      assert.equal(yRects[0].attributes.fill.value.split(' ').join(''), rgbToHex(colors['grey10']));
     });
   });
 

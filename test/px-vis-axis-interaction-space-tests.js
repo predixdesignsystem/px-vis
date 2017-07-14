@@ -203,7 +203,7 @@ function runTests(){
     var brush1 = document.getElementById('brush1'),
         brush2 = document.getElementById('brush2'),
         brush3 = document.getElementById('brush3');
-    var colors = baseColors.properties.colors.value;
+    var colors = PxColorsBehavior.baseColors.properties.colors.value;
     var d;
 
     suiteSetup(function(done) {
@@ -701,7 +701,7 @@ function runTests(){
     var radialBrush1 = document.getElementById('radialBrush1'),
         radialBrush2 = document.getElementById('radialBrush2'),
         radialBrush3 = document.getElementById('radialBrush3');
-    var colors = baseColors.properties.colors.value;
+    var colors = PxColorsBehavior.baseColors.properties.colors.value;
     var d;
     suiteSetup(function(done) {
       d = [radialBrush2.y(9), radialBrush2.y(16)];

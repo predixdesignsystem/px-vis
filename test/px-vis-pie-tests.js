@@ -15,7 +15,7 @@ function runTests(){
         basePie = document.getElementById('baseLine');
 
     suiteSetup(function(done){
-      var d = [{"x":15,"y":"IPA","percentage":"26"},{"x":1,"y":"Pils","percentage":"2"},{"x":1,"y":"Lager","percentage":"2"},{"x":8,"y":"Lambic","percentage":"14"},{"x":12,"y":"Stout","percentage":"21"},{"x":7,"y":"Pale Ale","percentage":"12"},{"x":9,"y":"Porter","percentage":"16"},{"x":4,"y":"Heffeweisse","percentage":"7"}],
+      var d = [{"x":15,"y":"IPA","percentage":"26", "colorIndex": 0},{"x":1,"y":"Pils","percentage":"2", "colorIndex": 1},{"x":1,"y":"Lager","percentage":"2", "colorIndex": 2},{"x":8,"y":"Lambic","percentage":"14", "colorIndex": 3},{"x":12,"y":"Stout","percentage":"21", "colorIndex": 4},{"x":7,"y":"Pale Ale","percentage":"12", "colorIndex": 5},{"x":9,"y":"Porter","percentage":"16", "colorIndex": 6},{"x":4,"y":"Heffeweisse","percentage":"7", "colorIndex": 7}],
           seriesConfig = {"y":{
             "type":"line",
             "y": "y",
@@ -28,7 +28,7 @@ function runTests(){
       basePie.set('seriesId',"y");
 
       //wait for animation to finish
-      setTimeout(function() {
+      window.setTimeout(function() {
         done();
       }, 1000);
     });

@@ -8,7 +8,7 @@ function runTests() {
         parallelSVG = document.getElementById('parallelSVG'),
         parallelhighlight = document.getElementById('parallelhighlight');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done) {
@@ -145,7 +145,7 @@ function runTests() {
         parallelSVG = document.getElementById('parallelSVG'),
         parallelhighlight = document.getElementById('parallelhighlight');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -212,7 +212,7 @@ function runTests() {
         parallelSVG = document.getElementById('parallelSVG'),
         parallelhighlight = document.getElementById('parallelhighlight');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -248,7 +248,7 @@ function runTests() {
         radarSVG = document.getElementById('radarSVG'),
         radarhighlight = document.getElementById('radarhighlight');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done) {
@@ -383,7 +383,7 @@ function runTests() {
         radarSVG = document.getElementById('radarSVG'),
         radarhighlight = document.getElementById('radarhighlight');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -465,7 +465,7 @@ function runTests() {
         radarSVG = document.getElementById('radarSVG'),
         radarhighlight = document.getElementById('radarhighlight');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -508,7 +508,7 @@ function runTests() {
         differentSVG = document.getElementById('differentSVG'),
         differenthighlight = document.getElementById('differenthighlight');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done) {
@@ -645,7 +645,7 @@ function runTests() {
         differentSVG = document.getElementById('differentSVG'),
         differenthighlight = document.getElementById('differenthighlight');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -713,7 +713,7 @@ function runTests() {
         differentSVG = document.getElementById('differentSVG'),
         differenthighlight = document.getElementById('differenthighlight');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -754,7 +754,7 @@ function runTests() {
         fuzzSVG = document.getElementById('fuzzSVG'),
         fuzzhighlight = document.getElementById('fuzzhighlight');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done) {
@@ -891,7 +891,7 @@ function runTests() {
         fuzzSVG = document.getElementById('fuzzSVG'),
         fuzzhighlight = document.getElementById('fuzzhighlight');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -977,7 +977,7 @@ function runTests() {
         fuzzSVG = document.getElementById('fuzzSVG'),
         fuzzhighlight = document.getElementById('fuzzhighlight');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1020,7 +1020,7 @@ function runTests() {
         generatingSVG = document.getElementById('generatingSVG'),
         generatinghighlight = document.getElementById('generatinghighlight');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done) {
@@ -1155,7 +1155,7 @@ function runTests() {
         generatingSVG = document.getElementById('generatingSVG'),
         generatinghighlight = document.getElementById('generatinghighlight');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1174,9 +1174,9 @@ function runTests() {
       generatinghighlight.set("crosshairData", d);
 
       setTimeout(function() {
-        linePath = generatinghighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
+        // linePath = generatinghighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
-      }, 100);
+      }, 1000);
     });
 
     test('datalayer gets masked', function() {
@@ -1184,7 +1184,7 @@ function runTests() {
     });
 
     test('generatinghighlight highlightData not created', function() {
-      assert.deepEqual(generatinghighlight._highlightData, []);
+      assert.equal(generatinghighlight._highlightData, undefined);
     });
 
   }); //suite
@@ -1194,7 +1194,7 @@ function runTests() {
         generatingSVG = document.getElementById('generatingSVG'),
         generatinghighlight = document.getElementById('generatinghighlight');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1241,7 +1241,7 @@ function runTests() {
         forceSVG = document.getElementById('forceSVG'),
         forcehighlight = document.getElementById('forcehighlight');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done) {
@@ -1377,7 +1377,7 @@ function runTests() {
         forceSVG = document.getElementById('forceSVG'),
         forcehighlight = document.getElementById('forcehighlight');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1445,7 +1445,7 @@ function runTests() {
         forceSVG = document.getElementById('forceSVG'),
         forcehighlight = document.getElementById('forcehighlight');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1492,7 +1492,7 @@ function runTests() {
         tooltipSVG = document.getElementById('tooltipSVG'),
         tooltiphighlight = document.getElementById('tooltiphighlight');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done) {
@@ -1617,7 +1617,7 @@ function runTests() {
         tooltipSVG = document.getElementById('tooltipSVG'),
         tooltiphighlight = document.getElementById('tooltiphighlight');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -1655,8 +1655,8 @@ function runTests() {
       assert.equal(tooltiphighlight.defaultEmptyData.time, 1397160780000);
       assert.deepEqual(tooltiphighlight.defaultEmptyData.dataset, {"x":1397160780000,"y":10,"y2":3,"y3":8,"cat":"b"});
       assert.deepEqual(tooltiphighlight.defaultEmptyData.series, [{"name":"y","value":{"y":10,"y2":3,"y3":8}},{"name":"y2","value":{"y":10,"y2":3,"y3":8}},{"name":"y3","value":{"y":10,"y2":3,"y3":8}}]);
-      assert.equal(tooltiphighlight.defaultEmptyData.color.split(" ").join(""), "rgb(93,165,218)");
-      assert.deepEqual(tooltiphighlight.defaultEmptyData.tooltipConfig, {"y":{"color":"rgb(93,165,218)","name":"y","yAxisUnit":"","y":"y"},"y2":{"color":"rgb(93,165,218)","name":"y2","yAxisUnit":"","y":"y2"},"y3":{"color":"rgb(93,165,218)","name":"y3","yAxisUnit":"","y":"y3"}});
+      assert.equal(tooltiphighlight.defaultEmptyData.color.split(" ").join(""), colorSet[0]);
+      assert.deepEqual(tooltiphighlight.defaultEmptyData.tooltipConfig, {"y":{"color":"rgb(0,0,0)","name":"y","yAxisUnit":"","y":"y"},"y2":{"color":"rgb(0,0,0)","name":"y2","yAxisUnit":"","y":"y2"},"y3":{"color":"rgb(0,0,0)","name":"y3","yAxisUnit":"","y":"y3"}});
     });
   }); //suite
 
@@ -1665,7 +1665,7 @@ function runTests() {
         tooltipSVG = document.getElementById('tooltipSVG'),
         tooltiphighlight = document.getElementById('tooltiphighlight');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){

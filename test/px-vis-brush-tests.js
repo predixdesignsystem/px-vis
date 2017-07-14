@@ -2,6 +2,26 @@ document.addEventListener("WebComponentsReady", function() {
   runTests();
 });
 
+function componentFromStr(numStr, percent) {
+    var num = Math.max(0, parseInt(numStr, 10));
+    return percent ?
+        Math.floor(255 * Math.min(100, num) / 100) : Math.min(255, num);
+}
+
+function rgbToHex(rgb) {
+    var rgbRegex = /^rgb\(\s*(-?\d+)(%?)\s*,\s*(-?\d+)(%?)\s*,\s*(-?\d+)(%?)\s*\)$/;
+    var result, r, g, b, hex = "";
+    if ( (result = rgbRegex.exec(rgb)) ) {
+        r = componentFromStr(result[1], result[2]);
+        g = componentFromStr(result[3], result[4]);
+        b = componentFromStr(result[5], result[6]);
+
+        hex = "#" + (0x1000000 + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
+    return hex;
+}
+
+
 function runTests(){
   suite('px-vis-brush does Polymer exist?', function() {
     test('Polymer exists', function() {
@@ -13,7 +33,7 @@ function runTests(){
     var baseScale = document.getElementById('baseScale'),
         baseSVG = document.getElementById('baseSVG'),
         baseBrush = document.getElementById('baseBrush');
-    var colors = baseColors.properties.colors.value;
+    var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     suiteSetup(function(done){
       var d = [{
@@ -38,7 +58,7 @@ function runTests(){
           "name":"mySeries",
           "x":"x",
           "y":"y",
-          "color": "rgb(93,165,218)"
+          "color": colors[0]
         }},
         dataExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
@@ -94,13 +114,13 @@ function runTests(){
       assert.equal(baseBrush._brushGroup.select('rect.selection').attr('height'), 295);
     });
     test('baseBrush._brushGroup.rect attr stroke', function() {
-      assert.equal(baseBrush._brushGroup.select('rect.selection').attr('stroke').split(" ").join(''), colors.gray5);
+      assert.equal(baseBrush._brushGroup.select('rect.selection').attr('stroke').split(" ").join(''), rgbToHex(colors['gray10']));
     });
     test('baseBrush._brushGroup.rect attr fill', function() {
-      assert.equal(baseBrush._brushGroup.select('rect.selection').attr('fill').split(" ").join(''), colors.gray5);
+      assert.equal(baseBrush._brushGroup.select('rect.selection').attr('fill').split(" ").join(''), rgbToHex(colors['gray10']));
     });
     test('baseBrush._brushGroup.rect attr fill-opacity', function() {
-      assert.equal(baseBrush._brushGroup.select('rect.selection').attr('fill-opacity'), 0.3);
+      assert.equal(baseBrush._brushGroup.select('rect.selection').attr('fill-opacity'), 0.2);
     });
     test('baseBrush._brushGroup.rect attr x', function() {
       assert.equal(baseBrush._brushGroup.select('rect.selection').attr('x'), 0);
@@ -129,10 +149,10 @@ function runTests(){
     //   assert.equal(baseBrush._handleGroup.select('rect').attr('width'),9);
     // });
     test('baseBrush._handleGroup.rect has correct stroke', function() {
-      assert.equal(baseBrush._handleGroup.attr('stroke').split(" ").join(''),colors.gray5);
+      assert.equal(baseBrush._handleGroup.attr('stroke').split(" ").join(''), rgbToHex(colors['gray10']));
     });
     test('baseBrush._handleGroup.rect has correct fill', function() {
-      assert.equal(baseBrush._handleGroup.attr('fill').split(" ").join(''),colors.white);
+      assert.equal(baseBrush._handleGroup.attr('fill').split(" ").join(''), 'white');
     });
 
     // test('baseBrush._handleGroup.lines are created', function() {
@@ -152,7 +172,7 @@ function runTests(){
     //   assert.equal(baseBrush._handleGroup.selectAll('line')[0][0].getAttribute('fill'),'none');
     // });
     // test('baseBrush._handleGroup.lines[0] stroke', function() {
-    //   assert.equal(baseBrush._handleGroup.selectAll('line')[0][0].getAttribute('stroke').split(' ').join(''),colors.gray5);
+    //   assert.equal(baseBrush._handleGroup.selectAll('line')[0][0].getAttribute('stroke').split(' ').join(''),colors.gray10);
     // });
     // test('baseBrush._handleGroup.lines[1] have correct x vals', function() {
     //   assert.equal(baseBrush._handleGroup.selectAll('line')[0][1].getAttribute('x1'),-1.5);
@@ -168,7 +188,7 @@ function runTests(){
     //   assert.equal(baseBrush._handleGroup.selectAll('line')[0][1].getAttribute('fill'),'none');
     // });
     // test('baseBrush._handleGroup.lines[1] stroke', function() {
-    //   assert.equal(baseBrush._handleGroup.selectAll('line')[0][1].getAttribute('stroke').split(' ').join(''),colors.gray5);
+    //   assert.equal(baseBrush._handleGroup.selectAll('line')[0][1].getAttribute('stroke').split(' ').join(''),colors.gray10);
     // });
   });
 
@@ -255,7 +275,7 @@ function runTests(){
   });
 
   suite('px-vis-brush handle mouseover ', function() {
-    var colors = baseColors.properties.colors.value;
+    var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     suiteSetup(function(done){
       var box = baseBrush._handleGroup.node().getBoundingClientRect();
@@ -273,18 +293,18 @@ function runTests(){
     });
 
     test('baseBrush._handleGroup rect stroke changes', function() {
-      assert.equal(baseBrush._handleGroup.attr('stroke').split(' ').join(''), colors.gray6);
+      assert.equal(baseBrush._handleGroup.attr('stroke').split(' ').join(''), rgbToHex(colors['gray12']));
     });
     test('baseBrush._handleGroup rect fill changes', function() {
-      assert.equal(baseBrush._handleGroup.attr('fill').split(' ').join(''), colors.gray5);
+      assert.equal(baseBrush._handleGroup.attr('fill').split(' ').join(''), rgbToHex(colors['gray10']));
     });
     // test('baseBrush._handleGroup lines stroke changes', function() {
-    //   assert.equal(baseBrush._handleGroup.select('line.handleLine').attr('stroke').split(' ').join(''), colors.gray6);
+    //   assert.equal(baseBrush._handleGroup.select('line.handleLine').attr('stroke').split(' ').join(''), colors.gray12);
     // });
   });
 
   suite('px-vis-brush handle mouseleave ', function() {
-    var colors = baseColors.properties.colors.value;
+    var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
 
     suiteSetup(function(done){
@@ -304,18 +324,18 @@ function runTests(){
     });
 
     test('baseBrush. handle rect stroke changes', function() {
-      assert.equal(baseBrush._handleGroup.attr('stroke').split(' ').join(''), colors.gray5);
+      assert.equal(baseBrush._handleGroup.attr('stroke').split(' ').join(''), rgbToHex(colors['gray10']));
     });
     test('baseBrush. handle rect fill changes', function() {
-      assert.equal(baseBrush._handleGroup.attr('fill').split(' ').join(''), colors.white);
+      assert.equal(baseBrush._handleGroup.attr('fill').split(' ').join(''), 'white');
     });
     // test('baseBrush. handle lines stroke changes', function() {
-    //   assert.equal(baseBrush._handleGroup.select('line.handleLine').attr('stroke').split(' ').join(''), colors.gray5);
+    //   assert.equal(baseBrush._handleGroup.select('line.handleLine').attr('stroke').split(' ').join(''), colors.gray10);
     // });
   });
 
   suite('px-vis-brush handle press ', function() {
-    var colors = baseColors.properties.colors.value;
+    var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     suiteSetup(function(done){
       var box = baseBrush._handleGroup.node().getBoundingClientRect();
@@ -336,13 +356,13 @@ function runTests(){
     });
 
     test('baseBrush._handleGroup rect stroke changes', function() {
-      assert.equal(baseBrush._handleGroup.attr('stroke').split(' ').join(''), colors.gray7);
+      assert.equal(baseBrush._handleGroup.attr('stroke').split(' ').join(''), rgbToHex(colors['gray14']));
     });
     test('baseBrush._handleGroup rect fill changes', function() {
-      assert.equal(baseBrush._handleGroup.attr('fill').split(' ').join(''), colors.gray6);
+      assert.equal(baseBrush._handleGroup.attr('fill').split(' ').join(''), rgbToHex(colors['gray12']));
     });
     // test('baseBrush._handleGroup lines stroke changes', function() {
-    //   assert.equal(baseBrush._handleGroup.select('line.handleLine').attr('stroke').split(' ').join(''), colors.gray7);
+    //   assert.equal(baseBrush._handleGroup.select('line.handleLine').attr('stroke').split(' ').join(''), colors.gray14);
     // });
   });
 // TODO figure out how to test the brush events...
@@ -385,7 +405,7 @@ function runTests(){
     var gradientScale = document.getElementById('gradientScale'),
         gradientSVG = document.getElementById('gradientSVG'),
         gradientBrush = document.getElementById('gradientBrush');
-    var colors = baseColors.properties.colors.value;
+    var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     suiteSetup(function(done){
       var d = [{
@@ -456,7 +476,7 @@ function runTests(){
     });
 
     test('gradientBrush._brushGroup.rect attr stroke', function() {
-      assert.equal(gradientBrush._brushGroup.select('rect.selection').attr('stroke').split(" ").join(''), colors.gray5);
+      assert.equal(gradientBrush._brushGroup.select('rect.selection').attr('stroke').split(" ").join(''), rgbToHex(colors['gray10']));
     });
     // test('gradientBrush._brushGroup.rect attr fill', function() {
     //   assert.equal(gradientBrush._brushGroup.select('rect.selection').attr('fill'), "url(#overlayGradient)");
@@ -483,13 +503,13 @@ function runTests(){
     test('linearGradient stop[0] is correct', function() {
       var stop = d3.select(gradientBrush.svg.select('defs').select('#overlayGradient').selectAll('stop').nodes()[0]);
       assert.equal(stop.attr('offset'), '0%');
-      assert.equal(stop.attr('stop-color').split(" ").join(''), colors.gray5);
-      assert.equal(stop.attr('stop-opacity'), 0.2);
+      assert.equal(stop.attr('stop-color').split(" ").join(''), rgbToHex(colors['gray10']));
+      assert.equal(stop.attr('stop-opacity'), 0.1);
     });
     test('linearGradient stop[1] is correct', function() {
       var stop = d3.select(gradientBrush.svg.select('defs').select('#overlayGradient').selectAll('stop').nodes()[1]);
       assert.equal(stop.attr('offset'), '100%');
-      assert.equal(stop.attr('stop-color').split(" ").join(''), colors.gray5);
+      assert.equal(stop.attr('stop-color').split(" ").join(''), rgbToHex(colors['gray10']));
       assert.equal(stop.attr('stop-opacity'), 0.8);
     });
   });

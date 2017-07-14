@@ -256,7 +256,7 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         defaultEvent = document.getElementById('defaultEvent');
 
-    var colors = baseColors.properties.colors.value;
+    var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     test('defaultEvent eventGroup created', function() {
       assert.equal(defaultEvent.eventGroup.node().tagName,'g');
@@ -326,7 +326,7 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         faEvent = document.getElementById('faEvent');
 
-    var colors = baseColors.properties.colors.value;
+    var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     test('faEvent eventGroup created', function() {
       assert.equal(faEvent.eventGroup.node().tagName,'g');
@@ -393,7 +393,7 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         uniEvent = document.getElementById('uniEvent');
 
-    var colors = baseColors.properties.colors.value;
+    var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     test('uniEvent eventGroup created', function() {
       assert.equal(uniEvent.eventGroup.node().tagName,'g');
@@ -460,7 +460,7 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         imgEvent = document.getElementById('imgEvent');
 
-    var colors = baseColors.properties.colors.value;
+    var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     test('imgEvent eventGroup created', function() {
       assert.equal(imgEvent.eventGroup.node().tagName,'g');
@@ -524,7 +524,7 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         noLabelEvent = document.getElementById('noLabelEvent');
 
-    var colors = baseColors.properties.colors.value;
+    var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     test('noLabelEvent eventGroup created', function() {
       assert.equal(noLabelEvent.eventGroup.node().tagName,'g');
@@ -591,7 +591,7 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         offsetEvent = document.getElementById('offsetEvent');
 
-    var colors = baseColors.properties.colors.value;
+    var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     test('offsetEvent eventGroup created', function() {
       assert.equal(offsetEvent.eventGroup.node().tagName,'g');
@@ -659,7 +659,7 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         linearEvent = document.getElementById('linearEvent');
 
-    var colors = baseColors.properties.colors.value;
+    var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     test('linearEvent eventGroup created', function() {
       assert.equal(linearEvent.eventGroup.node().tagName,'g');
@@ -705,7 +705,7 @@ function runTests(){
         baseSVG = document.getElementById('baseSVG'),
         ordinalEvent = document.getElementById('ordinalEvent');
 
-    var colors = baseColors.properties.colors.value;
+    var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     test('ordinalEvent eventGroup created', function() {
       assert.equal(ordinalEvent.eventGroup.node().tagName,'g');

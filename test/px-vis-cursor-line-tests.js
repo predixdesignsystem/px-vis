@@ -8,7 +8,7 @@ function runTests() {
         parallelSVG = document.getElementById('parallelSVG'),
         parallelCursor = document.getElementById('parallelCursor');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done) {
@@ -139,7 +139,7 @@ function runTests() {
         parallelSVG = document.getElementById('parallelSVG'),
         parallelCursor = document.getElementById('parallelCursor');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -197,7 +197,7 @@ function runTests() {
         parallelSVG = document.getElementById('parallelSVG'),
         parallelCursor = document.getElementById('parallelCursor');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -241,7 +241,7 @@ function runTests() {
         parallelSVGCanvas = document.getElementById('parallelSVGCanvas'),
         parallelCursorCanvas = document.getElementById('parallelCursorCanvas');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done) {
@@ -362,7 +362,7 @@ function runTests() {
         parallelSVGCanvas = document.getElementById('parallelSVGCanvas'),
         parallelCursorCanvas = document.getElementById('parallelCursorCanvas');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -420,7 +420,7 @@ function runTests() {
         parallelSVGCanvas = document.getElementById('parallelSVGCanvas'),
         parallelCursorCanvas = document.getElementById('parallelCursorCanvas');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -465,7 +465,7 @@ function runTests() {
         radarSVG = document.getElementById('radarSVG'),
         radarCursor = document.getElementById('radarCursor');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done) {
@@ -597,7 +597,7 @@ function runTests() {
         radarSVG = document.getElementById('radarSVG'),
         radarCursor = document.getElementById('radarCursor');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
@@ -670,7 +670,7 @@ function runTests() {
         radarSVG = document.getElementById('radarSVG'),
         radarCursor = document.getElementById('radarCursor');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){

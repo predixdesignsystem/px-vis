@@ -66,7 +66,7 @@ function runTests(){
   suite('px-vis-scale runs with basic declarative bindings', function() {
     var decTLScale = document.getElementById('decTLScale');
     suiteSetup(function(done) {
-      setTimeout(function() { done(); }, 500);
+      window.setTimeout(function() { done(); }, 500);
     });
 
     test('decTLScale fixture is created', function() {
@@ -131,7 +131,7 @@ function runTests(){
         }
       findExtents.set('dataExtents',ext);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         done();
       }, 100);
     });
@@ -195,7 +195,7 @@ function runTests(){
       updateData.push('chartData',d);
       updateData.set('dataExtents',ext);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         done();
       }, 100);
     });
@@ -286,7 +286,7 @@ function runTests(){
         updateData.set('chartData',d);
         updateData.set('dataExtents',ext);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         done();
       }, 100);
     });
@@ -346,7 +346,7 @@ function runTests(){
         }
       findXExtents.set('dataExtents',ext);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         done();
       }, 100);
     });
@@ -405,7 +405,7 @@ function runTests(){
         }
       findYExtents.set('dataExtents',ext);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         done();
       }, 100);
     });
@@ -466,7 +466,7 @@ function runTests(){
         }
       findLinearX.set('dataExtents',ext);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         done();
       }, 100);
     });
@@ -505,7 +505,7 @@ function runTests(){
         "x":[], "y": [Infinity,-Infinity]
         }
       findOrdinalX.set('dataExtents',ext);
-      setTimeout(function() {
+      window.setTimeout(function() {
         done();
       }, 100);
     });
@@ -566,7 +566,7 @@ function runTests(){
       setOrdinalX.set('chartExtents',ext);
       setOrdinalX.set('dataExtents',ext);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         done();
       }, 100);
     });
@@ -612,7 +612,7 @@ function runTests(){
         }
       diffXforY.set('dataExtents',ext);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         done();
       }, 100);
     });
@@ -677,7 +677,7 @@ function runTests(){
       cExts.set('chartExtents',cext);
       cExts.set('dataExtents',dext);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         done();
       }, 100);
     });
@@ -760,11 +760,11 @@ function runTests(){
         'chartId': 'webWorker'}
         );
 
-      setTimeout(function() {
+      window.setTimeout(function() {
 
         webWorker.set('dataExtents',ext);
         webWorker.set('chartData', chartData);
-        setTimeout(function() { done(); }, 500);
+        window.setTimeout(function() { done(); }, 500);
 
       }, 500);
     });

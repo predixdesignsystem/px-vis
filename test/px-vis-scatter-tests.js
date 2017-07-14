@@ -15,7 +15,7 @@ function runTests(){
         baseScatter = document.getElementById('baseScatter');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done) {
       var d = [{
@@ -40,7 +40,7 @@ function runTests(){
           "name":"mySeries",
           "x":"x",
           "y":"y",
-          "color": "rgb(93,165,218)"
+          "color": colorSet[0]
         }},
         chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
@@ -122,7 +122,7 @@ function runTests(){
         mutedScatter2 = document.getElementById('mutedScatter2');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
       var d = [{
@@ -153,14 +153,14 @@ function runTests(){
             "name":"mySeries",
             "x":"x",
             "y":"y",
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           },
           "mySeries2":{
             "type":"line",
             "name":"mySeries2",
             "x":"x",
             "y":"y2",
-            "color": "rgb(250,164,58)"
+            "color": colorSet[1]
           }
         },
         chartExtents = {"x":[1397102460000,1397219100000],"y":[0,27]},
@@ -300,7 +300,7 @@ function runTests(){
         mutedScatter2 = document.getElementById('mutedScatter2');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
       var m = {
@@ -350,7 +350,7 @@ function runTests(){
         mutedScatter2 = document.getElementById('mutedScatter2');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
       var m = {
@@ -406,7 +406,7 @@ function runTests(){
         markerWye = document.getElementById('markerWye');
 
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
       var d = [{
