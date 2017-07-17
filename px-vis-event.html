@@ -3,7 +3,7 @@
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="px-vis-behavior-datetime.html"/>
 <link rel="import" href="../px-tooltip/px-tooltip.html"/>
-<link rel="import" href="../px-icon-set/px-icon-set-themable.html"/>
+<link rel="import" href="../px-icon-set/px-icon-set.html"/>
 <link rel="import" href="../app-localize-behavior/app-localize-behavior.html"/>
 <link rel="import" href="../iron-meta/iron-meta.html">
 
@@ -30,15 +30,15 @@ It should follow the following form:
     eventConfig = {
       "Event Name 1":{
         "color": "blue",
-        "icon": "fa-camera",
-        "type": "fa",
+        "icon": "pxl:deployments",
+        "type": "px",
         "offset":[0,0]
       },
       "Event Name 2":{
         "color": "green",
-        "icon": "\uf015",
-        "type": "unicode",
-        "offset":[1,0],
+        "icon": "pxm:favorite",
+        "type": "px",
+        "offset":[0,0],
         "lineWeight": 0
       },
       "Event Name 3":{
@@ -247,6 +247,16 @@ Custom property | Description
        */
       _meta: {
         value: Polymer.Base.create('iron-meta', {type: 'iconset'})
+      },
+
+      _iconSize: {
+        type: Number,
+        value: 16
+      },
+
+      _iconScale: {
+        type: Number,
+        computed: '_computeIconScale(_iconSize, _thisConfig.*)'
       }
 
     },
@@ -407,12 +417,15 @@ Custom property | Description
         .attr("y1", Math.max(this.height - this.margin.top, 0))
         .attr("y2", 0);
 
-      var x = this.x(this.eventData[this.xKey]) - Number(this._thisConfig.size)/2 + this._thisConfig.offset[0],
-          y = 0 - 5 + this._thisConfig.offset[1];
+      var x = this.x(this.eventData[this.xKey]) -
+                Number(this._thisConfig.size)/2 + this._thisConfig.offset[0],
+          y0 = 0 - 5 + this._thisConfig.offset[1],
+          y = this._thisConfig.type === "image" ? y0 : y0 - this._thisConfig.size;
+          translate = "translate(" + x + "," + y + ")",
+          scale = this._thisConfig.type === "image" ? '' : " scale(" + this._iconScale + ")";
+
       this.eventIcon
-        .attr("transform", "translate(" + x + "," + y +")");
-        // .attr('x',this.x(this.eventData[this.xKey]) - Number(this._thisConfig.size)/2 + this._thisConfig.offset[0])
-        // .attr("y", 0 - 5 + this._thisConfig.offset[1]);
+        .attr("transform", (translate + scale));
     },
 
     _addIcon: function() {
@@ -422,9 +435,9 @@ Custom property | Description
           .attr("width", this._thisConfig.size + 'px')
           .attr("height", this._thisConfig.size + 'px');
       } else {
-        var icon = this._getIcon();
-        this.eventIcon = this.eventGroup.append('g');
-        this.eventIcon = Px.d3.select(this.eventIcon.node().appendChild(icon))
+        var icon = this._getIcon()
+
+        this.eventIcon = Px.d3.select(this.eventGroup.node().appendChild(icon))
           .attr('fill', 'transparent')
           .attr('stroke', this._thisConfig.color);
       }
@@ -435,24 +448,43 @@ Custom property | Description
     },
 
     _getIcon: function() {
-      var key = this._thisConfig.type ? this._thisConfig.type : 'px',
+      var split = this._thisConfig.icon.split(':'),
+          key = split[0] ? split[0] : 'pxs',
+          name = split[1] ? split[1] : 'information',
           iconSet = this._meta.byKey(key),
           icon;
-          // iconDict = iconSet._createIconMap(),
-          // icon = this._thisConfig.icon && iconDict[this._thisConfig.icon] ? iconDict[this._thisConfig.icon] : 'default';
+
       if(!iconSet) {
-        console.warn("Cant find set named: " + key);
-        iconSet = this._meta.byKey('px');
+        console.warn("Cant find set named: " + key + ". Falling back to default icon");
+
+        key = 'pxs';
+        iconSet = this._meta.byKey(key);
       }
 
-      icon = Polymer.dom(iconSet).querySelector('[id="' + this._thisConfig.icon + '"]');
+      icon = Polymer.dom(iconSet).querySelector('[id="' + name + '"]');
 
       if(!icon) {
         console.warn("Cant find icon named: " + this._thisConfig.icon);
-        icon = Polymer.dom(iconSet).querySelector('[id="car"]');
+        icon = Polymer.dom(iconSet).querySelector('[id="information"]');
       }
 
+      this._setIconSize(key);
+
       return icon.cloneNode(true);
+    },
+
+    _setIconSize: function(type) {
+      if (type === 'pxl') {
+        this._iconSize = 32;
+      } else if (type === 'pxm') {
+        this._iconSize = 22;
+      } else {
+        this._iconSize = 16;
+      }
+    },
+
+    _computeIconScale: function(size) {
+      return this._thisConfig.size / size;
     },
 
     /**
