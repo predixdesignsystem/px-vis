@@ -115,13 +115,6 @@ Element which creates an Canvas element and context
             context.setTransform(1, 0, 0, 1, 0, 0);
             context.translate(this.margin.left + this.offset[0], this.margin.top + this.offset[1]);
 
-            //create some base tracking info so we know how many lines we draw later
-            context._pxLinesSeries = [];
-            context._pxLinesRedraw = 0;
-            context._pxLinesCleared = true;
-            context._pxScatterSeries = [];
-            context._pxScatterRedraw = 0;
-            context._pxScatterCleared = true;
             context._translation = [this.margin.left + this.offset[0], this.margin.top + this.offset[1]];
 
             context.pxClearCanvas = function() {
@@ -129,13 +122,6 @@ Element which creates an Canvas element and context
               this.setTransform(1, 0, 0, 1, 0, 0);
               this.clearRect(0,0, this.canvas.width, this.canvas.height);
               this.restore();
-
-              context._pxLinesRedraw = 0;
-              context._pxLinesSeries = [];
-              context._pxLinesCleared = true;
-              context._pxScatterSeries = [];
-              context._pxScatterRedraw = 0;
-              context._pxScatterCleared = true;
             }.bind(context);
 
             this.set('canvasContext',context);
