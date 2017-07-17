@@ -648,10 +648,8 @@ PxVisBehaviorRenderer.base = [{
 
         ptsPerMs = totPoints/totDuration;
 
-        //aim for 18ms. This is crucial since when not busy requestanimationframe will give us a callback
+        //aim for more than 16ms. This is crucial since when not busy requestanimationframe will give us a callback
         //every ~16 ms, so we HAVE to aim a bit higher to be sure we are keeping the browser busy
-        pointsAddition = Math.floor((20 - avgDuration) * (avgPoints/avgDuration));
-
         return Math.max(this._minimumPointsPerFrame, Math.floor(ptsPerMs*20));
       } else {
         //no stats
