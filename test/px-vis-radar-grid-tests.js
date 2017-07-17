@@ -13,7 +13,7 @@ function runTests(){
     var baseScale = document.getElementById('baseScale'),
         baseSVG = document.getElementById('baseSVG'),
         baseGrid = document.getElementById('baseGrid');
-    var colors = baseColors.properties.colors.value;
+    var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     suiteSetup(function(done){
       var d = [
@@ -89,7 +89,7 @@ function runTests(){
     test('grid created config', function() {
       assert.isTrue(baseGrid._completeSeriesConfig !== null);
       assert.isTrue(baseGrid._completeSeriesConfig["radarGrids"] !== null);
-      assert.equal(baseGrid._completeSeriesConfig["radarGrids"].color, colors["grey4"]);
+      assert.equal(baseGrid._completeSeriesConfig["radarGrids"].color, colors["grey3"]);
       assert.equal(baseGrid._completeSeriesConfig["radarGrids"].x[0], "y");
       assert.equal(baseGrid._completeSeriesConfig["radarGrids"].x[1], "y1");
       assert.equal(baseGrid._completeSeriesConfig["radarGrids"].x[2], "y2");

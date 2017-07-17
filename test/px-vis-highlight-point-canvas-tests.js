@@ -16,7 +16,7 @@ function runTests(){
           basePoint = document.getElementById('basePoint');
 
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = [{
@@ -113,7 +113,7 @@ function runTests(){
           basePoint = document.getElementById('basePoint');
 
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -155,7 +155,7 @@ function runTests(){
           basePoint = document.getElementById('basePoint');
 
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -187,7 +187,7 @@ function runTests(){
           differentPoint = document.getElementById('differentPoint');
 
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = [{
@@ -282,7 +282,7 @@ function runTests(){
           differentPoint = document.getElementById('differentPoint');
 
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -320,7 +320,7 @@ function runTests(){
           differentPoint = document.getElementById('differentPoint');
 
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -352,7 +352,7 @@ function runTests(){
           fuzzPoint = document.getElementById('fuzzPoint');
 
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = [{
@@ -448,7 +448,7 @@ function runTests(){
           fuzzPoint = document.getElementById('fuzzPoint');
 
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -496,7 +496,7 @@ function runTests(){
           fuzzPoint = document.getElementById('fuzzPoint');
 
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -527,7 +527,7 @@ function runTests(){
           generatingPoint = document.getElementById('generatingPoint');
 
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = [{
@@ -621,7 +621,7 @@ function runTests(){
           generatingPoint = document.getElementById('generatingPoint');
 
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -641,7 +641,7 @@ function runTests(){
       });
 
       test('generatingPoint does not create highlightData', function() {
-        assert.deepEqual(generatingPoint._highlightData, []);
+        assert.equal(generatingPoint._highlightData, undefined);
       });
 
       test('generatingPoint generating layer does not mute', function() {
@@ -656,7 +656,7 @@ function runTests(){
           generatingPoint = document.getElementById('generatingPoint');
 
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -687,7 +687,7 @@ function runTests(){
           forcePoint = document.getElementById('forcePoint');
 
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = [{
@@ -782,7 +782,7 @@ function runTests(){
           forcePoint = document.getElementById('forcePoint');
 
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -822,7 +822,7 @@ function runTests(){
           forcePoint = document.getElementById('forcePoint');
 
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -855,7 +855,7 @@ function runTests(){
           tooltipPoint = document.getElementById('tooltipPoint');
 
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = [{
@@ -941,7 +941,7 @@ function runTests(){
           tooltipPoint = document.getElementById('tooltipPoint');
 
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {
@@ -975,7 +975,7 @@ function runTests(){
           tooltipPoint = document.getElementById('tooltipPoint');
 
 
-      var colorSet = dataVisColors.properties.seriesColorList.value;
+      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
         var d = {

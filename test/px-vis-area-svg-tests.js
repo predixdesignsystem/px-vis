@@ -14,7 +14,7 @@ function runTests() {
         baseSVG = document.getElementById('baseSVG'),
         baseArea = document.getElementById('baseArea');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var areaPath;
 
     suiteSetup(function(done){
@@ -40,7 +40,7 @@ function runTests() {
           "name":"mySeries",
           "x":"x",
           "y":"y",
-          "color": "rgb(93,165,218)"
+          "color": colorSet[0]
         }},
         chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
         w = 500,
@@ -108,7 +108,7 @@ function runTests() {
         multiSVG = document.getElementById('multiSVG'),
         multiArea = document.getElementById('multiArea')
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var areaPath1,areaPath2,areaPath3;
 
     suiteSetup(function(done){
@@ -145,14 +145,14 @@ function runTests() {
             "name":"mySeries",
             "x":"x",
             "y":"y",
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           },
           "mySeries2":{
             "type":"area",
             "name":"mySeries2",
             "x":"x",
             "y":"y2",
-            "color": "rgb(250,164,58)"
+            "color": colorSet[1]
           },
           "mySeries3":{
             "type":"area",

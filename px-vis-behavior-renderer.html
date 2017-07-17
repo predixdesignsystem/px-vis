@@ -91,6 +91,35 @@ PxVisBehaviorRenderer.debounceOnPanning = {
     @polymerBehavior PxVisBehaviorRenderer.base
 */
 PxVisBehaviorRenderer.base = [{
+
+  /**
+   * px-vis-chart-canvas-rendering-started, fired when a chart starts rendering
+   * some data on a canvas. This can be a highlighter, actual chart data or some
+   * markers.
+   * evt.details contains a `context` which is used internally to define what
+   * should be rendered. Interesting properties of this context are:
+   * - renderType: what type of rendering is occuring (chartData, markers, highlightData, filteredChartData)
+   * - canvasToClear: array of the canvases that will be cleared before drawing
+   * - canvasTargets: array of targets that will be rendered (e.g px-vis-line-canvas)
+   *
+   * @event px-vis-chart-canvas-rendering-started
+   */
+
+  /**
+   * px-vis-chart-canvas-rendering-ended, fired when a chart is done rendering
+   * some data on a canvas. This can be a highlighter, actual chart data or some
+   * markers.
+   * evt.details contains a `context` which is used internally to define what
+   * has been rendered. Interesting properties of this context are:
+   * - renderType: what type of rendering is occuring (chartData, markers, highlightData, filteredChartData)
+   * - canvasToClear: array of the canvases that will be cleared before drawing
+   * - canvasTargets: array of targets that will be rendered (e.g px-vis-line-canvas)
+   * - frameIndex: how many frames it took to render
+   *
+   * @event px-vis-chart-canvas-rendering-ended
+   */
+
+
   properties: {
     /**
     * Counter to track progressive rendering requests and only draw the latest one
@@ -123,15 +152,27 @@ PxVisBehaviorRenderer.base = [{
      * The minimum number of points to render per frame
      * even if the chart is laggy
      */
-    _minimumPointsPerFrame: {
+    rendererMinimumPointsPerFrame: {
       type: Number,
       value: 50
+    },
+    /**
+     * Target duration (in ms) for one frame. The renderer will try to render
+     * as much data as possible in that given timeframe before calling the next
+     * animation frame.
+     * WARNING: this needs to be higher than 16ms since by default
+     * requestAnimationFrame will be called every ~16ms, so our target needs to
+     * be higher to ensure we keep the processor busy
+     */
+    rendererFrameDurationTarget: {
+      type: Number,
+      value: 20
     },
     /**
      * Number of previous frames to average for the adaptive
      * progressive rendering
      */
-    _frameCountToAverage: {
+    rendererFrameCountToAverage: {
       type: Number,
       value: 5
     },
@@ -152,11 +193,6 @@ PxVisBehaviorRenderer.base = [{
       value: false
     }
   },
-
-
-  //TODO: filtered data chart also have the chart data kicking but shouldnt
-  //TODO: low priority: include SVG drawings
-  //TODO: benchamrks
 
   attached: function() {
 
@@ -182,7 +218,6 @@ PxVisBehaviorRenderer.base = [{
     //reset counter so it cancels current drawing
     this._progressiveRenderingCounter = this._initializeRendererTypeObject(0);
 
-//this.unlisten(this, 'px-vis-renderer-register', '_registerDrawingElement');
     this.unlisten(this, 'px-vis-highlight-data-changed', '_renderHighlight');
     this.unlisten(this, 'px-vis-redraw-lines', '_renderAllLines');
     this._hasBeenDetached = true;
@@ -381,9 +416,9 @@ PxVisBehaviorRenderer.base = [{
          this.domainChanged !== null &&
          this._isAttached) {
 
-        //  console.log('START RENDER ' + this.nodeName)
+      this.fire('px-vis-chart-canvas-rendering-started', {'context': ctx});
+
       this._initializeCanvasRendering(ctx, allowCanvasClearing);
-      this._initializeSvgRendering(ctx);
     }
   },
 
@@ -445,17 +480,14 @@ PxVisBehaviorRenderer.base = [{
 
     if(ctx.targetIndex > ctx.canvasTargets.length-1) {
 
-     // console.log('finished rendering in ' + ctx.frameIndex + ' frames');
-
       //Everything done
-      this.fire('px-vis-chart-canvas-rendering-ended');
+      this.fire('px-vis-chart-canvas-rendering-ended', {'context': ctx});
     } else {
 
       //keep rendering
       //wrap function so that we can still pass the context
       window.requestAnimationFrame(function() { this._processCanvasRendering(ctx); }.bind(this));
     }
-    //event?
   },
 
   /**
@@ -473,7 +505,6 @@ PxVisBehaviorRenderer.base = [{
         totalRendered = 0,
         drawingResult;
 
-    // console.log('NEW FRAME')
     while(budget > 0 && ctx.currentTarget) {
 
       //get how many points we can render
@@ -499,7 +530,7 @@ PxVisBehaviorRenderer.base = [{
       //get next target and keep rendering if we can
       ctx.currentTarget = this._getCurrentCanvasRenderingTarget(ctx);
     }
-    // console.log('finished one frame: ' + JSON.stringify(ctx.previousFrameStats) + ' in: ' + (window.performance.now() - ctx.previousStartTime));
+   //  console.log('finished one frame: ' + JSON.stringify(ctx.previousFrameStats) + ' in: ' + (window.performance.now() - ctx.previousStartTime));
   },
 
   /**
@@ -526,7 +557,7 @@ PxVisBehaviorRenderer.base = [{
           });
 
           //only keep a certain number of frame timing to average
-          if(this._previousFramesTiming[ctx.renderType][targetType].length > this._frameCountToAverage) {
+          if(this._previousFramesTiming[ctx.renderType][targetType].length > this.rendererFrameCountToAverage) {
             this._previousFramesTiming[ctx.renderType][targetType].shift();
           }
           // console.log('frame ' + ctx.frameIndex + ', type: ' + targetType + ', render: ' +JSON.stringify(this._previousFramesTiming[ctx.renderType][targetType][this._previousFramesTiming[ctx.renderType][targetType].length-1]));
@@ -654,25 +685,13 @@ PxVisBehaviorRenderer.base = [{
 
         ptsPerMs = totPoints/totDuration;
 
-        //aim for 18ms. This is crucial since when not busy requestanimationframe will give us a callback
+        //aim for more than 16ms. This is crucial since when not busy requestanimationframe will give us a callback
         //every ~16 ms, so we HAVE to aim a bit higher to be sure we are keeping the browser busy
-        pointsAddition = Math.floor((20 - avgDuration) * (avgPoints/avgDuration));
-
-        return Math.max(this._minimumPointsPerFrame, Math.floor(ptsPerMs*20));
+        return Math.max(this.rendererMinimumPointsPerFrame, Math.floor(ptsPerMs*this.rendererFrameDurationTarget));
       } else {
         //no stats
         return -1;
       }
-  },
-
-  _initializeSvgRendering: function(ctx) {
-
-    // //TODO, use requestanimationframe
-    // if(ctx.svgTargets.length) {
-    //   for(var i=0; i<ctx.svgTargets.length; i++) {
-    //     ctx.svgTargets[i].target.initializeDrawingSession();
-    //   }
-    // }
   }
 }, PxVisBehaviorD3.renderToCanvas, PxVisBehavior.dataset, PxVisBehavior.polarData, PxVisBehavior.radial, PxVisBehavior.preventInitialDrawing, PxVisBehavior.isAttached, PxVisBehaviorRenderer.debounceOnPanning, PxVisBehaviorD3.domainUpdateNotify, PxVisBehavior.mutedSeries, PxVisBehavior.completeSeriesConfig];
 

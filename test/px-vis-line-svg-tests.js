@@ -41,7 +41,7 @@ function runTests(){
           "name":"mySeries",
           "x":"x",
           "y":"y",
-          "color": "rgb(93,165,218)",
+          "color": colorSet[0],
           "dashPattern": "5,2"
         }},
         chartExtents = {"x":[1397102460000,1397219100000],"y":[0,10]},
@@ -140,14 +140,14 @@ function runTests(){
             "name":"mySeries",
             "x":"x",
             "y":"y",
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           },
           "mySeries2":{
             "type":"line",
             "name":"mySeries2",
             "x":"x",
             "y":"y2",
-            "color": "rgb(250,164,58)"
+            "color": colorSet[1]
           }
         },
         chartExtents = {"x":[1397102460000,1397219100000],"y":[0,27]},
@@ -385,14 +385,14 @@ function runTests(){
             "name":"mySeries",
             "x":"x",
             "y":"y",
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           },
           "mySeries2":{
             "type":"line",
             "name":"mySeries2",
             "x":"x",
             "y":"y2",
-            "color": "rgb(250,164,58)"
+            "color": colorSet[1]
           }
         },
         chartExtents = {"x":[1397102460000,1397219100000],"y":[0,27]},
@@ -499,14 +499,14 @@ function runTests(){
             "name":"mySeries",
             "x":"x",
             "y":"y",
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           },
           "mySeries2":{
             "type":"line",
             "name":"mySeries2",
             "x":"x",
             "y":"y2",
-            "color": "rgb(250,164,58)"
+            "color": colorSet[1]
           }
         },
         chartExtents = {"x":[1397102460000,1397219100000],"y":[0,27]},
@@ -612,14 +612,14 @@ function runTests(){
             "name":"mySeries",
             "x":"x",
             "y":"y",
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           },
           "mySeries2":{
             "type":"line",
             "name":"mySeries2",
             "x":"x",
             "y":"y2",
-            "color": "rgb(250,164,58)"
+            "color": colorSet[1]
           }
         },
         chartExtents = {"x":[1397102460000,1397219100000],"y":[0,27]},
@@ -725,7 +725,7 @@ function runTests(){
             "name":"mySeries",
             "x":['y','y2'],
             "y":['y','y2'],
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           }
         },
         dim = ['y','y2'],
@@ -800,16 +800,6 @@ function runTests(){
       assert.equal(d3.select(linePath.nodes()[3]).attr('d').split(/[\s,]+/).join(''),'M120230L360170');
       assert.equal(d3.select(linePath.nodes()[4]).attr('d').split(/[\s,]+/).join(''),'M120210L3600');
     });
-
-    test('context is still empty ', function() {
-      assert.equal(JSON.stringify(parallelSVG.canvasContext._pxLinesSeries), '[]');
-      assert.equal(parallelSVG.canvasContext._pxLinesRedraw, 0);
-      assert.equal(parallelSVG.canvasContext._pxLinesCleared, true);
-      assert.equal(JSON.stringify(parallelSVG.canvasContext._pxScatterSeries), '[]');
-      assert.equal(parallelSVG.canvasContext._pxScatterRedraw, 0);
-      assert.equal(parallelSVG.canvasContext._pxScatterCleared, true);
-    });
-
   }); //suite
 
   suite('px-vis-line-svg renders parallel axis with gradient lines to SVG', function() {
@@ -850,7 +840,7 @@ function runTests(){
             "name":"mySeries",
             "x":['y','y2'],
             "y":['y','y2'],
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           }
         },
         dim = ['y','y2'],
@@ -937,15 +927,6 @@ function runTests(){
       assert.equal(d3.select(linePath.nodes()[4]).attr('d').split(/[\s,]+/).join(''),'M120210L3600');
     });
 
-    test('context is still empty ', function() {
-      assert.equal(JSON.stringify(parallelGradientSVG.canvasContext._pxLinesSeries), '[]');
-      assert.equal(parallelGradientSVG.canvasContext._pxLinesRedraw, 0);
-      assert.equal(parallelGradientSVG.canvasContext._pxLinesCleared, true);
-      assert.equal(JSON.stringify(parallelGradientSVG.canvasContext._pxScatterSeries), '[]');
-      assert.equal(parallelGradientSVG.canvasContext._pxScatterRedraw, 0);
-      assert.equal(parallelGradientSVG.canvasContext._pxScatterCleared, true);
-    });
-
   }); //suite
 
   suite('px-vis-line-svg renders parallel axis with multiple categories to SVG', function() {
@@ -991,21 +972,21 @@ function runTests(){
             "name":"mySeries",
             "x":['y','y2'],
             "y":['y','y2'],
-            "color": "rgb(93,165,218)"
+            "color": colorSet[3]
           },
           "a":{
             "type":"line",
             "name":"a",
             "x":['y','y2'],
             "y":['y','y2'],
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           },
           "b":{
             "type":"line",
             "name":"b",
             "x":['y','y2'],
             "y":['y','y2'],
-            "color": "rgb(250,164,58)"
+            "color": colorSet[1]
           }
         },
         dim = ['y','y2'],
@@ -1086,16 +1067,6 @@ function runTests(){
       assert.equal(d3.select(linePath.nodes()[3]).attr('d').split(/[\s,]+/).join(''),'M120230L360170');
       assert.equal(d3.select(linePath.nodes()[4]).attr('d').split(/[\s,]+/).join(''),'M120210L3600');
     });
-
-    test('context is still empty ', function() {
-      assert.equal(JSON.stringify(parallelCategorySVG.canvasContext._pxLinesSeries), '[]');
-      assert.equal(parallelCategorySVG.canvasContext._pxLinesRedraw, 0);
-      assert.equal(parallelCategorySVG.canvasContext._pxLinesCleared, true);
-      assert.equal(JSON.stringify(parallelCategorySVG.canvasContext._pxScatterSeries), '[]');
-      assert.equal(parallelCategorySVG.canvasContext._pxScatterRedraw, 0);
-      assert.equal(parallelCategorySVG.canvasContext._pxScatterCleared, true);
-    });
-
   }); //suite
 
   suite('px-vis-line-svg renders parallel axis with multiple categories and gradients to SVG', function() {
@@ -1141,21 +1112,21 @@ function runTests(){
             "name":"mySeries",
             "x":['y','y2'],
             "y":['y','y2'],
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           },
           "a":{
             "type":"line",
             "name":"a",
             "x":['y','y2'],
             "y":['y','y2'],
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           },
           "b":{
             "type":"line",
             "name":"b",
             "x":['y','y2'],
             "y":['y','y2'],
-            "color": "rgb(250,164,58)"
+            "color": colorSet[1]
           }
         },
         dim = ['y','y2'],
@@ -1244,15 +1215,6 @@ function runTests(){
       assert.equal(d3.select(linePath.nodes()[2]).attr('d').split(/[\s,]+/).join(''),'M120170L360240');
       assert.equal(d3.select(linePath.nodes()[3]).attr('d').split(/[\s,]+/).join(''),'M120230L360170');
       assert.equal(d3.select(linePath.nodes()[4]).attr('d').split(/[\s,]+/).join(''),'M120210L3600');
-    });
-
-    test('context is still empty ', function() {
-      assert.equal(JSON.stringify(parallelCategoryGradientSVG.canvasContext._pxLinesSeries), '[]');
-      assert.equal(parallelCategoryGradientSVG.canvasContext._pxLinesRedraw, 0);
-      assert.equal(parallelCategoryGradientSVG.canvasContext._pxLinesCleared, true);
-      assert.equal(JSON.stringify(parallelCategoryGradientSVG.canvasContext._pxScatterSeries), '[]');
-      assert.equal(parallelCategoryGradientSVG.canvasContext._pxScatterRedraw, 0);
-      assert.equal(parallelCategoryGradientSVG.canvasContext._pxScatterCleared, true);
     });
 
   }); //suite
@@ -1388,7 +1350,7 @@ function runTests(){
             "name":"Data",
             "y":"y",
             "x":"x",
-            "color":"rgb(93,165,218)"
+            "color":colorSet[0]
           }
         },
         w = 500,
@@ -1509,7 +1471,7 @@ function runTests(){
             "name":"Data",
             "y":"y",
             "x":"x",
-            "color":"rgb(93,165,218)"
+            "color":colorSet[0]
           }
         },
         w = 500,
@@ -1630,7 +1592,7 @@ function runTests(){
             "name":"Data",
             "y":"y",
             "x":"x",
-            "color":"rgb(93,165,218)"
+            "color":colorSet[0]
           }
         },
         w = 500,
@@ -1751,7 +1713,7 @@ function runTests(){
             "name":"Data",
             "y":"y",
             "x":"x",
-            "color":"rgb(93,165,218)"
+            "color":colorSet[0]
           }
         },
         w = 500,
@@ -1871,7 +1833,7 @@ function runTests(){
             "name":"Data",
             "y":"y",
             "x":"x",
-            "color":"rgb(93,165,218)"
+            "color":colorSet[0]
           }
         },
         w = 500,
@@ -1993,7 +1955,7 @@ function runTests(){
             "name":"mySeries",
             "x":['y','y1','y2'],
             "y":['y','y1','y2'],
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           }
         },
         dim = ['y','y1','y2'],
@@ -2236,7 +2198,7 @@ function runTests(){
             "name":"mySeries",
             "x":['y','y1','y2'],
             "y":['y','y1','y2'],
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           }
         },
         dim = ['y','y1','y2'],
@@ -2424,14 +2386,14 @@ function runTests(){
             "name":"mySeries",
             "x":"x",
             "y":"y",
-            "color": "rgb(93,165,218)"
+            "color": colorSet[0]
           },
           "mySeries2":{
             "type":"line",
             "name":"mySeries2",
             "x":"x",
             "y":"y2",
-            "color": "rgb(250,164,58)",
+            "color": colorSet[1],
             "interpolationFunction": Px.d3.curveBasis
           }
         },

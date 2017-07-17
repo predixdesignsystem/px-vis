@@ -14,7 +14,7 @@ function runTests() {
         singleColumnSVG = document.getElementById('singleColumnSVG'),
         singleColumnBar = document.getElementById('singleColumnBar');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var barRect;
 
     suiteSetup(function(done){
@@ -39,7 +39,7 @@ function runTests() {
           "name":"mySeries",
           "x":"x",
           "y":"y",
-          "color": "rgb(93,165,218)"
+          "color": colorSet[0]
         }},
         chartExtents = {"x":["A","B","C","D","E"],"y":[0,0.6]},
         w = 500,
@@ -138,7 +138,7 @@ function runTests() {
         multiColumnBar2 = document.getElementById('multiColumnBar2'),
         multiColumnBar3 = document.getElementById('multiColumnBar3');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var barRect,barRect2,barRect3;
 
     suiteSetup(function(done){
@@ -394,7 +394,7 @@ function runTests() {
         singleBarSVG = document.getElementById('singleBarSVG'),
         singleBarBar = document.getElementById('singleBarBar');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var barRect;
 
     suiteSetup(function(done){
@@ -419,7 +419,7 @@ function runTests() {
           "name":"mySeries",
           "x":"x",
           "y":"y",
-          "color": "rgb(93,165,218)"
+          "color": colorSet[0]
         }},
         chartExtents = {"x":[0,0.6],"y":["A","B","C","D","E"]},
         w = 500,
@@ -519,7 +519,7 @@ function runTests() {
         multiBarBar2 = document.getElementById('multiBarBar2'),
         multiBarBar3 = document.getElementById('multiBarBar3');
 
-    var colorSet = dataVisColors.properties.seriesColorList.value;
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var barRect,barRect2,barRect3;
 
     suiteSetup(function(done){

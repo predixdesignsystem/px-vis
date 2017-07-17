@@ -82,6 +82,10 @@ PxVisBehaviorScale.scale = [{
     }
   },
 
+  attached: function() {
+    this.preventInitialDrawing = true;
+  },
+
   _recreateScales: function(width, height, margin) {
 
     //prevent domain update
@@ -248,6 +252,7 @@ PxVisBehaviorScale.scale = [{
       if(!this.chartId || this.preventWebWorkerSynchronization ) {
         var extents = this._determineExtents();
         this._applyExtents(extents);
+        this.set('preventInitialDrawing', false);
         return;
       }
 
@@ -270,6 +275,7 @@ PxVisBehaviorScale.scale = [{
             'data': wwInfo,
             'successCallback': function(e) {
               this._applyExtents(e.data);
+              this.set('preventInitialDrawing', false);
             }.bind(this)});
     }.bind(this), 10);
   },
@@ -862,7 +868,8 @@ _calcMultiAxisExtents: function() {
   PxVisBehavior.chartExtents,
   PxVisBehavior.dataExtents,
   PxVisBehaviorD3.domainUpdateNotify,
-  PxVisBehavior.preventWebWorkerSynchronization
+  PxVisBehavior.preventWebWorkerSynchronization,
+  PxVisBehavior.preventInitialDrawing
 ];
 
 </script>
