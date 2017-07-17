@@ -82,10 +82,6 @@ PxVisBehaviorScale.scale = [{
     }
   },
 
-  attached: function() {
-    this.preventInitialDrawing = true;
-  },
-
   _recreateScales: function(width, height, margin) {
 
     //prevent domain update
@@ -119,7 +115,12 @@ PxVisBehaviorScale.scale = [{
     //create or update
     if(this.x && this.x._scaleType === this.xAxisType && !forceRecreation) {
       this.x.range([0,w]);
-      this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+
+      //only update if it has been set already, the first set of domain
+      //changed should come from extents
+      if(this.domainChanged !== null) {
+        this.set('domainChanged', this.domainChanged);
+      }
     } else {
       this.set('x', this._setScale(this.xAxisType,[0, w], this.x));
     }
@@ -139,7 +140,12 @@ PxVisBehaviorScale.scale = [{
     //create or update
     if(this.y && this.y._scaleType === this.yAxisType && !forceRecreation) {
       this.y.range([h, 0]);
-      this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+
+      //only update if it has been set already, the first set of domain
+      //changed should come from extents
+      if(this.domainChanged !== null) {
+        this.set('domainChanged', this.domainChanged);
+      }
     } else {
       this.set('y', this._setScale(this.yAxisType,[h, 0], this.y));
     }
@@ -182,7 +188,11 @@ PxVisBehaviorScale.scale = [{
       this.set('y', copy);
     }
     if(updated) {
-      this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+      //only update if it has been set already, the first set of domain
+      //changed should come from extents
+      if(this.domainChanged !== null) {
+        this.set('domainChanged', this.domainChanged);
+      }
     }
   },
 
@@ -252,7 +262,6 @@ PxVisBehaviorScale.scale = [{
       if(!this.chartId || this.preventWebWorkerSynchronization ) {
         var extents = this._determineExtents();
         this._applyExtents(extents);
-        this.set('preventInitialDrawing', false);
         return;
       }
 
@@ -275,7 +284,6 @@ PxVisBehaviorScale.scale = [{
             'data': wwInfo,
             'successCallback': function(e) {
               this._applyExtents(e.data);
-              this.set('preventInitialDrawing', false);
             }.bind(this)});
     }.bind(this), 10);
   },
@@ -868,8 +876,7 @@ _calcMultiAxisExtents: function() {
   PxVisBehavior.chartExtents,
   PxVisBehavior.dataExtents,
   PxVisBehaviorD3.domainUpdateNotify,
-  PxVisBehavior.preventWebWorkerSynchronization,
-  PxVisBehavior.preventInitialDrawing
+  PxVisBehavior.preventWebWorkerSynchronization
 ];
 
 </script>
