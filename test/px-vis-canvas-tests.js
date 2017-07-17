@@ -191,19 +191,7 @@ function basicAttrs(elem, elemName, w,h,m){
     assert.equal(elem.canvasContext.canvas, elem._canvas);
   });
 
-// currently, no universal support to get the transform on a canvas. Methods have been speced, but no way to test this currently. :-/
-  // test(elemName + '.canvasContext has correct translation', function() {
-  //   console.log(elem.canvasContext.currentTransform);
-  //   assert.isTrue(elem.canvasContext.getTransform() === "translate("+m.left+","+m.top+")" || elem._canvas.attr('transform').trim() === "translate("+m.left+" "+m.top+")");
-  // });
-
   test(elemName + ' canvasContext has correct line trackers',function() {
-    assert.equal(JSON.stringify(elem.canvasContext._pxLinesSeries), '[]');
-    assert.equal(elem.canvasContext._pxLinesRedraw, 0);
-    assert.equal(elem.canvasContext._pxLinesCleared, true);
-    assert.equal(JSON.stringify(elem.canvasContext._pxScatterSeries), '[]');
-    assert.equal(elem.canvasContext._pxScatterRedraw, 0);
-    assert.equal(elem.canvasContext._pxScatterCleared, true);
     assert.equal(elem.canvasContext._translation[0], m.left);
     assert.equal(elem.canvasContext._translation[1], m.top);
   });

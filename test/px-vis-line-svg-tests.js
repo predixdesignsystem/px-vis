@@ -800,16 +800,6 @@ function runTests(){
       assert.equal(d3.select(linePath.nodes()[3]).attr('d').split(/[\s,]+/).join(''),'M120230L360170');
       assert.equal(d3.select(linePath.nodes()[4]).attr('d').split(/[\s,]+/).join(''),'M120210L3600');
     });
-
-    test('context is still empty ', function() {
-      assert.equal(JSON.stringify(parallelSVG.canvasContext._pxLinesSeries), '[]');
-      assert.equal(parallelSVG.canvasContext._pxLinesRedraw, 0);
-      assert.equal(parallelSVG.canvasContext._pxLinesCleared, true);
-      assert.equal(JSON.stringify(parallelSVG.canvasContext._pxScatterSeries), '[]');
-      assert.equal(parallelSVG.canvasContext._pxScatterRedraw, 0);
-      assert.equal(parallelSVG.canvasContext._pxScatterCleared, true);
-    });
-
   }); //suite
 
   suite('px-vis-line-svg renders parallel axis with gradient lines to SVG', function() {
@@ -935,15 +925,6 @@ function runTests(){
       assert.equal(d3.select(linePath.nodes()[2]).attr('d').split(/[\s,]+/).join(''),'M120170L360240');
       assert.equal(d3.select(linePath.nodes()[3]).attr('d').split(/[\s,]+/).join(''),'M120230L360170');
       assert.equal(d3.select(linePath.nodes()[4]).attr('d').split(/[\s,]+/).join(''),'M120210L3600');
-    });
-
-    test('context is still empty ', function() {
-      assert.equal(JSON.stringify(parallelGradientSVG.canvasContext._pxLinesSeries), '[]');
-      assert.equal(parallelGradientSVG.canvasContext._pxLinesRedraw, 0);
-      assert.equal(parallelGradientSVG.canvasContext._pxLinesCleared, true);
-      assert.equal(JSON.stringify(parallelGradientSVG.canvasContext._pxScatterSeries), '[]');
-      assert.equal(parallelGradientSVG.canvasContext._pxScatterRedraw, 0);
-      assert.equal(parallelGradientSVG.canvasContext._pxScatterCleared, true);
     });
 
   }); //suite
@@ -1086,16 +1067,6 @@ function runTests(){
       assert.equal(d3.select(linePath.nodes()[3]).attr('d').split(/[\s,]+/).join(''),'M120230L360170');
       assert.equal(d3.select(linePath.nodes()[4]).attr('d').split(/[\s,]+/).join(''),'M120210L3600');
     });
-
-    test('context is still empty ', function() {
-      assert.equal(JSON.stringify(parallelCategorySVG.canvasContext._pxLinesSeries), '[]');
-      assert.equal(parallelCategorySVG.canvasContext._pxLinesRedraw, 0);
-      assert.equal(parallelCategorySVG.canvasContext._pxLinesCleared, true);
-      assert.equal(JSON.stringify(parallelCategorySVG.canvasContext._pxScatterSeries), '[]');
-      assert.equal(parallelCategorySVG.canvasContext._pxScatterRedraw, 0);
-      assert.equal(parallelCategorySVG.canvasContext._pxScatterCleared, true);
-    });
-
   }); //suite
 
   suite('px-vis-line-svg renders parallel axis with multiple categories and gradients to SVG', function() {
@@ -1244,15 +1215,6 @@ function runTests(){
       assert.equal(d3.select(linePath.nodes()[2]).attr('d').split(/[\s,]+/).join(''),'M120170L360240');
       assert.equal(d3.select(linePath.nodes()[3]).attr('d').split(/[\s,]+/).join(''),'M120230L360170');
       assert.equal(d3.select(linePath.nodes()[4]).attr('d').split(/[\s,]+/).join(''),'M120210L3600');
-    });
-
-    test('context is still empty ', function() {
-      assert.equal(JSON.stringify(parallelCategoryGradientSVG.canvasContext._pxLinesSeries), '[]');
-      assert.equal(parallelCategoryGradientSVG.canvasContext._pxLinesRedraw, 0);
-      assert.equal(parallelCategoryGradientSVG.canvasContext._pxLinesCleared, true);
-      assert.equal(JSON.stringify(parallelCategoryGradientSVG.canvasContext._pxScatterSeries), '[]');
-      assert.equal(parallelCategoryGradientSVG.canvasContext._pxScatterRedraw, 0);
-      assert.equal(parallelCategoryGradientSVG.canvasContext._pxScatterCleared, true);
     });
 
   }); //suite
