@@ -1,5 +1,7 @@
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="../px-tooltip/px-tooltip.html"/>
+<link rel="import" href="../px-icon-set/px-icon-set.html"/>
+<link rel="import" href="../px-icon-set/px-icon.html"/>
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 
@@ -37,8 +39,7 @@ Custom property | Description
       <span id="mainRow" class$="flex [[_getRowDirection(horizontalAlignment)]]">
         <template id="mainRepeat" is="dom-repeat" items="{{_internalConfig}}" strip-whitespace>
           <span class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]]" style$="{{item.customButtonStyle}}" on-tap="_clickItem" value="{{index}}">
-            <i class$="fa [[_getIcon(item)]]" value="{{index}}">
-            </i>{{item.title}}
+            <px-icon icon="[[item.icon]]" value="{{index}}"></px-icon>{{item.title}}
             <template is="dom-if" if="[[_hasTooltip(item)]]">
               <px-tooltip
                 tooltip-message="[[item.tooltipLabel]]"
@@ -54,8 +55,7 @@ Custom property | Description
         <span id="subRow" class$="flex subrow--container [[_getRowDirection(horizontalAlignment)]] [[_getSubRowClass(withinChart, subToolbarAlignment)]]">
           <template id="subRepeat" is="dom-repeat" items="{{currentSubConfig}}" strip-whitespace>
               <span class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]]" on-tap="_clickSubItem" value="{{index}}">
-                <i class$="fa [[_getIcon(item)]]" value="{{index}}">
-                </i>{{item.title}}
+                <px-icon icon="[[item.icon]]" value="{{index}}"></px-icon>{{item.title}}
                 <template is="dom-if" if="[[_hasTooltip(item)]]">
                   <px-tooltip
                     tooltip-message="[[item.tooltipLabel]]"
@@ -109,8 +109,8 @@ Custom property | Description
           return {
             'axisBrush': {
               'tooltipLabel': 'Axis Brush',
-              'icon': 'fa-eraser',
-              'cursorIcon': 'fa-eraser',
+              'icon': 'px-utl:delete',
+              'cursorIcon': 'px-utl:delete',
               'buttonGroup': 1,
               'onClick': 'function() {this.set("_internalShowTooltip", false);}',
               'actionConfig': {
@@ -122,8 +122,8 @@ Custom property | Description
             },
             'axisDrag': {
               'tooltipLabel': 'Axis Drag',
-              'icon': 'fa-arrows-h',
-              'cursorIcon': 'fa-arrows-h',
+              'icon': 'px-utl:share',
+              'cursorIcon': 'px-utl:share',
               'buttonGroup': 1,
               'onClick': 'function() {this.set("_internalShowTooltip", false);}',
               'actionConfig': {
@@ -135,8 +135,8 @@ Custom property | Description
             },
             'crosshair': {
               'tooltipLabel': 'Crosshair',
-              'icon': 'fa-crosshairs',
-              'cursorIcon': 'fa-crosshairs',
+              'icon': 'px-utl:add',
+              'cursorIcon': 'px-utl:add',
               'buttonGroup': 1,
               'onClick': 'function() {this.set("_internalShowTooltip", true);}',
               'actionConfig': {
@@ -148,7 +148,7 @@ Custom property | Description
             },
             'crosshairWithOptions': {
               'tooltipLabel': 'Crosshair',
-              'icon': 'fa-crosshairs',
+              'icon': 'px-utl:add',
               'buttonGroup': 1,
               'onClick': 'function() {this.set("interactionSpaceConfig.cursorType", "circle"); }',
               'onDeselect': 'function() { this.set("interactionSpaceConfig.cursorType", "none");}',
@@ -160,36 +160,36 @@ Custom property | Description
               },
               'subConfig': {
                 'closestPoint': {
-                  'icon': 'fa-map-pin',
-                  'cursorIcon': 'fa-map-pin',
+                  'icon': 'px-utl:information',
+                  'cursorIcon': 'px-utl:information',
                   'tooltipLabel': 'Closest Timestamp and associated points',
                   'buttonGroup': 1,
                   'selectable': true,
                   'onClick': 'function() { this.set("interactionSpaceConfig.searchType", "closestPoint");}'
                 },
                 'pointPerSeries': {
-                  'icon': 'fa-list',
-                  'cursorIcon': 'fa-list',
+                  'icon': 'px-utl:information',
+                  'cursorIcon': 'px-utl:information',
                   'tooltipLabel': 'Point Per Series',
                   'buttonGroup': 1,
                   'selectable': true,
                   'onClick': 'function() { this.set("interactionSpaceConfig.searchType", "pointPerSeries");}'
                 },
                 'allInArea': {
-                  'icon': 'fa-circle-o',
-                  'cursorIcon': 'fa-circle-o',
+                  'icon': 'px-utl:information',
+                  'cursorIcon': 'px-utl:information',
                   'tooltipLabel': 'All in area',
                   'buttonGroup': 1,
                   'selectable': true,
                   'onClick': 'function() { this.set("interactionSpaceConfig.searchType", "allInArea");}'
                 },
                 'radiusUp': {
-                  'icon': 'fa-plus-circle',
+                  'icon': 'px-utl:share',
                   'tooltipLabel': 'Radius',
                   'onClick': 'function() { var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0; this.set("interactionSpaceConfig.searchRadius", sr + 5);}'
                 },
                 'radiusDown': {
-                  'icon': 'fa-minus-circle ',
+                  'icon': 'px-utl:download',
                   'tooltipLabel': 'Radius',
                   'onClick': 'function() { var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0; this.set("interactionSpaceConfig.searchRadius", Math.max(sr - 5, 0));}'
                 }
@@ -197,8 +197,8 @@ Custom property | Description
             },
             'tooltip': {
               'tooltipLabel': 'Tooltip',
-              'icon': 'fa-list-alt',
-              'cursorIcon': 'fa-list-alt',
+              'icon': 'px-utl:calculation',
+              'cursorIcon': 'px-utl:calculation',
               'buttonGroup': 1,
               'selected': true,
               'onClick': 'function() {this.set("_internalShowTooltip", true);}',
@@ -211,8 +211,8 @@ Custom property | Description
             },
             'pan': {
               'tooltipLabel': 'Pan',
-              'icon': 'fa-arrows',
-              'cursorIcon': 'fa-arrows',
+              'icon': 'px-utl:chevron',
+              'cursorIcon': 'px-utl:chevron',
               'onClick': 'function() {this.set("_internalShowTooltip", false);}',
               'buttonGroup': 1,
               'actionConfig': {
@@ -221,7 +221,7 @@ Custom property | Description
               },
               'subConfig': {
                 'resetZoom': {
-                  'icon': 'fa-expand',
+                  'icon': 'px-utl:chevron',
                   'tooltipLabel': 'Reset panning',
                   'eventName': 'px-vis-toolbar-reset-zoom'
                 }
@@ -229,8 +229,8 @@ Custom property | Description
             },
             'zoom': {
               'tooltipLabel': 'Zoom',
-              'icon': 'fa-search',
-              'cursorIcon': 'fa-search',
+              'icon': 'px-utl:zoom',
+              'cursorIcon': 'px-utl:zoom',
               'onClick': 'function() {this.set("_internalShowTooltip", false); }',
               'buttonGroup': 1,
               'actionConfig': {
@@ -239,22 +239,22 @@ Custom property | Description
               },
               'subConfig': {
                 'zoomIn': {
-                  'icon': 'fa-plus',
+                  'icon': 'px-utl:share',
                   'tooltipLabel': 'Zoom in',
                   'eventName': 'px-vis-toolbar-zoom-in'
                 },
                 'zoomOut': {
-                  'icon': 'fa-minus',
+                  'icon': 'px-utl:download',
                   'tooltipLabel': 'Zoom out',
                   'eventName': 'px-vis-toolbar-zoom-out'
                 },
                 'undoZoom': {
-                  'icon': 'fa-undo',
+                  'icon': 'px-utl:reply',
                   'tooltipLabel': 'Undo zoom',
                   'eventName': 'px-vis-toolbar-undo-zoom'
                 },
                 'resetZoom': {
-                  'icon': 'fa-expand',
+                  'icon': 'px-utl:chevron',
                   'tooltipLabel': 'Reset zoom',
                   'eventName': 'px-vis-toolbar-reset-zoom'
                 }
@@ -262,8 +262,8 @@ Custom property | Description
             },
             'advancedZoom': {
               'tooltipLabel': 'Zoom',
-              'icon': 'fa-search',
-              'cursorIcon': 'fa-search',
+              'icon': 'px-utl:zoom',
+              'cursorIcon': 'px-utl:zoom',
               'buttonGroup': 1,
               'selectable': true,
               'onClick': 'function() {this.set("_internalShowTooltip", false);}',
@@ -295,22 +295,22 @@ Custom property | Description
                   'onClick': 'function() { this.set("selectionType", "xy");}'
                 },
                 'zoomIn': {
-                  'icon': 'fa-plus',
+                  'icon': 'px-utl:share',
                   'tooltipLabel': 'Zoom in',
                   'eventName': 'px-vis-toolbar-zoom-in'
                 },
                 'zoomOut': {
-                  'icon': 'fa-minus',
+                  'icon': 'px-utl:download',
                   'tooltipLabel': 'Zoom out',
                   'eventName': 'px-vis-toolbar-zoom-out'
                 },
                 'undoZoom': {
-                  'icon': 'fa-undo',
+                  'icon': 'px-utl:reply',
                   'tooltipLabel': 'Undo zoom',
                   'eventName': 'px-vis-toolbar-undo-zoom'
                 },
                 'resetZoom': {
-                  'icon': 'fa-expand',
+                  'icon': 'px-utl:chevron',
                   'tooltipLabel': 'Reset zoom',
                   'eventName': 'px-vis-toolbar-reset-zoom'
                 }
@@ -318,15 +318,15 @@ Custom property | Description
             },
             'stripe': {
               'tooltipLabel': 'Draw Stripe',
-              'icon': 'fa-paint-brush',
-              'cursorIcon': 'fa-paint-brush',
+              'icon': 'px-utl:edit',
+              'cursorIcon': 'px-utl:edit',
               'buttonGroup': 1,
               'selectable': true,
               'onClick': 'function() {this.set("_internalShowTooltip", false);}',
               'subConfig': {
                 'inclusion': {
                   'title': 'Inclusion',
-                  'cursorIcon': 'fa-paint-brush',
+                  'cursorIcon': 'px-utl:edit',
                   'buttonGroup': 1,
                   'tooltipLabel': 'Draw/edit inclusion type stripes',
                   'selectable': true,
@@ -335,15 +335,15 @@ Custom property | Description
                 },
                 'exclusion': {
                   'title': 'Exclusion',
-                  'cursorIcon': 'fa-paint-brush',
+                  'cursorIcon': 'px-utl:edit',
                   'buttonGroup': 1,
                   'tooltipLabel': 'Draw/edit exclusion type stripes',
                   'selectable': true,
                   'onClick': 'function() { this.set("selectionType", "xAxis"); this.set("stripeType", "exclusion"); }'
                 },
                 'add': {
-                  'icon': 'fa-paint-brush',
-                  'cursorIcon': 'fa-paint-brush',
+                  'icon': 'px-utl:edit',
+                  'cursorIcon': 'px-utl:edit',
                   'tooltipLabel': 'Add stripe',
                   'buttonGroup': 2,
                   'selected': true,
@@ -356,8 +356,8 @@ Custom property | Description
                   },
                 },
                 'edit': {
-                  'icon': 'fa-pencil',
-                  'cursorIcon': 'fa-pencil',
+                  'icon': 'px-utl:edit',
+                  'cursorIcon': 'px-utl:edit',
                   'buttonGroup': 2,
                   'selectable': true,
                   'tooltipLabel': 'Edit/remove stripe',
@@ -414,7 +414,7 @@ Custom property | Description
        * {
        *   "customzoom": {
        *     "tooltipLabel": "zoom",          //label used for the tooltip for this button
-       *     "icon": "fa-search",             //font-awesome icon used for this button
+       *     "icon": "px-utl:zoom",             //font-awesome icon used for this button
        *     "onClick": "function() {this.set(\"_internalShowTooltip\", false);}",
        *     "onClickContext': "toolbar",   //context to be used on `onClick`. If "toolbar"
        * is specified then the context will be this toolbar
@@ -477,7 +477,7 @@ Custom property | Description
        *           "eventName": "px-vis-toolbar-undo-zoom"
        *         },
        *         "resetZoom": {
-       *           "icon": "fa-expand",
+       *           "icon": "px-utl:chevron",
        *           "tooltipLabel": "reset zoom to inital value",
        *           "eventName": "px-vis-toolbar-reset-zoom"
        *         }

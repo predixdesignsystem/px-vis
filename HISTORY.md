@@ -25,6 +25,16 @@ v3.0.0
 * new events for canvas rendering (TODO doc)
 * removed redrawElement function from highlightPoint and highlightLine
 * Changed inert property on register to inertRegister so as to not conflic with w3c spec
+* Changed over to px-icon-set for px-vis-events, px-vis-toolbar, and px-vis-dynamic-menu
+  * Events:
+    * Images still supported
+    * Font Awesome icons no longer supported.
+    * Unicode values no longer supported
+    * Icons can only be loaded icon-icon-sets which use SVG.
+    * Icon name must include the set prefix
+  * Dynamic menu and Toolbar:
+    * Must be icons use px-icon, which wraps iron-icon.
+    * Must be value icon types for px-icon or iron-icon.
 
 v2.1.6
 ==================
