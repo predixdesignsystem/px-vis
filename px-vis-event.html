@@ -30,13 +30,13 @@ It should follow the following form:
     eventConfig = {
       "Event Name 1":{
         "color": "blue",
-        "icon": "pxl:deployments",
+        "icon": "px-fea:deployments",
         "type": "px",
         "offset":[0,0]
       },
       "Event Name 2":{
         "color": "green",
-        "icon": "pxm:favorite",
+        "icon": "px-nav:favorite",
         "type": "px",
         "offset":[0,0],
         "lineWeight": 0
@@ -108,7 +108,8 @@ Custom property | Description
       PxVisBehavior.commonMethods,
       PxVisBehavior.events,
       PxVisBehaviorD3.domainUpdate,
-      Polymer.AppLocalizeBehavior
+      Polymer.AppLocalizeBehavior,
+      PxVisBehaviorD3.icons
     ],
 
     /**
@@ -241,22 +242,6 @@ Custom property | Description
 
       _value: {
         type: String
-      },
-      /**
-       * @type {!Polymer.IronMeta}
-       */
-      _meta: {
-        value: Polymer.Base.create('iron-meta', {type: 'iconset'})
-      },
-
-      _iconSize: {
-        type: Number,
-        value: 16
-      },
-
-      _iconScale: {
-        type: Number,
-        computed: '_computeIconScale(_iconSize, _thisConfig.*)'
       }
 
     },
@@ -435,7 +420,7 @@ Custom property | Description
           .attr("width", this._thisConfig.size + 'px')
           .attr("height", this._thisConfig.size + 'px');
       } else {
-        var icon = this._getIcon()
+        var icon = this._getIcon(this._thisConfig.icon, this._thisConfig.size, 'px-utl', 'information');
 
         this.eventIcon = Px.d3.select(this.eventGroup.node().appendChild(icon))
           .attr('fill', 'transparent')
@@ -447,52 +432,12 @@ Custom property | Description
 
     },
 
-    _getIcon: function() {
-      var split = this._thisConfig.icon.split(':'),
-          key = split[0] ? split[0] : 'pxs',
-          name = split[1] ? split[1] : 'information',
-          iconSet = this._meta.byKey(key),
-          icon;
-
-      if(!iconSet) {
-        console.warn("Cant find set named: " + key + ". Falling back to default icon");
-
-        key = 'pxs';
-        iconSet = this._meta.byKey(key);
-      }
-
-      icon = Polymer.dom(iconSet).querySelector('[id="' + name + '"]');
-
-      if(!icon) {
-        console.warn("Cant find icon named: " + this._thisConfig.icon);
-        icon = Polymer.dom(iconSet).querySelector('[id="information"]');
-      }
-
-      this._setIconSize(key);
-
-      return icon.cloneNode(true);
-    },
-
-    _setIconSize: function(type) {
-      if (type === 'pxl') {
-        this._iconSize = 32;
-      } else if (type === 'pxm') {
-        this._iconSize = 22;
-      } else {
-        this._iconSize = 16;
-      }
-    },
-
-    _computeIconScale: function(size) {
-      return this._thisConfig.size / size;
-    },
-
     /**
      * Compiles a configuration object by looking if there is a dev set style, or if it should use defaults
      *
      * @method _processConfiguration
      */
-    _processConfiguration:function() {
+    _processConfiguration: function() {
 
       // is there a configuration object for this event type?
       if(this.eventConfig[this.eventData.label]) {

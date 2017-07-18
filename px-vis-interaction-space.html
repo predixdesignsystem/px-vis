@@ -1,7 +1,8 @@
 <link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="../px-icon-set/px-icon-set.html"/>
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
-<link rel="import" href="fa_codes.html" />
+
 
 
 <!--
@@ -75,7 +76,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehavior.interactionSpaceShared,
       PxVisBehavior.preventWebWorkerSynchronization,
       PxVisBehavior.wwDataSyncCounter,
-      faCodes
+      PxVisBehaviorD3.cursorIcon
     ],
     /***EVENTS****
     /*
@@ -386,21 +387,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       }
     },
 
-    _drawCursorIcon: function() {
-      var icon = this.iconType && this.iconType !== 'none'  ? String.fromCharCode(parseInt(this.fa[this.iconType], 16)) : '';
-
-
-      if(!this._icon) {
-        this._icon = this._cursorGroup.append("text")
-          .attr('font-family', 'FontAwesome')
-          .attr('font-size', '12px')
-          .attr('fill', this._checkThemeVariable("--px-vis-cursor-line-color", 'rgb(0,0,0)'))
-          .attr('pointer-events', 'none');
-      }
-
-      this._icon.text(icon);
-    },
-
     _drawCursor: function() {
       if((!this.cursorType || this.cursorType === 'none') && this._doesD3HaveValues(this._cursor)) {
         this._cursor.remove();
@@ -472,9 +458,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       this._cursorGroup
         .attr('display',null);
 
-      this._icon
-        .attr("x", mousePos[0] + 5)
-        .attr("y", mousePos[1] - 5);
+      this._positionCursorIcon(mousePos);
 
       if(this.cursorType === 'circle') {
         this._cursor

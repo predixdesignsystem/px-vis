@@ -1752,4 +1752,112 @@ PxVisBehaviorD3.scatterMarkers = {
     },
   }
 };
+
+/*
+    Name:
+    PxVisBehaviorD3.icons
+
+    Description:
+    Polymer behavior that provides the mechanism to get icons
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorD3.icons
+*/
+PxVisBehaviorD3.icons = {
+  properties: {
+    /**
+      * @type {!Polymer.IronMeta}
+      */
+    _meta: {
+      value: Polymer.Base.create('iron-meta', {type: 'iconset'})
+    },
+
+    _iconSize: {
+      type: Number,
+      value: 16
+    },
+
+    _iconScale: {
+      type: Number,
+      value: 16
+    }
+  },
+
+  _getIcon: function(iconName, targetSize, defaultKey, defaultName) {
+    var split = iconName.split(':'),
+        key = split[0] && split[1] ? split[0] : defaultKey,
+        name = split[0] && split[1] ? split[1] : defaultName,
+        iconSet = this._meta.byKey(key),
+        icon;
+
+    if(!iconSet) {
+      console.warn("Cant find set named: " + key + ". Falling back to default icon");
+
+      key = defaultKey;
+      name = defaultName;
+      iconSet = this._meta.byKey(key);
+    }
+
+    icon = Polymer.dom(iconSet).querySelector('[id="' + name + '"]');
+
+    if(!icon) {
+      console.warn("Cant find icon named: " + this._thisConfig.icon);
+      icon = Polymer.dom(iconSet).querySelector('[id="' + defaultName + '"]');
+    }
+
+    this._iconSize = iconSet.size;
+    this._iconScale = this._calcIconScale(this._iconSize, targetSize);
+
+    return icon.cloneNode(true);
+  },
+
+  _calcIconScale: function(size, targetSize) {
+    return targetSize / size;
+  }
+};
+
+/*
+    Name:
+    PxVisBehaviorD3.cursorIcon
+
+    Description:
+    Polymer behavior that provides the mechanism to draw cursor icons
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorD3.cursorIcon
+*/
+PxVisBehaviorD3.cursorIcon = [{
+
+  _drawCursorIcon: function() {
+    if(!this.iconType || this.iconType === 'none') {
+      return;
+    }
+
+    if(this._doesD3HaveValues(this._icon)) {
+      this._icon.remove();
+    }
+
+    var icon = this._getIcon(this.iconType, 12, 'px-utl', 'information');
+
+    this._icon = Px.d3.select(this._cursorGroup.node().appendChild(icon))
+      .attr('fill', 'transparent')
+      .attr('stroke', this._checkThemeVariable("--px-vis-cursor-line-color", 'rgb(0,0,0)'))
+      .attr('pointer-events', 'none');
+  },
+
+  _positionCursorIcon: function(mousePos) {
+    var x = mousePos[0] + 5, //such magic, so wow
+        y = mousePos[1] - this._iconSize,
+        t = "translate(" + x + "," + y + ")",
+        s = " scale(" + this._iconScale + ")";
+
+    this._icon
+      .attr("transform", (t + s));
+  }
+
+}, PxVisBehaviorD3.icons];
 </script>
