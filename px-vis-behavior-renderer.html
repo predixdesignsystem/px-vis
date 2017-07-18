@@ -174,7 +174,7 @@ PxVisBehaviorRenderer.base = [{
      */
     rendererFrameCountToAverage: {
       type: Number,
-      value: 5
+      value: 3
     },
     /**
      * For each renderer type the previous frames number of points and duration for line and scatter
@@ -518,6 +518,11 @@ PxVisBehaviorRenderer.base = [{
       //wether we need to guess or have stats for this type of rendering
       if(toRender === -1) {
         drawingResult = this._firstCanvasRender(ctx);
+        //update toRender so that if we have a next target it can use those
+        //stats. toRender should be the number of points of the whole frame
+        //including what has just been rendered because it will be automatically
+        //adjusted by budget in the _renderTargetToCanvas
+        toRender = drawingResult.points * 100 / drawingResult.budgetUsed;
       } else {
         drawingResult = this._renderTargetToCanvas(toRender, ctx, budget);
       }
@@ -530,7 +535,7 @@ PxVisBehaviorRenderer.base = [{
       //get next target and keep rendering if we can
       ctx.currentTarget = this._getCurrentCanvasRenderingTarget(ctx);
     }
-   //  console.log('finished one frame: ' + JSON.stringify(ctx.previousFrameStats) + ' in: ' + (window.performance.now() - ctx.previousStartTime));
+    //  console.log('finished one frame: ' + JSON.stringify(ctx.previousFrameStats) + ' in: ' + (window.performance.now() - ctx.previousStartTime));
   },
 
   /**
@@ -560,7 +565,7 @@ PxVisBehaviorRenderer.base = [{
           if(this._previousFramesTiming[ctx.renderType][targetType].length > this.rendererFrameCountToAverage) {
             this._previousFramesTiming[ctx.renderType][targetType].shift();
           }
-          // console.log('frame ' + ctx.frameIndex + ', type: ' + targetType + ', render: ' +JSON.stringify(this._previousFramesTiming[ctx.renderType][targetType][this._previousFramesTiming[ctx.renderType][targetType].length-1]));
+           console.log('frame ' + ctx.frameIndex + ', type: ' + targetType + ', render: ' +JSON.stringify(this._previousFramesTiming[ctx.renderType][targetType][this._previousFramesTiming[ctx.renderType][targetType].length-1]));
         }
       }
     }
@@ -589,11 +594,12 @@ PxVisBehaviorRenderer.base = [{
     //try estimating how much we can render.
     var duration,
         multiplier,
-        targetTiming = 8,
+        targetTiming = this.rendererFrameDurationTarget-4,
         pointsRendered = 0,
         result,
         before = window.performance.now(),
-        toRender = Math.min(ctx.currentTarget.type === 'scatter' ? 200 : 1000, ctx.currentTarget.target.chartData ? ctx.currentTarget.target.chartData.length : 0);
+        toRender = Math.min(ctx.currentTarget.type === 'scatter' ? 200 : 1000, ctx.currentTarget.target.chartData ? ctx.currentTarget.target.chartData.length : 0),
+        budgetUsed;
 
     if(toRender) {
       //start by rendering X pts
@@ -602,19 +608,25 @@ PxVisBehaviorRenderer.base = [{
 
       duration = window.performance.now() - before;
 
-      //target 8ms: 16ms (60 fps) - 8ms for the browser to
+      //target our duration frame - 4ms: - 4ms for the browser to
       //actually draw. Crude but this is only for the first frame
       if(duration < targetTiming) {
         //find how much more we can render
         multiplier = Math.floor(targetTiming / duration);
 
-        //render more
+        //render more, but we might hit the end of this series
         result = this._renderTargetToCanvas(multiplier * toRender, ctx, 100);
         pointsRendered += result.points;
+        duration = window.performance.now() - before;
       }
 
       //if we have rendered less points than the estimation don't use all the budget
-      return { 'points': pointsRendered, 'budgetUsed': (pointsRendered*100)/(toRender + multiplier*10)};
+  //    budgetUsed = (pointsRendered*100)/(toRender + multiplier*10);
+
+      //adjust budget in case we finished rendering that series
+    //  budgetUsed = pointsRendered/(toRender * (multiplier+1));
+      budgetUsed = duration/targetTiming * 100;
+      return { 'points': pointsRendered, 'budgetUsed': budgetUsed};
     } else {
       //nothing to render, keep going
       ctx.currentRenderingCounter = 0;
