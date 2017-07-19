@@ -55,7 +55,10 @@ Custom property | Description
         <span id="subRow" class$="flex subrow--container [[_getRowDirection(horizontalAlignment)]] [[_getSubRowClass(withinChart, subToolbarAlignment)]]">
           <template id="subRepeat" is="dom-repeat" items="{{currentSubConfig}}" strip-whitespace>
               <span class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]]" on-tap="_clickSubItem" value="{{index}}">
-                <px-icon icon="[[item.icon]]" value="{{index}}"></px-icon>{{item.title}}
+                <template is="dom-if" if="[[item.icon]]">
+                  <px-icon icon="[[item.icon]]" value="{{index}}"></px-icon>
+                </template>
+                {{item.title}}
                 <template is="dom-if" if="[[_hasTooltip(item)]]">
                   <px-tooltip
                     tooltip-message="[[item.tooltipLabel]]"
