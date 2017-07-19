@@ -1,3 +1,7 @@
+v2.1.8
+==================
+* various fixes to markers
+
 v2.1.7
 ==================
 * Fix for axis interaction space position on right and bottom axis (effectively fixing problem where right positioned axis couldn't be dragged in multi Y)
