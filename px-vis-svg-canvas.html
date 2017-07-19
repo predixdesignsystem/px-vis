@@ -69,10 +69,10 @@ Element which creates 2 SVG elements, and a canvas element between the two svg e
       <template id="canvasTemplate" is="dom-repeat" items="[[_returnKeys(canvasLayersConfig.*, width, height, margin.*, offset.*)]]">
         <px-vis-canvas
           class="abs-elem inline--flex noPointer"
-          width="[[_returnProp(item, 'width', canvasLayersConfig.*)]]"
-          height="[[_returnProp(item, 'height', canvasLayersConfig.*)]]"
-          margin="[[_returnProp(item, 'margin', canvasLayersConfig.*)]]"
-          offset="[[_returnProp(item, 'offset', canvasLayersConfig.*)]]">
+          width="[[_returnProp(item, 'width', canvasLayersConfig.*, width)]]"
+          height="[[_returnProp(item, 'height', canvasLayersConfig.*, height)]]"
+          margin="[[_returnProp(item, 'margin', canvasLayersConfig.*, margin)]]"
+          offset="[[_returnProp(item, 'offset', canvasLayersConfig.*, offset)]]">
         </px-vis-canvas>
       </template>
 
@@ -118,7 +118,8 @@ Element which creates 2 SVG elements, and a canvas element between the two svg e
         },
 
         _assignCanvas: function(evt) {
-          var key = this.$.canvasTemplate.itemForElement(evt.target);
+          var normalized = Polymer.dom(evt),
+              key = this.$.canvasTemplate.itemForElement(normalized.rootTarget);
 
           if(key) {
             this.set('canvasLayers.' + key, evt.detail.data);
