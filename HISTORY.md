@@ -1,3 +1,8 @@
+v2.1.9
+==================
+* Ensure properties of a predefined toolbar config can be overriden
+* Fix getImage() width for radar
+
 v2.1.8
 ==================
 * various fixes to markers
