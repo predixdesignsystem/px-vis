@@ -544,9 +544,17 @@ Element providing an on-chart zoom.
         var toPush;
         //if this is a default action use it
         if(this._defaultActionsMapping[keys[i]]) {
+
+          //make sure we copy the predefined conf
+          //so that we 1) don't override it if we need to reuse it
+          //2) avoid dirty checking if reusing it later
+          var predefinedConf = {};
+
+          predefinedConf = this.clone(this._defaultActionsMapping[keys[i]], predefinedConf);
+
           toPush = typeof this.config[keys[i]] === 'object' ?
-            this._extendConfig(this._defaultActionsMapping[keys[i]], this.config[keys[i]]) :
-            this._defaultActionsMapping[keys[i]];
+            this._extendConfig(predefinedConf, this.config[keys[i]]) :
+            predefinedConf;
         } else {
           toPush = this.config[keys[i]];
         }
