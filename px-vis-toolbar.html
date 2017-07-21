@@ -39,7 +39,7 @@ Custom property | Description
       <span id="mainRow" class$="flex [[_getRowDirection(horizontalAlignment)]]">
         <template id="mainRepeat" is="dom-repeat" items="{{_internalConfig}}" strip-whitespace>
           <span class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]]" style$="{{item.customButtonStyle}}" on-tap="_clickItem" value="{{index}}">
-            <px-icon icon="[[item.icon]]" value="{{index}}"></px-icon>{{item.title}}
+            <px-icon class="icon" icon="[[item.icon]]" value="{{index}}"></px-icon>{{item.title}}
             <template is="dom-if" if="[[_hasTooltip(item)]]">
               <px-tooltip
                 tooltip-message="[[item.tooltipLabel]]"
@@ -56,7 +56,7 @@ Custom property | Description
           <template id="subRepeat" is="dom-repeat" items="{{currentSubConfig}}" strip-whitespace>
               <span class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]]" on-tap="_clickSubItem" value="{{index}}">
                 <template is="dom-if" if="[[item.icon]]">
-                  <px-icon icon="[[item.icon]]" value="{{index}}"></px-icon>
+                  <px-icon class="icon"icon="[[item.icon]]" value="{{index}}"></px-icon>
                 </template>
                 {{item.title}}
                 <template is="dom-if" if="[[_hasTooltip(item)]]">
@@ -112,8 +112,8 @@ Custom property | Description
           return {
             'axisBrush': {
               'tooltipLabel': 'Axis Brush',
-              'icon': 'px-utl:delete',
-              'cursorIcon': 'px-utl:delete',
+              'icon': 'px-vis:add-brush',
+              'cursorIcon': 'px-vis:add-brush',
               'buttonGroup': 1,
               'onClick': 'function() {this.set("_internalShowTooltip", false);}',
               'actionConfig': {
@@ -125,8 +125,8 @@ Custom property | Description
             },
             'axisDrag': {
               'tooltipLabel': 'Axis Drag',
-              'icon': 'px-utl:share',
-              'cursorIcon': 'px-utl:share',
+              'icon': 'px-vis:mov',
+              'cursorIcon': 'px-vis:mov',
               'buttonGroup': 1,
               'onClick': 'function() {this.set("_internalShowTooltip", false);}',
               'actionConfig': {
@@ -138,8 +138,8 @@ Custom property | Description
             },
             'crosshair': {
               'tooltipLabel': 'Crosshair',
-              'icon': 'px-utl:add',
-              'cursorIcon': 'px-utl:add',
+              'icon': 'px-vis:crosshair',
+              'cursorIcon': 'px-vis:crosshair',
               'buttonGroup': 1,
               'onClick': 'function() {this.set("_internalShowTooltip", true);}',
               'actionConfig': {
@@ -151,7 +151,7 @@ Custom property | Description
             },
             'crosshairWithOptions': {
               'tooltipLabel': 'Crosshair',
-              'icon': 'px-utl:add',
+              'icon': 'px-vis:crosshair',
               'buttonGroup': 1,
               'onClick': 'function() {this.set("interactionSpaceConfig.cursorType", "circle"); }',
               'onDeselect': 'function() { this.set("interactionSpaceConfig.cursorType", "none");}',
@@ -200,8 +200,8 @@ Custom property | Description
             },
             'tooltip': {
               'tooltipLabel': 'Tooltip',
-              'icon': 'px-utl:calculation',
-              'cursorIcon': 'px-utl:calculation',
+              'icon': 'px-vis:show-tooltip',
+              'cursorIcon': 'px-vis:show-tooltip',
               'buttonGroup': 1,
               'selected': true,
               'onClick': 'function() {this.set("_internalShowTooltip", true);}',
@@ -214,8 +214,8 @@ Custom property | Description
             },
             'pan': {
               'tooltipLabel': 'Pan',
-              'icon': 'px-utl:chevron',
-              'cursorIcon': 'px-utl:chevron',
+              'icon': 'px-vis:pan',
+              'cursorIcon': 'px-vis:pan',
               'onClick': 'function() {this.set("_internalShowTooltip", false);}',
               'buttonGroup': 1,
               'actionConfig': {
@@ -224,7 +224,7 @@ Custom property | Description
               },
               'subConfig': {
                 'resetZoom': {
-                  'icon': 'px-utl:chevron',
+                  'icon': 'px-vis:full-screen',
                   'tooltipLabel': 'Reset panning',
                   'eventName': 'px-vis-toolbar-reset-zoom'
                 }
@@ -232,8 +232,8 @@ Custom property | Description
             },
             'zoom': {
               'tooltipLabel': 'Zoom',
-              'icon': 'px-utl:zoom',
-              'cursorIcon': 'px-utl:zoom',
+              'icon': 'px-vis:zoom-toolbar',
+              'cursorIcon': 'px-vis:zoom-toolbar',
               'onClick': 'function() {this.set("_internalShowTooltip", false); }',
               'buttonGroup': 1,
               'actionConfig': {
@@ -242,22 +242,22 @@ Custom property | Description
               },
               'subConfig': {
                 'zoomIn': {
-                  'icon': 'px-utl:share',
+                  'icon': 'px-vis:zoom-in',
                   'tooltipLabel': 'Zoom in',
                   'eventName': 'px-vis-toolbar-zoom-in'
                 },
                 'zoomOut': {
-                  'icon': 'px-utl:download',
+                  'icon': 'px-vis:zoom-out',
                   'tooltipLabel': 'Zoom out',
                   'eventName': 'px-vis-toolbar-zoom-out'
                 },
                 'undoZoom': {
-                  'icon': 'px-utl:reply',
+                  'icon': 'px-vis:zoom-out-one-level',
                   'tooltipLabel': 'Undo zoom',
                   'eventName': 'px-vis-toolbar-undo-zoom'
                 },
                 'resetZoom': {
-                  'icon': 'px-utl:chevron',
+                  'icon': 'px-vis:full-screen',
                   'tooltipLabel': 'Reset zoom',
                   'eventName': 'px-vis-toolbar-reset-zoom'
                 }
@@ -265,8 +265,8 @@ Custom property | Description
             },
             'advancedZoom': {
               'tooltipLabel': 'Zoom',
-              'icon': 'px-utl:zoom',
-              'cursorIcon': 'px-utl:zoom',
+              'icon': 'px-vis:zoom-toolbar',
+              'cursorIcon': 'px-vis:zoom-toolbar',
               'buttonGroup': 1,
               'selectable': true,
               'onClick': 'function() {this.set("_internalShowTooltip", false);}',
@@ -276,7 +276,7 @@ Custom property | Description
               },
               'subConfig': {
                 'x': {
-                  'title': 'X',
+                  'icon': 'px-vis:x-axis',
                   'buttonGroup': 1,
                   'tooltipLabel': 'Zoom on X axis only',
                   'eventName': 'my-custom-click',
@@ -284,36 +284,36 @@ Custom property | Description
                   'onClick': 'function() { this.set("selectionType", "xAxis");}'
                 },
                 'y': {
-                  'title': 'Y',
+                  'icon': 'px-vis:y-axis',
                   'buttonGroup': 1,
                   'tooltipLabel': 'Zoom on Y axis only',
                   'selectable': true,
                   'onClick': 'function() { this.set("selectionType", "yAxis");}'
                 },
                 'xy': {
-                  'title': 'XY',
+                  'icon': 'px-vis:xy-axis',
                   'tooltipLabel': 'Zoom on X and Y axis',
                   'buttonGroup': 1,
                   'selectable': true,
                   'onClick': 'function() { this.set("selectionType", "xy");}'
                 },
                 'zoomIn': {
-                  'icon': 'px-utl:share',
+                  'icon': 'px-vis:zoom-in',
                   'tooltipLabel': 'Zoom in',
                   'eventName': 'px-vis-toolbar-zoom-in'
                 },
                 'zoomOut': {
-                  'icon': 'px-utl:download',
+                  'icon': 'px-vis:zoom-out',
                   'tooltipLabel': 'Zoom out',
                   'eventName': 'px-vis-toolbar-zoom-out'
                 },
                 'undoZoom': {
-                  'icon': 'px-utl:reply',
+                  'icon': 'px-vis:zoom-out-one-level',
                   'tooltipLabel': 'Undo zoom',
                   'eventName': 'px-vis-toolbar-undo-zoom'
                 },
                 'resetZoom': {
-                  'icon': 'px-utl:chevron',
+                  'icon': 'px-vis:full-screen',
                   'tooltipLabel': 'Reset zoom',
                   'eventName': 'px-vis-toolbar-reset-zoom'
                 }
@@ -480,7 +480,7 @@ Custom property | Description
        *           "eventName": "px-vis-toolbar-undo-zoom"
        *         },
        *         "resetZoom": {
-       *           "icon": "px-utl:chevron",
+       *           "icon": "px-vis:full-screen",
        *           "tooltipLabel": "reset zoom to inital value",
        *           "eventName": "px-vis-toolbar-reset-zoom"
        *         }
