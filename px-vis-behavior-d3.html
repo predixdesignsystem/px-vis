@@ -385,7 +385,7 @@ PxVisBehaviorD3.renderToCanvas = {
     PxVisBehaviorD3.axes
 
     Description:
-    Polymer behavior that provides the x,y axes and domains for d3 components.
+    Polymer behavior that provides the x,y and _isMultiY properties for d3 components.
 
     Dependencies:
     - D3.js
@@ -518,17 +518,49 @@ PxVisBehaviorD3.domainUpdateNotify = {
 
 /*
     Name:
+    PxVisBehaviorD3.axisOrientation
+
+    Description:
+    Polymer behavior that provides the orientation property for d3 components.
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorD3.axisOrientation
+*/
+PxVisBehaviorD3.axisOrientation = {
+  properties: {
+    /**
+     * Defines which side the axis should be on.
+     *  - 'left'
+     *  - 'right'
+     *  - 'bottom'
+     *  - 'top'
+     *
+     * @property orientation
+     * @type String
+     * @default bottom
+     */
+    orientation: {
+      type: String,
+      value: 'bottom'
+    }
+  }
+};
+
+/*
+    Name:
     PxVisBehaviorD3.axis
 
     Description:
-    Polymer behavior that provides the axis and domain properties for d3 components.
+    Polymer behavior that provides the axis and orientation properties for d3 components.
 
     Dependencies:
     - D3.js
 
     @polymerBehavior PxVisBehaviorD3.axis
 */
-PxVisBehaviorD3.axis = {
+PxVisBehaviorD3.axis = [{
   properties: {
     /**
      * axis is a general holder for the d3 instantiated scale object
@@ -559,7 +591,7 @@ PxVisBehaviorD3.axis = {
       value: 'bottom',
     }
   }
-};
+}, PxVisBehaviorD3.axisOrientation];
 
 /*
     Name:

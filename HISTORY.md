@@ -1,5 +1,5 @@
 v3.0.0
-==================
+================
 * Design refresh
 * all components load with default colors unless a theme is loaded
 * removed dataVisColors and seriesColorOrder
@@ -35,6 +35,11 @@ v3.0.0
   * Dynamic menu and Toolbar:
     * Must be icons use px-icon, which wraps iron-icon.
     * Must be value icon types for px-icon or iron-icon.
+
+v2.1.7
+==================
+* Fix for axis interaction space position on right and bottom axis (effectively fixing problem where right positioned axis couldn't be dragged in multi Y)
+* Ensure multi axis can handle changing all its axes to the same number of new axis
 
 v2.1.6
 ==================
