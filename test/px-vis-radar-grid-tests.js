@@ -66,7 +66,7 @@ function runTests(){
 
       baseGrid.set('margin',m);
       baseGrid.set('tickValues',tickValues);
-      setTimeout(function(){ done() },500);
+      window.setTimeout(function(){ done() },500);
     });
 
     test('baseGrid fixture is created', function() {

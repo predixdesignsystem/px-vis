@@ -405,7 +405,7 @@ function basicTests(registerID,dir){
     suiteSetup(function(done) {
       data = generateDataValues( generateEmptyData(5) );
       setData(register, data);
-      setTimeout(function() {
+      window.setTimeout(function() {
         done();
       }, 200);
     });
@@ -622,7 +622,7 @@ function setData(series, data, done){
   series.set('chartData',data.data.series);
 
   // pause and let the dom repeate chug away
-  setTimeout(function() {
+  window.setTimeout(function() {
     if(done){ done(); }
   }, 50);
 }
@@ -632,7 +632,7 @@ function setMutedSeries(series, name, done){
   series.set('mutedSeries.' + name, true);
 
   // pause and let the dom repeate chug away
-  setTimeout(function(){
+  window.setTimeout(function(){
     if(done){ done(); }
   },50);
 }

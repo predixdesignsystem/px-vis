@@ -238,7 +238,7 @@ function runTests(){
       linearEvent.set('eventData',dE[6]);
       ordinalEvent.set('eventData',dE[7]);
 
-      setTimeout(function(){
+      window.setTimeout(function(){
 
         //fake showing tooltip so it calculates its value
         defaultEvent._tooltipRequest();
@@ -291,7 +291,7 @@ function runTests(){
       assert.equal(defaultEvent.eventIcon.node().tagName,'g');
     });
     test('defaultEvent eventIcon transform', function() {
-      assert.equal(defaultEvent.eventIcon.attr('transform'), 'translate(232,-21) scale(1)');
+      assert.equal(defaultEvent.eventIcon.attr('transform').replace(',',' '), 'translate(232 -21) scale(1)');
     });
 
     test('defaultEvent eventLine created', function() {
@@ -352,7 +352,7 @@ function runTests(){
       assert.equal(imgEvent.eventIcon.attr('height'),'20px');
     });
     test('imgEvent eventIcon transform', function() {
-      assert.equal(imgEvent.eventIcon.attr('transform'),'translate(110,-25)');
+      assert.equal(imgEvent.eventIcon.attr('transform').replace(',',' '),'translate(110 -25)');
     });
 
     test('imgEvent eventLine created', function() {
@@ -400,7 +400,7 @@ function runTests(){
     });
 
     test('noLabelEvent eventIcon transform', function() {
-      assert.equal(noLabelEvent.eventIcon.attr('transform'), 'translate(29,-21) scale(1)');
+      assert.equal(noLabelEvent.eventIcon.attr('transform').replace(',',' '), 'translate(29 -21) scale(1)');
     });
 
     test('noLabelEvent eventLine created', function() {
@@ -452,7 +452,9 @@ function runTests(){
     });
 
     test('offsetEvent eventIcon transform translate', function() {
-      assert.equal(offsetEvent.eventIcon.attr('transform').split(' ')[0], 'translate(280,-1)');
+      var normalized = offsetEvent.eventIcon.attr('transform').replace(',',' '),
+          scaleIndex = normalized.indexOf('scale');
+      assert.equal(normalized.substring(0,scaleIndex), 'translate(280 -1) ');
     });
 
     test('offsetEvent eventLine created', function() {

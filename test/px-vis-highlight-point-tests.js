@@ -84,7 +84,7 @@ function runTests(){
         baseScale.set('dataExtents',chartExtents);
         baseScale.set('chartData',d);
 
-        setTimeout(function() {
+        window.setTimeout(function() {
             var g = baseSVG.svg.selectAll('g.layer')
                 .data([0,1]);
             g.enter()
@@ -96,7 +96,7 @@ function runTests(){
           basePoint.set('timeData', 'timeStamp');
           basePoint.set('completeSeriesConfig',completeSeriesConfig);
 
-          setTimeout(function() {
+          window.setTimeout(function() {
             done();
           }, 100);
 
@@ -142,7 +142,7 @@ function runTests(){
 
         basePoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('basePoint scatters created', function() {
@@ -189,7 +189,7 @@ function runTests(){
 
         basePoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('basePoint scatters removed', function() {
@@ -280,7 +280,7 @@ function runTests(){
         differentScale.set('dataExtents',chartExtents);
         differentScale.set('chartData',d);
 
-        setTimeout(function() {
+        window.setTimeout(function() {
             var g = differentSVG.svg.selectAll('g.layer')
                 .data([0,1]);
             g.enter()
@@ -293,7 +293,7 @@ function runTests(){
           differentPoint.set('completeSeriesConfig',completeSeriesConfig);
           differentPoint.set('chartData',d);
 
-          setTimeout(function() {
+          window.setTimeout(function() {
             done();
           }, 100);
 
@@ -336,7 +336,7 @@ function runTests(){
 
         differentPoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('differentPoint scatters created', function() {
@@ -380,7 +380,7 @@ function runTests(){
 
         differentPoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('differentPoint scatters removed', function() {
@@ -471,7 +471,7 @@ function runTests(){
         fuzzScale.set('dataExtents',chartExtents);
         fuzzScale.set('chartData',d);
 
-        setTimeout(function() {
+        window.setTimeout(function() {
             var g = fuzzSVG.svg.selectAll('g.layer')
                 .data([0,1]);
             g.enter()
@@ -484,7 +484,7 @@ function runTests(){
           fuzzPoint.set('completeSeriesConfig',completeSeriesConfig);
           fuzzPoint.set('chartData',d);
 
-          setTimeout(function() {
+          window.setTimeout(function() {
             done();
           }, 100);
 
@@ -527,7 +527,7 @@ function runTests(){
 
         fuzzPoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('fuzzPoint scatters created', function() {
@@ -594,7 +594,7 @@ function runTests(){
 
         fuzzPoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('fuzzPoint scatters removed', function() {
@@ -686,7 +686,7 @@ function runTests(){
         generatingScale.set('dataExtents',chartExtents);
         generatingScale.set('chartData',d);
 
-        setTimeout(function() {
+        window.setTimeout(function() {
             var g = generatingSVG.svg.selectAll('g.layer')
                 .data([0,1]);
             g.enter()
@@ -698,7 +698,7 @@ function runTests(){
           generatingPoint.set('timeData', 'timeStamp');
           generatingPoint.set('completeSeriesConfig',completeSeriesConfig);
 
-          setTimeout(function() {
+          window.setTimeout(function() {
             done();
           }, 100);
 
@@ -741,7 +741,7 @@ function runTests(){
 
         generatingPoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('generatingPoint scatters created', function() {
@@ -786,7 +786,7 @@ function runTests(){
         generatingPoint.set('generatingCrosshairData',true);
         generatingPoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('generatingPoint scatters removed', function() {
@@ -876,7 +876,7 @@ function runTests(){
         forceScale.set('dataExtents',chartExtents);
         forceScale.set('chartData',d);
 
-        setTimeout(function() {
+        window.setTimeout(function() {
             var g = forceSVG.svg.selectAll('g.layer')
                 .data([0,1]);
             g.enter()
@@ -889,7 +889,7 @@ function runTests(){
           forcePoint.set('completeSeriesConfig',completeSeriesConfig);
           forcePoint.set('drawWithLocalCrosshairData',true);
 
-          setTimeout(function() {
+          window.setTimeout(function() {
             done();
           }, 100);
 
@@ -933,7 +933,7 @@ function runTests(){
         forcePoint.set('generatingCrosshairData',true);
         forcePoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('forcePoint scatters created', function() {
@@ -977,7 +977,7 @@ function runTests(){
 
         forcePoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('forcePoint scatters removed', function() {
@@ -1067,7 +1067,7 @@ function runTests(){
         tooltipScale.set('dataExtents',chartExtents);
         tooltipScale.set('chartData',d);
 
-        setTimeout(function() {
+        window.setTimeout(function() {
             var g = tooltipSVG.svg.selectAll('g.layer')
                 .data([0,1]);
             g.enter()
@@ -1080,7 +1080,7 @@ function runTests(){
           tooltipPoint.set('completeSeriesConfig',completeSeriesConfig);
           tooltipPoint.set('showTooltipData',true);
 
-          setTimeout(function() {
+          window.setTimeout(function() {
             done();
           }, 100);
 
@@ -1114,7 +1114,7 @@ function runTests(){
 
         tooltipPoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('tooltipPoint created defaultEmptyData', function() {
@@ -1143,7 +1143,7 @@ function runTests(){
 
         tooltipPoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('tooltipPoint emptied defaultEmptyData', function() {

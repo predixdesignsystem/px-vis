@@ -32,7 +32,7 @@ function runTests(){
       testComponent.set('chartData', chartData)
       testComponent.set('seriesConfig', seriesConfig);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         done();
       }, 300);
     });

@@ -74,7 +74,7 @@ function runTests(){
       baseClip.set('width',w/2);
       baseClip.set('height',h/2);
 
-      setTimeout(function(){done()},100);
+      window.setTimeout(function(){done()},100);
       // done();
     });
 
@@ -117,7 +117,7 @@ function runTests(){
         rectSeries = Px.d3.select(document.getElementsByTagName('clipPath')[1].getElementsByTagName("rect")[0]);
       }
 
-      setTimeout(function(){done()},500);
+      window.setTimeout(function(){done()},500);
 
     });
 

@@ -58,7 +58,7 @@ function runTests(){
       //click
       slice.dispatchEvent(evt);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         var transform = basePie.pieGroup._groups[0][0].attributes['transform'].value.split(' ').join('');
 
         assert.equal(parseFloat(basePie._radToDeg(basePie._currentRotationAngle)), -47.368421052631575);
@@ -94,7 +94,7 @@ function runTests(){
       //click
       slice.dispatchEvent(evt);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
 
         done();
       }, 100);

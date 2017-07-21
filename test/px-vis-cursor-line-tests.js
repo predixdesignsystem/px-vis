@@ -92,7 +92,7 @@ function runTests() {
       parallelScale.set('axes',dim);
       parallelScale.set('chartData',d);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         var g = parallelSVG.svg.selectAll('g.layer')
             .data([0,1,2]);
         g.enter()
@@ -110,7 +110,7 @@ function runTests() {
         parallelCursor.set('categories',categories);
         parallelCursor.set('chartData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
 
       }, 100);
     });
@@ -153,7 +153,7 @@ function runTests() {
 
       parallelCursor.set("tooltipData", ttd);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         linePath = parallelCursor.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
       }, 100);
@@ -205,7 +205,7 @@ function runTests() {
 
       parallelCursor.set("tooltipData", ttd);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         linePath = parallelCursor.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
       }, 100);
@@ -334,7 +334,7 @@ function runTests() {
       parallelCursorCanvas.set('seriesId',"x");
       parallelCursorCanvas.set('chartData',d);
 
-      setTimeout(function() { done(); }, 100);
+      window.setTimeout(function() { done(); }, 100);
 
     });
 
@@ -376,7 +376,7 @@ function runTests() {
 
       parallelCursorCanvas.set("tooltipData", ttd);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         linePath = parallelCursorCanvas.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
       }, 100);
@@ -428,7 +428,7 @@ function runTests() {
 
       parallelCursorCanvas.set("tooltipData", ttd);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         linePath = parallelCursorCanvas.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
       }, 100);
@@ -552,7 +552,7 @@ function runTests() {
       radarScale.set('axes',dim);
       radarScale.set('chartData',d);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         var g = radarSVG.svg.selectAll('g.layer')
             .data([0,1,2]);
         g.enter()
@@ -568,7 +568,7 @@ function runTests() {
         radarCursor.set('seriesId',"x");
         radarCursor.set('chartData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
 
       }, 100);
     });
@@ -611,7 +611,7 @@ function runTests() {
 
       radarCursor.set("tooltipData", ttd);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         linePath = radarCursor.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
       }, 100);
@@ -678,7 +678,7 @@ function runTests() {
 
       radarCursor.set("tooltipData", ttd);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         linePath = radarCursor.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
       }, 100);

@@ -77,7 +77,7 @@ function runTests(){
 
     suiteSetup(function(done) {
       radialScale.set('chartExtents',chartExtents);
-      setTimeout(function() { done(); }, 100);
+      window.setTimeout(function() { done(); }, 100);
     });
 
     test('radialScale creates an x', function() {

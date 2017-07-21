@@ -82,7 +82,7 @@ function runTests(){
       };
 
       baseTooltip.set('tooltipData',d);
-      // setTimeout(function(){ done(); },1000);
+      // window.setTimeout(function(){ done(); },1000);
       done();
     });
 
@@ -128,7 +128,7 @@ function runTests(){
           color: 'red'
         }}
       );
-      // setTimeout(function(){ done(); },1000);
+      // window.setTimeout(function(){ done(); },1000);
       done();
     });
 

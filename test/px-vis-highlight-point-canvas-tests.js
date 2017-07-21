@@ -87,7 +87,7 @@ function runTests(){
         basePoint.set('timeData', 'timeStamp');
         basePoint.set('completeSeriesConfig',completeSeriesConfig);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('basePoint fixture is created', function() {
@@ -128,7 +128,7 @@ function runTests(){
 
         basePoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('basePoint create highlightData', function() {
@@ -165,7 +165,7 @@ function runTests(){
 
         basePoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('basePoint highlightData removed', function() {
@@ -259,7 +259,7 @@ function runTests(){
         differentPoint.set('completeSeriesConfig',completeSeriesConfig);
         differentPoint.set('chartData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
 
       });
 
@@ -297,7 +297,7 @@ function runTests(){
 
         differentPoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('basePoint create highlightData', function() {
@@ -330,7 +330,7 @@ function runTests(){
 
         differentPoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('differentPoint highlightData removed', function() {
@@ -424,7 +424,7 @@ function runTests(){
         fuzzPoint.set('completeSeriesConfig',completeSeriesConfig);
         fuzzPoint.set('chartData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
 
       });
 
@@ -463,7 +463,7 @@ function runTests(){
 
         fuzzPoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('fuzzPoint highlightData removed', function() {
@@ -506,7 +506,7 @@ function runTests(){
 
         fuzzPoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('fuzzPoint scatters removed', function() {
@@ -598,7 +598,7 @@ function runTests(){
         generatingPoint.set('timeData', 'timeStamp');
         generatingPoint.set('completeSeriesConfig',completeSeriesConfig);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('generatingPoint fixture is created', function() {
@@ -637,7 +637,7 @@ function runTests(){
         generatingPoint.set('generatingCrosshairData',true);
         generatingPoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('generatingPoint does not create highlightData', function() {
@@ -666,7 +666,7 @@ function runTests(){
 
         generatingPoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('generatingPoint highlightData removed', function() {
@@ -759,7 +759,7 @@ function runTests(){
         forcePoint.set('drawWithLocalCrosshairData',true);
         forcePoint.set('completeSeriesConfig',completeSeriesConfig);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('forcePoint fixture is created', function() {
@@ -798,7 +798,7 @@ function runTests(){
         forcePoint.set('generatingCrosshairData',true);
         forcePoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('forcePoint create highlightData', function() {
@@ -832,7 +832,7 @@ function runTests(){
 
         forcePoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('forcePoint highlightData removed', function() {
@@ -927,7 +927,7 @@ function runTests(){
         tooltipPoint.set('completeSeriesConfig',completeSeriesConfig);
         tooltipPoint.set('showTooltipData',true);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('tooltipPoint didnt create defaultEmptyData', function() {
@@ -956,7 +956,7 @@ function runTests(){
 
         tooltipPoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('tooltipPoint created defaultEmptyData', function() {
@@ -985,7 +985,7 @@ function runTests(){
 
         tooltipPoint.set('crosshairData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
       });
 
       test('tooltipPoint emptied defaultEmptyData', function() {

@@ -90,7 +90,7 @@ function runTests(){
       multiAxis.set('axes',dim);
       multiAxis.set('chartData',d);
 
-      setTimeout(function(){done()},300);
+      window.setTimeout(function(){done()},300);
      // done();
     });
 
@@ -278,7 +278,7 @@ function runTests(){
 
       multiAxis.set('chartData',d);
 
-      setTimeout(function(){
+      window.setTimeout(function(){
         done()}, 1000);
      // done();
     });
@@ -478,7 +478,7 @@ function runTests(){
 
       multiAxis.set('chartData',d);
 
-      setTimeout(function(){
+      window.setTimeout(function(){
         done()}, 500);
      // done();
     });
@@ -660,7 +660,7 @@ function runTests(){
       multiAxisCommon.set('axes',dim);
       multiAxisCommon.set('chartData',d);
 
-      setTimeout(function(){done()},300);
+      window.setTimeout(function(){done()},300);
      // done();
     });
 
@@ -870,7 +870,7 @@ function runTests(){
       noMatchAxis.set('axes',dim);
       noMatchAxis.set('chartData',d);
 
-      setTimeout(function(){done()},300);
+      window.setTimeout(function(){done()},300);
      // done();
     });
 
@@ -1057,7 +1057,7 @@ function runTests(){
       radialAxis.set('axes',dim);
       radialAxis.set('chartData',d);
 
-      setTimeout(function(){done()},300);
+      window.setTimeout(function(){done()},300);
      // done();
     });
 
@@ -1244,7 +1244,7 @@ function runTests(){
 
       radialAxis.set('chartData',d);
 
-      setTimeout(function(){
+      window.setTimeout(function(){
         done()},300);
      // done();
     });
@@ -1426,7 +1426,7 @@ function runTests(){
 
       radialAxis.set('chartData',d);
 
-      setTimeout(function(){done()},500);
+      window.setTimeout(function(){done()},500);
     });
 
     test('radialAxis created three groups', function() {

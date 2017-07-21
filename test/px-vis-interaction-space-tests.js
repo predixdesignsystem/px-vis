@@ -78,7 +78,7 @@ function runTests() {
                 'mousedown': 'startZooming',
                 'mouseup': 'stopZooming'});
 
-      // setTimeout(function(){done()},100);
+      // window.setTimeout(function(){done()},100);
       done();
     });
 
@@ -171,7 +171,7 @@ function runTests() {
   //     baseIS._rect.node().dispatchEvent(e);
   //
   //     // give event time to process and fire
-  //     setTimeout(function(){ done(); },10);
+  //     window.setTimeout(function(){ done(); },10);
   //   });
   //
   //   test('event fired', function() {
@@ -226,7 +226,7 @@ function runTests() {
       baseIS._rect.node().dispatchEvent(e);
 
       // give event time to process and fire
-      setTimeout(function(){ done(); },10);
+      window.setTimeout(function(){ done(); },10);
     });
 
     test('event fired', function() {
@@ -275,7 +275,7 @@ function runTests() {
       baseIS.set("seriesKeys", []);
 
       // give event time to process and fire
-      setTimeout(function(){ done(); },10);
+      window.setTimeout(function(){ done(); },10);
     });
 
     test('event fired', function() {
@@ -332,7 +332,7 @@ function runTests() {
       baseIS.set("seriesKeys", ["mySeries", "anotherSeries"]);
 
       // give event time to process and fire
-      setTimeout(function(){ done(); },10);
+      window.setTimeout(function(){ done(); },10);
     });
 
     test('event fired', function() {
@@ -385,7 +385,7 @@ function runTests() {
       baseIS.set("defaultEmptyData", empty);
       baseIS._resetTooltipData();
       // give event time to process and fire
-      setTimeout(function(){ done(); }, 500);
+      window.setTimeout(function(){ done(); }, 500);
     });
 
     test('event fired', function() {
