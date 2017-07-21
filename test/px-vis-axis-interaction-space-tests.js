@@ -2,6 +2,25 @@ document.addEventListener("WebComponentsReady", function() {
   runTests();
 });
 
+function componentFromStr(numStr, percent) {
+    var num = Math.max(0, parseInt(numStr, 10));
+    return percent ?
+        Math.floor(255 * Math.min(100, num) / 100) : Math.min(255, num);
+}
+
+function rgbToHex(rgb) {
+    var rgbRegex = /^rgb\(\s*(-?\d+)(%?)\s*,\s*(-?\d+)(%?)\s*,\s*(-?\d+)(%?)\s*\)$/;
+    var result, r, g, b, hex = "";
+    if ( (result = rgbRegex.exec(rgb)) ) {
+        r = componentFromStr(result[1], result[2]);
+        g = componentFromStr(result[3], result[4]);
+        b = componentFromStr(result[5], result[6]);
+
+        hex = "#" + (0x1000000 + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
+    return hex;
+}
+
 function runTests(){
   suite('px-vis-axis-interaction-space does Polymer exist?', function() {
     test('Polymer exists', function() {
@@ -195,7 +214,7 @@ function runTests(){
     });
 
     test('icon applied', function() {
-      assert.equal(brush1._icon.text().codePointAt(), 61741);
+      assert.equal(brush1._icon.node().tagName, 'g');
     });
   });
 
@@ -230,11 +249,11 @@ function runTests(){
       assert.closeTo(Number(brush2._brushD3.select('rect.selection').attr('height')), 176, 2);
     });
     test('brush2._brushGroup.rect correct fill', function() {
-      assert.equal(brush2._brushD3.select('rect.selection').attr('fill').split(' ').join(''), colors["grey5"]);
+      assert.equal(brush2._brushD3.select('rect.selection').attr('fill').split(' ').join(''), rgbToHex(colors["grey7"]));
       assert.equal(brush2._brushD3.select('rect.selection').attr('fill-opacity'), '0.3');
     });
     test('brush2._brushGroup.rect correct stroke', function() {
-      assert.equal(brush2._brushD3.select('rect.selection').attr('stroke').split(' ').join(''), colors["primary-blue"]);
+      assert.equal(brush2._brushD3.select('rect.selection').attr('stroke').split(' ').join(''), rgbToHex(colors["primary-default"]));
       assert.equal(brush2._brushD3.select('rect.selection').attr('stroke-dasharray'), null);
     });
 
@@ -726,11 +745,11 @@ function runTests(){
       assert.equal(radialBrush2._brushD3.select('rect.selection').attr('height'), 35);
     });
     test('radialBrush._brushGroup.rect correct fill', function() {
-      assert.equal(radialBrush2._brushD3.select('rect.selection').attr('fill').split(' ').join(''), colors['grey5']);
+      assert.equal(radialBrush2._brushD3.select('rect.selection').attr('fill').split(' ').join(''), rgbToHex(colors['grey7']));
       assert.equal(radialBrush2._brushD3.select('rect.selection').attr('fill-opacity'), '0.3');
     });
     test('radialBrush._brushGroup.rect correct stroke', function() {
-      assert.equal(radialBrush2._brushD3.select('rect.selection').attr('stroke').split(' ').join(''), colors["primary-blue"]);
+      assert.equal(radialBrush2._brushD3.select('rect.selection').attr('stroke').split(' ').join(''), rgbToHex(colors["primary-default"]));
       assert.equal(radialBrush2._brushD3.select('rect.selection').attr('stroke-dasharray').split(' ').join(''), "5,5");
     });
 

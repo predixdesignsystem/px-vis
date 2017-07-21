@@ -114,7 +114,7 @@ bower install
 git checkout --orphan $TARGET_BRANCH
 
 git add -A .
-git commit -m "${GIT_COMMIT_MESSAGE}"
+git commit -m "${GIT_COMMIT_MESSAGE}" --quiet
 
 # Set git credentials (defined in settings above)
 git config user.name ${GIT_USER_NAME}
