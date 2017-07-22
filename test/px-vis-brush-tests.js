@@ -504,7 +504,7 @@ function runTests(){
       var stop = d3.select(gradientBrush.svg.select('defs').select('#overlayGradient').selectAll('stop').nodes()[0]),
           stopColor = stop.attr('stop-color').split(" ").join('');
       assert.equal(stop.attr('offset'), '0%');
-      if(stopColor[0] = 'r') {
+      if(stopColor[0] === 'r') {
         assert.equal(stopColor, colors['gray10']);
       } else {
         assert.equal(stopColor, rgbToHex(colors['gray10']));
@@ -516,7 +516,7 @@ function runTests(){
       var stop = d3.select(gradientBrush.svg.select('defs').select('#overlayGradient').selectAll('stop').nodes()[1]),
           stopColor = stop.attr('stop-color').split(" ").join('');
       assert.equal(stop.attr('offset'), '100%');
-      if(stopColor[0] = 'r') {
+      if(stopColor[0] === 'r') {
         assert.equal(stopColor, colors['gray10']);
       } else {
         assert.equal(stopColor, rgbToHex(colors['gray10']));
