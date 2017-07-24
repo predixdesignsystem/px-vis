@@ -9,6 +9,7 @@ v3.0.0
 * new internal renderer for canvas:
   * renderer automatically adjust the number of points per frame rendered. This number will be adjusted every frame based on how long previous frame took, which should make the rendering smooth on different browsers and different hardware
   * It will now render "series per series" rather than a batch of several series for each frame, i.e it won't move to rendering the second series until the first series has been completely rendered
+  * a few properties are available to adjust renderer behavior, see API for more info
 * removed properties for controlling number of points rendered in progressive rendering:
   * noCanvasProgressiveRendering
   * progressiveRenderingPointsPerFrame
@@ -22,7 +23,7 @@ v3.0.0
   * px-vis-line-canvas-progressive-batch
   * px-vis-line-progressive-rendering-ended
   * px-vis-line-canvas-rendering-ended
-* new events for canvas rendering (TODO doc)
+* new events for canvas rendering: px-vis-chart-canvas-rendering-started and px-vis-chart-canvas-rendering-ended
 * removed redrawElement function from highlightPoint and highlightLine
 * Changed inert property on register to inertRegister so as to not conflic with w3c spec
 * Changed over to px-icon-set for px-vis-events, px-vis-toolbar, and px-vis-dynamic-menu
