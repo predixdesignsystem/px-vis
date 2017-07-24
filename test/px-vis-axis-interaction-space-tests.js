@@ -2,6 +2,25 @@ document.addEventListener("WebComponentsReady", function() {
   runTests();
 });
 
+function componentFromStr(numStr, percent) {
+    var num = Math.max(0, parseInt(numStr, 10));
+    return percent ?
+        Math.floor(255 * Math.min(100, num) / 100) : Math.min(255, num);
+}
+
+function rgbToHex(rgb) {
+    var rgbRegex = /^rgb\(\s*(-?\d+)(%?)\s*,\s*(-?\d+)(%?)\s*,\s*(-?\d+)(%?)\s*\)$/;
+    var result, r, g, b, hex = "";
+    if ( (result = rgbRegex.exec(rgb)) ) {
+        r = componentFromStr(result[1], result[2]);
+        g = componentFromStr(result[3], result[4]);
+        b = componentFromStr(result[5], result[6]);
+
+        hex = "#" + (0x1000000 + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
+    return hex;
+}
+
 function runTests(){
   suite('px-vis-axis-interaction-space does Polymer exist?', function() {
     test('Polymer exists', function() {
@@ -166,7 +185,7 @@ function runTests(){
         brush2.set('svg', multiSVG.svg.select('g.dimension1'));
         brush3.set('svg', multiSVG.svg.select('g.dimension2'));
 
-      setTimeout(function(){done()}, 1000);
+      window.setTimeout(function(){done()}, 1000);
       // done();
     });
 
@@ -195,7 +214,7 @@ function runTests(){
     });
 
     test('icon applied', function() {
-      assert.equal(brush1._icon.text().codePointAt(), 61741);
+      assert.equal(brush1._icon.node().tagName, 'g');
     });
   });
 
@@ -210,7 +229,7 @@ function runTests(){
       d = [brush2.y(16),brush2.y(9)];
       brush2._brushD3.call(brush2._brush.move,d);
 
-      setTimeout(function(){ done() }, 300);
+      window.setTimeout(function(){ done() }, 300);
     });
 
     test('brush2._brush extents match', function() {
@@ -230,11 +249,11 @@ function runTests(){
       assert.closeTo(Number(brush2._brushD3.select('rect.selection').attr('height')), 176, 2);
     });
     test('brush2._brushGroup.rect correct fill', function() {
-      assert.equal(brush2._brushD3.select('rect.selection').attr('fill').split(' ').join(''), colors["grey5"]);
+      assert.equal(brush2._brushD3.select('rect.selection').attr('fill').split(' ').join(''), rgbToHex(colors["grey7"]));
       assert.equal(brush2._brushD3.select('rect.selection').attr('fill-opacity'), '0.3');
     });
     test('brush2._brushGroup.rect correct stroke', function() {
-      assert.equal(brush2._brushD3.select('rect.selection').attr('stroke').split(' ').join(''), colors["primary-blue"]);
+      assert.equal(brush2._brushD3.select('rect.selection').attr('stroke').split(' ').join(''), rgbToHex(colors["primary-default"]));
       assert.equal(brush2._brushD3.select('rect.selection').attr('stroke-dasharray'), null);
     });
 
@@ -261,7 +280,7 @@ function runTests(){
       brush1._brushD3.call(brush1._brush.move, d1);
       brush3._brushD3.call(brush3._brush.move, d2);
 
-      setTimeout(function(){done()}, 100);
+      window.setTimeout(function(){done()}, 100);
 
     });
     test('brush1._brush extents match', function() {
@@ -325,7 +344,7 @@ function runTests(){
       brush1._brushD3.call(brush1._brush.move, d1);
       brush3._brushD3.call(brush3._brush.move, d2);
 
-      setTimeout(function(){done()}, 500);
+      window.setTimeout(function(){done()}, 500);
     });
     test('brush1._brush extents match', function() {
       assert.closeTo(Px.d3.brushSelection(brush1._brushElem)[0],266, 2);
@@ -380,7 +399,7 @@ function runTests(){
     suiteSetup(function(done) {
       multiScale.set('chartExtents', ext);
 
-      setTimeout(function() { done() }, 100);
+      window.setTimeout(function() { done() }, 100);
 
     });
 
@@ -454,7 +473,7 @@ function runTests(){
     suiteSetup(function(done) {
       multiScale.set('chartExtents',ext);
 
-      setTimeout(function(){ done() }, 100);
+      window.setTimeout(function(){ done() }, 100);
 
     });
 
@@ -515,7 +534,7 @@ function runTests(){
       brush2.deleteBrush();
       brush3.deleteBrush();
 
-      setTimeout(function(){ done() }, 1000);
+      window.setTimeout(function(){ done() }, 1000);
     });
 
     test('brush1._brush brush deleted', function() {
@@ -546,7 +565,7 @@ function runTests(){
       d = [brush2.y(16),brush2.y(9)];
       brush2._brushD3.call(brush2._brush.move,d);
 
-      setTimeout(function(){ done() }, 300);
+      window.setTimeout(function(){ done() }, 300);
     });
 
     test('brush2._brush extents match', function() {
@@ -632,7 +651,7 @@ function runTests(){
         radialScale.set('chartExtents',ext);
         radialScale.set('chartData',d);
 
-        setTimeout(function() {
+        window.setTimeout(function() {
           var g = radialSVG.svg.selectAll('g.dimension')
               .data(dim);
           g.enter()
@@ -668,7 +687,7 @@ function runTests(){
           radialBrush2.set('svg', radialSVG.svg.select('g.dimension1'));
           radialBrush3.set('svg', radialSVG.svg.select('g.dimension2'));
 
-          setTimeout(function() { done(); }, 500);
+          window.setTimeout(function() { done(); }, 500);
         }, 100);
     });
 
@@ -706,7 +725,7 @@ function runTests(){
     suiteSetup(function(done) {
       d = [radialBrush2.y(9), radialBrush2.y(16)];
       radialBrush2._brushD3.call(radialBrush2._brush.move, d);
-      setTimeout(function() { done() }, 100);
+      window.setTimeout(function() { done() }, 100);
     });
 
     test('radialBrush._brush extents match', function() {
@@ -726,11 +745,11 @@ function runTests(){
       assert.equal(radialBrush2._brushD3.select('rect.selection').attr('height'), 35);
     });
     test('radialBrush._brushGroup.rect correct fill', function() {
-      assert.equal(radialBrush2._brushD3.select('rect.selection').attr('fill').split(' ').join(''), colors['grey5']);
+      assert.equal(radialBrush2._brushD3.select('rect.selection').attr('fill').split(' ').join(''), rgbToHex(colors['grey7']));
       assert.equal(radialBrush2._brushD3.select('rect.selection').attr('fill-opacity'), '0.3');
     });
     test('radialBrush._brushGroup.rect correct stroke', function() {
-      assert.equal(radialBrush2._brushD3.select('rect.selection').attr('stroke').split(' ').join(''), colors["primary-blue"]);
+      assert.equal(radialBrush2._brushD3.select('rect.selection').attr('stroke').split(' ').join(''), rgbToHex(colors["primary-default"]));
       assert.equal(radialBrush2._brushD3.select('rect.selection').attr('stroke-dasharray').split(' ').join(''), "5,5");
     });
 
@@ -756,7 +775,7 @@ function runTests(){
       radialBrush1._brushD3.call(radialBrush1._brush.move,d1);
       radialBrush3._brushD3.call(radialBrush3._brush.move,d2);
 
-      setTimeout(function(){ done() }, 100);
+      window.setTimeout(function(){ done() }, 100);
     });
     test('radialBrush1._brush extents match', function() {
       assert.closeTo(Px.d3.brushSelection(radialBrush1._brushElem)[0], 20, 2);
@@ -806,7 +825,7 @@ function runTests(){
     suiteSetup(function(done) {
       radialScale.set('chartExtents',ext);
 
-      setTimeout(function(){done()},100);
+      window.setTimeout(function(){done()},100);
     });
 
     test('radialBrush1._brush extents match', function() {
@@ -869,7 +888,7 @@ function runTests(){
     suiteSetup(function(done) {
       radialScale.set('chartExtents',ext);
 
-      setTimeout(function(){ done() }, 100);
+      window.setTimeout(function(){ done() }, 100);
 
     });
 
@@ -923,7 +942,7 @@ function runTests(){
       radialBrush2.deleteBrush();
       radialBrush3.deleteBrush();
 
-      setTimeout(function(){ done() }, 1000);
+      window.setTimeout(function(){ done() }, 1000);
     });
 
     test('radialBrush1._brush brush deleted', function() {
@@ -954,7 +973,7 @@ function runTests(){
       d = [radialBrush2.y(9),radialBrush2.y(16)];
       radialBrush2._brushD3.call(radialBrush2._brush.move,d);
 
-      setTimeout(function(){ done() }, 300);
+      window.setTimeout(function(){ done() }, 300);
     });
 
     test('radialBrush2._brush extents match', function() {

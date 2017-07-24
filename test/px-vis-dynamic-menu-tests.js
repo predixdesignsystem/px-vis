@@ -64,7 +64,7 @@ function runTests() {
     test('menu fadeOut hides', function() {
       menu.fadeOut();
 
-      setTimeout('fadeout', function() {
+      window.setTimeout('fadeout', function() {
         assert.equal(menu.getComputedStyleValue('display'), 'none');
       }, menu.animationConfig.fadeOut.timing.duration);
     });
@@ -72,7 +72,7 @@ function runTests() {
     test('menu fadeIn shows', function() {
       menu.fadeOut();
 
-      setTimeout('fadeIn', function() {
+      window.setTimeout('fadeIn', function() {
         assert.equal(menu.getComputedStyleValue('display'), menu.displayClass);
       }, menu.animationConfig.fadeOut.timing.duration);
     });

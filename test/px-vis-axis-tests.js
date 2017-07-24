@@ -90,7 +90,7 @@ function runTests(){
       baseYAxis.set('height',h);
       baseYAxis.set('completeSeriesConfig',completeSeriesConfig);
       baseYAxis.set('chartData',d);
-      setTimeout(function(){done()},500);
+      window.setTimeout(function(){done()},500);
      // done();
     });
 
@@ -509,7 +509,7 @@ function runTests(){
         "mySeries":false
       };
       baseYAxis.set('mutedSeries',mutedSeries);
-      setTimeout(function(){done()},500)
+      window.setTimeout(function(){done()},500)
     });
 
     test('baseYAxis series box mutes', function() {
@@ -574,7 +574,7 @@ function runTests(){
       pcYAxis.set('height',h);
       pcYAxis.set('completeSeriesConfig',completeSeriesConfig);
       pcYAxis.set('chartData',d);
-      setTimeout(function(){done()},500);
+      window.setTimeout(function(){done()},500);
      // done();
     });
 
@@ -660,7 +660,7 @@ function runTests(){
       pcUnitYAxis.set('height',h);
       pcUnitYAxis.set('completeSeriesConfig',completeSeriesConfig);
       pcUnitYAxis.set('chartData',d);
-      setTimeout(function(){done()},500);
+      window.setTimeout(function(){done()},500);
      // done();
     });
 
@@ -746,7 +746,7 @@ function runTests(){
       pcTruncYAxis.set('height',h);
       pcTruncYAxis.set('completeSeriesConfig',completeSeriesConfig);
       pcTruncYAxis.set('chartData',d);
-      setTimeout(function(){done()},500);
+      window.setTimeout(function(){done()},500);
      // done();
     });
 
@@ -838,7 +838,7 @@ function runTests(){
       pcTruncUnitYAxis.set('height',h);
       pcTruncUnitYAxis.set('completeSeriesConfig',completeSeriesConfig);
       pcTruncUnitYAxis.set('chartData',d);
-      setTimeout(function(){done()},500);
+      window.setTimeout(function(){done()},500);
      // done();
     });
 
@@ -931,7 +931,7 @@ function runTests(){
       pcRotateYAxis.set('height',h);
       pcRotateYAxis.set('completeSeriesConfig',completeSeriesConfig);
       pcRotateYAxis.set('chartData',d);
-      setTimeout(function(){done()},500);
+      window.setTimeout(function(){done()},500);
      // done();
     });
 
@@ -1024,7 +1024,7 @@ function runTests(){
       tickAxis.set('height',h);
       tickAxis.set('completeSeriesConfig',completeSeriesConfig);
       tickAxis.set('chartData',d);
-      setTimeout(function(){done()},500);
+      window.setTimeout(function(){done()},500);
      // done();
     });
 
@@ -1116,7 +1116,7 @@ function runTests(){
       tickFormatYAxis.set('height',h);
       tickFormatYAxis.set('completeSeriesConfig',completeSeriesConfig);
       tickFormatYAxis.set('chartData',d);
-      setTimeout(function(){done()},500);
+      window.setTimeout(function(){done()},500);
      // done();
     });
 
@@ -1216,7 +1216,7 @@ function runTests(){
       inlineYAxis.set('height',h);
       inlineYAxis.set('completeSeriesConfig',completeSeriesConfig);
       inlineYAxis.set('chartData',d);
-      setTimeout(function(){
+      window.setTimeout(function(){
         xLabels = inlineXAxis._axisGroup.selectAll('text').nodes();
         yLabels = inlineYAxis._axisGroup.selectAll('text').nodes();
         xRects = inlineXAxis._axisGroup.selectAll('rect').nodes();
@@ -1362,7 +1362,7 @@ function runTests(){
       noTicksAxis.set('height',h);
       noTicksAxis.set('completeSeriesConfig',completeSeriesConfig);
       noTicksAxis.set('chartData',d);
-      setTimeout(function(){ done(); },500);
+      window.setTimeout(function(){ done(); },500);
     });
 
     test('noTicksAxis fixture is created', function() {

@@ -92,7 +92,7 @@ function runTests() {
       parallelScale.set('axes',dim);
       parallelScale.set('chartData',d);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         var g = parallelSVG.svg.selectAll('g.layer')
             .data([0,1,2]);
         g.enter()
@@ -109,7 +109,7 @@ function runTests() {
         parallelhighlight.set('categories',categories);
         parallelhighlight.set('chartData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
 
       }, 100);
     });
@@ -162,7 +162,7 @@ function runTests() {
 
       parallelhighlight.set("crosshairData", d);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         linePath = parallelhighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
       }, 100);
@@ -223,7 +223,7 @@ function runTests() {
 
       parallelhighlight.set("crosshairData", d);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         linePath = parallelhighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
       }, 100);
@@ -335,7 +335,7 @@ function runTests() {
       radarScale.set('axes',dim);
       radarScale.set('chartData',d);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         var g = radarSVG.svg.selectAll('g.layer')
             .data([0,1,2]);
         g.enter()
@@ -350,7 +350,7 @@ function runTests() {
         radarhighlight.set('seriesId',"x");
         radarhighlight.set('chartData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
 
       }, 100);
     });
@@ -400,7 +400,7 @@ function runTests() {
 
       radarhighlight.set("crosshairData", d);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         linePath = radarhighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
       }, 100);
@@ -476,7 +476,7 @@ function runTests() {
 
       radarhighlight.set("crosshairData", d);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         linePath = radarhighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
       }, 100);
@@ -592,7 +592,7 @@ function runTests() {
       differentScale.set('axes',dim);
       differentScale.set('chartData',d);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         var g = differentSVG.svg.selectAll('g.layer')
             .data([0,1,2]);
         g.enter()
@@ -609,7 +609,7 @@ function runTests() {
         differenthighlight.set('categories',categories);
         differenthighlight.set('chartData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
 
       }, 100);
     });
@@ -662,7 +662,7 @@ function runTests() {
 
       differenthighlight.set("crosshairData", d);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         linePath = differenthighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
       }, 100);
@@ -724,7 +724,7 @@ function runTests() {
 
       differenthighlight.set("crosshairData", d);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         linePath = differenthighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
       }, 100);
@@ -838,7 +838,7 @@ function runTests() {
       fuzzScale.set('axes',dim);
       fuzzScale.set('chartData',d);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         var g = fuzzSVG.svg.selectAll('g.layer')
             .data([0,1,2]);
         g.enter()
@@ -855,7 +855,7 @@ function runTests() {
         fuzzhighlight.set('categories',categories);
         fuzzhighlight.set('chartData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
 
       }, 100);
     });
@@ -908,7 +908,7 @@ function runTests() {
 
       fuzzhighlight.set("crosshairData", d);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         linePath = fuzzhighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
       }, 100);
@@ -988,7 +988,7 @@ function runTests() {
 
       fuzzhighlight.set("crosshairData", d);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         linePath = fuzzhighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
       }, 100);
@@ -1104,7 +1104,7 @@ function runTests() {
       generatingScale.set('axes',dim);
       generatingScale.set('chartData',d);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         var g = generatingSVG.svg.selectAll('g.layer')
             .data([0,1,2]);
         g.enter()
@@ -1119,7 +1119,7 @@ function runTests() {
         generatinghighlight.set('seriesId',"x");
         generatinghighlight.set('chartData',d);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
 
       }, 100);
     });
@@ -1173,7 +1173,7 @@ function runTests() {
       generatinghighlight.set('generatingCrosshairData',true);
       generatinghighlight.set("crosshairData", d);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         // linePath = generatinghighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
       }, 1000);
@@ -1206,7 +1206,7 @@ function runTests() {
       generatinghighlight.set("generatingCrosshairData", false);
       generatinghighlight.set("crosshairData", d);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         linePath = generatinghighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
       }, 100);
@@ -1325,7 +1325,7 @@ function runTests() {
       forceScale.set('axes',dim);
       forceScale.set('chartData',d);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         var g = forceSVG.svg.selectAll('g.layer')
             .data([0,1,2]);
         g.enter()
@@ -1341,7 +1341,7 @@ function runTests() {
         forcehighlight.set('chartData',d);
         forcehighlight.set('drawWithLocalCrosshairData',true);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
 
       }, 100);
     });
@@ -1395,7 +1395,7 @@ function runTests() {
       forcehighlight.setAttribute("generatingCrosshairData", true);
       forcehighlight.set("crosshairData", d);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         linePath = forcehighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
       }, 100);
@@ -1457,7 +1457,7 @@ function runTests() {
       forcehighlight.setAttribute("generatingCrosshairData", false);
       forcehighlight.set("crosshairData", d);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         linePath = forcehighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
       }, 100);
@@ -1576,7 +1576,7 @@ function runTests() {
       tooltipScale.set('axes',dim);
       tooltipScale.set('chartData',d);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         var g = tooltipSVG.svg.selectAll('g.layer')
             .data([0,1,2]);
         g.enter()
@@ -1593,7 +1593,7 @@ function runTests() {
         tooltiphighlight.set('showTooltipData',true);
         tooltiphighlight.set('margin',m);
 
-        setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 100);
 
       }, 100);
     });
@@ -1634,7 +1634,7 @@ function runTests() {
 
       tooltiphighlight.set("crosshairData", d);
 
-      setTimeout(function() { done(); }, 100);
+      window.setTimeout(function() { done(); }, 100);
     });
 
     test('_highlightData is created', function() {
@@ -1651,7 +1651,7 @@ function runTests() {
 
       assert.equal(tooltiphighlight.defaultEmptyData.mouse, null);
       assert.equal(tooltiphighlight.defaultEmptyData.dataPos[0], 423);
-      assert.closeTo(tooltiphighlight.defaultEmptyData.dataPos[1], 2182, 2);
+      assert.closeTo(tooltiphighlight.defaultEmptyData.dataPos[1], 2182, 4);
       assert.equal(tooltiphighlight.defaultEmptyData.time, 1397160780000);
       assert.deepEqual(tooltiphighlight.defaultEmptyData.dataset, {"x":1397160780000,"y":10,"y2":3,"y3":8,"cat":"b"});
       assert.deepEqual(tooltiphighlight.defaultEmptyData.series, [{"name":"y","value":{"y":10,"y2":3,"y3":8}},{"name":"y2","value":{"y":10,"y2":3,"y3":8}},{"name":"y3","value":{"y":10,"y2":3,"y3":8}}]);
@@ -1676,7 +1676,7 @@ function runTests() {
 
       tooltiphighlight.set("crosshairData", d);
 
-      setTimeout(function() {
+      window.setTimeout(function() {
         linePath = tooltiphighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
       }, 100);

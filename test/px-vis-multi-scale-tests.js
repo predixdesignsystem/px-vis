@@ -13,7 +13,7 @@ function runTests(){
     var multiScale = document.getElementById('multiScale');
 
     suiteSetup(function(done) {
-      setTimeout(function() { done(); }, 100);
+      window.setTimeout(function() { done(); }, 100);
     });
 
     test('multiScale fixture is created', function() {
@@ -91,7 +91,7 @@ function runTests(){
       domainChanged = multiScale.domainChanged;
       multiScale.set('chartExtents',chartExtents);
 
-      setTimeout(function() { done(); }, 500);
+      window.setTimeout(function() { done(); }, 500);
     });
 
 

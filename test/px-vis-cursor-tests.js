@@ -131,7 +131,7 @@ function baseTests(elem,hLine,vLine,circle,hArr,yArr){
       cursor.set('height',h);
       cursor.set('margin',m);
       cursor.set('chartData',d);
-      // setTimeout(function(){ done(); },500);
+      // window.setTimeout(function(){ done(); },500);
       done();
     });
 
@@ -229,7 +229,7 @@ function addTooltipTests(elem,hLine,vLine,circle,hX2,hTransformArr,vTransform,cA
       };
 
       cursor.set('tooltipData',d);
-      // setTimeout(function(){ done(); },1000);
+      // window.setTimeout(function(){ done(); },1000);
       done();
     });
 
@@ -300,7 +300,7 @@ function removeTooltipTests(elem){
       };
 
       cursor.set('tooltipData',d);
-      // setTimeout(function(){ done(); },500);
+      // window.setTimeout(function(){ done(); },500);
       done();
     });
 

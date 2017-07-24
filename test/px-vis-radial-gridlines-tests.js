@@ -66,7 +66,7 @@ function runTests(){
 
       radialGrid.set('margin',m);
 
-      setTimeout(function(){ done() },100);
+      window.setTimeout(function(){ done() },100);
     });
 
     test('radialGrid fixture is created', function() {
@@ -142,7 +142,7 @@ function runTests(){
 
       radialGrid.set('tickValues',tickValues);
 
-      setTimeout(function(){ done() },100);
+      window.setTimeout(function(){ done() },100);
     });
 
     test('radialGrid fixture is created', function() {

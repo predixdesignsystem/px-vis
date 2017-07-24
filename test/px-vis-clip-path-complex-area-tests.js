@@ -83,7 +83,7 @@ function runTests(){
       baseClip.set('dimensions',dim);
       baseClip.set('chartData',d);
 
-      // setTimeout(function(){done()},500);
+      // window.setTimeout(function(){done()},500);
 
       done();
     });

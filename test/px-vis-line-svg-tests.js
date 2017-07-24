@@ -70,7 +70,7 @@ function runTests(){
       baseLine.set('chartData',d);
 
       // needed for the debounce in line
-      setTimeout(function(){
+      window.setTimeout(function(){
         linePath =  baseLine.lineGroup.select('path.series-line');
         done();
       },250);;
@@ -254,7 +254,7 @@ function runTests(){
       };
       mutedLine1.set('mutedSeries',m);
       mutedLine2.set('mutedSeries',m);
-      // setTimeout(function(){ done() }.bind(this),5000);
+      // window.setTimeout(function(){ done() }.bind(this),5000);
       done();
     });
 
@@ -290,7 +290,7 @@ function runTests(){
       };
       mutedLine1.set('mutedSeries',m);
       mutedLine2.set('mutedSeries',m);
-      // setTimeout(function(){ done() }.bind(this),5000);
+      // window.setTimeout(function(){ done() }.bind(this),5000);
       done();
     });
 
@@ -327,7 +327,7 @@ function runTests(){
       mutedLine2.set('mutedOpacity',0.6);
       mutedLine1.set('mutedSeries',m);
       mutedLine2.set('mutedSeries',m);
-      // setTimeout(function(){ done() }.bind(this),5000);
+      // window.setTimeout(function(){ done() }.bind(this),5000);
       done();
     });
 
@@ -1238,7 +1238,7 @@ function runTests(){
       parallelCategoryGradientLine.set('selectedDomain',sd);
       parallelCategoryGradientLine.set('mutedSeries',m);
 
-      setTimeout(function(){
+      window.setTimeout(function(){
         linePath = parallelCategoryGradientLine.lineGroup.selectAll('path.series-line');
         done();
       },1000);
@@ -1283,7 +1283,7 @@ function runTests(){
       parallelCategoryGradientLine.set('selectedDomain',sd);
       parallelCategoryGradientLine.set('mutedSeries',m);
 
-      setTimeout(function(){
+      window.setTimeout(function(){
         linePath = parallelCategoryGradientLine.lineGroup.selectAll('path.series-line');
         done();
       },1000);;
@@ -2090,7 +2090,7 @@ function runTests(){
     suiteSetup(function(done) {
       radarScale.set('chartExtents',chartExtents);
 
-      setTimeout(function(){
+      window.setTimeout(function(){
         linePath = radarLine.lineGroup.selectAll('path.series-line');
         done();
       },500);;
@@ -2870,7 +2870,7 @@ function runTests(){
 
         domRepeatDomBind.set('seriesKeys',seriesKeys);
         domRepeatDomBind.set('chartData',d);
-        setTimeout(function() {
+        window.setTimeout(function() {
           domRepeatDomBind.set('completeSeriesConfig',completeSeriesConfig);
         },10);
 
@@ -3102,9 +3102,9 @@ function runTests(){
 
         domRepeatDomBind.set('seriesKeys',seriesKeys);
         domRepeatDomBind.set('chartData',d);
-        setTimeout(function() { domRepeatDomBind.set('completeSeriesConfig',completeSeriesConfig); }, 10)
+        window.setTimeout(function() { domRepeatDomBind.set('completeSeriesConfig',completeSeriesConfig); }, 10)
 
-        setTimeout(function() {
+        window.setTimeout(function() {
           domRepeatLines = document.querySelectorAll('.domRepeatLines');
           done();
         }, 100);

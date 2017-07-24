@@ -83,7 +83,7 @@ function runTests(){
 
       baseBrush.set('height',h);
 
-      setTimeout(function(){done()},500);
+      window.setTimeout(function(){done()},500);
       // done();
     });
 
@@ -199,7 +199,7 @@ function runTests(){
       var d = [1397131620000,1397189940000];
 
       baseBrush.set('chartDomain',d);
-       setTimeout(function(){done()},200);
+       window.setTimeout(function(){done()},200);
       //done();
     });
 
@@ -227,7 +227,7 @@ function runTests(){
 
       rect.dispatchEvent(e);
 
-      setTimeout(function(){done()},1000);
+      window.setTimeout(function(){done();},1500);
     });
 
     test('baseBrush._brush extents match', function() {
@@ -254,7 +254,7 @@ function runTests(){
       var d = [1397102460000,1397219100000];
 
       baseBrush.set('chartDomain',d);
-      setTimeout(function(){done()},500);
+      window.setTimeout(function(){done()},500);
       // flush(function() {
       //   done();
       // });
@@ -289,7 +289,7 @@ function runTests(){
       baseBrush._handleGroup.node().dispatchEvent(e);
       baseBrush._handleGroup.node().dispatchEvent(e2);
 
-      setTimeout(function(){done()},10);
+      window.setTimeout(function(){done()},10);
     });
 
     test('baseBrush._handleGroup rect stroke changes', function() {
@@ -319,7 +319,7 @@ function runTests(){
       baseBrush._handleGroup.node().dispatchEvent(e);
       baseBrush._handleGroup.node().dispatchEvent(e2);
 
-      setTimeout(function(){done()},10);
+      window.setTimeout(function(){done()},10);
       // done();
     });
 
@@ -348,11 +348,11 @@ function runTests(){
 
       baseBrush._handleGroup.node().dispatchEvent(e);
 
-      setTimeout(function(){
+      window.setTimeout(function(){
         baseBrush._handleGroup.node().dispatchEvent(e2);
       },10);
 
-      setTimeout(function(){done()},10);
+      window.setTimeout(function(){done()},10);
     });
 
     test('baseBrush._handleGroup rect stroke changes', function() {
@@ -382,11 +382,11 @@ function runTests(){
   //
   //     baseBrush._brushGroup.node().dispatchEvent(e);
   //
-  //     setTimeout(function(){
+  //     window.setTimeout(function(){
   //       baseBrush._brushGroup.node().dispatchEvent(e2);
   //     },10);
   //
-  //     setTimeout(function(){done()},3000);
+  //     window.setTimeout(function(){done()},3000);
   //     // done();
   //   });
   //
@@ -455,7 +455,7 @@ function runTests(){
 
       gradientBrush.set('height',h);
 
-      // setTimeout(function(){done()},5000);
+      // window.setTimeout(function(){done()},5000);
       done();
     });
 
@@ -501,15 +501,26 @@ function runTests(){
       assert.equal(stops[1].tagName, 'stop');
     });
     test('linearGradient stop[0] is correct', function() {
-      var stop = d3.select(gradientBrush.svg.select('defs').select('#overlayGradient').selectAll('stop').nodes()[0]);
+      var stop = d3.select(gradientBrush.svg.select('defs').select('#overlayGradient').selectAll('stop').nodes()[0]),
+          stopColor = stop.attr('stop-color').split(" ").join('');
       assert.equal(stop.attr('offset'), '0%');
-      assert.equal(stop.attr('stop-color').split(" ").join(''), rgbToHex(colors['gray10']));
+      if(stopColor[0] === 'r') {
+        assert.equal(stopColor, colors['gray10']);
+      } else {
+        assert.equal(stopColor, rgbToHex(colors['gray10']));
+      }
+
       assert.equal(stop.attr('stop-opacity'), 0.1);
     });
     test('linearGradient stop[1] is correct', function() {
-      var stop = d3.select(gradientBrush.svg.select('defs').select('#overlayGradient').selectAll('stop').nodes()[1]);
+      var stop = d3.select(gradientBrush.svg.select('defs').select('#overlayGradient').selectAll('stop').nodes()[1]),
+          stopColor = stop.attr('stop-color').split(" ").join('');
       assert.equal(stop.attr('offset'), '100%');
-      assert.equal(stop.attr('stop-color').split(" ").join(''), rgbToHex(colors['gray10']));
+      if(stopColor[0] === 'r') {
+        assert.equal(stopColor, colors['gray10']);
+      } else {
+        assert.equal(stopColor, rgbToHex(colors['gray10']));
+      }
       assert.equal(stop.attr('stop-opacity'), 0.8);
     });
   });
