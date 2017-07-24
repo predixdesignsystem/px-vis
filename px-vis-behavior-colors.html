@@ -344,11 +344,6 @@ PxColorsBehavior.dataVisColorTheming = [{
       if (firstThemedColor) {
         this._applyStyleVariables();
       }
-      // Otherwise, apply our default colors
-      // REDESIGN: Might need to change this so it checks if default was overwritten and use it instead of theme
-      // else {
-      //   this._applyDefaultStyleVariables();
-      // };
 
       this.dispatchEvent(new CustomEvent('px-data-vis-colors-applied'));
     },
@@ -399,43 +394,6 @@ PxColorsBehavior.dataVisColorTheming = [{
       this.set('seriesColorList', newColors);
     },
 
-    /**
-     * Called when there are no style variables applied. Collects the default
-     * data vis colors and sets the `dataVisColors` and `seriesColorOrder`
-     * properties.
-     *
-     * @private
-     * @method _applyDefaultStyleVariables
-     */
-    // _applyDefaultStyleVariables: function() {
-    //   var newColors = {};
-    //   var newOrder = [];
-    //   var dataVisColorsKeys = Object.keys(this.dataVisColors);
-    //   var i;
-    //   var length;
-
-    //   //check if the developer passed in their own seriesColorOrder
-    //   var devSet = this._checkIfDevSetSeriesColorOrder();
-
-    //   for (i = 0, length = dataVisColorsKeys.length; i < length; i++) {
-    //     newColors[dataVisColorsKeys[i]] = this.dataVisColors[dataVisColorsKeys[i]];
-    //     newColors['pxVisSeriesColor' + i] = this.dataVisColors[dataVisColorsKeys[i]];
-    //   };
-
-    //   if(!devSet) {
-    //     var updatedDataVisColorsKeys = Object.keys(newColors);
-    //     for (i = 0, length = this.seriesColorOrder.length; i < length; i++) {
-    //       var visIndex = dataVisColorsKeys.indexOf(this.seriesColorOrder[i]);
-    //       newOrder[i] = 'pxVisSeriesColor' + visIndex;
-    //     };
-
-    //     // Set properties on self to new values
-    //     // @TODO Use batch update in Polymer 2.0
-    //     this.set('seriesColorOrder', newOrder);
-    //   }
-
-    //   this.set('dataVisColors', newColors);
-    // },
 
     /**
      * Converts a hex-format color to RGB.
