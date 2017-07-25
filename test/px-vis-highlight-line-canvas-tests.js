@@ -93,7 +93,7 @@ function runTests() {
       parallelScale.set('chartData',d);
 
 
-      parallelhighlight.set('canvasContext', parallelSVG.canvasContextTop);
+      parallelhighlight.set('canvasContext', parallelSVG.canvasLayers.highlighter);
       parallelhighlight.set('layersToMask', parallelSVG.canvasContext);
       parallelhighlight.set('dimensions',dim);
       parallelhighlight.set('timeData', 'x');
@@ -294,7 +294,7 @@ function runTests() {
       radarScale.set('axes',dim);
       radarScale.set('chartData',d);
 
-      radarhighlight.set('canvasContext', radarSVG.canvasContextTop);
+      radarhighlight.set('canvasContext', radarSVG.canvasLayers.highlighter);
       radarhighlight.set('layersToMask', radarSVG.canvasContext);
       radarhighlight.set('dimensions',dim);
       radarhighlight.set('timeData', 'x');
@@ -488,7 +488,7 @@ function runTests() {
       differentScale.set('axes',dim);
       differentScale.set('chartData',d);
 
-      differenthighlight.set('canvasContext', differentSVG.canvasContextTop);
+      differenthighlight.set('canvasContext', differentSVG.canvasLayers.highlighter);
       differenthighlight.set('layersToMask', differentSVG.canvasContext);
       differenthighlight.set('dimensions',dim);
       differenthighlight.set('timeData', 'x');
@@ -684,7 +684,7 @@ function runTests() {
       fuzzScale.set('axes',dim);
       fuzzScale.set('chartData',d);
 
-      fuzzhighlight.set('canvasContext', fuzzSVG.canvasContextTop);
+      fuzzhighlight.set('canvasContext', fuzzSVG.canvasLayers.highlighter);
       fuzzhighlight.set('layersToMask', fuzzSVG.canvasContext);
       fuzzhighlight.set('dimensions',dim);
       fuzzhighlight.set('timeData', 'x');
@@ -894,7 +894,7 @@ function runTests() {
       generatingScale.set('axes',dim);
       generatingScale.set('chartData',d);
 
-      generatinghighlight.set('canvasContext', generatingSVG.canvasContextTop);
+      generatinghighlight.set('canvasContext', generatingSVG.canvasLayers.highlighter);
       generatinghighlight.set('layersToMask', generatingSVG.canvasContext);
       generatinghighlight.set('dimensions',dim);
       generatinghighlight.set('timeData', 'x');
@@ -1091,7 +1091,7 @@ function runTests() {
       forceScale.set('axes',dim);
       forceScale.set('chartData',d);
 
-      forcehighlight.set('canvasContext', forceSVG.canvasContextTop);
+      forcehighlight.set('canvasContext', forceSVG.canvasLayers.highlighter);
       forcehighlight.set('layersToMask', forceSVG.canvasContext);
       forcehighlight.set('dimensions',dim);
       forcehighlight.set('timeData', 'x');
@@ -1294,7 +1294,7 @@ function runTests() {
       tooltipScale.set('axes',dim);
       tooltipScale.set('chartData',d);
 
-      tooltiphighlight.set('canvasContext', tooltipSVG.canvasContextTop);
+      tooltiphighlight.set('canvasContext', tooltipSVG.canvasLayers.highlighter);
       tooltiphighlight.set('layersToMask', tooltipSVG.canvasContext);
       tooltiphighlight.set('dimensions',dim);
       tooltiphighlight.set('timeData', 'x');
