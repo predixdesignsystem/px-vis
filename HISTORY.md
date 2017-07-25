@@ -38,6 +38,15 @@ v3.0.0
     * Must be value icon types for px-icon or iron-icon.
     * Icon name must include the set prefix
 
+v2.1.9
+==================
+* Ensure properties of a predefined toolbar config can be overriden
+* Fix getImage() width for radar
+
+v2.1.8
+==================
+* various fixes to markers
+
 v2.1.7
 ==================
 * Fix for axis interaction space position on right and bottom axis (effectively fixing problem where right positioned axis couldn't be dragged in multi Y)
