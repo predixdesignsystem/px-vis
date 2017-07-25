@@ -2506,7 +2506,7 @@ PxVisBehavior.highlightShared = [{
 PxVisBehavior.highlightCanvasShared = [{
 
   observers: [
-    '_requestCanvasCreation(_highlightData, height, margin.*)',
+    '_requestCanvasCreation(_highlightData)',
     '_muteDataSeries(_highlightData)',
     '_addTransition(layersToMask)'
   ],
@@ -2515,13 +2515,10 @@ PxVisBehavior.highlightCanvasShared = [{
     if(this.layersToMask) {
 
       if(!Array.isArray(this.layersToMask)) {
-        // this.layersToMask.canvas.style.opacity = this._highlightData.length ? 'var(--px-vis-data-mask-opacity, 0.4)' : '';
-
         this.toggleClass('secondaryDataMask', this._highlightData.length,this.layersToMask.canvas);
+
       } else {
         for(var i=0; i<this.layersToMask.length; i++) {
-          // this.layersToMask[i].canvas.style.opacity = this._highlightData.length ? 'var(--px-vis-data-mask-opacity, 0.4)' : '';
-
           this.toggleClass('secondaryDataMask', this._highlightData.length, this.layersToMask[i].canvas);
         }
       }
