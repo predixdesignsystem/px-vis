@@ -98,6 +98,7 @@ Element which draws a striping series onto the chart
     },
 
     observers: [
+      '_requestCanvasCreation(stripeConfig, height, margin.*)',
       '_redraw(canvasContext, domainChanged, stripeData.*, stripeConfig.*)',
       '_drawOnTop(serieToRedrawOnTop)'
      ],
@@ -197,6 +198,10 @@ Element which draws a striping series onto the chart
       if(serieToRedraw === this.seriesId) {
         this.drawCanvas(false);
       }
+    },
+
+    _requestCanvasCreation: function() {
+      this.set('canvasLayersConfig.striping', {});
     }
   });
 </script>

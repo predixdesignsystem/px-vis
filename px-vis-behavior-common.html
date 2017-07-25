@@ -2506,6 +2506,7 @@ PxVisBehavior.highlightShared = [{
 PxVisBehavior.highlightCanvasShared = [{
 
   observers: [
+    '_requestCanvasCreation(_highlightData, height, margin.*)',
     '_muteDataSeries(_highlightData)',
     '_addTransition(layersToMask)'
   ],
@@ -2535,7 +2536,11 @@ PxVisBehavior.highlightCanvasShared = [{
     } else {
       this.layersToMask.canvas.style.transition = 'opacity 0.2s';
     }
-  }
+  },
+
+  _requestCanvasCreation: function() {
+      this.set('canvasLayersConfig.highlighter', {});
+    }
 
 }, PxVisBehavior.highlightShared];
 
