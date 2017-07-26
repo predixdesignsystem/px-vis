@@ -1283,7 +1283,7 @@ function runTests(){
     });
 
     test('x rect color is correct', function() {
-      assert.equal(xRects[0].attributes.fill.value.split(' ').join(''), rgbToHex(colors['grey10']));
+      assert.equal(xRects[0].attributes.fill.value.split(' ').join(''), rgbToHex(colors['grey5']));
     });
 
     test('y rect count is correct', function() {
@@ -1298,7 +1298,7 @@ function runTests(){
     });
 
     test('y rect color is correct', function() {
-      assert.equal(yRects[0].attributes.fill.value.split(' ').join(''), rgbToHex(colors['grey10']));
+      assert.equal(yRects[0].attributes.fill.value.split(' ').join(''), rgbToHex(colors['grey5']));
     });
   });
 
