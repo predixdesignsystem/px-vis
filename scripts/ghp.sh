@@ -42,21 +42,21 @@ rm -rf css
 rm -rf sass
 rm -rf scripts
 rm -rf test
-rm *.html
-rm *.json
-rm *.enc
-rm *.js
-rm *.png
-rm *.lock
-rm *.ico
-rm *.md
-rm *.pdf
+rm -f *.html
+rm -f *.json
+rm -f *.enc
+rm -f *.js
+rm -f *.png
+rm -f *.lock
+rm -f *.ico
+rm -f *.md
+rm -f *.pdf
 yes | rm .travis.yml
-rm .bowerrc
-rm .editorconfig
+rm -f .bowerrc
+rm -f .editorconfig
 rm -rf .github
-rm .gitignore
-rm .jshintrc
+rm -f .gitignore
+rm -f .jshintrc
 
 # force installation of bower packages at the root
 echo "{ \"directory\": \".\" }" > .bowerrc
@@ -79,7 +79,7 @@ echo ${meta_temp/'COMPONENT_NAME'/$REPO_NAME} > index.html
 npm install bower -g
 bower cache clean
 # Install the repo and the dark-theme.
-bower install ${REPO_NAME} px-dark-theme px-dark-demo-theme
+bower install ${REPO_NAME} px-dark-theme px-dark-demo-theme --force-latest
 
 #copy the bower file into our root
 yes | cp ${REPO_NAME}/bower.json bower.json
@@ -113,8 +113,10 @@ bower install
 # checkout a new orphan
 git checkout --orphan $TARGET_BRANCH
 
-git add -A .
+git add -A . > /dev/null
+echo "git add done"
 git commit -m "${GIT_COMMIT_MESSAGE}" --quiet
+echo "git commit done"
 
 # Set git credentials (defined in settings above)
 git config user.name ${GIT_USER_NAME}
