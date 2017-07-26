@@ -1,8 +1,8 @@
-#Px-Vis
+# px-vis
 
 ## Overview
 
-Px-Vis is a Predix UI visualization framework
+`Px-vis` is a Predix UI data visualization framework.
 
 ## Usage
 
@@ -12,17 +12,17 @@ Px-Vis is a Predix UI visualization framework
 3. bower
 4. [webcomponents-lite.js polyfill](https://github.com/webcomponents/webcomponentsjs)
 
-Node, npm and bower are necessary to install the component and dependencies. webcomponents.js adds support for web components and custom elements to your application.
+Node, npm, and bower are necessary to install the component and dependencies. webcomponents.js adds support for web components and custom elements to your application.
 
 ## Getting Started
 
-First, install the component via bower on the command line.
+First, install the component via bower on the command line:
 
 ```
 bower install px-vis --save
 ```
 
-Second, import the component to your application with the following tag in your head.
+Second, import the component in your application with the following tag in your head:
 
 ```
 <link rel="import" href="/bower_components/px-vis/px-vis.html"/>
@@ -37,7 +37,7 @@ See demo for examples
 <br />
 <hr />
 
-## documentation
+## Documentation
 
 Read the full API and view the demo [here](https://predixdev.github.io/px-vis).
 
