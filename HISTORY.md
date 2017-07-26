@@ -25,7 +25,7 @@ v3.0.0
   * px-vis-line-canvas-rendering-ended
 * new events for canvas rendering: px-vis-chart-canvas-rendering-started and px-vis-chart-canvas-rendering-ended
 * removed redrawElement function from highlightPoint and highlightLine
-* Changed inert property on register to inertRegister so as to not conflic with w3c spec
+* Changed inert property on register to inertRegister so as to not conflict with w3c spec
 * Changed over to px-icon-set for px-vis-events, px-vis-toolbar, and px-vis-dynamic-menu
   * Events:
     * Images still supported
@@ -39,7 +39,7 @@ v3.0.0
     * Icon name must include the set prefix
 * Removed canvasContextTop
   * changed to dynamic canvas creation
-  * non-dataseries canvas can be created in a canvasLayers property via a canvasLayersConfig property
+  * non-data series canvases can be created in a canvasLayers property via a canvasLayersConfig property
 
 v2.1.9
 ==================
