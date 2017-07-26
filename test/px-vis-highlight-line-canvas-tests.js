@@ -1081,6 +1081,7 @@ function runTests() {
       forceSVG.set('width',w);
       forceSVG.set('height',h);
       forceSVG.set('margin',m);
+      forceSVG.set('canvasLayersConfig', {highlighter:{}});
 
       forceScale.set('width',w);
       forceScale.set('height',h);
@@ -1284,6 +1285,7 @@ function runTests() {
       tooltipSVG.set('width',w);
       tooltipSVG.set('height',h);
       tooltipSVG.set('margin',m);
+      tooltipSVG.set('canvasLayersConfig',{highlighter:{}});
 
       tooltipScale.set('width',w);
       tooltipScale.set('height',h);
@@ -1294,7 +1296,6 @@ function runTests() {
       tooltipScale.set('axes',dim);
       tooltipScale.set('chartData',d);
 
-      tooltiphighlight.set('canvasContext', tooltipSVG.canvasLayers.highlighter);
       tooltiphighlight.set('layersToMask', tooltipSVG.canvasContext);
       tooltiphighlight.set('dimensions',dim);
       tooltiphighlight.set('timeData', 'x');
@@ -1304,7 +1305,10 @@ function runTests() {
       tooltiphighlight.set('showTooltipData',true);
       tooltiphighlight.set('margin',m);
 
-      window.setTimeout(function() { done(); }, 100);
+      window.setTimeout(function() {
+        tooltiphighlight.set('canvasContext', tooltipSVG.canvasLayers.highlighter);
+        done();
+      }, 100);
 
     });
 

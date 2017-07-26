@@ -1634,21 +1634,20 @@ function runTests() {
 
       tooltiphighlight.set("crosshairData", d);
 
-      window.setTimeout(function() { done(); }, 100);
+      window.setTimeout(function() { done(); }, 1000);
     });
 
     test('_highlightData is created', function() {
       assert.deepEqual(tooltiphighlight._highlightData, [{
-              "x": 1397160780000,
-              "y": 10,
-              "y2": 3,
-              "y3": 8,
-              'cat': 'b'
-            }]);
+        "x": 1397160780000,
+        "y": 10,
+        "y2": 3,
+        "y3": 8,
+        'cat': 'b'
+      }]);
     });
 
     test('tooltiphighlight created defaultEmptyData', function() {
-
       assert.equal(tooltiphighlight.defaultEmptyData.mouse, null);
       assert.equal(tooltiphighlight.defaultEmptyData.dataPos[0], 423);
       assert.closeTo(tooltiphighlight.defaultEmptyData.dataPos[1], 2182, 4);

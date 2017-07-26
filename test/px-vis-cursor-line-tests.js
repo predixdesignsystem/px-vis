@@ -315,6 +315,7 @@ function runTests() {
       parallelSVGCanvas.set('width',w);
       parallelSVGCanvas.set('height',h);
       parallelSVGCanvas.set('margin',m);
+      parallelSVGCanvas.set('canvasLayersConfig',{'highlighter': {}});
 
       parallelScaleCanvas.set('width',w);
       parallelScaleCanvas.set('height',h);
@@ -327,14 +328,16 @@ function runTests() {
 
       parallelCursorCanvas.set('svg', parallelSVGCanvas.svg);
       parallelCursorCanvas.set('canvasDataLayer', parallelSVGCanvas.canvasContext);
-      parallelCursorCanvas.set('canvasOverlayLayer', parallelSVGCanvas.canvasLayers.highlighter);
       parallelCursorCanvas.set('dimensions',dim);
       parallelCursorCanvas.set('timeData', 'x');
       parallelCursorCanvas.set('completeSeriesConfig',completeSeriesConfig);
       parallelCursorCanvas.set('seriesId',"x");
       parallelCursorCanvas.set('chartData',d);
 
-      window.setTimeout(function() { done(); }, 100);
+      window.setTimeout(function() {
+        parallelCursorCanvas.set('canvasOverlayLayer', parallelSVGCanvas.canvasLayers.highlighter);
+        done();
+      }, 100);
 
     });
 

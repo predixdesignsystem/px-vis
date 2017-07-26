@@ -119,11 +119,11 @@ function runTests(){
         },{
           "id": "456",
           "x": 1397102460000,
-          "label": "unicode"
+          "label": "choochoo"
         },{
           "id": "789",
           "x": 1397189940000,
-          "label": "font awesome"
+          "label": "rocketsaway"
         },{
           "id": "333",
           "x": 1397160780000,
@@ -145,16 +145,16 @@ function runTests(){
           "label": "ordinal"
         }],
         eventConfig =  {
-          "font awesome":{
+          "rocketsaway":{
             "color": "blue",
-            "icon": "px-vis:mov",
+            "icon": "px-fea:deployments",
             "type": "px",
             "offset":[0,0]
           },
-          "unicode":{
+          "choochoo":{
             "color": "green",
-            "icon": "\uf015",
-            "type": "unicode",
+            "icon": "px-obj:locomotive",
+            "type": "px",
             "offset":[1,0]
           },
           "image":{
@@ -164,7 +164,7 @@ function runTests(){
             "size":"20"
           },
           "offset":{
-            "icon": "px-vis:mov",
+            "icon": "px-obj:line-og",
             "color":"red",
             "type": "px",
             "offset":[10,20]
