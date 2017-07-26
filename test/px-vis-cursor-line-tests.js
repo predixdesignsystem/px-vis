@@ -327,7 +327,7 @@ function runTests() {
 
       parallelCursorCanvas.set('svg', parallelSVGCanvas.svg);
       parallelCursorCanvas.set('canvasDataLayer', parallelSVGCanvas.canvasContext);
-      parallelCursorCanvas.set('canvasOverlayLayer', parallelSVGCanvas.canvasContextTop);
+      parallelCursorCanvas.set('canvasOverlayLayer', parallelSVGCanvas.canvasLayers.highlighter);
       parallelCursorCanvas.set('dimensions',dim);
       parallelCursorCanvas.set('timeData', 'x');
       parallelCursorCanvas.set('completeSeriesConfig',completeSeriesConfig);
@@ -351,7 +351,7 @@ function runTests() {
     });
 
     test('overlay layer has transition', function() {
-      assert.equal(parallelSVGCanvas.canvasContextTop.canvas.style.transition.slice(0,12), 'opacity 0.2s');
+      assert.equal(parallelSVGCanvas.canvasLayers.highlighter.canvas.style.transition.slice(0,12), 'opacity 0.2s');
     });
 
   }); //suite
@@ -387,7 +387,7 @@ function runTests() {
     });
 
     test('overlay layer has transition', function() {
-      assert.isTrue(parallelSVGCanvas.canvasContextTop.canvas.classList.contains('primaryOverlayMask'));
+      assert.isTrue(parallelSVGCanvas.canvasLayers.highlighter.canvas.classList.contains('primaryOverlayMask'));
     });
 
     test('baseLine linePath created', function() {
@@ -439,7 +439,7 @@ function runTests() {
     });
 
     test('overlay layer has transition', function() {
-      assert.isFalse(parallelSVGCanvas.canvasContextTop.canvas.classList.contains('primaryOverlayMask'));
+      assert.isFalse(parallelSVGCanvas.canvasLayers.highlighter.canvas.classList.contains('primaryOverlayMask'));
     });
 
     test('baseLine linePath is empty', function() {

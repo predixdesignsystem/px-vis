@@ -196,7 +196,7 @@ PxVisBehaviorRenderer.base = [{
 
   attached: function() {
 
-    this.listen(this, 'px-vis-renderer-register', '_registerDrawingElement');
+    this.listen(this, 'px-vis-renderer-register', '_registerDrawingElement')
 
     this.listen(this, 'px-vis-highlight-data-changed', '_renderHighlight');
     this.listen(this, 'px-vis-redraw-lines', '_renderAllLines');
@@ -346,6 +346,10 @@ PxVisBehaviorRenderer.base = [{
   },
 
   _renderHighlight: function() {
+    if(this.domainChanged === null || !this.canvasLayers.highlighter ||
+      !this.completeSeriesConfig || this.preventInitialDrawing) {
+      return;
+    }
     this._renderTypedContext('highlightData', [this.canvasLayers.highlighter]);
   },
 
