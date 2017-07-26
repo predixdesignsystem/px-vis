@@ -37,6 +37,9 @@ v3.0.0
     * Must be icons use px-icon, which wraps iron-icon.
     * Must be value icon types for px-icon or iron-icon.
     * Icon name must include the set prefix
+* Removed canvasContextTop
+  * changed to dynamic canvas creation
+  * non-dataseries canvas can be created in a canvasLayers property via a canvasLayersConfig property
 
 v2.1.9
 ==================
