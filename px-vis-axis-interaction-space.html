@@ -248,8 +248,9 @@ Custom property | Description
      * For simplicity, we just let d3.brush create the listener elems and control their size
      */
     drawElement: function() {
-      if(this.domainChanged !== null && this.svg) {
-        this.debounce('_axisBrush', function() {
+
+      this.debounce('_axisBrush', function() {
+        if(this.domainChanged !== null && this.svg) {
 
           var range = this._calcRange();
 
@@ -263,9 +264,8 @@ Custom property | Description
 
           this._translateBrush();
           this._styleBrushSelection();
-
-        }, 10);
-      }
+        }
+      }, 10);
     },
 
     /**

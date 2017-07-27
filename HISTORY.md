@@ -1,3 +1,7 @@
+v3.0.2
+================
+* Ensure axis intercation space won't draw on empty svg
+
 v3.0.1
 ================
 * Patching issue if highlight canvas is not created yet/ever.
