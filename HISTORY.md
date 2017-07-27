@@ -1,3 +1,7 @@
+v3.0.1
+================
+* Patching issue if highlight canvas is not created yet/ever.
+
 v3.0.0
 ================
 * Design refresh

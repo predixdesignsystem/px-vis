@@ -360,6 +360,7 @@ PxVisBehaviorRenderer.base = [{
   _renderAllLines: function() {
 
     var canvasTargets = [],
+        clears = this.canvasLayers.highlighter ? [this.canvasContext, this.canvasLayers.highlighter] : [this.canvasContext],
         keys = Object.keys(this._canvasTargets),
         ctx;
 
@@ -379,7 +380,7 @@ PxVisBehaviorRenderer.base = [{
       'renderType': 'chartData',
       'canvasTargets': canvasTargets,
       'svgTargets': this._svgTargets['chartData'],
-      'canvasToClear': [this.canvasContext, this.canvasLayers.highlighter],
+      'canvasToClear': clears,
       'drawDebounceTime': this.drawDebounceTime['chartData']
     }
     this._renderData(ctx);
