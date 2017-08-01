@@ -1,3 +1,8 @@
+v3.0.3
+================
+* Update hidden class so we dont have to use helpers dseign
+* Add sass partial for charts for common classes
+
 v3.0.2
 ================
 * Ensure axis intercation space won't draw on empty svg

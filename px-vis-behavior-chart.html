@@ -945,6 +945,27 @@ PxVisBehaviorChart.waitForAttach = {
 
 /*
     Name:
+    PxVisBehaviorChart.getHideClass
+
+    Description:
+    Behavior allowing a chart to get the class to hide a register
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorChart.getHideClass
+*/
+PxVisBehaviorChart.getHideClass = {
+  _getHideClass: function(hide) {
+    if(hide === true) {
+      return 'hideAxis';
+    }
+    return '';
+  }
+};
+
+/*
+    Name:
     PxVisBehaviorChart.registerPositioning
 
     Description:
@@ -955,7 +976,7 @@ PxVisBehaviorChart.waitForAttach = {
 
     @polymerBehavior PxVisBehaviorChart.registerPositioning
 */
-PxVisBehaviorChart.registerPositioning = {
+PxVisBehaviorChart.registerPositioning = [{
   properties: {
      /**
       *
@@ -993,14 +1014,8 @@ PxVisBehaviorChart.registerPositioning = {
   },
   _hideRegisterChanged: function() {
     this.notifyResize();
-  },
-  _getHideClass: function(hide) {
-    if(hide === true) {
-      return 'visuallyhidden';
-    }
-    return '';
   }
-};
+}, PxVisBehaviorChart.hideClass];
 
 /*
     Name:
@@ -2184,14 +2199,6 @@ PxVisBehaviorChart.axisRegister = [{
     this.set('_axisRegisterConfig', axisConfig);
     this.set('_axisRegisterTooltipData', tooltipData);
   },
-
-  _getHideClass: function(hide) {
-    if(hide === true) {
-      return 'visuallyhidden';
-    }
-    return '';
-  },
-
   /**
   *
   * Resuses existing register dataset for series names and adds or removes values
@@ -2235,7 +2242,7 @@ PxVisBehaviorChart.axisRegister = [{
     this._axisRegisterConfig = copy;
     this.notifyPath('_axisRegisterConfig');
   }
-}, PxVisBehavior.dimensions, PxVisBehavior.completeSeriesConfig, PxVisBehaviorChart.mutedAxes];
+}, PxVisBehavior.dimensions, PxVisBehavior.completeSeriesConfig, PxVisBehaviorChart.mutedAxes, PxVisBehaviorChart.getHideClass];
 
 /*
     Name:
@@ -2301,14 +2308,8 @@ PxVisBehaviorChart.categoryRegister = [{
   },
   _computeHideCategoryRegister: function() {
     this.set('_hideCategoryRegister', this.hideCategoryRegister || !this.categoryKey);
-  },
-  _getHideClass: function(hide) {
-    if(hide === true) {
-      return 'visuallyhidden';
-    }
-    return '';
-  },
-}, PxVisBehavior.completeSeriesConfig, PxVisBehavior.categories];
+  }
+}, PxVisBehavior.completeSeriesConfig, PxVisBehavior.categories, PxVisBehaviorChart.getHideClass];
 
 /*
     Name:
