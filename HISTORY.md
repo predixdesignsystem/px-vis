@@ -1,3 +1,7 @@
+v3.0.5
+================
+* fixed behavior name
+
 v3.0.4
 ================
 * move sass partial out of sass folder
