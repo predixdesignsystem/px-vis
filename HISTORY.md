@@ -1,3 +1,7 @@
+v3.0.4
+================
+* move sass partial out of sass folder
+
 v3.0.3
 ================
 * Update hidden class so we dont have to use helpers dseign
