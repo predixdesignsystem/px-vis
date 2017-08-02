@@ -1,3 +1,8 @@
+v3.0.6
+================
+* Fix for many demos
+* Fix buttons 404 for demos
+
 v3.0.5
 ================
 * fixed behavior name
