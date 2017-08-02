@@ -4,6 +4,8 @@
 <link rel="import" href="../px-vis-highlight-line-canvas.html">
 <link rel="import" href="../px-vis-line-canvas.html">
 <link rel="import" href="../px-vis-svg-canvas.html">
+<link rel="import" href="../px-vis-behavior-renderer.html">
+<link rel="import" href="../px-vis-behavior-colors.html">
 
 
 <link rel="import" href="../bower_components/px-buttons-design/css/px-buttons-design-demo-styles.html" defer>
@@ -90,6 +92,7 @@
       domain-changed="[[domainChanged]]"
       time-data="[[seriesKey]]"
       complete-series-config="[[completeSeriesConfig]]"
+      crosshair-data="[[crosshairData]]"
       series-id="x"
       chart-data="[[chartData]]">
     </px-vis-highlight-line-canvas>
@@ -106,7 +109,8 @@
 <script>
 Polymer({
   is: 'px-vis-highlight-line-canvas-demo-component',
-  behaviors: [PxColorsBehavior.getSeriesColors,PxColorsBehavior.dataVisColorTheming],
+  behaviors: [PxColorsBehavior.getSeriesColors, PxColorsBehavior.dataVisColorTheming,
+  PxVisBehaviorRenderer.base],
   properties: {
     description: {
       type: String,
@@ -178,6 +182,14 @@ Polymer({
     crosshairData: {
       type: Object,
       value: {
+          "rawData":[],
+          "timeStamps":[]
+      }
+    },
+
+     _crosshairData: {
+      type: Object,
+      value: {
           "rawData":[{
             "x": 1397131620000,
             "y": 6,
@@ -191,6 +203,15 @@ Polymer({
           }],
           "timeStamps":[ 1397131620000, 1397160780000 ]
       }
+    },
+
+    canvasLayers: {
+      type: Object,
+      value: function() { return {}; }
+    },
+    canvasLayersConfig: {
+      type: Object,
+      value: function() { return {}; }
     }
 
   },
@@ -200,14 +221,16 @@ Polymer({
   },
 
   observers: [
-    'generateLayers(svg)'
-  ],
+    '_renderChartData(domainChanged, canvasContext, chartData.*, completeSeriesConfig.*)',
+    '_renderHighlight(domainChanged, canvasLayers.highlighter, completeSeriesConfig.*, crosshairData.timeStamps.*)',
+    ],
+
 
   highlightData: function() {
-    if(this.$.linehighlight.crosshairData && this.$.linehighlight.crosshairData.timeStamps.length) {
-      this.$.linehighlight.set('crosshairData', {rawData: [], timeStamps: []});
+    if(this.crosshairData && this.crosshairData.timeStamps.length) {
+      this.set('crosshairData', {rawData: [], timeStamps: []});
     } else {
-      this.$.linehighlight.set('crosshairData', this.crosshairData);
+      this.set('crosshairData', this._crosshairData);
     }
   },
 

@@ -4,6 +4,8 @@
 <link rel="import" href="../px-vis-highlight-point-canvas.html">
 <link rel="import" href="../px-vis-line-canvas.html">
 <link rel="import" href="../px-vis-svg-canvas.html">
+<link rel="import" href="../px-vis-behavior-colors.html">
+<link rel="import" href="../px-vis-behavior-renderer.html">
 
 
 <link rel="import" href="../bower_components/px-buttons-design/css/px-buttons-design-demo-styles.html" defer>
@@ -116,6 +118,7 @@
       time-data="x"
       complete-series-config="[[completeSeriesConfig]]"
       series-keys='["y","y1","y2"]'
+      crosshair-data="[[crosshairData]]"
       chart-data="[[chartData]]">
     </px-vis-highlight-point-canvas>
 
@@ -198,6 +201,14 @@ Polymer({
     crosshairData: {
       type: Object,
       value: {
+          "rawData":[],
+          "timeStamps":[]
+      }
+    },
+
+     _crosshairData: {
+      type: Object,
+      value: {
           "rawData":[{
             "x": 1397131620000,
             "y": 6,
@@ -211,6 +222,15 @@ Polymer({
           }],
           "timeStamps":[ 1397131620000, 1397160780000 ]
       }
+    },
+
+    canvasLayers: {
+      type: Object,
+      value: function() { return {}; }
+    },
+    canvasLayersConfig: {
+      type: Object,
+      value: function() { return {}; }
     }
   },
 
@@ -218,11 +238,16 @@ Polymer({
     'px-data-vis-colors-applied': '_genCSC'
   },
 
+  observers: [
+    '_renderChartData(domainChanged, canvasContext, chartData.*, completeSeriesConfig.*)',
+    '_renderHighlight(domainChanged, canvasLayers.highlighter, completeSeriesConfig.*, crosshairData.timeStamps.*)',
+    ],
+
   highlightData: function() {
-    if(this.$.pointhighlight.crosshairData && this.$.pointhighlight.crosshairData.timeStamps.length) {
-      this.$.pointhighlight.set('crosshairData', {rawData: [], timeStamps: []});
+    if(this.crosshairData && this.crosshairData.timeStamps.length) {
+      this.set('crosshairData', {rawData: [], timeStamps: []});
     } else {
-      this.$.pointhighlight.set('crosshairData', this.crosshairData);
+      this.set('crosshairData', this._crosshairData);
     }
   },
 
