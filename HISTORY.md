@@ -1,3 +1,7 @@
+v3.0.7
+================
+* Adding ability to pass strokeWidth down through seriesConfig to lines
+
 v3.0.6
 ================
 * Fix for many demos
