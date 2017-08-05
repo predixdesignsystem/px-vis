@@ -1,3 +1,8 @@
+v3.1.0
+================
+* Added PxVisBehavior.updateStylesOverride behavior
+* Added ability to dynamically update stuff drawn with css variable
+
 v3.0.7
 ================
 * Adding ability to pass strokeWidth down through seriesConfig to lines

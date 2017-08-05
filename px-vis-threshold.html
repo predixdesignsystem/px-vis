@@ -151,7 +151,8 @@ Custom property | Description
 
     observers: [
 
-      'drawElement(svg, y, domainChanged, completeSeriesConfig.*, thresholdData.*, width, margin.*, _animationFrameDone, language)'
+      'drawElement(svg, y, domainChanged, completeSeriesConfig.*, thresholdData.*, width, margin.*, _animationFrameDone, language)',
+      '_updateColors()'
      ],
 
     ready:function() {
@@ -402,6 +403,11 @@ Custom property | Description
         }
       }
       return Px.d3.format(format)(d.value) + title;
+    },
+
+    _updateColors: function() {
+      this._calcThemeOrConfig();
+      this._drawElementDebounced();
     }
   });
 </script>

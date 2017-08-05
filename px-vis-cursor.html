@@ -96,7 +96,8 @@ Custom property | Description
       PxVisBehaviorD3.clipPath,
       PxVisBehavior.mutedSeries,
       PxVisBehavior.dynamicConfigProperties,
-      PxVisBehavior.polarData
+      PxVisBehavior.polarData,
+      PxVisBehavior.updateStylesOverride
     ],
 
     /**
@@ -230,7 +231,8 @@ Custom property | Description
       'drawElement(svg,chartData.*,completeSeriesConfig.*, width, height)',
       '_cursorChange(tooltipData.*, _cursor)',
       '_addClipPath(clipPath)',
-      '_processOpacity(mutedSeries.*, completeSeriesConfig)'
+      '_processOpacity(mutedSeries.*, completeSeriesConfig)',
+      '_updateColors(_stylesUpdated)'
     ],
     ready: function() {
       this._watchConfigProperty('mutedOpacity', 0.3);
@@ -632,6 +634,16 @@ Custom property | Description
           this.setAttribute('opacity', opacity);
           this.setAttribute('stroke-opacity', strokeOpacity);
         });
+      }
+    },
+
+    _updateColors: function() {
+      if(this._doesD3HaveValues(this._hLines)) {
+        this._hLines.attr('stroke', this._checkThemeVariable("--px-vis-cursor-line-color", 'rgb(0,0,0)'));
+      }
+
+      if(this._doesD3HaveValues(this._vLines)) {
+        this._vLines.attr('stroke', this._checkThemeVariable("--px-vis-cursor-line-color", 'rgb(0,0,0)'));
       }
     }
   });

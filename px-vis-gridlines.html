@@ -61,7 +61,8 @@ Custom property | Description
           PxVisBehavior.commonMethods,
           PxVisBehaviorD3.axis,
           PxVisBehaviorD3.axisConfig,
-          PxVisBehaviorD3.domainUpdate
+          PxVisBehaviorD3.domainUpdate,
+          PxVisBehavior.updateStylesOverride
         ],
 
         /**
@@ -129,7 +130,8 @@ Custom property | Description
         },
 
         observers: [
-          'drawElement(domainChanged,axis,margin.*,length,svg)'
+          'drawElement(domainChanged,axis,margin.*,length,svg)',
+          '_setLineStyles(_stylesUpdated)'
         ],
 
 
@@ -222,7 +224,7 @@ Custom property | Description
                   .call(this._grid);
 
                 this._removeUncessaryElems(this._gridGroup);
-                this._setLineStyles(this._gridGroup,'line');
+                this._setLineStyles();
 
               } else {
                 this._gridGroup
@@ -231,7 +233,7 @@ Custom property | Description
                 .call(this._grid);
 
                 this._removeUncessaryElems(this._gridGroup);
-                this._setLineStyles(this._gridGroup,'line');
+                this._setLineStyles();
               }
             }
           },5);
@@ -250,11 +252,13 @@ Custom property | Description
          *
          * @method _drawElement
          */
-        _setLineStyles:function(elem,lines) {
-          elem.selectAll(lines)
-            .attr('fill','none')
-            .attr('stroke', this._checkThemeVariable("--px-vis-gridlines-color", 'rgb(125,125,125)'))
-            .attr('shape-rendering','crispEdges');
+        _setLineStyles:function() {
+          if(this._doesD3HaveValues(this._gridGroup)) {
+            this._gridGroup.selectAll('line')
+              .attr('fill','none')
+              .attr('stroke', this._checkThemeVariable("--px-vis-gridlines-color", 'rgb(125,125,125)'))
+              .attr('shape-rendering','crispEdges');
+          }
         }
     });
 </script>

@@ -81,7 +81,8 @@ Custom property | Description
       PxVisBehavior.completeSeriesConfig,
       PxVisBehavior.applyActionConfig,
       PxVisBehaviorD3.cursorIcon,
-      PxVisBehaviorD3.axisOrientation
+      PxVisBehaviorD3.axisOrientation,
+      PxVisBehavior.updateStylesOverride
     ],
 
     /**
@@ -211,7 +212,8 @@ Custom property | Description
       'recalcBrush(domainChanged)',
       '_setupActions(actionConfig.*)',
       '_setDragBehavior(cartesianDragBehavior, dragContainerElem)',
-      '_drawCursorIconAndGroup(svg, iconType)'
+      '_drawCursorIconAndGroup(svg, iconType)',
+      '_setBrushStyles(_stylesUpdated)'
     ],
 
     attached: function() {
@@ -314,15 +316,11 @@ Custom property | Description
           .on("end.brush", this.brushEnd.bind(this))
       );
 
-      b.selectAll("rect.selection")
-        .attr("fill", this._checkThemeVariable("--px-vis-axis-brush-fill-color", 'rgb(0,0,0)'))
-        .attr("fill-opacity", this._checkThemeVariable("--px-vis-axis-brush-fill-opacity", 0.3))
-        .attr("stroke", this._checkThemeVariable("--px-vis-axis-brush-outline-color", 'rgb(50,50,50)'));
-
       // save our references
       this._brushD3 = b;
       this._brushElem = b.node();
 
+      this._setBrushStyles();
       this._setupActions();
     },
 
@@ -337,6 +335,15 @@ Custom property | Description
           .on("start.brush", this.brushstart.bind(this))
           .on("end.brush", this.brushEnd.bind(this))
       );
+    },
+
+    _setBrushStyles: function() {
+      if(this._doesD3HaveValues(this._brushD3)) {
+        this._brushD3.selectAll("rect.selection")
+          .attr("fill", this._checkThemeVariable("--px-vis-axis-brush-fill-color", 'rgb(0,0,0)'))
+          .attr("fill-opacity", this._checkThemeVariable("--px-vis-axis-brush-fill-opacity", 0.3))
+          .attr("stroke", this._checkThemeVariable("--px-vis-axis-brush-outline-color", 'rgb(50,50,50)'));
+      }
     },
 
     _translateBrush: function() {

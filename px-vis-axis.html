@@ -89,7 +89,8 @@ Custom property | Description
           PxVisBehavior.truncating,
           PxVisBehaviorD3.domainUpdate,
           PxVisBehavior.preventInitialDrawing,
-          PxVisBehavior.isAttached
+          PxVisBehavior.isAttached,
+          PxVisBehavior.updateStylesOverride
         ],
 
         /**
@@ -260,7 +261,7 @@ Custom property | Description
         },
 
         observers: [
-          'drawElement(domainChanged, svg, axis, margin, width, height, disableTicks, _animationFrameDone, preventInitialDrawing, _isAttached)',
+          'drawElement(domainChanged, svg, axis, margin, width, height, disableTicks, _animationFrameDone, preventInitialDrawing, _isAttached, _stylesUpdated)',
           '_calcDrawnTicks(domainChanged)',
           'drawSeriesBars(completeSeriesConfig.*, titleDrawn)',
           '_muteSeriesBars(mutedSeries.*)',
@@ -442,8 +443,6 @@ Custom property | Description
          * @method drawElement
          */
         drawElement: function() {
-
-
           if(typeof this.preventInitialDrawing !== undefined && this.preventInitialDrawing === false) {
             this.debounce('drawaxis', function() {
 
