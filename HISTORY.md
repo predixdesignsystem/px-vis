@@ -1,3 +1,7 @@
+v3.1.2
+================
+* Fix radial grid dynamic theming
+
 v3.1.1
 ================
 * Remove stray logs
