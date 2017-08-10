@@ -385,13 +385,15 @@ Custom property | Description
       return this.type === 'vertical' ? 'height:' + (height - margin.bottom) + 'px': '';
     },
 
-
     _returnWidth: function(chartWidth, width, margin, type) {
-
-      return this.type === 'horizontal' ? 'width:' + chartWidth + 'px;': 'width:' + width + 'px;';
+      return this.type === 'horizontal' ? 'max-width:' + chartWidth + 'px;': 'width:' + width + 'px;';
     },
 
     _scrollBarsPresent: function() {
+      window.requestAnimationFrame(this._scrollBarsPresentAF.bind(this));
+    },
+
+    _scrollBarsPresentAF: function() {
       if(this.$$('#itemRepeat') && this._itemCount !== this.$$('#itemRepeat').renderedItemCount) {
         var b = false;
         if(this.type === 'vertical' &&
@@ -409,6 +411,10 @@ Custom property | Description
     },
 
     _scrollBarsPresentPie: function() {
+      window.requestAnimationFrame(this._scrollBarsPresentPieAF.bind(this));
+    },
+
+    _scrollBarsPresentPieAF: function() {
       //disable optimization for pie chart as we don't hit this function as
       //often and this helps making the register dynamically adjust
       //its scrollbars. we might want to revisit the scrollbar process in general
