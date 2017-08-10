@@ -1,3 +1,7 @@
+v3.1.3
+================
+* Moved returnStrokeWidth into different behavior
+
 v3.1.2
 ================
 * Fix radial grid dynamic theming
