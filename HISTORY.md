@@ -1,3 +1,7 @@
+v3.1.5
+================
+* Fix doc format for static analyzer
+
 v3.1.4
 ================
 * Fix horizontal reigister scrollbar check -- change setting width to max-width
