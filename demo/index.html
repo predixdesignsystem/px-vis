@@ -6,7 +6,7 @@
 <link rel="import" href="../../px-demo/px-demo-collection.html" />
 <link rel="import" href="summary-demo.html" />
 <!-- Import peer demo pages -->
-<link rel="import" href="px-vis-area-svg-demo.html"  defer />
+<!--<link rel="import" href="px-vis-area-svg-demo.html"  defer />
 <link rel="import" href="px-vis-axis-demo.html"  defer />
 <link rel="import" href="px-vis-axis-brush-demo.html"  defer />
 <link rel="import" href="px-vis-bar-svg-demo.html"  defer />
@@ -44,7 +44,9 @@
 <link rel="import" href="px-vis-striping-demo.html"  defer />
 <link rel="import" href="px-vis-svg-demo.html"  defer />
 <link rel="import" href="px-vis-threshold-demo.html"  defer />
-<link rel="import" href="px-vis-tooltip-demo.html"  defer />
+<link rel="import" href="px-vis-tooltip-demo.html"  defer />-->
+
+<link rel="import" href="px-vis-catalog.html"  defer />
 
 <!-- Demo DOM module -->
 <dom-module id="local-element-demo">
@@ -52,8 +54,8 @@
     <!-- Theme includes -->
     <style include="px-demo-styles" is="custom-style"></style>
     <style include="px-theme-styles" is="custom-style"></style>
-    <style include="px-dark-demo-theme-styles" is="custom-style"></style>
-    <style include="px-dark-theme-styles" is="custom-style"></style>
+    <!--<style include="px-dark-demo-theme-styles" is="custom-style"></style>
+    <style include="px-dark-theme-styles" is="custom-style"></style>-->
     <style include="px-vis-summary-demo-styles" is="custom-style"></style>
 
     <!-- Demo list/view change entrypoint -->
@@ -89,8 +91,8 @@
         value: function(){
           return [
             {
-              name: 'Overview',
-              tagName:'px-vis-overview'
+              name: 'catalog',
+              tagName:'px-vis-catalog'
             },{
               name:'px-vis-area-svg',
               tagName:'px-vis-area-svg-demo'
@@ -221,11 +223,32 @@
       * @type {String}
       */
      chosenDemoName: {
-       type: String
+       type: String,
+       observer: '_demoChosen'
      }
    },
    listeners: {
      'px-demo-active-should-change' : '_handleActiveChange'
+   },
+   created: function() {
+    this._loadedDemos = ['catalog'];
+   },
+   _demoChosen: function(newDemo) {
+    if (typeof newDemo === 'string' && this._loadedDemos.indexOf(newDemo) === -1) {
+      var pageName = null;
+      for (var i=0; i<this.demos.length; i++) {
+        if (this.demos[i].name === newDemo) {
+          pageName = this.demos[i].tagName + '.html';
+        }
+      }
+      if (!pageName) return;
+
+      this._loadedDemos.push(newDemo);
+      var url = this.resolveUrl(pageName);
+      this.importHref(url, null, function(){
+        console.log('Could not load demo ' + newDemo);
+      }, true);
+    }
    },
    _handleActiveChange: function(evt) {
      this.set('chosenDemoName', evt.detail.name);

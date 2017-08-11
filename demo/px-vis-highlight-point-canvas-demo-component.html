@@ -76,7 +76,8 @@
       label-position="center"
       complete-series-config="[[completeSeriesConfig]]"
       domain-changed="[[domainChanged]]"
-      prevent-series-bar>
+      prevent-series-bar
+      ticks="[[ticks]]">
     </px-vis-axis>
 
     <px-vis-axis
@@ -122,11 +123,8 @@
       chart-data="[[chartData]]">
     </px-vis-highlight-point-canvas>
 
-    <br />
-    <br />
-    <br />
-    <div>
-      <button on-click="highlightData" class="btn btn--primary u-mt-">Toggle Highlight Data</button>
+    <div style="margin-top:15px;">
+      <button on-click="highlightData" class="btn">Toggle Highlight Data</button>
     </div>
   </template>
 </dom-module>
@@ -186,48 +184,59 @@ Polymer({
     },
     chartExtents: {
       type: Object,
-      value: {'x': [1397102460000,1397219100000], 'y':[1,27]}
+      value: function(){return{'x': [1397102460000,1397219100000], 'y':[1,27]}}
     },
     margin: {
       type: Object,
-      value: {
-        "top": 10,
-        "right": 10,
-        "bottom": 50,
-        "left": 50
+      value: function(){
+        return {
+          "top": 10,
+          "right": 10,
+          "bottom": 50,
+          "left": 50
+        }
       }
     },
 
     crosshairData: {
       type: Object,
-      value: {
+      value: function(){
+        return {
           "rawData":[],
           "timeStamps":[]
+        }
       }
     },
 
      _crosshairData: {
       type: Object,
-      value: {
-          "rawData":[{
-            "x": 1397131620000,
-            "y": 6,
-            "y1": 15,
-            "y2": 21
-          },{
-            "x": 1397160780000,
-            "y": 10,
-            "y1": 8,
-            "y2": 3
-          }],
-          "timeStamps":[ 1397131620000, 1397160780000 ]
-      }
+      value: function(){
+          return {
+            "rawData": [{
+              "x": 1397131620000,
+              "y": 6,
+              "y1": 15,
+              "y2": 21
+            }, {
+              "x": 1397160780000,
+              "y": 10,
+              "y1": 8,
+              "y2": 3
+            }],
+            "timeStamps": [1397131620000, 1397160780000]
+          }}
+    },
+
+    ticks:{
+      type: Object,
+      value: function() {return {}}
     },
 
     canvasLayers: {
       type: Object,
       value: function() { return {}; }
     },
+
     canvasLayersConfig: {
       type: Object,
       value: function() { return {}; }
