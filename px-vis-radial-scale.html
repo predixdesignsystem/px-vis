@@ -50,6 +50,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       PxVisBehaviorD3.selectedDomain,
       PxVisBehavior.axisTypes,
       PxVisBehavior.chartExtents,
+      PxVisBehavior.amplitudeExtents,
       PxVisBehaviorD3.radialAxisConfig,
       PxVisBehaviorD3.domainUpdateNotify,
       PxVisBehavior.polarData
@@ -93,6 +94,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
       '_setYScale(width,margin,centerOffset)',
       '_generateChartExtents(chartData.*, amplitudeKeys)',
       '_generateChartExtents(chartExtents)',
+      '_generateChartExtents(amplitudeExtents)',
       '_currentDomain(x, y, _calculatedExtents)'
     ],
 
@@ -165,7 +167,19 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
               "y": (this.chartExtents && this.chartExtents.y) ? this.chartExtents.y : null
             },
             min = Infinity,
-            max = -Infinity;
+            max = -Infinity,
+            doMax = true;
+
+        /*
+          FOR POLAR
+          Min must be the min value, otherwise the angle is meaningless.
+          So if amplitudeExtents are provided, still search for a min, but use the provided extent as a default val. Max can be used normally
+        */
+        if(this.amplitudeExtents && this.amplitudeExtents.length === 2) {
+          min = this.amplitudeExtents[0] === 'dynamic' ? Infinity : this.amplitudeExtents[0];
+          max = this.amplitudeExtents[1] === 'dynamic' ? -Infinity : this.amplitudeExtents[1];
+          doMax = max === -Infinity ? true : false;
+        }
 
         if(!ext.y) {
           // go through all data and find min and max
@@ -173,7 +187,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
             for(var j = 0; j < this.chartData.length; j++) {
               if(this._isValidData(this.chartData[j][this.amplitudeKeys[i]])) {
                 min = Math.min(min, this.chartData[j][this.amplitudeKeys[i]]);
-                max = Math.max(max, this.chartData[j][this.amplitudeKeys[i]]);
+                max = doMax ? Math.max(max, this.chartData[j][this.amplitudeKeys[i]]) : max;
               }
             }
           }
@@ -181,6 +195,11 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
           // if all data is the same value, add 1 so we still get a range
           if(min === max){
             max += 1;
+          }
+
+          // if all data is the same value, add 1 so we still get a range
+          if(!this.radar && min < 0) {
+            min = 0;
           }
 
           ext.y = [min,max];

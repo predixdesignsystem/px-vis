@@ -1024,6 +1024,36 @@ PxVisBehavior.dataExtents = {
 
 /*
      Name:
+    PxVisBehavior.amplitudeExtents
+
+    Description:
+    Polymer behavior that provides a amplitudeExtents object to components.
+
+
+    @polymerBehavior PxVisBehavior.amplitudeExtents
+*/
+
+
+PxVisBehavior.amplitudeExtents = {
+  properties: {
+    /**
+    * Polar's equivalant to chartExtents. Adjusts the max to the given value and takes the min of the min value given and the data's min val: Math.min(amplitudeExtents[0], chartDataMin)
+    *
+    * Polar coords must start at the minimum value or else the angle is irrelevant. It also cannot be less than 0.
+    *
+    * ```
+    *  [minNumber, maxNumber]
+    * ```
+    */
+    amplitudeExtents: {
+      type: Array,
+      function() { return []; }
+    }
+  }
+};
+
+/*
+     Name:
     PxVisBehavior.events
 
     Description:
@@ -1870,12 +1900,12 @@ PxVisBehavior.toolbarConfig = {
        * {
        *   "customzoom": {
        *     "tooltipLabel": "zoom",          //label used for the tooltip for this button
-       *     "icon": "fa-search",             //font-awesome icon used for this button
-       *     "buttonGroup": 1,              //if a button is part of a button group then it
+       *     "icon": "px-vis:zoom-toolbar",   //icon to use for this button
+       *     "buttonGroup": 1,                //if a button is part of a button group then it
        * becomes blue when clicked and all other buttons with the same button group in the
        * same row become deselected (not blue)
        *     "selected": true,                //force this button to be selected at start
-       *     "actionConfig": {                //this config will be propagated to
+       *     "actionConfig": {                 //this config will be propagated to
        * px-vis-interaction-space
        *       "mousedown": "startZooming",   //key is an event, value is either a
        * predefined action defined in `actionMapping` in px-vis-interaction-space or a
@@ -1913,23 +1943,23 @@ PxVisBehavior.toolbarConfig = {
        *           "onClick": "function() { this.set(\"selectionType\", \"xy\");}"
        *         },
        *         "zoomIn": {
-       *           "icon": "fa-plus",
+       *           "icon": "px-vis:zoom-in",
        *           "tooltipLabel": "zoom in",
        *           "eventName": "px-vis-toolbar-zoom-in" //those events are vis specific
        * events and are automatically caught by the chart to do something
        *         },
        *         "zoomOut": {
-       *           "icon": "fa-minus",
+       *           "icon": "px-vis:zoom-out",
        *           "tooltipLabel": "zoom out",
        *           "eventName": "px-vis-toolbar-zoom-out"
        *         },
        *         "undoZoom": {
-       *           "icon": "fa-undo",
+       *           "icon": "px-vis:zoom-out-one-level",
        *           "tooltipLabel": "undo zoom",
        *           "eventName": "px-vis-toolbar-undo-zoom"
        *         },
        *         "resetZoom": {
-       *           "icon": "fa-expand",
+       *           "icon": "px-vis:full-screen",
        *           "tooltipLabel": "reset zoom to inital value",
        *           "eventName": "px-vis-toolbar-reset-zoom"
        *         }
