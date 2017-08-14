@@ -1483,32 +1483,14 @@ PxVisBehaviorChart.mutedAxes = {
 
 /*
     Name:
-    PxVisBehaviorChart.zooming
+    PxVisBehaviorChart.zoomGeneric
 
     Description:
-    Behavior providing properties and logic for chart zooming
-    @polymerBehavior PxVisBehaviorChart.zooming
+    Behavior providing some generic properties for zooming
+    @polymerBehavior PxVisBehaviorChart.zoomGeneric
 */
-PxVisBehaviorChart.zooming = [{
-
-  /*
-  * fires when the chart has been zoomed in or out. contains an object
-  * with 'x' and 'y' values, a 'reset' boolean flag and a 'panning' boolean
-  * - x: array containing the domain for X
-  * - y: when only 1 y axis is defined, array containing the domain for Y
-  *      when multi Y axis, object with 1 key per axis, each value being
-  * - reset: true if the event is a zoom reset, false otherwise
-  * - panning: true if the event comes from a panning action, false otherwise
-  * an array containing the domain for this specific axis
-  * @event px-vis-zoomed
-  */
-  /**
-   * Properties block, expose attribute values to the DOM via 'reflect'
-   *
-   * @property properties
-   * @type Object
-   */
-  properties: {
+PxVisBehaviorChart.zoomGeneric = [{
+   properties: {
     /**
      * Stack of previous zooms
      */
@@ -1534,20 +1516,66 @@ PxVisBehaviorChart.zooming = [{
       type: Number,
       value: 0.5
     },
-    /**
-     * Original extents before zooming if one of the axis is ordinal
-     */
-    _originalOrdinalExtents: {
-      type: Array
-    },
+
     _isPanning: {
       type: Boolean,
       value: false
     }
   },
-  observers: [
-    'zoom(extentsData)'
-  ],
+  zoomIn: function() {
+    this.set('extentsAction', 'zoom');
+    this._autoZoom(true);
+  },
+  zoomOut: function() {
+    this.set('extentsAction', 'zoom');
+    this._autoZoom(false);
+  },
+  _intSpaceStartPan: function() {
+    this.set('_isPanning', true);
+  },
+  _intSpaceStopPan: function() {
+    this.set('_isPanning', false);
+  }
+
+}, PxVisBehavior.extentsData];
+
+/*
+    Name:
+    PxVisBehaviorChart.zooming
+
+    Description:
+    Behavior providing properties and logic for chart zooming
+    @polymerBehavior PxVisBehaviorChart.zooming
+*/
+PxVisBehaviorChart.zooming = [{
+
+  /*
+  * fires when the chart has been zoomed in or out. contains an object
+  * with 'x' and 'y' values, a 'reset' boolean flag and a 'panning' boolean
+  * - x: array containing the domain for X
+  * - y: when only 1 y axis is defined, array containing the domain for Y
+  *      when multi Y axis, object with 1 key per axis, each value being
+  * - reset: true if the event is a zoom reset, false otherwise
+  * - panning: true if the event comes from a panning action, false otherwise
+  * an array containing the domain for this specific axis
+  * @event px-vis-zoomed
+  */
+
+  /**
+   * Properties block, expose attribute values to the DOM via 'reflect'
+   *
+   * @property properties
+   * @type Object
+   */
+  properties: {
+    /**
+     * Original extents before zooming if one of the axis is ordinal
+     */
+    _originalOrdinalExtents: {
+      type: Array
+    }
+  },
+
   listeners: {
     'px-vis-toolbar-reset-zoom': 'resetZoom',
     'px-vis-toolbar-zoom-in': 'zoomIn',
@@ -1556,6 +1584,10 @@ PxVisBehaviorChart.zooming = [{
     'px-vis-interaction-space-start-panning': '_intSpaceStartPan',
     'px-vis-interaction-space-stop-panning': '_intSpaceStopPan'
   },
+
+  observers: [
+    'zoom(extentsData)'
+  ],
 
   /**
    * Restore zoom to its previous value, do nothing if no previous value
@@ -1597,14 +1629,6 @@ PxVisBehaviorChart.zooming = [{
 
       this.set('_originalOrdinalExtents', [this.x.domain(), domains]);
     }
-  },
-  zoomIn: function() {
-    this.set('extentsAction', 'zoom');
-    this._autoZoom(true);
-  },
-  zoomOut: function() {
-    this.set('extentsAction', 'zoom');
-    this._autoZoom(false);
   },
   _autoZoom: function(isZoomIn) {
 
@@ -1781,13 +1805,7 @@ PxVisBehaviorChart.zooming = [{
       });
     this.fire('px-vis-zoomed', {x: this.x.domain(), y: domains, reset: isReset, panning: this._isPanning});
   },
-  _intSpaceStartPan: function() {
-    this.set('_isPanning', true);
-  },
-  _intSpaceStopPan: function() {
-    this.set('_isPanning', false);
-  },
-}, PxVisBehavior.extentsData, PxVisBehaviorD3.selectedDomain, PxVisBehavior.axisTypes, PxVisBehaviorD3.axes, PxVisBehavior.zoomSelection];
+}, PxVisBehavior.extentsData, PxVisBehaviorD3.selectedDomain, PxVisBehavior.axisTypes, PxVisBehaviorD3.axes, PxVisBehavior.zoomSelection, PxVisBehaviorChart.zoomGeneric];
 
 /*
     Name:

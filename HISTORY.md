@@ -1,3 +1,8 @@
+
+================
+* Fixed polar gridlines angle
+* Broke up zoom behavior to provide a more common import group
+
 v3.1.4
 ================
 * Fix horizontal reigister scrollbar check -- change setting width to max-width
