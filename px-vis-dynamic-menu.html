@@ -42,8 +42,8 @@ a configurable, dynamically built dropdown menu
         <div slot="dropdown-content" class="menu-wrapper">
           <ul class="menu-list">
             <template is="dom-repeat" items="{{dynamicMenuConfig}}" strip-whitespace>
-              <li class="menu-wrapper--item u-p--" on-tap="_clickItem" value="{{index}}">
-                <px-icon class="u-mr--" icon="[[item.icon]]"></px-icon>{{item.name}}
+              <li class="menu-wrapper--item u-p--" on-tap="_clickItem" value="[[index]]">
+                <px-icon class="u-mr--" value="[[index]]" icon="[[item.icon]]"></px-icon>{{item.name}}
               </li>
             </template>
           </ul>
@@ -169,9 +169,8 @@ a configurable, dynamically built dropdown menu
     },
     _clickItem: function(evt) {
 
-      var target = Polymer.dom(evt).rootTarget,
+      var target = Polymer.dom(evt).localTarget,
           item = this.dynamicMenuConfig[target.value];
-
       //if a function has been defined for this entry then run it
       if(item.action) {
 

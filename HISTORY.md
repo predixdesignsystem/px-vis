@@ -1,3 +1,7 @@
+v3.1.6
+================
+* Fix for dynamic menu icon
+
 v3.1.5
 ================
 * Fix doc format for static analyzer
