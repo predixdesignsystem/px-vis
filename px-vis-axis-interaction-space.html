@@ -300,6 +300,7 @@ Custom property | Description | Default
      *
      */
     _createBrush: function(range) {
+      if(this._isD3Empty(this.svg)) { return; }
       // create a new brush
       var b = this.svg.append("g")
         .attr("class", "interaction");
@@ -342,6 +343,7 @@ Custom property | Description | Default
     },
 
     _translateBrush: function() {
+      if(this._isD3Empty(this._brushD3)) { return; }
 
       var h = 0,
           w = 0;
@@ -362,6 +364,8 @@ Custom property | Description | Default
      *
      */
     _styleBrushSelection: function() {
+      if(this._isD3Empty(this._brushD3)) { return; }
+
       if(this.brushToRemove) {
         this._brushD3.selectAll("rect.selection")
           .attr("stroke-dasharray", ("5, 5"));
