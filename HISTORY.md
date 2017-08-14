@@ -1,3 +1,7 @@
+v2.1.10
+==================
+* Fix for scatter canvas muting bug
+
 v2.1.9
 ==================
 * Ensure properties of a predefined toolbar config can be overriden

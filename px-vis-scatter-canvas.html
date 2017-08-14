@@ -273,7 +273,6 @@ Element which draws a scatter series onto the chart
 
         // if we have previously drawn the same number of scatter as series, then let's start over; Clear the drawing canvas
         if(this.canvasContext._pxScatterRedraw >= this.canvasContext._pxScatterSeries.length) {
-
           //only cleared if nobody else already cleared us
           if(allowCanvasClearing && !this.canvasContext._pxScatterCleared) {
             // (x1,y1,x2,y2)
@@ -305,7 +304,7 @@ Element which draws a scatter series onto the chart
       this._currentDrawingOptions.symbol = Px.d3.symbol().type(this.markerMapping[this.markerSymbol]).size(this.markerSize * this.markerScale).context(this.canvasContext);
       this._currentDrawingOptions.muted = this.mutedSeries[this.seriesId];
       this._currentDrawingOptions.fillOpacity = this._currentDrawingOptions.muted  ? this.mutedOpacity : this.markerFillOpacity;
-      this._currentDrawingOptions.strokeOpacity = this._currentDrawingOptions.muted  ? 0 : this.markerStrokeOpacity;
+      this._currentDrawingOptions.strokeOpacity = this._currentDrawingOptions.muted ? 0 : this.markerStrokeOpacity;
       this._currentDrawingOptions.sameOpacity = this._currentDrawingOptions.fillOpacity === this._currentDrawingOptions.strokeOpacity;
       this._currentDrawingOptions.drawingFunction;
       this._currentDrawingOptions.oldAlpha = this.canvasContext.globalAlpha;
@@ -356,6 +355,9 @@ Element which draws a scatter series onto the chart
           'numberOfFrames': 1
         };
         this._renderOneBatch();
+      } else {
+        // See similar note in _renderProgressively
+        this.canvasContext._pxScatterCleared = false;
       }
 
       this._renderingEnded(false);
@@ -382,6 +384,14 @@ Element which draws a scatter series onto the chart
 
         //called every animation frame
         window.requestAnimationFrame(this._processOneBatchBound);
+      } else {
+        /*  I do not fully understand this, but if we have both a line and
+            scatter and scatter has 0 muted opacity, we have to set to false.
+            if we dont set to false, then we dont enter into our clear function
+            and then LINE-CANVAS clears the latest drawing. I dont fully
+            understand why, but not an issue in post DR.
+        */
+        this.canvasContext._pxScatterCleared = false;
       }
     },
 
