@@ -1,3 +1,8 @@
+v3.1.7
+================
+* Created new landing page for vis demos.
+* removed dark theme links from demo pages
+
 v3.1.6
 ================
 * Fix for dynamic menu icon
