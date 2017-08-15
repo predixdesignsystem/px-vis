@@ -1,3 +1,7 @@
+v2.1.11
+==================
+* Fix for dynamic menu icon
+
 v2.1.10
 ==================
 * Fix for scatter canvas muting bug
