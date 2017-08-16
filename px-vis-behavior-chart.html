@@ -1282,7 +1282,6 @@ PxVisBehaviorChart.circleChart = [{
     return Math.max(Math.min(height,width), 0);
   },
   _sizeChanged: function(_smallerSide, margin, internalMargin) {
-
       //measure appropriate width and height based on the smaller sides and margins
       var ml = Number(this.margin.left) + Number(this._internalCircleMargins.left),
           mr = Number(this.margin.right) + Number(this._internalCircleMargins.right),
@@ -1293,8 +1292,35 @@ PxVisBehaviorChart.circleChart = [{
           diameter = Math.min(adjWidth,adjHeight) ,
           radius = diameter / 2,
           center = [];
+
       center[0] = ml + adjWidth/2;
       center[1] = mt + adjHeight/2;
+
+      //For Polar, if we are zoomed, then we need to:
+      //  1) change the calculated vals for the entire stack
+      //  2) make the "new" radius and center our current zoom
+      if(!this.radar && this.zoomStack && this.zoomStack.length) {
+        var originalRadius = this.zoomStack[0]['radius'],
+            originalCenter = this.zoomStack[0]['center'],
+            end = this.zoomStack.length - 1;
+
+        // Dont start with first because that will be the above calc radius and center
+        for(var i = 1; i < this.zoomStack.length; i++) {
+          var s = this.zoomStack[i].radius / originalRadius,
+              r = s * radius,
+              c0 = this.zoomStack[i].center[0] / originalRadius * radius,
+              c1 = this.zoomStack[i].center[1] / originalRadius * radius;
+
+          this.zoomStack[i].radius = r;
+          this.zoomStack[i].center = [c0,c1];
+        }
+
+        this.zoomStack[0]['radius'] = radius;
+        this.zoomStack[0]['center'] = center;
+
+        radius = this.zoomStack[end]['radius'];
+        center = this.zoomStack[end]['center'];
+      }
 
       this.set('_diameter', diameter);
       this.set('_radius', radius);
@@ -1511,7 +1537,7 @@ PxVisBehaviorChart.extentsDataRouter = {
     var fn = this._extentsDataRoutes[this.extentsAction];
 
     if(!fn) {
-      console.warn("_extentsDataRoutes does not have a function to call " + this.extentsAction);
+      console.warn("_extentsDataRoutes does not have a method to call " + this.extentsAction);
       return;
     }
 

@@ -985,76 +985,113 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
         var mousePos = Px.d3.mouse(this._rect.node());
 
-        //for ordinal axis store mouse pos, for others the corresponding value
-        if(this.xAxisType === 'ordinal'||this.xAxisType === 'scaleBand') {
-          this._panningStartVal[0] = mousePos[0];
+        if(this.radial){
+          this._initializePanningRadial(mousePos);
         } else {
-          this._panningStartVal[0] = this.x.invert(mousePos[0]);
-        }
-
-        if(this.yAxisType === 'ordinal'||this.yAxisType === 'scaleBand') {
-          this._panningStartVal[1] = mousePos[1];
-        } else {
-          this._panningStartVal[1] = this._processYValues(function(axis, index) {
-            return axis.invert(mousePos[1]);
-          });
+          this.__initializePanning(mousePos);
         }
 
         this.fire('px-vis-interaction-space-start-panning');
       }
     },
+
+    _initializePanningRadial: function(mousePos) {
+      this._panningStartVal[0] = mousePos[0];
+      this._panningStartVal[1] = mousePos[1];
+    },
+
+    _initializePanning: function(mousePos) {
+      //for ordinal axis store mouse pos, for others the corresponding value
+      if(this.xAxisType === 'ordinal'||this.xAxisType === 'scaleBand') {
+        this._panningStartVal[0] = mousePos[0];
+      } else {
+        this._panningStartVal[0] = this.x.invert(mousePos[0]);
+      }
+
+      if(this.yAxisType === 'ordinal'||this.yAxisType === 'scaleBand') {
+        this._panningStartVal[1] = mousePos[1];
+      } else {
+        this._panningStartVal[1] = this._processYValues(function(axis, index) {
+          return axis.invert(mousePos[1]);
+        });
+      }
+    },
+
     _updatePanning: function() {
 
+      var newExtents,
+          mousePos = Px.d3.mouse(this._rect.node());
+
+        if(this.radial) {
+          newExtents = this._updatePanningCoordsRadial(mousePos);
+        } else {
+          newExtents = this._updatePanningCoords(mousePos);
+        }
+
+        this.set('extentsData', newExtents);
+    },
+
+    _updatePanningCoordsRadial: function(mousePos) {
+      return {
+        x1 : this._panningStartVal[0],
+        y1 : this._panningStartVal[1],
+        x2 : mousePos[0],
+        y2 : mousePos[1]
+      }
+    },
+
+    _updatePanningCoords: function(mousePos) {
       var newExtents = {},
-          mousePos = Px.d3.mouse(this._rect.node()),
           currentPanningVal,
           diff,
           xDomain = this.x.domain(),
           yDomain;
 
-        //for now ignore ordinal axis but allow panning along the other axis
-        //if it's not ordinal as well
-        //X
-        if(this.xAxisType !== 'ordinal' && this.xAxisType !== 'scaleBand') {
-          currentPanningVal = this.x.invert(mousePos[0]);
-          diff = currentPanningVal - this._panningStartVal[0];
-          newExtents.eX = [xDomain[0] - diff, xDomain[1] - diff];
-        } else {
-          newExtents.eX = xDomain;
-          this._adjustOrdinalAlign(this.x, mousePos[0], this._panningStartVal[0]);
-          //store mouse pos for next update
-          this._panningStartVal[0] = mousePos[0];
-        }
+      //for now ignore ordinal axis but allow panning along the other axis
+      //if it's not ordinal as well
 
-        //Y
-        if(this.yAxisType !== 'ordinal' && this.yAxisType !== 'scaleBand') {
+      //X
+      if(this.xAxisType !== 'ordinal' && this.xAxisType !== 'scaleBand') {
+        currentPanningVal = this.x.invert(mousePos[0]);
+        diff = currentPanningVal - this._panningStartVal[0];
+        newExtents.eX = [xDomain[0] - diff, xDomain[1] - diff];
+      } else {
+        newExtents.eX = xDomain;
+        this._adjustOrdinalAlign(this.x, mousePos[0], this._panningStartVal[0]);
+        //store mouse pos for next update
+        this._panningStartVal[0] = mousePos[0];
+      }
 
-          newExtents.eY = this._processYValues(function(axis, index) {
-            currentPanningVal = axis.invert(mousePos[1]);
-            diff = (index || index === 0) ? currentPanningVal - this._panningStartVal[1][index] : currentPanningVal - this._panningStartVal[1];
-            yDomain = axis.domain();
-            return [yDomain[0] - diff, yDomain[1] - diff];
-          });
-        } else {
-          //keep same domain and play on alignment for panning
-          newExtents.eY = this._processYValues(function(axis, index) {
-            //play on align to simulate panning
-            if(index || index === 0) {
-              this._adjustOrdinalAlign(axis, mousePos[1], this._panningStartVal[1][index]);
-              //store mouse pos for next update
-              this._panningStartVal[1][index] = mousePos[1];
-            } else {
-              this._adjustOrdinalAlign(axis, mousePos[1], this._panningStartVal[1]);
-              //store mouse pos for next update
-              this._panningStartVal[1] = mousePos[1];
-            }
-            //keep same domain
-            return axis.domain();
-          });
-        }
+      //Y
+      if(this.yAxisType !== 'ordinal' && this.yAxisType !== 'scaleBand') {
 
-        this.set('extentsData', newExtents);
+        newExtents.eY = this._processYValues(function(axis, index) {
+          currentPanningVal = axis.invert(mousePos[1]);
+          diff = (index || index === 0) ? currentPanningVal - this._panningStartVal[1][index] : currentPanningVal - this._panningStartVal[1];
+          yDomain = axis.domain();
+          return [yDomain[0] - diff, yDomain[1] - diff];
+        });
+      } else {
+        //keep same domain and play on alignment for panning
+        newExtents.eY = this._processYValues(function(axis, index) {
+          //play on align to simulate panning
+          if(index || index === 0) {
+            this._adjustOrdinalAlign(axis, mousePos[1], this._panningStartVal[1][index]);
+            //store mouse pos for next update
+            this._panningStartVal[1][index] = mousePos[1];
+          } else {
+            this._adjustOrdinalAlign(axis, mousePos[1], this._panningStartVal[1]);
+            //store mouse pos for next update
+            this._panningStartVal[1] = mousePos[1];
+          }
+          //keep same domain
+          return axis.domain();
+        });
+      }
+
+      return newExtents;
     },
+
     _adjustOrdinalAlign: function(axis, mousePos, initialMousePos) {
       var diff = (mousePos - initialMousePos)/2,
           step = axis.step(),

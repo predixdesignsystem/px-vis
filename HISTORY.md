@@ -2,6 +2,9 @@
 ================
 * Fixed polar gridlines angle
 * Broke up zoom behavior to provide a more common import group
+* Fixed cursor for polar
+* Implemented radial panning
+* Added checks to correct zoomStack on resize
 
 v3.1.4
 ================
