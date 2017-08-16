@@ -1481,6 +1481,50 @@ PxVisBehaviorChart.mutedAxes = {
   },
 };
 
+
+/*
+    Name:
+    PxVisBehaviorChart.extentsDataRouter
+
+    Description:
+    Behavior providing the extentsDataRouter
+    @polymerBehavior PxVisBehaviorChart.extentsDataRouter
+*/
+PxVisBehaviorChart.extentsDataRouter = {
+  properties: {
+    _extentsDataRoutes: {
+      type: Object,
+      value: function() {
+        return {
+          zoom: 'zoom',
+          pan: 'pan'
+        }
+      }
+    }
+  },
+
+  observers: [
+    '_extentsDataRouter(extentsData.*)'
+  ],
+
+  _extentsDataRouter: function() {
+    var fn = this._extentsDataRoutes[this.extentsAction];
+
+    if(!fn) {
+      console.warn("_extentsDataRoutes does not have a function to call " + this.extentsAction);
+      return;
+    }
+
+    if(!this[fn]) {
+      console.warn("Method " + fn + "is not defined");
+      return;
+    }
+
+    // run the function
+    this[fn]();
+  }
+};
+
 /*
     Name:
     PxVisBehaviorChart.zoomGeneric
@@ -1537,7 +1581,7 @@ PxVisBehaviorChart.zoomGeneric = [{
     this.set('_isPanning', false);
   }
 
-}, PxVisBehavior.extentsData];
+}, PxVisBehavior.extentsData, PxVisBehaviorChart.extentsDataRouter];
 
 /*
     Name:
@@ -1762,22 +1806,23 @@ PxVisBehaviorChart.zooming = [{
       return (axisType === 'time' || axisType === 'timeLocal') ? new Date(value) : value;
     }
   },
+
+  _zoomOrPan: function() {
+    this.set('selectedDomain', {x: this.extentsData.eX, y: this.extentsData.eY});
+    this.fire('px-vis-selected-domain-updated', { 'data':{x: this.extentsData.eX, y: this.extentsData.eY}, 'method': 'set', 'dataVar': 'selectedDomain' });
+    this._notifyZoomed(false);
+  },
   /**
    * Sets the selectedDomain to the drawn zoom and shows the button
    *
    */
-  zoom: function(extentsData) {
-    if(this.extentsAction !== 'zoom') {
-      return;
-    }
+  zoom: function() {
+    this._saveZoomState();
+    this._zoomOrPan()
+  },
 
-    if(!this._isPanning) {
-      this._saveZoomState();
-    }
-
-    this.set('selectedDomain', {x:extentsData.eX, y:extentsData.eY});
-    this.fire('px-vis-selected-domain-updated', { 'data':{x:extentsData.eX, y:extentsData.eY}, 'method': 'set', 'dataVar': 'selectedDomain' });
-    this._notifyZoomed(false);
+  pan: function() {
+    this._zoomOrPan();
   },
 
   /**
@@ -1785,7 +1830,6 @@ PxVisBehaviorChart.zooming = [{
    *
    */
   resetZoom: function() {
-
     //we still want to reset even if we were already reset, in case data has been filtered
     if(this.selectedDomain === 'reset') {
       this.set('selectedDomain', 'rereset');
@@ -1804,8 +1848,9 @@ PxVisBehaviorChart.zooming = [{
         return axis.domain();
       });
     this.fire('px-vis-zoomed', {x: this.x.domain(), y: domains, reset: isReset, panning: this._isPanning});
-  },
+  }
 }, PxVisBehavior.extentsData, PxVisBehaviorD3.selectedDomain, PxVisBehavior.axisTypes, PxVisBehaviorD3.axes, PxVisBehavior.zoomSelection, PxVisBehaviorChart.zoomGeneric];
+
 
 /*
     Name:
@@ -2599,7 +2644,7 @@ PxVisBehaviorChart.combineMutes = {
     }
     this.set('_combinedMutedSeries', muted);
     this.set('_combinedMutedChanged', this._combinedMutedChanged ? false : true);
-  },
+  }
 }
 
 </script>
