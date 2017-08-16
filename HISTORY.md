@@ -1,6 +1,10 @@
+v3.1.8
+================
+* Fix for sub-component demos to refer to shared API docs
+
 v3.1.7
 ================
-* Created new landing page for vis demos.
+* Created new landing page for vis demos
 * removed dark theme links from demo pages
 
 v3.1.6
