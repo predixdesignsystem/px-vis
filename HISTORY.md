@@ -5,6 +5,7 @@
 * Fixed cursor for polar
 * Implemented radial panning
 * Added checks to correct zoomStack on resize
+* Fix for cursor console error in FF when hovering over polar chart at 0
 
 v3.1.4
 ================
