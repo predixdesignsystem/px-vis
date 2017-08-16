@@ -1,3 +1,7 @@
+v3.1.9
+================
+* updated subcomponent links in demo
+
 v3.1.8
 ================
 * Fix for sub-component demos to refer to shared API docs
