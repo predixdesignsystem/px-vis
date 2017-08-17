@@ -250,10 +250,12 @@ PxVisBehaviorRenderer.base = [{
 
     this.listen(evt.rootTarget, 'px-vis-renderer-unregister', '_unregisterDrawingElement');
     e.stopPropagation();
-
+    console.log(e.detail.rendererType)
     // manually call after targets have registered
     if(e.detail.rendererType === 'chartData') {
       this._renderChartData();
+    } else if(e.detail.rendererType === 'filteredChartData') {
+      this._renderFilteredChartData();
     } else if(e.detail.rendererType === 'highlightData') {
       this._renderHighlight();
     }
