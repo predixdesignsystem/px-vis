@@ -242,7 +242,6 @@ PxVisBehaviorRenderer.base = [{
    */
   _registerDrawingElement: function(e) {
     var evt = Polymer.dom(e);
-
     if(e.detail.renderMode === 'canvas') {
       this._canvasTargets[e.detail.rendererType].push({'target': evt.rootTarget, 'type': e.detail.type});
     } else {
@@ -251,6 +250,13 @@ PxVisBehaviorRenderer.base = [{
 
     this.listen(evt.rootTarget, 'px-vis-renderer-unregister', '_unregisterDrawingElement');
     e.stopPropagation();
+
+    // manually call after targets have registered
+    if(e.detail.rendererType === 'chartData') {
+      this._renderChartData();
+    } else if(e.detail.rendererType === 'highlightData') {
+      this._renderHighlight();
+    }
   },
 
   /**
@@ -322,11 +328,17 @@ PxVisBehaviorRenderer.base = [{
   },
 
   _renderTypedContext: function(renderType, canvasesToClear) {
+    // we want the _canvasTargets to not be a link that can change mid debounce
+    var copy = [];
+    for(var i = 0; i < this._canvasTargets[renderType].length; i++) {
+      copy.push(this._canvasTargets[renderType][i]);
+    }
+
     var ctx = {
       'lastPointRenderedIndex': null,
       'currentBatchStartIndex': 0,
       'renderType': renderType,
-      'canvasTargets': this._canvasTargets[renderType],
+      'canvasTargets': copy,
       'svgTargets': this._svgTargets[renderType],
       'canvasToClear': canvasesToClear,
       'drawDebounceTime': this.drawDebounceTime[renderType]
@@ -338,7 +350,11 @@ PxVisBehaviorRenderer.base = [{
   },
 
   _renderChartData: function() {
-    this._renderTypedContext('chartData', [this.canvasContext]);
+    this.debounce('renderChartData', function() {
+      if(this.chartData.length) {
+        this._renderTypedContext('chartData', [this.canvasContext]);
+      }
+    }, 10);
   },
 
   _renderFilteredChartData: function() {
