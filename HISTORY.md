@@ -1,3 +1,7 @@
+v3.1.11
+================
+* removed ge_logo from events demo
+
 v3.1.10
 ================
 * updated demos positioning and sass
