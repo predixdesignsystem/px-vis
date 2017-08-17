@@ -1,3 +1,7 @@
+v3.1.10
+================
+* updated demos positioning and sass
+
 v3.1.9
 ================
 * updated subcomponent links in demo
