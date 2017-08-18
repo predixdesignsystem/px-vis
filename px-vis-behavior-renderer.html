@@ -250,7 +250,7 @@ PxVisBehaviorRenderer.base = [{
 
     this.listen(evt.rootTarget, 'px-vis-renderer-unregister', '_unregisterDrawingElement');
     e.stopPropagation();
-    console.log(e.detail.rendererType)
+
     // manually call after targets have registered
     if(e.detail.rendererType === 'chartData') {
       this._renderChartData();
@@ -360,7 +360,11 @@ PxVisBehaviorRenderer.base = [{
   },
 
   _renderFilteredChartData: function() {
-    this._renderTypedContext('filteredChartData', [this.canvasContext]);
+    this.debounce('renderFilteredChartData', function() {
+      if(this._filteredData.length) {
+        this._renderTypedContext('filteredChartData', [this.canvasContext]);
+      }
+    }, 10);
   },
 
   _renderHighlight: function() {
