@@ -278,13 +278,14 @@ PxVisBehaviorScale.scale = [{
       wwInfo.isYAxisObject = typeof this.y === 'object'
 
       Px.vis.scheduler.process({
-            'action': 'determineExtents',
-            'originatorName': this.nodeName,
-            'chartId': this.chartId,
-            'data': wwInfo,
-            'successCallback': function(e) {
-              this._applyExtents(e.data);
-            }.bind(this)});
+        'action': 'determineExtents',
+        'originatorName': this.nodeName,
+        'chartId': this.chartId,
+        'data': wwInfo,
+        'successCallback': function(e) {
+          this._applyExtents(e.data);
+        }.bind(this)
+      });
     }.bind(this), 10);
   },
 
@@ -502,11 +503,11 @@ PxVisBehaviorScale.scale = [{
     }
     for(j = 0; j < jLen; j++) {
       //make sure we're dealing with numbers
-      xVal = (typeof(data[j][x]) === 'string') ? parseFloat(data[j][x]) : data[j][x];
-      yVal = this._getDataExtents(data[j], keys);
+      xVal = this._getDataExtents(data[j], keys, 'x');
+      yVal = this._getDataExtents(data[j], keys, 'y');
 
       if(doX) {
-        this._processDataValues(ordX, result, data, 'x', x, j, doX0, doX1, xVal, xVal);
+        this._processDataValues(ordX, result, data, 'x', x, j, doX0, doX1, xVal[0], xVal[1]);
       }
       if(doY) {
         this._processDataValues(ordY, result, data, 'y', y, j, doY0, doY1, yVal[0], yVal[1]);
@@ -518,11 +519,11 @@ PxVisBehaviorScale.scale = [{
    * Goes through the data and extracts min and max values
    *
    */
-  _getDataExtents: function(d,yKeysArr) {
+  _getDataExtents: function(d,keysArr, axis) {
     var a = [];
-    for(var i = 0; i < yKeysArr.length; i++) {
-      var key = yKeysArr[i],
-          val = d[this.completeSeriesConfig[key]['y']];
+    for(var i = 0; i < keysArr.length; i++) {
+      var key = keysArr[i],
+          val = d[this.completeSeriesConfig[key][axis]];
 
       if(val || val === 0) {
         a.push(val);

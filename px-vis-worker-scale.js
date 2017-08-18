@@ -190,11 +190,11 @@ extentCalc._findMinMax = function _findMinMax(data, doX, doY, ordX, ordY, timeX,
     for(var i = 0; i < dLen; i++) {
       //make sure we're dealing with numbers
       // TODO xKeys and use _getDataExtents to support multi x keys on XY
-      xVal = (typeof(data[i][x]) === 'string') ? parseFloat(data[i][x]) : data[i][x];
-      yVal = this._getDataExtents(data[i], keys);
+      xVal = this._getDataExtents(data[i], keys, 'x');
+      yVal = this._getDataExtents(data[i], keys, 'y');
 
       if(doX) {
-        this._processDataValues(ordX, result, data, 'x', x, i, doX0, doX1, xVal, xVal);
+        this._processDataValues(ordX, result, data, 'x', x, i, doX0, doX1, xVal[0], xVal[1]);
       }
       if(doY) {
         this._processDataValues(ordY, result, data, 'y', y, i, doY0, doY1, yVal[0], yVal[1]);
@@ -207,11 +207,11 @@ extentCalc._findMinMax = function _findMinMax(data, doX, doY, ordX, ordY, timeX,
  * Goes through the data and extracts min and max values
  *
  */
-extentCalc._getDataExtents = function _getDataExtents(d,yKeysArr) {
+extentCalc._getDataExtents = function _getDataExtents(d,keysArr, axis) {
   var a = [];
-  for(var i = 0; i < yKeysArr.length; i++) {
-    var key = yKeysArr[i],
-        val = d[this.completeSeriesConfig[key]['y']];
+  for(var i = 0; i < keysArr.length; i++) {
+    var key = keysArr[i],
+        val = d[this.completeSeriesConfig[key][axis]];
 
     if(val || val === 0) {
       a.push(val);
