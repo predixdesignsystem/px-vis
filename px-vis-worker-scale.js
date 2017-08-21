@@ -189,7 +189,6 @@ extentCalc._findMinMax = function _findMinMax(data, doX, doY, ordX, ordY, timeX,
   if(doX || doY) {
     for(var i = 0; i < dLen; i++) {
       //make sure we're dealing with numbers
-      // TODO xKeys and use _getDataExtents to support multi x keys on XY
       xVal = this._getDataExtents(data[i], keys, 'x');
       yVal = this._getDataExtents(data[i], keys, 'y');
 

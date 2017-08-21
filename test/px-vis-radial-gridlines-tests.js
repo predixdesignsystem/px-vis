@@ -109,8 +109,8 @@ function runTests(){
       assert.equal(m3[1],"-150");
       assert.equal(m4[1],"-210");
       assert.equal(m5[1],"-240");
-      assert.equal(m6[1],"-310");
-      assert.equal(m7[1],"-340");
+      assert.equal(m6[1],"-300");
+      assert.equal(m7[1],"-330");
     });
 
     test('radialGrid circles are created', function() {
@@ -185,8 +185,8 @@ function runTests(){
       assert.equal(m3[1],"-150");
       assert.equal(m4[1],"-210");
       assert.equal(m5[1],"-240");
-      assert.equal(m6[1],"-310");
-      assert.equal(m7[1],"-340");
+      assert.equal(m6[1],"-300");
+      assert.equal(m7[1],"-330");
     });
 
     test('radialGrid circles are created', function() {
