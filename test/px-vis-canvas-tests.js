@@ -112,7 +112,7 @@ function runTests(){
         w = 400,
         h = 200;
 
-    suiteSetup(function(){
+    suiteSetup(function() {
       document.addEventListener('px-vis-canvas-context-updated',function(evt){
         eventObj = evt.detail;
       });
@@ -140,9 +140,6 @@ function runTests(){
     });
     test('updateCanvas eventObj has a dataVar var', function() {
       assert.equal(eventObj.dataVar , 'canvasContext');
-    });
-    test('updateCanvas eventObj has a method var', function() {
-      assert.equal(eventObj.method , 'set');
     });
   });
 
