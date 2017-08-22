@@ -1,3 +1,7 @@
+v2.2.0
+==================
+* Added useCategoryInTooltip
+
 v2.1.11
 ==================
 * Fix for dynamic menu icon
