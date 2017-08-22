@@ -2286,24 +2286,33 @@ PxVisBehaviorChart.categoryRegister = [{
   _computeCategoryRegisterConfig: function() {
     if(typeof(this.categoryKey) !== 'undefined') {
       var tooltipData = {},
-          config = {};
+          config = {},
+          currentCat,
+          catName;
       tooltipData.series = [];
 
       for(var i = 0; i < this.categories.length; i ++) {
 
-        //if config defined try to reuse color
-        if(this.completeSeriesConfig[this.categories[i].toString()]) {
-          config[this.categories[i].toString()] = {};
-          config[this.categories[i].toString()].name = this.categoryKey + ' - ' + this.categories[i].toString();
-          config[this.categories[i].toString()].color = this.completeSeriesConfig[this.categories[i].toString()].color ? this.completeSeriesConfig[this.categories[i].toString()].color : this._getColor(this.startColorIndex + i);
+        currentCat = this.categories[i].toString();
+        if(this.completeSeriesConfig[currentCat] && this.completeSeriesConfig[currentCat].name.toString() !== currentCat) {
+          catName = this.completeSeriesConfig[currentCat].name;
         } else {
-          config[this.categories[i].toString()] = {
-            'name': this.categoryKey + ' - ' + this.categories[i].toString(),
+          catName = this.categoryKey + ' - ' + currentCat;
+        }
+
+        //if config defined try to reuse color
+        if(this.completeSeriesConfig[currentCat]) {
+          config[currentCat] = {};
+          config[currentCat].name = catName;
+          config[currentCat].color = this.completeSeriesConfig[currentCat].color ? this.completeSeriesConfig[currentCat].color : this._getColor(this.startColorIndex + i);
+        } else {
+          config[currentCat] = {
+            'name': catName,
             "color": this._getColor(this.startColorIndex + i),
           };
         }
 
-        tooltipData.series.push({"name": this.categories[i].toString()})
+        tooltipData.series.push({"name": currentCat})
       }
 
       //set our confs
@@ -2582,6 +2591,29 @@ PxVisBehaviorChart.combineMutes = {
     this.set('_combinedMutedSeries', muted);
     this.set('_combinedMutedChanged', this._combinedMutedChanged ? false : true);
   },
+}
+
+/*
+    Name:
+    PxVisBehaviorChart.useCategoryInTooltip
+
+    Description:
+    Behavior providing useCategoryInTooltip property
+    @polymerBehavior PxVisBehaviorChart.useCategoryInTooltip
+*/
+PxVisBehaviorChart.useCategoryInTooltip = {
+  properties: {
+    /**
+     * Whether the tooltip should show the category name for each
+     * value rather than the axis name.
+     * Will use the category name if defined in seriesConfig, otherwise
+     * a string with the following formatting: 'categoryKey - category'
+     */
+    useCategoryInTooltip: {
+      type: Boolean,
+      value: false
+    }
+  }
 }
 
 </script>
