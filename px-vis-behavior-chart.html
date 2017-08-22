@@ -2277,19 +2277,26 @@ PxVisBehaviorChart.categoryRegister = [{
 
       for(var i = 0; i < this.categories.length; i ++) {
 
-        //if config defined try to reuse color
-        if(this.completeSeriesConfig[this.categories[i].toString()]) {
-          config[this.categories[i].toString()] = {};
-          config[this.categories[i].toString()].name = this.categoryKey + ' - ' + this.categories[i].toString();
-          config[this.categories[i].toString()].color = this.completeSeriesConfig[this.categories[i].toString()].color ? this.completeSeriesConfig[this.categories[i].toString()].color : this._getColor(this.startColorIndex + i);
+        currentCat = this.categories[i].toString();
+        if(this.completeSeriesConfig[currentCat] && this.completeSeriesConfig[currentCat].name.toString() !== currentCat) {
+          catName = this.completeSeriesConfig[currentCat].name;
         } else {
-          config[this.categories[i].toString()] = {
-            'name': this.categoryKey + ' - ' + this.categories[i].toString(),
+          catName = this.categoryKey + ' - ' + currentCat;
+        }
+
+        //if config defined try to reuse color
+        if(this.completeSeriesConfig[currentCat]) {
+          config[currentCat] = {};
+          config[currentCat].name = catName;
+          config[currentCat].color = this.completeSeriesConfig[currentCat].color ? this.completeSeriesConfig[currentCat].color : this._getColor(this.startColorIndex + i);
+        } else {
+          config[currentCat] = {
+            'name': catName,
             "color": this._getColor(this.startColorIndex + i),
           };
         }
 
-        tooltipData.series.push({"name": this.categories[i].toString()})
+        tooltipData.series.push({"name": currentCat})
       }
 
       //set our confs
