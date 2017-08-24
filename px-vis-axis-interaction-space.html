@@ -189,7 +189,9 @@ Custom property | Description
             'resetTooltipAndCrosshairData': '_resetTooltipAndCrosshairData',
             'resetTooltip': '_resetTooltipData',
             'resetCrosshair': '_resetCrosshairData',
-            'startZooming' : '_startZoom'
+            'startZooming' : '_startZoom',
+            'startPanning': '_startPanning',
+            'stopPanning': '_stopPanning'
           }
         }
       },
@@ -218,7 +220,11 @@ Custom property | Description
       _isDirty: {
         type: Boolean,
         value: false
-      }
+      },
+
+      _panningLastVal: {
+        type: Number
+      },
     },
 
     observers: [
@@ -515,6 +521,67 @@ Custom property | Description
       this._disableBrush();
       this._disableDrag();
       this._disableActions();
+    },
+
+
+// PANNING ###########################################################################################
+
+    /**
+     * Initiate Panning action
+     */
+    _startPanning: function() {
+      //only allow left clicks
+      if(Px.d3.event.button === 0) {
+        this.set('extentsAction', 'pan');
+
+        this._resetTooltipData();
+
+        //in case the user clicks inside the chart, and mouses out, we are waiting for a mouseup, and closing our action box with the coordinates available on the mouseup.
+        Px.d3.select(document).on('mouseup.action', this._stopPanning.bind(this));
+        Px.d3.select(document).on('mousemove.action', this._updatePanning.bind(this));
+
+        this._panningLastVal = Px.d3.mouse(this._brushElem)[1];
+
+        this.dispatchEvent(new CustomEvent('px-vis-interaction-space-start-panning', { bubbles: true, composed: true }));
+      }
+    },
+
+    _updatePanning: function() {
+      var mousePos = Px.d3.mouse(this._brushElem),
+          delta = this._panningLastVal - mousePos[1],
+          extents = {
+            dimension: this.dimension,
+            action: this.extentsAction,
+            extents: []
+          },
+          range = this._getRange();
+
+      extents.extents.push(range[0] + delta);
+      extents.extents.push(range[1] + delta);
+
+      this._panningLastVal = mousePos[1];
+
+      this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-extents-data', { bubbles: true, composed: true, detail: extents }));
+    },
+
+    _stopPanning: function() {
+      Px.d3.select(document).on('mouseup.action', null);
+      Px.d3.select(document).on('mousemove.action', null);
+
+      this.dispatchEvent(new CustomEvent('px-vis-interaction-space-stop-panning', { bubbles: true, composed: true }));
+
+    },
+
+    _getRange: function() {
+      var range;
+
+      if(typeof this.y === 'function') {
+        range = this.y.range();
+      } else {
+        range = this.y[this.dimension].range();
+      }
+
+      return range;
     },
 
 

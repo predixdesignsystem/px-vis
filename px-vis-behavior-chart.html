@@ -2824,8 +2824,7 @@ PxVisBehaviorChart.multiAxisZoom = [{
     'px-vis-toolbar-zoom-in': 'zoomIn',
     'px-vis-toolbar-zoom-out': 'zoomOut',
     'px-vis-toolbar-undo-zoom': 'undoZoom',
-    'px-vis-interaction-space-start-panning': '_intSpaceStartPan',
-    'px-vis-interaction-space-stop-panning': '_intSpaceStopPan'
+    'px-vis-interaction-space-start-panning': '_saveZoomState'
   },
 
   /**
@@ -2860,12 +2859,6 @@ PxVisBehaviorChart.multiAxisZoom = [{
     this.set('axesDomain', domains);
   },
 
-  _zoomRadar: function(extents) {
-    var y0 = this.y.invert(extents.extents[0]),
-        y1 = this.y.invert(extents.extents[1]);
-    return [y0, y1];
-  },
-
   _autoZoom: function(isZoomIn) {
     this._saveZoomState();
 
@@ -2897,6 +2890,7 @@ PxVisBehaviorChart.multiAxisZoom = [{
 
     //empty the zoom stack
     this.zoomStack = [];
-  },
+  }
+
 }, PxVisBehaviorChart.zoomGeneric];
 </script>

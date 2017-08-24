@@ -8,6 +8,7 @@ v4.0.0
   * None of these now calculate muted series
   * Generalized the axis interation space brush to fire an event with the brush extents
   * The event is expected to be caught at a "chart" level and processed by the PxVisBehaviorChart.extentsDataRouter
+* Added scale behavior for radar type charts
 * Added PxVisBehaviorChart.extentsDataRouter to handle all extentsData changes at the chart level
   * Routes to the appropriate callback for the extentsAction via the _extentsDataRoutes property
 * Fixed polar gridlines angle
