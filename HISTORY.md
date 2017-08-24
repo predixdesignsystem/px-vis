@@ -1,5 +1,15 @@
-
+v4.0.0
 ================
+* Implemented Zooming capabilities for:
+  * Polar charts
+  * Radar charts
+  * Parallel Coordinates charts
+* BREAKING CHANGE: Changed Axis Interaction Space, interactive axis, and multi axis
+  * None of these now calculate muted series
+  * Generalized the axis interation space brush to fire an event with the brush extents
+  * The event is expected to be caught at a "chart" level and processed by the PxVisBehaviorChart.extentsDataRouter
+* Added PxVisBehaviorChart.extentsDataRouter to handle all extentsData changes at the chart level
+  * Routes to the appropriate callback for the extentsAction via the _extentsDataRoutes property
 * Fixed polar gridlines angle
 * Broke up zoom behavior to provide a more common import group
 * Fixed cursor for polar

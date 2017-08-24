@@ -860,16 +860,6 @@ PxVisBehaviorChart.subConfiguration = {
 PxVisBehaviorChart.timeFiltering = [{
   properties: {
     /**
-     * Can be used to define a time domain to be used, typically to restrain/filter the amount
-     * of data displayed. Can be used in combination with a px-vis-chart-navigator
-     */
-    timeDomain: {
-      type: Object,
-      value: function() {
-        return [];
-      }
-    },
-    /**
      * Name of the variable holding the time stamp in the data
      */
     timeData: {
@@ -907,7 +897,7 @@ PxVisBehaviorChart.timeFiltering = [{
       return chartData;
     }
   }
-}, PxVisBehavior.dataset];
+}, PxVisBehavior.dataset, PxVisBehavior.timeDomain];
 
 /*
     Name:
@@ -1516,7 +1506,7 @@ PxVisBehaviorChart.mutedAxes = {
     Behavior providing the extentsDataRouter
     @polymerBehavior PxVisBehaviorChart.extentsDataRouter
 */
-PxVisBehaviorChart.extentsDataRouter = {
+PxVisBehaviorChart.extentsDataRouter = [{
   properties: {
     _extentsDataRoutes: {
       type: Object,
@@ -1542,14 +1532,14 @@ PxVisBehaviorChart.extentsDataRouter = {
     }
 
     if(!this[fn]) {
-      console.warn("Method " + fn + "is not defined");
+      console.warn("Method " + fn + " is not defined");
       return;
     }
 
     // run the function
     this[fn]();
   }
-};
+}, PxVisBehavior.extentsData];
 
 /*
     Name:
@@ -1654,10 +1644,6 @@ PxVisBehaviorChart.zooming = [{
     'px-vis-interaction-space-start-panning': '_intSpaceStartPan',
     'px-vis-interaction-space-stop-panning': '_intSpaceStopPan'
   },
-
-  observers: [
-    'zoom(extentsData)'
-  ],
 
   /**
    * Restore zoom to its previous value, do nothing if no previous value
@@ -2671,6 +2657,246 @@ PxVisBehaviorChart.combineMutes = {
     this.set('_combinedMutedSeries', muted);
     this.set('_combinedMutedChanged', this._combinedMutedChanged ? false : true);
   }
-}
+};
 
+/*
+    Name:
+    PxVisBehaviorChart.multiAxisMuting
+
+    Behavior for multi-axis charts (radar, parallel) to handle brush muting
+
+    Description:
+    Behavior providing property for muting axes
+    @polymerBehavior PxVisBehaviorChart.multiAxisMuting
+*/
+PxVisBehaviorChart.multiAxisMuting = [{
+  properties: {
+    _mutedExtents: {
+      type: Object,
+      value: function() {
+        return {};
+      }
+    }
+  },
+
+  ready: function() {
+    this._extentsDataRoutes['mute'] = '_addToMutedExtents';
+  },
+
+  _addToMutedExtents: function() {
+    this._mutedExtents[this.extentsData.dimension] = this.extentsData.extents;
+
+    this._calcMutedSeries();
+  },
+
+  _calcMutedSeries: function() {
+    var dims = Object.keys(this._mutedExtents),
+        mutedSeries = {},
+        brushDomains = {},
+        k;
+
+    for(var i = 0; i < dims.length; i++) {
+      k = dims[i];
+      this._calcSingleMutedSeries(this._mutedExtents[k], k, mutedSeries, brushDomains);
+    }
+
+    this.set('mutedSeriesBrush', mutedSeries);
+    this.set('brushDomains', brushDomains);
+  },
+
+  /**
+   * calc muted series based on the extents
+   */
+  _calcSingleMutedSeries: function(extents, dim, series, brushDomains) {
+    // if the brush has been cleared
+    if(!extents || extents.length === 0) {
+      return;
+    }
+
+    if(this.chartData && this.chartData.length > 0) {
+      var domain = [],
+          lower = 1,
+          upper = 0,
+          y0, y1;
+
+      if(this.radial) {
+        lower = 0;
+        upper = 1
+      }
+
+      y0 = this.y.invert(extents[lower]);
+      y1 = this.y.invert(extents[upper]);
+
+      for(var i = 0; i < this.chartData.length; i++) {
+        if(this.brushToRemove) {
+          if(y0 >= this.chartData[i][dim] && this.chartData[i][dim] >= y1) {
+            series[this.chartData[i][this.seriesKey]] = true;
+          }
+        } else {
+          if(y0 <= this.chartData[i][dim] || this.chartData[i][dim] <= y1) {
+            series[this.chartData[i][this.seriesKey]] = true;
+          }
+        }
+        domain = [y0, y1];
+      }
+
+      brushDomains[dim] = domain;
+    }
+  },
+
+  // _mutedSeriesFromBrush: function(evt) {
+  //   var dim = evt.detail.dimension,
+  //       ms = evt.detail.data;
+
+  //   this._mutedSeriesPerBrush[dim] = ms;
+
+  //   this._combineMutedSeries();
+  // },
+
+  // _combineMutedSeries: function() {
+  //   this.debounce('_combineMutedSeries', function() {
+
+  //     this._cleanUpMutedSeries();
+
+  //     var dims = Object.keys(this._mutedSeriesPerBrush),
+  //         series = {};
+
+  //     for(var i = 0; i < dims.length; i++) {
+  //       var d = dims[i];
+  //       this._addToMutedSeries(series, this._mutedSeriesPerBrush[d]);
+  //     }
+
+  //     //don't update if they're both empty
+  //     if(Object.keys(this.mutedSeries).length !== 0 || Object.keys(series).length !== 0) {
+  //       this.set('mutedSeries', series);
+  //     }
+  //   }, 50);
+  // },
+
+  // _addToMutedSeries: function(fullSeries, partialSeries) {
+  //   var mutedKeys = Object.keys(partialSeries);
+  //   for(var i = 0; i < mutedKeys.length; i++) {
+  //     var k = mutedKeys[i];
+
+  //     /*
+  //       To be a proper general solution, we should look at partialSeries[k] to see if it is true or false
+  //       We would have to also check fullSeries to see if it has k and if true or false
+
+  //       Instead, we are being lazy and just using the fact that axis brush always marks as true and
+  //       deletes if false.
+  //     */
+  //     fullSeries[k] = true;
+  //   }
+  // },
+
+  // _cleanUpMutedSeries: function() {
+  //   var dims = Object.keys(this._brushDomains);
+
+  //   for(var i = 0; i < dims.length; i++) {
+  //     var d = dims[i];
+  //     if(this._internalDimensions.indexOf(d) === -1) {
+  //       delete this._mutedSeriesPerBrush[d];
+  //       delete this._brushDomains[d];
+  //     }
+  //   }
+  // },
+
+  // _updateBrushDomains: function(e) {
+  //   this._brushDomains[e.detail.dimension] = e.detail.data;
+  // },
+
+  // _deleteBrushDomains: function(e) {
+  //   delete this._brushDomains[e.detail.dimension];
+  // },
+}, PxVisBehaviorChart.extentsDataRouter ];
+
+/*
+    Name:
+    PxVisBehaviorChart.multiAxisZoom
+
+    Description:
+    Behavior providing properties for zooming on multi-axis charts (radar, parallel)
+    @polymerBehavior PxVisBehaviorChart.multiAxisZoom
+*/
+PxVisBehaviorChart.multiAxisZoom = [{
+  listeners: {
+    'px-vis-toolbar-reset-zoom': 'resetZoom',
+    'px-vis-toolbar-zoom-in': 'zoomIn',
+    'px-vis-toolbar-zoom-out': 'zoomOut',
+    'px-vis-toolbar-undo-zoom': 'undoZoom',
+    'px-vis-interaction-space-start-panning': '_intSpaceStartPan',
+    'px-vis-interaction-space-stop-panning': '_intSpaceStopPan'
+  },
+
+  /**
+   * Sets the selectedDomain to the drawn zoom and shows the button
+   *
+   */
+  zoom: function() {
+    this._saveZoomState();
+    this._zoomOrPan();
+  },
+
+  pan: function() {
+    this._zoomOrPan();
+  },
+
+  _saveZoomState: function() {
+    var domains = this._processYValues(function(axis, index) {
+      return axis.domain();
+    });
+
+    this.zoomStack.push(domains);
+  },
+
+  _zoomOrPan: function() {
+    var exts = this.extentsData.extents,
+        domains = this._processYValues(function(axis, index) {
+        var y0 = axis.invert(exts[0]),
+            y1 = axis.invert(exts[1]);
+          return [y0, y1];
+        });
+
+    this.set('axesDomain', domains);
+  },
+
+  _zoomRadar: function(extents) {
+    var y0 = this.y.invert(extents.extents[0]),
+        y1 = this.y.invert(extents.extents[1]);
+    return [y0, y1];
+  },
+
+  _autoZoom: function(isZoomIn) {
+    this._saveZoomState();
+
+    var perc = isZoomIn? this.zoomInPercentage : 1 + this.zoomInPercentage,
+        domains = this._processYValues(function(axis, index) {
+          var d = axis.domain();
+          d[0] = d[0] * perc;
+          d[1] = d[1] * perc;
+          return d;
+        });
+
+    this.set('axesDomain', domains);
+  },
+
+  undoZoom: function() {
+    if(!this.zoomStack.length) { return; }
+
+    this.set('axesDomain', this.zoomStack.pop());
+  },
+
+  /**
+   * resets the extents
+   *
+   */
+  resetZoom: function() {
+    if(!this.zoomStack.length) { return; }
+
+    this.set('axesDomain', this.zoomStack[0]);
+
+    //empty the zoom stack
+    this.zoomStack = [];
+  },
+}, PxVisBehaviorChart.zoomGeneric];
 </script>

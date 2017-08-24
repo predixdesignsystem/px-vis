@@ -1372,7 +1372,7 @@ PxVisBehaviorD3.lineShared = [{
     */
     gradientRange: {
       type: Array,
-      computed: '_computeGradientRange(chartData.*,selectedDomain.*,seriesId)'
+      computed: '_computeGradientRange(chartData.*,timeDomain.*,seriesId)'
     },
     /**
     * Gets and saves the rgb so we can make an rgba to apply to the line
@@ -1454,12 +1454,12 @@ PxVisBehaviorD3.lineShared = [{
    * Computes the data range.
    *
    */
-  _computeGradientRange: function(chartData, selectedDomain,seriesId) {
+  _computeGradientRange: function(chartData, timeDomain,seriesId) {
     if(chartData.value.length > 0) {
       var x1,x2;
-      if(selectedDomain.value.x.length > 0) {
-        x1 = Number(selectedDomain.value.x[0]);
-        x2 = Number(selectedDomain.value.x[1]);
+      if(timeDomain.value && timeDomain.value.x && timeDomain.value.x.length > 0) {
+        x1 = Number(timeDomain.value.x[0]);
+        x2 = Number(timeDomain.value.x[1]);
       } else {
         x1 = Number(chartData.value[0][seriesId]);
         x2 = Number(chartData.value[chartData.value.length - 1][seriesId]);
@@ -1577,7 +1577,7 @@ PxVisBehaviorD3.lineShared = [{
 
     this.set('line',line);
   }
-},PxVisBehaviorD3.radialLineGenerator, PxVisBehavior.seriesId, PxVisBehaviorD3.lineGaps, PxVisBehaviorD3.interpolationFunction];
+},PxVisBehaviorD3.radialLineGenerator, PxVisBehavior.seriesId, PxVisBehaviorD3.lineGaps, PxVisBehaviorD3.interpolationFunction, PxVisBehavior.timeDomain];
 
 /*
     Name:

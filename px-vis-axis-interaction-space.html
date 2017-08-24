@@ -82,7 +82,8 @@ Custom property | Description
       PxVisBehavior.applyActionConfig,
       PxVisBehaviorD3.cursorIcon,
       PxVisBehaviorD3.axisOrientation,
-      PxVisBehavior.updateStylesOverride
+      PxVisBehavior.updateStylesOverride,
+      PxVisBehavior.extentsData
     ],
 
     /**
@@ -165,18 +166,31 @@ Custom property | Description
       /**
        * set of predefined action that can be used out of the box
        */
+      specialActionsList: {
+        type: Array,
+        value: function() {
+          return ['callAxisMute', 'callAxisDrag', 'startZooming'];
+        }
+      },
+
+      /**
+       * set of predefined action that can be used out of the box
+       */
       actionMapping: {
         type: Object,
         readOnly: true,
-        value: {
-          'callAxisBrush': '_enableBrush',
-          'callAxisDrag': '_enableDrag',
-          'calcTooltipData': '_calcTooltipData',
-          'calcCrosshairData': '_calcCrosshairData',
-          'calcTooltipAndCrosshairData': '_calcTooltipAndCrosshairData',
-          'resetTooltipAndCrosshairData': '_resetTooltipAndCrosshairData',
-          'resetTooltip': '_resetTooltipData',
-          'resetCrosshair': '_resetCrosshairData'
+        value: function() {
+          return {
+            'callAxisMute': '_startMute',
+            'callAxisDrag': '_enableDrag',
+            'calcTooltipData': '_calcTooltipData',
+            'calcCrosshairData': '_calcCrosshairData',
+            'calcTooltipAndCrosshairData': '_calcTooltipAndCrosshairData',
+            'resetTooltipAndCrosshairData': '_resetTooltipAndCrosshairData',
+            'resetTooltip': '_resetTooltipData',
+            'resetCrosshair': '_resetCrosshairData',
+            'startZooming' : '_startZoom'
+          }
         }
       },
 
@@ -190,8 +204,8 @@ Custom property | Description
         type: Object,
         value: function() {
           return {
-            'mousedown': 'callAxisBrush',
-            'mouseup': 'callAxisBrush',
+            'mousedown': 'callAxisMute',
+            'mouseup': 'callAxisMute',
             'mouseout': 'resetTooltip',
             'mousemove': 'calcTooltipData'
           };
@@ -347,7 +361,6 @@ Custom property | Description
     },
 
     _translateBrush: function() {
-
       var h = 0,
           w = 0;
       switch(this.orientation) {
@@ -407,15 +420,11 @@ Custom property | Description
           mouseEvent = null,
           action = null;
 
-      if(this.actionConfig["mousedown"] === "callAxisBrush" ||
-         this.actionConfig["mousedown"] === "callAxisDrag") {
-
+      if(this.specialActionsList.indexOf(this.actionConfig["mousedown"]) !== -1) {
         dontDoUpDown = true;
         mouseEvent = "mousedown";
 
-      } else if(this.actionConfig["mouseup"] === "callAxisBrush" ||
-                this.actionConfig["mouseup "] === "callAxisDrag") {
-
+      } else if(this.specialActionsList.indexOf(this.actionConfig["mouseup"]) !== -1) {
          dontDoUpDown = true;
          mouseEvent = "mouseup";
       }
@@ -442,6 +451,18 @@ Custom property | Description
           return 0;
         })
       );
+    },
+
+    _startMute: function() {
+      this.extentsAction = 'mute';
+
+      this._enableBrush();
+    },
+
+    _startZoom: function() {
+      this.extentsAction = 'zoom';
+
+      this._enableBrush();
     },
 
     _enableBrush: function() {
@@ -732,32 +753,42 @@ Custom property | Description
       .attr("width", 20);
     },
 
-    /**
-     * Update brush on a brush event
-     */
-    brush: function() {
-      var extents;
+    // /**
+    //  * Update brush on a brush event
+    //  */
+    // brush: function() {
+    //   var extents;
 
-      // if it was brushed, get the extents
-      if(Px.d3.brushSelection(this._brushElem)) {
-        extents = Px.d3.brushSelection(this._brushElem);
-      }
+    //   // if it was brushed, get the extents
+    //   if(Px.d3.brushSelection(this._brushElem)) {
+    //     extents = Px.d3.brushSelection(this._brushElem);
+    //   }
 
-      this._calcMutedSeries(extents);
-    },
+    //   var data = {
+    //     dimension: this.dimension,
+    //     extents: extents,
+    //     action: this.extentsAction
+    //   }
+    //   this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-extents-data', { bubbles: true, composed: true, detail: data }));
+    // },
 
     /**
      * Final update on a brush end event
      */
     brushEnd: function() {
-      var extents;
+      var extents = [];
 
       // if it was brushed, get the extents
       if(Px.d3.brushSelection(this._brushElem)) {
         extents = this._checkMinSize(Px.d3.brushSelection(this._brushElem), this._brushD3);
       }
 
-      this._calcMutedSeries(extents);
+      var data = {
+        dimension: this.dimension,
+        extents: extents,
+        action: this.extentsAction
+      }
+      this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-extents-data', { bubbles: true, composed: true, detail: data }));
     },
 
     /**
@@ -783,7 +814,12 @@ Custom property | Description
         this.drawElement();
 
         //create the muted list
-        this._calcMutedSeries(newBrushRange);
+        var data = {
+          dimension: this.dimension,
+          extents: newBrushRange,
+          action: this.extentsAction
+        }
+        this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-extents-data', { bubbles: true, composed: true, detail: data }));
 
       }
     },
@@ -806,57 +842,57 @@ Custom property | Description
       }
     },
 
-    /**
-     * calc muted series based on the extents
-     */
-    _calcMutedSeries: function(extents) {
-      // if the brush has been cleared
-      if(!extents || extents.length === 0) {
+    // /**
+    //  * calc muted series based on the extents
+    //  */
+    // _calcMutedSeries: function(extents) {
+    //   // if the brush has been cleared
+    //   if(!extents || extents.length === 0) {
 
-        this.fire('px-vis-brush-brush-domain-delete', { 'data': [], 'dimension': this.dimension });
+    //     this.fire('px-vis-brush-brush-domain-delete', { 'data': [], 'dimension': this.dimension });
 
-        this.set('mutedSeries', {});
-        this.fire('px-vis-brush-muted-series-updated', { 'data': {}, 'dimension': this.dimension });
+    //     this.set('mutedSeries', {});
+    //     this.fire('px-vis-brush-muted-series-updated', { 'data': {}, 'dimension': this.dimension });
 
-        return
-      }
+    //     return;
+    //   }
 
-      if(this.chartData && this.chartData.length > 0) {
-        var series = {},
-            domain = [],
-            lower = 1,
-            upper = 0,
-            dim = this.dimension,
-            y0, y1;
+    //   if(this.chartData && this.chartData.length > 0) {
+    //     var series = {},
+    //         domain = [],
+    //         lower = 1,
+    //         upper = 0,
+    //         dim = this.dimension,
+    //         y0, y1;
 
-        if(this.radial) {
-          lower = 0;
-          upper = 1
-        }
+    //     if(this.radial) {
+    //       lower = 0;
+    //       upper = 1
+    //     }
 
-        y0 = this.y.invert(extents[lower]);
-        y1 = this.y.invert(extents[upper]);
+    //     y0 = this.y.invert(extents[lower]);
+    //     y1 = this.y.invert(extents[upper]);
 
-        for(var i = 0; i < this.chartData.length; i++) {
-          if(this.brushToRemove) {
-            if(y0 <= this.chartData[i][dim] && this.chartData[i][dim] <= y1) {
-              series[this.chartData[i][this.seriesKey]] = true;
-            }
-          } else {
-            if(y0 >= this.chartData[i][dim] || this.chartData[i][dim] >= y1) {
-              series[this.chartData[i][this.seriesKey]] = true;
-            }
-          }
-          domain = [y0, y1];
-        }
+    //     for(var i = 0; i < this.chartData.length; i++) {
+    //       if(this.brushToRemove) {
+    //         if(y0 <= this.chartData[i][dim] && this.chartData[i][dim] <= y1) {
+    //           series[this.chartData[i][this.seriesKey]] = true;
+    //         }
+    //       } else {
+    //         if(y0 >= this.chartData[i][dim] || this.chartData[i][dim] >= y1) {
+    //           series[this.chartData[i][this.seriesKey]] = true;
+    //         }
+    //       }
+    //       domain = [y0, y1];
+    //     }
 
-        this.brushDomains[this.dimension] = domain;
-        this.fire('px-vis-brush-brush-domain-updated', { 'data': domain, 'dimension': this.dimension });
+    //     this.brushDomains[this.dimension] = domain;
+    //     this.fire('px-vis-brush-brush-domain-updated', { 'data': domain, 'dimension': this.dimension });
 
-        this.set('mutedSeries', series);
-        this.fire('px-vis-brush-muted-series-updated', { 'data': series, 'dimension': this.dimension });
-      }
-    },
+    //     this.set('mutedSeries', series);
+    //     this.fire('px-vis-brush-muted-series-updated', { 'data': series, 'dimension': this.dimension });
+    //   }
+    // },
 
     /**
      * Checks that the brush size is valid and within the domain
@@ -956,14 +992,16 @@ Custom property | Description
      */
     deleteAndClearBrush: function(elem) {
       this.clearBrush(elem);
-    //  this._calcMutedSeries(null);
+      this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-extents-clear', { bubbles: true, composed: true, detail: {dimension: this.dimension} }));
+
     },
 
     deleteBrush: function() {
       if(this._doesD3HaveValues(this._brushD3)) {
         //delete
         this._brushD3.call(this._brush.move, null);
-        this._calcMutedSeries(null);
+        this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-extents-clear', { bubbles: true, composed: true, detail: {dimension: this.dimension} }));
+
       }
     },
 
