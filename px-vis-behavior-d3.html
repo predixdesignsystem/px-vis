@@ -98,9 +98,14 @@ PxVisBehaviorD3.svg = [{
    * Draws the current svg into a canvas
    */
   _drawSVGOnCanvas: function(canvas, elem, callback, x, y) {
-    var svgData = elem.outerHTML;
+    var svgData = elem.outerHTML,
+        opacity = getComputedStyle(elem).getPropertyValue('opacity'),
+        oldAlpha = canvas.globalAlpha,
+        canvasContext = canvas.getContext('2d');
     x = x ? x : 0;
     y = y ? y : 0;
+
+    canvasContext.globalAlpha = opacity;
 
     //stupid IE can't get outerHTML of svg even though it's now a W3C spec
     if(!svgData) {
@@ -117,6 +122,7 @@ PxVisBehaviorD3.svg = [{
 
       //fallback on canvg
       this._drawCanvg(canvas, svgData, x, y, function() {
+        canvasContext.globalAlpha = oldAlpha;
         callback(this.resultCanvas);
       });
     }.bind(this);
@@ -129,10 +135,12 @@ PxVisBehaviorD3.svg = [{
 
         //ok no error were thrown, we can proceed
         this._nativeDrawSvgOnCanvas(canvas, svgData, x, y, function() {
+          canvasContext.globalAlpha = oldAlpha;
           callback(canvas);
         }, function() {
           //fallback on canvg
           this._drawCanvg(canvas, svgData, x, y, function() {
+            canvasContext.globalAlpha = oldAlpha;
             callback(this.resultCanvas);
           });
         }.bind(this));
@@ -140,6 +148,7 @@ PxVisBehaviorD3.svg = [{
 
         //fallback on canvg
         this._drawCanvg(canvas, svgData, x, y, function() {
+          canvasContext.globalAlpha = oldAlpha;
           callback(this.resultCanvas);
         });
       }
@@ -152,6 +161,7 @@ PxVisBehaviorD3.svg = [{
    * for the canvas, and draw on the canvas
    */
   _drawCanvg: function(canvas, svgData, x, y, callback) {
+    console.log('CANVG')
     var options = {ignoreDimensions: true,
                   ignoreClear: true,
                   renderCallback: callback,

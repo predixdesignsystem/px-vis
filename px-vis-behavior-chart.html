@@ -609,7 +609,13 @@ PxVisBehaviorChart.saveImage = [{
           if(target[0]) {
             if(!target[1]) {
               //canvas
-              canvas.getContext('2d').drawImage(target[0].canvas, 0, 0);
+              var opacity = getComputedStyle(target[0].canvas).getPropertyValue('opacity'),
+                  context = canvas.getContext('2d'),
+                  oldAlpha = context.globalAlpha;
+
+              context.globalAlpha = opacity;
+              context.drawImage(target[0].canvas, 0, 0);
+              context.globalAlpha = oldAlpha;
 
               //if we have more element keep drawing, else finish
               if(elementsToRender.length > 0) {
