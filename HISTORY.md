@@ -1,3 +1,8 @@
+v3.1.12
+================
+* fix opcaity in layers when exporting images
+* removed unused canvg import
+
 v3.1.11
 ================
 * removed ge_logo from events demo
