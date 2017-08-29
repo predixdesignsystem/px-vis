@@ -49,19 +49,18 @@
      * @method _setXScale
      */
     _setXScale: function(radius, useDegrees, forceRecreation) {
-      var range = [0, radius],
-          domain = this.useDegrees ? [0, 360] : [0, 2*Math.PI],
+      var range = this.useDegrees ? [0, 360] : [0, 2*Math.PI],
           x;
-
+debugger
       if(this.x && !forceRecreation) {
-        this.x.range(domain);
+        this.x.range(range);
 
         if(this.domainChanged !== null) {
           this.set('domainChanged', !this.domainChanged);
         }
 
       } else {
-        x = Px.d3.scalePoint().range(domain).padding(0.5).align(0);
+        x = Px.d3.scalePoint().range(range).padding(0.5).align(0);
         x._scaleType = "ordinal";
         this.set('x', x);
       }
@@ -71,13 +70,20 @@
      *
      * @method _setYScale
      */
-    _setYScale: function(radius,centerOffset) {
-      var range = [centerOffset, radius],
-          y = Px.d3.scaleLinear().nice().range(range);
+    _setYScale: function(radius,centerOffset, forceRecreation) {
+      var range = [centerOffset, radius];
 
-      y._scaleType = "linear";
+      if(this.y && !forceRecreation) {
+        this.y.range(range);
 
-      this.set('y', y);
+        if(this.domainChanged !== null) {
+          this.set('domainChanged', !this.domainChanged);
+        }
+      } else {
+        var y = Px.d3.scaleLinear().nice().range(range);
+        y._scaleType = "linear";
+        this.set('y', y);
+      }
     },
 
     _recreateScales: function() {
@@ -87,7 +93,7 @@
       }
 
       if(this.y) {
-        this._setYScale(this._radius, this.centerOffset);
+        this._setYScale(this._radius, this.centerOffset, true);
       }
     },
 

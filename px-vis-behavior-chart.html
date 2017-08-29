@@ -2701,7 +2701,7 @@ PxVisBehaviorChart.multiAxisMuting = [{
     }
 
     this.set('mutedSeriesBrush', mutedSeries);
-    this.set('brushDomains', brushDomains);
+    this.set('brushDomains.muted', brushDomains);
   },
 
   /**
@@ -2744,70 +2744,9 @@ PxVisBehaviorChart.multiAxisMuting = [{
     }
   },
 
-  // _mutedSeriesFromBrush: function(evt) {
-  //   var dim = evt.detail.dimension,
-  //       ms = evt.detail.data;
-
-  //   this._mutedSeriesPerBrush[dim] = ms;
-
-  //   this._combineMutedSeries();
-  // },
-
-  // _combineMutedSeries: function() {
-  //   this.debounce('_combineMutedSeries', function() {
-
-  //     this._cleanUpMutedSeries();
-
-  //     var dims = Object.keys(this._mutedSeriesPerBrush),
-  //         series = {};
-
-  //     for(var i = 0; i < dims.length; i++) {
-  //       var d = dims[i];
-  //       this._addToMutedSeries(series, this._mutedSeriesPerBrush[d]);
-  //     }
-
-  //     //don't update if they're both empty
-  //     if(Object.keys(this.mutedSeries).length !== 0 || Object.keys(series).length !== 0) {
-  //       this.set('mutedSeries', series);
-  //     }
-  //   }, 50);
-  // },
-
-  // _addToMutedSeries: function(fullSeries, partialSeries) {
-  //   var mutedKeys = Object.keys(partialSeries);
-  //   for(var i = 0; i < mutedKeys.length; i++) {
-  //     var k = mutedKeys[i];
-
-  //     /*
-  //       To be a proper general solution, we should look at partialSeries[k] to see if it is true or false
-  //       We would have to also check fullSeries to see if it has k and if true or false
-
-  //       Instead, we are being lazy and just using the fact that axis brush always marks as true and
-  //       deletes if false.
-  //     */
-  //     fullSeries[k] = true;
-  //   }
-  // },
-
-  // _cleanUpMutedSeries: function() {
-  //   var dims = Object.keys(this._brushDomains);
-
-  //   for(var i = 0; i < dims.length; i++) {
-  //     var d = dims[i];
-  //     if(this._internalDimensions.indexOf(d) === -1) {
-  //       delete this._mutedSeriesPerBrush[d];
-  //       delete this._brushDomains[d];
-  //     }
-  //   }
-  // },
-
-  // _updateBrushDomains: function(e) {
-  //   this._brushDomains[e.detail.dimension] = e.detail.data;
-  // },
-
-  // _deleteBrushDomains: function(e) {
-  //   delete this._brushDomains[e.detail.dimension];
-  // },
+  deleteMutedBrushes: function() {
+    this.set('_brushDomains.muted', {});
+  }
 }, PxVisBehaviorChart.extentsDataRouter ];
 
 /*
@@ -2893,4 +2832,5 @@ PxVisBehaviorChart.multiAxisZoom = [{
   }
 
 }, PxVisBehaviorChart.zoomGeneric];
+
 </script>
