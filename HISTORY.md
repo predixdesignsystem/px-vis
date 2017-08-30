@@ -1,7 +1,11 @@
-v3.1.13
+v3.1.14
 ================
 * Added capability for the sub toolbar to be displayed above the chart rather than on top (set `subToolbarAlignment` to 'above')
 * Can now close the subtoolbar by reclicking on its related main toolbar item
+
+v3.1.13
+================
+* fixed bug in multi-axis-demo-component
 
 v3.1.12
 ================
