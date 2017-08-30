@@ -52,9 +52,9 @@ Custom property | Description
       </span>
       <!--sub row-->
       <template id="templateSubRow" is="dom-if" if="[[_isWithinChart(withinChart)]]">
-        <span id="subRow" class$="flex subrow--container [[_getRowDirection(horizontalAlignment)]] [[_getSubRowClass(withinChart, subToolbarAlignment)]]">
+        <span id="subRow" class$="flex subrow--container [[_getRowDirection(horizontalAlignment)]] [[_getSubRowClass(subToolbarAlignment)]]">
           <template id="subRepeat" is="dom-repeat" items="{{currentSubConfig}}" strip-whitespace>
-              <span class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]]" on-tap="_clickSubItem" value="{{index}}">
+              <span class$="u-p- flex__item main-item subrow--item [[_getSelectedClass(item.selected)]]" on-tap="_clickSubItem" value="{{index}}">
                 <template is="dom-if" if="[[item.icon]]">
                   <px-icon class="icon"icon="[[item.icon]]" value="{{index}}"></px-icon>
                 </template>
@@ -82,6 +82,14 @@ Custom property | Description
       PxVisBehavior.commonMethods,
       PxVisBehavior.actionConfig
     ],
+
+
+    /**
+     * fired after the secondary toolbar has opened or closed. Details
+     * includes an `open` property reflecting whether the secondary
+     * toolbar is now open or closed
+     * @event px-vis-toolbar-secondary-toggled
+     */
 
     /**
      * Properties block, expose attribute values to the DOM via 'reflect'
@@ -402,6 +410,8 @@ Custom property | Description
        * alignment of the sub toolbar. Accepted values:
        * - horizontal
        * - vertical
+       * - above : when in a chart the sub toolbar will be displayed
+       * above the chart rather than on top of it
        */
       subToolbarAlignment: {
         type: String,
@@ -588,7 +598,9 @@ Custom property | Description
     _clickItem: function(evt) {
       evt = Polymer.dom(evt);
       var index = evt.localTarget.value,
-          conf = this._internalConfig[index];
+          conf = this._internalConfig[index],
+          alreadyOpened,
+          needNotify = false;
 
       //make it the current selection if it is in a buttonGroup
       if(conf.buttonGroup) {
@@ -608,14 +620,41 @@ Custom property | Description
           }
         }
 
-        // change styles on the new button
-        this.set('_internalConfig.#' + index + '.selected', true);
+        //toggle style on the new button
+        alreadyOpened = this._internalConfig[index].selected;
+        this.set('_internalConfig.#' + index + '.selected', !alreadyOpened);
       }
 
-      this._tryProcessSubConfig(conf);
-      this._processItem(conf);
 
-      this._tryApplySelectedSub(conf);
+      if(!alreadyOpened) {
+
+        if(!this.currentSubConfig || this.currentSubConfig.length === 0) {
+          needNotify = true;
+        }
+
+        //open sub toolbar
+        this._tryProcessSubConfig(conf);
+        this._processItem(conf);
+
+        this._tryApplySelectedSub(conf);
+      } else {
+
+        if(this.currentSubConfig !== []) {
+          needNotify = true;
+        }
+
+        //close subtoolbar
+        this.set('currentSubConfig', []);
+      }
+
+      if(needNotify) {
+
+        //make sure that the toolbar has been re rendered (i.e hidden or shown)
+        this.$.templateSubRow.render();
+
+        //tell the chart so it can resize
+        this.fire('px-vis-toolbar-secondary-toggled', {'open': this.currentSubConfig !== []});
+      }
     },
 
     _tryProcessSubConfig: function(conf) {
@@ -769,31 +808,31 @@ Custom property | Description
       this._alignRow(this.$$('#mainRow'));
     },
     _positionSubRow: function(withinChart, chartMargin, horizontalAlignement) {
-      if(withinChart) {
+      if(this.withinChart) {
 
         //make sure dom if is up to date
         this.$.templateSubRow.render();
 
-        this.$$('#subRow').style['margin-top'] = Number(chartMargin.top) + 'px';
+        this.$$('#subRow').style['margin-top'] = this.subToolbarAlignment === 'above' ? '0px' : Number(chartMargin.top) + 'px';
         this._alignRow(this.$$('#subRow'));
       }
     },
-    _getSubRowClass: function(withinChart, subToolbarAlignment) {
-      var base = withinChart ? 'subrow--chart ' : '';
+    _getSubRowClass: function(subToolbarAlignment) {
+      var base = this.subToolbarAlignment === 'above' ? '' : 'subrow--chart ';
 
-      if(subToolbarAlignment === 'horizontal') {
-        base += ' flex--row';
+      if(this.subToolbarAlignment === 'vertical') {
+        base += ' flex--col flex--bottom right ';
       } else {
-        base += ' flex--col flex--bottom';
+        base += ' flex--row';
       }
 
       return base;
     },
     _isWithinChart: function(withinChart) {
-      return withinChart;
+      return this.withinChart;
     },
     _getRowDirection: function(horizontalAlignment) {
-      if(horizontalAlignment === 'right') {
+      if(this.horizontalAlignment === 'right') {
         return 'flex--row--rev right ';
       } else {
         return 'flex--row ';

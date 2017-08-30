@@ -784,9 +784,20 @@ PxVisBehaviorChart.chartAutoResize = [{
         value: 250
       }
     },
+    listeners: {'px-vis-toolbar-secondary-toggled': '_secondaryToolbarToggled'},
     _preventResizeChanged: function() {
       if(!this.preventResize) {
         this.notifyResize();
+      }
+    },
+    _secondaryToolbarToggled: function() {
+      if(!this.preventResize) {
+
+        //ensure we bypass the debounce as we want to resize asap
+        var oldDebounce = this.debounceResizeTiming;
+        this.debounceResizeTiming = 0;
+        this.notifyResize();
+        this.debounceResizeTiming = oldDebounce;
       }
     },
     _getChartWrapperClass: function(hor, vert) {
