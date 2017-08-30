@@ -1,3 +1,7 @@
+v3.1.13
+================
+* fixed bug in multi-axis-demo-component
+
 v3.1.12
 ================
 * fix opcaity in layers when exporting images
