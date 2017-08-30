@@ -1,3 +1,7 @@
+v3.1.15
+================
+* updated px-vis-chart-navigator svg-canvas import
+
 v3.1.14
 ================
 * Added capability for the sub toolbar to be displayed above the chart rather than on top (set `subToolbarAlignment` to 'above')
