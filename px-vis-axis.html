@@ -509,7 +509,7 @@ Custom property | Description
             }.bind(this))
             .call(this._axis);
 
-          g.select("path.domain").attr("stroke", this._checkThemeVariable("--px-vis-axis-color", this.axisColor))
+          g.select("path.domain").attr("stroke", this.axisColor ? this.axisColor : this._checkThemeVariable("--px-vis-axis-color", 'black'))
           this.set('_axisGroup',g);
 
           this._setLineStyles(this._axisGroup,'line,path');
@@ -612,10 +612,10 @@ Custom property | Description
           // if we are not inline, apply default colors
           if(this.labelPosition !== 'inline') {
             elem.selectAll('text')
-              .attr('fill',this._checkThemeVariable("--px-vis-axis-color", this.axisColor));
+              .attr('fill', this.axisColor ? this.axisColor : this._checkThemeVariable("--px-vis-axis-color", 'black'));
 
             elem.selectAll('g.tick').selectAll("line")
-              .attr('stroke',this._checkThemeVariable("--px-vis-axis-color", this.axisColor));
+              .attr('stroke', this.axisColor ? this.axisColor : this._checkThemeVariable("--px-vis-axis-color", 'black'));
             }
 
           // if we are not default centering our label, then do calcs to figure out where to put it
@@ -647,7 +647,7 @@ Custom property | Description
                 return tickText.nodes()[i].getBoundingClientRect().width + 6
               })
               .attr('height', this.labelTypeSize + 4)
-              .attr('fill',this._checkThemeVariable("--px-vis-axis-inline-box-color", this.axisColor))
+              .attr('fill',this.axisColor ? this.axisColor : this._checkThemeVariable("--px-vis-axis-inline-box-color", 'black'))
               .attr('transform','rotate(' + this.labelRotation + ')');
 
               tickText.attr('fill', this._checkThemeVariable("--px-vis-axis-inline-type-color", 'rbg(255,255,255)'));
@@ -662,7 +662,7 @@ Custom property | Description
 
           elem.selectAll(lines)
             .attr('fill','none')
-            .attr('stroke', this._checkThemeVariable(theme, this.axisColor))
+            .attr('stroke', this.axisColor ? this.axisColor : this._checkThemeVariable(theme, 'black'))
             .attr('shape-rendering', 'crispEdges')
             .attr('stroke-width', this.strokeWidth);
         },
@@ -822,7 +822,7 @@ Custom property | Description
             var themeVar = (this.labelPosition === 'inline') ? "--px-vis-axis-inline-title-color" : "--px-vis-axis-title-color";
             this._titleGroup.append('text')
               .attr('class','axis-title')
-              .attr('fill',this._checkThemeVariable(themeVar, this.axisColor))
+              .attr('fill', this.axisColor ? this.axisColor : this._checkThemeVariable(themeVar, 'black'))
               .attr('font-size', this.titleTypeSize + 'px')
               .style('font-family',this._checkThemeVariable("--px-vis-font-family", 'Comic Sans MS'))
               .attr('font-style', this._checkThemeVariable("--px-vis-font-family", 'Comic Sans MS'))

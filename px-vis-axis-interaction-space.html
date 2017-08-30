@@ -170,7 +170,8 @@ Custom property | Description
         type: Object,
         value: function() {
           return {
-            'callAxisMute': 'muted'
+            'callAxisMute': 'muted',
+            'startZooming': 'zoom'
           };
         }
       },
@@ -208,8 +209,8 @@ Custom property | Description
         type: Object,
         value: function() {
           return {
-            'mousedown': 'callAxisMute',
-            'mouseup': 'callAxisMute',
+            'mousedown': null,
+            'mouseup': null,
             'mouseout': 'resetTooltip',
             'mousemove': 'calcTooltipData'
           };
@@ -1006,9 +1007,10 @@ Custom property | Description
 
 
       var key = this.brushActions[this.actionConfig.mousedown];
-      if(!key
-          || !this.brushDomains[key]
-          || this._isObjEmpty(this.brushDomains[key])) {
+
+      if(!key) { return; }
+      if(!this.brushDomains[key] ||
+          this._isObjEmpty(this.brushDomains[key])) {
 
         this._enableBrush();
         return;
