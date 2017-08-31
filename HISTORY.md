@@ -8,6 +8,14 @@ v4.0.0
   * None of these now calculate muted series
   * Generalized the axis interation space brush to fire an event with the brush extents
   * The event is expected to be caught at a "chart" level and processed by the PxVisBehaviorChart.extentsDataRouter
+  * Added two properties to axis interaction space which must be set with new toolbar types:
+    * specialActionsList: list of special actions that use brush or drag
+    * brushActions: object of actions which use a brush. Value is a string which is also used to store brushDomains
+  * Added an "unselected" brush box shown when you switch off of a toolbar brush action such as muting which shows a brush box that is not interactive
+    * Can be styled via CSS vars - type = brushActions value:
+      * --px-vis-axis-brush-fill-color-unselected-[[type]]
+      * --px-vis-axis-brush-fill-opacity-unselected-[[type]]
+      * --px-vis-axis-brush-outline-color-unselected-[[type]]
 * Added scale behavior for radar type charts
 * Added PxVisBehaviorChart.extentsDataRouter to handle all extentsData changes at the chart level
   * Routes to the appropriate callback for the extentsAction via the _extentsDataRoutes property
