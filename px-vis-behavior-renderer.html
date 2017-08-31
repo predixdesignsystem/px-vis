@@ -193,10 +193,10 @@ PxVisBehaviorRenderer.base = [{
       value: false
     }
   },
-
+  created: function() {
+    this.listen(this, 'px-vis-renderer-register', '_registerDrawingElement');
+  },
   attached: function() {
-
-    this.listen(this, 'px-vis-renderer-register', '_registerDrawingElement')
 
     this.listen(this, 'px-vis-highlight-data-changed', '_renderHighlight');
     this.listen(this, 'px-vis-redraw-lines', '_renderAllLines');
@@ -250,15 +250,6 @@ PxVisBehaviorRenderer.base = [{
 
     this.listen(evt.rootTarget, 'px-vis-renderer-unregister', '_unregisterDrawingElement');
     e.stopPropagation();
-
-    // manually call after targets have registered
-    if(e.detail.rendererType === 'chartData') {
-      this._renderChartData();
-    } else if(e.detail.rendererType === 'filteredChartData') {
-      this._renderFilteredChartData();
-    } else if(e.detail.rendererType === 'highlightData') {
-      this._renderHighlight();
-    }
   },
 
   /**
@@ -299,9 +290,6 @@ PxVisBehaviorRenderer.base = [{
    * Handlers for starting a render,. observers to be defined at the
    * chart level
    *****************************************************************/
-  _mutedChanged: function() {
-    this._renderChartData();
-  },
 
   _renderSeriesOnTop: function() {
     var targets = [],
@@ -352,19 +340,15 @@ PxVisBehaviorRenderer.base = [{
   },
 
   _renderChartData: function() {
-    this.debounce('renderChartData', function() {
-      if(this.chartData.length) {
-        this._renderTypedContext('chartData', [this.canvasContext]);
-      }
-    }, this.drawDebounceTime.chartData);
+    if(this.chartData.length) {
+      this._renderTypedContext('chartData', [this.canvasContext]);
+    }
   },
 
   _renderFilteredChartData: function() {
-    this.debounce('renderFilteredChartData', function() {
-      if(this._filteredData.length) {
-        this._renderTypedContext('filteredChartData', [this.canvasContext]);
-      }
-    }, this.drawDebounceTime.filteredChartData);
+    if(this._filteredData.length) {
+      this._renderTypedContext('filteredChartData', [this.canvasContext]);
+    }
   },
 
   _renderHighlight: function() {
