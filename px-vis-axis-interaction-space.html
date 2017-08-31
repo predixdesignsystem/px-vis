@@ -228,12 +228,16 @@ Custom property | Description
       _panningLastVal: {
         type: Number
       },
+
+      _unselectedBrushHolder: {
+        type: Object
+      }
     },
 
     observers: [
       'drawElement(svg, margin.* , height, domainChanged)',
       '_showBrushes(brushDomains.*, actionConfig.*, domainChanged)',
-      // 'recalcBrush(domainChanged)',
+      '_showUnselectedBrushes(actionConfig.*, domainChanged)',
       '_setupActions(actionConfig.*)',
       '_setDragBehavior(cartesianDragBehavior, dragContainerElem)',
       '_drawCursorIconAndGroup(svg, iconType)',
@@ -285,6 +289,9 @@ Custom property | Description
           if(this._doesD3HaveValues(this._brushD3)) {
             this._resizeBrush(range);
           } else {
+            this._unselectedBrushHolder = this.svg.append('g')
+              .attr('id', 'unselected-brushes');
+
             this._createBrush(range);
           }
 
@@ -1025,6 +1032,51 @@ Custom property | Description
       }
 
       this._enableBrush();
+    },
+
+    _showUnselectedBrushes: function() {
+      this.debounce('showUnselectedbrushes', function(){
+        this._showUnselectedBrushesDebounced();
+      }, 10);
+    },
+
+    _showUnselectedBrushesDebounced: function() {
+      if(this._isD3Empty(this._brushD3) ||
+          this.domainChanged === null ||
+          this._isObjEmpty(this.brushActions)) {
+        return;
+      }
+
+      var currentAction = this.brushActions[this.actionConfig.mousedown],
+          actions = Object.keys(this.brushActions);
+
+      // clear out brushes
+      this._unselectedBrushHolder.html(null);
+
+      actions.forEach(function(action) {
+        var key = this.brushActions[action];
+        // dont draw a fake brush for the currentAction b/c it gets a real brush
+        if(key === currentAction ||
+            !this.brushDomains[key] ||
+            !this.brushDomains[key][this.dimension] ||
+            this.brushDomains[key][this.dimension].length === 0) {
+          return;
+        }
+
+        var domains = this.brushDomains[key][this.dimension],
+            range = this._checkBrushSize(domains),
+            g = this._unselectedBrushHolder.append('g')
+                  .attr('id', 'unselected-' + key);
+
+        g.append('rect')
+          .attr('x', -10)
+          .attr('width', 20)
+          .attr('y', range[0])
+          .attr('height', range[1] - range[0])
+          .attr("fill", this._checkThemeVariable("--px-vis-axis-brush-fill-color-unselected-"+key, 'rgb(0,0,0)'))
+          .attr("fill-opacity", this._checkThemeVariable("--px-vis-axis-brush-fill-opacity-unselected-"+key, 0.1))
+          .attr("stroke", this._checkThemeVariable("--px-vis-axis-brush-outline-color-unselected-"+key, ''))
+      }.bind(this));
     },
 
     _drawCursorIconAndGroup: function() {
