@@ -2704,7 +2704,7 @@ PxVisBehaviorChart.multiAxisMuting = [{
       k = dims[i];
       this._calcSingleMutedSeries(this._mutedExtents[k], k, mutedSeries, brushDomains);
     }
-
+console.log(mutedSeries)
     this.set('mutedSeriesBrush', mutedSeries);
     this.set('brushDomains.muted', brushDomains);
   },
@@ -2720,17 +2720,22 @@ PxVisBehaviorChart.multiAxisMuting = [{
 
     if(this.chartData && this.chartData.length > 0) {
       var domain = [],
-          lower = 1,
-          upper = 0,
+          lower = 0,
+          upper = 1,
           y0, y1;
 
-      if(this.radial) {
-        lower = 0;
-        upper = 1
+      if(this._flipAxisLogic) {
+        lower = 1;
+        upper = 0
       }
 
-      y0 = this.y.invert(extents[lower]);
-      y1 = this.y.invert(extents[upper]);
+      if(typeof this.y === 'function') {
+        y0 = this.y.invert(extents[lower]);
+        y1 = this.y.invert(extents[upper]);
+      } else {
+        y0 = this.y[dim].invert(extents[lower]);
+        y1 = this.y[dim].invert(extents[upper]);
+      }
 
       for(var i = 0; i < this.chartData.length; i++) {
         if(this.brushToRemove) {
