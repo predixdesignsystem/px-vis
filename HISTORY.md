@@ -1,3 +1,7 @@
+v3.1.16
+================
+* clean up docs/comments
+
 v3.1.15
 ================
 * updated px-vis-chart-navigator svg-canvas import

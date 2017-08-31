@@ -7,7 +7,6 @@
 <link rel="import" href="css/px-vis-styles.html">
 
 <!--
-d3 element creating an axis for the chart
 
 ### Usage
 
@@ -187,30 +186,28 @@ Custom property | Description
      */
     properties: {
       /**
-       * A dictionary of g elems for each dimension
-       *
+       * A dictionary of g elements for each dimension.
        */
       _interactiveGroup: {
         type: Object
       },
 
       /**
-       * The string identifier for the axis
-       *
+       * The string identifier for the axis.
        */
       dimension: {
         type: String
       },
 
       /**
-       * Whether to append unit in brackets in axis title. e.g [Hz]
+       * Whether to append unit in brackets in axis title, e.g [Hz].
        */
       appendUnitInTitle: {
         type: Boolean,
         value: false
       },
       /**
-       * Array representing the actual displayed titles for each axis
+       * Array representing the actual displayed titles for each axis.
        */
       displayedValues: {
         type: Object,
@@ -221,28 +218,28 @@ Custom property | Description
       },
 
       /**
-       * Whether the axis ticks should be hidden and shown on hover or always shown
+       * Whether the axis ticks should be hidden and shown on hover, or always shown.
        */
       showTicksOnHover: {
         type: Boolean,
         value: false
       },
       /**
-       * Boolean to decide if all axes should get ticks or just one
+       * Boolean to decide if all axes or just one axis should get ticks.
        */
       disableTicks:{
         type: Boolean,
         value: false
       },
       /**
-       * Length of the axis
+       * Length of the axis.
        */
       length: {
         type: Number,
         value: null
       },
       /**
-       * Boolean controling if brushing should retain or delete series
+       * Boolean controlling if brushing should retain or delete series.
        */
       brushToRemove: {
         type: Boolean,
@@ -250,14 +247,14 @@ Custom property | Description
       },
 
       /**
-       * Force a redraw for titleLocation
+       * Force a redraw for titleLocation.
        */
       _pokeTitleLocation: {
         type: Boolean,
         value: false
       },
       /**
-       * Force a redraw if ticks
+       * Force a redraw if ticks.
        */
       recalcTicks: {
         type: Boolean,
@@ -281,7 +278,7 @@ Custom property | Description
         value: false
       },
       /**
-        * Boolean to specify not to draw the series bars
+        * Boolean to specify whether to draw the series bars.
         */
       preventSeriesBar: {
         type: Boolean,
@@ -317,7 +314,7 @@ Custom property | Description
         value: true
       },
       /**
-        * Object to pass in a brush domain
+        * Object to pass in a brush domain.
         */
       brushDomains: {
         type: Object,
@@ -393,8 +390,9 @@ Custom property | Description
 
 
     /**
-     * Generates a group elem for each dimension and moves it into the correct x coordinate
+     * Generates a group element for each dimension and moves it into the correct x coordinate.
      *
+     * @method _createGroup
      */
     _createGroup: function() {
       if(this._doesD3HaveValues(this.svg)) {
@@ -440,9 +438,10 @@ Custom property | Description
       return this.x(d) || this.x(d) === 0 ? "translate(" + this.x(d) + ",0)" : '';
     },
 
-    /*
-     * Sets styles and on hover states for common axis
+    /**
+     * Sets styles and on-hover states for common axis.
      *
+     * @method _setAxisStyles
      */
     _setAxisStyles: function(e) {
       if(this._interactiveGroup) {
