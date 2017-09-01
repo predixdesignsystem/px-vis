@@ -1,3 +1,7 @@
+v3.1.17
+================
+* Remove some line breaks to make sure all behaviors are included in the docs
+
 v3.1.16
 ================
 * clean up docs/comments
