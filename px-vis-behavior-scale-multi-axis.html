@@ -19,28 +19,6 @@ var PxVisBehaviorScale = PxVisBehaviorScale || {};
     @polymerBehavior PxVisBehaviorScale.scaleMultiAxis
 */
 PxVisBehaviorScale.scaleMultiAxis = [{
-    /**
-     * Properties block, expose attribute values to the DOM via 'reflect'
-     *
-     * @property properties
-     * @type Object
-     */
-    properties: {
-      _isAttached: {
-        type: Boolean
-      }
-    },
-
-    /**
-    * when attached, re-fire set properties for precipitation pattern
-    *
-    * @method attached
-    */
-    attached: function() {
-      // this.set('_isAttached', true);
-
-    },
-
     _recreateScales: function() {
       if(this.x) {
         this._setXScale(this.width, this.margin, true);
@@ -115,6 +93,22 @@ PxVisBehaviorScale.scaleMultiAxis = [{
           this.fire('px-vis-multi-domain-changed-updated', { 'dataVar': 'domainChanged', 'data': this.domainChanged, 'method':'set' });
         }, 5)
       }
+    },
+
+    /**
+     * When the domain gets set via a user interaction, set the scale function to use the new domain
+     *
+     * @method _updateDomain
+     */
+    _updateDomain: function(axesDomain) {
+      if(this._isObjEmpty(this.y) || this._isObjEmpty(axesDomain.value)) {
+        return;
+      }
+      var dims = Object.keys(axesDomain.value);
+      dims.forEach(function(dim) {
+        this.y[dim].domain(axesDomain.value[dim]);
+      }.bind(this))
+      this.set('domainChanged', !this.domainChanged);
     }
   },
   PxVisBehaviorD3.svg,

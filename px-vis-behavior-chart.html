@@ -2781,7 +2781,6 @@ PxVisBehaviorChart.multiAxisZoom = [{
    *
    */
   zoom: function() {
-    debugger
     this._saveZoomState();
     this._zoomOrPan();
   },
@@ -2800,11 +2799,16 @@ PxVisBehaviorChart.multiAxisZoom = [{
 
   _zoomOrPan: function() {
     var exts = this.extentsData.extents,
-        domains = this._processYValues(function(axis, index) {
-        var y0 = axis.invert(exts[0]),
-            y1 = axis.invert(exts[1]);
-          return [y0, y1];
-        });
+        domains;
+
+    if(typeof this.y === 'function') {
+      domains = [ this.y.invert(exts[0]), this.y.invert(exts[1]) ];
+
+    } else {
+      var dim = this.extentsData.dimension;
+      domains = {};
+      domains[dim] = [ this.y[dim].invert(exts[1]), this.y[dim].invert(exts[0]) ];
+    }
 
     this.set('axesDomain', domains);
   },
