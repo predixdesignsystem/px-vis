@@ -105,7 +105,6 @@ Custom property | Description
           label-type-size="[[labelTypeSize]]"
           stroke-width="[[strokeWidth]]"
           outer-tick-size="0"
-          tick-values="[[_calcTickVals(item, _internalDimensionsChanged)]]"
           truncation-length="[[truncationLength]]"
           complete-series-config="[[completeSeriesConfig]]"
           append-unit-in-title="[[appendUnitInTitle]]"
@@ -118,6 +117,7 @@ Custom property | Description
           label-position="[[labelPosition]]"
           axis-color="[[axisColor]]"
           ticks="[[ticks]]"
+          tick-values="[[_returnTickValues(item, tickValues.*)]]"
           label-rotation="[[labelRotation]]"
           label-translation="[[labelTranslation]]"
           series-on-axis="[[_returnSeriesArray(seriesToAxes, item)]]"
@@ -567,29 +567,7 @@ Custom property | Description
     _returnY: function(item){
       return this.singleDomain ? this.y : this.y[item]
     },
-    /**
-     * In order to make the ticks align, we iterate through and generate some round numbers for each axis
-     *
-     */
-    _calcTickVals: function(item) {
-      if(!this.y[item]){ return false }
 
-      if(this.matchTicks && !this.singleDomain) {
-        var d = this.y[item].domain(),
-            min = Math.floor(d[0]/10)*10,
-            max = Math.ceil(d[1]/10)*10,
-            diff = (max - min) / 10,
-            vals = [];
-
-        for(var i = 0; i < 11; i++){
-          vals.push(min + diff * i);
-        }
-
-        return vals;
-      }
-      // console.log("null")
-      return null;
-    },
     /**
      * Do the same thing for gridlines once
      *
@@ -597,23 +575,9 @@ Custom property | Description
     _calcDisableTicks: function(item) {
       if(this.labelOneAxis) {
         //check index of dimentions so it still works when we drag an axis
-        return this.dimensions.indexOf(item) === 0 ? false : true;
+        return this.dimensions[0] === item ? false : true;
       }
       return false;
-    },
-    /**
-     * Do the same thing for gridlines once
-     *
-     */
-    _calcGridTicks: function(dim){
-      this.set('gridTicks', this._calcTickVals(dim));
-    },
-    /**
-     * Do the same thing for gridlines axis
-     *
-     */
-    _calcGridAxis: function(dim){
-      this.set('gridAxis', this._returnY(dim));
     },
 
     /*
@@ -635,29 +599,7 @@ Custom property | Description
         var notFirst = this._internalDimensions ? true : false,
             dimsChanged = (notFirst && this.dimensions.join() === this._internalDimensions.join()) ? false : true;
 
-        //if match ticks, make sure the domains can be aligned
-        if(this.matchTicks && !this.singleDomain) {
-          this._normalizedTicks = true;
-          for(var i = 0; i < this.dimensions.length; i++) {
-            var dim = this.dimensions[i],
-                d = this.y[dim].domain(),
-                min = Math.floor(d[0]/10)*10,
-                max = Math.ceil(d[1]/10)*10;
-
-            this.y[dim].domain([min,max]);
-          }
-        }
-        // TODO Make match ticks dynamic
-        //if match ticks was flipped on and then off, undo our aligning
-        // if(this._normalizedTicks && !this.matchTicks) {
-        //   this._normalizedTicks = true;
-        //   // Reset the domains
-        // }
-
         this.set('_internalDimensions', this.dimensions);
-
-        this._calcGridTicks(this._internalDimensions[0]);
-        this._calcGridAxis(this._internalDimensions[0]);
 
         //don't force rendering the first time to have faster init
         if(dimsChanged && notFirst) {
@@ -670,7 +612,6 @@ Custom property | Description
 
       } else if(this.dimensions.length === 0 && this._internalDimensions && this._internalDimensions.length > 0) {
         this.set('_internalDimensions', []);
-        // this.$.bof.render();
         this.set('_internalDimensionsChanged', []);
       }
     },
@@ -818,6 +759,12 @@ Custom property | Description
       }
 
       return index === 0 ? false : true;
+    },
+
+    _returnTickValues: function(item, tickValues) {
+      if(this.tickValues) {
+        return this.tickValues[item];
+      }
     }
   });
 </script>

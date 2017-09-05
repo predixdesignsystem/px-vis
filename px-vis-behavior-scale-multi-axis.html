@@ -186,13 +186,33 @@ PxVisBehaviorScale.scaleMultiAxis = [{
             if(!this.y[dims[i]]) {
               return;
             }
+
             this.y[dims[i]].domain(exts.y[dims[i]]);
+
+            // if match ticks, make sure the domains can be aligned
+            // have to set our domain first sadly
+            if(this.matchTicks && !this.commonAxis) {
+              this._squareOffTicks(this.y[dims[i]], dims[i]);
+            }
+
           }
           this.x.domain(exts.x);
 
           this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
           this.fire('px-vis-multi-domain-changed-updated', { 'dataVar': 'domainChanged', 'data': this.domainChanged, 'method':'set' });
         }, 5)
+      }
+    },
+
+    _squareOffTicks: function(scale, dim) {
+      var ticks = scale.ticks();
+
+      if(scale.ticks.length !== 11) {
+        var d = scale.domain(),
+            min = Math.floor(d[0]/10)*10,
+            max = Math.ceil(d[1]/10)*10;
+
+        scale.domain([min,max]);
       }
     },
 
@@ -205,10 +225,10 @@ PxVisBehaviorScale.scaleMultiAxis = [{
       if(this._isObjEmpty(this.y) || this._isObjEmpty(axesDomain.value)) {
         return;
       }
-      var dims = Object.keys(axesDomain.value);
-      dims.forEach(function(dim) {
+
+      Object.keys(axesDomain.value).forEach(function(dim) {
         this.y[dim].domain(axesDomain.value[dim]);
-      }.bind(this))
+      }.bind(this));
       this.set('domainChanged', !this.domainChanged);
     }
   },
