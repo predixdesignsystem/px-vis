@@ -1,3 +1,7 @@
+v2.2.1
+==================
+* ensure muteunmute behavior is always loaded for completeSeriesConfig
+
 v2.2.0
 ==================
 * Added useCategoryInTooltip
