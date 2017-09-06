@@ -2209,13 +2209,34 @@ PxVisBehavior.waitForAnimationFrame = {
 };
 
 /*
+    PxVisBehavior.actionConfigGeneric
+
+    Description:
+    Behavior providing the actionConfig property
+    @polymerBehavior PxVisBehavior.actionConfigGeneric
+*/
+PxVisBehavior.actionConfigGeneric = {
+  properties: {
+    /**
+    * Configuration used to define what actions happen on events. Each key represents an event,
+    * each value can be:
+    * - a predefined action found in px-vis-interaction-space `actionMapping`
+    * - a function which context will be bound to the chart. The function argument will be the mouse position on the chart
+    */
+    actionConfig: {
+      type: Object
+    }
+  }
+};
+
+/*
     PxVisBehavior.applyActionConfig
 
     Description:
     Intended for the interaction spaces, method to apply the actionConfig to the listener elem
     @polymerBehavior PxVisBehavior.applyActionConfig
 */
-PxVisBehavior.applyActionConfig = {
+PxVisBehavior.applyActionConfig = [{
   /**
    * Set up normal listener actions
    *
@@ -2251,6 +2272,7 @@ PxVisBehavior.applyActionConfig = {
       } else if(typeof action === 'function') {
         toBeUsed = action;
       } else if(typeof action === 'string' && action && action != 'null') {
+        debugger
         toBeUsed = eval('var f = function() { return ' + action + ';}; f();');
       } else {
         toBeUsed = null;
@@ -2277,29 +2299,7 @@ PxVisBehavior.applyActionConfig = {
 
     }
   }
-};
-
-
-/*
-    PxVisBehavior.actionConfigGeneric
-
-    Description:
-    Behavior providing the actionConfig property
-    @polymerBehavior PxVisBehavior.actionConfigGeneric
-*/
-PxVisBehavior.actionConfigGeneric = {
-  properties: {
-    /**
-    * Configuration used to define what actions happen on events. Each key represents an event,
-    * each value can be:
-    * - a predefined action found in px-vis-interaction-space `actionMapping`
-    * - a function which context will be bound to the chart. The function argument will be the mouse position on the chart
-    */
-    actionConfig: {
-      type: Object
-    }
-  }
-};
+}, PxVisBehavior.actionConfigGeneric];
 
 
 /*
