@@ -491,9 +491,7 @@ PxVisBehaviorChart.webWorkerSynchronization = [{
       }
     },
     ready: function() {
-      if(!this.preventWebWorkerSynchronization) {
-        this.chartId = this.generateRandomID('chart');
-      }
+      this.chartId = this.generateRandomID('chart');
     },
     attached: function() {
       if(!this.preventWebWorkerSynchronization) {
@@ -1289,7 +1287,7 @@ PxVisBehaviorChart.circleChart = [{
       //For Polar, if we are zoomed, then we need to:
       //  1) change the calculated vals for the entire stack
       //  2) make the "new" radius and center our current zoom
-      if(!this.radar && this.zoomStack && this.zoomStack.length) {
+      if(this.polar && this.zoomStack && this.zoomStack.length) {
         var originalRadius = this.zoomStack[0]['radius'],
             originalCenter = this.zoomStack[0]['center'],
             end = this.zoomStack.length - 1;

@@ -35,17 +35,17 @@ PxVisBehaviorScale.scaleMultiAxis = [{
      */
     _setXScale: function(width, margin, forceRecreating) {
       var w = Math.max(width - margin.left - margin.right,0),
-          range = [0, w];
+          range = [0, w],
+          x;
 
       if(this.x && !forceRecreating) {
-        var oldDomain = this.x.domain();
-        this.x = Px.d3.scalePoint().range(range).domain(oldDomain).padding(0.5);
-      } else {
-        this.x = Px.d3.scalePoint().range(range).padding(0.5);
-      }
+        this.x.range(range);
 
-      this.notifyPath('x.range', this.x.range);
-      this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
+      } else {
+        x = Px.d3.scalePoint().range(range).padding(0.5);
+        this.set('x', x);
+        this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
+      }
     },
 
     /**
@@ -53,18 +53,25 @@ PxVisBehaviorScale.scaleMultiAxis = [{
      *
      * @method _setYScale
      */
-    _setYScale: function(height, margin, axes) {
+    _setYScale: function(height, margin, axes, forceRecreating) {
       var h = Math.max(height - margin.top - margin.bottom,0),
           range = [h, 0],
           newY = {};// y is an object with multiple scales
 
-      // iterate through the axes and create a scale for each; set them in the y obj with the axes as keys so we can easily access them again later
-      for(var i = 0; i < axes.length; i++){
-        newY[axes[i]] = Px.d3.scaleLinear().nice().range(range);
-      }
+      if(this.y && !forceRecreating) {
+        for(var i = 0; i < axes.length; i++) {
+          this.y[axes[i]].range(range);
+        }
 
-      this.set('y', newY);
-      this.fire('px-vis-y-updated', { 'dataVar': 'y', 'data': this.y, 'method':'set' });
+      } else {
+        // iterate through the axes and create a scale for each; set them in the y obj with the axes as keys so we can easily access them again later
+        for(var i = 0; i < axes.length; i++) {
+          newY[axes[i]] = Px.d3.scaleLinear().nice().range(range);
+        }
+
+        this.set('y', newY);
+        this.fire('px-vis-y-updated', { 'dataVar': 'y', 'data': this.y, 'method':'set' });
+      }
     },
 
     /**
@@ -179,6 +186,7 @@ PxVisBehaviorScale.scaleMultiAxis = [{
       if(this._doesObjHaveValues(this.x) &&
       this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.dataExtents)) {
         this.debounce('settingDomain', function() {
+
           var dims = this.dataExtents.x
               exts = this.dataExtents;
 
@@ -186,7 +194,6 @@ PxVisBehaviorScale.scaleMultiAxis = [{
             if(!this.y[dims[i]]) {
               return;
             }
-
             this.y[dims[i]].domain(exts.y[dims[i]]).nice();
 
             // if match ticks, make sure the domains can be aligned
