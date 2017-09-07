@@ -1,0 +1,162 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
+
+<script>
+  var PxVisBehaviorScale = PxVisBehaviorScale || {};
+
+  /*
+      Name:
+      PxVisBehaviorScale.radial
+
+      Description:
+      Polymer behavior that provides radial scales
+
+      Dependencies:
+      - D3.js
+
+      @polymerBehavior PxVisBehaviorScale.radial
+  */
+  PxVisBehaviorScale.radial = [{
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      /**
+      * Array of the amplitude keys.
+      *
+      */
+      amplitudeKeys: {
+        type: Array,
+        notify: true
+      },
+      /**
+      * Holder for the calculated extents.
+      *
+      */
+      _calculatedExtents: {
+        type: Object,
+        notify: true
+      }
+    },
+
+    /**
+     * Sets the y scale to multiple linear scales.
+     *
+     * @method _setYScale
+     */
+    _setYScale: function(width,margin,centerOffset) {
+      var range = [centerOffset, width],
+          y = Px.d3.scaleLinear().nice().range(range);
+
+      y._scaleType = "linear";
+
+      this.set('y', y);
+    },
+
+    _recreateScales: function() {
+      if(this.y) {
+        this._setYScale(this.width, this.margin, this.centerOffset);
+      }
+    },
+
+    /**
+     * Find overall data max and min.
+     *
+     * @method _generateChartExtents
+     */
+    _generateChartExtents: function() {
+      if(this.chartData && this.chartData.length > 0 && this._amplitudeKey && this._amplitudeKey.length > 0) {
+        var ext = null,
+            min = Infinity,
+            max = -Infinity,
+            doMin = true,
+            doMax = true;
+
+        /*
+          FOR POLAR
+          Min must be the min value, otherwise the angle is meaningless.
+          So if amplitudeExtents are provided, still search for a min, but use the provided extent as a default val. Max can be used normally
+        */
+        if(this.amplitudeExtents && this.amplitudeExtents.length === 2) {
+          min = this.amplitudeExtents[0] === 'dynamic' ? Infinity : this.amplitudeExtents[0];
+          max = this.amplitudeExtents[1] === 'dynamic' ? -Infinity : this.amplitudeExtents[1];
+
+          doMin = min === Infinity ? true : false;
+          doMax = max === -Infinity ? true : false;
+        }
+
+        if(doMin || doMax) {
+          // go through all data and find min and max
+          for(var i = 0; i < this._amplitudeKey.length; i++) {
+            for(var j = 0; j < this.chartData.length; j++) {
+              if(this._isValidData(this.chartData[j][this._amplitudeKey[i]])) {
+                min = doMin ? Math.min(min, this.chartData[j][this._amplitudeKey[i]]) : min;
+                max = doMax ? Math.max(max, this.chartData[j][this._amplitudeKey[i]]) : max;
+              }
+            }
+          }
+        }
+
+        // if all data is the same value, add 1 so we still get a range
+        if(min === max){
+          max += 1;
+        }
+
+        // if min is negative, set to 0
+        min = min < 0 ? 0 : min;
+
+        ext = [min,max];
+
+        this.set('_calculatedExtents',ext);
+      }
+    },
+
+    /**
+     * Calculates and sets the x and y domain after data loads.
+     *
+     * https://github.com/mbostock/d3/wiki/API-Reference
+     *
+     * @method _setDomain
+     */
+     _setDomain: function() {
+
+      this.debounce('_setDomain', function() {
+        // check to make sure there is data
+        if(this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this._calculatedExtents)){
+
+          var exts = this._calculatedExtents;
+
+          this.y.domain(exts.y);
+
+          /*
+            We dont actually need an x for Polar,
+            since we use the angle from the data directly
+            but various other components assume there will be an x
+            so just make a fake one to play nice
+          */
+          var domain = this.useDegrees ? [0, 360] : [0, 2*Math.PI];
+          this.x = Px.d3.scaleLinear().range([0,1]).domain(domain);
+
+          // Set the domains
+          this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+
+          this.fire('px-vis-domain-changed-updated', { 'dataVar': 'domainChanged', 'data': this.domainChanged, 'method':'set' });
+        }
+      }.bind(this), 10);
+    }
+  },
+    PxVisBehaviorD3.axes,
+    PxVisBehavior.sizing,
+    PxVisBehavior.dataset,
+    PxVisBehavior.commonMethods,
+    PxVisBehavior.axisTypes,
+    PxVisBehavior.amplitudeExtents,
+    PxVisBehaviorD3.radialAxisConfig,
+    PxVisBehaviorD3.domainUpdateNotify,
+    PxVisBehavior.polarData
+  ]
+</script>

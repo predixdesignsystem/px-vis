@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 v4.0.0
 ================
 * Implemented Zooming capabilities for:
@@ -17,6 +16,10 @@ v4.0.0
       * --px-vis-axis-brush-fill-color-unselected-[[type]]
       * --px-vis-axis-brush-fill-opacity-unselected-[[type]]
       * --px-vis-axis-brush-outline-color-unselected-[[type]]
+* BREAKING CHANGE: removed multi-axis-scale
+  * Replaced with multi-axis-scale behavior
+* BREAKING CHANGE: removed radial-scale
+  * Replaced with radial-scale behavior
 * Added scale behavior for radar type charts
 * Added PxVisBehaviorChart.extentsDataRouter to handle all extentsData changes at the chart level
   * Routes to the appropriate callback for the extentsAction via the _extentsDataRoutes property
@@ -29,7 +32,7 @@ v4.0.0
 * Fix for renderer to be dynamic:
   * clone the targets array so it cant be changed mid debounce
 * Fix for switching between svg and canvas at runtime
-=======
+
 v3.1.18
 ================
 * Fix for striping and the data returned by interaction space extentsData.
@@ -89,7 +92,6 @@ v3.1.6
 v3.1.5
 ================
 * Fix doc format for static analyzer
->>>>>>> master
 
 v3.1.4
 ================
