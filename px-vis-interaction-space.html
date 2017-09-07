@@ -1182,8 +1182,13 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
             if(this.xAxisType === 'ordinal'||this.xAxisType === 'scaleBand') {
               extents.eX = this._getOrdinalRange(true, extents.x1, extents.x2);
+
+            } else if(this.xAxisType === 'time' || this.xAxisType === 'timeLocal') {
+              extents.eX = [this.x.invert(extents.x1).getTime(), this.x.invert(extents.x2).getTime()];
+
             } else {
               extents.eX = [this.x.invert(extents.x1), this.x.invert(extents.x2)];
+
             }
 
             if(this.yAxisType === 'ordinal'||this.yAxisType === 'scaleBand') {

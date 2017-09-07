@@ -1,3 +1,8 @@
+v3.1.9
+================
+* Fix for striping and the data returned by interaction space extentsData.
+  * Now when on a time scale, will return epoch time rather than date obj.
+
 v3.1.8
 ================
 * Fix for sub-component demos to refer to shared API docs
