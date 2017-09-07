@@ -567,8 +567,13 @@ Custom property | Description
           },
           range = this._getRange();
 
-      extents.extents.push(range[0] + delta);
-      extents.extents.push(range[1] + delta);
+      if(this.radial) {
+        extents.extents.push(range[0] + delta);
+        extents.extents.push(range[1] + delta);
+      } else {
+        extents.extents.push(range[1] + delta);
+        extents.extents.push(range[0] + delta);
+      }
 
       this._panningLastVal = mousePos[1];
 
