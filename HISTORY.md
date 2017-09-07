@@ -1,7 +1,45 @@
-v3.1.9
+v3.1.18
 ================
 * Fix for striping and the data returned by interaction space extentsData.
   * Now when on a time scale, will return epoch time rather than date obj.
+
+v3.1.17
+================
+* Remove some line breaks to make sure all behaviors are included in the docs
+
+v3.1.16
+================
+* clean up docs/comments
+
+v3.1.15
+================
+* updated px-vis-chart-navigator svg-canvas import
+
+v3.1.14
+================
+* Added capability for the sub toolbar to be displayed above the chart rather than on top (set `subToolbarAlignment` to 'above')
+* Can now close the subtoolbar by reclicking on its related main toolbar item
+
+v3.1.13
+================
+* fixed bug in multi-axis-demo-component
+
+v3.1.12
+================
+* fix opcaity in layers when exporting images
+* removed unused canvg import
+
+v3.1.11
+================
+* removed ge_logo from events demo
+
+v3.1.10
+================
+* updated demos positioning and sass
+
+v3.1.9
+================
+* updated subcomponent links in demo
 
 v3.1.8
 ================

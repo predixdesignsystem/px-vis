@@ -6,7 +6,6 @@
 <link rel="import" href="css/px-vis-styles.html">
 
 <!--
-Element providing user interaction on an axis.
 
 ### Usage
     <px-vis-axis-interaction-space
@@ -113,13 +112,13 @@ Custom property | Description
       },
 
       /**
-       * holder for the original domain
+       * Holder for the original domain
        */
       _previousRange: {
         type: Array
       },
       /**
-       * holder for the brush
+       * Holder for the brush
        */
       _brush: {
         type: Object
@@ -161,7 +160,7 @@ Custom property | Description
       },
 
       /**
-       * set of predefined action that can be used out of the box
+       * Set of predefined actions that can be used out of the box
        */
       actionMapping: {
         type: Object,
@@ -182,7 +181,7 @@ Custom property | Description
       * Configuration used to define what actions happen on events. Each key represents an event,
       * each value can be:
       * - a predefined action found in px-vis-interaction-space `actionMapping`
-      * - a function which context will be bound to the chart. The function argument will be the mouse position on the chart
+      * - a function, where `this` will be bound to the chart and the function's argument will be the mouse position on the chart
       */
       actionConfig: {
         type: Object,
@@ -231,7 +230,7 @@ Custom property | Description
     },
 
     /**
-     * creates the drag behavior based on if we are a cartesian chart or a paraellel/radar chart
+     * Creates the drag behavior based on whether it is a cartesian chart or a parallel/radar chart
      *
      */
     _setDragBehavior: function() {
@@ -245,7 +244,7 @@ Custom property | Description
     /**
      * Creates the elements to listen to.
      *
-     * For simplicity, we just let d3.brush create the listener elems and control their size
+     * For simplicity, we just let d3.brush create the listener elements and control their size
      */
     drawElement: function() {
 
@@ -269,7 +268,7 @@ Custom property | Description
     },
 
     /**
-     * Calculates the range to pass to the brush. IE the size the brush will have
+     * Calculates the range to pass to the brush, i.e. the size the brush will have
      *
      */
     _calcRange: function() {
@@ -323,7 +322,7 @@ Custom property | Description
     },
 
     /**
-     * Resizes the brush elems
+     * Resizes the brush elements
      *
      */
     _resizeBrush: function(range) {
@@ -570,7 +569,7 @@ Custom property | Description
     /**
      * Creates the tooltipData & crosshairData
      *
-     * Takes the dimension (aid), the raw elem, and the mouse position
+     * Takes the dimension (aid), the raw element, and the mouse position
      */
     _calcSerieData: function(aid, elem, mousePos) {
       var mouseVal = this.y.invert(mousePos[1]), // the data space value
@@ -637,7 +636,7 @@ Custom property | Description
     },
 
     /**
-     * Builds our tooltipData obj from our results
+     * Builds the tooltipData object from the results
      *
      */
     _createTooltipData: function(aid, elem, mousePos, result) {
@@ -759,7 +758,7 @@ Custom property | Description
     },
 
     /**
-     * when new data is added or the chart is resized, recalc the brush and resize
+     * When new data is added or the chart is resized, recalculates the brush and resize
      */
     recalcBrush: function() {
       if(this._doesD3HaveValues(this._brushD3) && this.domainChanged !== null) {
@@ -787,7 +786,7 @@ Custom property | Description
     },
 
     /**
-     * check the min size of the brush and resize if necessary
+     * Checks the min size of the brush and resizes if necessary
      */
     _checkMinSize: function(sel, elem) {
       //check the size of the box and make sure it is some min
@@ -805,7 +804,7 @@ Custom property | Description
     },
 
     /**
-     * calc muted series based on the extents
+     * Calculates muted series based on the extents
      */
     _calcMutedSeries: function(extents) {
       // if the brush has been cleared
@@ -937,7 +936,7 @@ Custom property | Description
     },
 
     /**
-     * deletes a brush and clears listeners
+     * Deletes a brush and clears listeners
      */
     clearBrush: function(elem) {
       //clear listeners
@@ -950,7 +949,7 @@ Custom property | Description
     },
 
     /**
-     * deletes a brush and clears listeners
+     * Deletes a brush and clears listeners
      */
     deleteAndClearBrush: function(elem) {
       this.clearBrush(elem);

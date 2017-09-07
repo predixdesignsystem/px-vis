@@ -5,9 +5,7 @@
 <link rel="import" href="css/px-vis-styles.html">
 
 <!--
-Element which provides on-chart hover functionality to get data values near the mouse cursor and listen to mouse events on the chart.
-- Sets tooltipData property which can then be used to share adjacent datapoint values with other components, such as the register.
-
+Sets the tooltipData property, which can then be used to share adjacent datapoint values with other components, such as the register.
 
 ### Usage
 
@@ -75,21 +73,21 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehavior.wwDataSyncCounter,
       PxVisBehaviorD3.cursorIcon
     ],
-    /***EVENTS****
+    /***EVENTS****/
     /*
-    * fires an update to the interaction svg
+    * Fires an update to the interaction svg.
     * @event px-vis-interaction-svg-updated
     */
     /*
-    * fires an update to the tooltip
+    * Fires an update to the tooltip.
     * @event px-vis-tooltip-updated
     */
     /*
-    * fired when panning starts
+    * Fired when panning starts.
     * @event px-vis-interaction-space-start-panning
     */
     /*
-    * fired when panning stop
+    * Fired when panning stops.
     * @event px-vis-interaction-space-stop-panning
     */
 
@@ -101,14 +99,14 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      */
     properties: {
       /**
-       * Holder for the interaction rectangle object
+       * Holder for the interaction rectangle object.
        *
        */
       _rect:{
         type:Object
       },
       /**
-       * an object that contains meta data for the area drawn by the user
+       * An object that contains meta data for the area drawn by the user.
        *
        */
       _actionArea: {
@@ -117,7 +115,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       },
 
       /**
-       * The actual mouse svg rect which can be used to activate tooltip
+       * The actual mouse svg rectangle which can be used to activate the tooltip.
        *
        */
       mouseRect: {
@@ -125,14 +123,14 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         notify: true
       },
        /**
-       * Name of the variable holding the time stamp in the data. Used for non timeseries charts
+       * Name of the variable holding the time stamp in the data. Used for non timeseries charts.
        */
       timeData: {
         type: String,
         value: 'Timestamp'
       },
       /**
-       * set of predefined action that can be used out of the box
+       * Set of predefined actions that can be used out of the box.
        */
       actionMapping: {
         type: Object,
@@ -154,10 +152,10 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         }
       },
       /**
-      * Configuration used to define what actions happen on events. Each key represents an event,
-      * each value can be:
+      * Configuration used to define what actions happen on events.
+      * Each key represents an event, each value can be:
       * - a predefined action found in px-vis-interaction-space `actionMapping`
-      * - a function which context will be bound to the chart. The function argument will be the mouse position on the chart
+      * - a function, where `this` will be bound to the chart and the function's argument will be the mouse position on the chart
       */
       actionConfig: {
         type: Object,
@@ -178,7 +176,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         }
       },
       /**
-       * if false will pass hidden: true in the tooltip data
+       * If false, will pass `hidden: true` in the tooltip data.
        */
       showTooltip: {
         type: Boolean,
@@ -189,21 +187,21 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         value: false
       },
       /**
-       * Whether the scatter plot is using radial coordinates (x=phase, y=amplitude)
+       * Whether the scatter plot is using radial coordinates (x=phase, y=amplitude).
        */
       radial: {
         type: Boolean,
         value: false
       },
       /**
-       *  Whether we're searching for tooltip data
+       * Whether tooltip data is currently being searched for.
        */
       _calcTooltip: {
         type: Boolean,
         value: false
       },
       /**
-       *  Whether we're searching for crosshair data
+       *  Whether crosshair data is currently being searched for.
        */
       _calcCrosshair: {
         type: Boolean,
@@ -211,13 +209,13 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       },
 
       /**
-       *  The search radius for quadtree searches. Only points inside this radius will be returned
+       * The search radius for quadtree searches. Only points inside this radius will be returned.
        */
       searchRadius: {
         type: Number
       },
       /**
-       * Unique Id of the chart owning this interaction space
+       * Unique ID of the chart owning this interaction space.
        */
       chartId: {
         type: String
@@ -230,7 +228,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
 
       /**
-       * Holder for the cursor drawing objects
+       * Holder for the cursor drawing objects.
        *
        * @property _cursor
        * @type Object
@@ -239,14 +237,14 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         type:Object
       },
       /**
-       * Holder for the icon drawing object
+       * Holder for the icon drawing object.
        *
        */
       _icon:{
         type:Object
       },
       /**
-       * Holder for the drawing object
+       * Holder for the drawing object.
        *
        */
       _cursorGroup: {
@@ -264,7 +262,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       },
 
       /**
-       * Name of the icon type
+       * Name of the icon type.
        */
       iconType: {
         type: String,
@@ -272,8 +270,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       },
       /**
        * Type of cursor drawing to add:
-       *  - 'none' //default
-       *  - 'crosshair' : draws vertical and horizonal line
+       *  - 'none' : default
+       *  - 'crosshair' : draws vertical and horizontal line
        *  - 'circle' : draws circle of size radius
        */
       cursorType: {
@@ -282,7 +280,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       },
 
       /**
-       * Boolean specifying if a quadtree should be created and used for searching
+       * Boolean specifying if a quadtree should be created and used for searching.
        */
       useQuadtree: {
         type: Boolean,
@@ -302,7 +300,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      ],
 
     /**
-    * when attached, re-fire set properties for precipitation pattern
+    * When attached, re-fire set properties for precipitation pattern.
     *
     * @method attached
     */
@@ -318,8 +316,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     /**
-     * Draws the tooltip elements and sets up listeners and callbacks on chart hover
-     * Sets the tooltipData property which gets passed to the register.
+     * Draws the tooltip elements and sets up listeners and callbacks on chart hover.
+     * Sets the tooltipData property, which gets passed to the register.
      *
      * @method drawElement
      */
@@ -524,10 +522,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     /**
-     * Helper function called on mousemove
-     * Calculates the mouse position and associated x & y values. Then sets the d3 elements and sets tooltipData for consumption elsewhere
+     * Helper function called on mousemove.
+     * Calculates the mouse position and associated x & y values,
+     * then sets the d3 elements and sets tooltipData for consumption elsewhere.
      *
-     * @method _calcTooltipData
+     * @method _calcData
      */
     _calcData: function() {
 
@@ -570,9 +569,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     /**
-     *
-     * Searches through all data series and compiles and returns our tooltip data object
-     *
+     * Searches through all data series, then compiles and returns the tooltip data object.
      */
     _getDataForAllSeries: function(mousePos) {
       // invert: takes position on the screen and converts it into an equivalent date
@@ -633,18 +630,18 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     /**
+     * Returns the starter dataObj which data will be added to.
      *
-     * Returns our starter dataObj which we will add data to
-     *
+     * @method _returnTooltipDataStub
      */
     _returnTooltipDataStub: function(mousePos, x1) {
       return this._createTooltipDataStub(mousePos, null, !this.showTooltip)
     },
 
     /**
+     * Returns the tooltipData values for a single series.
      *
-     * Returns the tooltipData values for a single series
-     *
+     * @method _calcSerieData
      */
     _calcSerieData: function(dataObj, searchTimeStamp, closestTimestamp, x1, k, mousePos) {
       var yKey = this.completeSeriesConfig[k]['y'],
@@ -700,9 +697,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     /**
+     * Gets the data for timeseries type datasets.
      *
-     * Gets the data for timeseries type datasets
-     *
+     * @method _searchTimeData
      */
     _searchTimeData: function(x1, k, xKey, yKey, dataObj) {
       /*
@@ -741,9 +738,10 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     /**
+     * Iterates through all the data and returns the closest datapoints
+     * for all non-timeseries, non-ordinal data.
      *
-     * Iterates through all the data and returns our closest datapoints for all non-timeseries, non-ordinal data
-     *
+     * @method _searchContinuousData
      */
     _searchContinuousData: function(searchTimeStamp, closestTimestamp, mousePos, xKey, yKey, axisKey, dataObj) {
 
@@ -853,9 +851,10 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
     /**
      * Tries to find the ordinal value for the mouse position on the X (xAxis=true)
-     * or Y (xAxis=false) axis. If searching on X axis mousePos must be the X value,
-     * Y value if searching on the Y axis
+     * or Y (xAxis=false) axis. If searching on X axis, mousePos must be the X value;
+     * if searching on the Y axis, mousePos must be the Y value.
      *
+     * @method _getOrdinalValue
      */
     _getOrdinalValue: function(xAxis, mousePos, axisKey) {
 
@@ -894,8 +893,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     /**
-     * Gets the range of all ordinal values between from and to (both being values of the axis)
+     * Gets the range of all ordinal values between from and to (both being values of the axis).
      *
+     * @method _getOrdinalRange
      */
     _getOrdinalRange: function(xAxis, from, to) {
 
@@ -915,8 +915,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
     /**
      * Gets the closest value on the X (xAxis=true) or Y axis (xAxis=false)
-     * for a specific ordinal value defined on the other axis
+     * for a specific ordinal value defined on the other axis.
      *
+     * @method _getClosestValue
      */
     _getClosestValue: function(xAxis, value, data, xKey, yKey, ordValue) {
       var dataIndex = xAxis ? xKey : yKey,
@@ -926,7 +927,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           currDiff,
           result;
 
-// FIXME remoe forEach
+      // FIXME remove forEach
       data.forEach(function(point, index) {
         //only look at points that have the proper ordinal value
         if(point[ordIndex] === ordValue) {
@@ -943,8 +944,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       return result;
     },
     /**
-     * Helper function called on document.mouseup
-     * assumes the user wanted to 'close' the action box, and calls _finishActionBox
+     * Helper function called on document.mouseup.
+     * Assumes the user wanted to 'close' the action box, and calls _finishActionBox.
      *
      * @method _mouseUpOutsideSvg
      */
@@ -1066,8 +1067,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       this.fire('px-vis-interaction-space-stop-panning');
     },
     /**
-     * Helper function called on mousedown.action
-     * Draws a rectangle on the chart
+     * Helper function called on mousedown.action.
+     * Draws a rectangle on the chart.
      *
      * @method _drawActionBox
      */
@@ -1108,8 +1109,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       }
     },
     /**
-     * Helper function called on mousedown.action
-     * Updates the size of the action area rectangle
+     * Helper function called on mousedown.action.
+     * Updates the size of the action area rectangle.
      *
      * @method _updateActionBox
      */
@@ -1156,8 +1157,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     /**
-     * Helper function called on mouseup.action
-     * Gets the size of the action area rectangle, sets the extents, and removes it
+     * Helper function called on mouseup.action.
+     * Gets the size of the action area rectangle, sets the extents, and removes it.
      *
      * @method _finishActionBox
      */

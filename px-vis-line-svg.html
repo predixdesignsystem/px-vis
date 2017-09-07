@@ -4,7 +4,6 @@
 <link rel="import" href="css/px-vis-styles.html">
 
 <!--
-Element which draws lines series onto the chart
 
 ### Usage
 
@@ -76,8 +75,7 @@ Element which draws lines series onto the chart
     ],
 
     /**
-     * px-vis-line-svg-rendering-ended, fired when an svg line has finised
-     * drawing
+     * Event fired when an svg line has finished drawing
      * @event px-vis-line-svg-rendering-ended
      */
 
@@ -89,14 +87,13 @@ Element which draws lines series onto the chart
      */
     properties: {
       /**
-       * A holder object for the series object
-       *
+       * A holder object for the series object.
        */
       linePath:{
         type:Object
       },
       /**
-       * A holder object for the series builder
+       * A holder object for the series builder.
        *
        * @property linePath
        * @type String
@@ -105,7 +102,7 @@ Element which draws lines series onto the chart
         type:Object
       },
       /**
-       * A holder object for the series group
+       * A holder object for the series group.
        *
        */
       lineGroup:{
@@ -117,14 +114,14 @@ Element which draws lines series onto the chart
         value: 1
       },
       /**
-       * the opacity value of the fill to be used when muting a serie (stroke is not drawn on mute)
-       * This property will be read from the completeSeriesConfig
+       * The opacity value of the fill to be used when muting a series (stroke is not drawn on mute).
+       * This property will be read from the completeSeriesConfig.
        */
       mutedOpacity: {
         type: Number
       },
       /**
-       * Debounce time to use for drawing
+       * Debounce time to use for drawing.
        */
       drawDebounceTime: {
         type: Number,
@@ -167,7 +164,7 @@ Element which draws lines series onto the chart
     },
     /**
      * Draws or updates the line element.
-     * Called from an observer watching for data and the necessary d3 objects
+     * Called from an observer watching for data and the necessary d3 objects.
      *
      * @method drawElement
      */
@@ -272,7 +269,7 @@ Element which draws lines series onto the chart
     },
 
     /**
-     * Helper to call adClipPath with the elem
+     * Helper to call addClipPath with the element.
      *
      * @method _addClipPath
      */
@@ -281,8 +278,8 @@ Element which draws lines series onto the chart
     },
 
     /**
-     * Checks mutedSeries to see if this ID is in there
-     * Called from an observer watching mutedSeries
+     * Checks mutedSeries to see if this ID is in there.
+     * Called from an observer watching mutedSeries.
      *
      * @method isIdInMuted
      */
@@ -301,6 +298,7 @@ Element which draws lines series onto the chart
     /**
      * Adds full color to the SVG line.
      *
+     * @method _colorLine
      */
     _colorLine:function() {
       if(this.linePath) {
@@ -322,8 +320,9 @@ Element which draws lines series onto the chart
       }
     },
     /**
-     * Returns the opacity for the SVG line
+     * Returns the opacity for the SVG line.
      *
+     * @method _svgLineOpacity
      */
     _svgLineOpacity: function(d) {
       if(this.mutedSeries[this.seriesId]) {
@@ -336,7 +335,9 @@ Element which draws lines series onto the chart
       }
     },
     /**
-     * Redraw this serie on top if needed
+     * Redraw this series on top if needed.
+     *
+     * @method _drawOnTop
      */
     _drawOnTop: function(serieToRedrawOnTop) {
       if(this.lineGroup && this.seriesId) {

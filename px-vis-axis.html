@@ -5,7 +5,6 @@
 <link rel="import" href="css/px-vis-styles.html">
 
 <!--
-d3 element which creates an axis for the chart
 
 ### Minimal instantiation
 
@@ -132,14 +131,14 @@ Custom property | Description
             notify: true
           },
           /**
-           * Whether to append unit (if existing in config) in the title
+           * Whether to append a unit (if existing in config) in the title
            */
           appendUnitInTitle: {
             type: Boolean,
             value: false
           },
           /**
-           * Boolean to specify not to draw the series bars
+           * Boolean which specifies not to draw the series bars
            */
           preventSeriesBar: {
             type: Boolean,
@@ -160,7 +159,7 @@ Custom property | Description
             type: String
           },
           /**
-           * the text reprensenting the units of the axis
+           * The text representing the units of the axis
            */
           _currentUnits: {
             type: String,
@@ -168,7 +167,7 @@ Custom property | Description
             computed: '_computeUnits(appendUnitInTitle, title, unit)'
           },
           /**
-           * A boolean specifying if the axis title should truncate if too long
+           * A boolean specifying if the axis title should truncate when too long
            *
            */
           titleTruncation: {
@@ -183,7 +182,7 @@ Custom property | Description
             value: false
           },
           /**
-          * An String that specifies the format of the ticks
+          * A string that specifies the format of the ticks
           *
           * https://github.com/d3/d3-format
           *
@@ -203,20 +202,20 @@ Custom property | Description
             value: 'linear'
           },
           /**
-           * rotation to apply to the axis, in degrees
+           * Rotation to apply to the axis, in degrees
            */
           rotation: {
             type: Number
           },
           /**
-           * translation offset to apply to the axis
+           * Translation offset to apply to the axis
            */
           offset: {
             type: Array,
             value: [0,0]
           },
           /**
-           * A boolean specifying if the axis should have ticks or not
+           * A boolean specifying whether the axis should have ticks or not
            *
            */
           disableTicks: {
@@ -224,7 +223,7 @@ Custom property | Description
             value: false
           },
           /**
-           * Holder for the title g
+           * Holder for the title group
            *
            */
           _titleGroup: {
@@ -300,7 +299,7 @@ Custom property | Description
         },
 
         /**
-         * sets up this._axis as a d3 axis object.
+         * Sets up this._axis as a d3 axis object.
          *
          */
         defineAxis: function() {
@@ -335,7 +334,7 @@ Custom property | Description
           this._processTicks();
         },
         /**
-         * Examines what tick configs we have and applies them if relevant
+         * Examines the tick configs and applies them if relevant
          *
          */
         _processTicks: function() {
@@ -491,7 +490,7 @@ Custom property | Description
         },
 
         /**
-         * builds axis
+         * Builds the axis
          *
          */
         _buildAxis: function() {
@@ -518,7 +517,7 @@ Custom property | Description
         },
 
         /**
-         * Updates our ticks
+         * Updates the ticks
          *
          */
         _updateTicks: function() {
@@ -529,7 +528,7 @@ Custom property | Description
         },
 
         /**
-         * return the drawn tick values
+         * Returns the drawn tick values
          *
          */
         _calcDrawnTicks: function() {
@@ -599,7 +598,7 @@ Custom property | Description
           return label;
         },
         /**
-         * Sets the d3 attrs for the labels
+         * Sets the d3 attributes for the labels
          *
          */
         _setLabelStyles:function(elem) {
@@ -666,7 +665,7 @@ Custom property | Description
             .attr('stroke-width', this.strokeWidth);
         },
         /**
-         * /!\ forces layout reflow, call carefully
+         * /!\ Forces layout reflow, call carefully
          */
         _getAxisGroupSize: function() {
           var ext;
@@ -909,7 +908,7 @@ Custom property | Description
         },
 
         /**
-         * truncates the title label appropriately
+         * Truncates the title label appropriately
          */
         _truncateTitle: function(title, truncationLength, appendUnitInTitle) {
           this.debounce('_truncateTitle', function() {
@@ -934,7 +933,7 @@ Custom property | Description
         },
 
         /**
-         * redraws title on change
+         * Redraws the title on change
          */
         _titleChanged: function(displayedTitle) {
           // No debounce. Even though it fires a lot, debounce causes a noticable lag in the title.
@@ -944,7 +943,7 @@ Custom property | Description
         },
 
         /**
-         * assign target to tooltip
+         * Assigns target to tooltip
          */
         _processTooltip: function() {
           if(this._titleTruncated) {

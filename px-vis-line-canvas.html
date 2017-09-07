@@ -4,7 +4,6 @@
 <link rel="import" href="css/px-vis-styles.html">
 
 <!--
-Element which draws lines series onto the chart
 
 ### Usage
       <px-vis-svg-canvas
@@ -84,21 +83,20 @@ Element which draws lines series onto the chart
      */
     properties: {
        /**
-       * the opacity value of the fill to be used when muting a serie (stroke is not drawn on mute)
+       * The opacity value of the fill to be used when muting a series (stroke is not drawn on mute).
        */
       mutedOpacity: {
         type: Number,
         value: 0.3
       },
       /**
-       * Holder for our data for clipPath
-       *
+       * Holder for clipPath data.
        */
       _clipData: {
         type: Array
       },
       /**
-       * Whether to use the clippath to avoid drawing outside of axes
+       * Whether to use the clipPath to avoid drawing outside of the axes.
        *
        */
       clipPath: {
@@ -111,7 +109,7 @@ Element which draws lines series onto the chart
         value: 1
       },
       /**
-       * options currently in use for drawing lines: opacity, color...
+       * Options currently in use for drawing lines: opacity, color, etc.
        */
       _currentDrawingOptions: {
         type: Object,
@@ -130,8 +128,8 @@ Element which draws lines series onto the chart
     },
 
     /**
-     * Defines the appropriate line generator and update drawing
-     * variables: opacity, colors...
+     * Defines the appropriate line generator and updates drawing
+     * variables: opacity, colors, etc.
      */
     initializeDrawingSession: function() {
 
@@ -149,7 +147,7 @@ Element which draws lines series onto the chart
                             this.completeSeriesConfig[this.seriesId].mutedOpacity : this.mutedOpacity;
       this._currentDrawingOptions.strokeWidth = this.strokeWidth;
 
-//FIXME Clip Path can be optimized. Currently draws with every TS line. Can be drawn once.
+      //FIXME Clip Path can be optimized. Currently draws with every TS line. Can be drawn once.
       if(this.clipPath) {
         this.drawClipPath();
       }
@@ -184,8 +182,9 @@ Element which draws lines series onto the chart
     },
 
     /**
-     * Draws a clip path for canvas
+     * Draws a clip path for canvas.
      *
+     * @method drawClipPath
      */
     drawClipPath: function() {
       /* not sure why this if statement bandaid is needed
@@ -209,7 +208,7 @@ Element which draws lines series onto the chart
     },
 
     /**
-     * draws a clip path for radar
+     * Draws a clip path for radar.
      */
     _drawRadarClipPath: function() {
       //start off resetting our saved canvas
@@ -226,7 +225,7 @@ Element which draws lines series onto the chart
       this.canvasContext.clip("evenodd");
     },
     /**
-     * Draws a rectangular clip path for cartesian charts
+     * Draws a rectangular clip path for cartesian charts.
      */
     _drawRectClipPath: function() {
       this.canvasContext.beginPath();
@@ -239,8 +238,9 @@ Element which draws lines series onto the chart
     },
 
     /**
-     * Generates the edges for the radar clip path
+     * Generates the edges for the radar clip path.
      *
+     * @method _generateRadarClipPath
      */
     _generateRadarClipData: function() {
        var clipData = [{},{}];
@@ -326,6 +326,7 @@ Element which draws lines series onto the chart
     /**
      * Returns the correct rgba to use for the canvas line.
      *
+     * @method _canvasLineColor
      */
     _canvasLineColor:function(d,opacity) {
       // figure out if we are using a category or the seriesID
@@ -339,8 +340,9 @@ Element which draws lines series onto the chart
     },
 
     /**
-     * adds alpha to an rgb value
+     * Adds alpha to an rgb value.
      *
+     * @method rgbToRgba
      */
     rgbToRgba: function(rgb, opacity) {
       //assuming rgb is correctly formatted...

@@ -6,7 +6,6 @@
 <link rel="import" href="css/px-vis-styles.html">
 
 <!--
-d3 element creating an axis for the chart
 
 ### Usage
 
@@ -176,7 +175,7 @@ Custom property | Description
     properties: {
 
       /**
-       * A boolean to specify if the axis ticks should align or each have their own ranges
+       * A boolean to specify if the axis ticks should align or each have their own ranges.
        *
        */
       matchTicks: {
@@ -184,7 +183,7 @@ Custom property | Description
         value: false
       },
       /**
-       * If matchTicks, generate the ticks so they match too
+       * If matchTicks, generate the ticks so they match too.
        *
        */
       gridTicks: {
@@ -192,7 +191,7 @@ Custom property | Description
         notify: true
       },
       /**
-       * If matchTicks, generate the ticks so they match too
+       * If matchTicks, generate the axis so it matches too.
        *
        */
       gridAxis: {
@@ -200,83 +199,83 @@ Custom property | Description
         notify: true
       },
       /**
-       * Whether to append unit in brackets in axis title. e.g [Hz]
+       * Whether to append unit in brackets in axis title, e.g [Hz].
        */
       appendUnitInTitle: {
         type: Boolean,
         value: false
       },
       /**
-       * Array representing the actual displayed titles for each axis
+       * Array representing the actual displayed titles for each axis.
        */
       displayedValues: {
         type: Object,
         notify: true
       },
       /**
-       * internal dimensions to defeat race condition
+       * Internal dimensions to defeat race condition.
        */
       _internalDimensions: {
         type: Array
       },
       /**
-       * internal dimensions boolean to defeat race conditions
+       * Internal dimensions boolean to defeat race conditions.
        */
       _internalDimensionsChanged: {
         type: Boolean,
         value: false
       },
       /**
-       * whether the scales are using a single scale or multi scale
+       * Whether the scales are using a single scale or multi scale.
        */
       singleDomain: {
         type: Boolean,
         value: false
       },
       /**
-       * Boolean to decide if all axes should get ticks or just one
+       * Boolean to decide if all axes or just one axis should get ticks.
        */
       labelOneAxis:{
         type: Boolean,
         value: false
       },
       /**
-       * Length of the axis
+       * Length of the axis.
        */
       length: {
         type: Number,
         value: null
       },
       /**
-       * Computed on if it should use the height or the length for axis length
+       * Whether to use the height or the length for axis length.
        */
       _heightOrLen: {
         type: Number,
         computed: '_calcH(height,length)'
       },
       /**
-       * Boolean controling if brushing should retain or delete series
+       * Boolean controlling if brushing should retain or delete series.
        */
       brushToRemove: {
         type: Boolean,
         value: false
       },
       /**
-       * Boolean to decide if domainChanged changed or if something else triggered the observer
+       * Boolean to decide if domainChanged changed or if something else triggered the observer.
        */
       _lastDomainChanged: {
         type: Boolean,
         value: null
       },
       /**
-       * Force a redraw for titleLocation
+       * Force a redraw for titleLocation.
        */
       _pokeTitleLocation: {
         type: Boolean,
         value: false
       },
       /**
-       * Force a redraw if ticks
+       * Force a redraw of ticks.
        */
       recalcTicks: {
         type: Boolean,
@@ -300,7 +299,7 @@ Custom property | Description
         value: false
       },
       /**
-        * Boolean to specify not to draw the series bars
+        * Boolean to specify whether to draw the series bars.
         */
       preventSeriesBar: {
         type: Boolean,
@@ -340,14 +339,14 @@ Custom property | Description
         value: function() { return {}; }
       },
       /**
-       * counter to number of axis title that have been updated
+       * Counter for number of axis titles that have been updated.
        */
       _displayedTitlesCounter: {
         type: Number,
         value: 0
       },
       /**
-       * builder for current axis title updates
+       * Builder for current axis title updates.
        */
       _displayedTitlesBuilder: {
         type: Object,
@@ -356,7 +355,7 @@ Custom property | Description
         }
       },
       /**
-       * counter to number of drawn tick values that have been updated
+       * Counter for number of drawn tick values that have been updated.
        */
       _drawnTickValuesChangedCounter: {
         type: Number,
@@ -508,10 +507,10 @@ Custom property | Description
     },
 
     /**
-     * At ready, set the margin and titleLocation objects
+     * At ready, set the margin and titleLocation objects.
+     * Used for radar to rotate the title appropriately.
      *
-     * Used for radar to rotate the title appropriately
-     *
+     * @method _computeTitleLocation
      */
     _computeTitleLocation: function(item, titleLocation) {
       if(this.radial) {
@@ -555,8 +554,9 @@ Custom property | Description
     },
 
     /**
-     * Forces a redraw of the titleLocation
+     * Forces a redraw of the titleLocation.
      *
+     * @method _toggleTitleLocation
      */
     _toggleTitleLocation: function() {
       this.set('_pokeTitleLocation' , !this._pokeTitleLocation);
@@ -574,15 +574,17 @@ Custom property | Description
     },
 
     /**
-     * returns the appropriate scale for a dimension
+     * Returns the appropriate scale for a dimension.
      *
+     * @method _returnY
      */
     _returnY: function(item){
       return this.singleDomain ? this.y : this.y[item]
     },
     /**
-     * In order to make the ticks align, we iterate through and generate some round numbers for each axis
+     * In order to make the ticks align, we iterate through and generate some round numbers for each axis.
      *
+     * @method _calcTickVals
      */
     _calcTickVals: function(item) {
       if(!this.y[item]){ return false }
@@ -603,36 +605,40 @@ Custom property | Description
       return null;
     },
     /**
-     * Do the same thing for gridlines once
+     * Determines whether ticks are disabled.
      *
+     * @method _calcDisableTicks
      */
     _calcDisableTicks: function(item) {
       if(this.labelOneAxis) {
-        //check index of dimentions so it still works when we drag an axis
+        //check index of dimensions so it still works when we drag an axis
         return this.dimensions.indexOf(item) === 0 ? false : true;
       }
       return false;
     },
     /**
-     * Do the same thing for gridlines once
+     * Same as above, for the grid ticks.
      *
+     * @method _calcGridTicks
      */
     _calcGridTicks: function(dim){
       this.set('gridTicks', this._calcTickVals(dim));
     },
     /**
-     * Do the same thing for gridlines axis
+     * Same as above, for the grid axis.
      *
+     * @method _calcGridAxis
      */
     _calcGridAxis: function(dim){
       this.set('gridAxis', this._returnY(dim));
     },
 
-    /*
+    /**
      * Sets _internalDimensions to the value of dimensions but trigged AFTER the scale
      * has been set. Avoids an annoying race condition where dimensions triggers a
-     * chart refresh but the new scale has yet to be triggered
+     * chart refresh but the new scale has yet to be triggered.
      *
+     * @method _computedInternalDimensions
      */
     _computedInternalDimensions: function() {
       //makes sure we dont try to process a new dim before it has a new scale.
@@ -687,9 +693,10 @@ Custom property | Description
       }
     },
 
-    /*
-     * Checks if there is a title specified in the series config and returns it; otherwise returns the axis id
+    /**
+     * Checks if there is a title specified in the series config and returns it; otherwise returns the axis id.
      *
+     * @method _getTitle
      */
     _getTitle: function(item) {
       if(this.completeSeriesConfig) {
@@ -703,9 +710,10 @@ Custom property | Description
       }
     },
 
-    /*
-     * Deletes the brushes on its children axes
+    /**
+     * Deletes the brushes on children axes.
      *
+     * @method deleteAllBrushes
      */
     deleteAllBrushes: function() {
       this.$.axisBrush.deleteAllBrushes();
@@ -838,9 +846,10 @@ Custom property | Description
       this._drawnTickValuesChangedCounter = 0;
     },
 
-    /*
-     * sets the displayed value of the title including truncation
+    /**
+     * Sets the displayed value of the title including truncation
      *
+     * @method _displayedTitleChanged
      */
     _displayedTitleChanged: function(evt) {
 
