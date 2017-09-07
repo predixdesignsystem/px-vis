@@ -1,11 +1,9 @@
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
-
+<link rel="import" href="css/px-vis-styles.html">
 
 <!--
-Element which draws crosshairs around mouse pointer / data points and highlights adjacent datapoints.
-- Uses tooltipData property.
 
 ### Usage
 
@@ -72,8 +70,6 @@ Custom property | Description
 
 -->
 
-<link rel="import" href="css/px-vis-styles.html">
-
 <dom-module id="px-vis-cursor">
     <template>
       <style include="px-vis-styles"></style>
@@ -124,7 +120,7 @@ Custom property | Description
         type:Object
       },
       /**
-       * Holder for the horizonal line drawing objects
+       * Holder for the horizontal line drawing objects
        *
        * @property _hLines
        * @type Object
@@ -148,19 +144,17 @@ Custom property | Description
         type: Object
       },
       /**
-       * Object used to build the horizontal lines
+       * Object used to build the vertical lines
        */
       _vLinesBuilder: {
         type: Object
       },
       /**
-       * Draws a horizontal line through the point. Valid entries:
+       * Draws a horizontal line through the point. Valid values:
        * - full
        * - none
        * - left
        * - right
-       *
-       * <px-vis-tooltip horizontal-line="left" ...></px-vis-tooltip>
        *
        * @property horizontalLine
        * @type String
@@ -171,13 +165,11 @@ Custom property | Description
         value:'full'
       },
       /**
-       * Draws a vertical line through the point. Valid entries:
+       * Draws a vertical line through the point. Valid values:
        * - full
        * - none
        * - bottom
        * - top
-       *
-       * <px-vis-tooltip vertical-line='bottom' ...></px-vis-tooltip>
        *
        * @property verticalLine
        * @type String
@@ -188,11 +180,9 @@ Custom property | Description
         value:'full'
       },
       /**
-       * Draws a circle at the through the point. Valid entries:
+       * Draws a circle at the point. Valid values:
        * - yes
        * - no
-       *
-       * <px-vis-tooltip circle-point="no" ...></px-vis-tooltip>
        *
        * @property circlePoint
        * @type String
@@ -203,14 +193,14 @@ Custom property | Description
         value:'yes'
       },
       /**
-       * the opacity value of the fill to be used when muting a serie (stroke is not drawn on mute)
-       * This property will be read from the completeSeriesConfig
+       * The opacity value of the fill to be used when muting a series (stroke is not drawn on mute).
+       * This property will be read from the completeSeriesConfig.
        */
       mutedOpacity: {
         type: Number
       },
       /**
-       * Whether the scatter plot is using radial coordinates (x=phase, y=amplitude)
+       * Whether the scatter plot is using radial coordinates (x=phase, y=amplitude).
        */
       radial: {
         type: Boolean,
@@ -238,8 +228,8 @@ Custom property | Description
       this._watchConfigProperty('mutedOpacity', 0.3);
     },
     /**
-     * Draws the tooltip elements and sets up listeners and callbacks on chart hover
-     * Sets the tooltipData property which gets passed to the register.
+     * Draws the tooltip elements and sets up listeners and callbacks on chart hover.
+     * Sets the tooltipData property, which gets passed to the register.
      *
      * @method drawElement
      */
@@ -351,8 +341,8 @@ Custom property | Description
     },
 
     /**
-     * Function called by observer
-     * Determins if the cursor should be shown or hidden
+     * Function called by observer.
+     * Determines if the cursor should be shown or hidden.
      *
      * @method _cursorChange
      */
@@ -367,8 +357,8 @@ Custom property | Description
       }
     },
     /**
-     * Helper function called on mouseover
-     * Shows the cursor elements
+     * Helper function called on mouseover,
+     * shows the cursor elements.
      *
      * @method _showCursor
      */
@@ -377,8 +367,8 @@ Custom property | Description
     },
 
     /**
-     * Helper function called on mouseout
-     * Hides the cursor elements
+     * Helper function called on mouseout,
+     * hides the cursor elements.
      *
      * @method _hideCursor
      */
@@ -387,8 +377,8 @@ Custom property | Description
     },
 
     /**
-     * Helper function called on mousemove
-     * Moves the cursor elems to their proper location
+     * Helper function called on mousemove,
+     * moves the cursor elements to their proper location.
      *
      * @method _moveCursor
      */

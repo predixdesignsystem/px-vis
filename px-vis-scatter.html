@@ -1,9 +1,9 @@
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
+<link rel="import" href="css/px-vis-styles.html">
 
 <!--
-Element which draws a scatter series onto the chart
 
 ### Usage
 
@@ -43,8 +43,6 @@ Element which draws a scatter series onto the chart
 @demo demo.html
 -->
 
-<link rel="import" href="css/px-vis-styles.html">
-
 <dom-module id="px-vis-scatter">
   <template>
     <style include="px-vis-styles"></style>
@@ -77,8 +75,8 @@ Element which draws a scatter series onto the chart
     ],
 
     /**
-     * px-vis-scatter-rendering-ended, fired when an svg scatter series has finished
-     * drawing its scatter points
+     * Event fired when an svg scatter series has finished
+     * drawing its scatter points.
      * @event px-vis-scatter-rendering-ended
      */
 
@@ -90,7 +88,7 @@ Element which draws a scatter series onto the chart
      */
     properties: {
       /**
-       * An index of the series used for calculating its color
+       * The index of the series, used for calculating its color.
        *
        * @property scatterNumber
        * @type String
@@ -100,7 +98,7 @@ Element which draws a scatter series onto the chart
         value:0
       },
       /**
-       * A holder object for the series group
+       * A holder object for the series group.
        *
        * @property scatterGroup
        * @type Object
@@ -110,35 +108,35 @@ Element which draws a scatter series onto the chart
         value: function() {return{};}
       },
       /**
-       * A holder object for the series objects
+       * A holder object for the series objects.
        *
        */
       scatterDots:{
         type:Object
       },
       /**
-       * A holder object for the series builder
+       * A holder object for the series builder.
        *
        */
       scatterBuilder: {
         type: Object
       },
       /**
-       * Whether the scatter plot is using radial coiordinates (x=phase, y=amplitude)
+       * Whether the scatter plot is using radial coordinates (x=phase, y=amplitude).
        */
       radial: {
         type: Boolean,
         value: false
       },
       /**
-       * Name of the variable holding the time stamp in the data. Used for non timeseries charts
+       * Name of the variable holding the time stamp in the data. Used for non-timeseries charts.
        */
       timeData: {
         type: String,
         value: 'Timestamp'
       },
       /**
-       * Debounce time to use for drawing
+       * Debounce time to use for drawing.
        */
       drawDebounceTime: {
         type: Number,
@@ -181,7 +179,7 @@ Element which draws a scatter series onto the chart
     },
      /**
      * Draws or updates the scatter element.
-     * Called from an observer watching for data and the necessary d3 objects
+     * Called from an observer that watches for data and the necessary d3 objects.
      *
      * @method drawElement
      */
@@ -199,10 +197,9 @@ Element which draws a scatter series onto the chart
       }
     },
     /**
-     * Draws or updates the scatter element.
-     * Called from an observer watching for data and the necessary d3 objects
+     * Debounced version of the above method for drawing or updating the scatter element.
      *
-     * @method drawElement
+     * @method _drawElementDebounced
      */
     _drawElementDebounced: function() {
       if(this.y &&
@@ -257,7 +254,7 @@ Element which draws a scatter series onto the chart
     },
 
     /**
-     * Helper to call addClipPath with the elem
+     * Helper to call addClipPath with the element.
      *
      * @method _addClipPath
      */
@@ -266,8 +263,8 @@ Element which draws a scatter series onto the chart
     },
 
     /**
-     * Checks mutedSeries to see if this ID is in there
-     * Called from an observer watching mutedSeries
+     * Checks mutedSeries to see if this ID is in there.
+     * Called from an observer watching mutedSeries.
      *
      * @method isIdInMuted
      */
@@ -279,8 +276,9 @@ Element which draws a scatter series onto the chart
     },
 
     /**
-     * Applies the necessary translate and scale to the scatterDots
+     * Applies the necessary translate and scale to the scatterDots.
      *
+     * @method _applyTransform
      */
     _applyTransform: function(d) {
 /*
@@ -330,7 +328,7 @@ Element which draws a scatter series onto the chart
         .attr('stroke-opacity', muted ? 0 : this.markerStrokeOpacity);
     },
     /**
-     * Redraw this serie on top if needed
+     * Redraw this series on top if needed.
      */
     _drawOnTop: function(serieToRedrawOnTop) {
       if(this.scatterGroup && this.seriesId) {

@@ -6,13 +6,9 @@
 <link rel="import" href="px-vis-register-item-pie.html"/>
 <link rel="import" href="px-vis-register-datetime.html"/>
 <link rel="import" href="../px-tooltip/px-tooltip.html"/>
+<link rel="import" href="css/px-vis-register-styles.html">
 
 <!--
-Element providing a display and interaction space for series in your chart.
-
-It can be either vertical on the side of the chart or horizonal above or below your chart. It displays a colored bar matching the series color and the series name. When you hover over the chart, the chart sends data to the register via the bound "tooltipData" property. These data values are then displayed in the register.
-
-You can turn series on the chart off by clicking on that series in the register.
 
 ### Usage
 
@@ -57,7 +53,7 @@ tooltipData is in the form:
     }
 ```
 
- When not hovering on a chart, the tooltipData should still have the series names in order for them to still appear in the register. IE:
+ When not hovering on a chart, the tooltipData should still have the series names in order for them to still appear in the register. Ex:
 
 ```
     {
@@ -84,7 +80,7 @@ The component returns an object via mutedSeries which the chart can take and rea
     }
 
 ### Time, number, and name formatting
-Formatting for the timestamps,the data values, and the series names can be controlled via a series of properties. Please see the properties for configuration details.
+Formatting for the timestamps, the data values, and the series names can be controlled via a series of properties. Please see the properties for configuration details.
 
 ### Styling
 The following custom properties are available for styling:
@@ -110,7 +106,6 @@ Custom property | Description
 @homepage index.html
 @demo demo.html
 -->
-<link rel="import" href="css/px-vis-register-styles.html">
 
 <dom-module id="px-vis-register">
   <template>
@@ -228,10 +223,7 @@ Custom property | Description
      */
     properties: {
       /**
-       * Defines if the register should be horizontal or vertical. Options are:
-       *  - `vertical`
-       *  - `horizontal`
-       *
+      * Defines if the register should be `horizontal` or `vertical`.
       */
       type: {
        type:String,
@@ -239,14 +231,15 @@ Custom property | Description
        notify: true
       },
       /**
-       * If the `type` is 'horizontal' how the register should horizontally align, using flex align
+       * If the `type` is 'horizontal', this property determines how the register
+       * should align horizontally, using flex align:
        * - 'left'
        * - 'center'
        * - 'right'
        * - 'justify'
        * - 'spaced'
-       * If the registers starts overflowing this will be ignored so that all register
-       * items are accessible through scrolling
+       * If the register starts overflowing, this will be ignored so that all register
+       * items are accessible via scrolling.
        */
       horizontalAlignment: {
         type: String,
@@ -257,7 +250,7 @@ Custom property | Description
         value: false
       },
       /**
-       * List of the series to add to the register
+       * List of the series to add to the register.
        *
       */
       _series: {
@@ -265,14 +258,14 @@ Custom property | Description
         notify: true
       },
       /**
-       * Prevents the register from having a minimum size
+       * Prevents the register from having a minimum size.
        */
       preventMinSize: {
         type: Boolean,
         value: false
       },
       /**
-       * Prevents the mute on click behavior
+       * Prevents the mute on-click behavior.
        */
       preventMuting: {
         type: Boolean,
@@ -293,7 +286,7 @@ Custom property | Description
         value: 0
       },
       /**
-       * If inert the register won't process any new data coming in. Useful when the register is hidden
+       * If inert, the register won't process any new data coming in. Useful when the register is hidden.
        */
       inertRegister: {
         type: Boolean,
@@ -312,7 +305,6 @@ Custom property | Description
 
     /**
      * Function which takes the incoming datetime from tooltipData and formats it.
-     *
      * Returns set values via setting helper properties used in the html.
      *
      * @method _formatDateTime
@@ -343,8 +335,8 @@ Custom property | Description
       }
     },
     /**
-     * returns the list of series with proper grouping
-     * Also sets _seriesKeys and _tooltipDataObj
+     * Returns the list of series with proper grouping.
+     * Also sets _seriesKeys and _tooltipDataObj.
      *
     */
     _computeSeries: function() {

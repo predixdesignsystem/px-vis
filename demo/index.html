@@ -1,60 +1,19 @@
 <!-- Common imports -->
 <link rel="import" href="../../polymer/polymer.html" />
-<link rel="import" href="../css/px-vis-summary-demo-styles.html" />
 <link rel="import" href="../../px-demo/css/px-demo-styles.html"/>
 <link rel="import" href="../../px-demo/px-demo-footer.html"   defer />
 <link rel="import" href="../../px-demo/px-demo-collection.html" />
-<link rel="import" href="summary-demo.html" />
 <!-- Import peer demo pages -->
-<link rel="import" href="px-vis-area-svg-demo.html"  defer />
-<link rel="import" href="px-vis-axis-demo.html"  defer />
-<link rel="import" href="px-vis-axis-brush-demo.html"  defer />
-<link rel="import" href="px-vis-bar-svg-demo.html"  defer />
-<link rel="import" href="px-vis-brush-demo.html"  defer />
-<link rel="import" href="px-vis-cursor-demo.html"  defer />
-<link rel="import" href="px-vis-chart-navigator-demo.html"  defer />
-<link rel="import" href="px-vis-canvas-demo.html"  defer />
-<link rel="import" href="px-vis-clip-path-complex-area-demo.html"  defer />
-<link rel="import" href="px-vis-clip-path-demo.html"  defer />
-<link rel="import" href="px-vis-cursor-line-demo.html"  defer />
-<link rel="import" href="px-vis-data-converter-demo.html"  defer />
-<link rel="import" href="px-vis-dynamic-menu-demo.html"  defer />
-<link rel="import" href="px-vis-event-demo.html"  defer />
-<link rel="import" href="px-vis-gridlines-demo.html"  defer />
-<link rel="import" href="px-vis-highlight-line-canvas-demo.html"  defer />
-<link rel="import" href="px-vis-highlight-line-demo.html"  defer />
-<link rel="import" href="px-vis-highlight-point-canvas-demo.html"  defer />
-<link rel="import" href="px-vis-highlight-point-demo.html"  defer />
-<link rel="import" href="px-vis-interactive-axis-demo.html"  defer />
-<link rel="import" href="px-vis-interaction-space-demo.html"  defer />
-<link rel="import" href="px-vis-line-svg-demo.html"  defer />
-<link rel="import" href="px-vis-line-canvas-demo.html"  defer />
-<link rel="import" href="px-vis-multi-scale-demo.html"  defer />
-<link rel="import" href="px-vis-multi-axis-demo.html"  defer />
-<link rel="import" href="px-vis-pie-demo.html"  defer />
-<link rel="import" href="px-vis-radar-grid-demo.html"  defer />
-<link rel="import" href="px-vis-radial-gridlines-demo.html"  defer />
-<link rel="import" href="px-vis-svg-canvas-demo.html"  defer />
-<link rel="import" href="px-vis-toolbar-demo.html"  defer />
-<link rel="import" href="px-vis-radial-scale-demo.html"  defer />
-<link rel="import" href="px-vis-register-demo.html"  defer />
-<link rel="import" href="px-vis-scale-demo.html"  defer />
-<link rel="import" href="px-vis-scatter-demo.html"  defer />
-<link rel="import" href="px-vis-scatter-canvas-demo.html"  defer />
-<link rel="import" href="px-vis-striping-demo.html"  defer />
-<link rel="import" href="px-vis-svg-demo.html"  defer />
-<link rel="import" href="px-vis-threshold-demo.html"  defer />
-<link rel="import" href="px-vis-tooltip-demo.html"  defer />
+
+<link rel="import" href="px-vis-catalog.html"  defer />
 
 <!-- Demo DOM module -->
 <dom-module id="local-element-demo">
   <template>
     <!-- Theme includes -->
-    <style include="px-demo-styles" is="custom-style"></style>
     <style include="px-theme-styles" is="custom-style"></style>
-    <style include="px-dark-demo-theme-styles" is="custom-style"></style>
-    <style include="px-dark-theme-styles" is="custom-style"></style>
-    <style include="px-vis-summary-demo-styles" is="custom-style"></style>
+
+    <style include="px-vis-demo-catalog-styles" is="custom-style"></style>
 
     <!-- Demo list/view change entrypoint -->
     <px-demo-collection demos="{{demos}}" chosen-demo-name="{{chosenDemoName}}"></px-demo-collection>
@@ -89,8 +48,8 @@
         value: function(){
           return [
             {
-              name: 'Overview',
-              tagName:'px-vis-overview'
+              name: 'Catalog',
+              tagName:'px-vis-catalog'
             },{
               name:'px-vis-area-svg',
               tagName:'px-vis-area-svg-demo'
@@ -98,8 +57,8 @@
               name:'px-vis-axis',
               tagName:'px-vis-axis-demo'
             },{
-              name:'px-vis-axis-brush',
-              tagName:'px-vis-axis-brush-demo'
+              name:'px-vis-axis-interaction-space',
+              tagName:'px-vis-axis-interaction-space-demo'
             },{
               name:'px-vis-bar-svg',
               tagName:'px-vis-bar-svg-demo'
@@ -221,11 +180,32 @@
       * @type {String}
       */
      chosenDemoName: {
-       type: String
+       type: String,
+       observer: '_demoChosen'
      }
    },
    listeners: {
      'px-demo-active-should-change' : '_handleActiveChange'
+   },
+   created: function() {
+    this._loadedDemos = ['catalog'];
+   },
+   _demoChosen: function(newDemo) {
+    if (typeof newDemo === 'string' && this._loadedDemos.indexOf(newDemo) === -1) {
+      var pageName = null;
+      for (var i=0; i<this.demos.length; i++) {
+        if (this.demos[i].name === newDemo) {
+          pageName = this.demos[i].tagName + '.html';
+        }
+      }
+      if (!pageName) return;
+
+      this._loadedDemos.push(newDemo);
+      var url = this.resolveUrl(pageName);
+      this.importHref(url, null, function(){
+        console.log('Could not load demo ' + newDemo);
+      }, true);
+    }
    },
    _handleActiveChange: function(evt) {
      this.set('chosenDemoName', evt.detail.name);

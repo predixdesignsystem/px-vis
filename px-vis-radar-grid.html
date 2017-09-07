@@ -2,11 +2,10 @@
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="px-vis-line-svg.html"/>
+<link rel="import" href="css/px-vis-styles.html">
 
 <!--
-An element which draws polygonal grid lines.
 
-The following attributes in the example are required
 ### Usage
 
     <px-vis-radar-grid
@@ -33,7 +32,6 @@ An element which draws polygonal grid lines.
 @homepage index.html
 @demo demo.html
 -->
-<link rel="import" href="css/px-vis-styles.html">
 
 <dom-module id="px-vis-radar-grid">
   <template>
@@ -75,7 +73,7 @@ An element which draws polygonal grid lines.
      */
     properties: {
       /**
-       * The calculated grid data
+       * The calculated grid data.
        *
        */
       _gridData: {
@@ -83,7 +81,7 @@ An element which draws polygonal grid lines.
         notify: true
       },
       /**
-       * The color for the grid lines
+       * The color for the grid lines.
        *
        */
       axisColor: {
@@ -91,7 +89,7 @@ An element which draws polygonal grid lines.
         value: "rgb(0,0,0)"
       },
       /**
-       * A configuration file for the gridlines
+       * A configuration object for the gridlines.
        *
        */
       _completeSeriesConfig: {
@@ -99,7 +97,7 @@ An element which draws polygonal grid lines.
         notify: true
       },
       /**
-       * The access key for the seriesConfig
+       * The access key for the seriesConfig.
        *
        */
       _seriesKey: {
@@ -107,7 +105,7 @@ An element which draws polygonal grid lines.
         value: "radarGrids"
       },
       /**
-       * The values obtained from the axis where we want our gridlines
+       * The values obtained from the axis to place gridlines on.
        *
        */
       tickValues: {
@@ -115,7 +113,7 @@ An element which draws polygonal grid lines.
         notify: true
       },
       /**
-       * The dimensions of or chart
+       * The dimensions of the chart.
        *
        */
       dimensions: {
@@ -123,7 +121,7 @@ An element which draws polygonal grid lines.
         notify: true
       },
       /**
-       * The stroke width for the grid
+       * The stroke width for the grid.
        *
        */
       strokeWidth: {
@@ -136,8 +134,9 @@ An element which draws polygonal grid lines.
       'createGridData(dimensions.*,tickValues.*, _stylesUpdated)'
     ],
     /**
-     * Draws the gridlines
+     * Draws the gridlines.
      *
+     * @method createGridData
      */
     createGridData: function() {
       this.debounce('radarGrids', function(){
@@ -178,8 +177,9 @@ An element which draws polygonal grid lines.
       },10);
     },
     /**
-     * helper function to return a d3 interpolation function
+     * Helper function to return a d3 interpolation function.
      *
+     * @method _returnInterpolation
      */
     _returnInterpolation: function(){
       return Px.d3.curveLinearClosed;

@@ -1,15 +1,17 @@
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
+<link rel="import" href="css/px-vis-styles.html">
 
 
 <!--
-d3 element which draws a horizontal line at a specified threshold value. The threshold value can either be plain text, or surrounded by a box.
 
 ### Usage
 
-You must have a link import for px-vis-behavior-common (i.e.)
+You must have a link import for px-vis-behavior-common, e.g.
+
     <link rel="import" href="../px-vis/px-vis-behavior-common.html" />
+
 and include the PxVisBehavior.thresholds behavior in the behaviors array inside your Polymer object configuration.
 
 The following attributes are required:
@@ -38,7 +40,6 @@ Custom property | Description
 @demo demo.html
 -->
 
-<link rel="import" href="css/px-vis-styles.html">
 
 <dom-module id="px-vis-threshold">
   <template>
@@ -72,7 +73,7 @@ Custom property | Description
      */
     properties: {
       /**
-       * Default defailtColor
+       * Internal copy of the default color.
        *
        */
       _defaultDefaultColor: {
@@ -88,7 +89,7 @@ Custom property | Description
         value:'rgb(0,0,0)'
       },
       /**
-       * Holder object for the event svg "g" element
+       * Holder object for the event svg "g" element.
        *
        * @property thresholdGroup
        * @type Object
@@ -98,7 +99,7 @@ Custom property | Description
         value: function() { return {}; }
       },
       /**
-       * Holder object for the event line elements
+       * Holder object for the event line elements.
        *
        * @property thresholdLine
        * @type Object
@@ -107,7 +108,7 @@ Custom property | Description
         type:Object
       },
       /**
-       * Holder object for the event rectangle elements
+       * Holder object for the event rectangle elements.
        *
        * @property thresholdRect
        * @type Object
@@ -117,7 +118,7 @@ Custom property | Description
       },
 
       /**
-       * Boolean to show or hide the title on the threshold
+       * Whether to show the title on the threshold.
        *
        */
       displayTitle: {
@@ -134,14 +135,14 @@ Custom property | Description
         type: Object
       },
       /**
-       * Debounce time to use for drawing
+       * Debounce time to use for drawing.
        */
       drawDebounceTime: {
         type: Number,
         value: 10
       },
       /**
-      * set a default for localizing
+      * A valid IETF language key used for localization.
       */
       language: {
         type: String,
@@ -177,7 +178,7 @@ Custom property | Description
 
     /**
      * Draws or updates the threshold element.
-     * Called from an observer watching for data and the necessary d3 objects
+     * Called from an observer that watches for data and the necessary d3 objects.
      *
      * @method drawElement
      */
@@ -318,7 +319,7 @@ Custom property | Description
     },
 
     /**
-     * Sets the colors
+     * Sets the colors.
      *
      * @method _setColors
      */
@@ -334,7 +335,7 @@ Custom property | Description
       }
     },
     /**
-     * Returns the color of the associated series or returns the default color
+     * Returns the color of the associated series or returns the default color.
      *
      * @method _getColors
      */
@@ -348,7 +349,7 @@ Custom property | Description
       return c;
     },
     /**
-     * Calculates a y-position for the text and rectangle
+     * Calculates a y-position for the text and rectangle.
      *
      * @method _calcYPos
      */

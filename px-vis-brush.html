@@ -1,17 +1,9 @@
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
-
+<link rel="import" href="css/px-vis-styles.html">
 
 <!--
-Element providing user interaction on the navigator.
-
-This element draw the box over the navigator signifying the selected chart extents
-and provides the user interactions to resize and move the extent box.
-
-This element sets the selectedDomain property based on the extents box.
-
-The selectedDomain variable can then be consumed by the scale component to change the main chart extents.
 
 ### Usage
 
@@ -67,8 +59,6 @@ Custom property | Description
 @demo demo.html
 -->
 
-<link rel="import" href="css/px-vis-styles.html">
-
 <dom-module id="px-vis-brush">
     <template>
       <style include="px-vis-styles"></style>
@@ -110,7 +100,7 @@ Custom property | Description
         value: function() { return{}; }
       },
       /**
-       * Holder for a SVG group of elements pertaining to the brush
+       * Holder for a group of SVG <g> elements pertaining to the brush
        *
        */
       _brushGroup:{
@@ -118,7 +108,7 @@ Custom property | Description
         value: function() {return{};}
       },
       /**
-       * Holder for a SVG group of elements pertaining to the handles
+       * Holder for a group of SVG elements pertaining to the handles
        *
        */
       _handleGroup:{
@@ -126,7 +116,7 @@ Custom property | Description
         value: function() {return{};}
       },
       /**
-       * Holder for a calculated center of the extent box
+       * Holder for the calculated center of the extent box
        *
        */
       _center:{
@@ -158,7 +148,7 @@ Custom property | Description
         notify:true
       },
       /**
-       * Boolean specifying if the rectangle overlay should have a gradient applied
+       * Boolean specifying if the rectangular overlay should have a gradient applied
        *
        */
       gradientOverlay: {
@@ -166,7 +156,7 @@ Custom property | Description
         value: false
       },
       /**
-       * Allows to prevent changes to selectedDomain
+       * Allows or prevents changes to selectedDomain
        */
       _preventDomainChange: {
         type: Boolean,
@@ -282,7 +272,7 @@ Custom property | Description
 
           this._drawHandles(heightOffset);
 
-          // // Setup listeners for click on the navigator so the brush will jump instead of redraw
+          // Setup listeners for click on the navigator so the brush will jump instead of redraw
           this._brushGroup.select("rect.overlay")
             .on("mousedown.brush", this._brushcenter.bind(this))
             .on("touchstart.brush", this._brushcenter.bind(this));
@@ -377,7 +367,7 @@ Custom property | Description
     },
 
     /**
-     * Helper function to add class "selecting" to elems selected in the brush
+     * Helper function to add class "selecting" to elements selected in the brush
      *
      * @method _brushstart
      */
@@ -387,7 +377,7 @@ Custom property | Description
       this.svg.classed("selecting", true);
     },
     /**
-     * Helper function to remove class "selecting" to elems not selected in the brush
+     * Helper function to remove class "selecting" to elements not selected in the brush
      *
      * @method _brushend
      */
@@ -403,9 +393,9 @@ Custom property | Description
       this.svg.classed("selecting", false);
     },
     /**
-     * Helper function fired whtn the brush is moved / extents changed
-     * sets the attr 'selectedDomain' with the new extents
-     * this attr should travel up the compent tree via observers and set the new domain in the chart
+     * Helper function fired when the brush is moved / extents are changed.
+     * Sets the attribute 'selectedDomain' with the new extents.
+     * This attr should travel up the component tree via observers and set the new domain in the chart.
      *
      * @method _brushmove
      */
@@ -452,7 +442,7 @@ Custom property | Description
       }, 10);
     },
     /**
-     * Helper function fired whtn the navigator is clicked on
+     * Helper function fired when the navigator is clicked on
      *
      * @method _brushcenter
      */
@@ -477,7 +467,7 @@ Custom property | Description
       }
     }, //_brushcenter
     /**
-     * Helper function to calculate the centerpoint where the brush should move to
+     * Helper function to calculate the center point where the brush should move to
      *
      * @method _brushcentermove
      */
@@ -489,7 +479,7 @@ Custom property | Description
       this._recenter(false);
     },
     /**
-     * Helper function to move the brush and disable listner
+     * Helper function to move the brush and disable listener
      *
      * @method _brushcenterend
      */
@@ -525,7 +515,7 @@ Custom property | Description
       });
     },
     /**
-     * Helper function to tween so that the brush slides rather than a jumps
+     * Helper function to tween so that the brush slides rather than jumps
      *
      * @method tween
      * @private

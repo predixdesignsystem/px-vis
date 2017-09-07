@@ -607,7 +607,13 @@ PxVisBehaviorChart.saveImage = [{
           if(target[0]) {
             if(!target[1]) {
               //canvas
-              canvas.getContext('2d').drawImage(target[0].canvas, 0, 0);
+              var opacity = getComputedStyle(target[0].canvas).getPropertyValue('opacity'),
+                  context = canvas.getContext('2d'),
+                  oldAlpha = context.globalAlpha;
+
+              context.globalAlpha = opacity;
+              context.drawImage(target[0].canvas, 0, 0);
+              context.globalAlpha = oldAlpha;
 
               //if we have more element keep drawing, else finish
               if(elementsToRender.length > 0) {
@@ -776,9 +782,20 @@ PxVisBehaviorChart.chartAutoResize = [{
         value: 250
       }
     },
+    listeners: {'px-vis-toolbar-secondary-toggled': '_secondaryToolbarToggled'},
     _preventResizeChanged: function() {
       if(!this.preventResize) {
         this.notifyResize();
+      }
+    },
+    _secondaryToolbarToggled: function() {
+      if(!this.preventResize) {
+
+        //ensure we bypass the debounce as we want to resize asap
+        var oldDebounce = this.debounceResizeTiming;
+        this.debounceResizeTiming = 0;
+        this.notifyResize();
+        this.debounceResizeTiming = oldDebounce;
       }
     },
     _getChartWrapperClass: function(hor, vert) {
@@ -2361,24 +2378,33 @@ PxVisBehaviorChart.categoryRegister = [{
   _computeCategoryRegisterConfig: function() {
     if(typeof(this.categoryKey) !== 'undefined') {
       var tooltipData = {},
-          config = {};
+          config = {},
+          currentCat,
+          catName;
       tooltipData.series = [];
 
       for(var i = 0; i < this.categories.length; i ++) {
 
-        //if config defined try to reuse color
-        if(this.completeSeriesConfig[this.categories[i].toString()]) {
-          config[this.categories[i].toString()] = {};
-          config[this.categories[i].toString()].name = this.categoryKey + ' - ' + this.categories[i].toString();
-          config[this.categories[i].toString()].color = this.completeSeriesConfig[this.categories[i].toString()].color ? this.completeSeriesConfig[this.categories[i].toString()].color : this._getColor(this.startColorIndex + i);
+        currentCat = this.categories[i].toString();
+        if(this.completeSeriesConfig[currentCat] && this.completeSeriesConfig[currentCat].name.toString() !== currentCat) {
+          catName = this.completeSeriesConfig[currentCat].name;
         } else {
-          config[this.categories[i].toString()] = {
-            'name': this.categoryKey + ' - ' + this.categories[i].toString(),
+          catName = this.categoryKey + ' - ' + currentCat;
+        }
+
+        //if config defined try to reuse color
+        if(this.completeSeriesConfig[currentCat]) {
+          config[currentCat] = {};
+          config[currentCat].name = catName;
+          config[currentCat].color = this.completeSeriesConfig[currentCat].color ? this.completeSeriesConfig[currentCat].color : this._getColor(this.startColorIndex + i);
+        } else {
+          config[currentCat] = {
+            'name': catName,
             "color": this._getColor(this.startColorIndex + i),
           };
         }
 
-        tooltipData.series.push({"name": this.categories[i].toString()})
+        tooltipData.series.push({"name": currentCat})
       }
 
       //set our confs
@@ -2857,5 +2883,28 @@ PxVisBehaviorChart.multiAxisZoom = [{
   }
 
 }, PxVisBehaviorChart.zoomGeneric];
+
+/*
+    Name:
+    PxVisBehaviorChart.useCategoryInTooltip
+
+    Description:
+    Behavior providing useCategoryInTooltip property
+    @polymerBehavior PxVisBehaviorChart.useCategoryInTooltip
+*/
+PxVisBehaviorChart.useCategoryInTooltip = {
+  properties: {
+    /**
+     * Whether the tooltip should show the category name for each
+     * value rather than the axis name.
+     * Will use the category name if defined in seriesConfig, otherwise
+     * a string with the following formatting: 'categoryKey - category'
+     */
+    useCategoryInTooltip: {
+      type: Boolean,
+      value: false
+    }
+  }
+}
 
 </script>

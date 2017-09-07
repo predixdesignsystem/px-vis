@@ -4,9 +4,9 @@
 <link rel="import" href="px-vis-behavior-colors.html" />
 <link rel="import" href="../px-tooltip/px-tooltip.html" />
 <link rel="import" href="../px-popover/px-popover.html" />
+<link rel="import" href="css/px-vis-pie-styles.html">
 
 <!--
-Creates an interactive pie or donut chart
 
 ### Usage
 
@@ -38,8 +38,6 @@ Custom property | Description
 @demo demo.html
 -->
 
-<link rel="import" href="css/px-vis-pie-styles.html">
-
 <dom-module id="px-vis-pie">
     <template>
       <style include="px-vis-pie-styles"></style>
@@ -65,22 +63,22 @@ Custom property | Description
 
 
     /**
-    * Fired when the pie finished rotated for centering on a slice
+    * Fired when the pie finishes rotating, for centering on a slice.
     * detail: { datum: datumRelativeToSlice}
     * @event px-vis-pie-centered-on-slice
     */
     /**
-    * Fired when the mouse enters a pie slice
+    * Fired when the mouse enters a pie slice.
     * detail: { datum: datumRelativeToSlice, rotatedDatum: DatumUsedToDrawTheSlice}
     * @event px-vis-pie-mouse-enter-slice
     */
      /**
-    * Fired when the mouse leaves a pie slice
+    * Fired when the mouse leaves a pie slice.
     * detail: { datum: datumRelativeToSlice}
     * @event px-vis-pie-mouse-leave-slice
     */
     /**
-    * Fired when a pie slice is clicked
+    * Fired when a pie slice is clicked.
     * detail: { datum: datumRelativeToSlice}
     * @event px-vis-pie-slice-clicked
     */
@@ -93,7 +91,7 @@ Custom property | Description
      */
     properties: {
       /**
-       * allows to draw an empty pie chart when data is empty/null
+       * Whether to draw an empty pie chart when data is empty/null.
        */
       empty: {
         type: Boolean,
@@ -101,7 +99,7 @@ Custom property | Description
         observer: '_emptyChanged'
       },
       /**
-       * An index of the series used for calculating its color
+       * An index of the series used for calculating its color.
        *
        * @property scatterNumber
        * @type String
@@ -113,7 +111,7 @@ Custom property | Description
       /**
        * Number between 0 and 1 defining how much of the inner pie should be cut.
        * Typically at 0 this is a pie chart, at 0.5 a donut chart and at 1 all
-       * the chart is cut (=> not visible)
+       * the chart is cut (i.e. not visible).
        *
        */
       innerRadius: {
@@ -121,23 +119,23 @@ Custom property | Description
         value: 0
       },
       /**
-       * The actual inner radius value in pixels which will be used internally to draw the chart
+       * The actual inner radius value in pixels which will be used internally to draw the chart.
        */
       _innerRadiusPx: {
         type: Number,
         computed: '_calcInnerRadiusPx(innerRadius, radius, donut)'
       },
       /**
-       * Whether the chart should be disaplyed as a donut rather than a pie.
-       * If displayed as a donut it will by default use 30px as the ring size.
-       * It can be overriden by using the "innerRadius" property (between 0 and 1)
+       * Whether the chart should be displayed as a donut rather than a pie.
+       * If displayed as a donut, it will by default use 30px as the ring size.
+       * This can be overridden by using the "innerRadius" property (between 0 and 1).
        */
       donut: {
         type: Boolean,
         value: false
       },
       /**
-       * A holder object for the series object
+       * A holder object for the series object.
        *
        * @property linePath
        * @type String
@@ -147,42 +145,42 @@ Custom property | Description
         value: function() {return{};}
       },
       /**
-       * Total value of all slices
+       * Total value of all slices.
        */
       total: {
         Type: Number,
         value: 0
       },
       /**
-       * Radius of the pie chart
+       * Radius of the pie chart.
        *
        */
       radius: {
         type: Number
       },
       /**
-       * the current arcs
+       * The current arc definitions.
        */
       _arcs: {
         type: Object
       },
       /**
-       * How much the pie is currently rotated in rad
+       * How much the pie is currently rotated in radians.
        */
       _currentRotationAngle: {
         type:Number,
         value:0
       },
       /**
-       * whether the values should be displayed in %
+       * Whether the values should be displayed in percent.
        */
       usePercentage: {
         type: Boolean,
         value: false
       },
       /**
-       * By default the pie chart slices will be ordered by value. Set to false
-       * to keep the data order
+       * By default the pie chart slices will be ordered by value.
+       * Set to false to keep the data order.
        */
       preserveDataOrder: {
         type: Boolean,
@@ -195,7 +193,7 @@ Custom property | Description
      ],
     /**
      * Draws or updates the pie element.
-     * Called from an observer watching for data and the necessary d3 objects
+     * Called from an observer watching for data and the necessary d3 objects.
      *
      * @method drawElement
      */
@@ -206,8 +204,8 @@ Custom property | Description
       this._updateDrawing();
     },
     /**
-     * Checks whether the group holding all slices has been created and creates it
-     * if needed
+     * Checks whether the group holding all of the slices has been created,
+     * and creates it if necessary.
      */
     _checkInitialGroupCreation: function() {
       // checks to see if the group already exists. If not, create; if so, update
@@ -219,7 +217,7 @@ Custom property | Description
       }
     },
     /**
-     * all subsequent drawings when adding, removing or updating data
+     * Updates drawing when adding, removing or updating data.
      */
     _updateDrawing: function() {
 
@@ -329,8 +327,9 @@ Custom property | Description
     },
 
     /**
-     * Function used to display a tooltip for a specific slice
+     * Function used to display a tooltip for a specific slice.
      *
+     * @method _sliceMouseEnter
      */
     _sliceMouseEnter: function(datum, index, group) {
 
@@ -349,7 +348,7 @@ Custom property | Description
       this.fire('px-vis-pie-mouse-leave-slice', {datum: datum});
     },
     /**
-     * Position the chart given the rotation angle
+     * Position the chart given the rotation angle.
      */
     _positionChart: function(transitionTime) {
 
@@ -360,8 +359,9 @@ Custom property | Description
           .attr('transform', 'rotate(' + this._radToDeg(this._currentRotationAngle) + ')');
     },
     /**
-     * Emits px-vis-pie-slice-clicked event with selected slice data
+     * Emits px-vis-pie-slice-clicked event with selected slice data.
      *
+     * @method _onSliceClick
      */
     _onSliceClick: function (datum, index, group) {
 
@@ -370,8 +370,9 @@ Custom property | Description
       this._centerOnSlice(datum, index, group);
     },
     /**
-     * Transforms the svg to show the slice at the top (12 o clock)
+     * Transforms the svg to show the slice at the top (12 o'clock).
      *
+     * @method _centerOnSlice
      */
     _centerOnSlice: function(datum, index, group) {
       if(!this.empty) {
@@ -384,15 +385,17 @@ Custom property | Description
       }
     },
     /**
-     * Converts rad to deg
+     * Converts radians to degrees.
      *
+     * @method _radToDeg
      */
     _radToDeg: function(angle) {
       return angle * 180 / Math.PI;
     },
     /**
-     * Calculates the approriate rotation angle for the slice to be displayed at 12 o clock
+     * Calculates the appropriate rotation angle for the slice to be displayed at 12 o'clock.
      *
+     * @method _getRotationAngle
      */
     _getRotationAngle: function(slice) {
       //get angle to middle of slice, then adjust rotation direction

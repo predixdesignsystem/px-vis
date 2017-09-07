@@ -5,15 +5,15 @@
 <link rel="import" href="px-vis-behavior-chart.html" />
 <link rel="import" href="px-vis-behavior-scale.html" />
 <link rel="import" href="px-vis-behavior-renderer.html"/>
-<link rel="import" href="px-vis-svg.html"/>
+<link rel="import" href="px-vis-svg-canvas.html"/>
 <link rel="import" href="px-vis-line-svg.html"/>
 <link rel="import" href="px-vis-axis.html"/>
 <link rel="import" href="px-vis-brush.html"/>
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html" />
 <link rel="import" href="px-vis-behavior-colors.html" />
+<link rel="import" href="css/px-vis-styles.html">
 
 <!--
-Provides an interactive chart navigator with a brush to adjust the chart domain
 
 ### Usage
     <px-vis-chart-navigator
@@ -66,8 +66,6 @@ Custom property | Description
 @homepage index.html
 @demo demo.html
 -->
-
-<link rel="import" href="css/px-vis-styles.html">
 
 <dom-module id="px-vis-chart-navigator">
     <template>
@@ -263,7 +261,7 @@ Custom property | Description
             notify:true
           },
           /**
-           * Boolean specifying if the rectangle overlay should have a gradient applied
+           * Boolean specifying if the rectangular overlay should have a gradient applied
            *
            */
           gradientOverlay: {
@@ -271,7 +269,7 @@ Custom property | Description
             value: false
           },
           /**
-           * Can be set to override the time span shown by the navigator. Allows to use
+           * Can be set to override the time span shown by the navigator. Allows use of
            * the navigator without data.
            *
            * * Format ISO8601 strings
@@ -348,7 +346,7 @@ Custom property | Description
         },
 
         /**
-         * Dom if function to decide if a repeated item is above our limit
+         * Dom if function to decide if a repeated item is above the limit
          */
         _limitSeries: function(i) {
           return i < this.navSeriesLimit;
@@ -376,7 +374,7 @@ Custom property | Description
         },
 
         /**
-         * When a range from rangepicker changes
+         * Sets the range when the values in rangepicker changes
          */
         _rangeChanged: function() {
           var newXRange = [

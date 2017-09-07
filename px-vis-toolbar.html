@@ -4,17 +4,101 @@
 <link rel="import" href="../px-icon-set/px-icon.html"/>
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
+<link rel="import" href="css/px-vis-toolbar-styles.html">
 
 
 <!--
-Element providing an on-chart zoom.
 
 ### Usage
 
     <px-vis-toolbar
-      additional-detail="[[item]]"
-      dynamic-menu-config="[[dynamicMenuConfig]]">
+      config="[[config]]"
+      horizontal-alignment="left">
     </px-vis-toolbar>
+
+Example of a custom `config` object:
+
+    {
+      "customzoom": {
+        // label used for the tooltip of this button:
+        "tooltipLabel": "zoom",
+        // px-icon-set icon used for this button:
+        "icon": "px-vis:zoom",
+        "onClick": "function() {this.set(\"_internalShowTooltip\", false);}",
+        // context to be used in `onClick`:
+        "onClickContext': "toolbar",
+        // if a button is part of a button group then it becomes selected when clicked
+        // and all other buttons in the same group become deselected:
+        "buttonGroup": 1,
+        // force this button to be selected at start
+        // (including applying its actionConfig and subConfig):
+        "selected": true,
+        // this config will be propagated to px-vis-interaction-space:
+        "actionConfig": {
+          // key = an event, value = either a predefined action from `actionMapping` in interaction-space:
+          "mousedown": "startZooming",
+          "mouseup": "stopZooming",
+          // or a function, where `this` will be bound to the chart:
+          "mousemove": "function() { console.log(\"Mouse moved on the chart!\");}"
+          // or null, which ensures previously registered actions will be removed:
+          "mouseout": "null",
+        },
+        // subConfig allows you to define a second row of buttons
+        // which will be displayed after clicking the main button:
+        "subConfig": {
+          "x": {
+            // you can use a title instead of/in addition to the icon:
+            "title": "X",
+            "tooltipLabel": "Zoom on X axis only",
+            // an event will be fired when clicking on this button:
+            "eventName": "my-custom-click",
+            "selectable": true,
+            "selected": true,
+            // this function will be run when clicking the button
+            // `this` will be bound to the chart unless `onClickContext` is defined
+            // if defined in HTML, needs to be a string - if JS, can be a function:
+            "onClick": "function() { this.set(\"selectionType\", \"xAxis\");}"
+          },
+          "y": {
+            "title": "Y",
+            "tooltipLabel": "Zoom on Y axis only",
+            "selectable": true,
+            "onClick": "function() { this.set(\"selectionType\", \"yAxis\");}"
+          },
+          "xy": {
+            "title": "XY",
+            "tooltipLabel": "Zoom on X and Y axis",
+            "selectable": true,
+            "onClick": "function() { this.set(\"selectionType\", \"xy\");}"
+          },
+          "zoomIn": {
+            "icon": "fa-plus",
+            "tooltipLabel": "zoom in",
+            // these events are vis specific events and
+            // are automatically caught by the chart and handled:
+            "eventName": "px-vis-toolbar-zoom-in"
+          },
+          "zoomOut": {
+            "icon": "fa-minus",
+            "tooltipLabel": "zoom out",
+            "eventName": "px-vis-toolbar-zoom-out"
+          },
+          "undoZoom": {
+            "icon": "fa-undo",
+            "tooltipLabel": "undo zoom",
+            "eventName": "px-vis-toolbar-undo-zoom"
+          },
+          "resetZoom": {
+            "icon": "px-vis:full-screen",
+            "tooltipLabel": "reset zoom to initial value",
+            "eventName": "px-vis-toolbar-reset-zoom"
+          }
+        }
+      },
+      //default "out of the box" panning button:
+      "pan": true,
+      //default "out of the box" tooltip button:
+      "tooltip": true
 
 @element px-vis-toolbar
 @blurb Element providing a menu dynamically built depending on options
@@ -29,7 +113,6 @@ Custom property | Description
   `--px-vis-toolbar-selected-color` |
 -->
 
-<link rel="import" href="css/px-vis-toolbar-styles.html">
 
 <dom-module id="px-vis-toolbar">
   <template>
@@ -52,9 +135,9 @@ Custom property | Description
       </span>
       <!--sub row-->
       <template id="templateSubRow" is="dom-if" if="[[_isWithinChart(withinChart)]]">
-        <span id="subRow" class$="flex subrow--container [[_getRowDirection(horizontalAlignment)]] [[_getSubRowClass(withinChart, subToolbarAlignment)]]">
+        <span id="subRow" class$="flex subrow--container [[_getRowDirection(horizontalAlignment)]] [[_getSubRowClass(subToolbarAlignment)]]">
           <template id="subRepeat" is="dom-repeat" items="{{currentSubConfig}}" strip-whitespace>
-              <span class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]]" on-tap="_clickSubItem" value="{{index}}">
+              <span class$="u-p- flex__item main-item subrow--item [[_getSelectedClass(item.selected)]]" on-tap="_clickSubItem" value="{{index}}">
                 <template is="dom-if" if="[[item.icon]]">
                   <px-icon class="icon"icon="[[item.icon]]" value="{{index}}"></px-icon>
                 </template>
@@ -83,6 +166,14 @@ Custom property | Description
       PxVisBehavior.actionConfig
     ],
 
+
+    /**
+     * Fired after the secondary toolbar has opened or closed. Evt.detail
+     * includes an `open` property reflecting whether the secondary
+     * toolbar is now open or closed.
+     * @event px-vis-toolbar-secondary-toggled
+     */
+
     /**
      * Properties block, expose attribute values to the DOM via 'reflect'
      *
@@ -91,20 +182,20 @@ Custom property | Description
      */
     properties: {
       /**
-       * Whether the toolbar is within a chart. drives where the secondary toolbar is displayed
+       * Whether the toolbar is within a chart. Drives where the secondary toolbar is displayed.
        */
       withinChart: {
         type: Boolean,
         value: false
       },
       /**
-       * The charts margin. Used to position the secondary toolbar if withinChart is true
+       * The chart margins. Used to position the secondary toolbar if withinChart is true.
        */
       chartMargin: {
         type: Object
       },
       /**
-       * Config for default actions: tooltip/pan/zoom
+       * Config for default actions: tooltip/pan/zoom.
        */
       _defaultActionsMapping: {
         type: Object,
@@ -400,31 +491,31 @@ Custom property | Description
         }
       },
       /**
-       * Current subconfiguration. Can be the result of the config or passed in from another toolbar
+       * Current sub-configuration. Can be the result of the config or passed in from another toolbar.
        */
       currentSubConfig: {
         type: Object,
         notify: true
       },
       /**
-       * Current config used to build the toolbar
+       * Current config used to build the toolbar.
        */
       _internalConfig: {
         type: Object
       },
       /**
-       * Horizontal alignment of the toolbar. Accepted values:
-       * - left
-       * - right
+       * Horizontal alignment of the toolbar. Should be 'left' or 'right'.
        */
       horizontalAlignment: {
         type: String,
         value: 'right'
       },
       /**
-       * alignment of the sub toolbar. Accepted values:
+       * Alignment of the sub toolbar. Accepted values:
        * - horizontal
        * - vertical
+       * - above (when in a chart, the sub toolbar will be displayed
+       * above the chart rather than on top of it)
        */
       subToolbarAlignment: {
         type: String,
@@ -434,84 +525,8 @@ Custom property | Description
        * Configuration object for the toolbar. This object drives what buttons are available on
        * the toolbar and what they do. Three actions can be used out of the box by passing them
        * as keys in this config: 'zoom', 'pan' and 'tooltip'.
-       * Any other kind of actions and buttons can be defined through this object.
-       * Example of a custom config:
-       * ```
-       * {
-       *   "customzoom": {
-       *     "tooltipLabel": "zoom",          //label used for the tooltip for this button
-       *     "icon": "px-vis:zoom",             //font-awesome icon used for this button
-       *     "onClick": "function() {this.set(\"_internalShowTooltip\", false);}",
-       *     "onClickContext': "toolbar",   //context to be used on `onClick`. If "toolbar"
-       * is specified then the context will be this toolbar
-       *     "buttonGroup": 1,              //if a button is part of a button group then it
-       * becomes blue when clicked and all other buttons with the same button group in the
-       * same row become deselected (not blue)
-       *     "selected": true,                //force this button to be selected at start
-       *(including applying its actionConfig and subConfig)
-       *     "actionConfig": {                //this config will be propagated to
-       * px-vis-interaction-space
-       *       "mousedown": "startZooming",   //key is an event, value is either a
-       * predefined action defined in `actionMapping` in px-vis-interaction-space or a
-       * function which context is bound to the chart
-       *         "mouseup": "stopZooming",
-       *         "mouseout": "null",          //by specifying null it ensures previous
-       * actions registered against this event will be removed
-       *         "mousemove": "function() { console.log(\"Mouse moved on the chart!\");}"
-       *       },
-       *       "subConfig": {                 //subConfig allows you to defined a second row
-       * of buttons which will be displayed when clicking the main button
-       *         "x": {
-       *           "title": "X",              //you can use a title instead of/in addition to
-       * the icon
-       *           "tooltipLabel": "Zoom on X axis only",
-       *           "eventName": "my-custom-click", //an event will be fired when clicking on
-       * this button
-       *           "selectable": true,
-       *           "selected": true,
-       *           "onClick": "function() { this.set(\"selectionType\", \"xAxis\");}" //this
-       * function will be run when clicking the button. The chart will be the context of this
-       * function unless `onClickContext` is defined. If defined in HTML this needs to be a
-       * string, but if defined in javascript this can be a function
-       *         },
-       *         "y": {
-       *           "title": "Y",
-       *           "tooltipLabel": "Zoom on Y axis only",
-       *           "selectable": true,
-       *           "onClick": "function() { this.set(\"selectionType\", \"yAxis\");}"
-       *         },
-       *         "xy": {
-       *           "title": "XY",
-       *           "tooltipLabel": "Zoom on X and Y axis",
-       *           "selectable": true,
-       *           "onClick": "function() { this.set(\"selectionType\", \"xy\");}"
-       *         },
-       *         "zoomIn": {
-       *           "icon": "fa-plus",
-       *           "tooltipLabel": "zoom in",
-       *           "eventName": "px-vis-toolbar-zoom-in" //those events are vis specific
-       * events and are automatically caught by the chart to do something
-       *         },
-       *         "zoomOut": {
-       *           "icon": "fa-minus",
-       *           "tooltipLabel": "zoom out",
-       *           "eventName": "px-vis-toolbar-zoom-out"
-       *         },
-       *         "undoZoom": {
-       *           "icon": "fa-undo",
-       *           "tooltipLabel": "undo zoom",
-       *           "eventName": "px-vis-toolbar-undo-zoom"
-       *         },
-       *         "resetZoom": {
-       *           "icon": "px-vis:full-screen",
-       *           "tooltipLabel": "reset zoom to inital value",
-       *           "eventName": "px-vis-toolbar-reset-zoom"
-       *         }
-       *       }
-       *     },
-       *     "pan": true,           //default "out of the box" panning button
-       *     "tooltip": true        //default "out of the box" tooltip button
-       * ```
+       * Any other kind of actions and buttons can be defined through this object. See above for example.
+       *
        */
       config: {
         type: Object
@@ -520,7 +535,7 @@ Custom property | Description
       * Configuration used to define what actions happen on events. Each key represents an event,
       * each value can be:
       * - a predefined action found as a key in px-vis-interaction-space `actionMapping`
-      * - a function which context will be bound to the chart. The function argument will be the mouse position on the chart
+      * - a function, where `this` will be bound to the chart and the function's argument will be the mouse position on the chart
       */
       actionConfig: {
         type: Object,
@@ -611,7 +626,9 @@ Custom property | Description
     _clickItem: function(evt) {
       evt = Polymer.dom(evt);
       var index = evt.localTarget.value,
-          conf = this._internalConfig[index];
+          conf = this._internalConfig[index],
+          alreadyOpened,
+          needNotify = false;
 
       //make it the current selection if it is in a buttonGroup
       if(conf.buttonGroup) {
@@ -631,14 +648,41 @@ Custom property | Description
           }
         }
 
-        // change styles on the new button
-        this.set('_internalConfig.#' + index + '.selected', true);
+        //toggle style on the new button
+        alreadyOpened = this._internalConfig[index].selected;
+        this.set('_internalConfig.#' + index + '.selected', !alreadyOpened);
       }
 
-      this._tryProcessSubConfig(conf);
-      this._processItem(conf);
 
-      this._tryApplySelectedSub(conf);
+      if(!alreadyOpened) {
+
+        if(!this.currentSubConfig || this.currentSubConfig.length === 0) {
+          needNotify = true;
+        }
+
+        //open sub toolbar
+        this._tryProcessSubConfig(conf);
+        this._processItem(conf);
+
+        this._tryApplySelectedSub(conf);
+      } else {
+
+        if(this.currentSubConfig !== []) {
+          needNotify = true;
+        }
+
+        //close subtoolbar
+        this.set('currentSubConfig', []);
+      }
+
+      if(needNotify) {
+
+        //make sure that the toolbar has been re rendered (i.e hidden or shown)
+        this.$.templateSubRow.render();
+
+        //tell the chart so it can resize
+        this.fire('px-vis-toolbar-secondary-toggled', {'open': this.currentSubConfig !== []});
+      }
     },
 
     _tryProcessSubConfig: function(conf) {
@@ -792,31 +836,31 @@ Custom property | Description
       this._alignRow(this.$$('#mainRow'));
     },
     _positionSubRow: function(withinChart, chartMargin, horizontalAlignement) {
-      if(withinChart) {
+      if(this.withinChart) {
 
         //make sure dom if is up to date
         this.$.templateSubRow.render();
 
-        this.$$('#subRow').style['margin-top'] = Number(chartMargin.top) + 'px';
+        this.$$('#subRow').style['margin-top'] = this.subToolbarAlignment === 'above' ? '0px' : Number(chartMargin.top) + 'px';
         this._alignRow(this.$$('#subRow'));
       }
     },
-    _getSubRowClass: function(withinChart, subToolbarAlignment) {
-      var base = withinChart ? 'subrow--chart ' : '';
+    _getSubRowClass: function(subToolbarAlignment) {
+      var base = this.subToolbarAlignment === 'above' ? '' : 'subrow--chart ';
 
-      if(subToolbarAlignment === 'horizontal') {
-        base += ' flex--row';
+      if(this.subToolbarAlignment === 'vertical') {
+        base += ' flex--col flex--bottom right ';
       } else {
-        base += ' flex--col flex--bottom';
+        base += ' flex--row';
       }
 
       return base;
     },
     _isWithinChart: function(withinChart) {
-      return withinChart;
+      return this.withinChart;
     },
     _getRowDirection: function(horizontalAlignment) {
-      if(horizontalAlignment === 'right') {
+      if(this.horizontalAlignment === 'right') {
         return 'flex--row--rev right ';
       } else {
         return 'flex--row ';

@@ -5,9 +5,9 @@
 <link rel="import" href="../px-tooltip/px-tooltip.html"/>
 <link rel="import" href="../px-icon-set/px-icon-set.html"/>
 <link rel="import" href="../app-localize-behavior/app-localize-behavior.html"/>
+<link rel="import" href="css/px-vis-styles.html">
 
 <!--
-d3 element which draws a line and icon on the chart representing an event.
 
 ### Usage
 
@@ -24,7 +24,7 @@ d3 element which draws a line and icon on the chart representing an event.
 
 The configuration object allows developers to set the icon used for each event type.
 
-It should follow the following form:
+It should follow this form:
 
     eventConfig = {
       "Event Name 1":{
@@ -69,8 +69,6 @@ Custom property | Description
 @homepage index.html
 @demo demo.html
 -->
-
-<link rel="import" href="css/px-vis-styles.html">
 
 <dom-module id="px-vis-event">
     <template>
@@ -121,7 +119,7 @@ Custom property | Description
     properties: {
 
       /**
-       * Holder object for the event svg "g" element
+       * Holder object for the event svg "g" element.
        *
        * @property eventGroup
        * @type Object
@@ -131,7 +129,7 @@ Custom property | Description
         value: function() { return {}; }
       },
       /**
-       * Holder object for the event svg "line" element
+       * Holder object for the event svg "line" element.
        *
        * @property eventLine
        * @type Object
@@ -141,7 +139,7 @@ Custom property | Description
         value: function() { return {}; }
       },
       /**
-       * Holder object for the event svg icon
+       * Holder object for the event svg icon.
        *
        * @property eventIcon
        * @type Object
@@ -151,7 +149,7 @@ Custom property | Description
         value: function() { return {}; }
       },
       /**
-       * Computed configuration object based on dev set styles and default styles
+       * Computed configuration object based on custom styles and default styles.
        *
        * @property _thisConfig
        * @type Object
@@ -161,7 +159,7 @@ Custom property | Description
       value: function() { return {}; }
       },
       /**
-       * Specifies the orientation of the event tooltip
+       * Specifies the orientation of the event tooltip.
        *
        * @property tooltipOrientation
        * @type String
@@ -171,7 +169,7 @@ Custom property | Description
         value: 'left'
       },
       /**
-       * Specifies the x key for the event data
+       * Specifies the x key for the event data.
        *
        */
       xKey: {
@@ -179,7 +177,7 @@ Custom property | Description
         value: 'x'
       },
       /**
-       * Tracks if the event configuration has been edited
+       * Tracks if the event configuration has been edited.
        *
        */
       _eventConfigChanged: {
@@ -198,7 +196,7 @@ Custom property | Description
       },
 
       /**
-       * List of key/values to be included for translating this component
+       * List of keys & values used for translating this component.
        */
       resources: {
         type: Object,
@@ -214,15 +212,19 @@ Custom property | Description
         }
       },
       /**
-      * set a default for localizing
-      */
+       * A valid IETF language tag as a string that will be
+       * used to localize this component.
+       *
+       * See https://github.com/PolymerElements/app-localize-behavior for API
+       * documentation and more information.
+       */
       language: {
         type: String,
         value: 'en'
       },
       /**
-      * Use the key for localization if value for  language is missing. Should
-      * always be true for  our components
+      * Use the key for localization if value for language is missing.
+      * Should always be true for Predix components.
       */
      useKeyIfMissing: {
        type: Boolean,
@@ -331,7 +333,7 @@ Custom property | Description
 
     /**
      * Draws or updates the event element.
-     * Called from an observer watching for data and the necessary d3 objects
+     * Called from an observer watching for data and the necessary d3 objects.
      *
      * @method drawElement
      */
@@ -369,8 +371,8 @@ Custom property | Description
 
 
     /**
-     * Updates the position of the event
-     * Called from an observer watching for data and the necessary d3 objects
+     * Updates the position of the event.
+     * Called from an observer watching for data and the necessary d3 objects.
      *
      * @method positionElement
      */
@@ -381,7 +383,7 @@ Custom property | Description
     },
 
     /**
-     * Helper to call addClipPath with the elem
+     * Helper to call addClipPath with the element.
      *
      * @method _addClipPath
      */
@@ -391,7 +393,7 @@ Custom property | Description
     },
 
     /**
-     * Sets the position for the event line and icon
+     * Sets the position for the event line and icon.
      *
      * @method _positionEvent
      */
@@ -433,7 +435,7 @@ Custom property | Description
     },
 
     /**
-     * Compiles a configuration object by looking if there is a dev set style, or if it should use defaults
+     * Compiles a configuration object by looking if there is a custom style, or if it should use defaults.
      *
      * @method _processConfiguration
      */
@@ -476,7 +478,7 @@ Custom property | Description
       }
     },
     /**
-     * Formats the datetime to match the dev set format
+     * Formats the datetime to match the custom format.
      *
      * @method _formatDatetime
      */
@@ -484,7 +486,7 @@ Custom property | Description
       return this.formatTimestamp(time, this.timezone, format);
     },
     /**
-     * returns the title value to the tooltip
+     * Returns the title value to the tooltip.
      *
      */
     _getValueTitle: function(xAxisType) {
@@ -495,7 +497,7 @@ Custom property | Description
       }
     },
     /**
-     * returns the value of the x
+     * Returns the x value.
      *
      */
     _getValue: function(xAxisType) {
