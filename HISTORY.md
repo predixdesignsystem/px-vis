@@ -1,3 +1,7 @@
+v2.2.2
+==================
+* Ensure line canvas redraws on counterClockwise and useDegree changes
+
 v2.2.1
 ==================
 * ensure muteunmute behavior is always loaded for completeSeriesConfig
