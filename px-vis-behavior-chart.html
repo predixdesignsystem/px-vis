@@ -788,9 +788,8 @@ PxVisBehaviorChart.chartAutoResize = [{
         this.notifyResize();
       }
     },
-    _secondaryToolbarToggled: function() {
-      if(!this.preventResize) {
-
+    _secondaryToolbarToggled: function(e) {
+      if(!this.preventResize && !e.detail.withinChart) {
         //ensure we bypass the debounce as we want to resize asap
         var oldDebounce = this.debounceResizeTiming;
         this.debounceResizeTiming = 0;

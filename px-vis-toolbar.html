@@ -681,7 +681,7 @@ Custom property | Description
         this.$.templateSubRow.render();
 
         //tell the chart so it can resize
-        this.fire('px-vis-toolbar-secondary-toggled', {'open': this.currentSubConfig !== []});
+        this.fire('px-vis-toolbar-secondary-toggled', {'open': this.currentSubConfig !== [], withinChart: this.withinChart});
       }
     },
 
@@ -797,18 +797,18 @@ Custom property | Description
       var icon = null,
           fn;
 
-          // In general if a acton doesnt have a cursor icon, we want to use the last
-          // if we are forcing a reset, then start off null and overwrite if there is a cursorIcon
-          if(resetIcon) {
-            icon = null;
-          }
+        // In general if a acton doesnt have a cursor icon, we want to use the last
+        // if we are forcing a reset, then start off null and overwrite if there is a cursorIcon
+        if(resetIcon) {
+          icon = null;
+        }
 
-          if(conf.cursorIcon) {
-           icon = conf.cursorIcon;
-          }
+        if(conf.cursorIcon) {
+          icon = conf.cursorIcon;
+        }
 
 
-          fn = function() { this.set('interactionSpaceConfig.iconType', icon); };
+        fn = function() { this.set('interactionSpaceConfig.iconType', icon); };
 
       this.fire('px-vis-action-request', {'function': fn, 'data': null });
 
