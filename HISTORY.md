@@ -1,3 +1,7 @@
+v2.2.3
+==================
+* Ensure cursor-line can use mutedSeries
+
 v2.2.2
 ==================
 * Ensure line canvas redraws on counterClockwise and useDegree changes
