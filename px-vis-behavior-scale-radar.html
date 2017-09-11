@@ -48,8 +48,8 @@
      *
      * @method _setXScale
      */
-    _setXScale: function(radius, useDegrees, forceRecreation) {
-      var range = this.useDegrees ? [0, 360] : [0, 2*Math.PI],
+    _setXScale: function(radius, forceRecreation) {
+      var range = [0, 2*Math.PI],
           x;
 
       if(this.x && !forceRecreation) {
@@ -89,7 +89,7 @@
     _recreateScales: function() {
 
       if(this.x) {
-        this._setXScale(this._radius, this.useDegrees, true);
+        this._setXScale(this._radius, true);
       }
 
       if(this.y) {
@@ -104,31 +104,40 @@
     _generateChartExtents: function() {
       if(this.chartData && this.chartData.length > 0 && this.dimensions && this.dimensions.length > 0) {
         var ext = {
-              "x": this.dimensions,
-              "y": (this.chartExtents && this.chartExtents.y) ? this.chartExtents.y : null
+              "x": (this.chartExtents && this.chartExtents.x) ? this.chartExtents.x : this.dimensions,
+              "y": null
             },
             min = Infinity,
             max = -Infinity,
+            doMin = true,
             doMax = true;
 
-        if(!ext.y) {
+        if(this.chartExtents && this.chartExtents.y && this.chartExtents.y.length === 2) {
+          min = this.chartExtents.y[0] === 'dynamic' ? Infinity : this.chartExtents.y[0];
+          max = this.chartExtents.y[1] === 'dynamic' ? -Infinity : this.chartExtents.y[1];
+
+          doMin = min === Infinity ? true : false;
+          doMax = max === -Infinity ? true : false;
+        }
+
+        if(doMin || doMax) {
           // go through all data and find min and max
           for(var i = 0; i < this.dimensions.length; i++) {
             for(var j = 0; j < this.chartData.length; j++) {
               if(this._isValidData(this.chartData[j][this.dimensions[i]])) {
-                min = Math.min(min, this.chartData[j][this.dimensions[i]]);
-                max = Math.max(max, this.chartData[j][this.dimensions[i]]);
+                min = doMin ? Math.min(min, this.chartData[j][this.dimensions[i]]) : min;
+                max = doMax ? Math.max(max, this.chartData[j][this.dimensions[i]]) : max;
               }
             }
           }
-
-          // if all data is the same value, add 1 so we still get a range
-          if(min === max){
-            max += 1;
-          }
-
-          ext.y = [min,max];
         }
+
+        // if all data is the same value, add 1 so we still get a range
+        if(min === max){
+          max += 1;
+        }
+
+        ext.y = [min,max];
 
         this.set('_calculatedExtents',ext);
       }
@@ -139,11 +148,11 @@
      *
      * https://github.com/mbostock/d3/wiki/API-Reference
      *
-     * @method _currentDomain
+     * @method _setDomain
      */
-      _currentDomain: function() {
+      _setDomain: function() {
 
-      this.debounce('_currentDomain', function() {
+      this.debounce('_setDomain', function() {
         // check to make sure there is data
         if(this._doesObjHaveValues(this.x) && this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this._calculatedExtents)){
 
@@ -155,7 +164,6 @@
           // Set the domains
           this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
 
-          this.fire('px-vis-domain-changed-updated', { 'dataVar': 'domainChanged', 'data': this.domainChanged, 'method':'set' });
         }
       }.bind(this), 10);
     },
@@ -172,6 +180,8 @@
       }
     },
   },
+    PxVisBehavior.commonMethods,
+    PxVisBehavior.dataset,
     PxVisBehavior.sizing,
     PxVisBehavior.chartExtents,
     PxVisBehaviorD3.radialAxisConfig,

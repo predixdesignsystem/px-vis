@@ -26,14 +26,6 @@
      */
     properties: {
       /**
-      * Array of the amplitude keys.
-      *
-      */
-      amplitudeKeys: {
-        type: Array,
-        notify: true
-      },
-      /**
       * Holder for the calculated extents.
       *
       */
@@ -48,8 +40,8 @@
      *
      * @method _setYScale
      */
-    _setYScale: function(width,margin,centerOffset) {
-      var range = [centerOffset, width],
+    _setYScale: function(radius,centerOffset) {
+      var range = [centerOffset, radius],
           y = Px.d3.scaleLinear().nice().range(range);
 
       y._scaleType = "linear";
@@ -59,7 +51,7 @@
 
     _recreateScales: function() {
       if(this.y) {
-        this._setYScale(this.width, this.margin, this.centerOffset);
+        this._setYScale(this._radius, this.centerOffset);
       }
     },
 
@@ -130,7 +122,7 @@
 
           var exts = this._calculatedExtents;
 
-          this.y.domain(exts.y);
+          this.y.domain(exts);
 
           /*
             We dont actually need an x for Polar,
@@ -143,8 +135,6 @@
 
           // Set the domains
           this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
-
-          this.fire('px-vis-domain-changed-updated', { 'dataVar': 'domainChanged', 'data': this.domainChanged, 'method':'set' });
         }
       }.bind(this), 10);
     }
