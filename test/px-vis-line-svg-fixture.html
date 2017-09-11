@@ -14,14 +14,15 @@
 
 
     <link rel="import" href="../px-vis-scale.html" />
-    <link rel="import" href="../px-vis-radial-scale.html" />
     <link rel="import" href="../px-vis-svg.html" />
     <link rel="import" href="../px-vis-svg-canvas.html" />
-    <link rel="import" href="../px-vis-multi-scale.html" />
     <link rel="import" href="../px-vis-line-svg.html" />
     <link rel="import" href="../px-vis-line-canvas.html" />
     <link rel="import" href="behaviors/px-colors-behavior.html" />
     <link rel="import" href="../px-vis-behavior-scale-multi-axis.html" />
+    <link rel="import" href="../px-vis-behavior-scale-radial.html" />
+    <link rel="import" href="../px-vis-behavior-scale-radar.html" />
+
 
 
     <!-- Retain this link for px-theme.html -->
@@ -29,6 +30,12 @@
     <link rel="import" href="../../px-theme/px-theme-styles.html">
     <style include="px-theme-styles" is="custom-style"></style>
 
+    <script src="px-vis-line-svg-xy-tests.js"></script>
+    <script src="px-vis-line-svg-parallel-tests.js"></script>
+    <script src="px-vis-line-svg-polar-tests.js"></script>
+    <script src="px-vis-line-svg-radar-tests.js"></script>
+    <script src="px-vis-line-svg-interpolation-tests.js"></script>
+    <script src="px-vis-line-svg-domrepeat-tests.js"></script>
     <script src="px-vis-line-svg-tests.js"></script>
   </head>
 
@@ -179,8 +186,14 @@
 <!--  PARALLEL COORDINATES SVG-->
     <script>
       Polymer({
-        is: 'test-component',
-        behaviors: [ PxVisBehaviorScale.scaleMultiAxis ]
+        is: 'px-vis-multi-scale',
+        behaviors: [ PxVisBehaviorScale.scaleMultiAxis ],
+        observers: [
+          '_setXScale(width,margin)',
+          '_setYScale(height,margin,axes)',
+          '_generateDataExtents(dimensions)',
+          '_setDomain(x, y, dataExtents)',
+        ]
       })
     </script>
 
@@ -298,6 +311,18 @@
 
 
     <!-- POLAR -->
+    <script>
+      Polymer({
+        is: 'px-vis-radial-scale',
+        behaviors: [ PxVisBehaviorScale.radial ],
+        observers: [
+          '_setYScale(radius,offset)',
+          '_generateChartExtents(chartData.*, _amplitudeKey)',
+          '_setDomain(y, _calculatedExtents)',
+        ]
+      })
+    </script>
+
     <template is="dom-bind">
       <px-vis-radial-scale
         id="polarScale"
@@ -408,14 +433,28 @@
     </template>
 
     <!--  RADAR -->
+    <script>
+      Polymer({
+        is: 'px-vis-radar-scale',
+        behaviors: [ PxVisBehaviorScale.radar ],
+        observers: [
+          '_setXScale(_radius)',
+          '_setYScale(_radius,centerOffset)',
+          '_generateChartExtents(chartData.*, dimensions)',
+          '_generateChartExtents(chartExtents)',
+          '_setDomain(x, y, _calculatedExtents)',
+        ]
+      })
+    </script>
+
     <template is="dom-bind">
-      <px-vis-radial-scale
+      <px-vis-radar-scale
         id="radarScale"
         radar
         x="{{x}}"
         y="{{y}}"
         domain-changed="{{domainChanged}}">
-      </px-vis-radial-scale>
+      </px-vis-radar-scale>
       <px-vis-svg-canvas
         id="radarSVG"
         svg="{{svg}}">
@@ -434,13 +473,13 @@
     </template>
 
     <template is="dom-bind">
-      <px-vis-radial-scale
+      <px-vis-radar-scale
         id="radarMissingScale"
         radar
         x="{{x}}"
         y="{{y}}"
         domain-changed="{{domainChanged}}">
-      </px-vis-radial-scale>
+      </px-vis-radar-scale>
       <px-vis-svg-canvas
         id="radarMissingSVG"
         svg="{{svg}}">
@@ -457,7 +496,7 @@
       </px-vis-line-svg>
     </template>
 
-
+<!-- Interpolation-->
     <template is="dom-bind">
       <px-vis-scale
         id="interpolationScale"

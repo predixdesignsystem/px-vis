@@ -19,6 +19,14 @@ var PxVisBehaviorScale = PxVisBehaviorScale || {};
     @polymerBehavior PxVisBehaviorScale.scaleMultiAxis
 */
 PxVisBehaviorScale.scaleMultiAxis = [{
+    properties: {
+      _usedChartExtents: {
+        type: Object,
+        value: function() {
+          return {};
+        }
+      }
+    },
     _recreateScales: function() {
       if(this.x) {
         this._setXScale(this.width, this.margin, true);
@@ -81,10 +89,11 @@ PxVisBehaviorScale.scaleMultiAxis = [{
 
       if(this.dimensions) {
 
-        var ext = {
-                  "x": this.dimensions,
-                  "y": {}
-                };
+        var usedChartExtents = {},
+            ext = {
+              "x": this.dimensions,
+              "y": {}
+            };
 
         if(!this.chartExtents) {
 
@@ -124,19 +133,21 @@ PxVisBehaviorScale.scaleMultiAxis = [{
               ext.y[this.dimensions[i]] = [];
 
               //deal with min
-              if(this.chartExtents[this.dimensions[i]][0] === "dynamic") {
+              if(this.chartExtents[this.dimensions[i]][0] === "dynamic" || this.chartExtents[this.dimensions[i]][0] === Infinity) {
                 searchMin = true;
               } else {
                 //keep this min
                 ext.y[this.dimensions[i]][0] = this.chartExtents[this.dimensions[i]][0];
+                usedChartExtents[this.dimensions[i]] = true;
               }
 
               //deal with max
-              if(this.chartExtents[this.dimensions[i]][1] === "dynamic") {
+              if(this.chartExtents[this.dimensions[i]][1] === "dynamic" || this.chartExtents[this.dimensions[i]][1] === -Infinity) {
                 searchMax = true;
               } else {
                 //keep this max
                 ext.y[this.dimensions[i]][1] = this.chartExtents[this.dimensions[i]][1];
+                usedChartExtents[this.dimensions[i]] = true;
               }
             } else {
               searchMin = true;
@@ -171,6 +182,8 @@ PxVisBehaviorScale.scaleMultiAxis = [{
             }
           }
         }
+
+        this._usedChartExtents = usedChartExtents;
         this.set('dataExtents',ext);
       }
     },
@@ -194,7 +207,11 @@ PxVisBehaviorScale.scaleMultiAxis = [{
             if(!this.y[dims[i]]) {
               return;
             }
-            this.y[dims[i]].domain(exts.y[dims[i]]).nice();
+            this.y[dims[i]].domain(exts.y[dims[i]]);
+
+            if(!this._usedChartExtents[dims[i]] || this.commonAxis) {
+              this.y[dims[i]].nice();
+            }
 
             // if match ticks, make sure the domains can be aligned
             // have to set our domain first sadly
