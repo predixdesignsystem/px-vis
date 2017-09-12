@@ -1,3 +1,7 @@
+v2.2.4
+==================
+* Guards quadtree search in case a series is missing
+
 v2.2.3
 ==================
 * Ensure cursor-line can use mutedSeries

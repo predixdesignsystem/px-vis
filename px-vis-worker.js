@@ -620,7 +620,11 @@ function searchQuadtreeSeries(visData, dataObj, quadtreeData) {
   for(var i = 0; i < visData.keys.length; i++) {
     k = visData.keys[i];
 
-    result = quadtreeData[k].find(visData.mousePos[0], visData.mousePos[1], r);
+    if(quadtreeData[k]) {
+      result = quadtreeData[k].find(visData.mousePos[0], visData.mousePos[1], r);
+    } else {
+      result = null;
+    }
 
     dataObj = constructDataObj(result, dataObj, k, visData, false, xScale);
   }
