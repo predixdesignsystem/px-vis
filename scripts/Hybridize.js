@@ -79,7 +79,7 @@ function processFile(fileName) {
 
   if(functionsToProcess.length) {
     //inject behavior
-    injectBehavior(src, fileName);
+    src = injectBehavior(src, fileName);
   }
 
   console.log('\r\n');
@@ -96,6 +96,21 @@ function generateSpaces(number) {
 
 function injectBehavior(src, fileName) {
 
+  //search for behaviors first
+  var behaviorsRegExp = / *behaviors\s*:\s*\[([^]*?)\]/g,
+      tmpArray;
+
+  if((tmpArray = behaviorsRegExp.exec(src)) !== null) {
+
+    //ensure it's not already been added
+    if(!tmpArray[1].match(/PxVisBehavior\.observerCheck/)) {
+
+      //inject new behavior
+      var behaviorStart = /( *)behaviors\s*:\s*\[/.exec(tmpArray[0]);
+      src = src.slice(0, tmpArray.index + behaviorStart[0].length) + '\r\n' + generateSpaces(behaviorStart[1].length + 2) + 'PxVisBehavior.observerCheck,' + src.slice(tmpArray.index + behaviorStart[0].length);
+    }
+  }
+  return src;
 }
 
 function triageFunctionsToProcess(observers, functions, fileName) {
