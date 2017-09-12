@@ -109,7 +109,7 @@
     }, //properties
 
     observers: [
-      'drawElement(svg, crosshairData.timeStamps.*, completeSeriesConfig.*, drawWithLocalCrosshairData)',
+      'drawElement(svg, crosshairData.timeStamps.*, completeSeriesConfig.*, drawWithLocalCrosshairData, domainChanged)',
       '_updateTooltipData(domainChanged)'
     ],
 
@@ -145,6 +145,7 @@
         .enter()
           .append('g')
           .attr('class', 'highlightPoint')
+        .merge(svgBuilder)
           .each(function(data, index) {
             _this._createCircles(data, this);
           });
