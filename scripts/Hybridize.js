@@ -11,7 +11,8 @@
 const fs = require('fs');
 const path = require('path');
 let allObservers = {},
-    allFunctions = {};
+    allFunctions = {},
+    hasLog = false;
 
 
 function read(path) {
@@ -46,17 +47,12 @@ function hybridize() {
 
     }
   }
-
-
- // await write(outpath, JSON.stringify(data));
-  console.log(`\n\ndata/icons.json created successfully`);
 };
 
 function processFile(fileName) {
 
-  console.log('Process ' + folderNameFromPath(fileName));
-  console.log('============================');
 
+  hasLog = false;
   let src = fs.readFileSync(fileName, 'utf8'),
       observers = findObservers(src, fileName),
       functions = findFunctions(src, fileName),
@@ -82,7 +78,9 @@ function processFile(fileName) {
     src = injectBehavior(src, fileName);
   }
 
-  console.log('\r\n');
+    if(hasLog) {
+      console.log('\r\n');
+    }
 }
 
 function generateSpaces(number) {
@@ -124,6 +122,11 @@ function triageFunctionsToProcess(observers, functions, fileName) {
 
       result.push(functions[observers.observers[i]]);
     } else {
+      if(!hasLog) {
+        console.log('Process ' + folderNameFromPath(fileName));
+        console.log('============================');
+        hasLog = true;
+      }
       console.warn('observer ' + observers.observers[i] + ' is declared in ' + folderNameFromPath(fileName) + ' in its observers array but couldn\'t be found in the file. Manually update it where it is defined');
     }
   }
@@ -134,6 +137,11 @@ function triageFunctionsToProcess(observers, functions, fileName) {
 
       result.push(functions[observers.singleObservers[i]]);
     } else {
+      if(!hasLog) {
+        console.log('Process ' + folderNameFromPath(fileName));
+        console.log('============================');
+        hasLog = true;
+      }
       console.warn('observer ' + observers.singleObservers[i] + ' is declared in ' + folderNameFromPath(fileName) + ' as a single property observer but couldn\'t be found in the file. Manually update it where it is defined');
     }
   }
@@ -144,6 +152,11 @@ function triageFunctionsToProcess(observers, functions, fileName) {
 
       result.push(functions[observers.computed[i]]);
     } else {
+      if(!hasLog) {
+        console.log('Process ' + folderNameFromPath(fileName));
+        console.log('============================');
+        hasLog = true;
+      }
       console.warn('computed function ' + observers.computed[i] + ' is declared in ' + folderNameFromPath(fileName) + ' but couldn\'t be found in the file. Manually update it where it is defined');
     }
   }
