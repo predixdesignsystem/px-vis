@@ -86,8 +86,10 @@ function processFile() {
   let src = fs.readFileSync(currentFileName, 'utf8');
 
   if(src.match(/\s*Polymer\s*\(\s*{\s*is/)) {
+    DEBUG('processing element file...');
     processElement(src);
   } else {
+    DEBUG('processing non-element (assuming behavior) file...');
     processBehavior(src);
   }
 
@@ -161,6 +163,7 @@ function injectBehavior(src) {
     if(!tmpArray[1].match(/PxVisBehavior\.observerCheck/)) {
 
       //inject new behavior
+      DEBUG('injecting behavior');
       var behaviorStart = /( *)behaviors\s*:\s*\[/.exec(tmpArray[0]);
       src = src.slice(0, tmpArray.index + behaviorStart[0].length) + '\r\n' + generateSpaces(behaviorStart[1].length + 2) + 'PxVisBehavior.observerCheck,' + src.slice(tmpArray.index + behaviorStart[0].length);
     } else {
