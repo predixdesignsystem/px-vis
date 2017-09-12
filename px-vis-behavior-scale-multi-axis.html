@@ -66,20 +66,23 @@ PxVisBehaviorScale.scaleMultiAxis = [{
           range = [h, 0],
           newY = {};// y is an object with multiple scales
 
-      if(this.y && !forceRecreating) {
-        for(var i = 0; i < axes.length; i++) {
-          this.y[axes[i]].range(range);
-        }
-
-      } else {
+      // if(this.y && !forceRecreating) {
+      //   for(var i = 0; i < axes.length; i++) {
+      //     if(this.y[axes[i]]) {
+      //       this.y[axes[i]].range(range);
+      //     } else {
+      //       this.y[axes[i]] = Px.d3.scaleLinear().range(range);
+      //     }
+      //   }
+      // } else {
         // iterate through the axes and create a scale for each; set them in the y obj with the axes as keys so we can easily access them again later
         for(var i = 0; i < axes.length; i++) {
-          newY[axes[i]] = Px.d3.scaleLinear().nice().range(range);
+          newY[axes[i]] = Px.d3.scaleLinear().range(range);
         }
 
         this.set('y', newY);
         this.fire('px-vis-y-updated', { 'dataVar': 'y', 'data': this.y, 'method':'set' });
-      }
+      // }
     },
 
     /**
