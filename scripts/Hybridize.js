@@ -11,7 +11,7 @@
 const fs = require('fs');
 const path = require('path');
 const argv = require('yargs')
-              .usage('Usage: --path [path_to_folder] --write [bool] -v[v][v]\r\n v is verbose mode: 1v is less verbose and 3 most verbose')
+              .usage('Usage: --path [path_to_folder] --write [bool] -v[v]\r\n v is verbose mode: 0 v is less verbose and 2 most verbose')
               .demandOption(['path'])
               .count('verbose')
               .alias('v', 'verbose')
@@ -26,34 +26,32 @@ let VERBOSE_LEVEL = argv.verbose,
     shouldWrite = false,
     currentFileName;
 
+
+function checkHasLog() {
+  if(!hasLog) {
+    console.log('\r\n');
+    console.log('Process ' + folderNameFromPath(currentFileName));
+    console.log('============================');
+    hasLog = true;
+  }
+}
+
 function WARN()  {
   if(VERBOSE_LEVEL >= 0) {
-    if(!hasLog) {
-      console.log('Process ' + folderNameFromPath(currentFileName));
-      console.log('============================');
-      hasLog = true;
-    }
+    checkHasLog();
     console.log.apply(console, arguments);
   }
 }
 function INFO()  {
 
   if(VERBOSE_LEVEL >= 1) {
-    if(!hasLog) {
-      console.log('Process ' + folderNameFromPath(currentFileName));
-      console.log('============================');
-      hasLog = true;
-    }
+    checkHasLog();
     console.log.apply(console, arguments);
   }
 }
 function DEBUG() {
   if(VERBOSE_LEVEL >= 2) {
-    if(!hasLog) {
-      console.log('Process ' + folderNameFromPath(currentFileName));
-      console.log('============================');
-      hasLog = true;
-    }
+    checkHasLog();
     console.log.apply(console, arguments);
   }
 }
@@ -92,10 +90,6 @@ function processFile() {
     DEBUG('processing non-element (assuming behavior) file...');
     processBehavior(src);
   }
-
-  if(hasLog) {
-    console.log('\r\n');
-  }
 }
 
 function processElement(src) {
@@ -103,8 +97,6 @@ function processElement(src) {
   let observers = findObservers(src, currentFileName),
       functions = findFunctions(src, currentFileName),
       functionsNames = Object.keys(functions),
-      adjustedIndex = 0,
-      currentFunction,
       functionsToProcess = triageFunctionsToProcess(observers, functions),
       injection,
       injected = false;
@@ -115,7 +107,7 @@ function processElement(src) {
 
     if(!src.slice(functionsToProcess[i].index, functionsToProcess[i].index + 100).match(/if\(this.hasUndefinedArguments\(arguments\)\)/)) {
 
-      DEBUG('injecting ' + functionsToProcess[i].name);
+      INFO('injecting ' + functionsToProcess[i].name);
       injection = '\r\n' + generateSpaces(functionsToProcess[i].spaceLength + 2);
       injection += 'if(this.hasUndefinedArguments(arguments)) {\r\n';
       injection += generateSpaces(functionsToProcess[i].spaceLength + 4) + 'return;\r\n';
@@ -128,7 +120,7 @@ function processElement(src) {
 
   if(functionsToProcess.length) {
     //inject behavior
-    src = injectBehavior(src);
+    src = injectBehaviorElement(src);
     if(shouldWrite) {
       INFO('writing ' + currentFileName);
       fs.writeFileSync(currentFileName, src, 'utf8');
@@ -138,8 +130,102 @@ function processElement(src) {
   }
 }
 
-function processBehavior() {
+function processBehavior(src) {
 
+  let behaviors = searchBehaviors(src),
+      hasChange = false;
+
+  for(let behavior of behaviors) {
+
+    let currentSrc = src.slice(behavior.start, behavior.stop),
+        observers = findObservers(currentSrc, currentFileName),
+        functions = findFunctions(currentSrc, currentFileName),
+        functionsNames = Object.keys(functions),
+        functionsToProcess = triageFunctionsToProcess(observers, functions),
+        injection,
+        injected = false;
+
+    for(let i=0; i<functionsToProcess.length; i++) {
+
+      if(!currentSrc.slice(functionsToProcess[i].index, functionsToProcess[i].index + 100).match(/if\(this.hasUndefinedArguments\(arguments\)\)/)) {
+
+        INFO('injecting ' + functionsToProcess[i].name);
+        injection = '\r\n' + generateSpaces(functionsToProcess[i].spaceLength + 2);
+        injection += 'if(this.hasUndefinedArguments(arguments)) {\r\n';
+        injection += generateSpaces(functionsToProcess[i].spaceLength + 4) + 'return;\r\n';
+        injection += generateSpaces(functionsToProcess[i].spaceLength + 2) + '}\r\n';
+        currentSrc = currentSrc.slice(0, functionsToProcess[i].index) + injection + currentSrc.slice(functionsToProcess[i].index);
+      } else {
+        DEBUG(functionsToProcess[i].name + ' already injected');
+      }
+    }
+
+    if(functionsToProcess.length) {
+      currentSrc = injectBehaviorBehavior(currentSrc, behavior);
+      src = src.slice(0, behavior.start) + currentSrc + src.slice(behavior.stop);
+      hasChange = true;
+    } else {
+      DEBUG('no functions required change');
+    }
+  }
+
+  if(shouldWrite && hasChange) {
+    INFO('writing ' + currentFileName);
+    fs.writeFileSync(currentFileName, src, 'utf8');
+  }
+}
+
+function searchBehaviors(src) {
+  let behaviorRegExp = /^\s?(\w*\.?\w*)\s*=\s*(\[)?\s*{/gm,
+      regExpResult,
+      behaviors = [],
+      stop,
+      i,
+      count,
+      ignoreDueToComment = false,
+      ignoreType;
+
+  while((regExpResult = behaviorRegExp.exec(src)) !== null) {
+
+    //count '{' and '}' to find end of behavior
+    i = regExpResult.index + regExpResult[0].length;
+    count = 1;
+    while(count !== 0) {
+
+      if(!ignoreDueToComment) {
+
+        //detect comments so we can ignore counts in them
+        if(src[i] === '/' && src[i+1] === '*' && src[i+2] === '*') {
+          ignoreDueToComment = true;
+          ignoreType = 'multiline';
+        } else if(src[i] === '//' && src[i+1] === '//') {
+          ignoreDueToComment = true;
+          ignoreType = 'singleline';
+        }
+        //count
+        else if(src[i] === '{') {
+          count++;
+        } else if(src[i] === '}') {
+          count--;
+        }
+      } else if(ignoreType === 'multiline' && src[i] === '*' && src[i+1] === '/') {
+        ignoreDueToComment = false;
+      } else if(ignoreType === 'singleline' && (src[i] === '\r' || src[i] === '\n')) {
+        ignoreDueToComment = false;
+      }
+      i++;
+    }
+
+    //push at the beginning so that we process the file from end to start
+    behaviors.unshift({
+      'start': regExpResult.index,
+      'stop': i,
+      'name': regExpResult[1],
+      'isArray': !!regExpResult[2]
+    });
+  }
+
+  return behaviors;
 }
 
 function generateSpaces(number) {
@@ -151,7 +237,7 @@ function generateSpaces(number) {
   return str;
 }
 
-function injectBehavior(src) {
+function injectBehaviorElement(src) {
 
   //search for behaviors first
   var behaviorsRegExp = / *behaviors\s*:\s*\[([^]*?)\]/g,
@@ -163,7 +249,7 @@ function injectBehavior(src) {
     if(!tmpArray[1].match(/PxVisBehavior\.observerCheck/)) {
 
       //inject new behavior
-      DEBUG('injecting behavior');
+      INFO('injecting behavior');
       var behaviorStart = /( *)behaviors\s*:\s*\[/.exec(tmpArray[0]);
       src = src.slice(0, tmpArray.index + behaviorStart[0].length) + '\r\n' + generateSpaces(behaviorStart[1].length + 2) + 'PxVisBehavior.observerCheck,' + src.slice(tmpArray.index + behaviorStart[0].length);
     } else {
@@ -172,6 +258,32 @@ function injectBehavior(src) {
   } else {
     INFO('tried to inject behavior but couldn\'t find behavior array');
   }
+  return src;
+}
+
+function injectBehaviorBehavior(src, behavior) {
+
+  //make sure it's not already injected (or the behavior we are injecting)
+  if(!src.match(/PxVisBehavior\.observerCheck/)) {
+
+    //find last '}'
+    let index = src.lastIndexOf('}'),
+        injection = behavior.isArray ? ', PxVisBehavior.observerCheck' : ', PxVisBehavior.observerCheck]';
+
+    INFO('injecting behavior for ' + behavior.name);
+    src = src.slice(0, index + 1) + injection + src.slice(index + 1);
+
+    if(!behavior.isArray) {
+
+      //inject first '[' next to first '{'
+      let result = /{/.exec(src);
+
+      src = src.slice(0, result.index) + '[' + src.slice(result.index);
+    }
+  } else {
+    DEBUG('behavior PxVisBehavior.observerCheck already included in ' + behavior.name);
+  }
+
   return src;
 }
 
