@@ -351,12 +351,16 @@ PxVisBehaviorD3.canvas = [{
     '_renderToSvgChanged(renderToSvg)'
   ],
   _renderToSvgChanged: function(renderToSvg) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     if(this.renderToSvg && this.canvasContext && this.canvasContext.pxClearCanvas) {
       //make sure the canvas cleans itself
       this.canvasContext.pxClearCanvas();
     }
   }
-}, PxVisBehaviorD3.canvasContext]
+}, PxVisBehavior.observerCheck, PxVisBehaviorD3.canvasContext]
 
 /*
     Name:
@@ -370,7 +374,7 @@ PxVisBehaviorD3.canvas = [{
 
     @polymerBehavior PxVisBehaviorD3.renderToCanvas
 */
-PxVisBehaviorD3.renderToCanvas = {
+PxVisBehaviorD3.renderToCanvas = [{
   properties: {
     /**
     * Boolean to specify if drawings should render to canvas instead of svg
@@ -384,12 +388,16 @@ PxVisBehaviorD3.renderToCanvas = {
     '_renderToCanvasChanged(renderToCanvas)'
   ],
   _renderToCanvasChanged: function(renderToCanvas) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     if(!this.renderToCanvas && this.canvasContext && this.canvasContext.pxClearCanvas) {
       //make sure the canvas cleans itself
       this.canvasContext.pxClearCanvas();
     }
   }
-};
+}, PxVisBehavior.observerCheck];
 
 /*
     Name:
@@ -403,7 +411,7 @@ PxVisBehaviorD3.renderToCanvas = {
 
     @polymerBehavior PxVisBehaviorD3.axes
 */
-PxVisBehaviorD3.axes = {
+PxVisBehaviorD3.axes = [{
   properties: {
     /**
      * x is a holder for the d3 instantiated scale object
@@ -439,6 +447,10 @@ PxVisBehaviorD3.axes = {
     }
   },
   _getIsMultiY: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     return typeof this.y === 'object';
   },
   /**
@@ -466,7 +478,7 @@ PxVisBehaviorD3.axes = {
 
     return result;
   }
-};
+}, PxVisBehavior.observerCheck];
 
 /*
     Name:
@@ -1421,6 +1433,10 @@ PxVisBehaviorD3.lineShared = [{
   },
 
   _computeColorArr: function(categories,completeSeriesConfig,seriesId){
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
     //start with the RGB value and split it
     var c = completeSeriesConfig[seriesId]['color'].split('(')[1].split(','),
         colors = {};
@@ -1465,6 +1481,10 @@ PxVisBehaviorD3.lineShared = [{
    *
    */
   _computeGradientRange: function(chartData, selectedDomain,seriesId) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     if(chartData.value.length > 0) {
       var x1,x2;
       if(selectedDomain.value.x.length > 0) {
@@ -1587,7 +1607,7 @@ PxVisBehaviorD3.lineShared = [{
 
     this.set('line',line);
   }
-},PxVisBehaviorD3.radialLineGenerator, PxVisBehavior.seriesId, PxVisBehaviorD3.lineGaps, PxVisBehaviorD3.interpolationFunction];
+}, PxVisBehavior.observerCheck,PxVisBehaviorD3.radialLineGenerator, PxVisBehavior.seriesId, PxVisBehaviorD3.lineGaps, PxVisBehaviorD3.interpolationFunction];
 
 /*
     Name:
@@ -1876,6 +1896,10 @@ PxVisBehaviorD3.icons = {
 PxVisBehaviorD3.cursorIcon = [{
 
   _drawCursorIcon: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
     if(!this.iconType || this.iconType === 'none') {
       return;
     }
@@ -1902,5 +1926,5 @@ PxVisBehaviorD3.cursorIcon = [{
       .attr("transform", (t + s));
   }
 
-}, PxVisBehaviorD3.icons];
+}, PxVisBehavior.observerCheck, PxVisBehaviorD3.icons];
 </script>

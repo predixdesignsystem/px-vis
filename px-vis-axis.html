@@ -78,6 +78,7 @@ Custom property | Description
         is: 'px-vis-axis',
 
         behaviors: [
+          PxVisBehavior.observerCheck,
           PxVisBehaviorD3.svg,
           PxVisBehavior.sizing,
           PxVisBehaviorD3.axis,
@@ -441,6 +442,10 @@ Custom property | Description
          * @method drawElement
          */
         drawElement: function() {
+         if(this.hasUndefinedArguments(arguments)) {
+           return;
+         }
+
           if(typeof this.preventInitialDrawing !== undefined && this.preventInitialDrawing === false) {
             this.debounce('drawaxis', function() {
 
@@ -521,6 +526,10 @@ Custom property | Description
          *
          */
         _updateTicks: function() {
+         if(this.hasUndefinedArguments(arguments)) {
+           return;
+         }
+
           if(this._doesObjHaveValues(this._axis) && this.axis && this.margin && this.height && typeof this.disableTicks !== 'undefined') {
 
             this.drawElement();
@@ -532,6 +541,10 @@ Custom property | Description
          *
          */
         _calcDrawnTicks: function() {
+         if(this.hasUndefinedArguments(arguments)) {
+           return;
+         }
+
           if(this.axisType !== 'ordinal' && this._axis && this._axis.scale) {
             //apparently we need to give ourselves a bit of time to ensure the axis draws and it can clac this
             this.debounce("drawnTicks", function() {
@@ -837,6 +850,10 @@ Custom property | Description
          *
          */
         drawSeriesBars: function() {
+         if(this.hasUndefinedArguments(arguments)) {
+           return;
+         }
+
           if(!this.preventSeriesBar && this._doesObjHaveValues(this.completeSeriesConfig) && this._axisGroup && this._titleGroup) {
 
             // TODO do we need to move the title group based on how many series we have
@@ -856,6 +873,10 @@ Custom property | Description
          *
          */
         _muteSeriesBars: function() {
+         if(this.hasUndefinedArguments(arguments)) {
+           return;
+         }
+
           if(this._doesD3HaveValues(this._titleGroup) && !this.preventSeriesBar) {
             var keys = Object.keys(this.mutedSeries);
             for(var i = 0; i < keys.length; i++) {
@@ -899,6 +920,10 @@ Custom property | Description
          *
          */
         _computeUnits: function(appendUnitInTitle, title, unit) {
+         if(this.hasUndefinedArguments(arguments)) {
+           return;
+         }
+
           var result = '';
           if(appendUnitInTitle && this.unit) {
             result = ' [' + this.unit + ']';
@@ -911,6 +936,10 @@ Custom property | Description
          * Truncates the title label appropriately
          */
         _truncateTitle: function(title, truncationLength, appendUnitInTitle) {
+         if(this.hasUndefinedArguments(arguments)) {
+           return;
+         }
+
           this.debounce('_truncateTitle', function() {
 
               var oldTitle = this.displayedTitle,
@@ -936,6 +965,10 @@ Custom property | Description
          * Redraws the title on change
          */
         _titleChanged: function(displayedTitle) {
+         if(this.hasUndefinedArguments(arguments)) {
+           return;
+         }
+
           // No debounce. Even though it fires a lot, debounce causes a noticable lag in the title.
           if(!this._removingAxis && this._axisDrawn) {
             this.drawTitle();
@@ -963,6 +996,10 @@ Custom property | Description
         },
 
         _orientationChanged: function() {
+          if(this.hasUndefinedArguments(arguments)) {
+            return;
+          }
+
           this.removeAxis();
           this.drawElement();
         }

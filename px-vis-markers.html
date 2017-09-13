@@ -81,6 +81,7 @@ Custom property | Description
     is: 'px-vis-markers',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehavior.sizing,
       PxVisBehaviorD3.canvasContext,
       PxVisBehaviorD3.axes,
@@ -139,6 +140,10 @@ Custom property | Description
     ],
 
     _computeMarkerConfig: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       var types = Object.keys(this.markerConfig),
           type,
           config = {};
@@ -173,6 +178,10 @@ Custom property | Description
     },
 
     _computeMarkerData: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(!this.markerData || this.markerData.length === 0) {
         return [];
       }
@@ -208,6 +217,10 @@ Custom property | Description
     },
 
     _requestCanvasCreation: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       this.set('canvasLayersConfig.markers', {
         height: this.height,
         margin: { top: 0, bottom: 0, left: this.margin.left, right: this.margin.right }
@@ -215,6 +228,10 @@ Custom property | Description
     },
 
     _createScales: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       this.debounce('createScalesMarker', function() {
         this._createScalesDebounced();
       }, 10);
@@ -283,6 +300,10 @@ Custom property | Description
     },
 
     _redraw: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(this._topDomain !== null && this._bottomDomain !== null && this.domainChanged !== null) {
         this.set('_bottomDomain', !this._bottomDomain);
         this.set('_topDomain', !this._topDomain);

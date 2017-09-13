@@ -96,6 +96,7 @@ Custom property | Description
     is: 'px-vis-event',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehaviorD3.svg,
       PxVisBehaviorD3.axes,
       PxVisBehavior.sizing,
@@ -293,10 +294,18 @@ Custom property | Description
     },
 
     _eventConfigChanged: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       this._processConfiguration();
     },
 
     _recalcValue: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       //recalc/format the value next time we show the tooltip
       this._reCalcValue = true;
     },
@@ -338,6 +347,10 @@ Custom property | Description
      * @method drawElement
      */
     drawElement: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(this.svg && this._doesObjHaveValues(this.eventData) && this._animationFrameDone) {
 
         if(this.eventGroup && this._doesD3HaveValues(this.eventGroup)) {
@@ -377,6 +390,10 @@ Custom property | Description
      * @method positionElement
      */
     positionElement: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(this.x && this._eventDrawn) {
         this._positionEvent();
       }
@@ -388,6 +405,10 @@ Custom property | Description
      * @method _addClipPath
      */
     _addClipPath: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       this.addClipPath(this.eventLine);
       this.addClipPath(this.eventIcon);
     },

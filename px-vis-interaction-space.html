@@ -53,6 +53,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     is: 'px-vis-interaction-space',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehavior.sizing,
       PxVisBehaviorD3.svg,
       PxVisBehaviorD3.axes,
@@ -322,6 +323,10 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * @method drawElement
      */
     drawElement: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       // append the rectangle to capture mouse interactions
       if(!this._rect) {
         if(!this.radial) {
@@ -383,6 +388,10 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     _drawCursor: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if((!this.cursorType || this.cursorType === 'none') && this._doesD3HaveValues(this._cursor)) {
         this._cursor.remove();
       }
@@ -432,6 +441,10 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     _updateRadius: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(this.cursorType !== 'circle') {
         this.cursorType = 'circle';
         this._drawCursor();
@@ -472,12 +485,20 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     _setupActions: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(this._rect) {
         this._setupRegularActions(this._rect, this._rect.node(), false);
       }
     },
 
     _resetTooltipDataLegacy: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(!this.seriesKeys){
         this._resetTooltipData();
       }
@@ -1215,6 +1236,10 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     _createQuadtreeData: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(this.domainChanged !== null && this.useQuadtree && !this.preventWebWorkerSynchronization && this.xAxisType !== 'ordinal' && this.xAxisType !== 'scaleBand') {
         this.debounce('buildQuadtree', function() {
 

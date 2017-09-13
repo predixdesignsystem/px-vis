@@ -181,6 +181,10 @@ PxVisBehaviorChart.chartCommon = [{
     *
     */
     _setCompleteSeriesConfig: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(this._doesObjHaveValues(this._defaultSeriesConfig) && this._doesObjHaveValues(this.chartData) && this._doesObjHaveValues(this.seriesColorList) && !this.preventCompleteSeriesConfigCalc) {
         // FUTURE TODO refactor: use MAPs and SETs instead of Objects when IE has support / is no longer supported by us
         // We could use d3 sets and maps... worth it?
@@ -413,6 +417,10 @@ PxVisBehaviorChart.chartCommon = [{
     },
 
     _updateDSC: function(dsc) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       var k = Object.keys(this.defaultSeriesConfig),
           val;
 
@@ -428,7 +436,7 @@ PxVisBehaviorChart.chartCommon = [{
       return config[seriesId]["strokeWidth"] ? config[seriesId]["strokeWidth"] : 1;
     }
 
-}, PxColorsBehavior.dataVisColors , PxVisBehaviorChart.chartCommonMethods, PxVisBehavior.commonMethods, PxVisBehavior.completeSeriesConfig, PxVisBehavior.axisTypes, PxVisBehavior.muteUnmuteSeries];
+}, PxVisBehavior.observerCheck, PxColorsBehavior.dataVisColors , PxVisBehaviorChart.chartCommonMethods, PxVisBehavior.commonMethods, PxVisBehavior.completeSeriesConfig, PxVisBehavior.axisTypes, PxVisBehavior.muteUnmuteSeries];
 
 
 /*
@@ -535,6 +543,10 @@ PxVisBehaviorChart.webWorkerSynchronization = [{
     },
     _keepDataInSync: function() {
 
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(!this.preventWebWorkerSynchronization && this[this._wwSyncDataPropName]) {
         this._wwSyncDataDeleted = false;
         Px.vis.scheduler.process({
@@ -545,7 +557,7 @@ PxVisBehaviorChart.webWorkerSynchronization = [{
         this.set('wwDataSyncCounter', this.wwDataSyncCounter+1);
       }
     }
-}, PxVisBehavior.dataset, PxVisBehavior.preventWebWorkerSynchronization, PxVisBehavior.wwDataSyncCounter];
+}, PxVisBehavior.observerCheck, PxVisBehavior.dataset, PxVisBehavior.preventWebWorkerSynchronization, PxVisBehavior.wwDataSyncCounter];
 
 /*
     Name:
@@ -786,6 +798,10 @@ PxVisBehaviorChart.chartAutoResize = [{
     },
     listeners: {'px-vis-toolbar-secondary-toggled': '_secondaryToolbarToggled'},
     _preventResizeChanged: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(!this.preventResize) {
         this.notifyResize();
       }
@@ -801,6 +817,10 @@ PxVisBehaviorChart.chartAutoResize = [{
       }
     },
     _getChartWrapperClass: function(hor, vert) {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       var base = 'flex wrapper ';
 
       if(hor === 'center') {
@@ -821,7 +841,7 @@ PxVisBehaviorChart.chartAutoResize = [{
 
       return base;
     }
-}, Polymer.IronResizableBehavior];
+}, PxVisBehavior.observerCheck, Polymer.IronResizableBehavior];
 
 /**
     Name:
@@ -906,6 +926,9 @@ PxVisBehaviorChart.timeFiltering = [{
    * returns a filtered dataset based on the time domain
    */
   _filterData: function(chartData, timeDomain, timeData) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
 
     if(timeDomain.x && timeDomain.x.length === 2) {
       var min = Number(timeDomain.x[0]),
@@ -924,7 +947,7 @@ PxVisBehaviorChart.timeFiltering = [{
       return chartData;
     }
   }
-}, PxVisBehavior.dataset];
+}, PxVisBehavior.observerCheck, PxVisBehavior.dataset];
 
 /*
     Name:
@@ -1022,6 +1045,10 @@ PxVisBehaviorChart.registerPositioning = [{
   * determine the flex class on the wrapper depending on where the register is
   */
   _getRegisterWrapperClass: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     var classList = "flex ";
 
     if(!this.hideRegister) {
@@ -1036,9 +1063,13 @@ PxVisBehaviorChart.registerPositioning = [{
     return classList;
   },
   _hideRegisterChanged: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     this.notifyResize();
   }
-}, PxVisBehaviorChart.getHideClass];
+}, PxVisBehavior.observerCheck, PxVisBehaviorChart.getHideClass];
 
 /*
     Name:
@@ -1296,9 +1327,16 @@ PxVisBehaviorChart.circleChart = [{
     '_sizeChanged(_smallerSide, margin.*, _internalCircleMargins.*)'
       ],
   _computeSmallerSide: function(width, height) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     return Math.max(Math.min(height,width), 0);
   },
   _sizeChanged: function(_smallerSide, margin, internalMargin) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
 
       //measure appropriate width and height based on the smaller sides and margins
       var ml = Number(this.margin.left) + Number(this._internalCircleMargins.left),
@@ -1317,7 +1355,7 @@ PxVisBehaviorChart.circleChart = [{
       this.set('_radius', radius);
       this.set('_center', center);
   }
-}, PxVisBehavior.sizing];
+}, PxVisBehavior.observerCheck, PxVisBehavior.sizing];
 
 /*
     Name:
@@ -1399,6 +1437,10 @@ PxVisBehaviorChart.layers = [{
     this.fire('px-vis-' + name + '-updated',{ 'data': layers, 'dataVar': name, 'method': 'set' });
   },
   _createLayersOnce: function(svg, numberOfLayers, generateLayers, propName) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     var gen = generateLayers ? generateLayers : 'generateLayers';
 
     if(this[gen] && this._doesD3HaveValues(svg) && numberOfLayers > 0) {
@@ -1466,7 +1508,7 @@ PxVisBehaviorChart.layers = [{
       target.dispatchEvent(newEvt);
   }.bind(context);
   }
-}, PxVisBehaviorD3.svg, PxVisBehavior.commonMethods];
+}, PxVisBehavior.observerCheck, PxVisBehaviorD3.svg, PxVisBehavior.commonMethods];
 
 /*
     Name:
@@ -1760,6 +1802,10 @@ PxVisBehaviorChart.zooming = [{
    *
    */
   zoom: function(extentsData) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     if(this.extentsAction !== 'zoom') {
       return;
     }
@@ -1804,7 +1850,7 @@ PxVisBehaviorChart.zooming = [{
   _intSpaceStopPan: function() {
     this.set('_isPanning', false);
   },
-}, PxVisBehavior.extentsData, PxVisBehaviorD3.selectedDomain, PxVisBehavior.axisTypes, PxVisBehaviorD3.axes, PxVisBehavior.zoomSelection];
+}, PxVisBehavior.observerCheck, PxVisBehavior.extentsData, PxVisBehaviorD3.selectedDomain, PxVisBehavior.axisTypes, PxVisBehaviorD3.axes, PxVisBehavior.zoomSelection];
 
 /*
     Name:
@@ -1963,7 +2009,7 @@ PxVisBehaviorChart.noDebounceOnPanning = {
     visibility
     @polymerBehavior PxVisBehaviorChart.showTooltip
 */
-PxVisBehaviorChart.showTooltip = {
+PxVisBehaviorChart.showTooltip = [{
 
   properties: {
     /**
@@ -1983,10 +2029,14 @@ PxVisBehaviorChart.showTooltip = {
     }
   },
   _computeShowTooltip: function(showTooltip, _internalShowTooltip) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     return showTooltip && _internalShowTooltip;
   }
 
-};
+}, PxVisBehavior.observerCheck];
 
 /**
     Name:
@@ -2198,6 +2248,10 @@ PxVisBehaviorChart.axisRegister = [{
   * configures the register config and empty data series
   */
   _computedAxisRegisterConf: function(axes, completeSeriesConfig) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
 // TODO maybe need an axes check?
     //first set new config
     var axisConfig = {},
@@ -2264,7 +2318,7 @@ PxVisBehaviorChart.axisRegister = [{
     this._axisRegisterConfig = copy;
     this.notifyPath('_axisRegisterConfig');
   }
-}, PxVisBehavior.dimensions, PxVisBehavior.completeSeriesConfig, PxVisBehaviorChart.mutedAxes, PxVisBehaviorChart.getHideClass];
+}, PxVisBehavior.observerCheck, PxVisBehavior.dimensions, PxVisBehavior.completeSeriesConfig, PxVisBehaviorChart.mutedAxes, PxVisBehaviorChart.getHideClass];
 
 /*
     Name:
@@ -2301,6 +2355,10 @@ PxVisBehaviorChart.categoryRegister = [{
   ],
 
   _computeCategoryRegisterConfig: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
     if(typeof(this.categoryKey) !== 'undefined') {
       var tooltipData = {},
           config = {},
@@ -2338,9 +2396,13 @@ PxVisBehaviorChart.categoryRegister = [{
     }
   },
   _computeHideCategoryRegister: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     this.set('_hideCategoryRegister', this.hideCategoryRegister || !this.categoryKey);
   }
-}, PxVisBehavior.completeSeriesConfig, PxVisBehavior.categories, PxVisBehaviorChart.getHideClass];
+}, PxVisBehavior.observerCheck, PxVisBehavior.completeSeriesConfig, PxVisBehavior.categories, PxVisBehaviorChart.getHideClass];
 
 /*
     Name:
@@ -2375,12 +2437,20 @@ PxVisBehaviorChart.categoryAndAxisRegisterConfigs = [{
     '_categoryRegisterConfigChanged(categoryRegisterConfig.*)',
   ],
   _categoryRegisterConfigChanged: function(conf) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     this._applyConfigToElement(this.categoryRegisterConfig, this.$.categoryRegister);
   },
   _axisRegisterConfigChanged: function(conf) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     this._applyConfigToElement(this.axisRegisterConfig, this.$.axisRegister);
   },
-}, PxVisBehaviorChart.subConfiguration];
+}, PxVisBehavior.observerCheck, PxVisBehaviorChart.subConfiguration];
 
 /*
     Name:
@@ -2423,6 +2493,10 @@ PxVisBehaviorChart.sizeVerticalRegister = [{
       this.set('_verticalRegisterHeight', this.height);
   },
   _heightChanged: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     this._computeVerticalRegisterHeight();
   },
   _computeVerticalRegisterHeight: function(deductions) {
@@ -2453,7 +2527,7 @@ PxVisBehaviorChart.sizeVerticalRegister = [{
       this.set('_verticalRegisterHeight', Math.max(Number(this.$[this._verticalRegisterDrawingCanvasId].height) + deductionsTotal, 0));
     }.bind(this), 5);
   },
-}, PxVisBehavior.baseSize];
+}, PxVisBehavior.observerCheck, PxVisBehavior.baseSize];
 
 /*
     Name:
@@ -2491,6 +2565,10 @@ PxVisBehaviorChart.tooltipFollowMouseCalculation = [{
     '_computedShowTooltipChanged(_computedShowTooltip)'
   ],
   _computedShowTooltipChanged: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     if(!this._tooltipCalcMousePosHandler) {
       this._createHandler();
     }
@@ -2508,7 +2586,7 @@ PxVisBehaviorChart.tooltipFollowMouseCalculation = [{
   _createHandler: function() {
     this._tooltipCalcMousePosHandler = this._calcMousePos.bind(this);
   }
-}, PxVisBehaviorChart.showTooltip];
+}, PxVisBehavior.observerCheck, PxVisBehaviorChart.showTooltip];
 
 /*
     Name:
@@ -2539,7 +2617,7 @@ PxVisBehaviorChart.thresholdConfig = {
     Behavior providing ways to combine different type of muting into one array
     @polymerBehavior PxVisBehaviorChart.combineMutes
 */
-PxVisBehaviorChart.combineMutes = {
+PxVisBehaviorChart.combineMutes = [{
   properties: {
     _combinedMutedSeries: {
       type: Object,
@@ -2578,6 +2656,10 @@ PxVisBehaviorChart.combineMutes = {
    *
    */
   _combineMutes: function(m1,m2) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     var muted = {},
         mutedCategories = Object.keys(this.mutedSeriesCategories).filter(function(cat) {
           return this.mutedSeriesCategories[cat];
@@ -2608,7 +2690,7 @@ PxVisBehaviorChart.combineMutes = {
     this.set('_combinedMutedSeries', muted);
     this.set('_combinedMutedChanged', this._combinedMutedChanged ? false : true);
   },
-}
+}, PxVisBehavior.observerCheck]
 
 /*
     Name:

@@ -59,6 +59,7 @@ An element which draws polygonal grid lines.
     is: 'px-vis-radar-grid',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehaviorD3.svg,
       PxVisBehaviorD3.axes,
       PxVisBehavior.commonMethods,
@@ -139,6 +140,10 @@ An element which draws polygonal grid lines.
      * @method createGridData
      */
     createGridData: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       this.debounce('radarGrids', function(){
         if(this.tickValues && this.dimensions && this.tickValues.length > 0 && this.dimensions.length > 0) {
           var data = [],

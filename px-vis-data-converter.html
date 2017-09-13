@@ -81,6 +81,7 @@ It will reformat the data into the object format and create a seriesConfig file.
     is: 'px-vis-data-converter',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehavior.commonMethods,
       PxVisBehavior.dataConverterMethods
     ],
@@ -216,6 +217,10 @@ It will reformat the data into the object format and create a seriesConfig file.
     *
     */
     _computeChartData: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       return this.computeChartData(this.originalData, this, this.emptySets);
     },
 
@@ -224,6 +229,10 @@ It will reformat the data into the object format and create a seriesConfig file.
     *
     */
     _computeSeriesConfig: function(){
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       return this.computeSeriesConfig(this.originalData, this);
     }
   });

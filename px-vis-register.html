@@ -201,6 +201,7 @@ Custom property | Description
     is: 'px-vis-register',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehavior.sizing,
       PxVisBehavior.formatting,
       PxVisBehaviorTime.datetime,
@@ -313,6 +314,9 @@ Custom property | Description
      * @method _formatDateTime
      */
     _formatDateTime: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
 
       if(!this.inert) {
         if(this.tooltipData.time) {
@@ -343,6 +347,10 @@ Custom property | Description
      *
     */
     _computeSeries: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       this.debounce('computeSeries', function() {
         if(!this.inert) {
           var allSeries = this.tooltipData.series,
@@ -385,6 +393,10 @@ Custom property | Description
     },
 
     _scrollBarsPresent: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       window.requestAnimationFrame(this._scrollBarsPresentAF.bind(this));
     },
 
@@ -406,6 +418,10 @@ Custom property | Description
     },
 
     _scrollBarsPresentPie: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       window.requestAnimationFrame(this._scrollBarsPresentPieAF.bind(this));
     },
 

@@ -196,6 +196,7 @@ Custom property | Description
         is: 'px-vis-chart-navigator',
 
         behaviors: [
+          PxVisBehavior.observerCheck,
           PxVisBehaviorScale.scale,
           PxVisBehavior.sizing,
           PxVisBehavior.formatting,
@@ -342,6 +343,10 @@ Custom property | Description
 
 
         _xAxisConfigChanged: function(conf) {
+           if(this.hasUndefinedArguments(arguments)) {
+             return;
+           }
+
           this._applyConfigToElement(this.xAxisConfig, this.$.xAxis);
         },
 
@@ -377,6 +382,10 @@ Custom property | Description
          * Sets the range when the values in rangepicker changes
          */
         _rangeChanged: function() {
+         if(this.hasUndefinedArguments(arguments)) {
+           return;
+         }
+
           var newXRange = [
             Number(Px.moment(this.range.from, Px.moment.ISO_8601).format('x')),
             Number(Px.moment(this.range.to, Px.moment.ISO_8601).format('x'))

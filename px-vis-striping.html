@@ -60,6 +60,7 @@
     is: 'px-vis-striping',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehaviorD3.canvasContext,
       PxVisBehaviorD3.axes,
       PxVisBehavior.commonMethods,
@@ -115,6 +116,10 @@
     },
 
     _redraw: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(!this.preventInitialDrawing) {
         this.drawCanvas(true);
       }
@@ -193,12 +198,20 @@
      * Redraw this series on top if needed.
      */
     _drawOnTop: function(serieToRedraw) {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(serieToRedraw === this.seriesId) {
         this.drawCanvas(false);
       }
     },
 
     _requestCanvasCreation: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       this.set('canvasLayersConfig.striping', {});
     }
   });

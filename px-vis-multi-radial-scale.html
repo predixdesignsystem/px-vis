@@ -47,6 +47,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
     is: 'px-vis-multi-radial-scale',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehaviorD3.svg,
       PxVisBehavior.sizing,
       PxVisBehaviorD3.axes,
@@ -107,6 +108,10 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @method _setXScale
      */
     _setXScale: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
     //  this.debounce('setXScale', function() {
 
         var range = [0, 2 * Math.PI];
@@ -128,6 +133,10 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @method _setYScale
      */
     _setYScale: function(width,axes) {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
     //  this.debounce('setYScale', function() {
 
         var range = [20, Math.max(width - 20, 20)],
@@ -160,6 +169,10 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @method _currentDomain
      */
      _currentDomain: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       // check to make sure there is data
       if(this._doesObjHaveValues(this.x) &&
       this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.chartExtents)){

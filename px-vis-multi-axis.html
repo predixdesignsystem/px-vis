@@ -144,6 +144,7 @@ Custom property | Description
     is: 'px-vis-multi-axis',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehavior.svgDefinition,
       PxVisBehavior.sizing,
       PxVisBehavior.completeSeriesConfig,
@@ -398,6 +399,10 @@ Custom property | Description
     },
 
     _axisConfigChanged: function(conf) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(this.axisConfig && this._doesObjHaveValues(this.dimensions)) {
         var keys = Object.keys(this.axisConfig),
             hasProps = false,
@@ -559,6 +564,10 @@ Custom property | Description
      * @method _toggleTitleLocation
      */
     _toggleTitleLocation: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       this.set('_pokeTitleLocation' , !this._pokeTitleLocation);
     },
 
@@ -567,6 +576,10 @@ Custom property | Description
      *
      */
     _calcH: function(height,length) {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(length) {
         return length;
       }
@@ -641,6 +654,10 @@ Custom property | Description
      * @method _computedInternalDimensions
      */
     _computedInternalDimensions: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       //makes sure we dont try to process a new dim before it has a new scale.
       if(this._lastDomainChanged !== this.domainChanged) {
 
@@ -731,6 +748,10 @@ Custom property | Description
     },
 
     _recalcGTransforms: function(leftSize, rightSize) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(leftSize && rightSize && this._doesD3HaveValues(this.svg) && this._doesD3HaveValues(this.svg.selectAll('.dimension'))) {
         this.svg.selectAll('.dimension')
           .attr('transform', function(d) {

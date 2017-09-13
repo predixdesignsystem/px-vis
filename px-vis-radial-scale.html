@@ -41,6 +41,7 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
     is: 'px-vis-radial-scale',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehaviorD3.svg,
       PxVisBehaviorD3.axes,
       PxVisBehavior.sizing,
@@ -101,6 +102,10 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @method _setXScale
      */
     _setXScale: function(width, useDegrees, forceRecreation) {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
         var range = [0, this.width],
             domain = this.useDegrees ? [0, 360] : [0, 2*Math.PI],
             x;
@@ -134,6 +139,10 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @method _setYScale
      */
     _setYScale: function(width,margin,centerOffset) {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       var range = [centerOffset, width],
           y = Px.d3.scaleLinear().nice().range(range);
 
@@ -159,6 +168,10 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @method _generateChartExtents
      */
     _generateChartExtents: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(this.chartData && this.chartData.length > 0 && this.amplitudeKeys && this.amplitudeKeys.length > 0) {
         var ext = {
               "x": this.amplitudeKeys,
@@ -198,6 +211,10 @@ https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
      * @method _currentDomain
      */
      _currentDomain: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
 
       this.debounce('_currentDomain', function() {
         // check to make sure there is data
