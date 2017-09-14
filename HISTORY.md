@@ -1,3 +1,8 @@
+v3.1.19
+================
+* Striping supports a single timestamp entry, drawing a line instead of an area.
+* Line dash style is configurable via the stripeConfig obj
+
 v3.1.18
 ================
 * Fix for striping and the data returned by interaction space extentsData.
