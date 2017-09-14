@@ -372,7 +372,7 @@ function findObservers(src) {
   let singleObsRegExp = /observer\s*:\s*['"](.*)['"]/g,
       observersRegExp = /observers\s*:\s*\[(((?:\s*['"].*\(.*\)['"],?\s*)|(?:\s*\/\/\w*\s*))*)\]/g,
       computedRegExo = /computed\s*:\s*['"](.*)['"]/g,
-      bindingRegExp = /=['"][\w _]*(?:\[\[)?(?:{{)?(([\w_]*)\([\w_ ,]*\))(?:\]\])?(?:}})?[^'"]*['"]/g,
+      bindingRegExp = /=['"][\w _]*(?:\[{2}|\{{2})(([\w_]*)\([\w_ ,]*\))(?:\]{2}|\}{2})[^'"]*['"]/g,
       functionRegEXp = /.*\(.*\),?/g,
       result = {
         'singleObservers': [],
@@ -387,8 +387,16 @@ function findObservers(src) {
   //find all 'bindings' lines and get the function name
   while ((tmpArray = bindingRegExp.exec(src)) !== null) {
 
-    if(result.bindings.indexOf(tmpArray[2]) === -1) {
-      result.bindings.push(tmpArray[2]);
+    let funcNameRegExp = /(?:\[{2}|\{{2})([\w_]*)\([\w ,_]*\)(?:\]{2}|\}{2})/g,
+        funcArray,
+        bindingString = tmpArray[0];
+
+     //find every function within binding
+     while ((funcArray = funcNameRegExp.exec(bindingString)) !== null) {
+
+      if(result.bindings.indexOf(funcArray[1]) === -1) {
+        result.bindings.push(funcArray[1]);
+      }
     }
   }
   if(!result.singleObservers.length) {
