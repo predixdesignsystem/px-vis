@@ -397,6 +397,10 @@ PxVisBehaviorChart.chartCommon = [{
      *
      */
     _chartTypeLine: function(key,obj) {
+      if(this.hasUndefinedArguments(arguments)) {
+      return;
+      }
+
       return obj && obj[key] && (obj[key]['type'] === 'line' || obj[key]['type'] === 'both');
     },
 
@@ -405,6 +409,10 @@ PxVisBehaviorChart.chartCommon = [{
      *
      */
     _chartTypeScatter: function(key,obj) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       return obj && obj[key] && (obj[key]['type'] === 'scatter' || obj[key]['type'] === 'both');
     },
 
@@ -433,6 +441,10 @@ PxVisBehaviorChart.chartCommon = [{
     },
 
     _returnStrokeWidth: function(seriesId, config) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       return config[seriesId]["strokeWidth"] ? config[seriesId]["strokeWidth"] : 1;
     }
 
@@ -1001,14 +1013,18 @@ PxVisBehaviorChart.waitForAttach = {
 
     @polymerBehavior PxVisBehaviorChart.getHideClass
 */
-PxVisBehaviorChart.getHideClass = {
+PxVisBehaviorChart.getHideClass = [{
   _getHideClass: function(hide) {
+    if(this.hasUndefinedArguments(arguments)) {
+     return;
+    }
+
     if(hide === true) {
       return 'hideAxis';
     }
     return '';
   }
-};
+}, PxVisBehavior.observerCheck];
 
 /*
     Name:
@@ -2202,6 +2218,10 @@ PxVisBehaviorChart.multiAxis = [{
 
 
   _returnYScale: function(seriesId, config) {
+    if(this.hasUndefinedArguments(arguments)) {
+     return;
+    }
+
     if(this.domainChanged !== null) {
       if(typeof this.y === 'object') {
         var d = config[seriesId]['axis']['id'];
@@ -2214,7 +2234,7 @@ PxVisBehaviorChart.multiAxis = [{
    }
     return;
   }
-}, PxVisBehavior.dimensions, PxVisBehavior.seriesToAxes];
+}, PxVisBehavior.observerCheck, PxVisBehavior.dimensions, PxVisBehavior.seriesToAxes];
 
 /*
     Name:
