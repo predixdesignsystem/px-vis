@@ -12,10 +12,13 @@
          when wct is run from the command line -->
     <script src="../web-component-tester/browser.js"></script>
 
-
     <link rel="import" href="../px-vis-svg-canvas.html" />
-    <link rel="import" href="../px-vis-multi-scale.html" />
-    <link rel="import" href="../px-vis-radial-scale.html" />
+    <link rel="import" href="../px-vis-behavior-scale-multi-axis.html" />
+    <link rel="import" href="../px-vis-behavior-scale-radar.html" />
+    <link rel="import" href="../px-vis-behavior-renderer.html" />
+    <link rel="import" href="../px-vis-behavior-chart.html" />
+    <link rel="import" href="../px-vis-behavior-common.html" />
+    <link rel="import" href="../px-vis-behavior-d3.html" />
     <link rel="import" href="../px-vis-highlight-line-canvas.html" />
     <link rel="import" href="behaviors/px-colors-behavior.html" />
 
@@ -29,134 +32,160 @@
 
   <body>
     <h3>Web Component Test : Fixture for px-vis-highlight-line-canvas</h3>
+
+    <dom-module id="multi-test">
+      <template>
+        <px-vis-svg-canvas
+          id="canvas"
+          canvas-context="{{canvasContext}}"
+          canvas-layers="{{canvasLayers}}"
+          canvas-layers-config="[[canvasLayersConfig]]"
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]">
+        </px-vis-svg-canvas>
+        <px-vis-highlight-line-canvas
+          id="highlighter"
+          margin="[[margin]]"
+          canvas-context="[[canvasLayers.highlighter]]"
+          canvas-layers-config="{{canvasLayersConfig}}"
+          layers-to-mask="[[canvasContext]]"
+          x="[[x]]"
+          y="[[y]]"
+          parallel-coordinates
+          dimensions="[[dimensions]]"
+          domain-changed="[[domainChanged]]"
+          time-data="[[seriesKey]]"
+          complete-series-config="[[completeSeriesConfig]]"
+          series-id="[[seriesKey]]"
+          category-key="[[categoryKey]]"
+          categories="[[categories]]"
+          chart-data="[[chartData]]"
+          generating-crosshair-data="[[generatingCrosshairData]]"
+          crosshair-data="[[crosshairData]]"
+          default-empty-data="{{defaultEmptyData}}"
+          different-dataset="[[differentDataset]]"
+          fuzz="[[fuzz]]"
+          show-tooltip-data="[[showTooltipData]]">
+        </px-vis-highlight-line-canvas>
+      </template>
+    </dom-module>
+    <script>
+      Polymer({
+        is: 'multi-test',
+        behaviors: [
+          PxVisBehavior.sizing,
+          PxVisBehaviorScale.scaleMultiAxis,
+          PxVisBehaviorD3.canvas,
+          PxVisBehaviorD3.axes,
+          PxVisBehavior.dataset,
+          PxVisBehavior.dimensions,
+          PxVisBehaviorChart.layers,
+          PxVisBehaviorRenderer.base,
+          PxVisBehaviorChart.highlighterConfigs,
+          PxVisBehaviorD3.domainUpdate,
+          PxVisBehavior.crosshairData
+        ],
+        observers: [
+          '_setXScale(width,margin)',
+          '_setYScale(height,margin,axes)',
+          '_generateDataExtents(dimensions)',
+          '_setDomain(x, y, dataExtents)',
+          '_renderHighlight(domainChanged, canvasLayers.highlighter, completeSeriesConfig.*, preventInitialDrawing)'
+        ]
+      });
+    </script>
+
+    <dom-module id="radar-test">
+      <template>
+        <px-vis-svg-canvas
+          id="canvas"
+          canvas-context="{{canvasContext}}"
+          canvas-layers="{{canvasLayers}}"
+          canvas-layers-config="[[canvasLayersConfig]]"
+          width="[[width]]"
+          height="[[height]]"
+          margin="[[margin]]"
+          offset="[[offset]]">
+        </px-vis-svg-canvas>
+        <px-vis-highlight-line-canvas
+          id="highlighter"
+          margin="[[margin]]"
+          canvas-context="[[canvasLayers.highlighter]]"
+          canvas-layers-config="{{canvasLayersConfig}}"
+          layers-to-mask="[[canvasContext]]"
+          x="[[x]]"
+          y="[[y]]"
+          radial-line
+          dimensions="[[dimensions]]"
+          domain-changed="[[domainChanged]]"
+          time-data="[[seriesKey]]"
+          complete-series-config="[[completeSeriesConfig]]"
+          series-id="[[seriesKey]]"
+          category-key="[[categoryKey]]"
+          categories="[[categories]]"
+          chart-data="[[chartData]]"
+          generating-crosshair-data="[[generatingCrosshairData]]"
+          crosshair-data="[[crosshairData]]"
+          default-empty-data="{{defaultEmptyData}}"
+          interpolation-function="bofCompleteManually"
+          different-dataset="[[differentDataset]]"
+          fuzz="[[fuzz]]">
+        </px-vis-highlight-line-canvas>
+      </template>
+    </dom-module>
+    <script>
+      Polymer({
+        is: 'radar-test',
+        behaviors: [
+          PxVisBehavior.sizing,
+          PxVisBehaviorScale.radar,
+          PxVisBehaviorD3.canvas,
+          PxVisBehaviorD3.axes,
+          PxVisBehavior.dataset,
+          PxVisBehavior.dimensions,
+          PxVisBehaviorChart.layers,
+          PxVisBehaviorRenderer.base,
+          PxVisBehaviorChart.highlighterConfigs,
+          PxVisBehaviorD3.domainUpdate,
+          PxVisBehavior.crosshairData
+        ],
+        observers: [
+          '_setXScale(_radius)',
+          '_setYScale(_radius,centerOffset)',
+          '_generateChartExtents(chartData.*, dimensions)',
+          '_setDomain(x, y, _calculatedExtents)',
+          '_renderHighlight(domainChanged, canvasLayers.highlighter, completeSeriesConfig.*, preventInitialDrawing)'
+        ]
+      });
+    </script>
+
     <template is="dom-bind">
-      <px-vis-svg-canvas id="parallelSVG">
-      </px-vis-svg-canvas>
-      <px-vis-multi-scale
-        id="parallelScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
-      </px-vis-multi-scale>
-      <px-vis-highlight-line-canvas
-        id="parallelhighlight"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]"
-        parallel-coordinates>
-      </px-vis-highlight-line-canvas>
+      <multi-test id="parallel"></multi-test>
     </template>
 
     <template is="dom-bind">
-      <px-vis-svg-canvas id="radarSVG"></px-vis-svg-canvas>
-      <px-vis-radial-scale
-        id="radarScale"
-        radar
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
-      </px-vis-radial-scale>
-      <px-vis-highlight-line-canvas
-        id="radarhighlight"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]"
-        radial-line-canvas
-        interpolation-function="bofCompleteManually">
-      </px-vis-highlight-line-canvas>
+      <radar-test id="radar"></radar-test>
     </template>
 
     <template is="dom-bind">
-      <px-vis-svg-canvas id="differentSVG">
-      </px-vis-svg-canvas>
-      <px-vis-multi-scale
-        id="differentScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
-      </px-vis-multi-scale>
-      <px-vis-highlight-line-canvas
-        id="differenthighlight"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]"
-        parallel-coordinates
-        different-dataset>
-      </px-vis-highlight-line-canvas>
+      <multi-test id="different"></multi-test>
     </template>
 
     <template is="dom-bind">
-      <px-vis-svg-canvas id="fuzzSVG">
-      </px-vis-svg-canvas>
-      <px-vis-multi-scale
-        id="fuzzScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
-      </px-vis-multi-scale>
-      <px-vis-highlight-line-canvas
-        id="fuzzhighlight"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]"
-        parallel-coordinates
-        different-dataset
-        fuzz="30000000">
-      </px-vis-highlight-line-canvas>
+      <multi-test id="fuzz"></multi-test>
     </template>
 
     <template is="dom-bind">
-      <px-vis-svg-canvas id="generatingSVG">
-      </px-vis-svg-canvas>
-      <px-vis-multi-scale
-        id="generatingScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
-      </px-vis-multi-scale>
-      <px-vis-highlight-line-canvas
-        id="generatinghighlight"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]"
-        parallel-coordinates>
-      </px-vis-highlight-line-canvas>
+      <multi-test id="generating"></multi-test>
     </template>
 
     <template is="dom-bind">
-      <px-vis-svg-canvas id="forceSVG">
-      </px-vis-svg-canvas>
-      <px-vis-multi-scale
-        id="forceScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
-      </px-vis-multi-scale>
-      <px-vis-highlight-line-canvas
-        id="forcehighlight"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]"
-        parallel-coordinates>
-      </px-vis-highlight-line-canvas>
+      <multi-test id="force"></multi-test>
     </template>
 
     <template is="dom-bind">
-      <px-vis-svg-canvas id="tooltipSVG">
-      </px-vis-svg-canvas>
-      <px-vis-multi-scale
-        id="tooltipScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
-      </px-vis-multi-scale>
-      <px-vis-highlight-line-canvas
-        id="tooltiphighlight"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]"
-        parallel-coordinates>
-      </px-vis-highlight-line-canvas>
+      <multi-test id="tooltip"></multi-test>
     </template>
   </body>
 </html>

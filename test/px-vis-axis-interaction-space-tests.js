@@ -128,7 +128,7 @@ function runTests(){
         dim = ['y','y1','y2'],
         w = 500,
         h = 500,
-        ext = {'x': dim, 'y':{'y':[1,10], 'y1':[1,20], 'y2':[1,27]}},
+        ext = {'x': dim, 'y':[1,10], 'y1':[1,20], 'y2':[1,27]},
         m = {
           "top": 10,
           "right": 10,
@@ -143,10 +143,11 @@ function runTests(){
         multiScale.set('width',w);
         multiScale.set('height',h);
         multiScale.set('margin',m);
-        multiScale.set('axes',dim);
         multiScale.set('completeSeriesConfig',completeSeriesConfig);
-        multiScale.set('chartExtents',ext);
+        multiScale.set('dataExtents',ext);
         multiScale.set('chartData',d);
+        multiScale.set('axes',dim);
+        multiScale.set('dimensions',dim);
 
         var g = multiSVG.svg.selectAll('g.dimension')
             .data(dim);

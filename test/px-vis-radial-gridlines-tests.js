@@ -39,7 +39,7 @@ function runTests(){
           "y":"y",
           "color": "rgb(93,165,218)"
         }},
-        chartExtents = {"x":['y'],"y":[0,10]},
+        chartExtents = [0,10],
         w = 500,
         h = 500,
         min = 480/2,
@@ -57,12 +57,11 @@ function runTests(){
       baseSVG.set('offset',offset);
       baseSVG.set('margin',m);
 
-      baseScale.set('width',min);
-      baseScale.set('margin',m);
-      baseScale.set('amplitudeKeys','y');
+      baseScale.set('_radius',min);
+      baseScale.set('_amplitudeKey',['y']);
       baseScale.set('completeSeriesConfig',completeSeriesConfig);
-      baseScale.set('chartExtents',chartExtents);
       baseScale.set('chartData',d);
+      baseScale.set('_calculatedExtents',chartExtents);
 
       radialGrid.set('margin',m);
 

@@ -4,9 +4,9 @@ document.addEventListener("WebComponentsReady", function() {
 
 function runTests() {
   suite('px-vis-highlight-line renders parallel axis highlight', function() {
-    var parallelScale = document.getElementById('parallelScale'),
-        parallelSVG = document.getElementById('parallelSVG'),
-        parallelhighlight = document.getElementById('parallelhighlight');
+    var parallel = document.getElementById('parallel'),
+        parallelCanvas = parallel.$.canvas,
+        parallelhighlight = parallel.$.highlighter;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
@@ -68,7 +68,6 @@ function runTests() {
           }
         },
         dim = ['y','y2', 'y3'],
-        chartExtents = {"x": ['y','y2','y3'], "y": {'y': [0,10], 'y2':[0,27], 'y3':[0,14] }},
         categories = ['a','b'],
         w = 500,
         h = 300,
@@ -79,33 +78,21 @@ function runTests() {
           "left": 15
         };
 
-      parallelSVG.set('width',w);
-      parallelSVG.set('height',h);
-      parallelSVG.set('margin',m);
+        parallel.set('width',w);
+        parallel.set('height',h);
+        parallel.set('margin',m);
+        parallel.set('canvasLayersConfig.highlighter', {});
+        parallel.set('seriesKey', 'x');
+        parallel.set('catagories',categories);
+        parallel.set('catagoryKey','cat');
+        parallel.set('completeSeriesConfig',completeSeriesConfig);
+        parallel.set('chartData',d);
+        parallel.set('axes',dim);
+        parallel.set('dimensions',dim);
+        parallel.set('preventInitialDrawing',false);
 
-      parallelScale.set('width',w);
-      parallelScale.set('height',h);
-      parallelScale.set('margin',m);
-      parallelScale.set('completeSeriesConfig',completeSeriesConfig);
-      parallelScale.set('chartExtents',chartExtents);
-      parallelScale.set('dimensions',dim);
-      parallelScale.set('axes',dim);
-      parallelScale.set('chartData',d);
-
-
-      parallelhighlight.set('canvasContext', parallelSVG.canvasLayers.highlighter);
-      parallelhighlight.set('layersToMask', parallelSVG.canvasContext);
-      parallelhighlight.set('dimensions',dim);
-      parallelhighlight.set('timeData', 'x');
-      parallelhighlight.set('completeSeriesConfig',completeSeriesConfig);
-      parallelhighlight.set('seriesId',"x");
-      parallelhighlight.set('categoryKey',"cat");
-      parallelhighlight.set('categories',categories);
-      parallelhighlight.set('chartData',d);
-
-      window.setTimeout(function() { done(); }, 100);
-
-    });
+        window.setTimeout(function() { done(); }, 100);
+      });
 
     test('parallelhighlight fixture is created', function() {
       assert.isTrue(parallelhighlight !== null);
@@ -120,11 +107,11 @@ function runTests() {
     });
 
     test('parallelhighlight base layer is not muted', function() {
-      assert.isFalse(parallelSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
+      assert.isFalse(parallelCanvas.canvasContext.canvas.classList.contains("secondaryDataMask"));
     });
 
     test('parallelhighlight has transition', function() {
-      assert.equal(parallelSVG.canvasContext.canvas.style.transition.slice(0,12), 'opacity 0.2s');
+      assert.equal(parallelCanvas.canvasContext.canvas.style.transition.slice(0,12), 'opacity 0.2s');
     });
 
     test('parallelhighlight didnt create defaultEmptyData', function() {
@@ -134,9 +121,9 @@ function runTests() {
 
 
   suite('px-vis-highlight-line draws the highlight', function() {
-    var parallelScale = document.getElementById('parallelScale'),
-        parallelSVG = document.getElementById('parallelSVG'),
-        parallelhighlight = document.getElementById('parallelhighlight');
+    var parallel = document.getElementById('parallel'),
+        parallelCanvas = parallel.$.canvas,
+        parallelhighlight = parallel.$.highlighter;
 
     suiteSetup(function(done){
       var d = {
@@ -150,13 +137,13 @@ function runTests() {
             "timeStamps": [1397160780000]
           };
 
-      parallelhighlight.set("crosshairData", d);
+      parallel.set("crosshairData", d);
 
       window.setTimeout(function() { done(); }, 100);
     });
 
     test('datalayer gets masked', function() {
-      assert.isTrue(parallelSVG.canvasContext.canvas.classList.contains('secondaryDataMask'));
+      assert.isTrue(parallelCanvas.canvasContext.canvas.classList.contains('secondaryDataMask'));
     });
 
     test('_highlightData is created', function() {
@@ -171,9 +158,9 @@ function runTests() {
   }); //suite
 
   suite('px-vis-highlight-line clears the highlight', function() {
-    var parallelScale = document.getElementById('parallelScale'),
-        parallelSVG = document.getElementById('parallelSVG'),
-        parallelhighlight = document.getElementById('parallelhighlight');
+    var parallel = document.getElementById('parallel'),
+        parallelCanvas = parallel.$.canvas,
+        parallelhighlight = parallel.$.highlighter;
 
     suiteSetup(function(done){
       var d = {
@@ -187,7 +174,7 @@ function runTests() {
     });
 
     test('datalayer has transition', function() {
-      assert.isFalse(parallelSVG.canvasContext.canvas.classList.contains('secondaryDataMask'));
+      assert.isFalse(parallelCanvas.canvasContext.canvas.classList.contains('secondaryDataMask'));
     });
 
     test('data is empty', function() {
@@ -204,9 +191,9 @@ function runTests() {
 
 
   suite('px-vis-highlight-line renders radar axis highlight', function() {
-    var radarScale = document.getElementById('radarScale'),
-        radarSVG = document.getElementById('radarSVG'),
-        radarhighlight = document.getElementById('radarhighlight');
+    var radar = document.getElementById('radar'),
+        radarCanvas = radar.$.canvas,
+        radarhighlight = radar.$.highlighter;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
@@ -280,27 +267,21 @@ function runTests() {
           "left": 15
         };
 
-      radarSVG.set('width',w);
-      radarSVG.set('height',h);
-      radarSVG.set('margin',m);
-      radarSVG.set('offset',offset);
-
-      radarScale.set('width',min);
-      radarScale.set('margin',m);
-      radarScale.set('centerOffset',50);
-      radarScale.set('amplitudeKeys',dim);
-      radarScale.set('chartExtents',chartExtents);
-      radarScale.set('dimensions',dim);
-      radarScale.set('axes',dim);
-      radarScale.set('chartData',d);
-
-      radarhighlight.set('canvasContext', radarSVG.canvasLayers.highlighter);
-      radarhighlight.set('layersToMask', radarSVG.canvasContext);
-      radarhighlight.set('dimensions',dim);
-      radarhighlight.set('timeData', 'x');
-      radarhighlight.set('completeSeriesConfig',completeSeriesConfig);
-      radarhighlight.set('seriesId',"x");
-      radarhighlight.set('chartData',d);
+      radar.set('width',w);
+      radar.set('height',h);
+      radar.set('margin',m);
+      radar.set('offset',offset);
+      radar.set('_radius',min);
+      radar.set('centerOffset',50);
+      radar.set('canvasLayersConfig.highlighter', {});
+      radar.set('catagories',categories);
+      radar.set('catagoryKey','cat');
+      radar.set('seriesKey', 'x');
+      radar.set('completeSeriesConfig',completeSeriesConfig);
+      radar.set('chartData',d);
+      radar.set('axes',dim);
+      radar.set('dimensions',dim);
+      radar.set('preventInitialDrawing',false);
 
       window.setTimeout(function() { done(); }, 100);
 
@@ -319,7 +300,7 @@ function runTests() {
     });
 
     test('radarhighlight base layer is not muted', function() {
-      assert.isFalse(radarSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
+      assert.isFalse(radarCanvas.canvasContext.canvas.classList.contains("secondaryDataMask"));
     });
 
     test('radarhighlight didnt create defaultEmptyData', function() {
@@ -330,9 +311,9 @@ function runTests() {
 
 
   suite('px-vis-highlight-line draws the highlight', function() {
-    var radarScale = document.getElementById('radarScale'),
-        radarSVG = document.getElementById('radarSVG'),
-        radarhighlight = document.getElementById('radarhighlight');
+    var radar = document.getElementById('radar'),
+        radarCanvas = radar.$.canvas,
+        radarhighlight = radar.$.highlighter;
 
     suiteSetup(function(done){
       var d = {
@@ -346,13 +327,13 @@ function runTests() {
         "timeStamps": [1397160780000]
       };
 
-      radarhighlight.set("crosshairData", d);
+      radar.set("crosshairData", d);
 
       window.setTimeout(function() { done(); }, 100);
     });
 
     test('datalayer gets masked', function() {
-      assert.isTrue(radarSVG.canvasContext.canvas.classList.contains('secondaryDataMask'));
+      assert.isTrue(radarCanvas.canvasContext.canvas.classList.contains('secondaryDataMask'));
     });
 
     test('_highlightData is created', function() {
@@ -367,9 +348,9 @@ function runTests() {
   }); //suite
 
   suite('px-vis-highlight-line clears the highlight', function() {
-    var radarScale = document.getElementById('radarScale'),
-        radarSVG = document.getElementById('radarSVG'),
-        radarhighlight = document.getElementById('radarhighlight');
+    var radar = document.getElementById('radar'),
+        radarCanvas = radar.$.canvas,
+        radarhighlight = radar.$.highlighter;
 
     suiteSetup(function(done){
       var d = {
@@ -377,13 +358,13 @@ function runTests() {
             "timeStamps": []
           };
 
-      radarhighlight.set("crosshairData", d);
+      radar.set("crosshairData", d);
 
       window.setTimeout(function() { done(); }, 100);
     });
 
     test('datalayer has transition', function() {
-      assert.isFalse(radarSVG.canvasContext.canvas.classList.contains('secondaryDataMask'));
+      assert.isFalse(radarCanvas.canvasContext.canvas.classList.contains('secondaryDataMask'));
     });
 
     test('data is empty', function() {
@@ -400,9 +381,9 @@ function runTests() {
 
 
   suite('px-vis-highlight-line renders different dataset highlight', function() {
-    var differentScale = document.getElementById('differentScale'),
-        differentSVG = document.getElementById('differentSVG'),
-        differenthighlight = document.getElementById('differenthighlight');
+    var different = document.getElementById('different'),
+        differentCanvas = different.$.canvas,
+        differenthighlight = different.$.highlighter;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
@@ -475,28 +456,19 @@ function runTests() {
           "left": 15
         };
 
-      differentSVG.set('width',w);
-      differentSVG.set('height',h);
-      differentSVG.set('margin',m);
-
-      differentScale.set('width',w);
-      differentScale.set('height',h);
-      differentScale.set('margin',m);
-      differentScale.set('completeSeriesConfig',completeSeriesConfig);
-      differentScale.set('chartExtents',chartExtents);
-      differentScale.set('dimensions',dim);
-      differentScale.set('axes',dim);
-      differentScale.set('chartData',d);
-
-      differenthighlight.set('canvasContext', differentSVG.canvasLayers.highlighter);
-      differenthighlight.set('layersToMask', differentSVG.canvasContext);
-      differenthighlight.set('dimensions',dim);
-      differenthighlight.set('timeData', 'x');
-      differenthighlight.set('completeSeriesConfig',completeSeriesConfig);
-      differenthighlight.set('seriesId',"x");
-      differenthighlight.set('categoryKey',"cat");
-      differenthighlight.set('categories',categories);
-      differenthighlight.set('chartData',d);
+      different.set('differentDataset',true);
+      different.set('width',w);
+      different.set('height',h);
+      different.set('margin',m);
+      different.set('canvasLayersConfig.highlighter', {});
+      different.set('seriesKey', 'x');
+      different.set('catagories',categories);
+      different.set('catagoryKey','cat');
+      different.set('completeSeriesConfig',completeSeriesConfig);
+      different.set('chartData',d);
+      different.set('axes',dim);
+      different.set('dimensions',dim);
+      different.set('preventInitialDrawing',false);
 
       window.setTimeout(function() { done(); }, 100);
     });
@@ -514,11 +486,11 @@ function runTests() {
     });
 
     test('differenthighlight base layer is not muted', function() {
-      assert.isFalse(differentSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
+      assert.isFalse(differentCanvas.canvasContext.canvas.classList.contains("secondaryDataMask"));
     });
 
     test('differenthighlight has transition', function() {
-      assert.equal(differentSVG.canvasContext.canvas.style.transition.slice(0,12), 'opacity 0.2s');
+      assert.equal(differentCanvas.canvasContext.canvas.style.transition.slice(0,12), 'opacity 0.2s');
     });
 
     test('differenthighlight didnt create defaultEmptyData', function() {
@@ -528,9 +500,9 @@ function runTests() {
 
 
   suite('px-vis-highlight-line draws the highlight', function() {
-    var differentScale = document.getElementById('differentScale'),
-        differentSVG = document.getElementById('differentSVG'),
-        differenthighlight = document.getElementById('differenthighlight');
+    var different = document.getElementById('different'),
+        differentCanvas = different.$.canvas,
+        differenthighlight = different.$.highlighter;
 
     suiteSetup(function(done){
       var d = {
@@ -544,13 +516,13 @@ function runTests() {
             "timeStamps": [1397160780000]
           };
 
-      differenthighlight.set("crosshairData", d);
+      different.set("crosshairData", d);
 
       window.setTimeout(function() { done(); }, 100);
     });
 
     test('datalayer gets masked', function() {
-      assert.isTrue(differentSVG.canvasContext.canvas.classList.contains('secondaryDataMask'));
+      assert.isTrue(differentCanvas.canvasContext.canvas.classList.contains('secondaryDataMask'));
     });
 
      test('_highlightData is created', function() {
@@ -565,9 +537,9 @@ function runTests() {
   }); //suite
 
   suite('px-vis-highlight-line clears the highlight', function() {
-    var differentScale = document.getElementById('differentScale'),
-        differentSVG = document.getElementById('differentSVG'),
-        differenthighlight = document.getElementById('differenthighlight');
+    var different = document.getElementById('different'),
+        differentCanvas = different.$.canvas,
+        differenthighlight = different.$.highlighter;
 
     suiteSetup(function(done){
       var d = {
@@ -575,13 +547,13 @@ function runTests() {
             "timeStamps": []
           };
 
-      differenthighlight.set("crosshairData", d);
+      different.set("crosshairData", d);
 
       window.setTimeout(function() { done(); }, 100);
     });
 
     test('datalayer has transition', function() {
-      assert.isFalse(differentSVG.canvasContext.canvas.classList.contains('secondaryDataMask'));
+      assert.isFalse(differentCanvas.canvasContext.canvas.classList.contains('secondaryDataMask'));
     });
 
     test('data is empty', function() {
@@ -596,9 +568,9 @@ function runTests() {
 
 
   suite('px-vis-highlight-line renders fuzz dataset highlight', function() {
-    var fuzzScale = document.getElementById('fuzzScale'),
-        fuzzSVG = document.getElementById('fuzzSVG'),
-        fuzzhighlight = document.getElementById('fuzzhighlight');
+    var fuzz = document.getElementById('fuzz'),
+        fuzzCanvas = fuzz.$.canvas,
+        fuzzhighlight = fuzz.$.highlighter;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
@@ -660,7 +632,6 @@ function runTests() {
           }
         },
         dim = ['y','y2', 'y3'],
-        chartExtents = {"x": ['y','y2','y3'], "y": {'y': [0,10], 'y2':[0,27], 'y3':[0,14] }},
         categories = ['a','b'],
         w = 500,
         h = 300,
@@ -671,28 +642,20 @@ function runTests() {
           "left": 15
         };
 
-      fuzzSVG.set('width',w);
-      fuzzSVG.set('height',h);
-      fuzzSVG.set('margin',m);
-
-      fuzzScale.set('width',w);
-      fuzzScale.set('height',h);
-      fuzzScale.set('margin',m);
-      fuzzScale.set('completeSeriesConfig',completeSeriesConfig);
-      fuzzScale.set('chartExtents',chartExtents);
-      fuzzScale.set('dimensions',dim);
-      fuzzScale.set('axes',dim);
-      fuzzScale.set('chartData',d);
-
-      fuzzhighlight.set('canvasContext', fuzzSVG.canvasLayers.highlighter);
-      fuzzhighlight.set('layersToMask', fuzzSVG.canvasContext);
-      fuzzhighlight.set('dimensions',dim);
-      fuzzhighlight.set('timeData', 'x');
-      fuzzhighlight.set('completeSeriesConfig',completeSeriesConfig);
-      fuzzhighlight.set('seriesId',"x");
-      fuzzhighlight.set('categoryKey',"cat");
-      fuzzhighlight.set('categories',categories);
-      fuzzhighlight.set('chartData',d);
+      fuzz.set('differentDataset',true);
+      fuzz.set('fuzz',30000000);
+      fuzz.set('width',w);
+      fuzz.set('height',h);
+      fuzz.set('margin',m);
+      fuzz.set('canvasLayersConfig.highlighter', {});
+      fuzz.set('seriesKey', 'x');
+      fuzz.set('catagories',categories);
+      fuzz.set('catagoryKey','cat');
+      fuzz.set('completeSeriesConfig',completeSeriesConfig);
+      fuzz.set('chartData',d);
+      fuzz.set('axes',dim);
+      fuzz.set('dimensions',dim);
+      fuzz.set('preventInitialDrawing',false);
 
       window.setTimeout(function() { done(); }, 100);
     });
@@ -710,11 +673,11 @@ function runTests() {
     });
 
     test('fuzzhighlight base layer is not muted', function() {
-      assert.isFalse(fuzzSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
+      assert.isFalse(fuzzCanvas.canvasContext.canvas.classList.contains("secondaryDataMask"));
     });
 
     test('fuzzhighlight has transition', function() {
-      assert.equal(fuzzSVG.canvasContext.canvas.style.transition.slice(0,12), 'opacity 0.2s');
+      assert.equal(fuzzCanvas.canvasContext.canvas.style.transition.slice(0,12), 'opacity 0.2s');
     });
 
     test('fuzzhighlight didnt create defaultEmptyData', function() {
@@ -724,9 +687,9 @@ function runTests() {
 
 
   suite('px-vis-highlight-line draws the highlight', function() {
-    var fuzzScale = document.getElementById('fuzzScale'),
-        fuzzSVG = document.getElementById('fuzzSVG'),
-        fuzzhighlight = document.getElementById('fuzzhighlight');
+    var fuzz = document.getElementById('fuzz'),
+        fuzzCanvas = fuzz.$.canvas,
+        fuzzhighlight = fuzz.$.highlighter;
 
     suiteSetup(function(done){
       var d = {
@@ -740,13 +703,13 @@ function runTests() {
             "timeStamps": [1397160800000]
           };
 
-      fuzzhighlight.set("crosshairData", d);
+      fuzz.set("crosshairData", d);
 
       window.setTimeout(function() { done(); }, 100);
     });
 
     test('datalayer gets masked', function() {
-      assert.isTrue(fuzzSVG.canvasContext.canvas.classList.contains('secondaryDataMask'));
+      assert.isTrue(fuzzCanvas.canvasContext.canvas.classList.contains('secondaryDataMask'));
     });
 
      test('_highlightData is created', function() {
@@ -773,9 +736,9 @@ function runTests() {
   }); //suite
 
   suite('px-vis-highlight-line clears the highlight', function() {
-    var fuzzScale = document.getElementById('fuzzScale'),
-        fuzzSVG = document.getElementById('fuzzSVG'),
-        fuzzhighlight = document.getElementById('fuzzhighlight');
+    var fuzz = document.getElementById('fuzz'),
+        fuzzCanvas = fuzz.$.canvas,
+        fuzzhighlight = fuzz.$.highlighter;
 
     suiteSetup(function(done){
       var d = {
@@ -783,13 +746,13 @@ function runTests() {
             "timeStamps": []
           };
 
-      fuzzhighlight.set("crosshairData", d);
+      fuzz.set("crosshairData", d);
 
       window.setTimeout(function() { done(); }, 100);
     });
 
     test('datalayer has transition', function() {
-      assert.isFalse(fuzzSVG.canvasContext.canvas.classList.contains('secondaryDataMask'));
+      assert.isFalse(fuzzCanvas.canvasContext.canvas.classList.contains('secondaryDataMask'));
     });
 
     test('data is empty', function() {
@@ -806,9 +769,9 @@ function runTests() {
 
 
   suite('px-vis-highlight-line renders generating crosshair data axis highlight', function() {
-    var generatingScale = document.getElementById('generatingScale'),
-        generatingSVG = document.getElementById('generatingSVG'),
-        generatinghighlight = document.getElementById('generatinghighlight');
+    var generating = document.getElementById('generating'),
+        generatingCanvas = generating.$.canvas,
+        generatinghighlight = generating.$.highlighter;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
@@ -881,26 +844,18 @@ function runTests() {
           "left": 15
         };
 
-      generatingSVG.set('width',w);
-      generatingSVG.set('height',h);
-      generatingSVG.set('margin',m);
-
-      generatingScale.set('width',w);
-      generatingScale.set('height',h);
-      generatingScale.set('margin',m);
-      generatingScale.set('completeSeriesConfig',completeSeriesConfig);
-      generatingScale.set('chartExtents',chartExtents);
-      generatingScale.set('dimensions',dim);
-      generatingScale.set('axes',dim);
-      generatingScale.set('chartData',d);
-
-      generatinghighlight.set('canvasContext', generatingSVG.canvasLayers.highlighter);
-      generatinghighlight.set('layersToMask', generatingSVG.canvasContext);
-      generatinghighlight.set('dimensions',dim);
-      generatinghighlight.set('timeData', 'x');
-      generatinghighlight.set('completeSeriesConfig',completeSeriesConfig);
-      generatinghighlight.set('seriesId',"x");
-      generatinghighlight.set('chartData',d);
+      generating.set('width',w);
+      generating.set('height',h);
+      generating.set('margin',m);
+      generating.set('canvasLayersConfig.highlighter', {});
+      generating.set('seriesKey', 'x');
+      generating.set('catagories',categories);
+      generating.set('catagoryKey','cat');
+      generating.set('completeSeriesConfig',completeSeriesConfig);
+      generating.set('chartData',d);
+      generating.set('axes',dim);
+      generating.set('dimensions',dim);
+      generating.set('preventInitialDrawing',false);
 
       window.setTimeout(function() { done(); }, 100);
     });
@@ -918,11 +873,11 @@ function runTests() {
     });
 
     test('generatinghighlight base layer is not muted', function() {
-      assert.isFalse(generatingSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
+      assert.isFalse(generatingCanvas.canvasContext.canvas.classList.contains("secondaryDataMask"));
     });
 
     test('generatinghighlight has transition', function() {
-      assert.equal(generatingSVG.canvasContext.canvas.style.transition.slice(0,12), 'opacity 0.2s');
+      assert.equal(generatingCanvas.canvasContext.canvas.style.transition.slice(0,12), 'opacity 0.2s');
     });
 
     test('generatinghighlight didnt create defaultEmptyData', function() {
@@ -932,10 +887,9 @@ function runTests() {
 
 
   suite('px-vis-highlight-line draws the highlight', function() {
-    var generatingScale = document.getElementById('generatingScale'),
-        generatingSVG = document.getElementById('generatingSVG'),
-        generatinghighlight = document.getElementById('generatinghighlight');
-
+    var generating = document.getElementById('generating'),
+        generatingCanvas = generating.$.canvas,
+        generatinghighlight = generating.$.highlighter;
 
     suiteSetup(function(done){
       var d = {
@@ -949,14 +903,14 @@ function runTests() {
             "timeStamps": [1397160780000]
           };
 
-      generatinghighlight.set('generatingCrosshairData',true);
-      generatinghighlight.set("crosshairData", d);
+      generating.set('generatingCrosshairData',true);
+      generating.set("crosshairData", d);
 
       window.setTimeout(function() { done(); }, 100);
     });
 
     test('datalayer gets masked', function() {
-      assert.isFalse(generatingSVG.canvasContext.canvas.classList.contains('secondaryDataMask'));
+      assert.isFalse(generatingCanvas.canvasContext.canvas.classList.contains('secondaryDataMask'));
     });
 
     test('generatinghighlight highlightData not created', function() {
@@ -966,9 +920,9 @@ function runTests() {
   }); //suite
 
   suite('px-vis-highlight-line clears the highlight', function() {
-    var generatingScale = document.getElementById('generatingScale'),
-        generatingSVG = document.getElementById('generatingSVG'),
-        generatinghighlight = document.getElementById('generatinghighlight');
+    var generating = document.getElementById('generating'),
+        generatingCanvas = generating.$.canvas,
+        generatinghighlight = generating.$.highlighter;
 
     suiteSetup(function(done){
       var d = {
@@ -976,14 +930,14 @@ function runTests() {
             "timeStamps": []
           };
 
-      generatinghighlight.set("generatingCrosshairData", false);
-      generatinghighlight.set("crosshairData", d);
+      generating.set("generatingCrosshairData", false);
+      generating.set("crosshairData", d);
 
       window.setTimeout(function() { done(); }, 100);
     });
 
     test('datalayer has transition', function() {
-      assert.isFalse(generatingSVG.canvasContext.canvas.classList.contains('secondaryDataMask'));
+      assert.isFalse(generatingCanvas.canvasContext.canvas.classList.contains('secondaryDataMask'));
     });
 
     test('data is empty', function() {
@@ -1003,9 +957,9 @@ function runTests() {
 
 
   suite('px-vis-highlight-line forces display when generatingCrosshairData', function() {
-    var forceScale = document.getElementById('forceScale'),
-        forceSVG = document.getElementById('forceSVG'),
-        forcehighlight = document.getElementById('forcehighlight');
+    var force = document.getElementById('force'),
+        forceCanvas = force.$.canvas,
+        forcehighlight = force.$.highlighter;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
@@ -1078,28 +1032,19 @@ function runTests() {
           "left": 15
         };
 
-      forceSVG.set('width',w);
-      forceSVG.set('height',h);
-      forceSVG.set('margin',m);
-      forceSVG.set('canvasLayersConfig', {highlighter:{}});
-
-      forceScale.set('width',w);
-      forceScale.set('height',h);
-      forceScale.set('margin',m);
-      forceScale.set('completeSeriesConfig',completeSeriesConfig);
-      forceScale.set('chartExtents',chartExtents);
-      forceScale.set('dimensions',dim);
-      forceScale.set('axes',dim);
-      forceScale.set('chartData',d);
-
-      forcehighlight.set('canvasContext', forceSVG.canvasLayers.highlighter);
-      forcehighlight.set('layersToMask', forceSVG.canvasContext);
-      forcehighlight.set('dimensions',dim);
-      forcehighlight.set('timeData', 'x');
-      forcehighlight.set('completeSeriesConfig',completeSeriesConfig);
-      forcehighlight.set('seriesId',"x");
-      forcehighlight.set('chartData',d);
-      forcehighlight.set('drawWithLocalCrosshairData',true);
+      force.set('drawWithLocalCrosshairData',true);
+      force.set('width',w);
+      force.set('height',h);
+      force.set('margin',m);
+      force.set('canvasLayersConfig.highlighter', {});
+      force.set('seriesKey', 'x');
+      force.set('catagories',categories);
+      force.set('catagoryKey','cat');
+      force.set('completeSeriesConfig',completeSeriesConfig);
+      force.set('chartData',d);
+      force.set('axes',dim);
+      force.set('dimensions',dim);
+      force.set('preventInitialDrawing',false);
 
       window.setTimeout(function() { done(); }, 100);
 
@@ -1118,11 +1063,11 @@ function runTests() {
     });
 
     test('forcehighlight base layer is not muted', function() {
-      assert.isFalse(forceSVG.canvasContext.canvas.classList.contains("secondaryDataMask"));
+      assert.isFalse(forceCanvas.canvasContext.canvas.classList.contains("secondaryDataMask"));
     });
 
     test('forcehighlight has transition', function() {
-      assert.equal(forceSVG.canvasContext.canvas.style.transition.slice(0,12), 'opacity 0.2s');
+      assert.equal(forceCanvas.canvasContext.canvas.style.transition.slice(0,12), 'opacity 0.2s');
     });
 
     test('forcehighlight didnt create defaultEmptyData', function() {
@@ -1132,9 +1077,9 @@ function runTests() {
 
 
   suite('px-vis-highlight-line draws the highlight', function() {
-    var forceScale = document.getElementById('forceScale'),
-        forceSVG = document.getElementById('forceSVG'),
-        forcehighlight = document.getElementById('forcehighlight');
+    var force = document.getElementById('force'),
+        forceCanvas = force.$.canvas,
+        forcehighlight = force.$.highlighter;
 
     suiteSetup(function(done){
       var d = {
@@ -1148,14 +1093,14 @@ function runTests() {
             "timeStamps": [1397160780000]
           };
 
-      forcehighlight.setAttribute("generatingCrosshairData", true);
-      forcehighlight.set("crosshairData", d);
+      force.setAttribute("generatingCrosshairData", true);
+      force.set("crosshairData", d);
 
       window.setTimeout(function() { done(); }, 100);
     });
 
     test('datalayer gets masked', function() {
-      assert.isTrue(forceSVG.canvasContext.canvas.classList.contains('secondaryDataMask'));
+      assert.isTrue(forceCanvas.canvasContext.canvas.classList.contains('secondaryDataMask'));
     });
 
     test('_highlightData is created', function() {
@@ -1170,9 +1115,9 @@ function runTests() {
   }); //suite
 
   suite('px-vis-highlight-line clears the highlight', function() {
-    var forceScale = document.getElementById('forceScale'),
-        forceSVG = document.getElementById('forceSVG'),
-        forcehighlight = document.getElementById('forcehighlight');
+    var force = document.getElementById('force'),
+        forceCanvas = force.$.canvas,
+        forcehighlight = force.$.highlighter;
 
     suiteSetup(function(done){
       var d = {
@@ -1180,14 +1125,14 @@ function runTests() {
             "timeStamps": []
           };
 
-      forcehighlight.setAttribute("generatingCrosshairData", false);
-      forcehighlight.set("crosshairData", d);
+      force.setAttribute("generatingCrosshairData", false);
+      force.set("crosshairData", d);
 
       window.setTimeout(function() { done(); }, 100);
     });
 
     test('datalayer has transition', function() {
-      assert.isFalse(forceSVG.canvasContext.canvas.classList.contains('secondaryDataMask'));
+      assert.isFalse(forceCanvas.canvasContext.canvas.classList.contains('secondaryDataMask'));
     });
 
     test('data is empty', function() {
@@ -1207,9 +1152,9 @@ function runTests() {
 
 
   suite('px-vis-highlight-line creates tooltipData', function() {
-    var tooltipScale = document.getElementById('tooltipScale'),
-        tooltipSVG = document.getElementById('tooltipSVG'),
-        tooltiphighlight = document.getElementById('tooltiphighlight');
+    var tooltip = document.getElementById('tooltip'),
+        tooltipCanvas = tooltip.$.canvas,
+        tooltiphighlight = tooltip.$.highlighter;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
@@ -1282,31 +1227,22 @@ function runTests() {
           "left": 15
         };
 
-      tooltipSVG.set('width',w);
-      tooltipSVG.set('height',h);
-      tooltipSVG.set('margin',m);
-      tooltipSVG.set('canvasLayersConfig',{highlighter:{}});
-
-      tooltipScale.set('width',w);
-      tooltipScale.set('height',h);
-      tooltipScale.set('margin',m);
-      tooltipScale.set('completeSeriesConfig',completeSeriesConfig);
-      tooltipScale.set('chartExtents',chartExtents);
-      tooltipScale.set('dimensions',dim);
-      tooltipScale.set('axes',dim);
-      tooltipScale.set('chartData',d);
-
-      tooltiphighlight.set('layersToMask', tooltipSVG.canvasContext);
-      tooltiphighlight.set('dimensions',dim);
-      tooltiphighlight.set('timeData', 'x');
-      tooltiphighlight.set('completeSeriesConfig',completeSeriesConfig);
-      tooltiphighlight.set('seriesId',"x");
-      tooltiphighlight.set('chartData',d);
-      tooltiphighlight.set('showTooltipData',true);
-      tooltiphighlight.set('margin',m);
+      tooltip.set('showTooltipData',true);
+      tooltip.set('width',w);
+      tooltip.set('height',h);
+      tooltip.set('margin',m);
+      tooltip.set('canvasLayersConfig.highlighter', {});
+      tooltip.set('seriesKey', 'x');
+      tooltip.set('catagories',categories);
+      tooltip.set('catagoryKey','cat');
+      tooltip.set('completeSeriesConfig',completeSeriesConfig);
+      tooltip.set('chartData',d);
+      tooltip.set('axes',dim);
+      tooltip.set('dimensions',dim);
+      tooltip.set('preventInitialDrawing',false);
 
       window.setTimeout(function() {
-        tooltiphighlight.set('canvasContext', tooltipSVG.canvasLayers.highlighter);
+        tooltiphighlight.set('canvasContext', tooltipCanvas.canvasLayers.highlighter);
         done();
       }, 100);
 
@@ -1327,9 +1263,9 @@ function runTests() {
 
 
   suite('px-vis-highlight-line draws the highlight', function() {
-    var tooltipScale = document.getElementById('tooltipScale'),
-        tooltipSVG = document.getElementById('tooltipSVG'),
-        tooltiphighlight = document.getElementById('tooltiphighlight');
+    var tooltip = document.getElementById('tooltip'),
+        tooltipCanvas = tooltip.$.canvas,
+        tooltiphighlight = tooltip.$.highlighter;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
@@ -1346,7 +1282,7 @@ function runTests() {
             "timeStamps": [1397160780000]
           };
 
-      tooltiphighlight.set("crosshairData", d);
+      tooltip.set("crosshairData", d);
 
       window.setTimeout(function() { done(); }, 100);
     });
@@ -1365,7 +1301,7 @@ function runTests() {
 
       assert.equal(tooltiphighlight.defaultEmptyData.mouse, null);
       assert.equal(tooltiphighlight.defaultEmptyData.dataPos[0], 423);
-      assert.closeTo(tooltiphighlight.defaultEmptyData.dataPos[1], 2182, 4);
+      assert.closeTo(tooltiphighlight.defaultEmptyData.dataPos[1], 2190, 4);
       assert.equal(tooltiphighlight.defaultEmptyData.time, 1397160780000);
       assert.deepEqual(tooltiphighlight.defaultEmptyData.dataset, {"x":1397160780000,"y":10,"y2":3,"y3":8,"cat":"b"});
       assert.deepEqual(tooltiphighlight.defaultEmptyData.series, [{"name":"y","value":{"y":10,"y2":3,"y3":8}},{"name":"y2","value":{"y":10,"y2":3,"y3":8}},{"name":"y3","value":{"y":10,"y2":3,"y3":8}}]);
@@ -1375,9 +1311,9 @@ function runTests() {
   }); //suite
 
   suite('px-vis-highlight-line clears the highlight', function() {
-    var tooltipScale = document.getElementById('tooltipScale'),
-        tooltipSVG = document.getElementById('tooltipSVG'),
-        tooltiphighlight = document.getElementById('tooltiphighlight');
+    var tooltip = document.getElementById('tooltip'),
+        tooltipCanvas = tooltip.$.canvas,
+        tooltiphighlight = tooltip.$.highlighter;
 
     suiteSetup(function(done){
       var d = {
@@ -1385,13 +1321,13 @@ function runTests() {
             "timeStamps": []
           };
 
-      tooltiphighlight.set("crosshairData", d);
+      tooltip.set("crosshairData", d);
 
       window.setTimeout(function() { done(); }, 100);
     });
 
     test('datalayer has transition', function() {
-      assert.isFalse(tooltipSVG.canvasContext.canvas.classList.contains('secondaryDataMask'));
+      assert.isFalse(tooltipCanvas.canvasContext.canvas.classList.contains('secondaryDataMask'));
     });
 
     test('data is empty', function() {

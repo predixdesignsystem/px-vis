@@ -68,7 +68,7 @@ function runTests() {
           }
         },
         dim = ['y','y2', 'y3'],
-        chartExtents = {"x": ['y','y2','y3'], "y": {'y': [0,10], 'y2':[0,27], 'y3':[0,14] }},
+        chartExtents = {"x": ['y','y2','y3'], 'y': [0,10], 'y2':[0,27], 'y3':[0,14] },
         categories = ['a','b'],
         w = 500,
         h = 300,
@@ -87,10 +87,10 @@ function runTests() {
       parallelScale.set('height',h);
       parallelScale.set('margin',m);
       parallelScale.set('completeSeriesConfig',completeSeriesConfig);
-      parallelScale.set('chartExtents',chartExtents);
-      parallelScale.set('dimensions',dim);
-      parallelScale.set('axes',dim);
+      parallelScale.set('dataExtents',chartExtents);
       parallelScale.set('chartData',d);
+      parallelScale.set('axes',dim);
+      parallelScale.set('dimensions',dim);
 
       window.setTimeout(function() {
         var g = parallelSVG.svg.selectAll('g.layer')
@@ -203,7 +203,7 @@ function runTests() {
     });
 
     test('baseLine line d', function() {
-      assert.equal(linePath.attr('d').split(/[\s,]+/).join(''),'M800L240240L400115');
+      assert.equal(linePath.attr('d').split(/[\s,]+/).join(''),'M800L240241L400124');
     });
   }); //suite
 
@@ -326,14 +326,12 @@ function runTests() {
       radarSVG.set('margin',m);
       radarSVG.set('offset',offset);
 
-      radarScale.set('width',min);
-      radarScale.set('margin',m);
+      radarScale.set('_radius',min);
       radarScale.set('centerOffset',50);
-      radarScale.set('amplitudeKeys',dim);
       radarScale.set('chartExtents',chartExtents);
-      radarScale.set('dimensions',dim);
-      radarScale.set('axes',dim);
       radarScale.set('chartData',d);
+      radarScale.set('axes',dim);
+      radarScale.set('dimensions',dim);
 
       window.setTimeout(function() {
         var g = radarSVG.svg.selectAll('g.layer')
@@ -568,7 +566,7 @@ function runTests() {
           }
         },
         dim = ['y','y2', 'y3'],
-        chartExtents = {"x": ['y','y2','y3'], "y": {'y': [0,10], 'y2':[0,27], 'y3':[0,14] }},
+        chartExtents = {"x": ['y','y2','y3'], 'y': [0,10], 'y2':[0,27], 'y3':[0,14] },
         categories = ['a','b'],
         w = 500,
         h = 300,
@@ -587,10 +585,10 @@ function runTests() {
       differentScale.set('height',h);
       differentScale.set('margin',m);
       differentScale.set('completeSeriesConfig',completeSeriesConfig);
-      differentScale.set('chartExtents',chartExtents);
-      differentScale.set('dimensions',dim);
-      differentScale.set('axes',dim);
+      differentScale.set('dataExtents',chartExtents);
       differentScale.set('chartData',d);
+      differentScale.set('axes',dim);
+      differentScale.set('dimensions',dim);
 
       window.setTimeout(function() {
         var g = differentSVG.svg.selectAll('g.layer')
@@ -704,7 +702,7 @@ function runTests() {
     });
 
     test('baseLine line d', function() {
-      assert.equal(linePath.attr('d').split(/[\s,]+/).join(''),'M800L240240L400115');
+      assert.equal(linePath.attr('d').split(/[\s,]+/).join(''),'M800L240241L400124');
     });
   }); //suite
 
@@ -814,7 +812,7 @@ function runTests() {
           }
         },
         dim = ['y','y2', 'y3'],
-        chartExtents = {"x": ['y','y2','y3'], "y": {'y': [0,10], 'y2':[0,27], 'y3':[0,14] }},
+        chartExtents = {"x": ['y','y2','y3'], 'y': [0,10], 'y2':[0,27], 'y3':[0,14] },
         categories = ['a','b'],
         w = 500,
         h = 300,
@@ -833,10 +831,10 @@ function runTests() {
       fuzzScale.set('height',h);
       fuzzScale.set('margin',m);
       fuzzScale.set('completeSeriesConfig',completeSeriesConfig);
-      fuzzScale.set('chartExtents',chartExtents);
-      fuzzScale.set('dimensions',dim);
-      fuzzScale.set('axes',dim);
+      fuzzScale.set('dataExtents',chartExtents);
       fuzzScale.set('chartData',d);
+      fuzzScale.set('axes',dim);
+      fuzzScale.set('dimensions',dim);
 
       window.setTimeout(function() {
         var g = fuzzSVG.svg.selectAll('g.layer')
@@ -966,9 +964,9 @@ function runTests() {
     });
 
     test('baseLine line d', function() {
-      assert.equal(Px.d3.select(linePath.nodes()[0]).attr('d').split(/[\s,]+/).join(''),'M80108L24060L4000');
-      assert.equal(Px.d3.select(linePath.nodes()[1]).attr('d').split(/[\s,]+/).join(''),'M800L240240L400115');
-      assert.equal(Px.d3.select(linePath.nodes()[2]).attr('d').split(/[\s,]+/).join(''),'M80162L240170L40038');
+      assert.equal(Px.d3.select(linePath.nodes()[0]).attr('d').split(/[\s,]+/).join(''),'M80120L24067L4000');
+      assert.equal(Px.d3.select(linePath.nodes()[1]).attr('d').split(/[\s,]+/).join(''),'M800L240241L400124');
+      assert.equal(Px.d3.select(linePath.nodes()[2]).attr('d').split(/[\s,]+/).join(''),'M80180L240173L40041');
     });
   }); //suite
 
@@ -1080,7 +1078,7 @@ function runTests() {
           }
         },
         dim = ['y','y2', 'y3'],
-        chartExtents = {"x": ['y','y2','y3'], "y": {'y': [0,10], 'y2':[0,27], 'y3':[0,14] }},
+        chartExtents = {"x": ['y','y2','y3'], 'y': [0,10], 'y2':[0,27], 'y3':[0,14] },
         categories = ['a','b'],
         w = 500,
         h = 300,
@@ -1099,10 +1097,10 @@ function runTests() {
       generatingScale.set('height',h);
       generatingScale.set('margin',m);
       generatingScale.set('completeSeriesConfig',completeSeriesConfig);
-      generatingScale.set('chartExtents',chartExtents);
-      generatingScale.set('dimensions',dim);
-      generatingScale.set('axes',dim);
+      generatingScale.set('dataExtents',chartExtents);
       generatingScale.set('chartData',d);
+      generatingScale.set('axes',dim);
+      generatingScale.set('dimensions',dim);
 
       window.setTimeout(function() {
         var g = generatingSVG.svg.selectAll('g.layer')
@@ -1301,7 +1299,7 @@ function runTests() {
           }
         },
         dim = ['y','y2', 'y3'],
-        chartExtents = {"x": ['y','y2','y3'], "y": {'y': [0,10], 'y2':[0,27], 'y3':[0,14] }},
+        chartExtents = {"x": ['y','y2','y3'], 'y': [0,10], 'y2':[0,27], 'y3':[0,14] },
         categories = ['a','b'],
         w = 500,
         h = 300,
@@ -1320,10 +1318,10 @@ function runTests() {
       forceScale.set('height',h);
       forceScale.set('margin',m);
       forceScale.set('completeSeriesConfig',completeSeriesConfig);
-      forceScale.set('chartExtents',chartExtents);
-      forceScale.set('dimensions',dim);
-      forceScale.set('axes',dim);
+      forceScale.set('dataExtents',chartExtents);
       forceScale.set('chartData',d);
+      forceScale.set('axes',dim);
+      forceScale.set('dimensions',dim);
 
       window.setTimeout(function() {
         var g = forceSVG.svg.selectAll('g.layer')
@@ -1436,7 +1434,7 @@ function runTests() {
     });
 
     test('baseLine line d', function() {
-      assert.equal(linePath.attr('d').split(/[\s,]+/).join(''),'M800L240240L400115');
+      assert.equal(linePath.attr('d').split(/[\s,]+/).join(''),'M800L240241L400124');
     });
   }); //suite
 
@@ -1552,7 +1550,7 @@ function runTests() {
           }
         },
         dim = ['y','y2', 'y3'],
-        chartExtents = {"x": ['y','y2','y3'], "y": {'y': [0,10], 'y2':[0,27], 'y3':[0,14] }},
+        chartExtents = {"x": ['y','y2','y3'], 'y': [0,10], 'y2':[0,27], 'y3':[0,14] },
         categories = ['a','b'],
         w = 500,
         h = 300,
@@ -1571,10 +1569,10 @@ function runTests() {
       tooltipScale.set('height',h);
       tooltipScale.set('margin',m);
       tooltipScale.set('completeSeriesConfig',completeSeriesConfig);
-      tooltipScale.set('chartExtents',chartExtents);
-      tooltipScale.set('dimensions',dim);
-      tooltipScale.set('axes',dim);
+      tooltipScale.set('dataExtents',chartExtents);
       tooltipScale.set('chartData',d);
+      tooltipScale.set('axes',dim);
+      tooltipScale.set('dimensions',dim);
 
       window.setTimeout(function() {
         var g = tooltipSVG.svg.selectAll('g.layer')
@@ -1650,7 +1648,7 @@ function runTests() {
     test('tooltiphighlight created defaultEmptyData', function() {
       assert.equal(tooltiphighlight.defaultEmptyData.mouse, null);
       assert.equal(tooltiphighlight.defaultEmptyData.dataPos[0], 423);
-      assert.closeTo(tooltiphighlight.defaultEmptyData.dataPos[1], 2182, 4);
+      assert.closeTo(tooltiphighlight.defaultEmptyData.dataPos[1], 2190, 4);
       assert.equal(tooltiphighlight.defaultEmptyData.time, 1397160780000);
       assert.deepEqual(tooltiphighlight.defaultEmptyData.dataset, {"x":1397160780000,"y":10,"y2":3,"y3":8,"cat":"b"});
       assert.deepEqual(tooltiphighlight.defaultEmptyData.series, [{"name":"y","value":{"y":10,"y2":3,"y3":8}},{"name":"y2","value":{"y":10,"y2":3,"y3":8}},{"name":"y3","value":{"y":10,"y2":3,"y3":8}}]);

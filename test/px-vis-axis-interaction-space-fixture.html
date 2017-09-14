@@ -11,8 +11,8 @@
          for any URL ending with "/web-component-tester/browser.js"
          when wct is run from the command line -->
     <script src="../web-component-tester/browser.js"></script>
-    <link rel="import" href="../px-vis-multi-scale.html" />
-    <link rel="import" href="../px-vis-radial-scale.html" />
+    <link rel="import" href="../px-vis-behavior-scale-multi-axis.html" />
+    <link rel="import" href="../px-vis-behavior-scale-radar.html" />
     <link rel="import" href="../px-vis-svg.html" />
     <link rel="import" href="../px-vis-axis-interaction-space.html" />
     <link rel="import" href="behaviors/px-colors-behavior.html" />
@@ -29,6 +29,18 @@
     <h3>Web Component Test : Fixture for px-vis-axis-interaction-space</h3>
     <div>
       <template is="dom-bind">
+        <script>
+        Polymer({
+          is: 'px-vis-multi-scale',
+          behaviors: [ PxVisBehaviorScale.scaleMultiAxis ],
+          observers: [
+            '_setXScale(width,margin)',
+            '_setYScale(height,margin,axes)',
+            '_generateDataExtents(dimensions)',
+            '_setDomain(x, y, dataExtents)',
+          ]
+        })
+      </script>
         <px-vis-multi-scale
           id="multiScale"
           x="{{x}}"
@@ -59,13 +71,26 @@
 
     <div>
       <template is="dom-bind">
-        <px-vis-radial-scale
+        <script>
+        Polymer({
+          is: 'px-vis-radar-scale',
+          behaviors: [ PxVisBehaviorScale.radar ],
+          observers: [
+            '_setXScale(_radius)',
+            '_setYScale(_radius,centerOffset)',
+            '_generateChartExtents(chartData.*, dimensions)',
+            '_generateChartExtents(chartExtents)',
+            '_setDomain(x, y, _calculatedExtents)',
+          ]
+        })
+      </script>
+        <px-vis-radar-scale
           id="radialScale"
           radar
           x="{{x}}"
           y="{{y}}"
           domain-changed="{{domainChanged}}">
-        </px-vis-radial-scale>
+        </px-vis-radar-scale>
         <px-vis-svg
           id="radialSVG"
           svg="{{svg}}">

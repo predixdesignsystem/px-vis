@@ -11,7 +11,7 @@
          for any URL ending with "/web-component-tester/browser.js"
          when wct is run from the command line -->
     <script src="../web-component-tester/browser.js"></script>
-    <link rel="import" href="../px-vis-radial-scale.html" />
+    <link rel="import" href="../px-vis-behavior-scale-radial.html" />
     <link rel="import" href="../px-vis-svg.html" />
     <link rel="import" href="../px-vis-radial-gridlines.html" />
     <link rel="import" href="behaviors/px-colors-behavior.html" />
@@ -27,6 +27,18 @@
   <body>
     <h3>Web Component Test : Fixture for px-vis-radial-gridlines</h3>
     <template is="dom-bind">
+      <script>
+        Polymer({
+          is: 'px-vis-radial-scale',
+          behaviors: [ PxVisBehaviorScale.radial ],
+          observers: [
+            '_setYScale(_radius,centerOffset)',
+            '_generateChartExtents(chartData.*, _amplitudeKey)',
+            '_generateChartExtents(amplitudeExtents)',
+            '_setDomain(y, _calculatedExtents)',
+          ]
+        })
+      </script>
       <px-vis-radial-scale
         id="baseScale"
         y="{{y}}"
