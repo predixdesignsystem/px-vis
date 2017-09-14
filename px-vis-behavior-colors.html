@@ -1,4 +1,3 @@
-<link rel="import" href="px-vis-behavior-common.html" />
 <script>
 var PxColorsBehavior = PxColorsBehavior || {};
 
@@ -46,6 +45,15 @@ PxColorsBehavior.dataVisColorTheming = [{
       // To access any available CSS theming variables, we need to wait for the
       // first animation frame to complete
       window.requestAnimationFrame(this.syncCSSTheme.bind(this));
+    },
+
+    hasUndefinedArguments: function(args) {
+      for(var i=0; i<args.length; i++) {
+        if(args[i] === undefined) {
+          return true;
+        }
+      }
+      return false;
     },
 
     /**
@@ -172,7 +180,7 @@ PxColorsBehavior.dataVisColorTheming = [{
       return false;
     }
 
-}, PxVisBehavior.observerCheck, PxColorsBehavior.dataVisColors];
+}, PxColorsBehavior.dataVisColors];
 
 /*
     Name:

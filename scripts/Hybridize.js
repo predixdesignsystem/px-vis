@@ -183,13 +183,17 @@ function searchBehaviors(src) {
       i,
       count,
       ignoreDueToComment = false,
-      ignoreType;
+      ignoreType,
+      keepCounting,
+      isArray;
 
   while((regExpResult = behaviorRegExp.exec(src)) !== null) {
 
     //count '{' and '}' to find end of behavior
     i = regExpResult.index + regExpResult[0].length;
+    isArray = !!regExpResult[2];
     count = 1;
+    keepCounting = true;
     while(count !== 0) {
 
       if(!ignoreDueToComment) {
@@ -216,12 +220,20 @@ function searchBehaviors(src) {
       i++;
     }
 
+    //keep counting until ']' so that we have all behaviors if this is an array and wecan rerun the script without writing the new behavior twice
+    while(isArray && keepCounting) {
+      if(src[i] === ']') {
+        keepCounting = false;
+      }
+      i++;
+    }
+
     //push at the beginning so that we process the file from end to start
     behaviors.unshift({
       'start': regExpResult.index,
       'stop': i,
       'name': regExpResult[1],
-      'isArray': !!regExpResult[2]
+      'isArray': isArray
     });
   }
 
@@ -292,6 +304,20 @@ function triageFunctionsToProcess(observers, functions) {
   let functionsNames = Object.keys(functions),
       result = [];
 
+  for(let i=0; i<observers.bindings.length; i++) {
+
+    if(functionsNames.indexOf(observers.bindings[i]) !== -1) {
+
+      result.push({
+        'name': observers.bindings[i],
+        'index': functions[observers.bindings[i]].index,
+        'spaceLength': functions[observers.bindings[i]].spaceLength
+      });
+    } else {
+      WARN('binding function ' + observers.bindings[i] + ' is declared in ' + folderNameFromPath(currentFileName) + ' but couldn\'t be found in the file. Manually update it where it is defined');
+    }
+  }
+
   for(let i=0; i<observers.observers.length; i++) {
 
     if(functionsNames.indexOf(observers.observers[i]) !== -1) {
@@ -344,11 +370,13 @@ function triageFunctionsToProcess(observers, functions) {
 
 function findObservers(src) {
   let singleObsRegExp = /observer\s*:\s*['"](.*)['"]/g,
-      observersRegExp = /observers\s*:\s*\[((?:\s*['"].*\(.*\)['"],?\s*)*)\]/g,
+      observersRegExp = /observers\s*:\s*\[(((?:\s*['"].*\(.*\)['"],?\s*)|(?:\s*\/\/\w*\s*))*)\]/g,
       computedRegExo = /computed\s*:\s*['"](.*)['"]/g,
+      bindingRegExp = /=['"](?:\[\[)?(?:{{)?(([\w_]*)\([\w_ ,]*\))(?:\]\])?(?:}})?['"]/g,
       functionRegEXp = /.*\(.*\),?/g,
       result = {
         'singleObservers': [],
+        'bindings': [],
         'observers': [],
         'computed': []
       },
@@ -356,7 +384,18 @@ function findObservers(src) {
       tmpMatch,
       tmpStr;
 
-  //find all 'observer' lines and get the function name
+  //find all 'bindings' lines and get the function name
+  while ((tmpArray = bindingRegExp.exec(src)) !== null) {
+
+    if(result.bindings.indexOf(tmpArray[2]) === -1) {
+      result.bindings.push(tmpArray[2]);
+    }
+  }
+  if(!result.singleObservers.length) {
+    DEBUG('no function bindings in ' + folderNameFromPath(currentFileName));
+  }
+
+  //find all 'observer' lines
   while ((tmpArray = singleObsRegExp.exec(src)) !== null) {
 
     if(result.singleObservers.indexOf(tmpArray[1]) === -1) {
