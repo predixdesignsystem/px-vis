@@ -372,7 +372,7 @@ function findObservers(src) {
   let singleObsRegExp = /observer\s*:\s*['"](.*)['"]/g,
       observersRegExp = /observers\s*:\s*\[(((?:\s*['"].*\(.*\)['"],?\s*)|(?:\s*\/\/\w*\s*))*)\]/g,
       computedRegExo = /computed\s*:\s*['"](.*)['"]/g,
-      bindingRegExp = /=['"](?:\[\[)?(?:{{)?(([\w_]*)\([\w_ ,]*\))(?:\]\])?(?:}})?['"]/g,
+      bindingRegExp = /=['"][\w _]*(?:\[\[)?(?:{{)?(([\w_]*)\([\w_ ,]*\))(?:\]\])?(?:}})?[^'"]*['"]/g,
       functionRegEXp = /.*\(.*\),?/g,
       result = {
         'singleObservers': [],
