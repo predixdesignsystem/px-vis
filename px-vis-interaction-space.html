@@ -299,7 +299,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             height: null
           }
         }
-      }
+      },
+      _height: Number,
+      _width: Number
     },
 
     observers: [
@@ -339,10 +341,13 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       // append the rectangle to capture mouse interactions
       if(!this._rect) {
         if(!this.radial) {
+          this._width = Math.max(this.width - this.margin.left - this.margin.right,0);
+          this._height = Math.max(this.height - this.margin.bottom - this.margin.top,0);
+
           this._rect = this.svg.append('rect')
             .attr('id','mouseCapture')
-            .attr('width', Math.max(this.width - this.margin.left - this.margin.right,0))
-            .attr('height', Math.max(this.height - this.margin.bottom - this.margin.top,0))
+            .attr('width', this._width)
+            .attr('height', this._height)
             .attr('fill', 'none')
             .attr('pointer-events', 'all')
             .style('cursor','crosshair');
@@ -370,8 +375,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           this.fire('px-vis-mouse-rect-updated', {'data': this.mouseRect, 'dataVar': 'mouseRect', 'method': 'set'});
       } else {
         if(!this.radial) {
-          this._rect.attr('width', Math.max(0, this.width - this.margin.left - this.margin.right))
-          .attr('height', Math.max(0, this.height - this.margin.bottom - this.margin.top));
+          this._width = Math.max(this.width - this.margin.left - this.margin.right,0);
+          this._height = Math.max(this.height - this.margin.bottom - this.margin.top,0);
+
+          this._rect.attr('width', this._width)
+          .attr('height', this._height);
         } else {
           this._rect.attr('r', Math.max(this.width,0));
         }
@@ -1186,22 +1194,23 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             newY = mousePos[1],
             newW,
             newH;
-
         //width and height cannot be negative vals, so reverse to maintain positive vals
         if(originalX > newX) {
           newX = originalX;
           originalX = mousePos[0];
         }
         if(originalY > newY) {
+          console.log("neg")
           newY = originalY;
           originalY = mousePos[1];
         }
 
         if(this.selectionType === 'xAxis') {
-          newY = height;
+          newY = this._height;
         } else if(this.selectionType === 'yAxis') {
-          newX = width;
+          newX = this._width;
         }
+
 
         // if current position is greater than the original position
         if(newX >= originalX) {
