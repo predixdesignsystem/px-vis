@@ -113,6 +113,7 @@ function processElement(src) {
       injection += generateSpaces(functionsToProcess[i].spaceLength + 4) + 'return;\r\n';
       injection += generateSpaces(functionsToProcess[i].spaceLength + 2) + '}\r\n';
       src = src.slice(0, functionsToProcess[i].index) + injection + src.slice(functionsToProcess[i].index);
+      injected = true;
     } else {
       DEBUG(functionsToProcess[i].name + ' already injected');
     }
@@ -121,7 +122,7 @@ function processElement(src) {
   if(functionsToProcess.length) {
     //inject behavior
     src = injectBehaviorElement(src);
-    if(shouldWrite) {
+    if(shouldWrite && injected) {
       INFO('writing ' + currentFileName);
       fs.writeFileSync(currentFileName, src, 'utf8');
     }
@@ -155,6 +156,7 @@ function processBehavior(src) {
         injection += generateSpaces(functionsToProcess[i].spaceLength + 4) + 'return;\r\n';
         injection += generateSpaces(functionsToProcess[i].spaceLength + 2) + '}\r\n';
         currentSrc = currentSrc.slice(0, functionsToProcess[i].index) + injection + currentSrc.slice(functionsToProcess[i].index);
+        hasChange = true;
       } else {
         DEBUG(functionsToProcess[i].name + ' already injected');
       }
@@ -163,7 +165,6 @@ function processBehavior(src) {
     if(functionsToProcess.length) {
       currentSrc = injectBehaviorBehavior(currentSrc, behavior);
       src = src.slice(0, behavior.start) + currentSrc + src.slice(behavior.stop);
-      hasChange = true;
     } else {
       DEBUG('no functions required change');
     }

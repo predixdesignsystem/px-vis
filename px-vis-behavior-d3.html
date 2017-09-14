@@ -697,6 +697,10 @@ PxVisBehaviorD3.selectedTimeDomain = [{
     this._isAttached = true;
   },
   _rangeChanged: function(range) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     if(this._isAttached && !this._preventRangeUpdate) {
       //update selectedDomain with those new values
       //make sure we don't trigger a domain update when changing it from here
@@ -740,7 +744,7 @@ PxVisBehaviorD3.selectedTimeDomain = [{
   //   }
   // }
 
-}, PxVisBehaviorD3.selectedDomain];
+}, PxVisBehavior.observerCheck, PxVisBehaviorD3.selectedDomain];
 
 /*
     Name:

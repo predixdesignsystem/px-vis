@@ -242,6 +242,10 @@ PxVisBehaviorRegister.itemShared = [{
     return baseClasses;
   },
   _getDynamicMenuClass: function(type) {
+    if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     if(type === 'vertical') {
       return 'flex__item--bottom';
     } else {
@@ -270,12 +274,16 @@ PxVisBehaviorRegister.itemShared = [{
 
     @polymerBehavior PxVisBehaviorRegister.register
 */
-PxVisBehaviorRegister.register = {
+PxVisBehaviorRegister.register = [{
   properties: {},
   /**
    * returns the correct classes for the series based on type
    */
   _getSeriesWrapperClass: function(type, hozAlign, _hasScrollBar) {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
     var classList = 'flex fullWidth ';
 
     if(type === 'horizontal') {
@@ -300,6 +308,10 @@ PxVisBehaviorRegister.register = {
   },
 
   _getSeriesWrapperClassReverse: function(type) {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
     if(type === 'horizontal') {
       return this._getSeriesWrapperClass('vertical');
     }
@@ -312,7 +324,7 @@ PxVisBehaviorRegister.register = {
   _isOfType: function(toTest, type) {
     return toTest === type;
   }
-};
+}, PxVisBehavior.observerCheck];
 
 /*
     Name:
