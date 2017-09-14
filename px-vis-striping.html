@@ -149,7 +149,8 @@ Element which draws a striping series onto the chart
 
 
     _initiateRendering: function() {
-      var keys = Object.keys(this.stripeConfig);
+      var keys = Object.keys(this.stripeConfig),
+          dash;
 
       if(this.clipPath) {
         this.drawClipPath();
@@ -157,6 +158,10 @@ Element which draws a striping series onto the chart
 
       for(var i = 0; i < keys.length; i++) {
         this.canvasContext.fillStyle = this.stripeConfig[keys[i]]['fillColor'];
+        this.canvasContext.strokeStyle = this.stripeConfig[keys[i]]['fillColor'];
+        dash = this.stripeConfig[keys[i]]['dash'] ? this.stripeConfig[keys[i]]['dash'] : [5,2];
+        this.canvasContext.setLineDash(dash);
+
         this.canvasContext.globalAlpha = this.stripeConfig[keys[i]]['fillOpacity'];
 
         if(this.stripeData[keys[i]] && this.stripeData[keys[i]].length) {
@@ -169,9 +174,16 @@ Element which draws a striping series onto the chart
       var x, w;
       for(var i = 0; i < data.length; i++) {
         x = this.x(data[i][0]),
-        w = this.x(data[i][1]) - x;
+        w = data[i][1] || data[i][1] === 0 ? this.x(data[i][1]) - x : 0;
 
-        this.canvasContext.fillRect(x, 0, w, this.height);
+        if(w === 0) {
+          this.canvasContext.beginPath();
+          this.canvasContext.moveTo(x,0);
+          this.canvasContext.lineTo(x, this.height);
+          this.canvasContext.stroke();
+        } else {
+          this.canvasContext.fillRect(x, 0, w, this.height);
+        }
       }
     },
 
