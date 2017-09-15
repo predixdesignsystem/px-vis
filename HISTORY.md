@@ -1,3 +1,7 @@
+v3.1.20
+================
+* hide codepens for all demos
+
 v3.1.19
 ================
 * Striping supports a single timestamp entry, drawing a line instead of an area.
