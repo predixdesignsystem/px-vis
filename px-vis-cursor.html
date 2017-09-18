@@ -394,7 +394,7 @@ Custom property | Description
 
     _moveCircles: function() {
        // move the circles into position
-      if(this.circlePoint === 'yes') {
+      if(this.circlePoint === 'yes' && this._circles) {
         // this._circles.attr('transform', function(d,i) {
         //   return 'translate(' + this.tooltipData.series[i]['coord'][0] + ',' + this.tooltipData.series[i]['coord'][1] + ')'
         this._circles
@@ -431,7 +431,7 @@ Custom property | Description
     },
 
     _moveHorizontalLinesRadial: function() {
-      if(this.horizontalLine !== 'none') {
+      if(this.horizontalLine !== 'none' && this._hLines) {
         this._hLines
           .style("visibility", function(d,i) {
             if(this.tooltipData.series[i]['coord'] && !isNaN(this.tooltipData.series[i]['coord'][0]) && !isNaN(this.tooltipData.series[i]['coord'][1])) {
@@ -456,39 +456,41 @@ Custom property | Description
     },
 
     _moveHorizontalLinesCartesian: function() {
-      if(this.horizontalLine === 'full') {
-        this._hLines
-          .attr('y1', function(d,i) {
-            return this.tooltipData.series[i]['coord'][1] ? this.tooltipData.series[i]['coord'][1] : '';
-          }.bind(this))
-          .attr('y2', function(d,i) {
-            return this.tooltipData.series[i]['coord'][1] ? this.tooltipData.series[i]['coord'][1] : '';
-          }.bind(this));
+      if(this._hLines) {
+        if(this.horizontalLine === 'full') {
+          this._hLines
+            .attr('y1', function(d,i) {
+              return this.tooltipData.series[i]['coord'][1] ? this.tooltipData.series[i]['coord'][1] : '';
+            }.bind(this))
+            .attr('y2', function(d,i) {
+              return this.tooltipData.series[i]['coord'][1] ? this.tooltipData.series[i]['coord'][1] : '';
+            }.bind(this));
 
-      } else if(this.horizontalLine === 'left') {
-        this._hLines
-          .attr('x2', function(d,i) {
-            return this.tooltipData.series[i]['coord'][0] ? this.tooltipData.series[i]['coord'][0] : '';
-          }.bind(this))
-          .attr('y1', function(d,i) {
-            return this.tooltipData.series[i]['coord'][1] ? this.tooltipData.series[i]['coord'][1] : '';
-          }.bind(this))
-          .attr('y2', function(d,i) {
-            return this.tooltipData.series[i]['coord'][1] ? this.tooltipData.series[i]['coord'][1] : '';
-          }.bind(this));
+        } else if(this.horizontalLine === 'left') {
+          this._hLines
+            .attr('x2', function(d,i) {
+              return this.tooltipData.series[i]['coord'][0] ? this.tooltipData.series[i]['coord'][0] : '';
+            }.bind(this))
+            .attr('y1', function(d,i) {
+              return this.tooltipData.series[i]['coord'][1] ? this.tooltipData.series[i]['coord'][1] : '';
+            }.bind(this))
+            .attr('y2', function(d,i) {
+              return this.tooltipData.series[i]['coord'][1] ? this.tooltipData.series[i]['coord'][1] : '';
+            }.bind(this));
 
-      } else if(this.horizontalLine === 'right') {
-        this._hLines
-          .attr('x1', function(d,i) {
-            return this.tooltipData.series[i]['coord'][0] ? this.tooltipData.series[i]['coord'][0] : '';
-          }.bind(this))
-          .attr('y1', function(d,i) {
-            return this.tooltipData.series[i]['coord'][1] ? this.tooltipData.series[i]['coord'][1] : '';
-          }.bind(this))
-          .attr('y2', function(d,i) {
-            return this.tooltipData.series[i]['coord'][1] ? this.tooltipData.series[i]['coord'][1] : '';
-          }.bind(this));
+        } else if(this.horizontalLine === 'right') {
+          this._hLines
+            .attr('x1', function(d,i) {
+              return this.tooltipData.series[i]['coord'][0] ? this.tooltipData.series[i]['coord'][0] : '';
+            }.bind(this))
+            .attr('y1', function(d,i) {
+              return this.tooltipData.series[i]['coord'][1] ? this.tooltipData.series[i]['coord'][1] : '';
+            }.bind(this))
+            .attr('y2', function(d,i) {
+              return this.tooltipData.series[i]['coord'][1] ? this.tooltipData.series[i]['coord'][1] : '';
+            }.bind(this));
 
+        }
       }
     },
 
@@ -501,7 +503,7 @@ Custom property | Description
     },
 
     _moveVerticalLinesRadial: function() {
-      if(this.verticalLine !== 'none') {
+      if(this.verticalLine !== 'none' && this._vLines) {
         this._vLines
          .style("visibility", function(d,i) {
             if(this.tooltipData.series[i]['coord'] && !isNaN(this.tooltipData.series[i]['coord'][0]) && !isNaN(this.tooltipData.series[i]['coord'][1])) {
@@ -527,24 +529,26 @@ Custom property | Description
         If bottom, just take the lowest datapoint
         If top, take the highest
       */
-      if(this.verticalLine !== 'none') {
-        this._vLines
-          .attr('x1', function(d,i) {
-            return this.tooltipData.series[i]['coord'][0] ? this.tooltipData.series[i]['coord'][0] : '';
-          }.bind(this))
-          .attr('x2',function(d,i) {
-            return this.tooltipData.series[i]['coord'][0] ? this.tooltipData.series[i]['coord'][0] : '';
-          }.bind(this));
-      }
+      if(this._vLines) {
+        if(this.verticalLine !== 'none') {
+          this._vLines
+            .attr('x1', function(d,i) {
+              return this.tooltipData.series[i]['coord'][0] ? this.tooltipData.series[i]['coord'][0] : '';
+            }.bind(this))
+            .attr('x2',function(d,i) {
+              return this.tooltipData.series[i]['coord'][0] ? this.tooltipData.series[i]['coord'][0] : '';
+            }.bind(this));
+        }
 
-      if(this.verticalLine === 'bottom') {
-        this._vLines
-          .attr('y1',Math.max.apply(null, this.tooltipData.yArr));
+        if(this.verticalLine === 'bottom') {
+          this._vLines
+            .attr('y1',Math.max.apply(null, this.tooltipData.yArr));
 
-      } else if(this.verticalLine === 'top') {
-        this._vLines
-          .attr('y1', Math.min.apply(null, this.tooltipData.yArr))
-          .attr('y2', -this.height);
+        } else if(this.verticalLine === 'top') {
+          this._vLines
+            .attr('y1', Math.min.apply(null, this.tooltipData.yArr))
+            .attr('y2', -this.height);
+        }
       }
     },
 
