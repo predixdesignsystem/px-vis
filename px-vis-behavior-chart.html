@@ -1196,7 +1196,6 @@ PxVisBehaviorChart.highlighterConfigs = {
      * Most interesting properties include:
      * - `fuzz` : +/- search window around the datapoint value
      * - 'differenDataset' : if this chart has a different dataset from the crosshair data origin chart
-     * - `color` : the color for the point or line
      */
     highlighterConfig: {
       type: Object
@@ -2850,7 +2849,7 @@ PxVisBehaviorChart.multiAxisZoom = [{
   _autoZoom: function(isZoomIn) {
     this._saveZoomState();
 
-    var perc = isZoomIn? this.zoomInPercentage : 1 + this.zoomInPercentage,
+    var perc = isZoomIn ? 1 - this.zoomInPercentage : 1 + this.zoomOutPercentage,
         domains = this._processYValues(function(axis, index) {
           var d = axis.domain();
           d[0] = d[0] * perc;
