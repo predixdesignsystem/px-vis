@@ -134,6 +134,12 @@ function runTests(){
           "right": 10,
           "bottom": 10,
           "left": 10
+        },
+        actionConfig = {
+          'mouseout': 'null',
+          'mousemove': 'null',
+          'mousedown': 'callAxisMute',
+          'mouseup': 'callAxisMute'
         };
 
         multiSVG.set('width',w);
@@ -148,6 +154,7 @@ function runTests(){
         multiScale.set('chartData',d);
         multiScale.set('axes',dim);
         multiScale.set('dimensions',dim);
+        multiScale.set('chartExtents',ext);
 
         var g = multiSVG.svg.selectAll('g.dimension')
             .data(dim);
@@ -159,6 +166,8 @@ function runTests(){
             return "translate(" + (50 * i) + ",0)";
           });
 
+        brush1.set('orientation','left');
+        brush1.set('actionConfig', actionConfig);
         brush1.set('margin',m);
         brush1.set('height',h);
         brush1.set('seriesKey',"x");
@@ -166,12 +175,16 @@ function runTests(){
         brush1.set('chartData',d);
         brush1.set('iconType',"fa-eraser");
 
+        brush2.set('orientation','left');
+        brush2.set('actionConfig', actionConfig);
         brush2.set('margin',m);
         brush2.set('height',h);
         brush2.set('seriesKey',"x");
         brush2.set('dimension',dim[1]);
         brush2.set('chartData',d);
 
+        brush3.set('orientation','left');
+        brush3.set('actionConfig', actionConfig);
         brush3.set('margin',m);
         brush3.set('height',h);
         brush3.set('seriesKey',"x");
@@ -187,7 +200,6 @@ function runTests(){
         brush3.set('svg', multiSVG.svg.select('g.dimension2'));
 
       window.setTimeout(function(){done()}, 1000);
-      // done();
     });
 
     test('brush fixture is created', function() {
@@ -224,11 +236,17 @@ function runTests(){
         brush2 = document.getElementById('brush2'),
         brush3 = document.getElementById('brush3');
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
-    var d;
+    var d, bd;
 
     suiteSetup(function(done) {
-      d = [brush2.y(16),brush2.y(9)];
-      brush2._brushD3.call(brush2._brush.move,d);
+      d = [16,9];
+      bd = {
+        muted: {
+          y1: d
+        }
+      };
+
+      brush2.set('brushDomains',bd);
 
       window.setTimeout(function(){ done() }, 300);
     });
@@ -257,31 +275,26 @@ function runTests(){
       assert.equal(brush2._brushD3.select('rect.selection').attr('stroke').split(' ').join(''), rgbToHex(colors["primary-default"]));
       assert.equal(brush2._brushD3.select('rect.selection').attr('stroke-dasharray'), null);
     });
-
-    test('brush2 mutedSeries is correct', function() {
-      var ms = {
-        "1397102460000": true,
-        "1397160780000": true,
-        "1397219100000": true
-      };
-      assert.deepEqual(brush2.mutedSeries, ms);
-    });
   });
 
   suite('px-vis-axis-interaction-space min size', function() {
     var brush1 = document.getElementById('brush1'),
         brush2 = document.getElementById('brush2'),
         brush3 = document.getElementById('brush3');
-    var d1, d2;
+    var d1, d2, bd;
 
     suiteSetup(function(done) {
-      d1 = [brush1.y(1.01),brush1.y(1)];
-      d2 = [brush3.y(27),brush3.y(26.9)];
+      bd = brush2.brushDomains;
+      d1 = [1.01,1];
+      d2 = [27,26.9];
+      bd.muted['y'] = d1;
+      bd.muted['y2'] = d2;
 
-      brush1._brushD3.call(brush1._brush.move, d1);
-      brush3._brushD3.call(brush3._brush.move, d2);
+      brush1.set('brushDomains',bd);
+      brush2.set('brushDomains',bd);
+      brush3.set('brushDomains',bd);
 
-      window.setTimeout(function(){done()}, 100);
+      window.setTimeout(function(){ done(); }, 1000);
 
     });
     test('brush1._brush extents match', function() {
@@ -317,33 +330,20 @@ function runTests(){
     test('brush3._brush rect attr height', function() {
       assert.closeTo(Number(Px.d3.select(brush3._brushElem).select('rect.selection').attr('height')), 5, 2);
     });
-
-    test('brush mutedSeries is correct', function() {
-      var ms = {
-        "1397102460000": true,
-        "1397131620000": true,
-        "1397160780000": true,
-        "1397189940000": true,
-        "1397219100000": true
-      };
-
-      assert.deepEqual(brush1.mutedSeries, ms);
-      assert.deepEqual(brush3.mutedSeries, ms);
-    });
   });
 
   suite('px-vis-axis-interaction-space resize', function() {
     var brush1 = document.getElementById('brush1'),
         brush2 = document.getElementById('brush2'),
         brush3 = document.getElementById('brush3');
-    var d1, d2;
+    var d1, d2, bd;
 
     suiteSetup(function(done) {
-      d1 = [brush1.y(5),brush1.y(1)];
-      d2 = [brush3.y(27),brush3.y(15)];
+      d1 = [5,1];
+      d2 = [27,15];
 
-      brush1._brushD3.call(brush1._brush.move, d1);
-      brush3._brushD3.call(brush3._brush.move, d2);
+      brush1.set('brushDomains.muted.y',d1);
+      brush3.set('brushDomains.muted.y2',d2);
 
       window.setTimeout(function(){done()}, 500);
     });
@@ -368,24 +368,6 @@ function runTests(){
     test('brush3._brush rect attr height', function() {
       assert.closeTo(Number(Px.d3.select(brush3._brushElem).select('rect.selection').attr('height')), 221, 2);
     });
-
-    test('multiBrush mutedSeries is correct', function() {
-      var ms1 = {
-            "1397102460000": true,
-            "1397131620000": true,
-            "1397160780000": true,
-            "1397219100000": true
-          },
-          ms3 = {
-            "1397102460000": true,
-            "1397160780000": true,
-            "1397189940000": true,
-            "1397219100000": true
-         };
-
-      assert.deepEqual(brush1.mutedSeries, ms1);
-      assert.deepEqual(brush3.mutedSeries, ms3);
-    });
   });
 
   suite('px-vis-axis-interaction-space domain change', function() {
@@ -395,13 +377,11 @@ function runTests(){
         brush3 = document.getElementById('brush3');
 
     var dim = ['y','y1','y2'];
-    var ext = {'x': dim, 'y':{'y':[3,10], 'y1':[6,18], 'y2':[1,18]}};
+    var ext = {'x': dim, 'y':[3,10], 'y1':[6,18], 'y2':[1,18]};
 
     suiteSetup(function(done) {
       multiScale.set('chartExtents', ext);
-
       window.setTimeout(function() { done() }, 100);
-
     });
 
     test('brush1._brush extents match', function() {
@@ -436,31 +416,6 @@ function runTests(){
     test('brush3._brush rect attr height', function() {
       assert.closeTo(Number(brush3._brushD3.select('rect.selection').attr('height')), 84, 2);
     });
-
-    test('multiBrush mutedSeries is correct', function() {
-      var ms1 = {
-            "1397102460000": true,
-            "1397131620000": true,
-            "1397160780000": true,
-            "1397219100000": true
-          },
-          ms2 = {
-            "1397102460000": true,
-            "1397160780000": true,
-            "1397219100000": true
-          },
-          ms3 = {
-            "1397102460000": true,
-            "1397131620000": true,
-            "1397160780000": true,
-            "1397189940000": true,
-            "1397219100000": true
-          };
-
-      assert.deepEqual(brush1.mutedSeries, ms1);
-      assert.deepEqual(brush2.mutedSeries, ms2);
-      assert.deepEqual(brush3.mutedSeries, ms3);
-    });
   });
 
   suite('px-vis-axis-interaction-space domain change so brush falls outside', function() {
@@ -469,7 +424,7 @@ function runTests(){
         brush2 = document.getElementById('brush2'),
         brush3 = document.getElementById('brush3');
     var dim = ['y','y1','y2'];
-    var ext = {'x': dim, 'y':{'y':[6,10], 'y1':[6,18], 'y2':[1,18]}};
+    var ext = {'x': dim, 'y':[6,10], 'y1':[6,18], 'y2':[1,18]};
 
     suiteSetup(function(done) {
       multiScale.set('chartExtents',ext);
@@ -503,26 +458,6 @@ function runTests(){
     test('brush3._brush rect attr height', function() {
       assert.closeTo(Number(brush3._brushD3.select('rect.selection').attr('height')), 84, 2);
     });
-
-    test('multiBrush mutedSeries is correct', function() {
-      var ms1 = {},
-          ms2 = {
-            "1397102460000": true,
-            "1397160780000": true,
-            "1397219100000": true
-          },
-          ms3 = {
-            "1397102460000": true,
-            "1397131620000": true,
-            "1397160780000": true,
-            "1397189940000": true,
-            "1397219100000": true
-          };
-
-      assert.deepEqual(brush1.mutedSeries, ms1);
-      assert.deepEqual(brush2.mutedSeries, ms2);
-      assert.deepEqual(brush3.mutedSeries, ms3);
-    });
   });
 
   suite('px-vis-axis-interaction-space delete works', function() {
@@ -531,9 +466,9 @@ function runTests(){
         brush3 = document.getElementById('brush3');
 
     suiteSetup(function(done) {
-      brush1.deleteBrush();
-      brush2.deleteBrush();
-      brush3.deleteBrush();
+      brush1.deleteAndClearBrush();
+      brush2.deleteAndClearBrush();
+      brush3.deleteAndClearBrush();
 
       window.setTimeout(function(){ done() }, 1000);
     });
@@ -549,12 +484,6 @@ function runTests(){
     test('brush3._brush brush deleted', function() {
       assert.deepEqual(Px.d3.brushSelection(brush3._brushElem),null);
     });
-
-    test('brushes mutedSeries is correct', function() {
-      assert.deepEqual(brush1.mutedSeries, {});
-      assert.deepEqual(brush2.mutedSeries, {});
-      assert.deepEqual(brush3.mutedSeries, {});
-    });
   });
 
   suite('px-vis-axis-interaction-space draw still works after delete', function() {
@@ -563,8 +492,7 @@ function runTests(){
         brush3 = document.getElementById('brush3');
 
     suiteSetup(function(done) {
-      d = [brush2.y(16),brush2.y(9)];
-      brush2._brushD3.call(brush2._brush.move,d);
+      brush2.set('brushDomains', {muted:{y1: [16, 9]}});
 
       window.setTimeout(function(){ done() }, 300);
     });

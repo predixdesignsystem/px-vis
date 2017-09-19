@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Web Component Test : Fixture for px-vis-multi-axis</title>
+    <title>Web Component Test : Fixture for px-vis-interactive-axis</title>
 
     <!-- Requires Webcomponents.js polyfill is provided by the page for browsers that don't support html imports -->
     <script src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
@@ -11,10 +11,10 @@
          for any URL ending with "/web-component-tester/browser.js"
          when wct is run from the command line -->
     <script src="../web-component-tester/browser.js"></script>
-    <link rel="import" href="../px-vis-multi-scale.html" />
-    <link rel="import" href="../px-vis-radial-scale.html" />
+    <link rel="import" href="../px-vis-behavior-scale-multi-axis.html" />
+    <link rel="import" href="../px-vis-behavior-scale-radar.html" />
     <link rel="import" href="../px-vis-svg.html" />
-    <link rel="import" href="../px-vis-multi-axis.html" />
+    <link rel="import" href="../px-vis-interactive-axis.html" />
     <link rel="import" href="behaviors/px-colors-behavior.html" />
 
     <!-- Retain this link for px-theme.html -->
@@ -22,17 +22,39 @@
     <link rel="import" href="../../px-theme/px-theme-styles.html">
     <style include="px-theme-styles" is="custom-style"></style>
 
-    <script src="px-vis-multi-axis-tests.js"></script>
+    <script src="px-vis-interactive-axis-tests.js"></script>
   </head>
 
   <body>
-    <h3>Web Component Test : Fixture for px-vis-multi-axis</h3>
+    <h3>Web Component Test : Fixture for px-vis-interactive-axis</h3>
+    <script>
+      Polymer({
+        is: 'px-vis-multi-scale',
+        behaviors: [ PxVisBehaviorScale.scaleMultiAxis ],
+        observers: [
+          '_setXScale(width,margin)',
+          '_setYScale(height,margin,axes)',
+          '_generateDataExtents(dimensions)',
+          '_setDomain(x, y, dataExtents)',
+        ]
+      })
+    </script>
+    <script>
+      Polymer({
+        is: 'px-vis-radar-scale',
+        behaviors: [ PxVisBehaviorScale.radar ],
+        observers: [
+          '_setXScale(_radius)',
+          '_setYScale(_radius,centerOffset)',
+          '_generateChartExtents(chartData.*, dimensions)',
+          '_generateChartExtents(chartExtents)',
+          '_setDomain(x, y, _calculatedExtents)',
+        ]
+      })
+    </script>
     <template is="dom-bind">
       <px-vis-multi-scale
         id="multiScale"
-        axes="[[axes]]"
-        chart-data="[[chartData]]"
-        chart-extents="[[chartExtents]]"
         x="{{x}}"
         y="{{y}}"
         domain-changed="{{domainChanged}}">
@@ -41,7 +63,7 @@
         id="multiSVG"
         svg="{{svg}}">
       </px-vis-svg>
-      <px-vis-multi-axis
+      <px-vis-interactive-axis
         id="multiAxis"
         svg="[[svg]]"
         prevent-series-bar
@@ -54,84 +76,9 @@
         outer-tick-size="6"
         label-type-size="10"
         title-type-size="12"
-        displayed-values="{{displayedValues}}"
         append-unit-in-title
-        domain-changed="[[domainChanged]]"
-        axis-groups="{{axisGroups}}">
-      </px-vis-multi-axis>
-    </template>
-
-    <template is="dom-bind">
-      <px-vis-multi-scale
-        id="multiScaleCommon"
-        axes="[[axes]]"
-        chart-data="[[chartData]]"
-        chart-extents="[[chartExtents]]"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
-      </px-vis-multi-scale>
-      <px-vis-svg
-        id="multiSVGCommon"
-        svg="{{svg}}">
-      </px-vis-svg>
-      <px-vis-multi-axis
-        id="multiAxisCommon"
-        svg="[[svg]]"
-        prevent-series-bar
-        title-location='[[titleLocation]]'
-        x="[[x]]"
-        y="[[y]]"
-        complete-series-config="{{completeSeriesConfig}}"
-        redraw-series="true"
-        stroke-width="2"
-        common-axis
-        grid-ticks="{{gridTicks}}"
-        grid-axis="{{gridAxis}}"
-        outer-tick-size="6"
-        label-type-size="10"
-        title-type-size="12"
-        displayed-values="{{displayedValues}}"
-        append-unit-in-title
-        domain-changed="[[domainChanged]]"
-        axis-groups="{{axisGroups}}">
-      </px-vis-multi-axis>
-    </template>
-
-    <template is="dom-bind">
-      <px-vis-multi-scale
-        id="noMatchScale"
-        axes="[[axes]]"
-        chart-data="[[chartData]]"
-        chart-extents="[[chartExtents]]"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
-      </px-vis-multi-scale>
-      <px-vis-svg
-        id="noMatchSVG"
-        svg="{{svg}}">
-      </px-vis-svg>
-      <px-vis-multi-axis
-        id="noMatchAxis"
-        svg="[[svg]]"
-        prevent-series-bar
-        title-location='[[titleLocation]]'
-        x="[[x]]"
-        y="[[y]]"
-        complete-series-config="{{completeSeriesConfig}}"
-        redraw-series="true"
-        stroke-width="2"
-        grid-ticks="{{gridTicks}}"
-        grid-axis="{{gridAxis}}"
-        outer-tick-size="6"
-        label-type-size="10"
-        title-type-size="12"
-        displayed-values="{{displayedValues}}"
-        append-unit-in-title
-        domain-changed="[[domainChanged]]"
-        axis-groups="{{axisGroups}}">
-      </px-vis-multi-axis>
+        domain-changed="[[domainChanged]]">
+      </px-vis-interactive-axis>
     </template>
 
     <template is="dom-bind">
@@ -145,7 +92,7 @@
         id="radialSVG"
         svg="{{svg}}">
       </px-vis-svg>
-      <px-vis-multi-axis
+      <px-vis-interactive-axis
         id="radialAxis"
         prevent-series-bar
         svg="[[svg]]"
@@ -164,7 +111,7 @@
         brush-to-remove
         title-type-size="15"
         label-type-size="12">
-      </px-vis-multi-axis>
+      </px-vis-interactive-axis>
     </template>
   </body>
 </html>

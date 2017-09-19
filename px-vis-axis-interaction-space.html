@@ -386,6 +386,7 @@ Custom property | Description
           w = Math.max(this.width - this.margin.left - this.margin.right,0);
           break;
       }
+
       this._brushD3.attr('transform', 'translate(' + w + ',' + h + ')');
     },
 
@@ -899,8 +900,8 @@ Custom property | Description
     _checkBrushSize: function(domains) {
 
       var newAxisDomain = this.y.domain(),
-          oldBrushDomain = this.radial ? [domains[1], domains[0]] : domains,
-          // oldBrushDomain = this.radial ? [domains[1], domains[0] ] : domains
+          oldBrushDomain = [ domains[1], domains[0] ],
+          // oldBrushDomain = this.radial ? [domains[1], domains[0] ] : domains,
           newBrushRange = [];
 
       // if the brushExts fall within the new axis domain
@@ -942,7 +943,7 @@ Custom property | Description
       newRange[0] = this.y(d1);
       newRange[1] = this.y(d2);
 
-      return newRange;
+      return this.radial ? newRange : [newRange[1], newRange[0]];
     },
 
     /**
@@ -981,7 +982,6 @@ Custom property | Description
       // clear everything so if a brush was erased, we erase it
       this.clearBrush();
       this._styleBrushSelection();
-
 
       var key = this.brushActions[this.actionConfig.mousedown];
 
