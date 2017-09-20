@@ -32,6 +32,8 @@ v4.0.0
 * Fix for renderer to be dynamic:
   * clone the targets array so it cant be changed mid debounce
 * Fix for switching between svg and canvas at runtime
+* BREAKING CHANGE: default orientation in orientation definition is now `left` instead of `bottom`
+
 
 v3.1.18
 ================

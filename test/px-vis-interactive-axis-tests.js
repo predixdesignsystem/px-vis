@@ -61,7 +61,7 @@ function runTests(){
         dim = ['y','y1','y2'],
         w = 500,
         h = 500,
-        ext = {'x': dim, 'y':{'y':[1,10], 'y1':[1,20], 'y2':[1,27]}},
+        ext = {'x': dim, 'y':[1,10], 'y1':[1,20], 'y2':[1,27]},
         m = {
           "top": 10,
           "right": 10,
@@ -69,19 +69,34 @@ function runTests(){
           "left": 10
         };
 
+      var scaleSet = function() {
+        multiAxis.set('y',multiScale.y.y);
+        multiScale.removeEventListener('px-vis-y-updated', scaleSet);
+      };
+
+      var axisDone = function() {
+        multiAxis.removeEventListener('px-axis-done', axisDone);
+        done();
+      };
+
+      multiAxis.addEventListener('px-axis-done', axisDone);
+      multiScale.addEventListener('px-vis-y-updated', scaleSet);
+
       multiSVG.set('width',w);
       multiSVG.set('height',h);
       multiSVG.set('margin',m);
 
+      multiScale.set('commonAxis',false);
       multiScale.set('width',w);
       multiScale.set('height',h);
       multiScale.set('margin',m);
       multiScale.set('completeSeriesConfig',completeSeriesConfig);
-      multiScale.set('dataExtents',ext);
       multiScale.set('chartData',d);
       multiScale.set('axes',dim);
       multiScale.set('dimensions',dim);
+      multiScale.set('chartExtents',ext);
 
+      multiAxis.set('preventInitialDrawing',false);
       multiAxis.set('margin',m);
       multiAxis.set('width',w);
       multiAxis.set('height',h);
@@ -92,8 +107,6 @@ function runTests(){
       multiAxis.set('dimension','y1');
       multiAxis.set('chartData',d);
 
-      window.setTimeout(function(){done()}, 300);
-     // done();
     });
 
     test('multiAxis fixture is created', function() {
@@ -101,9 +114,12 @@ function runTests(){
     });
 
     test('multiAxis created its group', function() {
-      assert.equal(multiAxis._heightOrLen, 500);
+      assert.equal(multiAxis._interactiveGroup.attr('dimension'), 'y1');
     });
 
+    test('multiAxis groups transformed', function() {
+      assert.equal(multiAxis._interactiveGroup.attr('transform').replace(',',' '), 'translate(240 0)');
+    });
   });
 
 
@@ -112,12 +128,30 @@ function runTests(){
         multiSVG = document.getElementById('multiSVG'),
         multiAxis = document.getElementById('multiAxis');
 
-    suiteSetup(function(done){
+    suiteSetup(function(done) {
+      var scaleSet = function() {
+        multiAxis.set('y',multiScale.y.y);
+        multiScale.removeEventListener('px-vis-y-updated', scaleSet);
+      };
+      var axisDone = function() {
+        multiAxis.removeEventListener('px-axis-done', axisDone);
+        done();
+      };
 
-      window.setTimeout(function() { done()}, 100);
+      multiAxis.addEventListener('px-axis-done', axisDone);
+      multiScale.addEventListener('px-vis-y-updated', scaleSet);
+
+      multiAxis.set('hideAndShowOnHover',true);
+      multiScale.set('commonAxis',true);
     });
 
+    test('commonAxis boolean is flipped', function() {
+      assert.isTrue(multiAxis._commonAxisRanAtLeastOnce);
+    });
 
+    test('commonAxis styles', function() {
+      assert.isTrue(multiAxis._interactiveGroup.selectAll('g.tick text').node().classList.contains('hideCommon'));
+    });
   });
 
   suite('px-vis-interactive-axis radial setup works', function() {
@@ -182,18 +216,31 @@ function runTests(){
           "left": 20
         };
 
+      var scaleSet = function() {
+        multiAxis.set('y',multiScale.y.y);
+        multiScale.removeEventListener('px-vis-y-updated', scaleSet);
+      };
+
+      var axisDone = function() {
+        multiAxis.removeEventListener('px-axis-done', axisDone);
+        done();
+      };
+
+      radialAxis.addEventListener('px-axis-done', axisDone);
+      radialScale.addEventListener('px-vis-y-updated', scaleSet);
+
       radialSVG.set('width',w);
       radialSVG.set('height',h);
       radialSVG.set('offset',offset);
       radialSVG.set('margin',m);
 
-      radialScale.set('width',min);
+      radialScale.set('_radius',min);
+      radialScale.set('centerOffset',20);
       radialScale.set('margin',m);
-      radialScale.set('amplitudeKeys',dim);
+      radialScale.set('dimensions',dim);
       radialScale.set('completeSeriesConfig',completeSeriesConfig);
       radialScale.set('chartExtents',ext);
       radialScale.set('chartData',d);
-      radialScale.set('centerOffset',20);
 
       radialAxis.set('margin',m);
       radialAxis.set('width',w);
@@ -204,15 +251,21 @@ function runTests(){
       radialAxis.set('seriesKey','x');
       radialAxis.set('completeSeriesConfig',completeSeriesConfig);
       radialAxis.set('dimensions',dim);
+      radialAxis.set('dimension','y');
       radialAxis.set('axes',dim);
       radialAxis.set('chartData',d);
-
-      window.setTimeout(function(){done()},300);
-     // done();
     });
 
     test('radialAxis fixture is created', function() {
       assert.isTrue(radialAxis !== null);
+    });
+
+    test('radialAxis created its group', function() {
+      assert.equal(radialAxis._interactiveGroup.attr('dimension'), 'y');
+    });
+
+    test('radialAxis groups transformed', function() {
+      assert.equal(radialAxis._interactiveGroup.attr('transform'), 'rotate(180)');
     });
 
   });
