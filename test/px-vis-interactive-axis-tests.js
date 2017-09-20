@@ -118,7 +118,9 @@ function runTests(){
     });
 
     test('multiAxis groups transformed', function() {
-      assert.equal(multiAxis._interactiveGroup.attr('transform').replace(',',' '), 'translate(240 0)');
+      var t = multiAxis._interactiveGroup.attr('transform').replace(',',' '),
+          test = t === 'translate(240 0)' || t === 'translate(240)';
+      assert.isTrue(test);
     });
   });
 
