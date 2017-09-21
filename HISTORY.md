@@ -1,3 +1,7 @@
+v3.1.23
+================
+* delete empty line above some behaviors definition that would prevent them from showing up in the API
+
 v3.1.22
 ================
 * small update to demo catalog
