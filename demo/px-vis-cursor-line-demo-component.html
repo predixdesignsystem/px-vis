@@ -1,6 +1,7 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../px-vis-multi-axis.html">
-<link rel="import" href="../px-vis-multi-scale.html">
+<link rel="import" href="../px-vis-behavior-d3.html">
+<link rel="import" href="../px-vis-behavior-scale-multi-axis.html">
 <link rel="import" href="../px-vis-cursor-line.html">
 <link rel="import" href="../px-vis-line-svg.html">
 <link rel="import" href="../px-vis-svg.html">
@@ -8,21 +9,6 @@
 
 <dom-module id="px-vis-cursor-line-demo-component">
   <template>
-
-    <!--add demo tag-->
-    <px-vis-multi-scale
-      id="multiScale"
-      axes="[[axes]]"
-      chart-data="[[chartData]]"
-      chart-extents="[[chartExtents]]"
-      x="{{x}}"
-      y="{{y}}"
-      width="[[width]]"
-      height="[[height]]"
-      margin="[[margin]]"
-      dimensions="[[dimensions]]"
-      domain-changed="{{domainChanged}}">
-    </px-vis-multi-scale>
     <px-vis-multi-axis
       id="multiAxis"
       dimensions="[[dimensions]]"
@@ -88,7 +74,13 @@
 <script>
 Polymer({
   is: 'px-vis-cursor-line-demo-component',
-  behaviors: [PxColorsBehavior.getSeriesColors,PxColorsBehavior.dataVisColorTheming],
+  behaviors: [
+    PxColorsBehavior.getSeriesColors,
+    PxColorsBehavior.dataVisColorTheming,
+    PxVisBehaviorD3.axes,
+    PxVisBehaviorD3.domainUpdate,
+    PxVisBehaviorScale.scaleMultiAxis
+  ],
   properties: {
     description: {
       type: String,
@@ -145,7 +137,7 @@ Polymer({
     },
     chartExtents: {
       type: Object,
-      value: {'x': ['y','y1','y2'], 'y':{'y':[1,10], 'y1':[1,20], 'y2':[1,27]}}
+      value: {'x': ['y','y1','y2'], 'y':[1,10], 'y1':[1,20], 'y2':[1,27]}
     },
     margin: {
       type: Object,
@@ -175,7 +167,11 @@ Polymer({
   },
 
   observers: [
-    'generateLayers(svg)'
+    'generateLayers(svg)',
+    '_setXScale(width,margin)',
+    '_setYScale(height,margin,axes)',
+    '_generateDataExtents(chartExtents)',
+    '_setDomain(x, y, dataExtents)'
   ],
 
   generateLayers: function() {
