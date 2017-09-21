@@ -1,3 +1,7 @@
+v3.1.22
+================
+* small update to demo catalog
+
 v3.1.21
 ================
 * add stricter conditions for drawing cursor to avoid errors on edge case scenarios
