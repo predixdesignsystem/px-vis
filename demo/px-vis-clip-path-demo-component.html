@@ -1,22 +1,86 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../px-vis-clip-path.html">
+<link rel="import" href="../px-vis-svg.html">
 
 <dom-module id="px-vis-clip-path-demo-component">
   <template>
-    <!--add demo tag-->
-    <p style="color: rgb(177,177,188)">px-vis-clip-path cannot be seen</p>
-    <px-vis-clip-path></px-vis-clip-path>
+    <p style="color: rgb(177,177,188)">Two full sized rects are drawn, a grey and a black. px-vis-clip-path is clipping the black rectangle. </p>
+    <px-vis-svg
+      width="[[width]]"
+      height="[[height]]"
+      margin='{
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      }'
+      svg="{{svg}}">
+    </px-vis-svg>
+    <px-vis-clip-path
+      svg="[[svg]]"
+      width="[[cpWidth]]"
+      height="[[cpHeight]]"
+      margin='{
+        "top": 0,
+        "right": 0,
+        "bottom": 0,
+        "left": 0
+      }'
+      clip-path="{{clipPath}}"
+      series-clip-path="{{seriesClipPath}}">
+    </px-vis-clip-path>
   </template>
 </dom-module>
 
 <script>
-Polymer({
-  is: 'px-vis-clip-path-demo-component',
-  properties: {
-    description: {
-      type: String,
-      value: "\"The clipping path restricts the region to which paint can be applied. Conceptually, any parts of the drawing that lie outside of the region bounded by the currently active clipping path are not drawn.\" (MDN) Ostensibly, the clipping path gets applied to drawing components to prevent them from drawing on certain parts of the chart, such stopping a line series drawing where the axis is drawn. To use, specfify the sizing, svg, and interpreters as specified in the example. It will return an ID for the clipping path which can be passed to other drawing objects. This component returns TWO different clip path IDs. clipPath includes the margin on top and seriesClipPath excludes it."
+  Polymer({
+    is: 'px-vis-clip-path-demo-component',
+    properties: {
+      description: {
+        type: String,
+        value: "\"The clipping path restricts the region to which paint can be applied. Conceptually, any parts of the drawing that lie outside of the region bounded by the currently active clipping path are not drawn.\" (MDN) Ostensibly, the clipping path gets applied to drawing components to prevent them from drawing on certain parts of the chart, such stopping a line series drawing where the axis is drawn. To use, specfify the sizing, svg, and interpreters as specified in the example. It will return an ID for the clipping path which can be passed to other drawing objects. This component returns TWO different clip path IDs. clipPath includes the margin on top and seriesClipPath excludes it."
+      },
+      width: {
+        type: Number,
+        value: 500
+      },
+      height: {
+        type: Number,
+        value: 250
+      },
+      cpWidth: {
+        type: Number,
+        computed: 'computeWidth(width)'
+      },
+      cpHeight: {
+        type: Number,
+        computed: 'computeHeight(height)'
+      },
+      clipPath: {
+        type: String,
+        observer: 'drawBox'
+      }
+    },
+    computeWidth: function(width) {
+      return width - 100;
+    },
+    computeHeight: function(height) {
+      return height - 100;
+    },
+    drawBox: function() {
+      this.svg.append('rect')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', this.width)
+        .attr('height', this.height)
+        .attr('fill', 'grey');
+      this.svg.append('rect')
+        .attr('x', 0)
+        .attr('y', 0)
+        .attr('width', this.width)
+        .attr('height', this.height)
+        .attr('fill', 'black')
+        .attr("clip-path", 'url(#' + this.clipPath + ')');
     }
-  }
-});
+  });
 </script>

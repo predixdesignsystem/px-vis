@@ -1,33 +1,19 @@
 <link rel="import" href="../../polymer/polymer.html">
 
-<link rel="import" href="../px-vis-multi-scale.html">
+<link rel="import" href="../px-vis-behavior-d3.html">
+<link rel="import" href="../px-vis-behavior-scale-multi-axis.html">
 <link rel="import" href="../px-vis-svg.html">
 <link rel="import" href="../px-vis-interactive-axis.html">
 
 <dom-module id="px-vis-interactive-axis-demo-component">
   <template>
-      <div class="outline">
-
-      <!-- need for svg -->
+    <div class="outline">
         <px-vis-svg
         width="[[width]]"
         height="[[height]]"
         margin="[[margin]]"
         svg="{{svg}}">
       </px-vis-svg>
-      <px-vis-multi-scale
-        id="multiScale"
-        axes='["y"]'
-        chart-data="[[chartData]]"
-        chart-extents="[[chartExtents]]"
-        x="{{x}}"
-        y="{{y}}"
-        width="[[width]]"
-        height="[[height]]"
-        margin="[[margin]]"
-        dimensions='["y"]'
-        domain-changed="{{domainChanged}}">
-      </px-vis-multi-scale>
       <px-vis-interactive-axis
           svg="[[svg]]"
           x="[[x]]"
@@ -41,8 +27,8 @@
             }'
           y="[[_returnY(y, domainChanged)]]"
           dimension="y"
-          axes='["y"]'
-          dimensions='["y"]'
+          axes="[[axes]]"
+          dimensions="[[dimensions]]"
           series-key="x"
           height="[[height]]"
           width="[[width]]"
@@ -52,7 +38,7 @@
           complete-series-config="[[completeSeriesConfig]]"
           domain-changed="[[domainChanged]]"
           series-on-axis='["y"]'
-          >
+          action-config="[[actionConfig]]">
       </px-vis-interactive-axis>
       </div>
     </div>
@@ -61,8 +47,12 @@
   <script>
     Polymer({
       is: "px-vis-interactive-axis-demo-component",
-       properties:{
-        //basics
+      behaviors: [
+        PxVisBehaviorD3.axes,
+        PxVisBehaviorD3.domainUpdate,
+        PxVisBehaviorScale.scaleMultiAxis
+      ],
+      properties:{
         width: {
           type : Number,
           value : 150
@@ -77,16 +67,19 @@
         },
         margin:{
           type : Object,
-          value : {
-            "top": 5,
-            "right": 10,
-            "bottom": 25,
-            "left": 0
+          value : function() {
+            return {
+              "top": 5,
+              "right": 10,
+              "bottom": 25,
+              "left": 0
+            }
           }
         },
         chartData:{
           type : Array,
-          value : [{
+          value : function() {
+            return [{
               'x': 1397102460000,
               'y': 0.56
             },{
@@ -122,21 +115,35 @@
             },{
               'x': 1397522940000,
               'y': 0.32
-          }]
-        },
-        dataExtents:{
-          type : Object,
-          value: {
-            "x": [Infinity,-Infinity],
-            "y": [0,-Infinity]
+            }]
           }
+        },
+        dimensions: {
+          type: Array,
+          value: function() {
+            return ['y']
+          }
+        },
+        axes: {
+          type: Array,
+          value: function() {
+            return ['y']
+          }
+        },
+        dataExtents: {
+          type: Object,
+          notify: true
         },
         chartExtents: {
           type: Object,
-          value: {'x': ['y'], 'y':{'y':[1,10]}}
+          value: function() {
+            return {'x': ['y'], 'y':[1,10]}
+          }
         },
         completeSeriesConfig: {
-          value: {
+          type: Object,
+          value: function() {
+            return {
               "x":{
                 "type":"line",
                 "name":"mySeries",
@@ -144,14 +151,31 @@
                 "y":['y'],
                 "color": "rgb(93,165,218)"
               }
-            },
-          type: Object
+            }
+          }
         },
         titleTruncation: {
           type: Boolean,
           value: false
+        },
+        actionConfig: {
+          type: Object,
+          value: function() {
+            return {
+              mouseout: null,
+              mousemove: null,
+              mousedown: 'callAxisMute',
+              mouseup: 'callAxisMute'
+            }
+          }
         }
       },
+      observers: [
+        '_setXScale(width, margin)',
+        '_setYScale(height, margin, axes)',
+        '_generateDataExtents(chartExtents)',
+        '_setDomain(x, y, dataExtents)'
+      ],
       _returnY: function(y, dc) {
         return y.y
       }

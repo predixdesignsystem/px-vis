@@ -1,24 +1,11 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../px-vis-multi-axis.html">
-<link rel="import" href="../px-vis-multi-scale.html">
+<link rel="import" href="../px-vis-behavior-d3.html">
+<link rel="import" href="../px-vis-behavior-scale-multi-axis.html">
 <link rel="import" href="../px-vis-svg.html">
 
 <dom-module id="px-vis-multi-axis-demo-component">
   <template>
-    <!--add demo tag-->
-    <px-vis-multi-scale
-      id="multiScale"
-      axes="[[axes]]"
-      chart-data="[[chartData]]"
-      chart-extents="[[chartExtents]]"
-      x="{{x}}"
-      y="{{y}}"
-      width="[[width]]"
-      height="[[height]]"
-      margin="[[margin]]"
-      dimensions="[[dimensions]]"
-      domain-changed="{{domainChanged}}">
-    </px-vis-multi-scale>
     <px-vis-multi-axis
       id="multiAxis"
       svg="[[svg]]"
@@ -56,43 +43,51 @@
 <script>
 Polymer({
   is: 'px-vis-multi-axis-demo-component',
+  behaviors: [
+    PxVisBehaviorD3.axes,
+    PxVisBehaviorD3.domainUpdate,
+    PxVisBehaviorScale.scaleMultiAxis
+  ],
   properties: {
     description: {
       type: String,
       value: "d3 element creating an axis for the chart"
     },
     chartData: {
-      value: [{
-            "x": 1397102460000,
-            "y": 1,
-            "y1": 1,
-            "y2": 1
-          },{
-            "x": 1397131620000,
-            "y": 6,
-            "y1": 15,
-            "y2": 21
-          },{
-            "x": 1397160780000,
-            "y": 10,
-            "y1": 8,
-            "y2": 3
-          },{
-            "x": 1397189940000,
-            "y": 4,
-            "y1": 10,
-            "y2": 10
-          },{
-            "x": 1397219100000,
-            "y": 6,
-            "y1": 20,
-            "y2": 27
-          }
-        ],
-      type: Array
+      type: Array,
+      value: function() {
+        return [{
+          "x": 1397102460000,
+          "y": 1,
+          "y1": 1,
+          "y2": 1
+        },{
+          "x": 1397131620000,
+          "y": 6,
+          "y1": 15,
+          "y2": 21
+        },{
+          "x": 1397160780000,
+          "y": 10,
+          "y1": 8,
+          "y2": 3
+        },{
+          "x": 1397189940000,
+          "y": 4,
+          "y1": 10,
+          "y2": 10
+        },{
+          "x": 1397219100000,
+          "y": 6,
+          "y1": 20,
+          "y2": 27
+        }]
+      }
     },
     completeSeriesConfig: {
-      value: {
+      type: Object,
+      value: function() {
+        return {
           "x":{
             "type":"line",
             "name":"mySeries",
@@ -107,16 +102,20 @@ Polymer({
             "title": "Third Title",
             "yAxisUnit": "bofs"
           }
-        },
-      type: Object
+        }
+      }
     },
     dimensions: {
-      type :Array,
-      value: ['y','y1','y2']
+      type : Array,
+      value: function() {
+        return ['y','y1','y2']
+      }
     },
     axes: {
       type :Array,
-      value: ['y','y1','y2']
+      value: function() {
+        return ['y','y1','y2']
+      }
     },
     width: {
       type: Number,
@@ -128,23 +127,36 @@ Polymer({
     },
     chartExtents: {
       type: Object,
-      value: {'x': ['y','y1','y2'], 'y':{'y':[1,10], 'y1':[1,20], 'y2':[1,27]}}
+      value: function() {
+        return {
+          'x': ['y','y1','y2'],
+          'y':[1,10],
+          'y1':[1,20],
+          'y2':[1,27]
+        }
+      }
     },
     margin: {
       type: Object,
-      value: {
-        "top": 10,
-        "right": 10,
-        "bottom": 10,
-        "left": 10
+      value: function() {
+        return {
+          "top": 10,
+          "right": 10,
+          "bottom": 10,
+          "left": 10
+        }
       }
     },
     length: {
       type: Number,
       value: 5
     }
-
-
-  }
+  },
+  observers: [
+    '_setXScale(width,margin)',
+    '_setYScale(height,margin,axes)',
+    '_generateDataExtents(chartExtents)',
+    '_setDomain(x, y, dataExtents)'
+  ],
 });
 </script>

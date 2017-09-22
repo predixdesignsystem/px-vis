@@ -90,105 +90,106 @@ PxVisBehaviorScale.scaleMultiAxis = [{
      */
     _generateDataExtents: function() {
 
-      if(this.dimensions) {
+      if(!this.dimensions) {
+        return
+      }
 
-        var usedChartExtents = {},
-            ext = {
-              "x": this.dimensions,
-              "y": {}
-            };
+      var usedChartExtents = {},
+          ext = {
+            "x": this.dimensions,
+            "y": {}
+          };
 
-        if(!this.chartExtents) {
+      if(!this.chartExtents) {
 
-          //get all extents
+        //get all extents
+        for(var i = 0; i < this.dimensions.length; i++) {
+          ext.y[this.dimensions[i]] = d3.extent(this.chartData, function(d) {
+            return Number(d[this.dimensions[i]]);
+          }.bind(this));
+        }
+
+        // if we want a common axis, find overall extents
+        if(this.commonAxis) {
+          var maxMin = d3.extent(d3.merge(d3.values(ext.y)));
           for(var i = 0; i < this.dimensions.length; i++) {
+            // set each axis extent to max & min
+            // TODO this is not the most efficient strategy, but certainly is the easiest, especially to keep it dynamic. Better would be to use only a single scale instead of calculating a scale multiple times.
+            ext.y[this.dimensions[i]] = maxMin;
+          }
+        }
+      } else {
+
+        //we have some kind of chartExtents, possibly not complete
+        var searchMin,
+            searchMax,
+            commonMax = Number.MIN_VALUE,
+            commonMin = Number.MAX_VALUE;
+
+
+        for(var i = 0; i < this.dimensions.length; i++) {
+
+          searchMin = false,
+          searchMax = false;
+
+          //we have some extents specified for this dim
+          if(this.chartExtents[this.dimensions[i]]) {
+
+            ext.y[this.dimensions[i]] = [];
+
+            //deal with min
+            if(this.chartExtents[this.dimensions[i]][0] === "dynamic" || this.chartExtents[this.dimensions[i]][0] === Infinity) {
+              searchMin = true;
+            } else {
+              //keep this min
+              ext.y[this.dimensions[i]][0] = this.chartExtents[this.dimensions[i]][0];
+              usedChartExtents[this.dimensions[i]] = true;
+            }
+
+            //deal with max
+            if(this.chartExtents[this.dimensions[i]][1] === "dynamic" || this.chartExtents[this.dimensions[i]][1] === -Infinity) {
+              searchMax = true;
+            } else {
+              //keep this max
+              ext.y[this.dimensions[i]][1] = this.chartExtents[this.dimensions[i]][1];
+              usedChartExtents[this.dimensions[i]] = true;
+            }
+          } else {
+            searchMin = true;
+            searchMax = true;
+          }
+
+          //do search if needed
+          if(searchMin && searchMax) {
             ext.y[this.dimensions[i]] = d3.extent(this.chartData, function(d) {
+              return Number(d[this.dimensions[i]]);
+            }.bind(this));
+          } else if(searchMin) {
+            ext.y[this.dimensions[i]][0] = d3.min(this.chartData, function(d) {
+              return Number(d[this.dimensions[i]]);
+            }.bind(this));
+          } else if(searchMax) {
+            ext.y[this.dimensions[i]][1] = d3.max(this.chartData, function(d) {
               return Number(d[this.dimensions[i]]);
             }.bind(this));
           }
 
-          // if we want a common axis, find overall extents
           if(this.commonAxis) {
-            var maxMin = d3.extent(d3.merge(d3.values(ext.y)));
-            for(var i = 0; i < this.dimensions.length; i++) {
-              // set each axis extent to max & min
-              // TODO this is not the most efficient strategy, but certainly is the easiest, especially to keep it dynamic. Better would be to use only a single scale instead of calculating a scale multiple times.
-              ext.y[this.dimensions[i]] = maxMin;
-            }
-          }
-        } else {
-
-          //we have some kind of chartExtents, possibly not complete
-          var searchMin,
-              searchMax,
-              commonMax = Number.MIN_VALUE,
-              commonMin = Number.MAX_VALUE;
-
-
-          for(var i = 0; i < this.dimensions.length; i++) {
-
-            searchMin = false,
-            searchMax = false;
-
-            //we have some extents specified for this dim
-            if(this.chartExtents[this.dimensions[i]]) {
-
-              ext.y[this.dimensions[i]] = [];
-
-              //deal with min
-              if(this.chartExtents[this.dimensions[i]][0] === "dynamic" || this.chartExtents[this.dimensions[i]][0] === Infinity) {
-                searchMin = true;
-              } else {
-                //keep this min
-                ext.y[this.dimensions[i]][0] = this.chartExtents[this.dimensions[i]][0];
-                usedChartExtents[this.dimensions[i]] = true;
-              }
-
-              //deal with max
-              if(this.chartExtents[this.dimensions[i]][1] === "dynamic" || this.chartExtents[this.dimensions[i]][1] === -Infinity) {
-                searchMax = true;
-              } else {
-                //keep this max
-                ext.y[this.dimensions[i]][1] = this.chartExtents[this.dimensions[i]][1];
-                usedChartExtents[this.dimensions[i]] = true;
-              }
-            } else {
-              searchMin = true;
-              searchMax = true;
-            }
-
-            //do search if needed
-            if(searchMin && searchMax) {
-              ext.y[this.dimensions[i]] = d3.extent(this.chartData, function(d) {
-                return Number(d[this.dimensions[i]]);
-              }.bind(this));
-            } else if(searchMin) {
-              ext.y[this.dimensions[i]][0] = d3.min(this.chartData, function(d) {
-                return Number(d[this.dimensions[i]]);
-              }.bind(this));
-            } else if(searchMax) {
-              ext.y[this.dimensions[i]][1] = d3.max(this.chartData, function(d) {
-                return Number(d[this.dimensions[i]]);
-              }.bind(this));
-            }
-
-            if(this.commonAxis) {
-              commonMax = Math.max(commonMax, ext.y[this.dimensions[i]][1]);
-              commonMin = Math.min(commonMin, ext.y[this.dimensions[i]][0]);
-            }
-          }
-
-          //update all dims with the common axis max and min
-          if(this.commonAxis) {
-            for(var i=0; i<this.dimensions.length; i++) {
-              ext.y[this.dimensions[i]] = [commonMin, commonMax];
-            }
+            commonMax = Math.max(commonMax, ext.y[this.dimensions[i]][1]);
+            commonMin = Math.min(commonMin, ext.y[this.dimensions[i]][0]);
           }
         }
 
-        this._usedChartExtents = usedChartExtents;
-        this.set('dataExtents',ext);
+        //update all dims with the common axis max and min
+        if(this.commonAxis) {
+          for(var i=0; i<this.dimensions.length; i++) {
+            ext.y[this.dimensions[i]] = [commonMin, commonMax];
+          }
+        }
       }
+
+      this._usedChartExtents = usedChartExtents;
+      this.set('dataExtents',ext);
     },
 
     /**

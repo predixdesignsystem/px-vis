@@ -10,7 +10,6 @@
 <dom-module id="px-vis-area-svg-demo-component">
   <template>
     <div class="outline">
-
       <px-vis-svg
         width="[[width]]"
         height="[[height]]"
@@ -38,7 +37,6 @@
         y="[[y]]"
         domain-changed="[[domainChanged]]">
       </px-vis-area-svg>
-
     </div>
   </template>
   <script>
@@ -52,7 +50,6 @@
       ],
 
       properties:{
-        //basics
         width: {
           type : Number,
           value : 500
@@ -63,11 +60,13 @@
         },
         margin:{
           type : Object,
-          value : {
-            "top": 10,
-            "right": 10,
-            "bottom": 10,
-            "left": 10
+          value : function() {
+            return {
+              "top": 10,
+              "right": 10,
+              "bottom": 10,
+              "left": 10
+            }
           }
         },
         domainChanged:{
@@ -76,7 +75,8 @@
         },
         chartData:{
           type : Array,
-          value : [{
+          value : function() {
+            return [{
               'x': 1397102460000,
               'y': 0.56
             },{
@@ -112,17 +112,19 @@
             },{
               'x': 1397522940000,
               'y': 0.32
-          }]
+            }]
+          }
         },
         completeSeriesConfig: {
           type : Object
         },
-        //dataExtents
         dataExtents:{
           type : Object,
-          value: {
-            "x": [Infinity,-Infinity],
-            "y": [0,-Infinity]
+          value: function() {
+            return {
+              "x": [Infinity,-Infinity],
+              "y": [0,-Infinity]
+            }
           }
         }
       },
