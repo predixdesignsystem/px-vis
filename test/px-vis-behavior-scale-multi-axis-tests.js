@@ -234,6 +234,49 @@ function runTests(){
     });
   });
 
+  suite('dataExtents generated properly without commonAxis when one series is all same value', function() {
+    var scale = document.getElementById('scale');
+
+
+    suiteSetup(function() {
+
+      var dimensions = ['axis1', 'axis2', 'axis3', 'axis4'],
+          chartData = [ {axis1: 1, axis2: 6, axis3: 11, axis4: 16},
+                        {axis1: 2, axis2: 7, axis3: 12, axis4: 16},
+                        {axis1: 3, axis2: 8, axis3: 13, axis4: 16},
+                        {axis1: 4, axis2: 9, axis3: 14, axis4: 16},
+                        {axis1: 5, axis2: 10, axis3: 15, axis4: 16}];
+
+      scale.set('chartData', chartData);
+      scale.set('dimensions', dimensions);
+      scale.set('chartExtents', undefined);
+      scale.set('commonAxis', false);
+
+      //fake a call from an external observer
+      scale._generateDataExtents();
+    });
+
+    test('dataExtents for axis1', function() {
+      assert.equal(scale.dataExtents.y['axis1'][0], 1);
+      assert.equal(scale.dataExtents.y['axis1'][1], 5);
+    });
+
+    test('dataExtents for axis2', function() {
+      assert.equal(scale.dataExtents.y['axis2'][0], 6);
+      assert.equal(scale.dataExtents.y['axis2'][1], 10);
+    });
+
+    test('dataExtents for axis3', function() {
+      assert.equal(scale.dataExtents.y['axis3'][0], 11);
+      assert.equal(scale.dataExtents.y['axis3'][1], 15);
+    });
+
+    test('dataExtents for axis4', function() {
+      assert.equal(scale.dataExtents.y['axis4'][0], 16);
+      assert.equal(scale.dataExtents.y['axis4'][1], 17);
+    });
+  });
+
   suite('dataExtents generated properly with commonAxis and the axis with the max val is not defined in chartExtents', function() {
     var scale = document.getElementById('scale');
 

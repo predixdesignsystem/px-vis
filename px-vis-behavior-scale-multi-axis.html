@@ -85,6 +85,27 @@ PxVisBehaviorScale.scaleMultiAxis = [{
       // }
     },
 
+    _calcDimExtent: function(dim, ext, searchMin, searchMax) {
+      if(searchMin && searchMax) {
+        ext.y[dim] = Px.d3.extent(this.chartData, function(d) {
+          return Number(d[dim]);
+        }.bind(this));
+      } else if(searchMin) {
+        ext.y[dim][0] = Px.d3.min(this.chartData, function(d) {
+          return Number(d[dim]);
+        }.bind(this));
+      } else if(searchMax) {
+        ext.y[dim][1] = Px.d3.max(this.chartData, function(d) {
+          return Number(d[dim]);
+        }.bind(this));
+      }
+
+      // if the same val, add 1 to get a range
+      if(ext.y[dim][0] === ext.y[dim][1]) {
+        ext.y[dim][1] += 1;
+      }
+    },
+
     /**
      * Generate dataExtents based on chartExtents and data
      */
@@ -104,9 +125,7 @@ PxVisBehaviorScale.scaleMultiAxis = [{
 
         //get all extents
         for(var i = 0; i < this.dimensions.length; i++) {
-          ext.y[this.dimensions[i]] = d3.extent(this.chartData, function(d) {
-            return Number(d[this.dimensions[i]]);
-          }.bind(this));
+          this._calcDimExtent(this.dimensions[i], ext, true, true);
         }
 
         // if we want a common axis, find overall extents
@@ -160,19 +179,7 @@ PxVisBehaviorScale.scaleMultiAxis = [{
           }
 
           //do search if needed
-          if(searchMin && searchMax) {
-            ext.y[this.dimensions[i]] = d3.extent(this.chartData, function(d) {
-              return Number(d[this.dimensions[i]]);
-            }.bind(this));
-          } else if(searchMin) {
-            ext.y[this.dimensions[i]][0] = d3.min(this.chartData, function(d) {
-              return Number(d[this.dimensions[i]]);
-            }.bind(this));
-          } else if(searchMax) {
-            ext.y[this.dimensions[i]][1] = d3.max(this.chartData, function(d) {
-              return Number(d[this.dimensions[i]]);
-            }.bind(this));
-          }
+          this._calcDimExtent(this.dimensions[i], ext, searchMin, searchMax);
 
           if(this.commonAxis) {
             commonMax = Math.max(commonMax, ext.y[this.dimensions[i]][1]);
