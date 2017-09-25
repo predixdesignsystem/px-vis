@@ -34,6 +34,26 @@ v4.0.0
 * Fix for switching between svg and canvas at runtime
 * BREAKING CHANGE: default orientation in orientation definition is now `left` instead of `bottom`
 
+v3.1.23
+================
+* delete empty line above some behaviors definition that would prevent them from showing up in the API
+
+v3.1.22
+================
+* small update to demo catalog
+
+v3.1.21
+================
+* add stricter conditions for drawing cursor to avoid errors on edge case scenarios
+
+v3.1.20
+================
+* hide codepens for all demos
+
+v3.1.19
+================
+* Striping supports a single timestamp entry, drawing a line instead of an area.
+* Line dash style is configurable via the stripeConfig obj
 
 v3.1.18
 ================
