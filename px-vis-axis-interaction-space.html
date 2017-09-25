@@ -715,6 +715,11 @@ Custom property | Description
      *
      */
     _searchData: function(aid, mouseVal, result, d) {
+      // check that data is within our domain
+      if(this.y.domain()[0] > d[aid] || d[aid] > this.y.domain()[1]) {
+        return;
+      }
+
       //figure out the differnce between the data value and our saved value
       result.distance = Math.abs(d[aid] - mouseVal);
 
@@ -752,62 +757,47 @@ Custom property | Description
           tooltipConfig = {},  //a fake configuration object we will build
           value = {};          //the series obj within tooltipData
 
-      //only update if the value is on the screen
-      if(this.y.domain()[0] <= result.yVal && result.yVal <= this.y.domain()[1]) {
+      svgBounding = elem.ownerSVGElement.getBoundingClientRect();
 
-        svgBounding = elem.ownerSVGElement.getBoundingClientRect();
-
-        //calc the screen positions for the tooltip
-        if(this.radial) {
-          screenX = this.y(result.yVal) * Math.sin(this.x(aid)) + this.width/2 + svgBounding.left + window.pageXOffset;
-          screenY = this.y(result.yVal) * Math.cos(Math.PI - this.x(aid)) + this.smallerSide/2 + svgBounding.top + window.pageYOffset;
-
-        } else {
-          screenX = this.x(aid) + svgBounding.left + window.pageXOffset + 15;
-          screenY = this.y(result.yVal) + this.margin.top + svgBounding.top + window.pageYOffset;
-        }
-
-        //create our fake configuration object
-        tooltipConfig[aid] = {};
-
-        //if using categies, use it, otherwise default
-        tooltipConfig[aid]["color"] = result.group && this.completeSeriesConfig[result.group] ? this.completeSeriesConfig[result.group]["color"] : this.completeSeriesConfig[this.seriesKey]["color"];
-
-        //if title is specified, use it, otherwiuse id
-        tooltipConfig[aid]["name"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]['title'] ? this.completeSeriesConfig[aid]["title"] : aid;
-
-        //if there is a unit, add it
-        tooltipConfig[aid]["yAxisUnit"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]["yAxisUnit"] ? this.completeSeriesConfig[aid]["yAxisUnit"] : '';
-
-        //add the y series id
-        tooltipConfig[aid]['y'] = aid;
-
-        //create our value obj
-        value[aid] = result.yVal;
-        //create our tooltipData obj
-        data = {
-          "mouse": mousePos,
-          "dataPos": [screenX, screenY],
-          "time": result.time,
-          "dataset": result.dataset,
-          'series': [
-            { 'name': aid, 'value': value }
-          ],
-          "color": tooltipConfig[aid]["color"],
-          "tooltipConfig": tooltipConfig
-        };
+      //calc the screen positions for the tooltip
+      if(this.radial) {
+        screenX = this.y(result.yVal) * Math.sin(this.x(aid)) + this.width/2 + svgBounding.left + window.pageXOffset;
+        screenY = this.y(result.yVal) * Math.cos(Math.PI - this.x(aid)) + this.smallerSide/2 + svgBounding.top + window.pageYOffset;
 
       } else {
-        data = {
-          "mouse": null,
-          "dataPos": [-1000, -1000],
-          "time": null,
-          "dataset": null,
-          'series': [],
-          "color": null,
-          "tooltipConfig": null
-        };
+        screenX = this.x(aid) + svgBounding.left + window.pageXOffset + 15;
+        screenY = this.y(result.yVal) + this.margin.top + svgBounding.top + window.pageYOffset;
       }
+
+      //create our fake configuration object
+      tooltipConfig[aid] = {};
+
+      //if using categies, use it, otherwise default
+      tooltipConfig[aid]["color"] = result.group && this.completeSeriesConfig[result.group] ? this.completeSeriesConfig[result.group]["color"] : this.completeSeriesConfig[this.seriesKey]["color"];
+
+      //if title is specified, use it, otherwiuse id
+      tooltipConfig[aid]["name"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]['title'] ? this.completeSeriesConfig[aid]["title"] : aid;
+
+      //if there is a unit, add it
+      tooltipConfig[aid]["yAxisUnit"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]["yAxisUnit"] ? this.completeSeriesConfig[aid]["yAxisUnit"] : '';
+
+      //add the y series id
+      tooltipConfig[aid]['y'] = aid;
+
+      //create our value obj
+      value[aid] = result.yVal;
+      //create our tooltipData obj
+      data = {
+        "mouse": mousePos,
+        "dataPos": [screenX, screenY],
+        "time": result.time,
+        "dataset": result.dataset,
+        'series': [
+          { 'name': aid, 'value': value }
+        ],
+        "color": tooltipConfig[aid]["color"],
+        "tooltipConfig": tooltipConfig
+      };
 
       return data;
     },
