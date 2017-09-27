@@ -85,7 +85,8 @@
           // go through all data and find min and max
           for(var i = 0; i < this._amplitudeKey.length; i++) {
             for(var j = 0; j < this.chartData.length; j++) {
-              if(this._isValidData(this.chartData[j][this._amplitudeKey[i]])) {
+
+              if(this._isValidData(this.chartData[j][this._amplitudeKey[i]]) && (!this.hardMute || !this.mutedSeries[this._amplitudeKey[i]])) {
                 min = doMin ? Math.min(min, this.chartData[j][this._amplitudeKey[i]]) : min;
                 max = doMax ? Math.max(max, this.chartData[j][this._amplitudeKey[i]]) : max;
               }
@@ -98,8 +99,10 @@
           max += 1;
         }
 
-        // if min is negative, set to 0
-        min = min < 0 ? 0 : min;
+        if(!this.allowNegativeValues) {
+          // if min is negative, set to 0
+          min = min < 0 ? 0 : min;
+        }
 
         ext = [min,max];
 
@@ -147,6 +150,7 @@
     PxVisBehavior.amplitudeExtents,
     PxVisBehaviorD3.radialAxisConfig,
     PxVisBehaviorD3.domainUpdateNotify,
-    PxVisBehavior.polarData
+    PxVisBehavior.polarData,
+    PxVisBehavior.mutedSeries
   ]
 </script>

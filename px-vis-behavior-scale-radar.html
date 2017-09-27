@@ -124,7 +124,7 @@
           // go through all data and find min and max
           for(var i = 0; i < this.dimensions.length; i++) {
             for(var j = 0; j < this.chartData.length; j++) {
-              if(this._isValidData(this.chartData[j][this.dimensions[i]])) {
+              if(this._isValidData(this.chartData[j][this.dimensions[i]]) && (!this.hardMute || !this._combinedMutedSeries[this.chartData[j][this.seriesKey]])) {
                 min = doMin ? Math.min(min, this.chartData[j][this.dimensions[i]]) : min;
                 max = doMax ? Math.max(max, this.chartData[j][this.dimensions[i]]) : max;
               }
@@ -186,6 +186,7 @@
     PxVisBehavior.chartExtents,
     PxVisBehaviorD3.radialAxisConfig,
     PxVisBehaviorD3.domainUpdateNotify,
-    PxVisBehaviorD3.selectedDomain
+    PxVisBehaviorD3.selectedDomain,
+    PxVisBehavior.mutedSeries
   ];
 </script>
