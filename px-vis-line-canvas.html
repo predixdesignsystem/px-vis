@@ -196,9 +196,11 @@
       */
 
       //TODO: extend for polar
-      if(this.chartData.length > 0 && this.completeSeriesConfig[this.seriesId]["x"].length > 0) {
+      if(this.chartData && this.chartData.length > 0 && this.completeSeriesConfig[this.seriesId]["x"].length > 0) {
         if(this.radialLine) {
-          // Save seems required for Radar but breaks TS. Look into more.
+          // TODO Save & restore seems required for Radar but breaks TS.
+          // Look into more to understand difference.
+          this.canvasContext.restore();
           this.canvasContext.save();
           this._drawRadarClipPath();
         } else {
@@ -211,6 +213,7 @@
      * Draws a clip path for radar.
      */
     _drawRadarClipPath: function() {
+
       //start off resetting our saved canvas
       this._generateRadarClipData();
 

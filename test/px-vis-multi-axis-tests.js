@@ -76,10 +76,11 @@ function runTests(){
       multiScale.set('width',w);
       multiScale.set('height',h);
       multiScale.set('margin',m);
-      multiScale.set('axes',dim);
       multiScale.set('completeSeriesConfig',completeSeriesConfig);
-      multiScale.set('chartExtents',ext);
+      multiScale.set('dataExtents',ext);
       multiScale.set('chartData',d);
+      multiScale.set('axes',dim);
+      multiScale.set('dimensions',dim);
 
       multiAxis.set('margin',m);
       multiAxis.set('width',w);
@@ -129,82 +130,21 @@ function runTests(){
 
       assert.equal(axis0.seriesId, "y");
       assert.equal(axis0.title, "y");
-      assert.equal(JSON.stringify(axis0.tickValues), '[0,1,2,3,4,5,6,7,8,9,10]');
       assert.equal(axis0.disableTicks, false);
 
       assert.equal(axis1.seriesId, "y1");
       assert.equal(axis1.title, "2nd Title");
-      assert.equal(JSON.stringify(axis1.tickValues), '[0,2,4,6,8,10,12,14,16,18,20]');
       assert.equal(axis1.disableTicks, false);
 
       assert.equal(axis2.seriesId, "y2");
       assert.equal(axis2.title, "Third Title");
-      assert.equal(JSON.stringify(axis2.tickValues), '[0,3,6,9,12,15,18,21,24,27,30]');
       assert.equal(axis2.disableTicks, false);
-    });
-
-    test('multiAxis gridTicks', function() {
-      assert.equal(JSON.stringify(multiAxis.gridTicks), '[0,1,2,3,4,5,6,7,8,9,10]');
     });
 
     test('multiAxis displayedValues', function() {
       assert.equal(multiAxis.displayedValues.y, 'y');
       assert.equal(multiAxis.displayedValues.y1, '2nd Title');
       assert.equal(multiAxis.displayedValues.y2, 'Third...Title [bofs]');
-    });
-
-    test('multiAxis first axis ticks are correct', function() {
-      var ia = multiAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[0].getElementsByTagName('px-vis-axis')[0],
-          ticks = axis._axisGroup.selectAll('g.tick').nodes();
-
-      assert.equal(ticks[0].textContent, "0");
-      assert.equal(ticks[1].textContent, "1");
-      assert.equal(ticks[2].textContent, "2");
-      assert.equal(ticks[3].textContent, "3");
-      assert.equal(ticks[4].textContent, "4");
-      assert.equal(ticks[5].textContent, "5");
-      assert.equal(ticks[6].textContent, "6");
-      assert.equal(ticks[7].textContent, "7");
-      assert.equal(ticks[8].textContent, "8");
-      assert.equal(ticks[9].textContent, "9");
-      assert.equal(ticks[10].textContent, "10");
-    });
-
-    test('multiAxis second axis ticks correct', function() {
-      var ia = multiAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[1].getElementsByTagName('px-vis-axis')[0],
-          ticks = axis._axisGroup.selectAll('g.tick').nodes();
-
-      assert.equal(ticks[0].textContent, "0");
-      assert.equal(ticks[1].textContent, "2");
-      assert.equal(ticks[2].textContent, "4");
-      assert.equal(ticks[3].textContent, "6");
-      assert.equal(ticks[4].textContent, "8");
-      assert.equal(ticks[5].textContent, "10");
-      assert.equal(ticks[6].textContent, "12");
-      assert.equal(ticks[7].textContent, "14");
-      assert.equal(ticks[8].textContent, "16");
-      assert.equal(ticks[9].textContent, "18");
-      assert.equal(ticks[10].textContent, "20");
-    });
-
-    test('multiAxis third axis ticks correct', function() {
-      var ia = multiAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[2].getElementsByTagName('px-vis-axis')[0],
-          ticks = axis._axisGroup.selectAll('g.tick').nodes();
-
-      assert.equal(ticks[0].textContent, "0");
-      assert.equal(ticks[1].textContent, "3");
-      assert.equal(ticks[2].textContent, "6");
-      assert.equal(ticks[3].textContent, "9");
-      assert.equal(ticks[4].textContent, "12");
-      assert.equal(ticks[5].textContent, "15");
-      assert.equal(ticks[6].textContent, "18");
-      assert.equal(ticks[7].textContent, "21");
-      assert.equal(ticks[8].textContent, "24");
-      assert.equal(ticks[9].textContent, "27");
-      assert.equal(ticks[10].textContent, "30");
     });
   });
 
@@ -214,7 +154,7 @@ function runTests(){
         multiSVG = document.getElementById('multiSVG'),
         multiAxis = document.getElementById('multiAxis');
 
-    suiteSetup(function(done){
+    suiteSetup(function(done) {
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -270,7 +210,7 @@ function runTests(){
         dim = ['y','y1','y2','y3'],
         w = 500,
         h = 500,
-        ext = {'x': dim, 'y':{'y':[1,10], 'y1':[1,20], 'y2':[1,27], 'y3':[5,75] }},
+        ext = {'x': dim, 'y':[1,10], 'y1':[1,20], 'y2':[1,27], 'y3':[5,75] },
         m = {
           "top": 10,
           "right": 10,
@@ -278,21 +218,19 @@ function runTests(){
           "left": 10
         };
 
+      multiScale.set('chartData',d);
       multiScale.set('axes',dim);
+      multiScale.set('dataExtents',ext);
+      multiScale.set('dimensions',dim);
+
       multiAxis.set('dimensions',dim);
       multiAxis.set('axes',dim);
-
-      multiScale.set('completeSeriesConfig',completeSeriesConfig);
-      multiScale.set('chartExtents',ext);
-      multiScale.set('chartData',d);
 
       multiAxis.set('completeSeriesConfig',completeSeriesConfig);
 
       multiAxis.set('chartData',d);
 
-      window.setTimeout(function(){
-        done()}, 1000);
-     // done();
+      window.setTimeout(function() { done(); }, 1000);
     });
 
     test('multiAxis fixture is created', function() {
@@ -328,22 +266,18 @@ function runTests(){
 
       assert.equal(axes[0].seriesId, "y");
       assert.equal(axes[0].title, "y");
-      assert.equal(JSON.stringify(axes[0].tickValues), '[0,1,2,3,4,5,6,7,8,9,10]');
       assert.equal(axes[0].disableTicks, false);
 
       assert.equal(axes[1].seriesId, "y1");
       assert.equal(axes[1].title, "2nd Title");
-      assert.equal(JSON.stringify(axes[1].tickValues), '[0,2,4,6,8,10,12,14,16,18,20]');
       assert.equal(axes[1].disableTicks, false);
 
       assert.equal(axes[2].seriesId, "y2");
       assert.equal(axes[2].title, "Third Title");
-      assert.equal(JSON.stringify(axes[2].tickValues), '[0,3,6,9,12,15,18,21,24,27,30]');
       assert.equal(axes[2].disableTicks, false);
 
       assert.equal(axes[3].seriesId, "y3");
       assert.equal(axes[3].title, "New Title");
-      assert.equal(JSON.stringify(axes[3].tickValues), '[0,8,16,24,32,40,48,56,64,72,80]');
       assert.equal(axes[3].disableTicks, false);
     });
 
@@ -352,78 +286,6 @@ function runTests(){
       assert.equal(multiAxis.displayedValues.y1, '2nd Title');
       assert.equal(multiAxis.displayedValues.y2, 'Third...Title [bofs]');
       assert.equal(multiAxis.displayedValues.y3, 'New Title [bofs]');
-    });
-
-    test('multiAxis first axis ticks are correct', function() {
-      var ia = multiAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[0].getElementsByTagName('px-vis-axis')[0],
-          ticks = axis._axisGroup.selectAll('g.tick').nodes();
-
-      assert.equal(ticks[0].textContent, "0");
-      assert.equal(ticks[1].textContent, "1");
-      assert.equal(ticks[2].textContent, "2");
-      assert.equal(ticks[3].textContent, "3");
-      assert.equal(ticks[4].textContent, "4");
-      assert.equal(ticks[5].textContent, "5");
-      assert.equal(ticks[6].textContent, "6");
-      assert.equal(ticks[7].textContent, "7");
-      assert.equal(ticks[8].textContent, "8");
-      assert.equal(ticks[9].textContent, "9");
-      assert.equal(ticks[10].textContent, "10");
-    });
-
-    test('multiAxis second axis ticks correct', function() {
-      var ia = multiAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[1].getElementsByTagName('px-vis-axis')[0],
-          ticks = axis._axisGroup.selectAll('g.tick').nodes();
-
-      assert.equal(ticks[0].textContent, "0");
-      assert.equal(ticks[1].textContent, "2");
-      assert.equal(ticks[2].textContent, "4");
-      assert.equal(ticks[3].textContent, "6");
-      assert.equal(ticks[4].textContent, "8");
-      assert.equal(ticks[5].textContent, "10");
-      assert.equal(ticks[6].textContent, "12");
-      assert.equal(ticks[7].textContent, "14");
-      assert.equal(ticks[8].textContent, "16");
-      assert.equal(ticks[9].textContent, "18");
-      assert.equal(ticks[10].textContent, "20");
-    });
-
-    test('multiAxis third axis ticks correct', function() {
-      var ia = multiAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[2].getElementsByTagName('px-vis-axis')[0],
-          ticks = axis._axisGroup.selectAll('g.tick').nodes();
-
-      assert.equal(ticks[0].textContent, "0");
-      assert.equal(ticks[1].textContent, "3");
-      assert.equal(ticks[2].textContent, "6");
-      assert.equal(ticks[3].textContent, "9");
-      assert.equal(ticks[4].textContent, "12");
-      assert.equal(ticks[5].textContent, "15");
-      assert.equal(ticks[6].textContent, "18");
-      assert.equal(ticks[7].textContent, "21");
-      assert.equal(ticks[8].textContent, "24");
-      assert.equal(ticks[9].textContent, "27");
-      assert.equal(ticks[10].textContent, "30");
-    });
-
-    test('multiAxis fourth axis ticks correct', function() {
-      var ia = multiAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[3].getElementsByTagName('px-vis-axis')[0],
-          ticks = axis._axisGroup.selectAll('g.tick').nodes();
-
-      assert.equal(ticks[0].textContent, "0");
-      assert.equal(ticks[1].textContent, "8");
-      assert.equal(ticks[2].textContent, "16");
-      assert.equal(ticks[3].textContent, "24");
-      assert.equal(ticks[4].textContent, "32");
-      assert.equal(ticks[5].textContent, "40");
-      assert.equal(ticks[6].textContent, "48");
-      assert.equal(ticks[7].textContent, "56");
-      assert.equal(ticks[8].textContent, "64");
-      assert.equal(ticks[9].textContent, "72");
-      assert.equal(ticks[10].textContent, "80");
     });
   });
 
@@ -483,7 +345,7 @@ function runTests(){
         dim = ['y1','y2','y3'],
         w = 500,
         h = 500,
-        ext = {'x': dim, 'y':{'y1':[1,20], 'y2':[1,27], 'y3':[5,75] }},
+        ext = {'x': dim, 'y1':[1,20], 'y2':[1,27], 'y3':[5,75] },
         m = {
           "top": 10,
           "right": 10,
@@ -491,21 +353,20 @@ function runTests(){
           "left": 10
         };
 
+
+      multiScale.set('chartData',d);
       multiScale.set('axes',dim);
+      multiScale.set('dataExtents',ext);
+      multiScale.set('dimensions',dim);
+
       multiAxis.set('dimensions',dim);
       multiAxis.set('axes',dim);
-
-      multiScale.set('completeSeriesConfig',completeSeriesConfig);
-      multiScale.set('chartExtents',ext);
-      multiScale.set('chartData',d);
-
       multiAxis.set('completeSeriesConfig',completeSeriesConfig);
 
       multiAxis.set('chartData',d);
 
-      window.setTimeout(function(){
+      window.setTimeout(function() {
         done()}, 500);
-     // done();
     });
 
     test('multiAxis fixture is created', function() {
@@ -538,17 +399,14 @@ function runTests(){
 
       assert.equal(axes[0].seriesId, "y1");
       assert.equal(axes[0].title, "2nd Title");
-      assert.equal(JSON.stringify(axes[0].tickValues), '[0,2,4,6,8,10,12,14,16,18,20]');
       assert.equal(axes[0].disableTicks, false);
 
       assert.equal(axes[1].seriesId, "y2");
       assert.equal(axes[1].title, "Third Title");
-      assert.equal(JSON.stringify(axes[1].tickValues), '[0,3,6,9,12,15,18,21,24,27,30]');
       assert.equal(axes[1].disableTicks, false);
 
       assert.equal(axes[2].seriesId, "y3");
       assert.equal(axes[2].title, "New Title");
-      assert.equal(JSON.stringify(axes[2].tickValues), '[0,8,16,24,32,40,48,56,64,72,80]');
       assert.equal(axes[2].disableTicks, false);
     });
 
@@ -556,60 +414,6 @@ function runTests(){
       assert.equal(multiAxis.displayedValues.y1, '2nd Title');
       assert.equal(multiAxis.displayedValues.y2, 'Third...Title [bofs]');
       assert.equal(multiAxis.displayedValues.y3, 'New Title [bofs]');
-    });
-
-    test('multiAxis first axis ticks are correct', function() {
-      var ia = multiAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[0].getElementsByTagName('px-vis-axis')[0],
-          ticks = axis._axisGroup.selectAll('g.tick').nodes();
-
-      assert.equal(ticks[0].textContent, "0");
-      assert.equal(ticks[1].textContent, "2");
-      assert.equal(ticks[2].textContent, "4");
-      assert.equal(ticks[3].textContent, "6");
-      assert.equal(ticks[4].textContent, "8");
-      assert.equal(ticks[5].textContent, "10");
-      assert.equal(ticks[6].textContent, "12");
-      assert.equal(ticks[7].textContent, "14");
-      assert.equal(ticks[8].textContent, "16");
-      assert.equal(ticks[9].textContent, "18");
-      assert.equal(ticks[10].textContent, "20");
-    });
-
-    test('multiAxis second axis ticks correct', function() {
-      var ia = multiAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[1].getElementsByTagName('px-vis-axis')[0],
-          ticks = axis._axisGroup.selectAll('g.tick').nodes();
-
-      assert.equal(ticks[0].textContent, "0");
-      assert.equal(ticks[1].textContent, "3");
-      assert.equal(ticks[2].textContent, "6");
-      assert.equal(ticks[3].textContent, "9");
-      assert.equal(ticks[4].textContent, "12");
-      assert.equal(ticks[5].textContent, "15");
-      assert.equal(ticks[6].textContent, "18");
-      assert.equal(ticks[7].textContent, "21");
-      assert.equal(ticks[8].textContent, "24");
-      assert.equal(ticks[9].textContent, "27");
-      assert.equal(ticks[10].textContent, "30");
-    });
-
-    test('multiAxis third axis ticks correct', function() {
-      var ia = multiAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[2].getElementsByTagName('px-vis-axis')[0],
-          ticks = axis._axisGroup.selectAll('g.tick').nodes();
-
-      assert.equal(ticks[0].textContent, "0");
-      assert.equal(ticks[1].textContent, "8");
-      assert.equal(ticks[2].textContent, "16");
-      assert.equal(ticks[3].textContent, "24");
-      assert.equal(ticks[4].textContent, "32");
-      assert.equal(ticks[5].textContent, "40");
-      assert.equal(ticks[6].textContent, "48");
-      assert.equal(ticks[7].textContent, "56");
-      assert.equal(ticks[8].textContent, "64");
-      assert.equal(ticks[9].textContent, "72");
-      assert.equal(ticks[10].textContent, "80");
     });
   });
 
@@ -666,7 +470,7 @@ function runTests(){
         dim = ['y','y1','y2'],
         w = 500,
         h = 500,
-        ext = {'x': dim, 'y':{'y':[1,27], 'y1':[1,27], 'y2':[1,27]}},
+        ext = {'x': dim, 'y':[1,27], 'y1':[1,27], 'y2':[1,27]},
         m = {
           "top": 10,
           "right": 10,
@@ -681,10 +485,11 @@ function runTests(){
       multiScaleCommon.set('width',w);
       multiScaleCommon.set('height',h);
       multiScaleCommon.set('margin',m);
-      multiScaleCommon.set('axes',dim);
       multiScaleCommon.set('completeSeriesConfig',completeSeriesConfig);
       multiScaleCommon.set('chartExtents',ext);
       multiScaleCommon.set('chartData',d);
+      multiScaleCommon.set('axes',dim);
+      multiScaleCommon.set('dimensions',dim);
 
       multiAxisCommon.set('margin',m);
       multiAxisCommon.set('width',w);
@@ -880,7 +685,7 @@ function runTests(){
         dim = ['y','y1','y2'],
         w = 500,
         h = 500,
-        ext = {'x': dim, 'y':{'y':[1,10], 'y1':[1,20], 'y2':[1,27]}},
+        ext = {'x': dim, 'y':[1,10], 'y1':[1,20], 'y2':[1,27]},
         m = {
           "top": 10,
           "right": 10,
@@ -895,10 +700,11 @@ function runTests(){
       noMatchScale.set('width',w);
       noMatchScale.set('height',h);
       noMatchScale.set('margin',m);
-      noMatchScale.set('axes',dim);
-      noMatchScale.set('completeSeriesConfig',completeSeriesConfig);
-      noMatchScale.set('chartExtents',ext);
       noMatchScale.set('chartData',d);
+      noMatchScale.set('completeSeriesConfig',completeSeriesConfig);
+      noMatchScale.set('dataExtents',ext);
+      noMatchScale.set('axes',dim);
+      noMatchScale.set('dimensions',dim);
 
       noMatchAxis.set('margin',m);
       noMatchAxis.set('width',w);
@@ -961,60 +767,6 @@ function runTests(){
       assert.equal(noMatchAxis.displayedValues.y, 'y');
       assert.equal(noMatchAxis.displayedValues.y1, '2nd Title');
       assert.equal(noMatchAxis.displayedValues.y2, 'Third...Title [bofs]');
-    });
-
-    test('noMatchAxis first axis ticks correct', function() {
-      var ia = noMatchAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[0].getElementsByTagName('px-vis-axis')[0],
-          ticks = axis._axisGroup.selectAll('g.tick').nodes();
-
-      assert.equal(ticks[0].textContent, "1");
-      assert.equal(ticks[1].textContent, "2");
-      assert.equal(ticks[2].textContent, "3");
-      assert.equal(ticks[3].textContent, "4");
-      assert.equal(ticks[4].textContent, "5");
-      assert.equal(ticks[5].textContent, "6");
-      assert.equal(ticks[6].textContent, "7");
-      assert.equal(ticks[7].textContent, "8");
-      assert.equal(ticks[8].textContent, "9");
-      assert.equal(ticks[9].textContent, "10");
-    });
-
-    test('noMatchAxis second axis ticks correct', function() {
-      var ia = noMatchAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[1].getElementsByTagName('px-vis-axis')[0],
-          ticks = axis._axisGroup.selectAll('g.tick').nodes();
-
-      assert.equal(ticks[0].textContent, "2");
-      assert.equal(ticks[1].textContent, "4");
-      assert.equal(ticks[2].textContent, "6");
-      assert.equal(ticks[3].textContent, "8");
-      assert.equal(ticks[4].textContent, "10");
-      assert.equal(ticks[5].textContent, "12");
-      assert.equal(ticks[6].textContent, "14");
-      assert.equal(ticks[7].textContent, "16");
-      assert.equal(ticks[8].textContent, "18");
-      assert.equal(ticks[9].textContent, "20");
-    });
-
-    test('noMatchAxis third axis ticks correct', function() {
-      var ia = noMatchAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[2].getElementsByTagName('px-vis-axis')[0],
-          ticks = axis._axisGroup.selectAll('g.tick').nodes();
-
-        assert.equal(ticks[0].textContent, "2");
-        assert.equal(ticks[1].textContent, "4");
-        assert.equal(ticks[2].textContent, "6");
-        assert.equal(ticks[3].textContent, "8");
-        assert.equal(ticks[4].textContent, "10");
-        assert.equal(ticks[5].textContent, "12");
-        assert.equal(ticks[6].textContent, "14");
-        assert.equal(ticks[7].textContent, "16");
-        assert.equal(ticks[8].textContent, "18");
-        assert.equal(ticks[9].textContent, "20");
-        assert.equal(ticks[10].textContent, "22");
-        assert.equal(ticks[11].textContent, "24");
-        assert.equal(ticks[12].textContent, "26");
     });
   });
 
@@ -1086,13 +838,13 @@ function runTests(){
       radialSVG.set('offset',offset);
       radialSVG.set('margin',m);
 
-      radialScale.set('width',min);
+      radialScale.set('_radius',min);
+      radialScale.set('centerOffset',20);
       radialScale.set('margin',m);
-      radialScale.set('amplitudeKeys',dim);
+      radialScale.set('dimensions',dim);
       radialScale.set('completeSeriesConfig',completeSeriesConfig);
       radialScale.set('chartExtents',ext);
       radialScale.set('chartData',d);
-      radialScale.set('centerOffset',20);
 
       radialAxis.set('margin',m);
       radialAxis.set('width',w);

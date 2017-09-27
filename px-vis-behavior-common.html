@@ -987,6 +987,9 @@ PxVisBehavior.chartExtents = {
   properties: {
     /**
     * Developer set chart extents for the chart. The chart will draw to whatever values are specified in the chartExtents.
+    * Setting this and not using "dynamic" will prevent the chart from
+    * having to parse the data to find the extents and therefore improve
+    * performance for initial rendering
     *```
     *  {
     *      "x": [0,100],
@@ -998,7 +1001,7 @@ PxVisBehavior.chartExtents = {
     *```
     *  {
     *      "x": [0,"dynamic"],
-    *      "y": [-10,"dynaimc"],
+    *      "y": [-10,"dynamic"],
     *  }
     *```
     *
@@ -1049,6 +1052,34 @@ PxVisBehavior.dataExtents = {
     dataExtents: {
       type: Object,
       notify: true
+    }
+  }
+};
+
+/*
+     Name:
+    PxVisBehavior.amplitudeExtents
+
+    Description:
+    Polymer behavior that provides a amplitudeExtents object to components.
+
+
+    @polymerBehavior PxVisBehavior.amplitudeExtents
+*/
+PxVisBehavior.amplitudeExtents = {
+  properties: {
+    /**
+    * Polar's equivalant to chartExtents. Adjusts the max to the given value and takes the min of the min value given and the data's min val: Math.min(amplitudeExtents[0], chartDataMin)
+    *
+    * Polar coords must start at the minimum value or else the angle is irrelevant. It also cannot be less than 0.
+    *
+    * ```
+    *  [minNumber, maxNumber]
+    * ```
+    */
+    amplitudeExtents: {
+      type: Array,
+      value: function() { return []; }
     }
   }
 };
@@ -1894,12 +1925,12 @@ PxVisBehavior.toolbarConfig = {
        * {
        *   "customzoom": {
        *     "tooltipLabel": "zoom",          //label used for the tooltip for this button
-       *     "icon": "fa-search",             //font-awesome icon used for this button
-       *     "buttonGroup": 1,              //if a button is part of a button group then it
+       *     "icon": "px-vis:zoom-toolbar",   //icon to use for this button
+       *     "buttonGroup": 1,                //if a button is part of a button group then it
        * becomes blue when clicked and all other buttons with the same button group in the
        * same row become deselected (not blue)
        *     "selected": true,                //force this button to be selected at start
-       *     "actionConfig": {                //this config will be propagated to
+       *     "actionConfig": {                 //this config will be propagated to
        * px-vis-interaction-space
        *       "mousedown": "startZooming",   //key is an event, value is either a
        * predefined action defined in `actionMapping` in px-vis-interaction-space or a
@@ -1937,23 +1968,23 @@ PxVisBehavior.toolbarConfig = {
        *           "onClick": "function() { this.set(\"selectionType\", \"xy\");}"
        *         },
        *         "zoomIn": {
-       *           "icon": "fa-plus",
+       *           "icon": "px-vis:zoom-in",
        *           "tooltipLabel": "zoom in",
        *           "eventName": "px-vis-toolbar-zoom-in" //those events are vis specific
        * events and are automatically caught by the chart to do something
        *         },
        *         "zoomOut": {
-       *           "icon": "fa-minus",
+       *           "icon": "px-vis:zoom-out",
        *           "tooltipLabel": "zoom out",
        *           "eventName": "px-vis-toolbar-zoom-out"
        *         },
        *         "undoZoom": {
-       *           "icon": "fa-undo",
+       *           "icon": "px-vis:zoom-out-one-level",
        *           "tooltipLabel": "undo zoom",
        *           "eventName": "px-vis-toolbar-undo-zoom"
        *         },
        *         "resetZoom": {
-       *           "icon": "fa-expand",
+       *           "icon": "px-vis:full-screen",
        *           "tooltipLabel": "reset zoom to inital value",
        *           "eventName": "px-vis-toolbar-reset-zoom"
        *         }
@@ -2205,13 +2236,34 @@ PxVisBehavior.waitForAnimationFrame = {
 };
 
 /*
+    PxVisBehavior.actionConfigGeneric
+
+    Description:
+    Behavior providing the actionConfig property
+    @polymerBehavior PxVisBehavior.actionConfigGeneric
+*/
+PxVisBehavior.actionConfigGeneric = {
+  properties: {
+    /**
+    * Configuration used to define what actions happen on events. Each key represents an event,
+    * each value can be:
+    * - a predefined action found in px-vis-interaction-space `actionMapping`
+    * - a function which context will be bound to the chart. The function argument will be the mouse position on the chart
+    */
+    actionConfig: {
+      type: Object
+    }
+  }
+};
+
+/*
     PxVisBehavior.applyActionConfig
 
     Description:
     Intended for the interaction spaces, method to apply the actionConfig to the listener elem
     @polymerBehavior PxVisBehavior.applyActionConfig
 */
-PxVisBehavior.applyActionConfig = {
+PxVisBehavior.applyActionConfig = [{
   /**
    * Set up normal listener actions
    *
@@ -2273,29 +2325,7 @@ PxVisBehavior.applyActionConfig = {
 
     }
   }
-};
-
-
-/*
-    PxVisBehavior.actionConfigGeneric
-
-    Description:
-    Behavior providing the actionConfig property
-    @polymerBehavior PxVisBehavior.actionConfigGeneric
-*/
-PxVisBehavior.actionConfigGeneric = {
-  properties: {
-    /**
-    * Configuration used to define what actions happen on events. Each key represents an event,
-    * each value can be:
-    * - a predefined action found in px-vis-interaction-space `actionMapping`
-    * - a function, where `this` will be bound to the chart and the function's argument will be the mouse position on the chart
-    */
-    actionConfig: {
-      type: Object
-    }
-  }
-};
+}, PxVisBehavior.actionConfigGeneric];
 
 
 /*
@@ -2566,8 +2596,8 @@ PxVisBehavior.highlightCanvasShared = [{
   },
 
   _requestCanvasCreation: function() {
-      this.set('canvasLayersConfig.highlighter', {});
-    }
+    this.set('canvasLayersConfig.highlighter', {});
+  }
 
 }, PxVisBehavior.highlightShared];
 
@@ -2724,7 +2754,11 @@ PxVisBehavior.highlightLineShared = [{
         tooltipConfig[aid] = {};
 
         //if using categories, use it, otherwise default
-        tooltipConfig[aid]["color"] = this.categoryKey ? this.completeSeriesConfig[this.categoryKey]["color"] : this.completeSeriesConfig[this.seriesId]["color"];
+        if(this.categoryKey && dataset[this.categoryKey]) {
+          tooltipConfig[aid]["color"] = this.completeSeriesConfig[dataset[this.categoryKey]].color;
+        } else {
+          tooltipConfig[aid]["color"] = this.completeSeriesConfig[this.seriesId]["color"];
+        }
 
         //if title is specified, use it, otherwiuse id
         tooltipConfig[aid]["name"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]['title'] ? this.completeSeriesConfig[aid]["title"] : aid;
@@ -2804,8 +2838,7 @@ PxVisBehavior.wwDataSyncCounter = {
      * (i.e kicking another webworker processing)
      */
     wwDataSyncCounter: {
-      type: Boolean,
-      value: false
+      type: Number
     }
   }
 };
@@ -2929,6 +2962,95 @@ PxVisBehavior.updateStylesOverride = {
 
         this.drawDebounceTime = t;
       }, 50);
+    }
+  }
+};
+
+
+/**
+    Name:
+    PxVisBehavior.timeDomain
+
+    Description:
+    Polymer behavior that providse the timeDomain property.
+
+
+    @polymerBehavior PxVisBehavior.timeDomain
+*/
+PxVisBehavior.timeDomain = {
+  properties: {
+    /**
+     * Can be used to define a time domain to be used, typically to restrain/filter the amount
+     * of data displayed. Can be used in combination with a px-vis-chart-navigator
+     */
+    timeDomain: {
+      type: Object,
+      value: function() {
+        return {};
+      }
+    }
+  }
+};
+
+/**
+    Name:
+    PxVisBehavior.axesDomain
+
+    Description:
+    Polymer behavior that providse the axesDomain property.
+
+
+    @polymerBehavior PxVisBehavior.axesDomain
+*/
+PxVisBehavior.axesDomain = {
+  properties: {
+    /**
+     * New chart extents selected by the user
+     *
+     * Serves as a trigger for the scale component to redefine the chart extents
+     *
+     */
+    axesDomain: {
+      type: Object,
+      value: function() {
+        return {};
+      }
+    }
+  }
+};
+
+/**
+    Name:
+    PxVisBehavior.brushDomains
+
+    Description:
+    Polymer behavior that providse the brushDomains property.
+
+
+    @polymerBehavior PxVisBehavior.brushDomains
+*/
+PxVisBehavior.brushDomains = {
+  properties: {
+    /**
+     * Holder for all domains from brushes
+     *
+     * Chart expects a set of brushDomains by type
+     * {
+     *    type1: {
+     *      axis1: [min, max],
+     *      axis2: [min, max]
+     *    },
+     *    type2: {
+     *      axis1: [min, max],
+     *      axis2: [min, max]
+     *    }
+     * }
+     */
+    brushDomains: {
+      type: Object,
+      value: function() {
+        return {};
+      }
     }
   }
 };

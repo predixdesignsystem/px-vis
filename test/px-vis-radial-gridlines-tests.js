@@ -39,7 +39,7 @@ function runTests(){
           "y":"y",
           "color": "rgb(93,165,218)"
         }},
-        chartExtents = {"x":['y'],"y":[0,10]},
+        chartExtents = [0,10],
         w = 500,
         h = 500,
         min = 480/2,
@@ -57,12 +57,11 @@ function runTests(){
       baseSVG.set('offset',offset);
       baseSVG.set('margin',m);
 
-      baseScale.set('width',min);
-      baseScale.set('margin',m);
-      baseScale.set('amplitudeKeys','y');
+      baseScale.set('_radius',min);
+      baseScale.set('_amplitudeKey',['y']);
       baseScale.set('completeSeriesConfig',completeSeriesConfig);
-      baseScale.set('chartExtents',chartExtents);
       baseScale.set('chartData',d);
+      baseScale.set('_calculatedExtents',chartExtents);
 
       radialGrid.set('margin',m);
 
@@ -109,8 +108,8 @@ function runTests(){
       assert.equal(m3[1],"-150");
       assert.equal(m4[1],"-210");
       assert.equal(m5[1],"-240");
-      assert.equal(m6[1],"-310");
-      assert.equal(m7[1],"-340");
+      assert.equal(m6[1],"-300");
+      assert.equal(m7[1],"-330");
     });
 
     test('radialGrid circles are created', function() {
@@ -185,8 +184,8 @@ function runTests(){
       assert.equal(m3[1],"-150");
       assert.equal(m4[1],"-210");
       assert.equal(m5[1],"-240");
-      assert.equal(m6[1],"-310");
-      assert.equal(m7[1],"-340");
+      assert.equal(m6[1],"-300");
+      assert.equal(m7[1],"-330");
     });
 
     test('radialGrid circles are created', function() {

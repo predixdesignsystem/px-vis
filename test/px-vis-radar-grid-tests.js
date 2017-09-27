@@ -60,9 +60,11 @@ function runTests(){
       baseSVG.set('height',h);
       baseSVG.set('margin',m);
 
-      baseScale.set('width',min);
+      baseScale.set('_radius',min);
+      baseScale.set('centerOffset',50);
       baseScale.set('margin',m);
       baseScale.set('chartData',d);
+      baseScale.set('dimensions', ["y","y1","y2"])
 
       baseGrid.set('margin',m);
       baseGrid.set('tickValues',tickValues);

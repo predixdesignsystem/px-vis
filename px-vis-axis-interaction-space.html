@@ -79,7 +79,9 @@ Custom property | Description
       PxVisBehavior.applyActionConfig,
       PxVisBehaviorD3.cursorIcon,
       PxVisBehaviorD3.axisOrientation,
-      PxVisBehavior.updateStylesOverride
+      PxVisBehavior.updateStylesOverride,
+      PxVisBehavior.extentsData,
+      PxVisBehavior.brushDomains
     ],
 
     /**
@@ -123,20 +125,7 @@ Custom property | Description
       _brush: {
         type: Object
       },
-      /**
-       * Object of our brush domains
-       */
-      _brushDomain: {
-        type: Array,
-        value: function() { return []; }
-      },
-      /**
-        * Object to pass in a brush domain
-        */
-      brushDomains: {
-        type: Object,
-        value: function() { return {}; }
-      },
+
       brushToRemove: {
         type: Boolean,
         value: false
@@ -162,18 +151,48 @@ Custom property | Description
       /**
        * Set of predefined actions that can be used out of the box
        */
+      specialActionsList: {
+        type: Array,
+        value: function() {
+          return ['callAxisMute', 'callAxisDrag', 'startZooming'];
+        }
+      },
+
+      /**
+       * set of actions which should display drawn brushes.
+       * Key is the actionConfig value
+       * value is the brushDomains key
+       */
+      brushActions: {
+        type: Object,
+        value: function() {
+          return {
+            'callAxisMute': 'muted',
+            'startZooming': 'zoom'
+          };
+        }
+      },
+
+      /**
+       * set of predefined action that can be used out of the box
+       */
       actionMapping: {
         type: Object,
         readOnly: true,
-        value: {
-          'callAxisBrush': '_enableBrush',
-          'callAxisDrag': '_enableDrag',
-          'calcTooltipData': '_calcTooltipData',
-          'calcCrosshairData': '_calcCrosshairData',
-          'calcTooltipAndCrosshairData': '_calcTooltipAndCrosshairData',
-          'resetTooltipAndCrosshairData': '_resetTooltipAndCrosshairData',
-          'resetTooltip': '_resetTooltipData',
-          'resetCrosshair': '_resetCrosshairData'
+        value: function() {
+          return {
+            'callAxisMute': '_startMute',
+            'callAxisDrag': '_enableDrag',
+            'calcTooltipData': '_calcTooltipData',
+            'calcCrosshairData': '_calcCrosshairData',
+            'calcTooltipAndCrosshairData': '_calcTooltipAndCrosshairData',
+            'resetTooltipAndCrosshairData': '_resetTooltipAndCrosshairData',
+            'resetTooltip': '_resetTooltipData',
+            'resetCrosshair': '_resetCrosshairData',
+            'startZooming' : '_startZoom',
+            'startPanning': '_startPanning',
+            'stopPanning': '_stopPanning'
+          }
         }
       },
 
@@ -187,8 +206,8 @@ Custom property | Description
         type: Object,
         value: function() {
           return {
-            'mousedown': 'callAxisBrush',
-            'mouseup': 'callAxisBrush',
+            'mousedown': null,
+            'mouseup': null,
             'mouseout': 'resetTooltip',
             'mousemove': 'calcTooltipData'
           };
@@ -201,12 +220,21 @@ Custom property | Description
       _isDirty: {
         type: Boolean,
         value: false
+      },
+
+      _panningLastVal: {
+        type: Number
+      },
+
+      _unselectedBrushHolder: {
+        type: Object
       }
     },
 
     observers: [
       'drawElement(svg, margin.* , height, domainChanged)',
-      'recalcBrush(domainChanged)',
+      '_showBrushes(brushDomains.*, actionConfig.*, domainChanged)',
+      '_showUnselectedBrushes(actionConfig.*, domainChanged)',
       '_setupActions(actionConfig.*)',
       '_setDragBehavior(cartesianDragBehavior, dragContainerElem)',
       '_drawCursorIconAndGroup(svg, iconType)',
@@ -222,7 +250,7 @@ Custom property | Description
 
     detached: function() {
       if(this._doesD3HaveValues(this._brushD3)) {
-        this.deleteAndClearBrush(this._brushD3);
+        this.deleteAndClearBrush();
         this._brushD3.remove();
         this._brushD3 = null;
       }
@@ -258,6 +286,9 @@ Custom property | Description
           if(this._doesD3HaveValues(this._brushD3)) {
             this._resizeBrush(range);
           } else {
+            this._unselectedBrushHolder = this.svg.append('g')
+              .attr('id', 'unselected-brushes');
+
             this._createBrush(range);
           }
 
@@ -344,7 +375,6 @@ Custom property | Description
     },
 
     _translateBrush: function() {
-
       var h = 0,
           w = 0;
       switch(this.orientation) {
@@ -356,6 +386,7 @@ Custom property | Description
           w = Math.max(this.width - this.margin.left - this.margin.right,0);
           break;
       }
+
       this._brushD3.attr('transform', 'translate(' + w + ',' + h + ')');
     },
 
@@ -364,7 +395,7 @@ Custom property | Description
      *
      */
     _styleBrushSelection: function() {
-      if(this.brushToRemove) {
+      if(this.brushToRemove && this.actionConfig.mousedown === 'callAxisMute') {
         this._brushD3.selectAll("rect.selection")
           .attr("stroke-dasharray", ("5, 5"));
       } else {
@@ -404,15 +435,11 @@ Custom property | Description
           mouseEvent = null,
           action = null;
 
-      if(this.actionConfig["mousedown"] === "callAxisBrush" ||
-         this.actionConfig["mousedown"] === "callAxisDrag") {
-
+      if(this.specialActionsList.indexOf(this.actionConfig["mousedown"]) !== -1) {
         dontDoUpDown = true;
         mouseEvent = "mousedown";
 
-      } else if(this.actionConfig["mouseup"] === "callAxisBrush" ||
-                this.actionConfig["mouseup "] === "callAxisDrag") {
-
+      } else if(this.specialActionsList.indexOf(this.actionConfig["mouseup"]) !== -1) {
          dontDoUpDown = true;
          mouseEvent = "mouseup";
       }
@@ -439,6 +466,18 @@ Custom property | Description
           return 0;
         })
       );
+    },
+
+    _startMute: function() {
+      this.extentsAction = 'mute';
+      this._disableBrush();
+      this._enableBrush();
+    },
+
+    _startZoom: function() {
+      this.extentsAction = 'zoom';
+      this._disableBrush();
+      this._enableBrush();
     },
 
     _enableBrush: function() {
@@ -491,6 +530,72 @@ Custom property | Description
       this._disableBrush();
       this._disableDrag();
       this._disableActions();
+    },
+
+
+// PANNING ###########################################################################################
+
+    /**
+     * Initiate Panning action
+     */
+    _startPanning: function() {
+      //only allow left clicks
+      if(Px.d3.event.button === 0) {
+        this.set('extentsAction', 'pan');
+
+        this._resetTooltipData();
+
+        //in case the user clicks inside the chart, and mouses out, we are waiting for a mouseup, and closing our action box with the coordinates available on the mouseup.
+        Px.d3.select(document).on('mouseup.action', this._stopPanning.bind(this));
+        Px.d3.select(document).on('mousemove.action', this._updatePanning.bind(this));
+
+        this._panningLastVal = Px.d3.mouse(this._brushElem)[1];
+
+        this.dispatchEvent(new CustomEvent('px-vis-interaction-space-start-panning', { bubbles: true, composed: true }));
+      }
+    },
+
+    _updatePanning: function() {
+      var mousePos = Px.d3.mouse(this._brushElem),
+          delta = this._panningLastVal - mousePos[1],
+          extents = {
+            dimension: this.dimension,
+            action: this.extentsAction,
+            extents: []
+          },
+          range = this._getRange();
+
+      if(this.radial) {
+        extents.extents.push(range[0] + delta);
+        extents.extents.push(range[1] + delta);
+      } else {
+        extents.extents.push(range[1] + delta);
+        extents.extents.push(range[0] + delta);
+      }
+
+      this._panningLastVal = mousePos[1];
+
+      this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-extents-data', { bubbles: true, composed: true, detail: extents }));
+    },
+
+    _stopPanning: function() {
+      Px.d3.select(document).on('mouseup.action', null);
+      Px.d3.select(document).on('mousemove.action', null);
+
+      this.dispatchEvent(new CustomEvent('px-vis-interaction-space-stop-panning', { bubbles: true, composed: true }));
+
+    },
+
+    _getRange: function() {
+      var range;
+
+      if(typeof this.y === 'function') {
+        range = this.y.range();
+      } else {
+        range = this.y[this.dimension].range();
+      }
+
+      return range;
     },
 
 
@@ -613,6 +718,11 @@ Custom property | Description
      *
      */
     _searchData: function(aid, mouseVal, result, d) {
+      // check that data is within our domain
+      if(this.y.domain()[0] > d[aid] || d[aid] > this.y.domain()[1]) {
+        return;
+      }
+
       //figure out the differnce between the data value and our saved value
       result.distance = Math.abs(d[aid] - mouseVal);
 
@@ -650,62 +760,47 @@ Custom property | Description
           tooltipConfig = {},  //a fake configuration object we will build
           value = {};          //the series obj within tooltipData
 
-      //only update if the value is on the screen
-      if(this.y.domain()[0] <= result.yVal && result.yVal <= this.y.domain()[1]) {
+      svgBounding = elem.ownerSVGElement.getBoundingClientRect();
 
-        svgBounding = elem.ownerSVGElement.getBoundingClientRect();
-
-        //calc the screen positions for the tooltip
-        if(this.radial) {
-          screenX = this.y(result.yVal) * Math.sin(this.x(aid)) + this.width/2 + svgBounding.left + window.pageXOffset;
-          screenY = this.y(result.yVal) * Math.cos(Math.PI - this.x(aid)) + this.smallerSide/2 + svgBounding.top + window.pageYOffset;
-
-        } else {
-          screenX = this.x(aid) + svgBounding.left + window.pageXOffset + 15;
-          screenY = this.y(result.yVal) + this.margin.top + svgBounding.top + window.pageYOffset;
-        }
-
-        //create our fake configuration object
-        tooltipConfig[aid] = {};
-
-        //if using categies, use it, otherwise default
-        tooltipConfig[aid]["color"] = result.group && this.completeSeriesConfig[result.group] ? this.completeSeriesConfig[result.group]["color"] : this.completeSeriesConfig[this.seriesKey]["color"];
-
-        //if title is specified, use it, otherwiuse id
-        tooltipConfig[aid]["name"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]['title'] ? this.completeSeriesConfig[aid]["title"] : aid;
-
-        //if there is a unit, add it
-        tooltipConfig[aid]["yAxisUnit"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]["yAxisUnit"] ? this.completeSeriesConfig[aid]["yAxisUnit"] : '';
-
-        //add the y series id
-        tooltipConfig[aid]['y'] = aid;
-
-        //create our value obj
-        value[aid] = result.yVal;
-        //create our tooltipData obj
-        data = {
-          "mouse": mousePos,
-          "dataPos": [screenX, screenY],
-          "time": result.time,
-          "dataset": result.dataset,
-          'series': [
-            { 'name': aid, 'value': value }
-          ],
-          "color": tooltipConfig[aid]["color"],
-          "tooltipConfig": tooltipConfig
-        };
+      //calc the screen positions for the tooltip
+      if(this.radial) {
+        screenX = this.y(result.yVal) * Math.sin(this.x(aid)) + this.width/2 + svgBounding.left + window.pageXOffset;
+        screenY = this.y(result.yVal) * Math.cos(Math.PI - this.x(aid)) + this.smallerSide/2 + svgBounding.top + window.pageYOffset;
 
       } else {
-        data = {
-          "mouse": null,
-          "dataPos": [-1000, -1000],
-          "time": null,
-          "dataset": null,
-          'series': [],
-          "color": null,
-          "tooltipConfig": null
-        };
+        screenX = this.x(aid) + svgBounding.left + window.pageXOffset + 15;
+        screenY = this.y(result.yVal) + this.margin.top + svgBounding.top + window.pageYOffset;
       }
+
+      //create our fake configuration object
+      tooltipConfig[aid] = {};
+
+      //if using categies, use it, otherwise default
+      tooltipConfig[aid]["color"] = result.group && this.completeSeriesConfig[result.group] ? this.completeSeriesConfig[result.group]["color"] : this.completeSeriesConfig[this.seriesKey]["color"];
+
+      //if title is specified, use it, otherwiuse id
+      tooltipConfig[aid]["name"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]['title'] ? this.completeSeriesConfig[aid]["title"] : aid;
+
+      //if there is a unit, add it
+      tooltipConfig[aid]["yAxisUnit"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]["yAxisUnit"] ? this.completeSeriesConfig[aid]["yAxisUnit"] : '';
+
+      //add the y series id
+      tooltipConfig[aid]['y'] = aid;
+
+      //create our value obj
+      value[aid] = result.yVal;
+      //create our tooltipData obj
+      data = {
+        "mouse": mousePos,
+        "dataPos": [screenX, screenY],
+        "time": result.time,
+        "dataset": result.dataset,
+        'series': [
+          { 'name': aid, 'value': value }
+        ],
+        "color": tooltipConfig[aid]["color"],
+        "tooltipConfig": tooltipConfig
+      };
 
       return data;
     },
@@ -732,72 +827,58 @@ Custom property | Description
       .attr("width", 20);
     },
 
-    /**
-     * Update brush on a brush event
-     */
-    brush: function() {
-      var extents;
+    // /**
+    //  * Update brush on a brush event
+    //  */
+    // brush: function() {
+    //   var extents;
 
-      // if it was brushed, get the extents
-      if(Px.d3.brushSelection(this._brushElem)) {
-        extents = Px.d3.brushSelection(this._brushElem);
-      }
+    //   // if it was brushed, get the extents
+    //   if(Px.d3.brushSelection(this._brushElem)) {
+    //     extents = Px.d3.brushSelection(this._brushElem);
+    //   }
 
-      this._calcMutedSeries(extents);
-    },
+    //   var data = {
+    //     dimension: this.dimension,
+    //     extents: extents,
+    //     action: this.extentsAction
+    //   }
+    //   this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-extents-data', { bubbles: true, composed: true, detail: data }));
+    // },
 
     /**
      * Final update on a brush end event
      */
     brushEnd: function() {
-      var extents;
+      var extents = [];
 
       // if it was brushed, get the extents
       if(Px.d3.brushSelection(this._brushElem)) {
         extents = this._checkMinSize(Px.d3.brushSelection(this._brushElem), this._brushD3);
       }
 
-      this._calcMutedSeries(extents);
-    },
-
-    /**
-     * When new data is added or the chart is resized, recalculates the brush and resize
-     */
-    recalcBrush: function() {
-      if(this._doesD3HaveValues(this._brushD3) && this.domainChanged !== null) {
-        //first, delete all brushes and start over (probably dont have to do this, but seems safest)
-        this.clearBrush(this._brushD3);
-         this.deleteAndClearBrush(this._brushD3);
-
-        //if there is a brush, calc what size it should be now
-        if(this.brushDomains[this.dimension] && this.brushDomains[this.dimension].length > 0) {
-          // if the axis exists, then lets check out the extents
-          var oldBrushDomain = this.brushDomains[this.dimension],
-              newAxisDomain = this.y.domain(),
-              newBrushRange;
-
-          newBrushRange = this._checkBrushSize(this.dimension, newAxisDomain, oldBrushDomain, this._brushD3);
-        }
-
-        //reapply the brushes and listeners
-        this.drawElement();
-
-        //create the muted list
-        this._calcMutedSeries(newBrushRange);
-
+      var data = {
+        dimension: this.dimension,
+        extents: extents,
+        action: this.extentsAction
       }
+
+      this.clearBrush();
+      this._enableBrush();
+
+      this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-extents-data', { bubbles: true, composed: true, detail: data }));
     },
 
     /**
      * Checks the min size of the brush and resizes if necessary
      */
-    _checkMinSize: function(sel, elem) {
+    _checkMinSize: function(sel) {
       //check the size of the box and make sure it is some min
       if((sel[1] - sel[0]) < 4) {
         // increase size of extents while checking if we hit the top
-        var ext = (sel[0] - 4 - this.centerOffset) < 0 ? [ sel[0] , sel[1] + 4 ] : [ sel[0] -4 , sel[1] ];
-        // increase size of box
-        elem.call(this._brush.move, ext);
+        var ext = (sel[0] - 4 - this.centerOffset) < 0 ?
+                  [ sel[0] , sel[1] + 4 ] :
+                  [ sel[0] -4 , sel[1] ];
 
         return ext;
 
@@ -807,111 +888,40 @@ Custom property | Description
     },
 
     /**
-     * Calculates muted series based on the extents
-     */
-    _calcMutedSeries: function(extents) {
-      // if the brush has been cleared
-      if(!extents || extents.length === 0) {
-
-        this.fire('px-vis-brush-brush-domain-delete', { 'data': [], 'dimension': this.dimension });
-
-        this.set('mutedSeries', {});
-        this.fire('px-vis-brush-muted-series-updated', { 'data': {}, 'dimension': this.dimension });
-
-        return
-      }
-
-      if(this.chartData && this.chartData.length > 0) {
-        var series = {},
-            domain = [],
-            lower = 1,
-            upper = 0,
-            dim = this.dimension,
-            y0, y1;
-
-        if(this.radial) {
-          lower = 0;
-          upper = 1
-        }
-
-        y0 = this.y.invert(extents[lower]);
-        y1 = this.y.invert(extents[upper]);
-
-        for(var i = 0; i < this.chartData.length; i++) {
-          if(this.brushToRemove) {
-            if(y0 <= this.chartData[i][dim] && this.chartData[i][dim] <= y1) {
-              series[this.chartData[i][this.seriesKey]] = true;
-            }
-          } else {
-            if(y0 >= this.chartData[i][dim] || this.chartData[i][dim] >= y1) {
-              series[this.chartData[i][this.seriesKey]] = true;
-            }
-          }
-          domain = [y0, y1];
-        }
-
-        this.brushDomains[this.dimension] = domain;
-        this.fire('px-vis-brush-brush-domain-updated', { 'data': domain, 'dimension': this.dimension });
-
-        this.set('mutedSeries', series);
-        this.fire('px-vis-brush-muted-series-updated', { 'data': series, 'dimension': this.dimension });
-      }
-    },
-
-    /**
      * Checks that the brush size is valid and within the domain
      */
-    _checkBrushSize: function(d, newAxisDomain, oldBrushDomain, elem) {
+    _checkBrushSize: function(domains) {
 
-      var newBrushRange = [];
+      var newAxisDomain = this.y.domain(),
+          oldBrushDomain = [ domains[1], domains[0] ],
+          // oldBrushDomain = this.radial ? [domains[1], domains[0] ] : domains,
+          newBrushRange = [];
+
       // if the brushExts fall within the new axis domain
       if(newAxisDomain[0] <= oldBrushDomain[0] && newAxisDomain[1] >= oldBrushDomain[1]) {
 
         // resize brush
-        newBrushRange = this._getNewBrushRange(oldBrushDomain[1], oldBrushDomain[0], d);
-
-        //clear listeners
-        elem.call(this._brush
-          .on("start.brush", null)
-          .on("end.brush", null));
+        newBrushRange = this._getNewBrushRange(oldBrushDomain[0], oldBrushDomain[1]);
 
         //check that it still meets our min size req
-        newBrushRange = this._checkMinSize(newBrushRange, elem);
-
-        //move the brush / create the brush
-        elem.call(this._brush.move, newBrushRange);
+        newBrushRange = this._checkMinSize(newBrushRange);
 
       //bottom of brush is below new domain, top is within
       } else if(newAxisDomain[0] > oldBrushDomain[0] && newAxisDomain[0] < oldBrushDomain[1] && newAxisDomain[1] >= oldBrushDomain[1]) {
 
         //move bottom to the min newAxisRange
-        newBrushRange = this._getNewBrushRange(oldBrushDomain[1],newAxisDomain[0], d);
-
-        elem.call(this._brush
-          .on("start.brush", null)
-          .on("end.brush", null));
-
-        newBrushRange = this._checkMinSize(newBrushRange, elem);
-
-        elem.call(this._brush.move, newBrushRange);
+        newBrushRange = this._getNewBrushRange(newAxisDomain[0], oldBrushDomain[1]);
+        newBrushRange = this._checkMinSize(newBrushRange);
 
       //bottom of brush within new domain, top is out
       } else if(newAxisDomain[0] <= oldBrushDomain[0] && newAxisDomain[1] < oldBrushDomain[1] && newAxisDomain[1] > oldBrushDomain[0]) {
 
         //move top to the max newAxisRange
-        newBrushRange = this._getNewBrushRange(newAxisDomain[1], oldBrushDomain[0], d);
+        newBrushRange = this._getNewBrushRange(oldBrushDomain[0], newAxisDomain[1]);
 
-        elem.call(this._brush
-          .on("start.brush", null)
-          .on("end.brush", null));
-
-        newBrushRange = this._checkMinSize(newBrushRange, elem);
-
-        elem.call(this._brush.move, newBrushRange);
+        newBrushRange = this._checkMinSize(newBrushRange);
 
       } else {
-        //delete and move on to the next brush
-        this.deleteAndClearBrush(elem);
         return [];
       }
 
@@ -920,51 +930,116 @@ Custom property | Description
     /**
      * On a resize or change, returns the new valid range for the brush
      */
-    _getNewBrushRange: function(d1, d2, axisName) {
-      var newRange = [],
-          domain1, domain2;
-      // if radial, we need to flip our order
-      if(this.radial) {
-        domain1 = d2;
-        domain2 = d1;
-      } else {
-        domain1 = d1;
-        domain2 = d2;
-      }
+    _getNewBrushRange: function(d1, d2) {
+      var newRange = [];
 
-      newRange[0] = this.y(domain1);
-      newRange[1] = this.y(domain2);
+      newRange[0] = this.y(d1);
+      newRange[1] = this.y(d2);
 
-      return newRange;
+      return this.radial ? newRange : [newRange[1], newRange[0]];
     },
 
     /**
      * Deletes a brush and clears listeners
      */
-    clearBrush: function(elem) {
+    clearBrush: function() {
       //clear listeners
-      elem.call(this._brush
+      this._brushD3.call(this._brush
         .on("start.brush", null)
         .on("end.brush", null));
       //delete
-      elem.call(this._brush.move, null);
+      this._brushD3.call(this._brush.move, null);
 
     },
 
     /**
      * Deletes a brush and clears listeners
      */
-    deleteAndClearBrush: function(elem) {
-      this.clearBrush(elem);
-    //  this._calcMutedSeries(null);
+    deleteAndClearBrush: function() {
+      this.clearBrush();
+      this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-extents-clear', { bubbles: true, composed: true, detail: {dimension: this.dimension} }));
+
     },
 
-    deleteBrush: function() {
-      if(this._doesD3HaveValues(this._brushD3)) {
-        //delete
-        this._brushD3.call(this._brush.move, null);
-        this._calcMutedSeries(null);
+    _showBrushes: function() {
+      this.debounce('showbrushes', function(){
+        this._showBrushesDebounced();
+      }, 10);
+    },
+
+    _showBrushesDebounced: function() {
+      if(this._isD3Empty(this._brushD3) || this.domainChanged === null) {
+        return;
       }
+
+      // clear everything so if a brush was erased, we erase it
+      this.clearBrush();
+      this._styleBrushSelection();
+
+      var key = this.brushActions[this.actionConfig.mousedown];
+
+      if(!key) { return; }
+      if(!this.brushDomains[key] ||
+          this._isObjEmpty(this.brushDomains[key])) {
+
+        this._enableBrush();
+        return;
+      }
+
+      var domains = this.brushDomains[key][this.dimension];
+
+      //if there is a brush, calc what size it should be now
+      if(domains && domains.length > 0) {
+        var bd = this._checkBrushSize(domains);
+        this._brushD3.call(this._brush.move, bd);
+      }
+
+      this._enableBrush();
+    },
+
+    _showUnselectedBrushes: function() {
+      this.debounce('showUnselectedbrushes', function(){
+        this._showUnselectedBrushesDebounced();
+      }, 10);
+    },
+
+    _showUnselectedBrushesDebounced: function() {
+      if(this._isD3Empty(this._brushD3) ||
+          this.domainChanged === null ||
+          this._isObjEmpty(this.brushActions)) {
+        return;
+      }
+
+      var currentAction = this.brushActions[this.actionConfig.mousedown],
+          actions = Object.keys(this.brushActions);
+
+      // clear out brushes
+      this._unselectedBrushHolder.html(null);
+
+      actions.forEach(function(action) {
+        var key = this.brushActions[action];
+        // dont draw a fake brush for the currentAction b/c it gets a real brush
+        if(key === currentAction ||
+            !this.brushDomains[key] ||
+            !this.brushDomains[key][this.dimension] ||
+            this.brushDomains[key][this.dimension].length === 0) {
+          return;
+        }
+
+        var domains = this.brushDomains[key][this.dimension],
+            range = this._checkBrushSize(domains),
+            g = this._unselectedBrushHolder.append('g')
+                  .attr('id', 'unselected-' + key);
+
+        g.append('rect')
+          .attr('x', -10)
+          .attr('width', 20)
+          .attr('y', range[0])
+          .attr('height', range[1] - range[0])
+          .attr("fill", this._checkThemeVariable("--px-vis-axis-brush-fill-color-unselected-"+key, 'rgb(0,0,0)'))
+          .attr("fill-opacity", this._checkThemeVariable("--px-vis-axis-brush-fill-opacity-unselected-"+key, 0.1))
+          .attr("stroke", this._checkThemeVariable("--px-vis-axis-brush-outline-color-unselected-"+key, ''))
+      }.bind(this));
     },
 
     _drawCursorIconAndGroup: function() {

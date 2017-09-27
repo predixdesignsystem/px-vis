@@ -63,7 +63,6 @@ function updateData(eventData, time) {
 
 
 function deleteData(eventData, time) {
-
   delete dataMapping[eventData.chartId];
   delete quadtrees[eventData.chartId];
 

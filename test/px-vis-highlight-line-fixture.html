@@ -14,8 +14,8 @@
 
 
     <link rel="import" href="../px-vis-svg-canvas.html" />
-    <link rel="import" href="../px-vis-multi-scale.html" />
-    <link rel="import" href="../px-vis-radial-scale.html" />
+    <link rel="import" href="../px-vis-behavior-scale-multi-axis.html" />
+    <link rel="import" href="../px-vis-behavior-scale-radar.html" />
     <link rel="import" href="../px-vis-highlight-line.html" />
     <link rel="import" href="behaviors/px-colors-behavior.html" />
 
@@ -29,6 +29,35 @@
 
   <body>
     <h3>Web Component Test : Fixture for px-vis-highlight-line</h3>
+    <script>
+      document.addEventListener("WebComponentsReady", function() {
+        Polymer({
+          is: 'px-vis-multi-scale',
+          behaviors: [ PxVisBehaviorScale.scaleMultiAxis ],
+          observers: [
+            '_setXScale(width,margin)',
+            '_setYScale(height,margin,axes)',
+            '_generateDataExtents(dimensions)',
+            '_setDomain(x, y, dataExtents)',
+          ]
+        })
+      });
+    </script>
+    <script>
+      document.addEventListener("WebComponentsReady", function() {
+        Polymer({
+          is: 'px-vis-radar-scale',
+          behaviors: [ PxVisBehaviorScale.radar ],
+          observers: [
+            '_setXScale(_radius)',
+            '_setYScale(_radius,centerOffset)',
+            '_generateChartExtents(chartData.*, dimensions)',
+            '_generateChartExtents(chartExtents)',
+            '_setDomain(x, y, _calculatedExtents)',
+          ]
+        })
+      });
+    </script>
     <template is="dom-bind">
       <px-vis-svg-canvas id="parallelSVG">
       </px-vis-svg-canvas>
@@ -49,13 +78,13 @@
 
     <template is="dom-bind">
       <px-vis-svg-canvas id="radarSVG"></px-vis-svg-canvas>
-      <px-vis-radial-scale
+      <px-vis-radar-scale
         id="radarScale"
         radar
         x="{{x}}"
         y="{{y}}"
         domain-changed="{{domainChanged}}">
-      </px-vis-radial-scale>
+      </px-vis-radar-scale>
       <px-vis-highlight-line
         id="radarhighlight"
         x="[[x]]"

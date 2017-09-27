@@ -702,7 +702,7 @@ function runTests(){
       var dataset = { time: 1234566789, y0: 5, y1: 10, y2: 7, y3: 9},
           keys = ['y0', 'y1', 'y2', 'y3'];
 
-      var result = extentCalc._getDataExtents(dataset, keys);
+      var result = extentCalc._getDataExtents(dataset, keys, 'y');
       assert.deepEqual(result, [5,10]);
     });
 
@@ -710,7 +710,7 @@ function runTests(){
       var dataset = { time: 1234566789, y0: -5, y1: -4, y2: 0, y3: -9},
           keys = ['y0', 'y1', 'y2', 'y3'];
 
-      var result = extentCalc._getDataExtents(dataset, keys);
+      var result = extentCalc._getDataExtents(dataset, keys, 'y');
       assert.deepEqual(result, [-9,0]);
     });
 
@@ -718,7 +718,7 @@ function runTests(){
       var dataset = { time: 1234566789, y0: 5, y1: 5, y2: 5, y3: 5},
           keys = ['y0', 'y1', 'y2', 'y3'];
 
-      var result = extentCalc._getDataExtents(dataset, keys);
+      var result = extentCalc._getDataExtents(dataset, keys, 'y');
       assert.deepEqual(result, [5,5]);
     });
 
@@ -726,7 +726,7 @@ function runTests(){
       var dataset = { time: '1234566789', y0: '5', y1: '10', y2: '7', y3: '9'},
           keys = ['y0', 'y1', 'y2', 'y3'];
 
-      var result = extentCalc._getDataExtents(dataset, keys);
+      var result = extentCalc._getDataExtents(dataset, keys, 'y');
       assert.deepEqual(result, [5,10]);
     });
   }); //suite

@@ -6,7 +6,6 @@
 
 <dom-module id="px-vis-scatter-canvas-demo-component">
   <template>
-    <!--add demo tag-->
     <px-vis-svg-canvas
         width="[[width]]"
         height="[[height]]"
@@ -43,23 +42,22 @@
 </dom-module>
 
 <script>
-Polymer({
-  is: 'px-vis-scatter-canvas-demo-component',
+  Polymer({
+    is: 'px-vis-scatter-canvas-demo-component',
 
-  behaviors: [
-    PxColorsBehavior.dataVisColorTheming,
-    PxVisBehaviorRenderer.base,
-    PxColorsBehavior.getSeriesColors
-  ],
+    behaviors: [
+      PxColorsBehavior.dataVisColorTheming,
+      PxVisBehaviorRenderer.base,
+      PxColorsBehavior.getSeriesColors
+    ],
 
-  observers: ['_renderChartData(domainChanged, canvasContext, chartData.*, completeSeriesConfig.*)'],
+    observers: ['_renderChartData(domainChanged, canvasContext, chartData.*, completeSeriesConfig.*)'],
 
-  properties: {
-    description: {
-      type: String,
-      value: "Element which draws scatter series onto the chart"
-    },
-    //basics
+    properties: {
+      description: {
+        type: String,
+        value: "Element which draws scatter series onto the chart"
+      },
       width: {
         type : Number,
         value : 500
@@ -70,11 +68,13 @@ Polymer({
       },
       margin:{
         type : Object,
-        value : {
-          "top": 10,
-          "right": 10,
-          "bottom": 10,
-          "left": 10
+        value : function() {
+          return {
+            "top": 10,
+            "right": 10,
+            "bottom": 10,
+            "left": 10
+          }
         }
       },
       domainChanged:{
@@ -83,7 +83,8 @@ Polymer({
       },
       chartData:{
         type : Array,
-        value : [{
+        value : function() {
+          return [{
             'x': 1397102460000,
             'y': 0.56
           },{
@@ -119,17 +120,19 @@ Polymer({
           },{
             'x': 1397522940000,
             'y': 0.32
-        }]
+          }]
+        }
       },
       completeSeriesConfig:{
         type : Object
       },
-      //dataExtents
       dataExtents:{
         type : Object,
-        value: {
-          "x": [Infinity,-Infinity],
-          "y": [0,-Infinity]
+        value: function() {
+          return {
+            "x": [Infinity,-Infinity],
+            "y": [0,-Infinity]
+          }
         }
       }
     },

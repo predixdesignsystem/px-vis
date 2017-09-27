@@ -11,7 +11,7 @@
          for any URL ending with "/web-component-tester/browser.js"
          when wct is run from the command line -->
     <script src="../web-component-tester/browser.js"></script>
-    <link rel="import" href="../px-vis-radial-scale.html" />
+    <link rel="import" href="../px-vis-behavior-scale-radar.html" />
     <link rel="import" href="../px-vis-svg.html" />
     <link rel="import" href="../px-vis-radar-grid.html" />
     <link rel="import" href="behaviors/px-colors-behavior.html" />
@@ -27,14 +27,27 @@
   <body>
     <h3>Web Component Test : Fixture for px-vis-radar-grid</h3>
     <template is="dom-bind">
-      <px-vis-radial-scale
+      <script>
+        document.addEventListener("WebComponentsReady", function() {
+          Polymer({
+            is: 'px-vis-radar-scale',
+            behaviors: [ PxVisBehaviorScale.radar ],
+            observers: [
+              '_setXScale(_radius)',
+              '_setYScale(_radius,centerOffset)',
+              '_generateChartExtents(chartData.*, dimensions)',
+              '_generateChartExtents(chartExtents)',
+              '_setDomain(x, y, _calculatedExtents)',
+            ]
+          })
+        });
+      </script>
+      <px-vis-radar-scale
         id="baseScale"
-        center-offset="50"
-        amplitude-keys='["y","y1","y2"]'
         x="{{x}}"
         y="{{y}}"
         domain-changed="{{domainChanged}}">
-      </px-vis-radial-scale>
+      </px-vis-radar-scale>
       <px-vis-svg
         id="baseSVG"
         svg="{{svg}}"

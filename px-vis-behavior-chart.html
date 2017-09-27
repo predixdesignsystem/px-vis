@@ -59,7 +59,7 @@ PxVisBehaviorChart.chartCommon = [{
       *```
       *  {
       *     "seriesKey": {  //seriesKey is a unique identifier for the configuration
-      *         "type": "line",  //line or scatter
+      *         "type": "line",  //line or scatter or both
       *         "markerSymbol": "diamond" //if using scatter different markerSymbol can be used. See "markerSymbol" in px-vis-scatter
       *         "markerSize": "64" //if using scatter allows to change the size of markers
       *         "markerScale": "2" //if using scatter allows to scale the size of markers
@@ -491,9 +491,7 @@ PxVisBehaviorChart.webWorkerSynchronization = [{
       }
     },
     ready: function() {
-      if(!this.preventWebWorkerSynchronization) {
-        this.chartId = this.generateRandomID('chart');
-      }
+      this.chartId = this.generateRandomID('chart');
     },
     attached: function() {
       if(!this.preventWebWorkerSynchronization) {
@@ -790,9 +788,8 @@ PxVisBehaviorChart.chartAutoResize = [{
         this.notifyResize();
       }
     },
-    _secondaryToolbarToggled: function() {
-      if(!this.preventResize) {
-
+    _secondaryToolbarToggled: function(e) {
+      if(!this.preventResize && !e.detail.withinChart) {
         //ensure we bypass the debounce as we want to resize asap
         var oldDebounce = this.debounceResizeTiming;
         this.debounceResizeTiming = 0;
@@ -877,16 +874,6 @@ PxVisBehaviorChart.subConfiguration = {
 PxVisBehaviorChart.timeFiltering = [{
   properties: {
     /**
-     * Can be used to define a time domain to be used, typically to restrain/filter the amount
-     * of data displayed. Can be used in combination with a px-vis-chart-navigator
-     */
-    timeDomain: {
-      type: Object,
-      value: function() {
-        return [];
-      }
-    },
-    /**
      * Name of the variable holding the time stamp in the data
      */
     timeData: {
@@ -924,7 +911,7 @@ PxVisBehaviorChart.timeFiltering = [{
       return chartData;
     }
   }
-}, PxVisBehavior.dataset];
+}, PxVisBehavior.dataset, PxVisBehavior.timeDomain];
 
 /*
     Name:
@@ -1209,7 +1196,6 @@ PxVisBehaviorChart.highlighterConfigs = {
      * Most interesting properties include:
      * - `fuzz` : +/- search window around the datapoint value
      * - 'differenDataset' : if this chart has a different dataset from the crosshair data origin chart
-     * - `color` : the color for the point or line
      */
     highlighterConfig: {
       type: Object
@@ -1299,7 +1285,6 @@ PxVisBehaviorChart.circleChart = [{
     return Math.max(Math.min(height,width), 0);
   },
   _sizeChanged: function(_smallerSide, margin, internalMargin) {
-
       //measure appropriate width and height based on the smaller sides and margins
       var ml = Number(this.margin.left) + Number(this._internalCircleMargins.left),
           mr = Number(this.margin.right) + Number(this._internalCircleMargins.right),
@@ -1310,8 +1295,35 @@ PxVisBehaviorChart.circleChart = [{
           diameter = Math.min(adjWidth,adjHeight) ,
           radius = diameter / 2,
           center = [];
+
       center[0] = ml + adjWidth/2;
       center[1] = mt + adjHeight/2;
+
+      //For Polar, if we are zoomed, then we need to:
+      //  1) change the calculated vals for the entire stack
+      //  2) make the "new" radius and center our current zoom
+      if(this.polar && this.zoomStack && this.zoomStack.length) {
+        var originalRadius = this.zoomStack[0]['radius'],
+            originalCenter = this.zoomStack[0]['center'],
+            end = this.zoomStack.length - 1;
+
+        // Dont start with first because that will be the above calc radius and center
+        for(var i = 1; i < this.zoomStack.length; i++) {
+          var s = this.zoomStack[i].radius / originalRadius,
+              r = s * radius,
+              c0 = this.zoomStack[i].center[0] / originalRadius * radius,
+              c1 = this.zoomStack[i].center[1] / originalRadius * radius;
+
+          this.zoomStack[i].radius = r;
+          this.zoomStack[i].center = [c0,c1];
+        }
+
+        this.zoomStack[0]['radius'] = radius;
+        this.zoomStack[0]['center'] = center;
+
+        radius = this.zoomStack[end]['radius'];
+        center = this.zoomStack[end]['center'];
+      }
 
       this.set('_diameter', diameter);
       this.set('_radius', radius);
@@ -1498,34 +1510,61 @@ PxVisBehaviorChart.mutedAxes = {
   },
 };
 
+
 /*
     Name:
-    PxVisBehaviorChart.zooming
+    PxVisBehaviorChart.extentsDataRouter
 
     Description:
-    Behavior providing properties and logic for chart zooming
-    @polymerBehavior PxVisBehaviorChart.zooming
+    Behavior providing the extentsDataRouter
+    @polymerBehavior PxVisBehaviorChart.extentsDataRouter
 */
-PxVisBehaviorChart.zooming = [{
-
-  /*
-  * fires when the chart has been zoomed in or out. contains an object
-  * with 'x' and 'y' values, a 'reset' boolean flag and a 'panning' boolean
-  * - x: array containing the domain for X
-  * - y: when only 1 y axis is defined, array containing the domain for Y
-  *      when multi Y axis, object with 1 key per axis, each value being
-  * - reset: true if the event is a zoom reset, false otherwise
-  * - panning: true if the event comes from a panning action, false otherwise
-  * an array containing the domain for this specific axis
-  * @event px-vis-zoomed
-  */
-  /**
-   * Properties block, expose attribute values to the DOM via 'reflect'
-   *
-   * @property properties
-   * @type Object
-   */
+PxVisBehaviorChart.extentsDataRouter = [{
   properties: {
+    _extentsDataRoutes: {
+      type: Object,
+      value: function() {
+        return {
+          zoom: 'zoom',
+          pan: 'pan'
+        }
+      }
+    }
+  },
+
+  observers: [
+    '_extentsDataRouter(extentsData.*)'
+  ],
+// FIXME import extentsAction
+  _extentsDataRouter: function() {
+    if(!this.extentsAction) { return; }
+    var fn = this._extentsDataRoutes[this.extentsAction];
+
+    if(!fn) {
+      console.warn("_extentsDataRoutes does not have a method to call " + this.extentsAction);
+      return;
+    }
+
+    if(!this[fn]) {
+      console.warn("Method " + fn + " is not defined");
+      return;
+    }
+
+    // run the function
+    this[fn]();
+  }
+}, PxVisBehavior.extentsData];
+
+/*
+    Name:
+    PxVisBehaviorChart.zoomGeneric
+
+    Description:
+    Behavior providing some generic properties for zooming
+    @polymerBehavior PxVisBehaviorChart.zoomGeneric
+*/
+PxVisBehaviorChart.zoomGeneric = [{
+   properties: {
     /**
      * Stack of previous zooms
      */
@@ -1551,20 +1590,66 @@ PxVisBehaviorChart.zooming = [{
       type: Number,
       value: 0.5
     },
-    /**
-     * Original extents before zooming if one of the axis is ordinal
-     */
-    _originalOrdinalExtents: {
-      type: Array
-    },
+
     _isPanning: {
       type: Boolean,
       value: false
     }
   },
-  observers: [
-    'zoom(extentsData)'
-  ],
+  zoomIn: function() {
+    this.set('extentsAction', 'zoom');
+    this._autoZoom(true);
+  },
+  zoomOut: function() {
+    this.set('extentsAction', 'zoom');
+    this._autoZoom(false);
+  },
+  _intSpaceStartPan: function() {
+    this.set('_isPanning', true);
+  },
+  _intSpaceStopPan: function() {
+    this.set('_isPanning', false);
+  }
+
+}, PxVisBehavior.extentsData, PxVisBehaviorChart.extentsDataRouter];
+
+/*
+    Name:
+    PxVisBehaviorChart.zooming
+
+    Description:
+    Behavior providing properties and logic for chart zooming
+    @polymerBehavior PxVisBehaviorChart.zooming
+*/
+PxVisBehaviorChart.zooming = [{
+
+  /*
+  * fires when the chart has been zoomed in or out. contains an object
+  * with 'x' and 'y' values, a 'reset' boolean flag and a 'panning' boolean
+  * - x: array containing the domain for X
+  * - y: when only 1 y axis is defined, array containing the domain for Y
+  *      when multi Y axis, object with 1 key per axis, each value being
+  * - reset: true if the event is a zoom reset, false otherwise
+  * - panning: true if the event comes from a panning action, false otherwise
+  * an array containing the domain for this specific axis
+  * @event px-vis-zoomed
+  */
+
+  /**
+   * Properties block, expose attribute values to the DOM via 'reflect'
+   *
+   * @property properties
+   * @type Object
+   */
+  properties: {
+    /**
+     * Original extents before zooming if one of the axis is ordinal
+     */
+    _originalOrdinalExtents: {
+      type: Array
+    }
+  },
+
   listeners: {
     'px-vis-toolbar-reset-zoom': 'resetZoom',
     'px-vis-toolbar-zoom-in': 'zoomIn',
@@ -1614,14 +1699,6 @@ PxVisBehaviorChart.zooming = [{
 
       this.set('_originalOrdinalExtents', [this.x.domain(), domains]);
     }
-  },
-  zoomIn: function() {
-    this.set('extentsAction', 'zoom');
-    this._autoZoom(true);
-  },
-  zoomOut: function() {
-    this.set('extentsAction', 'zoom');
-    this._autoZoom(false);
   },
   _autoZoom: function(isZoomIn) {
 
@@ -1755,22 +1832,23 @@ PxVisBehaviorChart.zooming = [{
       return (axisType === 'time' || axisType === 'timeLocal') ? new Date(value) : value;
     }
   },
+
+  _zoomOrPan: function() {
+    this.set('selectedDomain', {x: this.extentsData.eX, y: this.extentsData.eY});
+    this.fire('px-vis-selected-domain-updated', { 'data':{x: this.extentsData.eX, y: this.extentsData.eY}, 'method': 'set', 'dataVar': 'selectedDomain' });
+    this._notifyZoomed(false);
+  },
   /**
    * Sets the selectedDomain to the drawn zoom and shows the button
    *
    */
-  zoom: function(extentsData) {
-    if(this.extentsAction !== 'zoom') {
-      return;
-    }
+  zoom: function() {
+    this._saveZoomState();
+    this._zoomOrPan()
+  },
 
-    if(!this._isPanning) {
-      this._saveZoomState();
-    }
-
-    this.set('selectedDomain', {x:extentsData.eX, y:extentsData.eY});
-    this.fire('px-vis-selected-domain-updated', { 'data':{x:extentsData.eX, y:extentsData.eY}, 'method': 'set', 'dataVar': 'selectedDomain' });
-    this._notifyZoomed(false);
+  pan: function() {
+    this._zoomOrPan();
   },
 
   /**
@@ -1778,7 +1856,6 @@ PxVisBehaviorChart.zooming = [{
    *
    */
   resetZoom: function() {
-
     //we still want to reset even if we were already reset, in case data has been filtered
     if(this.selectedDomain === 'reset') {
       this.set('selectedDomain', 'rereset');
@@ -1797,14 +1874,9 @@ PxVisBehaviorChart.zooming = [{
         return axis.domain();
       });
     this.fire('px-vis-zoomed', {x: this.x.domain(), y: domains, reset: isReset, panning: this._isPanning});
-  },
-  _intSpaceStartPan: function() {
-    this.set('_isPanning', true);
-  },
-  _intSpaceStopPan: function() {
-    this.set('_isPanning', false);
-  },
-}, PxVisBehavior.extentsData, PxVisBehaviorD3.selectedDomain, PxVisBehavior.axisTypes, PxVisBehaviorD3.axes, PxVisBehavior.zoomSelection];
+  }
+}, PxVisBehavior.extentsData, PxVisBehaviorD3.selectedDomain, PxVisBehavior.axisTypes, PxVisBehaviorD3.axes, PxVisBehavior.zoomSelection, PxVisBehaviorChart.zoomGeneric];
+
 
 /*
     Name:
@@ -2543,6 +2615,7 @@ PxVisBehaviorChart.combineMutes = {
   properties: {
     _combinedMutedSeries: {
       type: Object,
+      value: function() { return {}; }
     },
     /**
      * An object which holds the series lines that have been muted based on the selected domain
@@ -2559,7 +2632,8 @@ PxVisBehaviorChart.combineMutes = {
      * @private
      */
     mutedSeriesBrush: {
-      type:Object
+      type:Object,
+      value: function() { return {} }
     },
     /**
      * An object which holds the series lines that have been muted based on
@@ -2567,7 +2641,7 @@ PxVisBehaviorChart.combineMutes = {
      *
      */
     mutedSeriesCategories: {
-      type:Object,
+      type: Object,
       value: function() { return {} }
     }
   },
@@ -2607,8 +2681,204 @@ PxVisBehaviorChart.combineMutes = {
     }
     this.set('_combinedMutedSeries', muted);
     this.set('_combinedMutedChanged', this._combinedMutedChanged ? false : true);
+  }
+};
+
+/*
+    Name:
+    PxVisBehaviorChart.multiAxisMuting
+
+    Behavior for multi-axis charts (radar, parallel) to handle brush muting
+
+    Description:
+    Behavior providing property for muting axes
+    @polymerBehavior PxVisBehaviorChart.multiAxisMuting
+*/
+PxVisBehaviorChart.multiAxisMuting = [{
+  properties: {
+    _mutedExtents: {
+      type: Object,
+      value: function() {
+        return {};
+      }
+    }
   },
-}
+
+  ready: function() {
+    this._extentsDataRoutes['mute'] = '_addToMutedExtents';
+  },
+
+  _addToMutedExtents: function() {
+    this._mutedExtents[this.extentsData.dimension] = this.extentsData.extents;
+
+    this._calcMutedSeries();
+  },
+
+  _calcMutedSeries: function() {
+    var dims = Object.keys(this._mutedExtents),
+        mutedSeries = {},
+        brushDomains = {},
+        k;
+
+    for(var i = 0; i < dims.length; i++) {
+      k = dims[i];
+      this._calcSingleMutedSeries(this._mutedExtents[k], k, mutedSeries, brushDomains);
+    }
+
+    this.set('mutedSeriesBrush', mutedSeries);
+    this.set('brushDomains.muted', brushDomains);
+  },
+
+  /**
+   * calc muted series based on the extents
+   */
+  _calcSingleMutedSeries: function(extents, dim, series, brushDomains) {
+    // if the brush has been cleared
+    if(!extents || extents.length === 0) {
+      return;
+    }
+
+    if(this.chartData && this.chartData.length > 0) {
+      var domain = [],
+          lower = 0,
+          upper = 1,
+          y0, y1;
+
+      if(this._flipAxisLogic) {
+        lower = 1;
+        upper = 0
+      }
+
+      if(typeof this.y === 'function') {
+        y0 = this.y.invert(extents[lower]);
+        y1 = this.y.invert(extents[upper]);
+      } else {
+        y0 = this.y[dim].invert(extents[lower]);
+        y1 = this.y[dim].invert(extents[upper]);
+      }
+
+      for(var i = 0; i < this.chartData.length; i++) {
+        if(this.brushToRemove) {
+          if(y0 >= this.chartData[i][dim] && this.chartData[i][dim] >= y1) {
+            series[this.chartData[i][this.seriesKey]] = true;
+          }
+        } else {
+          if(y0 <= this.chartData[i][dim] || this.chartData[i][dim] <= y1) {
+            series[this.chartData[i][this.seriesKey]] = true;
+          }
+        }
+        domain = [y0, y1];
+      }
+
+      brushDomains[dim] = domain;
+    }
+  },
+
+  deleteMutedBrushes: function() {
+    this.set('_brushDomains.muted', {});
+  }
+}, PxVisBehaviorChart.extentsDataRouter ];
+
+/*
+    Name:
+    PxVisBehaviorChart.multiAxisZoom
+
+    Description:
+    Behavior providing properties for zooming on multi-axis charts (radar, parallel)
+    @polymerBehavior PxVisBehaviorChart.multiAxisZoom
+*/
+PxVisBehaviorChart.multiAxisZoom = [{
+  listeners: {
+    'px-vis-toolbar-reset-zoom': 'resetZoom',
+    'px-vis-toolbar-zoom-in': 'zoomIn',
+    'px-vis-toolbar-zoom-out': 'zoomOut',
+    'px-vis-toolbar-undo-zoom': 'undoZoom',
+    'px-vis-interaction-space-start-panning': '_saveZoomState'
+  },
+
+  /**
+   * Sets the selectedDomain to the drawn zoom and shows the button
+   *
+   */
+  zoom: function() {
+    if(this.extentsData.extents.length) {
+      this._saveZoomState();
+      this._zoomOrPan();
+    }
+  },
+
+  pan: function() {
+    this._zoomOrPan();
+  },
+
+  _saveZoomState: function() {
+    var domains = this._processYValues(function(axis, index) {
+      return axis.domain();
+    });
+
+    this.zoomStack.push(domains);
+  },
+
+  _zoomOrPan: function() {
+    var exts = this.extentsData.extents,
+        domains;
+    if(typeof this.y === 'function') {
+      domains = [ this.y.invert(exts[0]), this.y.invert(exts[1]) ];
+
+    } else if(this.commonAxis) {
+      var dims = Object.keys(this.y),
+          dim;
+      domains = {};
+
+      for(var i =0; i < dims.length; i++) {
+        dim = dims[i];
+        domains[dim] = [ this.y[dim].invert(exts[1]), this.y[dim].invert(exts[0]) ];
+      }
+
+    } else {
+      var dim = this.extentsData.dimension;
+      domains = {};
+      domains[dim] = [ this.y[dim].invert(exts[1]), this.y[dim].invert(exts[0]) ];
+
+    }
+
+    this.set('axesDomain', domains);
+  },
+
+  _autoZoom: function(isZoomIn) {
+    this._saveZoomState();
+
+    var perc = isZoomIn ? 1 - this.zoomInPercentage : 1 + this.zoomOutPercentage,
+        domains = this._processYValues(function(axis, index) {
+          var d = axis.domain();
+          d[0] = d[0] * perc;
+          d[1] = d[1] * perc;
+          return d;
+        });
+
+    this.set('axesDomain', domains);
+  },
+
+  undoZoom: function() {
+    if(!this.zoomStack.length) { return; }
+
+    this.set('axesDomain', this.zoomStack.pop());
+  },
+
+  /**
+   * resets the extents
+   *
+   */
+  resetZoom: function() {
+    if(!this.zoomStack.length) { return; }
+
+    this.set('axesDomain', this.zoomStack[0]);
+
+    //empty the zoom stack
+    this.zoomStack = [];
+  }
+
+}, PxVisBehaviorChart.zoomGeneric];
 
 /*
     Name:

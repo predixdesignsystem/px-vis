@@ -1,6 +1,7 @@
 <link rel="import" href="../../polymer/polymer.html">
 <link rel="import" href="../px-vis-multi-axis.html">
-<link rel="import" href="../px-vis-multi-scale.html">
+<link rel="import" href="../px-vis-behavior-d3.html">
+<link rel="import" href="../px-vis-behavior-scale-multi-axis.html">
 <link rel="import" href="../px-vis-highlight-line-canvas.html">
 <link rel="import" href="../px-vis-line-canvas.html">
 <link rel="import" href="../px-vis-svg-canvas.html">
@@ -13,20 +14,6 @@
 <dom-module id="px-vis-highlight-line-canvas-demo-component">
   <template>
     <style include="px-buttons-design-demo-styles" is="custom-style"></style>
-    <!--add demo tag-->
-    <px-vis-multi-scale
-      id="multiScale"
-      axes="[[axes]]"
-      chart-data="[[chartData]]"
-      chart-extents="[[chartExtents]]"
-      x="{{x}}"
-      y="{{y}}"
-      width="[[width]]"
-      height="[[height]]"
-      margin="[[margin]]"
-      dimensions="[[dimensions]]"
-      domain-changed="{{domainChanged}}">
-    </px-vis-multi-scale>
     <px-vis-multi-axis
       id="multiAxis"
       svg="[[svg]]"
@@ -84,13 +71,15 @@
       canvas-context="[[canvasLayers.highlighter]]"
       canvas-layers-config="{{canvasLayersConfig}}"
       layers-to-mask="[[canvasContext]]"
+      width="[[width]]"
+      height="[[height]]"
       margin="[[margin]]"
       x="[[x]]"
       y="[[y]]"
       parallel-coordinates
       dimensions="[[dimensions]]"
       domain-changed="[[domainChanged]]"
-      time-data="[[seriesKey]]"
+      time-data="x"
       complete-series-config="[[completeSeriesConfig]]"
       crosshair-data="[[crosshairData]]"
       series-id="x"
@@ -106,15 +95,24 @@
 <script>
 Polymer({
   is: 'px-vis-highlight-line-canvas-demo-component',
-  behaviors: [PxColorsBehavior.getSeriesColors, PxColorsBehavior.dataVisColorTheming,
-  PxVisBehaviorRenderer.base],
+  behaviors: [
+    PxColorsBehavior.getSeriesColors,
+    PxColorsBehavior.dataVisColorTheming,
+    PxVisBehaviorRenderer.base,
+    PxVisBehaviorD3.axes,
+    PxVisBehaviorD3.domainUpdate,
+    PxVisBehaviorScale.scaleMultiAxis,
+    PxVisBehaviorD3.canvasContext
+  ],
   properties: {
     description: {
       type: String,
       value: "d3 element which highlights data"
     },
     chartData: {
-      value: [{
+      type: Array,
+      value: function() {
+        return [{
             "x": 1397102460000,
             "y": 1,
             "y1": 1,
@@ -140,19 +138,23 @@ Polymer({
             "y1": 20,
             "y2": 27
           }
-        ],
-      type: Array
+        ]
+      }
     },
     completeSeriesConfig: {
       type: Object
     },
     dimensions: {
       type :Array,
-      value: ['y','y1','y2']
+      value: function() {
+        return ['y','y1','y2']
+      }
     },
     axes: {
       type :Array,
-      value: ['y','y1','y2']
+      value: function() {
+        return ['y','y1','y2']
+      }
     },
     width: {
       type: Number,
@@ -164,29 +166,41 @@ Polymer({
     },
     chartExtents: {
       type: Object,
-      value: {'x': ['y','y1','y2'], 'y':{'y':[1,10], 'y1':[1,20], 'y2':[1,27]}}
+      value: function() {
+        return {
+          'x': ['y','y1','y2'],
+          'y':[1,10],
+          'y1':[1,20],
+          'y2':[1,27]
+        }
+      }
     },
     margin: {
       type: Object,
-      value: {
-        "top": 10,
-        "right": 10,
-        "bottom": 10,
-        "left": 10
+      value: function() {
+        return {
+          "top": 10,
+          "right": 10,
+          "bottom": 10,
+          "left": 10
+        }
       }
     },
 
     crosshairData: {
       type: Object,
-      value: {
+      value: function() {
+        return {
           "rawData":[],
           "timeStamps":[]
+        }
       }
     },
 
      _crosshairData: {
       type: Object,
-      value: {
+      value: function() {
+        return {
           "rawData":[{
             "x": 1397131620000,
             "y": 6,
@@ -199,18 +213,9 @@ Polymer({
             "y2": 3
           }],
           "timeStamps":[ 1397131620000, 1397160780000 ]
+        }
       }
-    },
-
-    canvasLayers: {
-      type: Object,
-      value: function() { return {}; }
-    },
-    canvasLayersConfig: {
-      type: Object,
-      value: function() { return {}; }
     }
-
   },
 
   listeners:{
@@ -220,7 +225,11 @@ Polymer({
   observers: [
     '_renderChartData(domainChanged, canvasContext, chartData.*, completeSeriesConfig.*)',
     '_renderHighlight(domainChanged, canvasLayers.highlighter, completeSeriesConfig.*, crosshairData.timeStamps.*)',
-    ],
+    '_setXScale(width,margin)',
+    '_setYScale(height,margin,axes)',
+    '_generateDataExtents(chartExtents)',
+    '_setDomain(x, y, dataExtents)'
+  ],
 
 
   highlightData: function() {

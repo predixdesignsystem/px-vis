@@ -1,3 +1,39 @@
+v4.0.0
+================
+* Implemented Zooming capabilities for:
+  * Polar charts
+  * Radar charts
+  * Parallel Coordinates charts
+* BREAKING CHANGE: Changed Axis Interaction Space, interactive axis, and multi axis
+  * None of these now calculate muted series
+  * Generalized the axis interation space brush to fire an event with the brush extents
+  * The event is expected to be caught at a "chart" level and processed by the PxVisBehaviorChart.extentsDataRouter
+  * Added two properties to axis interaction space which must be set with new toolbar types:
+    * specialActionsList: list of special actions that use brush or drag
+    * brushActions: object of actions which use a brush. Value is a string which is also used to store brushDomains
+  * Added an "unselected" brush box shown when you switch off of a toolbar brush action such as muting which shows a brush box that is not interactive
+    * Can be styled via CSS vars - type = brushActions value:
+      * --px-vis-axis-brush-fill-color-unselected-[[type]]
+      * --px-vis-axis-brush-fill-opacity-unselected-[[type]]
+      * --px-vis-axis-brush-outline-color-unselected-[[type]]
+* BREAKING CHANGE: removed multi-axis-scale
+  * Replaced with multi-axis-scale behavior
+* BREAKING CHANGE: removed radial-scale
+  * Replaced with radial-scale behavior
+* Added scale behavior for radar type charts
+* Added PxVisBehaviorChart.extentsDataRouter to handle all extentsData changes at the chart level
+  * Routes to the appropriate callback for the extentsAction via the _extentsDataRoutes property
+* Fixed polar gridlines angle
+* Broke up zoom behavior to provide a more common import group
+* Fixed cursor for polar
+* Implemented radial panning
+* Added checks to correct zoomStack on resize
+* Fix for cursor console error in FF when hovering over polar chart at 0
+* Fix for renderer to be dynamic:
+  * clone the targets array so it cant be changed mid debounce
+* Fix for switching between svg and canvas at runtime
+* BREAKING CHANGE: default orientation in orientation definition is now `left` instead of `bottom`
+
 v3.1.23
 ================
 * delete empty line above some behaviors definition that would prevent them from showing up in the API

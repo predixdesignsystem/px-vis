@@ -355,6 +355,10 @@ PxVisBehaviorD3.canvas = [{
       //make sure the canvas cleans itself
       this.canvasContext.pxClearCanvas();
     }
+
+    //flush so that the dom if are processed and make the switch
+    //between svg and canvas components
+    Polymer.dom.flush();
   }
 }, PxVisBehaviorD3.canvasContext]
 
@@ -388,6 +392,10 @@ PxVisBehaviorD3.renderToCanvas = {
       //make sure the canvas cleans itself
       this.canvasContext.pxClearCanvas();
     }
+
+    //flush so that the dom if are processed and make the switch
+    //between svg and canvas components
+    Polymer.dom.flush();
   }
 };
 
@@ -554,7 +562,7 @@ PxVisBehaviorD3.axisOrientation = {
      */
     orientation: {
       type: String,
-      value: 'bottom'
+      value: 'left'
     }
   }
 };
@@ -986,15 +994,19 @@ PxVisBehaviorD3.axisConfig = [{
      *         "format": String or d3 object,
      *    }
      * ```
+     * @type {Object|Number}
+     *
      */
-    ticks: {},  //yes, this doesnt have a type because both Number and Object are valid
+    ticks: {
+      type: Object
+    },
     /**
      * Defines the color for axis lines, ticks, labels, and title
      *
      */
     axisColor: {
       type: String,
-      value: "rgb(0,0,0)"
+      value: ""
     },
     /**
      * Returned tick values from the axis
@@ -1382,7 +1394,7 @@ PxVisBehaviorD3.lineShared = [{
     */
     gradientRange: {
       type: Array,
-      computed: '_computeGradientRange(chartData.*,selectedDomain.*,seriesId)'
+      computed: '_computeGradientRange(chartData.*,timeDomain.*,seriesId)'
     },
     /**
     * Gets and saves the rgb so we can make an rgba to apply to the line
@@ -1464,12 +1476,12 @@ PxVisBehaviorD3.lineShared = [{
    * Computes the data range.
    *
    */
-  _computeGradientRange: function(chartData, selectedDomain,seriesId) {
+  _computeGradientRange: function(chartData, timeDomain,seriesId) {
     if(chartData.value.length > 0) {
       var x1,x2;
-      if(selectedDomain.value.x.length > 0) {
-        x1 = Number(selectedDomain.value.x[0]);
-        x2 = Number(selectedDomain.value.x[1]);
+      if(timeDomain.value && timeDomain.value.x && timeDomain.value.x.length > 0) {
+        x1 = Number(timeDomain.value.x[0]);
+        x2 = Number(timeDomain.value.x[1]);
       } else {
         x1 = Number(chartData.value[0][seriesId]);
         x2 = Number(chartData.value[chartData.value.length - 1][seriesId]);
@@ -1497,6 +1509,7 @@ PxVisBehaviorD3.lineShared = [{
       line = Px.d3.line()
         .x(function(d) {
           // ~~ --> round pixels values to optimize svg perfs
+
           return ~~_this.x(d[xKey]);
         })
         .y(function(d) {
@@ -1527,7 +1540,6 @@ PxVisBehaviorD3.lineShared = [{
           }
         })
         .defined(function(d,i) {
-
           //at first don't accept undefined since we don't have a previous point
           //to attach to
           return _this._currentDrawingOptions.lastPointRenderedIndex === null ? _this._isValidData(d[yKey]) : _this._isDataNotNull(d[yKey]);
@@ -1587,7 +1599,7 @@ PxVisBehaviorD3.lineShared = [{
 
     this.set('line',line);
   }
-},PxVisBehaviorD3.radialLineGenerator, PxVisBehavior.seriesId, PxVisBehaviorD3.lineGaps, PxVisBehaviorD3.interpolationFunction];
+},PxVisBehaviorD3.radialLineGenerator, PxVisBehavior.seriesId, PxVisBehaviorD3.lineGaps, PxVisBehaviorD3.interpolationFunction, PxVisBehavior.timeDomain];
 
 /*
     Name:

@@ -10,11 +10,8 @@
 <dom-module id="px-vis-axis-demo-component">
   <link rel="import" type="css" href="../../px-demo/css/px-demo-styles.html"/>
   <template>
-      <style include="px-demo-styles" is="custom-style"></style>
-
-      <div class="outline">
-
-      <!-- need for axis-y -->
+    <style include="px-demo-styles" is="custom-style"></style>
+    <div class="outline">
       <px-vis-svg
         width="[[width]]"
         height="[[height]]"
@@ -22,7 +19,7 @@
         svg="{{svg}}">
       </px-vis-svg>
       <px-vis-scale
-        x-axis-type="time"
+        x-axis-type="linear"
         y-axis-type="linear"
         complete-series-config="[[completeSeriesConfig]]"
         data-extents="[[dataExtents]]"
@@ -34,20 +31,37 @@
         y="{{y}}"
         domain-changed="{{domainChanged}}">
       </px-vis-scale>
-      <px-vis-axis
-        svg="[[svg]]"
-        axis="[[y]]"
-        margin="[[margin]]"
-        width="[[width]]"
-        height="[[height]]"
-        title="myTitle"
-        orientation="[[orientation]]"
-        label-position="center"
-        complete-series-config="[[completeSeriesConfig]]"
-        muted-series=[[mutedSeries]]
-        domain-changed="[[domainChanged]]"
-        prevent-series-bar="[[_drawSeriesBar(orientation)]]">
-      </px-vis-axis>
+      <template is="dom-if" if="[[_checkOrientation(orientation)]]" restamp>
+        <px-vis-axis
+          svg="[[svg]]"
+          axis="[[y]]"
+          margin="[[margin]]"
+          width="[[width]]"
+          height="[[height]]"
+          title="myYTitle"
+          orientation="[[orientation]]"
+          label-position="center"
+          complete-series-config="[[completeSeriesConfig]]"
+          muted-series=[[mutedSeries]]
+          domain-changed="[[domainChanged]]">
+        </px-vis-axis>
+      </template>
+      <template is="dom-if" if="[[!_checkOrientation(orientation)]]" restamp>
+        <px-vis-axis
+          svg="[[svg]]"
+          axis="[[x]]"
+          margin="[[margin]]"
+          width="[[width]]"
+          height="[[height]]"
+          title="myXTitle"
+          orientation="[[orientation]]"
+          label-position="center"
+          complete-series-config="[[completeSeriesConfig]]"
+          muted-series=[[mutedSeries]]
+          domain-changed="[[domainChanged]]"
+          prevent-series-bar>
+        </px-vis-axis>
+      </template>
 
       </div>
   </template>
@@ -82,62 +96,67 @@
         },
         margin:{
           type : Object,
-          value : {
-            "top": 0,
-            "right": 10,
-            "bottom": 50,
-            "left": 70
+          value : function() {
+            return {
+              "top": 0,
+              "right": 20,
+              "bottom": 50,
+              "left": 70
+            }
           }
         },
         chartData:{
           type : Array,
-          value : [{
-              'x': 1397102460000,
+          value : function() {
+            return [{
+              'x': 1,
               'y': 0.56
             },{
-              'x': 1397139660000,
+              'x': 2,
               'y': 0.4
             },{
-              'x': 1397177400000,
+              'x': 3,
               'y': 0.43
             },{
-              'x': 1397228040000,
+              'x': 4,
               'y': 0.33
             },{
-              'x': 1397248260000,
+              'x': 5,
               'y': 0.47
             },{
-              'x': 1397291280000,
+              'x': 6,
               'y': 0.41
             },{
-              'x': 1397318100000,
+              'x': 7,
               'y': 0.26
             },{
-              'x': 1397342100000,
+              'x': 8,
               'y': 0.42
             },{
-              'x': 1397390820000,
+              'x': 9,
               'y': 0.27
             },{
-              'x': 1397408100000,
+              'x': 10,
               'y': 0.38
             },{
-              'x': 1397458800000,
+              'x': 2,
               'y': 0.36
             },{
-              'x': 1397522940000,
+              'x': 1,
               'y': 0.32
-          }]
+            }]
+          }
         },
         completeSeriesConfig:{
           type : Object
         },
-        //dataExtents
         dataExtents:{
           type : Object,
-          value: {
-            "x": [Infinity,-Infinity],
-            "y": [0,-Infinity]
+          value: function() {
+            return {
+              "x": [0,10],
+              "y": [0,-Infinity]
+            }
           }
         },
 
@@ -150,8 +169,8 @@
         "px-data-vis-colors-applied" : '_returnCompleteSeriesConfig'
       },
 
-      _drawSeriesBar: function(orientation) {
-        return orientation === 'left' ? false : true;
+      _checkOrientation: function(orientation) {
+        return orientation === 'left';
       },
 
       _returnCompleteSeriesConfig: function() {

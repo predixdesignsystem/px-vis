@@ -68,7 +68,7 @@ function runTests() {
           }
         },
         dim = ['y','y2', 'y3'],
-        chartExtents = {"x": ['y','y2','y3'], "y": {'y': [0,10], 'y2':[0,27], 'y3':[0,14] }},
+        chartExtents = {"x": ['y','y2','y3'], 'y': [0,10], 'y2':[0,27], 'y3':[0,14] },
         categories = ['a','b'],
         w = 500,
         h = 300,
@@ -87,10 +87,10 @@ function runTests() {
       parallelScale.set('height',h);
       parallelScale.set('margin',m);
       parallelScale.set('completeSeriesConfig',completeSeriesConfig);
-      parallelScale.set('chartExtents',chartExtents);
-      parallelScale.set('dimensions',dim);
-      parallelScale.set('axes',dim);
+      parallelScale.set('dataExtents',chartExtents);
       parallelScale.set('chartData',d);
+      parallelScale.set('axes',dim);
+      parallelScale.set('dimensions',dim);
 
       window.setTimeout(function() {
         var g = parallelSVG.svg.selectAll('g.layer')
@@ -188,7 +188,7 @@ function runTests() {
     });
 
     test('baseLine line d', function() {
-      assert.equal(linePath.attr('d').split(/[\s,]+/).join(''),'M800L240240L400115');
+      assert.equal(linePath.attr('d').split(/[\s,]+/).join(''),'M800L240241L400124');
     });
   }); //suite
 
@@ -301,7 +301,7 @@ function runTests() {
           }
         },
         dim = ['y','y2', 'y3'],
-        chartExtents = {"x": ['y','y2','y3'], "y": {'y': [0,10], 'y2':[0,27], 'y3':[0,14] }},
+        chartExtents = {"x": ['y','y2','y3'], 'y': [0,10], 'y2':[0,27], 'y3':[0,14] },
         categories = ['a','b'],
         w = 500,
         h = 300,
@@ -321,10 +321,10 @@ function runTests() {
       parallelScaleCanvas.set('height',h);
       parallelScaleCanvas.set('margin',m);
       parallelScaleCanvas.set('completeSeriesConfig',completeSeriesConfig);
-      parallelScaleCanvas.set('chartExtents',chartExtents);
-      parallelScaleCanvas.set('dimensions',dim);
-      parallelScaleCanvas.set('axes',dim);
+      parallelScaleCanvas.set('dataExtents',chartExtents);
       parallelScaleCanvas.set('chartData',d);
+      parallelScaleCanvas.set('axes',dim);
+      parallelScaleCanvas.set('dimensions',dim);
 
       parallelCursorCanvas.set('svg', parallelSVGCanvas.svg);
       parallelCursorCanvas.set('canvasDataLayer', parallelSVGCanvas.canvasContext);
@@ -414,7 +414,7 @@ function runTests() {
     });
 
     test('baseLine line d', function() {
-      assert.equal(linePath.attr('d').split(/[\s,]+/).join(''),'M800L240240L400115');
+      assert.equal(linePath.attr('d').split(/[\s,]+/).join(''),'M800L240241L400124');
     });
   }); //suite
 
@@ -546,14 +546,12 @@ function runTests() {
       radarSVG.set('margin',m);
       radarSVG.set('offset',offset);
 
-      radarScale.set('width',min);
-      radarScale.set('margin',m);
+      radarScale.set('_radius',min);
       radarScale.set('centerOffset',50);
-      radarScale.set('amplitudeKeys',dim);
       radarScale.set('chartExtents',chartExtents);
-      radarScale.set('dimensions',dim);
-      radarScale.set('axes',dim);
       radarScale.set('chartData',d);
+      radarScale.set('axes',dim);
+      radarScale.set('dimensions',dim);
 
       window.setTimeout(function() {
         var g = radarSVG.svg.selectAll('g.layer')

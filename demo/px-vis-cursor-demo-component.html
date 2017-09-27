@@ -12,8 +12,6 @@
 <dom-module id="px-vis-cursor-demo-component">
   <template>
       <div class="outline">
-
-        <!-- need for cursor -->
         <px-vis-svg
           width="[[width]]"
           height="[[height]]"
@@ -82,7 +80,6 @@
       ],
 
       properties:{
-        //basics
         width: {
           type : Number,
           value : 500
@@ -93,20 +90,23 @@
         },
         margin:{
           type : Object,
-          value : {
-            "top": 0,
-            "right": 0,
-            "bottom": 0,
-            "left": 0
+          value : function() {
+            return {
+              "top": 0,
+              "right": 0,
+              "bottom": 0,
+              "left": 0
+            }
           }
         },
         seriesKeys: {
           type: Array,
-          value: ['mySeries']
+          value: function() { return ['mySeries'] }
         },
         chartData:{
           type : Array,
-          value : [{
+          value : function() {
+            return [{
               'x': 1397102460000,
               'y': 0.56
             },{
@@ -142,34 +142,38 @@
             },{
               'x': 1397522940000,
               'y': 0.32
-          }]
+            }]
+          }
         },
         completeSeriesConfig:{
           type : Object
         },
-        //dataExtents
         dataExtents:{
           type : Object,
-          value: {
-            "x": [Infinity,-Infinity],
-            "y": [0,-Infinity]
+          value: function() {
+            return {
+              "x": [Infinity,-Infinity],
+              "y": [0,-Infinity]
+            }
           }
         },
         // demo snippet
         elempropCursor:{
           type : Object,
-          value:{
-            "svg":"[[svg]]",
-            "width":"[[width]]",
-            "height":"[[height]]",
-            "margin":"[[margin]]",
-            "completeSeriesConfig":"[[completeSeriesConfig]]",
-            "chartData":"[[chartData]]",
-            "horizontalLine":"full",
-            "verticalLine":"full",
-            "circlePoint":"yes",
-            "tooltipData":"[[tooltipData]]",
-            "selectionType":"[[selectionType]]"
+          value: function() {
+            return {
+              "svg":"[[svg]]",
+              "width":"[[width]]",
+              "height":"[[height]]",
+              "margin":"[[margin]]",
+              "completeSeriesConfig":"[[completeSeriesConfig]]",
+              "chartData":"[[chartData]]",
+              "horizontalLine":"full",
+              "verticalLine":"full",
+              "circlePoint":"yes",
+              "tooltipData":"[[tooltipData]]",
+              "selectionType":"[[selectionType]]"
+            }
           }
         }
       },

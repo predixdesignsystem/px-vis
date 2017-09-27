@@ -201,17 +201,17 @@ Custom property | Description
         type: Object,
         value: function() {
           return {
-            'axisBrush': {
-              'tooltipLabel': 'Axis Brush',
+            'axisMuteSeries': {
+              'tooltipLabel': 'Mute Series on Axis',
               'icon': 'px-vis:brush',
               'cursorIcon': 'px-vis:brush',
               'buttonGroup': 1,
-              'onClick': 'function() {this.set("_internalShowTooltip", false);}',
+              'onClick': 'function() { this.set("_internalShowTooltip", false);}',
               'actionConfig': {
                 'mouseout': 'null',
                 'mousemove': 'null',
-                'mousedown': 'callAxisBrush',
-                'mouseup': 'callAxisBrush'
+                'mousedown': 'callAxisMute',
+                'mouseup': 'callAxisMute'
               }
             },
             'axisDrag': {
@@ -317,6 +317,29 @@ Custom property | Description
                 'resetZoom': {
                   'icon': 'px-vis:full-screen',
                   'tooltipLabel': 'Reset panning',
+                  'eventName': 'px-vis-toolbar-reset-zoom'
+                }
+              }
+            },
+            'bareZoom': {
+              'tooltipLabel': 'Zoom on axis',
+              'icon': 'px-vis:zoom-toolbar',
+              'cursorIcon': 'px-vis:zoom-toolbar',
+              'onClick': 'function() {this.set("_internalShowTooltip", false); }',
+              'buttonGroup': 1,
+              'actionConfig': {
+                'mousedown': 'startZooming',
+                'mouseup': 'stopZooming',
+              },
+              'subConfig': {
+                'undoZoom': {
+                  'icon': 'px-vis:zoom-out-one-level',
+                  'tooltipLabel': 'Undo zoom',
+                  'eventName': 'px-vis-toolbar-undo-zoom'
+                },
+                'resetZoom': {
+                  'icon': 'px-vis:full-screen',
+                  'tooltipLabel': 'Reset zoom',
                   'eventName': 'px-vis-toolbar-reset-zoom'
                 }
               }
@@ -543,6 +566,7 @@ Custom property | Description
 
       for(var i=0; i<this._internalConfig.length; i++) {
         this.set('_internalConfig.#' + i + '.selected', false);
+        this.set('_internalConfig.#' + i + '.opened', false);
       }
 
       this.set('actionConfig', o);
@@ -622,12 +646,14 @@ Custom property | Description
             }
             // change styles on the old button
             this.set('_internalConfig.#' + i + '.selected', false);
+            this.set('_internalConfig.#' + i + '.opened', false);
           }
         }
 
         //toggle style on the new button
-        alreadyOpened = this._internalConfig[index].selected;
-        this.set('_internalConfig.#' + index + '.selected', !alreadyOpened);
+        alreadyOpened = this._internalConfig[index].opened;
+        this.set('_internalConfig.#' + index + '.opened', !alreadyOpened);
+        this.set('_internalConfig.#' + index + '.selected', true);
       }
 
 
@@ -658,7 +684,7 @@ Custom property | Description
         this.$.templateSubRow.render();
 
         //tell the chart so it can resize
-        this.fire('px-vis-toolbar-secondary-toggled', {'open': this.currentSubConfig !== []});
+        this.dispatchEvent(new CustomEvent('px-vis-toolbar-secondary-toggled', { bubbles: true, composed: true, detail: { 'open': this.currentSubConfig !== [], withinChart: this.withinChart }}));
       }
     },
 
@@ -774,18 +800,18 @@ Custom property | Description
       var icon = null,
           fn;
 
-          // In general if a acton doesnt have a cursor icon, we want to use the last
-          // if we are forcing a reset, then start off null and overwrite if there is a cursorIcon
-          if(resetIcon) {
-            icon = null;
-          }
+        // In general if a acton doesnt have a cursor icon, we want to use the last
+        // if we are forcing a reset, then start off null and overwrite if there is a cursorIcon
+        if(resetIcon) {
+          icon = null;
+        }
 
-          if(conf.cursorIcon) {
-           icon = conf.cursorIcon;
-          }
+        if(conf.cursorIcon) {
+          icon = conf.cursorIcon;
+        }
 
 
-          fn = function() { this.set('interactionSpaceConfig.iconType', icon); };
+        fn = function() { this.set('interactionSpaceConfig.iconType', icon); };
 
       this.fire('px-vis-action-request', {'function': fn, 'data': null });
 

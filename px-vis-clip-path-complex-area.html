@@ -97,9 +97,10 @@ https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath
             .innerRadius(function(d) {
                 // ~~ --> round pixels values to optimize svg perfs
               return ~~_this.y.range()[0];
-            }).outerRadius(function(d) {
+            })
+            .outerRadius(function(d) {
                 // ~~ --> round pixels values to optimize svg perfs
-              return ~~_this.y.range()[1];
+              return ~~_this.y.range()[1] + 1; //+1px to not clip the very edge
             })
             .defined( function(d) {
               return _this.x(d) || _this.x(d) === 0;

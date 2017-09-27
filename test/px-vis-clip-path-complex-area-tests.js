@@ -70,11 +70,11 @@ function runTests(){
       baseSVG.set('margin',m);
       baseSVG.set('offset',offset);
 
-      baseScale.set('width',min);
-      baseScale.set('margin',m);
-      baseScale.set('amplitudeKeys',dim);
+      baseScale.set('_radius',min);
       baseScale.set('centerOffset',50);
+      baseScale.set('margin',m);
       baseScale.set('chartData',d);
+      baseScale.set('dimensions', dim)
 
       baseLine.set('completeSeriesConfig',completeSeriesConfig);
       baseLine.set('seriesId',"x");

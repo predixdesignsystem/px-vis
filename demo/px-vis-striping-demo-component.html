@@ -80,6 +80,7 @@
       canvas-context="[[canvasLayers.striping]]"
       canvas-layers-config="{{canvasLayersConfig}}"
       x="[[x]]"
+      clip-path
       domain-changed="[[domainChanged]]"
       stripe-config="[[stripeConfig]]"
       stripe-data="[[stripeData]]">
@@ -100,24 +101,25 @@ Polymer({
       value: "d3 element which stripes/highlights a region"
     },
     chartData: {
-      value: [{
-            "x": 1397102460000,
-            "y": 1
-          },{
-            "x": 1397131620000,
-            "y": 6
-          },{
-            "x": 1397160780000,
-            "y": 10
-          },{
-            "x": 1397189940000,
-            "y": 4
-          },{
-            "x": 1397219100000,
-            "y": 6
-          }
-        ],
-      type: Array
+      type: Array,
+      value: function() {
+        return [{
+          "x": 1397102460000,
+          "y": 1
+        },{
+          "x": 1397131620000,
+          "y": 6
+        },{
+          "x": 1397160780000,
+          "y": 10
+        },{
+          "x": 1397189940000,
+          "y": 4
+        },{
+          "x": 1397219100000,
+          "y": 6
+        }]
+      }
     },
     completeSeriesConfig: {
       type: Object
@@ -132,15 +134,22 @@ Polymer({
     },
     chartExtents: {
       type: Object,
-      value: {'x': [1397102460000,1397219100000], 'y':[1,10]}
+      value: function() {
+        return {
+          'x': [1397102460000,1397219100000],
+          'y':[1,10]
+        }
+      }
     },
     margin: {
       type: Object,
-      value: {
-        "top": 10,
-        "right": 10,
-        "bottom": 30,
-        "left": 50
+      value: function() {
+        return {
+          "top": 10,
+          "right": 10,
+          "bottom": 30,
+          "left": 50
+        }
       }
     },
 

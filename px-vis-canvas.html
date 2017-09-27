@@ -35,95 +35,111 @@
 </dom-module>
 
 <script>
-    Polymer({
 
-        is: 'px-vis-canvas',
+  Polymer({
 
-        /****** EVENTS ******/
-        /**
-         * Event fired once a d3 canvas context has been configured.
-         *
-         * Uses the px-vis-behavior-chart behavior, for listening and setting property, locally or globally.
-         * Detail includes:
-         *
-         * ```
-         * { 'data': canvasContext }
-         * ```
-         *
-         * @event px-vis-canvas-context-updated
-         */
+    is: 'px-vis-canvas',
 
-        behaviors: [
-          PxVisBehavior.sizing,
-          PxVisBehavior.commonMethods,
-          PxVisBehaviorD3.canvasContext
-        ],
+    /****** EVENTS ******/
+    /**
+     * Fired once d3 canvas context has been configured.
+     *
+     * Uses the px-vis-behavior-chart behavior, for listening and setting property, locally or globally.
+     * Detail includes:
+     *
+     * ```
+     * { 'data': canvasContext }
+     * ```
+     *
+     * @event px-vis-canvas-context-updated
+     */
 
-        /**
-         * Properties block, expose attribute values to the DOM via 'reflect'
-         *
-         * @property properties
-         * @type Object
-         */
-        properties: {
-          /**
-           * The canvas element
-           *
-           *
-           */
-          _canvas:{
-            type:Object
-          }
-        },
+    behaviors: [
+      PxVisBehavior.sizing,
+      PxVisBehavior.commonMethods,
+      PxVisBehaviorD3.canvasContext
+    ],
 
-        observers: [
-          '_setCanvas(width,height,margin,offset.*)'
-        ],
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      /**
+       * The canvas element
+       *
+       *
+       */
+      _canvas:{
+        type:Object
+      }
+    },
 
-        /**
-        * When attached, re-fire set properties for precipitation pattern, as well as the svg element that's inside px-svg.
-        *
-        * @method attached
-        */
-        attached: function(){
-          if(this._doesObjHaveValues(this.canvasContext)){
-            this.fire('px-vis-canvas-context-updated',{ 'data': this.canvasContext, 'dataVar': 'canvasContext', 'method': 'set' });
-          }
-        },
-        detached: function() {
-          if(this.canvasContext) {
-            this.canvasContext.pxClearCanvas();
-          }
-        },
-        /**
-         * Configures the canvas and context
-         *
-         */
-        _setCanvas: function(){
-          if(this.width && this.height && this._doesObjHaveValues(this.margin)) {
+    observers: [
+      '_setCanvas(width,height,margin,offset.*)'
+    ],
 
-            var context;
+    /**
+    * when attached, re-fire set properties for precipitation pattern, as well as the svg element that's inside px-svg.
+    *
+    * @method attached
+    */
+    attached: function(){
+      if(this._doesObjHaveValues(this.canvasContext)){
+        this.fire('px-vis-canvas-context-updated',{ 'data': this.canvasContext, 'dataVar': 'canvasContext', 'method': 'set' });
+      }
+    },
+    detached: function() {
+      if(this.canvasContext) {
+        this.canvasContext.pxClearCanvas();
+      }
+    },
+    /**
+     * Configures the canvas and context
+     *
+     */
+    _setCanvas: function(){
+      if(this.width && this.height && this._doesObjHaveValues(this.margin)) {
+        if(this.canvasContext) {
+          this._reCenterCanvas();
+        } else {
+          this._createCanvaContext();
+        }
+      }
+    },
 
-            this._canvas = this.$.chartCanvas;
+    _reCenterCanvas: function() {
+      this.canvasContext.setTransform(1, 0, 0, 1, 0, 0);
+      this.canvasContext.translate(this.margin.left + this.offset[0], this.margin.top + this.offset[1]);
+      this.canvasContext._translation = [this.margin.left + this.offset[0], this.margin.top + this.offset[1]];
 
-            context = this._canvas.getContext("2d");
+      this.fire('px-vis-canvas-context-updated',{ 'data': this.canvasContext, 'dataVar': 'canvasContext', 'method': 'set' });
+    },
 
-            //reset translation so subsequent calls do not keep shifting canvas drawings
-            context.setTransform(1, 0, 0, 1, 0, 0);
-            context.translate(this.margin.left + this.offset[0], this.margin.top + this.offset[1]);
+    _createCanvaContext: function() {
+      var context;
 
-            context._translation = [this.margin.left + this.offset[0], this.margin.top + this.offset[1]];
+      this._canvas = this.$.chartCanvas;
 
-            context.pxClearCanvas = function() {
-              this.save()
-              this.setTransform(1, 0, 0, 1, 0, 0);
-              this.clearRect(0,0, this.canvas.width, this.canvas.height);
-              this.restore();
-            }.bind(context);
+      context = this._canvas.getContext("2d");
 
-            this.set('canvasContext',context);
-            this.fire('px-vis-canvas-context-updated',{ 'data': context, 'dataVar': 'canvasContext', 'method': 'set' });
-          }
-        },
-    });
+      //reset translation so subsequent calls do not keep shifting canvas drawings
+      context.setTransform(1, 0, 0, 1, 0, 0);
+      context.translate(this.margin.left + this.offset[0], this.margin.top + this.offset[1]);
+
+      context._translation = [this.margin.left + this.offset[0], this.margin.top + this.offset[1]];
+
+      context.pxClearCanvas = function() {
+        this.save()
+        this.setTransform(1, 0, 0, 1, 0, 0);
+        this.clearRect(0,0, this.canvas.width, this.canvas.height);
+        this.restore();
+      }.bind(context);
+
+      this.set('canvasContext',context);
+      this.fire('px-vis-canvas-context-updated',{ 'data': context, 'dataVar': 'canvasContext', 'method': 'set' });
+    }
+  });
 </script>

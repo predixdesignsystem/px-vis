@@ -7,7 +7,6 @@
   <template>
       <p style="color: rgb(177,177,188)">px-vis-scale cannot be seen</p>
       <div style="border: 1px dotted #cccccc;">
-      <!-- need for scale -->
         <px-vis-svg
           width="[[width]]"
           height="[[height]]"
@@ -35,7 +34,6 @@
     Polymer({
       is: "px-vis-scale-demo-component",
       properties:{
-        //basics
         width: {
           type : Number,
           value : 500
@@ -46,16 +44,19 @@
         },
         margin:{
           type : Object,
-          value : {
-            "top": 10,
-            "right": 10,
-            "bottom": 10,
-            "left": 10
+          value : function() {
+            return {
+              "top": 10,
+              "right": 10,
+              "bottom": 10,
+              "left": 10
+            }
           }
         },
         chartData:{
           type : Array,
-          value : [{
+          value : function() {
+            return [{
               'x': 1397102460000,
               'y': 0.56
             },{
@@ -91,26 +92,30 @@
             },{
               'x': 1397522940000,
               'y': 0.32
-          }]
+            }]
+          }
         },
         seriesConfig:{
           type : Object,
-          value: {
-            'mySeries': {
-              "name":"My-Series",
-              "type": "line",
-              "x": 'x',
-              "y": 'y',
-              'color': "rgb(93,165,218)"
+          value: function() {
+            return {
+              'mySeries': {
+                "name":"My-Series",
+                "type": "line",
+                "x": 'x',
+                "y": 'y',
+                'color': "rgb(93,165,218)"
+              }
             }
           }
         },
-        //dataExtents
         dataExtents:{
           type : Object,
-          value: {
-            "x": [Infinity,-Infinity],
-            "y": [0,-Infinity]
+          value: function() {
+            return {
+              "x": [Infinity,-Infinity],
+              "y": [0,-Infinity]
+            }
           }
         }
       }
