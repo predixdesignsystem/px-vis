@@ -2718,7 +2718,11 @@ PxVisBehavior.highlightLineShared = [{
         tooltipConfig[aid] = {};
 
         //if using categories, use it, otherwise default
-        tooltipConfig[aid]["color"] = this.categoryKey ? this.completeSeriesConfig[this.categoryKey]["color"] : this.completeSeriesConfig[this.seriesId]["color"];
+        if(this.categoryKey && dataset[this.categoryKey]) {
+          tooltipConfig[aid]["color"] = this.completeSeriesConfig[dataset[this.categoryKey]].color;
+        } else {
+          tooltipConfig[aid]["color"] = this.completeSeriesConfig[this.seriesId]["color"];
+        }
 
         //if title is specified, use it, otherwiuse id
         tooltipConfig[aid]["name"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]['title'] ? this.completeSeriesConfig[aid]["title"] : aid;
