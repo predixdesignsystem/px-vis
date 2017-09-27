@@ -149,22 +149,22 @@ extentCalc._checkChartExtents = function _checkChartExtents(cExts, axis) {
  *
  */
 extentCalc._checkDataExtents = function _checkDataExtents(dExts, cExts, axis, bool, exts) {
-  var exts = exts || [];
+  var result = exts || [];
 
   //if there are dataExtents, use them if they dont overwrite the chartExtents
   if(dExts && dExts[axis] && dExts[axis].length === 2) {
     // if we have chartExtents aready, figure out which to use
     if(bool) {
-      exts[0] = (cExts[axis][0] === 'dynamic') ? dExts[axis][0] : cExts[axis][0];
-      exts[1] = (cExts[axis][1] === 'dynamic') ? dExts[axis][1] : cExts[axis][1];
+      result[0] = (cExts[axis][0] === 'dynamic') ? dExts[axis][0] : cExts[axis][0];
+      result[1] = (cExts[axis][1] === 'dynamic') ? dExts[axis][1] : cExts[axis][1];
 
     } else {
-      exts[0] = Math.min(dExts[axis][0], this._defaultScaleValue[axis][0]);
-      exts[1] = Math.max(dExts[axis][1], this._defaultScaleValue[axis][1]);
+      result[0] = Math.min(dExts[axis][0], this._defaultScaleValue[axis][0]);
+      result[1] = Math.max(dExts[axis][1], this._defaultScaleValue[axis][1]);
     }
   }
 
-  return exts;
+  return result;
 }.bind(extentCalc);
 
 /**
@@ -210,11 +210,13 @@ extentCalc._findMinMax = function _findMinMax(data, doX, doY, ordX, ordY, timeX,
 extentCalc._getDataExtents = function _getDataExtents(d,yKeysArr) {
   var a = [];
   for(var i = 0; i < yKeysArr.length; i++) {
-    var key = yKeysArr[i],
-        val = d[this.completeSeriesConfig[key]['y']];
 
-    if(val || val === 0) {
-      a.push(val);
+    if(!this.mutedSeries[yKeysArr[i]]) {
+      var val = d[this.completeSeriesConfig[yKeysArr[i]]['y']];
+
+      if(val || val === 0) {
+        a.push(val);
+      }
     }
   }
   return [ Math.min.apply(null,a), Math.max.apply(null,a) ];
@@ -288,11 +290,14 @@ extentCalc._checkInSeriesConfig = function _checkInSeriesConfig(exts, a) {
   for(var i = 0; i < this.seriesToAxes[a].length; i++) {
     var s = this.seriesToAxes[a][i];
 
-    exts[a][0] = (this.completeSeriesConfig[s]['yMin'] || this.completeSeriesConfig[s]['yMin'] === 0) ?
-        Math.min(this.completeSeriesConfig[s]['yMin'], exts[a][0]) : exts[a][0];
 
-    exts[a][1] = (this.completeSeriesConfig[s]['yMax'] || this.completeSeriesConfig[s]['yMax'] === 0) ?
-        Math.max(this.completeSeriesConfig[s]['yMax'], exts[a][1]) : exts[a][1];
+    if(!this.hardMute || !this.mutedSeries[s]) {
+      exts[a][0] = (this.completeSeriesConfig[s]['yMin'] || this.completeSeriesConfig[s]['yMin'] === 0) ?
+          Math.min(this.completeSeriesConfig[s]['yMin'], exts[a][0]) : exts[a][0];
+
+      exts[a][1] = (this.completeSeriesConfig[s]['yMax'] || this.completeSeriesConfig[s]['yMax'] === 0) ?
+          Math.max(this.completeSeriesConfig[s]['yMax'], exts[a][1]) : exts[a][1];
+    }
   }
 }.bind(extentCalc);
 
@@ -352,11 +357,15 @@ extentCalc._searchForExtents = function _searchForExtents(exts, seriesToSearch, 
 extentCalc._calcSeriesToSearch = function _calcSeriesToSearch(exts, a, seriesToSearch) {
   for(var i = 0; i < this.seriesToAxes[a].length; i++) {
     var s = this.seriesToAxes[a][i];
-    seriesToSearch[s] = {
-      "axis": a,
-      "min": exts[a][0] === Infinity ? true : false,
-      "max": exts[a][1] === -Infinity ? true : false
-    };
+
+
+    if(!this.hardMute || !this.mutedSeries[s]) {
+      seriesToSearch[s] = {
+        "axis": a,
+        "min": exts[a][0] === Infinity ? true : false,
+        "max": exts[a][1] === -Infinity ? true : false
+      };
+    }
   }
 }.bind(extentCalc);
 
@@ -369,7 +378,8 @@ extentCalc._calcMultiAxisExtents = function _calcMultiAxisExtents(data) {
   var search = false,
       exts = {},
       seriesToSearch = {},
-      a;
+      a,
+      keys;
 
   for(var i = 0; i < this.axes.length; i++) {
     a = this.axes[i];
@@ -396,6 +406,14 @@ extentCalc._calcMultiAxisExtents = function _calcMultiAxisExtents(data) {
   // if we indicated we need to search for extent values
   if(search) {
     this._searchForExtents(exts, seriesToSearch, data);
+  }
+
+  //verify all extents are valid
+  keys = Object.keys(exts);
+  for(var i=0; i<keys.length; i++) {
+    if(exts[keys[i]][0] === Infinity || exts[keys[i]][1] === -Infinity) {
+      exts[keys[i]] = [0,1];
+    }
   }
 
   return exts;

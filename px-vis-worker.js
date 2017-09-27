@@ -714,6 +714,8 @@ function determineExtents(eventData, time) {
   extentCalc.axes = visData.axes;
   extentCalc.seriesToAxes = visData.seriesToAxes;
   extentCalc.isYAxisObject = visData.isYAxisObject;
+  extentCalc.mutedSeries = visData.mutedSeries;
+  extentCalc.hardMute = visData.hardMute;
 
   extents = extentCalc.determineExtents(dataMapping[eventData.chartId]);
 

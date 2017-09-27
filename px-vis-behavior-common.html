@@ -367,6 +367,32 @@ PxVisBehavior.completeSeriesConfig = {
 
 /*
     Name:
+    PxVisBehavior.combinedMutedSeries
+
+    Description:
+    Polymer behavior that provides the combinedMutedSeries property px-vis components.
+
+    Dependencies:
+    -
+
+    @polymerBehavior PxVisBehavior.combinedMutedSeries
+*/
+PxVisBehavior.combinedMutedSeries = {
+  properties: {
+    /**
+     * Aimed at regrouping all muted series when different behavior can mute
+     * series (multi series for example: brush + navigator + categories)
+     */
+    combinedMutedSeries:{
+      type:Object,
+      notify: true,
+      value:function(){ return {}; },
+    }
+  }
+};
+
+/*
+    Name:
     PxVisBehavior.mutedSeries
 
     Description:
@@ -398,6 +424,16 @@ PxVisBehavior.mutedSeries = {
       type:Object,
       notify: true,
       value:function(){ return {}; },
+    },
+    /**
+     * Allows for a "hard" muting of the series/categories: the
+     * series/category won't show up
+     * in the tooltip anymore, it's tooltip data won't be shown in the register
+     * and its extents won't be taken into account by the chart
+     */
+     hardMute: {
+      type: Boolean,
+      value: false
     }
   }
 };
@@ -1374,7 +1410,6 @@ PxVisBehavior.dimensions = {
     },
     /**
     * An array of dimensions which the chart uses.
-    * @private
     */
     dimensions: {
       type: Array
