@@ -566,6 +566,7 @@ Custom property | Description
 
       for(var i=0; i<this._internalConfig.length; i++) {
         this.set('_internalConfig.#' + i + '.selected', false);
+        this.set('_internalConfig.#' + i + '.opened', false);
       }
 
       this.set('actionConfig', o);
@@ -645,12 +646,14 @@ Custom property | Description
             }
             // change styles on the old button
             this.set('_internalConfig.#' + i + '.selected', false);
+            this.set('_internalConfig.#' + i + '.opened', false);
           }
         }
 
         //toggle style on the new button
-        alreadyOpened = this._internalConfig[index].selected;
-        this.set('_internalConfig.#' + index + '.selected', !alreadyOpened);
+        alreadyOpened = this._internalConfig[index].opened;
+        this.set('_internalConfig.#' + index + '.opened', !alreadyOpened);
+        this.set('_internalConfig.#' + index + '.selected', true);
       }
 
 
@@ -681,7 +684,7 @@ Custom property | Description
         this.$.templateSubRow.render();
 
         //tell the chart so it can resize
-        this.fire('px-vis-toolbar-secondary-toggled', {'open': this.currentSubConfig !== [], withinChart: this.withinChart});
+        this.dispatchEvent(new CustomEvent('px-vis-toolbar-secondary-toggled', { bubbles: true, composed: true, detail: { 'open': this.currentSubConfig !== [], withinChart: this.withinChart }}));
       }
     },
 
