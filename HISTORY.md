@@ -33,6 +33,7 @@ v4.0.0
   * clone the targets array so it cant be changed mid debounce
 * Fix for switching between svg and canvas at runtime
 * BREAKING CHANGE: default orientation in orientation definition is now `left` instead of `bottom`
+* Added support for "hard muting" a series, effectively ignoring it when searching for data
 
 v3.1.23
 ================
