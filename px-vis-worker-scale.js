@@ -210,10 +210,10 @@ extentCalc._getDataExtents = function _getDataExtents(d,keysArr, axis) {
   var a = [];
   for(var i = 0; i < keysArr.length; i++) {
     var key = keysArr[i],
-        val = d[this.completeSeriesConfig[key][axis]];
+        val;
 
     if(!this.mutedSeries[keysArr[i]]) {
-      var val = d[this.completeSeriesConfig[keysArr[i]]['y']];
+      val = d[this.completeSeriesConfig[key][axis]];
 
       if(val || val === 0) {
         a.push(val);
