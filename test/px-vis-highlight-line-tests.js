@@ -1651,7 +1651,7 @@ function runTests() {
       assert.closeTo(tooltiphighlight.defaultEmptyData.dataPos[1], 2190, 4);
       assert.equal(tooltiphighlight.defaultEmptyData.time, 1397160780000);
       assert.deepEqual(tooltiphighlight.defaultEmptyData.dataset, {"x":1397160780000,"y":10,"y2":3,"y3":8,"cat":"b"});
-      assert.deepEqual(tooltiphighlight.defaultEmptyData.series, [{"name":"y","value":{"y":10,"y2":3,"y3":8}},{"name":"y2","value":{"y":10,"y2":3,"y3":8}},{"name":"y3","value":{"y":10,"y2":3,"y3":8}}]);
+      assert.deepEqual(tooltiphighlight.defaultEmptyData.series, [{"name":"y","value":{"y":10}},{"name":"y2","value":{"y2":3}},{"name":"y3","value":{"y3":8}}]);
       assert.equal(tooltiphighlight.defaultEmptyData.color.split(" ").join(""), colorSet[0]);
       assert.deepEqual(tooltiphighlight.defaultEmptyData.tooltipConfig, {"y":{"color":"rgb(0,0,0)","name":"y","yAxisUnit":"","y":"y"},"y2":{"color":"rgb(0,0,0)","name":"y2","yAxisUnit":"","y":"y2"},"y3":{"color":"rgb(0,0,0)","name":"y3","yAxisUnit":"","y":"y3"}});
     });
