@@ -358,9 +358,11 @@ PxVisBehaviorD3.canvas = [{
 
     //flush so that the dom if are processed and make the switch
     //between svg and canvas components
-    Polymer.dom.flush();
+    if(this._isAttached) {
+      Polymer.dom.flush();
+    }
   }
-}, PxVisBehaviorD3.canvasContext]
+}, PxVisBehaviorD3.canvasContext, PxVisBehavior.isAttached]
 
 /*
     Name:
@@ -374,7 +376,7 @@ PxVisBehaviorD3.canvas = [{
 
     @polymerBehavior PxVisBehaviorD3.renderToCanvas
 */
-PxVisBehaviorD3.renderToCanvas = {
+PxVisBehaviorD3.renderToCanvas = [{
   properties: {
     /**
     * Boolean to specify if drawings should render to canvas instead of svg
@@ -395,9 +397,11 @@ PxVisBehaviorD3.renderToCanvas = {
 
     //flush so that the dom if are processed and make the switch
     //between svg and canvas components
-    Polymer.dom.flush();
+    if(this._isAttached) {
+      Polymer.dom.flush();
+    }
   }
-};
+}, PxVisBehavior.isAttached];
 
 /*
     Name:
