@@ -1,6 +1,7 @@
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="../px-icon-set/px-icon-set.html"/>
 <link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-interaction.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="css/px-vis-styles.html">
 
@@ -71,7 +72,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehavior.interactionSpaceShared,
       PxVisBehavior.preventWebWorkerSynchronization,
       PxVisBehavior.wwDataSyncCounter,
-      PxVisBehaviorD3.cursorIcon
+      PxVisBehaviorD3.cursorIcon,
+      PxVisBehaviorInteraction.lasso
     ],
     /***EVENTS****/
     /*
@@ -148,7 +150,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           'resetCrosshair': '_resetCrosshairData',
           'startPanning': '_startPanning',
           'stopPanning': '_stopPanning',
-          'reportMouseCoords': '_reportMouseCoords'
+          'reportMouseCoords': '_reportMouseCoords',
+          'startLasso': '_startLasso',
+          'stopLasso': '_stopLasso'
         }
       },
       /**
@@ -221,11 +225,13 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         type: String
       },
 
+      /**
+       * the crosshair search: closestPoint, pointPerSeries, allInArea, polygon
+       */
       searchType: {
         type: String,
-        value: 'closestPoint' //closestPoint, pointPerSeries, allInArea
+        value: 'closestPoint'
       },
-
 
       /**
        * Holder for the cursor drawing objects.
@@ -519,6 +525,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           }
 
       this.set('crosshairData',ttD);
+      this.set('_lassoCrosshairData', ttD);
       this.generatingCrosshairData = false;
     },
 
@@ -552,6 +559,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      */
     _calcData: function() {
 
+      if(this.searchType === 'lasso' && !this._isLassoing) {
+        return;
+      }
       this.set('_calculatingData', true);
 
       if(!this.mouseDown && this.chartData.length > 0 && this.y) {
@@ -570,12 +580,29 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       // now we can set our data that we want to pass out
       if(this._calculatingData) {
 
-        delete dataObj.timeStampsTracker;
+
 
         if(this._calcCrosshair) {
           this.generatingCrosshairData = true;
-          this.set('crosshairData', {'rawData': dataObj.rawData, 'timeStamps': dataObj.timeStamps});
+
+          //when in lasso mode keep adding data
+          if(this.searchType === 'lasso' && this.crosshairData) {
+
+            var newData = {
+              rawData: this._lassoCrosshairData.rawData || [],
+              timeStamps: this._lassoCrosshairData.timeStamps || []
+            };
+
+            newData.rawData = newData.rawData.concat(dataObj.rawData);
+            newData.timeStamps = newData.timeStamps.concat(dataObj.timeStamps);
+            this.set('crosshairData', newData);
+
+          } else {
+            this.set('crosshairData', {'rawData': dataObj.rawData, 'timeStamps': dataObj.timeStamps});
+          }
         }
+
+        delete dataObj.timeStampsTracker;
 
         if(this._calcTooltip) {
 
@@ -638,6 +665,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       ctx.data.calcCrosshair = this._calcCrosshair;
       ctx.data.radius = this.searchRadius;
       ctx.data.searchType = this.searchType;
+      ctx.data.polygon = this._lassoCoords;
       ctx.successCallback = function(e) {
         dataObj.series = e.data.series;
         dataObj.rawData = e.data.rawData;

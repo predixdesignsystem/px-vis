@@ -457,9 +457,8 @@ function addCrosshairDataQuadtree(dataObj, d, timeData) {
     dataObj.rawData.push(d);
     dataObj.timeStamps.push(d[timeData]);
     dataObj.timeStampsTracker[d[timeData]] = true;
-
-    dataObj.rawData.push(d);
   } else if(!timeData) {
+
     dataObj.rawData.push(d);
   }
 
@@ -516,6 +515,61 @@ function calcBoxSize(visData) {
     "y0" : y0,
     "y1" : y1
   };
+}
+
+function calcPolygonExtents(polygon) {
+
+  //can we exclude more things?
+  var xExt = d3.extent(polygon, function(d) {
+        return d[0];
+      }),
+      yExt = d3.extent(polygon, function(d) {
+        return d[1];
+      });
+
+  return {
+  "x0" : xExt[0],
+  "x1" : xExt[1],
+  "y0" : yExt[0],
+  "y1" : yExt[1]
+  };
+}
+
+/**
+ * Performs the tree search for nodes within a polygon
+ *
+ * @method searchPolygonQuadtree
+ */
+function searchPolygonQuadtree(visData, dataObj, quadtree) {
+  var boxSize = calcPolygonExtents(visData.polygon),
+      scanned = 0,
+      selected = 0;
+
+  if(visData.polygon.length) {
+    // via https://bl.ocks.org/mbostock/4343214
+    quadtree.visit(function(node, nodeX0, nodeY0, nodeX1, nodeY1) {
+      if(!node.length) {
+        do {
+          var d = node.data;
+          scanned++;
+
+          //save points within our polygon
+          if(d3.polygonContains(visData.polygon, [d.px, d.py])) {
+            dataObj = addCrosshairDataQuadtree(dataObj, this.dataMapping[visData.chartId][node.data.i], visData.timeData);
+            selected++;
+          }
+        } while(node = node.next);
+        return true;
+      }
+
+      //return true  ==> skip the children nodes so we dont search unnessary bits of the tree
+      //comparing our polygon to a box is very crude but intersetcing a polygon hull with each
+      //quadrant would be too intensive
+      return  nodeX0 >= boxSize.x1 || nodeY0 >= boxSize.y1 || nodeX1 < boxSize.x0 || nodeY1 < boxSize.y0;
+    });
+  }
+
+  return dataObj;
 }
 
 /**
@@ -581,6 +635,10 @@ function searchAreaQuadtree(quadtree, visData, dataObj) {
     searchAreaBoxQuadtree(quadtree, visData, dataObj);
 }
 
+function searchQuadtreePolygon(visData, dataObj, quadtreeData) {
+
+}
+
 function searchQuadtreeSingle(visData, dataObj, quadtreeData) {
   var r = visData.radius ? visData.radius : Infinity,
       result = quadtreeData.find(visData.mousePos[0], visData.mousePos[1], r),
@@ -595,9 +653,12 @@ function searchQuadtreeSingle(visData, dataObj, quadtreeData) {
   }
 
   // if we want to do all in area crosshair data, do it outside our loop
-  if(visData.calcCrosshair && visData.searchType === 'allInArea') {
-    dataObj = searchAreaRadiusQuadtree(quadtreeData, visData, dataObj);
-
+  if(visData.calcCrosshair) {
+    if(visData.searchType === 'allInArea') {
+      dataObj = searchAreaRadiusQuadtree(quadtreeData, visData, dataObj);
+    } else if(visData.searchType === 'lasso') {
+      dataObj = searchPolygonQuadtree(quadtreeData, visData, dataObj);
+    }
   }
 
   // when we constructed our data objs, we saved this
@@ -652,7 +713,9 @@ function returnClosestsQuadtreePoints(eventData, time) {
     if(visData.searchType === 'pointPerSeries') {
       dataObj = searchQuadtreeSeries(visData, dataObj, quadtreeData);
 
-    } else {  //closestPoint && allInArea
+    } else if(visData.searchType === 'lasso') {
+      dataObj = searchPolygonQuadtree(visData, dataObj, quadtreeData);
+    } else {  //closestPoint && allInArea && polygon
       dataObj = searchQuadtreeSingle(visData, dataObj, quadtreeData);
     }
   }
@@ -671,9 +734,9 @@ function returnQuadtreePointsInArea(eventData, time) {
       quadtreeData = quadtrees[eventData.chartId],
       dataObj = createDataStub();
 
-      if(quadtreeData) {
-        dataObj = searchAreaBoxQuadtree(quadtreeData, visData, dataObj);
-      }
+  if(quadtreeData) {
+    dataObj = searchAreaBoxQuadtree(quadtreeData, visData, dataObj);
+  }
 
   reply(dataObj, time);
 }
