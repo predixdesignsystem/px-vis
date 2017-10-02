@@ -1,6 +1,7 @@
 v4.0.2
 ================
 * guards against null/undefined chartData in _combineMutes
+* changed tooltip label "reset zoom" and "reset panning" in the toolbar to "reset"
 
 v4.0.1
 ================
