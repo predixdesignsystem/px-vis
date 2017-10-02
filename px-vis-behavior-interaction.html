@@ -1,0 +1,130 @@
+<script>
+var PxVisBehaviorInteraction = PxVisBehaviorInteraction || {};
+
+/*
+    Name:
+    PxVisBehaviorInteraction.lasso
+
+    Description:
+    Polymer behavior that provides the methods and properties necessary
+    to handle lasso selection
+
+    @polymerBehavior PxVisBehaviorInteraction.lasso
+*/
+PxVisBehaviorInteraction.lasso = {
+  properties: {
+    _isLassoing: {
+      type: Boolean,
+      value: false
+    },
+    _lassoDrawing: {
+      type: Object
+    },
+    _lassoGroup: {
+      type: Object
+    },
+    _lassoCoords: {
+      type: Object,
+      value: function() {
+        return [];
+      }
+    },
+    _lassoCrosshairData: {
+      type: Object,
+      value: function() {
+        return {
+          'rawData': [],
+          'timeStamps': []
+        }
+      }
+    },
+    _lassoGenerator: {
+      type: Object
+    },
+    /**
+     * When set to true the next drawing of a lasso will clear all the previous selection made
+     * (in _lassoCrosshairData)
+     */
+    resetLassoData: {
+      type: Boolean,
+      value: false
+    }
+  },
+
+  observers: ['_test(crosshairData)'],
+
+  _test: function() {
+    var i =0;
+  },
+
+
+
+  _startLasso: function() {
+     //only allow left clicks
+     if(Px.d3.event.button === 0) {
+        this._isLassoing = true;
+
+        if(this.resetLassoData) {
+          this._lassoCrosshairData = {
+            rawData: [],
+            timeStamps: []
+          }
+          this.resetLassoData = false;
+        }
+        //in case the user clicks inside the chart, and mouses out, we are waiting for a mouseup, and closing our action box with the coordinates available on the mouseup.
+        Px.d3.select(document).on('mouseup.action', this._stopLasso.bind(this));
+        Px.d3.select(document).on('mousemove.action', this._updateLasso.bind(this));
+
+        var mousePos = Px.d3.mouse(this._rect.node());
+
+        //re add start at the end so that our polygon closes
+        this._lassoCoords.push([mousePos[0], mousePos[1]], [mousePos[0], mousePos[1]]);
+        this._lassoGenerator = Px.d3.line()
+                                    .x(function(d) {
+                                      return d[0];
+                                    })
+                                    .y(function(d) {
+                                      return d[1];
+                                    });
+
+        this._lassoGroup = this.svg.append('g')
+              .attr('class', 'lasso-group');
+
+        this._lassoGroup.append('path')
+              .attr('class', 'lasso-line')
+              .attr('fill','none')
+              .attr('stroke', 'black')
+              .attr('stroke-width', 1)
+              .attr('stroke-opacity', 1);
+      }
+  },
+
+  _updateLasso: function(first) {
+
+    if(this._isLassoing) {
+      var mousePos = Px.d3.mouse(this._rect.node()),
+          last = this._lassoCoords.pop();
+
+      //constrain drawing within visible bounds
+      mousePos[0] = mousePos[0] < 0 ? 0 : mousePos[0];
+      mousePos[0] = mousePos[0] > this._width ? this._width : mousePos[0];
+      mousePos[1] = mousePos[1] < 0 ? 0 : mousePos[1];
+      mousePos[1] = mousePos[1] > this._height ? this._height : mousePos[1];
+
+      this._lassoCoords.push(mousePos);
+      this._lassoCoords.push(last);
+
+      //update drawing
+      this._lassoGroup.selectAll('path.lasso-line')
+        .attr('d', this._lassoGenerator(this._lassoCoords));
+    }
+  },
+
+  _stopLasso: function() {
+    this._lassoGroup.remove();
+    this._lassoCoords = [];
+    this._isLassoing = false;
+    this._lassoCrosshairData = this.crosshairData;
+  }
+}
+</script>
