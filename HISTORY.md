@@ -1,3 +1,7 @@
+v4.0.2
+================
+* guards against null/undefined chartData in _combineMutes
+
 v4.0.1
 ================
 * Guards against flushing when render to canvas/svg changes and we are not attached
