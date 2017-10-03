@@ -1,3 +1,12 @@
+v4.0.2
+================
+* guards against null/undefined chartData in _combineMutes
+* changed tooltip label "reset zoom" and "reset panning" in the toolbar to "reset"
+
+v4.0.1
+================
+* Guards against flushing when render to canvas/svg changes and we are not attached
+
 v4.0.0
 ================
 * Implemented Zooming capabilities for:

@@ -187,10 +187,15 @@ Custom property | Description
     /**
      *  Forces the tooltip to show by calling _show on px-tooltip.
      */
-    forceShow: function() {
+    forceShow: function(numberSeriesChanged) {
 
       if(this._tooltipElem && (!this._tooltipElem._isShowing && !this._tooltipElem._requestShow)) {
         this._tooltipElem._show();
+      }
+
+      if(numberSeriesChanged) {
+        //make sure the tooltip will take its new size into account
+        this._tooltipElem.notifyResize();
       }
     },
     /**
@@ -238,8 +243,13 @@ Custom property | Description
         } else {
           //only update tooltip data for register when we're shown to avoid
           //non needed calculations by register
+          var numberSeriesChanged = false;
+          if(this._registerElem.tooltipData && this._registerElem.tooltipData.series.length !== this._mutedTooltipData.series.length) {
+            numberSeriesChanged = true;
+          }
+
           this._registerElem.set('tooltipData', this._mutedTooltipData);
-          this.forceShow()
+          this.forceShow(numberSeriesChanged);
         }
       }
      }

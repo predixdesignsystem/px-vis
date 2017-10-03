@@ -2733,15 +2733,29 @@ PxVisBehavior.highlightLineShared = [{
         svgBounding,  //bounding rect of our svg
         tooltipConfig = {},  //a fake configuration object we will build
         value = {},          //the series obj within tooltipData
-        series = [];
+        series = [],
+        max = -Number.MAX_VALUE,
+        val,
+        dim;
 
       // FIXME run on resize and wrap in animationFrame. Maybe at chart level?
       svgBounding = this.svg ? this.svg.node().ownerSVGElement.getBoundingClientRect() : this.canvasContext.canvas.getBoundingClientRect();
 
       //calc the screen positions for the tooltip
       if(this.radialLine) {
+
+        //find the most right axis in an attempt to not have the tooltip cover the chart
+        for(var i=0; i<this.dimensions.length; i++) {
+          dim = this.dimensions[i];
+          val = this.y(dataset[dim]) * Math.sin(this.x(dim));
+          if(val > max) {
+            last = dim;
+            max = val;
+          }
+        }
+
         screenX = this.y(dataset[last]) * Math.sin(this.x(last)) + this.width/2 + svgBounding.left + window.pageXOffset;
-        screenY = this.y(dataset[last]) * Math.cos(Math.PI - this.x(last)) + this.smallerSide/2 + svgBounding.top + window.pageYOffset;
+        screenY = this.y(dataset[last]) * Math.cos(Math.PI - this.x(last)) + this.height/2 + svgBounding.top + window.pageYOffset;
 
       } else {
         screenX = this.x(last) + svgBounding.left + window.pageXOffset + 15;
@@ -2750,6 +2764,7 @@ PxVisBehavior.highlightLineShared = [{
 
       for(var i = 0; i < this.dimensions.length; i++) {
         var aid = this.dimensions[i];
+        value = {};
         //create our fake configuration object
         tooltipConfig[aid] = {};
 
@@ -2771,9 +2786,9 @@ PxVisBehavior.highlightLineShared = [{
 
         //create our value obj
         value[aid] = dataset[aid];
-        series.push({ 'name': tooltipConfig[aid]["name"], 'value': value });
-
+        series.push({ 'name': aid, 'value': value });
       }
+
       //create our tooltipData obj
       data = {
         "mouse": null,
