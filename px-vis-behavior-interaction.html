@@ -51,14 +51,6 @@ PxVisBehaviorInteraction.lasso = {
     }
   },
 
-  observers: ['_test(crosshairData)'],
-
-  _test: function() {
-    var i =0;
-  },
-
-
-
   _startLasso: function() {
      //only allow left clicks
      if(Px.d3.event.button === 0) {
@@ -106,10 +98,28 @@ PxVisBehaviorInteraction.lasso = {
           last = this._lassoCoords.pop();
 
       //constrain drawing within visible bounds
-      mousePos[0] = mousePos[0] < 0 ? 0 : mousePos[0];
-      mousePos[0] = mousePos[0] > this._width ? this._width : mousePos[0];
-      mousePos[1] = mousePos[1] < 0 ? 0 : mousePos[1];
-      mousePos[1] = mousePos[1] > this._height ? this._height : mousePos[1];
+      if(!this.radial) {
+        var _width = Math.max(this.width - this.margin.left - this.margin.right,0),
+            _height = Math.max(this.height - this.margin.bottom - this.margin.top,0);
+
+        mousePos[0] = mousePos[0] < 0 ? 0 : mousePos[0];
+        mousePos[0] = mousePos[0] > _width ? _width : mousePos[0];
+        mousePos[1] = mousePos[1] < 0 ? 0 : mousePos[1];
+        mousePos[1] = mousePos[1] > _height ? _height : mousePos[1];
+      } else {
+
+        //width = height = radius
+        var squareDist = mousePos[0]*mousePos[0] + mousePos[1]*mousePos[1],
+            ratio;
+
+        //scale back values if we are outside of the circle
+        if(squareDist > this.width*this.width) {
+
+          ratio = this.width/Math.sqrt(squareDist);
+          mousePos[0] = mousePos[0] * ratio;
+          mousePos[1] = mousePos[1] * ratio;
+        }
+      }
 
       this._lassoCoords.push(mousePos);
       this._lassoCoords.push(last);
