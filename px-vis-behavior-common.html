@@ -790,7 +790,16 @@ PxVisBehavior.commonMethods = {
     if(obj.length) {
       return !!obj.length;
     }
-    return Object.keys(obj).length > 0;
+
+    //use iterator over object to find out if we have any property,
+    //fatser than Object.keys for big objects
+    var i = 0;
+    for(prop in obj) {
+      i++;
+      break;
+    }
+
+    return i!==0;
   },
   /**
    * Checks to see if an object is defined
@@ -2533,24 +2542,27 @@ PxVisBehavior.highlightShared = [{
         upperFuzz;
 
     for(var i = 0; i < this.crosshairData.timeStamps.length; i++) {
-      if(this.fuzz) {
-        lowerFuzz = this.crosshairData.timeStamps[i] - Number(this.fuzz);
-        upperFuzz = this.crosshairData.timeStamps[i] + Number(this.fuzz);
 
-        if(d.length) {
-          lowerFuzz = lowerFuzz <= d[d.length-1][this.timeData] ? d[d.length-1][this.timeData] + 1 : lowerFuzz;
+      if(!this.hardMute || !this.mutedSeries[this.crosshairData.timeStamps[i]]) {
+        if(this.fuzz) {
+          lowerFuzz = this.crosshairData.timeStamps[i] - Number(this.fuzz);
+          upperFuzz = this.crosshairData.timeStamps[i] + Number(this.fuzz);
+
+          if(d.length) {
+            lowerFuzz = lowerFuzz <= d[d.length-1][this.timeData] ? d[d.length-1][this.timeData] + 1 : lowerFuzz;
+          }
+
+          //merge 2 arrays without creating a new one. DON'T use concat here as the GC implications + array
+          //duplication are killing perf
+          //the only limitation is if the fuzzy search returns more than a few tens of thousands
+          //of points since argument length is arbitrarily limited in different  browsers:
+          //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply
+          //in practice we should be ok since each fuzzy search returns result for 1 point, if each point
+          //returns tens of thousands we are in an absolutely crazy scenario
+          Array.prototype.push.apply(d,this._fuzzyBinarySearch(this.chartData, this.timeData, lowerFuzz, upperFuzz, null, null));
+        } else {
+          d.push(this._binarySearch(this.chartData, this.timeData, this.crosshairData.timeStamps[i], null, null));
         }
-
-        //merge 2 arrays without creating a new one. DON'T use concat here as the GC implications + array
-        //duplication are killing perf
-        //the only limitation is if the fuzzy search returns more than a few tens of thousands
-        //of points since argument length is arbitrarily limited in different  browsers:
-        //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply
-        //in practice we should be ok since each fuzzy search returns result for 1 point, if each point
-        //returns tens of thousands we are in an absolutely crazy scenario
-        Array.prototype.push.apply(d,this._fuzzyBinarySearch(this.chartData, this.timeData, lowerFuzz, upperFuzz, null, null));
-      } else {
-        d.push(this._binarySearch(this.chartData, this.timeData, this.crosshairData.timeStamps[i], null, null));
       }
     }
 
@@ -2741,7 +2753,23 @@ PxVisBehavior.highlightLineShared = [{
       return [];
     }
 
-    var dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawData;
+    var dataset
+    if(this.differentDataset) {
+      dataset = this._calcDataset();
+    } else {
+      if(this.hardMute && this._doesObjHaveValues(this.mutedSeries)) {
+
+        var newRawData = [];
+        for(var i=0; i<this.crosshairData.rawData.length; i++) {
+          if(!this.mutedSeries[this.crosshairData.rawData[i][this.timeData]]) {
+            newRawData.push(this.crosshairData.rawData[i]);
+          }
+        }
+        dataset = newRawData;
+      } else {
+        dataset = this.crosshairData.rawData;
+      }
+    }
 
     if(this.showTooltipData) {
       this._setTooltipDataMultiLine(dataset);
@@ -2832,7 +2860,7 @@ PxVisBehavior.highlightLineShared = [{
         }
 
         //if title is specified, use it, otherwiuse id
-        tooltipConfig[aid]["name"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]['title'] ? this.completeSeriesConfig[aid]["title"] : aid;
+        tooltipConfig[aid]["name"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]['title'] ?                          this.completeSeriesConfig[aid]["title"] : aid;
 
         //if there is a unit, add it
         tooltipConfig[aid]["yAxisUnit"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]["yAxisUnit"] ? this.completeSeriesConfig[aid]["yAxisUnit"] : '';
