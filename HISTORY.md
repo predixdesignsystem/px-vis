@@ -1,3 +1,8 @@
+
+================
+* provide "hard muting", allowing a muted series to be ignored for tooltip search as well as recalculating extents when muting a serie
+* added --px-vis-toolbar-submenu-z-index for customizing toolbar sub menu z index
+
 v4.0.2
 ================
 * guards against null/undefined chartData in _combineMutes
