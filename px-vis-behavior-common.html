@@ -403,7 +403,7 @@ PxVisBehavior.combinedMutedSeries = {
 
     @polymerBehavior PxVisBehavior.mutedSeries
 */
-PxVisBehavior.mutedSeries = {
+PxVisBehavior.mutedSeries = [{
   properties: {
     /**
      * A list of user selected muted series. Tied declaratively to series components
@@ -436,7 +436,60 @@ PxVisBehavior.mutedSeries = {
       value: false
     }
   }
-};
+}, PxVisBehavior.completeSeriesConfig];
+
+
+/*
+    Name:
+    PxVisBehavior.mutedCompleteSeriesConfig
+
+    Description:
+    Polymer behavior that provides the _mutedCompleteSeriesConfig property
+
+    Dependencies:
+    -
+
+    @polymerBehavior PxVisBehavior.mutedCompleteSeriesConfig
+*/
+PxVisBehavior.mutedCompleteSeriesConfig = [{
+  properties: {
+    _mutedCompleteSeriesConfig: {
+      type: Object,
+      computed: '_computeMutedCompleteSeriesConfig(completeSeriesConfig, hardMute, mutedSeries.*)'
+    },
+    _nonMutedSeriesKeys: {
+      type: Array,
+      computed: '_computeNonMutedSeriesKeys(_mutedCompleteSeriesConfig)'
+    }
+  },
+
+  _computeNonMutedSeriesKeys: function() {
+    if(!(this._mutedCompleteSeriesConfig === undefined)) {
+      return Object.keys(this._mutedCompleteSeriesConfig);
+    }
+  },
+
+  _computeMutedCompleteSeriesConfig: function(completeSeriesConfig, hardMute, mutedSeries) {
+    if(!(this.completeSeriesConfig === undefined || this.hardMute === undefined || this.mutedSeries === undefined)) {
+      if(!this.hardMute) {
+        return this.completeSeriesConfig;
+      } else {
+
+        //create a new conf without the muted series
+        var newConf = {},
+            keys = Object.keys(this.completeSeriesConfig);
+
+        for(var i=0; i<keys.length; i++) {
+          if(!this.mutedSeries[keys[i]]) {
+            newConf[keys[i]] = this.completeSeriesConfig[[keys[i]]];
+          }
+        }
+        return newConf;
+      }
+    }
+  },
+}, PxVisBehavior.completeSeriesConfig, PxVisBehavior.mutedSeries];
+
 
 /*
     Name:
@@ -2510,31 +2563,34 @@ PxVisBehavior.highlightShared = [{
         arr = [];
 
     for(var i = 0; i < keys.length; i++) {
-      var val = {},
-          x = this.completeSeriesConfig[keys[i]]["x"],
-          y = this.completeSeriesConfig[keys[i]]["y"],
-          coords = [],
-          axis = typeof this.y === 'function' ? this.y : this.y[this.completeSeriesConfig[keys[i]]["axis"]['id']];
 
-      val[x] = dataset[x];
-      val[y] = dataset[y];
+      if(!this.hardMute || !this.mutedSeries[keys[i]]) {
+        var val = {},
+            x = this.completeSeriesConfig[keys[i]]["x"],
+            y = this.completeSeriesConfig[keys[i]]["y"],
+            coords = [],
+            axis = typeof this.y === 'function' ? this.y : this.y[this.completeSeriesConfig[keys[i]]["axis"]['id']];
 
-      if(this.radial) {
-        var domain = axis.domain(),
-            range = axis.range(),
-            dr = range[1] - range[0]
-            dd = domain[1] - domain[0];
-        coords = this._getPixelCoordForRadialData(dataset[x], dataset[y], dr, domain, dd);
-      } else {
-        coords.push(this.x(val[x]));
-        coords.push(axis(val[y]));
+        val[x] = dataset[x];
+        val[y] = dataset[y];
+
+        if(this.radial) {
+          var domain = axis.domain(),
+              range = axis.range(),
+              dr = range[1] - range[0]
+              dd = domain[1] - domain[0];
+          coords = this._getPixelCoordForRadialData(dataset[x], dataset[y], dr, domain, dd);
+        } else {
+          coords.push(this.x(val[x]));
+          coords.push(axis(val[y]));
+        }
+
+        arr.push({
+          "name": keys[i],
+          "value": val,
+          "coord": coords
+        })
       }
-
-      arr.push({
-        "name": keys[i],
-        "value": val,
-        "coord": coords
-      })
     }
 
     return arr;
