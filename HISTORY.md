@@ -2,6 +2,7 @@
 ================
 * provide "hard muting", allowing a muted series to be ignored for tooltip search as well as recalculating extents when muting a serie
 * added --px-vis-toolbar-submenu-z-index for customizing toolbar sub menu z index
+* extent calculation will now add a buffer of 0.5 if a series only has 1 value across all its points, so that the series is displayued in the middle of the chart instead of on the top/bottom
 
 v4.0.2
 ================
