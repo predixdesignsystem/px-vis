@@ -795,8 +795,10 @@ PxVisBehavior.commonMethods = {
     //fatser than Object.keys for big objects
     var i = 0;
     for(prop in obj) {
-      i++;
-      break;
+      if(Object.prototype.hasOwnProperty.call(obj, prop)) {
+        i++;
+        break;
+      }
     }
 
     return i!==0;
