@@ -1,4 +1,3 @@
-
 //obj to be used for running determineExtents. Set it up through properties:
 // xAxisType,
 // yAxisType,
