@@ -748,7 +748,7 @@ PxVisBehavior.commonMethods = {
     if(obj.length) {
       return !obj.length;
     }
-    return Object.keys(obj).length === 0;
+    return !this._hasProps(obj);
   },
 
   /**
@@ -791,8 +791,12 @@ PxVisBehavior.commonMethods = {
       return !!obj.length;
     }
 
+    return this._hasProps(obj);
+  },
+
+  _hasProps: function(obj) {
     //use iterator over object to find out if we have any property,
-    //fatser than Object.keys for big objects
+    //faster than Object.keys for big objects
     var i = 0;
     for(prop in obj) {
       if(Object.prototype.hasOwnProperty.call(obj, prop)) {
@@ -803,6 +807,7 @@ PxVisBehavior.commonMethods = {
 
     return i!==0;
   },
+
   /**
    * Checks to see if an object is defined
    *
