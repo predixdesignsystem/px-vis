@@ -64,9 +64,9 @@ Custom property | Description
       PxVisBehaviorD3.svg,
       PxVisBehaviorD3.axes,
       PxVisBehavior.commonMethods,
-      PxVisBehavior.dimensions,
       PxVisBehavior.dataset,
       PxVisBehavior.mutedSeries,
+      PxVisBehavior.combinedMutedSeries,
       PxVisBehaviorD3.selectedDomain,
       PxVisBehaviorD3.domainUpdate,
       PxVisBehaviorD3.radialAxisConfig,
@@ -615,7 +615,6 @@ Custom property | Description
 
     _calcTooltipData: function() {
       this._calcTooltip = true;
-      //TODO FIXME: MAKE SURE WE CHANGE THAT TO FALSE BEFORE RELEASE (and add preconfigured toolbar options)
       this._calcCrosshair = false;
 
       this._calcHoverData();
@@ -692,7 +691,11 @@ Custom property | Description
 
       //loop through our chart data and find a closetest match
       for(var i = 0; i < this.chartData.length; i++) {
-        this._searchData(aid, mouseVal, result, this.chartData[i])
+
+        //search everything if not hard muted, otherwise only non muted stuff
+        if(!this.hardMute || !this.combinedMutedSeries[this.chartData[i][this.seriesKey]]) {
+          this._searchData(aid, mouseVal, result, this.chartData[i])
+        }
       }
 
       if(this._calcTooltip) {

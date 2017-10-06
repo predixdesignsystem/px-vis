@@ -58,6 +58,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehaviorD3.axes,
       PxVisBehavior.dataset,
       PxVisBehavior.tooltipData,
+      PxVisBehavior.mutedSeries,
       PxVisBehavior.crosshairData,
       PxVisBehavior.extentsData,
       PxVisBehavior.commonMethods,
@@ -616,8 +617,10 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           break;
         }
 
-        //calc this series: returns updated dataObj, xArr, yArr & closestTimestamp
-        this._calcSerieData(dataObj, searchTimeStamp, closestTimestamp, x1, keys[i], mousePos);
+        if(!this.hardMute || !this.mutedSeries[keys[i]]) {
+          //calc this series: returns updated dataObj, xArr, yArr & closestTimestamp
+          this._calcSerieData(dataObj, searchTimeStamp, closestTimestamp, x1, keys[i], mousePos);
+        }
       } //for
 
       // add the timestamp
@@ -638,6 +641,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       ctx.data.calcCrosshair = this._calcCrosshair;
       ctx.data.radius = this.searchRadius;
       ctx.data.searchType = this.searchType;
+      ctx.data.mutedSeries = this.mutedSeries;
+      ctx.data.hardMute = this.hardMute;
       ctx.successCallback = function(e) {
         dataObj.series = e.data.series;
         dataObj.rawData = e.data.rawData;

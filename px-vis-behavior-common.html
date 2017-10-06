@@ -367,6 +367,32 @@ PxVisBehavior.completeSeriesConfig = {
 
 /*
     Name:
+    PxVisBehavior.combinedMutedSeries
+
+    Description:
+    Polymer behavior that provides the combinedMutedSeries property px-vis components.
+
+    Dependencies:
+    -
+
+    @polymerBehavior PxVisBehavior.combinedMutedSeries
+*/
+PxVisBehavior.combinedMutedSeries = {
+  properties: {
+    /**
+     * Aimed at regrouping all muted series when different behavior can mute
+     * series (multi series for example: brush + navigator + categories)
+     */
+    combinedMutedSeries:{
+      type:Object,
+      notify: true,
+      value:function(){ return {}; },
+    }
+  }
+};
+
+/*
+    Name:
     PxVisBehavior.mutedSeries
 
     Description:
@@ -377,7 +403,7 @@ PxVisBehavior.completeSeriesConfig = {
 
     @polymerBehavior PxVisBehavior.mutedSeries
 */
-PxVisBehavior.mutedSeries = {
+PxVisBehavior.mutedSeries = [{
   properties: {
     /**
      * A list of user selected muted series. Tied declaratively to series components
@@ -398,9 +424,72 @@ PxVisBehavior.mutedSeries = {
       type:Object,
       notify: true,
       value:function(){ return {}; },
+    },
+    /**
+     * Allows for a "hard" muting of the series/categories: the
+     * series/category won't show up
+     * in the tooltip anymore, it's tooltip data won't be shown in the register
+     * and its extents won't be taken into account by the chart
+     */
+     hardMute: {
+      type: Boolean,
+      value: false
     }
   }
-};
+}, PxVisBehavior.completeSeriesConfig];
+
+
+/*
+    Name:
+    PxVisBehavior.mutedCompleteSeriesConfig
+
+    Description:
+    Polymer behavior that provides the _mutedCompleteSeriesConfig property
+
+    Dependencies:
+    -
+
+    @polymerBehavior PxVisBehavior.mutedCompleteSeriesConfig
+*/
+PxVisBehavior.mutedCompleteSeriesConfig = [{
+  properties: {
+    _mutedCompleteSeriesConfig: {
+      type: Object,
+      computed: '_computeMutedCompleteSeriesConfig(completeSeriesConfig, hardMute, mutedSeries.*)'
+    },
+    _nonMutedSeriesKeys: {
+      type: Array,
+      computed: '_computeNonMutedSeriesKeys(_mutedCompleteSeriesConfig)'
+    }
+  },
+
+  _computeNonMutedSeriesKeys: function() {
+    if(!(this._mutedCompleteSeriesConfig === undefined)) {
+      return Object.keys(this._mutedCompleteSeriesConfig);
+    }
+  },
+
+  _computeMutedCompleteSeriesConfig: function(completeSeriesConfig, hardMute, mutedSeries) {
+    if(!(this.completeSeriesConfig === undefined || this.hardMute === undefined || this.mutedSeries === undefined)) {
+      if(!this.hardMute) {
+        return this.completeSeriesConfig;
+      } else {
+
+        //create a new conf without the muted series
+        var newConf = {},
+            keys = Object.keys(this.completeSeriesConfig);
+
+        for(var i=0; i<keys.length; i++) {
+          if(!this.mutedSeries[keys[i]]) {
+            newConf[keys[i]] = this.completeSeriesConfig[[keys[i]]];
+          }
+        }
+        return newConf;
+      }
+    }
+  },
+}, PxVisBehavior.completeSeriesConfig, PxVisBehavior.mutedSeries];
+
 
 /*
     Name:
@@ -701,7 +790,18 @@ PxVisBehavior.commonMethods = {
     if(obj.length) {
       return !!obj.length;
     }
-    return Object.keys(obj).length > 0;
+
+    //use iterator over object to find out if we have any property,
+    //fatser than Object.keys for big objects
+    var i = 0;
+    for(prop in obj) {
+      if(Object.prototype.hasOwnProperty.call(obj, prop)) {
+        i++;
+        break;
+      }
+    }
+
+    return i!==0;
   },
   /**
    * Checks to see if an object is defined
@@ -2444,24 +2544,27 @@ PxVisBehavior.highlightShared = [{
         upperFuzz;
 
     for(var i = 0; i < this.crosshairData.timeStamps.length; i++) {
-      if(this.fuzz) {
-        lowerFuzz = this.crosshairData.timeStamps[i] - Number(this.fuzz);
-        upperFuzz = this.crosshairData.timeStamps[i] + Number(this.fuzz);
 
-        if(d.length) {
-          lowerFuzz = lowerFuzz <= d[d.length-1][this.timeData] ? d[d.length-1][this.timeData] + 1 : lowerFuzz;
+      if(!this.hardMute || !this.mutedSeries[this.crosshairData.timeStamps[i]]) {
+        if(this.fuzz) {
+          lowerFuzz = this.crosshairData.timeStamps[i] - Number(this.fuzz);
+          upperFuzz = this.crosshairData.timeStamps[i] + Number(this.fuzz);
+
+          if(d.length) {
+            lowerFuzz = lowerFuzz <= d[d.length-1][this.timeData] ? d[d.length-1][this.timeData] + 1 : lowerFuzz;
+          }
+
+          //merge 2 arrays without creating a new one. DON'T use concat here as the GC implications + array
+          //duplication are killing perf
+          //the only limitation is if the fuzzy search returns more than a few tens of thousands
+          //of points since argument length is arbitrarily limited in different  browsers:
+          //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply
+          //in practice we should be ok since each fuzzy search returns result for 1 point, if each point
+          //returns tens of thousands we are in an absolutely crazy scenario
+          Array.prototype.push.apply(d,this._fuzzyBinarySearch(this.chartData, this.timeData, lowerFuzz, upperFuzz, null, null));
+        } else {
+          d.push(this._binarySearch(this.chartData, this.timeData, this.crosshairData.timeStamps[i], null, null));
         }
-
-        //merge 2 arrays without creating a new one. DON'T use concat here as the GC implications + array
-        //duplication are killing perf
-        //the only limitation is if the fuzzy search returns more than a few tens of thousands
-        //of points since argument length is arbitrarily limited in different  browsers:
-        //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply
-        //in practice we should be ok since each fuzzy search returns result for 1 point, if each point
-        //returns tens of thousands we are in an absolutely crazy scenario
-        Array.prototype.push.apply(d,this._fuzzyBinarySearch(this.chartData, this.timeData, lowerFuzz, upperFuzz, null, null));
-      } else {
-        d.push(this._binarySearch(this.chartData, this.timeData, this.crosshairData.timeStamps[i], null, null));
       }
     }
 
@@ -2474,49 +2577,52 @@ PxVisBehavior.highlightShared = [{
         arr = [];
 
     for(var i = 0; i < keys.length; i++) {
-      var val = {},
-          x = this.completeSeriesConfig[keys[i]]["x"],
-          y = this.completeSeriesConfig[keys[i]]["y"],
-          coords = [],
-          axis = typeof this.y === 'function' ? this.y : this.y[this.completeSeriesConfig[keys[i]]["axis"]['id']];
 
-      val[x] = dataset[x];
-      val[y] = dataset[y];
+      if(!this.hardMute || !this.mutedSeries[keys[i]]) {
+        var val = {},
+            x = this.completeSeriesConfig[keys[i]]["x"],
+            y = this.completeSeriesConfig[keys[i]]["y"],
+            coords = [],
+            axis = typeof this.y === 'function' ? this.y : this.y[this.completeSeriesConfig[keys[i]]["axis"]['id']];
 
-      if(this.radial) {
-        var domain = axis.domain(),
-            range = axis.range(),
-            dr = range[1] - range[0]
-            dd = domain[1] - domain[0];
-        coords = this._getPixelCoordForRadialData(dataset[x], dataset[y], dr, domain, dd);
-      } else {
-        coords.push(this.x(val[x]));
-        coords.push(axis(val[y]));
+        val[x] = dataset[x];
+        val[y] = dataset[y];
+
+        if(this.radial) {
+          var domain = axis.domain(),
+              range = axis.range(),
+              dr = range[1] - range[0]
+              dd = domain[1] - domain[0];
+          coords = this._getPixelCoordForRadialData(dataset[x], dataset[y], dr, domain, dd);
+        } else {
+          coords.push(this.x(val[x]));
+          coords.push(axis(val[y]));
+        }
+
+        arr.push({
+          "name": keys[i],
+          "value": val,
+          "coord": coords
+        })
       }
-
-      arr.push({
-        "name": keys[i],
-        "value": val,
-        "coord": coords
-      })
     }
 
     return arr;
   },
 
   _setTooltipData: function(dataset) {
+    var ttd = null;
+
     if(dataset.length) {
-      var timestamp = this.timeData ? dataset[0][this.timeData] : null;
+      var timestamp = this.timeData ? dataset[0][this.timeData] : null,
           series = this._generateSeries(dataset[0]);
-          ttd = this._createTooltipDataStub(series[0]["coord"], timestamp, !this.hideTooltip);
 
-      ttd.series = series;
-
-      this.set("defaultEmptyData", ttd);
-
-    } else {
-      this.set("defaultEmptyData", null);
+      if(series.length) {
+        ttd = this._createTooltipDataStub(series[0]["coord"], timestamp, !this.hideTooltip);
+        ttd.series = series;
+      }
     }
+    this.set("defaultEmptyData", ttd);
   }
 }, PxVisBehavior.interactionSpaceShared];
 
@@ -2649,7 +2755,23 @@ PxVisBehavior.highlightLineShared = [{
       return [];
     }
 
-    var dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawData;
+    var dataset
+    if(this.differentDataset) {
+      dataset = this._calcDataset();
+    } else {
+      if(this.hardMute && this._doesObjHaveValues(this.mutedSeries)) {
+
+        var newRawData = [];
+        for(var i=0; i<this.crosshairData.rawData.length; i++) {
+          if(!this.mutedSeries[this.crosshairData.rawData[i][this.timeData]]) {
+            newRawData.push(this.crosshairData.rawData[i]);
+          }
+        }
+        dataset = newRawData;
+      } else {
+        dataset = this.crosshairData.rawData;
+      }
+    }
 
     if(this.showTooltipData) {
       this._setTooltipDataMultiLine(dataset);
@@ -2740,7 +2862,7 @@ PxVisBehavior.highlightLineShared = [{
         }
 
         //if title is specified, use it, otherwiuse id
-        tooltipConfig[aid]["name"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]['title'] ? this.completeSeriesConfig[aid]["title"] : aid;
+        tooltipConfig[aid]["name"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]['title'] ?                          this.completeSeriesConfig[aid]["title"] : aid;
 
         //if there is a unit, add it
         tooltipConfig[aid]["yAxisUnit"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]["yAxisUnit"] ? this.completeSeriesConfig[aid]["yAxisUnit"] : '';

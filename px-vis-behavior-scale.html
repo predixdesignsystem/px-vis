@@ -275,7 +275,9 @@ PxVisBehaviorScale.scale = [{
       wwInfo.dataExtents = this.dataExtents;
       wwInfo.axes = this.axes;
       wwInfo.seriesToAxes = this.seriesToAxes;
-      wwInfo.isYAxisObject = typeof this.y === 'object'
+      wwInfo.isYAxisObject = typeof this.y === 'object';
+      wwInfo.hardMute = this.hardMute;
+      wwInfo.mutedSeries = this.mutedSeries;
 
       Px.vis.scheduler.process({
         'action': 'determineExtents',
@@ -393,12 +395,25 @@ PxVisBehaviorScale.scale = [{
       extents.y[1] = 1;
     }
 
-    //if min and max are the same add 1 so we still get a range
+    //if min and max are the same widen the range by 1 so we still get a range and see the value
     if(extents.x[1] === extents.x[0]) {
-      extents.x[1] += 1;
+      extents.x[0] -= 0.5;
+      extents.x[1] += 0.5;
     }
-    if(Array.isArray(extents.y) && extents.y[1] === extents.y[0]) {
-      extents.y[1] += 1;
+    if(Array.isArray(extents.y)) {
+      if(extents.y[1] === extents.y[0]) {
+        extents.y[0] -= 0.5;
+        extents.y[1] += 0.5;
+      }
+    } else {
+      var yKeys = Object.keys(extents.y);
+
+      for(var i=0; i<yKeys.length; i++) {
+        if(extents.y[yKeys[i]][0] === extents.y[yKeys[i]][1]) {
+          extents.y[yKeys[i]][0] -= 0.5;
+          extents.y[yKeys[i]][1] += 0.5;
+        }
+      }
     }
 
     return extents
@@ -522,11 +537,14 @@ PxVisBehaviorScale.scale = [{
   _getDataExtents: function(d,keysArr, axis) {
     var a = [];
     for(var i = 0; i < keysArr.length; i++) {
-      var key = keysArr[i],
-          val = d[this.completeSeriesConfig[key][axis]];
+      var key = keysArr[i];
 
-      if(val || val === 0) {
-        a.push(val);
+      if(!this.mutedSeries[keysArr[i]]) {
+        var val = d[this.completeSeriesConfig[key][axis]];
+
+        if(val || val === 0) {
+          a.push(val);
+        }
       }
     }
     return [ Math.min.apply(null,a), Math.max.apply(null,a) ];
@@ -596,11 +614,13 @@ _checkInSeriesConfig: function(exts, a) {
   for(var i = 0; i < this.seriesToAxes[a].length; i++) {
     var s = this.seriesToAxes[a][i];
 
-    exts[a][0] = (this.completeSeriesConfig[s]['yMin'] || this.completeSeriesConfig[s]['yMin'] === 0) ?
-        Math.min(this.completeSeriesConfig[s]['yMin'], exts[a][0]) : exts[a][0];
+    if(!this.hardMute || !this.mutedSeries[s]) {
+      exts[a][0] = (this.completeSeriesConfig[s]['yMin'] || this.completeSeriesConfig[s]['yMin'] === 0) ?
+          Math.min(this.completeSeriesConfig[s]['yMin'], exts[a][0]) : exts[a][0];
 
-    exts[a][1] = (this.completeSeriesConfig[s]['yMax'] || this.completeSeriesConfig[s]['yMax'] === 0) ?
-        Math.max(this.completeSeriesConfig[s]['yMax'], exts[a][1]) : exts[a][1];
+      exts[a][1] = (this.completeSeriesConfig[s]['yMax'] || this.completeSeriesConfig[s]['yMax'] === 0) ?
+          Math.max(this.completeSeriesConfig[s]['yMax'], exts[a][1]) : exts[a][1];
+    }
   }
 },
 
@@ -632,7 +652,7 @@ _applyChartExtents: function(exts, a) {
 },
 
 /**
- * Seach for multi axis extents
+ * Search for multi axis extents
  *
  */
 _searchForExtents: function (exts, seriesToSearch, data) {
@@ -654,17 +674,20 @@ _searchForExtents: function (exts, seriesToSearch, data) {
 },
 
 /**
- * Seach for multi axis extents
+ * Search for multi axis extents
  *
  */
 _calcSeriesToSearch: function (exts, a, seriesToSearch) {
   for(var i = 0; i < this.seriesToAxes[a].length; i++) {
     var s = this.seriesToAxes[a][i];
-    seriesToSearch[s] = {
-      "axis": a,
-      "min": exts[a][0] === Infinity ? true : false,
-      "max": exts[a][1] === -Infinity ? true : false
-    };
+
+    if(!this.hardMute || !this.mutedSeries[s]) {
+      seriesToSearch[s] = {
+        "axis": a,
+        "min": exts[a][0] === Infinity ? true : false,
+        "max": exts[a][1] === -Infinity ? true : false
+      };
+    }
   }
 },
 
@@ -677,7 +700,8 @@ _calcMultiAxisExtents: function() {
   var search = false,
       exts = {},
       seriesToSearch = {},
-      a;
+      a,
+      keys;
 
   for(var i = 0; i < this.axes.length; i++) {
     a = this.axes[i];
@@ -704,6 +728,14 @@ _calcMultiAxisExtents: function() {
   // if we indicated we need to search for extent values
   if(search) {
     this._searchForExtents(exts, seriesToSearch, this.chartData);
+  }
+
+  //verify all extents are valid
+  keys = Object.keys(exts);
+  for(var i=0; i<keys.length; i++) {
+    if(exts[keys[i]][0] === Infinity || exts[keys[i]][1] === -Infinity) {
+      exts[keys[i]] = [0,1];
+    }
   }
 
   return exts;
@@ -877,7 +909,8 @@ _calcMultiAxisExtents: function() {
   PxVisBehavior.chartExtents,
   PxVisBehavior.dataExtents,
   PxVisBehaviorD3.domainUpdateNotify,
-  PxVisBehavior.preventWebWorkerSynchronization
+  PxVisBehavior.preventWebWorkerSynchronization,
+  PxVisBehavior.mutedSeries
 ];
 
 </script>
