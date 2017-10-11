@@ -1,3 +1,7 @@
+v4.1.1
+================
+* Fix issue where change in x axis scale wouldn't notify
+
 v4.1.0
 ================
 * provide "hard muting", allowing a muted series to be ignored for tooltip search as well as recalculating extents when muting a serie. A "hard muted" series won't show up in the tooltip, but will in the register (so it can be unmuted). Values won't be provided for a "hard muted" series
