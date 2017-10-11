@@ -1,4 +1,5 @@
 <link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="../px-tooltip/px-tooltip.html" />
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="px-vis-scatter-canvas.html" />
@@ -72,6 +73,16 @@ Custom property | Description
           renderer-type="markers">
         </px-vis-scatter-canvas>
       </template>
+      <px-tooltip
+        id="tooltip"
+        follow-mouse
+        delay="50"
+        smart-orientation
+        orientation="top"
+        for="[[_canvas]]"
+        mouse-coords="[[_tooltipPosition]]"
+        tooltip-message="[[_ttMessage]]"
+      ></px-tooltip>
     </template>
 </dom-module>
 
@@ -128,6 +139,23 @@ Custom property | Description
       _bottomDomain: {
         type: Boolean,
         value: null
+      },
+
+      _canvas : {
+        type: Object,
+        computed: '_getCanvas(canvasContext)'
+      },
+
+      /**
+       * how close to a point the mouse has to be before we show a tooltip
+       */
+      tooltipDetectionRadius: {
+        type: Number,
+        value: 10
+      },
+
+      _tooltipPosition: {
+        type: Array
       }
 
     }, //properties
@@ -286,6 +314,149 @@ Custom property | Description
       if(this._topDomain !== null && this._bottomDomain !== null && this.domainChanged !== null) {
         this.set('_bottomDomain', !this._bottomDomain);
         this.set('_topDomain', !this._topDomain);
+      }
+    },
+
+    _mouseMove: function(evt) {
+
+      //figure out which row we're hovering
+      var mousePos = Px.d3.mouse(this._canvas);
+
+      if(mousePos[0] > this.margin.left && mousePos[0] < (this.width - this.margin.right) && mousePos[1] > 0) {
+
+        //adjust mouse pos to get correct time
+        adjustedMousePos = [mousePos[0] - this.margin.left, mousePos[1]];
+        var rowInfo = this._getRowInfoForMouse(mousePos);
+
+        if(rowInfo.index) {
+          //search for point on left
+          var labels = this._findLabelsForRow(rowInfo.index),
+              data = [],
+              bisect = Px.d3.bisector(function(d) {
+                  return d.x;
+              }.bind(this)).left,
+              maxDomain = this.x.domain()[1],
+              minDomain = this.x.domain()[0],
+              mouseTime = this.x.invert(adjustedMousePos[0]),
+              left,
+              right,
+              pixelResult = [],
+              dataResult;
+
+          //get data for all labels we're interested in
+          for(var i=0; i<labels.length; i++) {
+            data = data.concat(this._markerData[labels[i]]);
+          }
+
+          left = bisect(data, mouseTime) - 1;
+          right = left ? left+1 : data.length;
+
+          if(!data[left] || data[left].x < minDomain) {
+            //out of bound on left
+            dataResult = data[right];
+          } else if(!data[right] || data[right].x > maxDomain) {
+            //out of bound on right
+            dataResult = data[left];
+          } else if(data[right] && (data[right].x - mouseTime) < (mouseTime - data[left].x)) {
+            //closer to right
+            dataResult = data[right];
+          } else if(data[left]) {
+            //closer to left
+            dataResult = data[left];
+          } else {
+            console.log('fail');
+          }
+
+          // if(!data[left] || data[left].x < minDomain || (data[right].x - mouseTime) < (mouseTime - data[left].x)) {
+          //   //out of bound on left
+          //   console.log('right: ' + moment(data[right].x).format());
+          //   dataResult = data[right];
+          // } else if(!data[right] || data[right].x > maxDomain) {
+          //   //out of bound on right
+          //   console.log('left: ' + moment(data[left].x).format())
+          //   dataResult = data[left];
+          // }
+
+          if(dataResult) {
+            pixelResult[0] = this.x(dataResult.x) + this.margin.left ;
+            if(Math.abs(pixelResult[0] - mousePos[0]) <= this.tooltipDetectionRadius) {
+
+              //adjust pixel values to take canvas position into account
+              pixelResult[0] += (Px.d3.event.pageX - mousePos[0]);
+              pixelResult[1] = Px.d3.event.pageY - mousePos[1] + rowInfo.rowY;
+              this.set('_ttMessage', dataResult.x);
+              this.set('_tooltipPosition', pixelResult);
+              this.$.tooltip._show();
+
+            } else if(this.$.tooltip._isShowing || this.$.tooltip._requestShow) {
+              this.$.tooltip._hide();
+            }
+          } else if(this.$.tooltip._isShowing || this.$.tooltip._requestShow) {
+            this.$.tooltip._hide();
+          }
+        }
+      }
+    },
+
+    _getRowInfoForMouse: function(mousePos) {
+      var top = mousePos[1] <= this.margin.top ? true : false,
+            yStart,
+            scale,
+            domain,
+            availableSpace,
+            domainIndex = 0,
+            rowHeight,
+            rowY;
+
+        //init based on bottom or top rows
+        if(top) {
+          yStart = 0;
+          scale = this._topScale;
+          availableSpace = this.margin.top;
+        } else {
+          yStart = this.height - this.margin.bottom;
+          scale = this._bottomScale;
+          availableSpace = this.margin.bottom;
+        }
+        domain = scale.domain();
+
+        //find which row we're hovering
+        if(domain.length) {
+          rowHeight = availableSpace/domain.length;
+          domainIndex = Math.floor((mousePos[1] - yStart) / rowHeight);
+          rowY = yStart + (domainIndex + 0.5) * rowHeight;
+        } else {
+          rowY = yStart + availableSpace/2;
+        }
+
+        return {'index': domain[domainIndex], 'rowY': rowY};
+    },
+
+    _findLabelsForRow: function(rowIndex) {
+      var keys = Object.keys(this.markerConfig),
+          result = [];
+
+      rowIndex = Number(rowIndex);
+
+      for(var i=0; i<keys.length; i++) {
+        if(rowIndex === this.markerConfig[keys[i]].row || (rowIndex === 0 && !this.markerConfig[keys[i]].row)) {
+          result.push(keys[i]);
+        }
+      }
+
+      return result;
+    },
+
+    _getCanvas: function() {
+      if(this.canvasContext) {
+
+        if(this._canvas === undefined) {
+
+          //register handlers the first time
+          Px.d3.select(this.canvasContext.canvas).on('mousemove.markers', this._mouseMove.bind(this));
+        }
+
+        return this.canvasContext.canvas;
       }
     }
   });
