@@ -1335,13 +1335,21 @@ PxVisBehavior.markers = {
      * Configuration object to define what marker should map to what icon, color, and row.
      * The object has a key being the marker name, the value being a configuration object for that marker. The configuration object has four properties:
      * - `color`: A rgb color value for the fill or stroke.
-     * - "markerFillOpacity": the opacity of the inside of the marker
-     * - "markerStrokeOpacity": the opacity of the outside of the marker
+     * - `markerFillOpacity`: the opacity of the inside of the marker
+     * - `markerStrokeOpacity`: the opacity of the outside of the marker
      * - `markerSymbol`: the symbol type; see below
-     * - "markerSize": specifies the size of markers
-     * - "markerScale": allows to scale the size of markers
-     * - "location": "top" or "bottom"
-     * - "row": the row number on the top or the bottom, starting at 0
+     * - `markerSize`: specifies the size of markers
+     * - `markerScale`: allows to scale the size of markers
+     * - `location`: "top" or "bottom"
+     * - `row`: the row number on the top or the bottom, starting at 0
+     * - `showTooltip`: whether a tooltip should be shown on hover
+     * - `firstDateTimeFormat`: used to format the date part of the timestamp in the tooltip
+     * - `secondDateTimeFormat`: used to format the time part of the timestamp in the tooltip
+     * - `separator`: symbol between date and time in the tooltip
+     * - `timezone`: timezone to use for the timestamp in the tooltip
+     * - `tooltipOrientation`: orientation of the tooltip: "left", "right", "bottom", "top"
+     * - `tooltipLabel`: label to be used in the tooltip for this type. If not defined the key
+     * of this type will be used (which should match 'label' in the markerData)
      *
      * The symbol used for the marker. Supported symbols:
      * - 'circle'
@@ -1352,7 +1360,6 @@ PxVisBehavior.markers = {
      * - 'star'
      * - 'wye'
      * more info at https://github.com/d3/d3-shape/blob/master/README.md#symbols
-     * This property will be read from the completeSeriesConfig
      *
      * Some additional "custom" types are also available:
      * - 'bar'
@@ -1361,14 +1368,20 @@ PxVisBehavior.markers = {
      * - 'x'
      * ```
      * Example: {
-     *   "myMarkerType":{
-     *       "fillColor": "rgb(123,0,0)",
-     *       "markerFillOpacity": 0.5,
-     *       "markerSymbol": "square",
-     *       "markerSize": 4,
-     *       "location": "top",
-     *       "row": 1,
-     *       "priority": 10
+     *   'myMarkerType':{
+     *       'fillColor': 'rgb(123,0,0)',
+     *       'markerFillOpacity': 0.5,
+     *       'markerSymbol': 'square',
+     *       'markerSize': 4,
+     *       'location': 'top',
+     *       'row': 1,
+     *       'priority': 10,
+     *       'showTooltip': true,
+     *       'firstDateTimeFormat': 'HH:mm:ss ZZ',
+     *       'secondDateTimeFormat': 'DD MMM YYYY',
+     *       'separator': '|',
+     *       'timezone': 'utc',
+     *       'tooltipOrientation': 'top'
      *   }
      * }
      * ```
@@ -1376,6 +1389,24 @@ PxVisBehavior.markers = {
      */
     markerConfig: {
       type: Object
+    },
+    _defaultMarkerConfig: {
+      type: Object,
+      readonly: true,
+      value: function() {
+        return {
+          'color': 'rgb(123,123,123)',
+          'markerStrokeOpacity': 0,
+          'markerSymbol': 'square',
+          'markerSize': 64,
+          'markerScale': 1,
+          'showTooltip': true,
+          'firstDateTimeFormat': 'HH:mm:ss ZZ',
+          'secondDateTimeFormat': 'DD MMM YYYY',
+          'separator': '|',
+          'timezone': 'utc',
+          'tooltipOrientation': 'top'};
+      }
     },
     /**
      * Data representing the markers. Example:
