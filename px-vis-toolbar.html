@@ -244,6 +244,27 @@ Custom property | Description
                 'mouseup': 'callAxisDrag'
               }
             },
+            'crosshairLasso': {
+              'tooltipLabel': 'Lasso selection',
+              'icon': 'px-vis:refresh',
+              'buttonGroup': 1,
+              'selectable': true,
+              'onClick': 'function() { this.set("_internalShowTooltip", false); this.set("interactionSpaceConfig.searchType", "lasso");}',
+              'onDeselect': 'function() { this.set("interactionSpaceConfig.searchType", "none");}',
+              'actionConfig': {
+                'mouseout': 'null',
+                'mousemove': 'calcCrosshairData',
+                'mousedown': 'startLasso',
+                'mouseup': 'stopLasso'
+              },
+              'subConfig': {
+                'clearCrosshair': {
+                  'tooltipLabel': 'Clear lasso data',
+                  'icon': 'px-nav:close',
+                  'onClick': 'function() { this.set("crosshairData", { "rawData": [], "timeStamps": []}); this.set("interactionSpaceConfig.resetLassoData", !this.interactionSpaceConfig.resetLassoData);}',
+                }
+              }
+            },
             'crosshair': {
               'tooltipLabel': 'Crosshair',
               'icon': 'px-vis:crosshair',
@@ -276,7 +297,13 @@ Custom property | Description
                   'tooltipLabel': 'Closest Timestamp and associated points',
                   'buttonGroup': 1,
                   'selectable': true,
-                  'onClick': 'function() { this.set("interactionSpaceConfig.searchType", "closestPoint");}'
+                  'onClick': 'function() { this.set("interactionSpaceConfig.searchType", "closestPoint");}',
+                  'actionConfig': {
+                    'mouseout': 'resetTooltipAndCrosshairData',
+                    'mousemove': 'calcTooltipAndCrosshairData',
+                    'mousedown': 'null',
+                    'mouseup': 'null'
+                  },
                 },
                 'pointPerSeries': {
                   'icon': 'px-vis:closest-point-series',
@@ -284,7 +311,13 @@ Custom property | Description
                   'tooltipLabel': 'Point Per Series',
                   'buttonGroup': 1,
                   'selectable': true,
-                  'onClick': 'function() { this.set("interactionSpaceConfig.searchType", "pointPerSeries");}'
+                  'onClick': 'function() { this.set("interactionSpaceConfig.searchType", "pointPerSeries");}',
+                  'actionConfig': {
+                    'mouseout': 'resetTooltipAndCrosshairData',
+                    'mousemove': 'calcTooltipAndCrosshairData',
+                    'mousedown': 'null',
+                    'mouseup': 'null'
+                  },
                 },
                 'allInArea': {
                   'icon': 'px-vis:all-points-in-area',
@@ -292,7 +325,13 @@ Custom property | Description
                   'tooltipLabel': 'All in area',
                   'buttonGroup': 1,
                   'selectable': true,
-                  'onClick': 'function() { this.set("interactionSpaceConfig.searchType", "allInArea");}'
+                  'onClick': 'function() { this.set("interactionSpaceConfig.searchType", "allInArea");}',
+                  'actionConfig': {
+                    'mouseout': 'resetTooltipAndCrosshairData',
+                    'mousemove': 'calcTooltipAndCrosshairData',
+                    'mousedown': 'null',
+                    'mouseup': 'null'
+                  },
                 },
                 'radiusUp': {
                   'icon': 'px-vis:expand-radius',

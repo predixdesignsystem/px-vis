@@ -1,6 +1,7 @@
 <link rel="import" href="../polymer/polymer.html"/>
 <link rel="import" href="../px-icon-set/px-icon-set.html"/>
 <link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-interaction.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="css/px-vis-styles.html">
 
@@ -29,6 +30,10 @@ Custom property | Description | Default
   `--px-vis-zoom-brush-outline-color` | The stroke (border) color for the on-chart zoom/selection brush | `$grey6`
   `--px-vis-zoom-brush-fill-color` | The fill (background) color for the on-chart zoom/selection brush | `$gray2`
   `--px-vis-zoom-brush-fill-opacity` | The opacity for the on-chart zoom/selection brush | `0.5`
+
+  `--px-vis-lasso-outline-color` | The stroke (border) color for the on-chart lasso selection | `$grey12`
+  `--px-vis-lasso-fill-color` | The fill (background) color for the on-chart lasso selection | `none`
+  `--px-vis-lasso-fill-opacity` | The opacity for the on-chart lasso selection | `0.5`
 
 @element px-vis-interaction-space
 @blurb Element providing on-chart hover functionality to get data values near the mouse cursor.
@@ -72,7 +77,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehavior.interactionSpaceShared,
       PxVisBehavior.preventWebWorkerSynchronization,
       PxVisBehavior.wwDataSyncCounter,
-      PxVisBehaviorD3.cursorIcon
+      PxVisBehaviorD3.cursorIcon,
+      PxVisBehaviorInteraction.lasso
     ],
     /***EVENTS****/
     /*
@@ -149,7 +155,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           'resetCrosshair': '_resetCrosshairData',
           'startPanning': '_startPanning',
           'stopPanning': '_stopPanning',
-          'reportMouseCoords': '_reportMouseCoords'
+          'reportMouseCoords': '_reportMouseCoords',
+          'startLasso': '_startLasso',
+          'stopLasso': '_stopLasso'
         }
       },
       /**
@@ -222,11 +230,13 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         type: String
       },
 
+      /**
+       * the crosshair search: closestPoint, pointPerSeries, allInArea, polygon
+       */
       searchType: {
         type: String,
-        value: 'closestPoint' //closestPoint, pointPerSeries, allInArea
+        value: 'closestPoint'
       },
-
 
       /**
        * Holder for the cursor drawing objects.
@@ -520,6 +530,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           }
 
       this.set('crosshairData',ttD);
+      this.set('_lassoCrosshairData', ttD);
       this.generatingCrosshairData = false;
     },
 
@@ -553,6 +564,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      */
     _calcData: function() {
 
+      if(this.searchType === 'lasso' && !this._isLassoing) {
+        return;
+      }
       this.set('_calculatingData', true);
 
       if(!this.mouseDown && this.chartData.length > 0 && this.y) {
@@ -571,12 +585,29 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       // now we can set our data that we want to pass out
       if(this._calculatingData) {
 
-        delete dataObj.timeStampsTracker;
+
 
         if(this._calcCrosshair) {
           this.generatingCrosshairData = true;
-          this.set('crosshairData', {'rawData': dataObj.rawData, 'timeStamps': dataObj.timeStamps});
+
+          //when in lasso mode keep adding data
+          if(this.searchType === 'lasso' && this.crosshairData) {
+
+            var newData = {
+              rawData: this._lassoCrosshairData.rawData || [],
+              timeStamps: this._lassoCrosshairData.timeStamps || []
+            };
+
+            newData.rawData = newData.rawData.concat(dataObj.rawData);
+            newData.timeStamps = newData.timeStamps.concat(dataObj.timeStamps);
+            this.set('crosshairData', newData);
+
+          } else {
+            this.set('crosshairData', {'rawData': dataObj.rawData, 'timeStamps': dataObj.timeStamps});
+          }
         }
+
+        delete dataObj.timeStampsTracker;
 
         if(this._calcTooltip) {
 
@@ -643,6 +674,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       ctx.data.searchType = this.searchType;
       ctx.data.mutedSeries = this.mutedSeries;
       ctx.data.hardMute = this.hardMute;
+      ctx.data.polygon = this._lassoCoords;
       ctx.successCallback = function(e) {
         dataObj.series = e.data.series;
         dataObj.rawData = e.data.rawData;
@@ -736,12 +768,10 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       var bisectDate = Px.d3.bisector(function(d) {
             return d[this.completeSeriesConfig[k]['x']];
           }.bind(this)).left,
-          index = bisectDate(this.chartData, x1, 1),
-          // get the data values around our cursor timestamp
-          d0 = this.chartData[index - 1],
-          d1 = (this.chartData[index]) ? this.chartData[index] : this.chartData[index - 1],
-          // sets result as the closest date to the mouse
-          r = (x1 - d0[xKey] > d1[xKey] - x1) ? d1 : d0,
+          index,
+          d0,
+          d1,
+          r,
           result = {
             "series": {},
             "rawData": dataObj.rawData,
@@ -749,16 +779,58 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             'timeStampsTracker': dataObj.timeStampsTracker
           };
 
-      result.series[xKey] = r[xKey];
-      result.series[yKey] = r[yKey];
+      if(this.searchType === 'lasso') {
 
-      if(!result.timeStampsTracker[r[xKey]]) {
-        //TODO: pixel search? Should the fuzzy time be applied here instead
-        result.rawData.push(r);
+        //find min and max X
+        var ext = d3.extent(this._lassoCoords, function(d) {
+          return d[0];
+        }),
+            resultArr = [],
+            searching = true,
+            timestamp;
 
-        // TODO Convert to SET when we can use ES6
-        result.timeStamps.push(r[xKey]);
-        result.timeStampsTracker[r[xKey]] = true;
+        ext[0] = Number(this.x.invert(ext[0]));
+        ext[1] = Number(this.x.invert(ext[1]));
+        index = bisectDate(this.chartData, ext[0], 1);
+
+        //get point to the right of min and iterate until we reach max
+        do {
+          timestamp = this.chartData[index][xKey];
+
+          if(timestamp < ext[1]) {
+
+            resultArr.push(this.chartData[index]);
+            if(!result.timeStampsTracker[timestamp]) {
+              //TODO: pixel search? Should the fuzzy time be applied here instead
+              result.rawData.push(this.chartData[index]);
+
+              // TODO Convert to SET when we can use ES6
+              result.timeStamps.push(timestamp);
+              result.timeStampsTracker[timestamp] = true;
+            }
+            index++;
+          } else {
+            searching = false;
+          }
+        } while(searching)
+      } else {
+        index = bisectDate(this.chartData, x1, 1),
+        // get the data values around our cursor timestamp
+        d0 = this.chartData[index - 1],
+        d1 = (this.chartData[index]) ? this.chartData[index] : this.chartData[index - 1],
+        // sets result as the closest date to the mouse
+        r = (x1 - d0[xKey] > d1[xKey] - x1) ? d1 : d0;
+        result.series[xKey] = r[xKey];
+        result.series[yKey] = r[yKey];
+
+        if(!result.timeStampsTracker[r[xKey]]) {
+          //TODO: pixel search? Should the fuzzy time be applied here instead
+          result.rawData.push(r);
+
+          // TODO Convert to SET when we can use ES6
+          result.timeStamps.push(r[xKey]);
+          result.timeStampsTracker[r[xKey]] = true;
+        }
       }
 
       return result
@@ -1205,7 +1277,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           originalX = mousePos[0];
         }
         if(originalY > newY) {
-          console.log("neg")
           newY = originalY;
           originalY = mousePos[1];
         }
@@ -1246,8 +1317,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           this._actionArea.attr('height', newH);
           this._originalBoxCoords.y = newY;
           this._originalBoxCoords.height = newH;
-          console.log(newY);
-          console.log(newH);
         }
 
         Px.d3.event.preventDefault();
