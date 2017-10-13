@@ -1,3 +1,7 @@
+v4.2.0
+================
+* Added "lasso" selection for crosshair mode, available by default with "crosshairLasso" in toolbar
+
 v4.1.1
 ================
 * Fix issue where change in x axis scale wouldn't notify
