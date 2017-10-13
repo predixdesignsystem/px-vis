@@ -206,16 +206,16 @@ Custom property | Description
         value: function() {
           return {
             'annotations': {
-              'tooltipLabel': 'Mute Series on Axis',
-              'icon': 'px-vis:brush',
-              'cursorIcon': 'px-vis:brush',
+              'tooltipLabel': 'Annotations',
+              'icon': 'px-com:comment',
+              'cursorIcon': 'px-com:comment',
               'buttonGroup': 1,
               'onClick': 'function() { this.set("_internalShowTooltip", false);}',
               'actionConfig': {
                 'mouseout': 'null',
                 'mousemove': 'null',
-                'mousedown': 'callAxisMute',
-                'mouseup': 'callAxisMute'
+                'mousedown': function(evt) { this.fire('px-vis-event-request', {'eventName': 'px-vis-annotation-creation', 'data': {'mouseCoords': evt.mouseCoords} })},
+                'mouseup': 'null'
               }
             },
             'axisMuteSeries': {
