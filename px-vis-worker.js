@@ -611,9 +611,13 @@ function searchAreaRadiusQuadtree(quadtree, visData, dataObj) {
   quadtree.visit(function(node, nodeX0, nodeY0, nodeX1, nodeY1) {
     if(!node.length) {
       do {
-        // Thank you Πυθαγόρας ὁ Σάμιος   :)
-        if((Math.pow(node.data.px - visData.mousePos[0], 2) + Math.pow(node.data.py - visData.mousePos[1], 2)) <= r2 ) {
-          dataObj = addCrosshairDataQuadtree(dataObj, this.dataMapping[visData.chartId][node.data.i], visData.timeData);
+
+        if(!visData.hardMute || !visData.mutedSeries[node.data.k]) {
+
+          // Thank you Πυθαγόρας ὁ Σάμιος   :)
+          if((Math.pow(node.data.px - visData.mousePos[0], 2) + Math.pow(node.data.py - visData.mousePos[1], 2)) <= r2 ) {
+            dataObj = addCrosshairDataQuadtree(dataObj, this.dataMapping[visData.chartId][node.data.i], visData.timeData);
+          }
         }
       } while(node = node.next);
     }
@@ -649,7 +653,10 @@ function searchQuadtreeSingle(visData, dataObj, quadtreeData) {
   for(var i = 0; i < visData.keys.length; i++) {
     k = visData.keys[i];
 
-    dataObj = constructDataObj(result, dataObj, k, visData, true, null);
+    if(!visData.hardMute || !visData.mutedSeries[k]) {
+
+      dataObj = constructDataObj(result, dataObj, k, visData, true, null);
+    }
   }
 
   // if we want to do all in area crosshair data, do it outside our loop
@@ -680,9 +687,11 @@ function searchQuadtreeSeries(visData, dataObj, quadtreeData) {
   for(var i = 0; i < visData.keys.length; i++) {
     k = visData.keys[i];
 
-    result = quadtreeData[k].find(visData.mousePos[0], visData.mousePos[1], r);
+    if(!visData.hardMute || !visData.mutedSeries[k]) {
 
-    dataObj = constructDataObj(result, dataObj, k, visData, false, xScale);
+      result = quadtreeData[k].find(visData.mousePos[0], visData.mousePos[1], r);
+      dataObj = constructDataObj(result, dataObj, k, visData, false, xScale);
+    }
   }
 
   if(dataObj.closest) {
@@ -776,6 +785,8 @@ function determineExtents(eventData, time) {
   extentCalc.axes = visData.axes;
   extentCalc.seriesToAxes = visData.seriesToAxes;
   extentCalc.isYAxisObject = visData.isYAxisObject;
+  extentCalc.mutedSeries = visData.mutedSeries;
+  extentCalc.hardMute = visData.hardMute;
 
   extents = extentCalc.determineExtents(dataMapping[eventData.chartId]);
 
@@ -842,6 +853,7 @@ onmessage = function(e) {
       returnClosestsQuadtreePoints(e.data, time);
       break;
 
+    //we don't seem to use this
     case 'findQuadtreePointsInArea':
       returnQuadtreePointsInArea(e.data, time);
       break;

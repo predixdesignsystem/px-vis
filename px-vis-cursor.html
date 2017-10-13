@@ -88,9 +88,8 @@ Custom property | Description
       PxVisBehavior.dataset,
       PxVisBehavior.commonMethods,
       PxVisBehavior.tooltipData,
-      PxVisBehavior.completeSeriesConfig,
       PxVisBehaviorD3.clipPath,
-      PxVisBehavior.mutedSeries,
+      PxVisBehavior.mutedCompleteSeriesConfig,
       PxVisBehavior.dynamicConfigProperties,
       PxVisBehavior.polarData,
       PxVisBehavior.updateStylesOverride
@@ -218,7 +217,7 @@ Custom property | Description
     }, //properties
 
     observers: [
-      'drawElement(svg,chartData.*,completeSeriesConfig.*, width, height)',
+      'drawElement(svg,chartData.*,_mutedCompleteSeriesConfig, width, height)',
       '_cursorChange(tooltipData.*, _cursor)',
       '_addClipPath(clipPath)',
       '_processOpacity(mutedSeries.*, completeSeriesConfig)',
@@ -264,7 +263,7 @@ Custom property | Description
     _drawHorizontalLines: function() {
       // append the x line
       this._hLinesBuilder = this._cursor.selectAll('.xline')
-        .data(Object.keys(this.completeSeriesConfig));
+        .data(Object.keys(this._mutedCompleteSeriesConfig));
 
       this._hLinesBuilder.exit().remove();
 
@@ -297,7 +296,7 @@ Custom property | Description
 
       // append the y line
       this._vLinesBuilder = this._cursor.selectAll('line.yline')
-        .data(Object.keys(this.completeSeriesConfig));
+        .data(Object.keys(this._mutedCompleteSeriesConfig));
 
       this._vLinesBuilder.exit().remove();
 
@@ -318,7 +317,7 @@ Custom property | Description
     _drawPointCircles: function() {
       // append the circle
       this._circles = this._cursor.selectAll('circle.tooltipPoint')
-        .data(Object.keys(this.completeSeriesConfig));
+        .data(Object.keys(this._mutedCompleteSeriesConfig));
 
       this._circles.exit().remove();
 
@@ -331,10 +330,10 @@ Custom property | Description
           .attr('stroke-opacity', 0.3)
         .merge(this._circles)
           .attr('fill', (function(d) {
-            return this.completeSeriesConfig[d]['color']
+            return this._mutedCompleteSeriesConfig[d]['color']
           }).bind(this))
           .attr('stroke', (function(d) {
-            return this.completeSeriesConfig[d]['color']
+            return this._mutedCompleteSeriesConfig[d]['color']
           }).bind(this));
 
       this._circles = this._cursor.selectAll('circle.tooltipPoint');
@@ -351,6 +350,12 @@ Custom property | Description
         if(this.tooltipData.mouse === null || this.tooltipData.series.length === 0) {
           this._hideCursor();
         } else {
+
+          //update number of circles if needed
+          if(this._circles && this._nonMutedSeriesKeys.length !== this._circles.nodes().length) {
+            this.drawElement();
+          }
+
           this._showCursor();
           this._moveCursor();
         }
@@ -513,7 +518,7 @@ Custom property | Description
             }
           }.bind(this))
         .attr('transform', function(d, i) {
-          var xKey = this.completeSeriesConfig[this.tooltipData.series[i].name]['x'],
+          var xKey = this._mutedCompleteSeriesConfig[this.tooltipData.series[i].name]['x'],
               angle = this.tooltipData.series[i]['value'][xKey];
 
           angle = angle || angle === 0 ? this._adjustAngleForPolarChart(angle, true) : 0;
@@ -577,7 +582,7 @@ Custom property | Description
 
     _processOpacity: function() {
       var allMuted = true,
-          keys = Object.keys(this.completeSeriesConfig),
+          keys = Object.keys(this._mutedCompleteSeriesConfig),
           vLineOpacity,
           _this = this,
           isMultiSerie = keys.length > 1;
@@ -600,7 +605,7 @@ Custom property | Description
               opacity;
 
           if(muted) {
-            opacity = _this.completeSeriesConfig[d].mutedOpacity ? _this.completeSeriesConfig[d].mutedOpacity : _this._defaultmutedOpacity;
+            opacity = _this._mutedCompleteSeriesConfig[d].mutedOpacity ? _this._mutedCompleteSeriesConfig[d].mutedOpacity : _this._defaultmutedOpacity;
           } else {
             opacity = 1;
           }
@@ -617,7 +622,7 @@ Custom property | Description
               strokeOpacity;
 
           if(muted) {
-            mutedOpacity = _this.completeSeriesConfig[d].mutedOpacity ? _this.completeSeriesConfig[d].mutedOpacity : _this._defaultmutedOpacity;
+            mutedOpacity = _this._mutedCompleteSeriesConfig[d].mutedOpacity ? _this._mutedCompleteSeriesConfig[d].mutedOpacity : _this._defaultmutedOpacity;
           } else {
             mutedOpacity = 1;
           }

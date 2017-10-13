@@ -61,9 +61,8 @@
       PxVisBehavior.dataset,
       PxVisBehavior.commonMethods,
       PxVisBehavior.crosshairData,
-      PxVisBehavior.completeSeriesConfig,
       PxVisBehaviorD3.clipPath,
-      PxVisBehavior.mutedSeries,
+      PxVisBehavior.mutedCompleteSeriesConfig,
       PxVisBehavior.dynamicConfigProperties,
       PxVisBehavior.highlightSvgShared,
       PxVisBehaviorD3.radialPixelCalc,
@@ -163,7 +162,7 @@
 
     _createCircles: function(data, elem) {
       var c = Px.d3.select(elem).selectAll('circle.highlightPoint')
-        .data(Object.keys(this.completeSeriesConfig));
+        .data(Object.keys(this._mutedCompleteSeriesConfig));
 
       c.exit().remove();
 
@@ -174,37 +173,37 @@
         .attr('stroke-width', 12)
         .attr('stroke-opacity', 0.3)
         .attr('fill', (function(k) {
-          return this.completeSeriesConfig[k]['color'];
+          return this._mutedCompleteSeriesConfig[k]['color'];
         }).bind(this))
         .attr('stroke', (function(k) {
-          return this.completeSeriesConfig[k]['color'];
+          return this._mutedCompleteSeriesConfig[k]['color'];
         }).bind(this))
       .merge(c)
         .attr('cx', function(k) {
-          if(isNaN(data[this.completeSeriesConfig[k]['x']]) || isNaN(data[this.completeSeriesConfig[k]['y']])) {
+          if(isNaN(data[this._mutedCompleteSeriesConfig[k]['x']]) || isNaN(data[this._mutedCompleteSeriesConfig[k]['y']])) {
             return '';
           }
 
           if(this.radial) {
-            var angle = data[this.completeSeriesConfig[k]['x']],
-                amp = data[this.completeSeriesConfig[k]['y']],
+            var angle = data[this._mutedCompleteSeriesConfig[k]['x']],
+                amp = data[this._mutedCompleteSeriesConfig[k]['y']],
                 yRange = this.y.range()[1] - this.y.range()[0];
 
             return this.calcPixelCoordForRadial(angle, amp, yRange, this.y.domain(), 'x')
           }
 
           // else
-          return this.x(data[this.completeSeriesConfig[k]['x']]);
+          return this.x(data[this._mutedCompleteSeriesConfig[k]['x']]);
 
         }.bind(this))
         .attr('cy', function(k) {
-          if(isNaN(data[this.completeSeriesConfig[k]['x']]) || isNaN(data[this.completeSeriesConfig[k]['y']])) {
+          if(isNaN(data[this._mutedCompleteSeriesConfig[k]['x']]) || isNaN(data[this._mutedCompleteSeriesConfig[k]['y']])) {
             return '';
           }
 
           if(this.radial) {
-            var angle = data[this.completeSeriesConfig[k]['x']],
-                amp = data[this.completeSeriesConfig[k]['y']],
+            var angle = data[this._mutedCompleteSeriesConfig[k]['x']],
+                amp = data[this._mutedCompleteSeriesConfig[k]['y']],
                 yRange = this.y.range()[1] - this.y.range()[0];
 
             return this.calcPixelCoordForRadial(angle, amp, yRange, this.y.domain(), 'y')
@@ -212,13 +211,13 @@
 
           // else
           return  typeof this.y === 'function' ?
-            this.y(data[this.completeSeriesConfig[k]['y']]) :
-            this.y[this.completeSeriesConfig[k]["axis"]["id"]](data[this.completeSeriesConfig[k]['y']]);
+            this.y(data[this._mutedCompleteSeriesConfig[k]['y']]) :
+            this.y[this._mutedCompleteSeriesConfig[k]["axis"]["id"]](data[this._mutedCompleteSeriesConfig[k]['y']]);
 
         }.bind(this))
         .style("display", function(k) {
 
-          if(isNaN(data[this.completeSeriesConfig[k]['x']]) || isNaN(data[this.completeSeriesConfig[k]['y']])) {
+          if(isNaN(data[this._mutedCompleteSeriesConfig[k]['x']]) || isNaN(data[this._mutedCompleteSeriesConfig[k]['y']])) {
             return 'none';
           }
 

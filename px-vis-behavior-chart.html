@@ -540,7 +540,7 @@ PxVisBehaviorChart.webWorkerSynchronization = [{
             'originatorName': this.nodeName,
             'chartId': this.chartId,
             'data': {'chartData': this[this._wwSyncDataPropName]}});
-        this.set('wwDataSyncCounter', this.wwDataSyncCounter+1);
+        this.set('wwDataSyncCounter', this.wwDataSyncCounter ? this.wwDataSyncCounter+1 : 1);
       }
     }
 }, PxVisBehavior.dataset, PxVisBehavior.preventWebWorkerSynchronization, PxVisBehavior.wwDataSyncCounter];
@@ -2664,9 +2664,8 @@ PxVisBehaviorChart.combineMutes = {
       muted[k] = m2[k];
     }
 
-    if(mutedCategories.length) {
-      //parse data to add points muted by category
-      var isMuted;
+    if(mutedCategories.length && this.chartData) {
+
       //for each point
       for(var i=0; i<this.chartData.length; i++) {
 
@@ -2901,6 +2900,6 @@ PxVisBehaviorChart.useCategoryInTooltip = {
       value: false
     }
   }
-}
+};
 
 </script>

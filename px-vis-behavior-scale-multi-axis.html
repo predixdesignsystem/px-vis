@@ -1,5 +1,5 @@
 <link rel="import" href="../polymer/polymer.html"/>
-
+<link rel="import" href="px-vis-behavior-chart.html" />
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 
@@ -43,17 +43,17 @@ PxVisBehaviorScale.scaleMultiAxis = [{
      */
     _setXScale: function(width, margin, forceRecreating) {
       var w = Math.max(width - margin.left - margin.right,0),
-          range = [0, w],
-          x;
+          range = [0, w];
 
       if(this.x && !forceRecreating) {
-        this.x.range(range);
-
+        var oldDomain = this.x.domain();
+        this.x = Px.d3.scalePoint().range(range).domain(oldDomain).padding(0.5);
       } else {
-        x = Px.d3.scalePoint().range(range).padding(0.5);
-        this.set('x', x);
-        this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
+        this.x = Px.d3.scalePoint().range(range).padding(0.5);
       }
+
+      this.notifyPath('x.range', this.x.range);
+      this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
     },
 
     /**
@@ -86,18 +86,25 @@ PxVisBehaviorScale.scaleMultiAxis = [{
     },
 
     _calcDimExtent: function(dim, ext, searchMin, searchMax) {
+
+      var mutedCatKeys = Object.keys(this.mutedSeriesCategories).filter(function(cat) {
+              return this.mutedSeriesCategories[cat];
+            }.bind(this)),
+            checkForMute = this.hardMute && !!mutedCatKeys.length,
+            arrayAccessor = function(d) {
+              //ignore muted categories for extents
+              if(checkForMute && mutedCatKeys.indexOf(d[this.categoryKey]) !== -1) {
+                return;
+              }
+              return Number(d[dim]);
+            }.bind(this);
+
       if(searchMin && searchMax) {
-        ext.y[dim] = Px.d3.extent(this.chartData, function(d) {
-          return Number(d[dim]);
-        }.bind(this));
+        ext.y[dim] = Px.d3.extent(this.chartData, arrayAccessor);
       } else if(searchMin) {
-        ext.y[dim][0] = Px.d3.min(this.chartData, function(d) {
-          return Number(d[dim]);
-        }.bind(this));
+        ext.y[dim][0] = Px.d3.min(this.chartData, arrayAccessor);
       } else if(searchMax) {
-        ext.y[dim][1] = Px.d3.max(this.chartData, function(d) {
-          return Number(d[dim]);
-        }.bind(this));
+        ext.y[dim][1] = Px.d3.max(this.chartData, arrayAccessor);
       }
 
       // if the same val, add 1 to get a range
@@ -278,7 +285,8 @@ PxVisBehaviorScale.scaleMultiAxis = [{
   PxVisBehavior.chartExtents,
   PxVisBehavior.dataExtents,
   PxVisBehavior.dimensions,
-  PxVisBehaviorD3.domainUpdateNotify
+  PxVisBehaviorD3.domainUpdateNotify,
+  PxVisBehaviorChart.combineMutes
 ];
 
 </script>
