@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 v4.1.1
 ================
 * Fix issue where change in x axis scale wouldn't notify
@@ -53,6 +54,8 @@ v4.0.0
 * Fix for switching between svg and canvas at runtime
 * BREAKING CHANGE: default orientation in orientation definition is now `left` instead of `bottom`
 
+=======
+>>>>>>> Stashed changes
 v3.1.23
 ================
 * delete empty line above some behaviors definition that would prevent them from showing up in the API
