@@ -1,0 +1,133 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
+<link rel="import" href="../px-icon-set/px-icon.html" />
+<link rel="import" href="../px-icon-set/px-icon-set-communication.html" />
+<link rel="import" href="css/px-vis-annotations-styles.html">
+
+<!--
+
+### Usage
+
+    <px-vis-svg
+        ...
+        svg="{{svg}}">
+    </px-vis-svg>
+    <px-vis-scale
+        ...
+        x="{{x}}"
+        y="{{y}}"
+        domain-changed="{{domainChanged}}">
+    </px-vis-scale>
+
+    <px-vis-annotations
+        svg="[[svg]]"
+        x="[[x]]"
+        y="[[y]]"
+        domain-changed="[[domainChanged]]"
+        complete-series-config="[[completeSeriesConfig]]"
+        annotation-data="[[data]]">
+    </px-vis-annotations>
+
+### Styling
+The following custom properties are available for styling:
+
+Custom property | Description
+:----------------|:-------------
+
+
+
+@element px-vis-annotations
+@blurb Element which draws annotations on a chart
+@homepage index.html
+@demo demo/index.html
+
+-->
+
+<dom-module id="px-vis-annotations">
+    <template>
+      <style include="px-vis-annotations-styles"></style>
+
+      <template id="template" is="dom-repeat" items="[[annotationData]]" as="item">
+        <px-icon
+          icon="px-com:comment"
+          data="[[item]]"
+          class="annotation--icon"
+          style$="[[_getTransform(item, x, y, domainChanged, completeSeriesConfig)]]"
+          on-mouseover="_mouseOver"
+          on-mouseleave="_mouseLeave">
+        </px-icon>
+      </template>
+    </template>
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'px-vis-annotations',
+
+    behaviors: [
+      PxVisBehavior.sizing,
+      PxVisBehaviorD3.svg,
+      PxVisBehavior.annotationData
+    ],
+
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      _iconWidth: {
+        type: Number,
+        value: 12
+      },
+      _iconHeight: {
+        type: Number,
+        value: 12
+      },
+      /**
+       * Whether the scatter plot is using radial coordinates (x=phase, y=amplitude).
+       */
+      radial: {
+        type: Boolean,
+        value: false
+      }
+
+    }, //properties
+
+    observers: [
+
+    ],
+
+    _getTransform: function(item) {
+
+      var x = this.x(item.x) + Number(this.margin.left) - this._iconWidth/2,
+          y = this._getMultiYScaleForSeries(item.series)(item.y) + this.margin.top - this._iconHeight;
+
+      return 'transform: translate(' + x + 'px,' + y + 'px)';
+    },
+
+    _getMultiYScaleForSeries: function(series) {
+
+      var axisName = this.completeSeriesConfig[series].axis.id;
+
+      return this.y[axisName];
+    },
+
+    _mouseOver: function(evt) {
+      this._requestAnnotation(evt, 'show');
+    },
+
+    _mouseLeave: function(evt) {
+      this._requestAnnotation(evt, 'hide');
+    },
+
+    _requestAnnotation(evt, eventName) {
+      var target = Polymer.dom(evt).localTarget;
+
+      this.fire('px-vis-event-request', {'eventName': 'px-vis-annotation-' + eventName, 'data': {'annotationData': this.$.template.itemForElement(target), 'icon': target}});
+    }
+  });
+</script>
