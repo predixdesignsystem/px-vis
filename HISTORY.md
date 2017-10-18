@@ -1,6 +1,6 @@
 v4.2.1
 ================
-* Ensure renderer clears series when no data
+* Ensure canvas renderer clears series when no data
 
 v4.2.0
 ================
