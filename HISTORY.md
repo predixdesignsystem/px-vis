@@ -1,3 +1,7 @@
+v4.2.1
+================
+* Ensure renderer clears series when no data
+
 v4.2.0
 ================
 * Added "lasso" selection for crosshair mode, available by default with "crosshairLasso" in toolbar
