@@ -2642,7 +2642,7 @@ PxVisBehavior.highlightCanvasShared = [{
 
   observers: [
     '_requestCanvasCreation(_highlightData)',
-    '_muteDataSeries(_highlightData)',
+    '_muteDataSeries(_highlightData, layersToMask)',
     '_addTransition(layersToMask)'
   ],
 
@@ -2671,7 +2671,9 @@ PxVisBehavior.highlightCanvasShared = [{
   },
 
   _requestCanvasCreation: function() {
-    this.set('canvasLayersConfig.highlighter', {});
+    if(!this.canvasLayersConfig.highlighter) {
+      this.set('canvasLayersConfig.highlighter', {});
+    }
   }
 
 }, PxVisBehavior.highlightShared];
@@ -2746,7 +2748,7 @@ PxVisBehavior.highlightLineShared = [{
       value: false
     }
   },
-  observers: ['_computeChartData(crosshairData.timeStamps.*, drawWithLocalCrosshairData)'],
+  observers: ['_computeChartData(crosshairData.timeStamps.*, drawWithLocalCrosshairData, differentDataset, domainChanged, completeSeriesConfig)'],
 
   /**
    * Draws the crosshair elements and sets up listeners and callbacks on chart hover
@@ -2754,36 +2756,39 @@ PxVisBehavior.highlightLineShared = [{
    *
    */
   _computeChartData: function() {
-    //if we are generating data locally and not being told to draw anyways, dont draw
-    // but if we have cleared our dataset, then we do want to clear our datapoints
-    if(this.generatingCrosshairData && !this.drawWithLocalCrosshairData && this.crosshairData.rawData.length > 0) {
-      return [];
-    }
+    this.debounce('_computeHighlightData', function() {
 
-    var dataset
-    if(this.differentDataset) {
-      dataset = this._calcDataset();
-    } else {
-      if(this.hardMute && this._doesObjHaveValues(this.mutedSeries)) {
-
-        var newRawData = [];
-        for(var i=0; i<this.crosshairData.rawData.length; i++) {
-          if(!this.mutedSeries[this.crosshairData.rawData[i][this.timeData]]) {
-            newRawData.push(this.crosshairData.rawData[i]);
-          }
-        }
-        dataset = newRawData;
-      } else {
-        dataset = this.crosshairData.rawData;
+      //if we are generating data locally and not being told to draw anyways, dont draw
+      // but if we have cleared our dataset, then we do want to clear our datapoints
+      if(this.generatingCrosshairData && !this.drawWithLocalCrosshairData && this.crosshairData.rawData.length > 0) {
+        return [];
       }
-    }
 
-    if(this.showTooltipData) {
-      this._setTooltipDataMultiLine(dataset);
-    }
+      var dataset;
+      if(this.differentDataset) {
+        dataset = this._calcDataset();
+      } else {
+        if(this.hardMute && this._doesObjHaveValues(this.mutedSeries)) {
 
-    this.set('_highlightData', dataset);
-    this.fire('px-vis-highlight-data-changed');
+          var newRawData = [];
+          for(var i=0; i<this.crosshairData.rawData.length; i++) {
+            if(!this.mutedSeries[this.crosshairData.rawData[i][this.timeData]]) {
+              newRawData.push(this.crosshairData.rawData[i]);
+            }
+          }
+          dataset = newRawData;
+        } else {
+          dataset = this.crosshairData.rawData;
+        }
+      }
+
+      if(this.showTooltipData) {
+        this._setTooltipDataMultiLine(dataset);
+      }
+
+      this.set('_highlightData', dataset);
+      this.fire('px-vis-highlight-data-changed');
+    }.bind(this), 5);
   },
 
 
@@ -2829,9 +2834,6 @@ PxVisBehavior.highlightLineShared = [{
         val,
         dim;
 
-      // FIXME run on resize and wrap in animationFrame. Maybe at chart level?
-      svgBounding = this.svg ? this.svg.node().ownerSVGElement.getBoundingClientRect() : this.canvasContext.canvas.getBoundingClientRect();
-
       //calc the screen positions for the tooltip
       if(this.radialLine) {
 
@@ -2845,12 +2847,12 @@ PxVisBehavior.highlightLineShared = [{
           }
         }
 
-        screenX = this.y(dataset[last]) * Math.sin(this.x(last)) + this.width/2 + svgBounding.left + window.pageXOffset;
-        screenY = this.y(dataset[last]) * Math.cos(Math.PI - this.x(last)) + this.height/2 + svgBounding.top + window.pageYOffset;
+        screenX = this.y(dataset[last]) * Math.sin(this.x(last)) + this.width/2 + window.pageXOffset;
+        screenY = this.y(dataset[last]) * Math.cos(Math.PI - this.x(last)) + this.height/2 + window.pageYOffset;
 
       } else {
-        screenX = this.x(last) + svgBounding.left + window.pageXOffset + 15;
-        screenY = this.y[last](dataset[last]) + this.margin.top + svgBounding.top + window.pageYOffset;
+        screenX = this.x(last) + window.pageXOffset + 15;
+        screenY = this.y[last](dataset[last]) + this.margin.top + window.pageYOffset;
       }
 
       for(var i = 0; i < this.dimensions.length; i++) {
@@ -2888,7 +2890,8 @@ PxVisBehavior.highlightLineShared = [{
         "dataset": dataset,
         'series': series,
         "color": tooltipConfig[aid]["color"],
-        "tooltipConfig": tooltipConfig
+        "tooltipConfig": tooltipConfig,
+        "adjustPosition": true //warn chart that pos needs to be adjusted from canvas/svg
       };
 
     return data;
