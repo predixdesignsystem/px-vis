@@ -1647,8 +1647,8 @@ function runTests() {
 
     test('tooltiphighlight created defaultEmptyData', function() {
       assert.equal(tooltiphighlight.defaultEmptyData.mouse, null);
-      assert.equal(tooltiphighlight.defaultEmptyData.dataPos[0], 423);
-      assert.closeTo(tooltiphighlight.defaultEmptyData.dataPos[1], 2190, 4);
+      assert.equal(tooltiphighlight.defaultEmptyData.dataPos[0], 415);
+      assert.closeTo(tooltiphighlight.defaultEmptyData.dataPos[1], 134, 4);
       assert.equal(tooltiphighlight.defaultEmptyData.time, 1397160780000);
       assert.deepEqual(tooltiphighlight.defaultEmptyData.dataset, {"x":1397160780000,"y":10,"y2":3,"y3":8,"cat":"b"});
       assert.deepEqual(tooltiphighlight.defaultEmptyData.series, [{"name":"y","value":{"y":10}},{"name":"y2","value":{"y2":3}},{"name":"y3","value":{"y3":8}}]);
