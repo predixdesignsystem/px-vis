@@ -296,10 +296,15 @@ PxVisBehaviorRenderer.base = [{
         ctx;
 
     //search for the series we want to redraw
-
     for(var j=0; j<this._canvasTargets['chartData'].length; j++) {
       if(this._canvasTargets['chartData'][j].target.seriesId === this.serieToRedrawOnTop) {
         targets.push(this._canvasTargets['chartData'][j]);
+      }
+    }
+
+    for(var j=0; j<this._canvasTargets['filteredChartData'].length; j++) {
+      if(this._canvasTargets['filteredChartData'][j].target.seriesId === this.serieToRedrawOnTop) {
+        targets.push(this._canvasTargets['filteredChartData'][j]);
       }
     }
 
@@ -342,12 +347,18 @@ PxVisBehaviorRenderer.base = [{
   _renderChartData: function() {
     if(this.chartData.length) {
       this._renderTypedContext('chartData', [this.canvasContext]);
+    } else {
+      //make sure the canvas is clear
+      this.canvasContext.pxClearCanvas();
     }
   },
 
   _renderFilteredChartData: function() {
     if(this._filteredData.length) {
       this._renderTypedContext('filteredChartData', [this.canvasContext]);
+    } else {
+      //make sure the canvas is clear
+      this.canvasContext.pxClearCanvas();
     }
   },
 

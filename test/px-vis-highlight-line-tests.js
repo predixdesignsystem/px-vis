@@ -109,7 +109,7 @@ function runTests() {
         parallelhighlight.set('categories',categories);
         parallelhighlight.set('chartData',d);
 
-        window.setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 500);
 
       }, 100);
     });
@@ -165,7 +165,7 @@ function runTests() {
       window.setTimeout(function() {
         linePath = parallelhighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
-      }, 100);
+      }, 500);
     });
 
     test('datalayer gets masked', function() {
@@ -226,7 +226,7 @@ function runTests() {
       window.setTimeout(function() {
         linePath = parallelhighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
-      }, 100);
+      }, 500);
     });
 
     test('datalayer has transition', function() {
@@ -350,7 +350,7 @@ function runTests() {
 
         window.setTimeout(function() { done(); }, 100);
 
-      }, 100);
+      }, 500);
     });
 
     test('radarhighlight fixture is created', function() {
@@ -401,7 +401,7 @@ function runTests() {
       window.setTimeout(function() {
         linePath = radarhighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
-      }, 100);
+      }, 500);
     });
 
     test('datalayer gets masked', function() {
@@ -477,7 +477,7 @@ function runTests() {
       window.setTimeout(function() {
         linePath = radarhighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
-      }, 100);
+      }, 500);
     });
 
     test('datalayer has transition', function() {
@@ -607,7 +607,7 @@ function runTests() {
         differenthighlight.set('categories',categories);
         differenthighlight.set('chartData',d);
 
-        window.setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 500);
 
       }, 100);
     });
@@ -663,7 +663,7 @@ function runTests() {
       window.setTimeout(function() {
         linePath = differenthighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
-      }, 100);
+      }, 500);
     });
 
     test('datalayer gets masked', function() {
@@ -725,7 +725,7 @@ function runTests() {
       window.setTimeout(function() {
         linePath = differenthighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
-      }, 100);
+      }, 500);
     });
 
     test('datalayer has transition', function() {
@@ -853,7 +853,7 @@ function runTests() {
         fuzzhighlight.set('categories',categories);
         fuzzhighlight.set('chartData',d);
 
-        window.setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 500);
 
       }, 100);
     });
@@ -909,7 +909,7 @@ function runTests() {
       window.setTimeout(function() {
         linePath = fuzzhighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
-      }, 100);
+      }, 500);
     });
 
     test('datalayer gets masked', function() {
@@ -1117,7 +1117,7 @@ function runTests() {
         generatinghighlight.set('seriesId',"x");
         generatinghighlight.set('chartData',d);
 
-        window.setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 500);
 
       }, 100);
     });
@@ -1207,7 +1207,7 @@ function runTests() {
       window.setTimeout(function() {
         linePath = generatinghighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
-      }, 100);
+      }, 500);
     });
 
     test('datalayer has transition', function() {
@@ -1339,7 +1339,7 @@ function runTests() {
         forcehighlight.set('chartData',d);
         forcehighlight.set('drawWithLocalCrosshairData',true);
 
-        window.setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 500);
 
       }, 100);
     });
@@ -1396,7 +1396,7 @@ function runTests() {
       window.setTimeout(function() {
         linePath = forcehighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
-      }, 100);
+      }, 500);
     });
 
     test('datalayer gets masked', function() {
@@ -1458,7 +1458,7 @@ function runTests() {
       window.setTimeout(function() {
         linePath = forcehighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
-      }, 100);
+      }, 500);
     });
 
     test('datalayer has transition', function() {
@@ -1591,7 +1591,7 @@ function runTests() {
         tooltiphighlight.set('showTooltipData',true);
         tooltiphighlight.set('margin',m);
 
-        window.setTimeout(function() { done(); }, 100);
+        window.setTimeout(function() { done(); }, 500);
 
       }, 100);
     });
@@ -1647,8 +1647,8 @@ function runTests() {
 
     test('tooltiphighlight created defaultEmptyData', function() {
       assert.equal(tooltiphighlight.defaultEmptyData.mouse, null);
-      assert.equal(tooltiphighlight.defaultEmptyData.dataPos[0], 423);
-      assert.closeTo(tooltiphighlight.defaultEmptyData.dataPos[1], 2190, 4);
+      assert.equal(tooltiphighlight.defaultEmptyData.dataPos[0], 415);
+      assert.closeTo(tooltiphighlight.defaultEmptyData.dataPos[1], 134, 4);
       assert.equal(tooltiphighlight.defaultEmptyData.time, 1397160780000);
       assert.deepEqual(tooltiphighlight.defaultEmptyData.dataset, {"x":1397160780000,"y":10,"y2":3,"y3":8,"cat":"b"});
       assert.deepEqual(tooltiphighlight.defaultEmptyData.series, [{"name":"y","value":{"y":10}},{"name":"y2","value":{"y2":3}},{"name":"y3","value":{"y3":8}}]);
@@ -1676,7 +1676,7 @@ function runTests() {
       window.setTimeout(function() {
         linePath = tooltiphighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
-      }, 100);
+      }, 500);
     });
 
     test('datalayer has transition', function() {

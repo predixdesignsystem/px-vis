@@ -108,7 +108,7 @@
     }, //properties
 
     observers: [
-      'drawElement(svg, crosshairData.timeStamps.*, completeSeriesConfig.*, drawWithLocalCrosshairData, domainChanged)',
+      'drawElement(svg, crosshairData.timeStamps.*, _mutedCompleteSeriesConfig.*, drawWithLocalCrosshairData, differentDataset, domainChanged, x, y)',
       '_updateTooltipData(domainChanged)'
     ],
 
@@ -122,42 +122,46 @@
      * @method drawElement
      */
     drawElement: function() {
-      //if we are generating data locally and not being told to draw anyways, dont draw
-      // but if we have cleared our dataset, then we do want to clear our datapoints
-      if(this.generatingCrosshairData && !this.drawWithLocalCrosshairData && this.crosshairData.rawData.length > 0) {
-        return;
-      }
 
-      var _this = this,
-          xKey = this._getXKey(),
-          dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawData,
-          svgBuilder;
+      this.debounce('draw', function() {
 
-      this._muteDataSeries(dataset);
+        //if we are generating data locally and not being told to draw anyways, dont draw
+        // but if we have cleared our dataset, then we do want to clear our datapoints
+        if(this.generatingCrosshairData && !this.drawWithLocalCrosshairData && this.crosshairData.rawData.length > 0) {
+          return;
+        }
 
-      svgBuilder = this.svg.selectAll('g.highlightPoint')
-        .data(dataset, function(d) { return d[xKey]}.bind(this));
+        var _this = this,
+            xKey = this._getXKey(),
+            dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawData,
+            svgBuilder;
 
-      svgBuilder.exit().remove();
+        this._muteDataSeries(dataset);
 
-      svgBuilder
-        .enter()
-          .append('g')
-          .attr('class', 'highlightPoint')
-        .merge(svgBuilder)
-          .each(function(data, index) {
-            _this._createCircles(data, this);
-          });
+        svgBuilder = this.svg.selectAll('g.highlightPoint')
+          .data(dataset, function(d) { return d[xKey]}.bind(this));
 
-      this._circles = this.svg.selectAll('circle.highlightPoint');
-      this._addClipPath();
+        svgBuilder.exit().remove();
 
-      if(this.showTooltipData) {
-        this._setTooltipData(dataset);
-        this._resetTooltipData();
-      }
+        svgBuilder
+          .enter()
+            .append('g')
+            .attr('class', 'highlightPoint')
+          .merge(svgBuilder)
+            .each(function(data, index) {
+              _this._createCircles(data, this);
+            });
 
-      this._highlightData = dataset;
+        this._circles = this.svg.selectAll('circle.highlightPoint');
+        this._addClipPath();
+
+        if(this.showTooltipData) {
+          this._setTooltipData(dataset);
+          this._resetTooltipData();
+        }
+
+        this._highlightData = dataset;
+      }.bind(this),10);
     },  //drawElement
 
     _createCircles: function(data, elem) {
@@ -172,13 +176,13 @@
         .attr('r', 3)
         .attr('stroke-width', 12)
         .attr('stroke-opacity', 0.3)
+      .merge(c)
         .attr('fill', (function(k) {
           return this._mutedCompleteSeriesConfig[k]['color'];
         }).bind(this))
         .attr('stroke', (function(k) {
           return this._mutedCompleteSeriesConfig[k]['color'];
         }).bind(this))
-      .merge(c)
         .attr('cx', function(k) {
           if(isNaN(data[this._mutedCompleteSeriesConfig[k]['x']]) || isNaN(data[this._mutedCompleteSeriesConfig[k]['y']])) {
             return '';
