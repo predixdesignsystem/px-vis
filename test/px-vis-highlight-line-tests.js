@@ -165,7 +165,7 @@ function runTests() {
       window.setTimeout(function() {
         linePath = parallelhighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
-      }, 100);
+      }, 500);
     });
 
     test('datalayer gets masked', function() {
