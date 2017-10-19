@@ -1,3 +1,10 @@
+v4.2.2
+================
+* Fix radial scale extents when negative values are absolutely bigger than positive ones
+* Fix highlight point canvas to work with degrees in polar
+* Ensure svg and canvas highlighters (line + point) can be used at "creation time", i.e use crosshairData directly when creating a chart rather than at runtime
+* Ensure brings on top feature works for filtered chart datasets on canvas (polar + xy)
+
 v4.2.1
 ================
 * Ensure canvas renderer clears series when no data
