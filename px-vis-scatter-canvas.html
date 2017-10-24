@@ -76,7 +76,8 @@
       PxVisBehavior.preventInitialDrawing,
       PxVisBehavior.isAttached,
       PxVisBehaviorD3.scatterMarkers,
-      PxVisBehavior.rendererType
+      PxVisBehavior.rendererType,
+      PxVisBehaviorRenderer.priority
     ],
 
     /**
@@ -138,10 +139,11 @@
       this._watchConfigProperty('markerFillOpacity', 0.6);
       this._watchConfigProperty('markerStrokeOpacity', 1);
       this._watchConfigProperty('mutedOpacity', 0.3);
+      this._watchConfigProperty('priority', 0);
     },
 
     attached: function() {
-      this.fire('px-vis-renderer-register', {'type': 'scatter', 'renderMode': 'canvas', 'rendererType': this.rendererType});
+      this.fire('px-vis-renderer-register', {'type': 'scatter', 'renderMode': 'canvas', 'rendererType': this.rendererType, 'priority': this.priority});
     },
 
     detached: function() {

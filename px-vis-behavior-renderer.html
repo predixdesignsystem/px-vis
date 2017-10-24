@@ -243,7 +243,7 @@ PxVisBehaviorRenderer.base = [{
   _registerDrawingElement: function(e) {
     var evt = Polymer.dom(e);
     if(e.detail.renderMode === 'canvas') {
-      this._canvasTargets[e.detail.rendererType].push({'target': evt.rootTarget, 'type': e.detail.type});
+      this._canvasTargets[e.detail.rendererType].push({'target': evt.rootTarget, 'type': e.detail.type, 'priority': e.detail.priority});
     } else {
       this._svgTargets[e.detail.rendererType].push({'target': evt.rootTarget, 'type': e.detail.type});
     }
@@ -328,6 +328,11 @@ PxVisBehaviorRenderer.base = [{
     for(var i = 0; i < this._canvasTargets[renderType].length; i++) {
       copy.push(this._canvasTargets[renderType][i]);
     }
+
+    //sort based on priority
+    copy.sort(function(a,b) {
+      return Px.d3.ascending(a.priority, b.priority);
+    });
 
     var ctx = {
       'lastPointRenderedIndex': null,
@@ -737,5 +742,31 @@ PxVisBehaviorRenderer.base = [{
   PxVisBehavior.mutedSeries,
   PxVisBehavior.completeSeriesConfig
 ];
+
+/*
+    Name:
+    PxVisBehaviorRenderer.priority
+
+    Description:
+    Polymer behavior that provides the priority  property, used by elements
+    registering for drawing and allowing to set a drawing order
+
+    Dependencies:
+    - none
+
+    @polymerBehavior PxVisBehaviorRenderer.priority
+*/
+PxVisBehaviorRenderer.priority = {
+  properties: {
+    /**
+    * Priority is used by elements of the same rendering type to determine
+    * the order of drawing. priority 0 => smaller priority. 2 draws over 1, which itself draws over 0, etc..
+    */
+    priority: {
+      type: Number,
+      value: 0
+    }
+  }
+};
 
 </script>

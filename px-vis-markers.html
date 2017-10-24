@@ -3,9 +3,8 @@
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="px-vis-scatter-canvas.html" />
-<link rel="import" href="../app-localize-behavior/app-localize-behavior.html"/>
-<link rel="import" href="px-vis-behavior-datetime.html"/>
-<link rel="import" href="css/px-vis-styles.html">
+<link rel="import" href="px-vis-markers-tooltip-content.html" />
+<link rel="import" href="css/px-vis-markers-styles.html">
 
 <!--
 
@@ -39,13 +38,6 @@
         crosshair-data="[[crosshairData]]">
     </px-vis-markers>
 
-### Styling
-The following custom properties are available for styling:
-
-Custom property | Description
-:----------------|:-------------
-  `--px-vis-cursor-line-color` | The color for the lines which track the cursor/data
-
 
 @element px-vis-markers
 @blurb Element which draws markers on top or bottom of a chart
@@ -56,7 +48,7 @@ Custom property | Description
 
 <dom-module id="px-vis-markers">
     <template>
-      <style include="px-vis-styles"></style>
+      <style include="px-vis-markers-styles"></style>
 
       <template is="dom-repeat" items="[[_markerTypes]]">
         <px-vis-scatter-canvas
@@ -84,10 +76,15 @@ Custom property | Description
           for="[[_canvas]]"
           mouse-coords="[[_tooltipPosition]]"
           tooltip-message="[[_ttMessage]]">
-          <span>
-            <b>[[localize("Event")]]</b>: [[_eventType]] <br/>
-            <b>[[localize("Timestamp")]]</b>: [[_value]]<br/>
-          </span>
+            <!-- use a component to preserve css scope -->
+            <px-vis-markers-tooltip-content
+              resources="[[resources]]"
+              marker-config="[[_markerConfig]]"
+              marker-data="[[markerData]]"
+              marker-types="[[_markerTypes]]"
+              language="[[language]]"
+              tooltip-data-result="[[_tooltipDataResult]]">
+            </px-vis-markers-tooltip-content>
         </px-tooltip>
       </template>
     </template>
@@ -106,9 +103,7 @@ Custom property | Description
       PxVisBehavior.commonMethods,
       PxVisBehaviorD3.clipPath,
       PxVisBehavior.dynamicConfigProperties,
-      PxVisBehavior.markers,
-      PxVisBehaviorTime.datetime,
-      Polymer.AppLocalizeBehavior
+      PxVisBehavior.markers
     ],
 
     /**
@@ -160,7 +155,7 @@ Custom property | Description
        */
       tooltipDetectionRadius: {
         type: Number,
-        value: 10
+        value: 20
       },
 
       _tooltipPosition: {
@@ -195,23 +190,27 @@ Custom property | Description
       * Use the key for localization if value for language is missing.
       * Should always be true for Predix components.
       */
-     useKeyIfMissing: {
-       type: Boolean,
-       value: true
-     },
+      useKeyIfMissing: {
+        type: Boolean,
+        value: true
+      },
 
-     _eventType: {
-       type: String
-     },
+      _showTooltip: {
+        type: Boolean,
+        value: false
+      },
 
-     _value: {
-       type: String
-     },
+      _lockTooltip: {
+        type: Boolean,
+        value: false
+      },
 
-     _showTooltip: {
-       type: Boolean,
-       value: false
-     }
+      /*
+        * List of tooltips that can be displayed for current marker
+        */
+      _tooltipDataResult: {
+        type: Array
+      },
 
     }, //properties
 
@@ -277,6 +276,7 @@ Custom property | Description
         o = {};
         o.x = time;
         o[type] = row;
+        o.originIndex = i;
         data[type].push(o);
       }
 
@@ -377,58 +377,112 @@ Custom property | Description
 
     _mouseMove: function(evt) {
 
-      var mousePos = Px.d3.mouse(this._canvas);
+      if(!this._lockTooltip) {
 
-      if(mousePos[0] > this.margin.left && mousePos[0] < (this.width - this.margin.right) && mousePos[1] > 0) {
+        var mousePos = Px.d3.mouse(this._canvas);
 
-        //adjust mouse pos to get correct time
-        adjustedMousePos = [mousePos[0] - this.margin.left, mousePos[1]];
-        //figure out which row we're hovering
-        var rowInfo = this._getRowInfoForMouse(mousePos);
+        if(mousePos[0] > this.margin.left && mousePos[0] < (this.width - this.margin.right) && mousePos[1] > 0) {
 
-        if(rowInfo.index) {
+          //adjust mouse pos to get correct time
+          adjustedMousePos = [mousePos[0] - this.margin.left, mousePos[1]];
+          //figure out which row we're hovering
+          var rowInfo = this._getRowInfoForMouse(mousePos);
 
-          //find all marker types for this row
-          var labels = this._findLabelsForRow(rowInfo.index),
-              data = [],
-              bisect = Px.d3.bisector(function(d) {
-                  return d.x;
-              }.bind(this)).left,
-              maxDomain = this.x.domain()[1],
-              minDomain = this.x.domain()[0],
-              mouseTime = this.x.invert(adjustedMousePos[0]),
-              left,
-              right,
-              pixelResult = [],
-              dataResult;
+          if(rowInfo.index) {
 
-          //get data for all labels we're interested in
-          for(var i=0; i<labels.length; i++) {
-            data = data.concat(this._markerData[labels[i]]);
+            //find all marker types for this row
+            var labels = this._findLabelsForRow(rowInfo.index),
+                data = [],
+                //bissect RIGHT in case we have a bunch of same timestamps
+                bisect = Px.d3.bisector(function(d) {
+                    return d.x;
+                }.bind(this)).right,
+                maxDomain = this.x.domain()[1],
+                minDomain = this.x.domain()[0],
+                mouseTime = this.x.invert(adjustedMousePos[0]),
+                left,
+                right,
+                pixelResult = [],
+                dataResult,
+                indexChosen;
+
+            //get data for all labels we're interested in
+            for(var i=0; i<labels.length; i++) {
+              data = data.concat(this._markerData[labels[i]]);
+            }
+
+            //TODO: damn
+            data.sort(function(a,b) {
+              return Px.d3.ascending(a.x, b.x);
+            });
+
+            //search for point on left and right
+            left = bisect(data, mouseTime);
+            right = left ? left+1 : data.length;
+
+            //decide which point to pick
+            if(!data[left] || data[left].x < minDomain) {
+              //out of bound on left
+              indexChosen = right;
+            } else if(!data[right] || data[right].x > maxDomain) {
+              //out of bound on right
+              indexChosen = left;
+            } else if(data[right] && (data[right].x - mouseTime) < (mouseTime - data[left].x)) {
+              //closer to right
+              indexChosen = right;
+            } else if(data[left]) {
+              //closer to left
+              indexChosen = left;
+            }
+
+            //check if we have additional points with same timestamp
+            this._createTooltipData(indexChosen,data);
+
+            this._updateTooltip(mousePos, pixelResult, this._tooltipDataResult[0], rowInfo);
           }
-
-          //search for point on left and right
-          left = bisect(data, mouseTime) - 1;
-          right = left ? left+1 : data.length;
-
-          //decide which point to pick
-          if(!data[left] || data[left].x < minDomain) {
-            //out of bound on left
-            dataResult = data[right];
-          } else if(!data[right] || data[right].x > maxDomain) {
-            //out of bound on right
-            dataResult = data[left];
-          } else if(data[right] && (data[right].x - mouseTime) < (mouseTime - data[left].x)) {
-            //closer to right
-            dataResult = data[right];
-          } else if(data[left]) {
-            //closer to left
-            dataResult = data[left];
-          }
-
-          this._updateTooltip(mousePos, pixelResult, dataResult, rowInfo);
         }
       }
+    },
+
+    _createTooltipData: function(index, data) {
+      var result = [],
+          i=0,
+          currType = this._findMarkerType(data[index]),
+          newData = data[index];
+
+      //add result and then search for same timestamps
+      newData.priority = this.markerConfig[currType].priority;
+      result.push(newData);
+
+      //try right...
+      i=1;
+      while(data[index+i] && data[index].x === data[index+i].x) {
+        currType = this._findMarkerType(data[index+i]);
+        if(this.markerConfig[currType].showTooltip) {
+          newData = data[index+i];
+          newData.priority = this.markerConfig[currType].priority;
+          result.push(newData);
+        }
+        i++;
+      }
+
+      //try left
+      i=-1;
+      while(data[index+i] && data[index].x === data[index+i].x) {
+        currType = this._findMarkerType(data[index+i]);
+        if(this.markerConfig[currType].showTooltip) {
+          newData = data[index+i];
+          newData.priority = this.markerConfig[currType].priority;
+          result.push(newData);
+        }
+        i--;
+      }
+
+      result.sort(function(a, b) {
+        return Px.d3.descending(a.priority, b.priority);
+      });
+
+      this.set('_tooltipDataResult', result);
     },
 
     _updateTooltip: function(mousePos, pixelResult, dataResult, rowInfo) {
@@ -436,15 +490,7 @@ Custom property | Description
       var tooltipUpdated = false;
       if(dataResult) {
 
-        var type,
-            dataKey = Object.keys(dataResult);
-
-        for(var i=0; i<dataKey.length; i++) {
-          if(this._markerTypes.indexOf(dataKey[i]) !== -1) {
-            type = dataKey[i];
-            break;
-          }
-        }
+        var type = this._findMarkerType(dataResult);
 
         if(type && this._markerConfig[type].showTooltip) {
 
@@ -457,13 +503,9 @@ Custom property | Description
             pixelResult[0] += (Px.d3.event.pageX - mousePos[0]);
             pixelResult[1] = Px.d3.event.pageY - mousePos[1] + rowInfo.rowY;
 
-            //update everything the tooltip needs
-            this.set('_value', this._formatTimestampForType(dataResult, type));
-            this.set('_eventType', this._markerConfig[type].tooltipLabel);
             this.set('_tooltipPosition', pixelResult);
             this.set('_showTooltip', true);
 
-            //TODO: check if needed
             this._checkForTooltip();
             this.$.tooltip.orientation = this._markerConfig[type].tooltipOrientation;
             this.$.tooltip._show();
@@ -477,6 +519,40 @@ Custom property | Description
       }
     },
 
+
+    _findMarkerType: function(data) {
+      var type,
+            dataKey = Object.keys(data);
+
+      for(var i=0; i<dataKey.length; i++) {
+        if(this._markerTypes.indexOf(dataKey[i]) !== -1) {
+          type = dataKey[i];
+          break;
+        }
+      }
+
+      return type;
+    },
+
+    _mouseClick: function() {
+      if(this.$.tooltip && this.$.tooltip._isShowing) {
+
+        //prevent tooltip from closing or reallow it
+        this._lockTooltip = !this._lockTooltip;
+
+        //TODO: fix those private calls once we update px-tooltip
+        if(this._lockTooltip) {
+          this.$.tooltip._unlistenEvents();
+        } else {
+          this.$.tooltip._listenEvents();
+        }
+
+        //cancel event so the tooltip can't catch that click and close, preventing
+        //it from flashing
+        Px.d3.event.stopImmediatePropagation();
+      }
+    },
+
     _checkForTooltip: function() {
 
       //if the tooltip had never been rendered yet force it and store it for further use
@@ -484,13 +560,6 @@ Custom property | Description
         this.$.tooltipIf.render();
         this.$.tooltip = this.$$('px-tooltip');
       }
-    },
-
-    _formatTimestampForType: function(data, type) {
-      var conf = this._markerConfig[type];
-
-      return  this.formatTimestamp(data.x, conf.timezone, conf.firstDateTimeFormat) +
-      ' ' + conf.separator + ' ' + this.formatTimestamp(data.x, conf.timezone,conf.secondDateTimeFormat);
     },
 
     _getRowInfoForMouse: function(mousePos) {
@@ -549,6 +618,7 @@ Custom property | Description
 
           //register handlers the first time
           Px.d3.select(this.canvasContext.canvas).on('mousemove.markers', this._mouseMove.bind(this));
+          Px.d3.select(this.canvasContext.canvas).on('mousedown.markers', this._mouseClick.bind(this));
         }
 
         return this.canvasContext.canvas;
