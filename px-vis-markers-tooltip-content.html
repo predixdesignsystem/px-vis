@@ -1,0 +1,220 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="../app-localize-behavior/app-localize-behavior.html"/>
+<link rel="import" href="../px-icon-set/px-icon.html" />
+<link rel="import" href="px-vis-behavior-datetime.html"/>
+<link rel="import" href="../px-icon-set/px-icon-set-utility.html" />
+<link rel="import" href="css/px-vis-markers-tooltip-content-styles.html">
+
+<!--
+
+### Usage
+
+
+
+
+@element px-vis-markers
+@blurb Element which draws markers on top or bottom of a chart
+@homepage index.html
+@demo demo/index.html
+
+-->
+
+<dom-module id="px-vis-markers-tooltip-content">
+  <template>
+    <style include="px-vis-markers-tooltip-content-styles"></style>
+
+      <div class="flex flex--middle">
+        <template is="dom-if" if="[[_multipleTooltips]]">
+          <button class$="btn btn--bare button--nav-left [[_leftDisabled(_currentTooltipIndex)]]" on-click="_previousTooltip">
+            <px-icon icon="px-utl:chevron-left"></px-icon>
+          </button>
+        </template>
+        <div>
+          <b>[[localize("Event")]]</b>: [[_eventType]] <br/>
+          <b>[[localize("Timestamp")]]</b>: [[_value]]<br/>
+          <template id="infoTemplate" is="dom-repeat" items="[[_additionalInfo]]" as="info">
+            <b>[[info.key]]</b>: [[info.value]]<br/>
+          </template>
+        </div>
+        <template is="dom-if" if="[[_multipleTooltips]]">
+          <button class$="btn btn--bare button--nav-right [[_rightDisabled(_currentTooltipIndex)]]" on-click="_nextTooltip">
+            <px-icon icon="px-utl:chevron-right"></px-icon>
+          </button>
+        </template>
+      </div>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+
+    is: 'px-vis-markers-tooltip-content',
+
+    behaviors: [
+      Polymer.AppLocalizeBehavior,
+      PxVisBehaviorTime.datetime
+    ],
+
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      markerData: {
+        type:Object
+      },
+
+      markerConfig: {
+        type:Object
+      },
+
+      markerTypes: {
+        type: Array
+      },
+      /**
+       * List of keys & values used for translating this component.
+       */
+       resources: {
+        type: Object,
+        value: function() {
+          return {
+            'en': {
+              'Event': 'Event',
+              'Timestamp': 'Timestamp'
+            }
+          };
+        }
+      },
+      /**
+       * A valid IETF language tag as a string that will be
+       * used to localize this component.
+       *
+       * See https://github.com/PolymerElements/app-localize-behavior for API
+       * documentation and more information.
+       */
+      language: {
+        type: String,
+        value: 'en'
+      },
+      /**
+      * Use the key for localization if value for language is missing.
+      * Should always be true for Predix components.
+      */
+      useKeyIfMissing: {
+        type: Boolean,
+        value: true
+      },
+
+      _eventType: {
+        type: String
+      },
+
+      _value: {
+        type: String
+      },
+
+      _additionalInfo: {
+        type: Array
+      },
+
+      /*
+        * List of tooltips that can be displayed for current marker
+        */
+      tooltipDataResult: {
+        type: Array
+      },
+
+      /*
+       * Whether the tooltips we are displaying can have several values (markers)
+       * on top of each other
+       **/
+      _multipleTooltips: {
+        type: Boolean,
+        computed: '_computeMultipleTooltips(tooltipDataResult)'
+      },
+
+      /**
+       * Index of the current tooltip we are displaying (relative to tooltipDataResult)
+       */
+      _currentTooltipIndex: {
+        type: Number
+      },
+
+    }, //properties
+    observers: ['_dataChanged(tooltipDataResult)',
+                '_updateTooltipInfo(_currentTooltipIndex, tooltipDataResult, markerData, markerConfig, markerTypes)'],
+
+    _dataChanged: function() {
+      this._currentTooltipIndex = 0;
+    },
+
+    _computeMultipleTooltips: function() {
+      return this.tooltipDataResult.length > 1;
+    },
+
+    _findMarkerType: function(data) {
+      var type,
+            dataKey = Object.keys(data);
+
+      for(var i=0; i<dataKey.length; i++) {
+        if(this.markerTypes.indexOf(dataKey[i]) !== -1) {
+          type = dataKey[i];
+          break;
+        }
+      }
+
+      return type;
+    },
+
+    _updateTooltipInfo: function() {
+      this.debounce('updateInfo', function() {
+
+        //get additional info if there is some
+        var data = this.tooltipDataResult[this._currentTooltipIndex],
+            originalData = this.markerData[data.originIndex],
+            keys = Object.keys(originalData),
+            info = [],
+            markerType = this._findMarkerType(data);
+
+        keys.forEach(function(key) {
+          if(key !== 'time' && key !== 'label') {
+            info.push({
+              'key': key,
+              'value': originalData[key]
+            });
+          }
+        });
+
+        //update everything the tooltip needs
+        this.set('_additionalInfo', info);
+        this.set('_value', this._formatTimestampForType(data, markerType));
+        this.set('_eventType', this.markerConfig[markerType].tooltipLabel);
+      }.bind(this), 5);
+    },
+
+    _previousTooltip: function() {
+      this._updateTooltipInfo(this.tooltipDataResult[this._currentTooltipIndex--]);
+    },
+
+    _nextTooltip: function() {
+      this._updateTooltipInfo(this.tooltipDataResult[this._currentTooltipIndex++]);
+    },
+
+    _formatTimestampForType: function(data, type) {
+      var conf = this.markerConfig[type];
+
+      return  this.formatTimestamp(data.x, conf.timezone, conf.firstDateTimeFormat) +
+      ' ' + conf.separator + ' ' + this.formatTimestamp(data.x, conf.timezone,conf.secondDateTimeFormat);
+    },
+
+    _leftDisabled: function() {
+      return this._currentTooltipIndex === 0 ? 'btn--disabled' : '';
+    },
+
+    _rightDisabled: function() {
+      return this._currentTooltipIndex === this.tooltipDataResult.length-1 ? 'btn--disabled' : '';
+    },
+  });
+</script>

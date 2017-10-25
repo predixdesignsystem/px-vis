@@ -11,6 +11,28 @@ const gulpif = require('gulp-if');
 const combiner = require('stream-combiner2');
 const bump = require('gulp-bump');
 const argv = require('yargs').argv;
+const merge2 = require('merge2');
+const concat = require('gulp-concat');
+const srcToVariable = require("./gulp-srcToVariable");
+var gutil = require('gulp-util');
+
+//the worker task was altered a bit
+var workerStream;
+gulp.task('worker', function(cb) {
+  workerStream = gulp.src(['./px-vis-worker.js', './px-vis-worker-scale.js', './bower_components/pxd3/d3.min.js']).pipe(srcToVariable('workerBlob'));
+  cb();
+});
+
+gulp.task('buildWorker', ['worker'], function () {
+   var test = merge2(
+      gulp.src('./px-vis-scheduler_dev.html'),
+      // the workerStream result will be merged together with the main files.
+      workerStream
+  ).pipe(concat('px-vis-scheduler.html'))
+  .pipe(gulp.dest('./'));
+
+  return test;
+});
 
 const sassOptions = {
   importer: importOnce,

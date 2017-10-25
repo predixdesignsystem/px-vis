@@ -1,4 +1,4 @@
-importScripts("px-vis-worker-scale.js");
+
 
 /*
   VISDATA Example:
@@ -801,12 +801,6 @@ onmessage = function(e) {
   switch(e.data.action) {
 
     case 'init':
-      if(e.data.d3Url) {
-        importScripts(e.data.d3Url);
-      } else {
-        importScripts("../pxd3/d3.min.js");
-      }
-
       reply(null, time);
       break;
 
