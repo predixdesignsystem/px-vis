@@ -746,89 +746,6 @@ _calcMultiAxisExtents: function() {
   return exts;
 },
 
-
-  /**
-   * calculates chart extents for multi axis
-   *
-   */
-  // _calcMultiAxisExtents: function() {
-  //   // TODO integrate this into the other calcs
-  //   var search = false,
-  //       exts = {},
-  //       seriesToSearch = {},
-  //       a;
-
-  //   for(var i = 0; i < this.axes.length; i++) {
-  //     a = this.axes[i];
-  //     exts[a] = [];
-  //     exts[a][0] = this._defaultScaleValue.y[0];
-  //     exts[a][1] = this._defaultScaleValue.y[1];
-
-  //     // does it exist in the seriesConfig
-  //     // need to look at each series instead of each axis
-  //     for(var j = 0; j < this.seriesToAxes[a].length; j++) {
-  //       var s = this.seriesToAxes[a][j];
-
-  //       exts[a][0] = (this.completeSeriesConfig[s]['yMin'] || this.completeSeriesConfig[s]['yMin'] === 0) ?
-  //           Math.min(this.completeSeriesConfig[s]['yMin'], exts[a][0]) : exts[a][0];
-  //       exts[a][1] = (this.completeSeriesConfig[s]['yMax'] || this.completeSeriesConfig[s]['yMax'] === 0) ?
-  //           Math.max(this.completeSeriesConfig[s]['yMax'], exts[a][1]) : exts[a][1];
-  //     }
-
-  //     // does it exist in chartExtents, if so, overwrite
-  //     if(this.chartExtents) {
-  //       if(this.chartExtents[a]) {
-  //         exts[a][0] = (this.chartExtents[a][0] === 'dynamic') ?
-  //           //if we got a value from seriesConfig, use it, otherwise Infinity
-  //           (exts[a][0] ? exts[a][0] : Infinity) :
-  //           this.chartExtents[a][0];
-  //         exts[a][1] = (this.chartExtents[a][1] === 'dynamic') ? exts[a][1] : this.chartExtents[a][1];
-
-  //       // for backwards compatibility, if they dont specify an axis apply to all
-  //       } else if(this.chartExtents['y']) {
-  //         exts[a][0] = (this.chartExtents['y'][0] === 'dynamic') ?
-  //           (exts[a][0] ? exts[a][0] : Infinity) :
-  //           this.chartExtents['y'][0];
-  //         exts[a][1] = (this.chartExtents['y'][1] === 'dynamic') ? exts[a][1] : this.chartExtents['y'][1];
-  //       }
-  //     }
-
-  //     // check if we need to search chartData for extents
-  //     if(exts[a][0] === Infinity || exts[a][1] === -Infinity) {
-  //       search = true;
-  //       for(var j = 0; j < this.seriesToAxes[a].length; j++) {
-  //         var s = this.seriesToAxes[a][j];
-  //         seriesToSearch[s] = {
-  //           "axis": a,
-  //           "min": exts[a][0] === Infinity ? true : false,
-  //           "max": exts[a][1] === -Infinity ? true : false
-  //         };
-  //       }
-  //     }
-  //   }
-
-  //   // if we indicated we need to search for extent values
-  //   if(search) {
-  //     var seriesList = Object.keys(seriesToSearch);
-  //     for(var i = 0; i < this.chartData.length; i++) {
-  //       for(var j = 0; j < seriesList.length; j++) {
-  //         var s = seriesList[j],
-  //             sY = this.completeSeriesConfig[s]['y'],
-  //             series = seriesToSearch[s],
-  //             axis = series['axis'];
-  //         if(series.min && (this.chartData[i][sY] || this.chartData[i][sY] === 0)) {
-  //           exts[axis][0] = Math.min(this.chartData[i][sY], exts[axis][0]);
-  //         }
-  //         if(series.max && (this.chartData[i][sY] || this.chartData[i][sY] === 0)) {
-  //           exts[axis][1] = Math.max(this.chartData[i][sY], exts[axis][1]);
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   return exts;
-  // },
-
   /**
    * When the domain gets set via a user interaction, set the scale function to use the new domain
    *
@@ -902,6 +819,36 @@ _calcMultiAxisExtents: function() {
     }
 
     return s;
+  },
+
+  /**
+   * Gets pixel values for data values relating to a series (series is the id
+   * used in seriesConfig). data is an array: [xValue, yValue]
+   */
+  getPixelFromData: function(data, series) {
+    var x,
+        y;
+
+    x = this.x(data[0]) + Number(this.margin.left);
+    y = this.y[this.completeSeriesConfig[series].axis.id](data[1]) + this.margin.top;
+
+    return [x, y];
+  },
+
+  /**
+   * Gets data values for pixel values relating to a series (series is the id
+   * used in seriesConfig). pixelVal is an array: [xValue, yValue]
+   * please note that the values returned have no guarantee to match any
+   * actual chart data, this is just a conversion based on pixel
+   */
+  getDataFromPixel: function(pixelVal, series) {
+    var x,
+        y;
+
+    x = this.x.invert(pixelVal[0]);
+    y = this.y[this.completeSeriesConfig[series].axis.id].invert(pixelVal[1]);
+
+    return [x, y];
   }
 },
   PxVisBehavior.sizing,

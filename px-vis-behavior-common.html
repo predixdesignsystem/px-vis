@@ -1680,6 +1680,21 @@ PxVisBehavior.polarData = {
       value: false
     }
   },
+  _getPixelCoordForRadialData: function(dataX, dataY, yRange, yDomain, yDomainTot) {
+    var result = [];
+
+    //process angle and amplitude in pxel
+    var angle = dataX,
+        pixelAmplitude = yRange * (dataY - yDomain[0])/yDomainTot;
+
+    angle = this._adjustAngleForPolarChart(angle, false);
+
+    //sin * pixel range * percentage of data range
+    result[1] = Math.cos(angle) * pixelAmplitude;
+    result[0] = Math.sin(angle) * pixelAmplitude;
+
+    return result;
+  },
   /**
    * adjusts the angle for the polar chart, taking counterClockwise into account
    * and returning it in the asked unit (degrees if toDegrees is true)
@@ -2520,23 +2535,7 @@ PxVisBehavior.interactionSpaceShared = [{
       'timeStamps': [],
       'timeStampsTracker': {}
     }
-  },
-
-  _getPixelCoordForRadialData: function(dataX, dataY, yRange, yDomain, yDomainTot) {
-      var result = [];
-
-      //process angle and amplitude in pxel
-      var angle = dataX,
-          pixelAmplitude = yRange * (dataY - yDomain[0])/yDomainTot;
-
-      angle = this._adjustAngleForPolarChart(angle, false);
-
-      //sin * pixel range * percentage of data range
-      result[1] = Math.cos(angle) * pixelAmplitude;
-      result[0] = Math.sin(angle) * pixelAmplitude;
-
-      return result;
-    },
+  }
 }, PxVisBehavior.polarData];
 
 /*
