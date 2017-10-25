@@ -97,6 +97,14 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     * Fired when panning stops.
     * @event px-vis-interaction-space-stop-panning
     */
+    /*
+    * Fired when crosshair data has been generated. Detail contains:
+    * {
+    *  'crosshairData': the crosshair data
+    * }
+    * @event px-vis-crosshair-data-generated
+    */
+
 
     /**
      * Properties block, expose attribute values to the DOM via 'reflect'
@@ -585,8 +593,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       // now we can set our data that we want to pass out
       if(this._calculatingData) {
 
-
-
         if(this._calcCrosshair) {
           this.generatingCrosshairData = true;
 
@@ -605,6 +611,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           } else {
             this.set('crosshairData', {'rawData': dataObj.rawData, 'timeStamps': dataObj.timeStamps});
           }
+
+          this.fire('px-vis-crosshair-data-generated', {crosshairData: this.crosshairData});
         }
 
         delete dataObj.timeStampsTracker;

@@ -1,3 +1,7 @@
+v4.3.1
+================
+* Added px-vis-crosshair-data-generated event when crosshair data has finished generating
+
 v4.3.0
 ================
 * Added tooltip support for px-vis-markers as well as priority based drawing. Tooltip can handle custom information as well as several markers at the same timestamp.
