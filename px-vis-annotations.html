@@ -103,10 +103,11 @@ Custom property | Description
 
     _getTransform: function(item) {
 
-      var x = this.x(item.x) + Number(this.margin.left) - this._iconWidth/2,
-          y = this._getMultiYScaleForSeries(item.series)(item.y) + this.margin.top - this._iconHeight;
+      var pix = this.getPixelForData([item.x, item.y], item.series);
+      pix[0] -= this._iconWidth/2;
+      pix[1] -= this._iconHeight;
 
-      return 'transform: translate(' + x + 'px,' + y + 'px)';
+      return 'transform: translate(' + pix[0] + 'px,' + pix[1] + 'px)';
     },
 
     _getMultiYScaleForSeries: function(series) {

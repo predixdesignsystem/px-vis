@@ -145,6 +145,41 @@
           this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
         }
       }.bind(this), 10);
+    },
+
+    /**
+     * Gets pixel values for data values. data is an array: [xValue, yValue]
+     */
+    getPixelFromData: function(data) {
+      return this._getPixelCoordForRadialData(data[0], data[1], this.y.range(), domain, domain[1]-domain[0]);
+    },
+
+    /**
+     * Gets data values for pixel values. pixelVal is an array:
+     * [xValue, yValue]
+     * please note that the values returned have no guarantee to match any
+     * actual chart data, this is just a conversion based on pixel
+     */
+    getDataFromPixel: function(pixelVal) {
+      var x,
+          y;
+
+      y = this.y.invert(Math.sqrt(pixelVal[0]*pixelVal[0] + pixelVal[1]*pixelVal[1]));
+      x = Math.atan2(pixelVal[1],pixelVal[0]) + Math.PI/2;
+
+      if(this.counterClockwise) {
+        x *= -1;
+      }
+
+      if(x<0) {
+        x += 2 * Math.PI;
+      }
+
+      if(this.useDegrees) {
+        x = x * 360/(2 * Math.PI);
+      }
+
+      return [x,y];
     }
   },
     PxVisBehaviorD3.axes,
