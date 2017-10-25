@@ -1,3 +1,7 @@
+v4.3.0
+================
+* Added tooltip support for px-vis-markers as well as priority based drawing. Tooltip can handle custom information as well as several markers at the same timestamp.
+
 v4.2.2
 ================
 * Fix radial scale extents when negative values are absolutely bigger than positive ones
