@@ -381,7 +381,7 @@ function runTests(){
 
     suiteSetup(function(done) {
       multiScale.set('chartExtents', ext);
-      window.setTimeout(function() { done() }, 100);
+      window.setTimeout(function() { done() }, 500);
     });
 
     test('brush1._brush extents match', function() {

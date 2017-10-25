@@ -1335,13 +1335,21 @@ PxVisBehavior.markers = {
      * Configuration object to define what marker should map to what icon, color, and row.
      * The object has a key being the marker name, the value being a configuration object for that marker. The configuration object has four properties:
      * - `color`: A rgb color value for the fill or stroke.
-     * - "markerFillOpacity": the opacity of the inside of the marker
-     * - "markerStrokeOpacity": the opacity of the outside of the marker
+     * - `markerFillOpacity`: the opacity of the inside of the marker
+     * - `markerStrokeOpacity`: the opacity of the outside of the marker
      * - `markerSymbol`: the symbol type; see below
-     * - "markerSize": specifies the size of markers
-     * - "markerScale": allows to scale the size of markers
-     * - "location": "top" or "bottom"
-     * - "row": the row number on the top or the bottom, starting at 0
+     * - `markerSize`: specifies the size of markers
+     * - `markerScale`: allows to scale the size of markers
+     * - `location`: "top" or "bottom"
+     * - `row`: the row number on the top or the bottom, starting at 0
+     * - `showTooltip`: whether a tooltip should be shown on hover
+     * - `firstDateTimeFormat`: used to format the date part of the timestamp in the tooltip
+     * - `secondDateTimeFormat`: used to format the time part of the timestamp in the tooltip
+     * - `separator`: symbol between date and time in the tooltip
+     * - `timezone`: timezone to use for the timestamp in the tooltip
+     * - `tooltipOrientation`: orientation of the tooltip: "left", "right", "bottom", "top"
+     * - `tooltipLabel`: label to be used in the tooltip for this type. If not defined the key
+     * of this type will be used (which should match 'label' in the markerData)
      *
      * The symbol used for the marker. Supported symbols:
      * - 'circle'
@@ -1352,7 +1360,6 @@ PxVisBehavior.markers = {
      * - 'star'
      * - 'wye'
      * more info at https://github.com/d3/d3-shape/blob/master/README.md#symbols
-     * This property will be read from the completeSeriesConfig
      *
      * Some additional "custom" types are also available:
      * - 'bar'
@@ -1361,14 +1368,20 @@ PxVisBehavior.markers = {
      * - 'x'
      * ```
      * Example: {
-     *   "myMarkerType":{
-     *       "fillColor": "rgb(123,0,0)",
-     *       "markerFillOpacity": 0.5,
-     *       "markerSymbol": "square",
-     *       "markerSize": 4,
-     *       "location": "top",
-     *       "row": 1,
-     *       "priority": 10
+     *   'myMarkerType':{
+     *       'fillColor': 'rgb(123,0,0)',
+     *       'markerFillOpacity': 0.5,
+     *       'markerSymbol': 'square',
+     *       'markerSize': 4,
+     *       'location': 'top',
+     *       'row': 1,
+     *       'priority': 10,
+     *       'showTooltip': true,
+     *       'firstDateTimeFormat': 'HH:mm:ss ZZ',
+     *       'secondDateTimeFormat': 'DD MMM YYYY',
+     *       'separator': '|',
+     *       'timezone': 'utc',
+     *       'tooltipOrientation': 'top'
      *   }
      * }
      * ```
@@ -1376,6 +1389,26 @@ PxVisBehavior.markers = {
      */
     markerConfig: {
       type: Object
+    },
+    _defaultMarkerConfig: {
+      type: Object,
+      readonly: true,
+      value: function() {
+        return {
+          'color': 'rgb(123,123,123)',
+          'markerStrokeOpacity': 0,
+          'markerSymbol': 'square',
+          'markerSize': 64,
+          'markerScale': 1,
+          'showTooltip': true,
+          'firstDateTimeFormat': 'HH:mm:ss ZZ',
+          'secondDateTimeFormat': 'DD MMM YYYY',
+          'separator': '|',
+          'timezone': 'utc',
+          'tooltipOrientation': 'top',
+          'priority': 0
+        };
+      }
     },
     /**
      * Data representing the markers. Example:
@@ -2642,7 +2675,7 @@ PxVisBehavior.highlightCanvasShared = [{
 
   observers: [
     '_requestCanvasCreation(_highlightData)',
-    '_muteDataSeries(_highlightData)',
+    '_muteDataSeries(_highlightData, layersToMask)',
     '_addTransition(layersToMask)'
   ],
 
@@ -2671,7 +2704,9 @@ PxVisBehavior.highlightCanvasShared = [{
   },
 
   _requestCanvasCreation: function() {
-    this.set('canvasLayersConfig.highlighter', {});
+    if(!this.canvasLayersConfig.highlighter) {
+      this.set('canvasLayersConfig.highlighter', {});
+    }
   }
 
 }, PxVisBehavior.highlightShared];
@@ -2687,7 +2722,7 @@ PxVisBehavior.highlightCanvasShared = [{
 PxVisBehavior.highlightSvgShared = [{
 
   observers: [
-    '_muteDataSeries(_highlightData)',
+    '_muteDataSeries(_highlightData, layersToMask)',
     '_addTransition(layersToMask)'
   ],
 
@@ -2746,7 +2781,7 @@ PxVisBehavior.highlightLineShared = [{
       value: false
     }
   },
-  observers: ['_computeChartData(crosshairData.timeStamps.*, drawWithLocalCrosshairData)'],
+  observers: ['_computeChartData(crosshairData.timeStamps.*, drawWithLocalCrosshairData, differentDataset, domainChanged, completeSeriesConfig)'],
 
   /**
    * Draws the crosshair elements and sets up listeners and callbacks on chart hover
@@ -2754,36 +2789,39 @@ PxVisBehavior.highlightLineShared = [{
    *
    */
   _computeChartData: function() {
-    //if we are generating data locally and not being told to draw anyways, dont draw
-    // but if we have cleared our dataset, then we do want to clear our datapoints
-    if(this.generatingCrosshairData && !this.drawWithLocalCrosshairData && this.crosshairData.rawData.length > 0) {
-      return [];
-    }
+    this.debounce('_computeHighlightData', function() {
 
-    var dataset
-    if(this.differentDataset) {
-      dataset = this._calcDataset();
-    } else {
-      if(this.hardMute && this._doesObjHaveValues(this.mutedSeries)) {
-
-        var newRawData = [];
-        for(var i=0; i<this.crosshairData.rawData.length; i++) {
-          if(!this.mutedSeries[this.crosshairData.rawData[i][this.timeData]]) {
-            newRawData.push(this.crosshairData.rawData[i]);
-          }
-        }
-        dataset = newRawData;
-      } else {
-        dataset = this.crosshairData.rawData;
+      //if we are generating data locally and not being told to draw anyways, dont draw
+      // but if we have cleared our dataset, then we do want to clear our datapoints
+      if(this.generatingCrosshairData && !this.drawWithLocalCrosshairData && this.crosshairData.rawData.length > 0) {
+        return [];
       }
-    }
 
-    if(this.showTooltipData) {
-      this._setTooltipDataMultiLine(dataset);
-    }
+      var dataset;
+      if(this.differentDataset) {
+        dataset = this._calcDataset();
+      } else {
+        if(this.hardMute && this._doesObjHaveValues(this.mutedSeries)) {
 
-    this.set('_highlightData', dataset);
-    this.fire('px-vis-highlight-data-changed');
+          var newRawData = [];
+          for(var i=0; i<this.crosshairData.rawData.length; i++) {
+            if(!this.mutedSeries[this.crosshairData.rawData[i][this.timeData]]) {
+              newRawData.push(this.crosshairData.rawData[i]);
+            }
+          }
+          dataset = newRawData;
+        } else {
+          dataset = this.crosshairData.rawData;
+        }
+      }
+
+      if(this.showTooltipData) {
+        this._setTooltipDataMultiLine(dataset);
+      }
+
+      this.set('_highlightData', dataset);
+      this.fire('px-vis-highlight-data-changed');
+    }.bind(this), 5);
   },
 
 
@@ -2829,9 +2867,6 @@ PxVisBehavior.highlightLineShared = [{
         val,
         dim;
 
-      // FIXME run on resize and wrap in animationFrame. Maybe at chart level?
-      svgBounding = this.svg ? this.svg.node().ownerSVGElement.getBoundingClientRect() : this.canvasContext.canvas.getBoundingClientRect();
-
       //calc the screen positions for the tooltip
       if(this.radialLine) {
 
@@ -2845,12 +2880,12 @@ PxVisBehavior.highlightLineShared = [{
           }
         }
 
-        screenX = this.y(dataset[last]) * Math.sin(this.x(last)) + this.width/2 + svgBounding.left + window.pageXOffset;
-        screenY = this.y(dataset[last]) * Math.cos(Math.PI - this.x(last)) + this.height/2 + svgBounding.top + window.pageYOffset;
+        screenX = this.y(dataset[last]) * Math.sin(this.x(last)) + this.width/2 + window.pageXOffset;
+        screenY = this.y(dataset[last]) * Math.cos(Math.PI - this.x(last)) + this.height/2 + window.pageYOffset;
 
       } else {
-        screenX = this.x(last) + svgBounding.left + window.pageXOffset + 15;
-        screenY = this.y[last](dataset[last]) + this.margin.top + svgBounding.top + window.pageYOffset;
+        screenX = this.x(last) + window.pageXOffset + 15;
+        screenY = this.y[last](dataset[last]) + this.margin.top + window.pageYOffset;
       }
 
       for(var i = 0; i < this.dimensions.length; i++) {
@@ -2888,7 +2923,8 @@ PxVisBehavior.highlightLineShared = [{
         "dataset": dataset,
         'series': series,
         "color": tooltipConfig[aid]["color"],
-        "tooltipConfig": tooltipConfig
+        "tooltipConfig": tooltipConfig,
+        "adjustPosition": true //warn chart that pos needs to be adjusted from canvas/svg
       };
 
     return data;

@@ -1,4 +1,26 @@
-<<<<<<< Updated upstream
+v4.3.1
+================
+* Added px-vis-crosshair-data-generated event when crosshair data has finished generating
+
+v4.3.0
+================
+* Added tooltip support for px-vis-markers as well as priority based drawing. Tooltip can handle custom information as well as several markers at the same timestamp.
+
+v4.2.2
+================
+* Fix radial scale extents when negative values are absolutely bigger than positive ones
+* Fix highlight point canvas to work with degrees in polar
+* Ensure svg and canvas highlighters (line + point) can be used at "creation time", i.e use crosshairData directly when creating a chart rather than at runtime
+* Ensure brings on top feature works for filtered chart datasets on canvas (polar + xy)
+
+v4.2.1
+================
+* Ensure canvas renderer clears series when no data
+
+v4.2.0
+================
+* Added "lasso" selection for crosshair mode, available by default with "crosshairLasso" in toolbar
+
 v4.1.1
 ================
 * Fix issue where change in x axis scale wouldn't notify
