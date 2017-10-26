@@ -27,6 +27,11 @@ PxVisBehaviorScale.scaleMultiAxis = [{
         }
       }
     },
+
+    listeners: {
+      'px-vis-request-pixel-for-data': '_pixelRequest'
+    },
+
     _recreateScales: function() {
       if(this.x) {
         this._setXScale(this.width, this.margin, true);
@@ -291,6 +296,38 @@ PxVisBehaviorScale.scaleMultiAxis = [{
       }
 
       this.set('domainChanged', !this.domainChanged);
+    },
+
+    /**
+     * Gets pixel values for data value relating to an axis. data is a number
+     * if margin is specified it will use those to adjust the pixel values
+     * instead of the normal `margin` property
+     */
+    getPixelFromData: function(data, axis, margin) {
+      var x,
+          y,
+          marg = margin ? margin : this.margin;
+
+      x = this.x(axis);
+      y = this.y[axis](data) + marg.top;
+
+      return [x, y];
+    },
+
+    /**
+     * Gets data value for pixel value relating to an axis. Pixel val is a
+     * Y pixel value relating to an axis.
+     * It returns an array with the axis and the value: [axis, value]
+     * please note that the values returned have no guarantee to match any
+     * actual chart data, this is just a conversion based on pixel
+     */
+    getDataFromPixel: function(pixelVal, axis) {
+      return [axis, this.y[axis].invert(pixelVal[1])];
+    },
+
+    _pixelRequest: function(evt) {
+      var res = this.getPixelFromData(evt.detail.data[1], evt.detail.series, event.detail.margin);
+      evt.detail.callback(res);
     }
   },
   PxVisBehaviorD3.svg,

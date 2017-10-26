@@ -104,6 +104,8 @@ Custom property | Description
     _getTransform: function(item) {
 
       var result = '';
+
+      //ask the chart scale to convert those data values to pixels
       this.fire('px-vis-request-pixel-for-data', {callback: function(pix) {
 
           pix[0] -= this._iconWidth/2;
@@ -114,14 +116,6 @@ Custom property | Description
       );
 
       return result;
-    },
-
-
-    _getMultiYScaleForSeries: function(series) {
-
-      var axisName = this.completeSeriesConfig[series].axis.id;
-
-      return this.y[axisName];
     },
 
     _mouseOver: function(evt) {
