@@ -35,6 +35,10 @@
       }
     },
 
+    listeners: {
+      'px-vis-request-pixel-for-data': '_pixelRequest'
+    },
+
     /**
      * Sets the y scale to multiple linear scales.
      *
@@ -151,7 +155,16 @@
      * Gets pixel values for data values. data is an array: [xValue, yValue]
      */
     getPixelFromData: function(data) {
-      return this._getPixelCoordForRadialData(data[0], data[1], this.y.range(), domain, domain[1]-domain[0]);
+      var domain = this.y.domain(),
+          range = this.y.range(),
+          result;
+
+      result = this._getPixelCoordForRadialData(data[0], data[1], (range[1]-range[0]), domain, domain[1]-domain[0]);
+
+      result[0] += this._center[0];
+      result[1] += this._center[1];
+
+      return result;
     },
 
     /**
@@ -180,6 +193,11 @@
       }
 
       return [x,y];
+    },
+
+    _pixelRequest: function(evt) {
+      var res = this.getPixelFromData(evt.detail.data);
+      evt.detail.callback(res);
     }
   },
     PxVisBehaviorD3.axes,

@@ -103,12 +103,19 @@ Custom property | Description
 
     _getTransform: function(item) {
 
-      var pix = this.getPixelForData([item.x, item.y], item.series);
-      pix[0] -= this._iconWidth/2;
-      pix[1] -= this._iconHeight;
+      var result = '';
+      this.fire('px-vis-request-pixel-for-data', {callback: function(pix) {
 
-      return 'transform: translate(' + pix[0] + 'px,' + pix[1] + 'px)';
+          pix[0] -= this._iconWidth/2;
+          pix[1] -= this._iconHeight;
+
+          result = 'transform: translate(' + pix[0] + 'px,' + pix[1] + 'px)';
+        }.bind(this), data: [item.x, item.y], series: item.series, margin: this.margin}
+      );
+
+      return result;
     },
+
 
     _getMultiYScaleForSeries: function(series) {
 

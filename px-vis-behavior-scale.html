@@ -82,6 +82,10 @@ PxVisBehaviorScale.scale = [{
     }
   },
 
+  listeners: {
+    'px-vis-request-pixel-for-data': '_pixelRequest'
+  },
+
   _recreateScales: function(width, height, margin) {
 
     //prevent domain update
@@ -819,13 +823,16 @@ _calcMultiAxisExtents: function() {
   /**
    * Gets pixel values for data values relating to a series (series is the id
    * used in seriesConfig). data is an array: [xValue, yValue]
+   * if margin is specified it will use thos to adjust the pixel values
+   * instead of the normal `margin` property
    */
-  getPixelFromData: function(data, series) {
+  getPixelFromData: function(data, series, margin) {
     var x,
-        y;
+        y,
+        marg = margin ? margin : this.margin;
 
-    x = this.x(data[0]) + Number(this.margin.left);
-    y = this.y[this.completeSeriesConfig[series].axis.id](data[1]) + this.margin.top;
+    x = this.x(data[0]) + Number(marg.left);
+    y = this.y[this.completeSeriesConfig[series].axis.id](data[1]) + marg.top;
 
     return [x, y];
   },
@@ -844,6 +851,11 @@ _calcMultiAxisExtents: function() {
     y = this.y[this.completeSeriesConfig[series].axis.id].invert(pixelVal[1]);
 
     return [x, y];
+  },
+
+  _pixelRequest: function(evt) {
+    var res = this.getPixelFromData(evt.detail.data, evt.detail.series, event.detail.margin);
+    evt.detail.callback(res);
   }
 },
   PxVisBehavior.sizing,
