@@ -1,3 +1,7 @@
+v4.3.2
+================
+* Ensure axis register always get the right number of axes
+
 v4.3.1
 ================
 * Added px-vis-crosshair-data-generated event when crosshair data has finished generating
