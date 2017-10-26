@@ -43,6 +43,10 @@
       }
     },
 
+    listeners: {
+      'px-vis-request-pixel-for-data': '_pixelRequest'
+    },
+
     /**
      *  Sets the x scale to a single ordinal, radial scale
      *
@@ -178,6 +182,38 @@
         this.set('domainChanged', !this.domainChanged);
       }
     },
+
+    /**
+     * Gets pixel values for data value relating to an axis. data is a number
+     * if margin is specified it will use those to adjust the pixel values
+     * instead of the normal `margin` property
+     */
+     getPixelFromData: function(data, axis, margin) {
+      var x,
+          y,
+          marg = margin ? margin : this.margin;
+
+      x = this.y(data) * Math.sin(this.x(axis)) + this._extendedCenter[0];
+      y = this.y(data) * Math.cos(Math.PI - this.x(axis)) + this._smallerSide/2 + marg.top;
+
+      return [x, y];
+    },
+
+    /**
+     * Gets data value for pixel value relating to an axis. Pixel val is a
+     * Y pixel value relating to an axis.
+     * It returns an array with the axis and the value: [axis, value]
+     * please note that the values returned have no guarantee to match any
+     * actual chart data, this is just a conversion based on pixel
+     */
+    getDataFromPixel: function(pixelVal, axis) {
+      return [axis, this.y.invert(pixelVal[1])];
+    },
+
+    _pixelRequest: function(evt) {
+      var res = this.getPixelFromData(evt.detail.data[1], evt.detail.series, event.detail.margin);
+      evt.detail.callback(res);
+    }
   },
     PxVisBehavior.commonMethods,
     PxVisBehavior.dataset,
