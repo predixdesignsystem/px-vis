@@ -2291,10 +2291,31 @@ PxVisBehaviorChart.axisRegister = [{
     }
 
     this.set('_axisRegisterConfig', axisConfig);
-    if(!this._axisRegisterTooltipData) {
+    if(!this._ttDataHaveSameSeries(this._axisRegisterTooltipData, tooltipData)) {
       this.set('_axisRegisterTooltipData', tooltipData);
     }
   },
+
+  _ttDataHaveSameSeries: function(data1, data2) {
+
+    if((!data1 && data2) || (!data2 && data1)) {
+      return false;
+    }
+
+    if(data1.series.length !== data2.series.length) {
+      return false;
+    }
+
+    var same = true;
+    data1.series.forEach(function(element) {
+      if(data2.series.indexOf(element) === -1) {
+        same = false;
+      }
+    }, this);
+
+    return same;
+  },
+
   /**
   *
   * Resuses existing register dataset for series names and adds or removes values
@@ -2622,7 +2643,6 @@ PxVisBehaviorChart.combineMutes = {
     /**
      * An object which holds the series lines that have been muted based on the selected domain
      *
-     * @private
      */
     mutedSeriesDomain: {
       type:Object,
@@ -2631,7 +2651,6 @@ PxVisBehaviorChart.combineMutes = {
     /**
      * An object which holds the series lines that have been muted based on the axes brushes
      *
-     * @private
      */
     mutedSeriesBrush: {
       type:Object,
