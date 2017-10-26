@@ -55,7 +55,10 @@ Custom property | Description
           class="annotation--icon"
           style$="[[_getTransform(item, x, y, domainChanged, completeSeriesConfig)]]"
           on-mouseover="_mouseOver"
-          on-mouseleave="_mouseLeave">
+          on-mouseleave="_mouseLeave"
+          on-click="_mouseClick"
+          on-mouseenter="_mouseEnter"
+          on-mouseout="_mouseOut">
         </px-icon>
       </template>
     </template>
@@ -119,11 +122,23 @@ Custom property | Description
     },
 
     _mouseOver: function(evt) {
-      this._requestAnnotation(evt, 'show');
+      this._requestAnnotation(evt, 'over');
     },
 
     _mouseLeave: function(evt) {
-      this._requestAnnotation(evt, 'hide');
+      this._requestAnnotation(evt, 'leave');
+    },
+
+    _mouseClick: function(evt) {
+      this._requestAnnotation(evt, 'click');
+    },
+
+    _mouseEnter: function(evt) {
+      this._requestAnnotation(evt, 'enter');
+    },
+
+    _mouseOut: function(evt) {
+      this._requestAnnotation(evt, 'out');
     },
 
     _requestAnnotation(evt, eventName) {
