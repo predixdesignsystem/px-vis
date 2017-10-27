@@ -1,3 +1,7 @@
+v4.3.3
+=================
+* Ensure canvas context is saved and restored for each canvas line draw to avoid clippath update problems
+
 v4.3.2
 ================
 * Ensure axis register always get the right number of axes

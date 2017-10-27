@@ -147,11 +147,6 @@
                             this.completeSeriesConfig[this.seriesId].mutedOpacity : this.mutedOpacity;
       this._currentDrawingOptions.strokeWidth = this.strokeWidth;
 
-      //FIXME Clip Path can be optimized. Currently draws with every TS line. Can be drawn once.
-      if(this.clipPath) {
-        this.drawClipPath();
-      }
-
       this._currentDrawingOptions.lastPointRenderedIndex = null;
       this._currentDrawingOptions.currentBatchStartIndex = 0;
 
@@ -261,6 +256,12 @@
       this.canvasContext.lineWidth = this._currentDrawingOptions.strokeWidth
       this.canvasContext.lineCap = "square";
 
+      this.canvasContext.save();
+
+      if(this.clipPath) {
+        this.drawClipPath();
+      }
+
       //adjust start based on last point drawned
       this._currentDrawingOptions.currentBatchStartIndex = this._currentDrawingOptions.lastPointRenderedIndex;
 
@@ -317,6 +318,8 @@
         this.canvasContext.strokeStyle = this.rgbToRgba(this.completeSeriesConfig[this.seriesId]['color'], opacity);
         this.canvasContext.stroke();
       }
+
+      this.canvasContext.restore();
     },
 
     _isSerieMuted: function(d) {
