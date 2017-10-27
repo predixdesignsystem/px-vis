@@ -191,12 +191,20 @@
      getPixelFromData: function(data, axis, margin) {
       var x,
           y,
-          marg = margin ? margin : this.margin;
+          marg = margin ? margin : this.margin,
+          oob = false;
+
+      if(data > this.y.domain()[1] || data < this.y.domain()[0]) {
+        oob = true;
+      }
 
       x = this.y(data) * Math.sin(this.x(axis)) + this._extendedCenter[0];
       y = this.y(data) * Math.cos(Math.PI - this.x(axis)) + this._smallerSide/2 + marg.top;
 
-      return [x, y];
+      return {
+        'pixel': [x, y],
+        'outOfBounds': oob
+      };
     },
 
     /**
