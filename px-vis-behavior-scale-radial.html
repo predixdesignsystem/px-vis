@@ -153,18 +153,31 @@
 
     /**
      * Gets pixel values for data values. data is an array: [xValue, yValue]
+     * returns an object with pixel values and whether the values are
+     * currently out of bounds in regards to the current domain
      */
     getPixelFromData: function(data) {
       var domain = this.y.domain(),
           range = this.y.range(),
-          result;
+          domainTot = domain[1] - domain[0],
+          result,
+          oob = false;
 
-      result = this._getPixelCoordForRadialData(data[0], data[1], (range[1]-range[0]), domain, domain[1]-domain[0]);
+      result = this._getPixelCoordForRadialData(data[0], data[1], (range[1]-range[0]), domain, domainTot);
 
       result[0] += this._center[0];
       result[1] += this._center[1];
 
-      return result;
+      //do the out of bounds check on pixel values since zoom on radial
+      //doesn't update the domain
+      if(result[0] < 0 || result[0] > this._smallerSide || result[1] < 0 || result[1] > this._smallerSide) {
+        oob= true;
+      }
+
+      return {
+        'pixel': result,
+        'outOfBounds': oob
+      }
     },
 
     /**

@@ -106,19 +106,23 @@ Custom property | Description
 
     _getTransform: function(item) {
 
-      var result = '';
+      var coords,
+          oob;
 
       //ask the chart scale to convert those data values to pixels
-      this.fire('px-vis-request-pixel-for-data', {callback: function(pix) {
-
-          pix[0] -= this._iconWidth/2;
-          pix[1] -= this._iconHeight;
-
-          result = 'transform: translate(' + pix[0] + 'px,' + pix[1] + 'px)';
+      this.fire('px-vis-request-pixel-for-data', {callback: function(info) {
+          coords = info.pixel;
+          oob = info.outOfBounds;
         }.bind(this), data: [item.x, item.y], series: item.series, margin: this.margin}
       );
 
-      return result;
+      if(oob) {
+        return 'display: none';
+      } else {
+        coords[0] -= this._iconWidth/2;
+        coords[1] -= this._iconHeight;
+        return 'transform: translate(' + coords[0] + 'px,' + coords[1] + 'px)';
+      }
     },
 
     _mouseOver: function(evt) {

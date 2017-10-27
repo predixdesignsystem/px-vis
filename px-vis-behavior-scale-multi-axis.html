@@ -302,16 +302,26 @@ PxVisBehaviorScale.scaleMultiAxis = [{
      * Gets pixel values for data value relating to an axis. data is a number
      * if margin is specified it will use those to adjust the pixel values
      * instead of the normal `margin` property
+     * returns an object with pixel values and whether the values are
+     * currently out of bounds
      */
     getPixelFromData: function(data, axis, margin) {
       var x,
           y,
-          marg = margin ? margin : this.margin;
+          marg = margin ? margin : this.margin,
+          oob = false;
+
+      if(data < this.y[axis].domain()[0] || data > this.y[axis].domain()[1]) {
+        oob = true;
+      }
 
       x = this.x(axis) + marg.left;
       y = this.y[axis](data) + marg.top;
 
-      return [x, y];
+      return {
+        'pixel': [x, y],
+        'outOfBounds': oob
+      }
     },
 
     /**

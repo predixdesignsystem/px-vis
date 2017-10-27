@@ -830,16 +830,27 @@ _calcMultiAxisExtents: function() {
    * used in seriesConfig). data is an array: [xValue, yValue]
    * if margin is specified it will use thos to adjust the pixel values
    * instead of the normal `margin` property
+   * returns an object with the result and whether that result is out of
+   * bounds for the current domain
    */
   getPixelFromData: function(data, series, margin) {
     var x,
         y,
-        marg = margin ? margin : this.margin;
+        marg = margin ? margin : this.margin,
+        outOfBounds = false,
+        yDomain = this.y[this.completeSeriesConfig[series].axis.id].domain();
+
+    if(data[0] < this.x.domain()[0] || data[0] > this.x.domain()[1] || data[1] < yDomain[0] || data[1] > yDomain[1]) {
+      outOfBounds = true;
+    }
 
     x = this.x(data[0]) + Number(marg.left);
     y = this.y[this.completeSeriesConfig[series].axis.id](data[1]) + marg.top;
 
-    return [x, y];
+    return {
+      'pixel': [x, y],
+      'outOfBounds': outOfBounds
+    };
   },
 
   /**
