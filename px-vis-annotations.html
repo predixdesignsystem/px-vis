@@ -24,6 +24,7 @@
         svg="[[svg]]"
         x="[[x]]"
         y="[[y]]"
+        margin="[[margin]]"
         domain-changed="[[domainChanged]]"
         complete-series-config="[[completeSeriesConfig]]"
         annotation-data="[[data]]">
@@ -34,8 +35,9 @@ The following custom properties are available for styling:
 
 Custom property | Description
 :----------------|:-------------
-
-
+`--px-vis-annotations-icon` | Color of the annotation icon
+`--px-vis-annotations-icon-hover` | Color of the annotation icon when hovered
+`--px-vis-annotations-icon-pressed` | Color of the annotation icon when pressed
 
 @element px-vis-annotations
 @blurb Element which draws annotations on a chart
@@ -53,7 +55,7 @@ Custom property | Description
           icon="px-com:comment"
           data="[[item]]"
           class="annotation--icon"
-          style$="[[_getTransform(item, x, y, domainChanged, completeSeriesConfig)]]"
+          style$="[[_getTransform(item, x, y, domainChanged, completeSeriesConfig, forceRecalc, hide)]]"
           on-mouseover="_mouseOver"
           on-mouseleave="_mouseLeave"
           on-click="_mouseClick"
@@ -75,6 +77,57 @@ Custom property | Description
       PxVisBehavior.annotationData
     ],
 
+
+
+    /**
+     * Fired when the mouse enters an annotation icon (mouseenter event)
+     *
+     * @event px-vis-annotation-enter
+     */
+
+     /**
+     * Fired when the mouse out an annotation icon (mouseout event)
+     *
+     * @event px-vis-annotation-out
+     */
+
+     /**
+     * Fired when the mouse hovers an annotation icon (mouseover event)
+     *
+     * @event px-vis-annotation-over
+     */
+
+     /**
+     * Fired when the mouse leave an annotation icon (mouseleave event)
+     *
+     * @event px-vis-annotation-leave
+     */
+
+     /**
+     * Fired when a click happens on an annotation icon (click event)
+     *
+     * @event px-vis-annotation-click
+     */
+
+     /**
+     * Fired when a click happens on the chart requesting the creation
+     * of an annotation. !! this event is defined by the toolbar !!
+     *
+     * this event detail will contain the following `data` object:
+     * data: {
+     *  chart: the chart responsible for this interaction
+     *  clickTarget: the actual interaction target that has been clicked. Usually an axis interaction space (parallell coordinates/radar) or an interaction space
+     *  mouseCoords: the coordinates of the mouse relative to the clickTarget
+     * }
+     *
+     * the mouse coordinates can be converted to data values by calling
+     * `getDataFromPixel(mouseCoords, series)` on the chart. `series` is
+     * a series which scale will be used to convert (a `seriesConfig` series
+     * for xy/timeseries/polar or an axes for parallel coordinates/radar)
+     *
+     * @event px-vis-annotation-creation
+     */
+
     /**
      * Properties block, expose attribute values to the DOM via 'reflect'
      *
@@ -91,23 +144,29 @@ Custom property | Description
         value: 12
       },
       /**
-       * Whether the scatter plot is using radial coordinates (x=phase, y=amplitude).
+       * when switched forces the annotations to recalculate their position
        */
-      radial: {
+      forceRecalc: {
+        type: Boolean,
+        value: false
+      },
+      /**
+       * Whether the annotations should be hidden
+       */
+      hide: {
         type: Boolean,
         value: false
       }
-
     }, //properties
-
-    observers: [
-
-    ],
 
     _getTransform: function(item) {
 
       var coords,
           oob;
+
+      if(this.hide) {
+        return 'display:none';
+      }
 
       //ask the chart scale to convert those data values to pixels
       this.fire('px-vis-request-pixel-for-data', {callback: function(info) {
@@ -116,7 +175,9 @@ Custom property | Description
         }.bind(this), data: [item.x, item.y], series: item.series, margin: this.margin}
       );
 
-      if(oob) {
+      //out of bounds or
+      //some coords might be NaN if the series doesn't exist,  just hide
+      if(oob || isNaN(coords[0]) || isNaN(coords[1])) {
         return 'display: none';
       } else {
         coords[0] -= this._iconWidth/2;
