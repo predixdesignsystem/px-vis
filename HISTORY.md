@@ -1,3 +1,7 @@
+v4.3.4
+=================
+* Ensure markers tooltip can find last point in dataset
+
 v4.3.3
 =================
 * Ensure canvas context is saved and restored for each canvas line draw to avoid clippath update problems
