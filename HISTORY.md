@@ -1,3 +1,7 @@
+v4.3.5
+=================
+* Ensur marker tooltips handles rows with no data
+
 v4.3.4
 =================
 * Ensure markers tooltip can find last point in dataset

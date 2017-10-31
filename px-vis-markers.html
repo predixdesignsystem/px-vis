@@ -409,34 +409,37 @@
               data = data.concat(this._markerData[labels[i]]);
             }
 
-            //TODO: damn
-            data.sort(function(a,b) {
-              return Px.d3.ascending(a.x, b.x);
-            });
+            //only search if this row actually has data
+            if(data.length) {
 
-            //search for point on left and right
-            right = bisect(data, mouseTime);
-            left = Math.max(0, right ? right-1 : 0);
+              data.sort(function(a,b) {
+                return Px.d3.ascending(a.x, b.x);
+              });
 
-            //decide which point to pick
-            if(!data[left] || data[left].x < minDomain) {
-              //out of bound on left
-              indexChosen = right;
-            } else if(!data[right] || data[right].x > maxDomain) {
-              //out of bound on right
-              indexChosen = left;
-            } else if(data[right] && (data[right].x - mouseTime) < (mouseTime - data[left].x)) {
-              //closer to right
-              indexChosen = right;
-            } else if(data[left]) {
-              //closer to left
-              indexChosen = left;
+              //search for point on left and right
+              right = bisect(data, mouseTime);
+              left = Math.max(0, right ? right-1 : 0);
+
+              //decide which point to pick
+              if(!data[left] || data[left].x < minDomain) {
+                //out of bound on left
+                indexChosen = right;
+              } else if(!data[right] || data[right].x > maxDomain) {
+                //out of bound on right
+                indexChosen = left;
+              } else if(data[right] && (data[right].x - mouseTime) < (mouseTime - data[left].x)) {
+                //closer to right
+                indexChosen = right;
+              } else if(data[left]) {
+                //closer to left
+                indexChosen = left;
+              }
+
+              //check if we have additional points with same timestamp
+              this._createTooltipData(indexChosen,data);
+
+              this._updateTooltip(mousePos, pixelResult, this._tooltipDataResult[0], rowInfo);
             }
-
-            //check if we have additional points with same timestamp
-            this._createTooltipData(indexChosen,data);
-
-            this._updateTooltip(mousePos, pixelResult, this._tooltipDataResult[0], rowInfo);
           }
         }
       }
