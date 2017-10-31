@@ -1,6 +1,10 @@
+v4.3.6
+=================
+* Ensure marker tooltip handles row with no data at all
+
 v4.3.5
 =================
-* Ensur marker tooltips handles rows with no data
+* Ensure marker tooltips handles rows with a type that has no data
 
 v4.3.4
 =================
