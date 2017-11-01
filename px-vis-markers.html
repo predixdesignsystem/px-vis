@@ -71,6 +71,7 @@
           follow-mouse
           delay="50"
           smart-orientation
+          ignore-target-events
           for="[[_canvas]]"
           mouse-coords="[[_tooltipPosition]]"
           tooltip-message="[[_ttMessage]]">
@@ -209,6 +210,10 @@
       _tooltipDataResult: {
         type: Array
       },
+      _isSearchingTooltip: {
+        type: Boolean,
+        value: false
+      }
 
     }, //properties
 
@@ -371,14 +376,38 @@
         this.set('_bottomDomain', !this._bottomDomain);
         this.set('_topDomain', !this._topDomain);
       }
+
+      //if tooltip is locked and we change the domain ensure we hide it
+      if(this._lockTooltip) {
+        this._lockTooltip = false;
+        if(this.$.tooltip) {
+          this.$.tooltip.set('opened', false);
+        }
+      }
     },
 
     _mouseMove: function(evt) {
 
+      var d3Event = {
+        mousePos: Px.d3.mouse(this._canvas),
+        pageX: Px.d3.event.pageX,
+        pageY: Px.d3.event.pageY
+      }
+      if(!this._isSearchingTooltip) {
+        window.requestAnimationFrame(function() {
+
+          this._searchTooltip(d3Event);
+          this._isSearchingTooltip = false;
+        }.bind(this));
+
+        this._isSearchingTooltip = true;
+      }
+    },
+
+    _searchTooltip: function(d3Event) {
       if(!this._lockTooltip) {
 
-        var mousePos = Px.d3.mouse(this._canvas);
-
+        var mousePos = d3Event.mousePos;
         if(mousePos[0] > this.margin.left && mousePos[0] < (this.width - this.margin.right) && mousePos[1] > 0) {
 
           //adjust mouse pos to get correct time
@@ -440,7 +469,7 @@
               //check if we have additional points with same timestamp
               this._createTooltipData(indexChosen,data);
 
-              this._updateTooltip(mousePos, pixelResult, this._tooltipDataResult[0], rowInfo);
+              this._updateTooltip(mousePos, pixelResult, this._tooltipDataResult[0], rowInfo, d3Event);
             }
           }
         }
@@ -488,7 +517,7 @@
       this.set('_tooltipDataResult', result);
     },
 
-    _updateTooltip: function(mousePos, pixelResult, dataResult, rowInfo) {
+    _updateTooltip: function(mousePos, pixelResult, dataResult, rowInfo, d3Event) {
 
       var tooltipUpdated = false;
       if(dataResult) {
@@ -503,22 +532,33 @@
           if(Math.abs(pixelResult[0] - mousePos[0]) <= this.tooltipDetectionRadius) {
 
             //adjust pixel values to take canvas position into account
-            pixelResult[0] += (Px.d3.event.pageX - mousePos[0]);
-            pixelResult[1] = Px.d3.event.pageY - mousePos[1] + rowInfo.rowY;
+            pixelResult[0] += (d3Event.pageX - mousePos[0]);
+            pixelResult[1] = d3Event.pageY - mousePos[1] + rowInfo.rowY;
 
-            this.set('_tooltipPosition', pixelResult);
+
             this.set('_showTooltip', true);
 
             this._checkForTooltip();
+            this.$.tooltip.mouseCoords = pixelResult;
             this.$.tooltip.orientation = this._markerConfig[type].tooltipOrientation;
-            this.$.tooltip._show();
+
+            if(!this.$.tooltip.opened) {
+              this.$.tooltip.set('opened', true);
+            } else {
+
+              //we could just update 'mouseCoords' above with a set but
+              //if the tooltip content has changed enough then we need
+              //to remeasure it, which setPosition will do
+              this.$.tooltip.setPosition();
+            }
+
             tooltipUpdated = true;
           }
         }
       }
 
-      if(this.$.tooltip && !tooltipUpdated && (this.$.tooltip._isShowing || this.$.tooltip._requestShow)) {
-        this.$.tooltip._hide();
+      if(this.$.tooltip && !tooltipUpdated && this.$.tooltip.opened) {
+        this.$.tooltip.set('opened', false);
       }
     },
 
@@ -538,21 +578,16 @@
     },
 
     _mouseClick: function() {
-      if(this.$.tooltip && this.$.tooltip._isShowing) {
+      if(this.$.tooltip && this.$.tooltip.visible) {
 
         //prevent tooltip from closing or reallow it
         this._lockTooltip = !this._lockTooltip;
+      }
+    },
 
-        //TODO: fix those private calls once we update px-tooltip
-        if(this._lockTooltip) {
-          this.$.tooltip._unlistenEvents();
-        } else {
-          this.$.tooltip._listenEvents();
-        }
-
-        //cancel event so the tooltip can't catch that click and close, preventing
-        //it from flashing
-        Px.d3.event.stopImmediatePropagation();
+    _mouseLeave: function() {
+      if(this.$.tooltip && this.$.tooltip.opened && !this._lockTooltip) {
+        this.$.tooltip.set('opened', false);
       }
     },
 
@@ -622,6 +657,7 @@
           //register handlers the first time
           Px.d3.select(this.canvasContext.canvas).on('mousemove.markers', this._mouseMove.bind(this));
           Px.d3.select(this.canvasContext.canvas).on('mousedown.markers', this._mouseClick.bind(this));
+          Px.d3.select(this.canvasContext.canvas).on('mouseleave.markers', this._mouseLeave.bind(this));
         }
 
         return this.canvasContext.canvas;
