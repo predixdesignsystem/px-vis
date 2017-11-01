@@ -438,6 +438,31 @@ PxVisBehavior.mutedSeries = [{
   }
 }, PxVisBehavior.completeSeriesConfig];
 
+/*
+    Name:
+    PxVisBehavior.seriesKeys
+
+    Description:
+    Polymer behavior that provides the seriesKeys definition
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehavior.seriesKeys
+*/
+PxVisBehavior.seriesKeys = {
+  properties: {
+    /**
+     *  Representes the keys avaiable in completeSeriesConfig.
+     */
+    seriesKeys: {
+      type: Array,
+      value: function() {
+        return [];
+      }
+    }
+  }
+};
 
 /*
     Name:
@@ -459,13 +484,20 @@ PxVisBehavior.mutedCompleteSeriesConfig = [{
     },
     _nonMutedSeriesKeys: {
       type: Array,
-      computed: '_computeNonMutedSeriesKeys(_mutedCompleteSeriesConfig)'
+      computed: '_computeNonMutedSeriesKeys(_mutedCompleteSeriesConfig,seriesKeys)'
     }
   },
 
   _computeNonMutedSeriesKeys: function() {
-    if(!(this._mutedCompleteSeriesConfig === undefined)) {
-      return Object.keys(this._mutedCompleteSeriesConfig);
+    if(!(this._mutedCompleteSeriesConfig === undefined || this.seriesKeys === undefined)) {
+
+      var keys = Object.keys(this._mutedCompleteSeriesConfig);
+
+      //ensure all keys exists in case we deleted some but haven't updated
+      //the completeSeriesConfig yet
+      return keys.filter(function(key) {
+        return this.seriesKeys.indexOf(key) !== -1;
+      }.bind(this));
     }
   },
 
@@ -488,7 +520,7 @@ PxVisBehavior.mutedCompleteSeriesConfig = [{
       }
     }
   },
-}, PxVisBehavior.completeSeriesConfig, PxVisBehavior.mutedSeries];
+}, PxVisBehavior.completeSeriesConfig, PxVisBehavior.mutedSeries, PxVisBehavior.seriesKeys];
 
 
 /*
@@ -1815,29 +1847,6 @@ PxVisBehavior.forceDateTimeDisplay = {
     forceDateTimeDisplay: {
       type: Boolean,
       value: false
-    }
-  }
-};
-
-/*
-    Name:
-    PxVisBehavior.seriesKeys
-
-    Description:
-    Polymer behavior that provides the seriesKeys definition
-
-    Dependencies:
-    - D3.js
-
-    @polymerBehavior PxVisBehavior.seriesKeys
-*/
-PxVisBehavior.seriesKeys = {
-  properties: {
-    /**
-     *  Representes the keys avaiable in completeSeriesConfig.
-     */
-    seriesKeys: {
-      type: Array
     }
   }
 };
