@@ -1,4 +1,4 @@
-v4.3.7
+v4.4.0
 =================
 * fix some racing conditions with muted series
 * guard the scheduler more
