@@ -123,12 +123,19 @@
       //find worker for this chart
       var worker = scheduler.workers[getWorkerIndexForChart(context.chartId)]
 
+      startOrQueueWork(context, worker);
+    };
+
+    startOrQueueWork = function(context, worker) {
       // check if we have run updateData before so we can stick stuff in a queue if not
-      scheduler.hasChartData[context.chartId] = scheduler.hasChartData[context.chartId] ?
-        scheduler.hasChartData[context.chartId] : (context.action === 'updateData');
+      var hasData = scheduler.hasChartData[context.chartId] ?
+      scheduler.hasChartData[context.chartId] : (context.action === 'updateData');
+
 
       //start work or queue
-      if(!worker.inUse && scheduler.hasChartData[context.chartId]) {
+      if(!worker.inUse && hasData || context.action === 'unregisterChart') {
+
+        scheduler.hasChartData[context.chartId] = hasData;
         startWork(worker, context);
 
       } else {
@@ -160,13 +167,6 @@
 
       window.dispatchEvent(new CustomEvent('px-vis-scheduler-work-end', {'detail': { 'action': this.ctx.action, 'data': e.data.data, 'chartId': this.ctx.chartId, 'originatorName': this.ctx.originatorName}}));
 
-      var now = window.performance.now();
-
-      //  console.log('passing IN ww took: ' + (e.data.timeIn - this.startTime));
-      //  console.log('passing OUT ww took: ' + (now - e.data.timeOut));
-      //  console.log('passing total ww took: ' + (now - this.startTime));
-
-
       //store callback and kick off new work before processing results
       var callback = this.ctx.successCallback;
 
@@ -175,17 +175,21 @@
         //TODO: clean queues in case something has been added while deleting?
         delete scheduler.chartWorkerMapping[this.ctx.chartId];
         delete scheduler.hasChartData[this.ctx.chartId];
+
+        //clear everything related to this chart
+        scheduler.queue[this.index] = scheduler.queue[this.index].filter(function(elem) {
+          return elem.chartId !== this.ctx.chartId;
+        }.bind(this));
       }
+
+      this.inUse = false;
 
       //use thread if work queued
       if(scheduler.queue[this.index].length) {
 
         //get and do work
         var ctx = scheduler.queue[this.index].splice(0, 1)[0];
-        startWork(this, ctx);
-      } else {
-
-        this.inUse = false;
+        startOrQueueWork(ctx, worker);
       }
 
       //run callback with the result
