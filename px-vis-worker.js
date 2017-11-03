@@ -42,13 +42,8 @@ var dataMapping = {},
 
 function reply(data, time) {
 
-  var now = this.performance.now();
-  console.log('reply: ' + now + ' ' + JSON.stringify(data));
-  //var time2 = this.performance.now();
   var time2 = null;
-
-    console.log('post with data')
-    postMessage({'data': data, 'timeIn': time, 'timeOut': time2});
+  postMessage({'data': data, 'timeIn': time, 'timeOut': time2});
 
 }
 
