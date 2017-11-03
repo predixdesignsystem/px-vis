@@ -1,3 +1,9 @@
+v4.3.7
+=================
+* fix some racing conditions with muted series
+* guard the scheduler more
+* use new version of px-tooltip for positioning
+
 v4.3.6
 =================
 * Ensure marker tooltip handles row with no data at all
