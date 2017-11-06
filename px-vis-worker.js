@@ -42,13 +42,9 @@ var dataMapping = {},
 
 function reply(data, time) {
 
-  //var time2 = this.performance.now();
   var time2 = null;
-  if(data || data === false || data === 0) {
-    postMessage({'data': data, 'timeIn': time, 'timeOut': time2});
-  } else {
-    postMessage({'timeIn': time, 'timeOut': time2});
-  }
+  postMessage({'data': data, 'timeIn': time, 'timeOut': time2});
+
 }
 
 /**
@@ -775,7 +771,7 @@ function addCrosshairData(dataObj, d) {
 
 function determineExtents(eventData, time) {
   var visData = eventData.data,
-      extents;
+      extents = null;
 
   extentCalc.xAxisType = visData.xAxisType;
   extentCalc.yAxisType = visData.yAxisType;
@@ -788,10 +784,11 @@ function determineExtents(eventData, time) {
   extentCalc.mutedSeries = visData.mutedSeries;
   extentCalc.hardMute = visData.hardMute;
 
-  extents = extentCalc.determineExtents(dataMapping[eventData.chartId]);
+  if(dataMapping[eventData.chartId]) {
+    extents = extentCalc.determineExtents(dataMapping[eventData.chartId]);
+  }
 
   reply(extents, time);
-
 }
 
 onmessage = function(e) {

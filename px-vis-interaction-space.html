@@ -599,10 +599,19 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           //when in lasso mode keep adding data
           if(this.searchType === 'lasso' && this.crosshairData) {
 
-            var newData = {
-              rawData: this._lassoCrosshairData.rawData || [],
-              timeStamps: this._lassoCrosshairData.timeStamps || []
-            };
+            var newData
+
+            if(this._lassoCrosshairData) {
+              newData = {
+                rawData: this._lassoCrosshairData.rawData || [],
+                timeStamps: this._lassoCrosshairData.timeStamps || []
+              };
+            } else {
+              newData = {
+                rawData: [],
+                timeStamps: []
+              };
+            }
 
             newData.rawData = newData.rawData.concat(dataObj.rawData);
             newData.timeStamps = newData.timeStamps.concat(dataObj.timeStamps);

@@ -289,7 +289,12 @@ PxVisBehaviorScale.scale = [{
         'chartId': this.chartId,
         'data': wwInfo,
         'successCallback': function(e) {
-          this._applyExtents(e.data);
+
+          //if the chart has been detached while searching for extents
+          //the results will be null
+          if(e.data) {
+            this._applyExtents(e.data);
+          }
         }.bind(this)
       });
     }.bind(this), 10);

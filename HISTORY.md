@@ -1,3 +1,25 @@
+v4.4.0
+=================
+* fix some racing conditions with muted series
+* guard the scheduler more
+* use new version of px-tooltip for positioning
+
+v4.3.6
+=================
+* Ensure marker tooltip handles row with no data at all
+
+v4.3.5
+=================
+* Ensure marker tooltips handles rows with a type that has no data
+
+v4.3.4
+=================
+* Ensure markers tooltip can find last point in dataset
+
+v4.3.3
+=================
+* Ensure canvas context is saved and restored for each canvas line draw to avoid clippath update problems
+
 v4.3.2
 ================
 * Ensure axis register always get the right number of axes
