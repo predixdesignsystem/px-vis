@@ -1,3 +1,7 @@
+v4.4.2
+=================
+* Ensure multi axis scale returns some extents when no data
+
 v4.4.1
 =================
 * Exposed clipPath for canvas highlighters
