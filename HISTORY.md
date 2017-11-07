@@ -1,3 +1,9 @@
+v4.4.1
+=================
+* Exposed clipPath for canvas highlighters
+* Fixed sync issue in the scheduler
+* Ensure px-vis-events can get mouse events
+
 v4.4.0
 =================
 * fix some racing conditions with muted series

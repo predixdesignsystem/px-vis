@@ -83,7 +83,6 @@
       worker.ctx.action = ctx.action;
       worker.ctx.chartId = ctx.chartId;
       worker.ctx.originatorName = ctx.originatorName;
-      //DEBUG TIMING worker.startTime = window.performance.now();
 
       window.dispatchEvent(new CustomEvent('px-vis-scheduler-work-start', {'detail': { 'action': ctx.action, 'data': ctx.data, 'chartId': ctx.chartId, 'originatorName': ctx.originatorName}}));
 
@@ -130,7 +129,6 @@
       // check if we have run updateData before so we can stick stuff in a queue if not
       var hasData = scheduler.hasChartData[context.chartId] ?
       scheduler.hasChartData[context.chartId] : (context.action === 'updateData');
-
 
       //start work or queue
       if(!worker.inUse && hasData || context.action === 'unregisterChart') {
@@ -189,7 +187,7 @@
 
         //get and do work
         var ctx = scheduler.queue[this.index].splice(0, 1)[0];
-        startOrQueueWork(ctx, worker);
+        startOrQueueWork(ctx, this);
       }
 
       //run callback with the result
