@@ -112,6 +112,24 @@ PxVisBehaviorScale.scaleMultiAxis = [{
         ext.y[dim][1] = Px.d3.max(this.chartData, arrayAccessor);
       }
 
+      //check for null/undefined/NaN values if no data
+      if(!ext.y[dim][0] && ext.y[dim][0] !== 0) {
+        if(!ext.y[dim][1] && ext.y[dim][1] !== 0) {
+          ext.y[dim][0] = 0;
+          ext.y[dim][1] = 1;
+        } else {
+          ext.y[dim][0] = ext.y[dim][1] - 1;
+        }
+      }
+      if(!ext.y[dim][1] && ext.y[dim][1] !== 0) {
+        if(!ext.y[dim][0] && ext.y[dim][0] !== 0) {
+          ext.y[dim][0] = 0;
+          ext.y[dim][1] = 1;
+        } else {
+          ext.y[dim][1] = ext.y[dim][0] + 1;
+        }
+      }
+
       // if the same val, add 1 to get a range
       if(ext.y[dim][0] === ext.y[dim][1]) {
         ext.y[dim][1] += 1;
