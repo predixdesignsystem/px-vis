@@ -1,3 +1,7 @@
+v4.4.3
+=================
+* Ensure multi lines can draw 0 values (and that those can be searched by tooltip)
+
 v4.4.2
 =================
 * Ensure multi axis scale returns some extents when no data
