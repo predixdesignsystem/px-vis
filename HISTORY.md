@@ -1,3 +1,7 @@
+v4.4.5
+=================
+* Fix framework demo page
+
 v4.4.4
 =================
 * Cleaning up seriesKeys code in highlighters
