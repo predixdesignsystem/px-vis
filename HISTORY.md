@@ -1,3 +1,7 @@
+v4.4.4
+=================
+* Cleaning up seriesKeys code in highlighters
+
 v4.4.3
 =================
 * Ensure multi lines can draw 0 values (and that those can be searched by tooltip)
