@@ -989,7 +989,7 @@ function runTests() {
       window.setTimeout(function() {
         linePath = fuzzhighlight.$.myHighlighter.lineGroup.selectAll('path.series-line');
         done();
-      }, 100);
+      }, 500);
     });
 
     test('datalayer has transition', function() {

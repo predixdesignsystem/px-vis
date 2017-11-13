@@ -1076,6 +1076,7 @@ function runTests(){
 
           tooltipPoint.set('svg', tooltipSVG.svg.select('.layer1'));
           tooltipPoint.set('layersToMask', tooltipSVG.svg.select('.layer0'));
+          tooltipPoint.set('seriesKeys', Object.keys(completeSeriesConfig));
           tooltipPoint.set('timeData', 'timeStamp');
           tooltipPoint.set('completeSeriesConfig',completeSeriesConfig);
           tooltipPoint.set('showTooltipData',true);

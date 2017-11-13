@@ -923,6 +923,7 @@ function runTests(){
         tooltipScale.set('dataExtents',chartExtents);
         tooltipScale.set('chartData',d);
 
+        tooltipPoint.set('seriesKeys', Object.keys(completeSeriesConfig));
         tooltipPoint.set('timeData', 'timeStamp');
         tooltipPoint.set('completeSeriesConfig',completeSeriesConfig);
         tooltipPoint.set('showTooltipData',true);

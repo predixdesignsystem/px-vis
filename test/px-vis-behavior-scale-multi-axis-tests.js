@@ -272,8 +272,8 @@ function runTests(){
     });
 
     test('dataExtents for axis4', function() {
-      assert.equal(scale.dataExtents.y['axis4'][0], 16);
-      assert.equal(scale.dataExtents.y['axis4'][1], 17);
+      assert.equal(scale.dataExtents.y['axis4'][0], 15.5);
+      assert.equal(scale.dataExtents.y['axis4'][1], 16.5);
     });
   });
 
