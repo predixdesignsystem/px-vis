@@ -1,4 +1,4 @@
-
+v4.4.6
 =================
 * Fix axis titles bug in multi-axis for ts / xy charts
 * Fix for console errors for cursor
