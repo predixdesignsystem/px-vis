@@ -489,6 +489,10 @@ PxVisBehavior.mutedCompleteSeriesConfig = [{
   },
 
   _computeNonMutedSeriesKeys: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
     if(!(this._mutedCompleteSeriesConfig === undefined || this.seriesKeys === undefined)) {
 
       var keys = Object.keys(this._mutedCompleteSeriesConfig);
@@ -502,6 +506,10 @@ PxVisBehavior.mutedCompleteSeriesConfig = [{
   },
 
   _computeMutedCompleteSeriesConfig: function(completeSeriesConfig, hardMute, mutedSeries) {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
     if(!(this.completeSeriesConfig === undefined || this.hardMute === undefined || this.mutedSeries === undefined)) {
       if(!this.hardMute) {
         return this.completeSeriesConfig;
@@ -520,7 +528,7 @@ PxVisBehavior.mutedCompleteSeriesConfig = [{
       }
     }
   },
-}, PxVisBehavior.completeSeriesConfig, PxVisBehavior.mutedSeries, PxVisBehavior.seriesKeys];
+}, PxVisBehavior.observerCheck, PxVisBehavior.completeSeriesConfig, PxVisBehavior.mutedSeries, PxVisBehavior.seriesKeys];
 
 
 /*
@@ -1787,6 +1795,10 @@ PxVisBehavior.dynamicConfigProperties = [{
     *
     */
   _processConfig: function(completeSeriesConfig, seriesId) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
 
     var conf = this.completeSeriesConfig[this.seriesId],
         name;
@@ -1812,7 +1824,7 @@ PxVisBehavior.dynamicConfigProperties = [{
     }
   }
 
-},PxVisBehavior.completeSeriesConfig, PxVisBehavior.seriesId];
+}, PxVisBehavior.observerCheck,PxVisBehavior.completeSeriesConfig, PxVisBehavior.seriesId];
 
 
 
@@ -2485,6 +2497,9 @@ PxVisBehavior.interactionSpaceShared = [{
    * @method _resetTooltipData
    */
   _resetTooltipData: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
     var ttD;
     this.set('_calculatingData', false);
 
@@ -2527,7 +2542,7 @@ PxVisBehavior.interactionSpaceShared = [{
       'timeStampsTracker': {}
     }
   }
-}, PxVisBehavior.polarData];
+} PxVisBehavior.observerCheck, PxVisBehavior.polarData];
 
 /*
     PxVisBehavior.highlightShared
@@ -2688,6 +2703,10 @@ PxVisBehavior.highlightCanvasShared = [{
   ],
 
   _muteDataSeries: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
     if(this.layersToMask) {
 
       if(!Array.isArray(this.layersToMask)) {
@@ -2702,6 +2721,10 @@ PxVisBehavior.highlightCanvasShared = [{
   },
 
   _addTransition: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
     if(Array.isArray(this.layersToMask)) {
       for(var i=0; i<this.layersToMask.length; i++) {
         this.layersToMask[i].canvas.style.transition = 'opacity 0.2s';
@@ -2712,12 +2735,16 @@ PxVisBehavior.highlightCanvasShared = [{
   },
 
   _requestCanvasCreation: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
     if(!this.canvasLayersConfig.highlighter) {
       this.set('canvasLayersConfig.highlighter', {});
     }
   }
 
-}, PxVisBehavior.highlightShared];
+}, PxVisBehavior.observerCheck, PxVisBehavior.highlightShared];
 
 
 /*
@@ -2735,6 +2762,10 @@ PxVisBehavior.highlightSvgShared = [{
   ],
 
   _muteDataSeries: function(data) {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
     if(this.layersToMask) {
       if(!Array.isArray(this.layersToMask)) {
         this.toggleClass('secondaryDataMask', data.length, this.layersToMask.node());
@@ -2747,6 +2778,10 @@ PxVisBehavior.highlightSvgShared = [{
   },
 
   _addTransition: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
     if(!Array.isArray(this.layersToMask)) {
       this.layersToMask.node().style.transition = 'opacity 0.2s';
     } else {
@@ -2756,7 +2791,7 @@ PxVisBehavior.highlightSvgShared = [{
     }
   }
 
-}, PxVisBehavior.highlightShared];
+}, PxVisBehavior.observerCheck, PxVisBehavior.highlightShared];
 
 /*
     PxVisBehavior.highlightLineShared
@@ -2797,6 +2832,10 @@ PxVisBehavior.highlightLineShared = [{
    *
    */
   _computeChartData: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     this.debounce('_computeHighlightData', function() {
 
       //if we are generating data locally and not being told to draw anyways, dont draw
@@ -2937,7 +2976,7 @@ PxVisBehavior.highlightLineShared = [{
 
     return data;
   }
-}, PxVisBehavior.highlightShared, PxVisBehavior.margins];
+}, PxVisBehavior.observerCheck, PxVisBehavior.highlightShared, PxVisBehavior.margins];
 
 /*
     Name:

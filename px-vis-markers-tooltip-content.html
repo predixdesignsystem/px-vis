@@ -51,6 +51,7 @@
     is: 'px-vis-markers-tooltip-content',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       Polymer.AppLocalizeBehavior,
       PxVisBehaviorTime.datetime
     ],
@@ -147,10 +148,18 @@
                 '_updateTooltipInfo(_currentTooltipIndex, tooltipDataResult, markerData, markerConfig, markerTypes)'],
 
     _dataChanged: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       this._currentTooltipIndex = 0;
     },
 
     _computeMultipleTooltips: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       return this.tooltipDataResult.length > 1;
     },
 
@@ -169,6 +178,10 @@
     },
 
     _updateTooltipInfo: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       this.debounce('updateInfo', function() {
 
         //get additional info if there is some

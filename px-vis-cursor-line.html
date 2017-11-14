@@ -81,6 +81,7 @@
     is: 'px-vis-cursor-line',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehaviorD3.svg,
       PxVisBehaviorD3.axes,
       PxVisBehavior.dataset,
@@ -148,10 +149,18 @@
     ],
 
     _applyTransition: function(layer) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       layer.node().style.transition = 'opacity 0.2s';
     },
 
     _applyTransitionCanvas: function(layer) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       layer.canvas.style.transition = 'opacity 0.2s';
     },
 
@@ -160,6 +169,10 @@
      *
      */
     _updateLayers: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
 
       if(this.svgDataLayer) {
         this.toggleClass('primaryDataMask', this.tooltipData, this.svgDataLayer.node());

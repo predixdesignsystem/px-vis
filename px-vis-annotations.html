@@ -73,6 +73,7 @@ Custom property | Description
     is: 'px-vis-annotations',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehavior.sizing,
       PxVisBehaviorD3.svg,
       PxVisBehavior.annotationData
@@ -161,6 +162,10 @@ Custom property | Description
     }, //properties
 
     _getTransform: function(item) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
 
       var coords,
           oob;

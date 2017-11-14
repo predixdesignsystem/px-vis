@@ -61,6 +61,7 @@ Custom property | Description
     is: 'px-vis-axis-interaction-space',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehaviorD3.svg,
       PxVisBehaviorD3.axes,
       PxVisBehavior.commonMethods,
@@ -262,6 +263,10 @@ Custom property | Description
      *
      */
     _setDragBehavior: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(this.cartesianDragBehavior) {
         this.createCartesianDrag();
       } else {
@@ -275,6 +280,10 @@ Custom property | Description
      * For simplicity, we just let d3.brush create the listener elements and control their size
      */
     drawElement: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
 
       this.debounce('_axisBrush', function() {
         if(this.domainChanged !== null && this.svg) {
@@ -366,6 +375,10 @@ Custom property | Description
     },
 
     _setBrushStyles: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(this._doesD3HaveValues(this._brushD3)) {
         this._brushD3.selectAll("rect.selection")
           .attr("fill", this._checkThemeVariable("--px-vis-axis-brush-fill-color", 'rgb(0,0,0)'))
@@ -408,6 +421,10 @@ Custom property | Description
 // ACTIONS ###########################################################################################
 
     _setupActions: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(this._doesD3HaveValues(this._brushD3)) {
         // reset everything
         this._disableAllAction();
@@ -962,6 +979,10 @@ Custom property | Description
     },
 
     _showBrushes: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       this.debounce('showbrushes', function(){
         this._showBrushesDebounced();
       }, 10);
@@ -998,6 +1019,10 @@ Custom property | Description
     },
 
     _showUnselectedBrushes: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       this.debounce('showUnselectedbrushes', function(){
         this._showUnselectedBrushesDebounced();
       }, 10);
@@ -1043,6 +1068,10 @@ Custom property | Description
     },
 
     _drawCursorIconAndGroup: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(!this._cursorGroup) {
         this._cursorGroup = this.svg.append('g')
           .attr("display", "none")

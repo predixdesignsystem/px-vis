@@ -57,6 +57,7 @@
     is: 'px-vis-scatter',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehaviorD3.svg,
       PxVisBehaviorD3.axes,
       PxVisBehavior.dataset,
@@ -184,6 +185,10 @@
      * @method drawElement
      */
     drawElement: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
 
       if(!this.preventInitialDrawing) {
         //if 0 don't debounce at all
@@ -259,6 +264,10 @@
      * @method _addClipPath
      */
     _addClipPath: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       this.addClipPath(this.scatterGroup);
     },
 
@@ -269,6 +278,10 @@
      * @method isIdInMuted
      */
     isIdInMuted: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(this.mutedSeries.hasOwnProperty(this.seriesId) && this._doesD3HaveValues(this.scatterDots)) {
 
         this._colorScatter();
@@ -331,6 +344,10 @@
      * Redraw this series on top if needed.
      */
     _drawOnTop: function(serieToRedrawOnTop) {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(this.scatterGroup && this.seriesId) {
         this._drawSVGOnTop(serieToRedrawOnTop, this.seriesId, this.scatterGroup);
       }

@@ -166,6 +166,7 @@ Custom property | Description
     is: 'px-vis-toolbar',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehavior.commonMethods,
       PxVisBehavior.actionConfig
     ],
@@ -651,6 +652,10 @@ Custom property | Description
     },
 
     _configChanged: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       var internalConf = [],
           keys = Object.keys(this.config);
 
@@ -890,6 +895,10 @@ Custom property | Description
       return selected ? 'selected ' : '';
     },
     _hasTooltip: function(item) {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       return item.tooltipLabel && !!item.tooltipLabel.length;
     },
     _alignRow: function(row) {
@@ -902,9 +911,17 @@ Custom property | Description
       }
     },
     _positionMainRow: function(chartMargin, horizontalAlignement) {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       this._alignRow(this.$$('#mainRow'));
     },
     _positionSubRow: function(withinChart, chartMargin, horizontalAlignement) {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(this.withinChart) {
 
         //make sure dom if is up to date
@@ -926,9 +943,17 @@ Custom property | Description
       return base;
     },
     _isWithinChart: function(withinChart) {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       return this.withinChart;
     },
     _getRowDirection: function(horizontalAlignment) {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(this.horizontalAlignment === 'right') {
         return 'flex--row--rev right ';
       } else {

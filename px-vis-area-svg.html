@@ -56,6 +56,7 @@ Unlike most other drawing elements that can use chartData directly, area require
     is: 'px-vis-area-svg',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehaviorD3.svg,
       PxVisBehaviorD3.axes,
       PxVisBehavior.dataset,
@@ -141,6 +142,10 @@ Unlike most other drawing elements that can use chartData directly, area require
      * @method drawElement
      */
     drawElement: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
 
       if(!this.preventInitialDrawing) {
         //if 0 don't debounce at all
@@ -222,10 +227,18 @@ Unlike most other drawing elements that can use chartData directly, area require
      * @method _addClipPath
      */
     _addClipPath: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       this.addClipPath(this.areaGroup);
     },
 
     _computekeySeriesDict: function(completeSeriesConfig) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       var keys = Object.keys(this.completeSeriesConfig),
           dict = {};
 

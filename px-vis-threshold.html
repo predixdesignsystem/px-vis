@@ -54,6 +54,7 @@ Custom property | Description
     is: 'px-vis-threshold',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehavior.sizing,
       PxVisBehaviorD3.svg,
       PxVisBehaviorD3.axes,
@@ -183,6 +184,10 @@ Custom property | Description
      * @method drawElement
      */
     drawElement: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(this._animationFrameDone && this.domainChanged !== null && this.y && (typeof this.y === 'function' || this._doesObjHaveValues(this.y))) {
         if(this.drawDebounceTime > 0) {
           this.debounce('_drawThreshold', function() {
@@ -407,6 +412,10 @@ Custom property | Description
     },
 
     _updateColors: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       this._calcThemeOrConfig();
       this._drawElementDebounced();
     }

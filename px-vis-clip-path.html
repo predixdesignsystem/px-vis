@@ -35,6 +35,7 @@ https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath
     is: 'px-vis-clip-path',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehaviorD3.svg,
       PxVisBehavior.sizing,
       PxVisBehavior.commonMethods,
@@ -79,6 +80,10 @@ https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath
      * @method _drawElement
      */
     _drawElement: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
 
       //if the clip path has not been set, create it
       if(!this._clipPathSvg) {

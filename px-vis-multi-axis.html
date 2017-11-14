@@ -145,6 +145,7 @@ Custom property | Description
     is: 'px-vis-multi-axis',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehavior.svgDefinition,
       PxVisBehavior.sizing,
       PxVisBehavior.completeSeriesConfig,
@@ -393,6 +394,10 @@ Custom property | Description
     },
 
     _axisConfigChanged: function(conf) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(this.axisConfig && this._doesObjHaveValues(this.dimensions)) {
         var keys = Object.keys(this.axisConfig),
             hasProps = false,
@@ -500,6 +505,10 @@ Custom property | Description
      * @method _computeTitleLocation
      */
     _computeTitleLocation: function(item, titleLocation) {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(this.radial) {
         var r = (this.x(item) * 180 / Math.PI),
             attrs = {
@@ -546,6 +555,10 @@ Custom property | Description
      * @method _toggleTitleLocation
      */
     _toggleTitleLocation: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       this.set('_pokeTitleLocation' , !this._pokeTitleLocation);
     },
 
@@ -554,6 +567,10 @@ Custom property | Description
      *
      */
     _calcH: function(height,length) {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(length) {
         return length;
       }
@@ -566,6 +583,10 @@ Custom property | Description
      * @method _returnY
      */
     _returnY: function(item){
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       return this.singleDomain ? this.y : this.y[item]
     },
 
@@ -575,6 +596,10 @@ Custom property | Description
      * @method _calcDisableTicks
      */
     _calcDisableTicks: function(item) {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(this.labelOneAxis) {
 
         //check index of dimentions so it still works when we drag an axis
@@ -591,6 +616,10 @@ Custom property | Description
      * @method _computedInternalDimensions
      */
     _computedInternalDimensions: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       //makes sure we dont try to process a new dim before it has a new scale.
       if(this._lastDomainChanged !== this.domainChanged) {
 
@@ -626,6 +655,10 @@ Custom property | Description
      * @method _getTitle
      */
     _getTitle: function(item) {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(this.completeSeriesConfig) {
         if(this.axisConfig && this.axisConfig[item] && this.axisConfig[item].title) {
           return this.axisConfig[item].title
@@ -647,6 +680,10 @@ Custom property | Description
     },
 
     _getOrientation: function(axisId, orientationFromDimensions) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(orientationFromDimensions) {
         var rDims = this.x.rightDomain();
         if(rDims.indexOf(axisId) !== -1) {
@@ -658,6 +695,10 @@ Custom property | Description
     },
 
     _recalcGTransforms: function(leftSize, rightSize) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(leftSize && rightSize && this._doesD3HaveValues(this.svg) && this._doesD3HaveValues(this.svg.selectAll('.dimension'))) {
         this.svg.selectAll('.dimension')
           .attr('transform', function(d) {
@@ -667,6 +708,10 @@ Custom property | Description
     },
 
     _returnSeriesArray: function(arr, axisId) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       return (arr && arr[axisId]) ? arr[axisId] : [];
     },
 
@@ -675,6 +720,10 @@ Custom property | Description
     },
 
     _getUnit: function(item, completeSeriesConfig) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       //if we are dealing with the axes in completeSeriesConfig (|| and radar)
       if(this.completeSeriesConfig[item] && this.completeSeriesConfig[item].yAxisUnit) {
         return this.completeSeriesConfig[item].yAxisUnit
@@ -761,6 +810,10 @@ Custom property | Description
     },
 
     _isFirst: function(index) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(!this.commonAxis) {
         return false;
       }

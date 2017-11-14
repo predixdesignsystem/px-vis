@@ -78,6 +78,7 @@
          */
 
         behaviors: [
+          PxVisBehavior.observerCheck,
           PxVisBehavior.sizing,
           PxVisBehavior.commonMethods,
           PxVisBehaviorD3.svg
@@ -128,6 +129,10 @@
          * @method _setSVG
          */
         _setSVG: function(){
+         if(this.hasUndefinedArguments(arguments)) {
+           return;
+         }
+
           if(this.width && this.height && this._doesObjHaveValues(this.margin)){
             var svg = Px.d3.select(this.$$("svg"))
               .attr('width',this.width)

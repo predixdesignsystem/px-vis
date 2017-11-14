@@ -198,6 +198,7 @@ Custom property | Description
     is: 'px-vis-register',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehavior.sizing,
       PxVisBehavior.formatting,
       PxVisBehaviorTime.datetime,
@@ -310,6 +311,10 @@ Custom property | Description
      * @method _formatDateTime
      */
     _formatDateTime: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
 
       if(!this.inert) {
         if(this.tooltipData.time) {
@@ -340,6 +345,10 @@ Custom property | Description
      *
     */
     _computeSeries: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       this.debounce('computeSeries', function() {
         if(!this.inert) {
           var allSeries = this.tooltipData.series,
@@ -362,10 +371,18 @@ Custom property | Description
     },
 
     _displayTime: function(xAxisType, forceDateTimeDisplay) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       return forceDateTimeDisplay || xAxisType === 'time';
     },
 
     _getMinSizeClass: function(preventMinSize) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(preventMinSize) {
         return '';
       } else {
@@ -374,14 +391,26 @@ Custom property | Description
     },
 
     _returnHeight: function(height,margin, type) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       return this.type === 'vertical' ? 'height:' + (height - margin.bottom) + 'px': '';
     },
 
     _returnWidth: function(chartWidth, width, margin, type) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       return this.type === 'horizontal' ? 'max-width:' + chartWidth + 'px;': 'width:' + width + 'px;';
     },
 
     _scrollBarsPresent: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       window.requestAnimationFrame(this._scrollBarsPresentAF.bind(this));
     },
 
@@ -403,6 +432,10 @@ Custom property | Description
     },
 
     _scrollBarsPresentPie: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       window.requestAnimationFrame(this._scrollBarsPresentPieAF.bind(this));
     },
 

@@ -55,6 +55,7 @@
     is: 'px-vis-highlight-point',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehavior.sizing,
       PxVisBehaviorD3.svg,
       PxVisBehaviorD3.axes,
@@ -122,6 +123,10 @@
      * @method drawElement
      */
     drawElement: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
 
       this.debounce('draw', function() {
 
@@ -236,6 +241,10 @@
     },
 
     _updateTooltipData: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(this.defaultEmptyData) {
         this._setTooltipData(this._highlightData);
       }

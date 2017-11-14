@@ -82,6 +82,7 @@ Custom property | Description
     is: 'px-vis-cursor',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehavior.sizing,
       PxVisBehaviorD3.svg,
       PxVisBehaviorD3.axes,
@@ -233,6 +234,10 @@ Custom property | Description
      * @method drawElement
      */
     drawElement: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       // add circle to the line and hide it
       if(!this._cursor) {
         this._cursor = this.svg.append('g')
@@ -346,6 +351,10 @@ Custom property | Description
      * @method _cursorChange
      */
     _cursorChange: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(!this._isD3Empty(this._cursor)) {
         if(this.tooltipData.mouse === null || this.tooltipData.series.length === 0) {
           this._hideCursor();
@@ -558,6 +567,10 @@ Custom property | Description
     },
 
     _addClipPath: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(this.clipPath) {
         if(this.verticalLine !== 'none' && this._vLines) {
           this.addClipPath(this._vLines);
@@ -581,6 +594,10 @@ Custom property | Description
     },
 
     _processOpacity: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       var allMuted = true,
           keys = Object.keys(this._mutedCompleteSeriesConfig),
           vLineOpacity,
@@ -637,6 +654,10 @@ Custom property | Description
     },
 
     _updateColors: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(this._doesD3HaveValues(this._hLines)) {
         this._hLines.attr('stroke', this._checkThemeVariable("--px-vis-cursor-line-color", 'rgb(0,0,0)'));
       }

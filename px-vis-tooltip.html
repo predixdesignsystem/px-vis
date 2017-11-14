@@ -98,6 +98,7 @@ Custom property | Description
     is: 'px-vis-tooltip',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehavior.dataset,
       PxVisBehavior.tooltipData,
       PxVisBehavior.axisTypes,
@@ -208,6 +209,10 @@ Custom property | Description
     },
 
     _checkGroups: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       // if the dev specified a number of groups
       if(this.groupings && this.groupings > 1) {
         return this.groupings
@@ -222,6 +227,10 @@ Custom property | Description
       }
     },
     _computeInternalHidden: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
 
      if(this._mutedTooltipData) {
       var oldHidden = this._internalHidden,
@@ -254,6 +263,10 @@ Custom property | Description
      }
     },
     _computeMutedData: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(!(this.tooltipData === undefined || this.hardMute === undefined || this.mutedSeries === undefined)) {
 
         if(!this.hardMute || this._isObjEmpty(this.mutedSeries)) {
