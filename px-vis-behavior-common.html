@@ -5,6 +5,30 @@
 <script>
 var PxVisBehavior = PxVisBehavior || {};
 
+/**
+    Name:
+    PxVisBehavior.observerCheck
+
+    Description:
+    Polymer behavior that provides a function used to check if any argument
+    in an observer is undefined
+
+
+    @polymerBehavior PxVisBehavior.observerCheck
+*/
+PxVisBehavior.observerCheck = {
+  hasUndefinedArguments: function(args) {
+    for(var i=0; i<args.length; i++) {
+
+      //check if arg is undefined or if it's a 'var.*' undefined type of arg
+      if(args[i] === undefined || (args[i] && args[i].path && args[i].base === undefined)) {
+        return true;
+      }
+    }
+    return false;
+  }
+};
+
 /*
     Name:
     PxVisBehavior.baseSize
