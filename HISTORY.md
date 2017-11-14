@@ -2,6 +2,8 @@
 =================
 * Fix axis titles bug in multi-axis for ts / xy charts
 * Fix for console errors for cursor
+* Ensure dynamic menus items labels don't get truncated on IE
+* ensure no errors are thrown when setting markerData to empty
 
 v4.4.5
 =================
