@@ -1,3 +1,8 @@
+
+=================
+* Fix axis titles bug in multi-axis for ts / xy charts
+* Fix for console errors for cursor
+
 v4.4.5
 =================
 * Fix framework demo page
