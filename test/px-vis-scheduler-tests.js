@@ -107,9 +107,8 @@ function runTests(){
     });
 
     test('chart has been assigned a ww', function() {
-
       assert.equal(Px.vis.scheduler.chartWorkerMapping['chartId5'], 1);
-      assert.isFalse(Px.vis.scheduler.hasChartData['chartId5']);
+      assert.isUndefined(Px.vis.scheduler.hasChartData['chartId5']);
     });
 
     test('action has been queued', function() {

@@ -430,7 +430,7 @@ Custom property | Description
           if(this.tooltipData.series[i]['coord'] && !isNaN(this.tooltipData.series[i]['coord'][1])) {
             return this.tooltipData.series[i]['coord'][1];
           } else {
-            return '';
+            return null;
           }
         }.bind(this));
       }
@@ -474,34 +474,34 @@ Custom property | Description
         if(this.horizontalLine === 'full') {
           this._hLines
             .attr('y1', function(d,i) {
-              return this.tooltipData.series[i]['coord'][1] ? this.tooltipData.series[i]['coord'][1] : '';
+              return this._isValidData(this.tooltipData.series[i]['coord'][1]) ? this.tooltipData.series[i]['coord'][1] : null;
             }.bind(this))
             .attr('y2', function(d,i) {
-              return this.tooltipData.series[i]['coord'][1] ? this.tooltipData.series[i]['coord'][1] : '';
+              return this._isValidData(this.tooltipData.series[i]['coord'][1]) ? this.tooltipData.series[i]['coord'][1] : null;
             }.bind(this));
 
         } else if(this.horizontalLine === 'left') {
           this._hLines
             .attr('x2', function(d,i) {
-              return this.tooltipData.series[i]['coord'][0] ? this.tooltipData.series[i]['coord'][0] : '';
+              return this._isValidData(this.tooltipData.series[i]['coord'][0]) ? this.tooltipData.series[i]['coord'][0] : null;
             }.bind(this))
             .attr('y1', function(d,i) {
-              return this.tooltipData.series[i]['coord'][1] ? this.tooltipData.series[i]['coord'][1] : '';
+              return this._isValidData(this.tooltipData.series[i]['coord'][1]) ? this.tooltipData.series[i]['coord'][1] : null;
             }.bind(this))
             .attr('y2', function(d,i) {
-              return this.tooltipData.series[i]['coord'][1] ? this.tooltipData.series[i]['coord'][1] : '';
+              return this._isValidData(this.tooltipData.series[i]['coord'][1]) ? this.tooltipData.series[i]['coord'][1] : null;
             }.bind(this));
 
         } else if(this.horizontalLine === 'right') {
           this._hLines
             .attr('x1', function(d,i) {
-              return this.tooltipData.series[i]['coord'][0] ? this.tooltipData.series[i]['coord'][0] : '';
+              return this._isValidData(this.tooltipData.series[i]['coord'][0]) ? this.tooltipData.series[i]['coord'][0] : null;
             }.bind(this))
             .attr('y1', function(d,i) {
-              return this.tooltipData.series[i]['coord'][1] ? this.tooltipData.series[i]['coord'][1] : '';
+              return this._isValidData(this.tooltipData.series[i]['coord'][1]) ? this.tooltipData.series[i]['coord'][1] : null;
             }.bind(this))
             .attr('y2', function(d,i) {
-              return this.tooltipData.series[i]['coord'][1] ? this.tooltipData.series[i]['coord'][1] : '';
+              return this._isValidData(this.tooltipData.series[i]['coord'][1]) ? this.tooltipData.series[i]['coord'][1] : null;
             }.bind(this));
 
         }

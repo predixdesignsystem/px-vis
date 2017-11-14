@@ -70,8 +70,8 @@ function runTests() {
       baseIS.set('margin',m);
       baseIS.set('width',w);
       baseIS.set('height',h);
-      baseIS.set('seriesKeys',['mySeries']);
       baseIS.set('completeSeriesConfig',completeSeriesConfig);
+      baseIS.set('seriesKeys',['mySeries']);
       baseIS.set('chartData',d);
       baseIS.set('actionConfig', { 'mouseout': 'resetTooltip',
                 'mousemove': 'calcTooltipData',
