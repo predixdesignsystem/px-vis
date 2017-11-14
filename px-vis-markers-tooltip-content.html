@@ -174,23 +174,30 @@
         //get additional info if there is some
         var data = this.tooltipDataResult[this._currentTooltipIndex],
             originalData = this.markerData[data.originIndex],
-            keys = Object.keys(originalData),
-            info = [],
-            markerType = this._findMarkerType(data);
+            keys,
+            info,
+            markerType;
 
-        keys.forEach(function(key) {
-          if(key !== 'time' && key !== 'label') {
-            info.push({
-              'key': key,
-              'value': originalData[key]
-            });
-          }
-        });
+        if(originalData) {
 
-        //update everything the tooltip needs
-        this.set('_additionalInfo', info);
-        this.set('_value', this._formatTimestampForType(data, markerType));
-        this.set('_eventType', this.markerConfig[markerType].tooltipLabel);
+          keys = Object.keys(originalData);
+          info = [];
+          markerType = this._findMarkerType(data);
+
+          keys.forEach(function(key) {
+            if(key !== 'time' && key !== 'label') {
+              info.push({
+                'key': key,
+                'value': originalData[key]
+              });
+            }
+          });
+
+          //update everything the tooltip needs
+          this.set('_additionalInfo', info);
+          this.set('_value', this._formatTimestampForType(data, markerType));
+          this.set('_eventType', this.markerConfig[markerType].tooltipLabel);
+        }
       }.bind(this), 5);
     },
 
