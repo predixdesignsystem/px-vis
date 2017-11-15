@@ -71,16 +71,14 @@ PxVisBehaviorInteraction.lasso = {
       var mousePos = Px.d3.mouse(this._rect.node());
 
       this._lassoGenerator = Px.d3.line()
-                                  .x(function(d) {
-                                    return d[0];
-                                  })
-                                  .y(function(d) {
-                                    return d[1];
-                                  });
+        .x(function(d) { return d[0]; })
+        .y(function(d) { return d[1]; });
 
       this._lassoGroup = this.svg.append('g')
             .attr('class', 'lasso-group');
 
+// TODO Change to box type and lasso type; toolbar selection
+// make available to all
       if(this.xAxisType === 'time' || this.xAxisType === 'timeLocal') {
 
         //timeseries lasso will be a box
@@ -91,10 +89,10 @@ PxVisBehaviorInteraction.lasso = {
         this._lassoCoords.push([mousePos[0], mousePos[1]], [mousePos[0], mousePos[1]]);
       }
       this._lassoGroup.append('path')
-            .attr('class', 'lasso-line')
-            .attr('fill', this._checkThemeVariable('--px-vis-lasso-fill-color', 'rgb(0,0,0)'))
-            .attr('fill-opacity', this._checkThemeVariable('--px-vis-lasso-fill-opacity', 0.5))
-            .attr('stroke', this._checkThemeVariable('--px-vis-lasso-outline-color', 'rgb(0,0,0)'));
+        .attr('class', 'lasso-line')
+        .attr('fill', this._checkThemeVariable('--px-vis-zoom-brush-fill-color', 'rgb(0,0,0)'))
+        .attr('fill-opacity', this._checkThemeVariable('--px-vis-zoom-brush-fill-opacity', 0.5))
+        .attr('stroke', this._checkThemeVariable('--px-vis-zoom-brush-outline-color', 'rgb(0,0,0)'));
     }
   },
 
