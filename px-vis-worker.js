@@ -337,8 +337,6 @@ function createSeriesQuadtree(data) {
  * @method createQuadtree
  */
 function createQuadtree(data, time) {
-
-
   quadtrees[data.chartId] = data.data.searchType === 'pointPerSeries' ?
     createSeriesQuadtree(data) :
     // closestPoint & allInArea
@@ -462,8 +460,11 @@ function addCrosshairDataQuadtree(dataObj, d, timeData) {
 }
 
 function constructDataObj(result, dataObj, k, visData, isSingle, xScale) {
-
-  if(!result) {
+  // Still add name to the register if:
+  // we got no result at all
+  // if this key is muted
+  // if point searchFor and this is not the found key
+  if(!result || visData.mutedSeries[k] || (visData.searchFor === 'point' && result.k !== k)) {
     dataObj.series.push(emptySeries(k));
 
   } else if(isSingle) {
@@ -542,7 +543,6 @@ function searchPolygonQuadtree(visData, dataObj, quadtree) {
       selected = 0;
 
   if(visData.polygon.length) {
-    // via https://bl.ocks.org/mbostock/4343214
     quadtree.visit(function(node, nodeX0, nodeY0, nodeX1, nodeY1) {
       if(!node.length) {
         do {
@@ -607,7 +607,7 @@ function searchAreaRadiusQuadtree(quadtree, visData, dataObj) {
   quadtree.visit(function(node, nodeX0, nodeY0, nodeX1, nodeY1) {
     if(!node.length) {
       do {
-
+        // FIXME: Remove mute?
         if(!visData.hardMute || !visData.mutedSeries[node.data.k]) {
 
           // Thank you Πυθαγόρας ὁ Σάμιος   :)
@@ -635,32 +635,22 @@ function searchAreaQuadtree(quadtree, visData, dataObj) {
     searchAreaBoxQuadtree(quadtree, visData, dataObj);
 }
 
-function searchQuadtreePolygon(visData, dataObj, quadtreeData) {
-
-}
-
 function searchQuadtreeSingle(visData, dataObj, quadtreeData) {
   var r = visData.radius ? visData.radius : Infinity,
       result = quadtreeData.find(visData.mousePos[0], visData.mousePos[1], r),
       k;
 
-  //result will consist of one dataset
+  //result will consist of one dataset: ex: {i: 755, k: "y1", px: 190, py: 82}
   // we want to iterate through our keys and get each series within that single dataset
   for(var i = 0; i < visData.keys.length; i++) {
     k = visData.keys[i];
-
-    if(!visData.hardMute || !visData.mutedSeries[k]) {
-
-      dataObj = constructDataObj(result, dataObj, k, visData, true, null);
-    }
+    dataObj = constructDataObj(result, dataObj, k, visData, true, null);
   }
 
   // if we want to do all in area crosshair data, do it outside our loop
   if(visData.calcCrosshair) {
     if(visData.searchType === 'allInArea') {
       dataObj = searchAreaRadiusQuadtree(quadtreeData, visData, dataObj);
-    } else if(visData.searchType === 'lasso') {
-      dataObj = searchPolygonQuadtree(quadtreeData, visData, dataObj);
     }
   }
 
@@ -720,6 +710,7 @@ function returnClosestsQuadtreePoints(eventData, time) {
 
     } else if(visData.searchType === 'lasso') {
       dataObj = searchPolygonQuadtree(visData, dataObj, quadtreeData);
+
     } else {  //closestPoint && allInArea && polygon
       dataObj = searchQuadtreeSingle(visData, dataObj, quadtreeData);
     }
