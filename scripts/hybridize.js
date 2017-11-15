@@ -11,7 +11,7 @@
 const fs = require('fs');
 const path = require('path');
 const argv = require('yargs')
-              .usage('Usage: --path [path_to_folder] --write [bool] -v[v]\r\n v is verbose mode: 0 v is less verbose and 2 most verbose')
+              .usage('Usage: --path [path_to_folder] --write [bool] -v[v]\n v is verbose mode: 0 v is less verbose and 2 most verbose')
               .demandOption(['path'])
               .count('verbose')
               .alias('v', 'verbose')
@@ -29,7 +29,7 @@ let VERBOSE_LEVEL = argv.verbose,
 
 function checkHasLog() {
   if(!hasLog) {
-    console.log('\r\n');
+    console.log('\n');
     console.log('Process ' + folderNameFromPath(currentFileName));
     console.log('============================');
     hasLog = true;
@@ -108,10 +108,10 @@ function processElement(src) {
     if(!src.slice(functionsToProcess[i].index, functionsToProcess[i].index + 100).match(/if\(this.hasUndefinedArguments\(arguments\)\)/)) {
 
       INFO('injecting ' + functionsToProcess[i].name);
-      injection = '\r\n' + generateSpaces(functionsToProcess[i].spaceLength + 2);
-      injection += 'if(this.hasUndefinedArguments(arguments)) {\r\n';
-      injection += generateSpaces(functionsToProcess[i].spaceLength + 4) + 'return;\r\n';
-      injection += generateSpaces(functionsToProcess[i].spaceLength + 2) + '}\r\n';
+      injection = '\n' + generateSpaces(functionsToProcess[i].spaceLength + 2);
+      injection += 'if(this.hasUndefinedArguments(arguments)) {\n';
+      injection += generateSpaces(functionsToProcess[i].spaceLength + 4) + 'return;\n';
+      injection += generateSpaces(functionsToProcess[i].spaceLength + 2) + '}\n';
       src = src.slice(0, functionsToProcess[i].index) + injection + src.slice(functionsToProcess[i].index);
       injected = true;
     } else {
@@ -151,10 +151,10 @@ function processBehavior(src) {
       if(!currentSrc.slice(functionsToProcess[i].index, functionsToProcess[i].index + 100).match(/if\(this.hasUndefinedArguments\(arguments\)\)/)) {
 
         INFO('injecting ' + functionsToProcess[i].name);
-        injection = '\r\n' + generateSpaces(functionsToProcess[i].spaceLength + 2);
-        injection += 'if(this.hasUndefinedArguments(arguments)) {\r\n';
-        injection += generateSpaces(functionsToProcess[i].spaceLength + 4) + 'return;\r\n';
-        injection += generateSpaces(functionsToProcess[i].spaceLength + 2) + '}\r\n';
+        injection = '\n' + generateSpaces(functionsToProcess[i].spaceLength + 2);
+        injection += 'if(this.hasUndefinedArguments(arguments)) {\n';
+        injection += generateSpaces(functionsToProcess[i].spaceLength + 4) + 'return;\n';
+        injection += generateSpaces(functionsToProcess[i].spaceLength + 2) + '}\n';
         currentSrc = currentSrc.slice(0, functionsToProcess[i].index) + injection + currentSrc.slice(functionsToProcess[i].index);
         hasChange = true;
       } else {
@@ -215,7 +215,7 @@ function searchBehaviors(src) {
         }
       } else if(ignoreType === 'multiline' && src[i] === '*' && src[i+1] === '/') {
         ignoreDueToComment = false;
-      } else if(ignoreType === 'singleline' && (src[i] === '\r' || src[i] === '\n')) {
+      } else if(ignoreType === 'singleline' && (src[i] === '' || src[i] === '\n')) {
         ignoreDueToComment = false;
       }
       i++;
@@ -264,7 +264,7 @@ function injectBehaviorElement(src) {
       //inject new behavior
       INFO('injecting behavior');
       var behaviorStart = /( *)behaviors\s*:\s*\[/.exec(tmpArray[0]);
-      src = src.slice(0, tmpArray.index + behaviorStart[0].length) + '\r\n' + generateSpaces(behaviorStart[1].length + 2) + 'PxVisBehavior.observerCheck,' + src.slice(tmpArray.index + behaviorStart[0].length);
+      src = src.slice(0, tmpArray.index + behaviorStart[0].length) + '\n' + generateSpaces(behaviorStart[1].length + 2) + 'PxVisBehavior.observerCheck,' + src.slice(tmpArray.index + behaviorStart[0].length);
     } else {
       DEBUG('behavior PxVisBehavior.observerCheck already defined in behavior array');
     }
