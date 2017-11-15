@@ -55,7 +55,7 @@ Custom property | Description
         <px-icon
           icon="px-com:comment"
           data="[[item]]"
-          class="annotation--icon"
+          class$="annotation--icon [[strongClass]]"
           style$="[[_getTransform(item, x, y, domainChanged, completeSeriesConfig, forceRecalc, hide)]]"
           on-mouseover="_mouseOver"
           on-mouseleave="_mouseLeave"
@@ -157,8 +157,18 @@ Custom property | Description
       hide: {
         type: Boolean,
         value: false
+      },
+
+      strongClass: {
+        type: String,
+        value: '',
+        computed: '_computeStrongClass(showStrongIcon)'
       }
     }, //properties
+
+    _computeStrongClass: function(strong) {
+      return strong ? 'strong' : '';
+    },
 
     _getTransform: function(item) {
 
