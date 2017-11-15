@@ -667,7 +667,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       // invert: takes position on the screen and converts it into an equivalent date
       var x1 = this.xAxisType !== 'ordinal' && this.xAxisType !== 'scaleBand' ? this.x.invert(mousePos[0]) : null,
           dataObj = this._returnTooltipDataStub(mousePos, x1), // setup a holder for our data
-          keys = this.seriesKeys ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
+          keys = this.seriesKeys && this.seriesKeys.length ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
           closestTimestamp = { "distance": Number.MAX_VALUE, "time": null },
           //search for timestamp if we don't have it already (non time based chart)
           //and we know the data has some notion of time -- !! --> turn into a bool
@@ -1465,7 +1465,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           yAxisKeys = this.isMultiY ? Object.keys(this.y) : 'defaultAxis';
 
       data.completeSeriesConfig = this.completeSeriesConfig;
-      data.keys = this.seriesKeys ? this.seriesKeys : Object.keys(this.completeSeriesConfig);
+      data.keys = this.seriesKeys && this.seriesKeys.length ? this.seriesKeys : Object.keys(this.completeSeriesConfig);
       data.timeData = this.timeData;
 
       data.radial = this.radial;
