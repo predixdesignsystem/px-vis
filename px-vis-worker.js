@@ -469,7 +469,8 @@ function constructDataObj(result, dataObj, k, visData, isSingle, xScale) {
   // we got no result at all
   // if this key is muted
   // if point searchFor and this is not the found key
-  if(!result || visData.mutedSeries[k] || (visData.searchFor === 'point' && result.k !== k)) {
+  if(!result || (visData.hardMute && visData.mutedSeries[k]) ||
+      (visData.searchFor === 'point' && result.k !== k)) {
     dataObj.series.push(emptySeries(k));
 
   } else if(isSingle) {
@@ -645,6 +646,22 @@ function searchQuadtreeSingle(visData, dataObj, quadtreeData) {
       result = quadtreeData.find(visData.mousePos[0], visData.mousePos[1], r),
       k;
 
+/*
+quadtreeData.visit(function(node, nodeX0, nodeY0, nodeX1, nodeY1) {
+    if(!node.length) {
+      do {
+        var d = node.data;
+        // if our point is inside our box, save it if not a copy
+        if((d.px === result.px) && (d.py === result.py)) {
+          newResult.push(d);
+        }
+      } while(node = node.next);
+    }
+    //return true  ==> skip the children nodes so we dont search unnessary bits of the tree
+    return nodeX0 > result.px || nodeY0 > result.py || nodeX1 < result.px || nodeY1 < result.py;
+  });
+  */
+
   //result will consist of one dataset: ex: {i: 755, k: "y1", px: 190, py: 82}
   // we want to iterate through our keys and get each series within that single dataset
   for(var i = 0; i < visData.keys.length; i++) {
@@ -720,7 +737,7 @@ function returnClosestsQuadtreePoints(eventData, time) {
     } else if(visData.searchType === 'lasso') {
       dataObj = searchPolygonQuadtree(visData, dataObj, quadtreeData);
 
-    } else {  //closestPoint && allInArea && polygon
+    } else {  //closestPoint && allInArea
       dataObj = searchQuadtreeSingle(visData, dataObj, quadtreeData);
     }
   }
