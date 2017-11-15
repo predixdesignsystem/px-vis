@@ -1,3 +1,7 @@
+
+=================
+* Fix for multiaxis scale checking if dimensions are empty
+
 v4.4.6
 =================
 * Fix axis titles bug in multi-axis for ts / xy charts
