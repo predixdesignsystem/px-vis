@@ -125,12 +125,17 @@ gulp.task('blobfish', function() {
       if(('contents' in file) && !file.isNull() && !file.isStream() &&file.isBuffer()) {
         const contents = String(file.contents);;
         const re = /(\/\/start\sof\sblob\s+var\sblob\s=\s)[\s\S]*(\n\s+\/\/end\sof\sblob)/g;
-        // const matches = contents.replace(re,newStr);
-        const matches = contents.replace(re, (m, m1, m2) => {
-          return m1 + newStr + m2;
-        } );
 
-        file.contents = new Buffer(matches);
+        /*
+          d3 has regex code including `$&` :facepalm:
+          if we just replace the string normally, that `$&` gets interpreted and our whole match gets inserted in the middle of the d3 code
+          Instead, return the code-string with a callback to avoid this recursion
+        */
+        const newContent = contents.replace(re, (m, m1, m2) => {
+          return `${m1} ${newStr}; ${m2}`;
+        });
+
+        file.contents = new Buffer(newContent);
         this.push(file);
         return callback();
 
