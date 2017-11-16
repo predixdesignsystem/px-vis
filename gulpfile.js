@@ -110,7 +110,7 @@ gulp.task('blobfish', function() {
   const d3 = fs.readFileSync("bower_components/pxd3/d3.min.js", "utf8");
 
   // choose if we should minify said files (d3 is already minified)
-  const fugly = argv.dev ? (scale + worker) : uglifyJS.minify({"f1": scale, "f2": worker}).code;
+  const fugly = argv.minify ? uglifyJS.minify({"f1": scale, "f2": worker}).code: (scale + worker);
 
   // concatenate blob files into one
   const concatenated = d3 + fugly;
@@ -123,9 +123,12 @@ gulp.task('blobfish', function() {
   function replace(newStr) {
     return through.obj(function(file, enc, callback) {
       if(('contents' in file) && !file.isNull() && !file.isStream() &&file.isBuffer()) {
-        const contents = String(file.contents);
-        const re = /blobyblobblobblob/;
-        const matches = contents.replace(re, newStr);
+        const contents = String(file.contents);;
+        const re = /(\/\/start\sof\sblob\s+var\sblob\s=\s)[\s\S]*(\n\s+\/\/end\sof\sblob)/g;
+        // const matches = contents.replace(re,newStr);
+        const matches = contents.replace(re, (m, m1, m2) => {
+          return m1 + newStr + m2;
+        } );
 
         file.contents = new Buffer(matches);
         this.push(file);
@@ -137,9 +140,8 @@ gulp.task('blobfish', function() {
     });
   }
 
-  return gulp.src('./scheduler-dev.html')
+  return gulp.src('./px-vis-scheduler.html')
     .pipe(replace(str))
-    .pipe(rename('px-vis-scheduler.html'))
     .pipe(gulp.dest('./'));
 
 });
