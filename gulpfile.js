@@ -109,11 +109,34 @@ gulp.task('blobfish', function() {
   const worker = fs.readFileSync("px-vis-worker.js", "utf8");
   const d3 = fs.readFileSync("bower_components/pxd3/d3.min.js", "utf8");
 
-  // choose if we should minify said files (d3 is already minified)
-  const fugly = argv.minify ? uglifyJS.minify({"f1": scale, "f2": worker}).code: (scale + worker);
+  // choose if we should minify worker files (d3 is already minified)
+  const workerfiles = ((arg, f1, f2) => {
+    // minify does a full minification
+    if(arg.minify) {
+      return uglifyJS.minify({"f1": f1, "f2": f2}).code;
+    }
+    // dev does nothing; just returns files as is
+    if(arg.dev) {
+      return f1 + f2;
+    }
+    /*
+      default is to do a "light" minification, leaving vars alone but striping out:
+      * comments
+      * line breaks
+      * debugger statements
+
+      docs: https://www.npmjs.com/package/uglify-js
+    */
+    const options = {
+      compress: false,
+      mangle: false
+    };
+
+    return uglifyJS.minify({"f1": f1, "f2": f2}, options).code;
+  })(argv, scale, worker);
 
   // concatenate blob files into one
-  const concatenated = d3 + fugly;
+  const concatenated = d3 + workerfiles;
 
   // store as json to force the output to be a string when inserted into the scheduler.
   const json = { script: concatenated };
