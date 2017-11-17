@@ -17,7 +17,7 @@ function runTests(){
     });
 
     test('emptyCanvas creates an canvas', function() {
-      assert.equal(emptyCanvas.querySelector('#chartCanvas').tagName ,'CANVAS');
+      assert.equal(Polymer.dom(emptyCanvas.root).querySelector('#chartCanvas').tagName ,'CANVAS');
     });
 
     test('emptyCanvas does not set canvas or context property', function() {
@@ -34,7 +34,7 @@ function runTests(){
     });
 
     test('missingHeight creates an canvas', function() {
-      assert.equal(missingHeight.querySelector('#chartCanvas').tagName ,'CANVAS');
+      assert.equal(Polymer.dom(missingHeight.root).querySelector('#chartCanvas').tagName ,'CANVAS');
     });
 
     test('missingHeight does not set canvas or context property', function() {
@@ -45,7 +45,7 @@ function runTests(){
 
   suite('px-vis-canvas runs with basic declarative bindings', function() {
     var decCanvas = document.getElementById('decCanvas');
-    var chartCanvas = decCanvas.querySelector('#chartCanvas');
+    var chartCanvas = Polymer.dom(decCanvas.root).querySelector('#chartCanvas');
 
     test('decCanvas fixture is created', function() {
       assert.isDefined(decCanvas);
@@ -64,7 +64,7 @@ function runTests(){
   suite('px-vis-canvas runs with imperative bindings', function() {
     var eventObj,
         impCanvas = document.getElementById('impCanvas'),
-        chartCanvas = impCanvas.querySelector('#chartCanvas'),
+        chartCanvas = Polymer.dom(impCanvas.root).querySelector('#chartCanvas'),
         w = 600,
         h = 400,
         m = {
@@ -108,7 +108,7 @@ function runTests(){
   suite('px-vis-canvas updates imperitively', function() {
     var eventObj,
         updateCanvas = document.getElementById('updateCanvas'),
-        chartCanvas = updateCanvas.querySelector('#chartCanvas'),
+        chartCanvas = Polymer.dom(updateCanvas.root).querySelector('#chartCanvas'),
         w = 400,
         h = 200;
 
@@ -145,7 +145,7 @@ function runTests(){
 
   suite('px-vis-canvas with offset', function() {
     var offsetCanvas = document.getElementById('offsetCanvas');
-    var chartCanvas = decCanvas.querySelector('#chartCanvas');
+    var chartCanvas = Polymer.dom(decCanvas.root).querySelector('#chartCanvas');
 
     test('offsetCanvas fixture is created', function() {
       assert.isDefined(offsetCanvas);
@@ -162,7 +162,7 @@ function runTests(){
 } //runTests
 
 function basicAttrs(elem, elemName, w,h,m){
-  var chartCanvas = elem.querySelector('#chartCanvas');
+  var chartCanvas = Polymer.dom(elem.root).querySelector('#chartCanvas');
 
   test(elemName + ' chartCanvas has correct width',function(){
     assert.equal(chartCanvas.getAttribute('width'),w);

@@ -10,7 +10,7 @@ function runTests(){
   });
 
   suite('creates our multi scale', function() {
-    var multiScale = document.getElementById('scale');
+    var multiScale;
 
     suiteSetup(function(done) {
       var width = 800,
@@ -51,6 +51,7 @@ function runTests(){
             }
           ];
 
+      multiScale = document.getElementById('scale');
       multiScale.set('width', width);
       multiScale.set('height', height);
       multiScale.set('margin', margin);
@@ -141,9 +142,10 @@ function runTests(){
   }); //suite
 
   suite('squar off ticks our multi scale', function() {
-    var multiScale = document.getElementById('scale');
+    var multiScale;
 
     suiteSetup(function(done) {
+      multiScale = document.getElementById('scale');
       var finish = function() {
         multiScale.removeEventListener('domain-changed-changed', finish)
         done();
@@ -168,10 +170,11 @@ function runTests(){
   });
 
   suite('zooming works with our multi scale', function() {
-    var multiScale = document.getElementById('scale'),
+    var multiScale,
         axesDomain = {value: {y1: [15,20]}};
 
     suiteSetup(function(done) {
+      multiScale = document.getElementById('scale');
       var finish = function() {
         multiScale.removeEventListener('domain-changed-changed', finish)
         done();
@@ -191,7 +194,7 @@ function runTests(){
   });
 
   suite('dataExtents generated properly without commonAxis', function() {
-    var scale = document.getElementById('scale');
+    var scale;
 
 
     suiteSetup(function() {
@@ -203,6 +206,8 @@ function runTests(){
                     {axis1: 4, axis2: 9, axis3: 14, axis4: 19},
                     {axis1: 5, axis2: 10, axis3: 15, axis4: 20}],
           chartExtents = {axis1: ['dynamic', 'dynamic'], axis2: ['dynamic', 20], axis3: [0, 'dynamic']};
+
+      scale = document.getElementById('scale');
 
       scale.set('chartData', chartData);
       scale.set('dimensions', dimensions);
@@ -235,7 +240,7 @@ function runTests(){
   });
 
   suite('dataExtents generated properly without commonAxis when one series is all same value', function() {
-    var scale = document.getElementById('scale');
+    var scale;
 
 
     suiteSetup(function() {
@@ -247,6 +252,7 @@ function runTests(){
                         {axis1: 4, axis2: 9, axis3: 14, axis4: 16},
                         {axis1: 5, axis2: 10, axis3: 15, axis4: 16}];
 
+      scale = document.getElementById('scale');
       scale.set('chartData', chartData);
       scale.set('dimensions', dimensions);
       scale.set('chartExtents', undefined);
@@ -278,7 +284,7 @@ function runTests(){
   });
 
   suite('dataExtents generated properly with commonAxis and the axis with the max val is not defined in chartExtents', function() {
-    var scale = document.getElementById('scale');
+    var scale;
 
 
     suiteSetup(function() {
@@ -291,6 +297,7 @@ function runTests(){
                     {axis1: 5, axis2: 10, axis3: 15, axis4: 20}],
           chartExtents = {axis1: ['dynamic', 'dynamic'], axis2: ['dynamic', 20], axis3: [5, 'dynamic']};
 
+      scale = document.getElementById('scale');
       scale.set('chartData', chartData);
       scale.set('dimensions', dimensions);
       scale.set('chartExtents', chartExtents);
@@ -322,7 +329,7 @@ function runTests(){
   });
 
   suite('dataExtents generated properly with commonAxis and the axis with the max val is defined in chartExtents', function() {
-    var scale = document.getElementById('scale');
+    var scale;
 
 
     suiteSetup(function() {
@@ -335,6 +342,7 @@ function runTests(){
                     {axis1: 5, axis2: 10, axis3: 15, axis4: 20}],
           chartExtents = {axis1: ['dynamic', 'dynamic'], axis2: ['dynamic', 20], axis3: [0, 'dynamic']};
 
+      scale = document.getElementById('scale');
       scale.set('chartData', chartData);
       scale.set('dimensions', dimensions);
       scale.set('chartExtents', chartExtents);
@@ -366,7 +374,7 @@ function runTests(){
   });
 
   suite('dataExtents generated properly with commonAxis and the max val is defined in chartExtents', function() {
-    var scale = document.getElementById('scale');
+    var scale;
 
 
     suiteSetup(function() {
@@ -379,6 +387,7 @@ function runTests(){
                     {axis1: 5, axis2: 10, axis3: 15, axis4: 20}],
           chartExtents = {axis1: ['dynamic', 'dynamic'], axis2: ['dynamic', 20], axis3: [0, 30]};
 
+      scale = document.getElementById('scale')
       scale.set('chartData', chartData);
       scale.set('dimensions', dimensions);
       scale.set('chartExtents', chartExtents);
@@ -411,7 +420,7 @@ function runTests(){
 
 
   suite('creates our common axis multi scale', function() {
-    var multiScale = document.getElementById('scale');
+    var multiScale;
 
     suiteSetup(function(done) {
       var width = 800,
@@ -452,6 +461,7 @@ function runTests(){
             }
           ];
 
+      multiScale = document.getElementById('scale');
       multiScale.set('width', width);
       multiScale.set('height', height);
       multiScale.set('margin', margin);

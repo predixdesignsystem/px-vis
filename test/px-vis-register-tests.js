@@ -2,7 +2,81 @@ document.addEventListener("WebComponentsReady", function() {
   runTests();
 });
 
-function runTests(){
+function getRegisterXYValues(register, subitemName, xOrdinal) {
+  var subName = subitemName ? subitemName : 'px-vis-register-item',
+      series = Polymer.dom(register.root).querySelectorAll(subName),
+      seriesData,
+      valueX,
+      valueY,
+      unit = '';
+
+  seriesData = Polymer.dom(series[0].root).querySelector('.seriesData');
+
+  var child = seriesData.firstChild,
+      curr = '';
+
+  while(child) {
+      if (child.nodeType === 3) { // nodeType === Node.TEXT_NODE
+        curr = child.nodeValue.trim();
+        unit += curr;
+      }
+
+      child = child.nextSibling;
+  }
+
+  var index = 0;
+  if(xOrdinal) {
+    valueX = Polymer.dom(seriesData.querySelector('#xSpan')).textContent.trim();
+  } else {
+    valueX = Polymer.dom(seriesData.querySelectorAll('px-number-formatter')[0].root).querySelector('span').textContent;
+    index++;
+  }
+
+  valueY = Polymer.dom(seriesData.querySelectorAll('px-number-formatter')[index].root).querySelector('span').textContent;
+
+  return {
+    'x': valueX,
+    'y': valueY,
+    'unit': unit
+  }
+}
+
+function getRegisterSingleValues(register, subitemName, isPie) {
+  var subName = subitemName ? subitemName : 'px-vis-register-item',
+      series = Polymer.dom(register.root).querySelectorAll(subName),
+      seriesData,
+      valueX,
+      valueY,
+      unit = '';
+
+  seriesData = Polymer.dom(series[0].root).querySelector('.seriesData');
+
+  var child = seriesData.firstChild,
+      curr = '';
+
+  while(child) {
+      if (child.nodeType === 3) { // nodeType === Node.TEXT_NODE
+        curr = child.nodeValue.trim();
+        unit += curr;
+      }
+
+      child = child.nextSibling;
+  }
+
+  if(isPie) {
+    value = seriesData.querySelector('span').textContent.trim();
+  } else {
+    value = Polymer.dom(seriesData.querySelectorAll('px-number-formatter')[0].root).querySelector('span').textContent.trim();
+  }
+
+
+  return {
+    'value': value,
+    'unit': unit
+  }
+}
+
+function runTests() {
   suite('px-vis-register does Polymer exist?', function() {
 
     test('Polymer exists', function() {
@@ -46,7 +120,7 @@ function runTests(){
     test('doesItMute series has muted class', function() {
       var ms = doesItMute.mutedSeries;
       var series = Polymer.dom(doesItMute.root).querySelectorAll('px-vis-register-item'),
-          regWithoutMenu = series[1].querySelector('#regWithoutMenu');
+          regWithoutMenu = Polymer.dom(series[1].root).querySelector('#regWithoutMenu');
 
       assert.isTrue(ms[data.data.series[1].name]);
       assert.isTrue(regWithoutMenu.classList.contains('muted'));
@@ -77,33 +151,33 @@ function runTests(){
     test('truncate is correct', function() {
       var series = Polymer.dom(truncate.root).querySelectorAll('px-vis-register-item');
 
-      assert.equal(series[0].querySelector('.seriesName').firstChild.textContent.trim(),'this_...name0');
-      assert.equal(series[1].querySelector('.seriesName').firstChild.textContent.trim(),'this_...name1');
+      assert.equal(Polymer.dom(series[0].root).querySelector('.seriesName').firstChild.textContent.trim(),'this_...name0');
+      assert.equal(Polymer.dom(series[1].root).querySelector('.seriesName').firstChild.textContent.trim(),'this_...name1');
     });
 
     test('truncateShort is correct', function() {
       var series = Polymer.dom(truncateShort.root).querySelectorAll('px-vis-register-item');
 
-      assert.equal(series[0].querySelector('.seriesName').firstChild.textContent.trim(),'thi...e0');
-      assert.equal(series[1].querySelector('.seriesName').firstChild.textContent.trim(),'thi...e1');
+      assert.equal(Polymer.dom(series[0].root).querySelector('.seriesName').firstChild.textContent.trim(),'thi...e0');
+      assert.equal(Polymer.dom(series[1].root).querySelector('.seriesName').firstChild.textContent.trim(),'thi...e1');
     });
 
     test('noTruncate is correct', function() {
       var series = Polymer.dom(noTruncate.root).querySelectorAll('px-vis-register-item');
 
-      assert.equal(series[0].querySelector('.seriesName').firstChild.textContent.trim(),'this_is_a_long_name0');
-      assert.equal(series[1].querySelector('.seriesName').firstChild.textContent.trim(),'this_is_a_long_name1');
+      assert.equal(Polymer.dom(series[0].root).querySelector('.seriesName').firstChild.textContent.trim(),'this_is_a_long_name0');
+      assert.equal(Polymer.dom(series[1].root).querySelector('.seriesName').firstChild.textContent.trim(),'this_is_a_long_name1');
     });
 
     test('tooltips are created (or not)', function() {
       var truncateSeries = Polymer.dom(truncate.root).querySelectorAll('px-vis-register-item');
-      var truncateTT = truncateSeries[0].querySelector('.seriesName').querySelector('px-tooltip');
+      var truncateTT = Polymer.dom(truncateSeries[0].root).querySelector('.seriesName').querySelector('px-tooltip');
 
       var truncateShortSeries = Polymer.dom(truncateShort.root).querySelectorAll('px-vis-register-item');
-      var truncateShortTT = truncateShortSeries[0].querySelector('.seriesName').querySelector('px-tooltip');
+      var truncateShortTT = Polymer.dom(truncateShortSeries[0].root).querySelector('.seriesName').querySelector('px-tooltip');
 
       var noTruncateSeries = Polymer.dom(noTruncate.root).querySelectorAll('px-vis-register-item');
-      var noTruncateTT = noTruncateSeries[0].querySelector('.seriesName').querySelector('px-tooltip');
+      var noTruncateTT = Polymer.dom(noTruncateSeries[0].root).querySelector('.seriesName').querySelector('px-tooltip');
 
       assert.isTrue(truncateTT !== null);
       assert.isTrue(truncateShortTT !== null);
@@ -124,7 +198,7 @@ function runTests(){
     });
 
     test('datetimeFormat is correct', function() {
-      var series = Polymer.dom(datetimeFormat.root).querySelector('px-vis-register-datetime').querySelector('#dateTime');
+      var series = Polymer.dom(Polymer.dom(datetimeFormat.root).querySelector('px-vis-register-datetime').root).querySelector('#dateTime');
 
       assert.equal(series.textContent.trim(),'December 20th, 2014 @ 8:37:47AM');
     });
@@ -146,9 +220,10 @@ function runTests(){
     });
 
     test('numberFormat formated', function() {
-      var series = Polymer.dom(numberFormat.root).querySelectorAll('px-vis-register-item');
+      var value = getRegisterSingleValues(numberFormat);
 
-      assert.equal(series[0].querySelector('.seriesData').textContent.trim().replace(/?\n|/g, "").split(' ').join(''),'1015.20000yUnit');
+      assert.equal(value.value,'1015.20000');
+      assert.equal(value.unit,'yUnit');
     });
   });
 
@@ -165,8 +240,10 @@ function runTests(){
     });
 
     test('numberFormatCulture formated', function() {
-      var series = Polymer.dom(numberFormatCulture.root).querySelectorAll('px-vis-register-item');
-      assert.equal(series[0].querySelector('.seriesData').textContent.trim().replace(/?\n|/g, "").split(' ').join(''),'1.015,20yUnit');
+      var value = getRegisterSingleValues(numberFormatCulture);
+
+      assert.equal(value.value,'1.015,20');
+      assert.equal(value.unit,'yUnit');
     });
   });
 
@@ -190,11 +267,14 @@ function runTests(){
     });
 
     test('nonTime formated', function() {
-      var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item'),
-          texts = series[0].querySelector('.seriesData').textContent.trim().replace(/?\n|/g, "").split(' ').join('').split('/');
 
-      assert.equal(texts[0].trim(),'1,419,064,667,000.00xUnit');
-      assert.equal(texts[1].trim(),'1,015.20yUnit');
+      var values = getRegisterXYValues(register);
+      var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item'),
+          texts = Polymer.dom(series[0].root).querySelector('.seriesData').textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join('').split('/');
+
+      assert.equal(values.x,'1,419,064,667,000.00');
+      assert.equal(values.y,'1,015.20');
+      assert.equal(values.unit, 'xUnit /yUnit')
     });
   });
 
@@ -218,11 +298,11 @@ function runTests(){
     });
 
     test('ordinal formated', function() {
-      var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item'),
-          texts = series[0].querySelector('.seriesData').textContent.trim().replace(/?\n|/g, "").split(' ').join('').split('/');
+      var values = getRegisterXYValues(register, 'px-vis-register-item' , true);
 
-      assert.equal(texts[0].trim(),'StringyStringxUnit');
-      assert.equal(texts[1].trim(),'1,015.20yUnit');
+      assert.equal(values.x,'StringyString');
+      assert.equal(values.y,'1,015.20');
+      assert.equal(values.unit, 'xUnit /yUnit');
     });
   });
 
@@ -246,11 +326,11 @@ function runTests(){
     });
 
     test('nonTime formated', function() {
-      var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item'),
-          texts = series[0].querySelector('.seriesData').textContent.trim().replace(/?\n|/g, "").split(' ').join('').split('/');
+      var values = getRegisterXYValues(register);
 
-      assert.equal(texts[0].trim(),'1,419,064,667,000.00xUnit');
-      assert.equal(texts[1].trim(),'1,015.20yUnit');
+      assert.equal(values.x,'1,419,064,667,000.00');
+      assert.equal(values.y,'1,015.20');
+      assert.equal(values.unit, 'xUnit /yUnit');
     });
   });
 
@@ -270,10 +350,10 @@ function runTests(){
     });
 
     test('pie formated with unit', function() {
-      var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item-pie'),
-          texts = series[0].querySelector('.seriesData').textContent.trim().replace(/?\n|/g, "").split(' ').join('').split('/');
+      var value = getRegisterSingleValues(register, 'px-vis-register-item-pie', true);
 
-      assert.equal(texts,'1015.2xUnit');
+      assert.equal(value.value,'1015.2');
+      assert.equal(value.unit,'xUnit');
     });
 
     test('pie formated with percentage', function(done) {
@@ -281,10 +361,10 @@ function runTests(){
       register.usePercentage = true;
 
       flush(function(){
-        var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item-pie'),
-            texts = series[0].querySelector('.seriesData').textContent.trim().replace(/?\n|/g, "").split(' ').join('').split('/');
+        var value = getRegisterSingleValues(register, 'px-vis-register-item-pie', true);
 
-        assert.equal(texts,'12%');
+        assert.equal(value.value,'12');
+        assert.equal(value.unit,'%');
         done();
       });
     });
@@ -312,8 +392,8 @@ function runTests(){
           color0 = colorSet[0],
           color1 = colorSet[1],
 
-          pattern0 = series[0].querySelector('.seriesMarkerIcon').getAttribute('style'),
-          pattern1 = series[1].querySelector('.seriesMarkerIcon').getAttribute('style'),
+          pattern0 = Polymer.dom(series[0].root).querySelector('.seriesMarkerIcon').getAttribute('style'),
+          pattern1 = Polymer.dom(series[1].root).querySelector('.seriesMarkerIcon').getAttribute('style'),
 
           // "background:linear-gradient(to bottom, rgb(93,165,218) 0px, rgb(93,165,218) 5px, transparent 5px, transparent 7px, rgb(93,165,218) 7px, rgb(93,165,218) 12px, transparent 12px, transparent 14px, rgb(93,165,218) 14px, rgb(93,165,218) 19px, transparent 19px, transparent 21px, rgb(93,165,218) 21px, rgb(93,165,218) 26px, transparent 26px, transparent 28px); border-bottom: 1px solid rgb(93,165,218);"
           re0 = new RegExp([
@@ -382,7 +462,7 @@ function basicTests(registerID,dir){
     test(registerID + ' names match', function() {
       var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item');
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].querySelector('.seriesName').firstChild.textContent.trim(), data.completeSeriesConfig['series_'+i]['name']);
+        assert.equal(Polymer.dom(series[i].root).querySelector('.seriesName').firstChild.textContent.trim(), data.completeSeriesConfig['series_'+i]['name']);
       }
     });
 
@@ -392,10 +472,10 @@ function basicTests(registerID,dir){
 
       var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item');
       for(var i = 0; i < series.length-1; i++){
-        assert.equal(series[i].querySelector('.seriesMarkerIcon').getAttribute('style').split(' ').join('').split(';')[0], 'background-color:' + colorSet[i]);
+        assert.equal(Polymer.dom(series[i].root).querySelector('.seriesMarkerIcon').getAttribute('style').split(' ').join('').split(';')[0], 'background-color:' + colorSet[i]);
       }
 
-      assert.equal(series[series.length-1].querySelector('.seriesMarkerIcon').getAttribute('style').split(' ').join('').split(';')[0], 'background-color:transparent');
+      assert.equal(Polymer.dom(series[series.length-1].root).querySelector('.seriesMarkerIcon').getAttribute('style').split(' ').join('').split(';')[0], 'background-color:transparent');
     });
 
   });
@@ -423,14 +503,21 @@ function basicTests(registerID,dir){
     test(registerID + ' still names match', function() {
       var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item');
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].querySelector('.seriesName').firstChild.textContent.trim(), data.completeSeriesConfig['series_'+i]['name']);
+        assert.equal(Polymer.dom(series[i].root).querySelector('.seriesName').firstChild.textContent.trim(), data.completeSeriesConfig['series_'+i]['name']);
       }
     });
 
     test(registerID + ' values match', function() {
-      var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item');
+      var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item'),
+          seriesData,
+          value,
+          unit;
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].querySelector('.seriesData').textContent.replace(/?\n|/g, "").split(' ').join('').trim(), '1,015.20yUnit');
+        seriesData = Polymer.dom(series[i].root).querySelector('.seriesData');
+        unit = seriesData.lastChild.textContent.trim();
+        value = Polymer.dom(seriesData.querySelector('px-number-formatter').root).querySelector('span').innerText;
+        assert.equal(value, '1,015.20');
+        assert.equal(unit, 'yUnit');
       }
     });
   });
@@ -455,7 +542,7 @@ function basicTests(registerID,dir){
     test(registerID + ' still names match', function() {
       var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item');
       for(var i = 0; i < series.length; i++){
-        assert.equal(series[i].querySelector('.seriesName').firstChild.textContent.trim(), data.completeSeriesConfig['series_'+i]['name']);
+        assert.equal(Polymer.dom(series[i].root).querySelector('.seriesName').firstChild.textContent.trim(), data.completeSeriesConfig['series_'+i]['name']);
       }
     });
   });
@@ -477,7 +564,7 @@ function basicTests(registerID,dir){
 
     test(registerID + ' series added to mutedSeries', function() {
       regItem = Polymer.dom(register.root).querySelectorAll('px-vis-register-item')[1];
-      series = regItem.querySelector('.series');
+      series = Polymer.dom(regItem.root).querySelector('.series');
       seriesName = series.querySelector('.seriesName');
       regWithoutMenu = series.querySelector('#regWithoutMenu');
       regWithoutMenu.click();
@@ -540,14 +627,13 @@ function basicTests(registerID,dir){
     });
 
     test('showZero formated', function() {
-      var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item'),
-          texts = series[0].querySelector('.seriesData').textContent.trim().replace(/?\n|/g, "").split(' ').join('').split('/');
+      var values = getRegisterXYValues(register);
 
-      assert.equal(texts[0].trim(),'0xUnit');
-      assert.equal(texts[1].trim(),'0yUnit');
+      assert.equal(values.x, '0');
+      assert.equal(values.y, '0');
+      assert.equal(values.unit, 'xUnit /yUnit');
     });
   });
-
 }
 
 function generateEmptyData(num,str){

@@ -17,7 +17,8 @@ function runTests(){
     });
 
     test('emptySVG creates an svg', function() {
-      assert.equal(emptySVG.querySelector('#chartSVG').tagName ,'svg');
+
+      assert.equal(Polymer.dom(emptySVG.root).querySelector('#chartSVG').tagName ,'svg');
     });
 
     test('emptySVG does not set svg property', function() {
@@ -33,7 +34,7 @@ function runTests(){
     });
 
     test('missingHeight creates an svg', function() {
-      assert.equal(missingHeight.querySelector('#chartSVG').tagName ,'svg');
+      assert.equal(Polymer.dom(missingHeight.root).querySelector('#chartSVG').tagName ,'svg');
     });
 
     test('missingHeight does not set svg property', function() {
@@ -164,7 +165,7 @@ function runTests(){
 } //runTests
 
 function basicAttrs(elem, elemName, w,h,m){
-  var chartSVG = elem.querySelector('#chartSVG');
+  var chartSVG = Polymer.dom(elem.root).querySelector('#chartSVG');
 
   test(elemName + ' chartSVG has correct width',function(){
     assert.equal(chartSVG.getAttribute('width'),w);
