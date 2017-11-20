@@ -244,6 +244,12 @@
       this.canvasContext.beginPath();
       for(var i = start; i < stop; i++) {
 
+        if(!this._isValidData(this.chartData[i][this.completeSeriesConfig[this.seriesId]['y']]) ||
+            !this._isValidData(this.chartData[i][this.completeSeriesConfig[this.seriesId]['x']])) {
+          console.warn('Point ' + this.seriesId + ': ' + i + 'is invalid. [' + this.chartData[i][this.completeSeriesConfig[this.seriesId]['x']] + ',' + this.chartData[i][this.completeSeriesConfig[this.seriesId]['y']]+ ']');
+          continue;
+        }
+
         //get the position of the symbol
         translate = this._getTransform(this.chartData[i]);
 
@@ -256,7 +262,7 @@
         //remember pos so that we can move to the next point in 1 translate
         //instead of restoring the translate here
         previousTranslate = translate;
-        // previousTranslate = [translate[0] + 2.5, translate[1]-1.25];
+
       }
       this.canvasContext.closePath();
       this._currentDrawingOptions.drawingFunction();
@@ -268,35 +274,15 @@
     },
 
     _getTransform: function(d) {
-/*
-  FIXME
-  1) Unify the isValidData and lines(d) checks.
-  2) Figure out better default instead of 0,0 for transform
-  3) Think about using cx & cy instead of transform.
-*/
-      if(!this._isValidData(d[this.completeSeriesConfig[this.seriesId]['y']]) ||
-         !this._isValidData(d[this.completeSeriesConfig[this.seriesId]['x']])) {
-        return [0,0];
-      }
-
       if(this.radial) {
         var line = this.line([d]);
-        if (line) {
-          var coors = line.slice(1).slice(0, -1);
-          if (coors !== 'NaN,NaN') {
-            var commaIndex = coors.indexOf(',') + 1;
-            return [coors.slice(0,commaIndex -1), coors.slice(commaIndex)];
-          }
-        }
-        return [0,0];
-      } else {
+        var coors = line.slice(1).slice(0, -1),
+            commaIndex = coors.indexOf(',') + 1;
+        return [coors.slice(0,commaIndex -1), coors.slice(commaIndex)];
 
+      } else {
         var xTrans = this.x(d[this.completeSeriesConfig[this.seriesId]['x']]),
             yTrans = this.y(d[this.completeSeriesConfig[this.seriesId]['y']]);
-
-        //make sure we have a value
-        xTrans = xTrans ? xTrans : 0;
-        yTrans = yTrans ? yTrans : 0;
 
         return [xTrans, yTrans];
       }
