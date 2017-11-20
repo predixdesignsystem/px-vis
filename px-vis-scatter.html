@@ -141,6 +141,10 @@
       drawDebounceTime: {
         type: Number,
         value: 10
+      },
+      showArrows: {
+        type: Boolean,
+        value: false
       }
     },
 
@@ -219,6 +223,10 @@
 
         if(this.radial) {
           this._defineRadialLine(false, this.multiPath, this.counterClockwise, this.useDegrees);
+
+          if(this.showArrows) {
+            this._buildArrows();
+          }
         }
 
         this.scatterBuilder = this.scatterGroup.selectAll('path.symbol')
@@ -281,34 +289,19 @@
      * @method _applyTransform
      */
     _applyTransform: function(d) {
-/*
-  FIXME
-  1) Unify the isValidData and lines(d) checks.
-  2) Figure out better default instead of 0,0 for transform
-  3) Think about using cx & cy instead of transform.
-*/
       if(!this._isValidData(d[this.completeSeriesConfig[this.seriesId]['y']]) ||
          !this._isValidData(d[this.completeSeriesConfig[this.seriesId]['x']])) {
         return '';
       }
 
       if(this.radial) {
-        var line = this.line([d]);
-        if (line) {
-          var coors = line.slice(1).slice(0, -1);
-          if (coors !== 'NaN,NaN') {
-            return 'translate(' + coors + ')' + ' scale(' + this.markerScale + ')';
-          }
-        }
-        return 'translate(0,0)' + ' scale(' + this.markerScale + ')';
+        var line = this.line([d]),
+            coors = line.slice(1).slice(0, -1);
+        return 'translate(' + coors + ')' + ' scale(' + this.markerScale + ')';
       } else {
 
         var xTrans = this.x(d[this.completeSeriesConfig[this.seriesId]['x']]),
             yTrans = this.y(d[this.completeSeriesConfig[this.seriesId]['y']]);
-
-        //make sure we have a value
-        xTrans = xTrans ? xTrans : 0;
-        yTrans = yTrans ? yTrans : 0;
 
         return 'translate(' + xTrans + ',' + yTrans + ')' + ' scale(' + this.markerScale + ')';
       }
@@ -319,9 +312,9 @@
      *
      * @method _colorScatter
      */
-    _colorScatter:function() {
+    _colorScatter: function() {
       var muted = this.mutedSeries[this.seriesId];
-      this.scatterDots
+      this.scatterGroup
         .attr('fill',this.completeSeriesConfig[this.seriesId]['color'])
         .attr('fill-opacity', muted ? this.mutedOpacity : this.markerFillOpacity)
         .attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
@@ -334,6 +327,63 @@
       if(this.scatterGroup && this.seriesId) {
         this._drawSVGOnTop(serieToRedrawOnTop, this.seriesId, this.scatterGroup);
       }
+    },
+
+    _buildArrows: function() {
+      this.arrowBuilder = this.scatterGroup.selectAll('path.arrow')
+          .data(this.chartData);
+
+      this.arrowBuilder.exit().remove();
+
+      this.arrowBuilder.enter()
+        .append('path')
+        .attr('class', 'arrow')
+      .merge(this.arrowBuilder)
+        .attr('d', Px.d3.symbol().type(this.markerMapping.caret).size(this.markerSize/3))
+        .attr('transform', this._transformArrow.bind(this))
+        .each(function(d,i,paths) {
+          if(!this._isValidData(d[this.completeSeriesConfig[this.seriesId]['x']]) ||
+              !this._isValidData(d[this.completeSeriesConfig[this.seriesId]['y']]) ||
+              i === 0 ||
+              !this._isValidData(this.chartData[i-1][this.completeSeriesConfig[this.seriesId]['x']]) ||
+              !this._isValidData(this.chartData[i-1][this.completeSeriesConfig[this.seriesId]['y']])) {
+            paths[i].remove();
+          }
+        }.bind(this));
+
+      this.arrowDots = this.scatterGroup.selectAll('path.arrow');
+    },
+
+    _transformArrow: function(d, i) {
+
+      if(!this._isValidData(d[this.completeSeriesConfig[this.seriesId]['x']]) ||
+         !this._isValidData(d[this.completeSeriesConfig[this.seriesId]['y']]) ||
+         i === 0 ||
+         !this._isValidData(this.chartData[i-1][this.completeSeriesConfig[this.seriesId]['x']]) ||
+         !this._isValidData(this.chartData[i-1][this.completeSeriesConfig[this.seriesId]['y']])) {
+        return '';
+      }
+
+      var p0 = this.line([this.chartData[i-1]]),
+          p1 = this.line([d]),
+          coords0 = p0.slice(1).slice(0, -1).split(','),
+          coords1 = p1.slice(1).slice(0, -1).split(','),
+          dx = (Number(coords1[0]) - Number(coords0[0]))/2,
+          dy = (Number(coords1[1]) - Number(coords0[1]))/2,
+          // thank you Pythagoras
+          h = Math.sqrt(dx*dx + dy*dy),
+          x,y,angle,angleDeg;
+
+      if(h < 10) {
+        return '';
+      }
+
+      x = dx + Number(coords0[0]);
+      y = dy + Number(coords0[1]);
+      angle = Math.atan2(dy,dx) + Math.PI / 2;
+      angleDeg = angle * 180/Math.PI;
+
+      return 'rotate(' + angleDeg + ' ' + x + ',' + y + ') translate(' + x + ',' + y + ') scale(' + this.markerScale + ')';
     }
   });
 </script>
