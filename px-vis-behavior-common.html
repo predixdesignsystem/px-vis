@@ -908,7 +908,21 @@ PxVisBehavior.commonMethods = {
    * Checks if a theme variable exists, if so, returns the theme value, if not, returns the default
    */
   _checkThemeVariable: function(varName, defaultValue) {
-    var themeVar = this.getComputedStyleValue(varName);
+    var themeVar;
+
+    if (Polymer.Element) {
+      // 2.0 code
+      if (window.ShadyCSS) {
+        themeVar = ShadyCSS.getComputedStyleValue(this, varName);
+      } else {
+        themeVar = getComputedStyle(this).getPropertyValue(varName);
+      }
+    } else {
+      // 1.0 code
+      themeVar = this.getComputedStyleValue(varName);
+    }
+
+
     return (!themeVar || themeVar.length === 0) ? defaultValue : themeVar;
   },
 
@@ -3172,7 +3186,7 @@ PxVisBehavior.updateStylesOverride = {
         var t = this.drawDebounceTime;
         this.drawDebounceTime = 0;
 
-        this._stylesUpdated += 1;
+        this.set('_stylesUpdated',  this._stylesUpdated+ 1);
 
         this.drawDebounceTime = t;
       }, 50);

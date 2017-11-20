@@ -251,6 +251,7 @@ Custom property | Description
 
     observers: [
       'drawElement(svg, eventData.*, eventConfig.*, _animationFrameDone, height, _stylesUpdated)',
+      '_calcThemeOrConfig(_stylesUpdated)',
       '_eventConfigChanged(eventConfig.*)',
       'positionElement(x, domainChanged)',
       '_addClipPath(clipPath)',
@@ -282,7 +283,9 @@ Custom property | Description
     },
 
     ready: function() {
-      window.requestAnimationFrame(this._calcThemeOrConfig.bind(this));
+      window.requestAnimationFrame(function() {
+        this.updateStyles();
+      }.bind(this));
     },
 
     _tooltipRequest: function() {
@@ -321,16 +324,14 @@ Custom property | Description
     _calcThemeOrConfig: function() {
 
       if(!this.defaultEventConfig) {
-        var eventColor = this._checkThemeVariable("--px-vis-event-icon-color", this._defaultDefaultEventConfig.fillColor);
-        var lineColor = this._checkThemeVariable("--px-vis-event-line-color", this._defaultDefaultEventConfig.lineColor);
 
         this.defaultEventConfig = {
-          'color': eventColor,
+          'color': this._defaultDefaultEventConfig.fillColor,
           'icon': this._defaultDefaultEventConfig.icon,
           'type': this._defaultDefaultEventConfig.type,
           'offset': this._defaultDefaultEventConfig.offset,
           'size': this._defaultDefaultEventConfig.size,
-          'lineColor': lineColor,
+          'lineColor': this._defaultDefaultEventConfig.lineColor,
           'lineWeight': this._defaultDefaultEventConfig.lineWeight,
           'enableTooltip': this._defaultDefaultEventConfig.enableTooltip,
           'firstDateTimeFormat': this._defaultDefaultEventConfig.firstDateTimeFormat,
@@ -340,6 +341,9 @@ Custom property | Description
           'tooltipOrientation': this._defaultDefaultEventConfig.tooltipOrientation
         };
       }
+
+      this.defaultEventConfig.lineColor = this._checkThemeVariable("--px-vis-event-line-color", this._defaultDefaultEventConfig.lineColor);
+      this.defaultEventConfig.eventColor = this._checkThemeVariable("--px-vis-event-icon-color", this._defaultDefaultEventConfig.fillColor);
 
       this.set('_animationFrameDone', true);
     },

@@ -43,6 +43,7 @@ function runTests(){
         ordinalEvent;
 
     suiteSetup(function(done) {
+      window.setTimeout(function(){
       baseScale = document.getElementById('baseScale');
       linearScale = document.getElementById('linearScale');
       ordinalScale = document.getElementById('ordinalScale');
@@ -263,6 +264,7 @@ function runTests(){
         ordinalEvent._tooltipRequest();
         done();
       }.bind(this), 1500);
+    }.bind(this), 1500);
     });
 
     test('defaultEvent fixture is created', function() {
