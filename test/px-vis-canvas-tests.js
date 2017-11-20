@@ -10,9 +10,10 @@ function runTests(){
   });
 
   suite('px-vis-canvas canvas with no properties does nothing', function() {
-    var emptyCanvas = document.getElementById('empty');
+    var emptyCanvas;
 
-    test('emptyCanvas fixture is created', function() {
+    suiteSetup(function() {      emptyCanvas = document.getElementById('empty');
+    });test('emptyCanvas fixture is created', function() {
       assert.isDefined(emptyCanvas);
     });
 
@@ -27,9 +28,10 @@ function runTests(){
   });
 
   suite('px-vis-canvas missing one property does nothing', function() {
-    var missingHeight = document.getElementById('missingHeight');
+    var missingHeight;
 
-    test('missingHeight fixture is created', function() {
+    suiteSetup(function() {      missingHeight = document.getElementById('missingHeight');
+    });test('missingHeight fixture is created', function() {
       assert.isDefined(missingHeight);
     });
 
@@ -44,10 +46,11 @@ function runTests(){
   });
 
   suite('px-vis-canvas runs with basic declarative bindings', function() {
-    var decCanvas = document.getElementById('decCanvas');
+    var decCanvas;
     var chartCanvas = Polymer.dom(decCanvas.root).querySelector('#chartCanvas');
 
-    test('decCanvas fixture is created', function() {
+    suiteSetup(function() {      decCanvas = document.getElementById('decCanvas');
+    });test('decCanvas fixture is created', function() {
       assert.isDefined(decCanvas);
     });
 
@@ -63,7 +66,7 @@ function runTests(){
 
   suite('px-vis-canvas runs with imperative bindings', function() {
     var eventObj,
-        impCanvas = document.getElementById('impCanvas'),
+        impCanvas,
         chartCanvas = Polymer.dom(impCanvas.root).querySelector('#chartCanvas'),
         w = 600,
         h = 400,
@@ -75,6 +78,7 @@ function runTests(){
         };
 
     suiteSetup(function(){
+      impCanvas = document.getElementById('impCanvas');
       document.addEventListener('px-vis-canvas-context-updated',function(evt){
         eventObj = evt.detail;
       });
@@ -107,12 +111,13 @@ function runTests(){
 
   suite('px-vis-canvas updates imperitively', function() {
     var eventObj,
-        updateCanvas = document.getElementById('updateCanvas'),
+        updateCanvas,
         chartCanvas = Polymer.dom(updateCanvas.root).querySelector('#chartCanvas'),
         w = 400,
         h = 200;
 
     suiteSetup(function() {
+      updateCanvas = document.getElementById('updateCanvas');
       document.addEventListener('px-vis-canvas-context-updated',function(evt){
         eventObj = evt.detail;
       });
@@ -144,10 +149,11 @@ function runTests(){
   });
 
   suite('px-vis-canvas with offset', function() {
-    var offsetCanvas = document.getElementById('offsetCanvas');
+    var offsetCanvas;
     var chartCanvas = Polymer.dom(decCanvas.root).querySelector('#chartCanvas');
 
-    test('offsetCanvas fixture is created', function() {
+    suiteSetup(function() {      offsetCanvas = document.getElementById('offsetCanvas');
+    });test('offsetCanvas fixture is created', function() {
       assert.isDefined(offsetCanvas);
     });
 

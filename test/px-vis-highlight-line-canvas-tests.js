@@ -4,7 +4,7 @@ document.addEventListener("WebComponentsReady", function() {
 
 function runTests() {
   suite('px-vis-highlight-line renders parallel axis highlight', function() {
-    var parallel = document.getElementById('parallel'),
+    var parallel,
         parallelCanvas = parallel.$.canvas,
         parallelhighlight = parallel.$.highlighter;
 
@@ -12,6 +12,7 @@ function runTests() {
 
 
     suiteSetup(function(done) {
+      parallel = document.getElementById('parallel');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -121,11 +122,12 @@ function runTests() {
 
 
   suite('px-vis-highlight-line draws the highlight', function() {
-    var parallel = document.getElementById('parallel'),
+    var parallel,
         parallelCanvas = parallel.$.canvas,
         parallelhighlight = parallel.$.highlighter;
 
     suiteSetup(function(done){
+      parallel = document.getElementById('parallel');
       var d = {
             "rawData":[{
               "x": 1397160780000,
@@ -158,11 +160,12 @@ function runTests() {
   }); //suite
 
   suite('px-vis-highlight-line clears the highlight', function() {
-    var parallel = document.getElementById('parallel'),
+    var parallel,
         parallelCanvas = parallel.$.canvas,
         parallelhighlight = parallel.$.highlighter;
 
     suiteSetup(function(done){
+      parallel = document.getElementById('parallel');
       var d = {
             "rawData":[],
             "timeStamps": []
@@ -191,13 +194,14 @@ function runTests() {
 
 
   suite('px-vis-highlight-line renders radar axis highlight', function() {
-    var radar = document.getElementById('radar'),
+    var radar,
         radarCanvas = radar.$.canvas,
         radarhighlight = radar.$.highlighter;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done) {
+      radar = document.getElementById('radar');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -311,11 +315,12 @@ function runTests() {
 
 
   suite('px-vis-highlight-line draws the highlight', function() {
-    var radar = document.getElementById('radar'),
+    var radar,
         radarCanvas = radar.$.canvas,
         radarhighlight = radar.$.highlighter;
 
     suiteSetup(function(done){
+      radar = document.getElementById('radar');
       var d = {
         "rawData":[{
           "x": 1397160780000,
@@ -348,11 +353,12 @@ function runTests() {
   }); //suite
 
   suite('px-vis-highlight-line clears the highlight', function() {
-    var radar = document.getElementById('radar'),
+    var radar,
         radarCanvas = radar.$.canvas,
         radarhighlight = radar.$.highlighter;
 
     suiteSetup(function(done){
+      radar = document.getElementById('radar');
       var d = {
             "rawData":[],
             "timeStamps": []
@@ -381,7 +387,7 @@ function runTests() {
 
 
   suite('px-vis-highlight-line renders different dataset highlight', function() {
-    var different = document.getElementById('different'),
+    var different,
         differentCanvas = different.$.canvas,
         differenthighlight = different.$.highlighter;
 
@@ -389,6 +395,7 @@ function runTests() {
 
 
     suiteSetup(function(done) {
+      different = document.getElementById('different');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -500,11 +507,12 @@ function runTests() {
 
 
   suite('px-vis-highlight-line draws the highlight', function() {
-    var different = document.getElementById('different'),
+    var different,
         differentCanvas = different.$.canvas,
         differenthighlight = different.$.highlighter;
 
     suiteSetup(function(done){
+      different = document.getElementById('different');
       var d = {
             "rawData":[{
               "x": 1397160780000,
@@ -537,11 +545,12 @@ function runTests() {
   }); //suite
 
   suite('px-vis-highlight-line clears the highlight', function() {
-    var different = document.getElementById('different'),
+    var different,
         differentCanvas = different.$.canvas,
         differenthighlight = different.$.highlighter;
 
     suiteSetup(function(done){
+      different = document.getElementById('different');
       var d = {
             "rawData":[],
             "timeStamps": []
@@ -568,7 +577,7 @@ function runTests() {
 
 
   suite('px-vis-highlight-line renders fuzz dataset highlight', function() {
-    var fuzz = document.getElementById('fuzz'),
+    var fuzz,
         fuzzCanvas = fuzz.$.canvas,
         fuzzhighlight = fuzz.$.highlighter;
 
@@ -576,6 +585,7 @@ function runTests() {
 
 
     suiteSetup(function(done) {
+      fuzz = document.getElementById('fuzz');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -687,11 +697,12 @@ function runTests() {
 
 
   suite('px-vis-highlight-line draws the highlight', function() {
-    var fuzz = document.getElementById('fuzz'),
+    var fuzz,
         fuzzCanvas = fuzz.$.canvas,
         fuzzhighlight = fuzz.$.highlighter;
 
     suiteSetup(function(done){
+      fuzz = document.getElementById('fuzz');
       var d = {
             "rawData":[{
               "x": 1397160800000,
@@ -736,11 +747,12 @@ function runTests() {
   }); //suite
 
   suite('px-vis-highlight-line clears the highlight', function() {
-    var fuzz = document.getElementById('fuzz'),
+    var fuzz,
         fuzzCanvas = fuzz.$.canvas,
         fuzzhighlight = fuzz.$.highlighter;
 
     suiteSetup(function(done){
+      fuzz = document.getElementById('fuzz');
       var d = {
             "rawData":[],
             "timeStamps": []
@@ -769,7 +781,7 @@ function runTests() {
 
 
   suite('px-vis-highlight-line renders generating crosshair data axis highlight', function() {
-    var generating = document.getElementById('generating'),
+    var generating,
         generatingCanvas = generating.$.canvas,
         generatinghighlight = generating.$.highlighter;
 
@@ -777,6 +789,7 @@ function runTests() {
 
 
     suiteSetup(function(done) {
+      generating = document.getElementById('generating');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -887,11 +900,12 @@ function runTests() {
 
 
   suite('px-vis-highlight-line draws the highlight', function() {
-    var generating = document.getElementById('generating'),
+    var generating,
         generatingCanvas = generating.$.canvas,
         generatinghighlight = generating.$.highlighter;
 
     suiteSetup(function(done){
+      generating = document.getElementById('generating');
       var d = {
             "rawData":[{
               "x": 1397160780000,
@@ -920,11 +934,12 @@ function runTests() {
   }); //suite
 
   suite('px-vis-highlight-line clears the highlight', function() {
-    var generating = document.getElementById('generating'),
+    var generating,
         generatingCanvas = generating.$.canvas,
         generatinghighlight = generating.$.highlighter;
 
     suiteSetup(function(done){
+      generating = document.getElementById('generating');
       var d = {
             "rawData":[],
             "timeStamps": []
@@ -957,7 +972,7 @@ function runTests() {
 
 
   suite('px-vis-highlight-line forces display when generatingCrosshairData', function() {
-    var force = document.getElementById('force'),
+    var force,
         forceCanvas = force.$.canvas,
         forcehighlight = force.$.highlighter;
 
@@ -965,6 +980,7 @@ function runTests() {
 
 
     suiteSetup(function(done) {
+      force = document.getElementById('force');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -1077,11 +1093,12 @@ function runTests() {
 
 
   suite('px-vis-highlight-line draws the highlight', function() {
-    var force = document.getElementById('force'),
+    var force,
         forceCanvas = force.$.canvas,
         forcehighlight = force.$.highlighter;
 
     suiteSetup(function(done){
+      force = document.getElementById('force');
       var d = {
             "rawData":[{
               "x": 1397160780000,
@@ -1115,11 +1132,12 @@ function runTests() {
   }); //suite
 
   suite('px-vis-highlight-line clears the highlight', function() {
-    var force = document.getElementById('force'),
+    var force,
         forceCanvas = force.$.canvas,
         forcehighlight = force.$.highlighter;
 
     suiteSetup(function(done){
+      force = document.getElementById('force');
       var d = {
             "rawData":[],
             "timeStamps": []
@@ -1152,7 +1170,7 @@ function runTests() {
 
 
   suite('px-vis-highlight-line creates tooltipData', function() {
-    var tooltip = document.getElementById('tooltip'),
+    var tooltip,
         tooltipCanvas = tooltip.$.canvas,
         tooltiphighlight = tooltip.$.highlighter;
 
@@ -1160,6 +1178,7 @@ function runTests() {
 
 
     suiteSetup(function(done) {
+      tooltip = document.getElementById('tooltip');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -1263,7 +1282,7 @@ function runTests() {
 
 
   suite('px-vis-highlight-line draws the highlight', function() {
-    var tooltip = document.getElementById('tooltip'),
+    var tooltip,
         tooltipCanvas = tooltip.$.canvas,
         tooltiphighlight = tooltip.$.highlighter;
 
@@ -1271,6 +1290,7 @@ function runTests() {
 
 
     suiteSetup(function(done){
+      tooltip = document.getElementById('tooltip');
       var d = {
             "rawData":[{
               "x": 1397160780000,
@@ -1311,11 +1331,12 @@ function runTests() {
   }); //suite
 
   suite('px-vis-highlight-line clears the highlight', function() {
-    var tooltip = document.getElementById('tooltip'),
+    var tooltip,
         tooltipCanvas = tooltip.$.canvas,
         tooltiphighlight = tooltip.$.highlighter;
 
     suiteSetup(function(done){
+      tooltip = document.getElementById('tooltip');
       var d = {
             "rawData":[],
             "timeStamps": []

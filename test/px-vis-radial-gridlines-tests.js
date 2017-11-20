@@ -10,11 +10,14 @@ function runTests(){
   });
 
   suite('px-vis-radial-gridlines basic setup works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        radialGrid = document.getElementById('radialGrid');
+    var baseScale,
+        baseSVG,
+        radialGrid;
 
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      radialGrid = document.getElementById('radialGrid');
       var d = [{
             "x": 1397102460000,
             "y": 1
@@ -132,11 +135,14 @@ function runTests(){
   }); //suite
 
   suite('px-vis-radial-gridlines works with custom tick values', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        radialGrid = document.getElementById('radialGrid');
+    var baseScale,
+        baseSVG,
+        radialGrid;
 
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      radialGrid = document.getElementById('radialGrid');
       var tickValues = [3,6,9];
 
       radialGrid.set('tickValues',tickValues);

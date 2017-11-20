@@ -10,12 +10,15 @@ function runTests() {
   });
 
   suite('px-vis-interaction-space basic setup works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        baseIS = document.getElementById('baseIS');
+    var baseScale,
+        baseSVG,
+        baseIS;
     var eventObj,ttObj;
 
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      baseIS = document.getElementById('baseIS');
       var d = [{
             "x": 1397102460000,
             "y": 1
@@ -133,9 +136,10 @@ function runTests() {
   });
 
   suite('px-vis-interaction-space baseIS works', function() {
-    var baseIS = document.getElementById('baseIS');
+    var baseIS;
 
-    test('baseIS _rect is created', function() {
+    suiteSetup(function() {      baseIS = document.getElementById('baseIS');
+    });test('baseIS _rect is created', function() {
       assert.isTrue(baseIS._rect !== null);
     });
 
@@ -211,10 +215,11 @@ function runTests() {
   // }); //suite
 
   suite('px-vis-interaction-space baseIS mouseoff event', function() {
-    var baseIS = document.getElementById('baseIS');
+    var baseIS;
     var ttObj;
 
     suiteSetup(function(done){
+      baseIS = document.getElementById('baseIS');
       document.addEventListener('px-vis-tooltip-updated',function(evt){
         ttObj = evt.detail;
       });
@@ -264,10 +269,11 @@ function runTests() {
 
 
   suite('px-vis-interaction-space baseIS has no seriesKeys', function() {
-    var baseIS = document.getElementById('baseIS');
+    var baseIS;
     var ttObj;
 
     suiteSetup(function(done){
+      baseIS = document.getElementById('baseIS');
       document.addEventListener('px-vis-tooltip-updated',function(evt){
         ttObj = evt.detail;
       });
@@ -312,10 +318,11 @@ function runTests() {
   }); //suite
 
   suite('px-vis-interaction-space baseIS more seriesKeys', function() {
-    var baseIS = document.getElementById('baseIS');
+    var baseIS;
     var ttObj;
 
     suiteSetup(function(done){
+      baseIS = document.getElementById('baseIS');
       document.addEventListener('px-vis-tooltip-updated',function(evt){
         ttObj = evt.detail;
       });
@@ -372,10 +379,11 @@ function runTests() {
   }); //suite
 
   suite('px-vis-interaction-space defaultEmptyData', function() {
-    var baseIS = document.getElementById('baseIS');
+    var baseIS;
     var ttObj;
 
     suiteSetup(function(done){
+      baseIS = document.getElementById('baseIS');
       document.addEventListener('px-vis-tooltip-updated',function(evt){
         ttObj = evt.detail;
       });

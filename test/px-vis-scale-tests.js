@@ -10,9 +10,10 @@ function runTests(){
   });
 
   suite('px-vis-scale scale with no properties does nothing', function() {
-    var emptyAxisType = document.getElementById('empty');
+    var emptyAxisType;
 
-    test('emptyAxisType fixture is created', function() {
+    suiteSetup(function() {      emptyAxisType = document.getElementById('empty');
+    });test('emptyAxisType fixture is created', function() {
       assert.isTrue(emptyAxisType !== null);
     });
 
@@ -32,9 +33,10 @@ function runTests(){
   });
 
   suite('px-vis-scale missing height property does not create create y', function() {
-    var missingHeight = document.getElementById('missingHeight');
+    var missingHeight;
 
-    test('missingHeight fixture is created', function() {
+    suiteSetup(function() {      missingHeight = document.getElementById('missingHeight');
+    });test('missingHeight fixture is created', function() {
       assert.isTrue(missingHeight !== null);
     });
 
@@ -48,9 +50,10 @@ function runTests(){
   });
 
   suite('px-vis-scale missing chartData property does not set domains', function() {
-    var missingData = document.getElementById('missingData');
+    var missingData;
 
-    test('missingData fixture is created', function() {
+    suiteSetup(function() {      missingData = document.getElementById('missingData');
+    });test('missingData fixture is created', function() {
       assert.isTrue(missingData !== null);
     });
 
@@ -64,8 +67,9 @@ function runTests(){
   });
 
   suite('px-vis-scale runs with basic declarative bindings', function() {
-    var decTLScale = document.getElementById('decTLScale');
+    var decTLScale;
     suiteSetup(function(done) {
+      decTLScale = document.getElementById('decTLScale');
       window.setTimeout(function() { done(); }, 500);
     });
 
@@ -123,9 +127,10 @@ function runTests(){
   }); //suite
 
   suite('px-vis-scale calcs extents', function() {
-    var findExtents = document.getElementById('findExtents');
+    var findExtents;
 
     suiteSetup(function(done) {
+      findExtents = document.getElementById('findExtents');
       var ext = {
         "x":[Infinity,-Infinity], "y": [0,-Infinity]
         }
@@ -183,9 +188,10 @@ function runTests(){
 
 
   suite('px-vis-scale updates data', function() {
-    var updateData = document.getElementById('updateData');
+    var updateData;
 
     suiteSetup(function(done) {
+      updateData = document.getElementById('updateData');
       var d = {
         "x":1397219900000, "y": 15
       },
@@ -248,9 +254,10 @@ function runTests(){
   }); //suite
 
   suite('px-vis-scale updates with additional series', function() {
-    var updateData = document.getElementById('updateData');
+    var updateData;
 
     suiteSetup(function(done) {
+      updateData = document.getElementById('updateData');
       // updateData.chartData[0].series.push([1397351280000, 1.5])
       var d = [
           {
@@ -338,9 +345,10 @@ function runTests(){
 
 
   suite('px-vis-scale calcs x extents', function() {
-    var findXExtents = document.getElementById('findXExtents');
+    var findXExtents;
 
     suiteSetup(function(done) {
+      findXExtents = document.getElementById('findXExtents');
       var ext = {
         "x":[Infinity,-Infinity], "y": [0,100]
         }
@@ -397,9 +405,10 @@ function runTests(){
   }); //suite
 
   suite('px-vis-scale calcs y extents', function() {
-    var findYExtents = document.getElementById('findYExtents');
+    var findYExtents;
 
     suiteSetup(function(done) {
+      findYExtents = document.getElementById('findYExtents');
       var ext = {
         "x":[1397100000000,1397300000000], "y": [Infinity,-Infinity]
         }
@@ -458,9 +467,10 @@ function runTests(){
   }); //suite
 
   suite('px-vis-scale calcs linear x ext ', function() {
-    var findLinearX = document.getElementById('findLinearX');
+    var findLinearX;
 
     suiteSetup(function(done) {
+      findLinearX = document.getElementById('findLinearX');
       var ext = {
         "x":[Infinity,-Infinity], "y": [Infinity,-Infinity]
         }
@@ -498,9 +508,10 @@ function runTests(){
   }); //suite
 
   suite('px-vis-scale calcs x ordinal extents', function() {
-    var findOrdinalX = document.getElementById('findOrdinalX');
+    var findOrdinalX;
 
     suiteSetup(function(done) {
+      findOrdinalX = document.getElementById('findOrdinalX');
       var ext = {
         "x":[], "y": [Infinity,-Infinity]
         }
@@ -557,9 +568,10 @@ function runTests(){
   }); //suite
 
   suite('px-vis-scale sets x ordinal extents', function() {
-    var setOrdinalX = document.getElementById('setOrdinalX');
+    var setOrdinalX;
 
     suiteSetup(function(done) {
+      setOrdinalX = document.getElementById('setOrdinalX');
       var ext = {
         "x":["a","b","c","d"], "y": [0,10]
         }
@@ -604,9 +616,10 @@ function runTests(){
   }); //suite
 
   suite('px-vis-scale two series, different x for each series', function() {
-    var diffXforY = document.getElementById('diffXforY');
+    var diffXforY;
 
     suiteSetup(function(done) {
+      diffXforY = document.getElementById('diffXforY');
       var ext = {
         "x":[1397100000000,1397300000000], "y": [Infinity,-Infinity]
         }
@@ -665,9 +678,10 @@ function runTests(){
   }); //suite
 
   suite('px-vis-scale chartExtents trumps dataExtents', function() {
-    var cExts = document.getElementById('cExts');
+    var cExts;
 
     suiteSetup(function(done) {
+      cExts = document.getElementById('cExts');
       var dext = {
         "x":[1397000000000,1397700000000], "y": [5,25]
       },
@@ -729,8 +743,9 @@ function runTests(){
   }); //suite
 
   suite('px-vis-scale runs with web worker', function() {
-    var webWorker = document.getElementById('webWorker');
+    var webWorker;
     suiteSetup(function(done) {
+      webWorker = document.getElementById('webWorker');
       var chartData = [
           {
             "x": 1397102460000,

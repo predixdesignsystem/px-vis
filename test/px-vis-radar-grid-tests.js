@@ -10,12 +10,15 @@ function runTests(){
   });
 
   suite('px-vis-gridlines basic setup works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        baseGrid = document.getElementById('baseGrid');
+    var baseScale,
+        baseSVG,
+        baseGrid;
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      baseGrid = document.getElementById('baseGrid');
       var d = [
           {
             "x": 1397102460000,

@@ -10,10 +10,11 @@ function runTests() {
   });
 
   suite('px-vis-toolbar basic setup works', function() {
-    var toolbar = document.getElementById('toolbar'),
+    var toolbar,
         mainItems;
 
     suiteSetup(function(done) {
+      toolbar = document.getElementById('toolbar');
       var margin = {
             top: '10px',
             bottom: '10px',
@@ -95,11 +96,12 @@ function runTests() {
   });
 
   suite('px-vis-toolbar click on main item', function() {
-    var toolbar = document.getElementById('toolbar'),
+    var toolbar,
         mainItems,
         subItems;
 
     suiteSetup(function(done) {
+      toolbar = document.getElementById('toolbar');
       mainItems = toolbar.$.mainRow.querySelectorAll('span.main-item');
 
       var rendered = function() {
@@ -172,12 +174,14 @@ function runTests() {
 
 
   suite('px-vis-toolbar click on sub selectable item', function() {
-    var toolbar = document.getElementById('toolbar'),
-        template = document.getElementById('template'),
+    var toolbar,
+        template,
         mainItems,
         subItems;
 
     suiteSetup(function(done) {
+      toolbar = document.getElementById('toolbar');
+      template = document.getElementById('template');
       mainItems = toolbar.$.mainRow.querySelectorAll('span.main-item');
       subItems = toolbar.$$('#subRow').querySelectorAll('span.main-item');
 
@@ -209,13 +213,15 @@ function runTests() {
   });
 
   suite('px-vis-toolbar click on sub non selectable item', function() {
-    var toolbar = document.getElementById('toolbar'),
-        template = document.getElementById('template'),
+    var toolbar,
+        template,
         mainItems,
         subItems,
         event;
 
     suiteSetup(function(done) {
+      toolbar = document.getElementById('toolbar');
+      template = document.getElementById('template');
       mainItems = toolbar.$.mainRow.querySelectorAll('span.main-item');
       subItems = toolbar.$$('#subRow').querySelectorAll('span.main-item');
 
@@ -246,11 +252,12 @@ function runTests() {
   });
 
   suite('px-vis-toolbar click on new main item', function() {
-    var toolbar = document.getElementById('toolbar'),
+    var toolbar,
         mainItems,
         subItems;
 
     suiteSetup(function(done) {
+      toolbar = document.getElementById('toolbar');
       mainItems = toolbar.$.mainRow.querySelectorAll('span.main-item');
 
       mainItems[0].click();
@@ -298,11 +305,12 @@ function runTests() {
   });
 
   suite('px-vis-toolbar click to close item', function() {
-    var toolbar = document.getElementById('toolbar'),
+    var toolbar,
         mainItems,
         subItems;
 
     suiteSetup(function(done) {
+      toolbar = document.getElementById('toolbar');
       mainItems = toolbar.$.mainRow.querySelectorAll('span.main-item');
 
       mainItems[0].click();

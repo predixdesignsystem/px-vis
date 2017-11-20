@@ -10,14 +10,17 @@ function runTests() {
   });
 
   suite('px-vis-area-svg works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        baseArea = document.getElementById('baseArea');
+    var baseScale,
+        baseSVG,
+        baseArea;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var areaPath;
 
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      baseArea = document.getElementById('baseArea');
       var d = [{
             "x": 1397102460000,
             "y": 1
@@ -104,14 +107,17 @@ function runTests() {
   }); //suite
 
   suite('px-vis-area-svg with two series works', function() {
-    var multiScale = document.getElementById('multiScale'),
-        multiSVG = document.getElementById('multiSVG'),
-        multiArea = document.getElementById('multiArea')
+    var multiScale,
+        multiSVG,
+        multiArea
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var areaPath1,areaPath2,areaPath3;
 
     suiteSetup(function(done){
+      multiScale = document.getElementById('multiScale');
+      multiSVG = document.getElementById('multiSVG');
+      multiArea = document.getElementById('multiArea');
       var d = [{
             "x": 1397102460000,
             "y": 1,

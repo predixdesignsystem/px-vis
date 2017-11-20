@@ -29,20 +29,32 @@ function runTests(){
   });
 
   suite('px-vis-event is instantiated', function() {
-    var baseScale = document.getElementById('baseScale'),
-        linearScale = document.getElementById('linearScale'),
-        ordinalScale = document.getElementById('ordinalScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        defaultEvent = document.getElementById('defaultEvent'),
-        faEvent = document.getElementById('faEvent'),
-        uniEvent = document.getElementById('uniEvent'),
-        imgEvent = document.getElementById('imgEvent'),
-        noLabelEvent = document.getElementById('noLabelEvent'),
-        offsetEvent = document.getElementById('offsetEvent'),
-        linearEvent = document.getElementById('linearEvent'),
-        ordinalEvent = document.getElementById('ordinalEvent');
+    var baseScale,
+        linearScale,
+        ordinalScale,
+        baseSVG,
+        defaultEvent,
+        faEvent,
+        uniEvent,
+        imgEvent,
+        noLabelEvent,
+        offsetEvent,
+        linearEvent,
+        ordinalEvent;
 
     suiteSetup(function(done) {
+      baseScale = document.getElementById('baseScale');
+      linearScale = document.getElementById('linearScale');
+      ordinalScale = document.getElementById('ordinalScale');
+      baseSVG = document.getElementById('baseSVG');
+      defaultEvent = document.getElementById('defaultEvent');
+      faEvent = document.getElementById('faEvent');
+      uniEvent = document.getElementById('uniEvent');
+      imgEvent = document.getElementById('imgEvent');
+      noLabelEvent = document.getElementById('noLabelEvent');
+      offsetEvent = document.getElementById('offsetEvent');
+      linearEvent = document.getElementById('linearEvent');
+      ordinalEvent = document.getElementById('ordinalEvent');
       var w = 500,
         h = 300,
         m = {
@@ -271,13 +283,16 @@ function runTests(){
   }); //suite
 
   suite('px-vis-event defaultEvent works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        defaultEvent = document.getElementById('defaultEvent');
+    var baseScale,
+        baseSVG,
+        defaultEvent;
 
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    test('defaultEvent eventGroup created', function() {
+    suiteSetup(function() {      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      defaultEvent = document.getElementById('defaultEvent');
+    });test('defaultEvent eventGroup created', function() {
       assert.equal(defaultEvent.eventGroup.node().tagName,'g');
     });
     test('defaultEvent eventGroup has class', function() {
@@ -325,13 +340,16 @@ function runTests(){
   }); //suite
 
   suite('px-vis-event imgEvent works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        imgEvent = document.getElementById('imgEvent');
+    var baseScale,
+        baseSVG,
+        imgEvent;
 
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    test('imgEvent eventGroup created', function() {
+    suiteSetup(function() {      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      imgEvent = document.getElementById('imgEvent');
+    });test('imgEvent eventGroup created', function() {
       assert.equal(imgEvent.eventGroup.node().tagName,'g');
     });
     test('imgEvent eventGroup has class', function() {
@@ -386,13 +404,16 @@ function runTests(){
   }); //suite
 
   suite('px-vis-event noLabelEvent works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        noLabelEvent = document.getElementById('noLabelEvent');
+    var baseScale,
+        baseSVG,
+        noLabelEvent;
 
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    test('noLabelEvent eventGroup created', function() {
+    suiteSetup(function() {      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      noLabelEvent = document.getElementById('noLabelEvent');
+    });test('noLabelEvent eventGroup created', function() {
       assert.equal(noLabelEvent.eventGroup.node().tagName,'g');
     });
     test('noLabelEvent eventGroup has class', function() {
@@ -434,13 +455,16 @@ function runTests(){
   }); //suite
 
   suite('px-vis-event offsetEvent works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        offsetEvent = document.getElementById('offsetEvent');
+    var baseScale,
+        baseSVG,
+        offsetEvent;
 
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    test('offsetEvent eventGroup created', function() {
+    suiteSetup(function() {      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      offsetEvent = document.getElementById('offsetEvent');
+    });test('offsetEvent eventGroup created', function() {
       assert.equal(offsetEvent.eventGroup.node().tagName,'g');
     });
     test('offsetEvent eventGroup has class', function() {
@@ -489,13 +513,16 @@ function runTests(){
 
 
   suite('px-vis-event with linear scale', function() {
-    var baseScale = document.getElementById('linearScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        linearEvent = document.getElementById('linearEvent');
+    var baseScale,
+        baseSVG,
+        linearEvent;
 
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    test('linearEvent eventGroup created', function() {
+    suiteSetup(function() {      baseScale = document.getElementById('linearScale');
+      baseSVG = document.getElementById('baseSVG');
+      linearEvent = document.getElementById('linearEvent');
+    });test('linearEvent eventGroup created', function() {
       assert.equal(linearEvent.eventGroup.node().tagName,'g');
     });
     test('linearEvent eventGroup has class', function() {
@@ -535,13 +562,16 @@ function runTests(){
   }); //suite
 
   suite('px-vis-event with ordinal scale', function() {
-    var baseScale = document.getElementById('ordinalScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        ordinalEvent = document.getElementById('ordinalEvent');
+    var baseScale,
+        baseSVG,
+        ordinalEvent;
 
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    test('ordinalEvent eventGroup created', function() {
+    suiteSetup(function() {      baseScale = document.getElementById('ordinalScale');
+      baseSVG = document.getElementById('baseSVG');
+      ordinalEvent = document.getElementById('ordinalEvent');
+    });test('ordinalEvent eventGroup created', function() {
       assert.equal(ordinalEvent.eventGroup.node().tagName,'g');
     });
     test('ordinalEvent eventGroup has class', function() {

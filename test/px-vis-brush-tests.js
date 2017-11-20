@@ -30,12 +30,15 @@ function runTests(){
   });
 
   suite('px-vis-brush basic setup works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        baseBrush = document.getElementById('baseBrush');
+    var baseScale,
+        baseSVG,
+        baseBrush;
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      baseBrush = document.getElementById('baseBrush');
       var d = [{
             "x": 1397102460000,
             "y": 1
@@ -193,9 +196,10 @@ function runTests(){
   });
 
   suite('px-vis-brush brush resizes to the inputed domain', function() {
-    var baseBrush = document.getElementById('baseBrush');
+    var baseBrush;
 
     suiteSetup(function(done){
+      baseBrush = document.getElementById('baseBrush');
       var d = [1397131620000,1397189940000];
 
       baseBrush.set('chartDomain',d);
@@ -217,8 +221,9 @@ function runTests(){
   });
 
   suite('px-vis-brush click on navigator and the extent box should move to that point', function() {
-    var baseBrush = document.getElementById('baseBrush');
+    var baseBrush;
     suiteSetup(function(done){
+      baseBrush = document.getElementById('baseBrush');
       var rect = baseBrush._brushGroup.select('rect.overlay').node(),
           box = rect.getBoundingClientRect();
 
@@ -248,9 +253,10 @@ function runTests(){
   });
 
   suite('px-vis-brush brush reset inputed domain', function() {
-    var baseBrush = document.getElementById('baseBrush');
+    var baseBrush;
 
     suiteSetup(function(done){
+      baseBrush = document.getElementById('baseBrush');
       var d = [1397102460000,1397219100000];
 
       baseBrush.set('chartDomain',d);
@@ -402,12 +408,15 @@ function runTests(){
   // });
 
   suite('px-vis-brush gradient overlay', function() {
-    var gradientScale = document.getElementById('gradientScale'),
-        gradientSVG = document.getElementById('gradientSVG'),
-        gradientBrush = document.getElementById('gradientBrush');
+    var gradientScale,
+        gradientSVG,
+        gradientBrush;
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     suiteSetup(function(done){
+      gradientScale = document.getElementById('gradientScale');
+      gradientSVG = document.getElementById('gradientSVG');
+      gradientBrush = document.getElementById('gradientBrush');
       var d = [{
             "x": 1397102460000,
             "y": 1

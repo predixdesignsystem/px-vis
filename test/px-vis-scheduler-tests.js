@@ -286,7 +286,7 @@ function runTests(){
 
     var data = [{'blah': 'blouh'}, {'zlop': 'glob'}];
 
-    test('update custom data', function(done) {
+    suiteSetup(function() {    });test('update custom data', function(done) {
 
       Px.vis.scheduler.process({
           'action' : 'updateData',

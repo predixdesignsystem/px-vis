@@ -10,10 +10,12 @@ function runTests(){
   });
 
   suite('px-vis-tooltip baseTooltip setup works', function() {
-    var baseSVG = document.getElementById('baseSVG'),
-        baseTooltip = document.getElementById('baseTooltip');
+    var baseSVG,
+        baseTooltip;
 
     suiteSetup(function(){
+      baseSVG = document.getElementById('baseSVG');
+      baseTooltip = document.getElementById('baseTooltip');
       var w = 500,
         h = 300,
         m = {
@@ -66,10 +68,12 @@ function runTests(){
   }); //suite
 
   suite('px-vis-tooltip baseTooltip tooltipData is added', function() {
-    var baseSVG = document.getElementById('baseSVG'),
-        baseTooltip = document.getElementById('baseTooltip');
+    var baseSVG,
+        baseTooltip;
 
     suiteSetup(function(done){
+      baseSVG = document.getElementById('baseSVG');
+      baseTooltip = document.getElementById('baseTooltip');
       var d = {
         'time': 1397160780000,
         'series': [
@@ -102,10 +106,12 @@ function runTests(){
   }); //suite
 
   suite('px-vis-tooltip baseTooltip tooltipData is removed', function() {
-    var baseSVG = document.getElementById('baseSVG'),
-        baseTooltip = document.getElementById('baseTooltip');
+    var baseSVG,
+        baseTooltip;
 
     suiteSetup(function(done){
+      baseSVG = document.getElementById('baseSVG');
+      baseTooltip = document.getElementById('baseTooltip');
       var d = {
         'time': null,
         'series': [

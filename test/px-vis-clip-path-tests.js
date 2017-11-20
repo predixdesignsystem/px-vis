@@ -10,13 +10,17 @@ function runTests(){
   });
 
   suite('px-vis-clip-path basic setup works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        baseLine = document.getElementById('baseLine'),
-        baseClip = document.getElementById('baseClip');
+    var baseScale,
+        baseSVG,
+        baseLine,
+        baseClip;
     var eventObj;
 
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      baseLine = document.getElementById('baseLine');
+      baseClip = document.getElementById('baseClip');
       var d = [{
             "x": 1397102460000,
             "y": 1
@@ -97,11 +101,13 @@ function runTests(){
   });
 
   suite('px-vis-clip-path baseClip works', function() {
-    var baseSVG = document.getElementById('baseSVG'),
-        baseClip = document.getElementById('baseClip');
+    var baseSVG,
+        baseClip;
     var clipPath, clipPath2, rect, rectSeries;
 
     suiteSetup(function(done){
+      baseSVG = document.getElementById('baseSVG');
+      baseClip = document.getElementById('baseClip');
       clipPath = Px.d3.select(baseClip.svg.selectAll('clipPath').nodes()[0]);
       clipPath2 = Px.d3.select(baseClip.svg.selectAll('clipPath').nodes()[1]);
 

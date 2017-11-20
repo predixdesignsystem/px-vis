@@ -10,11 +10,14 @@ function runTests(){
   });
 
   suite('px-vis-pie works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        basePie = document.getElementById('baseLine');
+    var baseScale,
+        baseSVG,
+        basePie;
 
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      basePie = document.getElementById('baseLine');
       var d = [{"x":15,"y":"IPA","percentage":"26", "colorIndex": 0},{"x":1,"y":"Pils","percentage":"2", "colorIndex": 1},{"x":1,"y":"Lager","percentage":"2", "colorIndex": 2},{"x":8,"y":"Lambic","percentage":"14", "colorIndex": 3},{"x":12,"y":"Stout","percentage":"21", "colorIndex": 4},{"x":7,"y":"Pale Ale","percentage":"12", "colorIndex": 5},{"x":9,"y":"Porter","percentage":"16", "colorIndex": 6},{"x":4,"y":"Heffeweisse","percentage":"7", "colorIndex": 7}],
           seriesConfig = {"y":{
             "type":"line",

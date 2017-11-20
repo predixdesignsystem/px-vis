@@ -51,6 +51,18 @@ function runDRTests(){
         domRepeatSVG = document.getElementById('domRepeatSVG'),
         domRepeatDomBind = document.getElementById('domRepeatDomBind');
 
+        if(!domRepeatDomBind.set) {
+          //for Polymer 2 we need to grab the actual dom-bind element to
+          //set on it
+          domRepeatDomBind = document.getElementById('domRepeatDomBind2');
+        }
+
+        if(!domRepeatDomBind.set) {
+          //for Polymer 2 we need to grab the actual dom-bind element to
+          //set on it
+          domRepeatDomBind = document.getElementById('domRepeatDomBind2');
+        }
+
 
         var rendered = function() {
           domRepeatLines = document.querySelectorAll('.domRepeatLines');
@@ -182,6 +194,11 @@ function runDRTests(){
         domRepeatSVG = document.getElementById('domRepeatSVG'),
         domRepeatDomBind = document.getElementById('domRepeatDomBind');
 
+        if(!domRepeatDomBind.set) {
+          //for Polymer 2 we need to grab the actual dom-bind element to
+          //set on it
+          domRepeatDomBind = document.getElementById('domRepeatDomBind2');
+        }
         var rendered = function() {
           counter++;
 
@@ -329,6 +346,13 @@ function runDRTests(){
         domRepeatScale = document.getElementById('domRepeatScale'),
         domRepeatSVG = document.getElementById('domRepeatSVG'),
         domRepeatDomBind = document.getElementById('domRepeatDomBind');
+
+        if(!domRepeatDomBind.set) {
+          //for Polymer 2 we need to grab the actual dom-bind element to
+          //set on it
+          domRepeatDomBind = document.getElementById('domRepeatDomBind2');
+        }
+
         var rendered = function() {
           counter++;
 
@@ -475,6 +499,12 @@ function runDRTests(){
         domRepeatSVG = document.getElementById('domRepeatSVG'),
         domRepeatDomBind = document.getElementById('domRepeatDomBind');
 
+        if(!domRepeatDomBind.set) {
+          //for Polymer 2 we need to grab the actual dom-bind element to
+          //set on it
+          domRepeatDomBind = document.getElementById('domRepeatDomBind2');
+        }
+
          var rendered = function() {
           counter++;
 
@@ -585,6 +615,12 @@ function runDRTests(){
         domRepeatScale = document.getElementById('domRepeatScale'),
         domRepeatSVG = document.getElementById('domRepeatSVG'),
         domRepeatDomBind = document.getElementById('domRepeatDomBind');
+
+        if(!domRepeatDomBind.set) {
+          //for Polymer 2 we need to grab the actual dom-bind element to
+          //set on it
+          domRepeatDomBind = document.getElementById('domRepeatDomBind2');
+        }
 
         domRepeatDomBind._myClass = function(item) { return 'domRepeatLines' };
 

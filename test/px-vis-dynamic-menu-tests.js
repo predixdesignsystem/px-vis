@@ -5,7 +5,7 @@ document.addEventListener("WebComponentsReady", function() {
 function runTests() {
 
   suite('px-vis-dynamic-menu config', function() {
-    var menu = document.getElementById('menu'),
+    var menu,
         conf,
         deleteCounter = 0,
         deleteCounterEvent = 0,
@@ -13,6 +13,7 @@ function runTests() {
         someContext = {'isContext': true};
 
     suiteSetup(function() {
+      menu = document.getElementById('menu');
 
       conf = [
           {

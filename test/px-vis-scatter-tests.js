@@ -10,14 +10,17 @@ function runTests(){
   });
 
   suite('px-vis-scatter works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        baseScatter = document.getElementById('baseScatter');
+    var baseScale,
+        baseSVG,
+        baseScatter;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done) {
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      baseScatter = document.getElementById('baseScatter');
       var d = [{
             "x": 1397102460000,
             "y": 1
@@ -116,15 +119,19 @@ function runTests(){
   }); //suite
 
   suite('px-vis-scatter with two series works', function() {
-    var mutedScale = document.getElementById('mutedScale'),
-        mutedSVG = document.getElementById('mutedSVG'),
-        mutedScatter1 = document.getElementById('mutedScatter1'),
-        mutedScatter2 = document.getElementById('mutedScatter2');
+    var mutedScale,
+        mutedSVG,
+        mutedScatter1,
+        mutedScatter2;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
+      mutedScale = document.getElementById('mutedScale');
+      mutedSVG = document.getElementById('mutedSVG');
+      mutedScatter1 = document.getElementById('mutedScatter1');
+      mutedScatter2 = document.getElementById('mutedScatter2');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -294,15 +301,19 @@ function runTests(){
   }); //suite
 
   suite('px-vis-scatter mutes', function() {
-    var mutedScale = document.getElementById('mutedScale'),
-        mutedSVG = document.getElementById('mutedSVG'),
-        mutedScatter1 = document.getElementById('mutedScatter1'),
-        mutedScatter2 = document.getElementById('mutedScatter2');
+    var mutedScale,
+        mutedSVG,
+        mutedScatter1,
+        mutedScatter2;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
+      mutedScale = document.getElementById('mutedScale');
+      mutedSVG = document.getElementById('mutedSVG');
+      mutedScatter1 = document.getElementById('mutedScatter1');
+      mutedScatter2 = document.getElementById('mutedScatter2');
       var m = {
         "mySeries":false,
         "mySeries2":true
@@ -344,15 +355,19 @@ function runTests(){
   }); //suite
 
   suite('px-vis-scatter unmutes', function() {
-    var mutedScale = document.getElementById('mutedScale'),
-        mutedSVG = document.getElementById('mutedSVG'),
-        mutedScatter1 = document.getElementById('mutedScatter1'),
-        mutedScatter2 = document.getElementById('mutedScatter2');
+    var mutedScale,
+        mutedSVG,
+        mutedScatter1,
+        mutedScatter2;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
+      mutedScale = document.getElementById('mutedScale');
+      mutedSVG = document.getElementById('mutedSVG');
+      mutedScatter1 = document.getElementById('mutedScatter1');
+      mutedScatter2 = document.getElementById('mutedScatter2');
       var m = {
         "mySeries":false,
         "mySeries2":false
@@ -395,20 +410,29 @@ function runTests(){
   }); //suite
 
   suite('marker symbols', function() {
-    var markerScale = document.getElementById('markerScale'),
-        markerSVG = document.getElementById('markerSVG'),
-        markerCircle = document.getElementById('markerCircle'),
-        markerCross = document.getElementById('markerCross'),
-        markerDiamond = document.getElementById('markerDiamond'),
-        markerSquare = document.getElementById('markerSquare'),
-        markerTriangle = document.getElementById('markerTriangle'),
-        markerStar = document.getElementById('markerStar'),
-        markerWye = document.getElementById('markerWye');
+    var markerScale,
+        markerSVG,
+        markerCircle,
+        markerCross,
+        markerDiamond,
+        markerSquare,
+        markerTriangle,
+        markerStar,
+        markerWye;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
+      markerScale = document.getElementById('markerScale');
+      markerSVG = document.getElementById('markerSVG');
+      markerCircle = document.getElementById('markerCircle');
+      markerCross = document.getElementById('markerCross');
+      markerDiamond = document.getElementById('markerDiamond');
+      markerSquare = document.getElementById('markerSquare');
+      markerTriangle = document.getElementById('markerTriangle');
+      markerStar = document.getElementById('markerStar');
+      markerWye = document.getElementById('markerWye');
       var d = [{
             "x": 1397102460000,
             "circle": 1

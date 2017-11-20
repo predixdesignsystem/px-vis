@@ -10,10 +10,11 @@ function runTests(){
   });
 
   suite('px-vis-data-converter single series works with defaults', function() {
-    var singleConverter = document.getElementById('singleConverter')
+    var singleConverter
     var eventObj,configObj;
 
     suiteSetup(function(){
+      singleConverter = document.getElementById('singleConverter');
       var d = [{
         "data": [
           [1397102460000, 1],
@@ -90,9 +91,10 @@ function runTests(){
 
 
   suite('px-vis-data-converter single series works with data keys', function() {
-    var singleConverterDataKeys = document.getElementById('singleConverterDataKeys')
+    var singleConverterDataKeys
 
     suiteSetup(function(){
+      singleConverterDataKeys = document.getElementById('singleConverterDataKeys');
       var d = [{
         "data": [
           [1397102460000, 1],
@@ -158,9 +160,10 @@ function runTests(){
   });
 
   suite('px-vis-data-converter single series works with options', function() {
-    var singleConverterOptions = document.getElementById('singleConverterOptions')
+    var singleConverterOptions
 
     suiteSetup(function(){
+      singleConverterOptions = document.getElementById('singleConverterOptions');
       var d = [{
         "series": [
           [1397102460000, 1],
@@ -224,9 +227,10 @@ function runTests(){
   });
 
   suite('px-vis-data-converter works with two series', function() {
-    var twoConverter = document.getElementById('twoConverter')
+    var twoConverter
 
     suiteSetup(function(){
+      twoConverter = document.getElementById('twoConverter');
       var d = [{
         "data": [
           [1397102460000, 1],
@@ -321,9 +325,10 @@ function runTests(){
   });
 
   suite('px-vis-data-converter works with two series of different lengths', function() {
-    var twoConverterDiffLen = document.getElementById('twoConverterDiffLen')
+    var twoConverterDiffLen
 
     suiteSetup(function(){
+      twoConverterDiffLen = document.getElementById('twoConverterDiffLen');
       var d = [{
         "data": [
           [1397102460000, 1],
@@ -416,9 +421,10 @@ function runTests(){
   });
 
   suite('px-vis-data-converter works with three series', function() {
-    var threeConverter = document.getElementById('threeConverter')
+    var threeConverter
 
     suiteSetup(function(){
+      threeConverter = document.getElementById('threeConverter');
       var d = [{
         "data": [
           [1397102460000, 1],
@@ -556,9 +562,10 @@ function runTests(){
   });
 
   suite('px-vis-data-converter works with three series with custom id and names', function() {
-    var threeConverterCustom = document.getElementById('threeConverterCustom')
+    var threeConverterCustom
 
     suiteSetup(function(){
+      threeConverterCustom = document.getElementById('threeConverterCustom');
       var d = [{
         "data": [
           [1397102460000, 1],

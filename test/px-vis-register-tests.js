@@ -85,9 +85,10 @@ function runTests() {
   });
 
   suite('px-vis-register emptyRegister has default config', function() {
-    var emptyRegister = document.getElementById('emptyRegister');
+    var emptyRegister;
 
-    test('emptyRegister fixture is created', function() {
+    suiteSetup(function() {      emptyRegister = document.getElementById('emptyRegister');
+    });test('emptyRegister fixture is created', function() {
       assert.isTrue(emptyRegister !== null);
     });
 
@@ -105,9 +106,10 @@ function runTests() {
   basicTests('horizontalSeries','horizontal');
 
   suite('px-vis-register passing in a muteSeries applies muted class to the series', function() {
-    var doesItMute = document.getElementById('doesItMute');
+    var doesItMute;
     var data;
     suiteSetup(function(done) {
+      doesItMute = document.getElementById('doesItMute');
       data = generateDataValues( generateEmptyData(5) );
       setData(doesItMute, data);
       setMutedSeries(doesItMute, data.data.series[1].name, done);
@@ -129,11 +131,14 @@ function runTests() {
   });
 
   suite('px-vis-register truncates names correctly', function() {
-    var truncate = document.getElementById('truncate'),
-        truncateShort = document.getElementById('truncateShort'),
-        noTruncate = document.getElementById('noTruncate');
+    var truncate,
+        truncateShort,
+        noTruncate;
 
     suiteSetup(function(done) {
+      truncate = document.getElementById('truncate');
+      truncateShort = document.getElementById('truncateShort');
+      noTruncate = document.getElementById('noTruncate');
       var str = 'this_is_a_long_name';
       var data = generateDataValues( generateEmptyData(2,str) );
       // truncateShort.set('truncationLength',5)
@@ -186,9 +191,10 @@ function runTests() {
   });
 
   suite('px-vis-register formats time correctly', function() {
-    var datetimeFormat = document.getElementById('datetimeFormat');
+    var datetimeFormat;
 
     suiteSetup(function(done) {
+      datetimeFormat = document.getElementById('datetimeFormat');
       var data = generateDataValues( generateEmptyData(2) );
       setData(datetimeFormat, data,done);
     });
@@ -205,9 +211,10 @@ function runTests() {
   });
 
   suite('px-vis-register formats units', function() {
-    var numberFormat = document.getElementById('numberFormat');
+    var numberFormat;
 
     suiteSetup(function(done) {
+      numberFormat = document.getElementById('numberFormat');
       var data = generateDataValues( generateEmptyData(2) );
       setData(numberFormat, data);
       window.setTimeout(function() {
@@ -228,9 +235,10 @@ function runTests() {
   });
 
   suite('px-vis-register formats language units', function() {
-    var numberFormatCulture = document.getElementById('numberFormatCulture');
+    var numberFormatCulture;
 
     suiteSetup(function(done) {
+      numberFormatCulture = document.getElementById('numberFormatCulture');
       var data = generateDataValues( generateEmptyData(2) );
       setData(numberFormatCulture, data,done);
     });
@@ -248,9 +256,10 @@ function runTests() {
   });
 
   suite('px-vis-register shows both values if x axis is not time based', function() {
-    var register = document.getElementById('nonTime');
+    var register;
 
     suiteSetup(function(done) {
+      register = document.getElementById('nonTime');
       var data = generateDataValues( generateEmptyData(2) );
       setData(register, data);
       window.setTimeout(function() {
@@ -279,9 +288,10 @@ function runTests() {
   });
 
   suite('px-vis-register shows both values if x axis is ordinal', function() {
-    var register = document.getElementById('ordinal');
+    var register;
 
     suiteSetup(function(done) {
+      register = document.getElementById('ordinal');
       var data = generateOrdinalDataValues( generateEmptyData(2) );
       setData(register, data);
       window.setTimeout(function() {
@@ -307,9 +317,10 @@ function runTests() {
   });
 
   suite('px-vis-register non time based by default', function() {
-    var register = document.getElementById('nonTimeDefault');
+    var register;
 
     suiteSetup(function(done) {
+      register = document.getElementById('nonTimeDefault');
       var data = generateDataValues( generateEmptyData(2) );
       setData(register, data);
       window.setTimeout(function() {
@@ -335,9 +346,10 @@ function runTests() {
   });
 
   suite('px-vis-register for pie', function() {
-    var register = document.getElementById('pie');
+    var register;
 
     suiteSetup(function(done) {
+      register = document.getElementById('pie');
       var data = generatePieDataValues( generateEmptyData(2) );
       setData(register, data);
       window.setTimeout(function() {
@@ -372,9 +384,10 @@ function runTests() {
 
 
   suite('px-vis-register with dashPattern', function() {
-    var dashPattern = document.getElementById('dashPattern');
+    var dashPattern;
 
     suiteSetup(function(done) {
+      dashPattern = document.getElementById('dashPattern');
       var data = generateDataValues( generateEmptyData(2) );
       data.completeSeriesConfig["series_0"]["dashPattern"] = "5,2";
       data.completeSeriesConfig["series_1"]["dashPattern"] = "10,5";
@@ -605,9 +618,10 @@ function basicTests(registerID,dir){
   });
 
   suite('px-vis-register shows zero values ', function() {
-    var register = document.getElementById('checkZero');
+    var register;
 
     suiteSetup(function(done) {
+      register = document.getElementById('checkZero');
       var data = generateDataValues( generateEmptyData(2) );
 
       data.data.series[0]['value']['x'] = 0;

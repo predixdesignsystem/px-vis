@@ -30,9 +30,9 @@ function runTests(){
   });
 
   suite('px-vis-threshold first draw', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        defaultThreshold = document.getElementById('defaultThreshold'),
+    var baseScale,
+        baseSVG,
+        defaultThreshold,
         thresholdGroups,
         thresholdLines,
         thresholdRects,
@@ -43,6 +43,9 @@ function runTests(){
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      defaultThreshold = document.getElementById('defaultThreshold');
       var w = 500,
         h = 300,
         m = {
@@ -329,9 +332,9 @@ function runTests(){
 
 
   suite('px-vis-threshold completeSeriesConfig changed', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        defaultThreshold = document.getElementById('defaultThreshold'),
+    var baseScale,
+        baseSVG,
+        defaultThreshold,
         thresholdGroups,
         thresholdLines,
         thresholdRects,
@@ -342,6 +345,9 @@ function runTests(){
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     suiteSetup(function(done) {
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      defaultThreshold = document.getElementById('defaultThreshold');
       var completeSeriesConfig = {
         "mySeries":{
           "type":"line",
@@ -554,9 +560,9 @@ function runTests(){
 
 
   suite('px-vis-threshold update thresholds', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        defaultThreshold = document.getElementById('defaultThreshold'),
+    var baseScale,
+        baseSVG,
+        defaultThreshold,
         thresholdGroups,
         thresholdLines,
         thresholdRects,
@@ -567,6 +573,9 @@ function runTests(){
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      defaultThreshold = document.getElementById('defaultThreshold');
       var dT = [
           { "for":"mySeries", "type":"defaultSeriesTitleBox", "value":8 },
           { "for":"mySeries", "type":"defaultSeriesBox", "value": 7 },
@@ -779,9 +788,9 @@ function runTests(){
 
 
   suite('px-vis-threshold update threshold values', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        defaultThreshold = document.getElementById('defaultThreshold'),
+    var baseScale,
+        baseSVG,
+        defaultThreshold,
         thresholdGroups,
         thresholdLines,
         thresholdRects,
@@ -792,6 +801,9 @@ function runTests(){
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      defaultThreshold = document.getElementById('defaultThreshold');
       var dT = [
           { "for":"mySeries", "type":"defaultSeriesTitleBox", "value":9 },
           { "for":"mySeries", "type":"defaultSeriesBox", "value": 7 },
@@ -1004,9 +1016,9 @@ function runTests(){
 
 
   suite('px-vis-threshold delete thresholds', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        defaultThreshold = document.getElementById('defaultThreshold'),
+    var baseScale,
+        baseSVG,
+        defaultThreshold,
         thresholdGroups,
         thresholdLines,
         thresholdRects,
@@ -1016,6 +1028,9 @@ function runTests(){
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      defaultThreshold = document.getElementById('defaultThreshold');
       var dT = [
           { "for":"mySeries", "type":"defaultSeriesTitleBox", "value":9 },
           { "for":"mySeries", "type":"defaultSeries", "value":8 },
@@ -1190,9 +1205,9 @@ function runTests(){
 
 
   suite('px-vis-threshold add thresholds', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        defaultThreshold = document.getElementById('defaultThreshold'),
+    var baseScale,
+        baseSVG,
+        defaultThreshold,
         thresholdGroups,
         thresholdLines,
         thresholdRects,
@@ -1202,6 +1217,9 @@ function runTests(){
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      defaultThreshold = document.getElementById('defaultThreshold');
       var dT = [
           { "for":"mySeries", "type":"defaultSeriesTitleBox", "value":9 },
           { "for":"mySeries", "type":"defaultSeries", "value":8 },

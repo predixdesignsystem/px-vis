@@ -10,14 +10,17 @@ function runTests() {
   });
 
   suite('px-vis-bar-svg column works', function() {
-    var singleColumnScale = document.getElementById('singleColumnScale'),
-        singleColumnSVG = document.getElementById('singleColumnSVG'),
-        singleColumnBar = document.getElementById('singleColumnBar');
+    var singleColumnScale,
+        singleColumnSVG,
+        singleColumnBar;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var barRect;
 
     suiteSetup(function(done){
+      singleColumnScale = document.getElementById('singleColumnScale');
+      singleColumnSVG = document.getElementById('singleColumnSVG');
+      singleColumnBar = document.getElementById('singleColumnBar');
       var d = [{
           'x': "A",
           'y': 0.56
@@ -132,16 +135,21 @@ function runTests() {
   }); //suite
 
   suite('px-vis-bar-svg column with three series works', function() {
-    var multiColumnScale = document.getElementById('multiColumnScale'),
-        multiColumnSVG = document.getElementById('multiColumnSVG'),
-        multiColumnBar1 = document.getElementById('multiColumnBar1'),
-        multiColumnBar2 = document.getElementById('multiColumnBar2'),
-        multiColumnBar3 = document.getElementById('multiColumnBar3');
+    var multiColumnScale,
+        multiColumnSVG,
+        multiColumnBar1,
+        multiColumnBar2,
+        multiColumnBar3;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var barRect,barRect2,barRect3;
 
     suiteSetup(function(done){
+      multiColumnScale = document.getElementById('multiColumnScale');
+      multiColumnSVG = document.getElementById('multiColumnSVG');
+      multiColumnBar1 = document.getElementById('multiColumnBar1');
+      multiColumnBar2 = document.getElementById('multiColumnBar2');
+      multiColumnBar3 = document.getElementById('multiColumnBar3');
       var d = value = [{
           'x': "A",
           'y': 0.56,
@@ -390,14 +398,17 @@ function runTests() {
 
 
   suite('px-vis-bar-svg bar works', function() {
-    var singleBarScale = document.getElementById('singleBarScale'),
-        singleBarSVG = document.getElementById('singleBarSVG'),
-        singleBarBar = document.getElementById('singleBarBar');
+    var singleBarScale,
+        singleBarSVG,
+        singleBarBar;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var barRect;
 
     suiteSetup(function(done){
+      singleBarScale = document.getElementById('singleBarScale');
+      singleBarSVG = document.getElementById('singleBarSVG');
+      singleBarBar = document.getElementById('singleBarBar');
       var d = [{
           'x': "A",
           'y': 0.56
@@ -513,16 +524,21 @@ function runTests() {
   }); //suite
 
   suite('px-vis-bar-svg bar with three series works', function() {
-    var multiBarScale = document.getElementById('multiBarScale'),
-        multiBarSVG = document.getElementById('multiBarSVG'),
-        multiBarBar1 = document.getElementById('multiBarBar1'),
-        multiBarBar2 = document.getElementById('multiBarBar2'),
-        multiBarBar3 = document.getElementById('multiBarBar3');
+    var multiBarScale,
+        multiBarSVG,
+        multiBarBar1,
+        multiBarBar2,
+        multiBarBar3;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var barRect,barRect2,barRect3;
 
     suiteSetup(function(done){
+      multiBarScale = document.getElementById('multiBarScale');
+      multiBarSVG = document.getElementById('multiBarSVG');
+      multiBarBar1 = document.getElementById('multiBarBar1');
+      multiBarBar2 = document.getElementById('multiBarBar2');
+      multiBarBar3 = document.getElementById('multiBarBar3');
       var d = value = [{
           'x': "A",
           'y': 0.56,

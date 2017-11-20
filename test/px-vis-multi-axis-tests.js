@@ -10,11 +10,14 @@ function runTests(){
   });
 
   suite('px-vis-multi-axis basic setup works', function() {
-    var multiScale = document.getElementById('multiScale'),
-        multiSVG = document.getElementById('multiSVG'),
-        multiAxis = document.getElementById('multiAxis');
+    var multiScale,
+        multiSVG,
+        multiAxis;
 
     suiteSetup(function(done){
+      multiScale = document.getElementById('multiScale');
+      multiSVG = document.getElementById('multiSVG');
+      multiAxis = document.getElementById('multiAxis');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -150,11 +153,14 @@ function runTests(){
 
 
   suite('px-vis-multi-axis add a dimension', function() {
-    var multiScale = document.getElementById('multiScale'),
-        multiSVG = document.getElementById('multiSVG'),
-        multiAxis = document.getElementById('multiAxis');
+    var multiScale,
+        multiSVG,
+        multiAxis;
 
     suiteSetup(function(done) {
+      multiScale = document.getElementById('multiScale');
+      multiSVG = document.getElementById('multiSVG');
+      multiAxis = document.getElementById('multiAxis');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -290,11 +296,14 @@ function runTests(){
   });
 
   suite('px-vis-multi-axis deletes a dimension', function() {
-    var multiScale = document.getElementById('multiScale'),
-        multiSVG = document.getElementById('multiSVG'),
-        multiAxis = document.getElementById('multiAxis');
+    var multiScale,
+        multiSVG,
+        multiAxis;
 
     suiteSetup(function(done){
+      multiScale = document.getElementById('multiScale');
+      multiSVG = document.getElementById('multiSVG');
+      multiAxis = document.getElementById('multiAxis');
       var d = [{
             "x": 1397102460000,
             "y1": 1,
@@ -419,11 +428,14 @@ function runTests(){
 
 
   suite('px-vis-multi-axis common axis setup works', function() {
-    var multiScaleCommon = document.getElementById('multiScaleCommon'),
-        multiSVGCommon = document.getElementById('multiSVGCommon'),
-        multiAxisCommon = document.getElementById('multiAxisCommon');
+    var multiScaleCommon,
+        multiSVGCommon,
+        multiAxisCommon;
 
     suiteSetup(function(done){
+      multiScaleCommon = document.getElementById('multiScaleCommon');
+      multiSVGCommon = document.getElementById('multiSVGCommon');
+      multiAxisCommon = document.getElementById('multiAxisCommon');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -634,11 +646,14 @@ function runTests(){
 
 
   suite('px-vis-multi-axis no match ticks setup works', function() {
-    var noMatchScale = document.getElementById('noMatchScale'),
-        noMatchSVG = document.getElementById('noMatchSVG'),
-        noMatchAxis = document.getElementById('noMatchAxis');
+    var noMatchScale,
+        noMatchSVG,
+        noMatchAxis;
 
     suiteSetup(function(done){
+      noMatchScale = document.getElementById('noMatchScale');
+      noMatchSVG = document.getElementById('noMatchSVG');
+      noMatchAxis = document.getElementById('noMatchAxis');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -772,11 +787,14 @@ function runTests(){
 
 
   suite('px-vis-multi-axis radial setup works', function() {
-    var radialScale = document.getElementById('radialScale'),
-        radialSVG = document.getElementById('radialSVG'),
-        radialAxis = document.getElementById('radialAxis');
+    var radialScale,
+        radialSVG,
+        radialAxis;
 
     suiteSetup(function(done){
+      radialScale = document.getElementById('radialScale');
+      radialSVG = document.getElementById('radialSVG');
+      radialAxis = document.getElementById('radialAxis');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -967,11 +985,14 @@ function runTests(){
   });
 
   suite('px-vis-multi-axis radial add a dimension', function() {
-    var radialScale = document.getElementById('radialScale'),
-        radialSVG = document.getElementById('radialSVG'),
-        radialAxis = document.getElementById('radialAxis');
+    var radialScale,
+        radialSVG,
+        radialAxis;
 
     suiteSetup(function(done) {
+      radialScale = document.getElementById('radialScale');
+      radialSVG = document.getElementById('radialSVG');
+      radialAxis = document.getElementById('radialAxis');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -1167,11 +1188,14 @@ function runTests(){
   });
 
   suite('px-vis-multi-axis radial delete a dimension', function() {
-    var radialScale = document.getElementById('radialScale'),
-        radialSVG = document.getElementById('radialSVG'),
-        radialAxis = document.getElementById('radialAxis');
+    var radialScale,
+        radialSVG,
+        radialAxis;
 
     suiteSetup(function(done){
+      radialScale = document.getElementById('radialScale');
+      radialSVG = document.getElementById('radialSVG');
+      radialAxis = document.getElementById('radialAxis');
       var d = [{
             "x": 1397102460000,
             "y1": 1,
