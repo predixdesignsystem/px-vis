@@ -289,14 +289,16 @@ function runTests(){
 
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    suiteSetup(function() {      baseScale = document.getElementById('baseScale');
+    suiteSetup(function() {
+      baseScale = document.getElementById('baseScale');
       baseSVG = document.getElementById('baseSVG');
       defaultEvent = document.getElementById('defaultEvent');
-    });test('defaultEvent eventGroup created', function() {
+    });
+test('defaultEvent eventGroup created', function() {
       assert.equal(defaultEvent.eventGroup.node().tagName,'g');
     });
     test('defaultEvent eventGroup has class', function() {
-      assert.equal(defaultEvent.eventGroup.attr('class'),'event');
+      assert.isTrue(defaultEvent.eventGroup.attr('class').indexOf('event') !== -1);
     });
     test('defaultEvent eventGroup set event-id', function() {
       assert.equal(defaultEvent.eventGroup.attr('event-id'),defaultEvent.eventId);
@@ -335,7 +337,7 @@ function runTests(){
       assert.isTrue(defaultEvent.$$('px-tooltip') !== null);
     });
     test('tooltip content is correct', function() {
-      assert.equal(defaultEvent.$$('px-tooltip').$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: DefaultID: 333Timestamp: 20:13:00 +0000 | 10 Apr 2014');
+      assert.equal(defaultEvent.$$('px-tooltip').textContent.replace(/\s\s+/g, ''),'Event: DefaultID: 333Timestamp: 20:13:00 +0000 | 10 Apr 2014');
     });
   }); //suite
 
@@ -346,14 +348,16 @@ function runTests(){
 
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    suiteSetup(function() {      baseScale = document.getElementById('baseScale');
+    suiteSetup(function() {
+      baseScale = document.getElementById('baseScale');
       baseSVG = document.getElementById('baseSVG');
       imgEvent = document.getElementById('imgEvent');
-    });test('imgEvent eventGroup created', function() {
+    });
+test('imgEvent eventGroup created', function() {
       assert.equal(imgEvent.eventGroup.node().tagName,'g');
     });
     test('imgEvent eventGroup has class', function() {
-      assert.equal(imgEvent.eventGroup.attr('class'),'event');
+      assert.isTrue(imgEvent.eventGroup.attr('class').indexOf('event') !== -1);
     });
 
 
@@ -399,7 +403,7 @@ function runTests(){
       assert.isTrue(imgEvent.$$('px-tooltip') !== null);
     });
     test('tooltip content is correct', function() {
-      assert.equal(imgEvent.$$('px-tooltip').$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: imageID: 123Timestamp: 12:07:00 +0000 | 10 Apr 2014');
+      assert.equal(imgEvent.$$('px-tooltip').textContent.replace(/\s\s+/g, ''),'Event: imageID: 123Timestamp: 12:07:00 +0000 | 10 Apr 2014');
     });
   }); //suite
 
@@ -410,14 +414,16 @@ function runTests(){
 
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    suiteSetup(function() {      baseScale = document.getElementById('baseScale');
+    suiteSetup(function() {
+      baseScale = document.getElementById('baseScale');
       baseSVG = document.getElementById('baseSVG');
       noLabelEvent = document.getElementById('noLabelEvent');
-    });test('noLabelEvent eventGroup created', function() {
+    });
+test('noLabelEvent eventGroup created', function() {
       assert.equal(noLabelEvent.eventGroup.node().tagName,'g');
     });
     test('noLabelEvent eventGroup has class', function() {
-      assert.equal(noLabelEvent.eventGroup.attr('class'),'event');
+      assert.isTrue(noLabelEvent.eventGroup.attr('class').indexOf('event') !== -1);
     });
 
     test('noLabelEvent eventIcon transform', function() {
@@ -450,7 +456,7 @@ function runTests(){
       assert.isTrue(noLabelEvent.$$('px-tooltip') !== null);
     });
     test('tooltip content is correct', function() {
-      assert.equal(noLabelEvent.$$('px-tooltip').$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event:ID: 42Timestamp: 06:30:51 +0000 | 10 Apr 2014');
+      assert.equal(noLabelEvent.$$('px-tooltip').textContent.replace(/\s\s+/g, ''),'Event:ID: 42Timestamp: 06:30:51 +0000 | 10 Apr 2014');
     });
   }); //suite
 
@@ -461,14 +467,16 @@ function runTests(){
 
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    suiteSetup(function() {      baseScale = document.getElementById('baseScale');
+    suiteSetup(function() {
+      baseScale = document.getElementById('baseScale');
       baseSVG = document.getElementById('baseSVG');
       offsetEvent = document.getElementById('offsetEvent');
-    });test('offsetEvent eventGroup created', function() {
+    });
+test('offsetEvent eventGroup created', function() {
       assert.equal(offsetEvent.eventGroup.node().tagName,'g');
     });
     test('offsetEvent eventGroup has class', function() {
-      assert.equal(offsetEvent.eventGroup.attr('class'),'event');
+      assert.isTrue(offsetEvent.eventGroup.attr('class').indexOf('event') !== -1);
     });
 
     test('offsetEvent eventIcon created', function() {
@@ -507,7 +515,7 @@ function runTests(){
       assert.isTrue(offsetEvent.$$('px-tooltip') !== null);
     });
     test('tooltip content is correct', function() {
-      assert.equal(offsetEvent.$$('px-tooltip').$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: offsetID: 444Timestamp: 22:46:54 +0000 | 10 Apr 2014');
+      assert.equal(offsetEvent.$$('px-tooltip').textContent.replace(/\s\s+/g, ''),'Event: offsetID: 444Timestamp: 22:46:54 +0000 | 10 Apr 2014');
     });
   }); //suite
 
@@ -519,14 +527,16 @@ function runTests(){
 
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    suiteSetup(function() {      baseScale = document.getElementById('linearScale');
+    suiteSetup(function() {
+      baseScale = document.getElementById('linearScale');
       baseSVG = document.getElementById('baseSVG');
       linearEvent = document.getElementById('linearEvent');
-    });test('linearEvent eventGroup created', function() {
+    });
+test('linearEvent eventGroup created', function() {
       assert.equal(linearEvent.eventGroup.node().tagName,'g');
     });
     test('linearEvent eventGroup has class', function() {
-      assert.equal(linearEvent.eventGroup.attr('class'),'event');
+      assert.isTrue(linearEvent.eventGroup.attr('class').indexOf('event') !== -1);
     });
 
     test('linearEvent eventIcon created', function() {
@@ -557,7 +567,7 @@ function runTests(){
       assert.isTrue(linearEvent.$$('px-tooltip') !== null);
     });
     test('tooltip content is correct', function() {
-      assert.equal(linearEvent.$$('px-tooltip').$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: linearID: 666X: 3');
+      assert.equal(linearEvent.$$('px-tooltip').textContent.replace(/\s\s+/g, ''),'Event: linearID: 666X: 3');
     });
   }); //suite
 
@@ -568,14 +578,16 @@ function runTests(){
 
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    suiteSetup(function() {      baseScale = document.getElementById('ordinalScale');
+    suiteSetup(function() {
+      baseScale = document.getElementById('ordinalScale');
       baseSVG = document.getElementById('baseSVG');
       ordinalEvent = document.getElementById('ordinalEvent');
-    });test('ordinalEvent eventGroup created', function() {
+    });
+test('ordinalEvent eventGroup created', function() {
       assert.equal(ordinalEvent.eventGroup.node().tagName,'g');
     });
     test('ordinalEvent eventGroup has class', function() {
-      assert.equal(ordinalEvent.eventGroup.attr('class'),'event');
+      assert.isTrue(ordinalEvent.eventGroup.attr('class').indexOf('event') !== -1);
     });
 
     test('ordinalEvent eventIcon created', function() {
@@ -606,7 +618,7 @@ function runTests(){
       assert.isTrue(ordinalEvent.$$('px-tooltip') !== null);
     });
     test('tooltip content is correct', function() {
-      assert.equal(ordinalEvent.$$('px-tooltip').$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: ordinalID: 6666X: low');
+      assert.equal(ordinalEvent.$$('px-tooltip').textContent.replace(/\s\s+/g, ''),'Event: ordinalID: 6666X: low');
     });
   }); //suite
 } //runTests
