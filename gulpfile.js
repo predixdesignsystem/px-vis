@@ -111,13 +111,12 @@ gulp.task('blobfish', async () => {
   // Builds our custom d3 bundle
   async function buildD3Bundle(debug) {
     /*
-      note for potential future improvement:
-      could add `external: ['d3-color']` to inputOptions to prevent it from importing,
-      but would also have to remove the d3-scale functions which rely on it...
+      adding `external: ['d3-color']` to inputOptions to prevent it from importing. This potentially could break should something rely on it in the future. In rollupmodules, we are directly importing our scales for this reason. If something breaks, go back to the normal default imports and remove this external option.
     */
     const inputOptions = {
       input: 'rollupmodules.js',
-      plugins: [ resolve()]
+      plugins: [ resolve()],
+      external: ['d3-color']
     };
     let outputOptions = {
       name: "d3",
