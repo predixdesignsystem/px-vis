@@ -1,6 +1,7 @@
 
 =================
 * Fix for multiaxis scale checking if dimensions are empty
+* Fix for cursor to return null instead of empty string
 
 v4.4.6
 =================
