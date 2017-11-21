@@ -114,10 +114,13 @@ function runTests(){
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    suiteSetup(function() {      baseScale = document.getElementById('baseScale');
+    suiteSetup(function() {
+      baseScale = document.getElementById('baseScale');
       baseSVG = document.getElementById('baseSVG');
       baseXAxis = document.getElementById('baseXAxis');
-    });test('baseXAxis ID is random', function() {
+    });
+
+    test('baseXAxis ID is random', function() {
       assert.equal(baseXAxis.axisId.length,15);
       assert.equal(baseXAxis.axisId.split('_')[0],'axis');
     });
@@ -223,10 +226,12 @@ function runTests(){
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    suiteSetup(function() {      baseScale = document.getElementById('baseScale');
+    suiteSetup(function() {
+      baseScale = document.getElementById('baseScale');
       baseSVG = document.getElementById('baseSVG');
       baseYAxis = document.getElementById('baseYAxis');
-    });test('baseYAxis ID is random', function() {
+    });
+test('baseYAxis ID is random', function() {
       assert.equal(baseYAxis.axisId.length,15);
       assert.equal(baseYAxis.axisId.split('_')[0],'axis');
     });
