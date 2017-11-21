@@ -71,7 +71,8 @@
       PxVisBehavior.dynamicConfigProperties,
       PxVisBehaviorD3.serieToRedrawOnTopSVG,
       PxVisBehavior.isAttached,
-      PxVisBehaviorD3.scatterMarkers
+      PxVisBehaviorD3.scatterMarkers,
+      PxVisBehaviorD3.scatterArrow
     ],
 
     /**
@@ -122,6 +123,20 @@
         type: Object
       },
       /**
+       * A holder object for the arrow objects.
+       *
+       */
+      arrowDots:{
+        type:Object
+      },
+      /**
+       * A holder object for the arrow builder.
+       *
+       */
+      arrowBuilder: {
+        type: Object
+      },
+      /**
        * Whether the scatter plot is using radial coordinates (x=phase, y=amplitude).
        */
       radial: {
@@ -141,10 +156,6 @@
       drawDebounceTime: {
         type: Number,
         value: 10
-      },
-      showArrows: {
-        type: Boolean,
-        value: false
       }
     },
 
@@ -339,7 +350,7 @@
         .append('path')
         .attr('class', 'arrow')
       .merge(this.arrowBuilder)
-        .attr('d', Px.d3.symbol().type(this.markerMapping.caret).size(this.markerSize/3))
+        .attr('d', Px.d3.symbol().type(this.markerMapping[this.arrowConfig.symbol]).size(this.arrowConfig.size))
         .attr('transform', this._transformArrow.bind(this))
         .each(function(d,i,paths) {
           if(!this._isValidData(d[this.completeSeriesConfig[this.seriesId]['x']]) ||
@@ -374,7 +385,7 @@
           h = Math.sqrt(dx*dx + dy*dy),
           x,y,angle,angleDeg;
 
-      if(h < 10) {
+      if(h < this.arrowConfig.minLength) {
         return '';
       }
 
@@ -383,7 +394,7 @@
       angle = Math.atan2(dy,dx) + Math.PI / 2;
       angleDeg = angle * 180/Math.PI;
 
-      return 'rotate(' + angleDeg + ' ' + x + ',' + y + ') translate(' + x + ',' + y + ') scale(' + this.markerScale + ')';
+      return 'rotate(' + angleDeg + ' ' + x + ',' + y + ') translate(' + x + ',' + y + ') scale(' + this.arrowConfig.scale + ')';
     }
   });
 </script>

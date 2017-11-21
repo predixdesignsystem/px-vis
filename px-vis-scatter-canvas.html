@@ -77,7 +77,8 @@
       PxVisBehavior.isAttached,
       PxVisBehaviorD3.scatterMarkers,
       PxVisBehavior.rendererType,
-      PxVisBehaviorD3.clipPathBoolean
+      PxVisBehaviorD3.clipPathBoolean,
+      PxVisBehaviorD3.scatterArrow
     ],
 
     /**
@@ -120,10 +121,6 @@
         value:function() {
           return {};
         }
-      },
-      showArrows: {
-        type:Boolean,
-        value: false
       }
     },
 
@@ -163,7 +160,7 @@
 
       //create symbol, retrieve opacity values
       this._currentDrawingOptions.symbol = Px.d3.symbol().type(this.markerMapping[this.markerSymbol]).size(this.markerSize * this.markerScale).context(this.canvasContext);
-      this._currentDrawingOptions.arrow = Px.d3.symbol().type(this.markerMapping.caret).size(this.markerSize * this.markerScale/3).context(this.canvasContext);
+      this._currentDrawingOptions.arrow = Px.d3.symbol().type(this.markerMapping[this.arrowConfig.symbol]).size(this.arrowConfig.size * this.arrowConfig.scale).context(this.canvasContext);
       this._currentDrawingOptions.muted = this.mutedSeries[this.seriesId];
       this._currentDrawingOptions.fillOpacity = this._currentDrawingOptions.muted  ? this.mutedOpacity : this.markerFillOpacity;
       this._currentDrawingOptions.strokeOpacity = this._currentDrawingOptions.muted  ? 0 : this.markerStrokeOpacity;
@@ -265,7 +262,7 @@
           // thank you Mr Pythagoras of Samos
           h = Math.sqrt(tx*tx + ty*ty);
           //only draw if segment length is over x pixels
-          if(h > 10) {
+          if(h > this.arrowConfig.minLength) {
             angle = Math.atan2(ty,tx) + Math.PI / 2;
             angle_2PI = angle < 0 ? angle + 2 * Math.PI : angle;
             this.canvasContext.translate(tx,ty);
