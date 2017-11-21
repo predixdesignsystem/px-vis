@@ -138,8 +138,10 @@ function runTests() {
   suite('px-vis-interaction-space baseIS works', function() {
     var baseIS;
 
-    suiteSetup(function() {      baseIS = document.getElementById('baseIS');
-    });test('baseIS _rect is created', function() {
+    suiteSetup(function() {
+      baseIS = document.getElementById('baseIS');
+    });
+test('baseIS _rect is created', function() {
       assert.isTrue(baseIS._rect !== null);
     });
 
@@ -231,7 +233,7 @@ function runTests() {
       baseIS._rect.node().dispatchEvent(e);
 
       // give event time to process and fire
-      window.setTimeout(function(){ done(); },10);
+      window.setTimeout(function(){ done(); },2500);
     });
 
     test('event fired', function() {
