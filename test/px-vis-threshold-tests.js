@@ -147,7 +147,7 @@ function runTests(){
 
       test('defaultThreshold thresholdGroup created', function() {
         assert.equal(defaultThreshold.thresholdGroup.node().tagName,'g');
-        assert.equal(defaultThreshold.thresholdGroup.attr("class"),'thresholds');
+        assert.isTrue(defaultThreshold.thresholdGroup.attr("class").indexOf('thresholds') !== -1);
       });
 
       test('defaultThreshold thresholdGroup groups are created', function() {
@@ -375,7 +375,7 @@ function runTests(){
 
       test('defaultThreshold thresholdGroup created', function() {
         assert.equal(defaultThreshold.thresholdGroup.node().tagName,'g');
-        assert.equal(defaultThreshold.thresholdGroup.attr("class"),'thresholds');
+        assert.isTrue(defaultThreshold.thresholdGroup.attr("class").indexOf('thresholds') !== -1);
       });
 
       test('defaultThreshold thresholdGroup groups are created', function() {
@@ -603,7 +603,7 @@ function runTests(){
     suite('px-vis-threshold everything drew', function() {
       test('defaultThreshold thresholdGroup created', function() {
         assert.equal(defaultThreshold.thresholdGroup.node().tagName,'g');
-        assert.equal(defaultThreshold.thresholdGroup.attr("class"),'thresholds');
+        assert.isTrue(defaultThreshold.thresholdGroup.attr("class").indexOf('thresholds') !== -1);
       });
 
       test('defaultThreshold thresholdGroup groups are created', function() {
@@ -831,7 +831,7 @@ function runTests(){
     suite('px-vis-threshold everything drew', function() {
       test('defaultThreshold thresholdGroup created', function() {
         assert.equal(defaultThreshold.thresholdGroup.node().tagName,'g');
-        assert.equal(defaultThreshold.thresholdGroup.attr("class"),'thresholds');
+        assert.isTrue(defaultThreshold.thresholdGroup.attr("class").indexOf('thresholds') !== -1);
       });
 
       test('defaultThreshold thresholdGroup groups are created', function() {
@@ -1056,7 +1056,7 @@ function runTests(){
     suite('px-vis-threshold everything drew', function() {
       test('defaultThreshold thresholdGroup created', function() {
         assert.equal(defaultThreshold.thresholdGroup.node().tagName,'g');
-        assert.equal(defaultThreshold.thresholdGroup.attr("class"),'thresholds');
+        assert.isTrue(defaultThreshold.thresholdGroup.attr("class").indexOf('thresholds') !== -1);
       });
 
       test('defaultThreshold thresholdGroup groups are created', function() {
@@ -1247,7 +1247,7 @@ function runTests(){
     suite('px-vis-threshold everything drew', function() {
       test('defaultThreshold thresholdGroup created', function() {
         assert.equal(defaultThreshold.thresholdGroup.node().tagName,'g');
-        assert.equal(defaultThreshold.thresholdGroup.attr("class"),'thresholds');
+        assert.isTrue(defaultThreshold.thresholdGroup.attr("class").indexOf('thresholds') !== -1);
       });
 
       test('defaultThreshold thresholdGroup groups are created', function() {

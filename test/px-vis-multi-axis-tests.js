@@ -649,9 +649,9 @@ function runTests(){
           ticks1 = axis1._axisGroup.selectAll('g.tick').selectAll('text').nodes(),
           ticks2 = axis2._axisGroup.selectAll('g.tick').selectAll('text').nodes();
 
-      assert.equal(ticks0[0].className.baseVal, "");
-      assert.equal(ticks1[0].className.baseVal, "hideCommon");
-      assert.equal(ticks2[0].className.baseVal, "hideCommon");
+      assert.isTrue(ticks0[0].className.baseVal.indexOf('hideCommon') === -1);
+      assert.isTrue(ticks1[0].className.baseVal.indexOf('hideCommon') !== -1);
+      assert.isTrue(ticks2[0].className.baseVal.indexOf('hideCommon') !== -1);
 
     });
 

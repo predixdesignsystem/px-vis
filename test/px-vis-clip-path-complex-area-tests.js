@@ -16,80 +16,83 @@ function runTests(){
         baseClip;
     var eventObj;
 
-    suiteSetup(function(done){
-      baseScale = document.getElementById('baseScale');
-      baseSVG = document.getElementById('baseSVG');
-      baseLine = document.getElementById('baseLine');
-      baseClip = document.getElementById('baseClip');
-      var d = [{
-            "x": 1397102460000,
-            "y": 1,
-            "y1": 1,
-            "y2": 1
-          },{
-            "x": 1397131620000,
-            "y": 6,
-            "y1": 15,
-            "y2": 21
-          },{
-            "x": 1397160780000,
-            "y": 10,
-            "y1": 8,
-            "y2": 3
-          },{
-            "x": 1397189940000,
-            "y": 4,
-            "y1": 10,
-            "y2": 10
-          },{
-            "x": 1397219100000,
-            "y": 6,
-            "y1": 20,
-            "y2": 27
-          }
-        ],
-        completeSeriesConfig = {
-          "x":{
-            "type":"line",
-            "name":"mySeries",
-            "x":['y','y1','y2'],
-            "y":['y','y1','y2'],
-            "color": "rgb(93,165,218)"
-          }
-        },
-        dim = ['y','y1','y2'],
-        w = 500,
-        h = 500,
-        min = 480/2,
-        offset = [250,250],
-        m = {
-          "top": 10,
-          "right": 10,
-          "bottom": 10,
-          "left": 10
-        };
+    suiteSetup(function(done) {
+      flush(function() {
 
-      baseSVG.set('width',w);
-      baseSVG.set('height',h);
-      baseSVG.set('margin',m);
-      baseSVG.set('offset',offset);
+        baseScale = document.getElementById('baseScale');
+        baseSVG = document.getElementById('baseSVG');
+        baseLine = document.getElementById('baseLine');
+        baseClip = document.getElementById('baseClip');
+        var d = [{
+              "x": 1397102460000,
+              "y": 1,
+              "y1": 1,
+              "y2": 1
+            },{
+              "x": 1397131620000,
+              "y": 6,
+              "y1": 15,
+              "y2": 21
+            },{
+              "x": 1397160780000,
+              "y": 10,
+              "y1": 8,
+              "y2": 3
+            },{
+              "x": 1397189940000,
+              "y": 4,
+              "y1": 10,
+              "y2": 10
+            },{
+              "x": 1397219100000,
+              "y": 6,
+              "y1": 20,
+              "y2": 27
+            }
+          ],
+          completeSeriesConfig = {
+            "x":{
+              "type":"line",
+              "name":"mySeries",
+              "x":['y','y1','y2'],
+              "y":['y','y1','y2'],
+              "color": "rgb(93,165,218)"
+            }
+          },
+          dim = ['y','y1','y2'],
+          w = 500,
+          h = 500,
+          min = 480/2,
+          offset = [250,250],
+          m = {
+            "top": 10,
+            "right": 10,
+            "bottom": 10,
+            "left": 10
+          };
 
-      baseScale.set('_radius',min);
-      baseScale.set('centerOffset',50);
-      baseScale.set('margin',m);
-      baseScale.set('chartData',d);
-      baseScale.set('dimensions', dim)
+        baseSVG.set('width',w);
+        baseSVG.set('height',h);
+        baseSVG.set('margin',m);
+        baseSVG.set('offset',offset);
 
-      baseLine.set('completeSeriesConfig',completeSeriesConfig);
-      baseLine.set('seriesId',"x");
-      baseLine.set('chartData',d);
+        baseScale.set('_radius',min);
+        baseScale.set('centerOffset',50);
+        baseScale.set('margin',m);
+        baseScale.set('chartData',d);
+        baseScale.set('dimensions', dim)
 
-      baseClip.set('dimensions',dim);
-      baseClip.set('chartData',d);
+        baseLine.set('completeSeriesConfig',completeSeriesConfig);
+        baseLine.set('seriesId',"x");
+        baseLine.set('chartData',d);
 
-      // window.setTimeout(function(){done()},500);
+        baseClip.set('dimensions',dim);
+        baseClip.set('chartData',d);
 
-      done();
+        // window.setTimeout(function(){done()},500);
+
+        done();
+      });
     });
 
     test('baseClip fixture is created', function() {

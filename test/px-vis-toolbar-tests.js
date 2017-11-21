@@ -111,10 +111,12 @@ function runTests() {
       };
 
       toolbar.addEventListener('px-vis-toolbar-secondary-toggled', rendered);
+
       mainItems[3].click();
     });
 
     test('toolbar main item got selected class', function() {
+
       assert.isFalse(mainItems[0].classList.contains('selected'));
       assert.isFalse(mainItems[1].classList.contains('selected'));
       assert.isFalse(mainItems[2].classList.contains('selected'));
@@ -181,7 +183,7 @@ function runTests() {
 
     suiteSetup(function(done) {
       toolbar = document.getElementById('toolbar');
-      template = document.getElementById('template');
+      template = Polymer.Element ? document.getElementById('template2') : document.getElementById('template');
       mainItems = toolbar.$.mainRow.querySelectorAll('span.main-item');
       subItems = toolbar.$$('#subRow').querySelectorAll('span.main-item');
 
@@ -281,10 +283,11 @@ function runTests() {
     });
 
     test('toolbar sub items got correct icons', function() {
+
       assert.equal(subItems[0].querySelector('px-icon').icon, toolbar.currentSubConfig[0].icon);
       assert.equal(subItems[1].querySelector('px-icon').icon, toolbar.currentSubConfig[1].icon);
-      assert.equal(subItems[2].querySelector('px-icon').icon, toolbar.currentSubConfig[2].icon);
-      assert.equal(subItems[3].querySelector('px-icon').icon, toolbar.currentSubConfig[3].icon);
+      assert.equal(subItems[2].querySelector('px-icon').style['display'], 'none');
+      assert.equal(subItems[3].querySelector('px-icon').style['display'], 'none');
     });
 
     test('toolbar sub items are not selected', function() {

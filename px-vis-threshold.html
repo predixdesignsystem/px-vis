@@ -63,7 +63,8 @@ Custom property | Description
       PxVisBehavior.thresholds,
       PxVisBehaviorD3.domainUpdate,
       PxVisBehaviorD3.clipPath,
-      PxVisBehavior.measureText
+      PxVisBehavior.measureText,
+      PxVisBehavior.updateStylesOverride
     ],
 
     /**
@@ -154,13 +155,14 @@ Custom property | Description
     observers: [
 
       'drawElement(svg, y, domainChanged, completeSeriesConfig.*, thresholdData.*, width, margin.*, _animationFrameDone, language)',
-      '_updateColors()'
+      '_updateColors()',
+      '_calcThemeOrConfig(_stylesUpdated)'
      ],
 
     ready:function() {
       this._createMeasurementCanvas();
 
-      window.requestAnimationFrame(this._calcThemeOrConfig.bind(this));
+      window.requestAnimationFrame(function() {this.updateStyles();}.bind(this));
 
       // if there is no dev set unique ID, generate one
       if(!this.thresholdId){

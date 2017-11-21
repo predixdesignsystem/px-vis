@@ -2726,6 +2726,22 @@ PxVisBehavior.highlightShared = [{
 }, PxVisBehavior.interactionSpaceShared];
 
 /*
+    PxVisBehavior.canvasLayersConfig
+
+    Description:
+    Behavior providing the canvasLayersConfig property
+    @polymerBehavior PxVisBehavior.canvasLayersConfig
+*/
+PxVisBehavior.canvasLayersConfig = {
+  properties: {
+    canvasLayersConfig: {
+      type: Object,
+      value: function() { return {}; }
+    }
+  }
+};
+
+/*
     PxVisBehavior.highlightCanvasShared
 
     Description:
@@ -2735,7 +2751,7 @@ PxVisBehavior.highlightShared = [{
 PxVisBehavior.highlightCanvasShared = [{
 
   observers: [
-    '_requestCanvasCreation(_highlightData)',
+    '_requestCanvasCreation(_highlightData, canvasLayersConfig)',
     '_muteDataSeries(_highlightData, layersToMask)',
     '_addTransition(layersToMask)'
   ],
@@ -2782,7 +2798,7 @@ PxVisBehavior.highlightCanvasShared = [{
     }
   }
 
-}, PxVisBehavior.observerCheck, PxVisBehavior.highlightShared];
+}, PxVisBehavior.observerCheck, PxVisBehavior.highlightShared, PxVisBehavior.canvasLayersConfig];
 
 
 /*
@@ -3319,5 +3335,29 @@ PxVisBehavior.annotationData = {
     }
   }
 };
+
+/**
+    Name:
+    PxVisBehavior.titleTruncation
+
+    Description:
+    Polymer behavior that providse the titleTruncation property.
+
+
+    @polymerBehavior PxVisBehavior.titleTruncation
+*/
+PxVisBehavior.titleTruncation = {
+  properties: {
+    /**
+    * A boolean specifying if the axis title should truncate when too long
+    *
+    */
+    titleTruncation: {
+      type: Boolean,
+      value: false
+    },
+  }
+};
+
 
 </script>

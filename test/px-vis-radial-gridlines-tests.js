@@ -54,7 +54,7 @@ function runTests(){
           "left": 10
         },
         tickValues = [3,6,9];
-
+debugger
       baseSVG.set('width',w);
       baseSVG.set('height',h);
       baseSVG.set('offset',offset);
