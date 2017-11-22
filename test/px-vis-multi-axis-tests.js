@@ -1106,7 +1106,7 @@ function runTests(){
       radialAxis.set('chartData',d);
 
       window.setTimeout(function(){
-        done()}, 300);
+        done()}, 500);
      // done();
     });
 
