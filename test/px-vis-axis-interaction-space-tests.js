@@ -20,9 +20,7 @@ function rgbToHex(rgb) {
     }
     return hex;
 }
-suiteSetup(function(done) {
-  window.setTimeout(function() {done();}, 1000);
-});
+
 function runTests(){
   suite('px-vis-axis-interaction-space does Polymer exist?', function() {
     suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
@@ -207,7 +205,19 @@ function runTests(){
         brush2.set('svg', multiSVG.svg.select('g.dimension1'));
         brush3.set('svg', multiSVG.svg.select('g.dimension2'));
 
-      window.setTimeout(function(){done()}, 1000);
+        async.until(
+          ()=> {
+            return !!brush1._brushD3;
+          },
+          (callback)=> {
+            setTimeout(callback, 50);
+          },
+          ()=> {
+
+            done();
+          }
+        );
+
     });
 
     test('brush fixture is created', function() {
@@ -402,7 +412,18 @@ function runTests(){
       brush2 = document.getElementById('brush2');
       brush3 = document.getElementById('brush3');
       multiScale.set('chartExtents', ext);
-      window.setTimeout(function() { done() }, 500);
+
+      async.until(
+        ()=> {
+          return Px.d3.brushSelection(brush1._brushElem)[0] > 340 && Px.d3.brushSelection(brush1._brushElem)[0] < 344;
+        },
+        (callback)=> {
+          setTimeout(callback, 1000);
+        },
+        ()=> {
+          done();
+        }
+      );
     });
 
     test('brush1._brush extents match', function() {
@@ -454,7 +475,17 @@ function runTests(){
       brush3 = document.getElementById('brush3');
       multiScale.set('chartExtents',ext);
 
-      window.setTimeout(function(){ done() }, 100);
+      async.until(
+        ()=> {
+          return Px.d3.brushSelection(brush1._brushElem) === null;
+        },
+        (callback)=> {
+          setTimeout(callback, 1000);
+        },
+        ()=> {
+          done();
+        }
+      );
 
     });
 
@@ -498,7 +529,17 @@ function runTests(){
       brush2.deleteAndClearBrush();
       brush3.deleteAndClearBrush();
 
-      window.setTimeout(function(){ done() }, 1000);
+      async.until(
+        ()=> {
+          return Px.d3.brushSelection(brush1._brushElem) === null;
+        },
+        (callback)=> {
+          setTimeout(callback, 1000);
+        },
+        ()=> {
+          done();
+        }
+      )
     });
 
     test('brush1._brush brush deleted', function() {
@@ -788,7 +829,17 @@ function runTests(){
       radialBrush3 = document.getElementById('radialBrush3');
       radialScale.set('chartExtents',ext);
 
-      window.setTimeout(function(){done()},100);
+      async.until(
+        ()=> {
+          return Px.d3.brushSelection(radialBrush2._brushElem)[0] > 70 && Px.d3.brushSelection(radialBrush2._brushElem)[0] < 74;
+        },
+        (callback)=> {
+          setTimeout(callback, 1000);
+        },
+        ()=> {
+          done();
+        }
+      );
     });
 
     test('radialBrush1._brush extents match', function() {
@@ -840,7 +891,17 @@ function runTests(){
       radialBrush3 = document.getElementById('radialBrush3');
       radialScale.set('chartExtents',ext);
 
-      window.setTimeout(function(){ done() }, 100);
+      async.until(
+        ()=> {
+          return Px.d3.brushSelection(radialBrush1._brushElem) === null;
+        },
+        (callback)=> {
+          setTimeout(callback, 1000);
+        },
+        ()=> {
+          done();
+        }
+      );
 
     });
 
@@ -884,7 +945,17 @@ function runTests(){
       radialBrush2.deleteAndClearBrush();
       radialBrush3.deleteAndClearBrush();
 
-      window.setTimeout(function(){ done() }, 100);
+      async.until(
+        ()=> {
+          return Px.d3.brushSelection(radialBrush1._brushElem) === null;
+        },
+        (callback)=> {
+          setTimeout(callback, 1000);
+        },
+        ()=> {
+          done();
+        }
+      );
     });
 
     test('radialBrush1._brush brush deleted', function() {
