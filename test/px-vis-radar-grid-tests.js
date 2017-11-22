@@ -66,7 +66,7 @@ function runTests(){
             return baseSVG && baseScale && baseGrid;
           },
           (callback)=> {
-            setTimeout(callback, 100);
+            setTimeout(callback, 50);
           },
           ()=> {
 
@@ -82,7 +82,10 @@ function runTests(){
 
             baseGrid.set('margin',m);
             baseGrid.set('tickValues',tickValues);
-            done();
+
+            window.setTimeout(function() {
+              done();
+            }, 500);
           }
         );
     });
@@ -98,7 +101,7 @@ function runTests(){
     });
 
     test('grid created _gridData', function() {
-      assert.isTrue(baseGrid._gridData !== null);
+      assert.isTrue(baseGrid._gridData != null);
       assert.equal(baseGrid._gridData[0]["y"], 0);
       assert.equal(baseGrid._gridData[6]["y"], 30);
       assert.equal(baseGrid._gridData[7]["y"], 32);

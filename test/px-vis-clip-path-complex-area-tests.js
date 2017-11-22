@@ -71,27 +71,40 @@ function runTests(){
             "left": 10
           };
 
-        baseSVG.set('width',w);
-        baseSVG.set('height',h);
-        baseSVG.set('margin',m);
-        baseSVG.set('offset',offset);
+          async.until(
+            ()=> {
+              baseScale = document.getElementById('baseScale');
+              baseSVG = document.getElementById('baseSVG');
+              baseLine = document.getElementById('baseLine');
+              baseClip = document.getElementById('baseClip');
+              return baseSVG && baseScale && baseLine && baseClip;
+            },
+            (callback)=> {
+              setTimeout(callback, 50);
+            },
+            ()=> {
 
-        baseScale.set('_radius',min);
-        baseScale.set('centerOffset',50);
-        baseScale.set('margin',m);
-        baseScale.set('chartData',d);
-        baseScale.set('dimensions', dim)
+              baseSVG.set('width',w);
+              baseSVG.set('height',h);
+              baseSVG.set('margin',m);
+              baseSVG.set('offset',offset);
 
-        baseLine.set('completeSeriesConfig',completeSeriesConfig);
-        baseLine.set('seriesId',"x");
-        baseLine.set('chartData',d);
+              baseScale.set('_radius',min);
+              baseScale.set('centerOffset',50);
+              baseScale.set('margin',m);
+              baseScale.set('chartData',d);
+              baseScale.set('dimensions', dim)
 
-        baseClip.set('dimensions',dim);
-        baseClip.set('chartData',d);
+              baseLine.set('completeSeriesConfig',completeSeriesConfig);
+              baseLine.set('seriesId',"x");
+              baseLine.set('chartData',d);
 
-        // window.setTimeout(function(){done()},500);
+              baseClip.set('dimensions',dim);
+              baseClip.set('chartData',d);
 
-        done();
+              done();
+            }
+          );
       });
     });
 
