@@ -87,8 +87,10 @@ function runTests() {
   suite('px-vis-register emptyRegister has default config', function() {
     var emptyRegister;
 
-    suiteSetup(function() {      emptyRegister = document.getElementById('emptyRegister');
-    });test('emptyRegister fixture is created', function() {
+    suiteSetup(function() {
+      emptyRegister = document.getElementById('emptyRegister');
+    });
+test('emptyRegister fixture is created', function() {
       assert.isTrue(emptyRegister !== null);
     });
 
@@ -248,10 +250,20 @@ function runTests() {
     });
 
     test('numberFormatCulture formated', function() {
-      var value = getRegisterSingleValues(numberFormatCulture);
 
-      assert.equal(value.value,'1.015,20');
-      assert.equal(value.unit,'yUnit');
+      var value;
+      async.until(
+        ()=> {
+          value = getRegisterSingleValues(numberFormatCulture);
+          return value.value === '1.015,20' && value.unit === 'yUnit';
+        },
+        (callback)=> {
+          setTimeout(callback, 1000);
+        },
+        ()=> {
+          assert.isTrue(true);
+        }
+      )
     });
   });
 

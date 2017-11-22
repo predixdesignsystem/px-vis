@@ -54,21 +54,37 @@ function runTests(){
           "left": 10
         },
         tickValues = [3,6,9];
-debugger
-      baseSVG.set('width',w);
-      baseSVG.set('height',h);
-      baseSVG.set('offset',offset);
-      baseSVG.set('margin',m);
 
-      baseScale.set('_radius',min);
-      baseScale.set('_amplitudeKey',['y']);
-      baseScale.set('completeSeriesConfig',completeSeriesConfig);
-      baseScale.set('chartData',d);
-      baseScale.set('_calculatedExtents',chartExtents);
+      async.until(
+        ()=> {
+          baseScale = document.getElementById('baseScale');
+          baseSVG = document.getElementById('baseSVG');
+          radialGrid = document.getElementById('radialGrid');
+          return !!baseSVG;
+        },
+        (callback)=> {
+          setTimeout(callback, 100);
+        },
+        ()=> {
 
-      radialGrid.set('margin',m);
+          baseSVG.set('width',w);
+          baseSVG.set('height',h);
+          baseSVG.set('offset',offset);
+          baseSVG.set('margin',m);
 
-      window.setTimeout(function(){ done() },100);
+          baseScale.set('_radius',min);
+          baseScale.set('_amplitudeKey',['y']);
+          baseScale.set('completeSeriesConfig',completeSeriesConfig);
+          baseScale.set('chartData',d);
+          baseScale.set('_calculatedExtents',chartExtents);
+
+          radialGrid.set('margin',m);
+
+          window.setTimeout(function() {
+            done();
+          }, 500);
+        }
+      )
     });
 
     test('radialGrid fixture is created', function() {
@@ -140,14 +156,42 @@ debugger
         radialGrid;
 
     suiteSetup(function(done){
-      baseScale = document.getElementById('baseScale');
-      baseSVG = document.getElementById('baseSVG');
-      radialGrid = document.getElementById('radialGrid');
+      baseScale = document.getElementById('baseScale2');
+      baseSVG = document.getElementById('baseSVG2');
+      radialGrid = document.getElementById('radialGrid2');
       var tickValues = [3,6,9];
 
-      radialGrid.set('tickValues',tickValues);
+      async.until(
+        ()=> {
+          flush(function(){});
+          baseScale = document.getElementById('baseScale2');
+          baseSVG = document.getElementById('baseSVG2');
+          radialGrid = document.getElementById('radialGrid2');
+          return !!baseSVG;
+        },
+        (callback)=> {
+          setTimeout(callback, 100);
+        },
+        ()=> {
 
-      window.setTimeout(function(){ done() },100);
+          baseSVG.set('width',w);
+          baseSVG.set('height',h);
+          baseSVG.set('offset',offset);
+          baseSVG.set('margin',m);
+
+          baseScale.set('_radius',min);
+          baseScale.set('_amplitudeKey',['y']);
+          baseScale.set('completeSeriesConfig',completeSeriesConfig);
+          baseScale.set('chartData',d);
+          baseScale.set('_calculatedExtents',chartExtents);
+
+          radialGrid.set('margin',m);
+          radialGrid.set('tickValues',tickValues);
+          window.setTimeout(function() {
+            done();
+          }, 500);
+        }
+      );
     });
 
     test('radialGrid fixture is created', function() {

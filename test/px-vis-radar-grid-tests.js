@@ -58,20 +58,33 @@ function runTests(){
         min = 280/2,
         tickValues = [0,5,10,15,20,25,30];
 
+        async.until(
+          ()=> {
+            baseScale = document.getElementById('baseScale');
+            baseSVG = document.getElementById('baseSVG');
+            baseGrid = document.getElementById('baseGrid');
+            return baseSVG && baseScale && baseGrid;
+          },
+          (callback)=> {
+            setTimeout(callback, 100);
+          },
+          ()=> {
 
-      baseSVG.set('width',w);
-      baseSVG.set('height',h);
-      baseSVG.set('margin',m);
+            baseSVG.set('width',w);
+            baseSVG.set('height',h);
+            baseSVG.set('margin',m);
 
-      baseScale.set('_radius',min);
-      baseScale.set('centerOffset',50);
-      baseScale.set('margin',m);
-      baseScale.set('chartData',d);
-      baseScale.set('dimensions', ["y","y1","y2"])
+            baseScale.set('_radius',min);
+            baseScale.set('centerOffset',50);
+            baseScale.set('margin',m);
+            baseScale.set('chartData',d);
+            baseScale.set('dimensions', ["y","y1","y2"])
 
-      baseGrid.set('margin',m);
-      baseGrid.set('tickValues',tickValues);
-      window.setTimeout(function(){ done() },500);
+            baseGrid.set('margin',m);
+            baseGrid.set('tickValues',tickValues);
+            done();
+          }
+        );
     });
 
     test('baseGrid fixture is created', function() {

@@ -15,15 +15,15 @@
     <link rel="import" href="../px-vis-svg.html" />
     <link rel="import" href="../px-vis-radial-gridlines.html" />
     <link rel="import" href="behaviors/px-colors-behavior.html" />
-    <link rel="import" href="../../polymer/lib/elements/dom-bind.html" />
+    <!-- <link rel="import" href="../../polymer/lib/elements/dom-bind.html" /> -->
 
     <!-- Retain this link for px-theme.html -->
     <!-- px-theme is needed for WCT to run without errors -->
     <link rel="import" href="../../px-theme/px-theme-styles.html">
 
     <custom-style>
-    <style include="px-theme-styles" is="custom-style"></style>
-  </custom-style>
+      <style include="px-theme-styles" is="custom-style"></style>
+    </custom-style>
 
     <script src="px-vis-radial-gridlines-tests.js"></script>
   </head>
@@ -57,6 +57,26 @@
       </px-vis-svg>
       <px-vis-radial-gridlines
           id="radialGrid"
+          svg="[[svg]]"
+          axis="[[y]]"
+          domain-changed="[[domainChanged]]">
+      </px-vis-radial-gridlines>
+    </template>
+    </dom-bind>
+
+    <dom-bind>
+    <template is="dom-bind">
+      <px-vis-radial-scale
+        id="baseScale2"
+        y="{{y}}"
+        domain-changed="{{domainChanged}}">
+      </px-vis-radial-scale>
+      <px-vis-svg
+        id="baseSVG2"
+        svg="{{svg}}">
+      </px-vis-svg>
+      <px-vis-radial-gridlines
+          id="radialGrid2"
           svg="[[svg]]"
           axis="[[y]]"
           domain-changed="[[domainChanged]]">
