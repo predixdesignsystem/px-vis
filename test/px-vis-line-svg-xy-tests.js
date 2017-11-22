@@ -1,5 +1,6 @@
 function runXYTests(){
   suite('px-vis-line-svg does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });

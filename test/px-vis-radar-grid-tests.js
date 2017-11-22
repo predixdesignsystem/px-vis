@@ -4,6 +4,7 @@ document.addEventListener("WebComponentsReady", function() {
 
 function runTests(){
   suite('px-vis-gridlines does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });

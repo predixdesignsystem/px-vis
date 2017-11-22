@@ -4,6 +4,7 @@ document.addEventListener("WebComponentsReady", function() {
 
 function runTests(){
   suite('px-vis-sclae does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
@@ -12,8 +13,10 @@ function runTests(){
   suite('px-vis-scale scale with no properties does nothing', function() {
     var emptyAxisType;
 
-    suiteSetup(function() {      emptyAxisType = document.getElementById('empty');
-    });test('emptyAxisType fixture is created', function() {
+    suiteSetup(function() {
+      emptyAxisType = document.getElementById('empty');
+    });
+test('emptyAxisType fixture is created', function() {
       assert.isTrue(emptyAxisType !== null);
     });
 
@@ -35,8 +38,10 @@ function runTests(){
   suite('px-vis-scale missing height property does not create create y', function() {
     var missingHeight;
 
-    suiteSetup(function() {      missingHeight = document.getElementById('missingHeight');
-    });test('missingHeight fixture is created', function() {
+    suiteSetup(function() {
+      missingHeight = document.getElementById('missingHeight');
+    });
+test('missingHeight fixture is created', function() {
       assert.isTrue(missingHeight !== null);
     });
 
@@ -52,8 +57,10 @@ function runTests(){
   suite('px-vis-scale missing chartData property does not set domains', function() {
     var missingData;
 
-    suiteSetup(function() {      missingData = document.getElementById('missingData');
-    });test('missingData fixture is created', function() {
+    suiteSetup(function() {
+      missingData = document.getElementById('missingData');
+    });
+test('missingData fixture is created', function() {
       assert.isTrue(missingData !== null);
     });
 

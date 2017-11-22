@@ -4,6 +4,7 @@ document.addEventListener("WebComponentsReady", function() {
 
 function runTests(){
   suite('px-vis-svg does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isDefined(Polymer);
     });
@@ -12,8 +13,10 @@ function runTests(){
   suite('px-vis-svg svg with no properties does nothing', function() {
     var emptySVG;
 
-    suiteSetup(function() {      emptySVG = document.getElementById('empty');
-    });test('emptySVG fixture is created', function() {
+    suiteSetup(function() {
+      emptySVG = document.getElementById('empty');
+    });
+test('emptySVG fixture is created', function() {
       assert.isDefined(emptySVG);
     });
 
@@ -30,8 +33,10 @@ function runTests(){
   suite('px-vis-svg missing one property does nothing', function() {
     var missingHeight;
 
-    suiteSetup(function() {      missingHeight = document.getElementById('missingHeight');
-    });test('missingHeight fixture is created', function() {
+    suiteSetup(function() {
+      missingHeight = document.getElementById('missingHeight');
+    });
+test('missingHeight fixture is created', function() {
       assert.isDefined(missingHeight);
     });
 
@@ -48,8 +53,10 @@ function runTests(){
     var decSVG;
     var chartSVG = decSVG.querySelector('#chartSVG');
 
-    suiteSetup(function() {      decSVG = document.getElementById('decSVG');
-    });test('decSVG fixture is created', function() {
+    suiteSetup(function() {
+      decSVG = document.getElementById('decSVG');
+    });
+test('decSVG fixture is created', function() {
       assert.isDefined(decSVG);
     });
 
@@ -155,8 +162,10 @@ function runTests(){
     var offsetSVG;
     var chartSVG = offsetSVG.querySelector('#chartSVG');
 
-    suiteSetup(function() {      offsetSVG = document.getElementById('offsetSVG');
-    });test('offsetSVG fixture is created', function() {
+    suiteSetup(function() {
+      offsetSVG = document.getElementById('offsetSVG');
+    });
+test('offsetSVG fixture is created', function() {
       assert.isDefined(offsetSVG);
     });
 

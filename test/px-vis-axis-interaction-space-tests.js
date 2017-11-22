@@ -20,9 +20,12 @@ function rgbToHex(rgb) {
     }
     return hex;
 }
-
+suiteSetup(function(done) {
+  window.setTimeout(function() {done();}, 1000);
+});
 function runTests(){
   suite('px-vis-axis-interaction-space does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });

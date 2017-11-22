@@ -4,6 +4,7 @@ document.addEventListener("WebComponentsReady", function() {
 
 function runTests(){
   suite('px-vis-canvas does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isDefined(Polymer);
     });
@@ -12,8 +13,10 @@ function runTests(){
   suite('px-vis-canvas canvas with no properties does nothing', function() {
     var emptyCanvas;
 
-    suiteSetup(function() {      emptyCanvas = document.getElementById('empty');
-    });test('emptyCanvas fixture is created', function() {
+    suiteSetup(function() {
+      emptyCanvas = document.getElementById('empty');
+    });
+test('emptyCanvas fixture is created', function() {
       assert.isDefined(emptyCanvas);
     });
 
@@ -30,8 +33,10 @@ function runTests(){
   suite('px-vis-canvas missing one property does nothing', function() {
     var missingHeight;
 
-    suiteSetup(function() {      missingHeight = document.getElementById('missingHeight');
-    });test('missingHeight fixture is created', function() {
+    suiteSetup(function() {
+      missingHeight = document.getElementById('missingHeight');
+    });
+test('missingHeight fixture is created', function() {
       assert.isDefined(missingHeight);
     });
 
@@ -49,8 +54,10 @@ function runTests(){
     var decCanvas;
     var chartCanvas = Polymer.dom(decCanvas.root).querySelector('#chartCanvas');
 
-    suiteSetup(function() {      decCanvas = document.getElementById('decCanvas');
-    });test('decCanvas fixture is created', function() {
+    suiteSetup(function() {
+      decCanvas = document.getElementById('decCanvas');
+    });
+test('decCanvas fixture is created', function() {
       assert.isDefined(decCanvas);
     });
 
@@ -152,8 +159,10 @@ function runTests(){
     var offsetCanvas;
     var chartCanvas = Polymer.dom(decCanvas.root).querySelector('#chartCanvas');
 
-    suiteSetup(function() {      offsetCanvas = document.getElementById('offsetCanvas');
-    });test('offsetCanvas fixture is created', function() {
+    suiteSetup(function() {
+      offsetCanvas = document.getElementById('offsetCanvas');
+    });
+test('offsetCanvas fixture is created', function() {
       assert.isDefined(offsetCanvas);
     });
 

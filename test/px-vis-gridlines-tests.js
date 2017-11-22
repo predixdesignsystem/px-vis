@@ -23,6 +23,7 @@ function rgbToHex(rgb) {
 
 function runTests(){
   suite('px-vis-gridlines does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
@@ -106,10 +107,12 @@ function runTests(){
 
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    suiteSetup(function() {      baseScale = document.getElementById('baseScale');
+    suiteSetup(function() {
+      baseScale = document.getElementById('baseScale');
       baseSVG = document.getElementById('baseSVG');
       baseXGrid = document.getElementById('baseXGrid');
-    });test('baseXGrid ID is random', function() {
+    });
+test('baseXGrid ID is random', function() {
       assert.equal(baseXGrid.gridId.length,15);
       assert.equal(baseXGrid.gridId.split('_')[0],'grid');
     });
@@ -185,10 +188,12 @@ function runTests(){
 
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    suiteSetup(function() {      baseScale = document.getElementById('baseScale');
+    suiteSetup(function() {
+      baseScale = document.getElementById('baseScale');
       baseSVG = document.getElementById('baseSVG');
       baseYGrid = document.getElementById('baseYGrid');
-    });test('baseYGrid ID is random', function() {
+    });
+test('baseYGrid ID is random', function() {
       assert.equal(baseYGrid.gridId.length,15);
       assert.equal(baseYGrid.gridId.split('_')[0],'grid');
     });
