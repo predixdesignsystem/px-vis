@@ -262,7 +262,12 @@ PxVisBehaviorChart.chartCommon = [{
         // delete the 'x' key from our all y keys obj
 
         //figure out what x is, either a config value (assuming all x are the same) or the default
-        x = (k.length > 0) ? fullConfig[k[0]]['x'] : this._defaultSeriesConfig['x'];
+        if(this.includeAllSeries) {
+          x = this.defaultSeriesConfig['x'] ? this.defaultSeriesConfig['x'] : this._defaultSeriesConfig['x'];
+        } else {
+          x = (k.length > 0) ? fullConfig[k[0]]['x'] : this._defaultSeriesConfig['x'];
+        }
+
         delete objYs [x];
 
         // create a new set of whatever Ys are left so we can iterate over it
