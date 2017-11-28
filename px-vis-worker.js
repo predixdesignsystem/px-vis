@@ -122,7 +122,8 @@ function createDataStub() {
     "series" : [],
     "rawData" : [],
     "timeStamps" : [],
-    "timeStampsTracker" : {}
+    "timeStampsTracker" : {},
+    "additionalPoints" : []
   }
 }
 
@@ -141,8 +142,12 @@ function createDataStub() {
  * @method flattenData
  */
 function flattenData(visData, d, xScale, yScale, index, arr) {
-
   for(var i = 0; i < visData.keys.length; i++) {
+
+    if(visData.hardMute && visData.mutedSeries[visData.keys[i]]) {
+      continue;
+    }
+
     var o = {},
         k = visData.keys[i],
         axis = visData.completeSeriesConfig[k]['axis'] ? visData.completeSeriesConfig[k]['axis']['id'] : "default";
@@ -275,13 +280,14 @@ function createSingleQuadtree(data) {
       // To add all datapoints to our quadtree, we need to break each dataset up.
       // Iterate though all data, flatten our datasets, and add them to the quadtree
       // var before = this.performance.now(),
-        var  during, allFlat = [];
+      var allFlat = [];
       for(var i = 0; i < chartData.length; i++) {
 
        flattenData(visData, chartData[i], xScale, yScale, i, allFlat);
       }
 
       quadtree.addAll(allFlat);
+
 
       return quadtree;
     } else {
@@ -313,6 +319,10 @@ function createSeriesQuadtree(data) {
   // FIXME Make work for POLAR
     for(var i = 0; i < visData.keys.length; i++) {
       k = visData.keys[i];
+
+      if(visData.hardMute && visData.mutedSeries[k]) {
+        continue;
+      }
 
       //create an object and bind it to the x and y accessors so that the scales
       //won't be overriden by the next iteration of the loop
@@ -465,10 +475,10 @@ function addCrosshairDataQuadtree(dataObj, d, timeData) {
 }
 
 function constructDataObj(result, dataObj, k, visData, isSingle, xScale) {
-  // Still add name to the register if:
-  // we got no result at all
-  // if this key is muted
-  // if point searchFor and this is not the found key
+  // Only add name to the register if:
+  //  * we got no result at all
+  //  * if this key is muted with hard mute on
+  //  * if point searchFor mode and this is not the found key
   if(!result || (visData.hardMute && visData.mutedSeries[k]) ||
       (visData.searchFor === 'point' && result.k !== k)) {
     dataObj.series.push(emptySeries(k));
@@ -641,32 +651,90 @@ function searchAreaQuadtree(quadtree, visData, dataObj) {
     searchAreaBoxQuadtree(quadtree, visData, dataObj);
 }
 
-function searchQuadtreeSingle(visData, dataObj, quadtreeData) {
-  var r = visData.radius ? visData.radius : Infinity,
-      result = quadtreeData.find(visData.mousePos[0], visData.mousePos[1], r),
-      k;
+function buildQtSingleDataObj(visData, dataObj, result) {
+  //result will consist of one dataset: ex: {i: 755, k: "y1", px: 190, py: 82}
+  // we want to iterate through our keys and get each series within that single dataset
+  for(var i = 0; i < visData.keys.length; i++) {
+    dataObj = constructDataObj(result, dataObj, visData.keys[i], visData, true, null);
+  }
 
-/*
-quadtreeData.visit(function(node, nodeX0, nodeY0, nodeX1, nodeY1) {
+  if(result) {
+    dataObj.time = dataMapping[visData.chartId][result.i][visData.timeData];
+    dataObj.timeSeriesKey = visData.searchFor === 'point' ? result.k : '';
+  }
+
+  return dataObj
+}
+
+function findAllAtPoint(quadtreeData,point, visData) {
+  var allResults = [];
+
+  quadtreeData.visit(function(node, nodeX0, nodeY0, nodeX1, nodeY1) {
     if(!node.length) {
       do {
         var d = node.data;
-        // if our point is inside our box, save it if not a copy
-        if((d.px === result.px) && (d.py === result.py)) {
-          newResult.push(d);
+        // if our point is inside our box
+        if((d.px === point.px) && (d.py === point.py)) {
+          allResults.push(d);
         }
       } while(node = node.next);
     }
     //return true  ==> skip the children nodes so we dont search unnessary bits of the tree
-    return nodeX0 > result.px || nodeY0 > result.py || nodeX1 < result.px || nodeY1 < result.py;
+    return nodeX0 > point.px || nodeY0 > point.py || nodeX1 < point.px || nodeY1 < point.py;
   });
-  */
 
-  //result will consist of one dataset: ex: {i: 755, k: "y1", px: 190, py: 82}
-  // we want to iterate through our keys and get each series within that single dataset
-  for(var i = 0; i < visData.keys.length; i++) {
-    k = visData.keys[i];
-    dataObj = constructDataObj(result, dataObj, k, visData, true, null);
+  return allResults;
+}
+
+function buildAdditionalPoints(visData, allResults, result) {
+  var points = [],
+      additionObj,
+      timeStamps = {};
+      timeStamps[result.i] = true;
+
+  for(var i=0; i < allResults.length; i++) {
+    // exclude the already found and processed result
+    if(allResults[i]['i'] === result.i && allResults[i]['k'] === result.k) {
+      continue;
+    }
+
+    // exclude if searchFor is timestamp and we've already found it
+    if(visData.searchFor !== 'point' && timeStamps[allResults[i]['i']]) {
+      continue;
+    }
+
+    additionObj = createDataStub();
+    additionObj = buildQtSingleDataObj(visData, additionObj, allResults[i]);
+
+    timeStamps[allResults[i]['i']] = true;
+
+    points.push(additionObj);
+
+  }
+
+  return points;
+}
+
+function returnAllAtPoint(quadtreeData, visData, result, dataObj) {
+  var allResults = findAllAtPoint(quadtreeData, result, visData);
+
+  if(allResults.length > 1) {
+    dataObj.additionalPoints = buildAdditionalPoints(visData, allResults, result);
+  }
+
+  return dataObj;
+}
+
+function searchQuadtreeSingle(visData, dataObj, quadtreeData) {
+  var r = visData.radius ? visData.radius : Infinity,
+      result = quadtreeData.find(visData.mousePos[0], visData.mousePos[1], r);
+
+  // construct our basic dataObj
+  dataObj = buildQtSingleDataObj(visData, dataObj, result);
+
+  // find and construct additional points
+  if(result) {
+    dataObj = returnAllAtPoint(quadtreeData, visData, result, dataObj);
   }
 
   // if we want to do all in area crosshair data, do it outside our loop
@@ -674,13 +742,6 @@ quadtreeData.visit(function(node, nodeX0, nodeY0, nodeX1, nodeY1) {
     if(visData.searchType === 'allInArea') {
       dataObj = searchAreaRadiusQuadtree(quadtreeData, visData, dataObj);
     }
-  }
-
-  // when we constructed our data objs, we saved this
-  if(result) {
-
-    dataObj.time = dataMapping[visData.chartId][result.i][visData.timeData];
-    dataObj.timeSeriesKey = result.k;
   }
 
   return dataObj;
