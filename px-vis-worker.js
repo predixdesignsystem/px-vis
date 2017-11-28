@@ -608,7 +608,7 @@ function searchAreaRadiusQuadtree(quadtree, visData, dataObj) {
   quadtree.visit(function(node, nodeX0, nodeY0, nodeX1, nodeY1) {
     if(!node.length) {
       do {
-        // FIXME: Remove mute?
+
         if(!visData.hardMute || !visData.mutedSeries[node.data.k]) {
 
           // Thank you Πυθαγόρας ὁ Σάμιος   :)
