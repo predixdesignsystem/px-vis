@@ -339,7 +339,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       '_setupActions(actionConfig.*)',
       '_resetTooltipDataLegacy(completeSeriesConfig.*)',
       '_resetTooltipData(seriesKeys.*, defaultEmptyData.*)',
-      '_createQuadtreeData(wwDataSyncCounter, width, height, margin.*, domainChanged, searchType, useQuadtree, counterClockwise, xAxisType, preventWebWorkerSynchronization)'
+      '_createQuadtreeData(wwDataSyncCounter, width, height, margin.*, domainChanged, searchType, useQuadtree, counterClockwise, xAxisType, preventWebWorkerSynchronization)',
+      '_callCreateQuadtreeData(mutedSeries)'
      ],
 
     /**
@@ -638,9 +639,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
           delete dataObj.rawData;
           delete dataObj.timeStamps;
-
           this.set('tooltipData',dataObj);
           this.fire('px-vis-tooltip-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
+
         }
 
         this.set('_calculatingData', false);
@@ -707,6 +708,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         dataObj.timeStamps = e.data.timeStamps;
         dataObj.time =  e.data.time ? e.data.time : dataObj.time;
         dataObj.timeSeriesKey =  e.data.timeSeriesKey ? e.data.timeSeriesKey : dataObj.timeSeriesKey;
+        dataObj.additionalPoints = e.data.additionalPoints;
 
         this._calcDataFinished(dataObj);
       }.bind(this);
@@ -1418,6 +1420,12 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       var mousePos = Px.d3.mouse(this._rect.node());
 
       this.fire("px-vis-interaction-space-mouse-coords", { mouse: mousePos, type: Px.d3.event.type });
+    },
+
+    _callCreateQuadtreeData: function() {
+      if(this.hardMute) {
+        this._createQuadtreeData();
+      }
     },
 
     _createQuadtreeData: function() {
