@@ -1,7 +1,8 @@
-
+v4.4.7
 =================
 * Fix for multiaxis scale checking if dimensions are empty
 * Fix for cursor to return null instead of empty string
+* Ensure dynamic menu on IE won't show random scrollbars
 
 v4.4.6
 =================
