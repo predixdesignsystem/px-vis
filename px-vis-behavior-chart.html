@@ -2933,6 +2933,14 @@ PxVisBehaviorChart.useCategoryInTooltip = {
 */
 PxVisBehaviorChart.workerProgress = {
   properties: {
+    showProgressBar: {
+      type: Boolean,
+      value: true
+    },
+    _workerBuilding: {
+      type: Boolean,
+      value: false
+    }
 
   },
 
@@ -2952,14 +2960,18 @@ PxVisBehaviorChart.workerProgress = {
 
   _workerStarted: function(evt) {
     if(evt.detail.action === 'createQuadtree') {
-      console.log(evt.detail.action);
+      this.set('_workerBuilding', true);
     }
   },
 
   _workerEnded: function(evt) {
     if(evt.detail.action === 'createQuadtree') {
-      console.log(evt.detail.action);
+      this.set('_workerBuilding', false);
     }
+  },
+
+  _showProgress: function(showProgressBar, workerBuilding) {
+    return showProgressBar && workerBuilding;
   }
 };
 
