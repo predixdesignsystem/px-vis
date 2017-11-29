@@ -2923,46 +2923,4 @@ PxVisBehaviorChart.useCategoryInTooltip = {
   }
 };
 
-/*
-    Name:
-    PxVisBehaviorChart.workerProgress
-
-    Description:
-
-    @polymerBehavior PxVisBehaviorChart.workerProgress
-*/
-PxVisBehaviorChart.workerProgress = {
-  properties: {
-
-  },
-
-
-  ready: function() {
-    this._workerStartedBound = this._workerStarted.bind(this);
-    this._workerEndedBound = this._workerEnded.bind(this);
-
-    window.addEventListener('px-vis-scheduler-work-start', this._workerStartedBound);
-    window.addEventListener('px-vis-scheduler-work-end', this._workerEndedBound);
-  },
-
-  detached: function() {
-    window.removeEventListener('px-vis-scheduler-work-start', this._workerStartedBound);
-    window.removeEventListener('px-vis-scheduler-work-end', this._workerEndedBound);
-  },
-
-  _workerStarted: function(evt) {
-    if(evt.detail.action === 'createQuadtree') {
-      console.log(evt.detail.action);
-    }
-  },
-
-  _workerEnded: function(evt) {
-    if(evt.detail.action === 'createQuadtree') {
-      console.log(evt.detail.action);
-    }
-  }
-};
-
-
-
 </script>
