@@ -640,8 +640,9 @@ Custom property | Description
 
     _resetTooltipData: function() {
       var ttD = {
+        "axis": null,
+        "yVal": null,
         "mouse": null,
-        "dataPos": [-1000, -1000],
         "time": null,
         "dataset": null,
         'series': [],
@@ -693,7 +694,7 @@ Custom property | Description
       for(var i = 0; i < this.chartData.length; i++) {
 
         //search everything if not hard muted, otherwise only non muted stuff
-        if(!this.hardMute || !this.combinedMutedSeries[this.chartData[i][this.seriesKey]]) {
+        if(!this.combinedMutedSeries[this.chartData[i][this.seriesKey]]) {
           this._searchData(aid, mouseVal, result, this.chartData[i])
         }
       }
@@ -754,23 +755,8 @@ Custom property | Description
      */
     _createTooltipData: function(aid, elem, mousePos, result) {
       var data,     //our tooltipData obj
-          screenX,  //the mouse x on the scree
-          screenY,  //the mouse y on the scree
-          svgBounding,  //bounding rect of our svg
           tooltipConfig = {},  //a fake configuration object we will build
           value = {};          //the series obj within tooltipData
-
-      svgBounding = elem.ownerSVGElement.getBoundingClientRect();
-
-      //calc the screen positions for the tooltip
-      if(this.radial) {
-        screenX = this.y(result.yVal) * Math.sin(this.x(aid)) + this.width/2 + svgBounding.left + window.pageXOffset;
-        screenY = this.y(result.yVal) * Math.cos(Math.PI - this.x(aid)) + this.smallerSide/2 + svgBounding.top + window.pageYOffset;
-
-      } else {
-        screenX = this.x(aid) + svgBounding.left + window.pageXOffset + 15;
-        screenY = this.y(result.yVal) + this.margin.top + svgBounding.top + window.pageYOffset;
-      }
 
       //create our fake configuration object
       tooltipConfig[aid] = {};
@@ -791,8 +777,9 @@ Custom property | Description
       value[aid] = result.yVal;
       //create our tooltipData obj
       data = {
+        "axis": aid,
+        "yVal": result.yVal,
         "mouse": mousePos,
-        "dataPos": [screenX, screenY],
         "time": result.time,
         "dataset": result.dataset,
         'series': [

@@ -1,3 +1,17 @@
+=================
+* Fix polar cursor handling of negative data
+* Added ability to the web worker to return all datapoints at a particular point
+* Added single point search option
+* Changed the way tooltipData is reported for // and radar: now always ignores data hidden by brush instead of just with hardMute on.
+* Changed // & radar hardMute: register doesnt show muted axes data with hard mute on
+* Moved tooltip positioning for // and radar out of axis interaction space to the chart
+* Added a chart behavior tooltipSizing, which gets necessary sizing and position data for tooltip on // and radar.
+  * provides listeners to update when needed
+  * only active when showTooltip is true
+* Changes to interaction space so timeseries can have web worker point search too
+* Changes to toolbar providing different tooltipData search options
+* Changed the way tooltipData is reported for // and radar: now always ignores data hidden by brush instead of just with hardMute on.
+
 v4.4.9
 =================
 * Fix for hard mute series disappearing from list with crosshair defaultData
