@@ -2331,9 +2331,13 @@ PxVisBehaviorChart.axisRegister = [{
       for(var i=0; i<this._axisRegisterTooltipData.series.length; i++) {
         var newSeries = {},
             name = this._axisRegisterTooltipData.series[i].name;
+
         newSeries.name = name;
 
-        if(values && (values[name] || values[name] === 0)) {
+        if(values &&
+            (values[name] || values[name] === 0) &&
+            (!this.hardMute || !this.mutedAxes[name])) {
+
           newSeries.value = {};
           newSeries.value[name] = values[name];
         }
@@ -2922,5 +2926,68 @@ PxVisBehaviorChart.useCategoryInTooltip = {
     }
   }
 };
+
+/*
+    Name:
+    PxVisBehaviorChart.tooltipSizing
+
+    Description:
+    Behavior providing tooltipSizing property
+    @polymerBehavior PxVisBehaviorChart.tooltipSizing
+*/
+PxVisBehaviorChart.tooltipSizing = [{
+  properties: {
+    _svgClientRect: Object,
+    _canvasClientRect: Object,
+    _winX: Number,
+    _winY: Number
+  },
+  observers: [
+    '_setupScrollListener(showTooltip)'
+  ],
+
+  detached: function() {
+    window.removeEventListener('scroll', this._waitUntilScrollEndBound);
+  },
+
+  attached: function() {
+    this._waitUntilScrollEndBound = this._waitUntilScrollEnd.bind(this);
+    this._setupScrollListener();
+  },
+
+  _setupScrollListener: function() {
+    if(this.showTooltip) {
+      window.addEventListener('scroll', this._waitUntilScrollEndBound);
+      this._getSizing();
+
+    } else {
+      window.removeEventListener('scroll', this._waitUntilScrollEndBound);
+
+    }
+  },
+
+  _waitUntilScrollEnd: function() {
+    window.clearTimeout(this._scrollEnd);
+    this._scrollEnd = setTimeout(this._getSizing.bind(this), 100);
+  },
+
+  _getSizing: function() {
+    requestAnimationFrame(this._getImmediateSizing.bind(this));
+  },
+
+  _getImmediateSizing: function() {
+    if(this.pxSvgElem) {
+      this._svgClientRect = this.pxSvgElem.getBoundingClientRect();
+    }
+
+    if(this.canvasContext && this.canvasContext.canvas) {
+      this._canvasClientRect = this.canvasContext.canvas.getBoundingClientRect();
+    }
+
+    this._winX = window.pageXOffset;
+    this._winY = window.pageYOffset;
+  }
+},
+PxVisBehaviorChart.showTooltip];
 
 </script>
