@@ -341,7 +341,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       '_resetTooltipData(seriesKeys.*, defaultEmptyData.*)',
       '_createQuadtreeData(wwDataSyncCounter, width, height, margin.*, domainChanged, searchType, useQuadtree, counterClockwise, xAxisType, preventWebWorkerSynchronization)',
       '_callCreateQuadtreeData(mutedSeries)'
-     ],
+    ],
 
     /**
     * When attached, re-fire set properties for precipitation pattern.
@@ -652,40 +652,26 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * Searches through all data series, then compiles and returns the tooltip data object.
      */
     _getDataForAllSeries: function(mousePos) {
-      // invert: takes position on the screen and converts it into an equivalent date
       var x1 = this.xAxisType !== 'ordinal' && this.xAxisType !== 'scaleBand' ? this.x.invert(mousePos[0]) : null,
-          dataObj = this._returnTooltipDataStub(mousePos, x1), // setup a holder for our data
-          keys = this.seriesKeys ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
-          closestTimestamp = { "distance": Number.MAX_VALUE, "time": null },
-          //search for timestamp if we don't have it already (non time based chart)
-          //and we know the data has some notion of time -- !! --> turn into a bool
-          searchTimeStamp = dataObj.time === null && !!this.chartData[0][this.timeData];
+          dataObj = this._returnTooltipDataStub(mousePos, x1); // setup a holder for our data
 
-      // if we want to do a quadtree
-      if(this.xAxisType !== 'time' && this.xAxisType !== 'timeLocal' && this.xAxisType !== 'ordinal' && this.xAxisType !== 'scaleBand' && !this.preventWebWorkerSynchronization) {
-        this._searchOnWebWorker(mousePos, dataObj);
+      if(this.preventWebWorkerSynchronization ||
+            this.xAxisType === 'ordinal' ||
+            this.xAxisType === 'scaleBand') {
+
+        this._searchLocally(mousePos, dataObj, x1);
         return;
       }
-      // else
 
-      for(var i = 0; i < keys.length; i++) {
-        //if we had a request to reset tooltip stop calculating
-        if(!this._calculatingData) {
-          break;
-        }
+      if((this.xAxisType === 'time' || this.xAxisType === 'timeLocal') &&
+            this.searchFor !== 'point') {
 
-        if(!this.hardMute || !this.mutedSeries[keys[i]]) {
-          //calc this series: returns updated dataObj, xArr, yArr & closestTimestamp
-          this._calcSerieData(dataObj, searchTimeStamp, closestTimestamp, x1, keys[i], mousePos);
-        }
-      } //for
-
-      // add the timestamp
-      if(searchTimeStamp) {
-        dataObj.time = closestTimestamp.time;
+        this._searchLocally(mousePos, dataObj, x1);
+        return;
       }
 
-      this._calcDataFinished(dataObj);
+      this._searchOnWebWorker(mousePos, dataObj);
+      return;
     },
 
     _searchOnWebWorker: function(mousePos, dataObj) {
@@ -725,6 +711,32 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      */
     _returnTooltipDataStub: function(mousePos, x1) {
       return this._createTooltipDataStub(mousePos, null, !this.showTooltip)
+    },
+
+    _searchLocally: function(mousePos, dataObj, x1) {
+      var keys = this.seriesKeys ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
+          closestTimestamp = { "distance": Number.MAX_VALUE, "time": null },
+          //search for timestamp if we don't have it already (non time based chart) and we know the data has some notion of time -- !! --> turn into a bool
+          searchTimeStamp = dataObj.time === null && !!this.chartData[0][this.timeData];
+
+      for(var i = 0; i < keys.length; i++) {
+        //if we had a request to reset tooltip stop calculating
+        if(!this._calculatingData) {
+          break;
+        }
+
+        if(!this.hardMute || !this.mutedSeries[keys[i]]) {
+          //calc this series: returns updated dataObj, xArr, yArr & closestTimestamp
+          this._calcSerieData(dataObj, searchTimeStamp, closestTimestamp, x1, keys[i], mousePos);
+        }
+      } //for
+
+      // add the timestamp
+      if(searchTimeStamp) {
+        dataObj.time = closestTimestamp.time;
+      }
+
+      this._calcDataFinished(dataObj);
     },
 
     /**
@@ -1433,7 +1445,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     _createQuadtreeData: function() {
       if(this.domainChanged !== null && this.useQuadtree && !this.preventWebWorkerSynchronization && this.xAxisType !== 'ordinal' && this.xAxisType !== 'scaleBand') {
         this.debounce('buildQuadtree', function() {
-
           var w = this.width - this.margin.right - this.margin.left,
               h = this.height - this.margin.top - this.margin.bottom,
               ext = [[0,0], [w, h]],
@@ -1463,6 +1474,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       data.completeSeriesConfig = this.completeSeriesConfig;
       data.keys = this.seriesKeys ? this.seriesKeys : Object.keys(this.completeSeriesConfig);
+
       data.timeData = this.timeData;
 
       data.radial = this.radial;
