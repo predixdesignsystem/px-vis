@@ -2942,36 +2942,32 @@ PxVisBehaviorChart.tooltipSizing = [{
     _winX: Number,
     _winY: Number
   },
+
   observers: [
-    '_setupScrollListener(showTooltip)'
+    '_setupSizingListener(showTooltip)'
   ],
 
   detached: function() {
-    window.removeEventListener('scroll', this._waitUntilScrollEndBound);
+    this.removeEventListener('px-vis-tooltip-sizing-request', this._getSizingBound);
   },
 
   attached: function() {
-    this._waitUntilScrollEndBound = this._waitUntilScrollEnd.bind(this);
-    this._setupScrollListener();
+    this._getSizingBound = this._getSizing.bind(this);
+    this._setupSizingListener();
   },
 
-  _setupScrollListener: function() {
+  _setupSizingListener: function() {
     if(this.showTooltip) {
-      window.addEventListener('scroll', this._waitUntilScrollEndBound);
-      this._getSizing();
+      this.addEventListener('px-vis-tooltip-sizing-request', this._getSizingBound);
 
     } else {
-      window.removeEventListener('scroll', this._waitUntilScrollEndBound);
+      this.removeEventListener('px-vis-tooltip-sizing-request', this._getSizingBound);
 
     }
   },
 
-  _waitUntilScrollEnd: function() {
-    window.clearTimeout(this._scrollEnd);
-    this._scrollEnd = setTimeout(this._getSizing.bind(this), 100);
-  },
-
   _getSizing: function() {
+    console.log("getSizing")
     requestAnimationFrame(this._getImmediateSizing.bind(this));
   },
 

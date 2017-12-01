@@ -418,6 +418,12 @@ Custom property | Description
           .on("mousemove.cursor", this._updateCursor.bind(this))
           .on("mouseout.cursor", this._hideCursor.bind(this));
 
+        //setup a default cursor setup
+        this._brushD3.selectAll("rect")
+          .on('mouseenter.sizing', function() {
+            this.dispatchEvent(new CustomEvent('px-vis-tooltip-sizing-request', { bubbles: true, composed: true }));
+          }.bind(this));
+
         // check if we have special actions and if so, run their caller
         var dontDoUpDown = this._setupSpecialActions();
 
