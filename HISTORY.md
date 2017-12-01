@@ -8,6 +8,7 @@
 * Added a chart behavior tooltipSizing, which gets necessary sizing and position data for tooltip on // and radar.
   * provides listeners to update when needed
   * only active when showTooltip is true
+  * axis interaction space fires event on mouseenter
 * Changes to interaction space so timeseries can have web worker point search too
 * Changes to toolbar providing different tooltipData search options
 * Changed the way tooltipData is reported for // and radar: now always ignores data hidden by brush instead of just with hardMute on.
