@@ -81,7 +81,8 @@ Custom property | Description
       PxVisBehaviorD3.axisOrientation,
       PxVisBehavior.updateStylesOverride,
       PxVisBehavior.extentsData,
-      PxVisBehavior.brushDomains
+      PxVisBehavior.brushDomains,
+      PxVisBehavior.timeDomain
     ],
 
     /**
@@ -640,7 +641,7 @@ Custom property | Description
       var m = Px.d3.mouse(this._brushElem);
 
       this.debounce('axisMouseMove', function() {
-        this._calcSerieData(this.dimension, this._brushElem, m)
+        this._calcSerieData(this.dimension, m)
       }, 10);
     },
 
@@ -682,17 +683,12 @@ Custom property | Description
      *
      * Takes the dimension (aid), the raw element, and the mouse position
      */
-    _calcSerieData: function(aid, elem, mousePos) {
-      var mouseVal = this.y.invert(mousePos[1]), // the data space value
-          result = {
+    _calcSerieData: function(aid, mousePos) {
+      var result = {
             "distance" : Number.MAX_VALUE,    //difference between cursor and value
             "minDistance" : Number.MAX_VALUE, //smallest found distance
-            "dataset" : null,                 //full set of data at i
-            "yVal" : null,                    //the data value we've found
-            "time" : null,                    //time at data value
-            "group" : null,                   //the group if categoryKey is being used
             'rawData': [],                    //datasets for crosshair
-            'timeStamps': []                  //list of timeStamps for crosshair
+            'timeStamps': []                 //list of timeStamps for crosshair
           },
           ttD,chD;
 
@@ -701,12 +697,12 @@ Custom property | Description
 
         //search everything if not hard muted, otherwise only non muted stuff
         if(!this.combinedMutedSeries[this.chartData[i][this.seriesKey]]) {
-          this._searchData(aid, mouseVal, result, this.chartData[i])
+          this._searchData(aid, mousePos[1], result, this.chartData[i]);
         }
       }
 
       if(this._calcTooltip) {
-        ttD = this._createTooltipData(aid, elem, mousePos, result);
+        ttD = this._createTooltipData(aid, mousePos, result);
         this.set('tooltipData', ttD);
         this.fire('px-vis-axis-interaction-space-tooltip-data', ttD);
       }
@@ -729,29 +725,27 @@ Custom property | Description
       if(this.y.domain()[0] > d[aid] || d[aid] > this.y.domain()[1]) {
         return;
       }
+      if(this.timeDomain && this.timeDomain.x &&
+          (d[this.seriesKey] < this.timeDomain.x[0] || d[this.seriesKey] > this.timeDomain.x[1])) {
+        return;
+      }
 
       //figure out the differnce between the data value and our saved value
-      result.distance = Math.abs(d[aid] - mouseVal);
+      // we round our pixels while drawing the line, so should round here too
+      result.distance = Math.abs(~~this.y(d[aid]) - mouseVal);
 
       // if it is smaller than last time, save the data info
       if(result.distance < result.minDistance) {
-        result.dataset = d;     //save the whole dataset for the register
-        result.yVal = d[aid];          //save just the point for the tooltip
         result.minDistance = result.distance;   //track our minDistance for later
-        result.time = d[this.seriesKey];        //save the time for display if relevant
 
-        if(this.categoryKey) {
-          result.group = d[this.categoryKey];   //save the category so we can get the color
-          result.timeSeriesKey = d[this.categoryKey];   //save the category so we can get the color
-        }
-
-        //reset our crosshairData
+        //reset our data
         result.rawData = [d];
         result.timeStamps = [d[this.seriesKey]];
 
-      } else if(this._calcCrosshair && result.distance === result.minDistance) {
+      } else if(result.distance === result.minDistance) {
         result.rawData.push(d);
         result.timeStamps.push(d[this.seriesKey]);
+
       }
     },
 
@@ -759,16 +753,29 @@ Custom property | Description
      * Builds the tooltipData object from the results
      *
      */
-    _createTooltipData: function(aid, elem, mousePos, result) {
+    _createTooltipData: function(aid, mousePos, result) {
+      var tooltipData = this._createSingleDataset(aid, mousePos, result.rawData[0]);
+
+      tooltipData.additionalPoints = [];
+
+      for(var i=1; i< result.rawData.length; i++) {
+        tooltipData.additionalPoints.push(this._createSingleDataset(aid, mousePos, result.rawData[i]));
+      }
+
+      return tooltipData;
+
+    },
+
+    _createSingleDataset: function(aid, mousePos, d) {
       var data,     //our tooltipData obj
           tooltipConfig = {},  //a fake configuration object we will build
-          value = {};          //the series obj within tooltipData
+          value = {};         //the series obj within tooltipData
 
       //create our fake configuration object
       tooltipConfig[aid] = {};
 
       //if using categies, use it, otherwise default
-      tooltipConfig[aid]["color"] = result.group && this.completeSeriesConfig[result.group] ? this.completeSeriesConfig[result.group]["color"] : this.completeSeriesConfig[this.seriesKey]["color"];
+      tooltipConfig[aid]["color"] = this.categoryKey && d[this.categoryKey] && this.completeSeriesConfig[d[this.categoryKey]] ? this.completeSeriesConfig[d[this.categoryKey]]["color"] : this.completeSeriesConfig[this.seriesKey]["color"];
 
       //if title is specified, use it, otherwiuse id
       tooltipConfig[aid]["name"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]['title'] ? this.completeSeriesConfig[aid]["title"] : aid;
@@ -780,14 +787,14 @@ Custom property | Description
       tooltipConfig[aid]['y'] = aid;
 
       //create our value obj
-      value[aid] = result.yVal;
+      value[aid] = d[aid];
       //create our tooltipData obj
       data = {
         "axis": aid,
-        "yVal": result.yVal,
+        "yVal": d[aid],
         "mouse": mousePos,
-        "time": result.time,
-        "dataset": result.dataset,
+        "time": d[this.seriesKey],
+        "dataset": d,
         'series': [
           { 'name': aid, 'value': value }
         ],
