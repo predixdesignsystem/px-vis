@@ -681,12 +681,16 @@ function searchQuadtreeSeries(visData, dataObj, quadtreeData) {
       k;
 
   for(var i = 0; i < visData.keys.length; i++) {
-    k = visData.keys[i];
 
-    if(!visData.hardMute || !visData.mutedSeries[k]) {
+    if(quadtreeData[k]) {
 
-      result = quadtreeData[k].find(visData.mousePos[0], visData.mousePos[1], r);
-      dataObj = constructDataObj(result, dataObj, k, visData, false, xScale);
+      k = visData.keys[i];
+
+      if(!visData.hardMute || !visData.mutedSeries[k]) {
+
+        result = quadtreeData[k].find(visData.mousePos[0], visData.mousePos[1], r);
+        dataObj = constructDataObj(result, dataObj, k, visData, false, xScale);
+      }
     }
   }
 

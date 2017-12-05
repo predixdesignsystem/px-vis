@@ -961,16 +961,22 @@ PxVisBehavior.commonMethods = {
         break;
       }
       //prepend point
-      d.splice(0, 0, data[i]);
+      if(!this.hardMute || !this.mutedSeries[data[i][key]]) {
+        d.splice(0, 0, data[i]);
+      }
     }
 
-    d.push(data[index]);
+    if(!this.hardMute || !this.mutedSeries[data[index][key]]) {
+      d.push(data[index]);
+    }
 
     for(var i = index+1; i < upperIndex; i++) {
       if(data[i][key] > upperFuzz) {
         break;
       }
-      d.push(data[i]);
+      if(!this.hardMute || !this.mutedSeries[data[i][key]]) {
+        d.push(data[i]);
+      }
     }
 
     return d;
@@ -1775,9 +1781,12 @@ PxVisBehavior.dynamicConfigProperties = [{
 
     var conf = this.completeSeriesConfig[this.seriesId],
         name;
-    for(var i=0; i<this._dynamicProperties.length; i++) {
-      name = this._dynamicProperties[i];
-      this.set(name, this._computeValue(conf[name], this['_default' + name]));
+
+    if(conf) {
+      for(var i=0; i<this._dynamicProperties.length; i++) {
+        name = this._dynamicProperties[i];
+        this.set(name, this._computeValue(conf[name], this['_default' + name]));
+      }
     }
   },
 
@@ -2660,7 +2669,7 @@ PxVisBehavior.highlightShared = [{
   _setTooltipData: function(dataset) {
     var ttd = null;
 
-    if(dataset.length) {
+    if(dataset && dataset.length) {
       var timestamp = this.timeData ? dataset[0][this.timeData] : null,
           series = this._generateSeries(dataset[0]);
 
