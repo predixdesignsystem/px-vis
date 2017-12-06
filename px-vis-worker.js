@@ -38,7 +38,8 @@ importScripts("px-vis-worker-scale.js");
 
 // Global storage vars
 var dataMapping = {},
-    quadtrees = {};
+    quadtrees = {}
+    quadtreeBuilt = false;
 
 function reply(data, time) {
 
@@ -337,12 +338,14 @@ function createSeriesQuadtree(data) {
  * @method createQuadtree
  */
 function createQuadtree(data, time) {
-
+  quadtreeBuilt = false;
 
   quadtrees[data.chartId] = data.data.searchType === 'pointPerSeries' ?
     createSeriesQuadtree(data) :
     // closestPoint & allInArea
     createSingleQuadtree(data);
+
+  quadtreeBuilt = true;
 
   reply(null, time);
 }
@@ -846,21 +849,32 @@ onmessage = function(e) {
       break;
 
     case 'createQuadtree':
-   // reply(null, time);
       createQuadtree(e.data, time);
       break;
 
     case 'findQuadtreePoints':
-      returnClosestsQuadtreePoints(e.data, time);
+      if(quadtreeBuilt) {
+        returnClosestsQuadtreePoints(e.data, time);
+      } else {
+        reply(null, time);
+      }
       break;
 
     //we don't seem to use this
     case 'findQuadtreePointsInArea':
-      returnQuadtreePointsInArea(e.data, time);
+      if(quadtreeBuilt) {
+        returnQuadtreePointsInArea(e.data, time);
+      } else {
+        reply(null, time);
+      }
       break;
 
     case 'returnQuadtreeData':
-      reply(quadtrees[e.data.chartId], time);
+      if(quadtreeBuilt) {
+        reply(quadtrees[e.data.chartId], time);
+      } else {
+        reply(null, time);
+      }
       break;
 
     case 'determineExtents':
