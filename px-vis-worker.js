@@ -878,13 +878,8 @@ onmessage = function(e) {
     //     importScripts("../pxd3/d3.min.js");
     //   }
 
-<<<<<<< HEAD
     //   reply(null, time);
     //   break;
-=======
-      reply(null);
-      break;
->>>>>>> annotations
 
     case 'registerCustomScript':
 
