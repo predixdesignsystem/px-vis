@@ -77,7 +77,8 @@
       PxVisBehavior.isAttached,
       PxVisBehaviorD3.scatterMarkers,
       PxVisBehavior.rendererType,
-      PxVisBehaviorD3.clipPathBoolean
+      PxVisBehaviorD3.clipPathBoolean,
+      PxVisBehaviorD3.scatterArrow
     ],
 
     /**
@@ -159,6 +160,7 @@
 
       //create symbol, retrieve opacity values
       this._currentDrawingOptions.symbol = Px.d3.symbol().type(this.markerMapping[this.markerSymbol]).size(this.markerSize * this.markerScale).context(this.canvasContext);
+      this._currentDrawingOptions.arrow = Px.d3.symbol().type(this.markerMapping[this.arrowConfig.symbol]).size(this.arrowConfig.size * this.arrowConfig.scale).context(this.canvasContext);
       this._currentDrawingOptions.muted = this.mutedSeries[this.seriesId];
       this._currentDrawingOptions.fillOpacity = this._currentDrawingOptions.muted  ? this.mutedOpacity : this.markerFillOpacity;
       this._currentDrawingOptions.strokeOpacity = this._currentDrawingOptions.muted  ? 0 : this.markerStrokeOpacity;
@@ -206,14 +208,13 @@
       if(this.chartData.length > 0 && this.completeSeriesConfig[this.seriesId]["x"].length > 0) {
         this.canvasContext.beginPath();
 
-        if(!this.radial) {
+        if(this.radial) {
+          this.canvasContext.arc(0, 0, this.height/2, 0, Math.PI * 2, false);
+        } else {
           var w = Math.max(this.width - this.margin.left - this.margin.right,0),
               h = Math.max(this.height - this.margin.top - this.margin.bottom,0);
 
           this.canvasContext.rect(0, 0, w, h);
-        } else {
-          //width = height = diameter
-          this.canvasContext.arc(0, 0, this.height/2, 0, Math.PI * 2, false);
         }
 
         this.canvasContext.clip();
@@ -239,13 +240,38 @@
       this.canvasContext.strokeStyle = this.completeSeriesConfig[this.seriesId]['color'];
       this.canvasContext.globalAlpha = this._currentDrawingOptions.fillOpacity;
       var previousTranslate = [0,0],
-          translate;
+          translate,
+          tx,ty,h,angle,angle_2PI;
 
       this.canvasContext.beginPath();
       for(var i = start; i < stop; i++) {
 
+        if(!this._isValidData(this.chartData[i][this.completeSeriesConfig[this.seriesId]['y']]) ||
+            !this._isValidData(this.chartData[i][this.completeSeriesConfig[this.seriesId]['x']])) {
+          console.warn('Point ' + this.seriesId + ': ' + i + 'is invalid. [' + this.chartData[i][this.completeSeriesConfig[this.seriesId]['x']] + ',' + this.chartData[i][this.completeSeriesConfig[this.seriesId]['y']]+ ']');
+          continue;
+        }
+
         //get the position of the symbol
         translate = this._getTransform(this.chartData[i]);
+
+        // draw arrow
+        if(this.showArrows && i !== start) {
+          tx = (translate[0] - previousTranslate[0])/2;
+          ty = (translate[1] - previousTranslate[1])/2;
+          // thank you Mr Pythagoras of Samos
+          h = Math.sqrt(tx*tx + ty*ty);
+          //only draw if segment length is over x pixels
+          if(h > this.arrowConfig.minLength) {
+            angle = Math.atan2(ty,tx) + Math.PI / 2;
+            angle_2PI = angle < 0 ? angle + 2 * Math.PI : angle;
+            this.canvasContext.translate(tx,ty);
+            this.canvasContext.rotate(angle_2PI);
+            this._currentDrawingOptions.arrow();
+            previousTranslate = [tx + previousTranslate[0],ty + previousTranslate[1]];
+            this.canvasContext.rotate(-angle_2PI);
+          }
+        }
 
         //move canvas to new pos
         this.canvasContext.translate(translate[0] - previousTranslate[0], translate[1] - previousTranslate[1]);
@@ -256,7 +282,7 @@
         //remember pos so that we can move to the next point in 1 translate
         //instead of restoring the translate here
         previousTranslate = translate;
-        // previousTranslate = [translate[0] + 2.5, translate[1]-1.25];
+
       }
       this.canvasContext.closePath();
       this._currentDrawingOptions.drawingFunction();
@@ -268,35 +294,15 @@
     },
 
     _getTransform: function(d) {
-/*
-  FIXME
-  1) Unify the isValidData and lines(d) checks.
-  2) Figure out better default instead of 0,0 for transform
-  3) Think about using cx & cy instead of transform.
-*/
-      if(!this._isValidData(d[this.completeSeriesConfig[this.seriesId]['y']]) ||
-         !this._isValidData(d[this.completeSeriesConfig[this.seriesId]['x']])) {
-        return [0,0];
-      }
-
       if(this.radial) {
-        var line = this.line([d]);
-        if (line) {
-          var coors = line.slice(1).slice(0, -1);
-          if (coors !== 'NaN,NaN') {
-            var commaIndex = coors.indexOf(',') + 1;
-            return [coors.slice(0,commaIndex -1), coors.slice(commaIndex)];
-          }
-        }
-        return [0,0];
-      } else {
+        var line = this.line([d]),
+            coors = line.slice(1).slice(0, -1),
+            commaIndex = coors.indexOf(',') + 1;
+        return [Number(coors.slice(0,commaIndex -1)), Number(coors.slice(commaIndex))];
 
+      } else {
         var xTrans = this.x(d[this.completeSeriesConfig[this.seriesId]['x']]),
             yTrans = this.y(d[this.completeSeriesConfig[this.seriesId]['y']]);
-
-        //make sure we have a value
-        xTrans = xTrans ? xTrans : 0;
-        yTrans = yTrans ? yTrans : 0;
 
         return [xTrans, yTrans];
       }
