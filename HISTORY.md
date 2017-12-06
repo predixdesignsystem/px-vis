@@ -1,3 +1,7 @@
+=================
+* Fix for hard mute series disappearing from list with crosshair defaultData
+* Added check for quadtree before running search
+
 v4.4.8
 =================
 * Don't use strip whitespace in dynamic menu for IE measuring
