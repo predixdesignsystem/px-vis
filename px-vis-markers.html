@@ -283,12 +283,15 @@
       for(var i=0; i<this.markerData.length; i++) {
         time = this.markerData[i]['time'];
         type = this.markerData[i]['label'];
-        row = this.markerConfig[type]['row'] ? this.markerConfig[type]['row'] : 0;
+        row = this.markerConfig && this.markerConfig[type] && this.markerConfig[type]['row'] ? this.markerConfig[type]['row'] : 0;
 
         o = {};
         o.x = time;
         o[type] = row;
         o.originIndex = i;
+        if(!data[type]) {
+          data[type] = [];
+        }
         data[type].push(o);
       }
 

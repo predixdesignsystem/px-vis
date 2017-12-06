@@ -1007,16 +1007,22 @@ PxVisBehavior.commonMethods = {
         break;
       }
       //prepend point
-      d.splice(0, 0, data[i]);
+      if(!this.hardMute || !this.mutedSeries[data[i][key]]) {
+        d.splice(0, 0, data[i]);
+      }
     }
 
-    d.push(data[index]);
+    if(!this.hardMute || !this.mutedSeries[data[index][key]]) {
+      d.push(data[index]);
+    }
 
     for(var i = index+1; i < upperIndex; i++) {
       if(data[i][key] > upperFuzz) {
         break;
       }
-      d.push(data[i]);
+      if(!this.hardMute || !this.mutedSeries[data[i][key]]) {
+        d.push(data[i]);
+      }
     }
 
     return d;
@@ -1840,9 +1846,12 @@ PxVisBehavior.dynamicConfigProperties = [{
 
     var conf = this.completeSeriesConfig[this.seriesId],
         name;
-    for(var i=0; i<this._dynamicProperties.length; i++) {
-      name = this._dynamicProperties[i];
-      this.set(name, this._computeValue(conf[name], this['_default' + name]));
+
+    if(conf) {
+      for(var i=0; i<this._dynamicProperties.length; i++) {
+        name = this._dynamicProperties[i];
+        this.set(name, this._computeValue(conf[name], this['_default' + name]));
+      }
     }
   },
 
@@ -2702,7 +2711,13 @@ PxVisBehavior.highlightShared = [{
           "name": keys[i],
           "value": val,
           "coord": coords
-        })
+        });
+      } else {
+        arr.push({
+          "name": keys[i],
+          "value": null,
+          "coord": null
+        });
       }
     }
 
@@ -2712,7 +2727,7 @@ PxVisBehavior.highlightShared = [{
   _setTooltipData: function(dataset) {
     var ttd = null;
 
-    if(dataset.length) {
+    if(dataset && dataset.length) {
       var timestamp = this.timeData ? dataset[0][this.timeData] : null,
           series = this._generateSeries(dataset[0]);
 
@@ -2891,7 +2906,6 @@ PxVisBehavior.highlightLineShared = [{
    }
 
     this.debounce('_computeHighlightData', function() {
-
       //if we are generating data locally and not being told to draw anyways, dont draw
       // but if we have cleared our dataset, then we do want to clear our datapoints
       if(this.generatingCrosshairData && !this.drawWithLocalCrosshairData && this.crosshairData.rawData.length > 0) {

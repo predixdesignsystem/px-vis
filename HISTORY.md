@@ -1,3 +1,19 @@
+v4.4.9
+=================
+* Fix for hard mute series disappearing from list with crosshair defaultData
+* Added check for quadtree before running search
+
+v4.4.8
+=================
+* Don't use strip whitespace in dynamic menu for IE measuring
+* various bug fixes and guards
+
+v4.4.7
+=================
+* Fix for multiaxis scale checking if dimensions are empty
+* Fix for cursor to return null instead of empty string
+* Ensure dynamic menu on IE won't show random scrollbars
+
 v4.4.6
 =================
 * Fix axis titles bug in multi-axis for ts / xy charts

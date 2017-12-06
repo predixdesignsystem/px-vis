@@ -38,7 +38,8 @@ importScripts("px-vis-worker-scale.js");
 
 // Global storage vars
 var dataMapping = {},
-    quadtrees = {};
+    quadtrees = {}
+    quadtreeBuilt = false;
 
 function reply(data) {
 
@@ -335,12 +336,14 @@ function createSeriesQuadtree(data) {
  * @method createQuadtree
  */
 function createQuadtree(data) {
-
+  quadtreeBuilt = false;
 
   quadtrees[data.chartId] = data.data.searchType === 'pointPerSeries' ?
     createSeriesQuadtree(data) :
     // closestPoint & allInArea
     createSingleQuadtree(data);
+
+  quadtreeBuilt = true;
 
   reply(null);
 }
@@ -679,12 +682,16 @@ function searchQuadtreeSeries(visData, dataObj, quadtreeData) {
       k;
 
   for(var i = 0; i < visData.keys.length; i++) {
-    k = visData.keys[i];
 
-    if(!visData.hardMute || !visData.mutedSeries[k]) {
+    if(quadtreeData[k]) {
 
-      result = quadtreeData[k].find(visData.mousePos[0], visData.mousePos[1], r);
-      dataObj = constructDataObj(result, dataObj, k, visData, false, xScale);
+      k = visData.keys[i];
+
+      if(!visData.hardMute || !visData.mutedSeries[k]) {
+
+        result = quadtreeData[k].find(visData.mousePos[0], visData.mousePos[1], r);
+        dataObj = constructDataObj(result, dataObj, k, visData, false, xScale);
+      }
     }
   }
 
@@ -838,21 +845,32 @@ onmessage = function(e) {
       break;
 
     case 'createQuadtree':
-
       createQuadtree(e.data);
       break;
 
     case 'findQuadtreePoints':
-      returnClosestsQuadtreePoints(e.data);
+      if(quadtreeBuilt) {
+        returnClosestsQuadtreePoints(e.data);
+      } else {
+        reply(null);
+      }
       break;
 
     //we don't seem to use this
     case 'findQuadtreePointsInArea':
-      returnQuadtreePointsInArea(e.data);
+      if(quadtreeBuilt) {
+        returnQuadtreePointsInArea(e.data);
+      } else {
+        reply(null);
+      }
       break;
 
     case 'returnQuadtreeData':
-      reply(quadtrees[e.data.chartId]);
+      if(quadtreeBuilt) {
+        reply(quadtrees[e.data.chartId]);
+      } else {
+        reply(null);
+      }
       break;
 
     case 'determineExtents':
