@@ -765,7 +765,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         if(this.yAxisType === 'ordinal' || this.yAxisType === 'scaleBand') {
           result.series[yKey] = this._getOrdinalValue(false, mousePos[1], axisKey);
         } else {
-          y1 = this._isMultiY ? this.y[axisKey].invert(mousePos[1]) : this.y.invert(mousePos[1]);
+          y1 = this.isMultiY ? this.y[axisKey].invert(mousePos[1]) : this.y.invert(mousePos[1]);
           result.series[yKey] = this._getClosestValue(false, y1, this.chartData, xKey, yKey, result.series[xKey]);
         }
 
@@ -786,7 +786,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       //we already got the pixel coords in continuous
       if(!isContinuous) {
-        result.coords = [this.x(result.series[xKey]), this._isMultiY ? this.y[axisKey](result.series[yKey]) : this.y(result.series[yKey])]
+        result.coords = [this.x(result.series[xKey]), this.isMultiY ? this.y[axisKey](result.series[yKey]) : this.y(result.series[yKey])]
 
         //also keep pixel coords in array
         dataObj.xArr.push(result.coords[0]);
@@ -890,9 +890,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
 // TODO add option to pick closet point or closest x
       var xDomain = this.x.domain(),
-          yDomain = this._isMultiY ? this.y[axisKey].domain() : this.y.domain(),
+          yDomain = this.isMultiY ? this.y[axisKey].domain() : this.y.domain(),
           yDomainTot = yDomain[1] - yDomain[0],
-          yRange = this._isMultiY ? this.y[axisKey].range()[1] - this.y[axisKey].range()[0] : this.y.range()[1] - this.y.range()[0],
+          yRange = this.isMultiY ? this.y[axisKey].range()[1] - this.y[axisKey].range()[0] : this.y.range()[1] - this.y.range()[0],
           dataX,
           dataY,
           pixelX,
@@ -926,7 +926,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             pixelY = tmp[1];
           } else {
             pixelX = this.x(dataX);
-            pixelY = this._isMultiY ? this.y[axisKey](dataY) : this.y(dataY);
+            pixelY = this.isMultiY ? this.y[axisKey](dataY) : this.y(dataY);
           }
 
           //keep a copy in case we need this point
@@ -1007,7 +1007,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       if(xAxis) {
         domain = this.x.domain();
         range = this.x.range();
-      } else if(this._isMultiY) {
+      } else if(this.isMultiY) {
         domain = this.y[axisKey].domain();
         range = this.y[axisKey].range();
       } else {
@@ -1472,7 +1472,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
     _createBaseDataObjForWebWorker: function() {
       var data = {},
-          yAxisKeys = this._isMultiY ? Object.keys(this.y) : 'defaultAxis';
+          yAxisKeys = this.isMultiY ? Object.keys(this.y) : 'defaultAxis';
 
       data.completeSeriesConfig = this.completeSeriesConfig;
       data.keys = this.seriesKeys ? this.seriesKeys : Object.keys(this.completeSeriesConfig);
@@ -1483,7 +1483,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       data.counterClockwise = this.counterClockwise;
       data.useDegrees = this.useDegrees;
 
-      data.isMultiY = this._isMultiY;
+      data.isMultiY = this.isMultiY;
 
       data.x = {};
       data.x.range = this.x.range();
@@ -1492,7 +1492,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       data.y = {};
 
-      if(this._isMultiY) {
+      if(this.isMultiY) {
         for(var i=0; i<yAxisKeys.length; i++) {
           data.y[yAxisKeys[i]] = {
             'range': this.y[yAxisKeys[i]].range(),

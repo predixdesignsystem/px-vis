@@ -1680,6 +1680,21 @@ PxVisBehavior.polarData = {
       value: false
     }
   },
+  _getPixelCoordForRadialData: function(dataX, dataY, yRange, yDomain, yDomainTot) {
+    var result = [];
+
+    //process angle and amplitude in pxel
+    var angle = dataX,
+        pixelAmplitude = yRange * (dataY - yDomain[0])/yDomainTot;
+
+    angle = this._adjustAngleForPolarChart(angle, false);
+
+    //sin * pixel range * percentage of data range
+    result[1] = Math.cos(angle) * pixelAmplitude;
+    result[0] = Math.sin(angle) * pixelAmplitude;
+
+    return result;
+  },
   /**
    * adjusts the angle for the polar chart, taking counterClockwise into account
    * and returning it in the asked unit (degrees if toDegrees is true)
@@ -2520,23 +2535,7 @@ PxVisBehavior.interactionSpaceShared = [{
       'timeStamps': [],
       'timeStampsTracker': {}
     }
-  },
-
-  _getPixelCoordForRadialData: function(dataX, dataY, yRange, yDomain, yDomainTot) {
-      var result = [];
-
-      //process angle and amplitude in pxel
-      var angle = dataX,
-          pixelAmplitude = yRange * (dataY - yDomain[0])/yDomainTot;
-
-      angle = this._adjustAngleForPolarChart(angle, false);
-
-      //sin * pixel range * percentage of data range
-      result[1] = Math.cos(angle) * pixelAmplitude;
-      result[0] = Math.sin(angle) * pixelAmplitude;
-
-      return result;
-    },
+  }
 }, PxVisBehavior.polarData];
 
 /*
@@ -3217,6 +3216,48 @@ PxVisBehavior.brushDomains = {
       value: function() {
         return {};
       }
+    }
+  }
+};
+
+/**
+    Name:
+    PxVisBehavior.annotationData
+
+    Description:
+    Polymer behavior that providse the annotationData property.
+
+
+    @polymerBehavior PxVisBehavior.annotationData
+*/
+PxVisBehavior.annotationData = {
+  properties: {
+    /**
+     * The annotation data: x and y values + the series which scale should be used.
+     * Data is an arbitrary object you want to store for use when showing the
+     * annotation
+     *
+     * [{
+     *  x: 1325897523,
+     *  y: 15.7,
+     *  series: y0,
+     *  data: {
+     *
+     *  },
+     * ...
+     * }
+     * ]
+     */
+    annotationData: {
+      type: Array,
+      value: function() {
+        return [];
+      }
+    },
+
+    showStrongIcon: {
+      type: Boolean,
+      value: false
     }
   }
 };

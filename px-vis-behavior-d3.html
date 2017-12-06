@@ -405,7 +405,7 @@ PxVisBehaviorD3.renderToCanvas = [{
     PxVisBehaviorD3.axes
 
     Description:
-    Polymer behavior that provides the x,y and _isMultiY properties for d3 components.
+    Polymer behavior that provides the x,y and isMultiY properties for d3 components.
 
     Dependencies:
     - D3.js
@@ -442,8 +442,9 @@ PxVisBehaviorD3.axes = {
       type: Object,
       notify:true
     },
-    _isMultiY: {
+    isMultiY: {
       type: Boolean,
+      readOnly: true,
       computed: '_getIsMultiY(y.*)'
     }
   },
@@ -460,7 +461,7 @@ PxVisBehaviorD3.axes = {
 
     callback = callback.bind(this);
 
-    if(this._isMultiY) {
+    if(this.isMultiY) {
       var result = {},
           keys = Object.keys(this.y);
 
