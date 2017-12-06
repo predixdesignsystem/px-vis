@@ -1,3 +1,4 @@
+v4.4.9
 =================
 * Fix for hard mute series disappearing from list with crosshair defaultData
 * Added check for quadtree before running search
