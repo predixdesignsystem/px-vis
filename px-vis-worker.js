@@ -1,4 +1,4 @@
-importScripts("px-vis-worker-scale.js");
+// importScripts("px-vis-worker-scale.js");
 
 /*
   VISDATA Example:
@@ -875,15 +875,15 @@ onmessage = function(e) {
  var time = null;
   switch(e.data.action) {
 
-    case 'init':
-      if(e.data.d3Url) {
-        importScripts(e.data.d3Url);
-      } else {
-        importScripts("../pxd3/d3.min.js");
-      }
+    // case 'init':
+    //   if(e.data.d3Url) {
+    //     importScripts(e.data.d3Url);
+    //   } else {
+    //     importScripts("../pxd3/d3.min.js");
+    //   }
 
-      reply(null, time);
-      break;
+    //   reply(null, time);
+    //   break;
 
     case 'registerCustomScript':
 
