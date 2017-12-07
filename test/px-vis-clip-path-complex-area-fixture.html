@@ -32,23 +32,24 @@
 
   <body>
     <h3>Web Component Test : Fixture for px-vis-clip-path</h3>
+    <script>
+      document.addEventListener("WebComponentsReady", function() {
+        Polymer({
+          is: 'px-vis-radar-scale',
+          behaviors: [ PxVisBehaviorScale.radar ],
+          observers: [
+            '_setXScale(_radius)',
+            '_setYScale(_radius,centerOffset)',
+            '_generateChartExtents(chartData.*, dimensions)',
+            '_generateChartExtents(chartExtents)',
+            '_setDomain(x, y, _calculatedExtents)',
+          ]
+        })
+      });
+    </script>
     <dom-bind>
     <template is="dom-bind">
-      <script>
-        document.addEventListener("WebComponentsReady", function() {
-          Polymer({
-            is: 'px-vis-radar-scale',
-            behaviors: [ PxVisBehaviorScale.radar ],
-            observers: [
-              '_setXScale(_radius)',
-              '_setYScale(_radius,centerOffset)',
-              '_generateChartExtents(chartData.*, dimensions)',
-              '_generateChartExtents(chartExtents)',
-              '_setDomain(x, y, _calculatedExtents)',
-            ]
-          })
-        });
-      </script>
+
       <px-vis-radar-scale
         id="baseScale"
         x="{{x}}"
