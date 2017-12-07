@@ -17,8 +17,8 @@ before_script:
 - yarn add polymer-cli
 - polymer install --variants
 script:
-- xvfb-run wct --skip-plugin sauce
-- if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then wct --plugin sauce --skip-plugin local; fi
+- xvfb-run wct --skip-plugin sauce && xvfb-run wct --configFile wct.conf2.json --skip-plugin sauce
+- if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then wct --plugin sauce --skip-plugin local && wct --configFile wct.conf2.json --plugin sauce --skip-plugin local; fi
 after_success:
 - if [ "${TRAVIS_PULL_REQUEST}" = "false" ]; then openssl aes-256-cbc -k "$DEPLOYSECRET"
   -in deploy.enc -out deploy_key -d; fi
