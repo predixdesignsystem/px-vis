@@ -407,8 +407,8 @@ Custom property | Description
         var brushExt = Px.d3.brushSelection(this._brushGroup.node());
         if(brushExt) {
 
-          //if our extents are the same, add or subtract one based on location and reset the brush
-          if(brushExt[0] === brushExt[1]) {
+          //if our extents are the same (or less than 1 px apart), add or subtract one based on location and reset the brush
+          if(Math.abs(brushExt[0] - brushExt[1]) < 1) {
             brushExt[0] = (brushExt[0] === 0) ? 0 : brushExt[1] - 1;
             brushExt[1] = (brushExt[1] === 0) ? brushExt[0] + 1 : brushExt[1];
 
