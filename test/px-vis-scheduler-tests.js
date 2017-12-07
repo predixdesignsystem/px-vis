@@ -53,7 +53,11 @@ function runTests(){
       });
 
       //load the scheduler
-      Polymer.Base.importHref('../px-vis-scheduler.html');
+      if(Polymer.Base) {
+        Polymer.Base.importHref('../px-vis-scheduler.html');
+      } else {
+        Polymer.importHref('../px-vis-scheduler.html');
+      }
     });
 
     test('3 web workers', function() {
