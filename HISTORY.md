@@ -1,3 +1,7 @@
+v4.5.0
+=================
+* Hybrid support: Polymer 1.X and 2.X
+
 v4.4.9
 =================
 * Fix for hard mute series disappearing from list with crosshair defaultData
