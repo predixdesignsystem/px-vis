@@ -36,6 +36,7 @@ https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath
     is: 'px-vis-clip-path-complex-area',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehaviorD3.svg,
       PxVisBehavior.sizing,
       PxVisBehaviorD3.axes,
@@ -80,6 +81,10 @@ https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath
      * @method _drawElement
      */
     _drawElement: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(!this._clipPathObj) {
         this.set('clipPath', this.generateRandomID('cp_'));
         this.fire('px-vis-clip-path-updated', { 'dataVar': 'clipPath', 'data': this.clipPath, 'method':'set' });

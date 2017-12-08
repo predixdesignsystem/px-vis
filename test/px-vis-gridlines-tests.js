@@ -23,18 +23,23 @@ function rgbToHex(rgb) {
 
 function runTests(){
   suite('px-vis-gridlines does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
   });
 
   suite('px-vis-gridlines basic setup works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        baseXGrid = document.getElementById('baseXGrid'),
-        baseYGrid = document.getElementById('baseYGrid');
+    var baseScale,
+        baseSVG,
+        baseXGrid,
+        baseYGrid;
 
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      baseXGrid = document.getElementById('baseXGrid');
+      baseYGrid = document.getElementById('baseYGrid');
       var d = [{
             "x": 1397102460000,
             "y": 1
@@ -96,13 +101,18 @@ function runTests(){
   });
 
   suite('px-vis-gridlines basicXGrid works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        baseXGrid = document.getElementById('baseXGrid');
+    var baseScale,
+        baseSVG,
+        baseXGrid;
 
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    test('baseXGrid ID is random', function() {
+    suiteSetup(function() {
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      baseXGrid = document.getElementById('baseXGrid');
+    });
+test('baseXGrid ID is random', function() {
       assert.equal(baseXGrid.gridId.length,15);
       assert.equal(baseXGrid.gridId.split('_')[0],'grid');
     });
@@ -172,13 +182,18 @@ function runTests(){
   }); //suite
 
   suite('px-vis-gridlines basicYGrid works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        baseYGrid = document.getElementById('baseYGrid');
+    var baseScale,
+        baseSVG,
+        baseYGrid;
 
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    test('baseYGrid ID is random', function() {
+    suiteSetup(function() {
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      baseYGrid = document.getElementById('baseYGrid');
+    });
+test('baseYGrid ID is random', function() {
       assert.equal(baseYGrid.gridId.length,15);
       assert.equal(baseYGrid.gridId.split('_')[0],'grid');
     });

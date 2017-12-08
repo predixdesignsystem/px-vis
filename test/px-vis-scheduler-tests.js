@@ -4,21 +4,12 @@ document.addEventListener("WebComponentsReady", function() {
 
 function runTests(){
 
-  suite('before init', function() {
-
-    test('scheduler doesn\'t exist', function() {
-      assert.isUndefined(window.Px);
-    });
-  }); //suite
-
-
   suite('init scheduler', function() {
 
     suiteSetup(function(done) {
 
       //setup a custom number of workers and point to the file manually
       window.addEventListener('px-vis-worker-init', function() {
-        assert.deepEqual(Px.vis, {});
         Px.vis.maxWorkerCount = 3;
         Px.vis.workerUrl = '../px-vis-worker.js';
       });
@@ -62,7 +53,11 @@ function runTests(){
       });
 
       //load the scheduler
-      Polymer.Base.importHref('../px-vis-scheduler.html');
+      if(Polymer.Base) {
+        Polymer.Base.importHref('../px-vis-scheduler.html');
+      } else {
+        Polymer.importHref('../px-vis-scheduler.html');
+      }
     });
 
     test('3 web workers', function() {
@@ -286,7 +281,9 @@ function runTests(){
 
     var data = [{'blah': 'blouh'}, {'zlop': 'glob'}];
 
-    test('update custom data', function(done) {
+    suiteSetup(function() {
+    });
+test('update custom data', function(done) {
 
       Px.vis.scheduler.process({
           'action' : 'updateData',

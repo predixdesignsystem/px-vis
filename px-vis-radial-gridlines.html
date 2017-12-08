@@ -45,6 +45,7 @@ Custom property | Description
         is: 'px-vis-radial-gridlines',
 
         behaviors: [
+          PxVisBehavior.observerCheck,
           PxVisBehaviorD3.svg,
           PxVisBehavior.commonMethods,
           PxVisBehaviorD3.axis,
@@ -84,6 +85,10 @@ Custom property | Description
          * @method _drawElement
          */
         drawElement: function() {
+         if(this.hasUndefinedArguments(arguments)) {
+           return;
+         }
+
           this.debounce('draw_grid', function() {
 
             var radius = Math.max(0, this.axis.range()[1] - this.axis.range()[0]);

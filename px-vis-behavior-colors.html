@@ -54,6 +54,8 @@ PxColorsBehavior.dataVisColorTheming = [{
      * @method syncCSSTheme
      */
     syncCSSTheme: function() {
+
+
       // FIXME Aggressive debounce for simple charts. Look in solving the issue so we can reduce/remove this debounce.
       this.debounce('syncCSSTheme', this._debounceSyncCSSTheme, 100);
     },
@@ -66,7 +68,20 @@ PxColorsBehavior.dataVisColorTheming = [{
      * @method _debounceSyncCSSTheme
      */
     _debounceSyncCSSTheme: function() {
-      var firstThemedColor = this.getComputedStyleValue('--px-vis-series-color-0');
+      var firstThemedColor;
+
+
+      if (Polymer.Element) {
+        // 2.0 code
+        if (window.ShadyCSS) {
+          firstThemedColor = ShadyCSS.getComputedStyleValue(this, '--px-vis-series-color-0');
+        } else {
+          firstThemedColor = getComputedStyle(this).getPropertyValue('--px-vis-series-color-0');
+        }
+      } else {
+        // 1.0 code
+        firstThemedColor = this.getComputedStyleValue('--px-vis-series-color-0');
+      }
 
       // If there's a theme color set, attempt to get all CSS style variables
       // and prepare to apply them.
@@ -102,7 +117,18 @@ PxColorsBehavior.dataVisColorTheming = [{
 
       // Loop over style variables until a gap is found
       while (!stop) {
-        currentColor = this.getComputedStyleValue('--px-vis-series-color-' + index);
+
+        if (Polymer.Element) {
+          // 2.0 code
+          if (window.ShadyCSS) {
+            currentColor = ShadyCSS.getComputedStyleValue(this, '--px-vis-series-color-' + index);
+          } else {
+            currentColor = getComputedStyle(this).getPropertyValue('--px-vis-series-color-' + index);
+          }
+        } else {
+          // 1.0 code
+          currentColor = this.getComputedStyleValue('--px-vis-series-color-' + index);
+        }
 
         if (!currentColor) {
           // No more colors found, break out of while loop

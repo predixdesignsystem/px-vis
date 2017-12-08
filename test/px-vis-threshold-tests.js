@@ -24,15 +24,16 @@ function rgbToHex(rgb) {
 function runTests(){
   var testTimeout = 100;
   suite('px-vis-scatter does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
   });
 
   suite('px-vis-threshold first draw', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        defaultThreshold = document.getElementById('defaultThreshold'),
+    var baseScale,
+        baseSVG,
+        defaultThreshold,
         thresholdGroups,
         thresholdLines,
         thresholdRects,
@@ -43,6 +44,9 @@ function runTests(){
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      defaultThreshold = document.getElementById('defaultThreshold');
       var w = 500,
         h = 300,
         m = {
@@ -144,7 +148,7 @@ function runTests(){
 
       test('defaultThreshold thresholdGroup created', function() {
         assert.equal(defaultThreshold.thresholdGroup.node().tagName,'g');
-        assert.equal(defaultThreshold.thresholdGroup.attr("class"),'thresholds');
+        assert.isTrue(defaultThreshold.thresholdGroup.attr("class").indexOf('thresholds') !== -1);
       });
 
       test('defaultThreshold thresholdGroup groups are created', function() {
@@ -329,9 +333,9 @@ function runTests(){
 
 
   suite('px-vis-threshold completeSeriesConfig changed', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        defaultThreshold = document.getElementById('defaultThreshold'),
+    var baseScale,
+        baseSVG,
+        defaultThreshold,
         thresholdGroups,
         thresholdLines,
         thresholdRects,
@@ -342,6 +346,9 @@ function runTests(){
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     suiteSetup(function(done) {
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      defaultThreshold = document.getElementById('defaultThreshold');
       var completeSeriesConfig = {
         "mySeries":{
           "type":"line",
@@ -369,7 +376,7 @@ function runTests(){
 
       test('defaultThreshold thresholdGroup created', function() {
         assert.equal(defaultThreshold.thresholdGroup.node().tagName,'g');
-        assert.equal(defaultThreshold.thresholdGroup.attr("class"),'thresholds');
+        assert.isTrue(defaultThreshold.thresholdGroup.attr("class").indexOf('thresholds') !== -1);
       });
 
       test('defaultThreshold thresholdGroup groups are created', function() {
@@ -554,9 +561,9 @@ function runTests(){
 
 
   suite('px-vis-threshold update thresholds', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        defaultThreshold = document.getElementById('defaultThreshold'),
+    var baseScale,
+        baseSVG,
+        defaultThreshold,
         thresholdGroups,
         thresholdLines,
         thresholdRects,
@@ -567,6 +574,9 @@ function runTests(){
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      defaultThreshold = document.getElementById('defaultThreshold');
       var dT = [
           { "for":"mySeries", "type":"defaultSeriesTitleBox", "value":8 },
           { "for":"mySeries", "type":"defaultSeriesBox", "value": 7 },
@@ -594,7 +604,7 @@ function runTests(){
     suite('px-vis-threshold everything drew', function() {
       test('defaultThreshold thresholdGroup created', function() {
         assert.equal(defaultThreshold.thresholdGroup.node().tagName,'g');
-        assert.equal(defaultThreshold.thresholdGroup.attr("class"),'thresholds');
+        assert.isTrue(defaultThreshold.thresholdGroup.attr("class").indexOf('thresholds') !== -1);
       });
 
       test('defaultThreshold thresholdGroup groups are created', function() {
@@ -779,9 +789,9 @@ function runTests(){
 
 
   suite('px-vis-threshold update threshold values', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        defaultThreshold = document.getElementById('defaultThreshold'),
+    var baseScale,
+        baseSVG,
+        defaultThreshold,
         thresholdGroups,
         thresholdLines,
         thresholdRects,
@@ -792,6 +802,9 @@ function runTests(){
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      defaultThreshold = document.getElementById('defaultThreshold');
       var dT = [
           { "for":"mySeries", "type":"defaultSeriesTitleBox", "value":9 },
           { "for":"mySeries", "type":"defaultSeriesBox", "value": 7 },
@@ -819,7 +832,7 @@ function runTests(){
     suite('px-vis-threshold everything drew', function() {
       test('defaultThreshold thresholdGroup created', function() {
         assert.equal(defaultThreshold.thresholdGroup.node().tagName,'g');
-        assert.equal(defaultThreshold.thresholdGroup.attr("class"),'thresholds');
+        assert.isTrue(defaultThreshold.thresholdGroup.attr("class").indexOf('thresholds') !== -1);
       });
 
       test('defaultThreshold thresholdGroup groups are created', function() {
@@ -1004,9 +1017,9 @@ function runTests(){
 
 
   suite('px-vis-threshold delete thresholds', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        defaultThreshold = document.getElementById('defaultThreshold'),
+    var baseScale,
+        baseSVG,
+        defaultThreshold,
         thresholdGroups,
         thresholdLines,
         thresholdRects,
@@ -1016,6 +1029,9 @@ function runTests(){
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      defaultThreshold = document.getElementById('defaultThreshold');
       var dT = [
           { "for":"mySeries", "type":"defaultSeriesTitleBox", "value":9 },
           { "for":"mySeries", "type":"defaultSeries", "value":8 },
@@ -1041,7 +1057,7 @@ function runTests(){
     suite('px-vis-threshold everything drew', function() {
       test('defaultThreshold thresholdGroup created', function() {
         assert.equal(defaultThreshold.thresholdGroup.node().tagName,'g');
-        assert.equal(defaultThreshold.thresholdGroup.attr("class"),'thresholds');
+        assert.isTrue(defaultThreshold.thresholdGroup.attr("class").indexOf('thresholds') !== -1);
       });
 
       test('defaultThreshold thresholdGroup groups are created', function() {
@@ -1190,9 +1206,9 @@ function runTests(){
 
 
   suite('px-vis-threshold add thresholds', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        defaultThreshold = document.getElementById('defaultThreshold'),
+    var baseScale,
+        baseSVG,
+        defaultThreshold,
         thresholdGroups,
         thresholdLines,
         thresholdRects,
@@ -1202,6 +1218,9 @@ function runTests(){
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      defaultThreshold = document.getElementById('defaultThreshold');
       var dT = [
           { "for":"mySeries", "type":"defaultSeriesTitleBox", "value":9 },
           { "for":"mySeries", "type":"defaultSeries", "value":8 },
@@ -1229,7 +1248,7 @@ function runTests(){
     suite('px-vis-threshold everything drew', function() {
       test('defaultThreshold thresholdGroup created', function() {
         assert.equal(defaultThreshold.thresholdGroup.node().tagName,'g');
-        assert.equal(defaultThreshold.thresholdGroup.attr("class"),'thresholds');
+        assert.isTrue(defaultThreshold.thresholdGroup.attr("class").indexOf('thresholds') !== -1);
       });
 
       test('defaultThreshold thresholdGroup groups are created', function() {

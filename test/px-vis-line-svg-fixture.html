@@ -6,12 +6,11 @@
     <title>Web Component Test : Fixture for px-vis-line-svg</title>
 
     <!-- Requires Webcomponents.js polyfill is provided by the page for browsers that don't support html imports -->
-    <script src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <!-- web-component-tester automatically provides local copy of brower.js below
          for any URL ending with "/web-component-tester/browser.js"
          when wct is run from the command line -->
-    <script src="../web-component-tester/browser.js"></script>
-
+    <script src="../../web-component-tester/browser.js"></script>
 
     <link rel="import" href="../px-vis-scale.html" />
     <link rel="import" href="../px-vis-svg.html" />
@@ -22,13 +21,17 @@
     <link rel="import" href="../px-vis-behavior-scale-multi-axis.html" />
     <link rel="import" href="../px-vis-behavior-scale-radial.html" />
     <link rel="import" href="../px-vis-behavior-scale-radar.html" />
-
+    <link rel="import" href="../../polymer/lib/elements/dom-bind.html" />
+    <link rel="import" href="../../polymer/lib/elements/dom-repeat.html" />
 
 
     <!-- Retain this link for px-theme.html -->
     <!-- px-theme is needed for WCT to run without errors -->
     <link rel="import" href="../../px-theme/px-theme-styles.html">
-    <style include="px-theme-styles" is="custom-style"></style>
+
+    <custom-style>
+      <style include="px-theme-styles" is="custom-style"></style>
+    </custom-style>
 
     <script src="px-vis-line-svg-xy-tests.js"></script>
     <script src="px-vis-line-svg-parallel-tests.js"></script>
@@ -39,9 +42,11 @@
     <script src="px-vis-line-svg-tests.js"></script>
   </head>
 
+
   <body>
     <h3>Web Component Test : Fixture for px-vis-line-svg</h3>
 <!-- SVG -->
+  <dom-bind>
     <template is="dom-bind">
       <px-vis-scale
         id="baseScale"
@@ -63,36 +68,40 @@
         domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
+  </dom-bind>
 
+  <dom-bind>
     <template is="dom-bind">
       <px-vis-scale
         id="mutedScale"
         x-axis-type="time"
         y-axis-type="linear"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
+        x="{{x2}}"
+        y="{{y2}}"
+        domain-changed="{{domainChanged2}}">
       </px-vis-scale>
       <px-vis-svg
         id="mutedSVG"
-        svg="{{svg}}">
+        svg="{{svg2}}">
       </px-vis-svg>
       <px-vis-line-svg
         id="mutedLine1"
-        svg="[[svg]]"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]">
+        svg="[[svg2]]"
+        x="[[x2]]"
+        y="[[y2]]"
+        domain-changed="[[domainChanged2]]">
       </px-vis-line-svg>
       <px-vis-line-svg
         id="mutedLine2"
-        svg="[[svg]]"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]">
+        svg="[[svg2]]"
+        x="[[x2]]"
+        y="[[y2]]"
+        domain-changed="[[domainChanged2]]">
       </px-vis-line-svg>
     </template>
+    </dom-bind>
 
+    <dom-bind>
     <template is="dom-bind">
       <px-vis-scale
         id="missingDataPointScale"
@@ -121,7 +130,9 @@
         domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
+    </dom-bind>
 
+    <dom-bind>
     <template is="dom-bind">
       <px-vis-scale
         id="missingDataPointScaleNull"
@@ -150,7 +161,9 @@
         domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
+    </dom-bind>
 
+    <dom-bind>
     <template is="dom-bind">
       <px-vis-scale
         id="missingDataPointScaleGap"
@@ -181,6 +194,7 @@
         domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
+    </dom-bind>
 
 
 <!--  PARALLEL COORDINATES SVG-->
@@ -199,6 +213,7 @@
       });
     </script>
 
+    <dom-bind>
     <template is="dom-bind">
       <px-vis-multi-scale
         id="parallelScale"
@@ -220,7 +235,9 @@
         domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
+    </dom-bind>
 
+    <dom-bind>
     <template is="dom-bind">
       <px-vis-multi-scale
         id="parallelGradientScale"
@@ -243,7 +260,9 @@
         domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
+    </dom-bind>
 
+    <dom-bind>
     <template is="dom-bind">
       <px-vis-multi-scale
         id="parallelCategoryScale"
@@ -265,7 +284,9 @@
         domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
+    </dom-bind>
 
+    <dom-bind>
     <template is="dom-bind">
       <px-vis-multi-scale
         id="parallelCategoryGradientScale"
@@ -288,7 +309,9 @@
         domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
+    </dom-bind>
 
+    <dom-bind>
     <template is="dom-bind">
       <px-vis-multi-scale
         id="parallelMissingScale"
@@ -310,6 +333,7 @@
         domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
+    </dom-bind>
 
 
     <!-- POLAR -->
@@ -327,6 +351,7 @@
       });
     </script>
 
+    <dom-bind>
     <template is="dom-bind">
       <px-vis-radial-scale
         id="polarScale"
@@ -347,7 +372,9 @@
         domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
+    </dom-bind>
 
+    <dom-bind>
     <template is="dom-bind">
       <px-vis-radial-scale
         id="polarDegreeScale"
@@ -369,7 +396,9 @@
         domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
+    </dom-bind>
 
+    <dom-bind>
     <template is="dom-bind">
       <px-vis-radial-scale
         id="polarCCWScale"
@@ -391,7 +420,9 @@
         domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
+    </dom-bind>
 
+    <dom-bind>
     <template is="dom-bind">
       <px-vis-radial-scale
         id="polarDegreeCCWScale"
@@ -414,7 +445,9 @@
         domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
+    </dom-bind>
 
+    <dom-bind>
     <template is="dom-bind">
       <px-vis-radial-scale
         id="polarMissingScale"
@@ -435,6 +468,7 @@
         domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
+    </dom-bind>
 
     <!--  RADAR -->
     <script>
@@ -453,6 +487,7 @@
       });
     </script>
 
+    <dom-bind>
     <template is="dom-bind">
       <px-vis-radar-scale
         id="radarScale"
@@ -477,7 +512,9 @@
         domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
+    </dom-bind>
 
+    <dom-bind>
     <template is="dom-bind">
       <px-vis-radar-scale
         id="radarMissingScale"
@@ -501,8 +538,10 @@
         domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
+    </dom-bind>
 
 <!-- Interpolation-->
+<dom-bind>
     <template is="dom-bind">
       <px-vis-scale
         id="interpolationScale"
@@ -538,8 +577,10 @@
         domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
+</dom-bind>
 
     <div id="domRepeatDiv">
+        <dom-bind id="domRepeatDomBind2">
       <template id="domRepeatDomBind" is="dom-bind">
         <px-vis-scale
           id="domRepeatScale"
@@ -556,19 +597,22 @@
           svg="{{svg}}">
         </px-vis-svg>
 
-        <template is="dom-repeat" items="[[seriesKeys]]">
-          <px-vis-line-svg
-            class$="[[_myClass(item)]]"
-            svg="[[svg]]"
-            x="[[x]]"
-            y="[[y]]"
-            domain-changed="[[domainChanged]]"
-            chart-data="[[chartData]]"
-            complete-series-config="[[completeSeriesConfig]]"
-            series-id="[[item]]">
-          </px-vis-line-svg>
-        </template>
+        <dom-repeat>
+          <template is="dom-repeat" items="[[seriesKeys]]">
+            <px-vis-line-svg
+              class$="[[_myClass(item)]]"
+              svg="[[svg]]"
+              x="[[x]]"
+              y="[[y]]"
+              domain-changed="[[domainChanged]]"
+              chart-data="[[chartData]]"
+              complete-series-config="[[completeSeriesConfig]]"
+              series-id="[[item]]">
+            </px-vis-line-svg>
+          </template>
+        </dom-repeat>
       </template>
+      </dom-bind>
     </div>
 
   </body>

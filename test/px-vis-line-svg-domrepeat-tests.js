@@ -1,9 +1,9 @@
 function runDRTests(){
   suite('px-vis-line-svg in a dom-repeat', function() {
     suite('One line', function() {
-      var domRepeatScale = document.getElementById('domRepeatScale'),
-          domRepeatSVG = document.getElementById('domRepeatSVG'),
-          domRepeatDomBind = document.getElementById('domRepeatDomBind');
+      var domRepeatScale,
+          domRepeatSVG,
+          domRepeatDomBind;
 
 
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -46,6 +46,23 @@ function runDRTests(){
             "bottom": 20,
             "left": 15
           };
+
+        domRepeatScale = document.getElementById('domRepeatScale'),
+        domRepeatSVG = document.getElementById('domRepeatSVG'),
+        domRepeatDomBind = document.getElementById('domRepeatDomBind');
+
+        if(!domRepeatDomBind.set) {
+          //for Polymer 2 we need to grab the actual dom-bind element to
+          //set on it
+          domRepeatDomBind = document.getElementById('domRepeatDomBind2');
+        }
+
+        if(!domRepeatDomBind.set) {
+          //for Polymer 2 we need to grab the actual dom-bind element to
+          //set on it
+          domRepeatDomBind = document.getElementById('domRepeatDomBind2');
+        }
+
 
         var rendered = function() {
           domRepeatLines = document.querySelectorAll('.domRepeatLines');
@@ -102,9 +119,9 @@ function runDRTests(){
     }); //suite
 
     suite('three lines', function() {
-      var domRepeatScale = document.getElementById('domRepeatScale'),
-          domRepeatSVG = document.getElementById('domRepeatSVG'),
-          domRepeatDomBind = document.getElementById('domRepeatDomBind');
+      var domRepeatScale,
+          domRepeatSVG,
+          domRepeatDomBind;
 
 
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -173,6 +190,15 @@ function runDRTests(){
           },
           counter =0;
 
+        domRepeatScale = document.getElementById('domRepeatScale'),
+        domRepeatSVG = document.getElementById('domRepeatSVG'),
+        domRepeatDomBind = document.getElementById('domRepeatDomBind');
+
+        if(!domRepeatDomBind.set) {
+          //for Polymer 2 we need to grab the actual dom-bind element to
+          //set on it
+          domRepeatDomBind = document.getElementById('domRepeatDomBind2');
+        }
         var rendered = function() {
           counter++;
 
@@ -258,9 +284,9 @@ function runDRTests(){
     }); //suite
 
     suite('delete #2', function() {
-      var domRepeatScale = document.getElementById('domRepeatScale'),
-          domRepeatSVG = document.getElementById('domRepeatSVG'),
-          domRepeatDomBind = document.getElementById('domRepeatDomBind');
+      var domRepeatScale,
+          domRepeatSVG,
+          domRepeatDomBind;
 
 
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -316,6 +342,16 @@ function runDRTests(){
             "left": 15
           },
           counter = 0;
+
+        domRepeatScale = document.getElementById('domRepeatScale'),
+        domRepeatSVG = document.getElementById('domRepeatSVG'),
+        domRepeatDomBind = document.getElementById('domRepeatDomBind');
+
+        if(!domRepeatDomBind.set) {
+          //for Polymer 2 we need to grab the actual dom-bind element to
+          //set on it
+          domRepeatDomBind = document.getElementById('domRepeatDomBind2');
+        }
 
         var rendered = function() {
           counter++;
@@ -388,9 +424,9 @@ function runDRTests(){
     }); //suite
 
     suite('add #4', function() {
-      var domRepeatScale = document.getElementById('domRepeatScale'),
-          domRepeatSVG = document.getElementById('domRepeatSVG'),
-          domRepeatDomBind = document.getElementById('domRepeatDomBind');
+      var domRepeatScale,
+          domRepeatSVG,
+          domRepeatDomBind;
 
 
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -458,6 +494,16 @@ function runDRTests(){
             "left": 15
           },
           counter =0;
+
+        domRepeatScale = document.getElementById('domRepeatScale'),
+        domRepeatSVG = document.getElementById('domRepeatSVG'),
+        domRepeatDomBind = document.getElementById('domRepeatDomBind');
+
+        if(!domRepeatDomBind.set) {
+          //for Polymer 2 we need to grab the actual dom-bind element to
+          //set on it
+          domRepeatDomBind = document.getElementById('domRepeatDomBind2');
+        }
 
          var rendered = function() {
           counter++;
@@ -544,9 +590,9 @@ function runDRTests(){
     }); //suite
 
     suite('delete all', function() {
-      var domRepeatScale = document.getElementById('domRepeatScale'),
-          domRepeatSVG = document.getElementById('domRepeatSVG'),
-          domRepeatDomBind = document.getElementById('domRepeatDomBind');
+      var domRepeatScale,
+          domRepeatSVG,
+          domRepeatDomBind;
 
 
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -565,6 +611,16 @@ function runDRTests(){
             "bottom": 20,
             "left": 15
           };
+
+        domRepeatScale = document.getElementById('domRepeatScale'),
+        domRepeatSVG = document.getElementById('domRepeatSVG'),
+        domRepeatDomBind = document.getElementById('domRepeatDomBind');
+
+        if(!domRepeatDomBind.set) {
+          //for Polymer 2 we need to grab the actual dom-bind element to
+          //set on it
+          domRepeatDomBind = document.getElementById('domRepeatDomBind2');
+        }
 
         domRepeatDomBind._myClass = function(item) { return 'domRepeatLines' };
 

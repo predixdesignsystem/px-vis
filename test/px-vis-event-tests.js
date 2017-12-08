@@ -23,26 +23,40 @@ function rgbToHex(rgb) {
 
 function runTests(){
   suite('px-vis-scatter does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
   });
 
   suite('px-vis-event is instantiated', function() {
-    var baseScale = document.getElementById('baseScale'),
-        linearScale = document.getElementById('linearScale'),
-        ordinalScale = document.getElementById('ordinalScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        defaultEvent = document.getElementById('defaultEvent'),
-        faEvent = document.getElementById('faEvent'),
-        uniEvent = document.getElementById('uniEvent'),
-        imgEvent = document.getElementById('imgEvent'),
-        noLabelEvent = document.getElementById('noLabelEvent'),
-        offsetEvent = document.getElementById('offsetEvent'),
-        linearEvent = document.getElementById('linearEvent'),
-        ordinalEvent = document.getElementById('ordinalEvent');
+    var baseScale,
+        linearScale,
+        ordinalScale,
+        baseSVG,
+        defaultEvent,
+        faEvent,
+        uniEvent,
+        imgEvent,
+        noLabelEvent,
+        offsetEvent,
+        linearEvent,
+        ordinalEvent;
 
     suiteSetup(function(done) {
+      window.setTimeout(function(){
+      baseScale = document.getElementById('baseScale');
+      linearScale = document.getElementById('linearScale');
+      ordinalScale = document.getElementById('ordinalScale');
+      baseSVG = document.getElementById('baseSVG');
+      defaultEvent = document.getElementById('defaultEvent');
+      faEvent = document.getElementById('faEvent');
+      uniEvent = document.getElementById('uniEvent');
+      imgEvent = document.getElementById('imgEvent');
+      noLabelEvent = document.getElementById('noLabelEvent');
+      offsetEvent = document.getElementById('offsetEvent');
+      linearEvent = document.getElementById('linearEvent');
+      ordinalEvent = document.getElementById('ordinalEvent');
       var w = 500,
         h = 300,
         m = {
@@ -251,6 +265,7 @@ function runTests(){
         ordinalEvent._tooltipRequest();
         done();
       }.bind(this), 1500);
+    }.bind(this), 1500);
     });
 
     test('defaultEvent fixture is created', function() {
@@ -271,17 +286,22 @@ function runTests(){
   }); //suite
 
   suite('px-vis-event defaultEvent works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        defaultEvent = document.getElementById('defaultEvent');
+    var baseScale,
+        baseSVG,
+        defaultEvent;
 
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    test('defaultEvent eventGroup created', function() {
+    suiteSetup(function() {
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      defaultEvent = document.getElementById('defaultEvent');
+    });
+test('defaultEvent eventGroup created', function() {
       assert.equal(defaultEvent.eventGroup.node().tagName,'g');
     });
     test('defaultEvent eventGroup has class', function() {
-      assert.equal(defaultEvent.eventGroup.attr('class'),'event');
+      assert.isTrue(defaultEvent.eventGroup.attr('class').indexOf('event') !== -1);
     });
     test('defaultEvent eventGroup set event-id', function() {
       assert.equal(defaultEvent.eventGroup.attr('event-id'),defaultEvent.eventId);
@@ -320,22 +340,27 @@ function runTests(){
       assert.isTrue(defaultEvent.$$('px-tooltip') !== null);
     });
     test('tooltip content is correct', function() {
-      assert.equal(defaultEvent.$$('px-tooltip').$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: DefaultID: 333Timestamp: 20:13:00 +0000 | 10 Apr 2014');
+      assert.equal(defaultEvent.$$('px-tooltip').textContent.replace(/\s\s+/g, ''),'Event: DefaultID: 333Timestamp: 20:13:00 +0000 | 10 Apr 2014');
     });
   }); //suite
 
   suite('px-vis-event imgEvent works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        imgEvent = document.getElementById('imgEvent');
+    var baseScale,
+        baseSVG,
+        imgEvent;
 
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    test('imgEvent eventGroup created', function() {
+    suiteSetup(function() {
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      imgEvent = document.getElementById('imgEvent');
+    });
+test('imgEvent eventGroup created', function() {
       assert.equal(imgEvent.eventGroup.node().tagName,'g');
     });
     test('imgEvent eventGroup has class', function() {
-      assert.equal(imgEvent.eventGroup.attr('class'),'event');
+      assert.isTrue(imgEvent.eventGroup.attr('class').indexOf('event') !== -1);
     });
 
 
@@ -381,22 +406,27 @@ function runTests(){
       assert.isTrue(imgEvent.$$('px-tooltip') !== null);
     });
     test('tooltip content is correct', function() {
-      assert.equal(imgEvent.$$('px-tooltip').$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: imageID: 123Timestamp: 12:07:00 +0000 | 10 Apr 2014');
+      assert.equal(imgEvent.$$('px-tooltip').textContent.replace(/\s\s+/g, ''),'Event: imageID: 123Timestamp: 12:07:00 +0000 | 10 Apr 2014');
     });
   }); //suite
 
   suite('px-vis-event noLabelEvent works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        noLabelEvent = document.getElementById('noLabelEvent');
+    var baseScale,
+        baseSVG,
+        noLabelEvent;
 
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    test('noLabelEvent eventGroup created', function() {
+    suiteSetup(function() {
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      noLabelEvent = document.getElementById('noLabelEvent');
+    });
+test('noLabelEvent eventGroup created', function() {
       assert.equal(noLabelEvent.eventGroup.node().tagName,'g');
     });
     test('noLabelEvent eventGroup has class', function() {
-      assert.equal(noLabelEvent.eventGroup.attr('class'),'event');
+      assert.isTrue(noLabelEvent.eventGroup.attr('class').indexOf('event') !== -1);
     });
 
     test('noLabelEvent eventIcon transform', function() {
@@ -429,22 +459,27 @@ function runTests(){
       assert.isTrue(noLabelEvent.$$('px-tooltip') !== null);
     });
     test('tooltip content is correct', function() {
-      assert.equal(noLabelEvent.$$('px-tooltip').$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event:ID: 42Timestamp: 06:30:51 +0000 | 10 Apr 2014');
+      assert.equal(noLabelEvent.$$('px-tooltip').textContent.replace(/\s\s+/g, ''),'Event:ID: 42Timestamp: 06:30:51 +0000 | 10 Apr 2014');
     });
   }); //suite
 
   suite('px-vis-event offsetEvent works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        offsetEvent = document.getElementById('offsetEvent');
+    var baseScale,
+        baseSVG,
+        offsetEvent;
 
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    test('offsetEvent eventGroup created', function() {
+    suiteSetup(function() {
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      offsetEvent = document.getElementById('offsetEvent');
+    });
+test('offsetEvent eventGroup created', function() {
       assert.equal(offsetEvent.eventGroup.node().tagName,'g');
     });
     test('offsetEvent eventGroup has class', function() {
-      assert.equal(offsetEvent.eventGroup.attr('class'),'event');
+      assert.isTrue(offsetEvent.eventGroup.attr('class').indexOf('event') !== -1);
     });
 
     test('offsetEvent eventIcon created', function() {
@@ -483,23 +518,28 @@ function runTests(){
       assert.isTrue(offsetEvent.$$('px-tooltip') !== null);
     });
     test('tooltip content is correct', function() {
-      assert.equal(offsetEvent.$$('px-tooltip').$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: offsetID: 444Timestamp: 22:46:54 +0000 | 10 Apr 2014');
+      assert.equal(offsetEvent.$$('px-tooltip').textContent.replace(/\s\s+/g, ''),'Event: offsetID: 444Timestamp: 22:46:54 +0000 | 10 Apr 2014');
     });
   }); //suite
 
 
   suite('px-vis-event with linear scale', function() {
-    var baseScale = document.getElementById('linearScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        linearEvent = document.getElementById('linearEvent');
+    var baseScale,
+        baseSVG,
+        linearEvent;
 
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    test('linearEvent eventGroup created', function() {
+    suiteSetup(function() {
+      baseScale = document.getElementById('linearScale');
+      baseSVG = document.getElementById('baseSVG');
+      linearEvent = document.getElementById('linearEvent');
+    });
+test('linearEvent eventGroup created', function() {
       assert.equal(linearEvent.eventGroup.node().tagName,'g');
     });
     test('linearEvent eventGroup has class', function() {
-      assert.equal(linearEvent.eventGroup.attr('class'),'event');
+      assert.isTrue(linearEvent.eventGroup.attr('class').indexOf('event') !== -1);
     });
 
     test('linearEvent eventIcon created', function() {
@@ -530,22 +570,27 @@ function runTests(){
       assert.isTrue(linearEvent.$$('px-tooltip') !== null);
     });
     test('tooltip content is correct', function() {
-      assert.equal(linearEvent.$$('px-tooltip').$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: linearID: 666X: 3');
+      assert.equal(linearEvent.$$('px-tooltip').textContent.replace(/\s\s+/g, ''),'Event: linearID: 666X: 3');
     });
   }); //suite
 
   suite('px-vis-event with ordinal scale', function() {
-    var baseScale = document.getElementById('ordinalScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        ordinalEvent = document.getElementById('ordinalEvent');
+    var baseScale,
+        baseSVG,
+        ordinalEvent;
 
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    test('ordinalEvent eventGroup created', function() {
+    suiteSetup(function() {
+      baseScale = document.getElementById('ordinalScale');
+      baseSVG = document.getElementById('baseSVG');
+      ordinalEvent = document.getElementById('ordinalEvent');
+    });
+test('ordinalEvent eventGroup created', function() {
       assert.equal(ordinalEvent.eventGroup.node().tagName,'g');
     });
     test('ordinalEvent eventGroup has class', function() {
-      assert.equal(ordinalEvent.eventGroup.attr('class'),'event');
+      assert.isTrue(ordinalEvent.eventGroup.attr('class').indexOf('event') !== -1);
     });
 
     test('ordinalEvent eventIcon created', function() {
@@ -576,7 +621,7 @@ function runTests(){
       assert.isTrue(ordinalEvent.$$('px-tooltip') !== null);
     });
     test('tooltip content is correct', function() {
-      assert.equal(ordinalEvent.$$('px-tooltip').$.tooltip.querySelector('span.style-scope.px-vis-event').textContent.replace(/\s\s+/g, ''),'Event: ordinalID: 6666X: low');
+      assert.equal(ordinalEvent.$$('px-tooltip').textContent.replace(/\s\s+/g, ''),'Event: ordinalID: 6666X: low');
     });
   }); //suite
 } //runTests

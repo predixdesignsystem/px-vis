@@ -5,7 +5,7 @@ document.addEventListener("WebComponentsReady", function() {
 function runTests() {
 
   suite('px-vis-dynamic-menu config', function() {
-    var menu = document.getElementById('menu'),
+    var menu,
         conf,
         deleteCounter = 0,
         deleteCounterEvent = 0,
@@ -13,6 +13,7 @@ function runTests() {
         someContext = {'isContext': true};
 
     suiteSetup(function() {
+      menu = document.getElementById('dynamicMenu');
 
       conf = [
           {
@@ -37,7 +38,7 @@ function runTests() {
             'icon': 'fa-arrow-up'
           }
         ];
-        
+
         menu.set('dynamicMenuConfig', conf);
 
       document.addEventListener('px-vis-event-request', function(evt) {
@@ -78,13 +79,13 @@ function runTests() {
     });
 
     test('menu not opened', function() {
-      
+
       assert.isFalse(menu._opened);
       assert.equal(Polymer.dom(menu.root).querySelector('iron-dropdown').getComputedStyleValue('display'), 'none');
     });
 
     test('open menu by click', function() {
-      
+
       var span = Polymer.dom(menu.root).querySelector('span');
       span.click();
 
@@ -103,7 +104,7 @@ function runTests() {
     });
 
     test('click on bring to front', function() {
-      
+
       var bringToFront = Polymer.dom(menu.root).querySelectorAll('.menu-wrapper--item')[1];
       bringToFront.click();
 

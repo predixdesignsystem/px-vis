@@ -4,20 +4,24 @@ document.addEventListener("WebComponentsReady", function() {
 
 function runTests(){
   suite('px-vis-scatter does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
   });
 
   suite('px-vis-scatter works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        baseScatter = document.getElementById('baseScatter');
+    var baseScale,
+        baseSVG,
+        baseScatter;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done) {
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      baseScatter = document.getElementById('baseScatter');
       var d = [{
             "x": 1397102460000,
             "y": 1
@@ -83,7 +87,7 @@ function runTests(){
       assert.equal(baseScatter.scatterGroup.node().tagName,'g');
     });
     test('baseScatter scatterDots created', function() {
-      assert.equal(baseScatter.scatterDots.node().getAttribute("class"),'symbol');
+      assert.isTrue(baseScatter.scatterDots.node().getAttribute("class").indexOf('symbol') !== -1);
     });
 
     test('baseScatter scatter series ID is random', function() {
@@ -116,15 +120,19 @@ function runTests(){
   }); //suite
 
   suite('px-vis-scatter with two series works', function() {
-    var mutedScale = document.getElementById('mutedScale'),
-        mutedSVG = document.getElementById('mutedSVG'),
-        mutedScatter1 = document.getElementById('mutedScatter1'),
-        mutedScatter2 = document.getElementById('mutedScatter2');
+    var mutedScale,
+        mutedSVG,
+        mutedScatter1,
+        mutedScatter2;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
+      mutedScale = document.getElementById('mutedScale');
+      mutedSVG = document.getElementById('mutedSVG');
+      mutedScatter1 = document.getElementById('mutedScatter1');
+      mutedScatter2 = document.getElementById('mutedScatter2');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -219,7 +227,7 @@ function runTests(){
       assert.equal(mutedScatter1.scatterGroup.node().tagName,'g');
     });
     test('mutedScatter1 scatterDots created', function() {
-      assert.equal(mutedScatter1.scatterDots.node().getAttribute("class"),'symbol');
+      assert.isTrue(mutedScatter1.scatterDots.node().getAttribute("class").indexOf('symbol') !== -1);
     });
     test('mutedScatter1 scatter series ID is set', function() {
       assert.equal(mutedScatter1.scatterGroup.attr('series-id'),'scatter_mySeries');
@@ -257,7 +265,7 @@ function runTests(){
       assert.equal(mutedScatter2.scatterGroup.node().tagName,'g');
     });
     test('mutedScatter2 scatterDots created', function() {
-      assert.equal(mutedScatter2.scatterDots.node().getAttribute("class"),'symbol');
+      assert.isTrue(mutedScatter2.scatterDots.node().getAttribute("class").indexOf('symbol') !== -1);
     });
     test('mutedScatter2 scatter series ID is set', function() {
       assert.equal(mutedScatter2.scatterGroup.attr('series-id'),'scatter_mySeries2');
@@ -294,15 +302,19 @@ function runTests(){
   }); //suite
 
   suite('px-vis-scatter mutes', function() {
-    var mutedScale = document.getElementById('mutedScale'),
-        mutedSVG = document.getElementById('mutedSVG'),
-        mutedScatter1 = document.getElementById('mutedScatter1'),
-        mutedScatter2 = document.getElementById('mutedScatter2');
+    var mutedScale,
+        mutedSVG,
+        mutedScatter1,
+        mutedScatter2;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
+      mutedScale = document.getElementById('mutedScale');
+      mutedSVG = document.getElementById('mutedSVG');
+      mutedScatter1 = document.getElementById('mutedScatter1');
+      mutedScatter2 = document.getElementById('mutedScatter2');
       var m = {
         "mySeries":false,
         "mySeries2":true
@@ -344,15 +356,19 @@ function runTests(){
   }); //suite
 
   suite('px-vis-scatter unmutes', function() {
-    var mutedScale = document.getElementById('mutedScale'),
-        mutedSVG = document.getElementById('mutedSVG'),
-        mutedScatter1 = document.getElementById('mutedScatter1'),
-        mutedScatter2 = document.getElementById('mutedScatter2');
+    var mutedScale,
+        mutedSVG,
+        mutedScatter1,
+        mutedScatter2;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
+      mutedScale = document.getElementById('mutedScale');
+      mutedSVG = document.getElementById('mutedSVG');
+      mutedScatter1 = document.getElementById('mutedScatter1');
+      mutedScatter2 = document.getElementById('mutedScatter2');
       var m = {
         "mySeries":false,
         "mySeries2":false
@@ -395,20 +411,29 @@ function runTests(){
   }); //suite
 
   suite('marker symbols', function() {
-    var markerScale = document.getElementById('markerScale'),
-        markerSVG = document.getElementById('markerSVG'),
-        markerCircle = document.getElementById('markerCircle'),
-        markerCross = document.getElementById('markerCross'),
-        markerDiamond = document.getElementById('markerDiamond'),
-        markerSquare = document.getElementById('markerSquare'),
-        markerTriangle = document.getElementById('markerTriangle'),
-        markerStar = document.getElementById('markerStar'),
-        markerWye = document.getElementById('markerWye');
+    var markerScale,
+        markerSVG,
+        markerCircle,
+        markerCross,
+        markerDiamond,
+        markerSquare,
+        markerTriangle,
+        markerStar,
+        markerWye;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
+      markerScale = document.getElementById('markerScale');
+      markerSVG = document.getElementById('markerSVG');
+      markerCircle = document.getElementById('markerCircle');
+      markerCross = document.getElementById('markerCross');
+      markerDiamond = document.getElementById('markerDiamond');
+      markerSquare = document.getElementById('markerSquare');
+      markerTriangle = document.getElementById('markerTriangle');
+      markerStar = document.getElementById('markerStar');
+      markerWye = document.getElementById('markerWye');
       var d = [{
             "x": 1397102460000,
             "circle": 1
@@ -560,49 +585,49 @@ function runTests(){
       assert.equal(markerCircle.scatterDots.nodes().length, 1);
     });
     test('marker is a circle', function() {
-      assert.equal(markerCircle.scatterDots.node().getAttribute('class'),'symbol');
+      assert.isTrue(markerCircle.scatterDots.node().getAttribute('class').indexOf('symbol') !== -1);
     });
 
     test('correct number of circles', function() {
       assert.equal(markerCross.scatterDots.nodes().length, 1);
     });
     test('marker is a cross', function() {
-      assert.equal(markerCross.scatterDots.node().getAttribute('class'), 'symbol');
+      assert.isTrue(markerCross.scatterDots.node().getAttribute('class').indexOf('symbol') !== -1);
     });
 
     test('correct number of circles', function() {
       assert.equal(markerDiamond.scatterDots.nodes().length, 1);
     });
     test('marker is a diamond', function() {
-      assert.equal(markerDiamond.scatterDots.node().getAttribute('class'),'symbol');
+      assert.isTrue(markerDiamond.scatterDots.node().getAttribute('class').indexOf('symbol') !== -1);
     });
 
     test('correct number of circles', function() {
       assert.equal(markerSquare.scatterDots.nodes().length, 1);
     });
     test('marker is a square', function() {
-      assert.equal(markerSquare.scatterDots.node().getAttribute('class'),'symbol');
+      assert.isTrue(markerSquare.scatterDots.node().getAttribute('class').indexOf('symbol') !== -1);
     });
 
     test('correct number of circles', function() {
       assert.equal(markerTriangle.scatterDots.nodes().length, 1);
     });
     test('marker is a triangle', function() {
-      assert.equal(markerTriangle.scatterDots.node().getAttribute('class'),'symbol');
+      assert.isTrue(markerTriangle.scatterDots.node().getAttribute('class').indexOf('symbol') !== -1);
     });
 
     test('correct number of circles', function() {
       assert.equal(markerStar.scatterDots.nodes().length, 1);
     });
     test('marker is a star', function() {
-      assert.equal(markerStar.scatterDots.node().getAttribute('class'),'symbol');
+      assert.isTrue(markerStar.scatterDots.node().getAttribute('class').indexOf('symbol') !== -1);
     });
 
     test('correct number of circles', function() {
       assert.equal(markerWye.scatterDots.nodes().length, 1);
     });
     test('marker is a wye', function() {
-      assert.equal(markerWye.scatterDots.node().getAttribute('class'),'symbol');
+      assert.isTrue(markerWye.scatterDots.node().getAttribute('class').indexOf('symbol') !== -1);
     });
 
   }); //suite

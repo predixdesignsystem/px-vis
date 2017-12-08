@@ -4,13 +4,14 @@ document.addEventListener("WebComponentsReady", function() {
 
 function runTests(){
   suite('px-vis-behavior-chart does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
   });
 
   suite('radial scale is created', function() {
-    var radialScale = document.getElementById('scale');
+    var radialScale;
     var radius = 500,
         axes = ["y","y1","y2"],
         chartData = [
@@ -44,6 +45,7 @@ function runTests(){
         centerOffset = 50;
 
     suiteSetup(function(done) {
+      radialScale = document.getElementById('scale');
       radialScale.set('_radius', radius);
       radialScale.set('centerOffset', centerOffset);
       radialScale.set('chartData', chartData);
@@ -101,7 +103,7 @@ function runTests(){
 
 
   suite('radial scale works with amplitudeExtents', function() {
-    var radialScale = document.getElementById('scale');
+    var radialScale;
     var radius = 500,
         axes = ["y","y1","y2"],
         chartData = [
@@ -136,6 +138,7 @@ function runTests(){
         amplitudeExtents = [10,25];
 
     suiteSetup(function(done) {
+      radialScale = document.getElementById('scale');
       radialScale.set('_radius', radius);
       radialScale.set('centerOffset', centerOffset);
       radialScale.set('chartData', chartData);
@@ -189,7 +192,7 @@ function runTests(){
   }); //suite
 
   suite('radial scale with null data', function() {
-    var radialScale = document.getElementById('scale');
+    var radialScale;
     var radius = 500,
         axes = ["y","y1","y2"],
         chartData = [
@@ -222,6 +225,7 @@ function runTests(){
         centerOffset = 50;
 
     suiteSetup(function(done) {
+      radialScale = document.getElementById('scale');
       radialScale.set('_radius', radius);
       radialScale.set('centerOffset', centerOffset);
       radialScale.set('chartData', chartData);
@@ -261,7 +265,7 @@ function runTests(){
   }); //suite
 
   suite('radial scale with negative data resets to 0', function() {
-    var radialScale = document.getElementById('scale');
+    var radialScale;
     var radius = 500,
         axes = ["y","y1","y2"],
         chartData = [
@@ -294,6 +298,7 @@ function runTests(){
         centerOffset = 50;
 
     suiteSetup(function(done) {
+      radialScale = document.getElementById('scale');
       radialScale.set('_radius', radius);
       radialScale.set('centerOffset', centerOffset);
       radialScale.set('chartData', chartData);

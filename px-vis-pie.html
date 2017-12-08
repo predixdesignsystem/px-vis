@@ -49,6 +49,7 @@ Custom property | Description
     is: 'px-vis-pie',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehaviorD3.svg,
       PxVisBehavior.dataset,
       PxVisBehavior.mutedSeries,
@@ -198,6 +199,10 @@ Custom property | Description
      * @method drawElement
      */
     drawElement: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
 
       this._checkInitialGroupCreation();
 
@@ -407,6 +412,10 @@ Custom property | Description
       return adjusted;
     },
     _calcInnerRadiusPx: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(this.donut) {
         //if no inner radius defined used 30px by default
         return this.innerRadius === 0 ? (this.radius - 30) : this.innerRadius * this.radius;
@@ -416,6 +425,10 @@ Custom property | Description
       }
     },
     _emptyChanged: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(this.empty) {
         this.drawElement();
       }

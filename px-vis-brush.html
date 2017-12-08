@@ -73,6 +73,7 @@ Custom property | Description
     is: 'px-vis-brush',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehavior.sizing,
       PxVisBehaviorD3.svg,
       PxVisBehaviorD3.axis,
@@ -197,6 +198,10 @@ Custom property | Description
      * @method drawElement
      */
     drawElement: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
 
       if(this._animationFrameDone && this.domainChanged !== null &&
         this.height) {
@@ -659,6 +664,10 @@ Custom property | Description
      * @method _zoomBrush
      */
     _zoomBrush: function(chartDomain) {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(!this._brushing && !this._centering && this.chartDomain.length > 0 && this._doesObjHaveValues(this._brush) && this._doesObjHaveValues(this._brushGroup) && this._doesObjHaveValues(this.axis) && Px.d3.brushSelection(this._brushGroup.node())) {
         var extent = Px.d3.brushSelection(this._brushGroup.node()),
             range = [this.axis(this.chartDomain[0]),this.axis(this.chartDomain[1])];

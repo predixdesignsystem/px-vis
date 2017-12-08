@@ -1,10 +1,10 @@
 function runInterpolationTests(){
   suite('px-vis-line-svg interpolationFunction', function() {
-    var interpolationScale = document.getElementById('interpolationScale'),
-        interpolationSVG = document.getElementById('interpolationSVG'),
-        interpolationLine1 = document.getElementById('interpolationLine1'),
-        interpolationLine2 = document.getElementById('interpolationLine2'),
-        interpolationLine3 = document.getElementById('interpolationLine3');
+    var interpolationScale,
+        interpolationSVG,
+        interpolationLine1,
+        interpolationLine2,
+        interpolationLine3;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -61,6 +61,13 @@ function runInterpolationTests(){
         },
         iFnc = Px.d3.curveStep,
         counter = 0;
+
+      interpolationScale = document.getElementById('interpolationScale'),
+      interpolationSVG = document.getElementById('interpolationSVG'),
+      interpolationLine1 = document.getElementById('interpolationLine1'),
+      interpolationLine2 = document.getElementById('interpolationLine2'),
+      interpolationLine3 = document.getElementById('interpolationLine3');
+
 
       var rendered = function() {
 

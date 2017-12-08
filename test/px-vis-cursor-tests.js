@@ -4,16 +4,19 @@ document.addEventListener("WebComponentsReady", function() {
 
 function runTests(){
   suite('px-vis-cursor does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
   });
   suite('px-vis-cursor setup SVG', function() {
-    var baseSVG = document.getElementById('baseSVG');
-    var baseScale = document.getElementById('baseScale');
+    var baseSVG;
+    var baseScale;
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(){
+      baseSVG = document.getElementById('baseSVG');
+      baseScale = document.getElementById('baseScale');
       var w = 500,
         h = 300,
         m = {
@@ -87,11 +90,13 @@ function runTests(){
 
 function baseTests(elem,hLine,vLine,circle,hArr,yArr){
   suite('px-vis-cursor ' + elem + ' setup works', function() {
-    var baseScale = document.getElementById('baseScale');
-    var cursor = document.getElementById(elem),
+    var baseScale;
+    var cursor,
         colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      cursor = document.getElementById(elem);
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -214,9 +219,10 @@ function baseTests(elem,hLine,vLine,circle,hArr,yArr){
 
 function addTooltipTests(elem,hLine,vLine,circle,hX2,hTransformArr,vTransform,cArr){
   suite('px-vis-cursor ' + elem + ' tooltipData added simulating chart mouseover', function() {
-    var cursor = document.getElementById(elem);
+    var cursor;
 
     suiteSetup(function(done){
+      cursor = document.getElementById(elem);
       var d = {
         'time': 1397160780000,
         'series': [
@@ -285,9 +291,10 @@ function addTooltipTests(elem,hLine,vLine,circle,hX2,hTransformArr,vTransform,cA
 
 function removeTooltipTests(elem){
   suite('px-vis-cursor ' + elem + ' tooltipData removed simulating chart mouseout', function() {
-    var cursor = document.getElementById(elem);
+    var cursor;
 
     suiteSetup(function(done){
+      cursor = document.getElementById(elem);
       var d = {
         'time': null,
         'series': [

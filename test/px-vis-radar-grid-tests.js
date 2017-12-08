@@ -4,18 +4,22 @@ document.addEventListener("WebComponentsReady", function() {
 
 function runTests(){
   suite('px-vis-gridlines does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
   });
 
   suite('px-vis-gridlines basic setup works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        baseGrid = document.getElementById('baseGrid');
+    var baseScale,
+        baseSVG,
+        baseGrid;
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      baseGrid = document.getElementById('baseGrid');
       var d = [
           {
             "x": 1397102460000,
@@ -55,20 +59,36 @@ function runTests(){
         min = 280/2,
         tickValues = [0,5,10,15,20,25,30];
 
+        async.until(
+          ()=> {
+            baseScale = document.getElementById('baseScale');
+            baseSVG = document.getElementById('baseSVG');
+            baseGrid = document.getElementById('baseGrid');
+            return baseSVG && baseScale && baseGrid;
+          },
+          (callback)=> {
+            setTimeout(callback, 50);
+          },
+          ()=> {
 
-      baseSVG.set('width',w);
-      baseSVG.set('height',h);
-      baseSVG.set('margin',m);
+            baseSVG.set('width',w);
+            baseSVG.set('height',h);
+            baseSVG.set('margin',m);
 
-      baseScale.set('_radius',min);
-      baseScale.set('centerOffset',50);
-      baseScale.set('margin',m);
-      baseScale.set('chartData',d);
-      baseScale.set('dimensions', ["y","y1","y2"])
+            baseScale.set('_radius',min);
+            baseScale.set('centerOffset',50);
+            baseScale.set('margin',m);
+            baseScale.set('chartData',d);
+            baseScale.set('dimensions', ["y","y1","y2"])
 
-      baseGrid.set('margin',m);
-      baseGrid.set('tickValues',tickValues);
-      window.setTimeout(function(){ done() },500);
+            baseGrid.set('margin',m);
+            baseGrid.set('tickValues',tickValues);
+
+            window.setTimeout(function() {
+              done();
+            }, 500);
+          }
+        );
     });
 
     test('baseGrid fixture is created', function() {
@@ -82,7 +102,7 @@ function runTests(){
     });
 
     test('grid created _gridData', function() {
-      assert.isTrue(baseGrid._gridData !== null);
+      assert.isTrue(baseGrid._gridData != null);
       assert.equal(baseGrid._gridData[0]["y"], 0);
       assert.equal(baseGrid._gridData[6]["y"], 30);
       assert.equal(baseGrid._gridData[7]["y"], 32);

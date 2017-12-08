@@ -54,6 +54,7 @@ Custom property | Description
     is: 'px-vis-threshold',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehavior.sizing,
       PxVisBehaviorD3.svg,
       PxVisBehaviorD3.axes,
@@ -62,7 +63,8 @@ Custom property | Description
       PxVisBehavior.thresholds,
       PxVisBehaviorD3.domainUpdate,
       PxVisBehaviorD3.clipPath,
-      PxVisBehavior.measureText
+      PxVisBehavior.measureText,
+      PxVisBehavior.updateStylesOverride
     ],
 
     /**
@@ -153,13 +155,14 @@ Custom property | Description
     observers: [
 
       'drawElement(svg, y, domainChanged, completeSeriesConfig.*, thresholdData.*, width, margin.*, _animationFrameDone, language)',
-      '_updateColors()'
+      '_updateColors()',
+      '_calcThemeOrConfig(_stylesUpdated)'
      ],
 
     ready:function() {
       this._createMeasurementCanvas();
 
-      window.requestAnimationFrame(this._calcThemeOrConfig.bind(this));
+      window.requestAnimationFrame(function() {this.updateStyles();}.bind(this));
 
       // if there is no dev set unique ID, generate one
       if(!this.thresholdId){
@@ -183,6 +186,10 @@ Custom property | Description
      * @method drawElement
      */
     drawElement: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(this._animationFrameDone && this.domainChanged !== null && this.y && (typeof this.y === 'function' || this._doesObjHaveValues(this.y))) {
         if(this.drawDebounceTime > 0) {
           this.debounce('_drawThreshold', function() {
@@ -407,6 +414,10 @@ Custom property | Description
     },
 
     _updateColors: function() {
+      if(this.hasUndefinedArguments(arguments) || this.svg === undefined) {
+        return;
+      }
+
       this._calcThemeOrConfig();
       this._drawElementDebounced();
     }

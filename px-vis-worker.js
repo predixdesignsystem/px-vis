@@ -921,26 +921,26 @@ onmessage = function(e) {
 
     case 'findQuadtreePoints':
       if(quadtreeBuilt) {
-        returnClosestsQuadtreePoints(e.data, time);
+        returnClosestsQuadtreePoints(e.data);
       } else {
-        reply(null, time);
+        reply(null);
       }
       break;
 
     //we don't seem to use this
     case 'findQuadtreePointsInArea':
       if(quadtreeBuilt) {
-        returnQuadtreePointsInArea(e.data, time);
+        returnQuadtreePointsInArea(e.data);
       } else {
-        reply(null, time);
+        reply(null);
       }
       break;
 
     case 'returnQuadtreeData':
       if(quadtreeBuilt) {
-        reply(quadtrees[e.data.chartId], time);
+        reply(quadtrees[e.data.chartId]);
       } else {
-        reply(null, time);
+        reply(null);
       }
       break;
 

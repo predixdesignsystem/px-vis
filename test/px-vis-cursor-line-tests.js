@@ -4,14 +4,17 @@ document.addEventListener("WebComponentsReady", function() {
 
 function runTests() {
   suite('px-vis-cursor-line renders parallel axis cursor', function() {
-    var parallelScale = document.getElementById('parallelScale'),
-        parallelSVG = document.getElementById('parallelSVG'),
-        parallelCursor = document.getElementById('parallelCursor');
+    var parallelScale,
+        parallelSVG,
+        parallelCursor;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done) {
+      parallelScale = document.getElementById('parallelScale');
+      parallelSVG = document.getElementById('parallelSVG');
+      parallelCursor = document.getElementById('parallelCursor');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -135,14 +138,17 @@ function runTests() {
 
 
   suite('px-vis-cursor-line draws the cursor', function() {
-    var parallelScale = document.getElementById('parallelScale'),
-        parallelSVG = document.getElementById('parallelSVG'),
-        parallelCursor = document.getElementById('parallelCursor');
+    var parallelScale,
+        parallelSVG,
+        parallelCursor;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
+      parallelScale = document.getElementById('parallelScale');
+      parallelSVG = document.getElementById('parallelSVG');
+      parallelCursor = document.getElementById('parallelCursor');
       var ttd = {
         "x": 1397160780000,
         "y": 10,
@@ -193,14 +199,17 @@ function runTests() {
   }); //suite
 
   suite('px-vis-cursor-line clears the cursor', function() {
-    var parallelScale = document.getElementById('parallelScale'),
-        parallelSVG = document.getElementById('parallelSVG'),
-        parallelCursor = document.getElementById('parallelCursor');
+    var parallelScale,
+        parallelSVG,
+        parallelCursor;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
+      parallelScale = document.getElementById('parallelScale');
+      parallelSVG = document.getElementById('parallelSVG');
+      parallelCursor = document.getElementById('parallelCursor');
       var ttd = null;
 
       parallelCursor.set("tooltipData", ttd);
@@ -237,14 +246,17 @@ function runTests() {
 
 
   suite('px-vis-cursor-line with Canvas renders parallel axis cursor', function() {
-    var parallelScaleCanvas = document.getElementById('parallelScaleCanvas'),
-        parallelSVGCanvas = document.getElementById('parallelSVGCanvas'),
-        parallelCursorCanvas = document.getElementById('parallelCursorCanvas');
+    var parallelScaleCanvas,
+        parallelSVGCanvas,
+        parallelCursorCanvas;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done) {
+      parallelScaleCanvas = document.getElementById('parallelScaleCanvas');
+      parallelSVGCanvas = document.getElementById('parallelSVGCanvas');
+      parallelCursorCanvas = document.getElementById('parallelCursorCanvas');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -361,14 +373,17 @@ function runTests() {
 
 
   suite('px-vis-cursor-line canvas draws the cursor', function() {
-    var parallelScaleCanvas = document.getElementById('parallelScaleCanvas'),
-        parallelSVGCanvas = document.getElementById('parallelSVGCanvas'),
-        parallelCursorCanvas = document.getElementById('parallelCursorCanvas');
+    var parallelScaleCanvas,
+        parallelSVGCanvas,
+        parallelCursorCanvas;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
+      parallelScaleCanvas = document.getElementById('parallelScaleCanvas');
+      parallelSVGCanvas = document.getElementById('parallelSVGCanvas');
+      parallelCursorCanvas = document.getElementById('parallelCursorCanvas');
       var ttd = {
         "x": 1397160780000,
         "y": 10,
@@ -419,14 +434,17 @@ function runTests() {
   }); //suite
 
   suite('px-vis-cursor-line canvas clears the cursor', function() {
-    var parallelScaleCanvas = document.getElementById('parallelScaleCanvas'),
-        parallelSVGCanvas = document.getElementById('parallelSVGCanvas'),
-        parallelCursorCanvas = document.getElementById('parallelCursorCanvas');
+    var parallelScaleCanvas,
+        parallelSVGCanvas,
+        parallelCursorCanvas;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
+      parallelScaleCanvas = document.getElementById('parallelScaleCanvas');
+      parallelSVGCanvas = document.getElementById('parallelSVGCanvas');
+      parallelCursorCanvas = document.getElementById('parallelCursorCanvas');
       var ttd = null;
 
       parallelCursorCanvas.set("tooltipData", ttd);
@@ -464,14 +482,17 @@ function runTests() {
 
 
   suite('px-vis-cursor-line renders radar axis cursor', function() {
-    var radarScale = document.getElementById('radarScale'),
-        radarSVG = document.getElementById('radarSVG'),
-        radarCursor = document.getElementById('radarCursor');
+    var radarScale,
+        radarSVG,
+        radarCursor;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done) {
+      radarScale = document.getElementById('radarScale');
+      radarSVG = document.getElementById('radarSVG');
+      radarCursor = document.getElementById('radarCursor');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -594,14 +615,17 @@ function runTests() {
 
 
   suite('px-vis-cursor-line draws the cursor', function() {
-    var radarScale = document.getElementById('radarScale'),
-        radarSVG = document.getElementById('radarSVG'),
-        radarCursor = document.getElementById('radarCursor');
+    var radarScale,
+        radarSVG,
+        radarCursor;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
+      radarScale = document.getElementById('radarScale');
+      radarSVG = document.getElementById('radarSVG');
+      radarCursor = document.getElementById('radarCursor');
       var ttd = {
         "x": 1397160780000,
         "y": 10,
@@ -667,14 +691,17 @@ function runTests() {
   }); //suite
 
   suite('px-vis-cursor-line clears the cursor', function() {
-    var radarScale = document.getElementById('radarScale'),
-        radarSVG = document.getElementById('radarSVG'),
-        radarCursor = document.getElementById('radarCursor');
+    var radarScale,
+        radarSVG,
+        radarCursor;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
+      radarScale = document.getElementById('radarScale');
+      radarSVG = document.getElementById('radarSVG');
+      radarCursor = document.getElementById('radarCursor');
       var ttd = null;
 
       radarCursor.set("tooltipData", ttd);

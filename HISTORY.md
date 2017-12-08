@@ -13,6 +13,14 @@
 * Changes to toolbar providing different tooltipData search options
 * Changed the way tooltipData is reported for // and radar: now always ignores data hidden by brush instead of just with hardMute on.
 
+v4.5.1
+=================
+* Added check to area-svg for Polymer 2
+
+v4.5.0
+=================
+* Hybrid support: Polymer 1.X and 2.X
+
 v4.4.9
 =================
 * Fix for hard mute series disappearing from list with crosshair defaultData

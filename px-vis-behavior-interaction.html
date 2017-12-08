@@ -11,7 +11,7 @@ var PxVisBehaviorInteraction = PxVisBehaviorInteraction || {};
 
     @polymerBehavior PxVisBehaviorInteraction.lasso
 */
-PxVisBehaviorInteraction.lasso = {
+PxVisBehaviorInteraction.lasso = [{
   properties: {
     _isLassoing: {
       type: Boolean,
@@ -53,6 +53,10 @@ PxVisBehaviorInteraction.lasso = {
   },
 
   _resetLasso: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
     this._lassoCrosshairData = {
       rawData: [],
       timeStamps: []
@@ -176,5 +180,5 @@ PxVisBehaviorInteraction.lasso = {
     this._isLassoing = false;
     this._lassoCrosshairData = this.crosshairData;
   }
-}
+}, PxVisBehavior.observerCheck]
 </script>

@@ -4,17 +4,21 @@ document.addEventListener("WebComponentsReady", function() {
 
 function runTests(){
   suite('px-vis-radial-gridlines does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
   });
 
   suite('px-vis-radial-gridlines basic setup works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        radialGrid = document.getElementById('radialGrid');
+    var baseScale,
+        baseSVG,
+        radialGrid;
 
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      radialGrid = document.getElementById('radialGrid');
       var d = [{
             "x": 1397102460000,
             "y": 1
@@ -52,20 +56,36 @@ function runTests(){
         },
         tickValues = [3,6,9];
 
-      baseSVG.set('width',w);
-      baseSVG.set('height',h);
-      baseSVG.set('offset',offset);
-      baseSVG.set('margin',m);
+      async.until(
+        ()=> {
+          baseScale = document.getElementById('baseScale');
+          baseSVG = document.getElementById('baseSVG');
+          radialGrid = document.getElementById('radialGrid');
+          return !!baseSVG;
+        },
+        (callback)=> {
+          setTimeout(callback, 100);
+        },
+        ()=> {
 
-      baseScale.set('_radius',min);
-      baseScale.set('_amplitudeKey',['y']);
-      baseScale.set('completeSeriesConfig',completeSeriesConfig);
-      baseScale.set('chartData',d);
-      baseScale.set('_calculatedExtents',chartExtents);
+          baseSVG.set('width',w);
+          baseSVG.set('height',h);
+          baseSVG.set('offset',offset);
+          baseSVG.set('margin',m);
 
-      radialGrid.set('margin',m);
+          baseScale.set('_radius',min);
+          baseScale.set('_amplitudeKey',['y']);
+          baseScale.set('completeSeriesConfig',completeSeriesConfig);
+          baseScale.set('chartData',d);
+          baseScale.set('_calculatedExtents',chartExtents);
 
-      window.setTimeout(function(){ done() },100);
+          radialGrid.set('margin',m);
+
+          window.setTimeout(function() {
+            done();
+          }, 500);
+        }
+      )
     });
 
     test('radialGrid fixture is created', function() {
@@ -132,16 +152,68 @@ function runTests(){
   }); //suite
 
   suite('px-vis-radial-gridlines works with custom tick values', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        radialGrid = document.getElementById('radialGrid');
+    var baseScale,
+        baseSVG,
+        radialGrid;
 
     suiteSetup(function(done){
-      var tickValues = [3,6,9];
+      baseScale = document.getElementById('baseScale2');
+      baseSVG = document.getElementById('baseSVG2');
+      radialGrid = document.getElementById('radialGrid2');
+      var d = [{
+            "x": 1397102460000,
+            "y": 1
+          },{
+            "x": 1397131620000,
+            "y": 6
+          },{
+            "x": 1397160780000,
+            "y": 10
+          },{
+            "x": 1397189940000,
+            "y": 4
+          },{
+            "x": 1397219100000,
+            "y": 6
+          }
+        ],
+        completeSeriesConfig = {"mySeries":{
+          "type":"line",
+          "name":"mySeries",
+          "x":"x",
+          "y":"y",
+          "color": "rgb(93,165,218)"
+        }},
+        chartExtents = [0,10],
+        w = 500,
+        h = 500,
+        min = 480/2,
+        offset = [240,240],
+        m = {
+          "top": 10,
+          "right": 10,
+          "bottom": 10,
+          "left": 10
+        };
 
-      radialGrid.set('tickValues',tickValues);
+      async.until(
+        ()=> {
+          baseScale = document.getElementById('baseScale');
+          baseSVG = document.getElementById('baseSVG');
+          radialGrid = document.getElementById('radialGrid');
+          return !!baseSVG;
+        },
+        (callback)=> {
+          setTimeout(callback, 100);
+        },
+        ()=> {
 
-      window.setTimeout(function(){ done() },100);
+          radialGrid.set('tickValues', [3,6,9]);
+          window.setTimeout(function() {
+            done();
+          }, 500);
+        }
+      );
     });
 
     test('radialGrid fixture is created', function() {
@@ -189,6 +261,7 @@ function runTests(){
     });
 
     test('radialGrid circles are created', function() {
+      debugger
       var g = baseSVG.svg.select('g.radialGridlines'),
           circle = g.selectAll('circle');
 

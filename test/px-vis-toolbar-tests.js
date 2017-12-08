@@ -4,16 +4,18 @@ document.addEventListener("WebComponentsReady", function() {
 
 function runTests() {
   suite('px-vis-toolbar does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
   });
 
   suite('px-vis-toolbar basic setup works', function() {
-    var toolbar = document.getElementById('toolbar'),
+    var toolbar,
         mainItems;
 
     suiteSetup(function(done) {
+      toolbar = document.getElementById('toolbar');
       var margin = {
             top: '10px',
             bottom: '10px',
@@ -95,11 +97,12 @@ function runTests() {
   });
 
   suite('px-vis-toolbar click on main item', function() {
-    var toolbar = document.getElementById('toolbar'),
+    var toolbar,
         mainItems,
         subItems;
 
     suiteSetup(function(done) {
+      toolbar = document.getElementById('toolbar');
       mainItems = toolbar.$.mainRow.querySelectorAll('span.main-item');
 
       var rendered = function() {
@@ -109,10 +112,12 @@ function runTests() {
       };
 
       toolbar.addEventListener('px-vis-toolbar-secondary-toggled', rendered);
+
       mainItems[3].click();
     });
 
     test('toolbar main item got selected class', function() {
+
       assert.isFalse(mainItems[0].classList.contains('selected'));
       assert.isFalse(mainItems[1].classList.contains('selected'));
       assert.isFalse(mainItems[2].classList.contains('selected'));
@@ -172,12 +177,14 @@ function runTests() {
 
 
   suite('px-vis-toolbar click on sub selectable item', function() {
-    var toolbar = document.getElementById('toolbar'),
-        template = document.getElementById('template'),
+    var toolbar,
+        template,
         mainItems,
         subItems;
 
     suiteSetup(function(done) {
+      toolbar = document.getElementById('toolbar');
+      template = Polymer.Element ? document.getElementById('template2') : document.getElementById('template');
       mainItems = toolbar.$.mainRow.querySelectorAll('span.main-item');
       subItems = toolbar.$$('#subRow').querySelectorAll('span.main-item');
 
@@ -209,13 +216,15 @@ function runTests() {
   });
 
   suite('px-vis-toolbar click on sub non selectable item', function() {
-    var toolbar = document.getElementById('toolbar'),
-        template = document.getElementById('template'),
+    var toolbar,
+        template,
         mainItems,
         subItems,
         event;
 
     suiteSetup(function(done) {
+      toolbar = document.getElementById('toolbar');
+      template = document.getElementById('template');
       mainItems = toolbar.$.mainRow.querySelectorAll('span.main-item');
       subItems = toolbar.$$('#subRow').querySelectorAll('span.main-item');
 
@@ -246,11 +255,12 @@ function runTests() {
   });
 
   suite('px-vis-toolbar click on new main item', function() {
-    var toolbar = document.getElementById('toolbar'),
+    var toolbar,
         mainItems,
         subItems;
 
     suiteSetup(function(done) {
+      toolbar = document.getElementById('toolbar');
       mainItems = toolbar.$.mainRow.querySelectorAll('span.main-item');
 
       mainItems[0].click();
@@ -274,10 +284,11 @@ function runTests() {
     });
 
     test('toolbar sub items got correct icons', function() {
+
       assert.equal(subItems[0].querySelector('px-icon').icon, toolbar.currentSubConfig[0].icon);
       assert.equal(subItems[1].querySelector('px-icon').icon, toolbar.currentSubConfig[1].icon);
-      assert.equal(subItems[2].querySelector('px-icon').icon, toolbar.currentSubConfig[2].icon);
-      assert.equal(subItems[3].querySelector('px-icon').icon, toolbar.currentSubConfig[3].icon);
+      assert.equal(subItems[2].querySelector('px-icon').style['display'], 'none');
+      assert.equal(subItems[3].querySelector('px-icon').style['display'], 'none');
     });
 
     test('toolbar sub items are not selected', function() {
@@ -298,11 +309,12 @@ function runTests() {
   });
 
   suite('px-vis-toolbar click to close item', function() {
-    var toolbar = document.getElementById('toolbar'),
+    var toolbar,
         mainItems,
         subItems;
 
     suiteSetup(function(done) {
+      toolbar = document.getElementById('toolbar');
       mainItems = toolbar.$.mainRow.querySelectorAll('span.main-item');
 
       mainItems[0].click();

@@ -5,6 +5,30 @@
 <script>
 var PxVisBehavior = PxVisBehavior || {};
 
+/**
+    Name:
+    PxVisBehavior.observerCheck
+
+    Description:
+    Polymer behavior that provides a function used to check if any argument
+    in an observer is undefined
+
+
+    @polymerBehavior PxVisBehavior.observerCheck
+*/
+PxVisBehavior.observerCheck = {
+  hasUndefinedArguments: function(args) {
+    for(var i=0; i<args.length; i++) {
+
+      //check if arg is undefined or if it's a 'var.*' undefined type of arg
+      if(args[i] === undefined || (args[i] && args[i].path && args[i].hasOwnProperty('base') && args[i].base === undefined)) {
+        return true;
+      }
+    }
+    return false;
+  }
+};
+
 /*
     Name:
     PxVisBehavior.baseSize
@@ -489,6 +513,10 @@ PxVisBehavior.mutedCompleteSeriesConfig = [{
   },
 
   _computeNonMutedSeriesKeys: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
     if(!(this._mutedCompleteSeriesConfig === undefined || this.seriesKeys === undefined)) {
 
       var keys = Object.keys(this._mutedCompleteSeriesConfig);
@@ -502,6 +530,10 @@ PxVisBehavior.mutedCompleteSeriesConfig = [{
   },
 
   _computeMutedCompleteSeriesConfig: function(completeSeriesConfig, hardMute, mutedSeries) {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
     if(!(this.completeSeriesConfig === undefined || this.hardMute === undefined || this.mutedSeries === undefined)) {
       if(!this.hardMute) {
         return this.completeSeriesConfig;
@@ -520,7 +552,7 @@ PxVisBehavior.mutedCompleteSeriesConfig = [{
       }
     }
   },
-}, PxVisBehavior.completeSeriesConfig, PxVisBehavior.mutedSeries, PxVisBehavior.seriesKeys];
+}, PxVisBehavior.observerCheck, PxVisBehavior.completeSeriesConfig, PxVisBehavior.mutedSeries, PxVisBehavior.seriesKeys];
 
 
 /*
@@ -876,7 +908,21 @@ PxVisBehavior.commonMethods = {
    * Checks if a theme variable exists, if so, returns the theme value, if not, returns the default
    */
   _checkThemeVariable: function(varName, defaultValue) {
-    var themeVar = this.getComputedStyleValue(varName);
+    var themeVar;
+
+    if (Polymer.Element) {
+      // 2.0 code
+      if (window.ShadyCSS) {
+        themeVar = ShadyCSS.getComputedStyleValue(this, varName);
+      } else {
+        themeVar = getComputedStyle(this).getPropertyValue(varName);
+      }
+    } else {
+      // 1.0 code
+      themeVar = this.getComputedStyleValue(varName);
+    }
+
+
     return (!themeVar || themeVar.length === 0) ? defaultValue : themeVar;
   },
 
@@ -1001,7 +1047,7 @@ PxVisBehavior.commonMethods = {
   },
 
   isVarNumber: function(n) {
-    return n || n === 0 ? true : false;
+    return !isNaN(parseFloat(n)) && !isNaN(n - 0);
   }
 };
 
@@ -1793,6 +1839,10 @@ PxVisBehavior.dynamicConfigProperties = [{
     *
     */
   _processConfig: function(completeSeriesConfig, seriesId) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
 
     var conf = this.completeSeriesConfig[this.seriesId],
         name;
@@ -1821,7 +1871,7 @@ PxVisBehavior.dynamicConfigProperties = [{
     }
   }
 
-},PxVisBehavior.completeSeriesConfig, PxVisBehavior.seriesId];
+}, PxVisBehavior.observerCheck,PxVisBehavior.completeSeriesConfig, PxVisBehavior.seriesId];
 
 
 
@@ -2494,6 +2544,9 @@ PxVisBehavior.interactionSpaceShared = [{
    * @method _resetTooltipData
    */
   _resetTooltipData: function() {
+    if(this.seriesKeys === undefined) {
+      return;
+    }
     var ttD;
     this.set('_calculatingData', false);
 
@@ -2536,7 +2589,7 @@ PxVisBehavior.interactionSpaceShared = [{
       'timeStampsTracker': {}
     }
   }
-}, PxVisBehavior.polarData];
+}, PxVisBehavior.observerCheck, PxVisBehavior.polarData];
 
 /*
     PxVisBehavior.highlightShared
@@ -2688,6 +2741,22 @@ PxVisBehavior.highlightShared = [{
 }, PxVisBehavior.interactionSpaceShared];
 
 /*
+    PxVisBehavior.canvasLayersConfig
+
+    Description:
+    Behavior providing the canvasLayersConfig property
+    @polymerBehavior PxVisBehavior.canvasLayersConfig
+*/
+PxVisBehavior.canvasLayersConfig = {
+  properties: {
+    canvasLayersConfig: {
+      type: Object,
+      value: function() { return {}; }
+    }
+  }
+};
+
+/*
     PxVisBehavior.highlightCanvasShared
 
     Description:
@@ -2697,12 +2766,16 @@ PxVisBehavior.highlightShared = [{
 PxVisBehavior.highlightCanvasShared = [{
 
   observers: [
-    '_requestCanvasCreation(_highlightData)',
+    '_requestCanvasCreation(_highlightData, canvasLayersConfig)',
     '_muteDataSeries(_highlightData, layersToMask)',
     '_addTransition(layersToMask)'
   ],
 
   _muteDataSeries: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
     if(this.layersToMask) {
 
       if(!Array.isArray(this.layersToMask)) {
@@ -2717,6 +2790,10 @@ PxVisBehavior.highlightCanvasShared = [{
   },
 
   _addTransition: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
     if(Array.isArray(this.layersToMask)) {
       for(var i=0; i<this.layersToMask.length; i++) {
         this.layersToMask[i].canvas.style.transition = 'opacity 0.2s';
@@ -2727,12 +2804,16 @@ PxVisBehavior.highlightCanvasShared = [{
   },
 
   _requestCanvasCreation: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
     if(!this.canvasLayersConfig.highlighter) {
       this.set('canvasLayersConfig.highlighter', {});
     }
   }
 
-}, PxVisBehavior.highlightShared];
+}, PxVisBehavior.observerCheck, PxVisBehavior.highlightShared, PxVisBehavior.canvasLayersConfig];
 
 
 /*
@@ -2750,6 +2831,10 @@ PxVisBehavior.highlightSvgShared = [{
   ],
 
   _muteDataSeries: function(data) {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
     if(this.layersToMask) {
       if(!Array.isArray(this.layersToMask)) {
         this.toggleClass('secondaryDataMask', data.length, this.layersToMask.node());
@@ -2762,6 +2847,10 @@ PxVisBehavior.highlightSvgShared = [{
   },
 
   _addTransition: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
     if(!Array.isArray(this.layersToMask)) {
       this.layersToMask.node().style.transition = 'opacity 0.2s';
     } else {
@@ -2771,7 +2860,7 @@ PxVisBehavior.highlightSvgShared = [{
     }
   }
 
-}, PxVisBehavior.highlightShared];
+}, PxVisBehavior.observerCheck, PxVisBehavior.highlightShared];
 
 /*
     PxVisBehavior.highlightLineShared
@@ -2812,6 +2901,10 @@ PxVisBehavior.highlightLineShared = [{
    *
    */
   _computeChartData: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     this.debounce('_computeHighlightData', function() {
       //if we are generating data locally and not being told to draw anyways, dont draw
       // but if we have cleared our dataset, then we do want to clear our datapoints
@@ -2951,7 +3044,7 @@ PxVisBehavior.highlightLineShared = [{
 
     return data;
   }
-}, PxVisBehavior.highlightShared, PxVisBehavior.margins];
+}, PxVisBehavior.observerCheck, PxVisBehavior.highlightShared, PxVisBehavior.margins];
 
 /*
     Name:
@@ -3123,7 +3216,7 @@ PxVisBehavior.updateStylesOverride = {
         var t = this.drawDebounceTime;
         this.drawDebounceTime = 0;
 
-        this._stylesUpdated += 1;
+        this.set('_stylesUpdated',  this._stylesUpdated+ 1);
 
         this.drawDebounceTime = t;
       }, 50);
@@ -3261,5 +3354,29 @@ PxVisBehavior.annotationData = {
     }
   }
 };
+
+/**
+    Name:
+    PxVisBehavior.titleTruncation
+
+    Description:
+    Polymer behavior that providse the titleTruncation property.
+
+
+    @polymerBehavior PxVisBehavior.titleTruncation
+*/
+PxVisBehavior.titleTruncation = {
+  properties: {
+    /**
+    * A boolean specifying if the axis title should truncate when too long
+    *
+    */
+    titleTruncation: {
+      type: Boolean,
+      value: false
+    },
+  }
+};
+
 
 </script>

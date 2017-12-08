@@ -4,14 +4,17 @@ document.addEventListener("WebComponentsReady", function() {
 
 function runTests() {
   suite('px-vis-highlight-line renders parallel axis highlight', function() {
-    var parallelScale = document.getElementById('parallelScale'),
-        parallelSVG = document.getElementById('parallelSVG'),
-        parallelhighlight = document.getElementById('parallelhighlight');
+    var parallelScale,
+        parallelSVG,
+        parallelhighlight;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done) {
+      parallelScale = document.getElementById('parallelScale');
+      parallelSVG = document.getElementById('parallelSVG');
+      parallelhighlight = document.getElementById('parallelhighlight');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -141,14 +144,17 @@ function runTests() {
 
 
   suite('px-vis-highlight-line draws the highlight', function() {
-    var parallelScale = document.getElementById('parallelScale'),
-        parallelSVG = document.getElementById('parallelSVG'),
-        parallelhighlight = document.getElementById('parallelhighlight');
+    var parallelScale,
+        parallelSVG,
+        parallelhighlight;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
+      parallelScale = document.getElementById('parallelScale');
+      parallelSVG = document.getElementById('parallelSVG');
+      parallelhighlight = document.getElementById('parallelhighlight');
       var d = {
             "rawData":[{
               "x": 1397160780000,
@@ -208,14 +214,17 @@ function runTests() {
   }); //suite
 
   suite('px-vis-highlight-line clears the highlight', function() {
-    var parallelScale = document.getElementById('parallelScale'),
-        parallelSVG = document.getElementById('parallelSVG'),
-        parallelhighlight = document.getElementById('parallelhighlight');
+    var parallelScale,
+        parallelSVG,
+        parallelhighlight;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
+      parallelScale = document.getElementById('parallelScale');
+      parallelSVG = document.getElementById('parallelSVG');
+      parallelhighlight = document.getElementById('parallelhighlight');
       var d = {
             "rawData":[],
             "timeStamps": []
@@ -244,14 +253,17 @@ function runTests() {
 
 
   suite('px-vis-highlight-line renders radar axis highlight', function() {
-    var radarScale = document.getElementById('radarScale'),
-        radarSVG = document.getElementById('radarSVG'),
-        radarhighlight = document.getElementById('radarhighlight');
+    var radarScale,
+        radarSVG,
+        radarhighlight;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done) {
+      radarScale = document.getElementById('radarScale');
+      radarSVG = document.getElementById('radarSVG');
+      radarhighlight = document.getElementById('radarhighlight');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -377,14 +389,17 @@ function runTests() {
 
 
   suite('px-vis-highlight-line draws the highlight', function() {
-    var radarScale = document.getElementById('radarScale'),
-        radarSVG = document.getElementById('radarSVG'),
-        radarhighlight = document.getElementById('radarhighlight');
+    var radarScale,
+        radarSVG,
+        radarhighlight;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
+      radarScale = document.getElementById('radarScale');
+      radarSVG = document.getElementById('radarSVG');
+      radarhighlight = document.getElementById('radarhighlight');
       var d = {
         "rawData":[{
           "x": 1397160780000,
@@ -459,14 +474,17 @@ function runTests() {
   }); //suite
 
   suite('px-vis-highlight-line clears the highlight', function() {
-    var radarScale = document.getElementById('radarScale'),
-        radarSVG = document.getElementById('radarSVG'),
-        radarhighlight = document.getElementById('radarhighlight');
+    var radarScale,
+        radarSVG,
+        radarhighlight;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
+      radarScale = document.getElementById('radarScale');
+      radarSVG = document.getElementById('radarSVG');
+      radarhighlight = document.getElementById('radarhighlight');
       var d = {
             "rawData":[],
             "timeStamps": []
@@ -502,14 +520,17 @@ function runTests() {
 
 
   suite('px-vis-highlight-line renders different dataset highlight', function() {
-    var differentScale = document.getElementById('differentScale'),
-        differentSVG = document.getElementById('differentSVG'),
-        differenthighlight = document.getElementById('differenthighlight');
+    var differentScale,
+        differentSVG,
+        differenthighlight;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done) {
+      differentScale = document.getElementById('differentScale');
+      differentSVG = document.getElementById('differentSVG');
+      differenthighlight = document.getElementById('differenthighlight');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -639,14 +660,17 @@ function runTests() {
 
 
   suite('px-vis-highlight-line draws the highlight', function() {
-    var differentScale = document.getElementById('differentScale'),
-        differentSVG = document.getElementById('differentSVG'),
-        differenthighlight = document.getElementById('differenthighlight');
+    var differentScale,
+        differentSVG,
+        differenthighlight;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
+      differentScale = document.getElementById('differentScale');
+      differentSVG = document.getElementById('differentSVG');
+      differenthighlight = document.getElementById('differenthighlight');
       var d = {
             "rawData":[{
               "x": 1397160780000,
@@ -707,14 +731,17 @@ function runTests() {
   }); //suite
 
   suite('px-vis-highlight-line clears the highlight', function() {
-    var differentScale = document.getElementById('differentScale'),
-        differentSVG = document.getElementById('differentSVG'),
-        differenthighlight = document.getElementById('differenthighlight');
+    var differentScale,
+        differentSVG,
+        differenthighlight;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
+      differentScale = document.getElementById('differentScale');
+      differentSVG = document.getElementById('differentSVG');
+      differenthighlight = document.getElementById('differenthighlight');
       var d = {
             "rawData":[],
             "timeStamps": []
@@ -748,14 +775,17 @@ function runTests() {
 
 
   suite('px-vis-highlight-line renders fuzz dataset highlight', function() {
-    var fuzzScale = document.getElementById('fuzzScale'),
-        fuzzSVG = document.getElementById('fuzzSVG'),
-        fuzzhighlight = document.getElementById('fuzzhighlight');
+    var fuzzScale,
+        fuzzSVG,
+        fuzzhighlight;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done) {
+      fuzzScale = document.getElementById('fuzzScale');
+      fuzzSVG = document.getElementById('fuzzSVG');
+      fuzzhighlight = document.getElementById('fuzzhighlight');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -885,14 +915,17 @@ function runTests() {
 
 
   suite('px-vis-highlight-line draws the highlight', function() {
-    var fuzzScale = document.getElementById('fuzzScale'),
-        fuzzSVG = document.getElementById('fuzzSVG'),
-        fuzzhighlight = document.getElementById('fuzzhighlight');
+    var fuzzScale,
+        fuzzSVG,
+        fuzzhighlight;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
+      fuzzScale = document.getElementById('fuzzScale');
+      fuzzSVG = document.getElementById('fuzzSVG');
+      fuzzhighlight = document.getElementById('fuzzhighlight');
       var d = {
             "rawData":[{
               "x": 1397160800000,
@@ -971,14 +1004,17 @@ function runTests() {
   }); //suite
 
   suite('px-vis-highlight-line clears the highlight', function() {
-    var fuzzScale = document.getElementById('fuzzScale'),
-        fuzzSVG = document.getElementById('fuzzSVG'),
-        fuzzhighlight = document.getElementById('fuzzhighlight');
+    var fuzzScale,
+        fuzzSVG,
+        fuzzhighlight;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
+      fuzzScale = document.getElementById('fuzzScale');
+      fuzzSVG = document.getElementById('fuzzSVG');
+      fuzzhighlight = document.getElementById('fuzzhighlight');
       var d = {
             "rawData":[],
             "timeStamps": []
@@ -1014,14 +1050,17 @@ function runTests() {
 
 
   suite('px-vis-highlight-line renders generating crosshair data axis highlight', function() {
-    var generatingScale = document.getElementById('generatingScale'),
-        generatingSVG = document.getElementById('generatingSVG'),
-        generatinghighlight = document.getElementById('generatinghighlight');
+    var generatingScale,
+        generatingSVG,
+        generatinghighlight;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done) {
+      generatingScale = document.getElementById('generatingScale');
+      generatingSVG = document.getElementById('generatingSVG');
+      generatinghighlight = document.getElementById('generatinghighlight');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -1149,14 +1188,17 @@ function runTests() {
 
 
   suite('px-vis-highlight-line draws the highlight', function() {
-    var generatingScale = document.getElementById('generatingScale'),
-        generatingSVG = document.getElementById('generatingSVG'),
-        generatinghighlight = document.getElementById('generatinghighlight');
+    var generatingScale,
+        generatingSVG,
+        generatinghighlight;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
+      generatingScale = document.getElementById('generatingScale');
+      generatingSVG = document.getElementById('generatingSVG');
+      generatinghighlight = document.getElementById('generatinghighlight');
       var d = {
             "rawData":[{
               "x": 1397160780000,
@@ -1188,14 +1230,17 @@ function runTests() {
   }); //suite
 
   suite('px-vis-highlight-line clears the highlight', function() {
-    var generatingScale = document.getElementById('generatingScale'),
-        generatingSVG = document.getElementById('generatingSVG'),
-        generatinghighlight = document.getElementById('generatinghighlight');
+    var generatingScale,
+        generatingSVG,
+        generatinghighlight;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
+      generatingScale = document.getElementById('generatingScale');
+      generatingSVG = document.getElementById('generatingSVG');
+      generatinghighlight = document.getElementById('generatinghighlight');
       var d = {
             "rawData":[],
             "timeStamps": []
@@ -1235,14 +1280,17 @@ function runTests() {
 
 
   suite('px-vis-highlight-line forces display when generatingCrosshairData', function() {
-    var forceScale = document.getElementById('forceScale'),
-        forceSVG = document.getElementById('forceSVG'),
-        forcehighlight = document.getElementById('forcehighlight');
+    var forceScale,
+        forceSVG,
+        forcehighlight;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done) {
+      forceScale = document.getElementById('forceScale');
+      forceSVG = document.getElementById('forceSVG');
+      forcehighlight = document.getElementById('forcehighlight');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -1371,14 +1419,17 @@ function runTests() {
 
 
   suite('px-vis-highlight-line draws the highlight', function() {
-    var forceScale = document.getElementById('forceScale'),
-        forceSVG = document.getElementById('forceSVG'),
-        forcehighlight = document.getElementById('forcehighlight');
+    var forceScale,
+        forceSVG,
+        forcehighlight;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
+      forceScale = document.getElementById('forceScale');
+      forceSVG = document.getElementById('forceSVG');
+      forcehighlight = document.getElementById('forcehighlight');
       var d = {
             "rawData":[{
               "x": 1397160780000,
@@ -1439,14 +1490,17 @@ function runTests() {
   }); //suite
 
   suite('px-vis-highlight-line clears the highlight', function() {
-    var forceScale = document.getElementById('forceScale'),
-        forceSVG = document.getElementById('forceSVG'),
-        forcehighlight = document.getElementById('forcehighlight');
+    var forceScale,
+        forceSVG,
+        forcehighlight;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
+      forceScale = document.getElementById('forceScale');
+      forceSVG = document.getElementById('forceSVG');
+      forcehighlight = document.getElementById('forcehighlight');
       var d = {
             "rawData":[],
             "timeStamps": []
@@ -1486,14 +1540,17 @@ function runTests() {
 
 
   suite('px-vis-highlight-line creates tooltipData', function() {
-    var tooltipScale = document.getElementById('tooltipScale'),
-        tooltipSVG = document.getElementById('tooltipSVG'),
-        tooltiphighlight = document.getElementById('tooltiphighlight');
+    var tooltipScale,
+        tooltipSVG,
+        tooltiphighlight;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done) {
+      tooltipScale = document.getElementById('tooltipScale');
+      tooltipSVG = document.getElementById('tooltipSVG');
+      tooltiphighlight = document.getElementById('tooltiphighlight');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -1611,14 +1668,17 @@ function runTests() {
 
 
   suite('px-vis-highlight-line draws the highlight', function() {
-    var tooltipScale = document.getElementById('tooltipScale'),
-        tooltipSVG = document.getElementById('tooltipSVG'),
-        tooltiphighlight = document.getElementById('tooltiphighlight');
+    var tooltipScale,
+        tooltipSVG,
+        tooltiphighlight;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
+      tooltipScale = document.getElementById('tooltipScale');
+      tooltipSVG = document.getElementById('tooltipSVG');
+      tooltiphighlight = document.getElementById('tooltiphighlight');
       var d = {
             "rawData":[{
               "x": 1397160780000,
@@ -1658,14 +1718,17 @@ function runTests() {
   }); //suite
 
   suite('px-vis-highlight-line clears the highlight', function() {
-    var tooltipScale = document.getElementById('tooltipScale'),
-        tooltipSVG = document.getElementById('tooltipSVG'),
-        tooltiphighlight = document.getElementById('tooltiphighlight');
+    var tooltipScale,
+        tooltipSVG,
+        tooltiphighlight;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var linePath;
 
     suiteSetup(function(done){
+      tooltipScale = document.getElementById('tooltipScale');
+      tooltipSVG = document.getElementById('tooltipSVG');
+      tooltiphighlight = document.getElementById('tooltiphighlight');
       var d = {
             "rawData":[],
             "timeStamps": []

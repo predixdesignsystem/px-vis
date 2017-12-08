@@ -4,17 +4,21 @@ document.addEventListener("WebComponentsReady", function() {
 
 function runTests(){
   suite('px-vis-axis does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
   });
 
   suite('px-vis-multi-axis basic setup works', function() {
-    var multiScale = document.getElementById('multiScale'),
-        multiSVG = document.getElementById('multiSVG'),
-        multiAxis = document.getElementById('multiAxis');
+    var multiScale,
+        multiSVG,
+        multiAxis;
 
     suiteSetup(function(done){
+      multiScale = document.getElementById('multiScale');
+      multiSVG = document.getElementById('multiSVG');
+      multiAxis = document.getElementById('multiAxis');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -103,12 +107,13 @@ function runTests(){
     });
 
     test('multiAxis created three interactive axes', function() {
-      var ia = multiAxis.querySelectorAll('px-vis-interactive-axis');
+
+      var ia = Polymer.dom(multiAxis.root).querySelectorAll('px-vis-interactive-axis');
       assert.equal(ia.length, 3);
     });
 
     test('multiAxis each IA group is transformed correctly', function() {
-      var ia = multiAxis.querySelectorAll('px-vis-interactive-axis'),
+      var ia = Polymer.dom(multiAxis.root).querySelectorAll('px-vis-interactive-axis'),
           iag0 = ia[0]._interactiveGroup.attr('transform'),
           iag1 = ia[1]._interactiveGroup.attr('transform'),
           iag2 = ia[2]._interactiveGroup.attr('transform'),
@@ -123,22 +128,24 @@ function runTests(){
     });
 
     test('multiAxis axis gets correct calculated attrs', function() {
-      var ia = multiAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis0 = ia[0].getElementsByTagName('px-vis-axis')[0],
-          axis1 = ia[1].getElementsByTagName('px-vis-axis')[0],
-          axis2 = ia[2].getElementsByTagName('px-vis-axis')[0];
+      var iAxes = Polymer.dom(multiAxis.root).querySelectorAll('px-vis-interactive-axis'),
+          axes = [];
 
-      assert.equal(axis0.seriesId, "y");
-      assert.equal(axis0.title, "y");
-      assert.equal(axis0.disableTicks, false);
+      for(var i=0; i<iAxes.length; i++) {
+        axes.push(Polymer.dom(iAxes[i].root).querySelector('px-vis-axis'));
+      }
 
-      assert.equal(axis1.seriesId, "y1");
-      assert.equal(axis1.title, "2nd Title");
-      assert.equal(axis1.disableTicks, false);
+      assert.equal(axes[0].seriesId, "y");
+      assert.equal(axes[0].title, "y");
+      assert.equal(axes[0].disableTicks, false);
 
-      assert.equal(axis2.seriesId, "y2");
-      assert.equal(axis2.title, "Third Title");
-      assert.equal(axis2.disableTicks, false);
+      assert.equal(axes[1].seriesId, "y1");
+      assert.equal(axes[1].title, "2nd Title");
+      assert.equal(axes[1].disableTicks, false);
+
+      assert.equal(axes[2].seriesId, "y2");
+      assert.equal(axes[2].title, "Third Title");
+      assert.equal(axes[2].disableTicks, false);
     });
 
     test('multiAxis displayedValues', function() {
@@ -150,11 +157,14 @@ function runTests(){
 
 
   suite('px-vis-multi-axis add a dimension', function() {
-    var multiScale = document.getElementById('multiScale'),
-        multiSVG = document.getElementById('multiSVG'),
-        multiAxis = document.getElementById('multiAxis');
+    var multiScale,
+        multiSVG,
+        multiAxis;
 
     suiteSetup(function(done) {
+      multiScale = document.getElementById('multiScale');
+      multiSVG = document.getElementById('multiSVG');
+      multiAxis = document.getElementById('multiAxis');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -238,12 +248,12 @@ function runTests(){
     });
 
     test('multiAxis created four interactive axes', function() {
-      var ia = multiAxis.querySelectorAll('px-vis-interactive-axis');
+      var ia = Polymer.dom(multiAxis.root).querySelectorAll('px-vis-interactive-axis');
       assert.equal(ia.length, 4);
     });
 
     test('multiAxis each IA group is transformed correctly', function() {
-      var ia = multiAxis.querySelectorAll('px-vis-interactive-axis'),
+      var ia = Polymer.dom(multiAxis.root).querySelectorAll('px-vis-interactive-axis'),
           iag0 = ia[0]._interactiveGroup.attr('transform'),
           iag1 = ia[1]._interactiveGroup.attr('transform'),
           iag2 = ia[2]._interactiveGroup.attr('transform'),
@@ -262,7 +272,12 @@ function runTests(){
 
 
     test('multiAxis axis gets correct calculated attrs', function() {
-      var axes = multiAxis.getElementsByTagName('px-vis-axis');
+      var iAxes = Polymer.dom(multiAxis.root).querySelectorAll('px-vis-interactive-axis'),
+          axes = [];
+
+      for(var i=0; i<iAxes.length; i++) {
+        axes.push(Polymer.dom(iAxes[i].root).querySelector('px-vis-axis'));
+      }
 
       assert.equal(axes[0].seriesId, "y");
       assert.equal(axes[0].title, "y");
@@ -290,11 +305,14 @@ function runTests(){
   });
 
   suite('px-vis-multi-axis deletes a dimension', function() {
-    var multiScale = document.getElementById('multiScale'),
-        multiSVG = document.getElementById('multiSVG'),
-        multiAxis = document.getElementById('multiAxis');
+    var multiScale,
+        multiSVG,
+        multiAxis;
 
     suiteSetup(function(done){
+      multiScale = document.getElementById('multiScale');
+      multiSVG = document.getElementById('multiSVG');
+      multiAxis = document.getElementById('multiAxis');
       var d = [{
             "x": 1397102460000,
             "y1": 1,
@@ -374,12 +392,12 @@ function runTests(){
     });
 
     test('multiAxis created three groups', function() {
-      var ia = multiAxis.querySelectorAll('px-vis-interactive-axis');
+      var ia = Polymer.dom(multiAxis.root).querySelectorAll('px-vis-interactive-axis');
       assert.equal(ia.length, 3);
     });
 
     test('multiAxis each IA group is transformed correctly', function() {
-      var ia = multiAxis.querySelectorAll('px-vis-interactive-axis'),
+      var ia = Polymer.dom(multiAxis.root).querySelectorAll('px-vis-interactive-axis'),
           iag0 = ia[0]._interactiveGroup.attr('transform'),
           iag1 = ia[1]._interactiveGroup.attr('transform'),
           iag2 = ia[2]._interactiveGroup.attr('transform'),
@@ -395,7 +413,12 @@ function runTests(){
 
 
     test('multiAxis axis gets correct calculated attrs', function() {
-      var axes = multiAxis.getElementsByTagName('px-vis-axis');
+      var iAxes = Polymer.dom(multiAxis.root).querySelectorAll('px-vis-interactive-axis'),
+          axes = [];
+
+      for(var i=0; i<iAxes.length; i++) {
+        axes.push(Polymer.dom(iAxes[i].root).querySelector('px-vis-axis'));
+      }
 
       assert.equal(axes[0].seriesId, "y1");
       assert.equal(axes[0].title, "2nd Title");
@@ -419,11 +442,14 @@ function runTests(){
 
 
   suite('px-vis-multi-axis common axis setup works', function() {
-    var multiScaleCommon = document.getElementById('multiScaleCommon'),
-        multiSVGCommon = document.getElementById('multiSVGCommon'),
-        multiAxisCommon = document.getElementById('multiAxisCommon');
+    var multiScaleCommon,
+        multiSVGCommon,
+        multiAxisCommon;
 
     suiteSetup(function(done){
+      multiScaleCommon = document.getElementById('multiScaleCommon');
+      multiSVGCommon = document.getElementById('multiSVGCommon');
+      multiAxisCommon = document.getElementById('multiAxisCommon');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -513,12 +539,12 @@ function runTests(){
     });
 
     test('multiAxisCommon created three groups', function() {
-      var ia = multiAxisCommon.querySelectorAll('px-vis-interactive-axis');
+      var ia = Polymer.dom(multiAxisCommon.root).querySelectorAll('px-vis-interactive-axis');
       assert.equal(ia.length, 3);
     });
 
     test('multiAxis each IA group is transformed correctly', function() {
-      var ia = multiAxisCommon.querySelectorAll('px-vis-interactive-axis'),
+      var ia = Polymer.dom(multiAxisCommon.root).querySelectorAll('px-vis-interactive-axis'),
           iag0 = ia[0]._interactiveGroup.attr('transform'),
           iag1 = ia[1]._interactiveGroup.attr('transform'),
           iag2 = ia[2]._interactiveGroup.attr('transform'),
@@ -534,7 +560,13 @@ function runTests(){
 
 
     test('multiAxisCommon axis gets correct calculated attrs', function() {
-      var axes = multiAxisCommon.getElementsByTagName('px-vis-axis');
+
+      var iAxes = Polymer.dom(multiAxisCommon.root).querySelectorAll('px-vis-interactive-axis'),
+          axes = [];
+
+      for(var i=0; i<iAxes.length; i++) {
+        axes.push(Polymer.dom(iAxes[i].root).querySelector('px-vis-axis'));
+      }
 
       assert.equal(axes[0].seriesId, "y");
       assert.equal(axes[0].title, "y");
@@ -550,8 +582,8 @@ function runTests(){
     });
 
     test('multiAxisCommon first axis ticks are correct', function() {
-      var ia = multiAxisCommon.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[0].getElementsByTagName('px-vis-axis')[0],
+      var ia = Polymer.dom(multiAxisCommon.root).querySelectorAll('px-vis-interactive-axis'),
+          axis = Polymer.dom(ia[0].root).querySelectorAll('px-vis-axis')[0],
           ticks = axis._axisGroup.selectAll('g.tick').nodes();
 
       assert.equal(ticks[0].textContent, "2");
@@ -570,8 +602,8 @@ function runTests(){
     });
 
     test('multiAxisCommon second axis ticks correct', function() {
-      var ia = multiAxisCommon.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[1].getElementsByTagName('px-vis-axis')[0],
+      var ia = Polymer.dom(multiAxisCommon.root).querySelectorAll('px-vis-interactive-axis'),
+          axis = Polymer.dom(ia[1].root).querySelectorAll('px-vis-axis')[0],
           ticks = axis._axisGroup.selectAll('g.tick').nodes();
 
       assert.equal(ticks[0].textContent, "2");
@@ -590,8 +622,8 @@ function runTests(){
     });
 
     test('multiAxisCommon third axis ticks correct', function() {
-      var ia = multiAxisCommon.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[2].getElementsByTagName('px-vis-axis')[0],
+      var ia = Polymer.dom(multiAxisCommon.root).querySelectorAll('px-vis-interactive-axis'),
+          axis = Polymer.dom(ia[2].root).querySelectorAll('px-vis-axis')[0],
           ticks = axis._axisGroup.selectAll('g.tick').nodes();
 
       assert.equal(ticks[0].textContent, "2");
@@ -610,17 +642,17 @@ function runTests(){
     });
 
     test('multiAxisCommon ticks are correctly shown / hidden', function() {
-      var ia = multiAxisCommon.querySelectorAll('px-vis-interactive-axis'),
-          axis0 = ia[0].getElementsByTagName('px-vis-axis')[0],
-          axis1 = ia[1].getElementsByTagName('px-vis-axis')[0],
-          axis2 = ia[2].getElementsByTagName('px-vis-axis')[0],
+      var ia = Polymer.dom(multiAxisCommon.root).querySelectorAll('px-vis-interactive-axis'),
+          axis0 = Polymer.dom(ia[0].root).querySelectorAll('px-vis-axis')[0],
+          axis1 = Polymer.dom(ia[1].root).querySelectorAll('px-vis-axis')[0],
+          axis2 = Polymer.dom(ia[2].root).querySelectorAll('px-vis-axis')[0],
           ticks0 = axis0._axisGroup.selectAll('g.tick').selectAll('text').nodes(),
           ticks1 = axis1._axisGroup.selectAll('g.tick').selectAll('text').nodes(),
           ticks2 = axis2._axisGroup.selectAll('g.tick').selectAll('text').nodes();
 
-      assert.equal(ticks0[0].className.baseVal, "");
-      assert.equal(ticks1[0].className.baseVal, "hideCommon");
-      assert.equal(ticks2[0].className.baseVal, "hideCommon");
+      assert.isTrue(ticks0[0].className.baseVal.indexOf('hideCommon') === -1);
+      assert.isTrue(ticks1[0].className.baseVal.indexOf('hideCommon') !== -1);
+      assert.isTrue(ticks2[0].className.baseVal.indexOf('hideCommon') !== -1);
 
     });
 
@@ -634,11 +666,14 @@ function runTests(){
 
 
   suite('px-vis-multi-axis no match ticks setup works', function() {
-    var noMatchScale = document.getElementById('noMatchScale'),
-        noMatchSVG = document.getElementById('noMatchSVG'),
-        noMatchAxis = document.getElementById('noMatchAxis');
+    var noMatchScale,
+        noMatchSVG,
+        noMatchAxis;
 
     suiteSetup(function(done){
+      noMatchScale = document.getElementById('noMatchScale');
+      noMatchSVG = document.getElementById('noMatchSVG');
+      noMatchAxis = document.getElementById('noMatchAxis');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -728,12 +763,12 @@ function runTests(){
     });
 
     test('noMatchAxis created three groups', function() {
-      var ia = noMatchAxis.querySelectorAll('px-vis-interactive-axis');
+      var ia = Polymer.dom(noMatchAxis.root).querySelectorAll('px-vis-interactive-axis');
       assert.equal(ia.length, 3);
     });
 
     test('noMatchAxis each group is transformed correctly', function() {
-      var ia = noMatchAxis.querySelectorAll('px-vis-interactive-axis'),
+      var ia = Polymer.dom(noMatchAxis.root).querySelectorAll('px-vis-interactive-axis'),
           iag0 = ia[0]._interactiveGroup.attr('transform'),
           iag1 = ia[1]._interactiveGroup.attr('transform'),
           iag2 = ia[2]._interactiveGroup.attr('transform'),
@@ -748,7 +783,12 @@ function runTests(){
     });
 
     test('noMatchAxis axis gets correct calculated attrs', function() {
-      var axes = noMatchAxis.getElementsByTagName('px-vis-axis');
+      var iAxes = Polymer.dom(noMatchAxis.root).querySelectorAll('px-vis-interactive-axis'),
+          axes = [];
+
+      for(var i=0; i<iAxes.length; i++) {
+        axes.push(Polymer.dom(iAxes[i].root).querySelector('px-vis-axis'));
+      }
 
       assert.equal(axes[0].seriesId, "y");
       assert.equal(axes[0].title, "y");
@@ -772,11 +812,14 @@ function runTests(){
 
 
   suite('px-vis-multi-axis radial setup works', function() {
-    var radialScale = document.getElementById('radialScale'),
-        radialSVG = document.getElementById('radialSVG'),
-        radialAxis = document.getElementById('radialAxis');
+    var radialScale,
+        radialSVG,
+        radialAxis;
 
     suiteSetup(function(done){
+      radialScale = document.getElementById('radialScale');
+      radialSVG = document.getElementById('radialSVG');
+      radialAxis = document.getElementById('radialAxis');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -866,7 +909,7 @@ function runTests(){
     });
 
     test('radialAxis created three groups', function() {
-      var ia = radialAxis.querySelectorAll('px-vis-interactive-axis');
+      var ia = Polymer.dom(radialAxis.root).querySelectorAll('px-vis-interactive-axis');
       assert.lengthOf(ia, 3);
     });
 
@@ -876,7 +919,7 @@ function runTests(){
     });
 
     test('radialAxis each group is transformed correctly', function() {
-      var ia = radialAxis.querySelectorAll('px-vis-interactive-axis'),
+      var ia = Polymer.dom(radialAxis.root).querySelectorAll('px-vis-interactive-axis'),
           iag0 = ia[0]._interactiveGroup.attr('transform'),
           iag1 = ia[1]._interactiveGroup.attr('transform'),
           iag2 = ia[2]._interactiveGroup.attr('transform'),
@@ -891,7 +934,12 @@ function runTests(){
     });
 
     test('radialAxis axis gets correct calculated attrs', function() {
-      var axes = radialAxis.getElementsByTagName('px-vis-axis');
+      var iAxes = Polymer.dom(radialAxis.root).querySelectorAll('px-vis-interactive-axis'),
+          axes = [];
+
+      for(var i=0; i<iAxes.length; i++) {
+        axes.push(Polymer.dom(iAxes[i].root).querySelector('px-vis-axis'));
+      }
 
       assert.equal(axes[0].seriesId, "y");
       assert.equal(axes[0].title, "y");
@@ -925,13 +973,18 @@ function runTests(){
     });
 
     test('radialAxis drawnTickValues', function() {
-      var axes = radialAxis.getElementsByTagName('px-vis-axis');
+      var iAxes = Polymer.dom(radialAxis.root).querySelectorAll('px-vis-interactive-axis'),
+          axes = [];
+
+      for(var i=0; i<iAxes.length; i++) {
+        axes.push(Polymer.dom(iAxes[i].root).querySelector('px-vis-axis'));
+      }
       assert.equal(JSON.stringify(axes[0].drawnTickValues), '[2,4,6,8,10,12,14,16,18,20,22,24,26]');
     });
 
     test('radialAxis first axis ticks are correct', function() {
-      var ia = radialAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[0].getElementsByTagName('px-vis-axis')[0],
+      var ia = Polymer.dom(radialAxis.root).querySelectorAll('px-vis-interactive-axis'),
+          axis = Polymer.dom(ia[0].root).querySelectorAll('px-vis-axis')[0],
           ticks = axis._axisGroup.selectAll('g.tick').nodes();
 
       assert.equal(ticks[0].textContent, "2");
@@ -950,16 +1003,16 @@ function runTests(){
     });
 
     test('radialAxis second axis ticks are removed', function() {
-      var ia = radialAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[1].getElementsByTagName('px-vis-axis')[0],
+      var ia = Polymer.dom(radialAxis.root).querySelectorAll('px-vis-interactive-axis'),
+          axis = Polymer.dom(ia[1].root).querySelectorAll('px-vis-axis')[0],
           ticks = axis._axisGroup.selectAll('g.tick').nodes();
 
       assert.lengthOf(ticks,0);
     });
 
     test('radialAxis third axis ticks are removed', function() {
-      var ia = radialAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[2].getElementsByTagName('px-vis-axis')[0],
+      var ia = Polymer.dom(radialAxis.root).querySelectorAll('px-vis-interactive-axis'),
+          axis = Polymer.dom(ia[2].root).querySelectorAll('px-vis-axis')[0],
           ticks = axis._axisGroup.selectAll('g.tick').nodes();
 
       assert.lengthOf(ticks,0);
@@ -967,11 +1020,14 @@ function runTests(){
   });
 
   suite('px-vis-multi-axis radial add a dimension', function() {
-    var radialScale = document.getElementById('radialScale'),
-        radialSVG = document.getElementById('radialSVG'),
-        radialAxis = document.getElementById('radialAxis');
+    var radialScale,
+        radialSVG,
+        radialAxis;
 
     suiteSetup(function(done) {
+      radialScale = document.getElementById('radialScale');
+      radialSVG = document.getElementById('radialSVG');
+      radialAxis = document.getElementById('radialAxis');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -1050,17 +1106,17 @@ function runTests(){
       radialAxis.set('chartData',d);
 
       window.setTimeout(function(){
-        done()}, 300);
+        done()}, 500);
      // done();
     });
 
     test('radialAxis created four groups', function() {
-      var ia = radialAxis.querySelectorAll('px-vis-interactive-axis');
+      var ia = Polymer.dom(radialAxis.root).querySelectorAll('px-vis-interactive-axis');
       assert.equal(ia.length, 4);
     });
 
     test('radialAxis each group is transformed correctly', function() {
-      var ia = radialAxis.querySelectorAll('px-vis-interactive-axis'),
+      var ia = Polymer.dom(radialAxis.root).querySelectorAll('px-vis-interactive-axis'),
           iag0 = ia[0]._interactiveGroup.attr('transform'),
           iag1 = ia[1]._interactiveGroup.attr('transform'),
           iag2 = ia[2]._interactiveGroup.attr('transform'),
@@ -1079,7 +1135,12 @@ function runTests(){
 
 
     test('radialAxis axis gets correct calculated attrs', function() {
-      var axes = radialAxis.getElementsByTagName('px-vis-axis');
+      var iAxes = Polymer.dom(radialAxis.root).querySelectorAll('px-vis-interactive-axis'),
+          axes = [];
+
+      for(var i=0; i<iAxes.length; i++) {
+        axes.push(Polymer.dom(iAxes[i].root).querySelector('px-vis-axis'));
+      }
 
       assert.equal(axes[0].seriesId, "y");
       assert.equal(axes[0].title, "y");
@@ -1122,14 +1183,19 @@ function runTests(){
     });
 
     test('radialAxis drawnTickValues', function() {
-      var axes = radialAxis.getElementsByTagName('px-vis-axis');
+      var iAxes = Polymer.dom(radialAxis.root).querySelectorAll('px-vis-interactive-axis'),
+          axes = [];
+
+      for(var i=0; i<iAxes.length; i++) {
+        axes.push(Polymer.dom(iAxes[i].root).querySelector('px-vis-axis'));
+      }
 
       assert.equal(JSON.stringify(axes[0].drawnTickValues), '[10,20,30,40,50,60,70]');
     });
 
     test('radialAxis first axis ticks are correct', function() {
-      var ia = radialAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[0].getElementsByTagName('px-vis-axis')[0],
+      var ia = Polymer.dom(radialAxis.root).querySelectorAll('px-vis-interactive-axis'),
+          axis = Polymer.dom(ia[0].root).querySelectorAll('px-vis-axis')[0],
           ticks = axis._axisGroup.selectAll('g.tick').nodes();
 
       assert.equal(ticks[0].textContent, "10");
@@ -1142,24 +1208,24 @@ function runTests(){
     });
 
     test('radialAxis second axis ticks are removed', function() {
-      var ia = radialAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[1].getElementsByTagName('px-vis-axis')[0],
+      var ia = Polymer.dom(radialAxis.root).querySelectorAll('px-vis-interactive-axis'),
+          axis = Polymer.dom(ia[1].root).querySelectorAll('px-vis-axis')[0],
           ticks = axis._axisGroup.selectAll('g.tick').nodes();
 
       assert.lengthOf(ticks,0);
     });
 
     test('radialAxis third axis ticks are removed', function() {
-      var ia = radialAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[2].getElementsByTagName('px-vis-axis')[0],
+      var ia = Polymer.dom(radialAxis.root).querySelectorAll('px-vis-interactive-axis'),
+          axis = Polymer.dom(ia[2].root).querySelectorAll('px-vis-axis')[0],
           ticks = axis._axisGroup.selectAll('g.tick').nodes();
 
       assert.lengthOf(ticks,0);
     });
 
     test('radialAxis fourth axis ticks are removed', function() {
-      var ia = radialAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[3].getElementsByTagName('px-vis-axis')[0],
+      var ia = Polymer.dom(radialAxis.root).querySelectorAll('px-vis-interactive-axis'),
+          axis = Polymer.dom(ia[3].root).querySelectorAll('px-vis-axis')[0],
           ticks = axis._axisGroup.selectAll('g.tick').nodes();
 
       assert.lengthOf(ticks,0);
@@ -1167,11 +1233,14 @@ function runTests(){
   });
 
   suite('px-vis-multi-axis radial delete a dimension', function() {
-    var radialScale = document.getElementById('radialScale'),
-        radialSVG = document.getElementById('radialSVG'),
-        radialAxis = document.getElementById('radialAxis');
+    var radialScale,
+        radialSVG,
+        radialAxis;
 
     suiteSetup(function(done){
+      radialScale = document.getElementById('radialScale');
+      radialSVG = document.getElementById('radialSVG');
+      radialAxis = document.getElementById('radialAxis');
       var d = [{
             "x": 1397102460000,
             "y1": 1,
@@ -1248,7 +1317,7 @@ function runTests(){
     });
 
     test('radialAxis created three groups', function() {
-      var ia = radialAxis.querySelectorAll('px-vis-interactive-axis');
+      var ia = Polymer.dom(radialAxis.root).querySelectorAll('px-vis-interactive-axis');
       assert.lengthOf(ia, 3);
     });
 
@@ -1258,7 +1327,7 @@ function runTests(){
     });
 
     test('radialAxis each group is transformed correctly', function() {
-      var ia = radialAxis.querySelectorAll('px-vis-interactive-axis'),
+      var ia = Polymer.dom(radialAxis.root).querySelectorAll('px-vis-interactive-axis'),
           iag0 = ia[0]._interactiveGroup.attr('transform'),
           iag1 = ia[1]._interactiveGroup.attr('transform'),
           iag2 = ia[2]._interactiveGroup.attr('transform'),
@@ -1273,7 +1342,12 @@ function runTests(){
     });
 
     test('radialAxis axis gets correct calculated attrs', function() {
-      var axes = radialAxis.getElementsByTagName('px-vis-axis');
+      var iAxes = Polymer.dom(radialAxis.root).querySelectorAll('px-vis-interactive-axis'),
+          axes = [];
+
+      for(var i=0; i<iAxes.length; i++) {
+        axes.push(Polymer.dom(iAxes[i].root).querySelector('px-vis-axis'));
+      }
 
       assert.equal(axes[0].seriesId, "y1");
       assert.equal(axes[0].title, "2nd Title");
@@ -1307,14 +1381,19 @@ function runTests(){
     });
 
     test('radialAxis drawnTickValues', function() {
-      var axes = radialAxis.getElementsByTagName('px-vis-axis');
+      var iAxes = Polymer.dom(radialAxis.root).querySelectorAll('px-vis-interactive-axis'),
+          axes = [];
+
+      for(var i=0; i<iAxes.length; i++) {
+        axes.push(Polymer.dom(iAxes[i].root).querySelector('px-vis-axis'));
+      }
 
       assert.equal(JSON.stringify(axes[0].drawnTickValues), '[10,20,30,40,50,60,70]');
     });
 
     test('radialAxis first axis ticks are correct', function() {
-      var ia = radialAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[0].getElementsByTagName('px-vis-axis')[0],
+      var ia = Polymer.dom(radialAxis.root).querySelectorAll('px-vis-interactive-axis'),
+          axis = Polymer.dom(ia[0].root).querySelectorAll('px-vis-axis')[0],
           ticks = axis._axisGroup.selectAll('g.tick').nodes();
 
       assert.equal(ticks[0].textContent, "10");
@@ -1327,16 +1406,16 @@ function runTests(){
     });
 
     test('radialAxis second axis ticks are removed', function() {
-      var ia = radialAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[1].getElementsByTagName('px-vis-axis')[0],
+      var ia = Polymer.dom(radialAxis.root).querySelectorAll('px-vis-interactive-axis'),
+          axis = Polymer.dom(ia[1].root).querySelectorAll('px-vis-axis')[0],
           ticks = axis._axisGroup.selectAll('g.tick').nodes();
 
       assert.lengthOf(ticks,0);
     });
 
     test('radialAxis third axis ticks are removed', function() {
-      var ia = radialAxis.querySelectorAll('px-vis-interactive-axis'),
-          axis = ia[1].getElementsByTagName('px-vis-axis')[0],
+      var ia = Polymer.dom(radialAxis.root).querySelectorAll('px-vis-interactive-axis'),
+          axis = Polymer.dom(ia[1].root).querySelectorAll('px-vis-axis')[0],
           ticks = axis._axisGroup.selectAll('g.tick').nodes();
 
       assert.lengthOf(ticks,0);

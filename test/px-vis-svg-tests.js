@@ -4,20 +4,25 @@ document.addEventListener("WebComponentsReady", function() {
 
 function runTests(){
   suite('px-vis-svg does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isDefined(Polymer);
     });
   });
 
   suite('px-vis-svg svg with no properties does nothing', function() {
-    var emptySVG = document.getElementById('empty');
+    var emptySVG;
 
-    test('emptySVG fixture is created', function() {
+    suiteSetup(function() {
+      emptySVG = document.getElementById('empty');
+    });
+test('emptySVG fixture is created', function() {
       assert.isDefined(emptySVG);
     });
 
     test('emptySVG creates an svg', function() {
-      assert.equal(emptySVG.querySelector('#chartSVG').tagName ,'svg');
+
+      assert.equal(Polymer.dom(emptySVG.root).querySelector('#chartSVG').tagName ,'svg');
     });
 
     test('emptySVG does not set svg property', function() {
@@ -26,14 +31,17 @@ function runTests(){
   });
 
   suite('px-vis-svg missing one property does nothing', function() {
-    var missingHeight = document.getElementById('missingHeight');
+    var missingHeight;
 
-    test('missingHeight fixture is created', function() {
+    suiteSetup(function() {
+      missingHeight = document.getElementById('missingHeight');
+    });
+test('missingHeight fixture is created', function() {
       assert.isDefined(missingHeight);
     });
 
     test('missingHeight creates an svg', function() {
-      assert.equal(missingHeight.querySelector('#chartSVG').tagName ,'svg');
+      assert.equal(Polymer.dom(missingHeight.root).querySelector('#chartSVG').tagName ,'svg');
     });
 
     test('missingHeight does not set svg property', function() {
@@ -42,10 +50,13 @@ function runTests(){
   });
 
   suite('px-vis-svg runs with basic declarative bindings', function() {
-    var decSVG = document.getElementById('decSVG');
+    var decSVG;
     var chartSVG = decSVG.querySelector('#chartSVG');
 
-    test('decSVG fixture is created', function() {
+    suiteSetup(function() {
+      decSVG = document.getElementById('decSVG');
+    });
+test('decSVG fixture is created', function() {
       assert.isDefined(decSVG);
     });
 
@@ -61,7 +72,7 @@ function runTests(){
 
   suite('px-vis-svg runs with imperative bindings', function() {
     var eventObj,
-        impSVG = document.getElementById('impSVG'),
+        impSVG,
         chartSVG = impSVG.querySelector('#chartSVG'),
         w = 600,
         h = 400,
@@ -73,6 +84,7 @@ function runTests(){
         };
 
     suiteSetup(function(){
+      impSVG = document.getElementById('impSVG');
       document.addEventListener('px-vis-svg-updated',function(evt){
         eventObj = evt.detail;
       });
@@ -105,12 +117,13 @@ function runTests(){
 
   suite('px-vis-svg updates imperitively', function() {
     var eventObj,
-        updateSVG = document.getElementById('updateSVG'),
+        updateSVG,
         chartSVG = updateSVG.querySelector('#chartSVG'),
         w = 400,
         h = 200;
 
     suiteSetup(function(){
+      updateSVG = document.getElementById('updateSVG');
       document.addEventListener('px-vis-svg-updated',function(evt){
         eventObj = evt.detail;
       });
@@ -146,10 +159,13 @@ function runTests(){
 
 
   suite('px-vis-svg runs with an offset', function() {
-    var offsetSVG = document.getElementById('offsetSVG');
+    var offsetSVG;
     var chartSVG = offsetSVG.querySelector('#chartSVG');
 
-    test('offsetSVG fixture is created', function() {
+    suiteSetup(function() {
+      offsetSVG = document.getElementById('offsetSVG');
+    });
+test('offsetSVG fixture is created', function() {
       assert.isDefined(offsetSVG);
     });
 
@@ -164,7 +180,7 @@ function runTests(){
 } //runTests
 
 function basicAttrs(elem, elemName, w,h,m){
-  var chartSVG = elem.querySelector('#chartSVG');
+  var chartSVG = Polymer.dom(elem.root).querySelector('#chartSVG');
 
   test(elemName + ' chartSVG has correct width',function(){
     assert.equal(chartSVG.getAttribute('width'),w);

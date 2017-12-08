@@ -4,6 +4,7 @@ document.addEventListener("WebComponentsReady", function() {
 
 function runTests(){
   suite('px-vis-svg-canvas does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isDefined(Polymer);
     });
@@ -13,7 +14,7 @@ function runTests(){
   suite('px-vis-svg-canvas runs with imperative bindings', function() {
     var canvasEvt,canvasEvtNE,
         svgEvt,svgEvtNE,
-        svgCanvas = document.getElementById('svgCanvas'),
+        svgCanvas,
         canvasElem = svgCanvas.$$('px-vis-canvas'),
         svgElem = svgCanvas.$$('px-vis-svg'),
         w = 600,
@@ -26,6 +27,7 @@ function runTests(){
         };
 
     suiteSetup(function(){
+      svgCanvas = document.getElementById('svgCanvas');
       document.addEventListener('px-vis-canvas-context-updated',function(evt){
         canvasEvt = evt.detail;
         canvasEvtNE = Polymer.dom(evt);

@@ -4,18 +4,22 @@ document.addEventListener("WebComponentsReady", function() {
 
 function runTests() {
   suite('px-vis-interaction-space does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
   });
 
   suite('px-vis-interaction-space basic setup works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        baseIS = document.getElementById('baseIS');
+    var baseScale,
+        baseSVG,
+        baseIS;
     var eventObj,ttObj;
 
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      baseIS = document.getElementById('baseIS');
       var d = [{
             "x": 1397102460000,
             "y": 1
@@ -48,13 +52,29 @@ function runTests() {
           "right": 10,
           "bottom": 10,
           "left": 10
-        };
-      document.addEventListener('px-vis-mouse-rect-updated',function(evt){
+        },
+        called = 0;
+
+      var listener1 = function(evt){
         eventObj = evt.detail;
-      });
-      document.addEventListener('px-vis-tooltip-updated',function(evt){
+        called++;
+        document.removeEventListener('px-vis-mouse-rect-updated', listener1);
+        if(called === 2) {
+          done();
+        }
+      };
+
+      var listener2 = function(evt){
         ttObj = evt.detail;
-      });
+        called++;
+        document.removeEventListener('px-vis-tooltip-updated', listener2);
+        if(called === 2) {
+          done();
+        }
+      };
+
+      document.addEventListener('px-vis-mouse-rect-updated', listener1);
+      document.addEventListener('px-vis-tooltip-updated', listener2);
 
       baseSVG.set('width',w);
       baseSVG.set('height',h);
@@ -77,9 +97,6 @@ function runTests() {
                 'mousemove': 'calcTooltipData',
                 'mousedown': 'startZooming',
                 'mouseup': 'stopZooming'});
-
-      // window.setTimeout(function(){done()},100);
-      done();
     });
 
     test('baseIS fixture is created', function() {
@@ -133,8 +150,11 @@ function runTests() {
   });
 
   suite('px-vis-interaction-space baseIS works', function() {
-    var baseIS = document.getElementById('baseIS');
+    var baseIS;
 
+    suiteSetup(function() {
+      baseIS = document.getElementById('baseIS');
+    });
     test('baseIS _rect is created', function() {
       assert.isTrue(baseIS._rect !== null);
     });
@@ -211,22 +231,24 @@ function runTests() {
   // }); //suite
 
   suite('px-vis-interaction-space baseIS mouseoff event', function() {
-    var baseIS = document.getElementById('baseIS');
+    var baseIS;
     var ttObj;
 
     suiteSetup(function(done){
-      document.addEventListener('px-vis-tooltip-updated',function(evt){
+      baseIS = document.getElementById('baseIS');
+
+      var listener = function(evt){
         ttObj = evt.detail;
-      });
+        document.removeEventListener('px-vis-tooltip-updated', listener);
+        done();
+      };
+      document.addEventListener('px-vis-tooltip-updated', listener);
 
       //can't use new MouseEvent cause IE
       var e = document.createEvent("MouseEvent");
       e.initMouseEvent("mouseout",true,true,window,0,0,0,250,100,false,false,false,false,0,null);
 
       baseIS._rect.node().dispatchEvent(e);
-
-      // give event time to process and fire
-      window.setTimeout(function(){ done(); },10);
     });
 
     test('event fired', function() {
@@ -264,10 +286,11 @@ function runTests() {
 
 
   suite('px-vis-interaction-space baseIS has no seriesKeys', function() {
-    var baseIS = document.getElementById('baseIS');
+    var baseIS;
     var ttObj;
 
     suiteSetup(function(done){
+      baseIS = document.getElementById('baseIS');
       document.addEventListener('px-vis-tooltip-updated',function(evt){
         ttObj = evt.detail;
       });
@@ -312,10 +335,11 @@ function runTests() {
   }); //suite
 
   suite('px-vis-interaction-space baseIS more seriesKeys', function() {
-    var baseIS = document.getElementById('baseIS');
+    var baseIS;
     var ttObj;
 
     suiteSetup(function(done){
+      baseIS = document.getElementById('baseIS');
       document.addEventListener('px-vis-tooltip-updated',function(evt){
         ttObj = evt.detail;
       });
@@ -372,10 +396,11 @@ function runTests() {
   }); //suite
 
   suite('px-vis-interaction-space defaultEmptyData', function() {
-    var baseIS = document.getElementById('baseIS');
+    var baseIS;
     var ttObj;
 
     suiteSetup(function(done){
+      baseIS = document.getElementById('baseIS');
       document.addEventListener('px-vis-tooltip-updated',function(evt){
         ttObj = evt.detail;
       });

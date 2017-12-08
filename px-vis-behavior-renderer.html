@@ -292,6 +292,9 @@ PxVisBehaviorRenderer.base = [{
    *****************************************************************/
 
   _renderSeriesOnTop: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
     var targets = [],
         ctx;
 
@@ -350,6 +353,9 @@ PxVisBehaviorRenderer.base = [{
   },
 
   _renderChartData: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
     if(this.chartData && this.chartData.length) {
       this._renderTypedContext('chartData', [this.canvasContext]);
     } else {
@@ -359,6 +365,9 @@ PxVisBehaviorRenderer.base = [{
   },
 
   _renderFilteredChartData: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
     if(this._filteredData && this._filteredData.length) {
       this._renderTypedContext('filteredChartData', [this.canvasContext]);
     } else {
@@ -368,7 +377,8 @@ PxVisBehaviorRenderer.base = [{
   },
 
   _renderHighlight: function() {
-    if(this.domainChanged === null || !this.canvasLayers.highlighter ||
+
+    if(this.hasUndefinedArguments(arguments) || this.domainChanged === null || !this.canvasLayers.highlighter ||
       !this.completeSeriesConfig || this.preventInitialDrawing) {
       return;
     }
@@ -376,6 +386,9 @@ PxVisBehaviorRenderer.base = [{
   },
 
   _renderMarkers: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
     this._renderTypedContext('markers', [this.canvasLayers.markers]);
   },
 

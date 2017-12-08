@@ -4,17 +4,21 @@ document.addEventListener("WebComponentsReady", function() {
 
 function runTests(){
   suite('px-vis-axis does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
   });
 
   suite('px-vis-interactive-axis basic setup works', function() {
-    var multiScale = document.getElementById('multiScale'),
-        multiSVG = document.getElementById('multiSVG'),
-        multiAxis = document.getElementById('multiAxis');
+    var multiScale,
+        multiSVG,
+        multiAxis;
 
     suiteSetup(function(done){
+      multiScale = document.getElementById('multiScale');
+      multiSVG = document.getElementById('multiSVG');
+      multiAxis = document.getElementById('multiAxis');
       var d = [{
             "x": 1397102460000,
             "y": 1,
@@ -126,11 +130,14 @@ function runTests(){
 
 
   suite('commonAxis ticks styles', function() {
-    var multiScale = document.getElementById('multiScale'),
-        multiSVG = document.getElementById('multiSVG'),
-        multiAxis = document.getElementById('multiAxis');
+    var multiScale,
+        multiSVG,
+        multiAxis;
 
     suiteSetup(function(done) {
+      multiScale = document.getElementById('multiScale');
+      multiSVG = document.getElementById('multiSVG');
+      multiAxis = document.getElementById('multiAxis');
       var scaleSet = function() {
         multiAxis.set('y',multiScale.y.y);
         multiScale.removeEventListener('px-vis-y-updated', scaleSet);
@@ -157,11 +164,14 @@ function runTests(){
   });
 
   suite('px-vis-interactive-axis radial setup works', function() {
-    var radialScale = document.getElementById('radialScale'),
-        radialSVG = document.getElementById('radialSVG'),
-        radialAxis = document.getElementById('radialAxis');
+    var radialScale,
+        radialSVG,
+        radialAxis;
 
     suiteSetup(function(done){
+      radialScale = document.getElementById('radialScale');
+      radialSVG = document.getElementById('radialSVG');
+      radialAxis = document.getElementById('radialAxis');
       var d = [{
             "x": 1397102460000,
             "y": 1,

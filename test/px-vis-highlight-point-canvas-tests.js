@@ -4,6 +4,7 @@ document.addEventListener("WebComponentsReady", function() {
 
 function runTests(){
   suite('px-vis-highlight-point-canvas does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
@@ -11,14 +12,17 @@ function runTests(){
 
   suite('px-vis-highlight-point-canvas basic', function() {
     suite('px-vis-highlight-point-canvas setup works', function() {
-      var baseScale = document.getElementById('baseScale'),
-          baseSVG = document.getElementById('baseSVG'),
-          basePoint = document.getElementById('basePoint');
+      var baseScale,
+          baseSVG,
+          basePoint;
 
 
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      basePoint = document.getElementById('basePoint');
         var d = [{
               "x": 1,
               "timeStamp": 1397102460000,
@@ -108,14 +112,17 @@ function runTests(){
     }); //suite
 
     suite('px-vis-highlight-point-canvas mutes and draws', function() {
-      var baseScale = document.getElementById('baseScale'),
-          baseSVG = document.getElementById('baseSVG'),
-          basePoint = document.getElementById('basePoint');
+      var baseScale,
+          baseSVG,
+          basePoint;
 
 
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      basePoint = document.getElementById('basePoint');
         var d = {
             "rawData":[{
               "timeStamp": 1397160780000,
@@ -150,14 +157,17 @@ function runTests(){
     }); //suite
 
     suite('px-vis-highlight-point-canvas mutes and draws', function() {
-      var baseScale = document.getElementById('baseScale'),
-          baseSVG = document.getElementById('baseSVG'),
-          basePoint = document.getElementById('basePoint');
+      var baseScale,
+          baseSVG,
+          basePoint;
 
 
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      basePoint = document.getElementById('basePoint');
         var d = {
             "rawData":[],
             "timeStamps": []
@@ -182,14 +192,17 @@ function runTests(){
 
    suite('px-vis-highlight-point-canvas different dataset', function() {
     suite('px-vis-highlight-point-canvas setup works', function() {
-      var differentScale = document.getElementById('differentScale'),
-          differentSVG = document.getElementById('differentSVG'),
-          differentPoint = document.getElementById('differentPoint');
+      var differentScale,
+          differentSVG,
+          differentPoint;
 
 
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
+      differentScale = document.getElementById('differentScale');
+      differentSVG = document.getElementById('differentSVG');
+      differentPoint = document.getElementById('differentPoint');
         var d = [{
               "x": 1,
               "timeStamp": 1397102460000,
@@ -277,14 +290,17 @@ function runTests(){
     }); //suite
 
     suite('px-vis-highlight-point-canvas mutes and draws', function() {
-      var differentScale = document.getElementById('differentScale'),
-          differentSVG = document.getElementById('differentSVG'),
-          differentPoint = document.getElementById('differentPoint');
+      var differentScale,
+          differentSVG,
+          differentPoint;
 
 
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
+      differentScale = document.getElementById('differentScale');
+      differentSVG = document.getElementById('differentSVG');
+      differentPoint = document.getElementById('differentPoint');
         var d = {
             "rawData":[{
               "timeStamp": 1397160780000,
@@ -315,14 +331,17 @@ function runTests(){
     }); //suite
 
     suite('px-vis-highlight-point-canvas mutes and draws', function() {
-      var differentScale = document.getElementById('differentScale'),
-          differentSVG = document.getElementById('differentSVG'),
-          differentPoint = document.getElementById('differentPoint');
+      var differentScale,
+          differentSVG,
+          differentPoint;
 
 
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
+      differentScale = document.getElementById('differentScale');
+      differentSVG = document.getElementById('differentSVG');
+      differentPoint = document.getElementById('differentPoint');
         var d = {
             "rawData":[],
             "timeStamps": []
@@ -347,14 +366,17 @@ function runTests(){
 
   suite('px-vis-highlight-point-canvas fuzz', function() {
     suite('px-vis-highlight-point-canvas setup works', function() {
-      var fuzzScale = document.getElementById('fuzzScale'),
-          fuzzSVG = document.getElementById('fuzzSVG'),
-          fuzzPoint = document.getElementById('fuzzPoint');
+      var fuzzScale,
+          fuzzSVG,
+          fuzzPoint;
 
 
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
+      fuzzScale = document.getElementById('fuzzScale');
+      fuzzSVG = document.getElementById('fuzzSVG');
+      fuzzPoint = document.getElementById('fuzzPoint');
         var d = [{
               "x": 1,
               "timeStamp": 1397102460000,
@@ -443,14 +465,17 @@ function runTests(){
     }); //suite
 
     suite('px-vis-highlight-point-canvas mutes and draws', function() {
-      var fuzzScale = document.getElementById('fuzzScale'),
-          fuzzSVG = document.getElementById('fuzzSVG'),
-          fuzzPoint = document.getElementById('fuzzPoint');
+      var fuzzScale,
+          fuzzSVG,
+          fuzzPoint;
 
 
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
+      fuzzScale = document.getElementById('fuzzScale');
+      fuzzSVG = document.getElementById('fuzzSVG');
+      fuzzPoint = document.getElementById('fuzzPoint');
         var d = {
             "rawData":[{
               "timeStamp": 1397160780000,
@@ -491,14 +516,17 @@ function runTests(){
     }); //suite
 
     suite('px-vis-highlight-point-canvas mutes and draws', function() {
-      var fuzzScale = document.getElementById('fuzzScale'),
-          fuzzSVG = document.getElementById('fuzzSVG'),
-          fuzzPoint = document.getElementById('fuzzPoint');
+      var fuzzScale,
+          fuzzSVG,
+          fuzzPoint;
 
 
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
+      fuzzScale = document.getElementById('fuzzScale');
+      fuzzSVG = document.getElementById('fuzzSVG');
+      fuzzPoint = document.getElementById('fuzzPoint');
         var d = {
             "rawData":[],
             "timeStamps": []
@@ -522,14 +550,17 @@ function runTests(){
 
   suite('px-vis-highlight-point-canvas generating crosshair data', function() {
     suite('px-vis-highlight-point-canvas setup works', function() {
-      var generatingScale = document.getElementById('generatingScale'),
-          generatingSVG = document.getElementById('generatingSVG'),
-          generatingPoint = document.getElementById('generatingPoint');
+      var generatingScale,
+          generatingSVG,
+          generatingPoint;
 
 
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
+      generatingScale = document.getElementById('generatingScale');
+      generatingSVG = document.getElementById('generatingSVG');
+      generatingPoint = document.getElementById('generatingPoint');
         var d = [{
               "x": 1,
               "timeStamp": 1397102460000,
@@ -616,14 +647,17 @@ function runTests(){
     }); //suite
 
     suite('px-vis-highlight-point-canvas mutes and draws', function() {
-      var generatingScale = document.getElementById('generatingScale'),
-          generatingSVG = document.getElementById('generatingSVG'),
-          generatingPoint = document.getElementById('generatingPoint');
+      var generatingScale,
+          generatingSVG,
+          generatingPoint;
 
 
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
+      generatingScale = document.getElementById('generatingScale');
+      generatingSVG = document.getElementById('generatingSVG');
+      generatingPoint = document.getElementById('generatingPoint');
         var d = {
             "rawData":[{
               "timeStamp": 1397160780000,
@@ -651,14 +685,17 @@ function runTests(){
     }); //suite
 
     suite('px-vis-highlight-point-canvas mutes and draws', function() {
-      var generatingScale = document.getElementById('generatingScale'),
-          generatingSVG = document.getElementById('generatingSVG'),
-          generatingPoint = document.getElementById('generatingPoint');
+      var generatingScale,
+          generatingSVG,
+          generatingPoint;
 
 
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
+      generatingScale = document.getElementById('generatingScale');
+      generatingSVG = document.getElementById('generatingSVG');
+      generatingPoint = document.getElementById('generatingPoint');
         var d = {
             "rawData":[],
             "timeStamps": []
@@ -682,14 +719,17 @@ function runTests(){
 
   suite('px-vis-highlight-point-canvas drawWithLocalCrosshairData ', function() {
     suite('px-vis-highlight-point-canvas setup works', function() {
-      var forceScale = document.getElementById('forceScale'),
-          forceSVG = document.getElementById('forceSVG'),
-          forcePoint = document.getElementById('forcePoint');
+      var forceScale,
+          forceSVG,
+          forcePoint;
 
 
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
+      forceScale = document.getElementById('forceScale');
+      forceSVG = document.getElementById('forceSVG');
+      forcePoint = document.getElementById('forcePoint');
         var d = [{
               "x": 1,
               "timeStamp": 1397102460000,
@@ -777,14 +817,17 @@ function runTests(){
     }); //suite
 
     suite('px-vis-highlight-point-canvas mutes and draws', function() {
-      var forceScale = document.getElementById('forceScale'),
-          forceSVG = document.getElementById('forceSVG'),
-          forcePoint = document.getElementById('forcePoint');
+      var forceScale,
+          forceSVG,
+          forcePoint;
 
 
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
+      forceScale = document.getElementById('forceScale');
+      forceSVG = document.getElementById('forceSVG');
+      forcePoint = document.getElementById('forcePoint');
         var d = {
             "rawData":[{
               "timeStamp": 1397160780000,
@@ -817,14 +860,17 @@ function runTests(){
     }); //suite
 
     suite('px-vis-highlight-point-canvas mutes and draws', function() {
-      var forceScale = document.getElementById('forceScale'),
-          forceSVG = document.getElementById('forceSVG'),
-          forcePoint = document.getElementById('forcePoint');
+      var forceScale,
+          forceSVG,
+          forcePoint;
 
 
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
+      forceScale = document.getElementById('forceScale');
+      forceSVG = document.getElementById('forceSVG');
+      forcePoint = document.getElementById('forcePoint');
         var d = {
             "rawData":[],
             "timeStamps": []
@@ -850,14 +896,17 @@ function runTests(){
 
     suite('px-vis-highlight-point creates tooltip data', function() {
     suite('px-vis-highlight-point setup works', function() {
-      var tooltipScale = document.getElementById('tooltipScale'),
-          tooltipSVG = document.getElementById('tooltipSVG'),
-          tooltipPoint = document.getElementById('tooltipPoint');
+      var tooltipScale,
+          tooltipSVG,
+          tooltipPoint;
 
 
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
+      tooltipScale = document.getElementById('tooltipScale');
+      tooltipSVG = document.getElementById('tooltipSVG');
+      tooltipPoint = document.getElementById('tooltipPoint');
         var d = [{
               "x": 1,
               "timeStamp": 1397102460000,
@@ -937,14 +986,17 @@ function runTests(){
     }); //suite
 
     suite('px-vis-highlight-point mutes and draws', function() {
-      var tooltipScale = document.getElementById('tooltipScale'),
-          tooltipSVG = document.getElementById('tooltipSVG'),
-          tooltipPoint = document.getElementById('tooltipPoint');
+      var tooltipScale,
+          tooltipSVG,
+          tooltipPoint;
 
 
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
+      tooltipScale = document.getElementById('tooltipScale');
+      tooltipSVG = document.getElementById('tooltipSVG');
+      tooltipPoint = document.getElementById('tooltipPoint');
         var d = {
             "rawData":[{
               "timeStamp": 1397160780000,
@@ -971,14 +1023,17 @@ function runTests(){
     }); //suite
 
     suite('px-vis-highlight-point mutes and draws', function() {
-      var tooltipScale = document.getElementById('tooltipScale'),
-          tooltipSVG = document.getElementById('tooltipSVG'),
-          tooltipPoint = document.getElementById('tooltipPoint');
+      var tooltipScale,
+          tooltipSVG,
+          tooltipPoint;
 
 
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
+      tooltipScale = document.getElementById('tooltipScale');
+      tooltipSVG = document.getElementById('tooltipSVG');
+      tooltipPoint = document.getElementById('tooltipPoint');
         var d = {
             "rawData":[],
             "timeStamps": []

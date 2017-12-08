@@ -6,21 +6,26 @@
     <title>Web Component Test : Fixture for px-vis-axis-interaction-space</title>
 
     <!-- Requires Webcomponents.js polyfill is provided by the page for browsers that don't support html imports -->
-    <script src="../bower_components/webcomponentsjs/webcomponents-lite.min.js"></script>
+    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
     <!-- web-component-tester automatically provides local copy of brower.js below
          for any URL ending with "/web-component-tester/browser.js"
          when wct is run from the command line -->
-    <script src="../web-component-tester/browser.js"></script>
+    <script src="../../web-component-tester/browser.js"></script>
     <link rel="import" href="../px-vis-behavior-scale-multi-axis.html" />
     <link rel="import" href="../px-vis-behavior-scale-radar.html" />
     <link rel="import" href="../px-vis-svg.html" />
     <link rel="import" href="../px-vis-axis-interaction-space.html" />
     <link rel="import" href="behaviors/px-colors-behavior.html" />
+    <link rel="import" href="../../polymer/lib/elements/dom-bind.html" />
 
     <!-- Retain this link for px-theme.html -->
     <!-- px-theme is needed for WCT to run without errors -->
     <link rel="import" href="../../px-theme/px-theme-styles.html">
+
+
+    <custom-style>
     <style include="px-theme-styles" is="custom-style"></style>
+  </custom-style>
 
     <script src="px-vis-axis-interaction-space-tests.js"></script>
   </head>
@@ -42,33 +47,35 @@
           })
         });
       </script>
-      <template is="dom-bind">
-        <px-vis-multi-scale
-          id="multiScale"
-          x="{{x}}"
-          y="{{y}}"
-          domain-changed="{{domainChanged}}">
-        </px-vis-multi-scale>
-        <px-vis-svg
-          id="multiSVG"
-          svg="{{svg}}">
-        </px-vis-svg>
-        <px-vis-axis-interaction-space
-          id="brush1"
-          svg="[[svg]]"
-          domain-changed="[[domainChanged]]">
-        </px-vis-axis-interaction-space>
-        <px-vis-axis-interaction-space
-          id="brush2"
-          svg="[[svg]]"
-          domain-changed="[[domainChanged]]">
-        </px-vis-axis-interaction-space>
-        <px-vis-axis-interaction-space
-          id="brush3"
-          svg="[[svg]]"
-          domain-changed="[[domainChanged]]">
-        </px-vis-axis-interaction-space>
-      </template>
+      <dom-bind>
+        <template is="dom-bind">
+          <px-vis-multi-scale
+            id="multiScale"
+            x="{{x}}"
+            y="{{y}}"
+            domain-changed="{{domainChanged}}">
+          </px-vis-multi-scale>
+          <px-vis-svg
+            id="multiSVG"
+            svg="{{svg}}">
+          </px-vis-svg>
+          <px-vis-axis-interaction-space
+            id="brush1"
+            svg="[[svg]]"
+            domain-changed="[[domainChanged]]">
+          </px-vis-axis-interaction-space>
+          <px-vis-axis-interaction-space
+            id="brush2"
+            svg="[[svg]]"
+            domain-changed="[[domainChanged]]">
+          </px-vis-axis-interaction-space>
+          <px-vis-axis-interaction-space
+            id="brush3"
+            svg="[[svg]]"
+            domain-changed="[[domainChanged]]">
+          </px-vis-axis-interaction-space>
+        </template>
+      </dom-bind>
     </div>
 
     <div>
@@ -86,6 +93,8 @@
           })
         });
       </script>
+
+      <dom-bind>
       <template is="dom-bind">
         <px-vis-radar-scale
           id="radialScale"
@@ -123,6 +132,7 @@
           brush-to-remove>
         </px-vis-axis-interaction-space>
       </template>
+      </dom-bind>
     </div>
   </body>
 </html>

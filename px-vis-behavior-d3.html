@@ -294,7 +294,7 @@ PxVisBehaviorD3.svgLower = [{
 
     @polymerBehavior PxVisBehaviorD3.canvasContext
 */
-PxVisBehaviorD3.canvasContext = {
+PxVisBehaviorD3.canvasContext = [{
   properties: {
     /**
      * canvasContext is a holder for the instantiated canvas context to draw to.
@@ -314,14 +314,9 @@ PxVisBehaviorD3.canvasContext = {
       type: Object,
       notify: true,
       value: function() { return {}; }
-    },
-
-    canvasLayersConfig: {
-      type: Object,
-      value: function() { return {}; }
     }
   }
-};
+}, PxVisBehavior.canvasLayersConfig];
 
 /*
     Name:
@@ -350,6 +345,10 @@ PxVisBehaviorD3.canvas = [{
     '_renderToSvgChanged(renderToSvg)'
   ],
   _renderToSvgChanged: function(renderToSvg) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     if(this.renderToSvg && this.canvasContext && this.canvasContext.pxClearCanvas) {
       //make sure the canvas cleans itself
       this.canvasContext.pxClearCanvas();
@@ -361,7 +360,7 @@ PxVisBehaviorD3.canvas = [{
       Polymer.dom.flush();
     }
   }
-}, PxVisBehaviorD3.canvasContext, PxVisBehavior.isAttached]
+}, PxVisBehavior.observerCheck, PxVisBehaviorD3.canvasContext, PxVisBehavior.isAttached]
 
 /*
     Name:
@@ -387,6 +386,10 @@ PxVisBehaviorD3.renderToCanvas = [{
     }
   },
   _renderToCanvasChanged: function(renderToCanvas) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     if(!this.renderToCanvas && this.canvasContext && this.canvasContext.pxClearCanvas) {
       //make sure the canvas cleans itself
       this.canvasContext.pxClearCanvas();
@@ -398,7 +401,7 @@ PxVisBehaviorD3.renderToCanvas = [{
       Polymer.dom.flush();
     }
   }
-}, PxVisBehavior.isAttached];
+}, PxVisBehavior.observerCheck, PxVisBehavior.isAttached];
 
 /*
     Name:
@@ -412,7 +415,7 @@ PxVisBehaviorD3.renderToCanvas = [{
 
     @polymerBehavior PxVisBehaviorD3.axes
 */
-PxVisBehaviorD3.axes = {
+PxVisBehaviorD3.axes = [{
   properties: {
     /**
      * x is a holder for the d3 instantiated scale object
@@ -449,6 +452,10 @@ PxVisBehaviorD3.axes = {
     }
   },
   _getIsMultiY: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     return typeof this.y === 'object';
   },
   /**
@@ -476,7 +483,7 @@ PxVisBehaviorD3.axes = {
 
     return result;
   }
-};
+}, PxVisBehavior.observerCheck];
 
 /*
     Name:
@@ -688,13 +695,16 @@ PxVisBehaviorD3.selectedTimeDomain = [{
     }
   },
   observers: [
-    '_rangeChanged(range)',
-    // '_selectedDomainChanged(selectedDomain)'
+    '_rangeChanged(range)'
   ],
   attached: function() {
     this._isAttached = true;
   },
   _rangeChanged: function(range) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     if(this._isAttached && !this._preventRangeUpdate) {
       //update selectedDomain with those new values
       //make sure we don't trigger a domain update when changing it from here
@@ -738,7 +748,7 @@ PxVisBehaviorD3.selectedTimeDomain = [{
   //   }
   // }
 
-}, PxVisBehaviorD3.selectedDomain];
+}, PxVisBehavior.observerCheck, PxVisBehaviorD3.selectedDomain];
 
 /*
     Name:
@@ -1463,6 +1473,10 @@ PxVisBehaviorD3.lineShared = [{
   },
 
   _computeColorArr: function(categories,completeSeriesConfig,seriesId){
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
     //start with the RGB value and split it
     var c = completeSeriesConfig[seriesId]['color'].split('(')[1].split(','),
         colors = {};
@@ -1507,6 +1521,10 @@ PxVisBehaviorD3.lineShared = [{
    *
    */
   _computeGradientRange: function(chartData, timeDomain,seriesId) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     if(chartData.value.length > 0) {
       var x1,x2;
       if(timeDomain.value && timeDomain.value.x && timeDomain.value.x.length > 0) {
@@ -1629,7 +1647,7 @@ PxVisBehaviorD3.lineShared = [{
 
     this.set('line',line);
   }
-},PxVisBehaviorD3.radialLineGenerator, PxVisBehavior.seriesId, PxVisBehaviorD3.lineGaps, PxVisBehaviorD3.interpolationFunction, PxVisBehavior.timeDomain];
+}, PxVisBehavior.observerCheck,PxVisBehaviorD3.radialLineGenerator, PxVisBehavior.seriesId, PxVisBehaviorD3.lineGaps, PxVisBehaviorD3.interpolationFunction, PxVisBehavior.timeDomain];
 
 /*
     Name:
@@ -1931,6 +1949,9 @@ PxVisBehaviorD3.icons = {
 PxVisBehaviorD3.cursorIcon = [{
 
   _drawCursorIcon: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
     if(!this.iconType || this.iconType === 'none') {
       return;
     }
@@ -1957,7 +1978,8 @@ PxVisBehaviorD3.cursorIcon = [{
       .attr("transform", (t + s));
   }
 
-}, PxVisBehaviorD3.icons];
+}, PxVisBehavior.observerCheck, PxVisBehaviorD3.icons];
+
 
 /*
   Name:

@@ -17,6 +17,7 @@ const rename = require("gulp-rename");
 const through = require('through2');
 const rollup = require('rollup');
 const resolve = require('rollup-plugin-node-resolve');
+const exec = require('child_process').exec;
 
 const sassOptions = {
   importer: importOnce,
@@ -30,6 +31,14 @@ gulp.task('clean', function() {
   return gulp.src(['.tmp', 'css'], {
     read: false
   }).pipe($.clean());
+});
+
+gulp.task('generate-api', function (cb) {
+  exec(`node_modules/.bin/polymer analyze px-*.html > ${pkg.name}-api.json`, function (err, stdout, stderr) {
+    console.log(stdout);
+    console.log(stderr);
+    cb(err);
+  });
 });
 
 function handleError(err){
@@ -99,7 +108,7 @@ gulp.task('bump:major', function(){
 });
 
 gulp.task('default', function(callback) {
-  gulpSequence('clean', 'sass')(callback);
+  gulpSequence('clean', 'sass', 'generate-api')(callback);
 });
 
 /*

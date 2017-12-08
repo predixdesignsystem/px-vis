@@ -1,8 +1,8 @@
 function runRadarTests(){
   suite('px-vis-line-svg renders radar to SVG', function() {
-    var radarScale = document.getElementById('radarScale'),
-        radarSVG = document.getElementById('radarSVG'),
-        radarLine = document.getElementById('radarLine');
+    var radarScale,
+        radarSVG,
+        radarLine;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -56,6 +56,10 @@ function runRadarTests(){
           "bottom": 10,
           "left": 10
         };
+
+      radarScale = document.getElementById('radarScale'),
+      radarSVG = document.getElementById('radarSVG'),
+      radarLine = document.getElementById('radarLine');
 
       var rendered = function() {
 
@@ -169,11 +173,12 @@ function runRadarTests(){
   }); //suite
 
   suite('px-vis-line-svg radar small lines stop at 25', function() {
-    var radarScale = document.getElementById('radarScale'),
+    var radarScale,
         chartExtents = {"x":["y","y1","y2"],"y":[15,20] },
         linePath;
 
     suiteSetup(function(done) {
+      radarScale = document.getElementById('radarScale'),
       radarScale.set('chartExtents',chartExtents);
 
       window.setTimeout(function(){
@@ -244,9 +249,9 @@ function runRadarTests(){
   }); //suite
 
   suite('px-vis-line-svg radar with missing data', function() {
-    var radarMissingScale = document.getElementById('radarMissingScale'),
-        radarMissingSVG = document.getElementById('radarMissingSVG'),
-        radarMissingLine = document.getElementById('radarMissingLine');
+    var radarMissingScale,
+        radarMissingSVG,
+        radarMissingLine;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -298,6 +303,10 @@ function runRadarTests(){
           "bottom": 10,
           "left": 10
         };
+
+      radarMissingScale = document.getElementById('radarMissingScale'),
+      radarMissingSVG = document.getElementById('radarMissingSVG'),
+      radarMissingLine = document.getElementById('radarMissingLine');
 
       var rendered = function() {
 

@@ -23,20 +23,25 @@ function rgbToHex(rgb) {
 
 function runTests(){
   suite('px-vis-axis does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
   });
 
   suite('px-vis-axis basic setup works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        baseXAxis = document.getElementById('baseXAxis'),
-        baseYAxis = document.getElementById('baseYAxis');
+    var baseScale,
+        baseSVG,
+        baseXAxis,
+        baseYAxis;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
     suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      baseXAxis = document.getElementById('baseXAxis');
+      baseYAxis = document.getElementById('baseYAxis');
       var d = [{
             "x": 1397102460000,
             "y": 1
@@ -103,12 +108,18 @@ function runTests(){
   });
 
   suite('px-vis-axis basicXAxis works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        baseXAxis = document.getElementById('baseXAxis');
+    var baseScale,
+        baseSVG,
+        baseXAxis;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
+
+    suiteSetup(function() {
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      baseXAxis = document.getElementById('baseXAxis');
+    });
 
     test('baseXAxis ID is random', function() {
       assert.equal(baseXAxis.axisId.length,15);
@@ -209,14 +220,19 @@ function runTests(){
   }); //suite
 
   suite('px-vis-axis basicYAxis works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        baseYAxis = document.getElementById('baseYAxis');
+    var baseScale,
+        baseSVG,
+        baseYAxis;
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
     var colors = PxColorsBehavior.baseColors.properties.colors.value;
 
-    test('baseYAxis ID is random', function() {
+    suiteSetup(function() {
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      baseYAxis = document.getElementById('baseYAxis');
+    });
+test('baseYAxis ID is random', function() {
       assert.equal(baseYAxis.axisId.length,15);
       assert.equal(baseYAxis.axisId.split('_')[0],'axis');
     });
@@ -339,10 +355,11 @@ function runTests(){
   }); //suite
 
   suite('px-vis-axis setLabelDims func works', function() {
-    var baseXAxis = document.getElementById('baseXAxis');
+    var baseXAxis;
     suite('bottom & after', function() {
       var label;
       suiteSetup(function(){
+      baseXAxis = document.getElementById('baseXAxis');
         baseXAxis.orientation = 'bottom';
         baseXAxis.labelPosition = 'after';
         label = baseXAxis.setLabelDims();
@@ -486,9 +503,10 @@ function runTests(){
   }); //suite
 
   suite('px-vis-axis baseYAxis with mutedSeries', function() {
-    var baseYAxis = document.getElementById('baseYAxis');
+    var baseYAxis;
 
     suiteSetup(function(){
+      baseYAxis = document.getElementById('baseYAxis');
       var mutedSeries = {
         "mySeries":true
       };
@@ -502,9 +520,10 @@ function runTests(){
   });
 
   suite('px-vis-axis baseYAxis with mutedSeries', function() {
-    var baseYAxis = document.getElementById('baseYAxis');
+    var baseYAxis;
 
     suiteSetup(function(done){
+      baseYAxis = document.getElementById('baseYAxis');
       var mutedSeries = {
         "mySeries":false
       };
@@ -520,11 +539,14 @@ function runTests(){
 
 
   suite('px-vis-axis parallel coordinates axis works', function() {
-    var pcAxisSVG = document.getElementById('pcAxisSVG'),
-        pcAxisScale = document.getElementById('pcAxisScale'),
-        pcYAxis = document.getElementById('pcYAxis');
+    var pcAxisSVG,
+        pcAxisScale,
+        pcYAxis;
 
     suiteSetup(function(done){
+      pcAxisSVG = document.getElementById('pcAxisSVG');
+      pcAxisScale = document.getElementById('pcAxisScale');
+      pcYAxis = document.getElementById('pcYAxis');
       var d = [{
             "x": 1397102460000,
             "y": 1
@@ -606,11 +628,14 @@ function runTests(){
   });
 
   suite('px-vis-axis axis with units works', function() {
-    var pcUnitAxisSVG = document.getElementById('pcUnitAxisSVG'),
-        pcUnitAxisScale = document.getElementById('pcUnitAxisScale'),
-        pcUnitYAxis = document.getElementById('pcUnitYAxis');
+    var pcUnitAxisSVG,
+        pcUnitAxisScale,
+        pcUnitYAxis;
 
     suiteSetup(function(done){
+      pcUnitAxisSVG = document.getElementById('pcUnitAxisSVG');
+      pcUnitAxisScale = document.getElementById('pcUnitAxisScale');
+      pcUnitYAxis = document.getElementById('pcUnitYAxis');
       var d = [{
             "x": 1397102460000,
             "y": 1
@@ -692,11 +717,14 @@ function runTests(){
   });
 
   suite('px-vis-axis title truncation works', function() {
-    var pcTruncAxisSVG = document.getElementById('pcTruncAxisSVG'),
-        pcTruncAxisScale = document.getElementById('pcTruncAxisScale'),
-        pcTruncYAxis = document.getElementById('pcTruncYAxis');
+    var pcTruncAxisSVG,
+        pcTruncAxisScale,
+        pcTruncYAxis;
 
     suiteSetup(function(done){
+      pcTruncAxisSVG = document.getElementById('pcTruncAxisSVG');
+      pcTruncAxisScale = document.getElementById('pcTruncAxisScale');
+      pcTruncYAxis = document.getElementById('pcTruncYAxis');
       var d = [{
             "x": 1397102460000,
             "y": 1
@@ -778,11 +806,14 @@ function runTests(){
   });
 
   suite('px-vis-axis title truncation with units works', function() {
-    var pcTruncUnitAxisSVG = document.getElementById('pcTruncUnitAxisSVG'),
-        pcTruncUnitAxisScale = document.getElementById('pcTruncUnitAxisScale'),
-        pcTruncUnitYAxis = document.getElementById('pcTruncUnitYAxis');
+    var pcTruncUnitAxisSVG,
+        pcTruncUnitAxisScale,
+        pcTruncUnitYAxis;
 
     suiteSetup(function(done){
+      pcTruncUnitAxisSVG = document.getElementById('pcTruncUnitAxisSVG');
+      pcTruncUnitAxisScale = document.getElementById('pcTruncUnitAxisScale');
+      pcTruncUnitYAxis = document.getElementById('pcTruncUnitYAxis');
       var d = [{
             "x": 1397102460000,
             "y": 1
@@ -871,11 +902,14 @@ function runTests(){
   });
 
   suite('px-vis-axis title rotation works', function() {
-    var pcRotateAxisSVG = document.getElementById('pcRotateAxisSVG'),
-        pcRotateAxisScale = document.getElementById('pcRotateAxisScale'),
-        pcRotateYAxis = document.getElementById('pcRotateYAxis');
+    var pcRotateAxisSVG,
+        pcRotateAxisScale,
+        pcRotateYAxis;
 
     suiteSetup(function(done){
+      pcRotateAxisSVG = document.getElementById('pcRotateAxisSVG');
+      pcRotateAxisScale = document.getElementById('pcRotateAxisScale');
+      pcRotateYAxis = document.getElementById('pcRotateYAxis');
       var d = [{
             "x": 1397102460000,
             "y": 1
@@ -963,11 +997,14 @@ function runTests(){
   });
 
   suite('px-vis-axis tick values works', function() {
-    var tickScale = document.getElementById('tickScale'),
-        tickSVG = document.getElementById('tickSVG'),
-        tickAxis = document.getElementById('tickAxis');
+    var tickScale,
+        tickSVG,
+        tickAxis;
 
     suiteSetup(function(done){
+      tickScale = document.getElementById('tickScale');
+      tickSVG = document.getElementById('tickSVG');
+      tickAxis = document.getElementById('tickAxis');
       var d = [{
             "x": 1397102460000,
             "y": 1
@@ -1050,12 +1087,16 @@ function runTests(){
   });
 
   suite('px-vis-axis tick format works', function() {
-    var tickFormatScale = document.getElementById('tickFormatScale'),
-        tickFormatSVG = document.getElementById('tickFormatSVG'),
-        tickFormatXAxis = document.getElementById('tickFormatXAxis'),
-        tickFormatYAxis = document.getElementById('tickFormatYAxis');
+    var tickFormatScale,
+        tickFormatSVG,
+        tickFormatXAxis,
+        tickFormatYAxis;
 
     suiteSetup(function(done){
+      tickFormatScale = document.getElementById('tickFormatScale');
+      tickFormatSVG = document.getElementById('tickFormatSVG');
+      tickFormatXAxis = document.getElementById('tickFormatXAxis');
+      tickFormatYAxis = document.getElementById('tickFormatYAxis');
       var d = [{
             "x": 1397102460000,
             "y": 1

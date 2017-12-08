@@ -1,8 +1,8 @@
 function runParallelTests() {
   suite('px-vis-line-svg renders parallel axis to SVG', function() {
-    var parallelScale = document.getElementById('parallelScale'),
-        parallelSVG = document.getElementById('parallelSVG'),
-        parallelLine = document.getElementById('parallelLine');
+    var parallelScale,
+        parallelSVG,
+        parallelLine;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -50,6 +50,10 @@ function runParallelTests() {
           "bottom": 20,
           "left": 15
         };
+
+      parallelScale = document.getElementById('parallelScale'),
+      parallelSVG = document.getElementById('parallelSVG'),
+      parallelLine = document.getElementById('parallelLine');
 
 
       var rendered = function() {
@@ -115,9 +119,9 @@ function runParallelTests() {
   }); //suite
 
   suite('px-vis-line-svg renders parallel axis with gradient lines to SVG', function() {
-    var paralleGradientlScale = document.getElementById('parallelGradientScale'),
-        parallelGradientSVG = document.getElementById('parallelGradientSVG'),
-        parallelGradientLine = document.getElementById('parallelGradientLine');
+    var paralleGradientlScale,
+        parallelGradientSVG,
+        parallelGradientLine;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -165,6 +169,10 @@ function runParallelTests() {
           "bottom": 20,
           "left": 15
         };
+
+      paralleGradientlScale = document.getElementById('parallelGradientScale'),
+      parallelGradientSVG = document.getElementById('parallelGradientSVG'),
+      parallelGradientLine = document.getElementById('parallelGradientLine');
 
       var rendered = function() {
 
@@ -242,9 +250,9 @@ function runParallelTests() {
   }); //suite
 
   suite('px-vis-line-svg renders parallel axis with multiple categories to SVG', function() {
-    var parallelCategoryScale = document.getElementById('parallelCategoryScale'),
-        parallelCategorySVG = document.getElementById('parallelCategorySVG'),
-        parallelCategoryLine = document.getElementById('parallelCategoryLine');
+    var parallelCategoryScale,
+        parallelCategorySVG,
+        parallelCategoryLine;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -312,6 +320,10 @@ function runParallelTests() {
           "bottom": 20,
           "left": 15
         };
+
+      parallelCategoryScale = document.getElementById('parallelCategoryScale'),
+      parallelCategorySVG = document.getElementById('parallelCategorySVG'),
+      parallelCategoryLine = document.getElementById('parallelCategoryLine');
 
       var rendered = function() {
 
@@ -382,9 +394,9 @@ function runParallelTests() {
   }); //suite
 
   suite('px-vis-line-svg renders parallel axis with multiple categories and gradients to SVG', function() {
-    var parallelCategoryGradientScale = document.getElementById('parallelCategoryGradientScale'),
-        parallelCategoryGradientSVG = document.getElementById('parallelCategoryGradientSVG'),
-        parallelCategoryGradientLine = document.getElementById('parallelCategoryGradientLine');
+    var parallelCategoryGradientScale,
+        parallelCategoryGradientSVG,
+        parallelCategoryGradientLine;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -452,6 +464,10 @@ function runParallelTests() {
           "bottom": 20,
           "left": 15
         };
+
+      parallelCategoryGradientScale = document.getElementById('parallelCategoryGradientScale'),
+      parallelCategoryGradientSVG = document.getElementById('parallelCategoryGradientSVG'),
+      parallelCategoryGradientLine = document.getElementById('parallelCategoryGradientLine');
 
       var rendered = function() {
 
@@ -532,9 +548,9 @@ function runParallelTests() {
   }); //suite
 
   suite('px-vis-line-svg mutes parallel axis on SVG and selectedDomain changes gradient', function() {
-    var parallelCategoryGradientScale = document.getElementById('parallelCategoryGradientScale'),
-        parallelCategoryGradientSVG = document.getElementById('parallelCategoryGradientSVG'),
-        parallelCategoryGradientLine = document.getElementById('parallelCategoryGradientLine');
+    var parallelCategoryGradientScale,
+        parallelCategoryGradientSVG,
+        parallelCategoryGradientLine;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -546,6 +562,10 @@ function runParallelTests() {
         "1397131620000":true
       };
       var sd = {'x':[1397160780000,1397219100000]};
+
+      parallelCategoryGradientScale = document.getElementById('parallelCategoryGradientScale'),
+      parallelCategoryGradientSVG = document.getElementById('parallelCategoryGradientSVG'),
+      parallelCategoryGradientLine = document.getElementById('parallelCategoryGradientLine');
 
       parallelCategoryGradientLine.set('selectedDomain',sd);
       parallelCategoryGradientLine.set('mutedSeries',m);
@@ -580,9 +600,9 @@ function runParallelTests() {
   }); //suite
 
   suite('px-vis-line-svg unmutes parallel axis on SVG and selectedDomain changes gradient', function() {
-    var parallelCategoryGradientScale = document.getElementById('parallelCategoryGradientScale'),
-        parallelCategoryGradientSVG = document.getElementById('parallelCategoryGradientSVG'),
-        parallelCategoryGradientLine = document.getElementById('parallelCategoryGradientLine');
+    var parallelCategoryGradientScale,
+        parallelCategoryGradientSVG,
+        parallelCategoryGradientLine;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -591,6 +611,10 @@ function runParallelTests() {
     suiteSetup(function(done){
       var m = {};
       var sd = {'x':[1397102460000,1397219100000]};
+
+      parallelCategoryGradientScale = document.getElementById('parallelCategoryGradientScale'),
+      parallelCategoryGradientSVG = document.getElementById('parallelCategoryGradientSVG'),
+      parallelCategoryGradientLine = document.getElementById('parallelCategoryGradientLine');
 
       parallelCategoryGradientLine.set('selectedDomain',sd);
       parallelCategoryGradientLine.set('mutedSeries',m);

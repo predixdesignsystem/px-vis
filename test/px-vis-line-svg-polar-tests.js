@@ -1,8 +1,8 @@
 function runPolarTests(){
   suite('px-vis-line-svg polar works', function() {
-    var polarScale = document.getElementById('polarScale'),
-        polarSVG = document.getElementById('polarSVG'),
-        polarLine = document.getElementById('polarLine');
+    var polarScale,
+        polarSVG,
+        polarLine;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -48,6 +48,11 @@ function runPolarTests(){
           "bottom": 10,
           "left": 10
         };
+
+      polarScale = document.getElementById('polarScale'),
+      polarSVG = document.getElementById('polarSVG'),
+      polarLine = document.getElementById('polarLine');
+
 
       var rendered = function() {
 
@@ -122,9 +127,9 @@ function runPolarTests(){
   }); //suite
 
   suite('px-vis-line-svg polar with degrees and counter clockwise works', function() {
-    var polarDegreeScale = document.getElementById('polarDegreeScale'),
-        polarDegreeSVG = document.getElementById('polarDegreeSVG'),
-        polarDegreeLine = document.getElementById('polarDegreeLine');
+    var polarDegreeScale,
+        polarDegreeSVG,
+        polarDegreeLine;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -171,7 +176,9 @@ function runPolarTests(){
           "left": 10
         };
 
-
+      polarDegreeScale = document.getElementById('polarDegreeScale'),
+      polarDegreeSVG = document.getElementById('polarDegreeSVG'),
+      polarDegreeLine = document.getElementById('polarDegreeLine');
       var rendered = function() {
 
         linePath =  polarDegreeLine.lineGroup.select('path.series-line');
@@ -244,9 +251,9 @@ function runPolarTests(){
   }); //suite
 
   suite('px-vis-line-svg polar with degrees and counter clockwise works', function() {
-    var polarCCWScale = document.getElementById('polarCCWScale'),
-        polarCCWSVG = document.getElementById('polarCCWSVG'),
-        polarCCWLine = document.getElementById('polarCCWLine');
+    var polarCCWScale,
+        polarCCWSVG,
+        polarCCWLine;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -292,6 +299,10 @@ function runPolarTests(){
           "bottom": 10,
           "left": 10
         };
+
+      polarCCWScale = document.getElementById('polarCCWScale'),
+      polarCCWSVG = document.getElementById('polarCCWSVG'),
+      polarCCWLine = document.getElementById('polarCCWLine');
 
       var rendered = function() {
 
@@ -366,9 +377,9 @@ function runPolarTests(){
 
 
   suite('px-vis-line-svg polar with degrees and counter clockwise works', function() {
-    var polarDegreeCCWScale = document.getElementById('polarDegreeCCWScale'),
-        polarDegreeCCWSVG = document.getElementById('polarDegreeCCWSVG'),
-        polarDegreeCCWLine = document.getElementById('polarDegreeCCWLine');
+    var polarDegreeCCWScale,
+        polarDegreeCCWSVG,
+        polarDegreeCCWLine;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -414,6 +425,10 @@ function runPolarTests(){
           "bottom": 10,
           "left": 10
         };
+
+      polarDegreeCCWScale = document.getElementById('polarDegreeCCWScale'),
+      polarDegreeCCWSVG = document.getElementById('polarDegreeCCWSVG'),
+      polarDegreeCCWLine = document.getElementById('polarDegreeCCWLine');
 
       var rendered = function() {
 
@@ -488,9 +503,9 @@ function runPolarTests(){
   }); //suite
 
   suite('px-vis-line-svg polar missing data works', function() {
-    var polarMissingScale = document.getElementById('polarMissingScale'),
-        polarMissingSVG = document.getElementById('polarMissingSVG'),
-        polarMissingLine = document.getElementById('polarMissingLine');
+    var polarMissingScale,
+        polarMissingSVG,
+        polarMissingLine;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -535,6 +550,11 @@ function runPolarTests(){
           "bottom": 10,
           "left": 10
         };
+
+      polarMissingScale = document.getElementById('polarMissingScale'),
+      polarMissingSVG = document.getElementById('polarMissingSVG'),
+      polarMissingLine = document.getElementById('polarMissingLine');
+
 
       var rendered = function() {
 

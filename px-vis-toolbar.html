@@ -166,6 +166,7 @@ Custom property | Description
     is: 'px-vis-toolbar',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehavior.commonMethods,
       PxVisBehavior.actionConfig
     ],
@@ -788,8 +789,8 @@ Custom property | Description
       }
 
       for(var i=0; i<this._internalConfig.length; i++) {
-        this.set('_internalConfig.#' + i + '.selected', false);
-        this.set('_internalConfig.#' + i + '.opened', false);
+        this.set('_internalConfig.' + i + '.selected', false);
+        this.set('_internalConfig.' + i + '.opened', false);
       }
 
       this.set('actionConfig', o);
@@ -808,6 +809,10 @@ Custom property | Description
     },
 
     _configChanged: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       var internalConf = [],
           keys = Object.keys(this.config);
 
@@ -868,15 +873,15 @@ Custom property | Description
               this._setupContext(this._internalConfig[i], fn);
             }
             // change styles on the old button
-            this.set('_internalConfig.#' + i + '.selected', false);
-            this.set('_internalConfig.#' + i + '.opened', false);
+            this.set('_internalConfig.' + i + '.selected', false);
+            this.set('_internalConfig.' + i + '.opened', false);
           }
         }
 
         //toggle style on the new button
         alreadyOpened = this._internalConfig[index].opened;
-        this.set('_internalConfig.#' + index + '.opened', !alreadyOpened);
-        this.set('_internalConfig.#' + index + '.selected', this._internalConfig[index].toggle ? !this._internalConfig[index].selected : true);
+        this.set('_internalConfig.' + index + '.opened', !alreadyOpened);
+        this.set('_internalConfig.' + index + '.selected', this._internalConfig[index].toggle ? !this._internalConfig[index].selected : true);
       }
 
 
@@ -960,10 +965,10 @@ Custom property | Description
 
         for(var i =0; i<this.currentSubConfig.length; i++) {
           if(i !== index && this.currentSubConfig[i].buttonGroup === conf.buttonGroup) {
-            this.set('currentSubConfig.#' + i + '.selected', false);
+            this.set('currentSubConfig.' + i + '.selected', false);
           }
         }
-        this.set('currentSubConfig.#' + index + '.selected', conf.toggle ? !conf.selected : true);
+        this.set('currentSubConfig.' + index + '.selected', conf.toggle ? !conf.selected : true);
       }
 
       this._processItem(conf);
@@ -1047,6 +1052,10 @@ Custom property | Description
       return selected ? 'selected ' : '';
     },
     _hasTooltip: function(item) {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       return item.tooltipLabel && !!item.tooltipLabel.length;
     },
     _alignRow: function(row) {
@@ -1059,9 +1068,17 @@ Custom property | Description
       }
     },
     _positionMainRow: function(chartMargin, horizontalAlignement) {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       this._alignRow(this.$$('#mainRow'));
     },
     _positionSubRow: function(withinChart, chartMargin, horizontalAlignement) {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(this.withinChart) {
 
         //make sure dom if is up to date
@@ -1083,9 +1100,17 @@ Custom property | Description
       return base;
     },
     _isWithinChart: function(withinChart) {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       return this.withinChart;
     },
     _getRowDirection: function(horizontalAlignment) {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(this.horizontalAlignment === 'right') {
         return 'flex--row--rev right ';
       } else {

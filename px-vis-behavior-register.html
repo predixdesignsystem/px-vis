@@ -169,6 +169,10 @@ PxVisBehaviorRegister.itemShared = [{
    * Returns the correct flex type based on the register type
    */
   _getWrapperClass: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     var classList = 'flex ';
     if(this.type === 'horizontal') {
       classList += 'flex--col ';
@@ -182,12 +186,20 @@ PxVisBehaviorRegister.itemShared = [{
    * Returns the name of the item
    */
   _computeConfigName: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     return this._getConfigName();
   },
   /**
    * returns the truncated name of the item
    */
   _computeTruncatedName: function(_configName) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     return this._truncateName(_configName.toString(), this.truncationLength);
   },
 
@@ -196,6 +208,10 @@ PxVisBehaviorRegister.itemShared = [{
    *
    */
   _computeDidTruncate: function(str,len) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     var len = this.truncationLength;
     return len > 2 && str.length > len ? true : false;
   },
@@ -218,10 +234,17 @@ PxVisBehaviorRegister.itemShared = [{
    * helper function to set initial classes
    */
   _computeBaseClasses: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     var baseClasses = (this.type === 'horizontal') ? "series narrow flex flex--row" : "series wide flex flex--row flex--justify";
     return baseClasses;
   },
   _getDynamicMenuClass: function(type) {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
     if(type === 'vertical') {
       return 'flex__item--bottom';
     } else {
@@ -230,9 +253,13 @@ PxVisBehaviorRegister.itemShared = [{
   },
 
   _menuConfigChanged: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
     this._hasDynamicMenu = this.dynamicMenuConfig && this.dynamicMenuConfig.length > 0;
   }
-}, PxVisBehavior.dynamicMenuConfig];
+}, PxVisBehavior.observerCheck, PxVisBehavior.dynamicMenuConfig];
 
 /*
     Name:
@@ -246,12 +273,15 @@ PxVisBehaviorRegister.itemShared = [{
 
     @polymerBehavior PxVisBehaviorRegister.register
 */
-PxVisBehaviorRegister.register = {
+PxVisBehaviorRegister.register = [{
   properties: {},
   /**
    * returns the correct classes for the series based on type
    */
   _getSeriesWrapperClass: function(type, hozAlign, _hasScrollBar) {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
     var classList = 'flex fullWidth ';
 
     if(type === 'horizontal') {
@@ -276,6 +306,9 @@ PxVisBehaviorRegister.register = {
   },
 
   _getSeriesWrapperClassReverse: function(type) {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
     if(type === 'horizontal') {
       return this._getSeriesWrapperClass('vertical');
     }
@@ -286,9 +319,12 @@ PxVisBehaviorRegister.register = {
    * tests if an item is of a type
    */
   _isOfType: function(toTest, type) {
+    if(toTest === undefined || type === undefined) {
+      return false;
+    }
     return toTest === type;
   }
-};
+}, PxVisBehavior.observerCheck];
 
 /*
     Name:
@@ -410,6 +446,10 @@ PxVisBehaviorRegister.generalItem = [{
    * returns if the series should be muted to start
    */
   _computeItemMutedToStart: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     return this._mutedToStart(this.item.name);
   },
 
@@ -425,6 +465,10 @@ PxVisBehaviorRegister.generalItem = [{
    * @return {rgb}
    */
   _computeItemColor: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
     return this.completeSeriesConfig[this.item.name] && this.completeSeriesConfig[this.item.name]['color'] ? this.completeSeriesConfig[this.item.name]['color'] : 'transparent';
   },
 
@@ -437,6 +481,10 @@ PxVisBehaviorRegister.generalItem = [{
    * @return {pattern}
    */
   _computeItemDashPattern: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
       return this.completeSeriesConfig[this.item.name] && this.completeSeriesConfig[this.item.name]['dashPattern'] ?
           this.completeSeriesConfig[this.item.name]['dashPattern'] :
           '';
@@ -493,12 +541,15 @@ PxVisBehaviorRegister.generalItem = [{
    * @method _toggleSeries
    */
   _toggleSeries: function(item) {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
     //if it is a bool, we have something.
     if(typeof this.mutedSeries[item.name] === 'boolean') {
       this.toggleClass('muted', this.mutedSeries[item.name], this.$.regWithoutMenu);
     }
   },
-}, PxVisBehavior.muteUnmuteSeries];
+}, PxVisBehavior.observerCheck, PxVisBehavior.muteUnmuteSeries];
 
 
 

@@ -96,6 +96,7 @@ Custom property | Description
     is: 'px-vis-event',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehaviorD3.svg,
       PxVisBehaviorD3.axes,
       PxVisBehavior.sizing,
@@ -250,6 +251,7 @@ Custom property | Description
 
     observers: [
       'drawElement(svg, eventData.*, eventConfig.*, _animationFrameDone, height, _stylesUpdated)',
+      '_calcThemeOrConfig(_stylesUpdated)',
       '_eventConfigChanged(eventConfig.*)',
       'positionElement(x, domainChanged)',
       '_addClipPath(clipPath)',
@@ -281,7 +283,9 @@ Custom property | Description
     },
 
     ready: function() {
-      window.requestAnimationFrame(this._calcThemeOrConfig.bind(this));
+      window.requestAnimationFrame(function() {
+        this.updateStyles();
+      }.bind(this));
     },
 
     _tooltipRequest: function() {
@@ -293,31 +297,41 @@ Custom property | Description
     },
 
     _eventConfigChanged: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       this._processConfiguration();
     },
 
     _recalcValue: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       //recalc/format the value next time we show the tooltip
       this._reCalcValue = true;
     },
 
     _getTooltiptarget: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       return (this.eventIcon && this.eventIcon.node) ? this.eventIcon.node() : null;
     },
 
     _calcThemeOrConfig: function() {
 
       if(!this.defaultEventConfig) {
-        var eventColor = this._checkThemeVariable("--px-vis-event-icon-color", this._defaultDefaultEventConfig.fillColor);
-        var lineColor = this._checkThemeVariable("--px-vis-event-line-color", this._defaultDefaultEventConfig.lineColor);
 
         this.defaultEventConfig = {
-          'color': eventColor,
+          'color': this._defaultDefaultEventConfig.fillColor,
           'icon': this._defaultDefaultEventConfig.icon,
           'type': this._defaultDefaultEventConfig.type,
           'offset': this._defaultDefaultEventConfig.offset,
           'size': this._defaultDefaultEventConfig.size,
-          'lineColor': lineColor,
+          'lineColor': this._defaultDefaultEventConfig.lineColor,
           'lineWeight': this._defaultDefaultEventConfig.lineWeight,
           'enableTooltip': this._defaultDefaultEventConfig.enableTooltip,
           'firstDateTimeFormat': this._defaultDefaultEventConfig.firstDateTimeFormat,
@@ -327,6 +341,9 @@ Custom property | Description
           'tooltipOrientation': this._defaultDefaultEventConfig.tooltipOrientation
         };
       }
+
+      this.defaultEventConfig.lineColor = this._checkThemeVariable("--px-vis-event-line-color", this._defaultDefaultEventConfig.lineColor);
+      this.defaultEventConfig.eventColor = this._checkThemeVariable("--px-vis-event-icon-color", this._defaultDefaultEventConfig.fillColor);
 
       this.set('_animationFrameDone', true);
     },
@@ -338,6 +355,10 @@ Custom property | Description
      * @method drawElement
      */
     drawElement: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(this.svg && this._doesObjHaveValues(this.eventData) && this._animationFrameDone) {
 
         if(this.eventGroup && this._doesD3HaveValues(this.eventGroup)) {
@@ -378,6 +399,10 @@ Custom property | Description
      * @method positionElement
      */
     positionElement: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(this.x && this._eventDrawn) {
         this._positionEvent();
       }
@@ -389,6 +414,10 @@ Custom property | Description
      * @method _addClipPath
      */
     _addClipPath: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       this.addClipPath(this.eventLine);
       this.addClipPath(this.eventIcon);
     },

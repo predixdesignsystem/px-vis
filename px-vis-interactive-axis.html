@@ -148,7 +148,8 @@ Custom property | Description
         dynamic-redraw="[[dynamicRedraw]]"
         action-config="[[actionConfig]]"
         orientation="[[orientation]]"
-        time-domain="[[timeDomain]]">
+        time-domain="[[timeDomain]]"
+        title-truncation="[[titleTruncation]]">
       </px-vis-axis-interaction-space>
     </template>
 </dom-module>
@@ -159,6 +160,7 @@ Custom property | Description
     is: 'px-vis-interactive-axis',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehaviorD3.svg,
       PxVisBehavior.sizing,
       PxVisBehavior.completeSeriesConfig,
@@ -180,7 +182,8 @@ Custom property | Description
       PxVisBehavior.actionConfigGeneric,
       PxVisBehavior.interactionSpaceConfigGeneric,
       PxVisBehavior.brushDomains,
-      PxVisBehavior.timeDomain
+      PxVisBehavior.timeDomain,
+      PxVisBehavior.titleTruncation
     ],
 
     /**
@@ -364,6 +367,10 @@ Custom property | Description
     },
 
     _returnDragContainer: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       return this.svg.node();
     },
     _setDragBehavior: function() {
@@ -375,12 +382,20 @@ Custom property | Description
     },
 
     _axisConfigChanged: function(conf) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(this.axisConfig && this.dimension) {
         this._applyConfigToElement(this.axisConfig, this.$$('#axis_' + this.dimension));
       }
     },
 
     _interactionSpaceConfigChanged: function(conf) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(this.interactionSpaceConfig && this.dimension) {
         this._applyConfigToElement(this.interactionSpaceConfig, this.$$('#axisIS'));
       }
@@ -393,6 +408,10 @@ Custom property | Description
      * @method _createGroup
      */
     _createGroup: function() {
+     if(this.hasUndefinedArguments(arguments)) {
+       return;
+     }
+
       if(this._doesD3HaveValues(this.svg)) {
         var _this = this;
 

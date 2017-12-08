@@ -1,14 +1,15 @@
 function runXYTests(){
   suite('px-vis-line-svg does Polymer exist?', function() {
+    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
     test('Polymer exists', function() {
       assert.isTrue(Polymer !== null);
     });
   });
 
   suite('px-vis-line-svg works', function() {
-    var baseScale = document.getElementById('baseScale'),
-        baseSVG = document.getElementById('baseSVG'),
-        baseLine = document.getElementById('baseLine');
+    var baseScale,
+        baseSVG,
+        baseLine;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -49,6 +50,12 @@ function runXYTests(){
           "bottom": 20,
           "left": 15
         };
+
+
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      baseLine = document.getElementById('baseLine');
+
       baseSVG.set('width',w);
       baseSVG.set('height',h);
       baseSVG.set('margin',m);
@@ -98,10 +105,10 @@ function runXYTests(){
   }); //suite
 
   suite('px-vis-line-svg with two series works', function() {
-    var mutedScale = document.getElementById('mutedScale'),
-        mutedSVG = document.getElementById('mutedSVG'),
-        mutedLine1 = document.getElementById('mutedLine1'),
-        mutedLine2 = document.getElementById('mutedLine2');
+    var mutedScale,
+        mutedSVG,
+        mutedLine1,
+        mutedLine2;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -157,6 +164,14 @@ function runXYTests(){
         },
         counter = 0;
 
+      flush(function() {
+
+
+      mutedScale = document.getElementById('mutedScale');
+      mutedSVG = document.getElementById('mutedSVG');
+      mutedLine1 = document.getElementById('mutedLine1');
+      mutedLine2 = document.getElementById('mutedLine2');
+
       var rendered = function() {
         counter++;
 
@@ -191,7 +206,7 @@ function runXYTests(){
       mutedLine2.set('chartData',d);
 
 
-
+    });
     });
 
     test('mutedLine1 fixture is created', function() {
@@ -235,10 +250,10 @@ function runXYTests(){
   }); //suite
 
   suite('px-vis-line-svg mutes', function() {
-    var mutedScale = document.getElementById('mutedScale'),
-        mutedSVG = document.getElementById('mutedSVG'),
-        mutedLine1 = document.getElementById('mutedLine1'),
-        mutedLine2 = document.getElementById('mutedLine2');
+    var mutedScale,
+        mutedSVG,
+        mutedLine1,
+        mutedLine2;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -248,6 +263,10 @@ function runXYTests(){
         "mySeries":false,
         "mySeries2":true
       };
+      mutedScale = document.getElementById('mutedScale'),
+      mutedSVG = document.getElementById('mutedSVG'),
+      mutedLine1 = document.getElementById('mutedLine1'),
+      mutedLine2 = document.getElementById('mutedLine2');
       mutedLine1.set('mutedSeries',m);
       mutedLine2.set('mutedSeries',m);
       // window.setTimeout(function(){ done() }.bind(this),5000);
@@ -271,10 +290,10 @@ function runXYTests(){
   }); //suite
 
   suite('px-vis-line-svg unmutes', function() {
-    var mutedScale = document.getElementById('mutedScale'),
-        mutedSVG = document.getElementById('mutedSVG'),
-        mutedLine1 = document.getElementById('mutedLine1'),
-        mutedLine2 = document.getElementById('mutedLine2');
+    var mutedScale,
+        mutedSVG,
+        mutedLine1,
+        mutedLine2;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -284,6 +303,10 @@ function runXYTests(){
         "mySeries":false,
         "mySeries2":false
       };
+      mutedScale = document.getElementById('mutedScale'),
+      mutedSVG = document.getElementById('mutedSVG'),
+      mutedLine1 = document.getElementById('mutedLine1'),
+      mutedLine2 = document.getElementById('mutedLine2');
       mutedLine1.set('mutedSeries',m);
       mutedLine2.set('mutedSeries',m);
       // window.setTimeout(function(){ done() }.bind(this),5000);
@@ -306,10 +329,10 @@ function runXYTests(){
   }); //suite
 
   suite('px-vis-line-svg with custom muted opacity', function() {
-    var mutedScale = document.getElementById('mutedScale'),
-        mutedSVG = document.getElementById('mutedSVG'),
-        mutedLine1 = document.getElementById('mutedLine1'),
-        mutedLine2 = document.getElementById('mutedLine2');
+    var mutedScale,
+        mutedSVG,
+        mutedLine1,
+        mutedLine2;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -319,6 +342,10 @@ function runXYTests(){
         "mySeries":true,
         "mySeries2":true
       };
+      mutedScale = document.getElementById('mutedScale'),
+      mutedSVG = document.getElementById('mutedSVG'),
+      mutedLine1 = document.getElementById('mutedLine1'),
+      mutedLine2 = document.getElementById('mutedLine2');
       mutedLine1.set('mutedOpacity',0);
       mutedLine2.set('mutedOpacity',0.6);
       mutedLine1.set('mutedSeries',m);
@@ -344,10 +371,10 @@ function runXYTests(){
   }); //suite
 
   suite('px-vis-line-svg with missing data', function() {
-    var missingDataPointScale = document.getElementById('missingDataPointScale'),
-        missingDataPointSVG = document.getElementById('missingDataPointSVG'),
-        missingDataPointLine1 = document.getElementById('missingDataPointLine1'),
-        missingDataPointLine2 = document.getElementById('missingDataPointLine2');
+    var missingDataPointScale,
+        missingDataPointSVG,
+        missingDataPointLine1,
+        missingDataPointLine2;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -401,6 +428,11 @@ function runXYTests(){
           "left": 15
         },
         counter=0;
+
+        missingDataPointScale = document.getElementById('missingDataPointScale'),
+        missingDataPointSVG = document.getElementById('missingDataPointSVG'),
+        missingDataPointLine1 = document.getElementById('missingDataPointLine1'),
+        missingDataPointLine2 = document.getElementById('missingDataPointLine2');
 
        var rendered = function() {
 
@@ -457,10 +489,10 @@ function runXYTests(){
   }); //suite
 
   suite('px-vis-line-svg with null data showing gaps', function() {
-    var missingDataPointScaleNull = document.getElementById('missingDataPointScaleNull'),
-        missingDataPointSVGNull = document.getElementById('missingDataPointSVGNull'),
-        missingDataPointLine1Null = document.getElementById('missingDataPointLine1Null'),
-        missingDataPointLine2Null = document.getElementById('missingDataPointLine2Null');
+    var missingDataPointScaleNull,
+        missingDataPointSVGNull,
+        missingDataPointLine1Null,
+        missingDataPointLine2Null;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -515,6 +547,11 @@ function runXYTests(){
           "left": 15
         },
         counter =0;
+
+      missingDataPointScaleNull = document.getElementById('missingDataPointScaleNull'),
+      missingDataPointSVGNull = document.getElementById('missingDataPointSVGNull'),
+      missingDataPointLine1Null = document.getElementById('missingDataPointLine1Null'),
+      missingDataPointLine2Null = document.getElementById('missingDataPointLine2Null');
 
       var rendered = function() {
 
@@ -571,10 +608,10 @@ function runXYTests(){
   }); //suite
 
   suite('px-vis-line-svg with missing data showing gaps', function() {
-    var missingDataPointScaleGap = document.getElementById('missingDataPointScaleGap'),
-        missingDataPointSVGGap = document.getElementById('missingDataPointSVGGap'),
-        missingDataPointLine1Gap = document.getElementById('missingDataPointLine1Gap'),
-        missingDataPointLine2Gap = document.getElementById('missingDataPointLine2Gap');
+    var missingDataPointScaleGap,
+        missingDataPointSVGGap,
+        missingDataPointLine1Gap,
+        missingDataPointLine2Gap;
 
 
     var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
@@ -628,6 +665,12 @@ function runXYTests(){
           "left": 15
         },
         counter = 0;
+
+        missingDataPointScaleGap = document.getElementById('missingDataPointScaleGap'),
+        missingDataPointSVGGap = document.getElementById('missingDataPointSVGGap'),
+        missingDataPointLine1Gap = document.getElementById('missingDataPointLine1Gap'),
+        missingDataPointLine2Gap = document.getElementById('missingDataPointLine2Gap');
+
 
       var rendered = function() {
 

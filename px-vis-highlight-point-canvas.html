@@ -74,6 +74,7 @@
     is: 'px-vis-highlight-point-canvas',
 
     behaviors: [
+      PxVisBehavior.observerCheck,
       PxVisBehavior.sizing,
       PxVisBehaviorD3.canvasContext,
       PxVisBehaviorD3.axes,
@@ -119,6 +120,10 @@
     ],
 
     _computeChartData: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(this.generatingCrosshairData && !this.drawWithLocalCrosshairData && this.crosshairData.rawData.length > 0) {
         return [];
       }
@@ -135,12 +140,20 @@
     },
 
     _updateTooltipData: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(this.defaultEmptyData) {
         this._setTooltipData(this._highlightData);
       }
     },
 
     _returnYScale: function(seriesId, config) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+
       if(this.domainChanged !== null) {
         if(typeof this.y === 'object') {
           var d = config[seriesId]['axis']['id'];
