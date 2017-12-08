@@ -1,3 +1,7 @@
+v4.5.1
+=================
+* Added check to area-svg for Polymer 2
+
 v4.5.0
 =================
 * Hybrid support: Polymer 1.X and 2.X
