@@ -1,3 +1,7 @@
+v4.5.2
+=================
+* Ensure dynamic menus always get the right target on click
+
 v4.5.1
 =================
 * Added check to area-svg for Polymer 2
