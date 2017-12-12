@@ -345,7 +345,7 @@ function createSeriesQuadtree(data) {
  *
  * @method createQuadtree
  */
-function createQuadtree(data, time) {
+function createQuadtree(data) {
   quadtreeBuilt = false;
 
   quadtrees[data.chartId] = data.data.searchType === 'pointPerSeries' ?
@@ -355,7 +355,7 @@ function createQuadtree(data, time) {
 
   quadtreeBuilt = true;
 
-  reply(null, time);
+  reply(null, null);
 }
 
 /**
@@ -785,7 +785,7 @@ function returnClosestsQuadtreePoints(eventData, time) {
       dataObj = createDataStub(),
       quadtreeData = quadtrees[eventData.chartId];
 
-  visData.chartId = eventData.chartId;
+      visData.chartId = eventData.chartId;
   visData.xScale = recreateD3Scale(visData.x);
   visData.yScale = getMultiScale(visData);
 
@@ -916,7 +916,7 @@ onmessage = function(e) {
       break;
 
     case 'createQuadtree':
-      createQuadtree(e.data, time);
+      createQuadtree(e.data);
       break;
 
     case 'findQuadtreePoints':
