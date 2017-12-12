@@ -1,3 +1,7 @@
+v4.5.3
+=================
+* Ensure webworker URL can be found in Polymer 2 with polyfills
+
 v4.5.2
 =================
 * Ensure dynamic menus always get the right target on click
