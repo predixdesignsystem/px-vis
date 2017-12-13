@@ -1,3 +1,4 @@
+v4.5.4
 =================
 * Added listeners to recall icon loading methods if the iconset has not been loaded yet.
 
