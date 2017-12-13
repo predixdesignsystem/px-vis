@@ -1,3 +1,7 @@
+
+=================
+* Added listeners to recall icon loading methods if the iconset has not been loaded yet.
+
 v4.5.1
 =================
 * Added check to area-svg for Polymer 2

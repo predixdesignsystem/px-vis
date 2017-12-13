@@ -286,6 +286,7 @@ Custom property | Description
       window.requestAnimationFrame(function() {
         this.updateStyles();
       }.bind(this));
+      this._iconCallbackQueue = [this._addIcon,this.positionElement,this._addClipPath];
     },
 
     _tooltipRequest: function() {
@@ -380,8 +381,6 @@ Custom property | Description
 
         this._addIcon();
 
-        this._eventDrawn = true;
-
         this.positionElement();
 
         this._addClipPath();
@@ -450,17 +449,23 @@ Custom property | Description
         this.eventIcon = this.eventGroup.append("image")
           .attr("xlink:href", this._thisConfig.icon)
           .attr("width", this._thisConfig.size + 'px')
-          .attr("height", this._thisConfig.size + 'px');
+          .attr("height", this._thisConfig.size + 'px')
+          .style("cursor","pointer");
       } else {
         var icon = this._getIcon(this._thisConfig.icon, this._thisConfig.size, 'px-utl', 'information');
 
+        if(!icon) {
+          this._eventDrawn = false;
+          return;
+        }
+
         this.eventIcon = Px.d3.select(this.eventGroup.node().appendChild(icon))
           .attr('fill', 'transparent')
-          .attr('stroke', this._thisConfig.color);
+          .attr('stroke', this._thisConfig.color)
+          .style("cursor","pointer");
       }
 
-      this.eventIcon
-        .style("cursor","pointer");
+      this._eventDrawn = true;
 
     },
 

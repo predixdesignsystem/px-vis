@@ -1885,7 +1885,38 @@ PxVisBehaviorD3.icons = {
     _iconScale: {
       type: Number,
       value: 16
-    }
+    },
+    /*
+      A list of methods that should be called in order to load the icon, position it, etc
+    */
+    _iconCallbackQueue: {
+      type: Array,
+      value: function() { return []; }
+    },
+    _debugIconWarning: {
+      type: Boolean,
+      value: false
+    },
+    _iconsLoadedBound: Function,
+
+  },
+
+  ready: function() {
+    this._iconsLoadedBound = this._iconsLoaded.bind(this);
+  },
+
+  _iconsLoaded: function() {
+    window.removeEventListener('iron-iconset-added', this._iconsLoadedBound);
+    console.warn("New iconset loaded. Trying again.");
+
+    this._iconCallbackQueue.forEach(function(cb) {
+      cb.bind(this)();
+    }.bind(this));
+  },
+
+  _waitForIconsLoaded: function() {
+    // iron-iconset fires this event on the window when loaded
+    window.addEventListener('iron-iconset-added',this._iconsLoadedBound);
   },
 
   _getIcon: function(iconName, targetSize, defaultKey, defaultName) {
@@ -1896,11 +1927,15 @@ PxVisBehaviorD3.icons = {
         icon;
 
     if(!iconSet) {
-      console.warn("Cant find set named: " + key + ". Falling back to default icon");
+      console.warn("Cant find set named: " + key + ". Waiting for set to load...");
+      this._debugIconWarning = true;
+      this._waitForIconsLoaded();
+      return null;
+    }
 
-      key = defaultKey;
-      name = defaultName;
-      iconSet = this._meta.byKey(key);
+    if(this._debugIconWarning) {
+      this._debugIconWarning = false;
+      console.warn("Set " + key + " successfully loaded");
     }
 
     icon = Polymer.dom(iconSet).querySelector('[id="' + name + '"]');
@@ -1935,6 +1970,10 @@ PxVisBehaviorD3.icons = {
 */
 PxVisBehaviorD3.cursorIcon = [{
 
+  ready: function() {
+    this._iconCallbackQueue = [this._drawCursorIcon];
+  },
+
   _drawCursorIcon: function() {
     if(this.hasUndefinedArguments(arguments)) {
       return;
@@ -1948,6 +1987,10 @@ PxVisBehaviorD3.cursorIcon = [{
     }
 
     var icon = this._getIcon(this.iconType, 12, 'px-utl', 'information');
+
+    if(!icon) {
+      return;
+    }
 
     this._icon = Px.d3.select(this._cursorGroup.node().appendChild(icon))
       .attr('fill', 'transparent')
