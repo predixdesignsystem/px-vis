@@ -13,6 +13,9 @@
 * Changes to toolbar providing different tooltipData search options
 * Changed the way tooltipData is reported for // and radar: now always ignores data hidden by brush instead of just with hardMute on.
 * Fix for multiple cursors being drawn
+* Added lasso functionality for multi-axis charts
+* Made axis interaction-space brushes capable of dynamic extents updates
+* Some changes to how previous lasso functionality worked so it is more standalone
 
 v4.5.1
 =================
