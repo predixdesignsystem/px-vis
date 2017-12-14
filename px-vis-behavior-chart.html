@@ -1509,6 +1509,48 @@ PxVisBehaviorChart.mutedAxes = {
   },
 };
 
+/*
+    Name:
+    PxVisBehaviorChart.multiAxisLasso
+
+    Description:
+    Behavior providing property lasso methods for multi-axis charts
+    @polymerBehavior PxVisBehaviorChart.multiAxisLasso
+*/
+PxVisBehaviorChart.multiAxisLasso = {
+  lasso: function() {
+    var yScale = this.isMultiY ? this.y[this.extentsData.dimension] : this.y,
+        result = { detail: {
+          rawData: [],
+          timeStamps: []
+        }};
+
+    for(var i = 0; i < this.chartData.length; i++) {
+      this._searchForDataInArea(this.extentsData.dimension, yScale, this.chartData[i], this.extentsData.extents, result.detail);
+    }
+
+    this._calcCrosshair(result);
+  },
+
+  _searchForDataInArea: function(dim, y, d, ext, result) {
+    if(this._combinedMutedSeries[d[this.seriesKey]]) {
+      return;
+    }
+    if(y.domain()[0] > d[dim] || d[dim] > y.domain()[1]) {
+      return;
+    }
+    if(this.timeDomain && this.timeDomain.x &&
+        (d[this.seriesKey] < this.timeDomain.x[0] || d[this.seriesKey] > this.timeDomain.x[1])) {
+      return;
+    }
+
+    var dpx = y(d[dim]);
+    if(dpx >= ext[0] && dpx <= ext[1]) {
+      result.rawData.push(d);
+      result.timeStamps.push(d[this.seriesKey]);
+    }
+  }
+};
 
 /*
     Name:
@@ -1525,7 +1567,8 @@ PxVisBehaviorChart.extentsDataRouter = [{
       value: function() {
         return {
           zoom: 'zoom',
-          pan: 'pan'
+          pan: 'pan',
+          lasso: 'lasso'
         }
       }
     }

@@ -588,6 +588,13 @@ function searchPolygonQuadtree(visData, dataObj, quadtree) {
  * @method searchAreaBoxQuadtree
  */
 function searchAreaBoxQuadtree(quadtree, visData, dataObj) {
+  // {
+  //   "x0" : x0,
+  //   "x1" : x1,
+  //   "y0" : y0,
+  //   "y1" : y1
+  // }
+  // FIXME When we use, box size should not be calced with this method
   var boxSize = calcBoxSize(visData);
 
   // via https://bl.ocks.org/mbostock/4343214
@@ -785,11 +792,11 @@ function returnClosestsQuadtreePoints(eventData, time) {
       dataObj = createDataStub(),
       quadtreeData = quadtrees[eventData.chartId];
 
-      visData.chartId = eventData.chartId;
-  visData.xScale = recreateD3Scale(visData.x);
-  visData.yScale = getMultiScale(visData);
-
   if(quadtreeData) {
+    visData.chartId = eventData.chartId;
+    visData.xScale = recreateD3Scale(visData.x);
+    visData.yScale = getMultiScale(visData);
+
     if(visData.searchType === 'pointPerSeries') {
       dataObj = searchQuadtreeSeries(visData, dataObj, quadtreeData);
 
@@ -815,7 +822,12 @@ function returnQuadtreePointsInArea(eventData) {
       quadtreeData = quadtrees[eventData.chartId],
       dataObj = createDataStub();
 
+
   if(quadtreeData) {
+    visData.chartId = eventData.chartId;
+    visData.xScale = recreateD3Scale(visData.x);
+    visData.yScale = getMultiScale(visData);
+
     dataObj = searchAreaBoxQuadtree(quadtreeData, visData, dataObj);
   }
 
@@ -871,16 +883,6 @@ onmessage = function(e) {
 
   switch(e.data.action) {
 
-    // case 'init':
-    //   if(e.data.d3Url) {
-    //     importScripts(e.data.d3Url);
-    //   } else {
-    //     importScripts("../pxd3/d3.min.js");
-    //   }
-
-    //   reply(null, time);
-    //   break;
-
     case 'registerCustomScript':
 
       if(e.data.data.url) {
@@ -927,7 +929,6 @@ onmessage = function(e) {
       }
       break;
 
-    //we don't seem to use this
     case 'findQuadtreePointsInArea':
       if(quadtreeBuilt) {
         returnQuadtreePointsInArea(e.data);

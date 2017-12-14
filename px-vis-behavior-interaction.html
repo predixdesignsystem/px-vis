@@ -66,6 +66,7 @@ PxVisBehaviorInteraction.lasso = [{
   _startLasso: function() {
      //only allow left clicks
     if(Px.d3.event.button === 0) {
+      this._calcCrosshair = true;
       this._isLassoing = true;
 
       //in case the user clicks inside the chart, and mouses out, we are waiting for a mouseup, and closing our action box with the coordinates available on the mouseup.
@@ -79,7 +80,7 @@ PxVisBehaviorInteraction.lasso = [{
         .y(function(d) { return d[1]; });
 
       this._lassoGroup = this.svg.append('g')
-            .attr('class', 'lasso-group');
+        .attr('class', 'lasso-group');
 
 // TODO Change to box type and lasso type; toolbar selection
 // make available to all
@@ -97,6 +98,8 @@ PxVisBehaviorInteraction.lasso = [{
         .attr('fill', this._checkThemeVariable('--px-vis-zoom-brush-fill-color', 'rgb(0,0,0)'))
         .attr('fill-opacity', this._checkThemeVariable('--px-vis-zoom-brush-fill-opacity', 0.5))
         .attr('stroke', this._checkThemeVariable('--px-vis-zoom-brush-outline-color', 'rgb(0,0,0)'));
+
+      this._calcData();
     }
   },
 
@@ -116,6 +119,9 @@ PxVisBehaviorInteraction.lasso = [{
       //update drawing
       this._lassoGroup.selectAll('path.lasso-line')
         .attr('d', this._lassoGenerator(this._lassoCoords));
+
+      this._calcData();
+
     }
   },
 

@@ -19,4 +19,13 @@ export {
 export {
   default as scaleLinear
 } from "d3-scale/src/linear";
+
+export {
+  extent
+} from "d3-array";
+
+export {
+  polygonContains
+} from "d3-polygon";
+
 export * from "d3-quadtree";

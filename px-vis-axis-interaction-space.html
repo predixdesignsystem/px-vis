@@ -156,7 +156,7 @@ Custom property | Description
       specialActionsList: {
         type: Array,
         value: function() {
-          return ['callAxisMute', 'callAxisDrag', 'startZooming'];
+          return ['callAxisMute', 'callAxisDrag', 'startZooming', 'startLasso'];
         }
       },
 
@@ -170,7 +170,8 @@ Custom property | Description
         value: function() {
           return {
             'callAxisMute': 'muted',
-            'startZooming': 'zoom'
+            'startZooming': 'zoom',
+            'startLasso': 'lasso'
           };
         }
       },
@@ -193,7 +194,8 @@ Custom property | Description
             'resetCrosshair': '_resetCrosshairData',
             'startZooming' : '_startZoom',
             'startPanning': '_startPanning',
-            'stopPanning': '_stopPanning'
+            'stopPanning': '_stopPanning',
+            'startLasso': '_startLasso'
           }
         }
       },
@@ -230,6 +232,11 @@ Custom property | Description
 
       _unselectedBrushHolder: {
         type: Object
+      },
+
+      _continuousBrush: {
+        type: Boolean,
+        value: false
       }
     },
 
@@ -349,8 +356,7 @@ Custom property | Description
             return 1;
           })
           .on("start.brush", this.brushstart.bind(this))
-          // TODO make a flag so brushing is dynamic instead of just at the end
-          // .on("brush.brush", this.brush.bind(this))
+          .on("brush.brush", this.brushActive.bind(this))
           .on("end.brush", this.brushEnd.bind(this))
       );
 
@@ -494,12 +500,21 @@ Custom property | Description
 
     _startMute: function() {
       this.extentsAction = 'mute';
+      this._continuousBrush = false;
       this._disableBrush();
       this._enableBrush();
     },
 
     _startZoom: function() {
       this.extentsAction = 'zoom';
+      this._continuousBrush = false;
+      this._disableBrush();
+      this._enableBrush();
+    },
+
+    _startLasso: function() {
+      this.extentsAction = 'lasso';
+      this._continuousBrush = true;
       this._disableBrush();
       this._enableBrush();
     },
@@ -510,6 +525,7 @@ Custom property | Description
           return 1;
         })
         .on("start.brush", this.brushstart.bind(this))
+        .on("brush.brush", this.brushActive.bind(this))
         .on("end.brush", this.brushEnd.bind(this))
       );
 
@@ -555,7 +571,6 @@ Custom property | Description
       this._disableDrag();
       this._disableActions();
     },
-
 
 // PANNING ###########################################################################################
 
@@ -847,21 +862,23 @@ Custom property | Description
     // /**
     //  * Update brush on a brush event
     //  */
-    // brush: function() {
-    //   var extents;
+    brushActive: function() {
+      if(this._continuousBrush) {
+        var extents;
 
-    //   // if it was brushed, get the extents
-    //   if(Px.d3.brushSelection(this._brushElem)) {
-    //     extents = Px.d3.brushSelection(this._brushElem);
-    //   }
+        // if it was brushed, get the extents
+        if(Px.d3.brushSelection(this._brushElem)) {
+          extents = Px.d3.brushSelection(this._brushElem);
+        }
 
-    //   var data = {
-    //     dimension: this.dimension,
-    //     extents: extents,
-    //     action: this.extentsAction
-    //   }
-    //   this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-extents-data', { bubbles: true, composed: true, detail: data }));
-    // },
+        var data = {
+          dimension: this.dimension,
+          extents: extents,
+          action: this.extentsAction
+        }
+        this.dispatchEvent(new CustomEvent('px-vis-axis-interaction-space-extents-data', { bubbles: true, composed: true, detail: data }));
+      }
+    },
 
     /**
      * Final update on a brush end event
