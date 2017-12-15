@@ -199,550 +199,7 @@ Custom property | Description
       chartMargin: {
         type: Object
       },
-      /**
-       * Config for default actions: tooltip/pan/zoom.
-       */
-      _defaultActionsMapping: {
-        type: Object,
-        value: function() {
-          return {
-            'annotations': {
-              'tooltipLabel': 'Annotations',
-              'icon': 'px-vis:comment',
-              'cursorIcon': 'px-vis:comment',
-              'buttonGroup': 1,
-              'onClick': 'function() { this.set("_internalShowTooltip", false); this.set("showStrongIcon", true);}',
-              'onDeselect': 'function() { this.set("showStrongIcon", false);}',
-              'actionConfig': {
-                'mouseout': null,
-                'mousemove': null,
-                'mousedown': null,
-                'click': function(evt) { this.fire('px-vis-event-request', {'eventName': 'px-vis-annotation-creation', 'data': {'mouseCoords': evt.mouseCoords, 'clickTarget': evt.target, 'chart': this} })},
-                'mouseup': null
-              },
-              'subConfig': {
-                'hideAnnotations': {
-                  'tooltipLabel': 'Hide Annotations',
-                  'icon': 'px-vis:hide',
-                  'buttonGroup': 1,
-                  'toggle': true,
-                  'onClick': 'function(button) {this.$$("px-vis-annotations").set("hide", button.selected);}'
-                }
-              }
-            },
-            'axisMuteSeries': {
-              'tooltipLabel': 'Mute Series on Axis',
-              'icon': 'px-vis:brush',
-              'cursorIcon': 'px-vis:brush',
-              'buttonGroup': 1,
-              'onClick': 'function() { this.set("_internalShowTooltip", false);}',
-              'actionConfig': {
-                'mouseout': null,
-                'mousemove': null,
-                'click': null,
-                'mousedown': 'callAxisMute',
-                'mouseup': 'callAxisMute'
-              }
-            },
-            'axisDrag': {
-              'tooltipLabel': 'Axis Drag',
-              'icon': 'px-vis:move-axis',
-              'cursorIcon': 'px-vis:move-axis',
-              'buttonGroup': 1,
-              'onClick': 'function() {this.set("_internalShowTooltip", false);}',
-              'actionConfig': {
-                'mouseout': null,
-                'mousemove': null,
-                'click': null,
-                'mousedown': 'callAxisDrag',
-                'mouseup': 'callAxisDrag'
-              }
-            },
-            'crosshairLasso': {
-              'tooltipLabel': 'Lasso selection',
-              'icon': 'px-vis:lasso',
-              'buttonGroup': 1,
-              'selectable': true,
-              'onClick': 'function() {this.set("_internalShowTooltip", false); this.set("interactionSpaceConfig.searchType", "lasso");}',
-              'onDeselect': 'function() { this.set("interactionSpaceConfig.searchType", "none");}',
-              'actionConfig': {
-                'mouseout': null,
-                'mousemove': null,
-                'click': null,
-                'mousedown': 'startLasso',
-                'mouseup': 'stopLasso'
-              },
-              'subConfig': {
-                'clearCrosshair': {
-                  'tooltipLabel': 'Clear lasso data',
-                  'icon': 'px-nav:close',
-                  'onClick': 'function() { this.set("crosshairData", { "rawData": [], "timeStamps": []}); this.set("interactionSpaceConfig.resetLassoData", !this.interactionSpaceConfig.resetLassoData);this.set("resetLassoData", !this.resetLassoData);}',
-                }
-              }
-            },
-            'crosshair': {
-              'tooltipLabel': 'Crosshair',
-              'icon': 'px-vis:crosshair',
-              'cursorIcon': 'px-vis:crosshair',
-              'buttonGroup': 1,
-              'onClick': 'function() {this.set("_internalShowTooltip", true);}',
-              'actionConfig': {
-                'mouseout': 'resetTooltipAndCrosshairData',
-                'mousemove': 'calcTooltipAndCrosshairData',
-                'click': null,
-                'mousedown': null,
-                'mouseup': null
-              }
-            },
-            'crosshairWithOptions': {
-              'tooltipLabel': 'Crosshair',
-              'icon': 'px-vis:crosshair',
-              'buttonGroup': 1,
-              'onClick': 'function() {this.set("interactionSpaceConfig.cursorType", "circle"); }',
-              'onDeselect': 'function() { this.set("interactionSpaceConfig.cursorType", "none");}',
-              'actionConfig': {
-                'mouseout': 'resetTooltipAndCrosshairData',
-                'mousemove': 'calcTooltipAndCrosshairData',
-                'click': null,
-                'mousedown': null,
-                'mouseup': null
-              },
-              'subConfig': {
-                'closestPoint': {
-                  'icon': 'px-vis:closest-point',
-                  'cursorIcon': 'px-vis:closest-point',
-                  'tooltipLabel': 'Closest Timestamp and associated points',
-                  'buttonGroup': 1,
-                  'selectable': true,
-                  'onClick': 'function() { this.set("interactionSpaceConfig.searchType", "closestPoint");}',
-                  'actionConfig': {
-                    'mouseout': 'resetTooltipAndCrosshairData',
-                    'mousemove': 'calcTooltipAndCrosshairData',
-                    'click': null,
-                    'mousedown': null,
-                    'mouseup': null
-                  },
-                },
-                'pointPerSeries': {
-                  'icon': 'px-vis:closest-point-series',
-                  'cursorIcon': 'px-vis:closest-point-series',
-                  'tooltipLabel': 'Point Per Series',
-                  'buttonGroup': 1,
-                  'selectable': true,
-                  'onClick': 'function() { this.set("interactionSpaceConfig.searchType", "pointPerSeries");}',
-                  'actionConfig': {
-                    'mouseout': 'resetTooltipAndCrosshairData',
-                    'mousemove': 'calcTooltipAndCrosshairData',
-                    'click': null,
-                    'mousedown': null,
-                    'mouseup': null
-                  },
-                },
-                'allInArea': {
-                  'icon': 'px-vis:all-points-in-area',
-                  'cursorIcon': 'px-vis:all-points-in-area',
-                  'tooltipLabel': 'All in area',
-                  'buttonGroup': 1,
-                  'selectable': true,
-                  'onClick': 'function() { this.set("interactionSpaceConfig.searchType", "allInArea");}',
-                  'actionConfig': {
-                    'mouseout': 'resetTooltipAndCrosshairData',
-                    'mousemove': 'calcTooltipAndCrosshairData',
-                    'click': null,
-                    'mousedown': null,
-                    'mouseup': null
-                  },
-                },
-                'radiusUp': {
-                  'icon': 'px-vis:expand-radius',
-                  'tooltipLabel': 'Radius',
-                  'onClick': 'function() { var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0; this.set("interactionSpaceConfig.searchRadius", sr + 5);}'
-                },
-                'radiusDown': {
-                  'icon': 'px-vis:shrink-radius',
-                  'tooltipLabel': 'Radius',
-                  'onClick': 'function() { var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0; this.set("interactionSpaceConfig.searchRadius", Math.max(sr - 5, 0));}'
-                }
-              }
-            },
-            'tooltip': {
-              'tooltipLabel': 'Tooltip',
-              'icon': 'px-vis:show-tooltip',
-              'cursorIcon': 'px-vis:show-tooltip',
-              'buttonGroup': 1,
-              'selected': true,
-              'onClick': 'function() {this.set("_internalShowTooltip", true);}',
-              'actionConfig': {
-                'mouseout': 'resetTooltip',
-                'mousemove': 'calcTooltipData',
-                'click': null,
-                'mousedown': null,
-                'mouseup': null
-              }
-            },
-            'tooltipWithSearchTypes': {
-              'tooltipLabel': 'Tooltip',
-              'icon': 'px-vis:show-tooltip',
-              'cursorIcon': 'px-vis:show-tooltip',
-              'buttonGroup': 1,
-              'selected': true,
-              'onClick': 'function() {this.set("_internalShowTooltip", true);}',
-              'actionConfig': {
-                'mouseout': 'resetTooltip',
-                'mousemove': 'calcTooltipData',
-                'click': null,
-                'mousedown': null,
-                'mouseup': null
-              },
-              'subConfig': {
-                'timestamps': {
-                  'title': 'Timestamps',
-                  'tooltipLabel': 'Search for timestamps',
-                  'buttonGroup': 2,
-                  'selectable': true,
-                  'selected': true,
-                  'onClick': 'function() { this.set("interactionSpaceConfig.searchFor", "timestamps");}',
-                },
-                'points': {
-                  'title': 'Points',
-                  'tooltipLabel': 'Search for points',
-                  'buttonGroup': 2,
-                  'selectable': true,
-                  'onClick': 'function() { this.set("interactionSpaceConfig.searchFor", "point");}',
-                }
-              },
-            },
-            'tooltipWithSearchTypesAndRadius': {
-              'tooltipLabel': 'Tooltip',
-              'icon': 'px-vis:show-tooltip',
-              'cursorIcon': 'px-vis:show-tooltip',
-              'buttonGroup': 1,
-              'selected': true,
-              'onClick': 'function() {this.set("_internalShowTooltip", true);}',
-              'actionConfig': {
-                'mouseout': 'resetTooltip',
-                'mousemove': 'calcTooltipData',
-                'click': null,
-                'mousedown': null,
-                'mouseup': null
-              },
-              'subConfig': {
-                'timestamps': {
-                  'title': 'Timestamps',
-                  'tooltipLabel': 'Search for timestamps',
-                  'buttonGroup': 2,
-                  'selectable': true,
-                  'selected': true,
-                  'onClick': 'function() { this.set("interactionSpaceConfig.searchFor", "timestamps");}',
-                },
-                'points': {
-                  'title': 'Points',
-                  'tooltipLabel': 'Search for points',
-                  'buttonGroup': 2,
-                  'selectable': true,
-                  'onClick': 'function() { this.set("interactionSpaceConfig.searchFor", "point");}',
-                },
-                'radiusUp': {
-                  'icon': 'px-vis:expand-radius',
-                  'tooltipLabel': 'Radius',
-                  'onClick': 'function() { var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0; this.set("interactionSpaceConfig.searchRadius", sr + 5);}'
-                },
-                'radiusDown': {
-                  'icon': 'px-vis:shrink-radius',
-                  'tooltipLabel': 'Radius',
-                  'onClick': 'function() { var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0; this.set("interactionSpaceConfig.searchRadius", Math.max(sr - 5, 0));}'
-                }
-              },
-            },
-            'tooltipWithFullOptions': {
-              'tooltipLabel': 'Tooltip',
-              'icon': 'px-vis:show-tooltip',
-              'cursorIcon': 'px-vis:show-tooltip',
-              'buttonGroup': 1,
-              'selected': true,
-              'onClick': 'function() {this.set("_internalShowTooltip", true);}',
-              'actionConfig': {
-                'mouseout': 'resetTooltip',
-                'mousemove': 'calcTooltipData',
-                'click': null,
-                'mousedown': null,
-                'mouseup': null
-              },
-              'subConfig': {
-                'timestamps': {
-                  'title': 'Timestamps',
-                  'tooltipLabel': 'Search for timestamps',
-                  'buttonGroup': 2,
-                  'selectable': true,
-                  'selected': true,
-                  'onClick': 'function() { this.set("interactionSpaceConfig.searchFor", "timestamps");}',
-                },
-                'points': {
-                  'title': 'Points',
-                  'tooltipLabel': 'Search for points',
-                  'buttonGroup': 2,
-                  'selectable': true,
-                  'onClick': 'function() { this.set("interactionSpaceConfig.searchFor", "point");}',
-                },
-                'closestPoint': {
-                  'icon': 'px-vis:closest-point',
-                  'cursorIcon': 'px-vis:closest-point',
-                  'tooltipLabel': 'Closest point or timestamp',
-                  'buttonGroup': 1,
-                  'selectable': true,
-                  'selected': true,
-                  'onClick': 'function() { this.set("interactionSpaceConfig.searchType", "closestPoint");}',
-                  'actionConfig': {
-                    'mouseout': 'resetTooltip',
-                    'mousemove': 'calcTooltipData',
-                    'click': null,
-                    'mousedown': null,
-                    'mouseup': null
-                  },
-                },
-                'pointPerSeries': {
-                  'icon': 'px-vis:closest-point-series',
-                  'cursorIcon': 'px-vis:closest-point-series',
-                  'tooltipLabel': 'Point Per Series',
-                  'buttonGroup': 1,
-                  'selectable': true,
-                  'onClick': 'function() { this.set("interactionSpaceConfig.searchType", "pointPerSeries");}',
-                  'actionConfig': {
-                    'mouseout': 'resetTooltip',
-                    'mousemove': 'calcTooltipData',
-                    'click': null,
-                    'mousedown': null,
-                    'mouseup': null
-                  },
-                },
-                'allInArea': {
-                  'icon': 'px-vis:all-points-in-area',
-                  'cursorIcon': 'px-vis:all-points-in-area',
-                  'tooltipLabel': 'All in area',
-                  'buttonGroup': 1,
-                  'selectable': true,
-                  'onClick': 'function() { this.set("interactionSpaceConfig.searchType", "allInArea");}',
-                  'actionConfig': {
-                    'mouseout': 'resetTooltip',
-                    'mousemove': 'calcTooltipData',
-                    'click': null,
-                    'mousedown': null,
-                    'mouseup': null
-                  },
-                },
-                'radiusUp': {
-                  'icon': 'px-vis:expand-radius',
-                  'tooltipLabel': 'Radius',
-                  'onClick': 'function() { var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0; this.set("interactionSpaceConfig.searchRadius", sr + 5);}'
-                },
-                'radiusDown': {
-                  'icon': 'px-vis:shrink-radius',
-                  'tooltipLabel': 'Radius',
-                  'onClick': 'function() { var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0; this.set("interactionSpaceConfig.searchRadius", Math.max(sr - 5, 0));}'
-                }
-              }
-            },
-            'pan': {
-              'tooltipLabel': 'Pan',
-              'icon': 'px-vis:pan',
-              'cursorIcon': 'px-vis:pan',
-              'onClick': 'function() {this.set("_internalShowTooltip", false);}',
-              'buttonGroup': 1,
-              'actionConfig': {
-                'mousedown': 'startPanning',
-                'mouseup': 'stopPanning',
-                'mouseout': null,
-                'mousemove': null,
-                'click': null
-              },
-              'subConfig': {
-                'resetZoom': {
-                  'icon': 'px-vis:full-screen',
-                  'tooltipLabel': 'Reset',
-                  'eventName': 'px-vis-toolbar-reset-zoom'
-                }
-              }
-            },
-            'bareZoom': {
-              'tooltipLabel': 'Zoom on axis',
-              'icon': 'px-vis:zoom-toolbar',
-              'cursorIcon': 'px-vis:zoom-toolbar',
-              'onClick': 'function() {this.set("_internalShowTooltip", false); }',
-              'buttonGroup': 1,
-              'actionConfig': {
-                'mousedown': 'startZooming',
-                'mouseup': 'stopZooming',
-                'mouseout': null,
-                'mousemove': null,
-                'click': null
-              },
-              'subConfig': {
-                'undoZoom': {
-                  'icon': 'px-vis:zoom-out-one-level',
-                  'tooltipLabel': 'Undo zoom',
-                  'eventName': 'px-vis-toolbar-undo-zoom'
-                },
-                'resetZoom': {
-                  'icon': 'px-vis:full-screen',
-                  'tooltipLabel': 'Reset',
-                  'eventName': 'px-vis-toolbar-reset-zoom'
-                }
-              }
-            },
-            'zoom': {
-              'tooltipLabel': 'Zoom',
-              'icon': 'px-vis:zoom-toolbar',
-              'cursorIcon': 'px-vis:zoom-toolbar',
-              'onClick': 'function() {this.set("_internalShowTooltip", false); }',
-              'buttonGroup': 1,
-              'actionConfig': {
-                'mousedown': 'startZooming',
-                'mouseup': 'stopZooming',
-                'mouseout': null,
-                'mousemove': null,
-                'click': null
-              },
-              'subConfig': {
-                'zoomIn': {
-                  'icon': 'px-vis:zoom-in',
-                  'tooltipLabel': 'Zoom in',
-                  'eventName': 'px-vis-toolbar-zoom-in'
-                },
-                'zoomOut': {
-                  'icon': 'px-vis:zoom-out',
-                  'tooltipLabel': 'Zoom out',
-                  'eventName': 'px-vis-toolbar-zoom-out'
-                },
-                'undoZoom': {
-                  'icon': 'px-vis:zoom-out-one-level',
-                  'tooltipLabel': 'Undo zoom',
-                  'eventName': 'px-vis-toolbar-undo-zoom'
-                },
-                'resetZoom': {
-                  'icon': 'px-vis:full-screen',
-                  'tooltipLabel': 'Reset',
-                  'eventName': 'px-vis-toolbar-reset-zoom'
-                }
-              }
-            },
-            'advancedZoom': {
-              'tooltipLabel': 'Zoom',
-              'icon': 'px-vis:zoom-toolbar',
-              'cursorIcon': 'px-vis:zoom-toolbar',
-              'buttonGroup': 1,
-              'selectable': true,
-              'onClick': 'function() {this.set("_internalShowTooltip", false);}',
-              'actionConfig': {
-                'mousedown': 'startZooming',
-                'mouseup': 'stopZooming',
-                'mouseout': null,
-                'mousemove': null,
-                'click': null
-              },
-              'subConfig': {
-                'x': {
-                  'icon': 'px-vis:x-axis',
-                  'buttonGroup': 1,
-                  'tooltipLabel': 'Zoom on X axis only',
-                  'eventName': 'my-custom-click',
-                  'selectable': true,
-                  'onClick': 'function() { this.set("selectionType", "xAxis");}'
-                },
-                'y': {
-                  'icon': 'px-vis:y-axis',
-                  'buttonGroup': 1,
-                  'tooltipLabel': 'Zoom on Y axis only',
-                  'selectable': true,
-                  'onClick': 'function() { this.set("selectionType", "yAxis");}'
-                },
-                'xy': {
-                  'icon': 'px-vis:xy-axis',
-                  'tooltipLabel': 'Zoom on X and Y axis',
-                  'buttonGroup': 1,
-                  'selectable': true,
-                  'onClick': 'function() { this.set("selectionType", "xy");}'
-                },
-                'zoomIn': {
-                  'icon': 'px-vis:zoom-in',
-                  'tooltipLabel': 'Zoom in',
-                  'eventName': 'px-vis-toolbar-zoom-in'
-                },
-                'zoomOut': {
-                  'icon': 'px-vis:zoom-out',
-                  'tooltipLabel': 'Zoom out',
-                  'eventName': 'px-vis-toolbar-zoom-out'
-                },
-                'undoZoom': {
-                  'icon': 'px-vis:zoom-out-one-level',
-                  'tooltipLabel': 'Undo zoom',
-                  'eventName': 'px-vis-toolbar-undo-zoom'
-                },
-                'resetZoom': {
-                  'icon': 'px-vis:full-screen',
-                  'tooltipLabel': 'Reset',
-                  'eventName': 'px-vis-toolbar-reset-zoom'
-                }
-              }
-            },
-            'stripe': {
-              'tooltipLabel': 'Draw Stripe',
-              'icon': 'px-vis:draw-stripe',
-              'cursorIcon': 'px-vis:draw-stripe',
-              'buttonGroup': 1,
-              'selectable': true,
-              'onClick': 'function() {this.set("_internalShowTooltip", false);}',
-              'subConfig': {
-                'inclusion': {
-                  'title': 'Inclusion',
-                  'cursorIcon': 'px-vis:draw-stripe',
-                  'buttonGroup': 1,
-                  'tooltipLabel': 'Draw/edit inclusion type stripes',
-                  'selectable': true,
-                  'selected': true,
-                  'onClick': 'function() { this.set("selectionType", "xAxis"); this.set("stripeType", "inclusion");}'
-                },
-                'exclusion': {
-                  'title': 'Exclusion',
-                  'cursorIcon': 'px-vis:draw-stripe',
-                  'buttonGroup': 1,
-                  'tooltipLabel': 'Draw/edit exclusion type stripes',
-                  'selectable': true,
-                  'onClick': 'function() { this.set("selectionType", "xAxis"); this.set("stripeType", "exclusion"); }'
-                },
-                'add': {
-                  'icon': 'px-vis:draw-stripe',
-                  'cursorIcon': 'px-vis:draw-stripe',
-                  'tooltipLabel': 'Add stripe',
-                  'buttonGroup': 2,
-                  'selected': true,
-                  'selectable': true,
-                  'actionConfig': {
-                    'mousedown': 'startStriping',
-                    'mouseup': 'stopStriping',
-                    'mouseout': 'resetTooltip',
-                    'mousemove': 'calcTooltipData',
-                    'click': null
-                  },
-                },
-                'edit': {
-                  'icon': 'px-vis:remove-stripe',
-                  'cursorIcon': 'px-vis:remove-stripe',
-                  'buttonGroup': 2,
-                  'selectable': true,
-                  'tooltipLabel': 'Edit/remove stripe',
-                  'actionConfig': {
-                    'mousedown': null,
-                    'mouseup': null,
-                    'mouseout': null,
-                    'click': null,
-                    'mousemove': 'reportMouseCoords'
-                  },
-                }
-              }
-            }
-          };
-        }
-      },
+
       /**
        * Current sub-configuration. Can be the result of the config or passed in from another toolbar.
        */
@@ -803,11 +260,649 @@ Custom property | Description
         }
       }
     },
+
     observers: [
       '_configChanged(config.*, horizontalAlignment)',
       '_positionSubRow(withinChart, chartMargin, horizontalAlignment)',
       '_positionMainRow(chartMargin, horizontalAlignment)'
     ],
+
+    /**
+     * Config for default actions: tooltip/pan/zoom.
+     */
+    _defaultActionsMapping: {
+      annotations: {
+        tooltipLabel: 'Annotations',
+        icon: 'px-vis:comment',
+        cursorIcon: 'px-vis:comment',
+        buttonGroup: 1,
+        onClick: function() {
+          this.set("_internalShowTooltip", false);
+          this.set("showStrongIcon", true);
+        },
+        onDeselect: function() { this.set("showStrongIcon", false);},
+        actionConfig: {
+          mouseout: null,
+          mousemove: null,
+          mousedown: null,
+          click: function(evt) {
+            this.fire('px-vis-event-request', {
+              eventName: 'px-vis-annotation-creation',
+              data: {
+                mouseCoords: evt.mouseCoords,
+                clickTarget: evt.target,
+                chart: this
+              }
+            });
+          },
+          mouseup: null
+        },
+        subConfig: {
+          hideAnnotations: {
+            tooltipLabel: 'Hide Annotations',
+            icon: 'px-vis:hide',
+            buttonGroup: 1,
+            toggle: true,
+            onClick: function(button) {
+              this.$$("px-vis-annotations").set("hide", button.selected);
+            }
+          }
+        }
+      },
+      axisMuteSeries: {
+        tooltipLabel: 'Mute Series on Axis',
+        icon: 'px-vis:brush',
+        cursorIcon: 'px-vis:brush',
+        buttonGroup: 1,
+        onClick: function() {
+          this.set("_internalShowTooltip", false);
+        },
+        actionConfig: {
+          mouseout: null,
+          mousemove: null,
+          click: null,
+          mousedown: 'callAxisMute',
+          mouseup: 'callAxisMute'
+        }
+      },
+      axisDrag: {
+        tooltipLabel: 'Axis Drag',
+        icon: 'px-vis:move-axis',
+        cursorIcon: 'px-vis:move-axis',
+        buttonGroup: 1,
+        onClick: function() {
+          this.set("_internalShowTooltip", false);
+        },
+        actionConfig: {
+          mouseout: null,
+          mousemove: null,
+          click: null,
+          mousedown: 'callAxisDrag',
+          mouseup: 'callAxisDrag'
+        }
+      },
+      crosshairLasso: {
+        tooltipLabel: 'Lasso selection',
+        icon: 'px-vis:lasso',
+        buttonGroup: 1,
+        selectable: true,
+        onClick: function() {
+          this.set("_internalShowTooltip", false);
+          this.set("interactionSpaceConfig.searchType", "lasso");
+        },
+        onDeselect: function() {
+          this.set("interactionSpaceConfig.searchType", "none");
+        },
+        actionConfig: {
+          mouseout: null,
+          mousemove: null,
+          click: null,
+          mousedown: 'startLasso',
+          mouseup: 'stopLasso'
+        },
+        subConfig: {
+          clearCrosshair: {
+            tooltipLabel: 'Clear lasso data',
+            icon: 'px-nav:close',
+            onClick: function() {
+              this.set("crosshairData", { "rawData": [], "timeStamps": []});
+              this.set("interactionSpaceConfig.resetLassoData", !this.interactionSpaceConfig.resetLassoData);
+              this.set("resetLassoData", !this.resetLassoData);
+            }
+          }
+        }
+      },
+      crosshair: {
+        tooltipLabel: 'Crosshair',
+        icon: 'px-vis:crosshair',
+        cursorIcon: 'px-vis:crosshair',
+        buttonGroup: 1,
+        onClick: function() {
+          this.set("_internalShowTooltip", true);
+        },
+        actionConfig: {
+          mouseout: 'resetTooltipAndCrosshairData',
+          mousemove: 'calcTooltipAndCrosshairData',
+          click: null,
+          mousedown: null,
+          mouseup: null
+        }
+      },
+      crosshairWithOptions: {
+        tooltipLabel: 'Crosshair',
+        icon: 'px-vis:crosshair',
+        buttonGroup: 1,
+        onClick: function() {
+          this.set("interactionSpaceConfig.cursorType", "circle");
+        },
+        onDeselect: function() {
+          this.set("interactionSpaceConfig.cursorType", "none");
+        },
+        actionConfig: {
+          mouseout: 'resetTooltipAndCrosshairData',
+          mousemove: 'calcTooltipAndCrosshairData',
+          click: null,
+          mousedown: null,
+          mouseup: null
+        },
+        subConfig: {
+          closestPoint: {
+            icon: 'px-vis:closest-point',
+            cursorIcon: 'px-vis:closest-point',
+            tooltipLabel: 'Closest Timestamp and associated points',
+            buttonGroup: 1,
+            selectable: true,
+            onClick: function() {
+              this.set("interactionSpaceConfig.searchType", "closestPoint");
+            },
+            actionConfig: {
+              mouseout: 'resetTooltipAndCrosshairData',
+              mousemove: 'calcTooltipAndCrosshairData',
+              click: null,
+              mousedown: null,
+              mouseup: null
+            },
+          },
+          pointPerSeries: {
+            icon: 'px-vis:closest-point-series',
+            cursorIcon: 'px-vis:closest-point-series',
+            tooltipLabel: 'Point Per Series',
+            buttonGroup: 1,
+            selectable: true,
+            onClick: function() {
+              this.set("interactionSpaceConfig.searchType", "pointPerSeries");
+            },
+            actionConfig: {
+              mouseout: 'resetTooltipAndCrosshairData',
+              mousemove: 'calcTooltipAndCrosshairData',
+              click: null,
+              mousedown: null,
+              mouseup: null
+            },
+          },
+          allInArea: {
+            icon: 'px-vis:all-points-in-area',
+            cursorIcon: 'px-vis:all-points-in-area',
+            tooltipLabel: 'All in area',
+            buttonGroup: 1,
+            selectable: true,
+            onClick: function() {
+              this.set("interactionSpaceConfig.searchType", "allInArea");
+            },
+            actionConfig: {
+              mouseout: 'resetTooltipAndCrosshairData',
+              mousemove: 'calcTooltipAndCrosshairData',
+              click: null,
+              mousedown: null,
+              mouseup: null
+            },
+          },
+          radiusUp: {
+            icon: 'px-vis:expand-radius',
+            tooltipLabel: 'Radius',
+            onClick: function() {
+              var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0;
+              this.set("interactionSpaceConfig.searchRadius", sr + 5);
+            }
+          },
+          radiusDown: {
+            icon: 'px-vis:shrink-radius',
+            tooltipLabel: 'Radius',
+            onClick: function() {
+              var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0;
+              this.set("interactionSpaceConfig.searchRadius", Math.max(sr - 5, 0));
+            }
+          }
+        }
+      },
+      tooltip: {
+        tooltipLabel: 'Tooltip',
+        icon: 'px-vis:show-tooltip',
+        cursorIcon: 'px-vis:show-tooltip',
+        buttonGroup: 1,
+        selected: true,
+        onClick: function() {
+          this.set("_internalShowTooltip", true);
+        },
+        actionConfig: {
+          mouseout: 'resetTooltip',
+          mousemove: 'calcTooltipData',
+          click: null,
+          mousedown: null,
+          mouseup: null
+        }
+      },
+      tooltipWithSearchTypes: {
+        tooltipLabel: 'Tooltip',
+        icon: 'px-vis:show-tooltip',
+        cursorIcon: 'px-vis:show-tooltip',
+        buttonGroup: 1,
+        selected: true,
+        onClick: function() {
+          this.set("_internalShowTooltip", true);
+        },
+        actionConfig: {
+          mouseout: 'resetTooltip',
+          mousemove: 'calcTooltipData',
+          click: null,
+          mousedown: null,
+          mouseup: null
+        },
+        subConfig: {
+          timestamps: {
+            title: 'Timestamps',
+            tooltipLabel: 'Search for timestamps',
+            buttonGroup: 2,
+            selectable: true,
+            selected: true,
+            onClick: function() {
+              this.set("interactionSpaceConfig.searchFor", "timestamps");
+            },
+          },
+          points: {
+            title: 'Points',
+            tooltipLabel: 'Search for points',
+            buttonGroup: 2,
+            selectable: true,
+            onClick: function() {
+              this.set("interactionSpaceConfig.searchFor", "point");
+            },
+          }
+        },
+      },
+      tooltipWithSearchTypesAndRadius: {
+        tooltipLabel: 'Tooltip',
+        icon: 'px-vis:show-tooltip',
+        cursorIcon: 'px-vis:show-tooltip',
+        buttonGroup: 1,
+        selected: true,
+        onClick: function() {
+          this.set("_internalShowTooltip", true);
+        },
+        actionConfig: {
+          mouseout: 'resetTooltip',
+          mousemove: 'calcTooltipData',
+          click: null,
+          mousedown: null,
+          mouseup: null
+        },
+        subConfig: {
+          timestamps: {
+            title: 'Timestamps',
+            tooltipLabel: 'Search for timestamps',
+            buttonGroup: 2,
+            selectable: true,
+            selected: true,
+            onClick: function() {
+              this.set("interactionSpaceConfig.searchFor", "timestamps");
+            },
+          },
+          points: {
+            title: 'Points',
+            tooltipLabel: 'Search for points',
+            buttonGroup: 2,
+            selectable: true,
+            onClick: function() {
+              this.set("interactionSpaceConfig.searchFor", "point");
+            },
+          },
+          radiusUp: {
+            icon: 'px-vis:expand-radius',
+            tooltipLabel: 'Radius',
+            onClick: function() {
+              var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0;
+              this.set("interactionSpaceConfig.searchRadius", sr + 5);
+            }
+          },
+          radiusDown: {
+            icon: 'px-vis:shrink-radius',
+            tooltipLabel: 'Radius',
+            onClick: function() {
+              var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0;
+              this.set("interactionSpaceConfig.searchRadius", Math.max(sr - 5, 0));
+            }
+          }
+        }
+      },
+      tooltipWithFullOptions: {
+        tooltipLabel: 'Tooltip',
+        icon: 'px-vis:show-tooltip',
+        cursorIcon: 'px-vis:show-tooltip',
+        buttonGroup: 1,
+        selected: true,
+        onClick: function() {
+          this.set("_internalShowTooltip", true);
+        },
+        actionConfig: {
+          mouseout: 'resetTooltip',
+          mousemove: 'calcTooltipData',
+          click: null,
+          mousedown: null,
+          mouseup: null
+        },
+        subConfig: {
+          timestamps: {
+            title: 'Timestamps',
+            tooltipLabel: 'Search for timestamps',
+            buttonGroup: 2,
+            selectable: true,
+            selected: true,
+            onClick: function() {
+              this.set("interactionSpaceConfig.searchFor", "timestamps");
+            },
+          },
+          points: {
+            title: 'Points',
+            tooltipLabel: 'Search for points',
+            buttonGroup: 2,
+            selectable: true,
+            onClick: function() {
+              this.set("interactionSpaceConfig.searchFor", "point");
+            },
+          },
+          closestPoint: {
+            icon: 'px-vis:closest-point',
+            cursorIcon: 'px-vis:closest-point',
+            tooltipLabel: 'Closest point or timestamp',
+            buttonGroup: 1,
+            selectable: true,
+            selected: true,
+            onClick: function() {
+              this.set("interactionSpaceConfig.searchType", "closestPoint");
+            },
+            actionConfig: {
+              mouseout: 'resetTooltip',
+              mousemove: 'calcTooltipData',
+              click: null,
+              mousedown: null,
+              mouseup: null
+            },
+          },
+          pointPerSeries: {
+            icon: 'px-vis:closest-point-series',
+            cursorIcon: 'px-vis:closest-point-series',
+            tooltipLabel: 'Point Per Series',
+            buttonGroup: 1,
+            selectable: true,
+            onClick: function() {
+              this.set("interactionSpaceConfig.searchType", "pointPerSeries");
+            },
+            actionConfig: {
+              mouseout: 'resetTooltip',
+              mousemove: 'calcTooltipData',
+              click: null,
+              mousedown: null,
+              mouseup: null
+            },
+          },
+          allInArea: {
+            icon: 'px-vis:all-points-in-area',
+            cursorIcon: 'px-vis:all-points-in-area',
+            tooltipLabel: 'All in area',
+            buttonGroup: 1,
+            selectable: true,
+            onClick: function() {
+              this.set("interactionSpaceConfig.searchType", "allInArea");
+            },
+            actionConfig: {
+              mouseout: 'resetTooltip',
+              mousemove: 'calcTooltipData',
+              click: null,
+              mousedown: null,
+              mouseup: null
+            },
+          },
+          radiusUp: {
+            icon: 'px-vis:expand-radius',
+            tooltipLabel: 'Radius',
+            onClick: function() {
+              var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0;
+              this.set("interactionSpaceConfig.searchRadius", sr + 5);
+            }
+          },
+          radiusDown: {
+            icon: 'px-vis:shrink-radius',
+            tooltipLabel: 'Radius',
+            onClick: function() {
+              var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0;
+              this.set("interactionSpaceConfig.searchRadius", Math.max(sr - 5, 0));
+            }
+          }
+        }
+      },
+      pan: {
+        tooltipLabel: 'Pan',
+        icon: 'px-vis:pan',
+        cursorIcon: 'px-vis:pan',
+        onClick: function() {
+          this.set("_internalShowTooltip", false);
+        },
+        buttonGroup: 1,
+        actionConfig: {
+          mousedown: 'startPanning',
+          mouseup: 'stopPanning',
+          mouseout: null,
+          mousemove: null,
+          click: null
+        },
+        subConfig: {
+          resetZoom: {
+            icon: 'px-vis:full-screen',
+            tooltipLabel: 'Reset',
+            eventName: 'px-vis-toolbar-reset-zoom'
+          }
+        }
+      },
+      bareZoom: {
+        tooltipLabel: 'Zoom on axis',
+        icon: 'px-vis:zoom-toolbar',
+        cursorIcon: 'px-vis:zoom-toolbar',
+        onClick: function() {
+          this.set("_internalShowTooltip", false);
+        },
+        buttonGroup: 1,
+        actionConfig: {
+          mousedown: 'startZooming',
+          mouseup: 'stopZooming',
+          mouseout: null,
+          mousemove: null,
+          click: null
+        },
+        subConfig: {
+          undoZoom: {
+            icon: 'px-vis:zoom-out-one-level',
+            tooltipLabel: 'Undo zoom',
+            eventName: 'px-vis-toolbar-undo-zoom'
+          },
+          resetZoom: {
+            icon: 'px-vis:full-screen',
+            tooltipLabel: 'Reset',
+            eventName: 'px-vis-toolbar-reset-zoom'
+          }
+        }
+      },
+      zoom: {
+        tooltipLabel: 'Zoom',
+        icon: 'px-vis:zoom-toolbar',
+        cursorIcon: 'px-vis:zoom-toolbar',
+        onClick: function() {
+          this.set("_internalShowTooltip", false);
+        },
+        buttonGroup: 1,
+        actionConfig: {
+          mousedown: 'startZooming',
+          mouseup: 'stopZooming',
+          mouseout: null,
+          mousemove: null,
+          click: null
+        },
+        subConfig: {
+          zoomIn: {
+            icon: 'px-vis:zoom-in',
+            tooltipLabel: 'Zoom in',
+            eventName: 'px-vis-toolbar-zoom-in'
+          },
+          zoomOut: {
+            icon: 'px-vis:zoom-out',
+            tooltipLabel: 'Zoom out',
+            eventName: 'px-vis-toolbar-zoom-out'
+          },
+          undoZoom: {
+            icon: 'px-vis:zoom-out-one-level',
+            tooltipLabel: 'Undo zoom',
+            eventName: 'px-vis-toolbar-undo-zoom'
+          },
+          resetZoom: {
+            icon: 'px-vis:full-screen',
+            tooltipLabel: 'Reset',
+            eventName: 'px-vis-toolbar-reset-zoom'
+          }
+        }
+      },
+      advancedZoom: {
+        tooltipLabel: 'Zoom',
+        icon: 'px-vis:zoom-toolbar',
+        cursorIcon: 'px-vis:zoom-toolbar',
+        buttonGroup: 1,
+        selectable: true,
+        onClick: function() {
+          this.set("_internalShowTooltip", false);
+        },
+        actionConfig: {
+          mousedown: 'startZooming',
+          mouseup: 'stopZooming',
+          mouseout: null,
+          mousemove: null,
+          click: null
+        },
+        subConfig: {
+          x: {
+            icon: 'px-vis:x-axis',
+            buttonGroup: 1,
+            tooltipLabel: 'Zoom on X axis only',
+            eventName: 'my-custom-click',
+            selectable: true,
+            onClick: function() { this.set("selectionType", "xAxis");}
+          },
+          y: {
+            icon: 'px-vis:y-axis',
+            buttonGroup: 1,
+            tooltipLabel: 'Zoom on Y axis only',
+            selectable: true,
+            onClick: function() { this.set("selectionType", "yAxis");}
+          },
+          xy: {
+            icon: 'px-vis:xy-axis',
+            tooltipLabel: 'Zoom on X and Y axis',
+            buttonGroup: 1,
+            selectable: true,
+            onClick: function() { this.set("selectionType", "xy");}
+          },
+          zoomIn: {
+            icon: 'px-vis:zoom-in',
+            tooltipLabel: 'Zoom in',
+            eventName: 'px-vis-toolbar-zoom-in'
+          },
+          zoomOut: {
+            icon: 'px-vis:zoom-out',
+            tooltipLabel: 'Zoom out',
+            eventName: 'px-vis-toolbar-zoom-out'
+          },
+          undoZoom: {
+            icon: 'px-vis:zoom-out-one-level',
+            tooltipLabel: 'Undo zoom',
+            eventName: 'px-vis-toolbar-undo-zoom'
+          },
+          resetZoom: {
+            icon: 'px-vis:full-screen',
+            tooltipLabel: 'Reset',
+            eventName: 'px-vis-toolbar-reset-zoom'
+          }
+        }
+      },
+      stripe: {
+        tooltipLabel: 'Draw Stripe',
+        icon: 'px-vis:draw-stripe',
+        cursorIcon: 'px-vis:draw-stripe',
+        buttonGroup: 1,
+        selectable: true,
+        onClick: function() {this.set("_internalShowTooltip", false);},
+        subConfig: {
+          inclusion: {
+            title: 'Inclusion',
+            cursorIcon: 'px-vis:draw-stripe',
+            buttonGroup: 1,
+            tooltipLabel: 'Draw/edit inclusion type stripes',
+            selectable: true,
+            selected: true,
+            onClick: function() {
+              this.set("selectionType", "xAxis");
+              this.set("stripeType", "inclusion");
+            }
+          },
+          exclusion: {
+            title: 'Exclusion',
+            cursorIcon: 'px-vis:draw-stripe',
+            buttonGroup: 1,
+            tooltipLabel: 'Draw/edit exclusion type stripes',
+            selectable: true,
+            onClick: function() {
+              this.set("selectionType", "xAxis");
+              this.set("stripeType", "exclusion");
+            }
+          },
+          add: {
+            icon: 'px-vis:draw-stripe',
+            cursorIcon: 'px-vis:draw-stripe',
+            tooltipLabel: 'Add stripe',
+            buttonGroup: 2,
+            selected: true,
+            selectable: true,
+            actionConfig: {
+              mousedown: 'startStriping',
+              mouseup: 'stopStriping',
+              mouseout: 'resetTooltip',
+              mousemove: 'calcTooltipData',
+              click: null
+            },
+          },
+          edit: {
+            icon: 'px-vis:remove-stripe',
+            cursorIcon: 'px-vis:remove-stripe',
+            buttonGroup: 2,
+            selectable: true,
+            tooltipLabel: 'Edit/remove stripe',
+            actionConfig: {
+              mousedown: null,
+              mouseup: null,
+              mouseout: null,
+              click: null,
+              mousemove: 'reportMouseCoords'
+            }
+          }
+        }
+      }
+    },
 
     clearAllActions: function() {
       var keys = Object.keys(this.actionConfig),
@@ -1018,7 +1113,7 @@ Custom property | Description
       if(conf.eventName) {
 
         //fire the event fromt the chart's context
-        this.fire('px-vis-event-request', {'eventName': conf.eventName, 'data': conf});
+        this.fire('px-vis-event-request', {eventName: conf.eventName, data: conf});
       }
 
       if(conf.onClick) {
