@@ -1518,21 +1518,33 @@ PxVisBehaviorChart.mutedAxes = {
     @polymerBehavior PxVisBehaviorChart.multiAxisLasso
 */
 PxVisBehaviorChart.multiAxisLasso = {
-  lasso: function() {
-    var yScale = this.isMultiY ? this.y[this.extentsData.dimension] : this.y,
-        result = { detail: {
-          rawData: [],
-          timeStamps: []
-        }};
-
-    for(var i = 0; i < this.chartData.length; i++) {
-      this._searchForDataInArea(this.extentsData.dimension, yScale, this.chartData[i], this.extentsData.extents, result.detail);
+  properties: {
+    _lassoCrosshairData: {
+      type: Object,
+      value: function() { return {}; }
+    },
+    /**
+     * When switched clears all the previous selection made
+     * (in _lassoCrosshairData)
+     */
+     resetLassoData: {
+      type: Boolean,
+      value: false,
+      observer: '_resetLasso'
     }
-
-    this._calcCrosshair(result);
   },
 
-  _searchForDataInArea: function(dim, y, d, ext, result) {
+  lasso: function() {
+    var yScale = this.isMultiY ? this.y[this.extentsData.dimension] : this.y;
+
+    for(var i = 0; i < this.chartData.length; i++) {
+      this._searchForDataInArea(this.extentsData.dimension, yScale, this.chartData[i], this.extentsData.extents);
+    }
+
+    this._calcLassoData(this.extentsData.dimension);
+  },
+
+  _searchForDataInArea: function(dim, y, d, ext) {
     if(this._combinedMutedSeries[d[this.seriesKey]]) {
       return;
     }
@@ -1546,10 +1558,31 @@ PxVisBehaviorChart.multiAxisLasso = {
 
     var dpx = y(d[dim]);
     if(dpx >= ext[0] && dpx <= ext[1]) {
-      result.rawData.push(d);
-      result.timeStamps.push(d[this.seriesKey]);
+      this._lassoCrosshairData[d[this.seriesKey]] = d;
     }
-  }
+  },
+
+  _calcLassoData: function(dim) {
+    var keys = Object.keys(this._lassoCrosshairData),
+        combined = {detail: {
+          rawData: [],
+          timeStamps: keys
+        }};
+
+    for(var i=0; i< keys.length; i++) {
+      combined.detail.rawData.push(this._lassoCrosshairData[keys[i]]);
+    }
+
+    this._calcCrosshair(combined);
+  },
+
+  _resetLasso: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    this._lassoCrosshairData = {};
+  },
 };
 
 /*
