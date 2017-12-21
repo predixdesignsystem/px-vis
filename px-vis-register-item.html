@@ -54,24 +54,19 @@ Custom property | Description
         flex-shrink: 0;
       }
     </style>
-    <span
+    <span id="regItem"
       class$="[[_baseClasses]] register-item--min-width"
-      name$="R[[item.name]]"
-      id="regItem">
-      <span
+      name$="R[[item.name]]">
+      <span id="regWithoutMenu"
         class$="flex [[_itemMutedToStart]]"
-        on-tap="_seriesClicked"
-        id="regWithoutMenu">
+        on-tap="_seriesClicked">
         <span class="seriesMarker flex">
-          <span
-            class="seriesMarkerIcon"
+          <span class="seriesMarkerIcon"
             style$="[[_calcDashPattern(_itemColor,_dashPattern)]];"
             name$="R{{item.name}}">&nbsp;</span>
         </span>
         <span class$="[[_wrapperClass]]">
-          <div
-            class="seriesName flex__item--msfix"
-            name$="R[[item.name]]">
+          <div class="seriesName flex__item--msfix" name$="R[[item.name]]">
             [[_truncatedName]]&nbsp;
             <template is="dom-if" if="[[_didTruncate]]">
               <px-tooltip delay="500">[[_configName]]</px-tooltip>
@@ -79,42 +74,42 @@ Custom property | Description
           </div>
           <!-- Use inline flex to avoid the browser adding spaces between our sub elements-->
           <div class="seriesData flex__item--msfix" name$="R{{item.name}}">
-            <template is="dom-if" if="[[_isOfType(xAxisType, 'linear')]]">
-              <px-number-formatter-no-display
-                id="xFormatter"
-                value="[[_returnValue(item, 'x')]]"
-                format="[[numberFormat]]"
-                culture="[[numberFormatCulture]]"
-                currency$="[[numberFormatIsCurrency]]"
-                default-currency-format="[[numberFormatCurrency]]"
-                zero-format="[[numberFormatZero]]"
-                formatted-value="{{_formattedX}}">
-              </px-number-formatter-no-display>
-            </template>
-            <px-number-formatter-no-display
-              id="yFormatter"
-              value="[[_returnValue(item, 'y')]]"
-              format="[[numberFormat]]"
-              culture="[[numberFormatCulture]]"
-              currency$="[[numberFormatIsCurrency]]"
-              default-currency-format="[[numberFormatCurrency]]"
-              zero-format="[[numberFormatZero]]"
-              formatted-value="{{_formattedY}}">
-            </px-number-formatter-no-display>
             [[_displayedData]]
           </div>
         </span>
       </span>
       <template id="menuTemplate" is="dom-if" if="[[_hasDynamicMenu]]">
         <px-vis-dynamic-menu
-            id="menu"
-            class$="[[_getDynamicMenuClass(type)]]"
-            style="display: none"
-            additional-detail="[[item]]"
-            dynamic-menu-config="[[dynamicMenuConfig]]">
+          id="menu"
+          class$="[[_getDynamicMenuClass(type)]]"
+          style="display: none"
+          additional-detail="[[item]]"
+          dynamic-menu-config="[[dynamicMenuConfig]]">
         </px-vis-dynamic-menu>
       </template>
     </span>
+    <template is="dom-if" if="[[_isOfType(xAxisType, 'linear')]]">
+      <px-number-formatter-no-display
+        id="xFormatter"
+        value="[[_returnValue(item, 'x')]]"
+        format="[[numberFormat]]"
+        culture="[[numberFormatCulture]]"
+        currency$="[[numberFormatIsCurrency]]"
+        default-currency-format="[[numberFormatCurrency]]"
+        zero-format="[[numberFormatZero]]"
+        formatted-value="{{_formattedX}}">
+      </px-number-formatter-no-display>
+    </template>
+    <px-number-formatter-no-display
+      id="yFormatter"
+      value="[[_returnValue(item, 'y')]]"
+      format="[[numberFormat]]"
+      culture="[[numberFormatCulture]]"
+      currency$="[[numberFormatIsCurrency]]"
+      default-currency-format="[[numberFormatCurrency]]"
+      zero-format="[[numberFormatZero]]"
+      formatted-value="{{_formattedY}}">
+    </px-number-formatter-no-display>
   </template>
 </dom-module>
 

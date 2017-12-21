@@ -135,7 +135,7 @@ Custom property | Description
           <template is="dom-if" if="[[!_isOfType(xAxisType, 'pie')]]">
             <template is="dom-repeat" items="[[_series]]" as="_groups">
               <div class$="[[_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)]]">
-                <template is="dom-repeat" id="itemRepeat" items="[[_groups]]" on-dom-change="_scrollBarsPresent">
+                <template is="dom-repeat" id="itemRepeat" items="[[_groups]]" rendered-item-count="{{_itemCount}}">
                   <px-vis-register-item
                     class$="[[tooltipStyle]]"
                     item="[[item]]"
@@ -162,7 +162,7 @@ Custom property | Description
           <template is="dom-if" if="[[_isOfType(yAxisType, 'pie')]]">
             <div class$="[[_getSeriesWrapperClassReverse(type)]]">
               <div class$="[[_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)]]">
-                <template is="dom-repeat" id="pieItemRepeat" items="[[chartData]]" on-dom-change="_scrollBarsPresentPie">
+                <template is="dom-repeat" id="pieItemRepeat" items="[[chartData]]" rendered-item-count="{{_itemCount}}">
                   <px-vis-register-item-pie
                     item="[[item]]"
                     item-index="[[index]]"
@@ -291,15 +291,19 @@ Custom property | Description
       inertRegister: {
         type: Boolean,
         value: false
+      },
+
+      sortType: {
+        type: 'String',
+        value: ''
       }
     },
 
     observers: [
       '_formatDateTime(tooltipData.*)',
+      '_scrollBarsPresent(_itemCount)',
       '_scrollBarsPresent(height, margin)',
       '_scrollBarsPresent(chartWidth, margin)',
-      '_scrollBarsPresentPie(height, margin)',
-      '_scrollBarsPresentPie(chartWidth, type, margin)',
       '_computeSeries(tooltipData.series.*, groupings)'
      ],
 
@@ -343,9 +347,9 @@ Custom property | Description
      *
     */
     _computeSeries: function() {
-     if(this.hasUndefinedArguments(arguments)) {
-       return;
-     }
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
 
       this.debounce('computeSeries', function() {
         if(!this.inertRegister) {
@@ -381,11 +385,7 @@ Custom property | Description
         return;
       }
 
-      if(preventMinSize) {
-        return '';
-      } else {
-        return 'minSize';
-      }
+      return preventMinSize ? '' : 'minSize';
     },
 
     _returnHeight: function(height,margin, type) {
@@ -413,49 +413,29 @@ Custom property | Description
     },
 
     _scrollBarsPresentAF: function() {
-      if(this.$$('#itemRepeat') && this._itemCount !== this.$$('#itemRepeat').renderedItemCount) {
-        var b = false;
-        if(this.type === 'vertical' &&
-            this.$.seriesWrap.scrollHeight > (this.height - this.margin.top - this.margin.bottom)) {
-          b = true;
-        } else if(this.type === 'horizontal' &&
-            this.$.seriesWrap.scrollWidth > this.chartWidth) {
-          b = true;
-        }
-
-        this.toggleClass('scrollOn', b, this.$.seriesWrap);
-
-        this._itemCount = this.$$('#itemRepeat').renderedItemCount;
-      }
-    },
-
-    _scrollBarsPresentPie: function() {
-      if(this.height === undefined || this.chartWidth === undefined || this.margin === undefined) {
-        return;
+      var b = false;
+      if(this.type === 'vertical' &&
+          this.$.seriesWrap.scrollHeight > (this.height - this.margin.top - this.margin.bottom)) {
+        b = true;
+      } else if(this.type === 'horizontal' &&
+          this.$.seriesWrap.scrollWidth > this.chartWidth) {
+        b = true;
       }
 
-      window.requestAnimationFrame(this._scrollBarsPresentPieAF.bind(this));
+      this.toggleClass('scrollOn', b, this.$.seriesWrap);
+      this.set('_hasScrollBar', b);
     },
 
-    _scrollBarsPresentPieAF: function() {
-      //disable optimization for pie chart as we don't hit this function as
-      //often and this helps making the register dynamically adjust
-      //its scrollbars. we might want to revisit the scrollbar process in general
-      // if(this.$$('#pieItemRepeat') && this._itemCount !== this.$$('#pieItemRepeat').renderedItemCount) {
-        var b = false;
-        if(this.type === 'vertical' &&
-            this.$.seriesWrap.scrollHeight > (this.height - this.margin.top - this.margin.bottom)) {
-          b = true;
-        } else if(this.type === 'horizontal' &&
-            this.$.seriesWrap.scrollWidth > this.chartWidth) {
-          b = true;
-        }
+    _sortAlphbetically: function(a,b) {
+      return (this.completeSeriesConfig[a.name]["name"] < this.completeSeriesConfig[b.name]["name"]) ? -1 : (this.completeSeriesConfig[a.name]["name"] > this.completeSeriesConfig[b.name]["name"]) ? 1 : 0;
+    },
 
-        this.toggleClass('scrollOn', b, this.$.seriesWrap);
-        this.set('_hasScrollBar', b);
+    _sortItems: function(type) {
+      if(type === 'alphabetically') {
+        return this._sortAlphbetically.bind(this);
+      }
 
-        //this._itemCount = this.$$('#pieItemRepeat').renderedItemCount;
-      // }
+      return;
     }
   });
   </script>
