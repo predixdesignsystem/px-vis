@@ -110,12 +110,15 @@
     }, //properties
 
     observers: [
-      'drawElement(svg, crosshairData.timeStamps.*, _mutedCompleteSeriesConfig.*, drawWithLocalCrosshairData, differentDataset, domainChanged, x, y)',
+      'drawElement(svg, crosshairData.timeStamps.*, _mutedCompleteSeriesConfig.*, drawWithLocalCrosshairData, differentDataset, domainChanged, x, y, fuzz)',
       '_updateTooltipData(domainChanged)'
     ],
 
-    ready: function() {
-
+    detached: function() {
+      if(this._circles) {
+        this._circles.remove();
+        this._circles = null;
+      }
     },
     /**
      * Draws the crosshair elements and sets up listeners and callbacks on chart hover

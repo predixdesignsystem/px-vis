@@ -115,7 +115,7 @@
 
     }, //properties
     observers: [
-      '_computeChartData(crosshairData.timeStamps.*, completeSeriesConfig, drawWithLocalCrosshairData, y, x)',
+      '_computeChartData(crosshairData.timeStamps.*, completeSeriesConfig, drawWithLocalCrosshairData, y, x, differentDataset, fuzz)',
       '_updateTooltipData(domainChanged)',
     ],
 
@@ -128,15 +128,18 @@
         return [];
       }
 
-      var dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawData;
+      this.debounce('_calcDataset', function() {
 
-      if(this.showTooltipData) {
-        this._setTooltipData(dataset);
-        this._resetTooltipData();
-      }
+        var dataset = this.differentDataset ? this._calcDataset() : this.crosshairData.rawData;
 
-      this.set('_highlightData', dataset);
-      this.fire('px-vis-highlight-data-changed');
+        if(this.showTooltipData) {
+          this._setTooltipData(dataset);
+          this._resetTooltipData();
+        }
+
+        this.set('_highlightData', dataset);
+        this.fire('px-vis-highlight-data-changed');
+      }.bind(this), 10);
     },
 
     _updateTooltipData: function() {
