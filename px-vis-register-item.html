@@ -56,24 +56,24 @@ Custom property | Description
     </style>
     <span id="regItem"
       class$="[[_baseClasses]] register-item--min-width"
-      name$="R[[item.name]]">
+      name$="R[[seriesKey]]">
       <span id="regWithoutMenu"
         class$="flex [[_itemMutedToStart]]"
         on-tap="_seriesClicked">
         <span class="seriesMarker flex">
           <span class="seriesMarkerIcon"
             style$="[[_calcDashPattern(_itemColor,_dashPattern)]];"
-            name$="R{{item.name}}">&nbsp;</span>
+            name$="R[[seriesKey]]">&nbsp;</span>
         </span>
         <span class$="[[_wrapperClass]]">
-          <div class="seriesName flex__item--msfix" name$="R[[item.name]]">
+          <div class="seriesName flex__item--msfix" name$="R[[seriesKey]]">
             [[_truncatedName]]&nbsp;
             <template is="dom-if" if="[[_didTruncate]]">
               <px-tooltip delay="500">[[_configName]]</px-tooltip>
             </template>
           </div>
           <!-- Use inline flex to avoid the browser adding spaces between our sub elements-->
-          <div class="seriesData flex__item--msfix" name$="R{{item.name}}">
+          <div class="seriesData flex__item--msfix" name$="R[[seriesKey]]">
             [[_displayedData]]
           </div>
         </span>
@@ -83,7 +83,7 @@ Custom property | Description
           id="menu"
           class$="[[_getDynamicMenuClass(type)]]"
           style="display: none"
-          additional-detail="[[item]]"
+          additional-detail="[[seriesKey]]"
           dynamic-menu-config="[[dynamicMenuConfig]]">
         </px-vis-dynamic-menu>
       </template>
@@ -91,7 +91,7 @@ Custom property | Description
     <template is="dom-if" if="[[_isOfType(xAxisType, 'linear')]]">
       <px-number-formatter-no-display
         id="xFormatter"
-        value="[[_returnValue(item, 'x')]]"
+        value="[[_returnValue(data, 'x')]]"
         format="[[numberFormat]]"
         culture="[[numberFormatCulture]]"
         currency$="[[numberFormatIsCurrency]]"
@@ -102,7 +102,7 @@ Custom property | Description
     </template>
     <px-number-formatter-no-display
       id="yFormatter"
-      value="[[_returnValue(item, 'y')]]"
+      value="[[_returnValue(data, 'y')]]"
       format="[[numberFormat]]"
       culture="[[numberFormatCulture]]"
       currency$="[[numberFormatIsCurrency]]"
@@ -145,7 +145,7 @@ Custom property | Description
     },
 
     observers: [
-      '_toggleSeries(item,mutedSeries.*)',
+      '_toggleSeries(seriesKey, mutedSeries.*)',
       '_disableClickFunc(disableClick)',
       '_computeItem(_formattedY)'
     ],
@@ -156,15 +156,13 @@ Custom property | Description
       }
 
       this.debounce("numberFormatterValues", function() {
-        if(this.completeSeriesConfig && this.completeSeriesConfig[this.item.name]) {
-          this._computeItemDebounced();
-        }
+        this._computeItemDebounced();
       }, 10);
     },
 
     _computeItemDebounced: function() {
-      var xKey = this.completeSeriesConfig[this.item.name]['x'],
-          yKey = this.completeSeriesConfig[this.item.name]['y'],
+      var xKey = this.completeSeriesConfig[this.seriesKey]['x'],
+          yKey = this.completeSeriesConfig[this.seriesKey]['y'],
           xVal = '',
           xUnit = '',
           slash = '',
@@ -172,7 +170,7 @@ Custom property | Description
           yUnit = '';
 
       //process X val
-      if(this.item.value && (this.item.value[xKey] || this.item.value[xKey] === 0)) {
+      if(this.data && this.data.value && (this.data.value[xKey] || this.data.value[xKey] === 0)) {
         switch(this.xAxisType) {
           case 'time':
           case 'timeLocal':
@@ -183,25 +181,25 @@ Custom property | Description
 
           case 'ordinal':
           case 'scaleBand':
-            xVal = this.item.value[xKey];
-            xUnit = this.completeSeriesConfig[this.item.name]['xAxisUnit'] ? ' ' + this.completeSeriesConfig[this.item.name]['xAxisUnit'] : '';
+            xVal = this.data.value[xKey];
+            xUnit = this.completeSeriesConfig[this.seriesKey]['xAxisUnit'] ? ' ' + this.completeSeriesConfig[this.seriesKey]['xAxisUnit'] : '';
             slash = ' / ';
             break;
 
           default:
             xVal = this._formattedX;
-            xUnit = this.completeSeriesConfig[this.item.name]['xAxisUnit'] ? ' ' + this.completeSeriesConfig[this.item.name]['xAxisUnit'] : '';
+            xUnit = this.completeSeriesConfig[this.seriesKey]['xAxisUnit'] ? ' ' + this.completeSeriesConfig[this.seriesKey]['xAxisUnit'] : '';
             slash = ' / ';
             break;
         }
       }
 
       //process Y val
-      if(this.item.value && (this.item.value[yKey] || this.item.value[yKey] === 0)) {
+      if(this.data && this.data.value && (this.data.value[yKey] || this.data.value[yKey] === 0)) {
         switch(this.yAxisType) {
           case 'ordinal':
           case 'scaleBand':
-            yVal = this.item.value[yKey];
+            yVal = this.data.value[yKey];
             break;
 
           default:
@@ -209,7 +207,7 @@ Custom property | Description
             break;
         }
 
-        yUnit = this.completeSeriesConfig[this.item.name]['yAxisUnit'] ? ' ' + this.completeSeriesConfig[this.item.name]['yAxisUnit'] : '';
+        yUnit = this.completeSeriesConfig[this.seriesKey]['yAxisUnit'] ? ' ' + this.completeSeriesConfig[this.seriesKey]['yAxisUnit'] : '';
       }
 
       this.set('_displayedData', xVal + xUnit + slash + yVal + yUnit);
@@ -220,7 +218,7 @@ Custom property | Description
         return null;
       }
 
-      return item.value[this.completeSeriesConfig[item.name][key]];
+      return item.value[this.completeSeriesConfig[this.seriesKey][key]];
     },
 
     _disableClickFunc: function(disableClick) {

@@ -65,22 +65,26 @@ PxVisBehaviorRegister.itemShared = [{
     /**
      * A holder for a line of the register
      */
-    item: {
+    data: {
       type: Object
+    },
+
+    seriesKey: {
+      type: String
     },
     /**
      * Which flex classes get applied to make it side or top
      */
     _wrapperClass: {
       type: String,
-      computed: '_getWrapperClass(item, completeSeriesConfig)'
+      computed: '_getWrapperClass(seriesKey, type)'
     },
     /**
-     * The name of the item
+     * The name of the seriesKey
      */
     _configName: {
       type: String,
-      computed: '_computeConfigName(item, completeSeriesConfig)'
+      computed: '_computeConfigName(seriesKey)'
     },
     /**
      * The key holdiong the name of the item in the config
@@ -219,11 +223,9 @@ PxVisBehaviorRegister.itemShared = [{
   _getConfigName: function() {
 
     if(this.xAxisType === 'pie') {
-      return this.item.y;
+      return this.seriesKey.y;
     } else {
-      if(this.completeSeriesConfig && this.completeSeriesConfig[this.item.name]) {
-        return this.completeSeriesConfig[this.item.name]['name'];
-      }
+      return this.completeSeriesConfig[this.seriesKey][this.nameKey];
     }
   },
 
@@ -412,21 +414,21 @@ PxVisBehaviorRegister.generalItem = [{
      */
     _itemMutedToStart: {
       type: String,
-      computed: '_computeItemMutedToStart(item, completeSeriesConfig.*)'
+      computed: '_computeItemMutedToStart(seriesKey)'
     },
     /**
      * calcates the color of the item
      */
     _itemColor: {
       type: String,
-      computed: '_computeItemColor(item, completeSeriesConfig.*)'
+      computed: '_computeItemColor(seriesKey, completeSeriesConfig.*)'
     },
     /**
      * calculates the dash pattern of the item
      */
     _dashPattern: {
       type: String,
-      computed: '_computeItemDashPattern(item, completeSeriesConfig.*)'
+      computed: '_computeItemDashPattern(seriesKey)'
     },
     /**
       * Prevents the mute on click behavior
@@ -445,7 +447,7 @@ PxVisBehaviorRegister.generalItem = [{
      return;
    }
 
-    return this._mutedToStart(this.item.name);
+    return this._mutedToStart(this.seriesKey);
   },
 
   /**
@@ -464,7 +466,7 @@ PxVisBehaviorRegister.generalItem = [{
      return;
    }
 
-    return this.completeSeriesConfig[this.item.name] && this.completeSeriesConfig[this.item.name]['color'] ? this.completeSeriesConfig[this.item.name]['color'] : 'transparent';
+    return this.completeSeriesConfig[this.seriesKey] && this.completeSeriesConfig[this.seriesKey]['color'] ? this.completeSeriesConfig[this.seriesKey]['color'] : 'transparent';
   },
 
   /**
@@ -480,8 +482,8 @@ PxVisBehaviorRegister.generalItem = [{
      return;
    }
 
-      return this.completeSeriesConfig[this.item.name] && this.completeSeriesConfig[this.item.name]['dashPattern'] ?
-          this.completeSeriesConfig[this.item.name]['dashPattern'] :
+      return this.completeSeriesConfig[this.seriesKey] && this.completeSeriesConfig[this.seriesKey]['dashPattern'] ?
+          this.completeSeriesConfig[this.seriesKey]['dashPattern'] :
           '';
   },
 

@@ -138,7 +138,8 @@ Custom property | Description
                 <template is="dom-repeat" id="itemRepeat" items="[[_groups]]" rendered-item-count="{{_itemCount}}">
                   <px-vis-register-item
                     class$="[[tooltipStyle]]"
-                    item="[[item]]"
+                    data="[[_returnSeriesObj(tooltipData.*, item)]]"
+                    series-key="[[item]]"
                     dynamic-menu-config="[[dynamicMenuConfig]]"
                     complete-series-config="[[completeSeriesConfig]]"
                     type="[[type]]"
@@ -304,7 +305,7 @@ Custom property | Description
       '_scrollBarsPresent(_itemCount)',
       '_scrollBarsPresent(height, margin)',
       '_scrollBarsPresent(chartWidth, margin)',
-      '_computeSeries(tooltipData.series.*, groupings)'
+      '_computeSeries(completeSeriesConfig.*, groupings)'
      ],
 
     /**
@@ -341,6 +342,17 @@ Custom property | Description
         }
       }
     },
+
+    _getSeries: function() {
+      var series = Object.keys(this.completeSeriesConfig);
+      series.forEach(function(s,i) {
+        if(this.completeSeriesConfig[s]['hideInRegister']) {
+          series.splice(i, 1);
+        }
+      }.bind(this));
+
+      return series;
+    },
     /**
      * Returns the list of series with proper grouping.
      * Also sets _seriesKeys and _tooltipDataObj.
@@ -353,7 +365,7 @@ Custom property | Description
 
       this.debounce('computeSeries', function() {
         if(!this.inertRegister) {
-          var allSeries = this.tooltipData.series,
+          var allSeries = this._getSeries(),
               pivot = Math.ceil(allSeries.length / this.groupings),
               groupedSeries = [],
               s = 0,
@@ -424,6 +436,10 @@ Custom property | Description
 
       this.toggleClass('scrollOn', b, this.$.seriesWrap);
       this.set('_hasScrollBar', b);
+    },
+
+    _returnSeriesObj: function(data, key) {
+      return this.tooltipData.seriesObj[key];
     },
 
     _sortAlphbetically: function(a,b) {

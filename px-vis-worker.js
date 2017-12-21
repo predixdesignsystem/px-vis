@@ -118,6 +118,7 @@ function createDataStub() {
     'time': null,
     'timeSeriesKey': null,
     "series" : [],
+    "seriesObj" : {},
     "rawData" : [],
     "timeStamps" : [],
     "timeStampsTracker" : {},
@@ -270,7 +271,7 @@ function createSingleQuadtree(data) {
       quadtree;
 
     if(chartData) {
-        quadtree = d3.quadtree()
+      quadtree = d3.quadtree()
         .extent(visData.extents)
         .x(function(d) { return d.px; })
         .y(function(d) { return d.py; });
@@ -484,7 +485,8 @@ function constructDataObj(result, dataObj, k, visData, isSingle, xScale) {
   } else if(isSingle) {
 
     var rawData = this.dataMapping[visData.chartId][result.i];
-    dataObj.series.push(calcDataSingleQuadtree(rawData, k, visData));
+    dataObj.seriesObj[k] = calcDataSingleQuadtree(rawData, k, visData);
+    dataObj.series.push(dataObj.seriesObj[k]);
 
     // if we need to add crosshair data and are not doing all in area...
     // all in area gets calced else where rather than iteratively here
@@ -497,6 +499,7 @@ function constructDataObj(result, dataObj, k, visData, isSingle, xScale) {
         yScale = recreateD3Scale(visData.y[axis]),
         series = calcDataSeriesQuadtree(result, k, xScale, yScale, visData, axis);
 
+    dataObj.seriesObj[k] = series;
     dataObj.series.push(series);
 
     if(visData.timeData) {
