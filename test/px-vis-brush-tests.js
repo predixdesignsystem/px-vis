@@ -87,8 +87,7 @@ function runTests(){
 
       baseBrush.set('height',h);
 
-      window.setTimeout(function(){done()},500);
-      // done();
+      window.setTimeout(function() { done()}, 500);
     });
 
     test('baseBrush fixture is created', function() {
@@ -204,8 +203,7 @@ function runTests(){
       var d = [1397131620000,1397189940000];
 
       baseBrush.set('chartDomain',d);
-       window.setTimeout(function(){done()},200);
-      //done();
+       window.setTimeout(function() { done(); }, 200);
     });
 
     test('baseBrush._brush extents match', function() {
@@ -233,7 +231,7 @@ function runTests(){
 
       rect.dispatchEvent(e);
 
-      window.setTimeout(function(){done();},1500);
+      window.setTimeout(function(){ done(); }, 2000);
     });
 
     test('baseBrush._brush extents match', function() {
@@ -260,11 +258,8 @@ function runTests(){
       baseBrush = document.getElementById('baseBrush');
       var d = [1397102460000,1397219100000];
 
-      baseBrush.set('chartDomain',d);
-      window.setTimeout(function(){done()},500);
-      // flush(function() {
-      //   done();
-      // });
+      baseBrush.set('chartDomain', d);
+      window.setTimeout(function() { done(); }, 500);
 
     });
 
