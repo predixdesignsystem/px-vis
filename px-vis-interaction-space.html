@@ -674,7 +674,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      */
     _getDataForAllSeries: function(mousePos) {
       var x1 = this.xAxisType !== 'ordinal' && this.xAxisType !== 'scaleBand' ? this.x.invert(mousePos[0]) : null,
-          dataObj = this._returnTooltipDataStub(mousePos, x1); // setup a holder for our data
+          dataObj = this._returnTooltipDataStub(mousePos); // setup a holder for our data
 
       if(this.preventWebWorkerSynchronization ||
             this.xAxisType === 'ordinal' ||
@@ -686,7 +686,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       if((this.xAxisType === 'time' || this.xAxisType === 'timeLocal') &&
             this.searchFor !== 'point') {
-
+        dataObj.time = x1;
         this._searchLocally(mousePos, dataObj, x1);
         return;
       }
@@ -730,7 +730,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      *
      * @method _returnTooltipDataStub
      */
-    _returnTooltipDataStub: function(mousePos, x1) {
+    _returnTooltipDataStub: function(mousePos) {
       return this._createTooltipDataStub(mousePos, null, !this.showTooltip)
     },
 
