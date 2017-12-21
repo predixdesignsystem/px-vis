@@ -1,12 +1,10 @@
-v.4.6.0
+
 =================
 * Register Changes:
   * item: Simplified register data construction into a single string instead of multiple props
   * item: Replaces number formatter with the no display version
   * Changed scrollBarsPresent observer so it only fires on a renderedItemCount change instead of dom-change
   * Unified pie and regular to both use scrollBarsPresent
-
-
 
 v4.6.0
 =================
