@@ -16,12 +16,12 @@ function runTests(){
     suiteSetup(function() {
       emptySVG = document.getElementById('empty');
     });
-test('emptySVG fixture is created', function() {
+    test('emptySVG fixture is created', function() {
       assert.isDefined(emptySVG);
     });
 
     test('emptySVG creates an svg', function() {
-
+debugger
       assert.equal(Polymer.dom(emptySVG.root).querySelector('#chartSVG').tagName ,'svg');
     });
 
@@ -36,7 +36,7 @@ test('emptySVG fixture is created', function() {
     suiteSetup(function() {
       missingHeight = document.getElementById('missingHeight');
     });
-test('missingHeight fixture is created', function() {
+    test('missingHeight fixture is created', function() {
       assert.isDefined(missingHeight);
     });
 
@@ -56,7 +56,7 @@ test('missingHeight fixture is created', function() {
     suiteSetup(function() {
       decSVG = document.getElementById('decSVG');
     });
-test('decSVG fixture is created', function() {
+    test('decSVG fixture is created', function() {
       assert.isDefined(decSVG);
     });
 
@@ -118,7 +118,7 @@ test('decSVG fixture is created', function() {
   suite('px-vis-svg updates imperitively', function() {
     var eventObj,
         updateSVG,
-        chartSVG = updateSVG.querySelector('#chartSVG'),
+        chartSVG,
         w = 400,
         h = 200;
 
@@ -160,12 +160,13 @@ test('decSVG fixture is created', function() {
 
   suite('px-vis-svg runs with an offset', function() {
     var offsetSVG;
-    var chartSVG = offsetSVG.querySelector('#chartSVG');
+    var chartSVG;
 
     suiteSetup(function() {
       offsetSVG = document.getElementById('offsetSVG');
+      chartSVG = offsetSVG.querySelector('#chartSVG');
     });
-test('offsetSVG fixture is created', function() {
+    test('offsetSVG fixture is created', function() {
       assert.isDefined(offsetSVG);
     });
 

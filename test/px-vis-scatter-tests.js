@@ -95,7 +95,7 @@ function runTests(){
     });
 
     test('baseScatter scatter series has the right color', function() {
-      assert.equal(baseScatter.scatterDots.attr('stroke').split(' ').join(''),colorSet[0]);
+      assert.equal(baseScatter.scatterGroup.attr('stroke').split(' ').join(''),colorSet[0]);
     });
 
     test('baseScatter scatterDots markerSize is default', function() {
@@ -233,13 +233,13 @@ function runTests(){
       assert.equal(mutedScatter1.scatterGroup.attr('series-id'),'scatter_mySeries');
     });
     test('mutedScatter1 scatter series has the right stroke opacity', function() {
-      assert.equal(mutedScatter1.scatterDots.attr('stroke-opacity'),1);
+      assert.equal(mutedScatter1.scatterGroup.attr('stroke-opacity'),1);
     });
     test('mutedScatter1 scatter series has the right fill opacity', function() {
-      assert.equal(mutedScatter1.scatterDots.attr('fill-opacity'),'0.6');
+      assert.equal(mutedScatter1.scatterGroup.attr('fill-opacity'),'0.6');
     });
     test('mutedScatter1 scatter series has the right color', function() {
-      assert.equal(mutedScatter1.scatterDots.attr('stroke').split(' ').join(''),colorSet[0]);
+      assert.equal(mutedScatter1.scatterGroup.attr('stroke').split(' ').join(''),colorSet[0]);
     });
     test('mutedScatter1 scatterDots markerSize is correct', function() {
       assert.equal(mutedScatter1.scatterDots.attr('transform').split('scale')[1],'(1)');
@@ -271,13 +271,13 @@ function runTests(){
       assert.equal(mutedScatter2.scatterGroup.attr('series-id'),'scatter_mySeries2');
     });
     test('mutedScatter2 scatter series has the right stroke opacity', function() {
-      assert.equal(mutedScatter2.scatterDots.attr('stroke-opacity'),1);
+      assert.equal(mutedScatter2.scatterGroup.attr('stroke-opacity'),1);
     });
     test('mutedScatter2 scatter series has the right fill opacity', function() {
-      assert.equal(mutedScatter2.scatterDots.attr('fill-opacity'),0.6);
+      assert.equal(mutedScatter2.scatterGroup.attr('fill-opacity'),0.6);
     });
     test('mutedScatter2 scatter series has the right color', function() {
-      assert.equal(mutedScatter2.scatterDots.attr('stroke').split(' ').join(''),colorSet[1]);
+      assert.equal(mutedScatter2.scatterGroup.attr('stroke').split(' ').join(''),colorSet[1]);
     });
     test('mutedScatter2 scatterDots markerSize is correct', function() {
       assert.equal(mutedScatter2.scatterDots.attr('transform').split('scale')[1],'(1)');
@@ -329,29 +329,29 @@ function runTests(){
     });
 
     test('mutedScatter1 scatter series has the right stroke opacity', function() {
-      assert.equal(mutedScatter1.scatterDots.attr('stroke-opacity'),1);
+      assert.equal(mutedScatter1.scatterGroup.attr('stroke-opacity'),1);
     });
     test('mutedScatter1 scatter series has the right fill opacity', function() {
-      assert.equal(mutedScatter1.scatterDots.attr('fill-opacity'),0.6);
+      assert.equal(mutedScatter1.scatterGroup.attr('fill-opacity'),0.6);
     });
     test('mutedScatter1 scatter series has the stroke right color', function() {
-      assert.equal(mutedScatter1.scatterDots.attr('stroke').split(' ').join(''),colorSet[0]);
+      assert.equal(mutedScatter1.scatterGroup.attr('stroke').split(' ').join(''),colorSet[0]);
     });
     test('mutedScatter1 scatter series has the fill right color', function() {
-      assert.equal(mutedScatter1.scatterDots.attr('fill').split(' ').join(''),colorSet[0]);
+      assert.equal(mutedScatter1.scatterGroup.attr('fill').split(' ').join(''),colorSet[0]);
     });
 
     test('mutedScatter2 scatter series has the right stroke opacity', function() {
-      assert.equal(mutedScatter2.scatterDots.attr('stroke-opacity'),0);
+      assert.equal(mutedScatter2.scatterGroup.attr('stroke-opacity'),0);
     });
     test('mutedScatter2 scatter series has the right fill opacity', function() {
-      assert.equal(mutedScatter2.scatterDots.attr('fill-opacity'),0.3);
+      assert.equal(mutedScatter2.scatterGroup.attr('fill-opacity'),0.3);
     });
     test('mutedScatter2 scatter series has the stroke right color', function() {
-      assert.equal(mutedScatter2.scatterDots.attr('stroke').split(' ').join(''),colorSet[1]);
+      assert.equal(mutedScatter2.scatterGroup.attr('stroke').split(' ').join(''),colorSet[1]);
     });
     test('mutedScatter2 scatter series has the fill right color', function() {
-      assert.equal(mutedScatter2.scatterDots.attr('fill').split(' ').join(''),colorSet[1]);
+      assert.equal(mutedScatter2.scatterGroup.attr('fill').split(' ').join(''),colorSet[1]);
     });
   }); //suite
 
@@ -383,29 +383,29 @@ function runTests(){
     });
 
     test('mutedScatter1 scatter series has the right stroke opacity', function() {
-      assert.equal(mutedScatter1.scatterDots.attr('stroke-opacity'),1);
+      assert.equal(mutedScatter1.scatterGroup.attr('stroke-opacity'),1);
     });
     test('mutedScatter1 scatter series has the right fill opacity', function() {
-      assert.equal(mutedScatter1.scatterDots.attr('fill-opacity'),0.6);
+      assert.equal(mutedScatter1.scatterGroup.attr('fill-opacity'),0.6);
     });
     test('mutedScatter1 scatter series has the stroke right color', function() {
-      assert.equal(mutedScatter1.scatterDots.attr('stroke').split(' ').join(''),colorSet[0]);
+      assert.equal(mutedScatter1.scatterGroup.attr('stroke').split(' ').join(''),colorSet[0]);
     });
     test('mutedScatter1 scatter series has the fill right color', function() {
-      assert.equal(mutedScatter1.scatterDots.attr('fill').split(' ').join(''),colorSet[0]);
+      assert.equal(mutedScatter1.scatterGroup.attr('fill').split(' ').join(''),colorSet[0]);
     });
 
     test('mutedScatter2 scatter series has the right stroke opacity', function() {
-      assert.equal(mutedScatter2.scatterDots.attr('stroke-opacity'),1);
+      assert.equal(mutedScatter2.scatterGroup.attr('stroke-opacity'),1);
     });
     test('mutedScatter2 scatter series has the right fill opacity', function() {
-      assert.equal(mutedScatter2.scatterDots.attr('fill-opacity'),0.6);
+      assert.equal(mutedScatter2.scatterGroup.attr('fill-opacity'),0.6);
     });
     test('mutedScatter2 scatter series has the stroke right color', function() {
-      assert.equal(mutedScatter2.scatterDots.attr('stroke').split(' ').join(''),colorSet[1]);
+      assert.equal(mutedScatter2.scatterGroup.attr('stroke').split(' ').join(''),colorSet[1]);
     });
     test('mutedScatter2 scatter series has the fill right color', function() {
-      assert.equal(mutedScatter2.scatterDots.attr('fill').split(' ').join(''),colorSet[1]);
+      assert.equal(mutedScatter2.scatterGroup.attr('fill').split(' ').join(''),colorSet[1]);
     });
 
   }); //suite

@@ -251,7 +251,7 @@ Custom property | Description
       if(this.verticalLine !== 'none') {
         this._drawVerticalLines();
       }
-      // FIXME: WTF is this?!?
+      // FIXME: WTF is this?
       if(this.radialAreaCursor) {
         this._drawRadiusCursor();
       }
@@ -528,9 +528,20 @@ Custom property | Description
           }.bind(this))
         .attr('transform', function(d, i) {
           var xKey = this._mutedCompleteSeriesConfig[this.tooltipData.series[i].name]['x'],
+              yKey = this._mutedCompleteSeriesConfig[this.tooltipData.series[i].name]['y'],
               angle = this.tooltipData.series[i]['value'][xKey];
 
-          angle = angle || angle === 0 ? this._adjustAngleForPolarChart(angle, true) : 0;
+          if(angle || angle === 0) {
+            if(this.tooltipData.series[i]['value'][yKey] < 0 && !this.allowNegativeValues) {
+              angle = this.useDegrees ? angle - 180 : angle - Math.PI;
+            }
+
+            angle = this._adjustAngleForPolarChart(angle, this.useDegrees);
+
+          } else {
+            angle = 0;
+          }
+
 
           return 'rotate(' + angle + ')';
         }.bind(this));

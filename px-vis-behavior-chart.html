@@ -1509,6 +1509,81 @@ PxVisBehaviorChart.mutedAxes = {
   },
 };
 
+/*
+    Name:
+    PxVisBehaviorChart.multiAxisLasso
+
+    Description:
+    Behavior providing property lasso methods for multi-axis charts
+    @polymerBehavior PxVisBehaviorChart.multiAxisLasso
+*/
+PxVisBehaviorChart.multiAxisLasso = {
+  properties: {
+    _lassoCrosshairData: {
+      type: Object,
+      value: function() { return {}; }
+    },
+    /**
+     * When switched clears all the previous selection made
+     * (in _lassoCrosshairData)
+     */
+     resetLassoData: {
+      type: Boolean,
+      value: false,
+      observer: '_resetLasso'
+    }
+  },
+
+  lasso: function() {
+    var yScale = this.isMultiY ? this.y[this.extentsData.dimension] : this.y;
+
+    for(var i = 0; i < this.chartData.length; i++) {
+      this._searchForDataInArea(this.extentsData.dimension, yScale, this.chartData[i], this.extentsData.extents);
+    }
+
+    this._calcLassoData(this.extentsData.dimension);
+  },
+
+  _searchForDataInArea: function(dim, y, d, ext) {
+    if(this._combinedMutedSeries[d[this.seriesKey]]) {
+      return;
+    }
+    if(y.domain()[0] > d[dim] || d[dim] > y.domain()[1]) {
+      return;
+    }
+    if(this.timeDomain && this.timeDomain.x &&
+        (d[this.seriesKey] < this.timeDomain.x[0] || d[this.seriesKey] > this.timeDomain.x[1])) {
+      return;
+    }
+
+    var dpx = y(d[dim]);
+    if(dpx >= ext[0] && dpx <= ext[1]) {
+      this._lassoCrosshairData[d[this.seriesKey]] = d;
+    }
+  },
+
+  _calcLassoData: function(dim) {
+    var keys = Object.keys(this._lassoCrosshairData),
+        combined = {detail: {
+          rawData: [],
+          timeStamps: keys
+        }};
+
+    for(var i=0; i< keys.length; i++) {
+      combined.detail.rawData.push(this._lassoCrosshairData[keys[i]]);
+    }
+
+    this._calcCrosshair(combined);
+  },
+
+  _resetLasso: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    this._lassoCrosshairData = {};
+  },
+};
 
 /*
     Name:
@@ -1525,7 +1600,8 @@ PxVisBehaviorChart.extentsDataRouter = [{
       value: function() {
         return {
           zoom: 'zoom',
-          pan: 'pan'
+          pan: 'pan',
+          lasso: 'lasso'
         }
       }
     }
@@ -2342,9 +2418,13 @@ PxVisBehaviorChart.axisRegister = [{
       for(var i=0; i<this._axisRegisterTooltipData.series.length; i++) {
         var newSeries = {},
             name = this._axisRegisterTooltipData.series[i].name;
+
         newSeries.name = name;
 
-        if(values && (values[name] || values[name] === 0)) {
+        if(values &&
+            (values[name] || values[name] === 0) &&
+            (!this.hardMute || !this.mutedAxes[name])) {
+
           newSeries.value = {};
           newSeries.value[name] = values[name];
         }
@@ -2961,5 +3041,63 @@ PxVisBehaviorChart.useCategoryInTooltip = {
     }
   }
 };
+
+/*
+    Name:
+    PxVisBehaviorChart.tooltipSizing
+
+    Description:
+    Behavior providing tooltipSizing property
+    @polymerBehavior PxVisBehaviorChart.tooltipSizing
+*/
+PxVisBehaviorChart.tooltipSizing = [{
+  properties: {
+    _svgClientRect: Object,
+    _canvasClientRect: Object,
+    _winX: Number,
+    _winY: Number
+  },
+
+  observers: [
+    '_setupSizingListener(showTooltip)'
+  ],
+
+  detached: function() {
+    this.removeEventListener('px-vis-tooltip-sizing-request', this._getSizingBound);
+  },
+
+  attached: function() {
+    this._getSizingBound = this._getSizing.bind(this);
+    this._setupSizingListener();
+  },
+
+  _setupSizingListener: function() {
+    if(this.showTooltip) {
+      this.addEventListener('px-vis-tooltip-sizing-request', this._getSizingBound);
+
+    } else {
+      this.removeEventListener('px-vis-tooltip-sizing-request', this._getSizingBound);
+
+    }
+  },
+
+  _getSizing: function() {
+    requestAnimationFrame(this._getImmediateSizing.bind(this));
+  },
+
+  _getImmediateSizing: function() {
+    if(this.pxSvgElem) {
+      this._svgClientRect = this.pxSvgElem.getBoundingClientRect();
+    }
+
+    if(this.canvasContext && this.canvasContext.canvas) {
+      this._canvasClientRect = this.canvasContext.canvas.getBoundingClientRect();
+    }
+
+    this._winX = window.pageXOffset;
+    this._winY = window.pageYOffset;
+  }
+},
+PxVisBehaviorChart.showTooltip];
 
 </script>

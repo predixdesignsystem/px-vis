@@ -2449,6 +2449,29 @@ PxVisBehavior.actionConfigGeneric = {
     @polymerBehavior PxVisBehavior.applyActionConfig
 */
 PxVisBehavior.applyActionConfig = [{
+  properties: {
+    /**
+    * how many handlers are currently setup for each event type
+    */
+    handlersCount: {
+      type: Object,
+      value: function() {
+        return {};
+      }
+    }
+  },
+
+  _deletePreviousActions: function(d3Elem, eventType) {
+    var keys = Object.keys(this.handlersCount),
+        count = this.handlersCount[eventType] ? this.handlersCount[eventType] : 0;
+
+    //delete all handlers
+    for(var j=0; j<count; j++) {
+      d3Elem.on(eventType + '.' + j, null);
+    }
+
+    this.handlersCount[eventType] = 0;
+  },
   /**
    * Set up normal listener actions
    *
@@ -2457,6 +2480,7 @@ PxVisBehavior.applyActionConfig = [{
     var keys = Object.keys(this.actionConfig),
         mouseEvent,
         action,
+        allActions,
         bindingContext = this,
         toBeUsed,
         noChartContext;
@@ -2469,45 +2493,46 @@ PxVisBehavior.applyActionConfig = [{
         continue;
       }
 
-      action = this.actionConfig[keys[i]];
-      mappedAction = this[this.actionMapping[action]];
-      noChartContext = false;
+      allActions = Array.isArray(this.actionConfig[keys[i]]) ? this.actionConfig[keys[i]] : [this.actionConfig[keys[i]]];
 
+      //make sure we delete all previous handlers
+      this._deletePreviousActions(d3Elem, mouseEvent);
 
+      for(var j=0; j<allActions.length; j++) {
+        action = allActions[j];
+        mappedAction = this[this.actionMapping[action]];
+        noChartContext = false;
 
-      //is this a function defined heere
-      if(mappedAction && typeof mappedAction === 'function') {
-        //we don't need to remove previous handlers as if they have the same
-        //mouseEVent name then they will be overriden
-        toBeUsed = mappedAction;
-        noChartContext = true;
-      } else if(typeof action === 'function') {
-        toBeUsed = action;
-      } else if(typeof action === 'string' && action && action != 'null') {
-        toBeUsed = eval('var f = function() { return ' + action + ';}; f();');
-      } else {
-        toBeUsed = null;
-      }
+        //is this a function defined heere
+        if(mappedAction && typeof mappedAction === 'function') {
 
-      if(toBeUsed) {
-        var wrapper;
-        if(noChartContext) {
-          wrapper = toBeUsed.bind(this);
+          toBeUsed = mappedAction;
+          noChartContext = true;
+        } else if(typeof action === 'function') {
+          toBeUsed = action;
+        } else if(typeof action === 'string' && action && action != 'null') {
+          toBeUsed = eval('var f = function() { return ' + action + ';}; f();');
         } else {
-          //now ensure the action will be run within the context of the chart
-        var _this = this;
-
-        wrapper = function(evt) {
-            _this.fire('px-vis-action-request', {'function': this, 'data': {'mouseCoords': Px.d3.mouse(elem), 'target': elem}});
-          }.bind(toBeUsed);
+          toBeUsed = null;
         }
 
-        d3Elem.on(mouseEvent, wrapper);
-      } else {
-        //remove listener
-        d3Elem.on(mouseEvent, null);
-      }
+        if(toBeUsed) {
+          var wrapper;
+          if(noChartContext) {
+            wrapper = toBeUsed.bind(this);
+          } else {
+            //now ensure the action will be run within the context of the chart
+          var _this = this;
 
+          wrapper = function(evt) {
+              _this.fire('px-vis-action-request', {'function': this, 'data': {'mouseCoords': Px.d3.mouse(elem), 'target': elem}});
+            }.bind(toBeUsed);
+          }
+
+          d3Elem.on(mouseEvent + '.' + j, wrapper);
+          this.handlersCount[mouseEvent]++;
+        }
+      }
     }
   }
 }, PxVisBehavior.actionConfigGeneric];
@@ -3346,6 +3371,11 @@ PxVisBehavior.annotationData = {
       value: function() {
         return [];
       }
+    },
+
+    showStrongIcon: {
+      type: Boolean,
+      value: false
     }
   }
 };

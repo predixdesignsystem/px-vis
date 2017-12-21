@@ -90,8 +90,9 @@ function runTests() {
       assert.deepEqual(toolbar.actionConfig, {
         mouseout: "resetTooltip",
         mousemove: "calcTooltipData",
-        mousedown: "null",
-        mouseup: "null"
+        click: null,
+        mousedown: null,
+        mouseup: null
       });
     });
   });
@@ -169,7 +170,10 @@ function runTests() {
     test('toolbar actionConfig', function() {
       assert.deepEqual(toolbar.actionConfig, {
         mousedown: 'startZooming',
-        mouseup: 'stopZooming'
+        mouseup: 'stopZooming',
+        click: null,
+        mousemove: null,
+        mouseout: null
       });
     });
   });
@@ -303,7 +307,8 @@ function runTests() {
         'mousedown': 'startStriping',
         'mouseup': 'stopStriping',
         'mouseout': 'resetTooltip',
-        'mousemove': 'calcTooltipData'
+        'mousemove': 'calcTooltipData',
+        'click': null
       });
     });
   });
@@ -345,7 +350,8 @@ function runTests() {
         'mousedown': 'startStriping',
         'mouseup': 'stopStriping',
         'mouseout': 'resetTooltip',
-        'mousemove': 'calcTooltipData'
+        'mousemove': 'calcTooltipData',
+        'click': null
       });
     });
   });

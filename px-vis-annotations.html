@@ -55,7 +55,7 @@ Custom property | Description
         <px-icon
           icon="px-com:comment"
           data="[[item]]"
-          class="annotation--icon"
+          class$="annotation--icon [[strongClass]]"
           style$="[[_getTransform(item, x, y, domainChanged, completeSeriesConfig, forceRecalc, hide)]]"
           on-mouseover="_mouseOver"
           on-mouseleave="_mouseLeave"
@@ -158,14 +158,23 @@ Custom property | Description
       hide: {
         type: Boolean,
         value: false
+      },
+
+      strongClass: {
+        type: String,
+        value: '',
+        computed: '_computeStrongClass(showStrongIcon)'
       }
     }, //properties
+
+    _computeStrongClass: function(strong) {
+      return strong ? 'strong' : '';
+    },
 
     _getTransform: function(item) {
       if(this.hasUndefinedArguments(arguments)) {
         return;
       }
-
 
       var coords,
           oob;
@@ -188,7 +197,7 @@ Custom property | Description
       } else {
         coords[0] -= this._iconWidth/2;
         coords[1] -= this._iconHeight;
-        return 'transform: translate(' + coords[0] + 'px,' + coords[1] + 'px)';
+        return 'transform: translate(' + Math.floor(coords[0]) + 'px,' + Math.floor(coords[1]) + 'px)';
       }
     },
 

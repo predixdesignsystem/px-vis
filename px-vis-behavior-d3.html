@@ -1761,6 +1761,19 @@ PxVisBehaviorD3.scatterMarkers = {
             context.rect(-w, -t, w, t);
           }
         },
+        'caret': {
+          draw: function(context, size) {
+            var sqrt3 = Math.sqrt(3),
+                y = -Math.sqrt(size / (sqrt3 * 3));
+            context.moveTo(0, y * 2);
+            context.lineTo(-sqrt3 * y, -y);
+            // context.lineTo(-sqrt3 * y + 1, -y);
+            context.lineTo(0, y * 2);
+            // context.lineTo(sqrt3 * y - 1, -y);
+            context.lineTo(sqrt3 * y, -y);
+            context.closePath();
+          }
+        },
         'thin-bar': {
           draw: function(context, size) {
             var w = Math.sqrt(size),
@@ -2009,4 +2022,48 @@ PxVisBehaviorD3.cursorIcon = [{
   }
 
 }, PxVisBehavior.observerCheck, PxVisBehaviorD3.icons];
+
+
+/*
+  Name:
+  PxVisBehaviorD3.scatterArrow
+
+  Description:
+  Polymer behavior that provides the properties for the arrow option on scatter.
+
+  Dependencies:
+  - D3.js
+
+  @polymerBehavior PxVisBehaviorD3.scatterArrow
+*/
+PxVisBehaviorD3.scatterArrow = {
+  properties: {
+    /*
+    * Boolean to indicate if arrows should be drawn
+    */
+    showArrows: {
+      type: Boolean,
+      value: false
+    },
+    /*
+    * Configuration options for the arrow
+    * - `symbol`: the symbol name from `markerMapping`. Default: `caret
+    * - `size`: the size of the symbol.
+    * - `scale`: the scale of the symbol (another way to size). Default: 1
+    * - `minLength`: the minimum segment length between points which should get an arrow. Lengths below this min value will not get an arrow. Default: 10
+    *
+    */
+    arrowConfig: {
+      type: Boolean,
+      value: function() {
+        return {
+          symbol: 'caret',
+          size: 24,
+          scale: 1,
+          minLength: 10
+        }
+      }
+    }
+  }
+};
 </script>
