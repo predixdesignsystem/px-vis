@@ -169,33 +169,33 @@ Custom property | Description
           yVal = '',
           yUnit = '';
 
-      //process X val
-      if(this.data && this.data.value && (this.data.value[xKey] || this.data.value[xKey] === 0)) {
-        switch(this.xAxisType) {
-          case 'time':
-          case 'timeLocal':
-            xVal = '';
-            xUnit = '';
-            slash = '';
-            break;
-
-          case 'ordinal':
-          case 'scaleBand':
-            xVal = this.data.value[xKey];
-            xUnit = this.completeSeriesConfig[this.seriesKey]['xAxisUnit'] ? ' ' + this.completeSeriesConfig[this.seriesKey]['xAxisUnit'] : '';
-            slash = ' / ';
-            break;
-
-          default:
-            xVal = this._formattedX;
-            xUnit = this.completeSeriesConfig[this.seriesKey]['xAxisUnit'] ? ' ' + this.completeSeriesConfig[this.seriesKey]['xAxisUnit'] : '';
-            slash = ' / ';
-            break;
-        }
-      }
-
-      //process Y val
       if(this.data && this.data.value && (this.data.value[yKey] || this.data.value[yKey] === 0)) {
+        //process X val
+        if(this.data.value[xKey] || this.data.value[xKey] === 0) {
+          switch(this.xAxisType) {
+            case 'time':
+            case 'timeLocal':
+              xVal = '';
+              xUnit = '';
+              slash = '';
+              break;
+
+            case 'ordinal':
+            case 'scaleBand':
+              xVal = this.data.value[xKey];
+              xUnit = this.completeSeriesConfig[this.seriesKey]['xAxisUnit'] ? ' ' + this.completeSeriesConfig[this.seriesKey]['xAxisUnit'] : '';
+              slash = ' / ';
+              break;
+
+            default:
+              xVal = this._formattedX;
+              xUnit = this.completeSeriesConfig[this.seriesKey]['xAxisUnit'] ? ' ' + this.completeSeriesConfig[this.seriesKey]['xAxisUnit'] : '';
+              slash = ' / ';
+              break;
+          }
+        }
+
+        //process Y val
         switch(this.yAxisType) {
           case 'ordinal':
           case 'scaleBand':
@@ -213,12 +213,13 @@ Custom property | Description
       this.set('_displayedData', xVal + xUnit + slash + yVal + yUnit);
     },
 
-    _returnValue: function(item, key) {
-      if(!item || !this.completeSeriesConfig || !item.value) {
+    _returnValue: function(d, key) {
+      if(!d || !this.completeSeriesConfig || !d.value ||
+          d.value[this.completeSeriesConfig[this.seriesKey][key]] === undefined) {
         return null;
       }
 
-      return item.value[this.completeSeriesConfig[this.seriesKey][key]];
+      return d.value[this.completeSeriesConfig[this.seriesKey][key]];
     },
 
     _disableClickFunc: function(disableClick) {
