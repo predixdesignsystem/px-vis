@@ -1,3 +1,4 @@
+v.4.6.0
 =================
 * Fix polar cursor handling of negative data
 * Added ability to the web worker to return all datapoints at a particular point
