@@ -2,7 +2,7 @@
 <link rel="import" href="px-vis-behavior-common.html"/>
 <link rel="import" href="px-vis-behavior-register.html"/>
 <link rel="import" href="px-vis-dynamic-menu.html"/>
-<link rel="import" href="../px-number-formatter/px-number-formatter.html" />
+<link rel="import" href="../px-number-formatter/px-number-formatter-no-display.html" />
 <link rel="import" href="css/px-vis-register-styles.html">
 
 <!--
@@ -77,55 +77,44 @@ Custom property | Description
               <px-tooltip delay="500">[[_configName]]</px-tooltip>
             </template>
           </div>
-          <!-- Display serie data differently depending on x and y axis types -->
           <!-- Use inline flex to avoid the browser adding spaces between our sub elements-->
           <div class="seriesData flex__item--msfix" name$="R{{item.name}}">
-            <!-- if x axis is number format and show it -->
-            <template is="dom-if" if="[[_isOfType(xAxisType, 'linear')]]" on-dom-change="_xFormatterChanged" strip-whitespace>
-              <px-number-formatter
+            <template is="dom-if" if="[[_isOfType(xAxisType, 'linear')]]">
+              <px-number-formatter-no-display
                 id="xFormatter"
-                class$="[[_ttStyle]]"
+                value="[[_returnValue(item, 'x')]]"
                 format="[[numberFormat]]"
                 culture="[[numberFormatCulture]]"
                 currency$="[[numberFormatIsCurrency]]"
                 default-currency-format="[[numberFormatCurrency]]"
-                zero-format="[[numberFormatZero]]">&nbsp;
-              </px-number-formatter>[[_xUnit]][[_slash]]
+                zero-format="[[numberFormatZero]]"
+                formatted-value="{{_formattedX}}">
+              </px-number-formatter-no-display>
             </template>
-            <!-- if x axis is ordinal just display it -->
-            <template is="dom-if" if="[[_isOfType(xAxisType, 'ordinal')]]" on-dom-change="_xSpanChanged" strip-whitespace>
-              <span id="xSpan">[[_itemX]]</span>[[_xUnit]][[_slash]]&nbsp;
-            </template>
-            <!-- if x axis is time don't display it -->
-            <!-- if y axis is number format and show it -->
-              <template is="dom-if" if="[[_isOfType(yAxisType, 'linear')]]" on-dom-change="_yFormatterChanged" strip-whitespace>
-                <px-number-formatter
-                  id="yFormatter"
-                  class$="[[_ttStyle]]"
-                  format="[[numberFormat]]"
-                  culture="[[numberFormatCulture]]"
-                  currency$="[[numberFormatIsCurrency]]"
-                  default-currency-format="[[numberFormatCurrency]]"
-                  zero-format="[[numberFormatZero]]">&nbsp;
-                </px-number-formatter>
-              </template>
-              <!-- if y axis is ordinal just display it -->
-              <template is="dom-if" if="[[_isOfType(yAxisType, 'ordinal')]]" on-dom-change="_ySpanChanged" strip-whitespace>
-                <span id="ySpan">[[_itemY]]</span>
-              </template>[[_yUnit]]
-            </div>
-          </span>
+            <px-number-formatter-no-display
+              id="yFormatter"
+              value="[[_returnValue(item, 'y')]]"
+              format="[[numberFormat]]"
+              culture="[[numberFormatCulture]]"
+              currency$="[[numberFormatIsCurrency]]"
+              default-currency-format="[[numberFormatCurrency]]"
+              zero-format="[[numberFormatZero]]"
+              formatted-value="{{_formattedY}}">
+            </px-number-formatter-no-display>
+            [[_displayedData]]
+          </div>
         </span>
-        <template id="menuTemplate" is="dom-if" if="[[_hasDynamicMenu]]">
-          <px-vis-dynamic-menu
-              id="menu"
-              class$="[[_getDynamicMenuClass(type)]]"
-              style="display: none"
-              additional-detail="[[item]]"
-              dynamic-menu-config="[[dynamicMenuConfig]]">
-          </px-vis-dynamic-menu>
-        </template>
       </span>
+      <template id="menuTemplate" is="dom-if" if="[[_hasDynamicMenu]]">
+        <px-vis-dynamic-menu
+            id="menu"
+            class$="[[_getDynamicMenuClass(type)]]"
+            style="display: none"
+            additional-detail="[[item]]"
+            dynamic-menu-config="[[dynamicMenuConfig]]">
+        </px-vis-dynamic-menu>
+      </template>
+    </span>
   </template>
 </dom-module>
 
@@ -146,122 +135,97 @@ Custom property | Description
       PxVisBehaviorRegister.disableClick
     ],
     properties: {
-      /**
-       * The units for the x value.
-       */
-      _xUnit: {
-        type: String
+      _formattedX: {
+        type: String,
+        value: ''
       },
-      /**
-       * The units for the y value.
-       */
-      _yUnit: {
-        type: String
+      _formattedY: {
+        type: String,
+        value: ''
       },
-      /**
-       * Calculates the value for x.
-       */
-      _itemX: {
-        type: Number,
-        notify: false
-      },
-      _slash: {
-        type: String
-      },
-      /**
-       * Calculates the value of y.
-       */
-      _itemY: {
-        type: Number,
-        notify: false
-      },
-      /**
-      * Used to style the px-number-formatter to match the register styling.
-      * Should be 'light' or 'dark'.
-      */
-      _ttStyle: {
-        type: String
+      _displayedData: {
+        type: String,
+        value: ''
       }
     },
 
     observers: [
       '_toggleSeries(item,mutedSeries.*)',
       '_disableClickFunc(disableClick)',
-      '_computeItem(item, completeSeriesConfig.*)'
+      '_computeItem(_formattedY)'
     ],
 
-    _xFormatterChanged: function() {
-      this.$.xFormatter = Polymer.dom(this.root).querySelector('#xFormatter');
-      this._computeItem(this.item, this.completeSeriesConfig);
-    },
-    _yFormatterChanged: function() {
-      this.$.yFormatter = Polymer.dom(this.root).querySelector('#yFormatter');
-      this._computeItem(this.item, this.completeSeriesConfig);
-    },
-    _xSpanChanged: function() {
-      this.$.xSpan = Polymer.dom(this.root).querySelector('#xSpan');
-      this._computeItem(this.item, this.completeSeriesConfig);
-    },
-    _ySpanChanged: function() {
-      this.$.ySpan = Polymer.dom(this.root).querySelector('#ySpan');
-      this._computeItem(this.item, this.completeSeriesConfig);
-    },
-
-    _computeItem: function(item, completeSeriesConfig) {
+    _computeItem: function() {
       if(this.hasUndefinedArguments(arguments)) {
         return;
       }
 
-      // this was moved to manual instead of a binding for performance reasons which may or may not legit. One day we should revisit and see if it really matters
       this.debounce("numberFormatterValues", function() {
-        if(this.completeSeriesConfig && this.completeSeriesConfig[item.name]) {
-
-          var xKey = this.completeSeriesConfig[item.name]['x'],
-              yKey = this.completeSeriesConfig[item.name]['y'];
-
-          //process X val
-          if(item.value && (item.value[xKey] || item.value[xKey] === 0)) {
-            //manually assign value rather than bind because we needs the
-            //perf boost here (this might me called a lot wqhen hovering the
-            //chart and having a lot of different series
-            if(this.$.xFormatter) {
-              this.$.xFormatter.set('value', item.value[xKey]);
-            } else if(this.$.xSpan) {
-              this.$.xSpan.textContent = item.value[xKey];
-            }
-            this.set('_slash', ' / ');
-            this.set('_xUnit', this.completeSeriesConfig[item.name]['xAxisUnit']);
-          } else {
-            if(this.$.xFormatter) {
-              this.$.xFormatter.set('value', null);
-            } else if(this.$.xSpan) {
-              this.$.xSpan.textContent = null;
-            }
-            this.set('_slash', '');
-            this.set('_xUnit', '');
-          }
-
-          //process Y val
-          if(item.value && (item.value[yKey] || item.value[yKey] === 0)) {
-            //manually assign value rather than bind because we needs the
-            //perf boost here (this might me called a lot wqhen hovering the
-            //chart and having a lot of different series
-            if(this.$.yFormatter) {
-              this.$.yFormatter.set('value', item.value[yKey]);
-            } else if(this.$.ySpan) {
-              this.$.ySpan.textContent = item.value[yKey];
-            }
-            this.set('_yUnit', this.completeSeriesConfig[item.name]['yAxisUnit']);
-          } else {
-            if(this.$.yFormatter) {
-              this.$.yFormatter.set('value', null);
-            } else if(this.$.ySpan) {
-              this.$.ySpan.textContent = null;
-            }
-            this.set('_yUnit', '');
-          }
+        if(this.completeSeriesConfig && this.completeSeriesConfig[this.item.name]) {
+          this._computeItemDebounced();
         }
       }, 10);
+    },
+
+    _computeItemDebounced: function() {
+      var xKey = this.completeSeriesConfig[this.item.name]['x'],
+          yKey = this.completeSeriesConfig[this.item.name]['y'],
+          xVal = '',
+          xUnit = '',
+          slash = '',
+          yVal = '',
+          yUnit = '';
+
+      //process X val
+      if(this.item.value && (this.item.value[xKey] || this.item.value[xKey] === 0)) {
+        switch(this.xAxisType) {
+          case 'time':
+          case 'timeLocal':
+            xVal = '';
+            xUnit = '';
+            slash = '';
+            break;
+
+          case 'ordinal':
+          case 'scaleBand':
+            xVal = this.item.value[xKey];
+            xUnit = this.completeSeriesConfig[this.item.name]['xAxisUnit'] ? ' ' + this.completeSeriesConfig[this.item.name]['xAxisUnit'] : '';
+            slash = ' / ';
+            break;
+
+          default:
+            xVal = this._formattedX;
+            xUnit = this.completeSeriesConfig[this.item.name]['xAxisUnit'] ? ' ' + this.completeSeriesConfig[this.item.name]['xAxisUnit'] : '';
+            slash = ' / ';
+            break;
+        }
+      }
+
+      //process Y val
+      if(this.item.value && (this.item.value[yKey] || this.item.value[yKey] === 0)) {
+        switch(this.yAxisType) {
+          case 'ordinal':
+          case 'scaleBand':
+            yVal = this.item.value[yKey];
+            break;
+
+          default:
+            yVal = this._formattedY;
+            break;
+        }
+
+        yUnit = this.completeSeriesConfig[this.item.name]['yAxisUnit'] ? ' ' + this.completeSeriesConfig[this.item.name]['yAxisUnit'] : '';
+      }
+
+      this.set('_displayedData', xVal + xUnit + slash + yVal + yUnit);
+    },
+
+    _returnValue: function(item, key) {
+      if(!item || !this.completeSeriesConfig || !item.value) {
+        return null;
+      }
+
+      return item.value[this.completeSeriesConfig[item.name][key]];
     },
 
     _disableClickFunc: function(disableClick) {
