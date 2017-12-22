@@ -1,3 +1,7 @@
+v.4.6.2
+=================
+* changed workerUrl to blobUrl to prevent possible race conditions
+
 v.4.6.1
 =================
 * Removed px-vis-workerUrl check
