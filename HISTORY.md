@@ -1,3 +1,7 @@
+v.4.6.1
+=================
+* Removed px-vis-workerUrl check
+
 v.4.6.0
 =================
 * Fix polar cursor handling of negative data
