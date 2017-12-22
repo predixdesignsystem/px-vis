@@ -159,8 +159,8 @@ function runTests(){
   suite('Custom scripts', function() {
 
     suiteSetup(function(done) {
-
-      Px.vis.scheduler.registerCustomScript('test/test-worker.js', function() {
+      var url = document.location.protocol + '//' + document.location.host + '/test/test-worker.js';
+      Px.vis.scheduler.registerCustomScript(url, function() {
         done();
       });
     });
@@ -191,7 +191,7 @@ function runTests(){
       Px.vis.scheduler.process({
           'action' : 'runCustomFunction',
           'originatorName' : 'aChart',
-          'data' : {'objectName': 'myScriapt', 'functionName': 'dataLength'},
+          'data' : {'objectName': 'wrongObj', 'functionName': 'dataLength'},
           'chartId': 'chartId1',
           'errorCallback': function() {
             window.removeEventListener('px-vis-scheduler-work-error', handler);
