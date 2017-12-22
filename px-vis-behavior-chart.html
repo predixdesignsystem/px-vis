@@ -2365,6 +2365,7 @@ PxVisBehaviorChart.axisRegister = [{
         tooltipData = {};
 
     tooltipData.series = [];
+    tooltipData.seriesObj = {};
 
     for(var i=0; i<axes.length; i++) {
       configTitle = completeSeriesConfig[axes[i]] ? completeSeriesConfig[axes[i]].title : axes[i];
@@ -2376,6 +2377,7 @@ PxVisBehaviorChart.axisRegister = [{
       };
 
       tooltipData.series.push({ 'name': axes[i]});
+      tooltipData.seriesObj[axes[i]] = {};
     }
 
     this.set('_axisRegisterConfig', axisConfig);
@@ -2394,14 +2396,11 @@ PxVisBehaviorChart.axisRegister = [{
       return false;
     }
 
-    var same = true;
-    data1.series.forEach(function(element) {
-      if(data2.series.indexOf(element) === -1) {
-        same = false;
-      }
-    }, this);
+    if(JSON.stringify(data1.seriesObj) === JSON.stringify(data2.seriesObj)) {
+      return true;
+    }
 
-    return same;
+    return false;
   },
 
   /**
@@ -2414,6 +2413,7 @@ PxVisBehaviorChart.axisRegister = [{
       //rebuild object from scratch to avoid Polymer dirty check
       var copy = {};
       copy.series = [];
+      copy.seriesObj = {};
       copy.time = time || null;
 
       for(var i=0; i<this._axisRegisterTooltipData.series.length; i++) {
@@ -2431,25 +2431,11 @@ PxVisBehaviorChart.axisRegister = [{
         }
 
         copy.series.push(newSeries);
+        copy.seriesObj[name] = newSeries;
       }
 
       this.set('_axisRegisterTooltipData', copy);
     }
-  },
-  _updateAxisConfig: function(color) {
-    var copy = this._axisRegisterConfig,
-        keys = Object.keys(this._axisRegisterConfig);
-
-    for(var i=0; i<keys.length; i++) {
-      if(color) {
-        copy[keys[i]].color = color;
-      } else {
-        delete copy[keys[i]].color;
-      }
-    }
-
-    this._axisRegisterConfig = copy;
-    this.notifyPath('_axisRegisterConfig');
   }
 }, PxVisBehavior.observerCheck, PxVisBehavior.dimensions, PxVisBehavior.completeSeriesConfig, PxVisBehaviorChart.mutedAxes, PxVisBehaviorChart.getHideClass];
 
@@ -2497,7 +2483,8 @@ PxVisBehaviorChart.categoryRegister = [{
           config = {},
           currentCat,
           catName;
-      tooltipData.series = [];
+      tooltipData.series = [],
+      tooltipData.seriesObj = {};
 
       for(var i = 0; i < this.categories.length; i ++) {
 
@@ -2520,7 +2507,8 @@ PxVisBehaviorChart.categoryRegister = [{
           };
         }
 
-        tooltipData.series.push({"name": currentCat})
+        tooltipData.series.push({"name": currentCat});
+        tooltipData.seriesObj[currentCat] = {};
       }
 
       //set our confs

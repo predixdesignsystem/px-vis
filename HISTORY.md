@@ -1,10 +1,15 @@
 
 =================
+* Added tooltipData.seriesObj property
 * Register Changes:
   * item: Simplified register data construction into a single string instead of multiple props
   * item: Replaces number formatter with the no display version
   * Changed scrollBarsPresent observer so it only fires on a renderedItemCount change instead of dom-change
   * Unified pie and regular to both use scrollBarsPresent
+  * Now uses tooltipData.seriesObj and completeSeriesConfig keys to construct register
+    * completeSeriesConfig now has a `hideInRegister` option to prevent a series from showing in the register
+
+
 
 v4.6.0
 =================

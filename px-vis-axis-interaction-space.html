@@ -685,6 +685,7 @@ Custom property | Description
         "time": null,
         "dataset": null,
         'series': [],
+        'seriesObj': {},
         "color": null,
         "tooltipConfig": null
       };
@@ -698,9 +699,9 @@ Custom property | Description
 
     _resetCrosshairData: function() {
       var chD = {
-            'rawData': [],
-            'timeStamps': []
-          }
+        'rawData': [],
+        'timeStamps': []
+      };
 
       // make timeout larger than the debounce on _calcHoverData
       window.setTimeout(function() {
@@ -830,9 +831,12 @@ Custom property | Description
         'series': [
           { 'name': aid, 'value': value }
         ],
+        'seriesObj': {},
         "color": tooltipConfig[aid]["color"],
         "tooltipConfig": tooltipConfig
       };
+
+      data.seriesObj[aid] = {'value': value };
 
       return data;
     },

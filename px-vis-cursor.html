@@ -351,9 +351,9 @@ Custom property | Description
      * @method _cursorChange
      */
     _cursorChange: function() {
-     if(this.hasUndefinedArguments(arguments)) {
-       return;
-     }
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
 
       if(!this._isD3Empty(this._cursor)) {
         if(this.tooltipData.mouse === null || this.tooltipData.series.length === 0) {
@@ -412,27 +412,28 @@ Custom property | Description
         // this._circles.attr('transform', function(d,i) {
         //   return 'translate(' + this.tooltipData.series[i]['coord'][0] + ',' + this.tooltipData.series[i]['coord'][1] + ')'
         this._circles
-        .style("visibility", function(d,i) {
-          if(this.tooltipData.series[i]['coord'] && !isNaN(this.tooltipData.series[i]['coord'][0]) && !isNaN(this.tooltipData.series[i]['coord'][1])) {
-            return 'visible'
-          } else {
-            return 'hidden';
-          }
-        }.bind(this))
-        .attr('cx', function(d,i) {
-          if(this.tooltipData.series[i]['coord'] && !isNaN(this.tooltipData.series[i]['coord'][0])) {
-            return this.tooltipData.series[i]['coord'][0];
-          } else {
-            return null;
-          }
-        }.bind(this))
-        .attr('cy', function(d,i) {
-          if(this.tooltipData.series[i]['coord'] && !isNaN(this.tooltipData.series[i]['coord'][1])) {
-            return this.tooltipData.series[i]['coord'][1];
-          } else {
-            return null;
-          }
-        }.bind(this));
+          .style("visibility", function(d,i) {
+            if(this.tooltipData.series[i]['coord'] && !isNaN(this.tooltipData.series[i]['coord'][0]) && !isNaN(this.tooltipData.series[i]['coord'][1])) {
+              return 'visible'
+            } else {
+              return 'hidden';
+            }
+          }.bind(this))
+          .attr('cx', function(d,i) {
+            console.log(d);
+            if(this.tooltipData.series[i]['coord'] && !isNaN(this.tooltipData.series[i]['coord'][0])) {
+              return this.tooltipData.series[i]['coord'][0];
+            } else {
+              return null;
+            }
+          }.bind(this))
+          .attr('cy', function(d,i) {
+            if(this.tooltipData.series[i]['coord'] && !isNaN(this.tooltipData.series[i]['coord'][1])) {
+              return this.tooltipData.series[i]['coord'][1];
+            } else {
+              return null;
+            }
+          }.bind(this));
       }
     },
 

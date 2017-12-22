@@ -322,6 +322,36 @@ PxVisBehavior.formatting = [{
 }, PxVisBehavior.truncating];
 
 /*
+  Name:
+  PxVisBehavior.dataChecks
+
+  Description:
+  Polymer behavior that provides the data checkting methods
+
+  Dependencies:
+  - D3.js
+
+  @polymerBehavior PxVisBehavior.dataChecks
+*/
+PxVisBehavior.dataChecks = {
+  /**
+   * returns true if the data is valid: non NaN, null or undefined
+   */
+    _isValidData: function(d) {
+    //false and "" will return false, which is fine as they're not valid data
+    return d || d === 0;
+  },
+
+  /**
+   * returns true if the data is not null
+   */
+  _isDataNotNull: function(d) {
+    //false and "" will return false, which is fine as they're not valid data
+    return d !== null;
+  }
+};
+
+/*
     Name:
     PxVisBehavior.dataset
 
@@ -333,7 +363,7 @@ PxVisBehavior.formatting = [{
 
     @polymerBehavior PxVisBehavior.dataset
 */
-PxVisBehavior.dataset = {
+PxVisBehavior.dataset = [{
     properties: {
       /**
        * container for the data object that drives the chart / component
@@ -346,23 +376,8 @@ PxVisBehavior.dataset = {
       chartData:{
         type: Array
       }
-    },
-    /**
-     * returns true if the data is valid: non NaN, null or undefined
-     */
-    _isValidData: function(d) {
-      //false and "" will return false, which is fine as they're not valid data
-      return d || d === 0;
-    },
-
-    /**
-     * returns true if the data is not null
-     */
-    _isDataNotNull: function(d) {
-      //false and "" will return false, which is fine as they're not valid data
-      return d !== null;
     }
-};
+}, PxVisBehavior.dataChecks];
 
 /*
     Name:
@@ -795,10 +810,7 @@ PxVisBehavior.extentsData = {
 
     @polymerBehavior PxVisBehavior.commonMethods
 */
-PxVisBehavior.commonMethods = {
-  properties: {
-  },
-
+PxVisBehavior.commonMethods = [{
   /**
    * Checks to see if an object is empty
    *
@@ -1049,7 +1061,7 @@ PxVisBehavior.commonMethods = {
   isVarNumber: function(n) {
     return !isNaN(parseFloat(n)) && !isNaN(n - 0);
   }
-};
+}, PxVisBehavior.dataChecks];
 
 /*
     Name:

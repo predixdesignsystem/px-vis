@@ -127,7 +127,8 @@ Custom property | Description
       PxVisBehaviorRegister.register,
       PxVisBehaviorRegister.itemShared,
       PxVisBehaviorRegister.generalItem,
-      PxVisBehaviorRegister.disableClick
+      PxVisBehaviorRegister.disableClick,
+      PxVisBehavior.dataChecks
     ],
     properties: {
       _formattedX: {
@@ -141,6 +142,10 @@ Custom property | Description
       _displayedData: {
         type: String,
         value: ''
+      },
+      displayYValuesOnly: {
+        type: Boolean,
+        value: false
       }
     },
 
@@ -156,6 +161,10 @@ Custom property | Description
       }
 
       this.debounce("numberFormatterValues", function() {
+        if(!this.completeSeriesConfig[this.seriesKey]) {
+          return;
+        }
+
         this._computeItemDebounced();
       }, 10);
     },
@@ -169,9 +178,13 @@ Custom property | Description
           yVal = '',
           yUnit = '';
 
-      if(this.data && this.data.value && (this.data.value[yKey] || this.data.value[yKey] === 0)) {
+
+      if(this.data && this.data.value &&
+          (this.displayYValuesOnly || this._isValidData(this.data.value[xKey])) &&
+          this._isValidData(this.data.value[yKey])) {
+
         //process X val
-        if(this.data.value[xKey] || this.data.value[xKey] === 0) {
+        if(!this.displayYValuesOnly) {
           switch(this.xAxisType) {
             case 'time':
             case 'timeLocal':

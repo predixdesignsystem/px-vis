@@ -417,11 +417,18 @@ PxVisBehaviorRegister.generalItem = [{
       computed: '_computeItemMutedToStart(seriesKey)'
     },
     /**
+     * Optional color to use for the icon instead of using completeSeriesConfig
+     */
+    iconColor: {
+      type: String,
+      value: null
+    },
+    /**
      * calcates the color of the item
      */
     _itemColor: {
       type: String,
-      computed: '_computeItemColor(seriesKey, completeSeriesConfig.*)'
+      computed: '_computeItemColor(seriesKey, completeSeriesConfig.*, iconColor)'
     },
     /**
      * calculates the dash pattern of the item
@@ -462,9 +469,13 @@ PxVisBehaviorRegister.generalItem = [{
    * @return {rgb}
    */
   _computeItemColor: function() {
-   if(this.hasUndefinedArguments(arguments)) {
-     return;
-   }
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    if(this.iconColor) {
+      return this.iconColor
+    }
 
     return this.completeSeriesConfig[this.seriesKey] && this.completeSeriesConfig[this.seriesKey]['color'] ? this.completeSeriesConfig[this.seriesKey]['color'] : 'transparent';
   },
