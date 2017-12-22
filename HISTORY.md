@@ -17,6 +17,7 @@ v.4.6.0
 * Added lasso functionality for multi-axis charts
 * Made axis interaction-space brushes capable of dynamic extents updates
 * Some changes to how previous lasso functionality worked so it is more standalone
+* Added annotations component allowing users to add an annotation icon to charts with a tooltip with data
 
 v4.5.4
 =================
