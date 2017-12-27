@@ -188,7 +188,6 @@ Custom property | Description
      *  Forces the tooltip to show by calling _show on px-tooltip.
      */
     forceShow: function(numberSeriesChanged) {
-
       if(this._tooltipElem) {
         this._tooltipElem.set('opened', true);
       }
@@ -196,6 +195,16 @@ Custom property | Description
       if(numberSeriesChanged) {
         //make sure the tooltip will take its new size into account
         this._tooltipElem.notifyResize();
+      }
+
+      // dirty workaround to force register to display mutedSeries properly
+      // if a series is muted while tooltip is hidden, muted class wont get applied
+      // workaround resets mutedSeries to force classes to be recalculated
+      var reg = this.shadowRoot ? this.shadowRoot.querySelector('#register') : this.querySelector('#register');
+
+      if(reg) {
+        reg.mutedSeries = {};
+        reg.set('mutedSeries', this.mutedSeries);
       }
     },
     /**
@@ -231,7 +240,6 @@ Custom property | Description
        return;
      }
 
-
      if(this._mutedTooltipData) {
       var oldHidden = this._internalHidden,
           hidden = this._mutedTooltipData.hidden || this.hide || this._mutedTooltipData.series.length === 0;
@@ -263,9 +271,9 @@ Custom property | Description
      }
     },
     _computeMutedData: function() {
-     if(this.hasUndefinedArguments(arguments)) {
-       return;
-     }
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
 
       if(!(this.tooltipData === undefined || this.hardMute === undefined || this.mutedSeries === undefined)) {
 
