@@ -2347,6 +2347,7 @@ PxVisBehaviorChart.axisRegister = [{
       type: Object
     }
   },
+
   observers: ['_computedAxisRegisterConf(axes, completeSeriesConfig)'],
 
   /**
@@ -2407,7 +2408,7 @@ PxVisBehaviorChart.axisRegister = [{
   *
   * Resuses existing register dataset for series names and adds or removes values
   */
-  _buildAxisTooltipData: function(values, time, additionalPoints) {
+  _buildAxisTooltipData: function(values, time) {
     //update axis register with the value
     if(this._axisRegisterTooltipData && this._axisRegisterTooltipData.series && !this.hideAxisRegister) {
       //rebuild object from scratch to avoid Polymer dirty check
@@ -2415,7 +2416,6 @@ PxVisBehaviorChart.axisRegister = [{
       copy.series = [];
       copy.seriesObj = {};
       copy.time = time || null;
-      copy.additionalPoints = additionalPoints || [];
 
       for(var i=0; i<this._axisRegisterTooltipData.series.length; i++) {
         var newSeries = {},
@@ -2650,6 +2650,122 @@ PxVisBehaviorChart.sizeVerticalRegister = [{
     }.bind(this), 5);
   },
 }, PxVisBehavior.observerCheck, PxVisBehavior.baseSize];
+
+/*
+    Name:
+    PxVisBehaviorChart.registerPagnationBase
+
+    Description:
+    Behavior providing the register pagnation properties and methods
+    @polymerBehavior PxVisBehaviorChart.registerPagnationBase
+*/
+PxVisBehaviorChart.registerPagnationBase = {
+
+  properties: {
+    _currentPage: {
+      type: Number,
+      value: 0
+    },
+
+    _registerCurrentPage: {
+      type: Number,
+      value: 1
+    },
+
+    _registerTotalPages: {
+      type: Number,
+      value: 1
+    },
+
+    _registerDisplayPageArrows: {
+      type: Boolean,
+      value: false
+    }
+  },
+
+  ready: function() {
+    this.addEventListener('px-vis-register-page-change', this._changePage.bind(this));
+  },
+
+  _changePage: function(evt) {
+    this._currentPage += evt.detail.direction;
+
+    if(this._currentPage < 0) {
+      this._currentPage = this.tooltipData.additionalPoints.length;
+    } else if(this._currentPage > this.tooltipData.additionalPoints.length) {
+      this._currentPage = 0;
+    }
+
+    this.set('_registerCurrentPage', this._currentPage + 1);
+    this._updateRegisterData();
+  },
+
+  _resetPages: function() {
+    this._currentPage = 0;
+    this.set('_registerCurrentPage', 1);
+
+    if(this.tooltipData.additionalPoints && this.tooltipData.additionalPoints.length) {
+      this.set('_registerDisplayPageArrows', true);
+      this.set('_registerTotalPages', this.tooltipData.additionalPoints.length + 1);
+    } else {
+      this.set('_registerDisplayPageArrows', false);
+      this.set('_registerTotalPages', 1);
+    }
+  }
+};
+
+/*
+    Name:
+    PxVisBehaviorChart.registerPagnation
+
+    Description:
+    Behavior providing the register pagnation properties and methods
+    @polymerBehavior PxVisBehaviorChart.registerPagnation
+*/
+PxVisBehaviorChart.registerPagnation = [{
+  properties: {
+    _registerTooltipData: {
+      type: Object
+    }
+  },
+
+  _tooltipDataUpdated: function() {
+    this._resetPages();
+
+    this.set('_registerTooltipData', this.tooltipData);
+
+  },
+
+  _updateRegisterData: function() {
+    if(this._currentPage === 0) {
+      this.set('_registerTooltipData', this.tooltipData);
+    } else {
+      this.set('_registerTooltipData', this.tooltipData.additionalPoints[this._currentPage - 1]);
+    }
+  }
+}, PxVisBehaviorChart.registerPagnationBase];
+
+/*
+    Name:
+    PxVisBehaviorChart.registerPagnationMultiAxis
+
+    Description:
+    Behavior providing the register pagnation properties and methods
+    @polymerBehavior PxVisBehaviorChart.registerPagnationMultiAxis
+*/
+PxVisBehaviorChart.registerPagnationMultiAxis = [{
+  _updateRegisterData: function() {
+    if(this._currentPage === 0) {
+      this._buildAxisTooltipData(this.tooltipData, this.tooltipData.time);
+      this.set('_axisRegisterIconColor', this.tooltipData.color);
+    } else {
+      this._buildAxisTooltipData(
+        this.tooltipData.additionalPoints[this._currentPage - 1]['dataset'], this.tooltipData.additionalPoints[this._currentPage - 1]['time']
+      );
+      this.set('_axisRegisterIconColor', this.tooltipData.additionalPoints[this._currentPage - 1].color);
+    }
+  }
+}, PxVisBehaviorChart.registerPagnationBase];
 
 /*
     Name:

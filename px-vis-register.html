@@ -121,11 +121,11 @@ Custom property | Description
 
         <template is="dom-if" if="[[!hideControls]]">
           <div id="regControls">
-            <template is="dom-if" if="[[_displayArrows]]">
+            <template is="dom-if" if="[[displayPageArrows]]">
               <button class="btn btn--bare--primary btn--icon" on-click="_leftPage">
                 <px-icon icon="px-utl:chevron-left"></px-icon>
               </button>
-              <span>[[_getCurrentPage(_currentPage)]] of [[_totalPages]]</span>
+              <span>[[currentPage]] of [[totalPages]]</span>
               <button class="btn btn--bare--primary btn--icon" on-click="_rightPage">
                 <px-icon icon="px-utl:chevron-right"></px-icon>
               </button>
@@ -161,7 +161,7 @@ Custom property | Description
                 <template is="dom-repeat" id="itemRepeat" items="[[_groups]]" rendered-item-count="{{_itemCount}}">
                   <px-vis-register-item
                     class$="[[tooltipStyle]]"
-                    data="[[_returnSeriesObj(tooltipData.*, item, _currentPage)]]"
+                    data="[[_returnSeriesObj(tooltipData.*, item)]]"
                     series-key="[[item]]"
                     dynamic-menu-config="[[dynamicMenuConfig]]"
                     complete-series-config="[[completeSeriesConfig]]"
@@ -336,17 +336,17 @@ Custom property | Description
         }
       },
 
-      _currentPage: {
+      currentPage: {
         type: Number,
         value: 0
       },
 
-      _totalPages: {
+      totalPages: {
         type: Number,
         value: 1
       },
 
-      _displayArrows: {
+      displayPageArrows: {
         type: Boolean,
         value: false
       },
@@ -357,31 +357,23 @@ Custom property | Description
       },
 
       sortConfig: Object,
-      _updateSortTypeBound: Function,
       _timeSeriesKey: String,
       _regControls: HTMLElement
     },
 
     observers: [
-      '_formatDateTime(tooltipData.*, _currentPage)',
+      '_formatDateTime(tooltipData.*)',
       '_scrollBarsPresent(_itemCount)',
       '_scrollBarsPresent(height, margin)',
       '_scrollBarsPresent(chartWidth, margin)',
       '_computeSeries(completeSeriesConfig.*, groupings, sortType)',
       '_mutedChanged(mutedSeries.*)',
-      '_sortConfigChanged(sortConfig.*)',
-      '_tooltipDataUpdated(tooltipData.*)',
-      '_pointsUpdated(tooltipData.additionalPoints.*)'
+      '_sortConfigChanged(sortConfig.*)'
     ],
 
-    detached: function() {
-      this.removeEventListener('px-vis-register-sort-request', this._updateSortTypeBound);
-
-    },
 
     ready: function() {
-      this._updateSortTypeBound = this._updateSortType.bind(this);
-      this.addEventListener('px-vis-event-request', this._updateSortTypeBound);
+      this.addEventListener('px-vis-event-request', this._updateSortType.bind(this));
     },
 
     _updateSortType: function(evt) {
@@ -406,15 +398,7 @@ Custom property | Description
         return;
       }
 
-      var time, k;
-
-      if(this._currentPage === 0) {
-        time = this.tooltipData.time;
-        k = this.tooltipData.timeSeriesKey;
-      } else {
-        time = this.tooltipData.additionalPoints[this._currentPage-1]['time'],
-        k = this.tooltipData.additionalPoints[this._currentPage-1]['timeSeriesKey'];
-      }
+      var time = this.tooltipData.time;
 
       if(time) {
         var momentObj1 = this.formatTimestamp(
@@ -430,7 +414,7 @@ Custom property | Description
         this.set('_firstDateTime', momentObj1);
         this.set('_secondDateTime', momentObj2);
         this.set('_separator', this.separator);
-        this.set('_timeSeriesKey', k);
+        this.set('_timeSeriesKey', this.tooltipData.timeSeriesKey);
 
       } else {
         this.set('_firstDateTime', '');
@@ -555,12 +539,8 @@ Custom property | Description
       this.set('_hasScrollBar', b);
     },
 
-    _returnSeriesObj: function(data, key, page) {
-      if(page === 0) {
-        return this.tooltipData.seriesObj[key];
-      }
-
-      return this.tooltipData.additionalPoints[page-1].seriesObj[key];
+    _returnSeriesObj: function(data, key) {
+      return this.tooltipData.seriesObj[key];
     },
 
     _displaySortMenu: function() {
@@ -571,44 +551,12 @@ Custom property | Description
       return this._sortMapping[this.sortType]['icon'];
     },
 
-    _tooltipDataUpdated: function() {
-      this._currentPage = 0;
-    },
-
-    _pointsUpdated: function() {
-      if(this.tooltipData.additionalPoints && this.tooltipData.additionalPoints.length) {
-        this._totalPages = this.tooltipData.additionalPoints.length + 1;
-        this._displayArrows = true;
-      } else {
-        this._totalPages = 1;
-        this._displayArrows = false;
-      }
-      this._displayArrows = true;
-
-    },
-
-    _getCurrentPage: function() {
-      return this._currentPage + 1;
-    },
-
     _leftPage: function() {
-      this._changePage(-1);
+      this.dispatchEvent(new CustomEvent('px-vis-register-page-change', { bubbles: true, composed: true, detail: { direction: -1 } }));
     },
 
     _rightPage: function() {
-      this._changePage(1);
-    },
-
-    _changePage: function(dir) {
-      var n = this._currentPage + dir;
-
-      if(n < 0) {
-        n = this.tooltipData.additionalPoints.length;
-      } else if(n > this.tooltipData.additionalPoints.length) {
-        n = 0;
-      }
-
-      this.set('_currentPage', n);
+      this.dispatchEvent(new CustomEvent('px-vis-register-page-change', { bubbles: true, composed: true, detail: { direction: 1 } }));
     },
 
     _sortConfigChanged: function() {
