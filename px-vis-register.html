@@ -120,10 +120,11 @@ Custom property | Description
         style$="[[_returnHeight(height,margin, type)]]; [[_returnWidth(chartWidth, width, margin, type)]]">
 
         <div id="regControls">
-          <template is="dom-if" if="[[_displayArrows(tooltipData.additionalPoints)]]">
+          <template is="dom-if" if="[[_displayArrows]]">
             <button class="btn btn--bare--primary btn--icon" on-click="_leftPage">
               <px-icon icon="px-utl:chevron-left"></px-icon>
             </button>
+            <span>[[_getCurrentPage(_currentPage)]] of [[_totalPages]]</span>
             <button class="btn btn--bare--primary btn--icon" on-click="_rightPage">
               <px-icon icon="px-utl:chevron-right"></px-icon>
             </button>
@@ -341,6 +342,16 @@ Custom property | Description
         value: 0
       },
 
+      _totalPages: {
+        type: Number,
+        value: 1
+      },
+
+      _displayArrows: {
+        type: Boolean,
+        value: false
+      },
+
       _timeSeriesKey: String
     },
 
@@ -352,7 +363,8 @@ Custom property | Description
       '_computeSeries(completeSeriesConfig.*, groupings, sortType)',
       '_mutedChanged(mutedSeries.*)',
       '_sortConfigChanged(sortConfig.*)',
-      '_tooltipDataUpdated(tooltipData.*)'
+      '_tooltipDataUpdated(tooltipData.*)',
+      '_pointsUpdated(tooltipData.additionalPoints.*)'
     ],
 
     detached: function() {
@@ -544,16 +556,27 @@ Custom property | Description
       return this._sortTypes.length;
     },
 
-    _displayArrows: function() {
-      return this.tooltipData.additionalPoints && this.tooltipData.additionalPoints.length;
-    },
-
     _getMenuIcon: function() {
       return this._sortMapping[this.sortType]['icon'];
     },
 
     _tooltipDataUpdated: function() {
       this._currentPage = 0;
+    },
+
+    _pointsUpdated: function() {
+      if(this.tooltipData.additionalPoints && this.tooltipData.additionalPoints.length) {
+        this._totalPages = this.tooltipData.additionalPoints.length + 1;
+        this._displayArrows = true;
+      } else {
+        this._totalPages = 1;
+        this._displayArrows = false;
+      }
+
+    },
+
+    _getCurrentPage: function() {
+      return this._currentPage + 1;
     },
 
     _leftPage: function() {
