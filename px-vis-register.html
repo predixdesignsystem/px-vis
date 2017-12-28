@@ -119,24 +119,26 @@ Custom property | Description
         class$="[[_getMinSizeClass(preventMinSize)]] inline--flex flex--col"
         style$="[[_returnHeight(height,margin, type)]]; [[_returnWidth(chartWidth, width, margin, type)]]">
 
-        <div id="regControls">
-          <template is="dom-if" if="[[_displayArrows]]">
-            <button class="btn btn--bare--primary btn--icon" on-click="_leftPage">
-              <px-icon icon="px-utl:chevron-left"></px-icon>
-            </button>
-            <span>[[_getCurrentPage(_currentPage)]] of [[_totalPages]]</span>
-            <button class="btn btn--bare--primary btn--icon" on-click="_rightPage">
-              <px-icon icon="px-utl:chevron-right"></px-icon>
-            </button>
-          </template>
-          <template is="dom-if" if="[[_displaySortMenu(_sortTypes)]]">
-            <px-vis-dynamic-menu
-              id="menu"
-              menu-icon="[[_getMenuIcon(sortType)]]"
-              dynamic-menu-config="[[_sortTypes]]">
-            </px-vis-dynamic-menu>
-          </template>
-        </div>
+        <template is="dom-if" if="[[!hideControls]]">
+          <div id="regControls">
+            <template is="dom-if" if="[[_displayArrows]]">
+              <button class="btn btn--bare--primary btn--icon" on-click="_leftPage">
+                <px-icon icon="px-utl:chevron-left"></px-icon>
+              </button>
+              <span>[[_getCurrentPage(_currentPage)]] of [[_totalPages]]</span>
+              <button class="btn btn--bare--primary btn--icon" on-click="_rightPage">
+                <px-icon icon="px-utl:chevron-right"></px-icon>
+              </button>
+            </template>
+            <template is="dom-if" if="[[_displaySortMenu(_sortTypes)]]">
+              <px-vis-dynamic-menu
+                id="menu"
+                menu-icon="[[_getMenuIcon(sortType)]]"
+                dynamic-menu-config="[[_sortTypes]]">
+              </px-vis-dynamic-menu>
+            </template>
+          </div>
+        </template>
 
         <template is="dom-if" if="{{_displayTime(xAxisType, forceDateTimeDisplay)}}">
           <div class$="[[_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)]]">
@@ -334,9 +336,6 @@ Custom property | Description
         }
       },
 
-      sortConfig: Object,
-      _updateSortTypeBound: Function,
-
       _currentPage: {
         type: Number,
         value: 0
@@ -352,6 +351,13 @@ Custom property | Description
         value: false
       },
 
+      hideControls: {
+        type: Boolean,
+        value: false
+      },
+
+      sortConfig: Object,
+      _updateSortTypeBound: Function,
       _timeSeriesKey: String
     },
 
