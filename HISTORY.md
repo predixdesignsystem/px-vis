@@ -8,8 +8,17 @@
   * Unified pie and regular to both use scrollBarsPresent
   * Now uses tooltipData.seriesObj and completeSeriesConfig keys to construct register
     * completeSeriesConfig now has a `hideInRegister` option to prevent a series from showing in the register
-
-
+    * pagnation to view additionalPoints
+  * Sorting of register is now supported
+    * Functionally similar to toolbar; app dev should provide `sortConfig` property on the register
+    * `sortConfig` specifies desired sort types and provides a button/menu for users to change the sort order
+    * Built in sort types, `default`, `muted`, and `name` can be specified with a boolean
+    * Custom sort types can be specifed with an object
+    * Sorting can be specified without the button via `sortType` property
+  * Normalized sizing of icons in dynamic menu
+  * Allow customization of menu icon in dynamic menu
+  * Misc fixes and refactoring:
+    * cursor
 
 v4.6.0
 =================

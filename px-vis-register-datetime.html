@@ -54,9 +54,11 @@ Please see the properties for configuration details.
     },
 
     _computeItemColor: function(seriesKey) {
-      if(!(this.seriesKey === undefined || this.completeSeriesConfig === undefined)) {
-        return this.completeSeriesConfig[seriesKey] ? this.completeSeriesConfig[seriesKey]['color'] : '';
+      if(!this.seriesKey || !this.completeSeriesConfig || !this.completeSeriesConfig[seriesKey]) {
+        return '';
       }
+
+      return this.completeSeriesConfig[seriesKey]['color'];
     }
   });
 </script>

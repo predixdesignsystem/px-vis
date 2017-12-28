@@ -6,6 +6,8 @@
 <link rel="import" href="px-vis-register-item-pie.html"/>
 <link rel="import" href="px-vis-register-datetime.html"/>
 <link rel="import" href="px-vis-dynamic-menu.html"/>
+<link rel="import" href="../px-icon-set/px-icon-set.html"/>
+<link rel="import" href="../px-icon-set/px-icon.html"/>
 <link rel="import" href="../px-tooltip/px-tooltip.html"/>
 <link rel="import" href="css/px-vis-register-styles.html">
 
@@ -113,15 +115,27 @@ Custom property | Description
     <style include="px-vis-register-styles"></style>
 
     <div class="flex flex-row fullWidth">  <!--  IE min-height + flex bug workaround-->
-      <div
-        id="registerWrap"
+      <div id="registerWrap"
         class$="[[_getMinSizeClass(preventMinSize)]] inline--flex flex--col"
         style$="[[_returnHeight(height,margin, type)]]; [[_returnWidth(chartWidth, width, margin, type)]]">
 
-        <px-vis-dynamic-menu
-          id="menu"
-          dynamic-menu-config="[[_sortTypes]]">
-        </px-vis-dynamic-menu>
+        <div id="regControls">
+          <template is="dom-if" if="[[_displayArrows(tooltipData.additionalPoints)]]">
+            <button class="btn btn--bare--primary btn--icon" on-click="_leftPage">
+              <px-icon icon="px-utl:chevron-left"></px-icon>
+            </button>
+            <button class="btn btn--bare--primary btn--icon" on-click="_rightPage">
+              <px-icon icon="px-utl:chevron-right"></px-icon>
+            </button>
+          </template>
+          <template is="dom-if" if="[[_displaySortMenu(_sortTypes)]]">
+            <px-vis-dynamic-menu
+              id="menu"
+              menu-icon="[[_getMenuIcon(sortType)]]"
+              dynamic-menu-config="[[_sortTypes]]">
+            </px-vis-dynamic-menu>
+          </template>
+        </div>
 
         <template is="dom-if" if="{{_displayTime(xAxisType, forceDateTimeDisplay)}}">
           <div class$="[[_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)]]">
@@ -131,7 +145,7 @@ Custom property | Description
               second-date-time="[[_secondDateTime]]"
               separator="[[_separator]]"
               x-axis-type="[[xAxisType]]"
-              series-key="[[tooltipData.timeSeriesKey]]"
+              series-key="[[_timeSeriesKey]]"
               complete-series-config="[[completeSeriesConfig]]"
             ></px-vis-register-datetime>
           </div>
@@ -144,7 +158,7 @@ Custom property | Description
                 <template is="dom-repeat" id="itemRepeat" items="[[_groups]]" rendered-item-count="{{_itemCount}}">
                   <px-vis-register-item
                     class$="[[tooltipStyle]]"
-                    data="[[_returnSeriesObj(tooltipData.*, item)]]"
+                    data="[[_returnSeriesObj(tooltipData.*, item, _currentPage)]]"
                     series-key="[[item]]"
                     dynamic-menu-config="[[dynamicMenuConfig]]"
                     complete-series-config="[[completeSeriesConfig]]"
@@ -320,18 +334,25 @@ Custom property | Description
       },
 
       sortConfig: Object,
+      _updateSortTypeBound: Function,
 
-      _updateSortTypeBound: Function
+      _currentPage: {
+        type: Number,
+        value: 0
+      },
+
+      _timeSeriesKey: String
     },
 
     observers: [
-      '_formatDateTime(tooltipData.*)',
+      '_formatDateTime(tooltipData.*, _currentPage)',
       '_scrollBarsPresent(_itemCount)',
       '_scrollBarsPresent(height, margin)',
       '_scrollBarsPresent(chartWidth, margin)',
       '_computeSeries(completeSeriesConfig.*, groupings, sortType)',
       '_mutedChanged(mutedSeries.*)',
-      '_sortConfigChanged(sortConfig.*)'
+      '_sortConfigChanged(sortConfig.*)',
+      '_tooltipDataUpdated(tooltipData.*)'
     ],
 
     detached: function() {
@@ -363,27 +384,41 @@ Custom property | Description
        return;
      }
 
-      if(!this.inertRegister) {
-        if(this.tooltipData.time) {
-          var momentObj1 = this.formatTimestamp(
-            this.tooltipData.time,
-            this.timezone,
-            this.firstDateTimeFormat
-          );
-          var momentObj2 = this.formatTimestamp(
-            this.tooltipData.time,
-            this.timezone,
-            this.secondDateTimeFormat
-          );
-          this.set('_firstDateTime', momentObj1);
-          this.set('_secondDateTime', momentObj2);
-          this.set('_separator', this.separator);
+      if(this.inertRegister) {
+        return;
+      }
 
-        } else {
-          this.set('_firstDateTime', '');
-          this.set('_secondDateTime', '');
-          this.set('_separator', '');
-        }
+      var time, k;
+
+      if(this._currentPage === 0) {
+        time = this.tooltipData.time;
+        k = this.tooltipData.timeSeriesKey;
+      } else {
+        time = this.tooltipData.additionalPoints[this._currentPage-1]['time'],
+        k = this.tooltipData.additionalPoints[this._currentPage-1]['timeSeriesKey'];
+      }
+
+      if(time) {
+        var momentObj1 = this.formatTimestamp(
+          time,
+          this.timezone,
+          this.firstDateTimeFormat
+        );
+        var momentObj2 = this.formatTimestamp(
+          time,
+          this.timezone,
+          this.secondDateTimeFormat
+        );
+        this.set('_firstDateTime', momentObj1);
+        this.set('_secondDateTime', momentObj2);
+        this.set('_separator', this.separator);
+        this.set('_timeSeriesKey', k);
+
+      } else {
+        this.set('_firstDateTime', '');
+        this.set('_secondDateTime', '');
+        this.set('_separator', '');
+        this.set('_timeSeriesKey', null);
       }
     },
 
@@ -497,8 +532,48 @@ Custom property | Description
       this.set('_hasScrollBar', b);
     },
 
-    _returnSeriesObj: function(data, key) {
-      return this.tooltipData.seriesObj[key];
+    _returnSeriesObj: function(data, key, page) {
+      if(page === 0) {
+        return this.tooltipData.seriesObj[key];
+      }
+
+      return this.tooltipData.additionalPoints[page-1].seriesObj[key];
+    },
+
+    _displaySortMenu: function() {
+      return this._sortTypes.length;
+    },
+
+    _displayArrows: function() {
+      return this.tooltipData.additionalPoints && this.tooltipData.additionalPoints.length;
+    },
+
+    _getMenuIcon: function() {
+      return this._sortMapping[this.sortType]['icon'];
+    },
+
+    _tooltipDataUpdated: function() {
+      this._currentPage = 0;
+    },
+
+    _leftPage: function() {
+      this._changePage(-1);
+    },
+
+    _rightPage: function() {
+      this._changePage(1);
+    },
+
+    _changePage: function(dir) {
+      var n = this._currentPage + dir;
+
+      if(n < 0) {
+        n = this.tooltipData.additionalPoints.length;
+      } else if(n > this.tooltipData.additionalPoints.length) {
+        n = 0;
+      }
+
+      this.set('_currentPage', n);
     },
 
     _sortConfigChanged: function() {
@@ -522,11 +597,44 @@ Custom property | Description
     },
 
     /**
+     * Sorts by display name while ignoring case
+     *
+    */
+    _sortNameCaseInsensitive: function(series) {
+      var mapped = series.map(function(el, i) {
+        return {
+          index: i,
+          value: this.completeSeriesConfig[el]["name"].toLowerCase()
+        };
+      }.bind(this));
+
+      mapped.sort(function(a, b) {
+        if(a.value > b.value) {
+          return 1;
+        }
+        if(a.value < b.value) {
+          return -1;
+        }
+        return 0;
+      });
+
+      return mapped.map(function(el) {
+        return series[el.index];
+      });
+    },
+
+    /**
      * Sorts by display name
      *
     */
     _sortName: function(a,b) {
-      return (this.completeSeriesConfig[a]["name"] < this.completeSeriesConfig[b]["name"]) ? -1 : (this.completeSeriesConfig[a]["name"] > this.completeSeriesConfig[b]["name"]) ? 1 : 0;
+      if(this.completeSeriesConfig[a]["name"] < this.completeSeriesConfig[b]["name"]) {
+        return -1;
+      }
+      if(this.completeSeriesConfig[a]["name"] > this.completeSeriesConfig[b]["name"]){
+        return 1;
+      }
+      return 0;
     },
 
     /**
@@ -545,19 +653,24 @@ Custom property | Description
     _sortMapping: {
       default: {
         name: 'Default order',
-        icon: 'px-vis:comment',
+        icon: 'px-nav:list-view',
         sortFn: function(s) { return s; }
       },
       name: {
         name: 'Sort by display name',
-        icon: 'px-vis:comment',
+        icon: 'px-nav:database',
         sortFn: function(s) { return s.sort(this._sortName.bind(this)); }
       },
       muted: {
         name: 'Muted series to bottom',
-        icon: 'px-vis:comment',
+        icon: 'px-nav:tree',
         sortFn: function(s) { return s.sort(this._sortMuted.bind(this)); }
       },
+      nameIgnoreCase: {
+        name: 'Sort by display name',
+        icon: 'px-nav:database',
+        sortFn: function(s) { return this._sortNameCaseInsensitive.bind(this)(s); }
+      }
     }
 
   });

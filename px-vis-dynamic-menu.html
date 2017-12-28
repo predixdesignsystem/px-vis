@@ -29,7 +29,9 @@
   <template>
     <style include="px-vis-dynamic-menu-styles"></style>
 
-      <span id="button" slot="dropdown-trigger" on-tap="_buttonClicked"><px-icon icon="px-utl:app-settings" class="icon"></px-icon></span>
+      <button id="button" class="btn btn--bare--primary btn--icon" slot="dropdown-trigger" on-tap="_buttonClicked">
+        <px-icon icon="[[menuIcon]]" class="icon"></px-icon>
+      </button>
       <iron-dropdown
         id="dropdown"
         opened="[[_opened]]"
@@ -42,7 +44,7 @@
           <ul class="menu-list">
             <template is="dom-repeat" items="{{dynamicMenuConfig}}">
               <li class="menu-wrapper--item u-p--" on-tap="_clickItem" value="[[index]]">
-                <px-icon class="u-mr--" value="[[index]]" icon="[[item.icon]]"></px-icon>
+                <px-icon class="u-mr-- menu-icon" value="[[index]]" icon="[[item.icon]]"></px-icon>
                 <span>{{item.name}}</span>
               </li>
             </template>
@@ -69,6 +71,10 @@
      * @type Object
      */
     properties: {
+      menuIcon: {
+        type: String,
+        value: 'px-utl:app-settings'
+      },
       /**
        * Whether the menu is currently shown.
        */
@@ -124,8 +130,6 @@
         }
       }
     },
-    observers: [
-    ],
     listeners: {
       'neon-animation-finish': '_onNeonAnimationFinish'
     },
