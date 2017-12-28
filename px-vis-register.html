@@ -358,7 +358,8 @@ Custom property | Description
 
       sortConfig: Object,
       _updateSortTypeBound: Function,
-      _timeSeriesKey: String
+      _timeSeriesKey: String,
+      _regControls: HTMLElement
     },
 
     observers: [
@@ -380,7 +381,6 @@ Custom property | Description
 
     ready: function() {
       this._updateSortTypeBound = this._updateSortType.bind(this);
-
       this.addEventListener('px-vis-event-request', this._updateSortTypeBound);
     },
 
@@ -546,7 +546,12 @@ Custom property | Description
         b = true;
       }
 
+      if(!this._regControls) {
+        this._regControls = this.shadowRoot ? this.shadowRoot.querySelector('#regControls') : this.querySelector('#regControls');
+      }
+
       this.toggleClass('scrollOn', b, this.$.seriesWrap);
+      this.toggleClass('scrollOn', b, this._regControls);
       this.set('_hasScrollBar', b);
     },
 
@@ -578,6 +583,7 @@ Custom property | Description
         this._totalPages = 1;
         this._displayArrows = false;
       }
+      this._displayArrows = true;
 
     },
 

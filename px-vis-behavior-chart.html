@@ -2407,7 +2407,7 @@ PxVisBehaviorChart.axisRegister = [{
   *
   * Resuses existing register dataset for series names and adds or removes values
   */
-  _buildAxisTooltipData: function(values, time) {
+  _buildAxisTooltipData: function(values, time, additionalPoints) {
     //update axis register with the value
     if(this._axisRegisterTooltipData && this._axisRegisterTooltipData.series && !this.hideAxisRegister) {
       //rebuild object from scratch to avoid Polymer dirty check
@@ -2415,6 +2415,7 @@ PxVisBehaviorChart.axisRegister = [{
       copy.series = [];
       copy.seriesObj = {};
       copy.time = time || null;
+      copy.additionalPoints = additionalPoints || [];
 
       for(var i=0; i<this._axisRegisterTooltipData.series.length; i++) {
         var newSeries = {},
