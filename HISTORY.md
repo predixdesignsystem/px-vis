@@ -24,6 +24,7 @@
   * Removed neon animation from dynamic menu.
   * Removed fadeIn and fadeOut methods and classes
   * Created classes on register and refactored listeners to handle showing/hiding dynamic menu
+    * Relies on CSS transitions now instead of animations
 * Changed the way tooltipData is created throughout to accomodate new seriesObj
 * Changed the way charts handle tooltipData to allow for pagnation
 
