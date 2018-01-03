@@ -15,10 +15,17 @@
     * Built in sort types, `default`, `muted`, and `name` can be specified with a boolean
     * Custom sort types can be specifed with an object
     * Sorting can be specified without the button via `sortType` property
-  * Normalized sizing of icons in dynamic menu
-  * Allow customization of menu icon in dynamic menu
+  * Added pagnation display and interaction properties
   * Misc fixes and refactoring:
     * cursor
+* Dyanmic Menu changes:
+  * Normalized sizing of icons in dynamic menu
+  * Allow customization of menu icon in dynamic menu
+  * Removed neon animation from dynamic menu.
+  * Removed fadeIn and fadeOut methods and classes
+  * Created classes on register and refactored listeners to handle showing/hiding dynamic menu
+* Changed the way tooltipData is created throughout to accomodate new seriesObj
+* Changed the way charts handle tooltipData to allow for pagnation
 
 v4.6.0
 =================

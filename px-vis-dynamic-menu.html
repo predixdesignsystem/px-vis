@@ -1,8 +1,4 @@
 <link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="../web-animations-js/web-animations-next-lite.min.html"/>
-<link rel="import" href="../neon-animation/neon-animation-runner-behavior.html"/>
-<link rel="import" href="../neon-animation/animations/fade-in-animation.html"/>
-<link rel="import" href="../neon-animation/animations/fade-out-animation.html"/>
 <link rel="import" href="../iron-dropdown/iron-dropdown.html"/>
 <link rel="import" href="../px-icon-set/px-icon-set.html"/>
 <link rel="import" href="../px-icon-set/px-icon.html"/>
@@ -60,7 +56,6 @@
     is: 'px-vis-dynamic-menu',
 
     behaviors: [
-      Polymer.NeonAnimationRunnerBehavior,
       PxVisBehavior.dynamicMenuConfig
     ],
 
@@ -101,76 +96,17 @@
        */
       additionalDetail: {
         type: Object
-      },
-      /**
-       * Animation config for the fadein/fadeout animations. Configure the "timing"
-       * object of both animations if needed (delay, duration, ease).
-       */
-      animationConfig: {
-        type: Object,
-        value: function() {
-          return {
-            'fadeIn': {
-              name: 'fade-in-animation',
-              node: this,
-              timing: {
-                delay: 0,
-                duration: 250
-              }
-            },
-            'fadeOut': {
-              name: 'fade-out-animation',
-              node: this,
-              timing: {
-                delay: 0,
-                duration: 250
-              }
-            }
-          }
-        }
       }
     },
-    listeners: {
-      'neon-animation-finish': '_onNeonAnimationFinish'
-    },
+
     attached: function() {
       this.$.dropdown.set('positionTarget', this.$.button);
     },
-    /**
-     * Call this to fade in the menu icon. Doesn't apply if no menu config is defined.
-     */
-    fadeIn: function() {
-        if(!this._shown && this.dynamicMenuConfig && this.dynamicMenuConfig.length > 0) {
-            this._shown = true;
 
-            this.cancelAnimation();
-
-            this.style.display = this.displayClass;
-            this.playAnimation('fadeIn');
-        }
-    },
-     /**
-     * Call this to fade out the menu icon. Doesn't apply if no menu config is defined.
-     */
-    fadeOut: function() {
-        if(this._shown) {
-            this._shown = false;
-
-            this.cancelAnimation();
-            this.playAnimation('fadeOut');
-        }
-    },
-    _onNeonAnimationFinish: function() {
-      if(!this._shown) {
-        //hide and make sure we're closed
-        this.style.display = 'none';
-        this.set('_opened', false);
-      }
-    },
     _buttonClicked: function() {
-
       this.set('_opened', !this._opened);
     },
+
     _clickItem: function(evt) {
 
       var target = evt.currentTarget,
