@@ -195,6 +195,7 @@ PxVisBehaviorRenderer.base = [{
   },
   created: function() {
     this.listen(this, 'px-vis-renderer-register', '_registerDrawingElement');
+    this.listen(this, 'px-vis-renderer-update-target-props', '_updateTargetProperty');
   },
   attached: function() {
 
@@ -234,6 +235,25 @@ PxVisBehaviorRenderer.base = [{
       'highlightData': JSON.parse(JSON.stringify(initialVal)),
       'markers': JSON.parse(JSON.stringify(initialVal))
     }
+  },
+
+  _updateTargetProperty: function(e) {
+
+    var propName = e.detail.propertyName,
+        val = e.detail.propertyValue,
+        target = Polymer.dom(e).rootTarget,
+        renderType = e.detail.rendererType,
+        current;
+
+    for(var i=0; i<this._canvasTargets[renderType].length; i++) {
+      current = this._canvasTargets[renderType][i];
+
+      if(current.target === target) {
+        current[propName] = val;
+      }
+    }
+
+    e.stopPropagation();
   },
 
   /**
@@ -755,31 +775,5 @@ PxVisBehaviorRenderer.base = [{
   PxVisBehavior.mutedSeries,
   PxVisBehavior.completeSeriesConfig
 ];
-
-/*
-    Name:
-    PxVisBehaviorRenderer.priority
-
-    Description:
-    Polymer behavior that provides the priority  property, used by elements
-    registering for drawing and allowing to set a drawing order
-
-    Dependencies:
-    - none
-
-    @polymerBehavior PxVisBehaviorRenderer.priority
-*/
-PxVisBehaviorRenderer.priority = {
-  properties: {
-    /**
-    * Priority is used by elements of the same rendering type to determine
-    * the order of drawing. priority 0 => smaller priority. 2 draws over 1, which itself draws over 0, etc..
-    */
-    priority: {
-      type: Number,
-      value: 0
-    }
-  }
-};
 
 </script>
