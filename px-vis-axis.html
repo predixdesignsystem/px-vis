@@ -89,7 +89,8 @@ Custom property | Description
           PxVisBehavior.preventInitialDrawing,
           PxVisBehavior.isAttached,
           PxVisBehavior.updateStylesOverride,
-          PxVisBehavior.titleTruncation
+          PxVisBehavior.titleTruncation,
+          PxVisBehavior.scaleTypeCheck
         ],
 
         /**
@@ -344,27 +345,21 @@ Custom property | Description
 
           //support for general ticks setting
           // https://github.com/d3/d3-axis#axis_ticks
-          if(this.ticks && this.axisType !== 'ordinal') {
+          if(this.ticks && !this._isOrdinalType(this.axisType)) {
             if(typeof(this.ticks) === 'number' || !isNaN(parseInt(this.ticks))) {
 
               this._axis.ticks(this.ticks);
 
             } else if(typeof(this.ticks) === 'function') {
               this._axis.ticks(this.ticks);
-            } else if(typeof(this.ticks) === 'object' && this.ticks.interval && this.ticks.format) {
 
-              // if(this.axisType === 'time') {
-              //   this._axis.ticks(this.ticks.format, this.ticks.interval);
-              // } else {
+            } else if(typeof(this.ticks) === 'object' && this.ticks.interval && this.ticks.format) {
                 this._axis.ticks(this.ticks.interval, this.ticks.format);
-              // }
 
             } else if(typeof(this.ticks) === 'object' && this.ticks.interval && (this.axisType !== 'time') || (this.axisType !== 'timeLocal')) {
-
               this._axis.ticks(this.ticks.interval);
 
             } else if(typeof(this.ticks) === 'object' && this.ticks.format && (this.axisType !== 'time') || (this.axisType !== 'timeLocal')) {
-
               this._axis.ticks(10, this.ticks.format);
 
             } else {
@@ -374,7 +369,7 @@ Custom property | Description
 
           //support for tick format
           // https://github.com/mbostock/d3/wiki/Formatting#d3_format
-          if(this.tickFormat && this.axisType !== 'ordinal') {
+          if(this.tickFormat && !this._isOrdinalType(this.axisType)) {
             if(typeof this.tickFormat === 'function') {
               this._axis.tickFormat(this.tickFormat);
             } else if(this.axisType === 'time') {
@@ -388,7 +383,7 @@ Custom property | Description
 
           //support for tick values
           // https://github.com/d3/d3-axis/blob/master/README.md#axis_tickValues
-          if(this.tickValues && this.tickValues.length > 0 && this.axisType !== 'ordinal') {
+          if(this.tickValues && this.tickValues.length > 0 && !this._isOrdinalType(this.axisType)) {
             //dont run if our domain is NaN. Otherwise raises errors
             if(!isNaN(this.axis.domain()[0]) && !isNaN(this.axis.domain()[1])) {
               this._axis.tickValues(this.tickValues);
@@ -547,7 +542,7 @@ Custom property | Description
            return;
          }
 
-          if(this.axisType !== 'ordinal' && this._axis && this._axis.scale) {
+          if(!this._isOrdinalType(this.axisType) && this._axis && this._axis.scale) {
             //apparently we need to give ourselves a bit of time to ensure the axis draws and it can clac this
             this.debounce("drawnTicks", function() {
               // FIXME Only works if ticks is a Number; need to support other formats for ticks
@@ -708,7 +703,7 @@ Custom property | Description
           var size = 0;
 
           // if we are dealing with longer names, just measure
-          if(this.axisType === 'time' || this.axisType === 'timeLocal' || this.axisType === 'ordinal') {
+          if(this._isTimeType(this.axisType) || this._isOrdinalType(this.axisType)) {
             size = parseFloat(this._getAxisGroupSize()['width']);
           } else {
             // NOTE: If this is not exact enough, we can use PxVisBehavior.measureText to measure

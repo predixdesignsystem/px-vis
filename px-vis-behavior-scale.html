@@ -359,14 +359,14 @@ PxVisBehaviorScale.scale = [{
    */
   _determineExtents: function() {
     //check our axis types so we know if we are doing ordinal
-    var xOrd = (this.xAxisType === 'ordinal' || this.xAxisType === 'scaleBand'),
-        yOrd = (this.yAxisType === 'ordinal' || this.yAxisType === 'scaleBand'),
+    var xOrd = this._isOrdinalType(this.xAxisType),
+        yOrd = this._isOrdinalType(this.yAxisType),
         // are we doing time?
-        xTime = this.xAxisType === 'time' || this.xAxisType === 'timeLocal',
+        xTime = this._isTimeType(this.xAxisType),
         //doX if we are not doing time
         doX = xTime ? false : true,
         doY = true,
-        keys = Object.keys(this.completeSeriesConfig),
+        keys = this._seriesKeys ? this._seriesKeys : Object.keys(this.completeSeriesConfig),
         //our extents starter
         extents = {
           'x': [],
@@ -435,6 +435,18 @@ PxVisBehaviorScale.scale = [{
           extents.y[yKeys[i]][0] -= 0.5;
           extents.y[yKeys[i]][1] += 0.5;
         }
+      }
+    }
+
+    if(this.startFromZero) {
+      if(this.xAxisType === 'linear') {
+        extents.x[0] = Math.min(extents.x[0], 0);
+        extents.x[1] = Math.max(extents.x[1], 0);
+      }
+
+      if(this.yAxisType === 'linear') {
+        extents.y[0] = Math.min(extents.y[0], 0);
+        extents.y[1] = Math.max(extents.y[1], 0);
       }
     }
 
@@ -904,7 +916,8 @@ _calcMultiAxisExtents: function() {
   PxVisBehaviorD3.domainUpdateNotify,
   PxVisBehavior.preventWebWorkerSynchronization,
   PxVisBehavior.mutedSeries,
-  PxVisBehavior.observerCheck
+  PxVisBehavior.observerCheck,
+  PxVisBehavior.scaleTypeCheck
 ];
 
 </script>

@@ -27,6 +27,9 @@
     * Relies on CSS transitions now instead of animations
 * Changed the way tooltipData is created throughout to accomodate new seriesObj
 * Changed the way charts handle tooltipData to allow for pagnation
+* Added general method for checking for ordinal and time types.
+* Upgraded various ordinal checks to also check for scaleBand.
+* Added startFromZero option to scale
 
 v4.6.0
 =================
