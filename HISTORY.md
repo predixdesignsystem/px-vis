@@ -28,6 +28,7 @@ v4.6.0
 * Made axis interaction-space brushes capable of dynamic extents updates
 * Some changes to how previous lasso functionality worked so it is more standalone
 * Added annotations component allowing users to add an annotation icon to charts with a tooltip with data
+* Each handler in `actionConfig` in the toolbar can now be an array, allowing to run several handlers for one interaction (e.g click or hover). This allows to mix internal handlers of the chart (say run the tooltip search on hover) and custom ones (do something with the result of that tooltip search on hover for example)
 
 v4.5.4
 =================
