@@ -1,9 +1,14 @@
-v.4.6.1
+=================
+* ensure changing commonAxis dynamically updates axis ticks visibility
+* added `priority` to `seriesConfig` to control order of drawing. priority 0 => smaller priority. 2 draws over 1, which itself draws over 0, etc..
+* `priority` can now be changed dynamically in `markerConfig`
+
+v4.6.1
 =================
 * Removed px-vis-workerUrl check
 * changed workerUrl to blobUrl to prevent possible race conditions
 
-v.4.6.0
+v4.6.0
 =================
 * Fix polar cursor handling of negative data
 * Added ability to the web worker to return all datapoints at a particular point
