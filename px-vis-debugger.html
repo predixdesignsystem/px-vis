@@ -314,6 +314,16 @@
         }
       };
 
+      _debugAddRendererInfo = function(info) {
+
+        info.render = {};
+        info.render.renderToCanvas = chart.renderToCanvas;
+        if(info.render.renderToCanvas) {
+          info.render.targets = chart._canvasTargets;
+          info.render.timings = chart._previousFramesTiming;
+        }
+      };
+
       /***********************************************************
        * Public functions
        * *********************************************************/
@@ -331,7 +341,7 @@
         _debugAddExtentsInfo(info);
         _debugAddSubCompInfo(info);
         _debugAddMiscInfo(info);
-        // _debugAddRendererInfo(info);
+        _debugAddRendererInfo(info);
 
         if(log) {
           console.log(JSON.stringify(info, null, 2));
