@@ -113,14 +113,14 @@ Unlike most other drawing elements that can use chartData directly, bar requires
         value: 10
       },
 
-      _iKey: {
-        type: String
-      },
+      _iKey: String,
 
       _keySeriesDict: {
         type: Object,
-        computed: '_computekeySeriesDict(completeSeriesConfig.*)'
+        computed: '_computekeySeriesDict(completeSeriesConfig.*, _funcsWereSet)'
       },
+      _iAxis: String,
+      _dAxis: String,
       _funcsWereSet: {
         type: Number,
         value: 0
@@ -243,16 +243,20 @@ Unlike most other drawing elements that can use chartData directly, bar requires
       }
 
       if(this.type === 'bar') {
-        this._returnX = function(d) { return this.x(d[0]); }
-        this._returnY = function(d) { return this.y(d.data[this._iKey]); }
-        this._returnWidth = function(d) { return this.x(d[1]) - this.x(d[0]); }
-        this._returnHeight = function(d) { return this.y.bandwidth(); }
+        this._returnX = function(d) { return this.x(d[0]); };
+        this._returnY = function(d) { return this.y(d.data[this._iKey]); };
+        this._returnWidth = function(d) { return this.x(d[1]) - this.x(d[0]); };
+        this._returnHeight = function(d) { return this.y.bandwidth(); };
+        this._iAxis = 'y';
+        this._dAxis = 'x';
 
       } else {
-        this._returnX = function(d) { return this.x(d.data[this._iKey]); }
-        this._returnY = function(d) { return this.y(d[1]); }
-        this._returnWidth = function(d) { return this.x.bandwidth(); }
-        this._returnHeight = function(d) { return this.y(d[0]) - this.y(d[1]); }
+        this._returnX = function(d) { return this.x(d.data[this._iKey]); };
+        this._returnY = function(d) { return this.y(d[1]); };
+        this._returnWidth = function(d) { return this.x.bandwidth(); };
+        this._returnHeight = function(d) { return this.y(d[0]) - this.y(d[1]); };
+        this._iAxis = 'x';
+        this._dAxis = 'y';
       }
 
       this._funcsWereSet += 1;
@@ -281,11 +285,11 @@ Unlike most other drawing elements that can use chartData directly, bar requires
 
       for(var i = 0; i < keys.length; i++) {
         var k = keys[i],
-            y = this.completeSeriesConfig[k]['y'];
+            y = this.completeSeriesConfig[k][this._dAxis];
         dict[y] = k;
       }
 
-      this._iKey = this.completeSeriesConfig[keys[0]]['x'];
+      this._iKey = this.completeSeriesConfig[keys[0]][this._iAxis];
 
       return dict;
     }
