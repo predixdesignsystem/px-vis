@@ -678,7 +678,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * Searches through all data series, then compiles and returns the tooltip data object.
      */
     _getDataForAllSeries: function(mousePos) {
-      var x1 = this._isOrdinalType(this.xAxisType) ? this.x.invert(mousePos[0]) : null,
+      var x1 = this._isOrdinalType(this.xAxisType) ? null : this.x.invert(mousePos[0]),
           dataObj = this._returnTooltipDataStub(mousePos); // setup a holder for our data
 
       if(this.preventWebWorkerSynchronization || this._isOrdinalType(this.xAxisType)) {
@@ -737,8 +737,32 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     _searchLocally: function(mousePos, dataObj, x1) {
-      var keys = this.seriesKeys && this.seriesKeys.length ? this.seriesKeys : Object.keys(this.completeSeriesConfig),
-          closestTimestamp = { "distance": Number.MAX_VALUE, "time": null },
+      if(this._isTimeType(this.xAxisType) || this.isBar) {
+        this._findSingleDataset(mousePos, dataObj, x1);
+
+      } else {
+        this._findDataPerKey(mousePos, dataObj, x1);
+      }
+
+      this._calcDataFinished(dataObj);
+    },
+
+    _findSingleDataset: function(mousePos, dataObj, x1) {
+      // bar is closer to time in that we just want to return data associated with the ordinal position we are over
+      if(this.isBar) {
+        this._searchBarData(mousePos, dataObj, x1);
+
+      //time based X axis
+      } else {
+        this._searchTimeData(mousePos, dataObj, x1);
+      }
+    },
+
+    _findDataPerKey: function(mousePos, dataObj, x1) {
+      var keys = this.seriesKeys && this.seriesKeys.length ?
+            this.seriesKeys :
+            Object.keys(this.completeSeriesConfig),
+          closestTimestamp = { "distance": Number.MAX_VALUE, "time": null };
           //search for timestamp if we don't have it already (non time based chart) and we know the data has some notion of time -- !! --> turn into a bool
           searchTimeStamp = dataObj.time === null && !!this.chartData[0][this.timeData];
 
@@ -752,7 +776,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           //calc this series: returns updated dataObj, xArr, yArr & closestTimestamp
           this._calcSerieData(dataObj, searchTimeStamp, closestTimestamp, x1, keys[i], mousePos);
         } else {
-          dataObj.series.push({'name': keys[i], 'value': null, 'coord': null });
+          this._createEmptySeriesEntry(dataObj, keys[i]);
         }
       } //for
 
@@ -760,8 +784,10 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       if(searchTimeStamp) {
         dataObj.time = closestTimestamp.time;
       }
+    },
 
-      this._calcDataFinished(dataObj);
+    _createEmptySeriesEntry: function(dataObj, k) {
+      dataObj.series.push({'name': k, 'value': null, 'coord': null });
     },
 
     /**
@@ -779,12 +805,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           y1,
           isContinuous = false;
 
-      // bar is closer to time in that we just want to return data associated with the ordinal position we are over
-      if(this.isBar) {
-        result = this._searchBarData(mousePos, k, xKey, yKey, dataObj);
-
       //ordinal are specials...
-      } else if(this._isOrdinalType(this.xAxisType)) {
+      if(this._isOrdinalType(this.xAxisType)) {
         //find ordinal value for X
         result.series[xKey] = this._getOrdinalValue(true, mousePos[0], axisKey);
 
@@ -799,12 +821,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       } else if(this._isOrdinalType(this.yAxisType)) {
         result.series[yKey] = this._getOrdinalValue(false, mousePos[1], axisKey);
         result.series[xKey] = this._getClosestValue(true, x1, this.chartData, xKey, yKey, result.series[yKey]);
-
-      //time based X axis
-      } else if(this._isTimeType(this.xAxisType)) {
-        result = this._searchTimeData(x1, k, xKey, yKey, dataObj);
-
-        dataObj.time = result.series[xKey]
 
       } else  {  //non time based: iterate over points and find the closest
         result = this._searchContinuousData(searchTimeStamp, closestTimestamp, mousePos, xKey, yKey, axisKey, dataObj);
@@ -832,15 +848,19 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      *
      * @method _searchTimeData
      */
-    _searchTimeData: function(x1, k, xKey, yKey, dataObj) {
+    _searchTimeData: function(mousePos, dataObj, x1) {
       /*
         d3.bisector returns index in our array that corresponds to the horizontal position of the mouse pointer.
         Specifically this returns the date that falls to the left of the mouse cursor.
       */
-      var bisectDate = Px.d3.bisector(function(d) {
-            return d[xKey];
+      var keys = this.seriesKeys && this.seriesKeys.length ?
+            this.seriesKeys :
+            Object.keys(this.completeSeriesConfig),
+          bisectDate = Px.d3.bisector(function(d) {
+            return d[this.timeData];
           }.bind(this)).left,
           index,
+          yKey,
           d0,
           d1,
           r,
@@ -867,7 +887,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
         //get point to the right of min and iterate until we reach max
         do {
-          timestamp = this.chartData[index][xKey];
+          timestamp = this.chartData[index][this.timeData];
 
           if(timestamp < ext[1]) {
 
@@ -891,21 +911,30 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         d0 = this.chartData[index - 1],
         d1 = (this.chartData[index]) ? this.chartData[index] : this.chartData[index - 1],
         // sets result as the closest date to the mouse
-        r = (x1 - d0[xKey] > d1[xKey] - x1) ? d1 : d0;
-        result.series[xKey] = r[xKey];
-        result.series[yKey] = r[yKey];
+        r = (x1 - d0[this.timeData] > d1[this.timeData] - x1) ? d1 : d0;
+        result.series = r;
 
-        if(!result.timeStampsTracker[r[xKey]]) {
+        if(!result.timeStampsTracker[r[this.timeData]]) {
           //TODO: pixel search? Should the fuzzy time be applied here instead
           result.rawData.push(r);
 
           // TODO Convert to SET when we can use ES6
-          result.timeStamps.push(r[xKey]);
-          result.timeStampsTracker[r[xKey]] = true;
+          result.timeStamps.push(r[this.timeData]);
+          result.timeStampsTracker[r[this.timeData]] = true;
         }
       }
 
-      return result
+      for(var i=0; i<keys.length; i++) {
+        yKey = this.completeSeriesConfig[keys[i]]['y'];
+        dataObj.series.push({'name': yKey, 'value': result.series, 'coord': result.coords });
+        dataObj.seriesObj[yKey] = {'value': result.series, 'coord': result.coords };
+      }
+
+      dataObj.rawData = result.rawData;
+      // TODO Convert to SET when we can use ES6
+      dataObj.timeStamps = result.timeStamps;
+
+      dataObj.time = result.series[this.timeData];
     },
 
     /**
@@ -1115,52 +1144,53 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       return result;
     },
 
-    _searchBarData: function(mousePos, k, xKey, yKey, dataObj) {
-      var ordVal,
+    _searchBarData: function(mousePos, dataObj, x1) {
+      var keys = this.seriesKeys,
+          ordVal,
           bandStart,
           bandEnd,
-          d,
           scale,
-          scaleIndex,
+          mouseIndex,
           ordKey,
           result = {
             "series": {},
-            "rawData": dataObj.rawData,
-            'timeStamps': dataObj.timeStamps,
-            'timeStampsTracker': dataObj.timeStampsTracker
+            "coord": [],
           };
 
       if(this._isOrdinalType(this.xAxisType)) {
         scale = 'x';
-        scaleIndex = 0;
-        ordKey = xKey;
+        mouseIndex = 0;
+        ordKey = this.completeSeriesConfig[keys[0]]['x'];
       } else {
         scale = 'y';
-        scaleIndex = 1;
-        ordKey = yKey;
+        mouseIndex = 1;
+        ordKey = this.completeSeriesConfig[keys[0]]['y'];
       }
 
-      ordVal = this[scale].invert(mousePos[scaleIndex]);
+      ordVal = this[scale].invert(mousePos[mouseIndex]);
       bandStart = this[scale](ordVal);
       bandEnd = bandStart + this[scale].bandwidth();
 
       // our self-created ordScale.invert counts the padding between bands
       // So check if we are in the padding space or actually over the bar
-      if(bandStart <= mousePos[scaleIndex] && mousePos[scaleIndex] <= bandEnd) {
+      if(bandStart <= mousePos[mouseIndex] && mousePos[mouseIndex] <= bandEnd) {
         // Assuming small datasets; otherwise we may need to revisit this
         for(var i=0; i< this.chartData.length; i++) {
           if(this.chartData[i][ordKey] === ordVal) {
-            d = this.chartData[i];
+            result.series = this.chartData[i];
             break;
           }
         }
-
-        result.series[xKey] = d[xKey];
-        result.series[yKey] = d[yKey];
       }
+      // TODO calc top of bar
+      result.coord = []
 
-      return result
+      for(var i=0; i<keys.length; i++) {
+        dataObj.series.push({'name': keys[i], 'value': result.series, 'coord': result.coords });
+        dataObj.seriesObj[keys[i]] = {'value': result.series, 'coord': result.coords };
+      }
     },
+
     /**
      * Helper function called on document.mouseup.
      * Assumes the user wanted to 'close' the action box, and calls _finishActionBox.

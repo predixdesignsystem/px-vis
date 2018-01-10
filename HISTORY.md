@@ -31,6 +31,9 @@
 * Added general method for checking for ordinal and time types.
 * Upgraded various ordinal checks to also check for scaleBand.
 * Added startFromZero option to scale
+* Added invert function to ordinal scales
+* Refactored time search in interaction space to optimize perf
+
 
 v4.6.0
 =================
