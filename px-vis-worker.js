@@ -760,9 +760,8 @@ function searchQuadtreeSeries(visData, dataObj, quadtreeData) {
 
   for(var i = 0; i < visData.keys.length; i++) {
 
+    k = visData.keys[i];
     if(quadtreeData[k]) {
-
-      k = visData.keys[i];
 
       if(!visData.hardMute || !visData.mutedSeries[k]) {
 

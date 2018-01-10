@@ -1,3 +1,4 @@
+v4.6.2
 =================
 * ensure changing commonAxis dynamically updates axis ticks visibility.
 * added `priority` to `seriesConfig` to control order of drawing. priority 0 => smaller priority. 2 draws over 1, which itself draws over 0, etc..
@@ -6,7 +7,9 @@
   * verify the config of a chart is correct by using the `Px.vis.debug.checkConfig(chart)` method. The checks are minimal at the moment but will be enhanced in the future.
   * give debug info for a specific chart by using the `Px.vis.debug.getInfo(chart, log)` method. If log is true the returned object will be printed and indented in the console. useful for passing information back to the team when reporting a bug.
 * Clear canvases when renderer has no target and was about to render (helps with muting edge case scenarios)
-* Fixes to cursor in some hard mute scenarios
+* The default 'crosshairLasso' configuration for the toolbar does not reset the searchType to 'none' when deselected
+* Toolbar items that have an `onDeselect` function will only have their function run when actually deselected (used to fire every time another button was selected)
+* Fixed a bug where webworker tooltip search for 'pointPerSeries' would return no results
 
 v4.6.1
 =================

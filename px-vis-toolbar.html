@@ -350,9 +350,6 @@ Custom property | Description
           this.set("_internalShowTooltip", false);
           this.set("interactionSpaceConfig.searchType", "lasso");
         },
-        onDeselect: function() {
-          this.set("interactionSpaceConfig.searchType", "none");
-        },
         actionConfig: {
           mouseout: null,
           mousemove: null,
@@ -991,8 +988,8 @@ Custom property | Description
 
           // if we are changing groups
           if(index !== i && this._internalConfig[i].buttonGroup === conf.buttonGroup) {
-            // if we have a onDeselect func, run it
-            if(this._internalConfig[i]["onDeselect"]) {
+            // if we have a onDeselect func and we are selected, run it
+            if(this._internalConfig[i]["onDeselect"] && this._internalConfig[i].selected) {
               var fn = this._returnFn(this._internalConfig[i]["onDeselect"]);
               this._setupContext(this._internalConfig[i], fn);
             }
