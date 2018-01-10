@@ -476,9 +476,9 @@ function constructDataObj(result, dataObj, k, visData, isSingle, xScale) {
   // Only add name to the register if:
   //  * we got no result at all
   //  * if this key is muted with hard mute on
-  //  * if point searchFor mode and this is not the found key
+  //  * if point searchFor mode and this is not the found key and we are not in pointPerSeries
   if(!result || (visData.hardMute && visData.mutedSeries[k]) ||
-      (visData.searchFor === 'point' && result.k !== k)) {
+      (visData.searchFor === 'point' && result.k !== k && visData.searchType !== 'pointPerSeries')) {
     dataObj.series.push(emptySeries(k));
 
   } else if(isSingle) {
@@ -759,8 +759,8 @@ function searchQuadtreeSeries(visData, dataObj, quadtreeData) {
       k;
 
   for(var i = 0; i < visData.keys.length; i++) {
-
     k = visData.keys[i];
+
     if(quadtreeData[k]) {
 
       if(!visData.hardMute || !visData.mutedSeries[k]) {
