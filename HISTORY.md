@@ -16,8 +16,9 @@
     * Custom sort types can be specifed with an object
     * Sorting can be specified without the button via `sortType` property
   * Added pagnation display and interaction properties
-  * Misc fixes and refactoring:
-    * cursor
+  * Added reverseDisplayOrder property so the register can be instructed to display `y / x` instead of `x / y`
+* Misc fixes and refactoring:
+  * cursor
 * Dyanmic Menu changes:
   * Normalized sizing of icons in dynamic menu
   * Allow customization of menu icon in dynamic menu

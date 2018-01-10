@@ -279,6 +279,15 @@ PxVisBehaviorScale.scale = [{
       if(!this.chartId || this.preventWebWorkerSynchronization ) {
         var extents = this._determineExtents();
         this._applyExtents(extents);
+
+        // Ordinal scales do not have invert, so use quantizeScale to figure out ord value we are near
+        if(this._isOrdinalType(this.xAxisType)) {
+          this._createOrdinalInvert(this.x, false);
+        }
+        if(this._isOrdinalType(this.yAxisType)) {
+          this._createOrdinalInvert(this.y, true)
+        }
+
         return;
       }
 
@@ -311,6 +320,20 @@ PxVisBehaviorScale.scale = [{
         }.bind(this)
       });
     }.bind(this), 10);
+  },
+
+  _createOrdinalInvert: function(scale, invert) {
+    scale.invert = (function() {
+      var dom = scale.domain(),
+          r = scale.range(),
+          domain = invert ? dom.reverse() : dom,
+          range = invert ? [r[1],r[0]] : r,  //scaleQuantize REQUIRES ascending order range
+          sq = Px.d3.scaleQuantize().domain(range).range(domain);
+
+      return function(d) {
+        return sq(d)
+      }
+    })();
   },
 
   _applyExtents: function(extents) {

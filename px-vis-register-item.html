@@ -151,7 +151,7 @@ Custom property | Description
     observers: [
       '_toggleSeries(seriesKey, mutedSeries.*)',
       '_disableClickFunc(disableClick)',
-      '_computeItem(_formattedY)'
+      '_computeItem(_formattedX, _formattedY)'
     ],
 
     _computeItem: function() {
@@ -222,7 +222,11 @@ Custom property | Description
         yUnit = this.completeSeriesConfig[this.seriesKey]['yAxisUnit'] ? ' ' + this.completeSeriesConfig[this.seriesKey]['yAxisUnit'] : '';
       }
 
-      this.set('_displayedData', xVal + xUnit + slash + yVal + yUnit);
+      var display = this.reverseDisplayOrder ?
+          yVal + yUnit + slash + xVal + xUnit :
+          xVal + xUnit + slash + yVal + yUnit
+
+      this.set('_displayedData', display);
     },
 
     _returnValue: function(d, key) {

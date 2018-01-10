@@ -79,7 +79,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       PxVisBehavior.preventWebWorkerSynchronization,
       PxVisBehavior.wwDataSyncCounter,
       PxVisBehaviorD3.cursorIcon,
-      PxVisBehaviorInteraction.lasso
+      PxVisBehaviorInteraction.lasso,
+      PxVisBehavior.scaleTypeCheck
     ],
     /***EVENTS****/
     /*
@@ -329,7 +330,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         }
       },
       _height: Number,
-      _width: Number
+      _width: Number,
+      isBar: {
+        type: Boolean,
+        value: false
+      }
     },
 
     observers: [
@@ -673,19 +678,15 @@ TODO implement a dev setting to choose between only showing data at that x, snap
      * Searches through all data series, then compiles and returns the tooltip data object.
      */
     _getDataForAllSeries: function(mousePos) {
-      var x1 = this.xAxisType !== 'ordinal' && this.xAxisType !== 'scaleBand' ? this.x.invert(mousePos[0]) : null,
+      var x1 = this._isOrdinalType(this.xAxisType) ? this.x.invert(mousePos[0]) : null,
           dataObj = this._returnTooltipDataStub(mousePos); // setup a holder for our data
 
-      if(this.preventWebWorkerSynchronization ||
-            this.xAxisType === 'ordinal' ||
-            this.xAxisType === 'scaleBand') {
-
+      if(this.preventWebWorkerSynchronization || this._isOrdinalType(this.xAxisType)) {
         this._searchLocally(mousePos, dataObj, x1);
         return;
       }
 
-      if((this.xAxisType === 'time' || this.xAxisType === 'timeLocal') &&
-            this.searchFor !== 'point') {
+      if(this._isTimeType(this.xAxisType) && this.searchFor !== 'point') {
         dataObj.time = x1;
         this._searchLocally(mousePos, dataObj, x1);
         return;
@@ -778,25 +779,29 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           y1,
           isContinuous = false;
 
+      // bar is closer to time in that we just want to return data associated with the ordinal position we are over
+      if(this.isBar) {
+        result = this._searchBarData(mousePos, k, xKey, yKey, dataObj);
+
       //ordinal are specials...
-      if(this.xAxisType === 'ordinal' || this.xAxisType === 'scaleBand') {
+      } else if(this._isOrdinalType(this.xAxisType)) {
         //find ordinal value for X
         result.series[xKey] = this._getOrdinalValue(true, mousePos[0], axisKey);
 
         //now get Y
-        if(this.yAxisType === 'ordinal' || this.yAxisType === 'scaleBand') {
+        if(this._isOrdinalType(this.yAxisType)) {
           result.series[yKey] = this._getOrdinalValue(false, mousePos[1], axisKey);
         } else {
           y1 = this.isMultiY ? this.y[axisKey].invert(mousePos[1]) : this.y.invert(mousePos[1]);
           result.series[yKey] = this._getClosestValue(false, y1, this.chartData, xKey, yKey, result.series[xKey]);
         }
 
-      } else if(this.yAxisType === 'ordinal' || this.yAxisType === 'scaleBand') {
+      } else if(this._isOrdinalType(this.yAxisType)) {
         result.series[yKey] = this._getOrdinalValue(false, mousePos[1], axisKey);
         result.series[xKey] = this._getClosestValue(true, x1, this.chartData, xKey, yKey, result.series[yKey]);
 
       //time based X axis
-      } else if(this.xAxisType === 'time' || this.xAxisType === 'timeLocal') {
+      } else if(this._isTimeType(this.xAxisType)) {
         result = this._searchTimeData(x1, k, xKey, yKey, dataObj);
 
         dataObj.time = result.series[xKey]
@@ -833,7 +838,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         Specifically this returns the date that falls to the left of the mouse cursor.
       */
       var bisectDate = Px.d3.bisector(function(d) {
-            return d[this.completeSeriesConfig[k]['x']];
+            return d[xKey];
           }.bind(this)).left,
           index,
           d0,
@@ -1108,6 +1113,53 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       });
 
       return result;
+    },
+
+    _searchBarData: function(mousePos, k, xKey, yKey, dataObj) {
+      var ordVal,
+          bandStart,
+          bandEnd,
+          d,
+          scale,
+          scaleIndex,
+          ordKey,
+          result = {
+            "series": {},
+            "rawData": dataObj.rawData,
+            'timeStamps': dataObj.timeStamps,
+            'timeStampsTracker': dataObj.timeStampsTracker
+          };
+
+      if(this._isOrdinalType(this.xAxisType)) {
+        scale = 'x';
+        scaleIndex = 0;
+        ordKey = xKey;
+      } else {
+        scale = 'y';
+        scaleIndex = 1;
+        ordKey = yKey;
+      }
+
+      ordVal = this[scale].invert(mousePos[scaleIndex]);
+      bandStart = this[scale](ordVal);
+      bandEnd = bandStart + this[scale].bandwidth();
+
+      // our self-created ordScale.invert counts the padding between bands
+      // So check if we are in the padding space or actually over the bar
+      if(bandStart <= mousePos[scaleIndex] && mousePos[scaleIndex] <= bandEnd) {
+        // Assuming small datasets; otherwise we may need to revisit this
+        for(var i=0; i< this.chartData.length; i++) {
+          if(this.chartData[i][ordKey] === ordVal) {
+            d = this.chartData[i];
+            break;
+          }
+        }
+
+        result.series[xKey] = d[xKey];
+        result.series[yKey] = d[yKey];
+      }
+
+      return result
     },
     /**
      * Helper function called on document.mouseup.
