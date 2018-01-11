@@ -33,6 +33,7 @@
 * Added startFromZero option to scale
 * Added invert function to ordinal scales
 * Refactored time search in interaction space to optimize perf
+* New grouped bar component to provide grouped bars for a bar and column chart
 
 
 v4.6.0
