@@ -1,3 +1,7 @@
+v4.6.3
+=================
+* ensure canvas to clear are defined when rendering no targets
+
 v4.6.2
 =================
 * ensure changing commonAxis dynamically updates axis ticks visibility.
