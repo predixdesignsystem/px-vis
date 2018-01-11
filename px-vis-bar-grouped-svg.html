@@ -29,22 +29,22 @@ Unlike most other drawing elements that can use chartData directly, bar requires
       selected-domain="[[selectedDomain]]">
     </px-vis-scale>
 
-    <px-vis-bar-svg
+    <px-vis-bar-grouped-svg
       svg="[[svg]]"
       complete-series-config="[[seriesConfig]]"
-      chart-data="[[stackedChartData]]"
+      chart-data="[[chartData]]"
       x="[[x]]"
       y="[[y]]"
       domain-changed="[[domainChanged]]">
-    </px-vis-bar-svg>
+    </px-vis-bar-grouped-svg>
 
-@element px-vis-bar-svg
+@element px-vis-bar-grouped-svg
 @blurb Element which draws bar series onto the chart
 @homepage index.html
 @demo demo.html
 -->
 
-<dom-module id="px-vis-bar-svg">
+<dom-module id="px-vis-bar-grouped-svg">
     <template>
       <style include="px-vis-styles"></style>
 
@@ -53,7 +53,7 @@ Unlike most other drawing elements that can use chartData directly, bar requires
 
 <script>
   Polymer({
-    is: 'px-vis-bar-svg',
+    is: 'px-vis-bar-grouped-svg',
 
     behaviors: [
       PxVisBehavior.observerCheck,
@@ -70,7 +70,7 @@ Unlike most other drawing elements that can use chartData directly, bar requires
 
     /**
      * Event fired when an svg bar has finished drawing
-     * @event px-vis-bar-svg-rendering-ended
+     * @event px-vis-bar-grouped-svg-rendering-ended
      */
 
     /**
@@ -84,25 +84,19 @@ Unlike most other drawing elements that can use chartData directly, bar requires
        * A holder object for the series object
        *
        */
-      barRects:{
-        type:Object
-      },
+      barRects:Object,
       /**
        * A holder object for the series builder
        *
        * @property linePath
        * @type String
        */
-      barBuilder:{
-        type:Object
-      },
+      barBuilder:Object,
       /**
        * A holder object for the series group
        *
        */
-      barGroup:{
-        type:Object
-      },
+      barGroup:Object,
 
       /**
        * Debounce time to use for drawing
@@ -112,14 +106,9 @@ Unlike most other drawing elements that can use chartData directly, bar requires
         value: 10
       },
 
-      _iKey: String,
-
-      _keySeriesDict: {
-        type: Object,
-        computed: '_computekeySeriesDict(completeSeriesConfig.*, _funcsWereSet)'
-      },
       _iAxis: String,
       _dAxis: String,
+
       _funcsWereSet: {
         type: Number,
         value: 0
@@ -129,30 +118,26 @@ Unlike most other drawing elements that can use chartData directly, bar requires
         value: 'column'
       },
 
-      _returnX: {
-        type: Function
-      },
-      _returnY: {
-        type: Function
-      },
-      _returnWidth: {
-        type: Function
-      },
-      _returnHeight: {
-        type: Function
-      },
-      seriesKey: {
-        type: String
-      },
+      _returnX: Function,
+      _returnY: Function,
+      _returnWidth: Function,
+      _returnHeight: Function,
+      groupScale: Function,
+      ordinalKey: String,
 
       highlightBar: {
         type: String,
         value: ''
+      },
+
+      _chartAreaHeight: {
+        type: Number,
+        computed: '_computeChartAreaHeight(height, margin.*)'
       }
     },
 
     observers: [
-      'drawElement(svg, y, domainChanged, chartData.*, completeSeriesConfig.*, _keySeriesDict,  preventInitialDrawing, _funcsWereSet)',
+      'drawElement(svg, y, domainChanged, chartData.*, completeSeriesConfig.*, preventInitialDrawing, _funcsWereSet)',
       '_addClipPath(clipPath)',
       '_muteBars(highlightBar)',
       '_setFuncs(type)'
@@ -173,10 +158,9 @@ Unlike most other drawing elements that can use chartData directly, bar requires
      * @method drawElement
      */
     drawElement: function() {
-     if(this.hasUndefinedArguments(arguments)) {
-       return;
-     }
-
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
 
       if(!this.preventInitialDrawing) {
         //if 0 don't debounce at all
@@ -199,17 +183,28 @@ Unlike most other drawing elements that can use chartData directly, bar requires
     },
 
     _drawElementDebounced: function() {
-      // checks to see if the group already exists. If not, create; if so, update
-      if(this._isObjEmpty(this.barGroup)) {
-        // draw the path
-        this.barGroup = this.svg.append('g')
-          .attr('series-id', 'bars')
-          .attr('class', 'series-bars');
-      }
+
+      var barGroupBuilder = this.svg.selectAll('g.seriesGroups')
+        .data(this.chartData);
+
+      barGroupBuilder.exit().remove();
+
+      barGroupBuilder.enter()
+        .append('g')
+        .attr('series-id', 'bars')
+        .attr('class', 'seriesGroups')
+      .merge(barGroupBuilder)
+        .attr("transform", this._transformGroups.bind(this));
+
+      this.barGroup = this.svg.selectAll('g.seriesGroups');
 
       // set our data
-      var barBuilder = this.barGroup.selectAll('rect.series-bar')
-        .data(this.chartData);
+      var barBuilder = barGroupBuilder.selectAll('rect.series-bar')
+        .data(function(d) {
+          return this.seriesKeys.map(function(key) {
+            return { cscKey: key, key: this.completeSeriesConfig[key][this._dAxis], value: d[this.completeSeriesConfig[key][this._dAxis]] };
+          }.bind(this));
+        }.bind(this));
 
       // When datapoints disappear from our data, remove them
       barBuilder.exit().remove();
@@ -220,26 +215,20 @@ Unlike most other drawing elements that can use chartData directly, bar requires
         .attr('class', 'series-bar')
       // When datapoints are added OR this funtion is run, draw stuff
       .merge(barBuilder)
-        .attr('series-id', function(d, i) {
-          var series = this._keySeriesDict[this.seriesKey];
-          return 'bar_' + series + '_' + i;
-        }.bind(this))
-        .attr('series-keys', function(d, i) { return this._keySeriesDict[this.seriesKey]; }.bind(this))
+        .attr('series-id', function(d, i) { return 'bar_' + d.cscKey + '_' + i; }.bind(this))
+        .attr('series-keys', function(d, i) { return d.cscKey; })
         .attr('x', this._returnX.bind(this))
         .attr('y', this._returnY.bind(this))
         .attr('width', this._returnWidth.bind(this))
         .attr('height', this._returnHeight.bind(this))
-        .attr('fill', function(d,i) {
-          var series = this._keySeriesDict[this.seriesKey];
-          return this.completeSeriesConfig[series]['color'];
-        }.bind(this));
+        .attr('fill', function(d,i) { return this.completeSeriesConfig[d.cscKey]['color']; }.bind(this));
 
       // Make it easy to get our bars again
       this.barRects = this.barGroup.selectAll('rect.series-bar');
 
       this._addClipPath();
 
-      this.fire('px-vis-bar-svg-rendering-ended');
+      this.fire('px-vis-bar-grouped-svg-rendering-ended');
     },
 
     _setFuncs: function() {
@@ -248,18 +237,20 @@ Unlike most other drawing elements that can use chartData directly, bar requires
       }
 
       if(this.type === 'bar') {
-        this._returnX = function(d) { return this.x(d[0]); };
-        this._returnY = function(d) { return this.y(d.data[this._iKey]); };
-        this._returnWidth = function(d) { return this.x(d[1]) - this.x(d[0]); };
-        this._returnHeight = function(d) { return this.y.bandwidth(); };
+        this._returnX = function() { return 0; };
+        this._returnY = function(d) { return this.groupScale(d.key); };
+        this._returnWidth = function(d, i) { return this.x(d.value); };
+        this._returnHeight = function() { return this.groupScale.bandwidth(); };
+        this._transformGroups = function(d) { return "translate(0," + this.y(d[this.ordinalKey]) + ")"; };
         this._iAxis = 'y';
         this._dAxis = 'x';
 
       } else {
-        this._returnX = function(d) { return this.x(d.data[this._iKey]); };
-        this._returnY = function(d) { return this.y(d[1]); };
-        this._returnWidth = function(d) { return this.x.bandwidth(); };
-        this._returnHeight = function(d) { return this.y(d[0]) - this.y(d[1]); };
+        this._returnX = function(d) { return this.groupScale(d.key); };
+        this._returnY = function(d,i) { return this.y(d.value); };
+        this._returnWidth = function() { return this.groupScale.bandwidth(); };
+        this._returnHeight = function(d,i) { return this.y.range()[0] - this.y(d.value); };
+        this._transformGroups = function(d) { return "translate(" + this.x(d[this.ordinalKey]) + ",0)"; };
         this._iAxis = 'x';
         this._dAxis = 'y';
       }
@@ -273,15 +264,15 @@ Unlike most other drawing elements that can use chartData directly, bar requires
       }
 
       if(this.highlightBar === '') {
-        this.barRects.classed('muted', false);
+        this.barGroup.classed('muted', false);
         return;
       }
 
-      var iKey = this._iKey,
+      var ordKey = this.ordinalKey
           ordVal = this.highlightBar;
 
-      this.barRects.classed('muted', function() {
-        return Px.d3.select(this).data()[0].data[iKey] !== ordVal;
+      this.barGroup.classed('muted', function() {
+        return Px.d3.select(this).data()[0][ordKey] !== ordVal;
       });
     },
 
@@ -298,23 +289,8 @@ Unlike most other drawing elements that can use chartData directly, bar requires
       this.addClipPath(this.barGroup);
     },
 
-    _computekeySeriesDict: function(completeSeriesConfig) {
-      if(this.hasUndefinedArguments(arguments)) {
-        return;
-      }
-
-      var keys = Object.keys(this.completeSeriesConfig),
-          dict = {};
-
-      for(var i = 0; i < keys.length; i++) {
-        var k = keys[i],
-            y = this.completeSeriesConfig[k][this._dAxis];
-        dict[y] = k;
-      }
-
-      this._iKey = this.completeSeriesConfig[keys[0]][this._iAxis];
-
-      return dict;
+    _computeChartAreaHeight: function() {
+      return this.height - this.margin.top - this.margin.bottom;
     }
   });
 </script>

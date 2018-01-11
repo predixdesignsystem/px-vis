@@ -1149,27 +1149,32 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           ordVal,
           bandStart,
           bandEnd,
-          scale,
+          ordScale,
+          linScale,
           mouseIndex,
           ordKey,
+          x,
+          y,
           result = {
             "series": {},
             "coord": [],
           };
 
       if(this._isOrdinalType(this.xAxisType)) {
-        scale = 'x';
+        ordScale = 'x';
+        linScale = 'y';
         mouseIndex = 0;
         ordKey = this.completeSeriesConfig[keys[0]]['x'];
       } else {
-        scale = 'y';
+        ordScale = 'y';
+        linScale = 'x';
         mouseIndex = 1;
         ordKey = this.completeSeriesConfig[keys[0]]['y'];
       }
 
-      ordVal = this[scale].invert(mousePos[mouseIndex]);
-      bandStart = this[scale](ordVal);
-      bandEnd = bandStart + this[scale].bandwidth();
+      ordVal = this[ordScale].invert(mousePos[mouseIndex]);
+      bandStart = this[ordScale](ordVal);
+      bandEnd = bandStart + this[ordScale].bandwidth();
 
       // our self-created ordScale.invert counts the padding between bands
       // So check if we are in the padding space or actually over the bar
@@ -1181,13 +1186,17 @@ TODO implement a dev setting to choose between only showing data at that x, snap
             break;
           }
         }
-      }
-      // TODO calc top of bar
-      result.coord = []
 
-      for(var i=0; i<keys.length; i++) {
-        dataObj.series.push({'name': keys[i], 'value': result.series, 'coord': result.coords });
-        dataObj.seriesObj[keys[i]] = {'value': result.series, 'coord': result.coords };
+        x = this[ordScale](ordVal);
+
+        for(var i=0; i<keys.length; i++) {
+          y = this[linScale](result.series[this.completeSeriesConfig[keys[i]][linScale]]);
+          result.coord = this._isOrdinalType(this.xAxisType) ? [x,y] : [y,x];
+
+          dataObj.series.push({'name': keys[i], 'value': result.series, 'coord': result.coord });
+          dataObj.seriesObj[keys[i]] = {'value': result.series, 'coord': result.coord };
+          dataObj.ordinalSet = ordVal;
+        }
       }
     },
 
