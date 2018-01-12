@@ -79,6 +79,16 @@ PxVisBehaviorScale.scale = [{
      */
     chartId: {
       type: String
+    },
+
+    /**
+     * The padding for ordinal type scales - effective controls the spacing between ordinal groups
+
+     * Expressed as a percent of the ordinal group width, so a value of 0.5 for a bar chart means your bar and the gap between bars are the same size
+     */
+    scalePadding: {
+      type: Number,
+      value: 0.5
     }
   },
 
@@ -231,10 +241,10 @@ PxVisBehaviorScale.scale = [{
       result = Px.d3.scaleLinear().nice().range(range);
       result._scaleType = 'linear';
     } else if(type === 'scaleBand') {
-      result = Px.d3.scaleBand().range(range).round(true).paddingInner(0.5);
+      result = Px.d3.scaleBand().range(range).round(true).paddingInner(this.scalePadding);
       result._scaleType = 'scaleBand';
     } else { //ordinal
-      result = Px.d3.scalePoint().range(range).padding(0.5);
+      result = Px.d3.scalePoint().range(range).padding(this.scalePadding);
       result._scaleType = 'ordinal';
     }
 

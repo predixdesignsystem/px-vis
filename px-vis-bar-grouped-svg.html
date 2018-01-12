@@ -237,9 +237,9 @@ Unlike most other drawing elements that can use chartData directly, bar requires
       }
 
       if(this.type === 'bar') {
-        this._returnX = function() { return 0; };
+        this._returnX = function(d) { return this.x(d.value) - this.x(0) < 0 ? this.x(d.value) : this.x(0); };
         this._returnY = function(d) { return this.groupScale(d.key); };
-        this._returnWidth = function(d, i) { return this.x(d.value); };
+        this._returnWidth = function(d) { return Math.abs(this.x(d.value) - this.x(0)); };
         this._returnHeight = function() { return this.groupScale.bandwidth(); };
         this._transformGroups = function(d) { return "translate(0," + this.y(d[this.ordinalKey]) + ")"; };
         this._iAxis = 'y';
@@ -247,9 +247,9 @@ Unlike most other drawing elements that can use chartData directly, bar requires
 
       } else {
         this._returnX = function(d) { return this.groupScale(d.key); };
-        this._returnY = function(d,i) { return this.y(d.value); };
+        this._returnY = function(d,i) { return this.y(0) - this.y(d.value) < 0 ? this.y(0) : this.y(d.value); };
         this._returnWidth = function() { return this.groupScale.bandwidth(); };
-        this._returnHeight = function(d,i) { return this.y.range()[0] - this.y(d.value); };
+        this._returnHeight = function(d,i) { return Math.abs(this.y(0) - this.y(d.value)); };
         this._transformGroups = function(d) { return "translate(" + this.x(d[this.ordinalKey]) + ",0)"; };
         this._iAxis = 'x';
         this._dAxis = 'y';

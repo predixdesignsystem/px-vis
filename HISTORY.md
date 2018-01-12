@@ -29,11 +29,14 @@
 * Changed the way tooltipData is created throughout to accomodate new seriesObj
 * Changed the way charts handle tooltipData to allow for pagnation
 * Added general method for checking for ordinal and time types.
-* Upgraded various ordinal checks to also check for scaleBand.
-* Added startFromZero option to scale
-* Added invert function to ordinal scales
+  * Upgraded various ordinal checks to also check for scaleBand.
+* Ordinal type scale changes in scale-=behavior:
+  * Added startFromZero option to scale
+  * Added invert function to ordinal scales
+  * Added scalePadding property on scale behavior to allow you to set the padding for ordinal type scales
 * Refactored time search in interaction space to optimize perf
 * New grouped bar component to provide grouped bars for a bar and column chart
+  * seriesConfig can now have a `negativeColor` property to specify a different color for negative bar values. `color` will still be used for positive values
 
 
 v4.6.0

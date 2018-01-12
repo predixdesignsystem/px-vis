@@ -173,10 +173,9 @@ Unlike most other drawing elements that can use chartData directly, bar requires
      * @method drawElement
      */
     drawElement: function() {
-     if(this.hasUndefinedArguments(arguments)) {
-       return;
-     }
-
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
 
       if(!this.preventInitialDrawing) {
         //if 0 don't debounce at all
@@ -230,8 +229,10 @@ Unlike most other drawing elements that can use chartData directly, bar requires
         .attr('width', this._returnWidth.bind(this))
         .attr('height', this._returnHeight.bind(this))
         .attr('fill', function(d,i) {
-          var series = this._keySeriesDict[this.seriesKey];
-          return this.completeSeriesConfig[series]['color'];
+          var series = this._keySeriesDict[this.seriesKey],
+              colorKey = d[0] < 0 || d[1] < 0 ? 'negativeColor': 'color';
+
+          return this.completeSeriesConfig[series][colorKey] ? this.completeSeriesConfig[series][colorKey] : this.completeSeriesConfig[series]['color'];
         }.bind(this));
 
       // Make it easy to get our bars again
@@ -248,18 +249,18 @@ Unlike most other drawing elements that can use chartData directly, bar requires
       }
 
       if(this.type === 'bar') {
-        this._returnX = function(d) { return this.x(d[0]); };
+        this._returnX = function(d) { return (this.x(d[1]) - this.x(d[0]) < 0) ? this.x(d[1]) : this.x(d[0]); };
         this._returnY = function(d) { return this.y(d.data[this._iKey]); };
-        this._returnWidth = function(d) { return this.x(d[1]) - this.x(d[0]); };
+        this._returnWidth = function(d) { return Math.abs(this.x(d[1]) - this.x(d[0])); };
         this._returnHeight = function(d) { return this.y.bandwidth(); };
         this._iAxis = 'y';
         this._dAxis = 'x';
 
       } else {
         this._returnX = function(d) { return this.x(d.data[this._iKey]); };
-        this._returnY = function(d) { return this.y(d[1]); };
+        this._returnY = function(d) { return (this.y(d[0]) - this.y(d[1]) < 0) ? this.y(d[0]) : this.y(d[1]); };
         this._returnWidth = function(d) { return this.x.bandwidth(); };
-        this._returnHeight = function(d) { return this.y(d[0]) - this.y(d[1]); };
+        this._returnHeight = function(d) { return Math.abs(this.y(d[0]) - this.y(d[1])); };
         this._iAxis = 'x';
         this._dAxis = 'y';
       }
