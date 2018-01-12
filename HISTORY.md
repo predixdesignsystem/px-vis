@@ -1,3 +1,7 @@
+v4.6.4
+=================
+* add missing `function` keyword for IE
+
 v4.6.3
 =================
 * ensure canvas to clear are defined when rendering no targets
