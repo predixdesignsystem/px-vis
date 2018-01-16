@@ -17,6 +17,7 @@
     * Sorting can be specified without the button via `sortType` property
   * Added pagnation display and interaction properties
   * Added reverseDisplayOrder property so the register can be instructed to display `y / x` instead of `x / y`
+  * Added two tone option for series icon to also display `negativeColor` when applicable
 * Misc fixes and refactoring:
   * cursor
 * Dyanmic Menu changes:
@@ -37,6 +38,7 @@
 * Refactored time search in interaction space to optimize perf
 * New grouped bar component to provide grouped bars for a bar and column chart
   * seriesConfig can now have a `negativeColor` property to specify a different color for negative bar values. `color` will still be used for positive values
+* Thresholds now have a `type` property and can be shown on the x-axis
 
 
 v4.6.0

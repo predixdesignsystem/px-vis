@@ -447,6 +447,10 @@ PxVisBehaviorRegister.generalItem = [{
       type: String,
       computed: '_computeItemColor(seriesKey, completeSeriesConfig.*, iconColor)'
     },
+    _negativeColor: {
+      type: String,
+      computed: '_computeNegativeItemColor(seriesKey, completeSeriesConfig.*)'
+    },
     /**
      * calculates the dash pattern of the item
      */
@@ -481,7 +485,6 @@ PxVisBehaviorRegister.generalItem = [{
    *
    * `rgb(r,g,b)` return the appropriate rgb values based in the series index
    *
-   * @method _returnItemColor
    * @param {i}
    * @return {rgb}
    */
@@ -495,6 +498,16 @@ PxVisBehaviorRegister.generalItem = [{
     }
 
     return this.completeSeriesConfig[this.seriesKey] && this.completeSeriesConfig[this.seriesKey]['color'] ? this.completeSeriesConfig[this.seriesKey]['color'] : 'transparent';
+  },
+
+  /**
+   */
+   _computeNegativeItemColor: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    return this.completeSeriesConfig[this.seriesKey] && this.completeSeriesConfig[this.seriesKey]['negativeColor'] ? this.completeSeriesConfig[this.seriesKey]['negativeColor'] : null;
   },
 
   /**

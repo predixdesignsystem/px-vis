@@ -149,12 +149,18 @@ Custom property | Description
       language: {
         type: String,
         value: 'en'
+      },
+
+      type: {
+        type: String,
+        value: 'y'
       }
     },
 
     observers: [
 
-      'drawElement(svg, y, domainChanged, completeSeriesConfig.*, thresholdData.*, width, margin.*, _animationFrameDone, language)',
+      'drawElement(svg, domainChanged, completeSeriesConfig.*, thresholdData.*, width, margin.*, _animationFrameDone, language)',
+      'drawElement(svg, domainChanged, completeSeriesConfig.*, thresholdData.*, height, margin.*, _animationFrameDone, language)',
       '_updateColors()',
       '_calcThemeOrConfig(_stylesUpdated)'
      ],
@@ -190,7 +196,7 @@ Custom property | Description
        return;
      }
 
-      if(this._animationFrameDone && this.domainChanged !== null && this.y && (typeof this.y === 'function' || this._doesObjHaveValues(this.y))) {
+      if(this._animationFrameDone && this.domainChanged !== null) {
         if(this.drawDebounceTime > 0) {
           this.debounce('_drawThreshold', function() {
             this._drawElementDebounced();
@@ -221,6 +227,7 @@ Custom property | Description
           .append('g')
           .attr('class', 'threshold')
           .attr('threshold-id',function(d){ return d.for })
+          .attr("clip-path", 'url(#' + this.clipPath + ')')
           .each(function(d,i) {
             _this._enterLine(d, i, this);
             _this._enterRect(d, i, this);
@@ -251,10 +258,10 @@ Custom property | Description
 
     _mergeLine: function(d, i, elem) {
       Px.d3.select(elem).select("line.threshold-line")
-        .attr('x1', 0)
-        .attr('x2', this.width - this.margin.right - this.margin.left)
-        .attr('y1', function(d) { return this._getYVal(d); }.bind(this))
-        .attr('y2', function(d) { return this._getYVal(d); }.bind(this))
+        .attr('x1', function(d) { return this.type === 'y' ? 0 : this.x(d.value); }.bind(this))
+        .attr('x2', function(d) { return this.type === 'y' ? this.width - this.margin.right - this.margin.left : this.x(d.value); }.bind(this))
+        .attr('y1', function(d) { return this.type === 'y' ? this._getYVal(d) : 0; }.bind(this))
+        .attr('y2', function(d) { return this.type === 'y' ? this._getYVal(d) : this.height - this.margin.top - this.margin.bottom; }.bind(this))
         .attr('stroke', this._getColors.bind(this))
         .attr('stroke-width', function(d) {
           return (this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['strokeWidth'] ) ?
@@ -265,28 +272,27 @@ Custom property | Description
           return this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['dashPattern'] ?
             this.thresholdConfig[d.type]['dashPattern'] :
             this._defaultThresholdConfig['dashPattern'];
-        }.bind(this))
-        .attr("clip-path", 'url(#' + this.clipPath + ')');
+        }.bind(this));
     },
 
     _enterRect: function(d, i, elem) {
       Px.d3.select(elem).append("rect")
         .attr("class", "threshold-rect")
-        .attr('x', 5)
         .attr('height','18');
     },
 
     _mergeRect: function(d, i, elem) {
       Px.d3.select(elem).select("rect.threshold-rect")
-        .attr('y', this._calcYPos.bind(this))
+        .attr('x', function(d) { return this.type === 'y' ? 5 : this.x(d.value) - 1; }.bind(this))
+        .attr('y', function(d,i) { return this.type === 'y' ? this._calcYPos(d,i) : 2; }.bind(this))
+        .attr('transform', function(d) { return this.type === 'y' ? null : 'rotate(90 ' + (this.x(d.value) - 1) + ',2)'; }.bind(this))
         .attr('fill', function(d, i) {
           var type = d.type;
           if(this.thresholdConfig[type] && this.thresholdConfig[type]['showThresholdBox']) {
             return this._getColors(d,i);
           }
           return 'none';
-        }.bind(this))
-        .attr("clip-path", 'url(#' + this.clipPath + ')');
+        }.bind(this));
     },
 
     _enterText: function(d, i, elem) {
@@ -294,23 +300,24 @@ Custom property | Description
         .attr("class", "threshold-text")
         .attr('font-size', '12px')
         .style('font-family',this._checkThemeVariable("--px-vis-font-family", 'Comic Sans MS'))
-        .attr('font-style', this._checkThemeVariable("--px-vis-font-family", 'Comic Sans MS'))
-        .attr('x', 8);
+        .attr('font-style', this._checkThemeVariable("--px-vis-font-family", 'Comic Sans MS'));
     },
 
     _mergeText: function(d, i, elem) {
       var title = this._calcTitle(d);
       Px.d3.select(elem).select("text.threshold-text")
         .text(title)
-        .attr('y', function(d,i) { return this._calcYPos(d,i,13); }.bind(this) )
+        .attr('x', function(d,i) { return this.type === 'y' ? 8 : this.x(d.value) - 4; }.bind(this))
+        .attr('y', function(d,i) { return this.type === 'y' ? this._calcYPos(d,i,13) : 5; }.bind(this))
+        .attr('transform', function(d) { return this.type === 'y' ? null : 'rotate(-90 ' + (this.x(d.value) - 4) + ',5)'; }.bind(this))
+        .attr('text-anchor', function() { return this.type === 'y' ? 'start' : 'end'; }.bind(this))
         .attr('fill', function(d,i) {
           var type = d.type;
           if(this.thresholdConfig[type] && this.thresholdConfig[type]['showThresholdBox']) {
             return "white"
           }
           return this._getColors(d,i);
-        }.bind(this))
-        .attr("clip-path", 'url(#' + this.clipPath + ')');
+        }.bind(this));
 
       return title
     },
@@ -361,7 +368,7 @@ Custom property | Description
      * @method _calcYPos
      */
     _calcYPos: function(d,i,offset) {
-      offset = offset | 0;
+      offset = offset || 0;
       // var mid = (this.currentDomainY[1] +  this.currentDomainY[0]) / 2,
       //     val = (d.value < mid) ? this._getYVal(d) -1 + offset : this._getYVal(d) -17 + offset;
       // return val;
