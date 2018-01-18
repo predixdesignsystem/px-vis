@@ -131,6 +131,11 @@
       disablePointerEvents: {
         type: Boolean,
         value: false
+      },
+
+      idPrefix: {
+        type: String,
+        value: 'line_'
       }
     },
 
@@ -212,14 +217,14 @@
           if(this._isObjEmpty(this.lineGroup)) {
             // draw the path
             this.lineGroup = this.svg.append('g')
-              .attr('series-id', 'line_' + this.seriesId)
+              .attr('series-id', this.idPrefix + this.seriesId)
               .attr('class', 'series-line');
 
             if(this.disablePointerEvents) {
               this.lineGroup.style("pointer-events", "none");
             }
           } else {
-            this.lineGroup.attr('series-id', 'line_' + this.seriesId)
+            this.lineGroup.attr('series-id', this.idPrefix + this.seriesId)
           }
 
           // set our data
@@ -240,7 +245,10 @@
               return this.line(d);
             }.bind(this))
             .attr('series-id', function(d,i) {
-              return this.multiPath ? 'line_' + d[this.seriesId] : 'line_' + this.seriesId
+              return this.multiPath ? this.idPrefix + d[this.seriesId] : this.idPrefix + this.seriesId
+            }.bind(this))
+            .attr('id', function(d,i) {
+              return this.multiPath ? this.idPrefix + d[this.seriesId] : this.idPrefix + this.seriesId
             }.bind(this))
             .attr('stroke-width',this.strokeWidth)
             .attr('stroke',function(d,i) {

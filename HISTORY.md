@@ -39,6 +39,7 @@
 * New grouped bar component to provide grouped bars for a bar and column chart
   * seriesConfig can now have a `negativeColor` property to specify a different color for negative bar values. `color` will still be used for positive values
 * Thresholds now have a `type` property and can be shown on the x-axis
+* Added a reference curve component which accepts `referenceData` and `referenceConfig` to create a reference curve with a colored line and text
 
 
 v4.6.0
