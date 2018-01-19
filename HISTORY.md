@@ -1,3 +1,7 @@
+=================
+* `dimensions` now notify and improved documentation for `dimensions` and `axes`
+* fixed a rare timing issue with the web worker scheduler when unregistering charts
+
 v4.6.4
 =================
 * add missing `function` keyword for IE
