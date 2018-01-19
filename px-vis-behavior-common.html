@@ -1620,17 +1620,23 @@ PxVisBehavior.thresholds = {
 PxVisBehavior.dimensions = {
   properties: {
     /**
-     * An optional dev set array to specify which dimensions to plot
-     *
+     * Represents all axes plotted by the chart, including muted ones.
+     * It doesn't guarantee to have the same order as the current visual
+     * representation.
+     * Can be set by the developer to define which axes to plot
      */
     axes: {
       type: Array
     },
     /**
-    * An array of dimensions which the chart uses.
+    * An array of dimensions (axes) which the chart uses. This array represents
+    * the current state of all axes: muted axes won't be included and the
+    * array is ordered based on the current visual representation.
+    * Do not set at a chart level, only read
     */
     dimensions: {
-      type: Array
+      type: Array,
+      notify: true
     },
     /**
     * A string specifying which key to use as the series
