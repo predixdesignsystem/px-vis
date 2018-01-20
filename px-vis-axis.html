@@ -259,6 +259,16 @@ Custom property | Description
           unit: {
             type: String,
             value: ''
+          },
+
+          /**
+           * Allows you to shift just the title from it's default location. Array,[x,y]
+           */
+          titleOffset: {
+            type: Array,
+            value: function() {
+              return [0,0];
+            }
           }
         },
 
@@ -765,8 +775,8 @@ Custom property | Description
               ext["height"] = this.labelRotation ? parseFloat(this._getAxisGroupSize()["height"]) :
                   this._axis.tickSizeInner() + this._calcTopBottomLabelSize() + this.labelTranslation[1] + this.titleTypeSize + 5;
 
-              x = ext['width'] + this.translateAmt[0];
-              y = ext['height'] + this.translateAmt[1];
+              x = ext['width'] + this.translateAmt[0] + this.titleOffset[0];
+              y = ext['height'] + this.translateAmt[1]  + this.titleOffset[1];
               r = 0;
               anchor = 'middle';
               break;
@@ -780,8 +790,8 @@ Custom property | Description
               ext["height"] = this.labelRotation ? parseFloat(this._getAxisGroupSize()["height"]) :
                   this._axis.tickSizeInner() + this._calcTopBottomLabelSize() + this.labelTranslation[1] + 5;
 
-              x = ext['width'] + this.translateAmt[0];
-              y = -ext["height"] + this.translateAmt[1];
+              x = ext['width'] + this.translateAmt[0] + this.titleOffset[0];
+              y = -ext["height"] + this.translateAmt[1] + this.titleOffset[1];
               r = 0;
               anchor = 'middle';
               break;
@@ -794,8 +804,8 @@ Custom property | Description
               //range of axis = length of axis
               ext["height"] = (this.axis.range()[1] - this.axis.range()[0]) / 2;
 
-              x = -ext["width"] + this.translateAmt[0];
-              y = -ext['height'] + this.translateAmt[1];
+              x = -ext["width"] + this.translateAmt[0] + this.titleOffset[0];
+              y = -ext['height'] + this.translateAmt[1] + this.titleOffset[1];
               r = -90;
               anchor = 'middle';
               break;
@@ -808,8 +818,8 @@ Custom property | Description
               //range of axis = length of axis
               ext["height"] = (this.axis.range()[1] - this.axis.range()[0]) / 2;
 
-              x = ext["width"] + this.translateAmt[0];
-              y = -ext['height'] + this.translateAmt[1];
+              x = ext["width"] + this.translateAmt[0] + this.titleOffset[0];
+              y = -ext['height'] + this.translateAmt[1] + this.titleOffset[1];
               r = -90;
               anchor = 'middle';
               break;
