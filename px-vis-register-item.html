@@ -145,6 +145,10 @@ Custom property | Description
       displayYValuesOnly: {
         type: Boolean,
         value: false
+      },
+      displayXValuesOnly: {
+        type: Boolean,
+        value: false
       }
     },
 
@@ -196,30 +200,32 @@ Custom property | Description
             case 'scaleBand':
               xVal = this.data.value[xKey];
               xUnit = this.completeSeriesConfig[this.seriesKey]['xAxisUnit'] ? ' ' + this.completeSeriesConfig[this.seriesKey]['xAxisUnit'] : '';
-              slash = ' / ';
+              slash = this.displayXValuesOnly ? '' : ' / ';
               break;
 
             default:
               xVal = this._formattedX;
               xUnit = this.completeSeriesConfig[this.seriesKey]['xAxisUnit'] ? ' ' + this.completeSeriesConfig[this.seriesKey]['xAxisUnit'] : '';
-              slash = ' / ';
+              slash = this.displayXValuesOnly ? '' : ' / ';
               break;
           }
         }
 
         //process Y val
-        switch(this.yAxisType) {
-          case 'ordinal':
-          case 'scaleBand':
-            yVal = this.data.value[yKey];
-            break;
+        if(!this.displayXValuesOnly) {
+          switch(this.yAxisType) {
+            case 'ordinal':
+            case 'scaleBand':
+              yVal = this.data.value[yKey];
+              break;
 
-          default:
-            yVal = this._formattedY;
-            break;
+            default:
+              yVal = this._formattedY;
+              break;
+          }
+
+          yUnit = this.completeSeriesConfig[this.seriesKey]['yAxisUnit'] ? ' ' + this.completeSeriesConfig[this.seriesKey]['yAxisUnit'] : '';
         }
-
-        yUnit = this.completeSeriesConfig[this.seriesKey]['yAxisUnit'] ? ' ' + this.completeSeriesConfig[this.seriesKey]['yAxisUnit'] : '';
       }
 
       var display = this.reverseDisplayOrder ?

@@ -140,7 +140,7 @@ Custom property | Description
           </div>
         </template>
 
-        <template is="dom-if" if="{{_displayTime(xAxisType, forceDateTimeDisplay)}}">
+        <template is="dom-if" if="[[_displayTime(xAxisType, forceDateTimeDisplay)]]">
           <div class$="[[_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)]]">
             <px-vis-register-datetime
               class$="[[tooltipStyle]]"
@@ -151,6 +151,12 @@ Custom property | Description
               series-key="[[_timeSeriesKey]]"
               complete-series-config="[[completeSeriesConfig]]"
             ></px-vis-register-datetime>
+          </div>
+        </template>
+
+        <template is="dom-if" if="[[displayOrdinalValue]]">
+          <div class$="[[_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)]]">
+            <div>[[tooltipData.ordinalSet]]&nbsp;</div>
           </div>
         </template>
 
@@ -177,6 +183,7 @@ Custom property | Description
                     number-format-zero="[[numberFormatZero]]"
                     truncation-length="[[truncationLength]]"
                     prevent-muting="[[preventMuting]]"
+                    display-x-values-only="[[displayXValuesOnly]]"
                     display-y-values-only="[[displayYValuesOnly]]"
                     icon-color="[[iconColor]]"
                     reverse-display-order="[[reverseDisplayOrder]]">
@@ -320,6 +327,11 @@ Custom property | Description
         value: false
       },
 
+      displayXValuesOnly: {
+        type: Boolean,
+        value: false
+      },
+
       displayYValuesOnly: {
         type: Boolean,
         value: false
@@ -353,6 +365,11 @@ Custom property | Description
       },
 
       hideControls: {
+        type: Boolean,
+        value: false
+      },
+
+      displayOrdinalValue: {
         type: Boolean,
         value: false
       },
