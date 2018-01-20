@@ -17,6 +17,7 @@
     * Sorting can be specified without the button via `sortType` property
   * Added pagnation display and interaction properties
   * Added reverseDisplayOrder property so the register can be instructed to display `y / x` instead of `x / y`
+  * Added `displayXValuesOnly` & `displayYValuesOnly` to only display x or y data from tooltipData
   * Added two tone option for series icon to also display `negativeColor` when applicable
 * Misc fixes and refactoring:
   * cursor
