@@ -32,7 +32,7 @@
 * Changed the way charts handle tooltipData to allow for pagnation
 * Added general method for checking for ordinal and time types.
   * Upgraded various ordinal checks to also check for scaleBand.
-* Ordinal type scale changes in scale-=behavior:
+* Ordinal type scale changes in scale-behavior:
   * Added startFromZero option to scale
   * Added invert function to ordinal scales
   * Added scalePadding property on scale behavior to allow you to set the padding for ordinal type scales
