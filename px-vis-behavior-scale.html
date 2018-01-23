@@ -136,7 +136,12 @@ PxVisBehaviorScale.scale = [{
       //only update if it has been set already, the first set of domain
       //changed should come from extents
       if(this.domainChanged !== null) {
+        if(this._isOrdinalType(this.xAxisType)) {
+          this._createOrdinalInvert(this.x, false);
+        }
+
         this.set('domainChanged', !this.domainChanged);
+
       }
     } else {
       this.set('x', this._setScale(this.xAxisType,[0, w], this.x));
@@ -164,7 +169,12 @@ PxVisBehaviorScale.scale = [{
       //only update if it has been set already, the first set of domain
       //changed should come from extents
       if(this.domainChanged !== null) {
+        if(this._isOrdinalType(this.yAxisType)) {
+          this._createOrdinalInvert(this.y, true)
+        }
+
         this.set('domainChanged', !this.domainChanged);
+
       }
     } else {
       this.set('y', this._setScale(this.yAxisType,[h, 0], this.y));
