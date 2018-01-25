@@ -1,6 +1,10 @@
+4.6.5
 =================
 * `dimensions` now notify and improved documentation for `dimensions` and `axes`
 * fixed a rare timing issue with the web worker scheduler when unregistering charts
+* mitigated renderer slowness on screens with display rate between 30Hz and 60Hz
+* Added Px.vis.debug.logLevel: 0 (no log), 1 (critical), 2 (warning), 3 (info). Currently only logs renderer level 3 info.
+* Hang Px.vis.debug explicitely on the window
 
 v4.6.4
 =================

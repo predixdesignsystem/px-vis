@@ -168,6 +168,10 @@ PxVisBehaviorRenderer.base = [{
       type: Number,
       value: 20
     },
+    _internalRendererFrameDurationTarget: {
+      type: Number,
+      value: 20
+    },
     /**
      * Number of previous frames to average for the adaptive
      * progressive rendering
@@ -193,6 +197,9 @@ PxVisBehaviorRenderer.base = [{
       value: false
     }
   },
+  observers: [
+    '_targetTimingChanged(rendererFrameDurationTarget)'
+  ],
   created: function() {
     this.listen(this, 'px-vis-renderer-register', '_registerDrawingElement');
     this.listen(this, 'px-vis-renderer-update-target-props', '_updateTargetProperty');
@@ -531,6 +538,8 @@ PxVisBehaviorRenderer.base = [{
         pointsRendered = 0,
         allRenderedTargetSameType = true;
 
+    Px.vis.debug.info(' ')
+    Px.vis.debug.info('STARTIN ONE FRAME')
     this._updatePreviousFrameTiming(ctx, now);
 
     if(ctx.requestCounter !== this._progressiveRenderingCounter[ctx.renderType]) {
@@ -547,6 +556,9 @@ PxVisBehaviorRenderer.base = [{
     ctx.frameIndex++;
 
     if(ctx.targetIndex > ctx.canvasTargets.length-1) {
+
+      //make sure we restore target frame timing if we had to change it
+      this._internalRendererFrameDurationTarget = this.rendererFrameDurationTarget;
 
       //Everything done
       this.fire('px-vis-chart-canvas-rendering-ended', {'context': ctx});
@@ -582,7 +594,7 @@ PxVisBehaviorRenderer.base = [{
         previousRenderTargetType = ctx.currentTarget.type;
       }
 
-      //  console.log('NEW TARGET, torender: ' + toRender + ', budget left: ' + budget)
+      Px.vis.debug.info('NEW TARGET, torender: ' + toRender + ', budget left: ' + budget)
       //wether we need to guess or have stats for this type of rendering
       if(toRender === -1) {
         drawingResult = this._firstCanvasRender(ctx);
@@ -603,7 +615,7 @@ PxVisBehaviorRenderer.base = [{
       //get next target and keep rendering if we can
       ctx.currentTarget = this._getCurrentCanvasRenderingTarget(ctx);
     }
-    //  console.log('finished one frame: ' + JSON.stringify(ctx.previousFrameStats) + ' in: ' + (window.performance.now() - ctx.previousStartTime));
+    Px.vis.debug.info('finished one frame: ' + JSON.stringify(ctx.previousFrameStats) + ' in: ' + (window.performance.now() - ctx.previousStartTime));
   },
 
   /**
@@ -633,7 +645,7 @@ PxVisBehaviorRenderer.base = [{
           if(this._previousFramesTiming[ctx.renderType][targetType].length > this.rendererFrameCountToAverage) {
             this._previousFramesTiming[ctx.renderType][targetType].shift();
           }
-          //  console.log('frame ' + ctx.frameIndex + ', type: ' + targetType + ', render: ' +JSON.stringify(this._previousFramesTiming[ctx.renderType][targetType][this._previousFramesTiming[ctx.renderType][targetType].length-1]));
+          Px.vis.debug.info('frame ' + ctx.frameIndex + ', type: ' + targetType + ', render: ' +JSON.stringify(this._previousFramesTiming[ctx.renderType][targetType][this._previousFramesTiming[ctx.renderType][targetType].length-1]));
         }
       }
     }
@@ -662,7 +674,7 @@ PxVisBehaviorRenderer.base = [{
     //try estimating how much we can render.
     var duration,
         multiplier,
-        targetTiming = this.rendererFrameDurationTarget-4,
+        targetTiming = this._internalRendererFrameDurationTarget-4,
         pointsRendered = 0,
         result,
         before = window.performance.now(),
@@ -715,6 +727,7 @@ PxVisBehaviorRenderer.base = [{
         stop,
         proRatedToRender = Math.floor(toRender * currentBudget /100);
 
+      Px.vis.debug.info('trying to render target with ' + proRatedToRender + ' points for target of ' + toRender + ' with budget of ' + currentBudget)
     if(leftInCurrentSeries > 0) {
       start = ctx.currentRenderingCounter;
       stop = Math.min(start + proRatedToRender, ctx.currentTarget.target.chartData.length);
@@ -730,9 +743,11 @@ PxVisBehaviorRenderer.base = [{
       ctx.currentRenderingCounter = 0;
       ctx.targetIndex++;
 
+      Px.vis.debug.info('rendered target ' + (stop-start) + ' points, used budget of ' + Math.floor((stop-start) * 100 / toRender));
       //return how many points we rendered
       return { 'points': stop-start, 'budgetUsed': Math.floor((stop-start) * 100 / toRender)};
     } else {
+      Px.vis.debug.info('rendered target ' + (stop-start) + ' points, used budget of ' + currentBudget);
       ctx.currentRenderingCounter += proRatedToRender;
       return { 'points': stop-start, 'budgetUsed': currentBudget};
     }
@@ -750,7 +765,8 @@ PxVisBehaviorRenderer.base = [{
         avgDuration,
         pointsAddition,
         ptsPerMs,
-        framesArray = this._previousFramesTiming[ctx.renderType][ctx.currentTarget.type];
+        framesArray = this._previousFramesTiming[ctx.renderType][ctx.currentTarget.type],
+        result;
 
       if(framesArray.length > 0) {
         //calculate averages
@@ -767,11 +783,27 @@ PxVisBehaviorRenderer.base = [{
 
         //aim for more than 16ms. This is crucial since when not busy requestanimationframe will give us a callback
         //every ~16 ms, so we HAVE to aim a bit higher to be sure we are keeping the browser busy
-        return Math.max(this.rendererMinimumPointsPerFrame, Math.floor(ptsPerMs*this.rendererFrameDurationTarget));
+        result = Math.floor(ptsPerMs*this._internalRendererFrameDurationTarget);
+
+        //if our average is too close to the minimum points rendered then
+        //aim at 30 fps instead of 60. This mainly aims at mitigating
+        //screens with refresh rate between 30 and 60 Hz, without minimal
+        //impact to the usual mechanism
+        if(this._internalRendererFrameDurationTarget < 37 && result < 1.05*this.rendererMinimumPointsPerFrame) {
+          this._internalRendererFrameDurationTarget = 37;
+        }
+
+        Px.vis.debug.info('calculating points allowance, stats: ' + JSON.stringify(framesArray) +' points: ' + Math.max(this.rendererMinimumPointsPerFrame, Math.floor(ptsPerMs*this._internalRendererFrameDurationTarget)))
+
+        return Math.max(this.rendererMinimumPointsPerFrame, Math.floor(ptsPerMs*this._internalRendererFrameDurationTarget));
       } else {
         //no stats
         return -1;
       }
+  },
+
+  _targetTimingChanged: function() {
+    this.set('_internalRendererFrameDurationTarget', this.rendererFrameDurationTarget);
   }
 },
   PxVisBehaviorD3.renderToCanvas,

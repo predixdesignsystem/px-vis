@@ -1,11 +1,11 @@
 <script>
   (function() {
-    if(typeof Px === 'undefined') {
-      Px = {};
+    if(typeof window.Px === 'undefined') {
+      window.Px = {};
     }
-    Px.vis = Px.vis || {};
+    window.Px.vis = window.Px.vis || {};
 
-    if(!Px.vis.debug) {
+    if(!window.Px.vis.debug) {
 
       var debug = {},
           isParaRadar,
@@ -236,12 +236,12 @@
 
           data.length = chart.chartData.length;
           data.timeStart = chart.chartData[0][timeKey];
-          data.timeStartHuman = Px.moment(chart.chartData[0][timeKey]).format();
+          data.timeStartHuman = window.Px.moment(chart.chartData[0][timeKey]).format();
           data.timeEnd = chart.chartData[chart.chartData.length - 1][timeKey];
-          data.timeEndHuman = Px.moment(chart.chartData[chart.chartData.length - 1][timeKey]).format();
+          data.timeEndHuman = window.Px.moment(chart.chartData[chart.chartData.length - 1][timeKey]).format();
 
           for(var i=0; i<seriesKeys.length; i++) {
-            extents[seriesKeys[i]] = Px.d3.extent(chart.chartData, function(d) {
+            extents[seriesKeys[i]] = window.Px.d3.extent(chart.chartData, function(d) {
               return d[seriesKeys[i]];
             });
             min = Math.min(extents[seriesKeys[i]][0], min);
@@ -360,8 +360,16 @@
         _debugCheckMargin();
       }
 
-      Px.vis.debug = debug;
-      Px.vis.debug.version = '4.6.4';
+      debug.info = function(msg, origin) {
+        if(logLevel >= 2) {
+          console.log('[' + origin.toUpperCase() + '] ' + msg);
+        }
+      }
+
+      debug.version = '4.6.5';
+      debug.logLevel = 0;
+
+      window.Px.vis.debug = debug;
     }
   })();
 </script>
