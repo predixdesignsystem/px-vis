@@ -3248,6 +3248,13 @@ PxVisBehavior.updateStylesOverride = {
   },
 
   created: function() {
+    /*
+      Polymer provides the updateStyles method.
+      This method is called when we reload a theme.
+      We want to update our _stylesUpdated prop when it is called
+      so, remap Polymer.updateStyles to _updateStyles and then rewrite
+      this.updateStyles to do what we want
+    */
     this._updateStyles = this.updateStyles;
     this.updateStyles = function() {
       this.debounce('styleupdate', function() {
@@ -3369,17 +3376,16 @@ PxVisBehavior.annotationData = {
      * The annotation data: x and y values + the series which scale should be used.
      * Data is an arbitrary object you want to store for use when showing the
      * annotation
-     *
-     * [{
-     *  x: 1325897523,
-     *  y: 15.7,
-     *  series: y0,
-     *  data: {
-     *
-     *  },
-     * ...
-     * }
-     * ]
+     * ```
+     *    [{
+     *        x: 1325897523,
+     *        y: 15.7,
+     *        series: y0,
+     *        data: {...}
+     *    },{
+     *     ...
+     *     }]
+     * ```
      */
     annotationData: {
       type: Array,

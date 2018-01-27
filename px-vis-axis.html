@@ -269,7 +269,9 @@ Custom property | Description
             value: function() {
               return [0,0];
             }
-          }
+          },
+
+          _builtAxisType: String
         },
 
         observers: [
@@ -344,6 +346,8 @@ Custom property | Description
               this.translateAmt = [this.offset[0],this.offset[1]];
               break;
           }
+
+          this._builtAxisType = this.axisType;
 
           this._processTicks();
         },
@@ -449,9 +453,9 @@ Custom property | Description
          * @method drawElement
          */
         drawElement: function() {
-         if(this.hasUndefinedArguments(arguments)) {
-           return;
-         }
+          if(this.hasUndefinedArguments(arguments)) {
+            return;
+          }
 
           if(typeof this.preventInitialDrawing !== undefined && this.preventInitialDrawing === false) {
             this.debounce('drawaxis', function() {
@@ -548,22 +552,28 @@ Custom property | Description
          *
          */
         _calcDrawnTicks: function() {
-         if(this.hasUndefinedArguments(arguments)) {
-           return;
-         }
-
-          if(!this._isOrdinalType(this.axisType) && this._axis && this._axis.scale) {
-            //apparently we need to give ourselves a bit of time to ensure the axis draws and it can clac this
-            this.debounce("drawnTicks", function() {
-              // FIXME Only works if ticks is a Number; need to support other formats for ticks
-              if(this.ticks && typeof this.ticks === 'number') {
-                this.set('drawnTickValues', this._axis.scale().ticks(this.ticks));
-              } else {
-                this.set('drawnTickValues', this._axis.scale().ticks());
-              }
-              this.fire('px-vis-axis-drawn-tick-values-changed', { drawnTickValues: this.drawnTickValues});
-            },1)
+          if(this.hasUndefinedArguments(arguments)) {
+            return;
           }
+
+          if(this.domainChanged === null ||
+              this._isOrdinalType(this.axisType) ||
+              this._axis ||
+              this._axis.scale ||
+              this._builtAxisType !== this.axisType) {
+            return;
+          }
+
+          //apparently we need to give ourselves a bit of time to ensure the axis draws and it can clac this
+          this.debounce("drawnTicks", function() {
+            // FIXME Only works if ticks is a Number; need to support other formats for ticks
+            if(this.ticks && typeof this.ticks === 'number') {
+              this.set('drawnTickValues', this._axis.scale().ticks(this.ticks));
+            } else {
+              this.set('drawnTickValues', this._axis.scale().ticks());
+            }
+            this.fire('px-vis-axis-drawn-tick-values-changed', { drawnTickValues: this.drawnTickValues});
+          }, 1);
         },
 
         /**

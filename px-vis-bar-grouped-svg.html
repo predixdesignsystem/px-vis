@@ -140,12 +140,16 @@ Unlike most other drawing elements that can use chartData directly, bar requires
       'drawElement(svg, y, domainChanged, chartData.*, completeSeriesConfig.*, preventInitialDrawing, _funcsWereSet)',
       '_addClipPath(clipPath)',
       '_muteBars(highlightBar)',
-      '_setFuncs(type)'
+      '_setFuncs(type, groupScale, ordinalKey)'
     ],
 
     detached: function() {
-      if(this._doesD3HaveValues(this.barPath)) {
-        this.barPath.remove();
+      if(this._debouncers.draw) {
+        this._debouncers.draw.cancel()
+      }
+
+      if(this._doesD3HaveValues(this.barRects)) {
+        this.barRects.remove();
       }
       if(this._doesD3HaveValues(this.barGroup)) {
         this.barGroup.remove();
@@ -166,15 +170,7 @@ Unlike most other drawing elements that can use chartData directly, bar requires
         //if 0 don't debounce at all
         if(this.drawDebounceTime > 0) {
           this.debounce('draw',function() {
-            if(this._funcsWereSet &&
-                this.domainChanged !== null &&
-                this._doesD3HaveValues(this.svg) &&
-                this.y &&
-                this.chartData.length > 0 &&
-                this._doesObjHaveValues(this.completeSeriesConfig)) {
-
-              this._drawElementDebounced();
-            }
+            this._drawElementDebounced();
           }.bind(this), this.drawDebounceTime);
         } else {
           this._drawElementDebounced();
@@ -183,6 +179,14 @@ Unlike most other drawing elements that can use chartData directly, bar requires
     },
 
     _drawElementDebounced: function() {
+      if(!this._funcsWereSet ||
+          this.domainChanged === null ||
+          this._isD3Empty(this.svg) ||
+          !this.y ||
+          this.chartData.length === 0 ||
+          this._isObjEmpty(this.completeSeriesConfig)) {
+        return;
+      }
 
       var barGroupBuilder = this.svg.selectAll('g.seriesGroups')
         .data(this.chartData);
@@ -199,7 +203,7 @@ Unlike most other drawing elements that can use chartData directly, bar requires
       this.barGroup = this.svg.selectAll('g.seriesGroups');
 
       // set our data
-      var barBuilder = barGroupBuilder.selectAll('rect.series-bar')
+      var barBuilder = this.barGroup.selectAll('rect.series-bar')
         .data(function(d) {
           return this.seriesKeys.map(function(key) {
             return { cscKey: key, key: this.completeSeriesConfig[key][this._dAxis], value: d[this.completeSeriesConfig[key][this._dAxis]] };
@@ -232,7 +236,7 @@ Unlike most other drawing elements that can use chartData directly, bar requires
     },
 
     _setFuncs: function() {
-      if(this.hasUndefinedArguments(arguments)) {
+      if(this.type === undefined || !this.groupScale || !this.ordinalKey) {
         return;
       }
 

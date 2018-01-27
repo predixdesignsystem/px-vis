@@ -158,9 +158,7 @@ Custom property | Description
     },
 
     observers: [
-
       'drawElement(svg, domainChanged, completeSeriesConfig.*, thresholdData.*, width, margin.*, _animationFrameDone, language)',
-      'drawElement(svg, domainChanged, completeSeriesConfig.*, thresholdData.*, height, margin.*, _animationFrameDone, language)',
       '_updateColors()',
       '_calcThemeOrConfig(_stylesUpdated)'
      ],
@@ -208,6 +206,9 @@ Custom property | Description
     },
 
     _drawElementDebounced: function() {
+      if(this.domainChanged === null) {
+        return;
+      }
       var _this = this,
           updateColors = true;
 
@@ -218,7 +219,6 @@ Custom property | Description
 
       this._thresholdBuilder = this.thresholdGroup.selectAll('g.threshold')
         .data(this.thresholdData, function(d) { return d.value });
-
 
       this._thresholdBuilder.exit().remove();
 
