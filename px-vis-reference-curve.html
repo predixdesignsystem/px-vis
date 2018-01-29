@@ -39,7 +39,7 @@ An element which draws polygonal grid lines.
     <template is="dom-repeat" items="[[_seriesKeys]]">
       <px-vis-line-svg
         svg="[[_refCurveG]]"
-        id-prefix="refCurve_"
+        id-prefix="[[_idPrefix]]"
         series-id="[[item]]"
         chart-data="[[_referenceData]]"
         complete-series-config="[[_referenceConfig]]"
@@ -88,6 +88,14 @@ An element which draws polygonal grid lines.
       reverseData: {
         type: Boolean,
         value: false
+      },
+      chartId: {
+        type: String,
+        value: ''
+      },
+      _idPrefix: {
+        type: String,
+        computed: '_computeIdPrefix(chartId)'
       }
     },
 
@@ -201,7 +209,7 @@ An element which draws polygonal grid lines.
 
     _mergeText: function(d, i, elem) {
       Px.d3.select(elem).select('textPath.reference-curve')
-        .attr("xlink:href", function(d) { return '#refCurve_' + d; }.bind(this))
+        .attr("xlink:href", function(d) { return '#refCurve_' + this.chartId + d; }.bind(this))
         .text(function(d) { return this.referenceConfig[d]['name']; }.bind(this));
     },
 
@@ -238,6 +246,10 @@ An element which draws polygonal grid lines.
         }
       }
       return;
+    },
+
+    _computeIdPrefix: function() {
+      return 'refCurve_' + this.chartId;
     }
   });
 </script>
