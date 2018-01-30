@@ -288,7 +288,7 @@ PxVisBehaviorScale.scale = [{
     this.debounce('_setDomain', function() {
 
       // escape if we dont have everything we need
-      if(this._calculatingDomain || this._isObjEmpty(this.chartData) || !this.x || !this.y || this._isObjEmpty(this.completeSeriesConfig) || this._isObjEmpty(this._seriesKeys)) {
+      if(this._calculatingDomain || this._isObjEmpty(this.chartData) || !this.x || !this.y || this._isObjEmpty(this.completeSeriesConfig)) {
         return
       }
       // indicate we are calculating the domain
@@ -943,6 +943,25 @@ _calcMultiAxisExtents: function() {
   _pixelRequest: function(evt) {
     var res = this.getPixelFromData(evt.detail.data, evt.detail.series, evt.detail.margin);
     evt.detail.callback(res);
+  },
+
+  _updatePadding: function() {
+    var updated = false;
+
+    if(this.xAxisType === 'scaleBand' && this.x && this.x.paddingInner) {
+      this.x.paddingInner(this.scalePadding);
+       updated = true;
+    }
+
+    if(this.yAxisType === 'scaleBand' && this.y && this.y.paddingInner) {
+      this.y.paddingInner(this.scalePadding);
+      updated = true;
+    }
+
+    if(updated && this.domainChanged !== null) {
+      this.set('domainChanged', !this.domainChanged);
+    }
+
   }
 },
   PxVisBehavior.sizing,
