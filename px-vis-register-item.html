@@ -81,7 +81,7 @@ Custom property | Description
           <!-- Use inline flex to avoid the browser adding spaces between our sub elements-->
           <div class="seriesData flex__item--msfix" name$="R{{item.name}}">
             <!-- if x axis is number format and show it -->
-            <template is="dom-if" if="[[_isOfType(xAxisType, 'linear')]]" on-dom-change="_xFormatterChanged" strip-whitespace>
+            <template is="dom-if" if="[[_checkLinearType(xAxisType)]]" on-dom-change="_xFormatterChanged" strip-whitespace>
               <px-number-formatter
                 id="xFormatter"
                 class$="[[_ttStyle]]"
@@ -98,7 +98,7 @@ Custom property | Description
             </template>
             <!-- if x axis is time don't display it -->
             <!-- if y axis is number format and show it -->
-              <template is="dom-if" if="[[_isOfType(yAxisType, 'linear')]]" on-dom-change="_yFormatterChanged" strip-whitespace>
+              <template is="dom-if" if="[[_checkLinearType(yAxisType)]]" on-dom-change="_yFormatterChanged" strip-whitespace>
                 <px-number-formatter
                   id="yFormatter"
                   class$="[[_ttStyle]]"
@@ -307,6 +307,10 @@ Custom property | Description
         }
         return 'background:linear-gradient(' + result + '); border-bottom: 1px solid ' + color;
       }
+    },
+
+    _checkLinearType: function(axis) {
+      return this._isOfType(axis, ['linear','log']);
     }
   });
 </script>

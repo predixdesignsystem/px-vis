@@ -1,6 +1,6 @@
 v4.7.0
 =================
-* Added log scale
+* Added log scale and many associated changes to support log type scale
 
 v4.6.5
 =================

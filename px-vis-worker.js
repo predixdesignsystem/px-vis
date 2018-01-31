@@ -79,6 +79,8 @@ function recreateD3Scale(scaleObj) {
     result = d3.scaleTime().nice().range(scaleObj.range).domain(scaleObj.domain);
   } else if(scaleObj.type === 'linear') {
     result = d3.scaleLinear().nice().range(scaleObj.range).domain(scaleObj.domain);
+  } else if(scaleObj.type === 'log') {
+    result = d3.scaleLog().nice().base(scaleObj.logBase).range(scaleObj.range).domain(scaleObj.domain);
   } else if(scaleObj.type === 'scaleBand') {
     result = d3.scaleBand().range(scaleObj.range).domain(scaleObj.domain).round(true).paddingInner(0.5);
   } else { //ordinal

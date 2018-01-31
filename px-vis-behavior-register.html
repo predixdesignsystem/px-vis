@@ -322,7 +322,19 @@ PxVisBehaviorRegister.register = [{
     if(toTest === undefined || type === undefined) {
       return false;
     }
-    return toTest === type;
+
+    if(typeof type === 'string') {
+      return toTest === type;
+    }
+
+    var linear = false;
+    type.forEach(function(t) {
+      if(toTest === t) {
+        linear = true;
+      }
+    });
+
+    return linear;
   }
 }, PxVisBehavior.observerCheck];
 

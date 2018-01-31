@@ -4,6 +4,7 @@
 //   scaleTime,
 //   scaleLinear,
 //   scaleBand,
+//   scaleLog,
 //   scalePoint
 // } from "d3-scale";
 export {
@@ -19,6 +20,9 @@ export {
 export {
   default as scaleLinear
 } from "d3-scale/src/linear";
+export {
+  default as scaleLog
+} from "d3-scale/src/log";
 
 export {
   extent
