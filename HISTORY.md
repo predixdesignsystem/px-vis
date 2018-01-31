@@ -1,4 +1,8 @@
-4.6.5
+v4.7.0
+=================
+* Added log scale
+
+v4.6.5
 =================
 * `dimensions` now notify and improved documentation for `dimensions` and `axes`
 * fixed a rare timing issue with the web worker scheduler when unregistering charts

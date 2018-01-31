@@ -79,6 +79,14 @@ PxVisBehaviorScale.scale = [{
      */
     chartId: {
       type: String
+    },
+
+    /**
+     * The base for logarithmic type scales
+     */
+    logBase: {
+      type: String,
+      value: 10
     }
   },
 
@@ -230,6 +238,9 @@ PxVisBehaviorScale.scale = [{
     } else if(type === 'linear') {
       result = Px.d3.scaleLinear().nice().range(range);
       result._scaleType = 'linear';
+    } else if(type === 'log') {
+      result = Px.d3.scaleLog().nice().base(this.logBase).range(range);
+      result._scaleType = 'log';
     } else if(type === 'scaleBand') {
       result = Px.d3.scaleBand().range(range).round(true).paddingInner(0.5);
       result._scaleType = 'scaleBand';
@@ -320,6 +331,11 @@ PxVisBehaviorScale.scale = [{
           continue;
         }
 
+        // need to make sure 0 is not included in ext for log
+        if(this.yAxisType === 'log') {
+          extents.y[this.axes[i]] = this._fixLogExt(extents.y[this.axes[i]]);
+        }
+
         if(this.matchTicks && !this.singleDomain) {
           var min = Math.floor(extents.y[this.axes[i]][0]/10)*10,
               max = Math.ceil(extents.y[this.axes[i]][1]/10)*10;
@@ -333,8 +349,15 @@ PxVisBehaviorScale.scale = [{
       }
 
     } else {
+      if(this.yAxisType === 'log') {
+        extents.y = this._fixLogExt(extents.y);
+      }
       this.y.domain(extents.y);
 
+    }
+
+    if(this.xAxisType === 'log') {
+      extents.x = this._fixLogExt(extents.x);
     }
 
     // if we are streaming data, dont keep updating x
@@ -890,6 +913,59 @@ _calcMultiAxisExtents: function() {
   _pixelRequest: function(evt) {
     var res = this.getPixelFromData(evt.detail.data, evt.detail.series, evt.detail.margin);
     evt.detail.callback(res);
+  },
+
+  _updateLogBase: function() {
+    var updated = false;
+    if(this.xAxisType === 'log' && this.x && this.x.base) {
+      this.x.base(this.logBase);
+      updated = true;
+    }
+
+    if(this.yAxisType === 'log' && this.y) {
+      if(typeof this.y === 'function') {
+        this.y.base(this.logBase);
+        updated = true;
+
+      } else if(typeof this.y === 'object') {
+        for(var i = 0; i < this.axes.length; i++) {
+          if(this.y[this.axes[i]] && this.y[this.axes[i]].base) {
+            // such depth, so pretty
+            this.y[this.axes[i]].base(this.logBase);
+          }
+        }
+        updated = true;
+
+      }
+    }
+
+    if(updated && this.domainChanged !== null) {
+      this.set('domainChanged', !this.domainChanged);
+    }
+  },
+
+  _fixLogExt: function(ext) {
+
+    // Both are negative ==> check for 0
+    if(ext[0] <= 0 && ext[1] <= 0) {
+      ext[1] = ext[1] === 0 ? -1 : ext[1];
+
+    // Both are positive ==> check for 0
+    } else if(ext[0] >= 0 && ext[1] >= 0) {
+      ext[0] = ext[0] === 0 ? 1 : ext[0];
+
+    // one is neg and one is pos ==> check for larger of two and change one end
+    } else {
+      console.warn("log domain crosses 0, which is invalid");
+      if(Math.abs(ext[0]) > Math.abs(ext[1])) {
+        ext[1] = ext[1] === 0 ? -1 : ext[1];
+      } else {
+        ext[0] = ext[0] === 0 ? 1 : ext[0];
+      }
+    }
+
+    return ext;
+
   }
 },
   PxVisBehavior.sizing,
