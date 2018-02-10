@@ -43,7 +43,10 @@
 * Added a reference curve component which accepts `referenceData` and `referenceConfig` to create a reference curve with a colored line and text
 * Added `titleOffset` to px-vis-axis to allow you to offset the title from the default position
 * Prefix all behaviors and window objects with `window`
-
+* Upgrade to d3 v5
+* Changed names for outerTickSize to tickSizeOuter to match d3.
+* Added tickSizeInner to change tickSize on axis
+* Added tickPadding on axis
 
 v4.6.0
 =================

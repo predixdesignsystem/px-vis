@@ -271,7 +271,10 @@ Custom property | Description
             }
           },
 
-          _builtAxisType: String
+          _builtAxisType: String,
+          tickSizeOuter: Number,
+          tickSizeInner: Number,
+          tickPadding: Number
         },
 
         observers: [
@@ -404,24 +407,27 @@ Custom property | Description
             }
           }
 
-          // controls the tick mark size for ticks with numbers
-          // this._axis.tickSizeInner(this.innerTickSize);
-          // this._axis.tickPadding(10);
-          // controls the first and last ticks
-          // TODO rename var names to match new d3?
-          this._axis.tickSizeOuter(this.outerTickSize);
-
-          //if we want to turn off ticks and labels
-          if(this.disableTicks) {
-            this._axis.ticks(0);
-            // this._axis.tickValues([]);
-          }
-
           //if we want our labels to be in a specific position
           if(this.labelPosition === 'inline') {
             this._axis.tickSizeInner(0);
           } else if(this.labelPosition !== 'center') {
             this._axis.tickSizeInner(this.labelTypeSize);
+          }
+
+          // controls the tick mark size for ticks with numbers
+          if(this.tickSizeInner || this.tickSizeInner === 0) {
+            this._axis.tickSizeInner(this.tickSizeInner);
+          }
+
+          this._axis.tickPadding(this.tickPadding);
+
+          // controls the first and last ticks
+          this._axis.tickSizeOuter(this.tickSizeOuter);
+
+          //if we want to turn off ticks and labels
+          if(this.disableTicks) {
+            this._axis.ticks(0);
+            // this._axis.tickValues([]);
           }
         },
 
