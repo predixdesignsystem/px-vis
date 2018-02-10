@@ -272,7 +272,10 @@ Custom property | Description
           },
 
           _builtAxisType: String,
-          tickSizeOuter: Number,
+          tickSizeOuter: {
+            type: Number,
+            value: 0
+          },
           tickSizeInner: Number,
           tickPadding: Number
         },
@@ -419,7 +422,9 @@ Custom property | Description
             this._axis.tickSizeInner(this.tickSizeInner);
           }
 
-          this._axis.tickPadding(this.tickPadding);
+          if(this.tickPadding || this.tickPadding === 0) {
+            this._axis.tickPadding(this.tickPadding);
+          }
 
           // controls the first and last ticks
           this._axis.tickSizeOuter(this.tickSizeOuter);
