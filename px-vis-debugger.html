@@ -361,13 +361,31 @@
       }
 
       debug.info = function(msg, origin) {
-        if(debug.logLevel >= 2) {
-          console.log('[' + origin.toUpperCase() + '] ' + msg);
+        if(debug.logLevel >= 3 && debug.log[origin]) {
+          origin = origin ? origin.toUpperCase() : origin;
+          console.log('[' + origin + '] ' + msg);
         }
       }
 
-      debug.version = '4.6.5';
+      debug.log = function(msg, origin) {
+        if(debug.logLevel >= 2 && debug.log[origin]) {
+          origin = origin ? origin.toUpperCase() : origin;
+          console.log('[' + origin + '] ' + msg);
+        }
+      }
+
+      debug.warn = function(msg, origin) {
+        if(debug.logLevel >= 1 && debug.log[origin]) {
+          origin = origin ? origin.toUpperCase() : origin;
+          console.log('[' + origin + '] ' + msg);
+        }
+      }
+
+      debug.version = '4.7.1';
+      //1: warn, 2: log, 3: info
       debug.logLevel = 0;
+      debug.log.renderer = false;
+      debug.log.scheduler = false;
 
       window.Px.vis.debug = debug;
     }

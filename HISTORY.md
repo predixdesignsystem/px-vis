@@ -1,3 +1,8 @@
+v4.7.1
+=================
+* Added logging option for scheduler (boolean Px.vis.debug.log.scheduler)
+* Logging for renderer is now optional (boolean Px.vis.debug.log.renderer)
+
 v4.7.0
 =================
 * Added log scale and many associated changes to support log type scale
