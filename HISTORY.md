@@ -1,3 +1,7 @@
+v4.7.2
+=================
+* Avoid circular dependency in log object in Px.vis.debug.getInfo to be able to stringify it
+
 v4.7.1
 =================
 * Added logging option for scheduler (boolean Px.vis.debug.log.scheduler)

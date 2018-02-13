@@ -328,7 +328,7 @@
        * Public functions
        * *********************************************************/
 
-      debug.getInfo = function(chart, log) {
+      debug.getInfo = function(chart, log, includeRenderer) {
         initialize(chart);
 
         var info = {};
@@ -341,7 +341,12 @@
         _debugAddExtentsInfo(info);
         _debugAddSubCompInfo(info);
         _debugAddMiscInfo(info);
-        _debugAddRendererInfo(info);
+
+        //exclude renderer by default because it causes circular
+        //dependency for JSON
+        if(includeRenderer) {
+          _debugAddRendererInfo(info);
+        }
 
         if(log) {
           console.log(JSON.stringify(info, null, 2));
@@ -381,7 +386,7 @@
         }
       }
 
-      debug.version = '4.7.1';
+      debug.version = '4.7.2';
       //1: warn, 2: log, 3: info
       debug.logLevel = 0;
       debug.log.renderer = false;
