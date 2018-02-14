@@ -350,9 +350,6 @@ Custom property | Description
           this.set("_internalShowTooltip", false);
           this.set("interactionSpaceConfig.searchType", "lasso");
         },
-        onDeselect: function() {
-          this.set("interactionSpaceConfig.searchType", "none");
-        },
         actionConfig: {
           mouseout: null,
           mousemove: null,
@@ -511,7 +508,7 @@ Custom property | Description
         subConfig: {
           timestamps: {
             title: 'Timestamps',
-            tooltipLabel: 'Search for timestamps',
+            tooltipLabel: 'Returns all points with the same timestamp as the point closest to your cursor',
             buttonGroup: 2,
             selectable: true,
             selected: true,
@@ -521,7 +518,7 @@ Custom property | Description
           },
           points: {
             title: 'Points',
-            tooltipLabel: 'Search for points',
+            tooltipLabel: 'Returns only the closest point to your cursor',
             buttonGroup: 2,
             selectable: true,
             onClick: function() {
@@ -549,7 +546,7 @@ Custom property | Description
         subConfig: {
           timestamps: {
             title: 'Timestamps',
-            tooltipLabel: 'Search for timestamps',
+            tooltipLabel: 'Returns all points with the same timestamp as the point closest to your cursor',
             buttonGroup: 2,
             selectable: true,
             selected: true,
@@ -559,7 +556,7 @@ Custom property | Description
           },
           points: {
             title: 'Points',
-            tooltipLabel: 'Search for points',
+            tooltipLabel: 'Returns only the closest point(s) to your cursor',
             buttonGroup: 2,
             selectable: true,
             onClick: function() {
@@ -603,7 +600,7 @@ Custom property | Description
         subConfig: {
           timestamps: {
             title: 'Timestamps',
-            tooltipLabel: 'Search for timestamps',
+            tooltipLabel: 'Returns all points with the same timestamp as the point closest to your cursor',
             buttonGroup: 2,
             selectable: true,
             selected: true,
@@ -613,7 +610,7 @@ Custom property | Description
           },
           points: {
             title: 'Points',
-            tooltipLabel: 'Search for points',
+            tooltipLabel: 'Returns only the closest point to your cursor',
             buttonGroup: 2,
             selectable: true,
             onClick: function() {
@@ -991,8 +988,8 @@ Custom property | Description
 
           // if we are changing groups
           if(index !== i && this._internalConfig[i].buttonGroup === conf.buttonGroup) {
-            // if we have a onDeselect func, run it
-            if(this._internalConfig[i]["onDeselect"]) {
+            // if we have a onDeselect func and we are selected, run it
+            if(this._internalConfig[i]["onDeselect"] && this._internalConfig[i].selected) {
               var fn = this._returnFn(this._internalConfig[i]["onDeselect"]);
               this._setupContext(this._internalConfig[i], fn);
             }

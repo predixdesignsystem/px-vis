@@ -79,6 +79,8 @@ function recreateD3Scale(scaleObj) {
     result = d3.scaleTime().nice().range(scaleObj.range).domain(scaleObj.domain);
   } else if(scaleObj.type === 'linear') {
     result = d3.scaleLinear().nice().range(scaleObj.range).domain(scaleObj.domain);
+  } else if(scaleObj.type === 'log') {
+    result = d3.scaleLog().nice().base(scaleObj.logBase).range(scaleObj.range).domain(scaleObj.domain);
   } else if(scaleObj.type === 'scaleBand') {
     result = d3.scaleBand().range(scaleObj.range).domain(scaleObj.domain).round(true).paddingInner(0.5);
   } else { //ordinal
@@ -477,9 +479,9 @@ function constructDataObj(result, dataObj, k, visData, isSingle, xScale) {
   // Only add name to the register if:
   //  * we got no result at all
   //  * if this key is muted with hard mute on
-  //  * if point searchFor mode and this is not the found key
+  //  * if point searchFor mode and this is not the found key and we are not in pointPerSeries
   if(!result || (visData.hardMute && visData.mutedSeries[k]) ||
-      (visData.searchFor === 'point' && result.k !== k)) {
+      (visData.searchFor === 'point' && result.k !== k && visData.searchType !== 'pointPerSeries')) {
     dataObj.series.push(emptySeries(k));
 
   } else if(isSingle) {
@@ -762,10 +764,9 @@ function searchQuadtreeSeries(visData, dataObj, quadtreeData) {
       k;
 
   for(var i = 0; i < visData.keys.length; i++) {
+    k = visData.keys[i];
 
     if(quadtreeData[k]) {
-
-      k = visData.keys[i];
 
       if(!visData.hardMute || !visData.mutedSeries[k]) {
 

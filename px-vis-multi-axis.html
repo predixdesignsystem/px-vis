@@ -127,7 +127,7 @@ Custom property | Description
           prevent-initial-drawing="[[preventInitialDrawing]]"
           redraw-series="[[redrawSeries]]"
           brush-domains="[[brushDomains]]"
-          hide-and-show-on-hover="[[_isFirst(index)]]"
+          hide-and-show-on-hover="[[_isFirst(index, commonAxis)]]"
           cartesian-drag-behavior="[[cartesianDragBehavior]]"
           brush-to-remove="[[brushToRemove]]"
           action-config="[[actionConfig]]"
@@ -331,9 +331,6 @@ Custom property | Description
         type: Boolean,
         value: false
       },
-      _commonAxisRanAtLeastOnce: {
-        type: Boolean
-      },
       _axisDoneCounter: {
         type: Number,
         value: 0
@@ -491,10 +488,9 @@ Custom property | Description
         this.x.leftDomain(e.detail.lDims);
         this.x.rightDomain(e.detail.rDims);
 
-        this.dimensions = e.detail.dimensions;
+        this.set('dimensions', e.detail.dimensions);
 
       } else {
-        this.dimensions = e.detail.dimensions;
         this.x.domain(this.dimensions);
 
       }

@@ -124,6 +124,10 @@
       }
     },
 
+    observers: [
+      '_priorityChanged(priority)'
+    ],
+
     ready:function() {
       //generate properties dynamically
       this._watchConfigProperty('markerSymbol', 'circle');
@@ -141,6 +145,10 @@
 
     detached: function() {
       this.fire('px-vis-renderer-unregister', {'renderMode': 'canvas', 'rendererType': this.rendererType});
+    },
+
+    _priorityChanged: function() {
+      this.fire('px-vis-renderer-update-target-props', {'propertyName': 'priority', 'propertyValue': this.priority ,'rendererType': this.rendererType});
     },
 
     /**
