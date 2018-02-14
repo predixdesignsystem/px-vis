@@ -548,16 +548,15 @@ Custom property | Description
             return;
           }
 
-          if(this.domainChanged === null ||
+          //apparently we need to give ourselves a bit of time to ensure the axis draws and it can clac this
+          this.debounce("drawnTicks", function() {
+            if(this.domainChanged === null ||
               this._isOrdinalType(this.axisType) ||
               !this._axis ||
               !this._axis.scale ||
               this._builtAxisType !== this.axisType) {
-            return;
-          }
-
-          //apparently we need to give ourselves a bit of time to ensure the axis draws and it can clac this
-          this.debounce("drawnTicks", function() {
+              return;
+            }
             // FIXME Only works if ticks is a Number; need to support other formats for ticks
             if(this.ticks && typeof this.ticks === 'number') {
               this.set('drawnTickValues', this._axis.scale().ticks(this.ticks));
