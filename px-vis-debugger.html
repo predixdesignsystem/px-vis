@@ -328,7 +328,7 @@
        * Public functions
        * *********************************************************/
 
-      debug.getInfo = function(chart, log, includeRenderer) {
+      debug.getInfo = function(chart, log) {
         initialize(chart);
 
         var info = {};
@@ -341,15 +341,18 @@
         _debugAddExtentsInfo(info);
         _debugAddSubCompInfo(info);
         _debugAddMiscInfo(info);
-
-        //exclude renderer by default because it causes circular
-        //dependency for JSON
-        if(includeRenderer) {
-          _debugAddRendererInfo(info);
-        }
+        _debugAddRendererInfo(info);
 
         if(log) {
-          console.log(JSON.stringify(info, null, 2));
+
+          //exclude renderer by default because it causes circular
+          //dependency for JSON
+          delete info.render;
+
+          //JSON doesn't support undefined value so return them as '_undefined_' instead
+          console.log(JSON.stringify(info, function(key, value) {
+            if(value === undefined) { return '_undefined_';} return value;
+          }, 2));
         }
 
         return info;
