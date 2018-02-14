@@ -1,3 +1,8 @@
+v4.7.3
+=================
+* handle undefined value for log in Px.vis.debug.getInfo
+* By default exclude render info when logging in Px.vis.debug.getInfo but still include it in returning object
+
 v4.7.2
 =================
 * Avoid circular dependency in log object in Px.vis.debug.getInfo to be able to stringify it
