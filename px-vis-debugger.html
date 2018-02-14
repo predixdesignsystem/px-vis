@@ -1,0 +1,401 @@
+<script>
+  (function() {
+    if(typeof window.Px === 'undefined') {
+      window.Px = {};
+    }
+    window.Px.vis = window.Px.vis || {};
+
+    if(!window.Px.vis.debug) {
+
+      var debug = {},
+          isParaRadar,
+          chart,
+          util = {};
+
+      initialize = function(chartToProcess) {
+        chart = chartToProcess;
+        isParaRadar = chart.nodeName === 'PX-VIS-PARALLEL-COORDINATES' || chart.nodeName === 'PX-VIS-RADAR';
+      }
+
+      /**********************************************************
+       *  UTILITY
+       **********************************************************/
+      _debugObjectHasKeys = function(obj, toFind) {
+        var result = {
+              hasKeys: false,
+              otherKeys: []
+            },
+            keyCount = 0,
+            keys;
+
+        if(obj) {
+          keys = Object.keys(obj);
+
+          for(var i=0; i<keys.length; i++) {
+            if(obj.hasOwnProperty(keys[i])) {
+              if(toFind.indexOf(keys[i]) === -1) {
+                otherKeys.push(keys[i]);
+              } else {
+                keyCount++;
+              }
+            }
+          }
+
+          if(keyCount === toFind.length) {
+            result.hasKeys = true;
+          }
+        }
+
+        return result;
+      };
+
+      _debugGetTimeKey = function() {
+
+        var timeKey;
+
+        if(chart.timeData) {
+          timeKey = chart.timeData;
+        } else if(chart.seriesKey) {
+          timeKey = chart.seriesKey;
+        } else {
+          timeKey = chart.completeSeriesConfig[Object.keys(chart.completeSeriesConfig)[0]].x;
+        }
+
+        return timeKey;
+      };
+
+      _debugGetSeriesKeys = function() {
+
+        if(isParaRadar) {
+          return chart.dimensions;
+        } else {
+          return Object.keys(chart.completeSeriesConfig);
+        }
+      };
+
+      log = function(msg) {
+        console.warn(msg);
+        hasLogged = true;
+      };
+
+      logTitle = function(msg) {
+        console.log('Checking ' + msg);
+        var separator = '=========';
+        for(var i=0; i< msg.length; i++) {
+          separator += '=';
+        }
+        console.log(separator);
+        hasLogged = false;
+      };
+
+      logEnd = function() {
+        if(!hasLogged) {
+          console.log('No problem found');
+          console.log(' ');
+        }
+      };
+
+      warn = function(msg) {
+        console.log(msg);
+        hasLogged = true;
+      };
+
+      _getAllPropertiesKeys = function() {
+        var result = Object.keys(chart.properties);
+
+        for(var i=0; i<chart.behaviors.length; i++) {
+          if(chart.behaviors[i].properties) {
+            result = result.concat(Object.keys(chart.behaviors[i].properties));
+          }
+        }
+        return result;
+      };
+
+      /***********************************************************
+       * Check functions
+       * *********************************************************/
+
+      _debugCheckConfigInfoParaRadar = function() {
+
+        var current,
+            keys;
+
+        logTitle('seriesConfig');
+
+        //check axes
+        for(var i=0; i<chart.dimensions.length; i++) {
+          current = chart.dimensions[i];
+          if(chart.seriesConfig[current]) {
+            keys = Object.keys(chart.seriesConfig[current]);
+
+            for(var j=0; j<keys.length; j++) {
+              if(keys[i] !== 'title' || keys[i] !== 'yAxisUnit') {
+
+                console.warn('Unrecognized key "' + keys[i] + '" for axis ' + current + ' in seriesConfig. Axis can only have "title" and/or "yAxisUnit". Please delete');
+              }
+            }
+          }
+        }
+
+        //check categories
+        if(chart.categories) {
+          if(!chart.categoryKey) {
+
+            log('categories are defined but categoryKey isn\'t. This is valid but categories won\'t be used.');
+          }
+
+          for(var i=0; i<chart.categories.length; i++) {
+            current = chart.categories[i];
+            if(chart.seriesConfig[current]) {
+              keys = Object.keys(chart.seriesConfig[current]);
+
+              for(var j=0; j<keys.length; j++) {
+                if(keys[i] !== 'color') {
+
+                  warn('Unrecognized key "' + keys[i] + '" for category ' + current + ' in seriesConfig. Categories can only have "color". Please delete');
+                }
+              }
+            }
+          }
+        } else if(chart.categoryKey) {
+          if(!chart.categoryKey) {
+
+            log('categoryKey is defined but categories aren\'t. This is valid but categories won\'t be used.');
+          }
+        }
+
+        //check for series
+        var timeKey = _debugGetTimeKey();
+
+        if(chart.seriesConfig[timeKey]) {
+          for(var j=0; j<keys.length; j++) {
+            if(keys[i] !== 'color') {
+
+              warn('Unrecognized key "' + keys[i] + '" for the time based series ' + timeKey + ' in seriesConfig. Series can only have "color". Please delete');
+            }
+          }
+        }
+        logEnd();
+      };
+
+      _debugCheckMargin = function() {
+
+        var valid = _debugObjectHasKeys(chart.margin, ['top', 'bottom', 'left', 'right']);
+
+        if(!valid.hasKeys) {
+          console.warn('`margin` property must be an object with "top", "bottom", "left" and "right" properties (numbers).')
+        }
+        if(valid.otherKeys.length) {
+          console.warn('`margin` property can\'t have other properties than "top", "bottom", "left" and "right". invalid properties: ' + JSON.stringify(valid.otherKeys));
+        }
+      };
+
+      _debugCheckChartExtents = function() {
+
+        logTitle('chartExtents');
+
+        if(chart.chartExtents) {
+          var keys = Object.keys(chart.chartExtents),
+              current;
+
+          for(var i=0; i<keys.length; i++) {
+
+            current = chart.chartExtents[keys[i]];
+            if(!Array.isArray(current) || current.length !== 2) {
+
+              warn('chartExtents key ' + keys[i] + ' is not an array of 2 values: ' + JSON.stringify(current));
+            } else {
+              if(current[0] !== 'dynamic' && isNan(parseFloat(current[0])) || current[0] === Infinity || current[0] === -Infinity) {
+                warn('chartExtents key ' + keys[i] + ' should only have numbers, string representing a number or "dynamic". Current value: ' + JSON.stringify(current));
+              }
+              if(current[1] !== 'dynamic' && isNan(parseFloat(current[1])) || current[1] === Infinity || current[1] === -Infinity) {
+                warn('chartExtents key ' + keys[i] + ' should only have numbers, string representing a number or "dynamic". Current value: ' + JSON.stringify(current));
+              }
+            }
+          }
+        }
+        logEnd();
+      };
+
+      /***********************************************************
+       * Info functions
+       * *********************************************************/
+
+       _debugAddDataInfo = function(info) {
+
+        var data = {},
+            extents = {};
+        info.hasData = !!chart.chartData;
+
+        if(info.hasData) {
+
+          var timeKey = _debugGetTimeKey(),
+              seriesKeys = _debugGetSeriesKeys(),
+              min = Number.MAX_VALUE,
+              max = Number.MIN_VALUE;
+
+          data.length = chart.chartData.length;
+          data.timeStart = chart.chartData[0][timeKey];
+          data.timeStartHuman = window.Px.moment(chart.chartData[0][timeKey]).format();
+          data.timeEnd = chart.chartData[chart.chartData.length - 1][timeKey];
+          data.timeEndHuman = window.Px.moment(chart.chartData[chart.chartData.length - 1][timeKey]).format();
+
+          for(var i=0; i<seriesKeys.length; i++) {
+            extents[seriesKeys[i]] = window.Px.d3.extent(chart.chartData, function(d) {
+              return d[seriesKeys[i]];
+            });
+            min = Math.min(extents[seriesKeys[i]][0], min);
+            max = Math.max(extents[seriesKeys[i]][1], max);
+          }
+
+          data.extents = extents;
+          data.min = min;
+          data.max = max;
+        }
+
+        info.data = data;
+      };
+
+      _debugAddConfigInfo = function(info) {
+
+        info.config = {};
+
+        info.config.seriesConfig = chart.seriesConfig;
+        info.config.completeSeriesConfig = chart.completeSeriesConfig;
+
+        if(isParaRadar) {
+          info.config.dimension = chart.dimensions;
+          info.config.axes = chart.axes;
+        }
+        //TODO: check XY/TS/Polar conf?
+      };
+
+      _debugAddMiscInfo = function(info) {
+        info.misc = {};
+        info.misc.margin = chart.margin;
+      };
+
+      _debugAddExtentsInfo = function(info) {
+
+        info.extents = {};
+
+        info.extents.chartExtents = chart.chartExtents;
+        info.extents.dataExtents = chart.dataExtents;
+
+        if(typeof chart.y === 'function') {
+          info.extents.y = {};
+          info.extents.y.domain = chart.y.domain();
+          info.extents.y.range = chart.y.range();
+        } else {
+          var keys = Object.keys(chart.y);
+
+          info.extents.y = {};
+          for(var i=0; i<keys.length; i++) {
+            info.extents.y[keys[i]] = {};
+            info.extents.y[keys[i]].domain = chart.y[keys[i]].domain();
+            info.extents.y[keys[i]].range = chart.y[keys[i]].range();
+          }
+        }
+
+        info.extents.x = {};
+        info.extents.x.domain = chart.x.domain();
+        info.extents.x.range = chart.x.range();
+      };
+
+      _debugAddSubCompInfo = function(info) {
+        info.subConfigs = {};
+
+        var keys = _getAllPropertiesKeys();
+
+        for(var i=0; i<keys.length; i++) {
+          if(/^[^_]*Config/.test(keys[i]) && keys[i] !== 'seriesConfig' && keys[i] !== 'completeSeriesConfig') {
+            info.subConfigs[keys[i]] = chart[keys[i]];
+          }
+        }
+      };
+
+      _debugAddRendererInfo = function(info) {
+
+        info.render = {};
+        info.render.renderToCanvas = chart.renderToCanvas;
+        if(info.render.renderToCanvas) {
+          info.render.targets = chart._canvasTargets;
+          info.render.timings = chart._previousFramesTiming;
+        }
+      };
+
+      /***********************************************************
+       * Public functions
+       * *********************************************************/
+
+      debug.getInfo = function(chart, log) {
+        initialize(chart);
+
+        var info = {};
+
+        info.timeStamp = new Date();
+        info.chartType = chart.nodeName;
+
+        _debugAddDataInfo(info);
+        _debugAddConfigInfo(info);
+        _debugAddExtentsInfo(info);
+        _debugAddSubCompInfo(info);
+        _debugAddMiscInfo(info);
+        _debugAddRendererInfo(info);
+
+        if(log) {
+
+          //exclude renderer by default because it causes circular
+          //dependency for JSON
+          delete info.render;
+
+          //JSON doesn't support undefined value so return them as '_undefined_' instead
+          console.log(JSON.stringify(info, function(key, value) {
+            if(value === undefined) { return '_undefined_';} return value;
+          }, 2));
+        }
+
+        return info;
+      }
+
+      debug.checkConfig = function(chart) {
+        initialize(chart);
+
+        if(isParaRadar) {
+          _debugCheckConfigInfoParaRadar();
+        }
+        _debugCheckChartExtents();
+        _debugCheckMargin();
+      }
+
+      debug.info = function(msg, origin) {
+        if(debug.logLevel >= 3 && debug.log[origin]) {
+          origin = origin ? origin.toUpperCase() : origin;
+          console.log('[' + origin + '] ' + msg);
+        }
+      }
+
+      debug.log = function(msg, origin) {
+        if(debug.logLevel >= 2 && debug.log[origin]) {
+          origin = origin ? origin.toUpperCase() : origin;
+          console.log('[' + origin + '] ' + msg);
+        }
+      }
+
+      debug.warn = function(msg, origin) {
+        if(debug.logLevel >= 1 && debug.log[origin]) {
+          origin = origin ? origin.toUpperCase() : origin;
+          console.log('[' + origin + '] ' + msg);
+        }
+      }
+
+      debug.version = '4.7.3';
+      //1: warn, 2: log, 3: info
+      debug.logLevel = 0;
+      debug.log.renderer = false;
+      debug.log.scheduler = false;
+
+      window.Px.vis.debug = debug;
+    }
+  })();
+</script>

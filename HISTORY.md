@@ -1,5 +1,4 @@
-
-=================
+================
 * Added tooltipData.seriesObj property
 * Register Changes:
   * item: Simplified register data construction into a single string instead of multiple props
@@ -48,6 +47,58 @@
 * Added tickSizeInner to change tickSize on axis
 * Added tickPadding on axis
 
+v4.7.3
+=================
+* handle undefined value for log in Px.vis.debug.getInfo
+* By default exclude render info when logging in Px.vis.debug.getInfo but still include it in returning object
+
+v4.7.2
+=================
+* Avoid circular dependency in log object in Px.vis.debug.getInfo to be able to stringify it
+
+v4.7.1
+=================
+* Added logging option for scheduler (boolean Px.vis.debug.log.scheduler)
+* Logging for renderer is now optional (boolean Px.vis.debug.log.renderer)
+
+v4.7.0
+=================
+* Added log scale and many associated changes to support log type scale
+
+v4.6.5
+=================
+* `dimensions` now notify and improved documentation for `dimensions` and `axes`
+* fixed a rare timing issue with the web worker scheduler when unregistering charts
+* mitigated renderer slowness on screens with display rate between 30Hz and 60Hz
+* Added Px.vis.debug.logLevel: 0 (no log), 1 (critical), 2 (warning), 3 (info). Currently only logs renderer level 3 info.
+* Hang Px.vis.debug explicitely on the window
+
+v4.6.4
+=================
+* add missing `function` keyword for IE
+
+v4.6.3
+=================
+* ensure canvas to clear are defined when rendering no targets
+
+v4.6.2
+=================
+* ensure changing commonAxis dynamically updates axis ticks visibility.
+* added `priority` to `seriesConfig` to control order of drawing. priority 0 => smaller priority. 2 draws over 1, which itself draws over 0, etc..
+* `priority` can now be changed dynamically in `markerConfig`
+* Added a vis "debugger": Px.vis.debug. This object can:
+  * verify the config of a chart is correct by using the `Px.vis.debug.checkConfig(chart)` method. The checks are minimal at the moment but will be enhanced in the future.
+  * give debug info for a specific chart by using the `Px.vis.debug.getInfo(chart, log)` method. If log is true the returned object will be printed and indented in the console. useful for passing information back to the team when reporting a bug.
+* Clear canvases when renderer has no target and was about to render (helps with muting edge case scenarios)
+* The default 'crosshairLasso' configuration for the toolbar does not reset the searchType to 'none' when deselected
+* Toolbar items that have an `onDeselect` function will only have their function run when actually deselected (used to fire every time another button was selected)
+* Fixed a bug where webworker tooltip search for 'pointPerSeries' would return no results
+
+v4.6.1
+=================
+* Removed px-vis-workerUrl check
+* changed workerUrl to blobUrl to prevent possible race conditions
+
 v4.6.0
 =================
 * Fix polar cursor handling of negative data
@@ -67,6 +118,8 @@ v4.6.0
 * Added lasso functionality for multi-axis charts
 * Made axis interaction-space brushes capable of dynamic extents updates
 * Some changes to how previous lasso functionality worked so it is more standalone
+* Added annotations component allowing users to add an annotation icon to charts with a tooltip with data
+* Each handler in `actionConfig` in the toolbar can now be an array, allowing to run several handlers for one interaction (e.g click or hover). This allows to mix internal handlers of the chart (say run the tooltip search on hover) and custom ones (do something with the result of that tooltip search on hover for example)
 
 v4.5.4
 =================

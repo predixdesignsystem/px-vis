@@ -1083,9 +1083,11 @@ PxVisBehavior.axisTypes = {
      *
      * Valid entries are:
      * - `ordinal`: for discrete input domains, such as names or categories.
+     * - `scaleBand`: another ordinal type meant to create a bar instead of a point.
      * - `time`: for time domains.
      * - `timeLocal`: for local time domains.
      * - `linear`: for continuous input domains, such as numbers.
+     * - `log`: for continuous input domains displayed logarithmicly. NOTE: Per d3 docs, this scale cannot cross or include 0.
      * - `pie`: for pie/donut charts
      */
     xAxisType: {
@@ -1097,7 +1099,9 @@ PxVisBehavior.axisTypes = {
      *
      * Valid entries are:
      * - `ordinal`: for discrete input domains, such as names or categories.
+     * - `scaleBand`: another ordinal type meant to create a bar instead of a point.
      * - `linear`: for continuous input domains, such as numbers.
+     * - `log`: for continuous input domains, such as numbers.
      * - `pie`: for pie/donut charts
      */
     yAxisType: {
@@ -1431,6 +1435,7 @@ PxVisBehavior.markers = {
      * Configuration object to define what marker should map to what icon, color, and row.
      * The object has a key being the marker name, the value being a configuration object for that marker. The configuration object has four properties:
      * - `color`: A rgb color value for the fill or stroke.
+     * - `priority`: relative priority is used to decide which type of markers draw on top of each other. priority 0 => smaller priority. 2 draws over 1, which itself draws over 0, etc..
      * - `markerFillOpacity`: the opacity of the inside of the marker
      * - `markerStrokeOpacity`: the opacity of the outside of the marker
      * - `markerSymbol`: the symbol type; see below
@@ -1631,17 +1636,23 @@ PxVisBehavior.thresholds = {
 PxVisBehavior.dimensions = {
   properties: {
     /**
-     * An optional dev set array to specify which dimensions to plot
-     *
+     * Represents all axes plotted by the chart, including muted ones.
+     * It doesn't guarantee to have the same order as the current visual
+     * representation.
+     * Can be set by the developer to define which axes to plot
      */
     axes: {
       type: Array
     },
     /**
-    * An array of dimensions which the chart uses.
+    * An array of dimensions (axes) which the chart uses. This array represents
+    * the current state of all axes: muted axes won't be included and the
+    * array is ordered based on the current visual representation.
+    * Do not set at a chart level, only read
     */
     dimensions: {
-      type: Array
+      type: Array,
+      notify: true
     },
     /**
     * A string specifying which key to use as the series
