@@ -19,6 +19,13 @@ var PxVisBehaviorScale = window.PxVisBehaviorScale = (window.PxVisBehaviorScale 
     @polymerBehavior PxVisBehaviorScale.scale
 */
 PxVisBehaviorScale.scale = [{
+    /**
+   * px-vis-extents-applied, fired when the calculated extents
+   * (based on chartExtents/dataExtents) are actually applied
+   * to the chart
+   *
+   * @event px-vis-extents-applied
+   */
   properties: {
     /**
      * Holder for chart extents from the seriesConfig object
@@ -394,8 +401,9 @@ PxVisBehaviorScale.scale = [{
         extents.y = this._fixLogExt(extents.y);
       }
       this.y.domain(extents.y);
-
     }
+
+    this.fire('px-vis-extents-applied', extents);
 
     if(this.xAxisType === 'log') {
       extents.x = this._fixLogExt(extents.x);
