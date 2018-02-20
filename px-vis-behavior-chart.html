@@ -2605,6 +2605,13 @@ PxVisBehaviorChart.sizeVerticalRegister = [{
       type: Number
     },
     /**
+     * The register height based on its type and config
+     */
+    _registerHeight: {
+      type: Number,
+      computed: '_computeRegisterHeight(_verticalRegisterHeight, registerConfig.*)'
+    },
+    /**
     * When calculating the register height if the height deductions to do
     * haven't been passed in (i.e height changed rather than ironResize being called)
     * then this list of string will be used to search for elements IDs and calculate
@@ -2661,6 +2668,14 @@ PxVisBehaviorChart.sizeVerticalRegister = [{
       this.set('_verticalRegisterHeight', Math.max(Number(this.$[this._verticalRegisterDrawingCanvasId].height) + deductionsTotal, 0));
     }.bind(this), 5);
   },
+
+  _computeRegisterHeight: function() {
+    if(this.registerConfig && this.registerConfig.type === 'horizontal') {
+      return this.registerConfig.height ? this.registerConfig.height : '';
+    }
+
+    return this._verticalRegisterHeight;
+  }
 }, PxVisBehavior.observerCheck, PxVisBehavior.baseSize];
 
 /*
