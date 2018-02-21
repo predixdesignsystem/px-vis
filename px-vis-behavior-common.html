@@ -3030,13 +3030,6 @@ PxVisBehavior.highlightLineShared = [{
             max = val;
           }
         }
-
-        screenX = this.y(dataset[last]) * Math.sin(this.x(last)) + this.width/2 + window.pageXOffset;
-        screenY = this.y(dataset[last]) * Math.cos(Math.PI - this.x(last)) + this.height/2 + window.pageYOffset;
-
-      } else {
-        screenX = this.x(last) + window.pageXOffset + 15;
-        screenY = this.y[last](dataset[last]) + this.margin.top + window.pageYOffset;
       }
 
       for(var i = 0; i < this.dimensions.length; i++) {
@@ -3068,14 +3061,14 @@ PxVisBehavior.highlightLineShared = [{
 
       //create our tooltipData obj
       data = {
-        "mouse": null,
-        "dataPos": [screenX, screenY],
-        "time": dataset[this.timeData],
-        "dataset": dataset,
+        'mouse': null,
+        'time': dataset[this.timeData],
+        'dataset': dataset,
+        'yVal': dataset[last],
         'series': series,
-        "color": tooltipConfig[aid]["color"],
-        "tooltipConfig": tooltipConfig,
-        "adjustPosition": true //warn chart that pos needs to be adjusted from canvas/svg
+        'color': tooltipConfig[aid]['color'],
+        'tooltipConfig': tooltipConfig,
+        'axis': last
       };
 
     return data;
