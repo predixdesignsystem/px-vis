@@ -1,3 +1,7 @@
+v4.7.4
+=================
+* Fix bug where position of tooltip for parallel coordinates and radar were causing exceptions
+
 v4.7.3
 =================
 * handle undefined value for log in Px.vis.debug.getInfo
