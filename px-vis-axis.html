@@ -491,7 +491,7 @@ Custom property | Description
           }.bind(this))
           .call(this._axis);
 
-          this._setLineStyles(this._axisGroup,'line,path');
+          this._setLineStyles(this._axisGroup);
           this._setLabelStyles(this._axisGroup);
 
           this._calcDrawnTicks();
@@ -515,10 +515,10 @@ Custom property | Description
             }.bind(this))
             .call(this._axis);
 
-          g.select("path.domain").attr("stroke", this.axisColor ? this.axisColor : this._checkThemeVariable("--px-vis-axis-color", 'black'))
+          g.select('path.domain').attr('stroke', this._findAxisSubColor(this.axisLineColor, '--px-vis-axis-color', 'black'))
           this.set('_axisGroup',g);
 
-          this._setLineStyles(this._axisGroup,'line,path');
+          this._setLineStyles(this._axisGroup);
           this._setLabelStyles(this._axisGroup);
 
           this._calcDrawnTicks();
@@ -631,10 +631,10 @@ Custom property | Description
           // if we are not inline, apply default colors
           if(this.labelPosition !== 'inline') {
             elem.selectAll('text')
-              .attr('fill', this.axisColor ? this.axisColor : this._checkThemeVariable("--px-vis-axis-color", 'black'));
+              .attr('fill', this._findAxisSubColor(this.axisLabelColor, '--px-vis-axis-color', 'black'));
 
             elem.selectAll('g.tick').selectAll("line")
-              .attr('stroke', this.axisColor ? this.axisColor : this._checkThemeVariable("--px-vis-axis-color", 'black'));
+              .attr('stroke', this._findAxisSubColor(this.axisTickColor, '--px-vis-axis-color', 'black'));
             }
 
           // if we are not default centering our label, then do calcs to figure out where to put it
@@ -666,7 +666,7 @@ Custom property | Description
                 return tickText.nodes()[i].getBoundingClientRect().width + 6
               })
               .attr('height', this.labelTypeSize + 4)
-              .attr('fill',this.axisColor ? this.axisColor : this._checkThemeVariable("--px-vis-axis-inline-box-color", 'black'))
+              .attr('fill',this._findAxisSubColor(this.axisLineColor, '--px-vis-axis-inline-box-color', 'black'))
               .attr('transform','rotate(' + this.labelRotation + ')');
 
               tickText.attr('fill', this._checkThemeVariable("--px-vis-axis-inline-type-color", 'rbg(255,255,255)'));
@@ -676,12 +676,18 @@ Custom property | Description
          * Sets the axis line styles
          *
          */
-        _setLineStyles:function(elem,lines) {
+        _setLineStyles:function(elem) {
           var theme = this.labelPosition === 'inline' ? "--px-vis-axis-inline-box-color" : "--px-vis-axis-color";
 
-          elem.selectAll(lines)
+          elem.selectAll('path')
             .attr('fill','none')
-            .attr('stroke', this.axisColor ? this.axisColor : this._checkThemeVariable(theme, 'black'))
+            .attr('stroke', this._findAxisSubColor(this.axisLineColor, theme, 'black'))
+            .attr('shape-rendering', 'crispEdges')
+            .attr('stroke-width', this.strokeWidth);
+
+          elem.selectAll('line')
+            .attr('fill','none')
+            .attr('stroke', this._findAxisSubColor(this.axisTickColor, theme, 'black'))
             .attr('shape-rendering', 'crispEdges')
             .attr('stroke-width', this.strokeWidth);
         },
@@ -841,7 +847,7 @@ Custom property | Description
             var themeVar = (this.labelPosition === 'inline') ? "--px-vis-axis-inline-title-color" : "--px-vis-axis-title-color";
             this._titleGroup.append('text')
               .attr('class','axis-title')
-              .attr('fill', this.axisColor ? this.axisColor : this._checkThemeVariable(themeVar, 'black'))
+              .attr('fill', this._findAxisSubColor(this.axisTitleColor, themeVar, 'black'))
               .attr('font-size', this.titleTypeSize + 'px')
               .style('font-family',this._checkThemeVariable("--px-vis-font-family", 'Comic Sans MS'))
               .attr('font-style', this._checkThemeVariable("--px-vis-font-family", 'Comic Sans MS'))
@@ -1010,6 +1016,15 @@ Custom property | Description
 
           this.removeAxis();
           this.drawElement();
+        },
+
+        _findAxisSubColor: function(subProperty, cssVarName, cssVarDefault) {
+
+          if(subProperty) {
+            return subProperty;
+          } else {
+            return this.axisColor ? this.axisColor : this._checkThemeVariable(cssVarName, cssVarDefault);
+          }
         }
     });
 </script>
