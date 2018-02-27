@@ -124,6 +124,12 @@ Unlike most other drawing elements that can use chartData directly, bar requires
       _returnHeight: Function,
       groupScale: Function,
       ordinalKey: String,
+      groupColors: Object,
+
+      colorByGroup: {
+        type: Boolean,
+        value: false
+      },
 
       highlightBar: {
         type: String,
@@ -198,6 +204,7 @@ Unlike most other drawing elements that can use chartData directly, bar requires
         .attr('series-id', 'bars')
         .attr('class', 'seriesGroups')
       .merge(barGroupBuilder)
+        .attr('fill', function(d,i) { return this.colorByGroup && this.groupColors ? this.groupColors[d[this.ordinalKey]] : null }.bind(this))
         .attr("transform", this._transformGroups.bind(this));
 
       this.barGroup = this.svg.selectAll('g.seriesGroups');
@@ -225,7 +232,7 @@ Unlike most other drawing elements that can use chartData directly, bar requires
         .attr('y', this._returnY.bind(this))
         .attr('width', this._returnWidth.bind(this))
         .attr('height', this._returnHeight.bind(this))
-        .attr('fill', function(d,i) { return this.completeSeriesConfig[d.cscKey]['color']; }.bind(this));
+        .attr('fill', function(d,i) { return this.colorByGroup ? null : this.completeSeriesConfig[d.cscKey]['color']; }.bind(this));
 
       // Make it easy to get our bars again
       this.barRects = this.barGroup.selectAll('rect.series-bar');
