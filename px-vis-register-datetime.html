@@ -31,7 +31,7 @@ Please see the properties for configuration details.
 
     <div id="dateTime">
       <span
-        class="seriesMarker"
+        class$="seriesMarker [[_hide(seriesKey, completeSeriesConfig.*)]]"
         style$="background-color:[[_computeItemColor(seriesKey, completeSeriesConfig.*)]]">&nbsp;</span>
       <span id="firstDateTime">[[firstDateTime]]</span> <span>[[separator]]</span> <span id="secondDateTime">[[secondDateTime]]</span>  &nbsp;
     </div>
@@ -51,6 +51,14 @@ Please see the properties for configuration details.
       seriesKey: {
         type: String
       }
+    },
+
+    _hide: function() {
+      if(!this.seriesKey || !this.completeSeriesConfig || !this.completeSeriesConfig[this.seriesKey]) {
+        return 'hide';
+      }
+
+      return '';
     },
 
     _computeItemColor: function(seriesKey) {
