@@ -231,7 +231,7 @@ PxVisBehaviorChart.chartCommon = [{
           if(!fullConfig[k[i]]['name']) {
             fullConfig[k[i]]['name'] = k[i];
           }
-          if(!fullConfig[k[i]]['color']) {
+          if(!fullConfig[k[i]]['color'] && !this._dontCalcColors) {
             fullConfig[k[i]]['color'] = this._getColor(i);
           }
 
@@ -283,7 +283,9 @@ PxVisBehaviorChart.chartCommon = [{
           objYs[ missingYs[i] ]['name'] = missingYs[i];
           objYs[ missingYs[i] ]['x'] = x;
           objYs[ missingYs[i] ]['y'] = missingYs[i];
-          objYs[ missingYs[i] ]['color'] = this._getColor(kLen + i);
+          if(!this._dontCalcColors) {
+            objYs[ missingYs[i] ]['color'] = this._getColor(kLen + i);
+          }
 
           // copy the obj to our config
           fullConfig[ missingYs[i] ] = objYs[ missingYs[i] ];
