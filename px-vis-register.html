@@ -95,6 +95,7 @@ Custom property | Description
   `--px-vis-register-series-name` | The color of the data series name
   `--px-vis-register-data-value` | The color of the data series value
   `--px-vis-register-box` | The color of the box around the register when a scrollbar is present
+  `--px-vis-register-border-color` | The color of the outside border for the register
   |
   |
   |
@@ -117,106 +118,141 @@ Custom property | Description
 
     <div class="flex flex-row fullWidth">  <!--  IE min-height + flex bug workaround-->
       <div id="registerWrap"
-        class$="[[_getMinSizeClass(preventMinSize)]] inline--flex flex--col"
+        class$="[[_getMinSizeClass(preventMinSize)]] inline--flex"
         style$="[[_returnHeight(height,margin, type)]]; [[_returnWidth(chartWidth, width, margin, type)]]">
 
-        <div class$="[[_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)]] [[_show(xAxisType, forceDateTimeDisplay)]]">
-          <px-vis-register-datetime
-            class$="[[tooltipStyle]]"
-            first-date-time="[[_firstDateTime]]"
-            second-date-time="[[_secondDateTime]]"
-            separator="[[_separator]]"
-            x-axis-type="[[xAxisType]]"
-            series-key="[[_timeSeriesKey]]"
-            complete-series-config="[[completeSeriesConfig]]"
-          ></px-vis-register-datetime>
+        <div class$="[[_show(_isHorizontal)]] borderRight flex flex--center paginateButton">
+          <span class$="[[_show(displayPageArrows)]] actionable flex__item--middle" on-tap="_leftPage">
+            <px-icon icon="px-nav:back"></px-icon>
+          </span>
         </div>
 
-        <div class$="[[_show(_sortTypes.length)]]">
-          <span>Sort by: </span>
-          <px-dropdown
-            items="[[_sortTypes]]"
-            selected="{{currentSortType}}"
-            select-by="key"
-            button-style="bare">
-          </px-dropdown>
-        </div>
+        <!-- header + content -->
+        <div class$="[[_getMinSizeClass(preventMinSize)]] inline--flex flex--col fullWidth">
+          <div id="header" class$="[[_headerClass(_isVertical)]] u-pl-">
+            <!-- pagination numbers for horizontal -->
+            <div class$="[[_show(displayPageArrows, _isHorizontal)]]">
+              <span class="textInfo">[[currentPage]] of [[totalPages]]</span>
+            </div>
 
-        <div class$="[[_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)]] [[_show(displayOrdinalValue)]]">
-          <div>[[tooltipData.ordinalSet]]&nbsp;</div>
-        </div>
+            <!-- datetime -->
+            <div id="datetimeContainer" class$="[[_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)]] [[_show(xAxisType, forceDateTimeDisplay)]] u-ml- u-mr-" style="flex-grow:2">
+              <px-vis-register-datetime
+                class$="[[tooltipStyle]]"
+                first-date-time="[[_firstDateTime]]"
+                second-date-time="[[_secondDateTime]]"
+                separator="[[_separator]]"
+                x-axis-type="[[xAxisType]]"
+                series-key="[[_timeSeriesKey]]"
+                complete-series-config="[[completeSeriesConfig]]"
+              ></px-vis-register-datetime>
+            </div>
 
-        <div id="seriesWrap" class$="[[_getSeriesWrapperClassReverse(type)]]">
-          <template is="dom-if" if="[[!_isOfType(xAxisType, 'pie')]]">
-            <template is="dom-repeat" items="[[_series]]" as="_groups">
-              <div class$="[[_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)]]">
-                <template is="dom-repeat" id="itemRepeat" items="[[_groups]]" rendered-item-count="{{_itemCount}}">
-                  <px-vis-register-item
-                    class$="[[tooltipStyle]]"
-                    data="[[_returnSeriesObj(tooltipData.*, item)]]"
-                    series-key="[[item]]"
-                    dynamic-menu-config="[[dynamicMenuConfig]]"
-                    complete-series-config="[[completeSeriesConfig]]"
-                    type="[[type]]"
-                    x-axis-type="[[xAxisType]]"
-                    y-axis-type="[[yAxisType]]"
-                    disable-click="[[disableClick]]"
-                    muted-series="{{mutedSeries}}"
-                    number-format="[[numberFormat]]"
-                    number-format-culture="[[numberFormatCulture]]"
-                    number-format-is-currency="[[numberFormatIsCurrency]]"
-                    number-format-currency="[[numberFormatCurrency]]"
-                    number-format-zero="[[numberFormatZero]]"
-                    truncation-length="[[truncationLength]]"
-                    prevent-muting="[[preventMuting]]"
-                    display-x-values-only="[[displayXValuesOnly]]"
-                    display-y-values-only="[[displayYValuesOnly]]"
-                    icon-color="[[iconColor]]"
-                    reverse-display-order="[[reverseDisplayOrder]]">
-                  </px-vis-register-item>
-                </template>
-              </div>
-            </template>
-          </template>
-          <!-- For pie charts -->
-          <template is="dom-if" if="[[_isOfType(yAxisType, 'pie')]]">
-            <div class$="[[_getSeriesWrapperClassReverse(type)]]">
-              <div class$="[[_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)]]">
-                <template is="dom-repeat" id="pieItemRepeat" items="[[chartData]]" rendered-item-count="{{_itemCount}}">
-                  <px-vis-register-item-pie
-                    item="[[item]]"
-                    item-index="[[index]]"
-                    dynamic-menu-config="[[dynamicMenuConfig]]"
-                    complete-series-config="[[completeSeriesConfig]]"
-                    chart-data="[[chartData]]"
-                    type="[[type]]"
-                    x-axis-type="[[xAxisType]]"
-                    y-axis-type="[[yAxisType]]"
-                    use-percentage="[[usePercentage]]"
-                    number-format="[[numberFormat]]"
-                    number-format-culture="[[numberFormatCulture]]"
-                    number-format-is-currency$="[[numberFormatIsCurrency]]"
-                    number-format-currency="[[numberFormatCurrency]]"
-                    number-format-zero="[[numberFormatZero]]"
-                    truncation-length="[[truncationLength]]">
-                  </px-vis-register-item-pie>
-                </template>
+            <!-- sorting options -->
+            <div id="sortingContainer" class$="[[_show(_sortTypes.length)]] flex flex--middle u-ml- u-mr-">
+              <span class="u-mr-- textInfo">Sort by:</span>
+              <px-dropdown
+                id="sortDropdown"
+                items="[[_sortTypes]]"
+                selected="{{currentSortType}}"
+                select-by="key"
+                button-style="bare"
+                disable-clear>
+              </px-dropdown>
+              <div class="flex flex--right" style="flex-grow:2">
+                <span class="actionable" on-tap="_sortOrderChanged">
+                    <px-icon class="smallerIcon" icon="[[_sortOrderIcon(sortDescending)]]"></px-icon>
+                </span>
               </div>
             </div>
-          </template>
-        </div>
 
-        <!-- pagination -->
-        <div class$="[[_show(displayPageArrows)]] flex flex--justify">
-          <button class="btn btn--bare--primary btn--icon" on-click="_leftPage">
-            <px-icon icon="px-nav:back"></px-icon>
-          </button>
-          <span>[[currentPage]] of [[totalPages]]</span>
-          <button class="btn btn--bare--primary btn--icon" on-click="_rightPage">
+            <!-- ?? -->
+            <div class$="[[_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)]] [[_show(displayOrdinalValue)]] u-ml- u-mr-">
+              <div>[[tooltipData.ordinalSet]]&nbsp;</div>
+            </div>
+
+          </div>
+
+          <div id="seriesWrap" class$="[[_getSeriesWrapperClassReverse(type)]]">
+            <template is="dom-if" if="[[!_isOfType(xAxisType, 'pie')]]">
+              <template is="dom-repeat" items="[[_series]]" as="_groups">
+                <div class$="[[_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)]] u-ml- u-mr-">
+                  <template is="dom-repeat" id="itemRepeat" items="[[_groups]]" rendered-item-count="{{_itemCount}}">
+                    <px-vis-register-item
+                      class$="[[tooltipStyle]]"
+                      data="[[_returnSeriesObj(tooltipData.*, item)]]"
+                      series-key="[[item]]"
+                      dynamic-menu-config="[[dynamicMenuConfig]]"
+                      complete-series-config="[[completeSeriesConfig]]"
+                      type="[[type]]"
+                      x-axis-type="[[xAxisType]]"
+                      y-axis-type="[[yAxisType]]"
+                      disable-click="[[disableClick]]"
+                      muted-series="{{mutedSeries}}"
+                      number-format="[[numberFormat]]"
+                      number-format-culture="[[numberFormatCulture]]"
+                      number-format-is-currency="[[numberFormatIsCurrency]]"
+                      number-format-currency="[[numberFormatCurrency]]"
+                      number-format-zero="[[numberFormatZero]]"
+                      truncation-length="[[truncationLength]]"
+                      prevent-muting="[[preventMuting]]"
+                      display-x-values-only="[[displayXValuesOnly]]"
+                      display-y-values-only="[[displayYValuesOnly]]"
+                      icon-color="[[iconColor]]"
+                      reverse-display-order="[[reverseDisplayOrder]]">
+                    </px-vis-register-item>
+                  </template>
+                </div>
+              </template>
+            </template>
+            <!-- For pie charts -->
+            <template is="dom-if" if="[[_isOfType(yAxisType, 'pie')]]">
+              <div class$="[[_getSeriesWrapperClassReverse(type)]]">
+                <div class$="[[_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)]]">
+                  <template is="dom-repeat" id="pieItemRepeat" items="[[chartData]]" rendered-item-count="{{_itemCount}}">
+                    <px-vis-register-item-pie
+                      item="[[item]]"
+                      item-index="[[index]]"
+                      dynamic-menu-config="[[dynamicMenuConfig]]"
+                      complete-series-config="[[completeSeriesConfig]]"
+                      chart-data="[[chartData]]"
+                      type="[[type]]"
+                      x-axis-type="[[xAxisType]]"
+                      y-axis-type="[[yAxisType]]"
+                      use-percentage="[[usePercentage]]"
+                      number-format="[[numberFormat]]"
+                      number-format-culture="[[numberFormatCulture]]"
+                      number-format-is-currency$="[[numberFormatIsCurrency]]"
+                      number-format-currency="[[numberFormatCurrency]]"
+                      number-format-zero="[[numberFormatZero]]"
+                      truncation-length="[[truncationLength]]">
+                    </px-vis-register-item-pie>
+                  </template>
+                </div>
+              </div>
+            </template>
+          </div>
+
+          <!-- filler -->
+          <div style="flex-grow:2"></div>
+
+          <!-- vertical pagination -->
+          <div class$="[[_show(displayPageArrows, _isVertical)]] flex flex--justify u-ml- u-mr-">
+            <span class="actionable" on-tap="_leftPage">
+              <px-icon class="smallerIcon" icon="px-nav:back"></px-icon>
+            </span>
+            <span class="textInfo">[[currentPage]] of [[totalPages]]</span>
+            <span class="actionable" on-tap="_rightPage">
+              <px-icon class="smallerIcon" icon="px-nav:next"></px-icon>
+            </span>
+          </div>
+
+        </div>
+        <div class$="[[_show(_isHorizontal)]] borderLeft flex paginateButton flex--center">
+          <span class$="[[_show(displayPageArrows)]] actionable flex__item--middle" on-tap="_rightPage">
             <px-icon icon="px-nav:next"></px-icon>
-          </button>
+          </span>
         </div>
-
       </div>
     </div>
 
@@ -262,6 +298,14 @@ Custom property | Description
         type: String,
         value: "vertical",
         notify: true
+      },
+      _isVertical: {
+        type: Boolean,
+        computed: '_computeIsVertical(type)'
+      },
+      _isHorizontal: {
+        type: Boolean,
+        computed: '_computeIsHorizontal(_isVertical)'
       },
       /**
        * If the `type` is 'horizontal', this property determines how the register
@@ -372,6 +416,13 @@ Custom property | Description
           };
         }
       },
+      /**
+       * Set to true to reverse the current sorting algorithm
+       */
+      sortDescending: {
+        type: Boolean,
+        value: false
+      },
       _timeSeriesKey: String,
       // _regControls: HTMLElement
     },
@@ -381,21 +432,9 @@ Custom property | Description
       '_scrollBarsPresent(_itemCount)',
       '_scrollBarsPresent(height, margin)',
       '_scrollBarsPresent(chartWidth, margin)',
-      '_computeSeries(completeSeriesConfig.*, groupings, currentSortType, mutedSeries.*)',
+      '_computeSeries(completeSeriesConfig.*, groupings, currentSortType, mutedSeries.*, sortDescending)',
       '_sortConfigChanged(sortConfig.*)'
     ],
-
-
-    ready: function() {
-      this.addEventListener('px-vis-event-request', this._updateSortType.bind(this));
-    },
-
-    _updateSortType: function(evt) {
-      if(evt.detail.eventName === 'px-vis-register-sort-request') {
-        this.set('sortType', evt.detail.data.menuItem.type);
-        evt.stopPropagation();
-      }
-    },
 
     /**
      * Function which takes the incoming datetime from tooltipData and formats it.
@@ -458,6 +497,10 @@ Custom property | Description
         });
       }
 
+      if(this.sortDescending) {
+        series.reverse();
+      }
+
       return series;
     },
 
@@ -504,6 +547,18 @@ Custom property | Description
       }
 
       return '';
+    },
+
+    _sortOrderChanged: function() {
+      this.set('sortDescending', !this.sortDescending);
+    },
+
+    _sortOrderIcon: function() {
+      if(this.sortDescending) {
+        return 'px-nav:up';
+      } else {
+        return 'px-nav:down';
+      }
     },
 
     _displayTime: function(xAxisType, forceDateTimeDisplay) {
@@ -662,6 +717,22 @@ Custom property | Description
         return -1;
       }
       return 0;
+    },
+
+    _computeIsVertical: function() {
+      return this.type === 'vertical';
+    },
+
+    _computeIsHorizontal: function() {
+      return !this._isVertical;
+    },
+
+    _headerClass: function() {
+      if(this._isVertical) {
+        return 'borderBottom u-mb ';
+      } else {
+        return 'flex ';
+      }
     }
 
   });
