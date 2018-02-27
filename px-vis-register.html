@@ -96,6 +96,7 @@ Custom property | Description
   `--px-vis-register-data-value` | The color of the data series value
   `--px-vis-register-box` | The color of the box around the register when a scrollbar is present
   `--px-vis-register-border-color` | The color of the outside border for the register
+  `--px-vis-register-font-size` | font size for the register
   |
   |
   |
@@ -176,10 +177,10 @@ Custom property | Description
           <div id="seriesWrap" class$="[[_getSeriesWrapperClassReverse(type)]]">
             <template is="dom-if" if="[[!_isOfType(xAxisType, 'pie')]]">
               <template is="dom-repeat" items="[[_series]]" as="_groups">
-                <div class$="[[_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)]] u-ml- u-mr-">
+                <div class$="[[_getSeriesWrapperClass(type, horizontalAlignment, _hasScrollBar)]] [[_itemClass(_isVertical)]] u-ml- u-mr-">
                   <template is="dom-repeat" id="itemRepeat" items="[[_groups]]" rendered-item-count="{{_itemCount}}">
                     <px-vis-register-item
-                      class$="[[tooltipStyle]]"
+                      class$="[[tooltipStyle]] [[_itemClass(_isVertical)]]"
                       data="[[_returnSeriesObj(tooltipData.*, item)]]"
                       series-key="[[item]]"
                       dynamic-menu-config="[[dynamicMenuConfig]]"
@@ -732,6 +733,14 @@ Custom property | Description
         return 'borderBottom u-mb ';
       } else {
         return 'flex ';
+      }
+    },
+
+    _itemClass: function() {
+      if(this._isVertical) {
+        return 'fullWidth ';
+      } else {
+        return '';
       }
     }
 
