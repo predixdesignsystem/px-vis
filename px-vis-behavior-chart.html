@@ -2623,7 +2623,7 @@ PxVisBehaviorChart.sizeVerticalRegister = [{
     }
   },
   observers: [
-    '_heightChanged(height)'
+    '_heightChanged(height, _verticalRegisterDrawingCanvasId, _verticalRegisterHeightDeductions)'
   ],
   ready:function() {
       this.set('_verticalRegisterHeight', this.height);
@@ -2865,7 +2865,34 @@ PxVisBehaviorChart.thresholdConfig = {
      */
     thresholdConfig: {
       type: Object
+    },
+
+    _horizontalThresholdData: Array,
+    _verticalThresholdData: Array
+  },
+
+  _splitThresholds: function() {
+    if(!this.thresholdData) {
+      return;
     }
+
+    let key;
+    const horizontal = [];
+    const vertical = [];
+
+    for(let i=0; i<this.thresholdData.length; i++) {
+      key = this.thresholdData[i]['type'];
+      if(this.thresholdConfig[key] && this.thresholdConfig[key]['type'] === 'vertical') {
+        vertical.push(this.thresholdData[i]);
+
+      } else {
+        horizontal.push(this.thresholdData[i]);
+
+      }
+    }
+
+    this.set('_horizontalThresholdData', horizontal);
+    this.set('_verticalThresholdData', vertical);
   }
 };
 

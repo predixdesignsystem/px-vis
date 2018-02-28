@@ -399,24 +399,27 @@ Custom property | Description
     },
 
     _calcTitle: function(d) {
-
       //default is 2 decimals
-      var format = '.2f',
+      let format = '.2f',
           title = '';
 
       if(this.thresholdConfig[d.type]) {
+        if(this.thresholdConfig[d.type].hideValue) {
+          return this.thresholdConfig[d.type]['title'] ? this.thresholdConfig[d.type]['title'] : d.type;
+        }
 
         //format title if defined in config
         if(this.thresholdConfig[d.type].title) {
-          title = this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['title'] ?
-          ' (' + this.thresholdConfig[d.type]['title'] + ')': ' (' + d.type + ')';
+          title = ` (${this.thresholdConfig[d.type]['title']})`;
         }
 
         //format value if defined in config
         if(this.thresholdConfig[d.type].format) {
           format = this.thresholdConfig[d.type].format;
         }
+
       }
+
       return Px.d3.format(format)(d.value) + title;
     },
 
