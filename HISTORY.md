@@ -46,9 +46,12 @@
 * Changed names for outerTickSize to tickSizeOuter to match d3.
 * Added tickSizeInner to change tickSize on axis
 * Added tickPadding on axis
+* Toolbar changes:
+  * Any toolbar item can now have a `hidden` property to show/hide the item
 * BREAKING:
   * when using preconfigured toolbar options keys with a value of `false` will be ignored, e.g : {zoom: true, pan: false} will only show zoom button
   * `range` property has been removed from px-vis-chart-navigator. use `chartExtents.x` to control the timespan. The chart navigator does not support being used without data anymore
+  * horizontal registers do not support custom alignment anymore and will use all available width
 
 v4.7.3
 =================
