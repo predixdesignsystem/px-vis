@@ -23,8 +23,11 @@ Example of a custom `config` object:
         "tooltipLabel": "zoom",
         // px-icon-set icon used for this button:
         "icon": "px-vis:zoom",
+        // this function will be run when clicking the button
+        // `this` will be bound to the chart unless `onClickContext` is defined
         "onClick": "function() {this.set(\"_internalShowTooltip\", false);}",
-        // context to be used in `onClick`:
+        // context to be used in `onClick`. Can be 'toolbar' or any object. If
+        //not specified will use the chart context
         "onClickContext': "toolbar",
         // if a button is part of a button group then it becomes selected when clicked
         // and all other buttons in the same group become deselected:
@@ -34,13 +37,13 @@ Example of a custom `config` object:
         "selected": true,
         // this config will be propagated to px-vis-interaction-space:
         "actionConfig": {
-          // key = an event, value = either a predefined action from `actionMapping` in interaction-space:
+          // key = an event, value = either a predefined action from `actionMapping` in interaction-space
+          // or a function, where `this` will be bound to the chart
+          // or null, which ensures previously registered actions will be removed
           "mousedown": "startZooming",
           "mouseup": "stopZooming",
-          // or a function, where `this` will be bound to the chart:
-          "mousemove": "function() { console.log(\"Mouse moved on the chart!\");}"
-          // or null, which ensures previously registered actions will be removed:
-          "mouseout": "null",
+          "mousemove": "function() { console.log(\"Mouse moved on the chart!\");}",
+          "mouseout": "null"
         },
         // subConfig allows you to define a second row of buttons
         // which will be displayed after clicking the main button:
@@ -53,9 +56,6 @@ Example of a custom `config` object:
             "eventName": "my-custom-click",
             "selectable": true,
             "selected": true,
-            // this function will be run when clicking the button
-            // `this` will be bound to the chart unless `onClickContext` is defined
-            // if defined in HTML, needs to be a string - if JS, can be a function:
             "onClick": "function() { this.set(\"selectionType\", \"xAxis\");}"
           },
           "y": {
