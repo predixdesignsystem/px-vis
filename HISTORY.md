@@ -28,7 +28,7 @@
   * Created classes on register and refactored listeners to handle showing/hiding dynamic menu
     * Relies on CSS transitions now instead of animations
 * Changed the way tooltipData is created throughout to accomodate new seriesObj
-* Changed the way charts handle tooltipData to allow for pagnation
+* Changed the way charts handle tooltipData to allow for pagination
 * Added general method for checking for ordinal and time types.
   * Upgraded various ordinal checks to also check for scaleBand.
 * Ordinal type scale changes in scale-behavior:
