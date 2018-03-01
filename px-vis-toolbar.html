@@ -125,7 +125,7 @@ Custom property | Description
       <!--main row-->
       <span id="mainRow" class$="flex [[_getRowDirection(horizontalAlignment)]]">
         <template id="mainRepeat" is="dom-repeat" items="{{_internalConfig}}" strip-whitespace>
-          <span class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]] [[_hide(item.hidden)]]" style$="{{item.customButtonStyle}}" on-tap="_clickItem" value="{{index}}">
+          <span class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item.disabled)]] [[_hide(item.hidden)]]" style$="{{item.customButtonStyle}}" on-tap="_clickItem" value="{{index}}">
             <px-icon class$="icon [[_show(item.icon)]]" icon="[[item.icon]]" value="{{index}}"></px-icon>{{item.title}}
             <template is="dom-if" if="[[_hasTooltip(item)]]">
               <px-tooltip
@@ -141,7 +141,7 @@ Custom property | Description
       <template id="templateSubRow" is="dom-if" if="[[_isWithinChart(withinChart)]]">
         <span id="subRow" class$="flex subrow--container [[_getRowDirection(horizontalAlignment)]] [[_getSubRowClass(subToolbarAlignment)]]">
           <template id="subRepeat" is="dom-repeat" items="{{currentSubConfig}}" strip-whitespace>
-              <span class$="u-p- flex__item main-item subrow--item [[_getSelectedClass(item.selected)]] [[_hide(item.hidden)]]" on-tap="_clickSubItem" value="{{index}}">
+              <span class$="u-p- flex__item main-item subrow--item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item.disabled)]] [[_hide(item.hidden)]]" on-tap="_clickSubItem" value="{{index}}">
                 <px-icon class$="icon [[_show(item.icon)]]" icon="[[item.icon]]" value="{{index}}"></px-icon>
                 {{item.title}}
                 <template is="dom-if" if="[[_hasTooltip(item)]]">
@@ -554,7 +554,7 @@ Custom property | Description
         actionConfig: {
           mouseout: 'resetTooltip',
           mousemove: 'calcTooltipData',
-          click: 'request',
+          click: null,
           mousedown: null,
           mouseup: null
         },
@@ -932,6 +932,15 @@ Custom property | Description
       this.set('actionConfig', o);
     },
 
+    /**
+     * Forces the toolbar to reprocess its current config. Useful when changing
+     * one subproperty of a toolbar item without having to re-copy the whole
+     * config
+     */
+    reProcessConfig: function() {
+      this._configChanged();
+    },
+
     _extendConfig: function(defaultConfig, customConfig) {
       var keys = Object.keys(customConfig),
           obj = defaultConfig || {};
@@ -998,66 +1007,69 @@ Custom property | Description
           alreadyOpened,
           needNotify = false;
 
-      //make it the current selection if it is in a buttonGroup
-      if(conf.buttonGroup) {
+      if(!conf.disabled) {
 
-         //ensure we remember selection, deselect others and select this one
-        for(var i=0; i<this._internalConfig.length; i++) {
+        //make it the current selection if it is in a buttonGroup
+        if(conf.buttonGroup) {
 
-          // if we are changing groups
-          if(index !== i && this._internalConfig[i].buttonGroup === conf.buttonGroup) {
-            // if we have a onDeselect func and we are selected, run it
-            if(this._internalConfig[i]['onDeselect'] && this._internalConfig[i].selected) {
-              var fn = this._returnFn(this._internalConfig[i]['onDeselect']);
-              this._setupContext(this._internalConfig[i], fn);
+          //ensure we remember selection, deselect others and select this one
+          for(var i=0; i<this._internalConfig.length; i++) {
+
+            // if we are changing groups
+            if(index !== i && this._internalConfig[i].buttonGroup === conf.buttonGroup) {
+              // if we have a onDeselect func and we are selected, run it
+              if(this._internalConfig[i]['onDeselect'] && this._internalConfig[i].selected) {
+                var fn = this._returnFn(this._internalConfig[i]['onDeselect']);
+                this._setupContext(this._internalConfig[i], fn);
+              }
+              // change styles on the old button
+              this.set('_internalConfig.' + i + '.selected', false);
+              this.set('_internalConfig.' + i + '.opened', false);
             }
-            // change styles on the old button
-            this.set('_internalConfig.' + i + '.selected', false);
-            this.set('_internalConfig.' + i + '.opened', false);
           }
+
+          //toggle style on the new button
+          alreadyOpened = this._internalConfig[index].opened;
+          this.set('_internalConfig.' + index + '.opened', !alreadyOpened);
+          this.set('_internalConfig.' + index + '.selected', this._internalConfig[index].toggle ? !this._internalConfig[index].selected : true);
         }
 
-        //toggle style on the new button
-        alreadyOpened = this._internalConfig[index].opened;
-        this.set('_internalConfig.' + index + '.opened', !alreadyOpened);
-        this.set('_internalConfig.' + index + '.selected', this._internalConfig[index].toggle ? !this._internalConfig[index].selected : true);
-      }
 
+        if(!alreadyOpened) {
 
-      if(!alreadyOpened) {
+          if(!this.currentSubConfig || this.currentSubConfig.length === 0) {
+            needNotify = true;
+          }
 
-        if(!this.currentSubConfig || this.currentSubConfig.length === 0) {
-          needNotify = true;
+          //open sub toolbar
+          this._tryProcessSubConfig(conf);
+          this._processItem(conf);
+
+          this._tryApplySelectedSub(conf);
+        } else {
+
+          if(this.currentSubConfig !== []) {
+            needNotify = true;
+          }
+
+          //close subtoolbar
+          this.set('currentSubConfig', []);
         }
 
-        //open sub toolbar
-        this._tryProcessSubConfig(conf);
-        this._processItem(conf);
+        if(needNotify) {
 
-        this._tryApplySelectedSub(conf);
-      } else {
+          //make sure that the toolbar has been re rendered (i.e hidden or shown)
+          this.$.templateSubRow.render();
 
-        if(this.currentSubConfig !== []) {
-          needNotify = true;
+          //tell the chart so it can resize
+          this.dispatchEvent(new CustomEvent('px-vis-toolbar-secondary-toggled', { bubbles: true, composed: true, detail: { 'open': this.currentSubConfig !== [], withinChart: this.withinChart }}));
         }
-
-        //close subtoolbar
-        this.set('currentSubConfig', []);
-      }
-
-      if(needNotify) {
-
-        //make sure that the toolbar has been re rendered (i.e hidden or shown)
-        this.$.templateSubRow.render();
-
-        //tell the chart so it can resize
-        this.dispatchEvent(new CustomEvent('px-vis-toolbar-secondary-toggled', { bubbles: true, composed: true, detail: { 'open': this.currentSubConfig !== [], withinChart: this.withinChart }}));
       }
     },
 
     _tryProcessSubConfig: function(conf) {
       //process sub config if existing
-      if(conf.subConfig) {
+      if(conf.subConfig && !conf.disabled) {
         var subConf = [],
             keys = Object.keys(conf.subConfig);
 
@@ -1118,10 +1130,14 @@ Custom property | Description
      */
     _processItem: function(conf) {
       if(conf.actionConfig) {
-        if(typeof conf.actionConfig === 'string') {
-          this.set('actionConfig', JSON.parse(conf.actionConfig));
+        if(!conf.disabled) {
+          if(typeof conf.actionConfig === 'string') {
+            this.set('actionConfig', JSON.parse(conf.actionConfig));
+          } else {
+            this.set('actionConfig', this.clone(conf.actionConfig));
+          }
         } else {
-          this.set('actionConfig', this.clone(conf.actionConfig));
+          this.set('actionConfig', {});
         }
       }
 
@@ -1189,6 +1205,9 @@ Custom property | Description
     },
     _getSelectedClass: function(selected) {
       return selected ? 'selected ' : '';
+    },
+    _getDisabledClass: function(disabled) {
+      return disabled ? 'disabled ' : '';
     },
     _hasTooltip: function(item) {
      if(this.hasUndefinedArguments(arguments)) {
