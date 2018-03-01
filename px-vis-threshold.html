@@ -149,11 +149,6 @@ Custom property | Description
       language: {
         type: String,
         value: 'en'
-      },
-
-      type: {
-        type: String,
-        value: 'y'
       }
     },
 
@@ -236,11 +231,14 @@ Custom property | Description
         .merge(this._thresholdBuilder)
           .each(function(d,i) {
             updateColors = false;
-            _this._mergeLine(d, i, this);
-            _this._mergeRect(d, i, this);
+            let dir = _this.thresholdConfig && _this.thresholdConfig[d.type] && _this.thresholdConfig[d.type]['direction'] ?
+              _this.thresholdConfig[d.type]['direction'] :
+              'horizontal';
 
-            var title = _this._mergeText(d, i, this);
+            _this._mergeLine(d, i, this, dir);
+            _this._mergeRect(d, i, this, dir);
 
+            let title = _this._mergeText(d, i, this, dir);
             _this._rectWidth(this, d, title);
           });
 
@@ -256,12 +254,12 @@ Custom property | Description
         .attr("class", "threshold-line");
     },
 
-    _mergeLine: function(d, i, elem) {
+    _mergeLine: function(d, i, elem, dir) {
       Px.d3.select(elem).select("line.threshold-line")
-        .attr('x1', function(d) { return this.type === 'y' ? 0 : this.x(d.value); }.bind(this))
-        .attr('x2', function(d) { return this.type === 'y' ? this.width - this.margin.right - this.margin.left : this.x(d.value); }.bind(this))
-        .attr('y1', function(d) { return this.type === 'y' ? this._getYVal(d) : 0; }.bind(this))
-        .attr('y2', function(d) { return this.type === 'y' ? this._getYVal(d) : this.height - this.margin.top - this.margin.bottom; }.bind(this))
+        .attr('x1', function(d) { return this._xFn(d,dir,0,0); }.bind(this))
+        .attr('x2', function(d) { return this._xFn(d,dir,(this.width - this.margin.right - this.margin.left),0);  }.bind(this))
+        .attr('y1', function(d) { return this._yFn(d,dir,0); }.bind(this))
+        .attr('y2', function(d) { return this._yFn(d,dir,(this.height - this.margin.top - this.margin.bottom)); }.bind(this))
         .attr('stroke', this._getColors.bind(this))
         .attr('stroke-width', function(d) {
           return (this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['strokeWidth'] ) ?
@@ -281,11 +279,11 @@ Custom property | Description
         .attr('height','18');
     },
 
-    _mergeRect: function(d, i, elem) {
+    _mergeRect: function(d, i, elem, dir) {
       Px.d3.select(elem).select("rect.threshold-rect")
-        .attr('x', function(d) { return this.type === 'y' ? 5 : this.x(d.value) - 1; }.bind(this))
-        .attr('y', function(d,i) { return this.type === 'y' ? this._calcYPos(d,i) : 2; }.bind(this))
-        .attr('transform', function(d) { return this.type === 'y' ? null : 'rotate(90 ' + (this.x(d.value) - 1) + ',2)'; }.bind(this))
+        .attr('x', function(d) { return this._xFn(d,dir,5,1); }.bind(this))
+        .attr('y', function(d) { return this._yFn(d,dir,2); }.bind(this))
+        .attr('transform', function(d) { return dir === 'horizontal' ? null : 'rotate(90 ' + (this.x(d.value) - 1) + ',2)'; }.bind(this))
         .attr('fill', function(d, i) {
           var type = d.type;
           if(this.thresholdConfig[type] && this.thresholdConfig[type]['showThresholdBox']) {
@@ -303,14 +301,14 @@ Custom property | Description
         .attr('font-style', this._checkThemeVariable("--px-vis-font-family", 'Comic Sans MS'));
     },
 
-    _mergeText: function(d, i, elem) {
+    _mergeText: function(d, i, elem, dir) {
       var title = this._calcTitle(d);
       Px.d3.select(elem).select("text.threshold-text")
         .text(title)
-        .attr('x', function(d,i) { return this.type === 'y' ? 8 : this.x(d.value) - 4; }.bind(this))
-        .attr('y', function(d,i) { return this.type === 'y' ? this._calcYPos(d,i,13) : 5; }.bind(this))
-        .attr('transform', function(d) { return this.type === 'y' ? null : 'rotate(-90 ' + (this.x(d.value) - 4) + ',5)'; }.bind(this))
-        .attr('text-anchor', function() { return this.type === 'y' ? 'start' : 'end'; }.bind(this))
+        .attr('x', function(d) { return this._xFn(d,dir,8,4); }.bind(this))
+        .attr('y', function(d) { return this._yFn(d,dir,5,13); }.bind(this))
+        .attr('transform', function(d) { return dir === 'horizontal' ? null : 'rotate(-90 ' + (this.x(d.value) - 4) + ',5)'; }.bind(this))
+        .attr('text-anchor', function() { return dir === 'horizontal' ? 'start' : 'end'; }.bind(this))
         .attr('fill', function(d,i) {
           var type = d.type;
           if(this.thresholdConfig[type] && this.thresholdConfig[type]['showThresholdBox']) {
@@ -367,7 +365,7 @@ Custom property | Description
      *
      * @method _calcYPos
      */
-    _calcYPos: function(d,i,offset) {
+    _calcYPos: function(d,offset) {
       offset = offset || 0;
       // var mid = (this.currentDomainY[1] +  this.currentDomainY[0]) / 2,
       //     val = (d.value < mid) ? this._getYVal(d) -1 + offset : this._getYVal(d) -17 + offset;
@@ -399,24 +397,27 @@ Custom property | Description
     },
 
     _calcTitle: function(d) {
-
       //default is 2 decimals
-      var format = '.2f',
+      let format = '.2f',
           title = '';
 
       if(this.thresholdConfig[d.type]) {
+        if(this.thresholdConfig[d.type].hideValue) {
+          return this.thresholdConfig[d.type]['title'] ? this.thresholdConfig[d.type]['title'] : d.type;
+        }
 
         //format title if defined in config
         if(this.thresholdConfig[d.type].title) {
-          title = this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['title'] ?
-          ' (' + this.thresholdConfig[d.type]['title'] + ')': ' (' + d.type + ')';
+          title = ` (${this.thresholdConfig[d.type]['title']})`;
         }
 
         //format value if defined in config
         if(this.thresholdConfig[d.type].format) {
           format = this.thresholdConfig[d.type].format;
         }
+
       }
+
       return Px.d3.format(format)(d.value) + title;
     },
 
@@ -427,6 +428,28 @@ Custom property | Description
 
       this._calcThemeOrConfig();
       this._drawElementDebounced();
+    },
+
+    _xFn: function(d, dir, hVal, adj) {
+      const v = dir === 'horizontal' ? hVal : this.x(d.value) - adj;
+
+      if(isNaN(v)) {
+        console.warn(`Cannot place threshold ${JSON.stringify(d)}. Check data & configuration.`)
+        return null;
+      }
+
+      return v;
+    },
+
+    _yFn: function(d, dir, vVal, adj) {
+      const v = dir === 'horizontal' ? this._calcYPos(d,adj) : vVal;
+
+      if(isNaN(v)) {
+        console.warn(`Cannot place threshold ${JSON.stringify(d)}. Check data & configuration.`)
+        return null;
+      }
+
+      return v;
     }
   });
 </script>

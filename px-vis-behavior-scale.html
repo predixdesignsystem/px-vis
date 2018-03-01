@@ -98,6 +98,15 @@ PxVisBehaviorScale.scale = [{
       value: 0.5
     },
     /**
+     * The outer padding for ordinal type scales - effective controls the spacing between the first and last ordinal group the the axes
+
+     * Expressed as a percent of the ordinal group width, so a value of 0.5 for a bar chart means your bar and the gap between bars are the same size
+     */
+     paddingOuter: {
+      type: Number,
+      value: 0.1
+    },
+    /**
      * The base for logarithmic type scales
      */
     logBase: {
@@ -268,7 +277,7 @@ PxVisBehaviorScale.scale = [{
       result = Px.d3.scaleLog().nice().base(this.logBase).range(range);
       result._scaleType = 'log';
     } else if(type === 'scaleBand') {
-      result = Px.d3.scaleBand().range(range).round(true).paddingInner(this.scalePadding);
+      result = Px.d3.scaleBand().range(range).round(true).paddingInner(this.scalePadding).paddingOuter(this.paddingOuter);
       result._scaleType = 'scaleBand';
     } else { //ordinal
       result = Px.d3.scalePoint().range(range).padding(this.scalePadding);
@@ -979,12 +988,12 @@ _calcMultiAxisExtents: function() {
     var updated = false;
 
     if(this.xAxisType === 'scaleBand' && this.x && this.x.paddingInner) {
-      this.x.paddingInner(this.scalePadding);
+      this.x.paddingInner(this.scalePadding).paddingOuter(this.paddingOuter);
        updated = true;
     }
 
     if(this.yAxisType === 'scaleBand' && this.y && this.y.paddingInner) {
-      this.y.paddingInner(this.scalePadding);
+      this.y.paddingInner(this.scalePadding).paddingOuter(this.paddingOuter);
       updated = true;
     }
 
