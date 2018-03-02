@@ -1,3 +1,7 @@
+v4.7.5
+=================
+* Fix bug in events where default config gets no color (and also draw fn may never get called)
+
 v4.7.4
 =================
 * Fix bug where position of tooltip for parallel coordinates and radar were causing exceptions
