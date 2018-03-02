@@ -24,15 +24,15 @@ $inuit-enable-btn--icon : true;
 @import 'px-buttons-design/_objects.buttons.scss';
 @import "px-actionable-design/_objects.actionable.scss";
 
-$register-font-size:    var(--px-vis-register-font-size, 12px);//$inuit-base-font-size; //$inuit-heading-size-6
-$register-spacing-unit: calculateRem($register-font-size);
+$register-font-ratio: calculateRem(12px);
+$register-font-size: var(--px-vis-register-font-size, $register-font-ratio);
 
 $icon-width:            $inuit-base-spacing-unit / 3;
 $icon-narrow-m-t:       $inuit-base-spacing-unit / 5;
 $icon-text-space:       $inuit-base-spacing-unit / 3;
 
-$icon-wide-height:      $register-spacing-unit * 4 / 3;
-$icon-narrow-height:    $register-spacing-unit * 2;
+$icon-wide-height:      calc(#{$register-font-size} * 4 / 3);
+$icon-narrow-height:    calc(#{$register-font-size} * 2.5);
 
 $series-wide-spacing:   $inuit-base-spacing-unit / 5;
 $series-narrow-spacing: $inuit-base-spacing-unit;
@@ -54,12 +54,12 @@ $register-border-color: var(--px-vis-register-border-color, $grey3);
 }
 
 .minSize {
-  min-height: $register-spacing-unit * 3; //4x the font size plus a little
-  min-width: $register-spacing-unit * 14;
+  min-height: calc(#{$register-font-size} * 3);
+  min-width: calc(#{$register-font-size} * 14);
 }
 
 .register-item--min-width {
-  min-width: $register-spacing-unit * 4;
+  min-width: calc(#{$register-font-size} * 4);
 }
 
 #registerWrap{
@@ -86,7 +86,7 @@ $register-border-color: var(--px-vis-register-border-color, $grey3);
 }
 
 #seriesWrap.scrollOn {
-  min-height: $register-spacing-unit * 3;  //needs to match the registerWrap min-height
+  min-height: calc(#{$register-font-size} * 3); //needs to match the registerWrap min-height
   overflow: auto;
   padding: $inuit-base-spacing-unit--tiny;
 }

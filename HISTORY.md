@@ -28,7 +28,7 @@
   * Created classes on register and refactored listeners to handle showing/hiding dynamic menu
     * Relies on CSS transitions now instead of animations
 * Changed the way tooltipData is created throughout to accomodate new seriesObj
-* Changed the way charts handle tooltipData to allow for pagnation
+* Changed the way charts handle tooltipData to allow for pagination
 * Added general method for checking for ordinal and time types.
   * Upgraded various ordinal checks to also check for scaleBand.
 * Ordinal type scale changes in scale-behavior:
@@ -46,9 +46,12 @@
 * Changed names for outerTickSize to tickSizeOuter to match d3.
 * Added tickSizeInner to change tickSize on axis
 * Added tickPadding on axis
+* Toolbar changes:
+  * Any toolbar item can now have a `hidden` property to show/hide the item
 * BREAKING:
   * when using preconfigured toolbar options keys with a value of `false` will be ignored, e.g : {zoom: true, pan: false} will only show zoom button
   * `range` property has been removed from px-vis-chart-navigator. use `chartExtents.x` to control the timespan. The chart navigator does not support being used without data anymore
+  * horizontal registers do not support custom alignment anymore and will use all available width
 
 v4.7.3
 =================

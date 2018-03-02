@@ -23,8 +23,11 @@ Example of a custom `config` object:
         "tooltipLabel": "zoom",
         // px-icon-set icon used for this button:
         "icon": "px-vis:zoom",
+        // this function will be run when clicking the button
+        // `this` will be bound to the chart unless `onClickContext` is defined
         "onClick": "function() {this.set(\"_internalShowTooltip\", false);}",
-        // context to be used in `onClick`:
+        // context to be used in `onClick`. Can be 'toolbar' or any object. If
+        //not specified will use the chart context
         "onClickContext': "toolbar",
         // if a button is part of a button group then it becomes selected when clicked
         // and all other buttons in the same group become deselected:
@@ -34,13 +37,13 @@ Example of a custom `config` object:
         "selected": true,
         // this config will be propagated to px-vis-interaction-space:
         "actionConfig": {
-          // key = an event, value = either a predefined action from `actionMapping` in interaction-space:
+          // key = an event, value = either a predefined action from `actionMapping` in interaction-space
+          // or a function, where `this` will be bound to the chart
+          // or null, which ensures previously registered actions will be removed
           "mousedown": "startZooming",
           "mouseup": "stopZooming",
-          // or a function, where `this` will be bound to the chart:
-          "mousemove": "function() { console.log(\"Mouse moved on the chart!\");}"
-          // or null, which ensures previously registered actions will be removed:
-          "mouseout": "null",
+          "mousemove": "function() { console.log(\"Mouse moved on the chart!\");}",
+          "mouseout": "null"
         },
         // subConfig allows you to define a second row of buttons
         // which will be displayed after clicking the main button:
@@ -53,9 +56,6 @@ Example of a custom `config` object:
             "eventName": "my-custom-click",
             "selectable": true,
             "selected": true,
-            // this function will be run when clicking the button
-            // `this` will be bound to the chart unless `onClickContext` is defined
-            // if defined in HTML, needs to be a string - if JS, can be a function:
             "onClick": "function() { this.set(\"selectionType\", \"xAxis\");}"
           },
           "y": {
@@ -125,8 +125,8 @@ Custom property | Description
       <!--main row-->
       <span id="mainRow" class$="flex [[_getRowDirection(horizontalAlignment)]]">
         <template id="mainRepeat" is="dom-repeat" items="{{_internalConfig}}" strip-whitespace>
-          <span class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]]" style$="{{item.customButtonStyle}}" on-tap="_clickItem" value="{{index}}">
-            <px-icon class="icon" icon="[[item.icon]]" value="{{index}}"></px-icon>{{item.title}}
+          <span class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item.disabled)]] [[_hide(item.hidden)]]" style$="{{item.customButtonStyle}}" on-tap="_clickItem" value="{{index}}">
+            <px-icon class$="icon [[_show(item.icon)]]" icon="[[item.icon]]" value="{{index}}"></px-icon>{{item.title}}
             <template is="dom-if" if="[[_hasTooltip(item)]]">
               <px-tooltip
                 tooltip-message="[[item.tooltipLabel]]"
@@ -141,10 +141,8 @@ Custom property | Description
       <template id="templateSubRow" is="dom-if" if="[[_isWithinChart(withinChart)]]">
         <span id="subRow" class$="flex subrow--container [[_getRowDirection(horizontalAlignment)]] [[_getSubRowClass(subToolbarAlignment)]]">
           <template id="subRepeat" is="dom-repeat" items="{{currentSubConfig}}" strip-whitespace>
-              <span class$="u-p- flex__item main-item subrow--item [[_getSelectedClass(item.selected)]]" on-tap="_clickSubItem" value="{{index}}">
-                <template is="dom-if" if="[[item.icon]]">
-                  <px-icon class="icon"icon="[[item.icon]]" value="{{index}}"></px-icon>
-                </template>
+              <span class$="u-p- flex__item main-item subrow--item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item.disabled)]] [[_hide(item.hidden)]]" on-tap="_clickSubItem" value="{{index}}">
+                <px-icon class$="icon [[_show(item.icon)]]" icon="[[item.icon]]" value="{{index}}"></px-icon>
                 {{item.title}}
                 <template is="dom-if" if="[[_hasTooltip(item)]]">
                   <px-tooltip
@@ -168,7 +166,8 @@ Custom property | Description
     behaviors: [
       PxVisBehavior.observerCheck,
       PxVisBehavior.commonMethods,
-      PxVisBehavior.actionConfig
+      PxVisBehavior.actionConfig,
+      PxVisBehavior.showHideClasses
     ],
 
 
@@ -268,7 +267,23 @@ Custom property | Description
     ],
 
     /**
-     * Config for default actions: tooltip/pan/zoom.
+     * Predefined configs available for use and/or extensions:
+     * - annotations
+     * - axisMuteSeries
+     * - axisDrag
+     * - crosshairLasso
+     * - crosshair
+     * - crosshairWithOptions
+     * - tooltip
+     * - tooltipFrozen
+     * - tooltipWithSearchTypes
+     * - tooltipWithSearchTypesAndRadius
+     * - tooltipWithFullOptions
+     * - pan
+     * - bareZoom
+     * - zoom
+     * - advancedZoom
+     * - stripe
      */
     _defaultActionsMapping: {
       annotations: {
@@ -277,10 +292,10 @@ Custom property | Description
         cursorIcon: 'px-vis:comment',
         buttonGroup: 1,
         onClick: function() {
-          this.set("_internalShowTooltip", false);
-          this.set("showStrongIcon", true);
+          this.set('_internalShowTooltip', false);
+          this.set('showStrongIcon', true);
         },
-        onDeselect: function() { this.set("showStrongIcon", false);},
+        onDeselect: function() { this.set('showStrongIcon', false);},
         actionConfig: {
           mouseout: null,
           mousemove: null,
@@ -304,7 +319,7 @@ Custom property | Description
             buttonGroup: 1,
             toggle: true,
             onClick: function(button) {
-              this.$$("px-vis-annotations").set("hide", button.selected);
+              this.$$('px-vis-annotations').set('hide', button.selected);
             }
           }
         }
@@ -315,7 +330,7 @@ Custom property | Description
         cursorIcon: 'px-vis:brush',
         buttonGroup: 1,
         onClick: function() {
-          this.set("_internalShowTooltip", false);
+          this.set('_internalShowTooltip', false);
         },
         actionConfig: {
           mouseout: null,
@@ -331,7 +346,7 @@ Custom property | Description
         cursorIcon: 'px-vis:move-axis',
         buttonGroup: 1,
         onClick: function() {
-          this.set("_internalShowTooltip", false);
+          this.set('_internalShowTooltip', false);
         },
         actionConfig: {
           mouseout: null,
@@ -347,8 +362,8 @@ Custom property | Description
         buttonGroup: 1,
         selectable: true,
         onClick: function() {
-          this.set("_internalShowTooltip", false);
-          this.set("interactionSpaceConfig.searchType", "lasso");
+          this.set('_internalShowTooltip', false);
+          this.set('interactionSpaceConfig.searchType', 'lasso');
         },
         actionConfig: {
           mouseout: null,
@@ -362,9 +377,9 @@ Custom property | Description
             tooltipLabel: 'Clear lasso data',
             icon: 'px-nav:close',
             onClick: function() {
-              this.set("crosshairData", { "rawData": [], "timeStamps": []});
-              this.set("interactionSpaceConfig.resetLassoData", !this.interactionSpaceConfig.resetLassoData);
-              this.set("resetLassoData", !this.resetLassoData);
+              this.set('crosshairData', { 'rawData': [], 'timeStamps': []});
+              this.set('interactionSpaceConfig.resetLassoData', !this.interactionSpaceConfig.resetLassoData);
+              this.set('resetLassoData', !this.resetLassoData);
             }
           }
         }
@@ -375,7 +390,7 @@ Custom property | Description
         cursorIcon: 'px-vis:crosshair',
         buttonGroup: 1,
         onClick: function() {
-          this.set("_internalShowTooltip", true);
+          this.set('_internalShowTooltip', true);
         },
         actionConfig: {
           mouseout: 'resetTooltipAndCrosshairData',
@@ -390,10 +405,10 @@ Custom property | Description
         icon: 'px-vis:crosshair',
         buttonGroup: 1,
         onClick: function() {
-          this.set("interactionSpaceConfig.cursorType", "circle");
+          this.set('interactionSpaceConfig.cursorType', 'circle');
         },
         onDeselect: function() {
-          this.set("interactionSpaceConfig.cursorType", "none");
+          this.set('interactionSpaceConfig.cursorType', 'none');
         },
         actionConfig: {
           mouseout: 'resetTooltipAndCrosshairData',
@@ -410,7 +425,7 @@ Custom property | Description
             buttonGroup: 1,
             selectable: true,
             onClick: function() {
-              this.set("interactionSpaceConfig.searchType", "closestPoint");
+              this.set('interactionSpaceConfig.searchType', 'closestPoint');
             },
             actionConfig: {
               mouseout: 'resetTooltipAndCrosshairData',
@@ -427,7 +442,7 @@ Custom property | Description
             buttonGroup: 1,
             selectable: true,
             onClick: function() {
-              this.set("interactionSpaceConfig.searchType", "pointPerSeries");
+              this.set('interactionSpaceConfig.searchType', 'pointPerSeries');
             },
             actionConfig: {
               mouseout: 'resetTooltipAndCrosshairData',
@@ -444,7 +459,7 @@ Custom property | Description
             buttonGroup: 1,
             selectable: true,
             onClick: function() {
-              this.set("interactionSpaceConfig.searchType", "allInArea");
+              this.set('interactionSpaceConfig.searchType', 'allInArea');
             },
             actionConfig: {
               mouseout: 'resetTooltipAndCrosshairData',
@@ -459,7 +474,7 @@ Custom property | Description
             tooltipLabel: 'Radius',
             onClick: function() {
               var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0;
-              this.set("interactionSpaceConfig.searchRadius", sr + 5);
+              this.set('interactionSpaceConfig.searchRadius', sr + 5);
             }
           },
           radiusDown: {
@@ -467,7 +482,7 @@ Custom property | Description
             tooltipLabel: 'Radius',
             onClick: function() {
               var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0;
-              this.set("interactionSpaceConfig.searchRadius", Math.max(sr - 5, 0));
+              this.set('interactionSpaceConfig.searchRadius', Math.max(sr - 5, 0));
             }
           }
         }
@@ -479,7 +494,7 @@ Custom property | Description
         buttonGroup: 1,
         selected: true,
         onClick: function() {
-          this.set("_internalShowTooltip", true);
+          this.set('_internalShowTooltip', true);
         },
         actionConfig: {
           mouseout: 'resetTooltip',
@@ -496,7 +511,7 @@ Custom property | Description
         buttonGroup: 1,
         selected: true,
         onClick: function() {
-          this.set("_internalShowTooltip", true);
+          this.set('_internalShowTooltip', true);
         },
         actionConfig: {
           mouseout: 'resetTooltip',
@@ -513,7 +528,7 @@ Custom property | Description
             selectable: true,
             selected: true,
             onClick: function() {
-              this.set("interactionSpaceConfig.searchFor", "timestamps");
+              this.set('interactionSpaceConfig.searchFor', 'timestamps');
             },
           },
           points: {
@@ -522,7 +537,7 @@ Custom property | Description
             buttonGroup: 2,
             selectable: true,
             onClick: function() {
-              this.set("interactionSpaceConfig.searchFor", "point");
+              this.set('interactionSpaceConfig.searchFor', 'point');
             },
           }
         },
@@ -534,7 +549,7 @@ Custom property | Description
         buttonGroup: 1,
         selected: true,
         onClick: function() {
-          this.set("_internalShowTooltip", true);
+          this.set('_internalShowTooltip', true);
         },
         actionConfig: {
           mouseout: 'resetTooltip',
@@ -551,7 +566,7 @@ Custom property | Description
             selectable: true,
             selected: true,
             onClick: function() {
-              this.set("interactionSpaceConfig.searchFor", "timestamps");
+              this.set('interactionSpaceConfig.searchFor', 'timestamps');
             },
           },
           points: {
@@ -560,7 +575,7 @@ Custom property | Description
             buttonGroup: 2,
             selectable: true,
             onClick: function() {
-              this.set("interactionSpaceConfig.searchFor", "point");
+              this.set('interactionSpaceConfig.searchFor', 'point');
             },
           },
           radiusUp: {
@@ -568,7 +583,7 @@ Custom property | Description
             tooltipLabel: 'Radius',
             onClick: function() {
               var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0;
-              this.set("interactionSpaceConfig.searchRadius", sr + 5);
+              this.set('interactionSpaceConfig.searchRadius', sr + 5);
             }
           },
           radiusDown: {
@@ -576,7 +591,7 @@ Custom property | Description
             tooltipLabel: 'Radius',
             onClick: function() {
               var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0;
-              this.set("interactionSpaceConfig.searchRadius", Math.max(sr - 5, 0));
+              this.set('interactionSpaceConfig.searchRadius', Math.max(sr - 5, 0));
             }
           }
         }
@@ -588,7 +603,7 @@ Custom property | Description
         buttonGroup: 1,
         selected: true,
         onClick: function() {
-          this.set("_internalShowTooltip", true);
+          this.set('_internalShowTooltip', true);
         },
         actionConfig: {
           mouseout: 'resetTooltip',
@@ -605,7 +620,7 @@ Custom property | Description
             selectable: true,
             selected: true,
             onClick: function() {
-              this.set("interactionSpaceConfig.searchFor", "timestamps");
+              this.set('interactionSpaceConfig.searchFor', 'timestamps');
             },
           },
           points: {
@@ -614,7 +629,7 @@ Custom property | Description
             buttonGroup: 2,
             selectable: true,
             onClick: function() {
-              this.set("interactionSpaceConfig.searchFor", "point");
+              this.set('interactionSpaceConfig.searchFor', 'point');
             },
           },
           closestPoint: {
@@ -625,7 +640,7 @@ Custom property | Description
             selectable: true,
             selected: true,
             onClick: function() {
-              this.set("interactionSpaceConfig.searchType", "closestPoint");
+              this.set('interactionSpaceConfig.searchType', 'closestPoint');
             },
             actionConfig: {
               mouseout: 'resetTooltip',
@@ -642,7 +657,7 @@ Custom property | Description
             buttonGroup: 1,
             selectable: true,
             onClick: function() {
-              this.set("interactionSpaceConfig.searchType", "pointPerSeries");
+              this.set('interactionSpaceConfig.searchType', 'pointPerSeries');
             },
             actionConfig: {
               mouseout: 'resetTooltip',
@@ -659,7 +674,7 @@ Custom property | Description
             buttonGroup: 1,
             selectable: true,
             onClick: function() {
-              this.set("interactionSpaceConfig.searchType", "allInArea");
+              this.set('interactionSpaceConfig.searchType', 'allInArea');
             },
             actionConfig: {
               mouseout: 'resetTooltip',
@@ -674,7 +689,7 @@ Custom property | Description
             tooltipLabel: 'Radius',
             onClick: function() {
               var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0;
-              this.set("interactionSpaceConfig.searchRadius", sr + 5);
+              this.set('interactionSpaceConfig.searchRadius', sr + 5);
             }
           },
           radiusDown: {
@@ -682,7 +697,7 @@ Custom property | Description
             tooltipLabel: 'Radius',
             onClick: function() {
               var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0;
-              this.set("interactionSpaceConfig.searchRadius", Math.max(sr - 5, 0));
+              this.set('interactionSpaceConfig.searchRadius', Math.max(sr - 5, 0));
             }
           }
         }
@@ -692,7 +707,7 @@ Custom property | Description
         icon: 'px-vis:pan',
         cursorIcon: 'px-vis:pan',
         onClick: function() {
-          this.set("_internalShowTooltip", false);
+          this.set('_internalShowTooltip', false);
         },
         buttonGroup: 1,
         actionConfig: {
@@ -715,7 +730,7 @@ Custom property | Description
         icon: 'px-vis:zoom-toolbar',
         cursorIcon: 'px-vis:zoom-toolbar',
         onClick: function() {
-          this.set("_internalShowTooltip", false);
+          this.set('_internalShowTooltip', false);
         },
         buttonGroup: 1,
         actionConfig: {
@@ -743,7 +758,7 @@ Custom property | Description
         icon: 'px-vis:zoom-toolbar',
         cursorIcon: 'px-vis:zoom-toolbar',
         onClick: function() {
-          this.set("_internalShowTooltip", false);
+          this.set('_internalShowTooltip', false);
         },
         buttonGroup: 1,
         actionConfig: {
@@ -783,7 +798,7 @@ Custom property | Description
         buttonGroup: 1,
         selectable: true,
         onClick: function() {
-          this.set("_internalShowTooltip", false);
+          this.set('_internalShowTooltip', false);
         },
         actionConfig: {
           mousedown: 'startZooming',
@@ -799,21 +814,21 @@ Custom property | Description
             tooltipLabel: 'Zoom on X axis only',
             eventName: 'my-custom-click',
             selectable: true,
-            onClick: function() { this.set("selectionType", "xAxis");}
+            onClick: function() { this.set('selectionType', 'xAxis');}
           },
           y: {
             icon: 'px-vis:y-axis',
             buttonGroup: 1,
             tooltipLabel: 'Zoom on Y axis only',
             selectable: true,
-            onClick: function() { this.set("selectionType", "yAxis");}
+            onClick: function() { this.set('selectionType', 'yAxis');}
           },
           xy: {
             icon: 'px-vis:xy-axis',
             tooltipLabel: 'Zoom on X and Y axis',
             buttonGroup: 1,
             selectable: true,
-            onClick: function() { this.set("selectionType", "xy");}
+            onClick: function() { this.set('selectionType', 'xy');}
           },
           zoomIn: {
             icon: 'px-vis:zoom-in',
@@ -843,7 +858,7 @@ Custom property | Description
         cursorIcon: 'px-vis:draw-stripe',
         buttonGroup: 1,
         selectable: true,
-        onClick: function() {this.set("_internalShowTooltip", false);},
+        onClick: function() {this.set('_internalShowTooltip', false);},
         subConfig: {
           inclusion: {
             title: 'Inclusion',
@@ -853,8 +868,8 @@ Custom property | Description
             selectable: true,
             selected: true,
             onClick: function() {
-              this.set("selectionType", "xAxis");
-              this.set("stripeType", "inclusion");
+              this.set('selectionType', 'xAxis');
+              this.set('stripeType', 'inclusion');
             }
           },
           exclusion: {
@@ -864,8 +879,8 @@ Custom property | Description
             tooltipLabel: 'Draw/edit exclusion type stripes',
             selectable: true,
             onClick: function() {
-              this.set("selectionType", "xAxis");
-              this.set("stripeType", "exclusion");
+              this.set('selectionType', 'xAxis');
+              this.set('stripeType', 'exclusion');
             }
           },
           add: {
@@ -915,6 +930,15 @@ Custom property | Description
       }
 
       this.set('actionConfig', o);
+    },
+
+    /**
+     * Forces the toolbar to reprocess its current config. Useful when changing
+     * one subproperty of a toolbar item without having to re-copy the whole
+     * config
+     */
+    reProcessConfig: function() {
+      this._configChanged();
     },
 
     _extendConfig: function(defaultConfig, customConfig) {
@@ -983,66 +1007,69 @@ Custom property | Description
           alreadyOpened,
           needNotify = false;
 
-      //make it the current selection if it is in a buttonGroup
-      if(conf.buttonGroup) {
+      if(!conf.disabled) {
 
-         //ensure we remember selection, deselect others and select this one
-        for(var i=0; i<this._internalConfig.length; i++) {
+        //make it the current selection if it is in a buttonGroup
+        if(conf.buttonGroup) {
 
-          // if we are changing groups
-          if(index !== i && this._internalConfig[i].buttonGroup === conf.buttonGroup) {
-            // if we have a onDeselect func and we are selected, run it
-            if(this._internalConfig[i]["onDeselect"] && this._internalConfig[i].selected) {
-              var fn = this._returnFn(this._internalConfig[i]["onDeselect"]);
-              this._setupContext(this._internalConfig[i], fn);
+          //ensure we remember selection, deselect others and select this one
+          for(var i=0; i<this._internalConfig.length; i++) {
+
+            // if we are changing groups
+            if(index !== i && this._internalConfig[i].buttonGroup === conf.buttonGroup) {
+              // if we have a onDeselect func and we are selected, run it
+              if(this._internalConfig[i]['onDeselect'] && this._internalConfig[i].selected) {
+                var fn = this._returnFn(this._internalConfig[i]['onDeselect']);
+                this._setupContext(this._internalConfig[i], fn);
+              }
+              // change styles on the old button
+              this.set('_internalConfig.' + i + '.selected', false);
+              this.set('_internalConfig.' + i + '.opened', false);
             }
-            // change styles on the old button
-            this.set('_internalConfig.' + i + '.selected', false);
-            this.set('_internalConfig.' + i + '.opened', false);
           }
+
+          //toggle style on the new button
+          alreadyOpened = this._internalConfig[index].opened;
+          this.set('_internalConfig.' + index + '.opened', !alreadyOpened);
+          this.set('_internalConfig.' + index + '.selected', this._internalConfig[index].toggle ? !this._internalConfig[index].selected : true);
         }
 
-        //toggle style on the new button
-        alreadyOpened = this._internalConfig[index].opened;
-        this.set('_internalConfig.' + index + '.opened', !alreadyOpened);
-        this.set('_internalConfig.' + index + '.selected', this._internalConfig[index].toggle ? !this._internalConfig[index].selected : true);
-      }
 
+        if(!alreadyOpened) {
 
-      if(!alreadyOpened) {
+          if(!this.currentSubConfig || this.currentSubConfig.length === 0) {
+            needNotify = true;
+          }
 
-        if(!this.currentSubConfig || this.currentSubConfig.length === 0) {
-          needNotify = true;
+          //open sub toolbar
+          this._tryProcessSubConfig(conf);
+          this._processItem(conf);
+
+          this._tryApplySelectedSub(conf);
+        } else {
+
+          if(this.currentSubConfig !== []) {
+            needNotify = true;
+          }
+
+          //close subtoolbar
+          this.set('currentSubConfig', []);
         }
 
-        //open sub toolbar
-        this._tryProcessSubConfig(conf);
-        this._processItem(conf);
+        if(needNotify) {
 
-        this._tryApplySelectedSub(conf);
-      } else {
+          //make sure that the toolbar has been re rendered (i.e hidden or shown)
+          this.$.templateSubRow.render();
 
-        if(this.currentSubConfig !== []) {
-          needNotify = true;
+          //tell the chart so it can resize
+          this.dispatchEvent(new CustomEvent('px-vis-toolbar-secondary-toggled', { bubbles: true, composed: true, detail: { 'open': this.currentSubConfig !== [], withinChart: this.withinChart }}));
         }
-
-        //close subtoolbar
-        this.set('currentSubConfig', []);
-      }
-
-      if(needNotify) {
-
-        //make sure that the toolbar has been re rendered (i.e hidden or shown)
-        this.$.templateSubRow.render();
-
-        //tell the chart so it can resize
-        this.dispatchEvent(new CustomEvent('px-vis-toolbar-secondary-toggled', { bubbles: true, composed: true, detail: { 'open': this.currentSubConfig !== [], withinChart: this.withinChart }}));
       }
     },
 
     _tryProcessSubConfig: function(conf) {
       //process sub config if existing
-      if(conf.subConfig) {
+      if(conf.subConfig && !conf.disabled) {
         var subConf = [],
             keys = Object.keys(conf.subConfig);
 
@@ -1103,10 +1130,14 @@ Custom property | Description
      */
     _processItem: function(conf) {
       if(conf.actionConfig) {
-        if(typeof conf.actionConfig === 'string') {
-          this.set('actionConfig', JSON.parse(conf.actionConfig));
+        if(!conf.disabled) {
+          if(typeof conf.actionConfig === 'string') {
+            this.set('actionConfig', JSON.parse(conf.actionConfig));
+          } else {
+            this.set('actionConfig', this.clone(conf.actionConfig));
+          }
         } else {
-          this.set('actionConfig', this.clone(conf.actionConfig));
+          this.set('actionConfig', {});
         }
       }
 
@@ -1135,7 +1166,7 @@ Custom property | Description
 
     _setupContext: function(conf, fn) {
       if(conf.onClickContext) {
-        if(conf.onClickContext === "toolbar") {
+        if(conf.onClickContext === 'toolbar') {
           fn = fn.bind(this);
         } else {
           fn = fn.bind(conf.onClickContext);
@@ -1152,7 +1183,7 @@ Custom property | Description
       var icon = null,
           fn;
 
-        // In general if a acton doesnt have a cursor icon, we want to use the last
+        // In general if an action doesnt have a cursor icon, we want to use the last
         // if we are forcing a reset, then start off null and overwrite if there is a cursorIcon
         if(resetIcon) {
           icon = null;
@@ -1174,6 +1205,9 @@ Custom property | Description
     },
     _getSelectedClass: function(selected) {
       return selected ? 'selected ' : '';
+    },
+    _getDisabledClass: function(disabled) {
+      return disabled ? 'disabled ' : '';
     },
     _hasTooltip: function(item) {
      if(this.hasUndefinedArguments(arguments)) {
