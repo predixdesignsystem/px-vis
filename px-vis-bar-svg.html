@@ -309,18 +309,23 @@ Unlike most other drawing elements that can use chartData directly, bar requires
         return;
       }
 
-      var keys = Object.keys(this.completeSeriesConfig),
-          dict = {};
+      const dict = {};
+      let key;
 
-      for(var i = 0; i < keys.length; i++) {
-        var k = keys[i],
-            y = this.completeSeriesConfig[k][this._dAxis];
-        dict[y] = k;
+      for(let [k,v] of Object.entries(this.completeSeriesConfig)) {
+        if(v.type === 'bar') {
+          const y = v[this._dAxis];
+          dict[y] = k;
+          key = k;
+        }
       }
 
-      this._iKey = this.completeSeriesConfig[keys[0]][this._iAxis];
+      if(key) {
+        this._iKey = this.completeSeriesConfig[key][this._iAxis];
+        return dict;
+      }
 
-      return dict;
+      return undefined;
     }
   });
 </script>
