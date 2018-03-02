@@ -52,6 +52,8 @@
   * when using preconfigured toolbar options keys with a value of `false` will be ignored, e.g : {zoom: true, pan: false} will only show zoom button
   * `range` property has been removed from px-vis-chart-navigator. use `chartExtents.x` to control the timespan. The chart navigator does not support being used without data anymore
   * horizontal registers do not support custom alignment anymore and will use all available width
+  * domainChanged is not a Number with initial value of 0. This toggling easier and checking if it hasnt been toggled.
+  * PxVisBehaviorD3.domainUpdateNotify has been removed. PxVisBehaviorD3.domainUpdate once again has `notify: true`.
 
 v4.7.3
 =================

@@ -453,7 +453,7 @@ Custom property | Description
             this.debounce('drawaxis', function() {
 
               // Should be inside debounce to ensure that nothing changed after the debounce timer started
-              if(this._isAttached && this._animationFrameDone && this._doesD3HaveValues(this.svg) && this.domainChanged !== null && this.orientation && this.axis) {
+              if(this._isAttached && this._animationFrameDone && this._doesD3HaveValues(this.svg) && this.domainChanged && this.orientation && this.axis) {
 
                 if(this.rebuildOnDraw) {
                   this.removeAxis();
@@ -550,7 +550,7 @@ Custom property | Description
 
           //apparently we need to give ourselves a bit of time to ensure the axis draws and it can clac this
           this.debounce("drawnTicks", function() {
-            if(this.domainChanged === null ||
+            if(!this.domainChanged ||
               this._isOrdinalType(this.axisType) ||
               !this._axis ||
               !this._axis.scale ||

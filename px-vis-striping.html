@@ -133,11 +133,10 @@
     },
     _drawCanvasDebounced: function(allowCanvasClearing) {
       if(!this.x ||
-         typeof this.domainChanged === 'undefined' ||
-         this.domainChanged === null ||
-         this._isObjEmpty(this.stripeData)) {
-           return;
-         }
+        !this.domainChanged ||
+        this._isObjEmpty(this.stripeData)) {
+          return;
+        }
 
       this.canvasContext.pxClearCanvas();
       this._initiateRendering();

@@ -294,7 +294,7 @@ Custom property | Description
 
 
       this.debounce('_axisBrush', function() {
-        if(this.domainChanged !== null && this.svg) {
+        if(this.domainChanged && this.svg) {
 
           var range = this._calcRange();
 
@@ -1010,7 +1010,7 @@ Custom property | Description
     },
 
     _showBrushesDebounced: function() {
-      if(this._isD3Empty(this._brushD3) || this.domainChanged === null) {
+      if(this._isD3Empty(this._brushD3) || !this.domainChanged) {
         return;
       }
 
@@ -1051,7 +1051,7 @@ Custom property | Description
 
     _showUnselectedBrushesDebounced: function() {
       if(this._isD3Empty(this._brushD3) ||
-          this.domainChanged === null ||
+          !this.domainChanged ||
           this._isObjEmpty(this.brushActions)) {
         return;
       }
