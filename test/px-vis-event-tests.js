@@ -314,7 +314,7 @@ function runTests(){
       assert.equal(defaultEvent.eventIcon.attr('transform').replace(',',' '), 'translate(232 -21) scale(1)');
     });
     test('defaultEvent eventIcon color', function() {
-      assert.equal(defaultEvent.eventIcon.attr('color').split(' ').join(''), rgbToHex(colors['gray10']));
+      assert.equal(defaultEvent.eventIcon.attr('stroke').split(' ').join(''), rgbToHex(colors['gray10']));
     });
 
     test('defaultEvent eventLine created', function() {
