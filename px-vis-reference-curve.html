@@ -76,7 +76,10 @@ An element which draws polygonal grid lines.
      * @type Object
      */
     properties: {
-      _referenceConfig: Object,
+      _referenceConfig: {
+        type: Object,
+        notify: true
+      },
       _seriesKeys: Array,
       _refCurveG: Object,
       _textBuilder: Object,
@@ -123,24 +126,12 @@ An element which draws polygonal grid lines.
         return;
       }
 
-      var g;
-
       if(this._isD3Empty(this._refCurveG)) {
-        g = this.svg.append('g')
+        const g = this.svg.append('g')
           .attr('class', 'reference-curves');
-      } else {
-        var g = this._refCurveG;
+
+        this.set('_refCurveG', g);
       }
-
-      if(this._isOrdinalType(this.x._scaleType)) {
-        g.attr('transform', 'translate(' + this.x.bandwidth()/2 + ',0)');
-
-      // This only works with non-multi-y axes; might want to support multi-y ordinal axes?
-      } else if(typeof this.y === 'function' && this._isOrdinalType(this.y._scaleType)) {
-        g.attr('transform', 'translate(0,' + this.y.bandwidth()/2 + ')');
-      }
-
-      this.set('_refCurveG', g);
     },
 
     _buildReferenceConfig: function() {
