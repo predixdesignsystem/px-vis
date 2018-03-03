@@ -1,6 +1,7 @@
 v4.7.5
 =================
 * Fix bug in events where default config gets no color (and also draw fn may never get called)
+* Fixed issue in scheduler where an error in the webworker could prevent further scheduling
 
 v4.7.4
 =================
