@@ -25,8 +25,12 @@ Example of a custom `config` object:
         "icon": "px-vis:zoom",
         // this function will be run when clicking the button
         // `this` will be bound to the chart unless `onClickContext` is defined
-        "onClick": "function() {this.set(\"_internalShowTooltip\", false);}",
-        // context to be used in `onClick`. Can be 'toolbar' or any object. If
+        "onClick": function() { console.log("clicked")},
+        // this function will be run when the buttons is selected: either on click
+        //or programmatically when `selected` is true
+        // `this` will be bound to the chart unless `onClickContext` is defined
+        "onSelect": "function() {this.set(\"_internalShowTooltip\", false);}",
+        // context to be used in `onClick` `onSelect` and `onDeselect`. Can be 'toolbar' or any object. If
         //not specified will use the chart context
         "onClickContext': "toolbar",
         // if a button is part of a button group then it becomes selected when clicked
@@ -254,7 +258,8 @@ Custom property | Description
             'mousedown': 'startZooming',
             'mouseup': 'stopZooming',
             'mouseout': 'resetTooltip',
-            'mousemove': 'calcTooltipData'
+            'mousemove': 'calcTooltipData',
+            'toolbar': this
           };
         }
       }
@@ -291,7 +296,7 @@ Custom property | Description
         icon: 'px-vis:comment',
         cursorIcon: 'px-vis:comment',
         buttonGroup: 1,
-        onClick: function() {
+        onSelect: function() {
           this.set('_internalShowTooltip', false);
           this.set('showStrongIcon', true);
         },
@@ -329,7 +334,7 @@ Custom property | Description
         icon: 'px-vis:brush',
         cursorIcon: 'px-vis:brush',
         buttonGroup: 1,
-        onClick: function() {
+        onSelect: function() {
           this.set('_internalShowTooltip', false);
         },
         actionConfig: {
@@ -345,7 +350,7 @@ Custom property | Description
         icon: 'px-vis:move-axis',
         cursorIcon: 'px-vis:move-axis',
         buttonGroup: 1,
-        onClick: function() {
+        onSelect: function() {
           this.set('_internalShowTooltip', false);
         },
         actionConfig: {
@@ -361,7 +366,7 @@ Custom property | Description
         icon: 'px-vis:lasso',
         buttonGroup: 1,
         selectable: true,
-        onClick: function() {
+        onSelect: function() {
           this.set('_internalShowTooltip', false);
           this.set('interactionSpaceConfig.searchType', 'lasso');
         },
@@ -389,7 +394,7 @@ Custom property | Description
         icon: 'px-vis:crosshair',
         cursorIcon: 'px-vis:crosshair',
         buttonGroup: 1,
-        onClick: function() {
+        onSelect: function() {
           this.set('_internalShowTooltip', true);
         },
         actionConfig: {
@@ -404,7 +409,7 @@ Custom property | Description
         tooltipLabel: 'Crosshair',
         icon: 'px-vis:crosshair',
         buttonGroup: 1,
-        onClick: function() {
+        onSelect: function() {
           this.set('interactionSpaceConfig.cursorType', 'circle');
         },
         onDeselect: function() {
@@ -424,7 +429,7 @@ Custom property | Description
             tooltipLabel: 'Closest Timestamp and associated points',
             buttonGroup: 1,
             selectable: true,
-            onClick: function() {
+            onSelect: function() {
               this.set('interactionSpaceConfig.searchType', 'closestPoint');
             },
             actionConfig: {
@@ -441,7 +446,7 @@ Custom property | Description
             tooltipLabel: 'Point Per Series',
             buttonGroup: 1,
             selectable: true,
-            onClick: function() {
+            onSelect: function() {
               this.set('interactionSpaceConfig.searchType', 'pointPerSeries');
             },
             actionConfig: {
@@ -458,7 +463,7 @@ Custom property | Description
             tooltipLabel: 'All in area',
             buttonGroup: 1,
             selectable: true,
-            onClick: function() {
+            onSelect: function() {
               this.set('interactionSpaceConfig.searchType', 'allInArea');
             },
             actionConfig: {
@@ -472,7 +477,7 @@ Custom property | Description
           radiusUp: {
             icon: 'px-vis:expand-radius',
             tooltipLabel: 'Radius',
-            onClick: function() {
+            onSelect: function() {
               var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0;
               this.set('interactionSpaceConfig.searchRadius', sr + 5);
             }
@@ -480,7 +485,7 @@ Custom property | Description
           radiusDown: {
             icon: 'px-vis:shrink-radius',
             tooltipLabel: 'Radius',
-            onClick: function() {
+            onSelect: function() {
               var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0;
               this.set('interactionSpaceConfig.searchRadius', Math.max(sr - 5, 0));
             }
@@ -493,13 +498,15 @@ Custom property | Description
         cursorIcon: 'px-vis:show-tooltip',
         buttonGroup: 1,
         selected: true,
-        onClick: function() {
+        onSelect: function() {
           this.set('_internalShowTooltip', true);
         },
         actionConfig: {
           mouseout: 'resetTooltip',
           mousemove: 'calcTooltipData',
-          click: null,
+          click: function(e) {
+            e.toolbar.switchConfigItems('tooltipWithSearchTypesAndRadius', 'tooltipFrozen', true);
+          },
           mousedown: null,
           mouseup: null
         }
@@ -510,13 +517,15 @@ Custom property | Description
         cursorIcon: 'px-vis:show-tooltip',
         buttonGroup: 1,
         selected: true,
-        onClick: function() {
+        onSelect: function() {
           this.set('_internalShowTooltip', true);
         },
         actionConfig: {
           mouseout: 'resetTooltip',
           mousemove: 'calcTooltipData',
-          click: null,
+          click: function(e) {
+            e.toolbar.switchConfigItems('tooltipWithSearchTypesAndRadius', 'tooltipFrozen', true);
+          },
           mousedown: null,
           mouseup: null
         },
@@ -527,7 +536,7 @@ Custom property | Description
             buttonGroup: 2,
             selectable: true,
             selected: true,
-            onClick: function() {
+            onSelect: function() {
               this.set('interactionSpaceConfig.searchFor', 'timestamps');
             },
           },
@@ -536,7 +545,7 @@ Custom property | Description
             tooltipLabel: 'Returns only the closest point to your cursor',
             buttonGroup: 2,
             selectable: true,
-            onClick: function() {
+            onSelect: function() {
               this.set('interactionSpaceConfig.searchFor', 'point');
             },
           }
@@ -548,13 +557,15 @@ Custom property | Description
         cursorIcon: 'px-vis:show-tooltip',
         buttonGroup: 1,
         selected: true,
-        onClick: function() {
+        onSelect: function() {
           this.set('_internalShowTooltip', true);
         },
         actionConfig: {
           mouseout: 'resetTooltip',
           mousemove: 'calcTooltipData',
-          click: null,
+          click: function(e) {
+            e.toolbar.switchConfigItems('tooltipWithSearchTypesAndRadius', 'tooltipFrozen', true);
+          },
           mousedown: null,
           mouseup: null
         },
@@ -565,7 +576,7 @@ Custom property | Description
             buttonGroup: 2,
             selectable: true,
             selected: true,
-            onClick: function() {
+            onSelect: function() {
               this.set('interactionSpaceConfig.searchFor', 'timestamps');
             },
           },
@@ -574,14 +585,14 @@ Custom property | Description
             tooltipLabel: 'Returns only the closest point(s) to your cursor',
             buttonGroup: 2,
             selectable: true,
-            onClick: function() {
+            onSelect: function() {
               this.set('interactionSpaceConfig.searchFor', 'point');
             },
           },
           radiusUp: {
             icon: 'px-vis:expand-radius',
             tooltipLabel: 'Radius',
-            onClick: function() {
+            onSelect: function() {
               var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0;
               this.set('interactionSpaceConfig.searchRadius', sr + 5);
             }
@@ -589,7 +600,7 @@ Custom property | Description
           radiusDown: {
             icon: 'px-vis:shrink-radius',
             tooltipLabel: 'Radius',
-            onClick: function() {
+            onSelect: function() {
               var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0;
               this.set('interactionSpaceConfig.searchRadius', Math.max(sr - 5, 0));
             }
@@ -602,7 +613,7 @@ Custom property | Description
         cursorIcon: 'px-vis:show-tooltip',
         buttonGroup: 1,
         selected: true,
-        onClick: function() {
+        onSelect: function() {
           this.set('_internalShowTooltip', true);
         },
         actionConfig: {
@@ -619,7 +630,7 @@ Custom property | Description
             buttonGroup: 2,
             selectable: true,
             selected: true,
-            onClick: function() {
+            onSelect: function() {
               this.set('interactionSpaceConfig.searchFor', 'timestamps');
             },
           },
@@ -628,7 +639,7 @@ Custom property | Description
             tooltipLabel: 'Returns only the closest point to your cursor',
             buttonGroup: 2,
             selectable: true,
-            onClick: function() {
+            onSelect: function() {
               this.set('interactionSpaceConfig.searchFor', 'point');
             },
           },
@@ -639,13 +650,12 @@ Custom property | Description
             buttonGroup: 1,
             selectable: true,
             selected: true,
-            onClick: function() {
+            onSelect: function() {
               this.set('interactionSpaceConfig.searchType', 'closestPoint');
             },
             actionConfig: {
               mouseout: 'resetTooltip',
               mousemove: 'calcTooltipData',
-              click: null,
               mousedown: null,
               mouseup: null
             },
@@ -656,13 +666,12 @@ Custom property | Description
             tooltipLabel: 'Point Per Series',
             buttonGroup: 1,
             selectable: true,
-            onClick: function() {
+            onSelect: function() {
               this.set('interactionSpaceConfig.searchType', 'pointPerSeries');
             },
             actionConfig: {
               mouseout: 'resetTooltip',
               mousemove: 'calcTooltipData',
-              click: null,
               mousedown: null,
               mouseup: null
             },
@@ -673,13 +682,12 @@ Custom property | Description
             tooltipLabel: 'All in area',
             buttonGroup: 1,
             selectable: true,
-            onClick: function() {
+            onSelect: function() {
               this.set('interactionSpaceConfig.searchType', 'allInArea');
             },
             actionConfig: {
               mouseout: 'resetTooltip',
               mousemove: 'calcTooltipData',
-              click: null,
               mousedown: null,
               mouseup: null
             },
@@ -687,7 +695,7 @@ Custom property | Description
           radiusUp: {
             icon: 'px-vis:expand-radius',
             tooltipLabel: 'Radius',
-            onClick: function() {
+            onSelect: function() {
               var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0;
               this.set('interactionSpaceConfig.searchRadius', sr + 5);
             }
@@ -695,10 +703,28 @@ Custom property | Description
           radiusDown: {
             icon: 'px-vis:shrink-radius',
             tooltipLabel: 'Radius',
-            onClick: function() {
+            onSelect: function() {
               var sr = this.interactionSpaceConfig.searchRadius ? this.interactionSpaceConfig.searchRadius : 0;
               this.set('interactionSpaceConfig.searchRadius', Math.max(sr - 5, 0));
             }
+          }
+        }
+      },
+      tooltipFrozen: {
+        tooltipLabel: 'Frozen Tooltip',
+        icon: 'px-utl:locked',
+        cursorIcon: 'px-utl:locked',
+        hidden: true,
+        onClick: function(e) {
+          e.toolbar.switchConfigItems('tooltipFrozen', e.toolbar.config.tooltipFrozen.originalTooltipConf, true);
+        },
+        buttonGroup: 1,
+        selected: true,
+        actionConfig: {
+          mouseout: null,
+          mousemove: null,
+          click: function(e) {
+            e.toolbar.switchConfigItems('tooltipFrozen', e.toolbar.config.tooltipFrozen.originalTooltipConf, true);
           }
         }
       },
@@ -706,7 +732,7 @@ Custom property | Description
         tooltipLabel: 'Pan',
         icon: 'px-vis:pan',
         cursorIcon: 'px-vis:pan',
-        onClick: function() {
+        onSelect: function() {
           this.set('_internalShowTooltip', false);
         },
         buttonGroup: 1,
@@ -729,7 +755,7 @@ Custom property | Description
         tooltipLabel: 'Zoom on axis',
         icon: 'px-vis:zoom-toolbar',
         cursorIcon: 'px-vis:zoom-toolbar',
-        onClick: function() {
+        onSelect: function() {
           this.set('_internalShowTooltip', false);
         },
         buttonGroup: 1,
@@ -757,7 +783,7 @@ Custom property | Description
         tooltipLabel: 'Zoom',
         icon: 'px-vis:zoom-toolbar',
         cursorIcon: 'px-vis:zoom-toolbar',
-        onClick: function() {
+        onSelect: function() {
           this.set('_internalShowTooltip', false);
         },
         buttonGroup: 1,
@@ -797,7 +823,7 @@ Custom property | Description
         cursorIcon: 'px-vis:zoom-toolbar',
         buttonGroup: 1,
         selectable: true,
-        onClick: function() {
+        onSelect: function() {
           this.set('_internalShowTooltip', false);
         },
         actionConfig: {
@@ -814,21 +840,21 @@ Custom property | Description
             tooltipLabel: 'Zoom on X axis only',
             eventName: 'my-custom-click',
             selectable: true,
-            onClick: function() { this.set('selectionType', 'xAxis');}
+            onSelect: function() { this.set('selectionType', 'xAxis');}
           },
           y: {
             icon: 'px-vis:y-axis',
             buttonGroup: 1,
             tooltipLabel: 'Zoom on Y axis only',
             selectable: true,
-            onClick: function() { this.set('selectionType', 'yAxis');}
+            onSelect: function() { this.set('selectionType', 'yAxis');}
           },
           xy: {
             icon: 'px-vis:xy-axis',
             tooltipLabel: 'Zoom on X and Y axis',
             buttonGroup: 1,
             selectable: true,
-            onClick: function() { this.set('selectionType', 'xy');}
+            onSelect: function() { this.set('selectionType', 'xy');}
           },
           zoomIn: {
             icon: 'px-vis:zoom-in',
@@ -858,7 +884,7 @@ Custom property | Description
         cursorIcon: 'px-vis:draw-stripe',
         buttonGroup: 1,
         selectable: true,
-        onClick: function() {this.set('_internalShowTooltip', false);},
+        onSelect: function() {this.set('_internalShowTooltip', false);},
         subConfig: {
           inclusion: {
             title: 'Inclusion',
@@ -867,7 +893,7 @@ Custom property | Description
             tooltipLabel: 'Draw/edit inclusion type stripes',
             selectable: true,
             selected: true,
-            onClick: function() {
+            onSelect: function() {
               this.set('selectionType', 'xAxis');
               this.set('stripeType', 'inclusion');
             }
@@ -878,7 +904,7 @@ Custom property | Description
             buttonGroup: 1,
             tooltipLabel: 'Draw/edit exclusion type stripes',
             selectable: true,
-            onClick: function() {
+            onSelect: function() {
               this.set('selectionType', 'xAxis');
               this.set('stripeType', 'exclusion');
             }
@@ -941,6 +967,48 @@ Custom property | Description
       this._configChanged();
     },
 
+    /**
+     * Convenience function for switching a toolbar item to another by hiding
+     * the first one and selecting the second one
+     */
+    switchConfigItems(fromItemName, toItemName, selectToItem) {
+
+      //add the "toItem" if it has not already been defined by the user
+      if(!this.config[toItemName]) {
+
+        if(!this._defaultActionsMapping[toItemName]) {
+          console.warn('Can\'t find item ' + toItemName + ' in toolbar config or toolbar predefined config, abort switching toolbar items.');
+          return;
+        } else {
+          this.config[toItemName] = {};
+        }
+      }
+
+      if(typeof this.config[fromItemName] !== 'object' && this.config[fromItemName] !== false) {
+        //this is a predefined conf, convert to an obj so we still
+        //apply the predefined conf and allow to override hidden
+        this.config[fromItemName] = {};
+      }
+      this.config[fromItemName].hidden = true;
+      this.config[fromItemName].selected = false;
+
+      if(typeof this.config[toItemName] !== 'object' && this.config[fromItemName] !== false) {
+        //same as above
+        this.config[toItemName] = {};
+      }
+      this.config[toItemName].hidden = false;
+
+      //store original conf so we can switch to it easily
+      this.config[toItemName].originalTooltipConf = fromItemName;
+
+      if(selectToItem) {
+        this.config[toItemName].selected = true;
+      }
+
+      //notify the toolbar to process the changes
+      this.reProcessConfig();
+    },
+
     _extendConfig: function(defaultConfig, customConfig) {
       var keys = Object.keys(customConfig),
           obj = defaultConfig || {};
@@ -982,12 +1050,13 @@ Custom property | Description
           } else {
             toPush = this.config[keys[i]];
           }
+          toPush.initialKey = keys[i];
           internalConf.push(toPush);
         }
 
         if(toPush.selected) {
           this._tryProcessSubConfig(toPush);
-          this._processItem(toPush);
+          this._processItem(toPush, false);
         }
       }
 
@@ -1043,7 +1112,7 @@ Custom property | Description
 
           //open sub toolbar
           this._tryProcessSubConfig(conf);
-          this._processItem(conf);
+          this._processItem(conf, true);
 
           this._tryApplySelectedSub(conf);
         } else {
@@ -1096,7 +1165,7 @@ Custom property | Description
 
         for(var i=0; i<subs.length; i++) {
           if(conf.subConfig[subs[i]]["selected"]) {
-            this._processItem(conf.subConfig[subs[i]]);
+            this._processItem(conf.subConfig[subs[i]], false);
           }
         }
       }
@@ -1122,20 +1191,19 @@ Custom property | Description
         this.set('currentSubConfig.' + index + '.selected', conf.toggle ? !conf.selected : true);
       }
 
-      this._processItem(conf);
+      this._processItem(conf, true);
     },
 
     /**
      * Processes an item click: fire event if needed and set action config appropriately
      */
-    _processItem: function(conf) {
+    _processItem: function(conf, comesFromClick) {
       if(conf.actionConfig) {
         if(!conf.disabled) {
-          if(typeof conf.actionConfig === 'string') {
-            this.set('actionConfig', JSON.parse(conf.actionConfig));
-          } else {
-            this.set('actionConfig', this.clone(conf.actionConfig));
-          }
+          var newConf = typeof conf.actionConfig === 'string' ? JSON.parse(conf.actionConfig) : this.clone(conf.actionConfig);
+          newConf.toolbar = this;
+
+          this.set('actionConfig', newConf);
         } else {
           this.set('actionConfig', {});
         }
@@ -1147,8 +1215,13 @@ Custom property | Description
         this.fire('px-vis-event-request', {eventName: conf.eventName, data: conf});
       }
 
-      if(conf.onClick) {
-        var fn = this._returnFn(conf.onClick);
+      if(conf.onClick && comesFromClick) {
+        let fn = this._returnFn(conf.onClick);
+        this._setupContext(conf, fn);
+      }
+
+      if(conf.onSelect) {
+        let fn = this._returnFn(conf.onSelect);
         this._setupContext(conf, fn);
       }
 
@@ -1172,10 +1245,10 @@ Custom property | Description
           fn = fn.bind(conf.onClickContext);
         }
 
-        fn(conf);
+        fn(conf, this);
       } else {
         //run it from the chart's context
-        this.fire('px-vis-action-request', {'function': fn, 'data': conf});
+        this.fire('px-vis-action-request', {'function': fn, 'data': {itemConfig: conf, toolbar: this}});
       }
     },
 
