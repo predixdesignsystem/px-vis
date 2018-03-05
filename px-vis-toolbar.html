@@ -628,7 +628,12 @@ Custom property | Description
         actionConfig: {
           mouseout: 'resetTooltip',
           mousemove: 'calcTooltipData',
-          click: null,
+          click: function(e) {
+            var toolbar = this.getToolbar();
+            if(toolbar) {
+              toolbar.switchConfigItems('tooltipWithFullOptions', 'tooltipFrozen', true);
+            }
+          },
           mousedown: null,
           mouseup: null
         },
