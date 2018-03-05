@@ -1,3 +1,4 @@
+
 ================
 * Added tooltipData.seriesObj property
 * Register Changes:
@@ -57,6 +58,15 @@
   * `range` property has been removed from px-vis-chart-navigator. use `chartExtents.x` to control the timespan. The chart navigator does not support being used without data anymore
   * horizontal registers do not support custom alignment anymore and will use all available width
 * Added PxVisBehaviorChart.searchToolbar to PxVisBehaviorChart.chartCommon, adding a `getToolbar` method for all charts
+
+v4.7.5
+=================
+* Fix bug in events where default config gets no color (and also draw fn may never get called)
+* Fixed issue in scheduler where an error in the webworker could prevent further scheduling
+
+v4.7.4
+=================
+* Fix bug where position of tooltip for parallel coordinates and radar were causing exceptions
 
 v4.7.3
 =================
