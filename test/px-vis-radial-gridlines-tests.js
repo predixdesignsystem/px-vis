@@ -261,7 +261,6 @@ function runTests(){
     });
 
     test('radialGrid circles are created', function() {
-      debugger
       var g = baseSVG.svg.select('g.radialGridlines'),
           circle = g.selectAll('circle');
 

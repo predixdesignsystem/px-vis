@@ -21,7 +21,6 @@ function runTests(){
     });
 
     test('emptySVG creates an svg', function() {
-debugger
       assert.equal(Polymer.dom(emptySVG.root).querySelector('#chartSVG').tagName ,'svg');
     });
 

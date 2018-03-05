@@ -250,7 +250,7 @@ Custom property | Description
     },
 
     observers: [
-      'drawElement(svg, eventData.*, eventConfig.*, _animationFrameDone, height, _stylesUpdated)',
+      'drawElement(svg, eventData.*, _animationFrameDone, height, _stylesUpdated)',
       '_calcThemeOrConfig(_stylesUpdated)',
       '_eventConfigChanged(eventConfig.*)',
       'positionElement(x, domainChanged)',
@@ -302,7 +302,8 @@ Custom property | Description
         return;
       }
 
-      this._processConfiguration();
+      // this._processConfiguration();
+      this.drawElement();
     },
 
     _recalcValue: function() {
@@ -327,7 +328,6 @@ Custom property | Description
       if(!this.defaultEventConfig) {
 
         this.defaultEventConfig = {
-          'color': this._defaultDefaultEventConfig.fillColor,
           'icon': this._defaultDefaultEventConfig.icon,
           'type': this._defaultDefaultEventConfig.type,
           'offset': this._defaultDefaultEventConfig.offset,
@@ -344,7 +344,7 @@ Custom property | Description
       }
 
       this.defaultEventConfig.lineColor = this._checkThemeVariable("--px-vis-event-line-color", this._defaultDefaultEventConfig.lineColor);
-      this.defaultEventConfig.eventColor = this._checkThemeVariable("--px-vis-event-icon-color", this._defaultDefaultEventConfig.fillColor);
+      this.defaultEventConfig.color = this._checkThemeVariable("--px-vis-event-icon-color", this._defaultDefaultEventConfig.color);
 
       this.set('_animationFrameDone', true);
     },
@@ -477,7 +477,7 @@ Custom property | Description
     _processConfiguration: function() {
 
       // is there a configuration object for this event type?
-      if(this.eventConfig[this.eventData.label]) {
+      if(this.eventConfig && this.eventConfig[this.eventData.label]) {
         /*
           check each key (icon, color, etc) of the defaultEventConfig and see if the eventConfig is overwriting that property. If so, set it, otherwise use default
         */
