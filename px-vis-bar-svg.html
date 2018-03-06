@@ -2,6 +2,7 @@
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="css/px-vis-styles.html">
+<link rel="import" href="../px-component-helpers/polyfills/of-polyfill.html" />
 
 <!--
 
@@ -312,13 +313,13 @@ Unlike most other drawing elements that can use chartData directly, bar requires
       const dict = {};
       let key;
 
-      for(let [k,v] of Object.entries(this.completeSeriesConfig)) {
+      Object.entries(this.completeSeriesConfig).forEach(([k,v]) => {
         if(v.type === 'bar') {
           const y = v[this._dAxis];
           dict[y] = k;
           key = k;
         }
-      }
+      });
 
       if(key) {
         this._iKey = this.completeSeriesConfig[key][this._iAxis];
