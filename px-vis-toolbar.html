@@ -279,6 +279,7 @@ Custom property | Description
      * - crosshairLasso
      * - crosshair
      * - crosshairWithOptions
+     * - crosshairFrozen
      * - tooltip
      * - tooltipFrozen
      * - tooltipWithSearchTypes
@@ -400,7 +401,13 @@ Custom property | Description
         actionConfig: {
           mouseout: 'resetTooltipAndCrosshairData',
           mousemove: 'calcTooltipAndCrosshairData',
-          click: null,
+          click: function() {
+            var toolbar = this.getToolbar();
+            if(toolbar) {
+              toolbar.switchConfigItems('crosshairWithOptions', 'crosshairFrozen', true);
+              this.fire('px-freeze-crosshair');
+            }
+          },
           mousedown: null,
           mouseup: null
         }
@@ -418,7 +425,13 @@ Custom property | Description
         actionConfig: {
           mouseout: 'resetTooltipAndCrosshairData',
           mousemove: 'calcTooltipAndCrosshairData',
-          click: null,
+          click: function() {
+            var toolbar = this.getToolbar();
+            if(toolbar) {
+              toolbar.switchConfigItems('crosshairWithOptions', 'crosshairFrozen', true);
+              this.fire('px-freeze-crosshair');
+            }
+          },
           mousedown: null,
           mouseup: null
         },
@@ -492,6 +505,15 @@ Custom property | Description
           }
         }
       },
+      crosshairFrozen: {
+        tooltipLabel: 'Crosshair Frozen',
+        hidden: true,
+        icon: 'px-vis:pin',
+        onClick: function(e) {
+          e.toolbar.switchConfigItems('crosshairFrozen', e.toolbar.config.crosshairFrozen.originalTooltipConf, true);
+          this.fire('px-unfreeze-crosshair');
+        }
+      },
       tooltip: {
         tooltipLabel: 'Tooltip',
         icon: 'px-vis:show-tooltip',
@@ -507,7 +529,7 @@ Custom property | Description
           click: function(e) {
             var toolbar = this.getToolbar();
             if(toolbar) {
-              toolbar.switchConfigItems('tooltipWithSearchTypesAndRadius', 'tooltipFrozen', true);
+              toolbar.switchConfigItems('tooltip', 'tooltipFrozen', true);
             }
           },
           mousedown: null,
@@ -529,7 +551,7 @@ Custom property | Description
           click: function(e) {
             var toolbar = this.getToolbar();
             if(toolbar) {
-              toolbar.switchConfigItems('tooltipWithSearchTypesAndRadius', 'tooltipFrozen', true);
+              toolbar.switchConfigItems('tooltipWithSearchTypes', 'tooltipFrozen', true);
             }
           },
           mousedown: null,
@@ -986,9 +1008,14 @@ Custom property | Description
 
     /**
      * Convenience function for switching a toolbar item to another by hiding
-     * the first one and selecting the second one
+     * the first one and selecting the second one.
+     * Pass selectToItem true to select the "toItemName" automatically
+     * By default this function will force the toolbar to reprocess the
+     * changes incurred by this switching. If you have more changes to apply
+     * to the config then pass `preventReprocess` true to this function and
+     * call `reProcessConfig` on the toolbar once you applied all your changes
      */
-    switchConfigItems(fromItemName, toItemName, selectToItem) {
+    switchConfigItems(fromItemName, toItemName, selectToItem, preventReprocess) {
 
       //add the "toItem" if it has not already been defined by the user
       if(!this.config[toItemName]) {
@@ -1022,8 +1049,10 @@ Custom property | Description
         this.config[toItemName].selected = true;
       }
 
-      //notify the toolbar to process the changes
-      this.reProcessConfig();
+      if(!preventReprocess) {
+        //notify the toolbar to process the changes
+        this.reProcessConfig();
+      }
     },
 
     _extendConfig: function(defaultConfig, customConfig) {
