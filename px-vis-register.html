@@ -472,7 +472,7 @@ Custom property | Description
     _tooltipDataChanged: function() {
 
       this.debounce('_tooltipDataChanged', function() {
-        if(this.tooltipData) {
+        if(this.tooltipData && this.completeSeriesConfig) {
           this._formatDateTime();
 
           if(this._currentSortType && this.sortConfig && this.sortConfig[this._currentSortType].sortOnDataChange) {
@@ -672,37 +672,43 @@ Custom property | Description
     },
 
     _sortConfigChanged: function() {
-      var keys = Object.keys(this.sortConfig),
-          sortTypes = [],
-          config = {},
-          onSeries,
-          onData,
-          currentFunction;
 
-      this._internalSortConfig = {};
+      if(this.sortConfig) {
+        var keys = Object.keys(this.sortConfig),
+            sortTypes = [],
+            config = {},
+            onSeries,
+            onData,
+            currentFunction;
 
-      keys.forEach(function(k) {
+        this._internalSortConfig = {};
 
-        onSeries = [];
-        onData = [];
+        keys.forEach(function(k) {
 
-        this._processSortingFunction(this.sortConfig[k].sortOnSeriesChange, k, onSeries);
-        this._processSortingFunction(this.sortConfig[k].sortOnDataChange, k, onData);
+          onSeries = [];
+          onData = [];
 
-        config[k] = {
-          'sortOnSeries': onSeries,
-          'sortOnData': onData
-        };
+          this._processSortingFunction(this.sortConfig[k].sortOnSeriesChange, k, onSeries);
+          this._processSortingFunction(this.sortConfig[k].sortOnDataChange, k, onData);
 
-        sortTypes.push({
-          val: this.sortConfig[k].name,
-          key: k,
-          selected: this.sortConfig[k].selected
-        });
-      }.bind(this));
+          config[k] = {
+            'sortOnSeries': onSeries,
+            'sortOnData': onData
+          };
 
-      this.set('_sortTypes', sortTypes);
-      this.set('_internalSortConfig', config);
+          sortTypes.push({
+            val: this.sortConfig[k].name,
+            key: k,
+            selected: this.sortConfig[k].selected
+          });
+        }.bind(this));
+
+        this.set('_sortTypes', sortTypes);
+        this.set('_internalSortConfig', config);
+      } else {
+        this.set('_sortTypes', []);
+        this.set('_internalSortConfig', {});
+      }
     },
 
     _processSortingFunction(configFunction, key, result) {

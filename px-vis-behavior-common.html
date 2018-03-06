@@ -2555,7 +2555,7 @@ PxVisBehavior.applyActionConfig = [{
             var _this = this;
 
             wrapper = function(evt) {
-                _this.fire('px-vis-action-request', {'function': this, 'data': {'mouseCoords': Px.d3.mouse(elem), 'target': elem, 'toolbar': _this.actionConfig.toolbar}});
+                _this.fire('px-vis-action-request', {'function': this, 'data': {'mouseCoords': Px.d3.mouse(elem), 'target': elem}});
               }.bind(toBeUsed);
             }
 
@@ -2793,6 +2793,11 @@ PxVisBehavior.highlightShared = [{
       if(series.length) {
         ttd = this._createTooltipDataStub(series[0]["coord"], timestamp, !this.hideTooltip);
         ttd.series = series;
+        ttd.seriesObj = {};
+
+        ttd.series.forEach(function(item) {
+          ttd.seriesObj[item.name] = item;
+        });
       }
     }
     this.set("defaultEmptyData", ttd);
@@ -3037,6 +3042,7 @@ PxVisBehavior.highlightLineShared = [{
         tooltipConfig = {},  //a fake configuration object we will build
         value = {},          //the series obj within tooltipData
         series = [],
+        seriesObj = {},
         max = -Number.MAX_VALUE,
         val,
         dim;
@@ -3080,6 +3086,7 @@ PxVisBehavior.highlightLineShared = [{
         //create our value obj
         value[aid] = dataset[aid];
         series.push({ 'name': aid, 'value': value });
+        seriesObj[name] = {'value': value};
       }
 
       //create our tooltipData obj
@@ -3089,6 +3096,7 @@ PxVisBehavior.highlightLineShared = [{
         'dataset': dataset,
         'yVal': dataset[last],
         'series': series,
+        'seriesObj': seriesObj,
         'color': tooltipConfig[aid]['color'],
         'tooltipConfig': tooltipConfig,
         'axis': last
