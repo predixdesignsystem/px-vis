@@ -312,13 +312,13 @@ Unlike most other drawing elements that can use chartData directly, bar requires
       const dict = {};
       let key;
 
-      for(let [k,v] of Object.entries(this.completeSeriesConfig)) {
+      Object.entries(this.completeSeriesConfig).forEach(([k,v]) => {
         if(v.type === 'bar') {
           const y = v[this._dAxis];
           dict[y] = k;
           key = k;
         }
-      }
+      });
 
       if(key) {
         this._iKey = this.completeSeriesConfig[key][this._iAxis];
