@@ -59,8 +59,8 @@
       if(this.x && !forceRecreation) {
         this.x.range(range);
 
-        if(this.domainChanged !== null) {
-          this.set('domainChanged', !this.domainChanged);
+        if(this.domainChanged) {
+          this.set('domainChanged', this.domainChanged + 1);
         }
 
       } else {
@@ -80,8 +80,8 @@
       if(this.y && !forceRecreation) {
         this.y.range(range);
 
-        if(this.domainChanged !== null) {
-          this.set('domainChanged', !this.domainChanged);
+        if(this.domainChanged) {
+          this.set('domainChanged', this.domainChanged + 1);
         }
       } else {
         var y = Px.d3.scaleLinear().nice().range(range);
@@ -165,7 +165,7 @@
           this.y.domain(exts.y);
 
           // Set the domains
-          this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+          this.set('domainChanged', this.domainChanged + 1);
 
         }
       }.bind(this), 10);
@@ -179,7 +179,7 @@
     _updateDomain: function(axesDomain) {
       if(this.y) {
         this.y.domain(axesDomain.value);
-        this.set('domainChanged', !this.domainChanged);
+        this.set('domainChanged', this.domainChanged + 1);
       }
     },
 
@@ -229,7 +229,7 @@
     PxVisBehavior.sizing,
     PxVisBehavior.chartExtents,
     PxVisBehaviorD3.radialAxisConfig,
-    PxVisBehaviorD3.domainUpdateNotify,
+    PxVisBehaviorD3.domainUpdate,
     PxVisBehaviorD3.selectedDomain,
     PxVisBehavior.mutedSeries
   ];

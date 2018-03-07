@@ -2225,8 +2225,8 @@ PxVisBehaviorChart.multiAxis = [{
     },
 
     _axisDomainChanged: {
-      type: Boolean,
-      value: null
+      type: Number,
+      value: 0
     },
 
     _multiAxisSeriesConfig: {
@@ -2308,7 +2308,7 @@ PxVisBehaviorChart.multiAxis = [{
       this.set('_axisX', this._setAxisScale(lDims.sort(), rDims.sort(), this.leftAxisSize, this.rightAxisSize));
 
       if(typeof this._axisX === 'function') {
-        this.set('_axisDomainChanged', !this._axisDomainChanged);
+        this.set('_axisDomainChanged', this._axisDomainChanged + 1);
       }
 
       // must decouple completeSeriesConfig from px-vis-multi-axis for timing reasons. Needs to set after dimensions
@@ -2332,7 +2332,7 @@ PxVisBehaviorChart.multiAxis = [{
 
 
   _returnYScale: function(seriesId, config) {
-    if(this.domainChanged !== null) {
+    if(this.domainChanged) {
       if(typeof this.y === 'object') {
         var d = config[seriesId]['axis']['id'];
         if(this.y && this.y[d]) {

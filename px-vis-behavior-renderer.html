@@ -413,8 +413,11 @@ PxVisBehaviorRenderer.base = [{
 
   _renderHighlight: function() {
 
-    if(this.hasUndefinedArguments(arguments) || this.domainChanged === null || !this.canvasLayers.highlighter ||
-      !this.completeSeriesConfig || this.preventInitialDrawing) {
+    if(this.hasUndefinedArguments(arguments) ||
+        !this.domainChanged ||
+        !this.canvasLayers.highlighter ||
+        !this.completeSeriesConfig ||
+        this.preventInitialDrawing) {
       return;
     }
     this._renderTypedContext('highlightData', [this.canvasLayers.highlighter]);
@@ -487,9 +490,8 @@ PxVisBehaviorRenderer.base = [{
    */
   _renderDataDebounced: function(ctx, allowCanvasClearing) {
     if(this.y &&
-         typeof this.domainChanged !== 'undefined' &&
-         this.domainChanged !== null &&
-         this._isAttached) {
+        this.domainChanged &&
+        this._isAttached) {
 
       this.fire('px-vis-chart-canvas-rendering-started', {'context': ctx});
 
@@ -811,7 +813,7 @@ PxVisBehaviorRenderer.base = [{
   PxVisBehavior.preventInitialDrawing,
   PxVisBehavior.isAttached,
   PxVisBehaviorRenderer.debounceOnPanning,
-  PxVisBehaviorD3.domainUpdateNotify,
+  PxVisBehaviorD3.domainUpdate,
   PxVisBehavior.mutedSeries,
   PxVisBehavior.completeSeriesConfig
 ];

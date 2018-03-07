@@ -158,12 +158,12 @@ PxVisBehaviorScale.scale = [{
 
       //only update if it has been set already, the first set of domain
       //changed should come from extents
-      if(this.domainChanged !== null) {
+      if(this.domainChanged) {
         if(this._isOrdinalType(this.xAxisType)) {
           this._createOrdinalInvert(this.x, false);
         }
 
-        this.set('domainChanged', !this.domainChanged);
+        this.set('domainChanged', this.domainChanged + 1);
 
       }
     } else {
@@ -191,12 +191,12 @@ PxVisBehaviorScale.scale = [{
 
       //only update if it has been set already, the first set of domain
       //changed should come from extents
-      if(this.domainChanged !== null) {
+      if(this.domainChanged) {
         if(this._isOrdinalType(this.yAxisType)) {
           this._createOrdinalInvert(this.y, true)
         }
 
-        this.set('domainChanged', !this.domainChanged);
+        this.set('domainChanged', this.domainChanged + 1);
 
       }
     } else {
@@ -246,8 +246,8 @@ PxVisBehaviorScale.scale = [{
     if(updated) {
       //only update if it has been set already, the first set of domain
       //changed should come from extents
-      if(this.domainChanged !== null) {
-        this.set('domainChanged', !this.domainChanged);
+      if(this.domainChanged) {
+        this.set('domainChanged', this.domainChanged + 1);
       }
     }
   },
@@ -422,13 +422,13 @@ PxVisBehaviorScale.scale = [{
     if(this.disableDynamicUpdate) {
       if(!this.runOnce) {
         this.x.domain(extents.x);
-        this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+        this.set('domainChanged', this.domainChanged + 1);
 
         this.runOnce = true;
       }
     } else {
       this.x.domain(extents.x);
-      this.set('domainChanged', (this.domainChanged === null) ? true : !this.domainChanged);
+      this.set('domainChanged', this.domainChanged + 1);
     }
 
     this._calculatingDomain = false;
@@ -884,7 +884,7 @@ _calcMultiAxisExtents: function() {
           this.y.domain(selectedDomain.y);
         }
 
-        this.set('domainChanged', !this.domainChanged);
+        this.set('domainChanged', this.domainChanged + 1);
       }
     }
   },
@@ -997,8 +997,8 @@ _calcMultiAxisExtents: function() {
       updated = true;
     }
 
-    if(updated && this.domainChanged !== null) {
-      this.set('domainChanged', !this.domainChanged);
+    if(updated && this.domainChanged) {
+      this.set('domainChanged', this.domainChanged + 1);
     }
   },
 
@@ -1060,7 +1060,7 @@ _calcMultiAxisExtents: function() {
   PxVisBehavior.completeSeriesConfig,
   PxVisBehavior.chartExtents,
   PxVisBehavior.dataExtents,
-  PxVisBehaviorD3.domainUpdateNotify,
+  PxVisBehaviorD3.domainUpdate,
   PxVisBehavior.preventWebWorkerSynchronization,
   PxVisBehavior.mutedSeries,
   PxVisBehavior.observerCheck,
