@@ -59,7 +59,6 @@
   * horizontal registers do not support custom alignment anymore and will use all available width
   * domainChanged is not a Number with initial value of 0. This toggling easier and checking if it hasnt been toggled.
   * PxVisBehaviorD3.domainUpdateNotify has been removed. PxVisBehaviorD3.domainUpdate once again has `notify: true`.
-=======
 * Added PxVisBehaviorChart.searchToolbar to PxVisBehaviorChart.chartCommon, adding a `getToolbar` method for all charts
 
 v4.7.5
