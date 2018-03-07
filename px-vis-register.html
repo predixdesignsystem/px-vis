@@ -117,12 +117,12 @@ Custom property | Description
   <template>
     <style include="px-vis-register-styles"></style>
 
-    <div class="flex flex-row fullWidth">  <!--  IE min-height + flex bug workaround-->
+    <div class="flex flex-row fullWidth fullHeight">  <!--  IE min-height + flex bug workaround-->
       <div id="registerWrap"
         class$="[[_getMinSizeClass(preventMinSize)]] inline--flex [[_registerWrapClass(_isHorizontal)]]"
         style$="[[_returnHeight(height,margin, type)]]; [[_returnWidth(chartWidth, width, margin, type)]]">
 
-        <div class$="[[_show(_isHorizontal)]] borderRight flex flex--center paginateButton">
+        <div class$="[[_show(_isHorizontal)]] [[_hide(hidePaginationControls)]] borderRight flex flex--center paginateButton">
           <button class$="[[_show(displayPageArrows)]] actionable flex__item--middle" on-click="_leftPage">
             <px-icon icon="px-nav:back"></px-icon>
           </button>
@@ -137,7 +137,7 @@ Custom property | Description
             </div>
 
             <!-- datetime -->
-            <div id="datetimeContainer" class$="[[_getSeriesWrapperClass(type, _hasScrollBar)]] [[_show(forceDateTimeDisplay)]] u-ml- u-mr-" style="flex-grow:2">
+            <div id="datetimeContainer" class$="[[_getSeriesWrapperClass(type, _hasScrollBar)]] [[_show(_showDateTime)]] u-ml- u-mr-" style="flex-grow:2">
               <px-vis-register-datetime
                 class$="[[tooltipStyle]]"
                 first-date-time="[[_firstDateTime]]"
@@ -177,7 +177,7 @@ Custom property | Description
           <div id="seriesWrap" class$="[[_getSeriesWrapperClassReverse(type)]]">
             <template is="dom-if" if="[[!_isOfType(xAxisType, 'pie')]]">
               <template is="dom-repeat" items="[[_series]]" as="_groups">
-                <div class$="[[_getSeriesWrapperClass(type, _hasScrollBar)]] [[_itemClass(_isVertical)]] u-ml- u-mr-">
+                <div class$="[[_getSeriesWrapperClass(type, _hasScrollBar)]] [[_itemWrapClass(_isVertical)]] u-ml- u-mr-">
                   <template is="dom-repeat" id="itemRepeat" items="[[_groups]]" rendered-item-count="{{_itemCount}}">
                     <px-vis-register-item
                       class$="[[tooltipStyle]] [[_itemClass(_isVertical)]]"
@@ -238,7 +238,7 @@ Custom property | Description
           <div style="flex-grow:2"></div>
 
           <!-- vertical pagination -->
-          <div class$="[[_show(displayPageArrows, _isVertical)]] flex flex--justify u-ml- u-mr-">
+          <div class$="[[_show(displayPageArrows, _isVertical)]] [[_hide(hidePaginationControls)]] flex flex--justify u-ml- u-mr-">
             <button class="actionable" on-click="_leftPage">
               <px-icon class="smallerIcon" icon="px-nav:back"></px-icon>
             </button>
@@ -249,7 +249,7 @@ Custom property | Description
           </div>
 
         </div>
-        <div class$="[[_show(_isHorizontal)]] borderLeft flex paginateButton flex--center">
+        <div class$="[[_show(_isHorizontal)]] [[_hide(hidePaginationControls)]] borderLeft flex paginateButton flex--center">
           <button class$="[[_show(displayPageArrows)]] actionable flex__item--middle" on-click="_rightPage">
             <px-icon icon="px-nav:next"></px-icon>
           </button>
@@ -386,6 +386,11 @@ Custom property | Description
         value: false
       },
 
+      hidePaginationControls: {
+        type: Boolean,
+        value: false
+      },
+
       /**
        * Configuration object for defining sorting options. Each key of this
        * object is an object representing one sorting option. This object
@@ -453,9 +458,13 @@ Custom property | Description
         type: Boolean,
         value: false
       },
+      _showDateTime: {
+        type: Boolean,
+        computed: '_computeShowDateTime(forceDateTimeDisplay, xAxisType)'
+      },
       _hasHeaderData: {
         type: Boolean,
-        computed: '_computeHasHeaderData(forceDateTimeDisplay, _sortTypes.length, displayOrdinalValue)'
+        computed: '_computeHasHeaderData(_showDateTime, _sortTypes.length, displayOrdinalValue)'
       },
       _timeSeriesKey: String
     },
@@ -472,7 +481,7 @@ Custom property | Description
     _tooltipDataChanged: function() {
 
       this.debounce('_tooltipDataChanged', function() {
-        if(this.tooltipData) {
+        if(this.tooltipData && this.completeSeriesConfig) {
           this._formatDateTime();
 
           if(this._currentSortType && this.sortConfig && this.sortConfig[this._currentSortType].sortOnDataChange) {
@@ -672,37 +681,43 @@ Custom property | Description
     },
 
     _sortConfigChanged: function() {
-      var keys = Object.keys(this.sortConfig),
-          sortTypes = [],
-          config = {},
-          onSeries,
-          onData,
-          currentFunction;
 
-      this._internalSortConfig = {};
+      if(this.sortConfig) {
+        var keys = Object.keys(this.sortConfig),
+            sortTypes = [],
+            config = {},
+            onSeries,
+            onData,
+            currentFunction;
 
-      keys.forEach(function(k) {
+        this._internalSortConfig = {};
 
-        onSeries = [];
-        onData = [];
+        keys.forEach(function(k) {
 
-        this._processSortingFunction(this.sortConfig[k].sortOnSeriesChange, k, onSeries);
-        this._processSortingFunction(this.sortConfig[k].sortOnDataChange, k, onData);
+          onSeries = [];
+          onData = [];
 
-        config[k] = {
-          'sortOnSeries': onSeries,
-          'sortOnData': onData
-        };
+          this._processSortingFunction(this.sortConfig[k].sortOnSeriesChange, k, onSeries);
+          this._processSortingFunction(this.sortConfig[k].sortOnDataChange, k, onData);
 
-        sortTypes.push({
-          val: this.sortConfig[k].name,
-          key: k,
-          selected: this.sortConfig[k].selected
-        });
-      }.bind(this));
+          config[k] = {
+            'sortOnSeries': onSeries,
+            'sortOnData': onData
+          };
 
-      this.set('_sortTypes', sortTypes);
-      this.set('_internalSortConfig', config);
+          sortTypes.push({
+            val: this.sortConfig[k].name,
+            key: k,
+            selected: this.sortConfig[k].selected
+          });
+        }.bind(this));
+
+        this.set('_sortTypes', sortTypes);
+        this.set('_internalSortConfig', config);
+      } else {
+        this.set('_sortTypes', []);
+        this.set('_internalSortConfig', {});
+      }
     },
 
     _processSortingFunction(configFunction, key, result) {
@@ -807,6 +822,14 @@ Custom property | Description
       }
     },
 
+    _itemWrapClass: function() {
+      if(this._isVertical) {
+        return 'fullWidth ';
+      } else {
+        return 'u-mb-';
+      }
+    },
+
     _registerWrapClass: function() {
       if(this._isHorizontal) {
         return 'fullWidth';
@@ -816,7 +839,11 @@ Custom property | Description
     },
 
     _computeHasHeaderData: function() {
-      return this.forceDateTimeDisplay || this._sortTypes.length || this.displayOrdinalValues;
+      return this._showDateTime || this._sortTypes.length || this.displayOrdinalValues;
+    },
+
+    _computeShowDateTime: function() {
+      return this.forceDateTimeDisplay || this.xAxisType === 'time' || this.xAxisType === 'timeLocal';
     }
 
   });

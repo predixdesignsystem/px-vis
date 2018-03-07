@@ -6,6 +6,24 @@ var PxVisBehaviorChart = window.PxVisBehaviorChart = (window.PxVisBehaviorChart 
 
 /*
     Name:
+    PxVisBehaviorChart.searchToolbar
+
+    Description:
+    Behavior providing a convenience function for searching for a toolbar in a chart
+    @polymerBehavior PxVisBehaviorChart.searchToolbar
+*/
+PxVisBehaviorChart.searchToolbar = {
+
+  /**
+   * Convenience method for searching for a toolbar in a chart.
+   */
+  getToolbar: function() {
+    return this.$$('px-vis-toolbar');
+  }
+};
+
+/*
+    Name:
     PxVisBehaviorChart.chartCommonMethods
 
     Description:
@@ -35,7 +53,7 @@ PxVisBehaviorChart.chartCommonMethods = [{
     }
     return Object.keys(o)
   },
-}, PxColorsBehavior.getSeriesColors];
+}, PxColorsBehavior.getSeriesColors, PxVisBehaviorChart.searchToolbar];
 
 /*
     Name:
@@ -2583,98 +2601,6 @@ PxVisBehaviorChart.categoryAndAxisRegisterConfigs = [{
 
 /*
     Name:
-    PxVisBehaviorChart.sizeVerticalRegister
-
-    Description:
-    Behavior providing the ability to size the height of a vertical register
-    @polymerBehavior PxVisBehaviorChart.sizeVerticalRegister
-*/
-PxVisBehaviorChart.sizeVerticalRegister = [{
-
-  properties: {
-    /**
-    * the calculated height that should be used by the vertical register
-    *
-    */
-    _verticalRegisterHeight: {
-      type: Number
-    },
-    /**
-     * The register height based on its type and config
-     */
-    _registerHeight: {
-      type: Number,
-      computed: '_computeRegisterHeight(_verticalRegisterHeight, registerConfig.*)'
-    },
-    /**
-    * When calculating the register height if the height deductions to do
-    * haven't been passed in (i.e height changed rather than ironResize being called)
-    * then this list of string will be used to search for elements IDs and calculate
-    * their height, deducting them
-    */
-    _verticalRegisterHeightDeductions: {
-      type: Array
-    },
-    /**
-     * ID of the element where the drawing happens. used to get its height property
-     */
-    _verticalRegisterDrawingCanvasId: {
-      type: String
-    }
-  },
-  observers: [
-    '_heightChanged(height, _verticalRegisterDrawingCanvasId, _verticalRegisterHeightDeductions)'
-  ],
-  ready:function() {
-      this.set('_verticalRegisterHeight', this.height);
-  },
-  _heightChanged: function() {
-   if(this.hasUndefinedArguments(arguments)) {
-     return;
-   }
-
-    this._computeVerticalRegisterHeight();
-  },
-  _computeVerticalRegisterHeight: function(deductions) {
-
-    this.debounce('_computeVerticalRegisterHeight', function() {
-
-      var deductionsTotal = 0;
-      if(!deductions) {
-        if(this._verticalRegisterHeightDeductions && this._verticalRegisterHeightDeductions.length) {
-
-          //try to get each eleme we want to add
-          for(var i=0; i<this._verticalRegisterHeightDeductions.length; i++) {
-            var el = this.$$('#' + this._verticalRegisterHeightDeductions[i]);
-
-            //if we found the item get its height
-            if(el) {
-              deductionsTotal += el.getBoundingClientRect().height;
-            }
-          }
-        }
-      } else {
-        //just add all deductions
-        for(var i=0; i<deductions.length; i++) {
-          deductionsTotal += deductions[i];
-        }
-      }
-
-      this.set('_verticalRegisterHeight', Math.max(Number(this.$[this._verticalRegisterDrawingCanvasId].height) + deductionsTotal, 0));
-    }.bind(this), 5);
-  },
-
-  _computeRegisterHeight: function() {
-    if(this.registerConfig && this.registerConfig.type === 'horizontal') {
-      return this.registerConfig.height ? this.registerConfig.height : '';
-    }
-
-    return this._verticalRegisterHeight;
-  }
-}, PxVisBehavior.observerCheck, PxVisBehavior.baseSize];
-
-/*
-    Name:
     PxVisBehaviorChart.registerPagnationBase
 
     Description:
@@ -2778,11 +2704,11 @@ PxVisBehaviorChart.registerPagnation = [{
 PxVisBehaviorChart.registerPagnationMultiAxis = [{
   _updateRegisterData: function() {
     if(this._currentPage === 0) {
-      this._buildAxisTooltipData(this.tooltipData, this.tooltipData.time);
+      this._buildAxisTooltipData(this.tooltipData.dataset, this.tooltipData.time);
       this.set('_axisRegisterIconColor', this.tooltipData.color);
     } else {
       this._buildAxisTooltipData(
-        this.tooltipData.additionalPoints[this._currentPage - 1]['dataset'], this.tooltipData.additionalPoints[this._currentPage - 1]['time']
+        this.tooltipData.additionalPoints[this._currentPage - 1].dataset, this.tooltipData.additionalPoints[this._currentPage - 1].time
       );
       this.set('_axisRegisterIconColor', this.tooltipData.additionalPoints[this._currentPage - 1].color);
     }

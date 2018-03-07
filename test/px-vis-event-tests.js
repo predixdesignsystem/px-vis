@@ -297,7 +297,7 @@ function runTests(){
       baseSVG = document.getElementById('baseSVG');
       defaultEvent = document.getElementById('defaultEvent');
     });
-test('defaultEvent eventGroup created', function() {
+    test('defaultEvent eventGroup created', function() {
       assert.equal(defaultEvent.eventGroup.node().tagName,'g');
     });
     test('defaultEvent eventGroup has class', function() {
@@ -312,6 +312,9 @@ test('defaultEvent eventGroup created', function() {
     });
     test('defaultEvent eventIcon transform', function() {
       assert.equal(defaultEvent.eventIcon.attr('transform').replace(',',' '), 'translate(232 -21) scale(1)');
+    });
+    test('defaultEvent eventIcon color', function() {
+      assert.equal(defaultEvent.eventIcon.attr('stroke').split(' ').join(''), rgbToHex(colors['gray10']));
     });
 
     test('defaultEvent eventLine created', function() {

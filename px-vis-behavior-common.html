@@ -2386,6 +2386,10 @@ PxVisBehavior.measureText = {
   },
 
   _measureTextOnCanvas: function(text) {
+    if(!this._measurementCanvas) {
+      this._createMeasurementCanvas();
+    }
+
     var context = this._measurementCanvas.getContext('2d'),
     textSize = context.measureText(text);
 
@@ -2512,49 +2516,52 @@ PxVisBehavior.applyActionConfig = [{
     for(var i=0; i<keys.length; i++) {
       mouseEvent = keys[i];
 
-      // if we already setup mousedown && up via our d3 caller, skip it
-      if(dontDoUpDown && (mouseEvent === 'mousedown' || mouseEvent === 'mouseup')) {
-        continue;
-      }
+      if(mouseEvent !== 'toolbar') {
 
-      allActions = Array.isArray(this.actionConfig[keys[i]]) ? this.actionConfig[keys[i]] : [this.actionConfig[keys[i]]];
-
-      //make sure we delete all previous handlers
-      this._deletePreviousActions(d3Elem, mouseEvent);
-
-      for(var j=0; j<allActions.length; j++) {
-        action = allActions[j];
-        mappedAction = this[this.actionMapping[action]];
-        noChartContext = false;
-
-        //is this a function defined heere
-        if(mappedAction && typeof mappedAction === 'function') {
-
-          toBeUsed = mappedAction;
-          noChartContext = true;
-        } else if(typeof action === 'function') {
-          toBeUsed = action;
-        } else if(typeof action === 'string' && action && action != 'null') {
-          toBeUsed = eval('var f = function() { return ' + action + ';}; f();');
-        } else {
-          toBeUsed = null;
+        // if we already setup mousedown && up via our d3 caller, skip it
+        if(dontDoUpDown && (mouseEvent === 'mousedown' || mouseEvent === 'mouseup')) {
+          continue;
         }
 
-        if(toBeUsed) {
-          var wrapper;
-          if(noChartContext) {
-            wrapper = toBeUsed.bind(this);
-          } else {
-            //now ensure the action will be run within the context of the chart
-          var _this = this;
+        allActions = Array.isArray(this.actionConfig[keys[i]]) ? this.actionConfig[keys[i]] : [this.actionConfig[keys[i]]];
 
-          wrapper = function(evt) {
-              _this.fire('px-vis-action-request', {'function': this, 'data': {'mouseCoords': Px.d3.mouse(elem), 'target': elem}});
-            }.bind(toBeUsed);
+        //make sure we delete all previous handlers
+        this._deletePreviousActions(d3Elem, mouseEvent);
+
+        for(var j=0; j<allActions.length; j++) {
+          action = allActions[j];
+          mappedAction = this[this.actionMapping[action]];
+          noChartContext = false;
+
+          //is this a function defined heere
+          if(mappedAction && typeof mappedAction === 'function') {
+
+            toBeUsed = mappedAction;
+            noChartContext = true;
+          } else if(typeof action === 'function') {
+            toBeUsed = action;
+          } else if(typeof action === 'string' && action && action != 'null') {
+            toBeUsed = eval('var f = function() { return ' + action + ';}; f();');
+          } else {
+            toBeUsed = null;
           }
 
-          d3Elem.on(mouseEvent + '.' + j, wrapper);
-          this.handlersCount[mouseEvent]++;
+          if(toBeUsed) {
+            var wrapper;
+            if(noChartContext) {
+              wrapper = toBeUsed.bind(this);
+            } else {
+              //now ensure the action will be run within the context of the chart
+            var _this = this;
+
+            wrapper = function(evt) {
+                _this.fire('px-vis-action-request', {'function': this, 'data': {'mouseCoords': Px.d3.mouse(elem), 'target': elem}});
+              }.bind(toBeUsed);
+            }
+
+            d3Elem.on(mouseEvent + '.' + j, wrapper);
+            this.handlersCount[mouseEvent]++;
+          }
         }
       }
     }
@@ -2786,6 +2793,11 @@ PxVisBehavior.highlightShared = [{
       if(series.length) {
         ttd = this._createTooltipDataStub(series[0]["coord"], timestamp, !this.hideTooltip);
         ttd.series = series;
+        ttd.seriesObj = {};
+
+        ttd.series.forEach(function(item) {
+          ttd.seriesObj[item.name] = item;
+        });
       }
     }
     this.set("defaultEmptyData", ttd);
@@ -3016,6 +3028,7 @@ PxVisBehavior.highlightLineShared = [{
         "time": null,
         "dataset": null,
         'series': [],
+        'seriesObj': {},
         "color": null,
         "tooltipConfig": null
       };
@@ -3030,6 +3043,7 @@ PxVisBehavior.highlightLineShared = [{
         tooltipConfig = {},  //a fake configuration object we will build
         value = {},          //the series obj within tooltipData
         series = [],
+        seriesObj = {},
         max = -Number.MAX_VALUE,
         val,
         dim;
@@ -3046,13 +3060,6 @@ PxVisBehavior.highlightLineShared = [{
             max = val;
           }
         }
-
-        screenX = this.y(dataset[last]) * Math.sin(this.x(last)) + this.width/2 + window.pageXOffset;
-        screenY = this.y(dataset[last]) * Math.cos(Math.PI - this.x(last)) + this.height/2 + window.pageYOffset;
-
-      } else {
-        screenX = this.x(last) + window.pageXOffset + 15;
-        screenY = this.y[last](dataset[last]) + this.margin.top + window.pageYOffset;
       }
 
       for(var i = 0; i < this.dimensions.length; i++) {
@@ -3080,18 +3087,20 @@ PxVisBehavior.highlightLineShared = [{
         //create our value obj
         value[aid] = dataset[aid];
         series.push({ 'name': aid, 'value': value });
+        seriesObj[aid] = {'name': aid, 'value': value};
       }
 
       //create our tooltipData obj
       data = {
-        "mouse": null,
-        "dataPos": [screenX, screenY],
-        "time": dataset[this.timeData],
-        "dataset": dataset,
+        'mouse': null,
+        'time': dataset[this.timeData],
+        'dataset': dataset,
+        'yVal': dataset[last],
         'series': series,
-        "color": tooltipConfig[aid]["color"],
-        "tooltipConfig": tooltipConfig,
-        "adjustPosition": true //warn chart that pos needs to be adjusted from canvas/svg
+        'seriesObj': seriesObj,
+        'color': tooltipConfig[aid]['color'],
+        'tooltipConfig': tooltipConfig,
+        'axis': last
       };
 
     return data;

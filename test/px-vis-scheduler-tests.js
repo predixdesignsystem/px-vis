@@ -11,7 +11,6 @@ function runTests(){
       //setup a custom number of workers and point to the file manually
       window.addEventListener('px-vis-worker-init', function() {
         Px.vis.maxWorkerCount = 3;
-        Px.vis.workerUrl = '../px-vis-worker.js';
       });
 
       //when scheduler loaded initialize some data
@@ -160,8 +159,11 @@ function runTests(){
 
     suiteSetup(function(done) {
       var url = document.location.protocol + '//' + document.location.host + '/test/test-worker.js';
+
       Px.vis.scheduler.registerCustomScript(url, function() {
         done();
+      }, function() {
+        assert.equal('failed loading custom script', 2);
       });
     });
 
