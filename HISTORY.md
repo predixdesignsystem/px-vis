@@ -53,8 +53,10 @@
   * added a `onSelect` handler for items. `onClick` now won't be called when the item is programmatically selected (as opposed to being selected by a click). `onSelect` will be called in both cases (like `onClick` used to behave).
   * Not a toolbar change per say but any custom event handler defined in `actionConfig` can access the toolbar by calling `getToolbar` on the chart (which is usually `this` in the handler).
   * In a similar way handlers for `onClick`, `onSelect` and `onDeselect` have direct access to the toolbar through `e.toolbar`.
-* BREAKING:
   * when using preconfigured toolbar options keys with a value of `false` will be ignored, e.g : {zoom: true, pan: false} will only show zoom button
+* BREAKING:
+  * Toolbar: `onClick` definition in the config has been replaced by `onSelect`
+  * Toolbar: Config definitions now have a 'click' defined by default. Custom configurations must now nullify this 'click' handler (if you dont use click).
   * `range` property has been removed from px-vis-chart-navigator. use `chartExtents.x` to control the timespan. The chart navigator does not support being used without data anymore
   * horizontal registers do not support custom alignment anymore and will use all available width
   * domainChanged is not a Number with initial value of 0. This toggling easier and checking if it hasnt been toggled.
