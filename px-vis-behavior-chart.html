@@ -876,13 +876,13 @@ PxVisBehaviorChart.chartAutoResize = [{
       return base;
     },
 
-    __onIronResize: function() {
+    _onIronResize: function() {
       if(this.preventResize) {
         return;
       }
 
       this.debounce('ironresize', () => {
-        requestAnimationFrame(this._resizeCalculations);
+        requestAnimationFrame(this._resizeCalculations.bind(this));
       }, this.debounceResizeTiming);
     }
 }, PxVisBehavior.observerCheck, Polymer.IronResizableBehavior];
