@@ -1,3 +1,7 @@
+v4.7.6
+=================
+* Fix bug in canvas line rendering with show gaps on
+
 v4.7.5
 =================
 * Fix bug in events where default config gets no color (and also draw fn may never get called)

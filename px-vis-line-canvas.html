@@ -153,9 +153,6 @@
                             this.completeSeriesConfig[this.seriesId].mutedOpacity : this.mutedOpacity;
       this._currentDrawingOptions.strokeWidth = this.strokeWidth;
 
-      this._currentDrawingOptions.lastPointRenderedIndex = null;
-      this._currentDrawingOptions.currentBatchStartIndex = 0;
-
       //render differently depending on the type of line
       if(this.gradientLine) {
         //gradient line
@@ -261,12 +258,7 @@
         this.drawClipPath();
       }
 
-      //adjust start based on last point drawned
-      this._currentDrawingOptions.currentBatchStartIndex = this._currentDrawingOptions.lastPointRenderedIndex;
-
       if(!this.multiPath) {
-        //ensure weprepend the last defined point
-        start = this._currentDrawingOptions.lastPointRenderedIndex;
         //for single line we have to slice the array to pass it to the line function
         data = this.chartData.slice(start, stop);
       }
@@ -307,7 +299,6 @@
             }
           }
         }
-
 
         var dashPattern = this.completeSeriesConfig[this.seriesId] && this.completeSeriesConfig[this.seriesId]["dashPattern"] ? this.completeSeriesConfig[this.seriesId]["dashPattern"] : '';
         dashPattern = JSON.parse('[' + dashPattern +']');
