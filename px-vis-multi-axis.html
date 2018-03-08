@@ -231,11 +231,11 @@ Custom property | Description
         type: Array
       },
       /**
-       * Internal dimensions boolean to defeat race conditions.
+       * Internal dimensions trigger to defeat race conditions.
        */
       _internalDimensionsChanged: {
-        type: Boolean,
-        value: false
+        type: Number,
+        value: 0
       },
       /**
        * Whether the scales are using a single scale or multi scale.
@@ -645,11 +645,11 @@ Custom property | Description
           this.set('_pokeTitleLocation', !this._pokeTitleLocation);
         }
 
-        this.set('_internalDimensionsChanged', !this._internalDimensionsChanged);
+        this.set('_internalDimensionsChanged', this._internalDimensionsChanged + 1);
 
       } else if(this.dimensions.length === 0 && this._internalDimensions && this._internalDimensions.length > 0) {
         this.set('_internalDimensions', []);
-        this.set('_internalDimensionsChanged', []);
+        this.set('_internalDimensionsChanged', 0);
       }
     },
 
