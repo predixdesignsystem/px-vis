@@ -3470,7 +3470,7 @@ PxVisBehavior.scaleTypeCheck = {
     PxVisBehavior.referenceCurveProps
 
     Description:
-    Polymer behavior that providse the properties for the reference curve.
+    Polymer behavior that provide the properties for the reference curve.
 
 
     @polymerBehavior PxVisBehavior.referenceCurveProps
@@ -3539,5 +3539,79 @@ PxVisBehavior.showHideClasses = {
     return 'hide';
   },
 };
+
+/**
+    Name:
+    PxVisBehavior.gradientColors
+
+    Description:
+    Polymer behavior that allows configuration and use of a color gradient
+
+
+    @polymerBehavior PxVisBehavior.gradientColors
+*/
+PxVisBehavior.gradientColors = {
+  properties: {
+    /**
+     * TODO: DOCUMENTATION
+     *  Color array, 1 color string or function
+     * @type {Array|String|Function}
+     */
+    colorGradient: {
+      type: Array
+    },
+    /**
+     *
+     */
+    colorGradientMin :{
+      type: Number,
+      value: 0
+    },
+    /**
+     *
+     */
+    colorGradientMax: {
+      type: Number,
+      value: 1
+    },
+    _colorGradientFunction: {
+      type: Function,
+      computed: '_computeColorGradientFunction(colorGradient, colorGradientMin, colorGradientMax)'
+    }
+  },
+
+  _computeColorGradientFunction: function() {
+    if(this.colorGradient) {
+      if(typeof this.colorGradient === 'string') {
+        return function() {
+          return this.colorGradient;
+        }
+      } else if(typeof this.colorGradient === 'array') {
+
+        if(this.colorGradient.length === 2) {
+          return function(val) {
+            return Px.d3.interpolateRgb(this.colorGradient[0], this.colorGradient[1])(this._normalizeGradientValue(val));
+          };
+        } else {
+          return function(val) {
+            return Px.d3.interpolateRgbBasis(this.colorGradient)(this._normalizeGradientValue(val));
+          };
+        }
+      } else if(typeof this.colorGradient === 'function') {
+        return this.colorGradient;
+      } else {
+        console.warn('Color gradient ' + this.colorGradient + ' has an invalid type. Should be string, array or function');
+      }
+    }
+  },
+
+  _normalizeGradientValue: function() {
+    if(this.colorGradientMax === this.colorGradientMin) {
+      return 0;
+    } else {
+      return val / (this.colorGradientMax - this.colorGradientMin);
+    }
+  }
+}
 
 </script>
