@@ -772,7 +772,10 @@ PxVisBehaviorChart.saveImage = [{
     PxVisBehaviorChart.chartAutoResize
 
     Description:
-    Polymer behavior that provides auto resize options for charts
+    Polymer behavior that provides auto resize options for charts. Charts
+    implementing this behavior can define a `_resizeCalculations` function
+    which will be called when the chart needs to redo its size calculations
+    (typically measure its parents and adjust its height/width)
 
     Dependencies:
     - D3.js
@@ -831,7 +834,7 @@ PxVisBehaviorChart.chartAutoResize = [{
         value: 250
       }
     },
-    listeners: {'px-vis-toolbar-secondary-toggled': '_secondaryToolbarToggled'},
+    listeners: {'iron-resize': '_onIronResize'},
     _preventResizeChanged: function() {
      if(this.hasUndefinedArguments(arguments)) {
        return;
@@ -839,15 +842,6 @@ PxVisBehaviorChart.chartAutoResize = [{
 
       if(!this.preventResize) {
         this.notifyResize();
-      }
-    },
-    _secondaryToolbarToggled: function(e) {
-      if(!this.preventResize && !e.detail.withinChart) {
-        //ensure we bypass the debounce as we want to resize asap
-        var oldDebounce = this.debounceResizeTiming;
-        this.debounceResizeTiming = 0;
-        this.notifyResize();
-        this.debounceResizeTiming = oldDebounce;
       }
     },
     _getChartWrapperClass: function(hor, vert) {
