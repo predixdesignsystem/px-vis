@@ -120,7 +120,7 @@ Custom property | Description
     <div class="flex flex-row fullWidth fullHeight">  <!--  IE min-height + flex bug workaround-->
       <div id="registerWrap"
         class$="[[_getMinSizeClass(preventMinSize)]] inline--flex [[_registerWrapClass(_isHorizontal)]]"
-        style$="[[_returnHeight(height,margin, type)]]; [[_returnWidth(chartWidth, width, margin, type)]]">
+        style$="height:[[height]]px; [[_returnWidth(chartWidth, width, margin, type)]]">
 
         <div class$="[[_show(_isHorizontal)]] [[_hide(hidePaginationControls)]] borderRight flex flex--center paginateButton">
           <button class$="[[_show(displayPageArrows)]] actionable flex__item--middle" on-click="_leftPage">
@@ -623,14 +623,6 @@ Custom property | Description
       }
 
       return preventMinSize ? '' : 'minSize';
-    },
-
-    _returnHeight: function(height,margin, type) {
-      if(this.hasUndefinedArguments(arguments)) {
-        return;
-      }
-
-      return this.type === 'vertical' ? 'height:' + (height - margin.bottom) + 'px': 'height:' + height + 'px';
     },
 
     _returnWidth: function(chartWidth, width, margin, type) {
