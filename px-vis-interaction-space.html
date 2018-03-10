@@ -346,7 +346,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       '_resetTooltipDataLegacy(completeSeriesConfig.*)',
       '_resetTooltipData(seriesKeys.*, defaultEmptyData.*)',
       '_createQuadtreeData(wwDataSyncCounter, width, height, margin.*, domainChanged, searchType, useQuadtree, counterClockwise, xAxisType, preventWebWorkerSynchronization)',
-      '_callCreateQuadtreeData(mutedSeries)'
+      '_callCreateQuadtreeData(mutedSeries)',
+      '_updateTooltipData(domainChanged)'
     ],
 
     /**
@@ -831,7 +832,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       //we already got the pixel coords in continuous
       if(!isContinuous) {
-        result.coords = [this.x(result.series[xKey]), this.isMultiY ? this.y[axisKey](result.series[yKey]) : this.y(result.series[yKey])]
+        result.coords = this._getCoordsForValues(result.series[xKey], result.series[yKey], axisKey);
 
         //also keep pixel coords in array
         dataObj.xArr.push(result.coords[0]);
@@ -1635,6 +1636,46 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       }
 
       return data;
+    },
+
+    _updateTooltipData: function() {
+      if(this.tooltipData && this.tooltipData.seriesObj) {
+
+        let updated = false;
+
+        //update coords in tooltip data because of a scale change
+        this.tooltipData.series.forEach(function(item, i) {
+
+          if(item.value && item.coord) {
+            let axisKey;
+            if(this.isMultiY) {
+              axisKey = (this.completeSeriesConfig[item.name]['axis'] && this.completeSeriesConfig[item.name]['axis']['id']) ? this.completeSeriesConfig[item.name]['axis']['id'] : null;
+            }
+
+            item.coord = this._getCoordsForValues(item.value[this.completeSeriesConfig[item.name].x], item.value[this.completeSeriesConfig[item.name].y], axisKey);
+            this.tooltipData.seriesObj[item.name] = item;
+
+            updated = true;
+          }
+        }.bind(this));
+
+        if(updated) {
+
+          //copy all data in a new object
+          let newTtData = {},
+              keys = Object.keys(this.tooltipData);
+
+          for(var i=0; i<keys.length; i++) {
+            newTtData[keys[i]] = this.tooltipData[keys[i]];
+          }
+
+          this.set('tooltipData', newTtData);
+        }
+      }
+    },
+
+    _getCoordsForValues(xVal, yVal, axisKey) {
+      return [this.x(xVal), this.isMultiY ? this.y[axisKey](yVal) : this.y(yVal)];
     }
 
   });
