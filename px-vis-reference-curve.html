@@ -122,7 +122,7 @@ An element which draws polygonal grid lines.
     },
 
     _createRefCurveG: function() {
-      if(this._isD3Empty(this.svg) || this.domainChanged === null) {
+      if(this._isD3Empty(this.svg) || !this.domainChanged) {
         return;
       }
 
@@ -226,7 +226,7 @@ An element which draws polygonal grid lines.
     },
 
     _returnYScale: function(seriesId, config) {
-      if(this.domainChanged !== null) {
+      if(this.domainChanged) {
         if(typeof this.y === 'object') {
           var d = config[seriesId]['axis']['id'];
           if(this.y && this.y[d]) {

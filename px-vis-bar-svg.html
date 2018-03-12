@@ -148,6 +148,11 @@ Unlike most other drawing elements that can use chartData directly, bar requires
       highlightBar: {
         type: String,
         value: ''
+      },
+
+      barOpacity: {
+        type: Number,
+        value: 1
       }
     },
 
@@ -195,7 +200,7 @@ Unlike most other drawing elements that can use chartData directly, bar requires
 
     _drawElementDebounced: function() {
       if(!this._funcsWereSet ||
-            this.domainChanged === null ||
+            !this.domainChanged ||
             this._isD3Empty(this.svg) ||
             !this.y ||
             this.chartData.length === 0 ||
@@ -238,7 +243,8 @@ Unlike most other drawing elements that can use chartData directly, bar requires
               colorKey = d[0] < 0 || d[1] < 0 ? 'negativeColor': 'color';
 
           return this.completeSeriesConfig[series][colorKey] ? this.completeSeriesConfig[series][colorKey] : this.completeSeriesConfig[series]['color'];
-        }.bind(this));
+        }.bind(this))
+        .attr('opacity', this.barOpacity);
 
       // Make it easy to get our bars again
       this.barRects = this.barGroup.selectAll('rect.series-bar');

@@ -406,7 +406,7 @@ Custom property | Description
       this._moveVerticalLines();
     }, //mousemove
 
-    _setVisibility: function(d,i) {
+    _setVisibility: function(d, i) {
       if(this.tooltipData.seriesObj[d] &&
           this.tooltipData.seriesObj[d]['coord'] &&
           this._isValidData(this.tooltipData.seriesObj[d]['coord'][0]) &&
@@ -417,7 +417,7 @@ Custom property | Description
       return 'hidden';
     },
 
-    _setXCoord: function(d,i) {
+    _setXCoord: function(d, i) {
       if(this.tooltipData.seriesObj[d] &&
           this.tooltipData.seriesObj[d]['coord'] &&
           this._isValidData(this.tooltipData.seriesObj[d]['coord'][0])) {
@@ -427,14 +427,26 @@ Custom property | Description
       return null;
     },
 
-    _setYCoord: function(d,i) {
-      if(this.tooltipData.seriesObj[d] &&
-          this.tooltipData.seriesObj[d]['coord'] &&
-          this._isValidData(this.tooltipData.seriesObj[d]['coord'][1])) {
+    _setYCoord: function(d, i) {
+      if(this._hasYCoord(d)) {
         return this.tooltipData.seriesObj[d]['coord'][1];
       }
 
       return null;
+    },
+
+    _setDisplayYCoord: function(d, i) {
+      return this._hasYCoord(d) ? null : 'none';
+    },
+
+    _hasYCoord: function(d) {
+      if(this.tooltipData.seriesObj[d] &&
+          this.tooltipData.seriesObj[d]['coord'] &&
+          this._isValidData(this.tooltipData.seriesObj[d]['coord'][1])) {
+        return true;
+      }
+
+      return false;
     },
 
     _moveCircles: function() {
@@ -460,7 +472,7 @@ Custom property | Description
         this._hLines
           .style("visibility", this._setVisibility.bind(this))
           .attr('r', function(d,i) {
-            if(this.tooltipData.seriesObj[d]['coord']) {
+            if(this.tooltipData.seriesObj[d] && this.tooltipData.seriesObj[d]['coord']) {
               var x = this.tooltipData.seriesObj[d]['coord'][0],
                   y = this.tooltipData.seriesObj[d]['coord'][1];
               if(this._isValidData(x) && this._isValidData(y)) {
@@ -481,7 +493,8 @@ Custom property | Description
       if(this.horizontalLine !== 'none') {
         this._hLines
           .attr('y1', this._setYCoord.bind(this))
-          .attr('y2', this._setYCoord.bind(this));
+          .attr('y2', this._setYCoord.bind(this))
+          .attr('display', this._setDisplayYCoord.bind(this));
       }
 
       if(this.horizontalLine === 'left') {
@@ -508,22 +521,27 @@ Custom property | Description
         this._vLines
          .style("visibility", this._setVisibility.bind(this))
         .attr('transform', function(d, i) {
-          var xKey = this._mutedCompleteSeriesConfig[d]['x'],
-              yKey = this._mutedCompleteSeriesConfig[d]['y'],
-              angle = this.tooltipData.seriesObj[d]['value'][xKey];
 
-          if(this._isValidData(angle)) {
-            if(this.tooltipData.seriesObj[d]['value'][yKey] < 0 && !this.allowNegativeValues) {
-              angle = this.useDegrees ? angle - 180 : angle - Math.PI;
+          if(this.tooltipData.seriesObj[d] && this.tooltipData.seriesObj[d]['value']) {
+            var xKey = this._mutedCompleteSeriesConfig[d]['x'],
+                yKey = this._mutedCompleteSeriesConfig[d]['y'],
+                angle = this.tooltipData.seriesObj[d]['value'][xKey];
+
+            if(this._isValidData(angle)) {
+              if(this.tooltipData.seriesObj[d]['value'][yKey] < 0 && !this.allowNegativeValues) {
+                angle = this.useDegrees ? angle - 180 : angle - Math.PI;
+              }
+
+              angle = this._adjustAngleForPolarChart(angle, this.useDegrees);
+
+            } else {
+              angle = 0;
             }
 
-            angle = this._adjustAngleForPolarChart(angle, this.useDegrees);
-
+            return 'rotate(' + angle + ')';
           } else {
-            angle = 0;
+            return null;
           }
-
-          return 'rotate(' + angle + ')';
         }.bind(this));
       }
     },

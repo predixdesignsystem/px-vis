@@ -772,7 +772,10 @@ PxVisBehaviorChart.saveImage = [{
     PxVisBehaviorChart.chartAutoResize
 
     Description:
-    Polymer behavior that provides auto resize options for charts
+    Polymer behavior that provides auto resize options for charts. Charts
+    implementing this behavior can define a `_resizeCalculations` function
+    which will be called when the chart needs to redo its size calculations
+    (typically measure its parents and adjust its height/width)
 
     Dependencies:
     - D3.js
@@ -831,7 +834,7 @@ PxVisBehaviorChart.chartAutoResize = [{
         value: 250
       }
     },
-    listeners: {'px-vis-toolbar-secondary-toggled': '_secondaryToolbarToggled'},
+    listeners: {'iron-resize': '_onIronResize'},
     _preventResizeChanged: function() {
      if(this.hasUndefinedArguments(arguments)) {
        return;
@@ -839,15 +842,6 @@ PxVisBehaviorChart.chartAutoResize = [{
 
       if(!this.preventResize) {
         this.notifyResize();
-      }
-    },
-    _secondaryToolbarToggled: function(e) {
-      if(!this.preventResize && !e.detail.withinChart) {
-        //ensure we bypass the debounce as we want to resize asap
-        var oldDebounce = this.debounceResizeTiming;
-        this.debounceResizeTiming = 0;
-        this.notifyResize();
-        this.debounceResizeTiming = oldDebounce;
       }
     },
     _getChartWrapperClass: function(hor, vert) {
@@ -874,6 +868,16 @@ PxVisBehaviorChart.chartAutoResize = [{
       }
 
       return base;
+    },
+
+    _onIronResize: function() {
+      if(this.preventResize) {
+        return;
+      }
+
+      this.debounce('ironresize', () => {
+        requestAnimationFrame(this._resizeCalculations.bind(this));
+      }, this.debounceResizeTiming);
     }
 }, PxVisBehavior.observerCheck, Polymer.IronResizableBehavior];
 
@@ -2225,8 +2229,8 @@ PxVisBehaviorChart.multiAxis = [{
     },
 
     _axisDomainChanged: {
-      type: Boolean,
-      value: null
+      type: Number,
+      value: 0
     },
 
     _multiAxisSeriesConfig: {
@@ -2308,7 +2312,7 @@ PxVisBehaviorChart.multiAxis = [{
       this.set('_axisX', this._setAxisScale(lDims.sort(), rDims.sort(), this.leftAxisSize, this.rightAxisSize));
 
       if(typeof this._axisX === 'function') {
-        this.set('_axisDomainChanged', !this._axisDomainChanged);
+        this.set('_axisDomainChanged', this._axisDomainChanged + 1);
       }
 
       // must decouple completeSeriesConfig from px-vis-multi-axis for timing reasons. Needs to set after dimensions
@@ -2332,7 +2336,7 @@ PxVisBehaviorChart.multiAxis = [{
 
 
   _returnYScale: function(seriesId, config) {
-    if(this.domainChanged !== null) {
+    if(this.domainChanged) {
       if(typeof this.y === 'object') {
         var d = config[seriesId]['axis']['id'];
         if(this.y && this.y[d]) {
@@ -2345,6 +2349,102 @@ PxVisBehaviorChart.multiAxis = [{
     return;
   }
 }, PxVisBehavior.dimensions, PxVisBehavior.seriesToAxes];
+
+/*
+    Name:
+    PxVisBehaviorChart.sizeVerticalRegister
+
+    Description:
+    Behavior providing the ability to size the height of a vertical register
+    @polymerBehavior PxVisBehaviorChart.sizeVerticalRegister
+*/
+PxVisBehaviorChart.sizeVerticalRegister = [{
+
+properties: {
+  /**
+  * the calculated height that can be used by the vertical register
+  *
+  */
+  _verticalRegisterHeight: {
+    type: Number
+  },
+  /**
+   * The register height based on its type, config and calculated size
+   */
+  _registerHeight: {
+    type: Number,
+    computed: '_computeRegisterHeight(_verticalRegisterHeight, registerConfig.*)'
+  },
+    /**
+    * When calculating the register height if the height deductions to do
+    * haven't been passed in (i.e height changed rather than ironResize being called)
+    * then this list of string will be used to search for elements IDs and calculate
+    * their height, deducting them
+    */
+    _verticalRegisterHeightDeductions: {
+      type: Array
+    },
+    /**
+     * ID of the element where the drawing happens. used to get its height property
+     */
+    _verticalRegisterDrawingCanvasId: {
+      type: String
+    }
+  },
+  observers: [
+    '_heightChanged(height, _verticalRegisterDrawingCanvasId, _verticalRegisterHeightDeductions)'
+  ],
+  ready:function() {
+      this.set('_verticalRegisterHeight', this.height);
+  },
+  _heightChanged: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
+    this._computeVerticalRegisterHeight();
+  },
+  _computeVerticalRegisterHeight: function(deductions) {
+
+    this.debounce('_computeVerticalRegisterHeight', function() {
+
+      var deductionsTotal = 0;
+      if(!deductions) {
+        if(this._verticalRegisterHeightDeductions && this._verticalRegisterHeightDeductions.length) {
+
+          window.requestAnimationFrame(() => {
+            //try to get each eleme we want to add
+            for(var i=0; i<this._verticalRegisterHeightDeductions.length; i++) {
+              var el = this.$$('#' + this._verticalRegisterHeightDeductions[i]);
+
+              //if we found the item get its height
+              if(el) {
+                deductionsTotal += el.getBoundingClientRect().height;
+              }
+            }
+
+            this.set('_verticalRegisterHeight', Math.max(Number(this.$[this._verticalRegisterDrawingCanvasId].height) + deductionsTotal, 0));
+          });
+        }
+      } else {
+        //just add all deductions
+        for(var i=0; i<deductions.length; i++) {
+          deductionsTotal += deductions[i];
+        }
+        this.set('_verticalRegisterHeight', Math.max(Number(this.$[this._verticalRegisterDrawingCanvasId].height) + deductionsTotal, 0));
+      }
+    }.bind(this), 5);
+  },
+
+  _computeRegisterHeight: function() {
+    if(this.registerConfig && this.registerConfig.type === 'horizontal') {
+      return this.registerConfig.height ? this.registerConfig.height : '';
+    }
+
+    return this._verticalRegisterHeight;
+  }
+}, PxVisBehavior.observerCheck, PxVisBehavior.baseSize];
+
 
 /*
     Name:

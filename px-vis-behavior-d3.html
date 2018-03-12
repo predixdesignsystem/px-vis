@@ -500,46 +500,19 @@ PxVisBehaviorD3.axes = [{
 PxVisBehaviorD3.domainUpdate = {
   properties: {
     /**
-     * Boolean switching when the domain(s) has(have) changed
+     * Number which increments up when the domain(s) has(have) changed.
      *
-     * Serves as a trigger for many elements to redraw
+     * 0 (false) indicates that domains have not been set.
      *
-     * @property domainChanged
-     * @type Object
-     */
-    domainChanged: {
-      type: Boolean,
-      value: null
-    }
-  }
-};
-
-/*
-    Name:
-    PxVisBehaviorD3.domainUpdateNotify
-
-    Description:
-    Polymer behavior that provides domain update property
-
-    Dependencies:
-    - D3.js
-
-    @polymerBehavior PxVisBehaviorD3.domainUpdateNotify
-*/
-PxVisBehaviorD3.domainUpdateNotify = {
-  properties: {
-    /**
-     * Boolean switching when the domain(s) has(have) changed
-     *
-     * Serves as a trigger for many elements to redraw
+     * Serves as a trigger for many elements to redraw.
      *
      * @property domainChanged
-     * @type Object
+     * @type Number
      */
     domainChanged: {
-      type: Boolean,
+      type: Number,
       notify: true,
-      value: null
+      value: 0
     }
   }
 };
@@ -1604,7 +1577,6 @@ PxVisBehaviorD3.lineShared = [{
       line = Px.d3.line()
         .x(function(d) {
           // ~~ --> round pixels values to optimize svg perfs
-
           return ~~_this.x(d[xKey]);
         })
         .y(function(d) {

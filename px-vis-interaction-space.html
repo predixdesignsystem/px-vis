@@ -346,7 +346,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       '_resetTooltipDataLegacy(completeSeriesConfig.*)',
       '_resetTooltipData(seriesKeys.*, defaultEmptyData.*)',
       '_createQuadtreeData(wwDataSyncCounter, width, height, margin.*, domainChanged, searchType, useQuadtree, counterClockwise, xAxisType, preventWebWorkerSynchronization)',
-      '_callCreateQuadtreeData(mutedSeries)'
+      '_callCreateQuadtreeData(mutedSeries)',
+      '_updateTooltipData(domainChanged)'
     ],
 
     /**
@@ -831,7 +832,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       //we already got the pixel coords in continuous
       if(!isContinuous) {
-        result.coords = [this.x(result.series[xKey]), this.isMultiY ? this.y[axisKey](result.series[yKey]) : this.y(result.series[yKey])]
+        result.coords = this._getCoordsForValues(result.series[xKey], result.series[yKey], axisKey);
 
         //also keep pixel coords in array
         dataObj.xArr.push(result.coords[0]);
@@ -1571,7 +1572,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         return;
       }
 
-      if(this.domainChanged !== null && this.useQuadtree && !this.preventWebWorkerSynchronization && this.xAxisType !== 'ordinal' && this.xAxisType !== 'scaleBand') {
+      if(this.domainChanged && this.useQuadtree && !this.preventWebWorkerSynchronization && this.xAxisType !== 'ordinal' && this.xAxisType !== 'scaleBand') {
         this.debounce('buildQuadtree', function() {
           var w = this.width - this.margin.right - this.margin.left,
               h = this.height - this.margin.top - this.margin.bottom,
@@ -1635,6 +1636,63 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       }
 
       return data;
+    },
+
+    _updateTooltipData: function() {
+      if(this.tooltipData && this.tooltipData.seriesObj) {
+
+        let updated = false;
+
+        //update coords in tooltip data because of a scale change
+        this.tooltipData.series.forEach(function(item, i) {
+
+          if(item.value && item.coord) {
+            let axisKey;
+            if(this.isMultiY) {
+              axisKey = (this.completeSeriesConfig[item.name]['axis'] && this.completeSeriesConfig[item.name]['axis']['id']) ? this.completeSeriesConfig[item.name]['axis']['id'] : null;
+            }
+
+            //ask the chart scale to convert those data values to pixels
+            //this is synchronous
+            this.fire('px-vis-request-pixel-for-data', {callback: function(info) {
+                item.coord = info.pixel;
+                this.tooltipData.seriesObj[item.name] = item;
+              }.bind(this),
+                //data values
+                data: [item.value[this.completeSeriesConfig[item.name].x], item.value[this.completeSeriesConfig[item.name].y]],
+                //seriesName
+                series: item.name,
+                //charts margin are "outside" of the interaction space itself
+                //so we don't want them for this calculation
+                margin: {'top': 0, 'bottom':0, 'left':0, 'right': 0},
+                //for polar we want those coordinates to be relative to the
+                //center, not the top left corner
+                relativeToCenter: true}
+            );
+
+            updated = true;
+          }
+        }.bind(this));
+
+
+
+        if(updated) {
+
+          //copy all data in a new object
+          let newTtData = {},
+              keys = Object.keys(this.tooltipData);
+
+          for(var i=0; i<keys.length; i++) {
+            newTtData[keys[i]] = this.tooltipData[keys[i]];
+          }
+
+          this.set('tooltipData', newTtData);
+        }
+      }
+    },
+
+    _getCoordsForValues(xVal, yVal, axisKey) {
+      return [this.x(xVal), this.isMultiY ? this.y[axisKey](yVal) : this.y(yVal)];
     }
 
   });

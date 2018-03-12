@@ -189,7 +189,7 @@ Custom property | Description
        return;
      }
 
-      if(this._animationFrameDone && this.domainChanged !== null) {
+      if(this._animationFrameDone && this.domainChanged) {
         if(this.drawDebounceTime > 0) {
           this.debounce('_drawThreshold', function() {
             this._drawElementDebounced();
@@ -201,7 +201,7 @@ Custom property | Description
     },
 
     _drawElementDebounced: function() {
-      if(this.domainChanged === null) {
+      if(!this.domainChanged) {
         return;
       }
       var _this = this,
@@ -258,8 +258,8 @@ Custom property | Description
       Px.d3.select(elem).select("line.threshold-line")
         .attr('x1', function(d) { return this._xFn(d,dir,0,0); }.bind(this))
         .attr('x2', function(d) { return this._xFn(d,dir,(this.width - this.margin.right - this.margin.left),0);  }.bind(this))
-        .attr('y1', function(d) { return this._yFn(d,dir,0); }.bind(this))
-        .attr('y2', function(d) { return this._yFn(d,dir,(this.height - this.margin.top - this.margin.bottom)); }.bind(this))
+        .attr('y1', function(d) { return this._yFn(d,dir,0,0); }.bind(this))
+        .attr('y2', function(d) { return this._yFn(d,dir,(this.height - this.margin.top - this.margin.bottom),0); }.bind(this))
         .attr('stroke', this._getColors.bind(this))
         .attr('stroke-width', function(d) {
           return (this.thresholdConfig[d.type] && this.thresholdConfig[d.type]['strokeWidth'] ) ?
@@ -282,7 +282,7 @@ Custom property | Description
     _mergeRect: function(d, i, elem, dir) {
       Px.d3.select(elem).select("rect.threshold-rect")
         .attr('x', function(d) { return this._xFn(d,dir,5,1); }.bind(this))
-        .attr('y', function(d) { return this._yFn(d,dir,2); }.bind(this))
+        .attr('y', function(d) { return this._yFn(d,dir,2,0); }.bind(this))
         .attr('transform', function(d) { return dir === 'horizontal' ? null : 'rotate(90 ' + (this.x(d.value) - 1) + ',2)'; }.bind(this))
         .attr('fill', function(d, i) {
           var type = d.type;
@@ -360,24 +360,12 @@ Custom property | Description
       }
       return c;
     },
-    /**
-     * Calculates a y-position for the text and rectangle.
-     *
-     * @method _calcYPos
-     */
-    _calcYPos: function(d,offset) {
-      offset = offset || 0;
-      // var mid = (this.currentDomainY[1] +  this.currentDomainY[0]) / 2,
-      //     val = (d.value < mid) ? this._getYVal(d) -1 + offset : this._getYVal(d) -17 + offset;
-      // return val;
-      return this._getYVal(d) -17 + offset;
-    },
 
-    _getYVal: function(d) {
+    _getYVal: function(d, dir) {
       if(typeof this.y === 'object') {
         // is for in our seriesConfig?
         if(this.completeSeriesConfig[d.for] && this.completeSeriesConfig[d.for]['axis'] && this.completeSeriesConfig[d.for]['axis']['id'] && this.y[this.completeSeriesConfig[d.for]['axis']['id']]) {
-          var axis = this.completeSeriesConfig[d.for]['axis']['id'];
+          const axis = this.completeSeriesConfig[d.for]['axis']['id'];
           return this.y[axis](d.value);
 
         // is for an axis?
@@ -390,9 +378,14 @@ Custom property | Description
         }
 
         console.warn("(๏̯͡๏ ) Invalid series or axis for threshold: " + JSON.stringify(d));
-        return -9999; //basicall hide it
+        return -9999; //basically hide it
         // TODO find a better solution for error case
       }
+
+      if(dir === 'horizontal' && this.y._scaleType === 'scaleBand') {
+        return this.y(d.value) + this.y.bandwidth();
+      }
+
       return this.y(d.value);
     },
 
@@ -442,7 +435,7 @@ Custom property | Description
     },
 
     _yFn: function(d, dir, vVal, adj) {
-      const v = dir === 'horizontal' ? this._calcYPos(d,adj) : vVal;
+      const v = dir === 'horizontal' ? this._getYVal(d, dir) + adj : vVal;
 
       if(isNaN(v)) {
         console.warn(`Cannot place threshold ${JSON.stringify(d)}. Check data & configuration.`)
