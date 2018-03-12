@@ -1652,12 +1652,29 @@ TODO implement a dev setting to choose between only showing data at that x, snap
               axisKey = (this.completeSeriesConfig[item.name]['axis'] && this.completeSeriesConfig[item.name]['axis']['id']) ? this.completeSeriesConfig[item.name]['axis']['id'] : null;
             }
 
-            item.coord = this._getCoordsForValues(item.value[this.completeSeriesConfig[item.name].x], item.value[this.completeSeriesConfig[item.name].y], axisKey);
-            this.tooltipData.seriesObj[item.name] = item;
+            //ask the chart scale to convert those data values to pixels
+            //this is synchronous
+            this.fire('px-vis-request-pixel-for-data', {callback: function(info) {
+                item.coord = info.pixel;
+                this.tooltipData.seriesObj[item.name] = item;
+              }.bind(this),
+                //data values
+                data: [item.value[this.completeSeriesConfig[item.name].x], item.value[this.completeSeriesConfig[item.name].y]],
+                //seriesName
+                series: item.name,
+                //charts margin are "outside" of the interaction space itself
+                //so we don't want them for this calculation
+                margin: {'top': 0, 'bottom':0, 'left':0, 'right': 0},
+                //for polar we want those coordinates to be relative to the
+                //center, not the top left corner
+                relativeToCenter: true}
+            );
 
             updated = true;
           }
         }.bind(this));
+
+
 
         if(updated) {
 

@@ -156,7 +156,7 @@
      * returns an object with pixel values and whether the values are
      * currently out of bounds in regards to the current domain
      */
-    getPixelFromData: function(data) {
+    getPixelFromData: function(data, relativeToCenter) {
       var domain = this.y.domain(),
           range = this.y.range(),
           domainTot = domain[1] - domain[0],
@@ -165,8 +165,12 @@
 
       result = this._getPixelCoordForRadialData(data[0], data[1], (range[1]-range[0]), domain, domainTot);
 
-      result[0] += this._center[0];
-      result[1] += this._center[1];
+      if(!relativeToCenter) {
+        //[0,0] is the center of the drawing, adjust to give the top left corner
+        // as [0,0]
+        result[0] += this._center[0];
+        result[1] += this._center[1];
+      }
 
       //do the out of bounds check on pixel values since zoom on radial
       //doesn't update the domain
@@ -209,7 +213,7 @@
     },
 
     _pixelRequest: function(evt) {
-      var res = this.getPixelFromData(evt.detail.data);
+      var res = this.getPixelFromData(evt.detail.data, evt.detail.relativeToCenter);
       evt.detail.callback(res);
     }
   },
