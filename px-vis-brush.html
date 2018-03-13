@@ -174,7 +174,7 @@ Custom property | Description
 
     observers: [
       'drawElement(domainChanged, svg, axis, height, selectedDomain, _animationFrameDone, _stylesUpdated)',
-      '_styleGradient(gradientOverlay, _colorGradientFunction)',
+      '_styleGradient(gradientOverlay, _gradientColorsFunction)',
       '_zoomBrush(chartDomain.*)',
       '_chartDomainChanged(chartDomain)'
     ],
@@ -288,7 +288,7 @@ Custom property | Description
       if(!this._isD3Empty(this._brushGroup)) {
         let overlay = this._brushGroup.select('rect.selection');
 
-        if(this.gradientOverlay && this._colorGradientFunction) {
+        if(this.gradientOverlay && this._gradientColorsFunction) {
           let gradient = this.svg.append('defs')
                 .append('linearGradient')
                 .attr('id', 'overlayGradient');
@@ -298,7 +298,7 @@ Custom property | Description
           for(let i=0; i<steps; i++) {
             gradient.append('stop')
               .attr('offset', (i*interval) + '%')
-              .attr('stop-color', this._colorGradientFunction((i*interval)/100));
+              .attr('stop-color', this._gradientColorsFunction((i*interval)/100));
           }
 
           //TODO: reintroduce css var
@@ -687,8 +687,8 @@ Custom property | Description
     },
 
     _chartDomainChanged: function() {
-      this.colorGradientMin = this.chartDomain[0];
-      this.colorGradientMax = this.chartDomain[1];
+      this.gradientColorsMin = this.chartDomain[0];
+      this.gradientColorsMax = this.chartDomain[1];
     }
   });
 </script>
