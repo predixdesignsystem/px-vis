@@ -1,3 +1,7 @@
+v4.7.7
+=================
+* Fixed bug where tooltip search on timeseries with prevent web worker would not return the timestamp
+
 v4.7.6
 =================
 * Fix bug in canvas line rendering with show gaps on
