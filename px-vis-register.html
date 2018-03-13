@@ -137,17 +137,19 @@ Custom property | Description
             </div>
 
             <!-- datetime -->
-            <div id="datetimeContainer" class$="[[_getSeriesWrapperClass(type, _hasScrollBar)]] [[_show(_showDateTime)]] u-ml- u-mr-" style="flex-grow:2">
-              <px-vis-register-datetime
-                class$="[[tooltipStyle]]"
-                first-date-time="[[_firstDateTime]]"
-                second-date-time="[[_secondDateTime]]"
-                separator="[[_separator]]"
-                x-axis-type="[[xAxisType]]"
-                series-key="[[_timeSeriesKey]]"
-                complete-series-config="[[completeSeriesConfig]]"
-              ></px-vis-register-datetime>
-            </div>
+            <template is="dom-if" if="{{_displayTime(xAxisType, forceDateTimeDisplay)}}">
+              <div id="datetimeContainer" class$="[[_getSeriesWrapperClass(type, _hasScrollBar)]] [[_show(_showDateTime)]] u-ml- u-mr-" style="flex-grow:2">
+                <px-vis-register-datetime
+                  class$="[[tooltipStyle]]"
+                  first-date-time="[[_firstDateTime]]"
+                  second-date-time="[[_secondDateTime]]"
+                  separator="[[_separator]]"
+                  x-axis-type="[[xAxisType]]"
+                  series-key="[[_timeSeriesKey]]"
+                  complete-series-config="[[completeSeriesConfig]]"
+                ></px-vis-register-datetime>
+              </div>
+            </template>
 
             <!-- sorting options -->
             <div id="sortingContainer" class$="[[_show(_sortTypes.length)]] flex flex--middle u-ml- u-mr-">
@@ -167,8 +169,8 @@ Custom property | Description
               </div>
             </div>
 
-            <!-- ?? -->
-            <div class$="[[_getSeriesWrapperClass(type, _hasScrollBar)]] [[_show(displayOrdinalValue)]] u-ml- u-mr-">
+            <!-- displays the ordinal set value -->
+            <div id="ordinalSet" class$="[[_getSeriesWrapperClass(type, _hasScrollBar)]] [[_show(displayOrdinalValue)]] u-ml- u-mr-">
               <div>[[tooltipData.ordinalSet]]&nbsp;</div>
             </div>
 

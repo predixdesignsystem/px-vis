@@ -2,96 +2,17 @@ document.addEventListener("WebComponentsReady", function() {
   runTests();
 });
 
-function getRegisterXYValues(register, subitemName, xOrdinal) {
-  var subName = subitemName ? subitemName : 'px-vis-register-item',
-      series = Polymer.dom(register.root).querySelectorAll(subName),
-      seriesData,
-      valueX,
-      valueY,
-      unit = '';
-
-  seriesData = Polymer.dom(series[0].root).querySelector('.seriesData');
-
-  var child = seriesData.firstChild,
-      curr = '';
-
-  while(child) {
-      if (child.nodeType === 3) { // nodeType === Node.TEXT_NODE
-        curr = child.nodeValue.trim();
-        unit += curr;
-      }
-
-      child = child.nextSibling;
-  }
-
-  var index = 0;
-  if(xOrdinal) {
-    valueX = Polymer.dom(seriesData.querySelector('#xSpan')).textContent.trim();
-  } else {
-    valueX = Polymer.dom(seriesData.querySelectorAll('px-number-formatter')[0].root).querySelector('span').textContent;
-    index++;
-  }
-
-  valueY = Polymer.dom(seriesData.querySelectorAll('px-number-formatter')[index].root).querySelector('span').textContent;
-
-  return {
-    'x': valueX,
-    'y': valueY,
-    'unit': unit
-  }
-}
-
-function getRegisterSingleValues(register, subitemName, isPie) {
-  var subName = subitemName ? subitemName : 'px-vis-register-item',
-      series = Polymer.dom(register.root).querySelectorAll(subName),
-      seriesData,
-      valueX,
-      valueY,
-      unit = '';
-
-  seriesData = Polymer.dom(series[0].root).querySelector('.seriesData');
-
-  var child = seriesData.firstChild,
-      curr = '';
-
-  while(child) {
-      if (child.nodeType === 3) { // nodeType === Node.TEXT_NODE
-        curr = child.nodeValue.trim();
-        unit += curr;
-      }
-
-      child = child.nextSibling;
-  }
-
-  if(isPie) {
-    value = seriesData.querySelector('span').textContent.trim();
-  } else {
-    value = Polymer.dom(seriesData.querySelectorAll('px-number-formatter')[0].root).querySelector('span').textContent.trim();
-  }
-
-
-  return {
-    'value': value,
-    'unit': unit
-  }
-}
-
 function runTests() {
-  suite('px-vis-register does Polymer exist?', function() {
-
-    suiteSetup(function(done) {   window.setTimeout(function() {done();}, 1000); });
-    test('Polymer exists', function() {
-      assert.isTrue(Polymer !== null);
-    });
-  });
-
+// ############################################################################
+// ############################################################################
   suite('px-vis-register emptyRegister has default config', function() {
     var emptyRegister;
 
     suiteSetup(function() {
       emptyRegister = document.getElementById('emptyRegister');
     });
-test('emptyRegister fixture is created', function() {
+
+    test('emptyRegister fixture is created', function() {
       assert.isTrue(emptyRegister !== null);
     });
 
@@ -105,8 +26,16 @@ test('emptyRegister fixture is created', function() {
     });
   });
 
+// ############################################################################
+// ############################################################################
   basicTests('verticalSeries','vertical');
+
+// ############################################################################
+// ############################################################################
   basicTests('horizontalSeries','horizontal');
+
+// ############################################################################
+// ############################################################################
 
   suite('px-vis-register passing in a muteSeries applies muted class to the series', function() {
     var doesItMute;
@@ -132,6 +61,9 @@ test('emptyRegister fixture is created', function() {
     });
 
   });
+
+// ############################################################################
+// ############################################################################
 
   suite('px-vis-register truncates names correctly', function() {
     var truncate,
@@ -193,6 +125,9 @@ test('emptyRegister fixture is created', function() {
     });
   });
 
+// ############################################################################
+// ############################################################################
+
   suite('px-vis-register formats time correctly', function() {
     var datetimeFormat;
 
@@ -213,6 +148,9 @@ test('emptyRegister fixture is created', function() {
     });
   });
 
+// ############################################################################
+// ############################################################################
+
   suite('px-vis-register formats units', function() {
     var numberFormat;
 
@@ -230,12 +168,14 @@ test('emptyRegister fixture is created', function() {
     });
 
     test('numberFormat formated', function() {
-      var value = getRegisterSingleValues(numberFormat);
+      var series = Polymer.dom(numberFormat.root).querySelector('px-vis-register-item');
 
-      assert.equal(value.value,'1015.20000');
-      assert.equal(value.unit,'yUnit');
+      assert.equal(series._displayedData, '1015.20000 yUnit');
     });
   });
+
+// ############################################################################
+// ############################################################################
 
   suite('px-vis-register formats language units', function() {
     var numberFormatCulture;
@@ -251,22 +191,13 @@ test('emptyRegister fixture is created', function() {
     });
 
     test('numberFormatCulture formated', function() {
-
-      var value;
-      async.until(
-        ()=> {
-          value = getRegisterSingleValues(numberFormatCulture);
-          return value.value === '1.015,20' && value.unit === 'yUnit';
-        },
-        (callback)=> {
-          setTimeout(callback, 1000);
-        },
-        ()=> {
-          assert.isTrue(true);
-        }
-      )
+      var series = Polymer.dom(numberFormatCulture.root).querySelector('px-vis-register-item');
+      assert.equal(series._displayedData, '1.015,20 yUnit');
     });
   });
+
+// ############################################################################
+// ############################################################################
 
   suite('px-vis-register shows both values if x axis is not time based', function() {
     var register;
@@ -289,16 +220,13 @@ test('emptyRegister fixture is created', function() {
     });
 
     test('nonTime formated', function() {
-
-      var values = getRegisterXYValues(register);
-      var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item'),
-          texts = Polymer.dom(series[0].root).querySelector('.seriesData').textContent.trim().replace(/\r?\n|\r/g, "").split(' ').join('').split('/');
-
-      assert.equal(values.x,'1,419,064,667,000.00');
-      assert.equal(values.y,'1,015.20');
-      assert.equal(values.unit, 'xUnit /yUnit')
+      var series = Polymer.dom(register.root).querySelector('px-vis-register-item');
+      assert.equal(series._displayedData, '1,419,064,667,000.00 xUnit / 1,015.20 yUnit');
     });
   });
+
+// ############################################################################
+// ############################################################################
 
   suite('px-vis-register shows both values if x axis is ordinal', function() {
     var register;
@@ -321,13 +249,13 @@ test('emptyRegister fixture is created', function() {
     });
 
     test('ordinal formated', function() {
-      var values = getRegisterXYValues(register, 'px-vis-register-item' , true);
-
-      assert.equal(values.x,'StringyString');
-      assert.equal(values.y,'1,015.20');
-      assert.equal(values.unit, 'xUnit /yUnit');
+      var series = Polymer.dom(register.root).querySelector('px-vis-register-item');
+      assert.equal(series._displayedData, 'StringyString xUnit / 1,015.20 yUnit');
     });
   });
+
+// ############################################################################
+// ############################################################################
 
   suite('px-vis-register non time based by default', function() {
     var register;
@@ -350,13 +278,13 @@ test('emptyRegister fixture is created', function() {
     });
 
     test('nonTime formated', function() {
-      var values = getRegisterXYValues(register);
-
-      assert.equal(values.x,'1,419,064,667,000.00');
-      assert.equal(values.y,'1,015.20');
-      assert.equal(values.unit, 'xUnit /yUnit');
+      var series = Polymer.dom(register.root).querySelector('px-vis-register-item');
+      assert.equal(series._displayedData, '1,419,064,667,000.00 xUnit / 1,015.20 yUnit');
     });
   });
+
+// ############################################################################
+// ############################################################################
 
   suite('px-vis-register for pie', function() {
     var register;
@@ -375,7 +303,9 @@ test('emptyRegister fixture is created', function() {
     });
 
     test('pie formated with unit', function() {
-      var value = getRegisterSingleValues(register, 'px-vis-register-item-pie', true);
+      var series = Polymer.dom(register.root).querySelector('px-vis-register-item');
+
+      var value = getPieValues(register);
 
       assert.equal(value.value,'1015.2');
       assert.equal(value.unit,'xUnit');
@@ -386,7 +316,7 @@ test('emptyRegister fixture is created', function() {
       register.usePercentage = true;
 
       flush(function(){
-        var value = getRegisterSingleValues(register, 'px-vis-register-item-pie', true);
+        var value = getPieValues(register);
 
         assert.equal(value.value,'12');
         assert.equal(value.unit,'%');
@@ -395,6 +325,8 @@ test('emptyRegister fixture is created', function() {
     });
   });
 
+// ############################################################################
+// ############################################################################
 
   suite('px-vis-register with dashPattern', function() {
     var dashPattern;
@@ -412,11 +344,10 @@ test('emptyRegister fixture is created', function() {
     });
 
     test('dashPattern is correct', function() {
-      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value,
-          series = Polymer.dom(dashPattern.root).querySelectorAll('px-vis-register-item'),
+      let series = Polymer.dom(dashPattern.root).querySelectorAll('px-vis-register-item'),
 
-          color0 = colorSet[0],
-          color1 = colorSet[1],
+          color0 = getColor(0),
+          color1 = getColor(1),
 
           pattern0 = Polymer.dom(series[0].root).querySelector('.seriesMarkerIcon').getAttribute('style'),
           pattern1 = Polymer.dom(series[1].root).querySelector('.seriesMarkerIcon').getAttribute('style'),
@@ -459,7 +390,79 @@ test('emptyRegister fixture is created', function() {
 
     });
   });
+
+// ############################################################################
+// ############################################################################
+
+  suite('px-vis-register displays only y', function() {
+    var register;
+
+    suiteSetup(function(done) {
+      register = document.getElementById('yOnly');
+      var data = generateOrdinalDataValues( generateEmptyData(2) );
+      register.setProperties({
+        displayYValuesOnly: true,
+        displayOrdinalValue: true
+      });
+      setData(register, data);
+      window.setTimeout(function() {
+        done();
+      }, 150);
+    });
+
+    test('onlyY fixtures are created', function() {
+      assert.isTrue(register !== null);
+    });
+
+    test('onlyY doesnt show date', function() {
+      assert.isNull(Polymer.dom(register.root).querySelector('px-vis-register-datetime'));
+    });
+
+    test('onlyY formated', function() {
+      var series = Polymer.dom(register.root).querySelector('px-vis-register-item');
+      assert.equal(series._displayedData, '1,015.20 yUnit');
+    });
+
+    test('onlyY displays ordinal set', function() {
+      var set = Polymer.dom(register.root).querySelector('#ordinalSet');
+      assert.equal(set.textContent.trim(), 'StringyString');
+    });
+  });
+
+  suite('px-vis-register displays bi-color bar when negativeColor is defined', function() {
+    var register;
+
+    suiteSetup(function(done) {
+      register = document.getElementById('negative');
+      var data = generateOrdinalDataValues( generateEmptyData(2) );
+
+      data.completeSeriesConfig.series_0.negativeColor = 'rgb(255,0,0)';
+
+      setData(register, data);
+      window.setTimeout(function() {
+        done();
+      }, 150);
+    });
+
+    test('onlyY fixtures are created', function() {
+      assert.isTrue(register !== null);
+    });
+
+    test('bi-color is correct', function() {
+      var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item');
+
+      assert.equal(Polymer.dom(series[0].root).querySelector('.seriesMarkerIcon').getAttribute('style').split(' ').join('').split(';')[0], 'background:linear-gradient(rgb(0,0,0)50%,rgb(255,0,0)50%)');
+      assert.equal(Polymer.dom(series[1].root).querySelector('.seriesMarkerIcon').getAttribute('style').split(' ').join('').split(';')[0], 'background-color:' + getColor(1));
+    });
+  });
 }
+
+/*
+################################################################################
+######## BASIC TESTS ###########################################################
+################################################################################
+*/
+
 
 function basicTests(registerID,dir){
   var register = document.getElementById(registerID);
@@ -493,21 +496,17 @@ function basicTests(registerID,dir){
     });
 
     test(registerID + ' colors are correct', function() {
-
-      var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
-
       var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item');
-      for(var i = 0; i < series.length-1; i++){
-        assert.equal(Polymer.dom(series[i].root).querySelector('.seriesMarkerIcon').getAttribute('style').split(' ').join('').split(';')[0], 'background-color:' + colorSet[i]);
+      for(var i = 0; i < series.length; i++){
+        assert.equal(Polymer.dom(series[i].root).querySelector('.seriesMarkerIcon').getAttribute('style').split(' ').join('').split(';')[0], 'background-color:' + getColor(i));
       }
-
-      assert.equal(Polymer.dom(series[series.length-1].root).querySelector('.seriesMarkerIcon').getAttribute('style').split(' ').join('').split(';')[0], 'background-color:transparent');
     });
 
   });
 
   suite('px-vis-register ' + registerID + ' update data on series  -- simulating on-chart-hover', function() {
     var data;
+
     suiteSetup(function(done) {
       data = generateDataValues( generateEmptyData(5) );
       setData(register, data);
@@ -534,16 +533,10 @@ function basicTests(registerID,dir){
     });
 
     test(registerID + ' values match', function() {
-      var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item'),
-          seriesData,
-          value,
-          unit;
+      var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item');
+
       for(var i = 0; i < series.length; i++){
-        seriesData = Polymer.dom(series[i].root).querySelector('.seriesData');
-        unit = seriesData.lastChild.textContent.trim();
-        value = Polymer.dom(seriesData.querySelector('px-number-formatter').root).querySelector('span').innerText;
-        assert.equal(value, '1,015.20');
-        assert.equal(unit, 'yUnit');
+        assert.equal(series[i]._displayedData, '1,015.20 yUnit');
       }
     });
   });
@@ -654,89 +647,95 @@ function basicTests(registerID,dir){
     });
 
     test('showZero formated', function() {
-      var values = getRegisterXYValues(register);
+      var series = Polymer.dom(register.root).querySelector('px-vis-register-item');
 
-      assert.equal(values.x, '0');
-      assert.equal(values.y, '0');
-      assert.equal(values.unit, 'xUnit /yUnit');
+      assert.equal(series._displayedData, '0 xUnit / 0 yUnit');
     });
   });
 }
 
 function generateEmptyData(num,str){
-
-  var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
   var str = str || 'series_';
   var chartData = [];
   var dataObj = {
-    'time': null,
-    'series': []
+    time: null,
+    series: [],
+    seriesObj: {}
   };
   var seriesConfig = {};
   for(var i = 0; i < num; i++){
     var name = str + i;
     seriesConfig[name] = {
-      'name': name,
-      'color': colorSet[i],
-      'x': 'x',
-      'y': 'y',
-      'xAxisUnit': 'xUnit',
-      'yAxisUnit': 'yUnit'
+      name: name,
+      color: getColor(i),
+      x: 'x',
+      y: 'y',
+      xAxisUnit: 'xUnit',
+      yAxisUnit: 'yUnit'
     };
 
     dataObj.series[i] = {
-      "name": name,
-      "value": null
+      name: name,
+      value: null
     };
   }
 
   return { 'data':dataObj,'completeSeriesConfig':seriesConfig };
 }
 
-function generateDataValues(data){
+function generateDataValues(data) {
   data.data.time = new Date('Sat Dec 20 2014 00:37:47 GMT-0800 (PST)');
 
-  for(var i = 0; i < data.data.series.length; i++){
-    data.data.series[i]['value'] = {
-      "x": Number(data.data.time),
-      "y": 1015.2
+  for(var i = 0; i < data.data.series.length; i++) {
+    const n = data.data.series[i]['name'];
+    const v = {
+      x: Number(data.data.time),
+      y: 1015.2
     };
+
+    data.data.series[i]['value'] = v;
+    data.data.seriesObj[n] = { value: v};
   }
   return data;
 }
 
-function generateOrdinalDataValues(data){
-
-  for(var i = 0; i < data.data.series.length; i++){
-    data.data.series[i]['value'] = {
-      "x": "StringyString",
-      "y": 1015.2
-    };
+function generateOrdinalDataValues(data) {
+  let v = {
+    x: 'StringyString',
+    y: 1015.2
+  };
+  data.data.ordinalSet = 'StringyString';
+  for(var i = 0; i < data.data.series.length; i++) {
+    const n = data.data.series[i]['name'];
+    data.data.series[i]['value'] = v;
+    data.data.seriesObj[n] = { value: v};
   }
   return data;
 }
 
-function generatePieDataValues(data){
+function generatePieDataValues(data) {
+  let v = {
+    x:  1015.2,
+    y: 'somestring',
+    percentage: 12
+  };
 
   for(var i = 0; i < data.data.series.length; i++){
-    data.data.series[i] = {
-      "x":  1015.2,
-      "y": "somestring",
-      "percentage": 12
-    };
+    const n = data.data.series[i]['name'];
+    data.data.series[i] = v;
+    data.data.seriesObj[n] = { value: v};
   }
   return data;
 }
 
 function setData(series, data, done){
-  series.set('tooltipData',{});
   series.set('completeSeriesConfig',data.completeSeriesConfig);
   series.set('tooltipData',data.data);
   series.set('chartData',data.data.series);
 
   // pause and let the dom repeate chug away
   window.setTimeout(function() {
-    if(done){ done(); }
+    if(done) { done(); }
   }, 50);
 }
 
@@ -748,4 +747,45 @@ function setMutedSeries(series, name, done){
   window.setTimeout(function(){
     if(done){ done(); }
   },50);
+}
+
+function getColor(i) {
+  const colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
+  let l = colorSet.length,
+      index = _calcIndex(i,l);
+
+  return colorSet[ index ];
+}
+
+function _calcIndex(i, l) {
+  return i < l ? i : this._calcIndex(i - l,l);
+}
+
+function getPieValues(register) {
+  var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item-pie'),
+      seriesData,
+      value,
+      unit = '';
+
+  seriesData = Polymer.dom(series[0].root).querySelector('.seriesData');
+
+  var child = seriesData.firstChild,
+      curr = '';
+
+  while(child) {
+      if (child.nodeType === 3) { // nodeType === Node.TEXT_NODE
+        curr = child.nodeValue.trim();
+        unit += curr;
+      }
+
+      child = child.nextSibling;
+  }
+
+  value = seriesData.querySelector('span').textContent.trim();
+
+
+  return {
+    'value': value,
+    'unit': unit
+  }
 }
