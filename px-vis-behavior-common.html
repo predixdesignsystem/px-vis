@@ -3597,42 +3597,49 @@ PxVisBehavior.gradientColorsFunction = [{
     },
     _colorGradientFunction: {
       type: Function,
-      computed: '_computeColorGradientFunction(colorGradient, colorGradientMin, colorGradientMax)'
+      computed: '_computeColorGradientFunction(colorGradient)'
     }
   },
 
-  _computeColorGradientFunction: function() {
-    if(this.colorGradient) {
-      if(typeof this.colorGradient === 'String') {
-        return function() {
-          return this.colorGradient;
-        }
-      } else if(Array.isArray(this.colorGradient)) {
+  createGradientFunction: function(colors) {
 
-        if(this.colorGradient.length === 2) {
+    if(colors) {
+      if(typeof colors === 'string') {
+        return function() {
+          return colors;
+        }
+      } else if(Array.isArray(colors)) {
+
+        if(colors.length === 2) {
           return function(val) {
-            return Px.d3.interpolateRgb(this.colorGradient[0], this.colorGradient[1])(this._normalizeGradientValue(val));
-          };
+            return Px.d3.interpolateRgb(colors[0], colors[1])(this._normalizeValue(val));
+          }.bind(this);
         } else {
           return function(val) {
-            return Px.d3.interpolateRgbBasis(this.colorGradient)(this._normalizeGradientValue(val));
-          };
+            return Px.d3.interpolateRgbBasis(colors)(this._normalizeValue(val));
+          }.bind(this);
         }
-      } else if(typeof this.colorGradient === 'function') {
-        return this.colorGradient;
+      } else if(typeof colors === 'function') {
+        return colors;
       } else {
-        console.warn('Color gradient ' + this.colorGradient + ' has an invalid type. Should be string, array or function');
+        console.warn('Color gradient ' + colors + ' has an invalid type. Should be string, array or function');
       }
     }
   },
 
-  _normalizeGradientValue: function(val) {
-    if(this.colorGradientMax === this.colorGradientMin) {
+  _computeColorGradientFunction: function() {
+
+    return this.createGradientFunction(this.colorGradient);
+  },
+
+  _normalizeValue: function(val) {
+    if(this.colorGradientMin === this.colorGradientMax) {
       return 0;
     } else {
-      return val / (this.colorGradientMax - this.colorGradientMin);
+      return (val - this.colorGradientMin) / (this.colorGradientMax - this.colorGradientMin);
     }
   }
-},PxVisBehavior.colorGradient];
+
+}, PxVisBehavior.colorGradient];
 
 </script>

@@ -158,25 +158,15 @@
       if(this.gradientLine) {
         //gradient line
         this._currentDrawingOptions.getColorValue = function(d) {
-          var opacity = this._isSerieMuted(d) ? this._currentDrawingOptions.mutedOpacity : this._opacityLine(d);
-          if(opacity !== 0) {
-            return this._canvasLineColor(d, opacity);
-          } else {
-            return null;
-          }
-        }.bind(this);
-
-      } else if(this.categoryKey) {
-        //category color line
-        this._currentDrawingOptions.getColorValue = function(d) {
+          console.log('get color')
           var opacity = this._isSerieMuted(d) ? this._currentDrawingOptions.mutedOpacity : 1;
+
           if(opacity !== 0) {
             return this._canvasLineColor(d, opacity);
           } else {
             return null;
           }
         }.bind(this);
-
       }
     },
 
@@ -272,9 +262,11 @@
         //just access each point by the appropriate index
         for(var i = start; i < stop; i++) {
           color = this._currentDrawingOptions.getColorValue(this.chartData[i]);
+          opacity = this._isSerieMuted(this.chartData[i]) ? this._currentDrawingOptions.mutedOpacity : 1;
           if(color) {
             this.canvasContext.beginPath();
             this.canvasContext.strokeStyle = color;
+            this.canvasContext.globalAlpha = opacity;
             this.line(this.chartData[i]);
             this.canvasContext.stroke();
           }
@@ -286,6 +278,7 @@
         if(!this.multiPath) {
           opacity = this._isSerieMuted(data) ? this._currentDrawingOptions.mutedOpacity : 1;
           if(opacity !== 0) {
+            this.canvasContext.globalAlpha = opacity;
             this.line(data);
           }
         } else {
@@ -306,7 +299,8 @@
         this.canvasContext.setLineDash(dashPattern);
 
         //only strike once
-        this.canvasContext.strokeStyle = this.rgbToRgba(this.completeSeriesConfig[this.seriesId]['color'], opacity);
+        this.canvasContext.strokeStyle = this.completeSeriesConfig[this.seriesId]['color'];
+        this.canvasContext.globalAlpha = opacity;
         this.canvasContext.stroke();
       }
 
@@ -332,23 +326,9 @@
       // check that we want to draw that category
       if(this._colorArr[key]) {
         // return the appropriate rgba
-        return 'rgba(' + this._colorArr[key]['r'] + ',' + this._colorArr[key]['g'] + ',' + this._colorArr[key]['b'] + ',' + opacity + ')';
+        return this._colorArr[key](d[this.seriesId]);
       }
       return null;
-    },
-
-    /**
-     * Adds alpha to an rgb value.
-     *
-     * @method rgbToRgba
-     */
-    rgbToRgba: function(rgb, opacity) {
-      //assuming rgb is correctly formatted...
-      //remove ')'
-      var result = rgb.slice(0,rgb.length-1);
-      //add 'a' for 'rgba'
-      result = 'rgba' + result.slice(3);
-      return result + ',' + opacity + ')';
     }
   });
 </script>
