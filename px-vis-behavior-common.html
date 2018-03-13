@@ -3547,24 +3547,40 @@ PxVisBehavior.showHideClasses = {
 
 /**
     Name:
-    PxVisBehavior.gradientColors
+    PxVisBehavior.colorGradient
 
     Description:
-    Polymer behavior that allows configuration and use of a color gradient
+    Polymer behavior that defines the color gradient Array/String/Function input
 
 
-    @polymerBehavior PxVisBehavior.gradientColors
+    @polymerBehavior PxVisBehavior.colorGradient
 */
-PxVisBehavior.gradientColors = {
+PxVisBehavior.colorGradient = {
   properties: {
     /**
      * TODO: DOCUMENTATION
      *  Color array, 1 color string or function
      * @type {Array|String|Function}
      */
-    colorGradient: {
+     colorGradient: {
       type: Array
-    },
+    }
+  }
+};
+
+/**
+    Name:
+    PxVisBehavior.gradientColorsFunction
+
+    Description:
+    Polymer behavior that defines the color gradient function based on an
+    Array/String/Function input
+
+
+    @polymerBehavior PxVisBehavior.gradientColorsFunction
+*/
+PxVisBehavior.gradientColorsFunction = [{
+  properties: {
     /**
      *
      */
@@ -3587,11 +3603,11 @@ PxVisBehavior.gradientColors = {
 
   _computeColorGradientFunction: function() {
     if(this.colorGradient) {
-      if(typeof this.colorGradient === 'string') {
+      if(typeof this.colorGradient === 'String') {
         return function() {
           return this.colorGradient;
         }
-      } else if(typeof this.colorGradient === 'array') {
+      } else if(Array.isArray(this.colorGradient)) {
 
         if(this.colorGradient.length === 2) {
           return function(val) {
@@ -3610,13 +3626,13 @@ PxVisBehavior.gradientColors = {
     }
   },
 
-  _normalizeGradientValue: function() {
+  _normalizeGradientValue: function(val) {
     if(this.colorGradientMax === this.colorGradientMin) {
       return 0;
     } else {
       return val / (this.colorGradientMax - this.colorGradientMin);
     }
   }
-}
+},PxVisBehavior.colorGradient];
 
 </script>

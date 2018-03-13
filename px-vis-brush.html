@@ -80,7 +80,8 @@ Custom property | Description
       PxVisBehaviorD3.selectedDomain,
       PxVisBehavior.commonMethods,
       PxVisBehaviorD3.domainUpdate,
-      PxVisBehavior.updateStylesOverride
+      PxVisBehavior.updateStylesOverride,
+      PxVisBehavior.gradientColorsFunction
     ],
 
     /**
@@ -175,7 +176,9 @@ Custom property | Description
 
     observers: [
       'drawElement(domainChanged, svg, axis, height, selectedDomain, _animationFrameDone, _stylesUpdated)',
-      '_zoomBrush(chartDomain.*)'
+      '_styleGradient(gradientOverlay, _colorGradientFunction)',
+      '_zoomBrush(chartDomain.*)',
+      '_chartDomainChanged(chartDomain)'
     ],
 
     detached: function() {
@@ -229,14 +232,14 @@ Custom property | Description
           this._brush = Px.d3.brushX()
             .extent(range)
             .handleSize(6)
-            .on("start", this._brushstart.bind(this))
-            .on("brush", this._brushmove.bind(this))
-            .on("end", this._brushend.bind(this));
+            .on('start', this._brushstart.bind(this))
+            .on('brush', this._brushmove.bind(this))
+            .on('end', this._brushend.bind(this));
 
             this._preventDomainChange = true;
           // now that we have our new g, proceed with drawing brush
-          this._brushGroup = this.svg.append("g")
-            .attr("class", "brush")
+          this._brushGroup = this.svg.append('g')
+            .attr('class', 'brush')
             .call(this._brush)
             .call(this._brush.move, axisRange);
 
@@ -244,34 +247,14 @@ Custom property | Description
             There are actually two boxes, .selection and .overlay:
             overlay captures the mouse events; selection is what is visible
           */
-          var overlay = this._brushGroup.select("rect.selection")
-            .attr("y", 0)
-            .attr('stroke', this._checkThemeVariable("--px-vis-nav-brush-outline-color", 'rgb(0,0,0)'))
+          this._brushGroup.select('rect.selection')
+            .attr('y', 0)
+            .attr('stroke', this._checkThemeVariable('--px-vis-nav-brush-outline-color', 'rgb(0,0,0)'))
             .attr('stroke-width',1)
             .attr('shape-rendering','crispEdges')
-            .attr("clip-path", 'url(#' + this._clipPathId + ')');
+            .attr('clip-path', 'url(#' + this._clipPathId + ')');
 
-          if(this.gradientOverlay){
-            var gradient = this.svg.append("defs")
-              .append("linearGradient")
-              .attr("id", "overlayGradient");
-
-            gradient.append("stop")
-              .attr("offset", "0%")
-              .attr("stop-color", this._checkThemeVariable("--px-vis-nav-brush-gradient-fill-color", 'rgb(0,0,0)'))
-              .attr("stop-opacity", this._checkThemeVariable("--px-vis-nav-brush-gradient-opacity-1", 0.2));
-
-            gradient.append("stop")
-              .attr("offset", "100%")
-              .attr("stop-color", this._checkThemeVariable("--px-vis-nav-brush-gradient-fill-color", 'rgb(0,0,0)'))
-              .attr("stop-opacity", this._checkThemeVariable("--px-vis-nav-brush-gradient-opacity-2", 0.8));
-
-            overlay.attr('fill','url(#overlayGradient)')
-              .attr('fill-opacity','1.0');
-          } else {
-            overlay.attr('fill',this._checkThemeVariable("--px-vis-nav-brush-fill-color", 'rgb(0,0,0)'))
-              .attr('fill-opacity', this._checkThemeVariable("--px-vis-nav-brush-opacity", 0.3));
-          }
+          this._styleGradient();
 
           this._drawHandles(heightOffset);
 
@@ -298,6 +281,36 @@ Custom property | Description
             this._brushGroup
               .call(this._brush.move, axisRange);
           }
+        }
+      }
+    },
+
+    _styleGradient: function() {
+
+      if(!this._isD3Empty(this._brushGroup)) {
+        let overlay = this._brushGroup.select('rect.selection');
+
+        if(this.gradientOverlay && this._colorGradientFunction) {
+          let gradient = this.svg.append('defs')
+                .append('linearGradient')
+                .attr('id', 'overlayGradient');
+
+          let steps = 100,
+              interval = 100/steps;
+          for(let i=0; i<steps; i++) {
+            gradient.append('stop')
+              .attr('offset', (i*interval) + '%')
+              .attr('stop-color', this._colorGradientFunction((i*interval)/100));
+          }
+
+          //TODO: reintroduce css var
+          overlay.attr('fill','url(#overlayGradient)')
+            .attr('fill-opacity', 0.5);
+          // overlay.attr('fill','url(#overlayGradient)')
+          //   .attr('fill-opacity', this._checkThemeVariable("--px-vis-nav-brush-opacity", 0.3));
+        } else {
+          overlay.attr('fill',this._checkThemeVariable("--px-vis-nav-brush-fill-color", 'rgb(0,0,0)'))
+            .attr('fill-opacity', this._checkThemeVariable("--px-vis-nav-brush-opacity", 0.3));
         }
       }
     },
@@ -674,5 +687,10 @@ Custom property | Description
         }
       }
     },
+
+    _chartDomainChanged: function() {
+      this.colorGradientMin = this.chartDomain[0];
+      this.colorGradientMax = this.chartDomain[1];
+    }
   });
 </script>
