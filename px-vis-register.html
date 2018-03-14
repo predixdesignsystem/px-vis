@@ -137,17 +137,19 @@ Custom property | Description
             </div>
 
             <!-- datetime -->
-            <div id="datetimeContainer" class$="[[_getSeriesWrapperClass(type, _hasScrollBar)]] [[_show(_showDateTime)]] u-ml- u-mr-" style="flex-grow:2">
-              <px-vis-register-datetime
-                class$="[[tooltipStyle]]"
-                first-date-time="[[_firstDateTime]]"
-                second-date-time="[[_secondDateTime]]"
-                separator="[[_separator]]"
-                x-axis-type="[[xAxisType]]"
-                series-key="[[_timeSeriesKey]]"
-                complete-series-config="[[completeSeriesConfig]]"
-              ></px-vis-register-datetime>
-            </div>
+            <template is="dom-if" if="{{_displayTime(xAxisType, forceDateTimeDisplay)}}">
+              <div id="datetimeContainer" class$="[[_getSeriesWrapperClass(type)]] [[_show(_showDateTime)]] [[_dateTimeClass(_isVertical, _sortTypes.length, displayOrdinalValue)]]" style="flex-grow:2">
+                <px-vis-register-datetime
+                  class$="[[tooltipStyle]]"
+                  first-date-time="[[_firstDateTime]]"
+                  second-date-time="[[_secondDateTime]]"
+                  separator="[[_separator]]"
+                  x-axis-type="[[xAxisType]]"
+                  series-key="[[_timeSeriesKey]]"
+                  complete-series-config="[[completeSeriesConfig]]"
+                ></px-vis-register-datetime>
+              </div>
+            </template>
 
             <!-- sorting options -->
             <div id="sortingContainer" class$="[[_show(_sortTypes.length)]] flex flex--middle u-ml- u-mr-">
@@ -167,17 +169,17 @@ Custom property | Description
               </div>
             </div>
 
-            <!-- ?? -->
-            <div class$="[[_getSeriesWrapperClass(type, _hasScrollBar)]] [[_show(displayOrdinalValue)]] u-ml- u-mr-">
+            <!-- displays the ordinal set value -->
+            <div id="ordinalSet" class$="[[_getSeriesWrapperClass(type, _hasScrollBar)]] [[_show(displayOrdinalValue)]] u-ml- u-mr-">
               <div>[[tooltipData.ordinalSet]]&nbsp;</div>
             </div>
 
           </div>
 
-          <div id="seriesWrap" class$="[[_getSeriesWrapperClassReverse(type)]]">
+          <div id="seriesWrap" class$="[[_getSeriesWrapperClassReverse(type)]] [[_seriesWrapPadding(_isVertical)]]">
             <template is="dom-if" if="[[!_isOfType(xAxisType, 'pie')]]">
               <template is="dom-repeat" items="[[_series]]" as="_groups">
-                <div class$="[[_getSeriesWrapperClass(type, _hasScrollBar)]] [[_itemWrapClass(_isVertical)]] u-ml- u-mr-">
+                <div class$="[[_getSeriesWrapperClass(type)]] [[_itemWrapClass(_isVertical)]] u-ml- u-mr-">
                   <template is="dom-repeat" id="itemRepeat" items="[[_groups]]" rendered-item-count="{{_itemCount}}">
                     <px-vis-register-item
                       class$="[[tooltipStyle]] [[_itemClass(_isVertical)]]"
@@ -209,7 +211,7 @@ Custom property | Description
             <!-- For pie charts -->
             <template is="dom-if" if="[[_isOfType(yAxisType, 'pie')]]">
               <div class$="[[_getSeriesWrapperClassReverse(type)]]">
-                <div class$="[[_getSeriesWrapperClass(type, _hasScrollBar)]]">
+                <div class$="[[_getSeriesWrapperClass(type)]]">
                   <template is="dom-repeat" id="pieItemRepeat" items="[[chartData]]" rendered-item-count="{{_itemCount}}">
                     <px-vis-register-item-pie
                       item="[[item]]"
@@ -238,7 +240,7 @@ Custom property | Description
           <div style="flex-grow:2"></div>
 
           <!-- vertical pagination -->
-          <div class$="[[_show(displayPageArrows, _isVertical)]] [[_hide(hidePaginationControls)]] flex flex--justify u-ml- u-mr-">
+          <div id="verticalPagnation" class$="[[_show(displayPageArrows, _isVertical)]] [[_hide(hidePaginationControls)]] flex flex--justify u-ml- u-mr-">
             <button class="actionable" on-click="_leftPage">
               <px-icon class="smallerIcon" icon="px-nav:back"></px-icon>
             </button>
@@ -249,6 +251,7 @@ Custom property | Description
           </div>
 
         </div>
+        <!-- other horizontal pagination -->
         <div class$="[[_show(_isHorizontal)]] [[_hide(hidePaginationControls)]] borderLeft flex paginateButton flex--center">
           <button class$="[[_show(displayPageArrows)]] actionable flex__item--middle" on-click="_rightPage">
             <px-icon icon="px-nav:next"></px-icon>
@@ -824,10 +827,29 @@ Custom property | Description
 
     _registerWrapClass: function() {
       if(this._isHorizontal) {
-        return 'fullWidth';
+        return 'fullWidth ';
       } else {
         return '';
       }
+    },
+
+    _seriesWrapPadding: function() {
+      if(this._isVertical) {
+        return 'u-pt- ';
+      } else {
+        return '';
+      }
+    },
+
+    _dateTimeClass: function() {
+      var base = 'u-ml- u-mr- ';
+
+      //add bottom padding if datetime is the only thing we show in the header
+      if((!this.sortTypes || this.sortTypes.length === 0) && !this.displayOrdinalValues && this._isVertical) {
+        base += 'u-mb-- '
+      }
+
+      return base;
     },
 
     _computeHasHeaderData: function() {

@@ -25,7 +25,8 @@ function runTests(){
           "bottom": 20,
           "left": 15
         },
-        completeSeriesConfig = {"mySeries":{
+        completeSeriesConfig = {
+        "mySeries":{
           "type":"line",
           "name":"mySeries",
           "x":"x",
@@ -229,6 +230,10 @@ function addTooltipTests(elem,hLine,vLine,circle,hX2,hTransformArr,vTransform,cA
           {'name':'mySeries1','coord': [240,170] },
           {'name':'mySeries2','coord': [240,240] },
         ],
+        'seriesObj': {
+          mySeries: {'coord': [240,170] },
+          mySeries2: {'coord': [240,240] }
+        },
         'mouse': [260,150],
         'xArr': [240,240],
         'yArr': [170,240]
@@ -301,6 +306,7 @@ function removeTooltipTests(elem){
           {'name':'mySeries1' },
           {'name':'mySeries2' },
         ],
+        seriesObj: {},
         'mouse': null,
         'xArr': null,
         'yArr': null

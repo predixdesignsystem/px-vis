@@ -1148,7 +1148,6 @@ function runTests(){
           tooltipSVG,
           tooltipPoint;
 
-
       var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
 
       suiteSetup(function(done) {
@@ -1171,11 +1170,11 @@ function runTests(){
       });
 
       test('tooltipPoint created defaultEmptyData', function() {
-        assert.deepEqual(tooltipPoint.defaultEmptyData, {"time":1397160780000,"timeSeriesKey":null,"hidden":true,"series":[{"name":"mySeries","value":{"x":3,"y0":4},"coord":[240,162]},{"name":"mySeries2","value":{"x":3,"y1":8},"coord":[240,54]}],"mouse":[240,162],"xArr":[],"yArr":[],"rawData":[],"timeStamps":[],"timeStampsTracker":{}});
+        assert.deepEqual(tooltipPoint.defaultEmptyData, {"time":1397160780000,"timeSeriesKey":null,"hidden":true,"series":[{"name":"mySeries","value":{"x":3,"y0":4},"coord":[240,162]},{"name":"mySeries2","value":{"x":3,"y1":8},"coord":[240,54]}],"seriesObj":{"mySeries":{"name":"mySeries","value":{"x":3,"y0":4},"coord":[240,162]},"mySeries2":{"name":"mySeries2","value":{"x":3,"y1":8},"coord":[240,54]}},"mouse":[240,162],"xArr":[],"yArr":[],"rawData":[],"timeStamps":[],"timeStampsTracker":{},"additionalPoints":[]});
       });
 
       test('tooltipPoint created tooltipData', function() {
-        assert.deepEqual(tooltipPoint.tooltipData, {"time":1397160780000,"timeSeriesKey":null,"hidden":true,"series":[{"name":"mySeries","value":{"x":3,"y0":4},"coord":[240,162]},{"name":"mySeries2","value":{"x":3,"y1":8},"coord":[240,54]}],"mouse":[240,162],"xArr":[],"yArr":[],"rawData":[],"timeStamps":[],"timeStampsTracker":{}});
+        assert.deepEqual(tooltipPoint.tooltipData, {"time":1397160780000,"timeSeriesKey":null,"hidden":true,"series":[{"name":"mySeries","value":{"x":3,"y0":4},"coord":[240,162]},{"name":"mySeries2","value":{"x":3,"y1":8},"coord":[240,54]}],"seriesObj":{"mySeries":{"name":"mySeries","value":{"x":3,"y0":4},"coord":[240,162]},"mySeries2":{"name":"mySeries2","value":{"x":3,"y1":8},"coord":[240,54]}},"mouse":[240,162],"xArr":[],"yArr":[],"rawData":[],"timeStamps":[],"timeStampsTracker":{},"additionalPoints":[]});
       });
 
     }); //suite
@@ -1207,7 +1206,7 @@ function runTests(){
       });
 
       test('tooltipPoint emptied tooltipData', function() {
-        assert.deepEqual(tooltipPoint.tooltipData, {"time":null,"timeSeriesKey":null,"hidden":true,"series":[{"name":"mySeries","value":null},{"name":"mySeries2","value":null}],"mouse":null,"xArr":null,"yArr":null});
+        assert.deepEqual(tooltipPoint.tooltipData,{"time":null,"timeSeriesKey":null,"hidden":true,"series":[{"name":"mySeries","value":null},{"name":"mySeries2","value":null}],"seriesObj":{},"mouse":null,"xArr":null,"yArr":null});
       });
 
     }); //suite
