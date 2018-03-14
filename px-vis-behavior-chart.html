@@ -950,6 +950,17 @@ PxVisBehaviorChart.timeFiltering = [{
     }
   },
 
+  observers: [
+    '_setTimeKey(timeData)'
+  ],
+
+  _setTimeKey: function() {
+    if(this.timeData) {
+      //harmonise key referencing time across charts
+      this.set('timeKey', this.timeData);
+    }
+  },
+
   /**
    * returns a filtered dataset based on the time domain
    */
@@ -957,7 +968,6 @@ PxVisBehaviorChart.timeFiltering = [{
    if(this.hasUndefinedArguments(arguments)) {
      return;
    }
-
 
     if(timeDomain.x && timeDomain.x.length === 2) {
       var min = Number(timeDomain.x[0]),
