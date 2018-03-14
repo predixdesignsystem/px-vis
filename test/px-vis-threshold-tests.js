@@ -138,6 +138,7 @@ function runTests(){
       baseScale.set('chartData',d);
 
       defaultThreshold.set('width',w);
+      defaultThreshold.set('height',h);
       defaultThreshold.set('margin',m);
       defaultThreshold.set('completeSeriesConfig',completeSeriesConfig);
       defaultThreshold.set('thresholdData',dT);
@@ -243,13 +244,13 @@ function runTests(){
         assert.equal(thresholdRects.nodes()[6].getAttribute('x'),5);
       });
       test('defaultThreshold thresholdRect y', function() {
-        assert.equal(thresholdRects.nodes()[0].getAttribute('y'), (55-17));
-        assert.equal(thresholdRects.nodes()[1].getAttribute('y'), (82.5-17));
-        assert.equal(thresholdRects.nodes()[2].getAttribute('y'), (110-17));
-        assert.equal(thresholdRects.nodes()[3].getAttribute('y'), (137.5-17));
-        assert.equal(thresholdRects.nodes()[4].getAttribute('y'), (165-17));
-        assert.equal(thresholdRects.nodes()[5].getAttribute('y'), (192.5-17));
-        assert.equal(thresholdRects.nodes()[6].getAttribute('y'), (220-17));
+        assert.equal(thresholdRects.nodes()[0].getAttribute('y'), 55);
+        assert.equal(thresholdRects.nodes()[1].getAttribute('y'), 82.5);
+        assert.equal(thresholdRects.nodes()[2].getAttribute('y'), 110);
+        assert.equal(thresholdRects.nodes()[3].getAttribute('y'), 137.5);
+        assert.equal(thresholdRects.nodes()[4].getAttribute('y'), 165);
+        assert.equal(thresholdRects.nodes()[5].getAttribute('y'), 192.5);
+        assert.equal(thresholdRects.nodes()[6].getAttribute('y'), 220);
       });
       test('defaultThreshold thresholdRect width', function() {
         assert.equal(thresholdRects.nodes()[0].getAttribute('width'), 0);
@@ -302,13 +303,13 @@ function runTests(){
         assert.equal(thresholdTexts.nodes()[6].getAttribute('x'),8);
       });
       test('defaultThreshold thresholdText y', function() {
-        assert.equal(thresholdTexts.nodes()[0].getAttribute('y'),(55-17+13));
-        assert.equal(thresholdTexts.nodes()[1].getAttribute('y'),(82.5-17+13));
-        assert.equal(thresholdTexts.nodes()[2].getAttribute('y'),(110-17+13));
-        assert.equal(thresholdTexts.nodes()[3].getAttribute('y'),(137.5-17+13));
-        assert.equal(thresholdTexts.nodes()[4].getAttribute('y'),(165-17+13));
-        assert.equal(thresholdTexts.nodes()[5].getAttribute('y'),(192.5-17+13));
-        assert.equal(thresholdTexts.nodes()[6].getAttribute('y'),(220-17+13));
+        assert.equal(thresholdTexts.nodes()[0].getAttribute('y'),(55+13));
+        assert.equal(thresholdTexts.nodes()[1].getAttribute('y'),(82.5+13));
+        assert.equal(thresholdTexts.nodes()[2].getAttribute('y'),(110+13));
+        assert.equal(thresholdTexts.nodes()[3].getAttribute('y'),(137.5+13));
+        assert.equal(thresholdTexts.nodes()[4].getAttribute('y'),(165+13));
+        assert.equal(thresholdTexts.nodes()[5].getAttribute('y'),(192.5+13));
+        assert.equal(thresholdTexts.nodes()[6].getAttribute('y'),(220+13));
       });
       test('defaultThreshold thresholdText color', function() {
         assert.equal(thresholdTexts.nodes()[0].getAttribute('fill').split(' ').join(''), rgbToHex(colors["grey12"]));
@@ -471,13 +472,13 @@ function runTests(){
         assert.equal(thresholdRects.nodes()[6].getAttribute('x'),5);
       });
       test('defaultThreshold thresholdRect y', function() {
-        assert.equal(thresholdRects.nodes()[0].getAttribute('y'), (55-17));
-        assert.equal(thresholdRects.nodes()[1].getAttribute('y'), (82.5-17));
-        assert.equal(thresholdRects.nodes()[2].getAttribute('y'), (110-17));
-        assert.equal(thresholdRects.nodes()[3].getAttribute('y'), (137.5-17));
-        assert.equal(thresholdRects.nodes()[4].getAttribute('y'), (165-17));
-        assert.equal(thresholdRects.nodes()[5].getAttribute('y'), (192.5-17));
-        assert.equal(thresholdRects.nodes()[6].getAttribute('y'), (220-17));
+        assert.equal(thresholdRects.nodes()[0].getAttribute('y'), (55));
+        assert.equal(thresholdRects.nodes()[1].getAttribute('y'), (82.5));
+        assert.equal(thresholdRects.nodes()[2].getAttribute('y'), (110));
+        assert.equal(thresholdRects.nodes()[3].getAttribute('y'), (137.5));
+        assert.equal(thresholdRects.nodes()[4].getAttribute('y'), (165));
+        assert.equal(thresholdRects.nodes()[5].getAttribute('y'), (192.5));
+        assert.equal(thresholdRects.nodes()[6].getAttribute('y'), (220));
       });
       test('defaultThreshold thresholdRect width', function() {
         assert.equal(thresholdRects.nodes()[0].getAttribute('width'), 0);
@@ -530,13 +531,13 @@ function runTests(){
         assert.equal(thresholdTexts.nodes()[6].getAttribute('x'),8);
       });
       test('defaultThreshold thresholdText y', function() {
-        assert.equal(thresholdTexts.nodes()[0].getAttribute('y'),(55-17+13));
-        assert.equal(thresholdTexts.nodes()[1].getAttribute('y'),(82.5-17+13));
-        assert.equal(thresholdTexts.nodes()[2].getAttribute('y'),(110-17+13));
-        assert.equal(thresholdTexts.nodes()[3].getAttribute('y'),(137.5-17+13));
-        assert.equal(thresholdTexts.nodes()[4].getAttribute('y'),(165-17+13));
-        assert.equal(thresholdTexts.nodes()[5].getAttribute('y'),(192.5-17+13));
-        assert.equal(thresholdTexts.nodes()[6].getAttribute('y'),(220-17+13));
+        assert.equal(thresholdTexts.nodes()[0].getAttribute('y'),(55+13));
+        assert.equal(thresholdTexts.nodes()[1].getAttribute('y'),(82.5+13));
+        assert.equal(thresholdTexts.nodes()[2].getAttribute('y'),(110+13));
+        assert.equal(thresholdTexts.nodes()[3].getAttribute('y'),(137.5+13));
+        assert.equal(thresholdTexts.nodes()[4].getAttribute('y'),(165+13));
+        assert.equal(thresholdTexts.nodes()[5].getAttribute('y'),(192.5+13));
+        assert.equal(thresholdTexts.nodes()[6].getAttribute('y'),(220+13));
       });
       test('defaultThreshold thresholdText color', function() {
         assert.equal(thresholdTexts.nodes()[0].getAttribute('fill').split(' ').join(''), rgbToHex(colors["grey12"]));
@@ -699,13 +700,13 @@ function runTests(){
         assert.equal(thresholdRects.nodes()[6].getAttribute('x'),5);
       });
       test('defaultThreshold thresholdRect y', function() {
-        assert.equal(thresholdRects.nodes()[0].getAttribute('y'), (55-17));
-        assert.equal(thresholdRects.nodes()[1].getAttribute('y'), (82.5-17));
-        assert.equal(thresholdRects.nodes()[2].getAttribute('y'), (110-17));
-        assert.equal(thresholdRects.nodes()[3].getAttribute('y'), (137.5-17));
-        assert.equal(thresholdRects.nodes()[4].getAttribute('y'), (165-17));
-        assert.equal(thresholdRects.nodes()[5].getAttribute('y'), (192.5-17));
-        assert.equal(thresholdRects.nodes()[6].getAttribute('y'), (220-17));
+        assert.equal(thresholdRects.nodes()[0].getAttribute('y'), 55);
+        assert.equal(thresholdRects.nodes()[1].getAttribute('y'), 82.5);
+        assert.equal(thresholdRects.nodes()[2].getAttribute('y'), 110);
+        assert.equal(thresholdRects.nodes()[3].getAttribute('y'), 137.5);
+        assert.equal(thresholdRects.nodes()[4].getAttribute('y'), 165);
+        assert.equal(thresholdRects.nodes()[5].getAttribute('y'), 192.5);
+        assert.equal(thresholdRects.nodes()[6].getAttribute('y'), 220);
       });
       test('defaultThreshold thresholdRect width', function() {
         assert.closeTo(Number(thresholdRects.nodes()[0].getAttribute('width')),
@@ -758,13 +759,13 @@ function runTests(){
         assert.equal(thresholdTexts.nodes()[6].getAttribute('x'),8);
       });
       test('defaultThreshold thresholdText y', function() {
-        assert.equal(thresholdTexts.nodes()[0].getAttribute('y'),(55-17+13));
-        assert.equal(thresholdTexts.nodes()[1].getAttribute('y'),(82.5-17+13));
-        assert.equal(thresholdTexts.nodes()[2].getAttribute('y'),(110-17+13));
-        assert.equal(thresholdTexts.nodes()[3].getAttribute('y'),(137.5-17+13));
-        assert.equal(thresholdTexts.nodes()[4].getAttribute('y'),(165-17+13));
-        assert.equal(thresholdTexts.nodes()[5].getAttribute('y'),(192.5-17+13));
-        assert.equal(thresholdTexts.nodes()[6].getAttribute('y'),(220-17+13));
+        assert.equal(thresholdTexts.nodes()[0].getAttribute('y'),(55+13));
+        assert.equal(thresholdTexts.nodes()[1].getAttribute('y'),(82.5+13));
+        assert.equal(thresholdTexts.nodes()[2].getAttribute('y'),(110+13));
+        assert.equal(thresholdTexts.nodes()[3].getAttribute('y'),(137.5+13));
+        assert.equal(thresholdTexts.nodes()[4].getAttribute('y'),(165+13));
+        assert.equal(thresholdTexts.nodes()[5].getAttribute('y'),(192.5+13));
+        assert.equal(thresholdTexts.nodes()[6].getAttribute('y'),(220+13));
       });
       test('defaultThreshold thresholdText color', function() {
         assert.equal(thresholdTexts.nodes()[0].getAttribute('fill').split(' ').join(''), 'white');
@@ -927,13 +928,13 @@ function runTests(){
         assert.equal(thresholdRects.nodes()[6].getAttribute('x'),5);
       });
       test('defaultThreshold thresholdRect y', function() {
-        assert.equal(thresholdRects.nodes()[0].getAttribute('y'), (55-17));
-        assert.equal(thresholdRects.nodes()[1].getAttribute('y'), (27.5-17));
-        assert.equal(thresholdRects.nodes()[2].getAttribute('y'), (82.5-17));
-        assert.equal(thresholdRects.nodes()[3].getAttribute('y'), (137.5-17));
-        assert.equal(thresholdRects.nodes()[4].getAttribute('y'), (247.5-17));
-        assert.equal(thresholdRects.nodes()[5].getAttribute('y'), (192.5-17));
-        assert.equal(thresholdRects.nodes()[6].getAttribute('y'), (220-17));
+        assert.equal(thresholdRects.nodes()[0].getAttribute('y'), 55);
+        assert.equal(thresholdRects.nodes()[1].getAttribute('y'), 27.5);
+        assert.equal(thresholdRects.nodes()[2].getAttribute('y'), 82.5);
+        assert.equal(thresholdRects.nodes()[3].getAttribute('y'), 137.5);
+        assert.equal(thresholdRects.nodes()[4].getAttribute('y'), 247.5);
+        assert.equal(thresholdRects.nodes()[5].getAttribute('y'), 192.5);
+        assert.equal(thresholdRects.nodes()[6].getAttribute('y'), 220);
       });
       test('defaultThreshold thresholdRect width', function() {
         assert.equal(thresholdRects.nodes()[0].getAttribute('width'), 0);
@@ -986,13 +987,13 @@ function runTests(){
         assert.equal(thresholdTexts.nodes()[6].getAttribute('x'),8);
       });
       test('defaultThreshold thresholdText y', function() {
-        assert.equal(thresholdTexts.nodes()[0].getAttribute('y'),(55-17+13));
-        assert.equal(thresholdTexts.nodes()[1].getAttribute('y'),(27.5-17+13));
-        assert.equal(thresholdTexts.nodes()[2].getAttribute('y'),(82.5-17+13));
-        assert.equal(thresholdTexts.nodes()[3].getAttribute('y'),(137.5-17+13));
-        assert.equal(thresholdTexts.nodes()[4].getAttribute('y'),(247.5-17+13));
-        assert.equal(thresholdTexts.nodes()[5].getAttribute('y'),(192.5-17+13));
-        assert.equal(thresholdTexts.nodes()[6].getAttribute('y'),(220-17+13));
+        assert.equal(thresholdTexts.nodes()[0].getAttribute('y'),(55+13));
+        assert.equal(thresholdTexts.nodes()[1].getAttribute('y'),(27.5+13));
+        assert.equal(thresholdTexts.nodes()[2].getAttribute('y'),(82.5+13));
+        assert.equal(thresholdTexts.nodes()[3].getAttribute('y'),(137.5+13));
+        assert.equal(thresholdTexts.nodes()[4].getAttribute('y'),(247.5+13));
+        assert.equal(thresholdTexts.nodes()[5].getAttribute('y'),(192.5+13));
+        assert.equal(thresholdTexts.nodes()[6].getAttribute('y'),(220+13));
       });
       test('defaultThreshold thresholdText color', function() {
         assert.equal(thresholdTexts.nodes()[0].getAttribute('fill').split(' ').join(''), colorSet[1]);
@@ -1136,11 +1137,11 @@ function runTests(){
         assert.equal(thresholdRects.nodes()[4].getAttribute('x'),5);
       });
       test('defaultThreshold thresholdRect y', function() {
-        assert.equal(thresholdRects.nodes()[0].getAttribute('y'), (55-17));
-        assert.equal(thresholdRects.nodes()[1].getAttribute('y'), (27.5-17));
-        assert.equal(thresholdRects.nodes()[2].getAttribute('y'), (137.5-17));
-        assert.equal(thresholdRects.nodes()[3].getAttribute('y'), (247.5-17));
-        assert.equal(thresholdRects.nodes()[4].getAttribute('y'), (220-17));
+        assert.equal(thresholdRects.nodes()[0].getAttribute('y'), 55);
+        assert.equal(thresholdRects.nodes()[1].getAttribute('y'), 27.5);
+        assert.equal(thresholdRects.nodes()[2].getAttribute('y'), 137.5);
+        assert.equal(thresholdRects.nodes()[3].getAttribute('y'), 247.5);
+        assert.equal(thresholdRects.nodes()[4].getAttribute('y'), 220);
       });
       test('defaultThreshold thresholdRect width', function() {
         assert.equal(thresholdRects.nodes()[0].getAttribute('width'), 0);
@@ -1181,11 +1182,11 @@ function runTests(){
         assert.equal(thresholdTexts.nodes()[4].getAttribute('x'),8);
       });
       test('defaultThreshold thresholdText y', function() {
-        assert.equal(thresholdTexts.nodes()[0].getAttribute('y'),(55-17+13));
-        assert.equal(thresholdTexts.nodes()[1].getAttribute('y'),(27.5-17+13));
-        assert.equal(thresholdTexts.nodes()[2].getAttribute('y'),(137.5-17+13));
-        assert.equal(thresholdTexts.nodes()[3].getAttribute('y'),(247.5-17+13));
-        assert.equal(thresholdTexts.nodes()[4].getAttribute('y'),(220-17+13));
+        assert.equal(thresholdTexts.nodes()[0].getAttribute('y'),(55+13));
+        assert.equal(thresholdTexts.nodes()[1].getAttribute('y'),(27.5+13));
+        assert.equal(thresholdTexts.nodes()[2].getAttribute('y'),(137.5+13));
+        assert.equal(thresholdTexts.nodes()[3].getAttribute('y'),(247.5+13));
+        assert.equal(thresholdTexts.nodes()[4].getAttribute('y'),(220+13));
       });
       test('defaultThreshold thresholdText color', function() {
         assert.equal(thresholdTexts.nodes()[0].getAttribute('fill').split(' ').join(''), colorSet[1]);
@@ -1343,13 +1344,13 @@ function runTests(){
         assert.equal(thresholdRects.nodes()[6].getAttribute('x'),5);
       });
       test('defaultThreshold thresholdRect y', function() {
-        assert.equal(thresholdRects.nodes()[0].getAttribute('y'),(55-17));
-        assert.equal(thresholdRects.nodes()[1].getAttribute('y'),(27.5-17));
-        assert.equal(thresholdRects.nodes()[2].getAttribute('y'),(137.5-17));
-        assert.equal(thresholdRects.nodes()[3].getAttribute('y'),(247.5-17));
-        assert.equal(thresholdRects.nodes()[4].getAttribute('y'),(220-17));
-        assert.equal(thresholdRects.nodes()[5].getAttribute('y'),(82.5-17));
-        assert.equal(thresholdRects.nodes()[6].getAttribute('y'),(192.5-17));
+        assert.equal(thresholdRects.nodes()[0].getAttribute('y'),55);
+        assert.equal(thresholdRects.nodes()[1].getAttribute('y'),27.5);
+        assert.equal(thresholdRects.nodes()[2].getAttribute('y'),137.5);
+        assert.equal(thresholdRects.nodes()[3].getAttribute('y'),247.5);
+        assert.equal(thresholdRects.nodes()[4].getAttribute('y'),220);
+        assert.equal(thresholdRects.nodes()[5].getAttribute('y'),82.5);
+        assert.equal(thresholdRects.nodes()[6].getAttribute('y'),192.5);
       });
       test('defaultThreshold thresholdRect width', function() {
         assert.equal(thresholdRects.nodes()[0].getAttribute('width'), 0);
@@ -1400,13 +1401,13 @@ function runTests(){
         assert.equal(thresholdTexts.nodes()[6].getAttribute('x'),8);
       });
       test('defaultThreshold thresholdText y', function() {
-        assert.equal(thresholdTexts.nodes()[0].getAttribute('y'),(55-17+13));
-        assert.equal(thresholdTexts.nodes()[1].getAttribute('y'),(27.5-17+13));
-        assert.equal(thresholdTexts.nodes()[2].getAttribute('y'),(137.5-17+13));
-        assert.equal(thresholdTexts.nodes()[3].getAttribute('y'),(247.5-17+13));
-        assert.equal(thresholdTexts.nodes()[4].getAttribute('y'),(220-17+13));
-        assert.equal(thresholdTexts.nodes()[5].getAttribute('y'),(82.5-17+13));
-        assert.equal(thresholdTexts.nodes()[6].getAttribute('y'),(192.5-17+13));
+        assert.equal(thresholdTexts.nodes()[0].getAttribute('y'),(55+13));
+        assert.equal(thresholdTexts.nodes()[1].getAttribute('y'),(27.5+13));
+        assert.equal(thresholdTexts.nodes()[2].getAttribute('y'),(137.5+13));
+        assert.equal(thresholdTexts.nodes()[3].getAttribute('y'),(247.5+13));
+        assert.equal(thresholdTexts.nodes()[4].getAttribute('y'),(220+13));
+        assert.equal(thresholdTexts.nodes()[5].getAttribute('y'),(82.5+13));
+        assert.equal(thresholdTexts.nodes()[6].getAttribute('y'),(192.5+13));
       });
       test('defaultThreshold thresholdText color', function() {
         assert.equal(thresholdTexts.nodes()[0].getAttribute('fill').split(' ').join(''), colorSet[1]);
@@ -1425,6 +1426,195 @@ function runTests(){
         assert.equal(thresholdTexts.nodes()[4].textContent,'2.00 (CUSTOM)');
         assert.equal(thresholdTexts.nodes()[5].textContent,'7.00 (CUSTOM)');
         assert.equal(thresholdTexts.nodes()[6].textContent,'3.00');
+      });
+    }); //suite
+  }); //suite
+
+  suite('px-vis-threshold go vertical', function() {
+    var baseScale,
+        baseSVG,
+        defaultThreshold,
+        thresholdGroups,
+        thresholdLines,
+        thresholdRects,
+        thresholdTexts;
+
+
+    var colorSet = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
+    var colors = PxColorsBehavior.baseColors.properties.colors.value;
+
+    suiteSetup(function(done){
+      baseScale = document.getElementById('baseScale');
+      baseSVG = document.getElementById('baseSVG');
+      defaultThreshold = document.getElementById('defaultThreshold');
+      const data = [
+        { "for":"mySeries", "type":"defaultSeriesTitleBox", "value":9 },
+        { "for":"mySeries", "type":"defaultSeries", "value":8 },
+        { "for":"", "type":"defaultTitle", "value": 1397160780000 },
+        { "for":"", "type":"default", "value":1 },
+        { "for":"", "type":"custom", "value": 1397131620000 },
+        { "for":"", "type":"custom", "value": 1397189940000 },
+        { "for":"", "type":"defaultSeries", "value": 3 }
+      ];
+
+      const conf = {
+        "custom": {
+          "color": "red",
+          "dashPattern": "5,0",
+          "title": "CUSTOM",
+          "direction": "vertical"
+        },
+        "defaultSeriesBox": {
+          "showThresholdBox": true
+        },
+        "defaultBox": {
+          "showThresholdBox": true
+        },
+        "defaultTitle": {
+          "showThresholdBox": true,
+          "direction": "vertical"
+        },
+        "defaultTitleBox": {
+          "showThresholdBox": true,
+          "title": "show me"
+        },
+        "defaultSeriesTitleBox": {
+          "showThresholdBox": true,
+          "title": "show me too",
+          "direction": "horizontal"
+        }
+      };
+
+      var rendered = function() {
+        thresholdGroups = defaultThreshold.thresholdGroup.selectAll('g.threshold');
+        thresholdLines = thresholdGroups.selectAll('line.threshold-line');
+        thresholdRects = thresholdGroups.selectAll('rect.threshold-rect');
+        thresholdTexts = thresholdGroups.selectAll('text.threshold-text');
+        defaultThreshold.removeEventListener('px-vis-threshold-rendering-ended', rendered);
+        done();
+      };
+
+      defaultThreshold.addEventListener('px-vis-threshold-rendering-ended', rendered);
+
+      defaultThreshold.set('thresholdData', data);
+      defaultThreshold.set('thresholdConfig', conf);
+    });
+
+    suite('px-vis-threshold everything drew', function() {
+      test('defaultThreshold thresholdGroup created', function() {
+        assert.equal(defaultThreshold.thresholdGroup.node().tagName,'g');
+        assert.isTrue(defaultThreshold.thresholdGroup.attr("class").indexOf('thresholds') !== -1);
+      });
+
+      test('defaultThreshold thresholdGroup groups are created', function() {
+        assert.lengthOf(thresholdGroups.nodes(), 7);
+      });
+
+      test('defaultThreshold threshold lines are created', function() {
+        assert.lengthOf(thresholdLines.nodes(), 7);
+      });
+
+      test('defaultThreshold threshold rects are created', function() {
+        assert.lengthOf(thresholdRects.nodes(), 7);
+      });
+
+      test('defaultThreshold threshold texts are created', function() {
+        assert.lengthOf(thresholdTexts.nodes(), 7);
+      });
+    });
+
+    suite('px-vis-threshold thresholds have correct values', function() {
+      test('defaultThreshold thresholdLine x1', function() {
+        assert.equal(thresholdLines.nodes()[0].getAttribute('x1'),0);
+        assert.equal(thresholdLines.nodes()[1].getAttribute('x1'),0);
+        assert.equal(thresholdLines.nodes()[2].getAttribute('x1'),240);
+        assert.equal(thresholdLines.nodes()[3].getAttribute('x1'),0);
+        assert.equal(thresholdLines.nodes()[4].getAttribute('x1'),120);
+        assert.equal(thresholdLines.nodes()[5].getAttribute('x1'),360);
+        assert.equal(thresholdLines.nodes()[6].getAttribute('x1'),0);
+      });
+      test('defaultThreshold thresholdLine x2', function() {
+        assert.equal(thresholdLines.nodes()[0].getAttribute('x2'),480);
+        assert.equal(thresholdLines.nodes()[1].getAttribute('x2'),480);
+        assert.equal(thresholdLines.nodes()[2].getAttribute('x2'),240);
+        assert.equal(thresholdLines.nodes()[3].getAttribute('x2'),480);
+        assert.equal(thresholdLines.nodes()[4].getAttribute('x2'),120);
+        assert.equal(thresholdLines.nodes()[5].getAttribute('x2'),360);
+        assert.equal(thresholdLines.nodes()[6].getAttribute('x2'),480);
+      });
+      test('defaultThreshold thresholdLine y1', function() {
+        assert.equal(thresholdLines.nodes()[0].getAttribute('y1'),55);
+        assert.equal(thresholdLines.nodes()[1].getAttribute('y1'),27.5);
+        assert.equal(thresholdLines.nodes()[2].getAttribute('y1'),0);
+        assert.equal(thresholdLines.nodes()[3].getAttribute('y1'),247.5);
+        assert.equal(thresholdLines.nodes()[4].getAttribute('y1'),0);
+        assert.equal(thresholdLines.nodes()[5].getAttribute('y1'),0);
+        assert.equal(thresholdLines.nodes()[6].getAttribute('y1'),192.5);
+      });
+      test('defaultThreshold thresholdLine y2', function() {
+        assert.equal(thresholdLines.nodes()[0].getAttribute('y2'),55);
+        assert.equal(thresholdLines.nodes()[1].getAttribute('y2'),27.5);
+        assert.equal(thresholdLines.nodes()[2].getAttribute('y2'),275);
+        assert.equal(thresholdLines.nodes()[3].getAttribute('y2'),247.5);
+        assert.equal(thresholdLines.nodes()[4].getAttribute('y2'),275);
+        assert.equal(thresholdLines.nodes()[5].getAttribute('y2'),275);
+        assert.equal(thresholdLines.nodes()[6].getAttribute('y2'),192.5);
+      });
+
+      test('defaultThreshold thresholdRect x', function() {
+        assert.equal(thresholdRects.nodes()[0].getAttribute('x'),5);
+        assert.equal(thresholdRects.nodes()[1].getAttribute('x'),5);
+        assert.equal(thresholdRects.nodes()[2].getAttribute('x'),240);
+        assert.equal(thresholdRects.nodes()[3].getAttribute('x'),5);
+        assert.equal(thresholdRects.nodes()[4].getAttribute('x'),120);
+        assert.equal(thresholdRects.nodes()[5].getAttribute('x'),360);
+        assert.equal(thresholdRects.nodes()[6].getAttribute('x'),5);
+      });
+      test('defaultThreshold thresholdRect y', function() {
+        assert.equal(thresholdRects.nodes()[0].getAttribute('y'),55);
+        assert.equal(thresholdRects.nodes()[1].getAttribute('y'),27.5);
+        assert.equal(thresholdRects.nodes()[2].getAttribute('y'),2);
+        assert.equal(thresholdRects.nodes()[3].getAttribute('y'),247.5);
+        assert.equal(thresholdRects.nodes()[4].getAttribute('y'),2);
+        assert.equal(thresholdRects.nodes()[5].getAttribute('y'),2);
+        assert.equal(thresholdRects.nodes()[6].getAttribute('y'),192.5);
+      });
+      test('defaultThreshold thresholdRect width', function() {
+        assert.equal(thresholdRects.nodes()[0].getAttribute('width'), 0);
+        assert.closeTo(Number(thresholdRects.nodes()[1].getAttribute('width')), 104, 1);
+        assert.closeTo(Number(thresholdRects.nodes()[2].getAttribute('width')), 104, 1);
+        assert.equal(thresholdRects.nodes()[3].getAttribute('width'), 0);
+        assert.equal(thresholdRects.nodes()[4].getAttribute('width'), 0);
+        assert.equal(thresholdRects.nodes()[5].getAttribute('width'), 0);
+        assert.equal(thresholdRects.nodes()[6].getAttribute('width'), 0);
+      });
+      test('defaultThreshold thresholdRect height', function() {
+        assert.equal(thresholdRects.nodes()[0].getAttribute('height'),18);
+        assert.equal(thresholdRects.nodes()[1].getAttribute('height'),18);
+        assert.equal(thresholdRects.nodes()[2].getAttribute('height'),18);
+        assert.equal(thresholdRects.nodes()[3].getAttribute('height'),18);
+        assert.equal(thresholdRects.nodes()[4].getAttribute('height'),18);
+        assert.equal(thresholdRects.nodes()[5].getAttribute('height'),18);
+        assert.equal(thresholdRects.nodes()[6].getAttribute('height'),18);
+      });
+
+      test('defaultThreshold thresholdText x', function() {
+        assert.equal(thresholdTexts.nodes()[0].getAttribute('x'),8);
+        assert.equal(thresholdTexts.nodes()[1].getAttribute('x'),8);
+        assert.equal(thresholdTexts.nodes()[2].getAttribute('x'),236);
+        assert.equal(thresholdTexts.nodes()[3].getAttribute('x'),8);
+        assert.equal(thresholdTexts.nodes()[4].getAttribute('x'),116);
+        assert.equal(thresholdTexts.nodes()[5].getAttribute('x'),356);
+        assert.equal(thresholdTexts.nodes()[6].getAttribute('x'),8);
+      });
+      test('defaultThreshold thresholdText y', function() {
+        assert.equal(thresholdTexts.nodes()[0].getAttribute('y'),(55+13));
+        assert.equal(thresholdTexts.nodes()[1].getAttribute('y'),(27.5+13));
+        assert.equal(thresholdTexts.nodes()[2].getAttribute('y'),5);
+        assert.equal(thresholdTexts.nodes()[3].getAttribute('y'),(247.5+13));
+        assert.equal(thresholdTexts.nodes()[4].getAttribute('y'),5);
+        assert.equal(thresholdTexts.nodes()[5].getAttribute('y'),5);
+        assert.equal(thresholdTexts.nodes()[6].getAttribute('y'),(192.5+13));
       });
     }); //suite
   }); //suite

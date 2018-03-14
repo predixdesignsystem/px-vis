@@ -283,6 +283,116 @@ function runTests() {
     });
   });
 
+
+// ############################################################################
+// ############################################################################
+
+suite('Horizontal px-vis-register pagnation works', function() {
+  var register;
+
+  suiteSetup(function(done) {
+    register = document.getElementById('pagnation1');
+    var data = generateDataValues( generateEmptyData(2) );
+    register.set('currentPage', 2);
+    register.set('totalPages', 250);
+    setData(register, data);
+    window.setTimeout(function() {
+      done();
+    }, 150);
+  });
+
+  test('pagnation fixtures are created', function() {
+    assert.isTrue(register !== null);
+  });
+
+  test('pagnation displays page counts', function() {
+    var pages = Polymer.dom(register.root).querySelectorAll('.textInfo');
+    assert.isFalse(pages[0].parentNode.classList.contains('hide'));
+    assert.equal(pages[0].textContent.trim(), '2 of 250');
+  });
+
+  test('pagnation displays page arrows', function() {
+    var pages = Polymer.dom(register.root).querySelectorAll('.paginateButton');
+    assert.isFalse(pages[0].firstElementChild.classList.contains('hide'));
+    assert.isFalse(pages[1].firstElementChild.classList.contains('hide'));
+  });
+});
+
+// ############################################################################
+// ############################################################################
+
+suite('Vertical px-vis-register pagnation works', function() {
+  var register;
+
+  suiteSetup(function(done) {
+    register = document.getElementById('pagnation2');
+    var data = generateDataValues( generateEmptyData(2) );
+    register.set('currentPage', 2);
+    register.set('totalPages', 250);
+    setData(register, data);
+    window.setTimeout(function() {
+      done();
+    }, 150);
+  });
+
+  test('pagnation fixtures are created', function() {
+    assert.isTrue(register !== null);
+  });
+
+  test('pagnation displays page counts', function() {
+    var pages = Polymer.dom(register.root).querySelectorAll('.textInfo');
+    assert.isFalse(pages[2].parentNode.classList.contains('hide'));
+    assert.equal(pages[2].textContent.trim(), '2 of 250');
+  });
+
+  test('pagnation displays page arrows', function() {
+      const pages = Polymer.dom(register.root).querySelector('#verticalPagnation');
+      assert.isFalse(pages.classList.contains('hide'));
+  });
+});
+
+// ############################################################################
+// ############################################################################
+
+suite('px-vis-register sorting menu is shown', function() {
+  var register;
+
+  suiteSetup(function(done) {
+    register = document.getElementById('sorting');
+    var data = generateDataValues( generateEmptyData(2) );
+    register.set("sortConfig", {
+      "default": {
+        "name": "default",
+        "sortFunction": "default",
+        "selected": "true"
+      },
+      "combined": {
+        "name": "Combined",
+        "sortFunction": ["nameIgnoreCase", "muted"]
+      },
+      "muted": {
+        "name": "Muted",
+        "sortFunction": "muted"
+      }
+    });
+    setData(register, data);
+    window.setTimeout(function() {
+      done();
+    }, 150);
+  });
+
+  test('sorting fixtures are created', function() {
+    assert.isTrue(register !== null);
+  });
+
+  test('sorting is shown', function() {
+    var set = Polymer.dom(register.root).querySelector('#sortingContainer');
+    assert.isFalse(set.classList.contains('hide'));
+  });
+
+  // TODO Add tests for sorting
+});
+
 // ############################################################################
 // ############################################################################
 
@@ -426,6 +536,7 @@ function runTests() {
     test('onlyY displays ordinal set', function() {
       var set = Polymer.dom(register.root).querySelector('#ordinalSet');
       assert.equal(set.textContent.trim(), 'StringyString');
+      assert.isFalse(set.classList.contains('hide'));
     });
   });
 
@@ -502,6 +613,11 @@ function basicTests(registerID,dir){
       }
     });
 
+    test(registerID + ' doesnt show sorting container', function() {
+      var set = Polymer.dom(register.root).querySelector('#sortingContainer');
+      assert.isTrue(set.classList.contains('hide'));
+    });
+
   });
 
   suite('px-vis-register ' + registerID + ' update data on series  -- simulating on-chart-hover', function() {
@@ -535,8 +651,32 @@ function basicTests(registerID,dir){
     test(registerID + ' values match', function() {
       var series = Polymer.dom(register.root).querySelectorAll('px-vis-register-item');
 
-      for(var i = 0; i < series.length; i++){
+      for(var i = 0; i < series.length; i++) {
         assert.equal(series[i]._displayedData, '1,015.20 yUnit');
+      }
+    });
+
+    test(registerID + ' doesnt displays ordinal set', function() {
+      var set = Polymer.dom(register.root).querySelector('#ordinalSet');
+      assert.isTrue(set.classList.contains('hide'));
+    });
+
+    test(registerID + ' doesnt display page counts', function() {
+      var pages = Polymer.dom(register.root).querySelectorAll('.textInfo');
+      assert.isTrue(pages[0].parentNode.classList.contains('hide'));
+      assert.isTrue(pages[2].parentNode.classList.contains('hide'));
+    });
+
+    test(registerID + ' doesnt display page arrows', function() {
+      if(dir === 'vertical') {
+        const pages = Polymer.dom(register.root).querySelector('#verticalPagnation');
+
+        assert.isTrue(pages.classList.contains('hide'));
+      } else {
+        var pages = Polymer.dom(register.root).querySelectorAll('.paginateButton');
+        assert.isTrue(pages[0].firstElementChild.classList.contains('hide'));
+        assert.isTrue(pages[1].firstElementChild.classList.contains('hide'));
+
       }
     });
   });

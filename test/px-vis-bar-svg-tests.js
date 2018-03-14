@@ -101,17 +101,17 @@ function runTests() {
     });
 
     test('singleColumnBar bar width', function() {
-      assert.equal(barRect.attr('width'), 53);
+      assert.equal(barRect.attr('width'), 51);
     });
 
     test('singleColumnBar bar x', function() {
       var bars = barRect.nodes();
 
-      assert.equal(Px.d3.select(bars[0]).attr('x'), 2);
-      assert.equal(Px.d3.select(bars[1]).attr('x'), 108);
-      assert.equal(Px.d3.select(bars[2]).attr('x'), 214);
-      assert.equal(Px.d3.select(bars[3]).attr('x'), 320);
-      assert.equal(Px.d3.select(bars[4]).attr('x'), 426);
+      assert.equal(Px.d3.select(bars[0]).attr('x'), 11);
+      assert.equal(Px.d3.select(bars[1]).attr('x'), 113);
+      assert.equal(Px.d3.select(bars[2]).attr('x'), 215);
+      assert.equal(Px.d3.select(bars[3]).attr('x'), 317);
+      assert.equal(Px.d3.select(bars[4]).attr('x'), 419);
     });
 
     test('singleColumnBar bar y', function() {
@@ -279,17 +279,17 @@ function runTests() {
     });
 
     test('multiColumnBar1 bar width', function() {
-      assert.equal(barRect.attr('width'), 53);
+      assert.equal(barRect.attr('width'), 51);
     });
 
     test('multiColumnBar1 bar x', function() {
       var bars = barRect.nodes();
 
-      assert.equal(Px.d3.select(bars[0]).attr('x'), 2);
-      assert.equal(Px.d3.select(bars[1]).attr('x'), 108);
-      assert.equal(Px.d3.select(bars[2]).attr('x'), 214);
-      assert.equal(Px.d3.select(bars[3]).attr('x'), 320);
-      assert.equal(Px.d3.select(bars[4]).attr('x'), 426);
+      assert.equal(Px.d3.select(bars[0]).attr('x'), 11);
+      assert.equal(Px.d3.select(bars[1]).attr('x'), 113);
+      assert.equal(Px.d3.select(bars[2]).attr('x'), 215);
+      assert.equal(Px.d3.select(bars[3]).attr('x'), 317);
+      assert.equal(Px.d3.select(bars[4]).attr('x'), 419);
     });
 
     test('multiColumnBar1 bar y', function() {
@@ -321,17 +321,17 @@ function runTests() {
     });
 
     test('multiColumnBar2 bar width', function() {
-      assert.equal(barRect2.attr('width'), 53);
+      assert.equal(barRect2.attr('width'), 51);
     });
 
     test('multiColumnBar2 bar x', function() {
       var bars = barRect2.nodes();
 
-      assert.equal(Px.d3.select(bars[0]).attr('x'), 2);
-      assert.equal(Px.d3.select(bars[1]).attr('x'), 108);
-      assert.equal(Px.d3.select(bars[2]).attr('x'), 214);
-      assert.equal(Px.d3.select(bars[3]).attr('x'), 320);
-      assert.equal(Px.d3.select(bars[4]).attr('x'), 426);
+      assert.equal(Px.d3.select(bars[0]).attr('x'), 11);
+      assert.equal(Px.d3.select(bars[1]).attr('x'), 113);
+      assert.equal(Px.d3.select(bars[2]).attr('x'), 215);
+      assert.equal(Px.d3.select(bars[3]).attr('x'), 317);
+      assert.equal(Px.d3.select(bars[4]).attr('x'), 419);
     });
 
     test('multiColumnBar2 bar y', function() {
@@ -363,17 +363,17 @@ function runTests() {
     });
 
     test('multiColumnBar3 bar width', function() {
-      assert.equal(barRect3.attr('width'), 53);
+      assert.equal(barRect3.attr('width'), 51);
     });
 
     test('multiColumnBar3 bar x', function() {
       var bars = barRect3.nodes();
 
-      assert.equal(Px.d3.select(bars[0]).attr('x'), 2);
-      assert.equal(Px.d3.select(bars[1]).attr('x'), 108);
-      assert.equal(Px.d3.select(bars[2]).attr('x'), 214);
-      assert.equal(Px.d3.select(bars[3]).attr('x'), 320);
-      assert.equal(Px.d3.select(bars[4]).attr('x'), 426);
+      assert.equal(Px.d3.select(bars[0]).attr('x'), 11);
+      assert.equal(Px.d3.select(bars[1]).attr('x'), 113);
+      assert.equal(Px.d3.select(bars[2]).attr('x'), 215);
+      assert.equal(Px.d3.select(bars[3]).attr('x'), 317);
+      assert.equal(Px.d3.select(bars[4]).attr('x'), 419);
     });
 
     test('multiColumnBar3 bar y', function() {
@@ -429,8 +429,8 @@ function runTests() {
         completeSeriesConfig = {"mySeries":{
           "type":"bar",
           "name":"mySeries",
-          "x":"x",
-          "y":"y",
+          "x":"y",
+          "y":"x",
           "color": colorSet[0]
         }},
         chartExtents = {"x":[0,0.6],"y":["A","B","C","D","E"]},
@@ -512,15 +512,15 @@ function runTests() {
     test('singleBarBar bar y', function() {
       var bars = barRect.nodes();
 
-      assert.equal(Px.d3.select(bars[0]).attr('y'), 240);
-      assert.equal(Px.d3.select(bars[1]).attr('y'), 180);
-      assert.equal(Px.d3.select(bars[2]).attr('y'), 120);
-      assert.equal(Px.d3.select(bars[3]).attr('y'), 60);
-      assert.equal(Px.d3.select(bars[4]).attr('y'), 0);
+      assert.equal(Px.d3.select(bars[0]).attr('y'), 235);
+      assert.equal(Px.d3.select(bars[1]).attr('y'), 178);
+      assert.equal(Px.d3.select(bars[2]).attr('y'), 121);
+      assert.equal(Px.d3.select(bars[3]).attr('y'), 64);
+      assert.equal(Px.d3.select(bars[4]).attr('y'), 7);
     });
 
     test('singleBarBar bar height', function() {
-      assert.equal(barRect.attr('height'), 30);
+      assert.equal(barRect.attr('height'), 29);
     });
   }); //suite
 
@@ -570,22 +570,22 @@ function runTests() {
           "mySeries":{
             "type":"bar",
             "name":"mySeries",
-            "x":"x",
-            "y":"y",
+            "x":"y",
+            "y":"x",
             "color": colorSet[0]
           },
           "mySeries2":{
             "type":"bar",
             "name":"mySeries2",
-            "x":"x",
-            "y":"y1",
+            "x":"y1",
+            "y":"x",
             "color": colorSet[1]
           },
           "mySeries3":{
             "type":"bar",
             "name":"mySeries3",
-            "x":"x",
-            "y":"y2",
+            "x":"y2",
+            "y":"x",
             "color": colorSet[2]
           },
         },
@@ -690,15 +690,15 @@ function runTests() {
     test('multiBarBar1 bar y', function() {
       var bars = barRect.nodes();
 
-      assert.equal(Px.d3.select(bars[0]).attr('y'), 240);
-      assert.equal(Px.d3.select(bars[1]).attr('y'), 180);
-      assert.equal(Px.d3.select(bars[2]).attr('y'), 120);
-      assert.equal(Px.d3.select(bars[3]).attr('y'), 60);
-      assert.equal(Px.d3.select(bars[4]).attr('y'), 0);
+      assert.equal(Px.d3.select(bars[0]).attr('y'), 235);
+      assert.equal(Px.d3.select(bars[1]).attr('y'), 178);
+      assert.equal(Px.d3.select(bars[2]).attr('y'), 121);
+      assert.equal(Px.d3.select(bars[3]).attr('y'), 64);
+      assert.equal(Px.d3.select(bars[4]).attr('y'), 7);
     });
 
     test('multiBarBar1 bar heights', function() {
-      assert.equal(barRect.attr('height'), 30);
+      assert.equal(barRect.attr('height'), 29);
     });
 
     test('multiBarBar2 bar series ID', function() {
@@ -732,15 +732,15 @@ function runTests() {
     test('multiBarBar2 bar y', function() {
       var bars = barRect2.nodes();
 
-      assert.equal(Px.d3.select(bars[0]).attr('y'), 240);
-      assert.equal(Px.d3.select(bars[1]).attr('y'), 180);
-      assert.equal(Px.d3.select(bars[2]).attr('y'), 120);
-      assert.equal(Px.d3.select(bars[3]).attr('y'), 60);
-      assert.equal(Px.d3.select(bars[4]).attr('y'), 0);
+      assert.equal(Px.d3.select(bars[0]).attr('y'), 235);
+      assert.equal(Px.d3.select(bars[1]).attr('y'), 178);
+      assert.equal(Px.d3.select(bars[2]).attr('y'), 121);
+      assert.equal(Px.d3.select(bars[3]).attr('y'), 64);
+      assert.equal(Px.d3.select(bars[4]).attr('y'), 7);
     });
 
     test('multiBarBar2 bar heights', function() {
-      assert.equal(barRect2.attr('height'), 30);
+      assert.equal(barRect2.attr('height'), 29);
     });
 
     test('multiBarBar3 bar series ID', function() {
@@ -774,15 +774,15 @@ function runTests() {
     test('multiBarBar3 bar y', function() {
       var bars = barRect3.nodes();
 
-      assert.equal(Px.d3.select(bars[0]).attr('y'), 240);
-      assert.equal(Px.d3.select(bars[1]).attr('y'), 180);
-      assert.equal(Px.d3.select(bars[2]).attr('y'), 120);
-      assert.equal(Px.d3.select(bars[3]).attr('y'), 60);
-      assert.equal(Px.d3.select(bars[4]).attr('y'), 0);
+      assert.equal(Px.d3.select(bars[0]).attr('y'), 235);
+      assert.equal(Px.d3.select(bars[1]).attr('y'), 178);
+      assert.equal(Px.d3.select(bars[2]).attr('y'), 121);
+      assert.equal(Px.d3.select(bars[3]).attr('y'), 64);
+      assert.equal(Px.d3.select(bars[4]).attr('y'), 7);
     });
 
     test('multiBarBar3 bar heights', function() {
-      assert.equal(barRect3.attr('height'), 30);
+      assert.equal(barRect3.attr('height'), 29);
     });
   }); //suite
 } //runTests

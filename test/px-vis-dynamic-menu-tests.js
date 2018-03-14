@@ -62,21 +62,6 @@ function runTests() {
       assert.notEqual(menu.getComputedStyleValue('display'), 'none');
     });
 
-    test('menu fadeOut hides', function() {
-      menu.fadeOut();
-
-      window.setTimeout('fadeout', function() {
-        assert.equal(menu.getComputedStyleValue('display'), 'none');
-      }, menu.animationConfig.fadeOut.timing.duration);
-    });
-
-    test('menu fadeIn shows', function() {
-      menu.fadeOut();
-
-      window.setTimeout('fadeIn', function() {
-        assert.equal(menu.getComputedStyleValue('display'), menu.displayClass);
-      }, menu.animationConfig.fadeOut.timing.duration);
-    });
 
     test('menu not opened', function() {
 
@@ -86,8 +71,8 @@ function runTests() {
 
     test('open menu by click', function() {
 
-      var span = Polymer.dom(menu.root).querySelector('span');
-      span.click();
+      var button = Polymer.dom(menu.root).querySelector('button#button');
+      button.click();
 
       assert.isTrue(menu._opened);
       flush(function() {
