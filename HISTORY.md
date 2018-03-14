@@ -48,6 +48,7 @@
 * Changed names for outerTickSize to tickSizeOuter to match d3.
 * Added tickSizeInner to change tickSize on axis
 * Added tickPadding on axis
+* Added PxVisBehaviorChart.searchToolbar to PxVisBehaviorChart.chartCommon, adding a `getToolbar` method for all charts
 * Toolbar changes:
   * Any toolbar item can now have a `hidden` property to show/hide the item
   * Any toolbar item can now have a `disabled` property
@@ -55,6 +56,11 @@
   * Not a toolbar change per say but any custom event handler defined in `actionConfig` can access the toolbar by calling `getToolbar` on the chart (which is usually `this` in the handler).
   * In a similar way handlers for `onClick`, `onSelect` and `onDeselect` have direct access to the toolbar through `e.toolbar`.
   * when using preconfigured toolbar options keys with a value of `false` will be ignored, e.g : {zoom: true, pan: false} will only show zoom button
+* Event changes (BREAKING):
+  * Event now draws all events in the supplied data, not just one
+  * Removed `xKey` property and instead rely on `dataKey` supplied in the config
+  * Made defaul `dataKey` = 'time' instead of 'x' which was the default for `xKey`
+  * Event no longer directly displays a tooltip. Instead, it fires an event up and will rely on the chart to display the tooltip with the supplied information
 * BREAKING:
   * Toolbar: `onClick` definition in the config has been replaced by `onSelect`
   * Toolbar: Config definitions now have a 'click' defined by default. Custom configurations must now nullify this 'click' handler (if you dont use click).
@@ -62,7 +68,9 @@
   * horizontal registers do not support custom alignment anymore and will use all available width
   * domainChanged is not a Number with initial value of 0. This toggling easier and checking if it hasnt been toggled.
   * PxVisBehaviorD3.domainUpdateNotify has been removed. PxVisBehaviorD3.domainUpdate once again has `notify: true`.
-* Added PxVisBehaviorChart.searchToolbar to PxVisBehaviorChart.chartCommon, adding a `getToolbar` method for all charts
+  * remove `_checkColorType` from PxVisBehavior.commonMethods
+  * changed `PxVisBehaviorD3.icons._getIcon` to `PxVisBehaviorD3.icons._getPxIcon`
+  * changed `PxVisBehaviorD3.icons._getPxIcon` to return an object with the icon, size, and scale instead of returning an icon and setting two props for size and scale
 
 v4.7.6
 =================

@@ -1952,15 +1952,15 @@ PxVisBehaviorD3.icons = {
     window.addEventListener('iron-iconset-added',this._iconsLoadedBound);
   },
 
-  _getIcon: function(iconName, targetSize, defaultKey, defaultName) {
-    var split = iconName.split(':'),
-        key = split[0] && split[1] ? split[0] : defaultKey,
+  _getPxIcon: function(iconName, targetSize, defaultKey, defaultName) {
+    const split = iconName.split(':');
+    let key = split[0] && split[1] ? split[0] : defaultKey,
         name = split[0] && split[1] ? split[1] : defaultName,
         iconSet = this._meta.byKey(key),
         icon;
 
     if(!iconSet) {
-      console.warn("Cant find set named: " + key + ". Waiting for set to load...");
+      console.warn(`Cant find set named: ${key}. Waiting for set to load...`);
       this._debugIconWarning = true;
       this._waitForIconsLoaded();
       return null;
@@ -1968,20 +1968,25 @@ PxVisBehaviorD3.icons = {
 
     if(this._debugIconWarning) {
       this._debugIconWarning = false;
-      console.warn("Set " + key + " successfully loaded");
+      console.warn(`Set ${key} successfully loaded`);
     }
 
-    icon = Polymer.dom(iconSet).querySelector('[id="' + name + '"]');
+    icon = Polymer.dom(iconSet).querySelector(`[id="${name}"]`);
 
     if(!icon) {
-      console.warn("Cant find icon named: " + this._thisConfig.icon);
-      icon = Polymer.dom(iconSet).querySelector('[id="' + defaultName + '"]');
+      console.warn(`Cant find icon named: ${name}`);
+      icon = Polymer.dom(iconSet).querySelector(`[id="${defaultName}"]`);
     }
 
     this._iconSize = iconSet.size;
-    this._iconScale = this._calcIconScale(this._iconSize, targetSize);
+    const iconScale = this._calcIconScale(this._iconSize, targetSize);
+    const copy = icon.cloneNode(true);
 
-    return icon.cloneNode(true);
+    return {
+      icon: copy,
+      size: iconSet.size,
+      scale: iconScale
+    };
   },
 
   _calcIconScale: function(size, targetSize) {
@@ -2019,13 +2024,16 @@ PxVisBehaviorD3.cursorIcon = [{
       this._icon.remove();
     }
 
-    var icon = this._getIcon(this.iconType, 12, 'px-utl', 'information');
+    var icon = this._getPxIcon(this.iconType, 12, 'px-utl', 'information');
 
     if(!icon) {
       return;
     }
 
-    this._icon = Px.d3.select(this._cursorGroup.node().appendChild(icon))
+    this._iconSize = icon.size;
+    this._iconScale = icon.scale;
+
+    this._icon = Px.d3.select(this._cursorGroup.node().appendChild(icon.icon))
       .attr('fill', 'transparent')
       .attr('stroke', this._checkThemeVariable("--px-vis-cursor-line-color", 'rgb(0,0,0)'))
       .attr('pointer-events', 'none');

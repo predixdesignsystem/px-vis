@@ -2,10 +2,7 @@
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
 <link rel="import" href="px-vis-behavior-datetime.html"/>
-<link rel="import" href="../px-tooltip/px-tooltip.html"/>
 <link rel="import" href="../px-icon-set/px-icon-set.html"/>
-<link rel="import" href="../app-localize-behavior/app-localize-behavior.html"/>
-<link rel="import" href="css/px-vis-styles.html">
 
 <!--
 
@@ -71,23 +68,8 @@ Custom property | Description
 -->
 
 <dom-module id="px-vis-event">
-    <template>
-      <style include="px-vis-styles"></style>
-      <template is="dom-if" if="[[_thisConfig.enableTooltip]]">
-        <px-tooltip
-          id="eventTooltip"
-          for="[[_getTooltiptarget(eventIcon)]]"
-          smart-orientation
-          delay="10"
-          orientation="[[tooltipOrientation]]">
-          <span>
-            <b>[[localize("Event")]]</b>: [[eventData.label]] <br/>
-            <b>[[localize("ID")]]</b>: [[eventData.id]] <br/>
-            <b>[[_getValueTitle(xAxisType, localize)]]</b>[[_value]]<br/>
-          </span>
-        </px-tooltip>
-      </template>
-    </template>
+  <template>
+  </template>
 </dom-module>
 
 <script>
@@ -106,7 +88,6 @@ Custom property | Description
       PxVisBehavior.commonMethods,
       PxVisBehavior.events,
       PxVisBehaviorD3.domainUpdate,
-      Polymer.AppLocalizeBehavior,
       PxVisBehaviorD3.icons,
       PxVisBehavior.updateStylesOverride
     ],
@@ -127,37 +108,7 @@ Custom property | Description
        */
       eventGroup:{
         type:Object,
-        value: function() { return {}; }
-      },
-      /**
-       * Holder object for the event svg "line" element.
-       *
-       * @property eventLine
-       * @type Object
-       */
-      eventLine:{
-        type:Object,
-        value: function() { return {}; }
-      },
-      /**
-       * Holder object for the event svg icon.
-       *
-       * @property eventIcon
-       * @type Object
-       */
-      eventIcon:{
-        type:Object,
-        value: function() { return {}; }
-      },
-      /**
-       * Computed configuration object based on custom styles and default styles.
-       *
-       * @property _thisConfig
-       * @type Object
-       */
-      _thisConfig:{
-        type:Object,
-      value: function() { return {}; }
+        value: () => { return {}; }
       },
       /**
        * Specifies the orientation of the event tooltip.
@@ -182,11 +133,6 @@ Custom property | Description
        *
        */
       _eventConfigChanged: {
-        type: Boolean,
-        value: false
-      },
-
-      _animationFrameDone: {
         type: Boolean,
         value: false
       },
@@ -227,15 +173,9 @@ Custom property | Description
       * Use the key for localization if value for language is missing.
       * Should always be true for Predix components.
       */
-     useKeyIfMissing: {
-       type: Boolean,
-       value: true
-     },
-
-
-      _hasBeenDetached: {
+      useKeyIfMissing: {
         type: Boolean,
-        value: false
+        value: true
       },
 
       _reCalcValue: {
@@ -245,17 +185,64 @@ Custom property | Description
 
       _value: {
         type: String
-      }
+      },
 
+      /**
+       * Default defaultEventConfig
+       *
+       *```
+      * Default: {
+      *   'color': 'rgb(0,0,0)',
+      *   'icon': 'px-utl:information',
+      *   'type': 'px',
+      *   'offset': 0,
+      *   'size': 16,
+      *   'lineColor': 'rgb(0,0,0)',
+      *   'lineWeight': 1,
+      *   'enableTooltip': true,
+      *   'firstDateTimeFormat': 'HH:mm:ss ZZ',
+      *   'secondDateTimeFormat': 'DD MMM YYYY',
+      *   'separator': '|',
+      *   'timezone': 'utc',
+      *   'tooltipOrientation': 'left'
+      *   'dataKey': 'time'
+      * }
+      *```
+      *
+      */
+      _defaultDefaultEventConfig: {
+        type: Object,
+        value: () => {
+          return {
+            'color': 'rgb(0,0,0)',
+            'icon': 'px-utl:information',
+            'type': 'px',
+            'offset': [0,0],
+            'size': 16,
+            'lineColor': 'rgb(0,0,0)',
+            'lineWeight': 1,
+            'enableTooltip': true,
+            'firstDateTimeFormat': 'HH:mm:ss ZZ',
+            'secondDateTimeFormat': 'DD MMM YYYY',
+            'separator': '|',
+            'timezone': 'utc',
+            'tooltipOrientation': 'left',
+            'dataKey': 'time'
+          };
+        }
+      },
+
+      _iconInfo: {
+        type: Object,
+        value: () => { return {}; }
+      }
     },
 
     observers: [
-      'drawElement(svg, eventData.*, _animationFrameDone, height, _stylesUpdated)',
-      '_calcThemeOrConfig(_stylesUpdated)',
-      '_eventConfigChanged(eventConfig.*)',
-      'positionElement(x, domainChanged)',
-      '_addClipPath(clipPath)',
-      '_recalcValue(eventData, xAxisType, eventConfig.*)'
+      'drawElement(svg, eventData.*, height, _stylesUpdated, domainChanged)',
+      '_eventConfigUpdated(eventConfig.*)',
+      '_eventConfigUpdated(defaultEventConfig.*)',
+      '_addClipPath(clipPath)'
      ],
 
      listeners: {
@@ -270,23 +257,14 @@ Custom property | Description
          this.eventGroup = null;
          this.eventLine = null;
          this.eventIcon = null;
-         this._hasBeenDetached = true
        }
      },
-
-
-    attached: function() {
-      if(this._hasBeenDetached) {
-        this._hasBeenDetached = false;
-        this.drawElement();
-      }
-    },
 
     ready: function() {
       window.requestAnimationFrame(function() {
         this.updateStyles();
       }.bind(this));
-      this._iconCallbackQueue = [this._addIcon,this.positionElement,this._addClipPath];
+      this._iconCallbackQueue = [this._forceIconRedraw];
     },
 
     _tooltipRequest: function() {
@@ -297,56 +275,55 @@ Custom property | Description
       }
     },
 
-    _eventConfigChanged: function() {
+    _getConfigValue: function(key, eventType, theme) {
+      if(this.eventConfig && this.eventConfig[eventType] && this.eventConfig[eventType][key]) {
+        return this.eventConfig[eventType][key];
+      }
+
+      if(theme) {
+        return this._getDefaultValueOrTheme(key, theme);
+      }
+
+      return this._getDefaultValue(key);
+    },
+
+    _getDefaultValue: function(key) {
+      return this.defaultEventConfig && this.defaultEventConfig[key] ? this.defaultEventConfig[key] : this._defaultDefaultEventConfig[key];
+    },
+
+    _getDefaultValueOrTheme: function(key, theme) {
+      return this.defaultEventConfig && this.defaultEventConfig[key] ? this.defaultEventConfig[key] : this._checkThemeVariable(theme, this._defaultDefaultEventConfig[key]);
+    },
+
+    _eventConfigUpdated: function() {
       if(this.hasUndefinedArguments(arguments)) {
         return;
       }
 
-      // this._processConfiguration();
+      if(!this._eventDrawn) {
+        return;
+      }
+
+      this._forceIconRedraw();
+    },
+
+    _forceIconRedraw: function() {
+      this._eventConfigChanged = true;
       this.drawElement();
     },
 
-    _recalcValue: function() {
+    drawElement: function() {
       if(this.hasUndefinedArguments(arguments)) {
         return;
       }
 
-      //recalc/format the value next time we show the tooltip
-      this._reCalcValue = true;
-    },
-
-    _getTooltiptarget: function() {
-      if(this.hasUndefinedArguments(arguments)) {
-        return;
+      if(this.drawDebounceTime > 0) {
+        this.debounce('_drawEvents', function() {
+          this._drawElementDebounced();
+        }, this.drawDebounceTime);
+      } else {
+        this._drawElementDebounced();
       }
-
-      return (this.eventIcon && this.eventIcon.node) ? this.eventIcon.node() : null;
-    },
-
-    _calcThemeOrConfig: function() {
-
-      if(!this.defaultEventConfig) {
-
-        this.defaultEventConfig = {
-          'icon': this._defaultDefaultEventConfig.icon,
-          'type': this._defaultDefaultEventConfig.type,
-          'offset': this._defaultDefaultEventConfig.offset,
-          'size': this._defaultDefaultEventConfig.size,
-          'lineColor': this._defaultDefaultEventConfig.lineColor,
-          'lineWeight': this._defaultDefaultEventConfig.lineWeight,
-          'enableTooltip': this._defaultDefaultEventConfig.enableTooltip,
-          'firstDateTimeFormat': this._defaultDefaultEventConfig.firstDateTimeFormat,
-          'secondDateTimeFormat': this._defaultDefaultEventConfig.secondDateTimeFormat,
-          'separator': this._defaultDefaultEventConfig.separator,
-          'timezone': this._defaultDefaultEventConfig.timezone,
-          'tooltipOrientation': this._defaultDefaultEventConfig.tooltipOrientation
-        };
-      }
-
-      this.defaultEventConfig.lineColor = this._checkThemeVariable("--px-vis-event-line-color", this._defaultDefaultEventConfig.lineColor);
-      this.defaultEventConfig.color = this._checkThemeVariable("--px-vis-event-icon-color", this._defaultDefaultEventConfig.color);
-
-      this.set('_animationFrameDone', true);
     },
 
     /**
@@ -355,56 +332,126 @@ Custom property | Description
      *
      * @method drawElement
      */
-    drawElement: function() {
-     if(this.hasUndefinedArguments(arguments)) {
-       return;
-     }
+     _drawElementDebounced: function() {
+      if(!this.svg ||
+          this._isObjEmpty(this.eventData) ||
+          !this.domainChanged) {
+        return;
+      }
 
-      if(this.svg && this._doesObjHaveValues(this.eventData) && this._animationFrameDone) {
+      let _this = this;
 
-        if(this.eventGroup && this._doesD3HaveValues(this.eventGroup)) {
-          this._eventDrawn = false;
-          this.eventGroup.remove();
-          this.eventGroup = null;
-        }
-
-        this._processConfiguration();
-
+      if(this._isD3Empty(this.eventGroup)) {
         this.eventGroup = this.svg.append('g')
-          .attr('class','event')
+          .attr('class', 'events')
           .attr('pointer-events', 'all');
 
-        // draw the path
-        this.eventLine = this.eventGroup.append("line")
-          .attr('stroke', this._checkColorType(this._thisConfig.lineColor))
-          .attr('stroke-width', this._thisConfig.lineWeight);
-
-        this._addIcon();
-
-        this.positionElement();
-
         this._addClipPath();
-
-        //check if we want a tooltip
-        this.notifyPath('_thisConfig.enableTooltip')
       }
+
+      this._eventBuilder = this.eventGroup.selectAll('g.event')
+        .data(this.eventData, function(d) { return d.id });
+
+      this._eventBuilder.exit().remove();
+
+      this._eventBuilder
+        .enter()
+          .append('g')
+          .attr('class', 'event')
+          .attr('event-id',function(d) { return d.id })
+          .each(function(d,i) {
+            _this._enterLine(d, i, this);
+            _this._enterIcon(d, i, this);
+          })
+        .merge(this._eventBuilder)
+          .each(function(d,i) {
+            // since the config controls the type of icon (image vs svg) we append, we cannot just rely on d3 updating. Have to remove and reappend the correct icon type
+            if(_this._eventConfigChanged) {
+              Px.d3.select(this).select('.event-icon').remove();
+              _this._enterIcon(d, i, this);
+            }
+
+            _this._mergeLine(d, i, this);
+            _this._mergeIcon(d, i, this);
+          });
+
+      this._eventConfigChanged = false;
+      this._eventDrawn = true;
+      this.fire('px-vis-event-rendering-ended');
     },
 
+    _enterLine: function(d, i, elem) {
+      Px.d3.select(elem).append("line")
+        .attr('class', 'event-line');
+    },
 
-    /**
-     * Updates the position of the event.
-     * Called from an observer watching for data and the necessary d3 objects.
-     *
-     * @method positionElement
-     */
-    positionElement: function() {
-     if(this.hasUndefinedArguments(arguments)) {
-       return;
-     }
+    _enterIcon: function(d, i, elem) {
+      const iconType = this._getConfigValue('type', d.label, false);
+      let iconSvg;
+      if(iconType === 'image') {
+        iconSvg = Px.d3.select(elem).append("image")
+          .attr('class', 'event-icon')
+          .attr("xlink:href", this._getConfigValue('icon', d.label, false))
+          .attr("width", this._getConfigValue('size', d.label, false) + 'px')
+          .attr("height", this._getConfigValue('size', d.label, false) + 'px')
+          .style("cursor","pointer");
 
-      if(this.x && this._eventDrawn) {
-        this._positionEvent();
+      } else {
+        const g = Px.d3.select(elem).append("g")
+          .attr('class', 'event-icon')
+          .style("cursor","pointer");
+
+        const iconName = this._getConfigValue('icon', d.label, false);
+        const size = this._getConfigValue('size', d.label, false);
+
+        if(!this._iconInfo[iconName]) {
+          this._iconInfo[iconName] = this._getPxIcon(iconName, size, 'px-utl', 'information');
+
+          if(!this._iconInfo[iconName]) {
+            // error messages and handling are in _getPxIcon
+            return;
+          }
+        }
+
+        const icon = g.node().appendChild(this._iconInfo[iconName].icon);
+        iconSvg = Px.d3.select(icon)
+          .attr('fill', 'transparent')
+          .attr('stroke', this._getConfigValue('color', d.label, "--px-vis-event-icon-color"))
+          .style("cursor","pointer");
       }
+
+      iconSvg.on('mouseenter', this._requestTooltip.bind(this))
+        .on('mouseleave', this._clearTooltipRequest.bind(this));
+    },
+
+    _mergeLine: function(d, i, elem) {
+      const key = this._getConfigValue('dataKey', d.label, false);
+
+      Px.d3.select(elem).select("line.event-line")
+        .attr('stroke', this._getConfigValue('lineColor', d.label, "--px-vis-event-line-color"))
+        .attr('stroke-width', this._getConfigValue('lineWeight', d.label, false))
+        .attr("x1", this.x(d[key]))
+        .attr("x2", this.x(d[key]))
+        .attr("y1", Math.max(this.height - this.margin.top, 0))
+        .attr("y2", 0);
+
+    },
+
+    _mergeIcon: function(d, i, elem) {
+      const key = this._getConfigValue('dataKey', d.label, false);
+      const size = Number(this._getConfigValue('size', d.label, false));
+      const offset = this._getConfigValue('offset', d.label, false);
+      const type = this._getConfigValue('type', d.label, false);
+      const iconName = this._getConfigValue('icon', d.label, false);
+
+      const x = this.x(d[key]) - size/2 + offset[0];
+      const y0 = offset[1] - 5;
+      const y = type === "image" ? y0 : y0 - size;
+      const translate = `translate(${x},${y})`;
+      const scale = type === "image" ? '' : `scale(${this._iconInfo[iconName].scale})`;
+
+      Px.d3.select(elem).select('.event-icon')
+        .attr("transform", `${translate} ${scale}`);
     },
 
     /**
@@ -417,101 +464,17 @@ Custom property | Description
        return;
      }
 
-      this.addClipPath(this.eventLine);
-      this.addClipPath(this.eventIcon);
+      this.addClipPath(this.eventGroup);
     },
 
-    /**
-     * Sets the position for the event line and icon.
-     *
-     * @method _positionEvent
-     */
-    _positionEvent: function() {
-      this.eventLine
-        .attr("x1", this.x(this.eventData[this.xKey]))
-        .attr("x2", this.x(this.eventData[this.xKey]))
-        .attr("y1", Math.max(this.height - this.margin.top, 0))
-        .attr("y2", 0);
-
-      var x = this.x(this.eventData[this.xKey]) -
-                Number(this._thisConfig.size)/2 + this._thisConfig.offset[0],
-          y0 = 0 - 5 + this._thisConfig.offset[1],
-          y = this._thisConfig.type === "image" ? y0 : y0 - this._thisConfig.size;
-          translate = "translate(" + x + "," + y + ")",
-          scale = this._thisConfig.type === "image" ? '' : " scale(" + this._iconScale + ")";
-
-      this.eventIcon
-        .attr("transform", (translate + scale));
-    },
-
-    _addIcon: function() {
-      if(this._thisConfig.type === 'image') {
-        this.eventIcon = this.eventGroup.append("image")
-          .attr("xlink:href", this._thisConfig.icon)
-          .attr("width", this._thisConfig.size + 'px')
-          .attr("height", this._thisConfig.size + 'px')
-          .style("cursor","pointer");
-      } else {
-        var icon = this._getIcon(this._thisConfig.icon, this._thisConfig.size, 'px-utl', 'information');
-
-        if(!icon) {
-          this._eventDrawn = false;
-          return;
-        }
-
-        this.eventIcon = Px.d3.select(this.eventGroup.node().appendChild(icon))
-          .attr('fill', 'transparent')
-          .attr('stroke', this._thisConfig.color)
-          .style("cursor","pointer");
-      }
-
-      this._eventDrawn = true;
+    _requestTooltip: function(d,i) {
 
     },
 
-    /**
-     * Compiles a configuration object by looking if there is a custom style, or if it should use defaults.
-     *
-     * @method _processConfiguration
-     */
-    _processConfiguration: function() {
+    _clearTooltipRequest: function(d,i) {
 
-      // is there a configuration object for this event type?
-      if(this.eventConfig && this.eventConfig[this.eventData.label]) {
-        /*
-          check each key (icon, color, etc) of the defaultEventConfig and see if the eventConfig is overwriting that property. If so, set it, otherwise use default
-        */
-        var k = Object.keys(this.defaultEventConfig),
-            i,
-            len = k.length;
-        for(i = 0; i < len; i++){
-          this._thisConfig[k[i]] =  this.eventConfig[this.eventData.label][k[i]] || this.eventConfig[this.eventData.label][k[i]] === 0 || this.eventConfig[this.eventData.label][k[i]] === false ? this.eventConfig[this.eventData.label][k[i]] : this.defaultEventConfig[k[i]];
-        }
-
-        //process special config........................
-        if(this._thisConfig.firstDateTimeFormat) {
-          this.firstDateTimeFormat = this._thisConfig.firstDateTimeFormat;
-        }
-        if(this._thisConfig.secondDateTimeFormat) {
-          this.secondDateTimeFormat = this._thisConfig.secondDateTimeFormat;
-        }
-        if(this._thisConfig.timezone) {
-          this.timezone = this._thisConfig.timezone;
-        }
-        if(this._thisConfig.tooltipOrientation) {
-          this.set('tooltipOrientation', this._thisConfig.tooltipOrientation);
-        }
-        if(this._thisConfig.separator) {
-          this.separator = this._thisConfig.separator;
-        }
-        if(typeof this._thisConfig.enableTooltip !== "undefined") {
-          this.notifyPath('_thisConfig.enableTooltip');
-        }
-      } else {
-        // else, set everything to default
-        this._thisConfig = this.defaultEventConfig;
-      }
     },
+
     /**
      * Formats the datetime to match the custom format.
      *
