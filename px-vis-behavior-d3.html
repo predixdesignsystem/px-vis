@@ -1480,7 +1480,7 @@ PxVisBehaviorD3.lineShared = [{
   },
 
   observers: [
-    '_computeGradientRange(chartData.*,timeDomain.*,seriesId)'
+    '_computeGradientRange(timeDomain)'
   ],
 
   _resetRenderingContext: function() {
@@ -1511,32 +1511,19 @@ PxVisBehaviorD3.lineShared = [{
   },
 
   /**
-   * Computes the data range.
+   * Returns the correct color to use for the line.
    *
+   * @method _canvasLineColor
    */
-  _computeGradientRange: function(chartData, timeDomain, seriesId) {
-   if(this.hasUndefinedArguments(arguments)) {
-     return;
-   }
-
-    if(chartData.value.length > 0) {
-      var x1,x2;
-      if(timeDomain.value && timeDomain.value.x && timeDomain.value.x.length > 0) {
-        x1 = Number(timeDomain.value.x[0]);
-        x2 = Number(timeDomain.value.x[1]);
-      } else {
-        x1 = Number(chartData.value[0][seriesId]);
-        x2 = Number(chartData.value[chartData.value.length - 1][seriesId]);
-      }
-
-      //TODO: notify for things to redraw? prob ok
-      this.set('gradientColorsMin', x1);
-      this.set('gradientColorsMax', x2);
+    _getLineColor:function(data) {
+    // figure out if we are using a category or the seriesID
+    var key = this.categoryKey ? data[this.categoryKey] : this.seriesId;
+    // check that we want to draw that category
+    if(this._colorArr[key]) {
+      // return the appropriate rgba
+      return this._colorArr[key](data[this.seriesId]);
     }
-  },
-
-  _removeGaps: function(data) {
-
+    return null;
   },
 
   /**

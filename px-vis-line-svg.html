@@ -323,18 +323,7 @@
     _colorLine:function() {
       if(this.linePath) {
         this.linePath.attr('stroke',function(d,i) {
-          //normally, do this
-          if(!this.categoryKey) {
-            return this.completeSeriesConfig[this.seriesId]['color'];
-          }
-
-          //check that category has been defined
-          if(this.completeSeriesConfig[d[this.categoryKey]]) {
-            return this.completeSeriesConfig[d[this.categoryKey]]['color']
-          }
-
-          //do nothing if not
-          return
+          return this._getLineColor(d);
         }.bind(this))
         .attr('stroke-opacity',this._svgLineOpacity.bind(this));
       }
@@ -348,11 +337,8 @@
       if(this.mutedSeries[this.seriesId]) {
         return this.mutedOpacity;
       }
-      if(this.gradientLine) {
-        return this._opacityLine(d);
-      } else {
-        return 1;
-      }
+
+      return 1;
     },
     /**
      * Redraw this series on top if needed.

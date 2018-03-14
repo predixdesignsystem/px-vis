@@ -158,7 +158,7 @@
       if(this.gradientLine) {
         //gradient line
         this._currentDrawingOptions.getColorValue = function(d) {
-          console.log('get color')
+          console.log('optimize opacity?')
           var opacity = this._isSerieMuted(d) ? this._currentDrawingOptions.mutedOpacity : 1;
 
           if(opacity !== 0) {
@@ -313,22 +313,6 @@
       } else {
         return this.mutedSeries[this.seriesId] ? true : false;
       }
-    },
-
-    /**
-     * Returns the correct rgba to use for the canvas line.
-     *
-     * @method _canvasLineColor
-     */
-    _canvasLineColor:function(d,opacity) {
-      // figure out if we are using a category or the seriesID
-      var key = this.categoryKey ? d[this.categoryKey] : this.seriesId;
-      // check that we want to draw that category
-      if(this._colorArr[key]) {
-        // return the appropriate rgba
-        return this._colorArr[key](d[this.seriesId]);
-      }
-      return null;
     }
   });
 </script>

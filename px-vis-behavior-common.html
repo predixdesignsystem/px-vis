@@ -3308,7 +3308,7 @@ PxVisBehavior.updateStylesOverride = {
 
     @polymerBehavior PxVisBehavior.timeDomain
 */
-PxVisBehavior.timeDomain = {
+PxVisBehavior.timeDomain = [{
   properties: {
     /**
      * Can be used to define a time domain to be used, typically to restrain/filter the amount
@@ -3319,9 +3319,27 @@ PxVisBehavior.timeDomain = {
       value: function() {
         return {};
       }
+    },
+    timeKey: {
+      type: String
+    }
+  },
+  observers: [
+    '_timeDomainChartData(chartData, timeKey)'
+  ],
+
+  _timeDomainChartData: function() {
+    if(this.timeKey && this.chartData && this.chartData.length && (!this._doesObjHaveValues(this.timeDomain) || !this.timeDomain.x || this.timeDomain.x.length === 0)) {
+
+      let domain = {};
+      if(this.timeDomain && this.timeDomain.y) {
+        domain.y = this.timeDomain.y;
+      }
+      domain.x = [this.chartData[0][this.timeKey], this.chartData[this.chartData.length - 1][this.timeKey]];
+      this.set('timeDomain', domain);
     }
   }
-};
+}, PxVisBehavior.dataset, PxVisBehavior.commonMethods];
 
 /**
     Name:
@@ -3598,6 +3616,18 @@ PxVisBehavior.gradientColorsFunction = [{
     _gradientColorsFunction: {
       type: Function,
       computed: '_computeColorGradientFunction(gradientColors)'
+    }
+  },
+
+  /**
+   * Computes the data range.
+   *
+   */
+   _computeGradientRange: function(timeDomain) {
+
+    if(timeDomain && timeDomain.x && timeDomain.x.length > 0) {
+      this.set('gradientColorsMin', Number(timeDomain.x[0]));
+      this.set('gradientColorsMax', Number(timeDomain.x[1]));
     }
   },
 
