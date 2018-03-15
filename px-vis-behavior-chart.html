@@ -2482,14 +2482,14 @@ PxVisBehaviorChart.axisRegister = [{
     }
   },
 
-  observers: ['_computedAxisRegisterConf(axes, completeSeriesConfig)'],
+  observers: ['_computedAxisRegisterConf(axes, completeSeriesConfig, hideAxisRegister)'],
 
   /**
   *
   * configures the register config and empty data series
   */
   _computedAxisRegisterConf: function(axes, completeSeriesConfig) {
-   if(this.hasUndefinedArguments(arguments)) {
+   if(this.hasUndefinedArguments(arguments) || this.hideAxisRegister) {
      return;
    }
 
@@ -2571,6 +2571,14 @@ PxVisBehaviorChart.axisRegister = [{
       }
 
       this.set('_axisRegisterTooltipData', copy);
+    } else {
+
+      //make sure we still update it in case something else is looking for it
+      if(!this._axisRegisterTooltipData) {
+        this._axisRegisterTooltipData = {};
+      }
+
+      this.set('_axisRegisterTooltipData.dataset', values ? values : null);
     }
   }
 }, PxVisBehavior.observerCheck, PxVisBehavior.dimensions, PxVisBehavior.completeSeriesConfig, PxVisBehaviorChart.mutedAxes, PxVisBehaviorChart.getHideClass];
@@ -2605,12 +2613,12 @@ PxVisBehaviorChart.categoryRegister = [{
     }
   },
   observers: [
-    '_computeCategoryRegisterConfig(categoryKey, completeSeriesConfig, categories)',
+    '_computeCategoryRegisterConfig(categoryKey, completeSeriesConfig, categories, _hideCategoryRegister)',
     '_computeHideCategoryRegister(hideCategoryRegister, categoryKey)'
   ],
 
   _computeCategoryRegisterConfig: function() {
-    if(this.hasUndefinedArguments(arguments)) {
+    if(this.hasUndefinedArguments(arguments) || this._hideCategoryRegister) {
       return;
     }
 

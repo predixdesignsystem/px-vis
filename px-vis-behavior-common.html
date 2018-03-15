@@ -3633,6 +3633,7 @@ PxVisBehavior.gradientColorsFunction = [{
 
   createGradientFunction: function(colors) {
 
+console.log('TOO MANY CALLS')
     if(colors) {
       if(typeof colors === 'string') {
         return function() {
@@ -3640,15 +3641,15 @@ PxVisBehavior.gradientColorsFunction = [{
         }
       } else if(Array.isArray(colors)) {
 
+        let fn;
         if(colors.length === 2) {
-          return function(val) {
-            return Px.d3.interpolateRgb(colors[0], colors[1])(this._normalizeValue(val));
-          }.bind(this);
+          fn = Px.d3.interpolateRgb(colors[0], colors[1]);
         } else {
-          return function(val) {
-            return Px.d3.interpolateRgbBasis(colors)(this._normalizeValue(val));
-          }.bind(this);
+          fn = Px.d3.interpolateRgbBasis(colors);
         }
+        return function(val) {
+          return fn(this._normalizeValue(val));
+        }.bind(this);
       } else if(typeof colors === 'function') {
         return colors;
       } else {
@@ -3658,7 +3659,6 @@ PxVisBehavior.gradientColorsFunction = [{
   },
 
   _computeColorGradientFunction: function() {
-
     return this.createGradientFunction(this.gradientColors);
   },
 
