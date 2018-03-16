@@ -23,9 +23,9 @@
   <template>
     <style include="px-vis-markers-tooltip-content-styles"></style>
 
-      <div class="flex flex--middle u-ml- u-mr- u-mb- u-mt--">
+      <div class$="flex flex--middle u-mb- u-mt-- [[_buttonsShown(_multipleTooltips)]]">
         <template is="dom-if" if="[[_multipleTooltips]]">
-          <button class$="btn btn--bare button--nav-left [[_leftDisabled(_currentTooltipIndex)]]" on-click="_previousTooltip">
+          <button class$="btn btn--bare button--nav-left no-min-width [[_leftDisabled(_currentTooltipIndex)]]" on-click="_previousTooltip">
             <px-icon icon="px-utl:chevron-left"></px-icon>
           </button>
         </template>
@@ -47,7 +47,7 @@
           </template>
         </div>
         <template is="dom-if" if="[[_multipleTooltips]]">
-          <button class$="btn btn--bare button--nav-right [[_rightDisabled(_currentTooltipIndex)]]" on-click="_nextTooltip">
+          <button class$="btn btn--bare button--nav-right no-min-width [[_rightDisabled(_currentTooltipIndex)]]" on-click="_nextTooltip">
             <px-icon icon="px-utl:chevron-right"></px-icon>
           </button>
         </template>
@@ -243,5 +243,9 @@
     _rightDisabled: function() {
       return this._currentTooltipIndex === this.tooltipDataResult.length-1 ? 'btn--disabled' : '';
     },
+
+    _buttonsShown: function(buttonsShown) {
+      return buttonsShown ? '' : ' u-ml- u-mr-';
+    }
   });
 </script>

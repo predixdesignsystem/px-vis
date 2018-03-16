@@ -61,6 +61,8 @@
   * Removed `xKey` property and instead rely on `dataKey` supplied in the config
   * Made defaul `dataKey` = 'time' instead of 'x' which was the default for `xKey`
   * Event no longer directly displays a tooltip. Instead, it fires an event up and will rely on the chart to display the tooltip with the supplied information
+* Marker changes (BREAKING):
+  * Marker no longer directly displays a tooltip. Instead, it fires an event up and will rely on the chart to display the tooltip with the supplied information
 * BREAKING:
   * Toolbar: `onClick` definition in the config has been replaced by `onSelect`
   * Toolbar: Config definitions now have a 'click' defined by default. Custom configurations must now nullify this 'click' handler (if you dont use click).
