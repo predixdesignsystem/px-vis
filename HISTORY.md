@@ -62,6 +62,10 @@
   * horizontal registers do not support custom alignment anymore and will use all available width
   * domainChanged is not a Number with initial value of 0. This toggling easier and checking if it hasnt been toggled.
   * PxVisBehaviorD3.domainUpdateNotify has been removed. PxVisBehaviorD3.domainUpdate once again has `notify: true`.
+  * `px-vis-brush` and `px-vis-chart-navigator` don't use opacity for gradients but colors instead. As such the `gradientOverlay` property has been replaced byt the `gradientColors` property which can be:
+    * A single color (string)
+    * An array of colors (creating a linear gradient from those colors)
+    * A custom function defining a gradient by returning a color for an input between 0 and 1.
 * Added PxVisBehaviorChart.searchToolbar to PxVisBehaviorChart.chartCommon, adding a `getToolbar` method for all charts
 
 v4.7.6

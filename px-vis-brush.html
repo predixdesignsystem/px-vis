@@ -43,7 +43,7 @@ Custom property | Description
   `--px-vis-nav-brush-outline-color` | The stroke (border) color for the brushed box
   `--px-vis-nav-brush-fill-color` | The fill (background) color for the brushed box
   `--px-vis-nav-brush-opacity` | The opacity of the brushed box
-  `--px-vis-nav-brush-gradient-fill-color` | The fill (background) color for the brushed box when gradientOverlay is 'true'
+  `--px-vis-nav-brush-gradient-fill-color` | The fill (background) color for the brushed box when gradientColors is not defined
   `--px-vis-nav-brush-handle-fill-color` | The fill (background) color for the handles on the brushed box
   `--px-vis-nav-brush-handle-lines-color` | The stroke (border) color for the handles on the brushed box
   `--px-vis-nav-brush-handle-fill-color-hover` | The hover state fill (background) color for the handles on the brushed box
@@ -149,14 +149,6 @@ Custom property | Description
         notify:true
       },
       /**
-       * Boolean specifying if the rectangular overlay should have a gradient applied
-       *
-       */
-      gradientOverlay: {
-        type: Boolean,
-        value: false
-      },
-      /**
        * Allows or prevents changes to selectedDomain
        */
       _preventDomainChange: {
@@ -171,17 +163,14 @@ Custom property | Description
       _clipPathId: {
         type: String
       },
-      _gradientFunctions: {
-        type: Array,
-        value: function() {
-          return [];
-        }
+      _gradientFunction: {
+        type: Function
       }
     },
 
     observers: [
       'drawElement(domainChanged, svg, axis, height, selectedDomain, _animationFrameDone, _stylesUpdated)',
-      '_styleGradient(gradientOverlay, _gradientFunctions)',
+      '_styleGradient(_gradientFunction)',
       '_zoomBrush(chartDomain.*)',
       '_chartDomainChanged(chartDomain)',
       '_computeGradientFunctions(gradientColors)'
@@ -255,34 +244,10 @@ Custom property | Description
           */
           this._brushGroup.select('rect.selection')
             .attr('y', 0)
-
+            .attr('stroke', this._checkThemeVariable('--px-vis-nav-brush-outline-color', 'rgb(0,0,0)'))
+            .attr('stroke-width',1)
             .attr('shape-rendering','crispEdges')
-            .attr('clip-path', 'url(#' + this._clipPathId + '0)')
-            .attr('fill-opacity', this._checkThemeVariable('--px-vis-nav-brush-opacity', 0.3))
-            .attr('fill','url(#overlayGradient0)');
-
-          if(this._gradientFunctions.length > 1) {
-            let originalRect = this._brushGroup.select('rect.selection'),
-                height = originalRect.attr('height'),
-                width = originalRect.attr('width'),
-                rectHeight = Math.floor(height/this._gradientFunctions.length);
-
-            originalRect.attr('height', rectHeight);
-
-//TODO: solve stroke
-            for(let i=1; i<this._gradientFunctions.length; i++) {
-              this._brushGroup.append('rect')
-                .attr('class', 'selection')
-                .attr('y', rectHeight * i)
-                .attr('height', rectHeight)
-                .attr('width', width)
-
-                .attr('shape-rendering','crispEdges')
-                .attr('clip-path', 'url(#' + this._clipPathId + 'i)')
-                .attr('fill-opacity', this._checkThemeVariable('--px-vis-nav-brush-opacity', 0.3))
-                .attr('fill',`url(#overlayGradient${i})`);
-            }
-          }
+            .attr('clip-path', 'url(#' + this._clipPathId + '0)');
 
           this._styleGradient();
 
@@ -318,29 +283,26 @@ Custom property | Description
     _styleGradient: function() {
 
       if(!this._isD3Empty(this._brushGroup)) {
-        let overlay = this._brushGroup.select('rect.selection');
+        let overlay = this._brushGroup.select('rect.selection'),
+            currentOverlayIndex = 0;
 
-        if(this.gradientOverlay && this._gradientFunctions.length) {
+        if(this._gradientFunction) {
 
+          let steps = 100,
+              interval = 100/steps,
+              gradient = this.svg.append('defs')
+                          .append('linearGradient')
+                          .attr('id', `overlayGradient`);
 
-          this._gradientFunctions.forEach(function(fn, index) {
+          for(let i=0; i<steps; i++) {
+            gradient.append('stop')
+              .attr('offset', (i*interval) + '%')
+              .attr('stop-color', this._gradientFunction((i*interval)/100));
+          }
 
-            let steps = 100,
-                interval = 100/steps,
-                gradient = this.svg.append('defs')
-                            .append('linearGradient')
-                            .attr('id', `overlayGradient${index}`);
+          overlay.attr('fill',`url(#overlayGradient)`)
+            .attr('fill-opacity', this._checkThemeVariable("--px-vis-nav-brush-opacity", 0.3));
 
-            for(let i=0; i<steps; i++) {
-              gradient.append('stop')
-                .attr('offset', (i*interval) + '%')
-                .attr('stop-color', fn((i*interval)/100));
-            }
-
-            //TODO: opacity
-            // overlay.attr('fill',`url(#overlayGradient${index})`)
-            //   .attr('fill-opacity', this._checkThemeVariable("--px-vis-nav-brush-opacity", 0.3));
-          }.bind(this));
         } else {
           overlay.attr('fill',this._checkThemeVariable("--px-vis-nav-brush-fill-color", 'rgb(0,0,0)'))
             .attr('fill-opacity', this._checkThemeVariable("--px-vis-nav-brush-opacity", 0.3));
@@ -728,17 +690,7 @@ Custom property | Description
 
     _computeGradientFunctions: function() {
       if(this.gradientColors) {
-        if(Array.isArray(this.gradientColors) && Array.isArray(this.gradientColors[0])) {
-
-          let newArr = [];
-          this.gradientColors.forEach(function(color) {
-            newArr.push(this.createGradientFunction(color));
-          }.bind(this));
-          this.set('_gradientFunctions', newArr);
-
-        } else {
-          this.set('_gradientFunctions', [this.createGradientFunction(this.gradientColors)]);
-        }
+        this.set('_gradientFunction', this.createGradientFunction(this.gradientColors));
       }
     }
   });
