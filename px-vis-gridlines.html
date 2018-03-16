@@ -100,10 +100,10 @@ Custom property | Description
           /**
            * An x,y amount to move the grid to allow for labels and titles.
            *
-           * @property translateAmt
+           * @property _translateAmt
            * @type Array
            */
-          translateAmt: {
+          _translateAmt: {
             type: Array,
             value:function() { return [0,0]; }
           },
@@ -122,7 +122,7 @@ Custom property | Description
         },
 
         observers: [
-          'drawElement(domainChanged,axis,margin.*,length,svg)',
+          'drawElement(domainChanged,axis,margin.*,length,svg, offset)',
           '_setLineStyles(_stylesUpdated)'
         ],
 
@@ -206,17 +206,17 @@ Custom property | Description
               // this._grid.tickValues(this.axis.domain());
               if(this.orientation === 'bottom') {
                 var h = Px.d3.select(this.svg.node().ownerSVGElement).attr('height') - Number(this.margin.bottom) - Number(this.margin.top);
-                this.translateAmt = [0,h];
+                this._translateAmt = [0,h];
               } else if(this.orientation === 'left') {
-                this.translateAmt = [0,0];
+                this._translateAmt = [0,0];
               }
 
               // checks to see if the grid already exists. If not, create; if so, update
               if(this._isObjEmpty(this._gridGroup)) {
-                this._gridGroup = this.svg.append("g")
-                  .attr("class", "grid")
+                this._gridGroup = this.svg.append('g')
+                  .attr('class', 'grid')
                   .attr('grid-id',this.gridId)
-                  .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
+                  .attr('transform', 'translate(' + (this._translateAmt[0] + this.offset[0]) + ',' + (this._translateAmt[1] + this.offset[1])  + ')')
                   .call(this._grid);
 
                 this._removeUncessaryElems(this._gridGroup);
@@ -225,7 +225,7 @@ Custom property | Description
               } else {
                 this._gridGroup
                 // .duration(750)
-                .attr("transform", "translate(" + this.translateAmt.join(',') + ")")
+                .attr('transform', 'translate(' + (this._translateAmt[0] + this.offset[0]) + ',' + (this._translateAmt[1] + this.offset[1])  + ')')
                 .call(this._grid);
 
                 this._removeUncessaryElems(this._gridGroup);
@@ -256,7 +256,7 @@ Custom property | Description
           if(this._doesD3HaveValues(this._gridGroup)) {
             this._gridGroup.selectAll('line')
               .attr('fill','none')
-              .attr('stroke', this._checkThemeVariable("--px-vis-gridlines-color", 'rgb(125,125,125)'))
+              .attr('stroke', this._checkThemeVariable('--px-vis-gridlines-color', 'rgb(125,125,125)'))
               .attr('shape-rendering','crispEdges');
           }
         }
