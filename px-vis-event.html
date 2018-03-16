@@ -83,13 +83,13 @@ Custom property | Description
       PxVisBehaviorD3.axes,
       PxVisBehavior.sizing,
       PxVisBehavior.axisTypes,
-      PxVisBehaviorTime.datetime,
       PxVisBehaviorD3.clipPath,
       PxVisBehavior.commonMethods,
       PxVisBehavior.events,
       PxVisBehaviorD3.domainUpdate,
       PxVisBehaviorD3.icons,
-      PxVisBehavior.updateStylesOverride
+      PxVisBehavior.updateStylesOverride,
+      PxVisBehavior.scaleTypeCheck
     ],
 
     /**
@@ -111,24 +111,6 @@ Custom property | Description
         value: () => { return {}; }
       },
       /**
-       * Specifies the orientation of the event tooltip.
-       *
-       * @property tooltipOrientation
-       * @type String
-       */
-      tooltipOrientation: {
-        type: String,
-        value: 'left'
-      },
-      /**
-       * Specifies the x key for the event data.
-       *
-       */
-      xKey: {
-        type: String,
-        value: 'x'
-      },
-      /**
        * Tracks if the event configuration has been edited.
        *
        */
@@ -140,51 +122,6 @@ Custom property | Description
       _eventDrawn: {
         type: Boolean,
         value: false
-      },
-
-      /**
-       * List of keys & values used for translating this component.
-       */
-      resources: {
-        type: Object,
-        value: function() {
-          return {
-            'en': {
-              'Event': 'Event',
-              'ID': 'ID',
-              'Timestamp': 'Timestamp',
-              'X': 'X'
-            }
-          };
-        }
-      },
-      /**
-       * A valid IETF language tag as a string that will be
-       * used to localize this component.
-       *
-       * See https://github.com/PolymerElements/app-localize-behavior for API
-       * documentation and more information.
-       */
-      language: {
-        type: String,
-        value: 'en'
-      },
-      /**
-      * Use the key for localization if value for language is missing.
-      * Should always be true for Predix components.
-      */
-      useKeyIfMissing: {
-        type: Boolean,
-        value: true
-      },
-
-      _reCalcValue: {
-        type: Boolean,
-        value: true
-      },
-
-      _value: {
-        type: String
       },
 
       /**
@@ -245,34 +182,20 @@ Custom property | Description
       '_addClipPath(clipPath)'
      ],
 
-     listeners: {
-      'px-tooltip-request-show': '_tooltipRequest'
-     },
+    detached: function() {
+      this._eventDrawn = false;
 
-     detached: function() {
-       this._eventDrawn = false;
-
-       if(this.eventGroup && this._doesD3HaveValues(this.eventGroup)) {
-         this.eventGroup.remove();
-         this.eventGroup = null;
-         this.eventLine = null;
-         this.eventIcon = null;
-       }
-     },
+      if(this.eventGroup && this._doesD3HaveValues(this.eventGroup)) {
+        this.eventGroup.remove();
+        this.eventGroup = null;
+      }
+    },
 
     ready: function() {
       window.requestAnimationFrame(function() {
         this.updateStyles();
       }.bind(this));
       this._iconCallbackQueue = [this._forceIconRedraw];
-    },
-
-    _tooltipRequest: function() {
-      //only format the value when we're actually about to show it
-      if(this._reCalcValue) {
-        this.set('_value', this._getValue());
-        this._reCalcValue = false;
-      }
     },
 
     _getConfigValue: function(key, eventType, theme) {
@@ -327,12 +250,12 @@ Custom property | Description
     },
 
     /**
-     * Draws or updates the event element.
-     * Called from an observer watching for data and the necessary d3 objects.
-     *
-     * @method drawElement
-     */
-     _drawElementDebounced: function() {
+    * Draws or updates the event element.
+    * Called from an observer watching for data and the necessary d3 objects.
+    *
+    * @method drawElement
+    */
+    _drawElementDebounced: function() {
       if(!this.svg ||
           this._isObjEmpty(this.eventData) ||
           !this.domainChanged) {
@@ -377,7 +300,8 @@ Custom property | Description
 
       this._eventConfigChanged = false;
       this._eventDrawn = true;
-      this.fire('px-vis-event-rendering-ended');
+
+      this.dispatchEvent(new CustomEvent('px-vis-event-rendering-ended', { bubbles: true, composed: true}));
     },
 
     _enterLine: function(d, i, elem) {
@@ -388,6 +312,7 @@ Custom property | Description
     _enterIcon: function(d, i, elem) {
       const iconType = this._getConfigValue('type', d.label, false);
       let iconSvg;
+
       if(iconType === 'image') {
         iconSvg = Px.d3.select(elem).append("image")
           .attr('class', 'event-icon')
@@ -397,7 +322,7 @@ Custom property | Description
           .style("cursor","pointer");
 
       } else {
-        const g = Px.d3.select(elem).append("g")
+        iconSvg = Px.d3.select(elem).append("g")
           .attr('class', 'event-icon')
           .style("cursor","pointer");
 
@@ -413,15 +338,17 @@ Custom property | Description
           }
         }
 
-        const icon = g.node().appendChild(this._iconInfo[iconName].icon);
-        iconSvg = Px.d3.select(icon)
+        const icon = iconSvg.node().appendChild(this._iconInfo[iconName].icon);
+
+        Px.d3.select(icon)
           .attr('fill', 'transparent')
           .attr('stroke', this._getConfigValue('color', d.label, "--px-vis-event-icon-color"))
           .style("cursor","pointer");
       }
 
-      iconSvg.on('mouseenter', this._requestTooltip.bind(this))
-        .on('mouseleave', this._clearTooltipRequest.bind(this));
+      iconSvg
+        .on('mouseenter', this._requestTooltip.bind(this,d,i,iconSvg.node()))
+        .on('mouseleave', this._clearTooltipRequest.bind(this,d,i));
     },
 
     _mergeLine: function(d, i, elem) {
@@ -460,18 +387,63 @@ Custom property | Description
      * @method _addClipPath
      */
     _addClipPath: function() {
-     if(this.hasUndefinedArguments(arguments)) {
-       return;
-     }
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
 
       this.addClipPath(this.eventGroup);
     },
 
-    _requestTooltip: function(d,i) {
+    _requestTooltip: function(d,i, elem) {
+      if(!this._getConfigValue('enableTooltip', d.label, false)) {
+        return;
+      }
+
+      const detail = {
+        element: elem,
+        delay: 10,
+        tooltipType: this.is,
+        orientation: this._getConfigValue('tooltipOrientation', d.label, false),
+        data: [{
+          title: d.label,
+          data: this._getAllKeys(d)
+        }]
+      };
+
+      if(this._isTimeType(this.xAxisType)) {
+        detail.data[0].time = d[this._getConfigValue('dataKey', d.label, false)];
+      } else {
+        detail.data[0].data.push({
+          title: 'X',
+          value: d[this._getConfigValue('dataKey', d.label, false)],
+          type: 'number'
+        });
+      }
+
+      this.dispatchEvent(new CustomEvent('central-tooltip-display-request', { bubbles: true, composed: true, detail: detail }));
 
     },
 
+    _getAllKeys: function(d) {
+      const arr = [];
+      Object.entries(d).forEach(([key,val]) => {
+        if(key !== 'time' && key !== 'label') {
+          arr.push({
+            title: key,
+            value: val
+          });
+        }
+      });
+
+      return arr;
+    },
+
     _clearTooltipRequest: function(d,i) {
+      if(!this._getConfigValue('enableTooltip', d.label, false)) {
+        return;
+      }
+
+      this.dispatchEvent(new CustomEvent('central-tooltip-cancel-request', { bubbles: true, composed: true }));
 
     },
 
@@ -487,12 +459,8 @@ Custom property | Description
      * Returns the title value to the tooltip.
      *
      */
-    _getValueTitle: function(xAxisType) {
-      if(xAxisType === 'time' || xAxisType === 'timeLocal') {
-        return this.localize('Timestamp');
-      } else {
-        return this.localize('X');
-      }
+    _getValueTitle: function() {
+      return this._isTimeType(this.xAxisType) ? 'Timestamp' : 'X';
     },
     /**
      * Returns the x value.

@@ -65,27 +65,6 @@
           renderer-type="markers">
         </px-vis-scatter-canvas>
       </template>
-      <template id="tooltipIf" is="dom-if" if="[[_showTooltip]]">
-        <px-tooltip
-          id="tooltip"
-          follow-mouse
-          delay="50"
-          smart-orientation
-          ignore-target-events
-          for="[[_canvas]]"
-          mouse-coords="[[_tooltipPosition]]"
-          tooltip-message="[[_ttMessage]]">
-            <!-- use a component to preserve css scope -->
-            <px-vis-markers-tooltip-content
-              resources="[[resources]]"
-              marker-config="[[_markerConfig]]"
-              marker-data="[[markerData]]"
-              marker-types="[[_markerTypes]]"
-              language="[[language]]"
-              tooltip-data-result="[[_tooltipDataResult]]">
-            </px-vis-markers-tooltip-content>
-        </px-tooltip>
-      </template>
     </template>
 </dom-module>
 
@@ -136,13 +115,13 @@
       },
 
       _topDomain: {
-        type: Boolean,
-        value: null
+        type: Number,
+        value: 0
       },
 
       _bottomDomain: {
-        type: Boolean,
-        value: null
+        type: Number,
+        value: 0
       },
 
       _canvas : {
@@ -160,39 +139,6 @@
 
       _tooltipPosition: {
         type: Array
-      },
-      /**
-       * List of keys & values used for translating this component.
-       */
-       resources: {
-        type: Object,
-        value: function() {
-          return {
-            'en': {
-              'Event': 'Event',
-              'Timestamp': 'Timestamp'
-            }
-          };
-        }
-      },
-      /**
-       * A valid IETF language tag as a string that will be
-       * used to localize this component.
-       *
-       * See https://github.com/PolymerElements/app-localize-behavior for API
-       * documentation and more information.
-       */
-      language: {
-        type: String,
-        value: 'en'
-      },
-      /**
-      * Use the key for localization if value for language is missing.
-      * Should always be true for Predix components.
-      */
-      useKeyIfMissing: {
-        type: Boolean,
-        value: true
       },
 
       _showTooltip: {
@@ -214,6 +160,30 @@
       _isSearchingTooltip: {
         type: Boolean,
         value: false
+      },
+
+      _tooltipShown: {
+        type: Boolean,
+        value: false
+      },
+
+      _defaultMarkerConfig: {
+        type: Object,
+        readonly: true,
+        value: function() {
+          return {
+            'color': 'rgb(123,123,123)',
+            'markerStrokeOpacity': 0,
+            'markerSymbol': 'square',
+            'markerSize': 64,
+            'markerScale': 1,
+            'showTooltip': true,
+            'tooltipOrientation': 'top',
+            'priority': 0,
+            'row': 0,
+            'location': 'top'
+          };
+        }
       }
 
     }, //properties
@@ -243,12 +213,11 @@
 
         //fill default if needed
         for(var j=0; j<defaultKeys.length; j++) {
-            config[type][defaultKeys[j]] = (this.markerConfig[type][defaultKeys[j]] || this.markerConfig[type][defaultKeys[j]] === false || this.markerConfig[type][defaultKeys[j]] === 0) ? this.markerConfig[type][defaultKeys[j]] : this._defaultMarkerConfig[defaultKeys[j]];
+          config[type][defaultKeys[j]] = (this.markerConfig[type][defaultKeys[j]] || this.markerConfig[type][defaultKeys[j]] === false || this.markerConfig[type][defaultKeys[j]] === 0) ? this.markerConfig[type][defaultKeys[j]] : this._defaultMarkerConfig[defaultKeys[j]];
         }
 
-        //treat fill and tooltipLabel differently
         config[type]['markerFillOpacity'] = this._getFillOpacity(this.markerConfig[type].markerFillOpacity, config[type]['markerFillOpacity']);
-        config[type]['tooltipLabel'] = this._defaultMarkerConfig['tooltipLabel'] ? this._defaultMarkerConfig['tooltipLabel'] : type;
+
       }
 
       this.set('_markerTypes', types);
@@ -366,8 +335,8 @@
       this.set('_bottomScale', bScale);
       this.set('_topScale', tScale);
 
-      this.set('_bottomDomain', (this._bottomDomain === null) ? true : !this._bottomDomain);
-      this.set('_topDomain', (this._topDomain === null) ? true : !this._topDomain);
+      this.set('_bottomDomain', this._bottomDomain + 1);
+      this.set('_topDomain', this._topDomain + 1);
     },
 
     _returnYScale: function(item) {
@@ -375,7 +344,7 @@
         return;
       }
 
-      if(this._topDomain !== null && this._bottomDomain !== null) {
+      if(this._topDomain && this._bottomDomain) {
         return this.markerConfig[item]["location"] === "bottom" ? this._bottomScale : this._topScale;
       }
     },
@@ -385,7 +354,7 @@
         return;
       }
 
-      if(this._topDomain !== null && this._bottomDomain !== null && this.domainChanged) {
+      if(this._topDomain && this._bottomDomain && this.domainChanged) {
         return this.markerConfig[item]["location"] === "bottom" ? this._bottomDomain : this._topDomain;
       }
     },
@@ -408,9 +377,9 @@
         return;
       }
 
-      if(this._topDomain !== null && this._bottomDomain !== null && this.domainChanged) {
-        this.set('_bottomDomain', !this._bottomDomain);
-        this.set('_topDomain', !this._topDomain);
+      if(this._topDomain && this._bottomDomain && this.domainChanged) {
+        this.set('_bottomDomain', this._bottomDomain + 1);
+        this.set('_topDomain', this._topDomain + 1);
       }
 
       //if tooltip is locked and we change the domain ensure we hide it
@@ -423,13 +392,13 @@
     },
 
     _mouseMove: function(evt) {
-
       var d3Event = {
         mousePos: Px.d3.mouse(this._canvas),
         pageX: Px.d3.event.pageX,
         pageY: Px.d3.event.pageY
       }
-      if(!this._isSearchingTooltip && this._topDomain !== null) {
+
+      if(!this._isSearchingTooltip && this._topDomain) {
         window.requestAnimationFrame(function() {
 
           this._searchTooltip(d3Event);
@@ -441,75 +410,108 @@
     },
 
     _searchTooltip: function(d3Event) {
-      if(!this._lockTooltip) {
+      if(this._lockTooltip) {
+        return;
+      }
 
-        var mousePos = d3Event.mousePos;
-        if(mousePos[0] > this.margin.left && mousePos[0] < (this.width - this.margin.right) && mousePos[1] > 0) {
+      const mousePos = d3Event.mousePos;
 
-          //adjust mouse pos to get correct time
-          adjustedMousePos = [mousePos[0] - this.margin.left, mousePos[1]];
-          //figure out which row we're hovering
-          var rowInfo = this._getRowInfoForMouse(mousePos);
+      // if not in the chart area
+      if(mousePos[0] <= this.margin.left || mousePos[0] >= (this.width - this.margin.right) || mousePos[1] <= 0) {
+        this._closeTooltip();
+        return;
+      }
 
-          if(rowInfo.index) {
+      //figure out which row we're hovering
+      const rowInfo = this._getRowInfoForMouse(mousePos);
 
-            //find all marker types for this row
-            var labels = this._findLabelsForRow(rowInfo.index),
-                data = [],
-                //bissect RIGHT in case we have a bunch of same timestamps
-                bisect = Px.d3.bisector(function(d) {
-                    return d.x;
-                }.bind(this)).right,
-                maxDomain = this.x.domain()[1],
-                minDomain = this.x.domain()[0],
-                mouseTime = this.x.invert(adjustedMousePos[0]),
-                left,
-                right,
-                pixelResult = [],
-                dataResult,
-                indexChosen;
+      // if not hovering a row
+      if(!(rowInfo.index || rowInfo.index === 0)) {
+        this._closeTooltip();
+        return;
+      }
 
-            //get data for all labels we're interested in
-            for(var i=0; i<labels.length; i++) {
-              if(this._markerData[labels[i]] && this._markerData[labels[i]].length) {
-                data = data.concat(this._markerData[labels[i]]);
-              }
-            }
+      //find all marker types for this row
+      const labels = this._findLabelsForRow(rowInfo.index);
 
-            //only search if this row actually has data
-            if(data.length) {
+      // if no markers we want a tooltip on in that row
+      if(labels.length === 0) {
+        this._closeTooltip();
+        return;
+      }
 
-              data.sort(function(a,b) {
-                return Px.d3.ascending(a.x, b.x);
-              });
+      let data = [];
 
-              //search for point on left and right
-              right = bisect(data, mouseTime);
-              left = Math.max(0, right ? right-1 : 0);
-
-              //decide which point to pick
-              if(!data[left] || data[left].x < minDomain) {
-                //out of bound on left
-                indexChosen = right;
-              } else if(!data[right] || data[right].x > maxDomain) {
-                //out of bound on right
-                indexChosen = left;
-              } else if(data[right] && (data[right].x - mouseTime) < (mouseTime - data[left].x)) {
-                //closer to right
-                indexChosen = right;
-              } else if(data[left]) {
-                //closer to left
-                indexChosen = left;
-              }
-
-              //check if we have additional points with same timestamp
-              this._createTooltipData(indexChosen,data);
-
-              this._updateTooltip(mousePos, pixelResult, this._tooltipDataResult[0], rowInfo, d3Event);
-            }
-          }
+      //get data for all labels we're interested in
+      for(let i=0; i<labels.length; i++) {
+        if(this._markerData[labels[i]] && this._markerData[labels[i]].length) {
+          data = data.concat(this._markerData[labels[i]]);
         }
       }
+
+      // if there no longer is data
+      if(data.length === 0) {
+        this._closeTooltip();
+        return;
+      }
+
+      data.sort(function(a,b) {
+        return Px.d3.ascending(a.x, b.x);
+      });
+
+      //adjust mouse pos to get correct time
+      const adjustedMousePos = [mousePos[0] - this.margin.left, mousePos[1]];
+      //search for point on left and right
+      //bissect RIGHT in case we have a bunch of same timestamps
+      const bisect = Px.d3.bisector(function(d) {
+        return d.x;
+      }.bind(this)).right;
+      const maxDomain = this.x.domain()[1];
+      const minDomain = this.x.domain()[0];
+      const mouseTime = this.x.invert(adjustedMousePos[0]);
+
+      const right = bisect(data, mouseTime);
+      const left = Math.max(0, right ? right-1 : 0);
+      let indexChosen;
+
+      //decide which point to pick
+      if(!data[left] || data[left].x < minDomain) {
+        //out of bound on left
+        indexChosen = right;
+
+      } else if(!data[right] || data[right].x > maxDomain) {
+        //out of bound on right
+        indexChosen = left;
+
+      } else if(data[right] && (data[right].x - mouseTime) < (mouseTime - data[left].x)) {
+        //closer to right
+        indexChosen = right;
+
+      } else if(data[left]) {
+        //closer to left
+        indexChosen = left;
+      }
+
+      //check if we have additional points with same timestamp
+      const dataResult = this._createTooltipData(indexChosen, data);
+
+      if(!dataResult || dataResult.length === 0) {
+        this._closeTooltip();
+        return;
+      }
+
+      const detail = this._createStub(mousePos, dataResult[0], rowInfo, d3Event);
+
+      if(!detail) {
+        this._closeTooltip();
+        return;
+      }
+
+      detail.data = this._formatDataForTooltip(dataResult);
+
+      this._tooltipShown = true;
+      this.dispatchEvent(new CustomEvent('central-tooltip-display-request', { bubbles: true, composed: true, detail: detail }));
+
     },
 
     _createTooltipData: function(index, data) {
@@ -519,16 +521,16 @@
           newData = data[index];
 
       //add result and then search for same timestamps
-      newData.priority = this.markerConfig[currType].priority;
+      newData.priority = this._markerConfig[currType].priority;
       result.push(newData);
 
       //try right...
       i=1;
       while(data[index+i] && data[index].x === data[index+i].x) {
         currType = this._findMarkerType(data[index+i]);
-        if(this.markerConfig[currType].showTooltip) {
+        if(this._markerConfig[currType].showTooltip) {
           newData = data[index+i];
-          newData.priority = this.markerConfig[currType].priority;
+          newData.priority = this._markerConfig[currType].priority;
           result.push(newData);
         }
         i++;
@@ -538,9 +540,9 @@
       i=-1;
       while(data[index+i] && data[index].x === data[index+i].x) {
         currType = this._findMarkerType(data[index+i]);
-        if(this.markerConfig[currType].showTooltip) {
+        if(this._markerConfig[currType].showTooltip) {
           newData = data[index+i];
-          newData.priority = this.markerConfig[currType].priority;
+          newData.priority = this._markerConfig[currType].priority;
           result.push(newData);
         }
         i--;
@@ -550,52 +552,70 @@
         return Px.d3.descending(a.priority, b.priority);
       });
 
-      this.set('_tooltipDataResult', result);
+      return result;
     },
 
-    _updateTooltip: function(mousePos, pixelResult, dataResult, rowInfo, d3Event) {
+    _createStub: function(mousePos, dataResult, rowInfo, d3Event) {
+      const pixelResult = [];
+      const type = this._findMarkerType(dataResult);
 
-      var tooltipUpdated = false;
-      if(dataResult) {
+      if(!type || !this._markerConfig[type].showTooltip) {
+        return null;
+      }
 
-        var type = this._findMarkerType(dataResult);
+      pixelResult[0] = this.x(dataResult.x) + this.margin.left ;
 
-        if(type && this._markerConfig[type].showTooltip) {
+      //only show if we're close enough
+      if(Math.abs(pixelResult[0] - mousePos[0]) > this.tooltipDetectionRadius) {
+        return null;
+      }
 
-          pixelResult[0] = this.x(dataResult.x) + this.margin.left ;
+      //adjust pixel values to take canvas position into account
+      pixelResult[0] += (d3Event.pageX - mousePos[0]);
+      pixelResult[1] = d3Event.pageY - mousePos[1] + rowInfo.rowY;
 
-          //only show if we're close enough
-          if(Math.abs(pixelResult[0] - mousePos[0]) <= this.tooltipDetectionRadius) {
+      return {
+        mouseCoords: pixelResult,
+        orientation: this._markerConfig[type].tooltipOrientation,
+        delay: 50,
+        tooltipType: this.is,
+      };
+    },
 
-            //adjust pixel values to take canvas position into account
-            pixelResult[0] += (d3Event.pageX - mousePos[0]);
-            pixelResult[1] = d3Event.pageY - mousePos[1] + rowInfo.rowY;
+    _formatDataForTooltip: function(data) {
+      const formatted = [];
+      data.forEach((d) => {
+        formatted.push({
+          title: this.markerData[d.originIndex]['label'],
+          time: d.x,
+          data: this._getAllKeys(this.markerData[d.originIndex])
+        });
+      });
 
+      return formatted;
+    },
 
-            this.set('_showTooltip', true);
-
-            this._checkForTooltip();
-            this.$.tooltip.mouseCoords = pixelResult;
-            this.$.tooltip.orientation = this._markerConfig[type].tooltipOrientation;
-
-            if(!this.$.tooltip.opened) {
-              this.$.tooltip.set('opened', true);
-            } else {
-
-              //we could just update 'mouseCoords' above with a set but
-              //if the tooltip content has changed enough then we need
-              //to remeasure it, which setPosition will do
-              this.$.tooltip.setPosition();
-            }
-
-            tooltipUpdated = true;
-          }
+    _getAllKeys: function(d) {
+      const arr = [];
+      Object.entries(d).forEach(([key,val]) => {
+        if(key !== 'time' && key !== 'label') {
+          arr.push({
+            title: key,
+            value: val
+          });
         }
+      });
+
+      return arr;
+    },
+
+    _closeTooltip: function() {
+      if(!this._tooltipShown) {
+        return;
       }
 
-      if(this.$.tooltip && !tooltipUpdated && this.$.tooltip.opened) {
-        this.$.tooltip.set('opened', false);
-      }
+      this._tooltipShown = false;
+      this.dispatchEvent(new CustomEvent('central-tooltip-cancel-request', { bubbles: true, composed: true }));
     },
 
 
@@ -614,31 +634,20 @@
     },
 
     _mouseClick: function() {
-      if(this.$.tooltip && this.$.tooltip.visible) {
+      if(this._tooltipShown) {
 
         //prevent tooltip from closing or reallow it
         this._lockTooltip = !this._lockTooltip;
 
         if(!this._lockTooltip) {
-
-          //make sure it hides
-          this.$.tooltip.set('opened', false);
+          this._closeTooltip();
         }
       }
     },
 
     _mouseLeave: function() {
-      if(this.$.tooltip && this.$.tooltip.opened && !this._lockTooltip) {
-        this.$.tooltip.set('opened', false);
-      }
-    },
-
-    _checkForTooltip: function() {
-
-      //if the tooltip had never been rendered yet force it and store it for further use
-      if(!this.$.tooltip) {
-        this.$.tooltipIf.render();
-        this.$.tooltip = this.$$('px-tooltip');
+      if(!this._lockTooltip) {
+        this._closeTooltip();
       }
     },
 
@@ -677,16 +686,14 @@
     },
 
     _findLabelsForRow: function(rowIndex) {
-      var keys = Object.keys(this.markerConfig),
-          result = [];
+      const index = Number(rowIndex);
+      const result = [];
 
-      rowIndex = Number(rowIndex);
-
-      for(var i=0; i<keys.length; i++) {
-        if(rowIndex === this.markerConfig[keys[i]].row || (rowIndex === 0 && !this.markerConfig[keys[i]].row)) {
-          result.push(keys[i]);
+      Object.entries(this._markerConfig).forEach(([key,conf]) => {
+        if(index === conf.row && conf.showTooltip) {
+          result.push(key);
         }
-      }
+      });
 
       return result;
     },

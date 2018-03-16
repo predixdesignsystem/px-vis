@@ -1,5 +1,6 @@
 <link rel="import" href="px-vis-behavior-common.html" />
 <link rel="import" href="px-vis-behavior-d3.html" />
+<link rel="import" href="px-vis-behavior-datetime.html" />
 <link rel="import" href="../iron-resizable-behavior/iron-resizable-behavior.html">
 <script>
 var PxVisBehaviorChart = window.PxVisBehaviorChart = (window.PxVisBehaviorChart || {});
@@ -3264,7 +3265,7 @@ PxVisBehaviorChart.showTooltip];
 
     @polymerBehavior PxVisBehaviorChart.centralTooltip
 */
-PxVisBehaviorChart.centralTooltip = {
+PxVisBehaviorChart.centralTooltip = [{
   properties: {
     /**
      * Whether the tooltip should be shown or hidden
@@ -3272,8 +3273,116 @@ PxVisBehaviorChart.centralTooltip = {
      tooltipRequested: {
       type: Boolean,
       value: false
+    },
+    /**
+     * Specifies the orientation of the event tooltip.
+     *
+     * @property tooltipOrientation
+     * @type String
+     */
+      tooltipOrientation: {
+      type: String,
+      value: 'left'
+    },
+
+    /**
+     * List of keys & values used for translating this component.
+     */
+      resources: {
+      type: Object,
+      value: function() {
+        return {
+          'en': {
+            'Event': 'Event',
+            'ID': 'ID',
+            'Timestamp': 'Timestamp',
+            'X': 'X'
+          }
+        };
+      }
+    },
+
+    /**
+    * Use the key for localization if value for language is missing.
+    * Should always be true for Predix components.
+    */
+    useKeyIfMissing: {
+      type: Boolean,
+      value: true
+    },
+
+    /**
+     * A valid IETF language tag as a string that will be
+     * used to localize this component.
+     *
+     * See https://github.com/PolymerElements/app-localize-behavior for API
+     * documentation and more information.
+     */
+    language: {
+      type: String,
+      value: 'en'
+    },
+    /**
+    * Use the key for localization if value for language is missing.
+    * Should always be true for Predix components.
+    */
+    useKeyIfMissing: {
+      type: Boolean,
+      value: true
+    },
+  },
+
+  listeners: {
+    'central-tooltip-display-request': '_centralTooltipDisplayRequest',
+    'central-tooltip-cancel-request': '_centralTooltipCancelRequest'
+  },
+
+  _centralTooltipDisplayRequest: function(evt) {
+    if(evt.detail.element) {
+      this.$.centralTooltip.set('for', evt.detail.element);
     }
+
+    if(evt.detail.mouseCoords) {
+      this.$.centralTooltip.set('followMouse', true);
+      this.$.centralTooltip.set('mouseCoords', evt.detail.mouseCoords);
+    }
+
+    if(evt.detail.orientation) {
+      this.$.centralTooltip.set('orientation', evt.detail.orientation);
+    }
+
+    if(this._isValidData(evt.detail.delay)) {
+      this.$.centralTooltip.set('delay', evt.detail.delay);
+    }
+
+    if(evt.detail.data) {
+      this.$.centralTooltipContent.set('tooltipDataResult', evt.detail.data);
+    }
+
+    this.$.centralTooltip.set('opened', true);
+
+  },
+
+  _centralTooltipCancelRequest: function(evt) {
+    this.$.centralTooltip.set('opened', false);
+
+    this.$.centralTooltip.set('for', undefined);
+    this.$.centralTooltip.set('followMouse', false);
+    this.$.centralTooltip.set('mouseCoords', undefined);
+
+    this.$.centralTooltipContent.set('tooltipDataResult', []);
+    this.$.centralTooltipContent.set('timestamp', undefined);
+    this.$.centralTooltipContent.set('tooltipTitle', '');
+
+  },
+
+  _resizeTooltip: function() {
+    // if the content changes, we need to resize to make sure
+    // stuff fits / is aligned
+    this.$.tooltip.setPosition();
   }
-};
+
+
+}, PxVisBehaviorTime.datetime];
 
 </script>

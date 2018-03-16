@@ -23,17 +23,27 @@
   <template>
     <style include="px-vis-markers-tooltip-content-styles"></style>
 
-      <div class="flex flex--middle">
+      <div class="flex flex--middle u-ml- u-mr- u-mb- u-mt--">
         <template is="dom-if" if="[[_multipleTooltips]]">
           <button class$="btn btn--bare button--nav-left [[_leftDisabled(_currentTooltipIndex)]]" on-click="_previousTooltip">
             <px-icon icon="px-utl:chevron-left"></px-icon>
           </button>
         </template>
         <div>
-          <b>[[localize("Event")]]</b>: [[_eventType]] <br/>
-          <b>[[localize("Timestamp")]]</b>: [[_value]]<br/>
-          <template id="infoTemplate" is="dom-repeat" items="[[_additionalInfo]]" as="info">
-            <b>[[info.key]]</b>: [[info.value]]<br/>
+          <h1 class="epsilon u-mb- u-mt--">[[_currentData.title]]</h1>
+
+          <template is="dom-if" if="[[_currentData.time]]">
+            <div class="u-mt- u-mb-">[[_formatData(_currentData.time, 'time')]]</div>
+          </template>
+
+          <template id="infoTemplate" is="dom-repeat" items="[[_currentData.data]]" as="info">
+            <div class="flex flex--justify u-mt--">
+              <span class="u-mr"><b>[[localize(info.title)]]</b>:</span> <span>[[_formatData(info.value, info.type)]]</span>
+            </div>
+          </template>
+
+          <template is="dom-if" if="[[_currentData.text]]">
+            <div class="u-mt- u-mb-">[[_currentData.time]]</div>
           </template>
         </div>
         <template is="dom-if" if="[[_multipleTooltips]]">
@@ -63,68 +73,56 @@
      * @type Object
      */
     properties: {
-      markerData: {
-        type:Object
-      },
-
-      markerConfig: {
-        type:Object
-      },
-
-      markerTypes: {
-        type: Array
-      },
-      /**
-       * List of keys & values used for translating this component.
-       */
-       resources: {
-        type: Object,
-        value: function() {
-          return {
-            'en': {
-              'Event': 'Event',
-              'Timestamp': 'Timestamp'
-            }
-          };
-        }
-      },
-      /**
-       * A valid IETF language tag as a string that will be
-       * used to localize this component.
-       *
-       * See https://github.com/PolymerElements/app-localize-behavior for API
-       * documentation and more information.
-       */
-      language: {
-        type: String,
-        value: 'en'
-      },
-      /**
-      * Use the key for localization if value for language is missing.
-      * Should always be true for Predix components.
+      _currentData: Array,
+      /*
+      * List of tooltips that can be displayed
+      *
+      * Array of Array of Objs
+      *
+      * Example:
+      * ```
+      * [{
+      *   title: 'Tooltip Title',
+      *   time: 123456789,
+      *   text: "Blah blah"
+      *   data: [{
+      *     title: "Foo",
+      *     value: 250,
+      *     type: "number"
+      *   },{
+      *     title: "Bar",
+      *     value: "ABC"
+      *   }]
+      * }]
+      * ```
+      *  `title` : Title to appear at the top of the tooltip
+      *
+      * `time` : Appears under the Title and will be formatted as a datetime using the provided datetime formating strings
+      *
+      * `text` : Appears at the bottom of the tooltip
+      *
+      * `data`: list of key value pairs to display: title:  value
+      *
+      * `data.title`: Will be localized
+      *
+      * `data.type` is optional. `values` without a type will just be displayed as provided. Valid entries are:
+      *   - 'time' : instructs to format as a datetime using the provided datetime formating strings
+      *   - 'number': format as a number using the px-number-formatter with provided options
+      *   - 'localize': will localize value using provided resources
+      *
       */
-      useKeyIfMissing: {
-        type: Boolean,
-        value: true
-      },
-
-      _eventType: {
-        type: String
-      },
-
-      _value: {
-        type: String
-      },
-
-      _additionalInfo: {
-        type: Array
-      },
+      tooltipDataResult: Array,
 
       /*
-        * List of tooltips that can be displayed for current marker
-        */
-      tooltipDataResult: {
-        type: Array
+       * Title to display
+       **/
+       tooltipTitle: {
+        type: String,
+        value: ''
+      },
+
+      timestamp: {
+        type: Number
       },
 
       /*
@@ -139,13 +137,51 @@
       /**
        * Index of the current tooltip we are displaying (relative to tooltipDataResult)
        */
-      _currentTooltipIndex: {
-        type: Number
+      _currentTooltipIndex: Number,
+
+      /**
+       * List of keys & values used for translating this component.
+       */
+      resources: {
+        type: Object,
+        value: function() {
+          return {
+            'en': {
+              'Event': 'Event',
+              'ID': 'ID',
+              'Timestamp': 'Timestamp',
+              'X': 'X'
+            }
+          };
+        }
       },
 
+      /**
+      * Use the key for localization if value for language is missing.
+      * Should always be true for Predix components.
+      */
+      useKeyIfMissing: {
+        type: Boolean,
+        value: true
+      },
+
+      /**
+       * A valid IETF language tag as a string that will be
+       * used to localize this component.
+       *
+       * See https://github.com/PolymerElements/app-localize-behavior for API
+       * documentation and more information.
+       */
+      language: {
+        type: String,
+        value: 'en'
+      }
+
     }, //properties
-    observers: ['_dataChanged(tooltipDataResult)',
-                '_updateTooltipInfo(_currentTooltipIndex, tooltipDataResult, markerData, markerConfig, markerTypes)'],
+
+    observers: [
+      '_dataChanged(tooltipDataResult.*)'
+    ],
 
     _dataChanged: function() {
       if(this.hasUndefinedArguments(arguments)) {
@@ -153,6 +189,7 @@
       }
 
       this._currentTooltipIndex = 0;
+      this._updateTooltipInfo(this.tooltipDataResult[this._currentTooltipIndex]);
     },
 
     _computeMultipleTooltips: function() {
@@ -163,54 +200,11 @@
       return this.tooltipDataResult.length > 1;
     },
 
-    _findMarkerType: function(data) {
-      var type,
-            dataKey = Object.keys(data);
-
-      for(var i=0; i<dataKey.length; i++) {
-        if(this.markerTypes.indexOf(dataKey[i]) !== -1) {
-          type = dataKey[i];
-          break;
-        }
-      }
-
-      return type;
-    },
 
     _updateTooltipInfo: function() {
-      if(this.hasUndefinedArguments(arguments)) {
-        return;
-      }
-
       this.debounce('updateInfo', function() {
+        this.set('_currentData', this.tooltipDataResult[this._currentTooltipIndex]);
 
-        //get additional info if there is some
-        var data = this.tooltipDataResult[this._currentTooltipIndex],
-            originalData = this.markerData[data.originIndex],
-            keys,
-            info,
-            markerType;
-
-        if(originalData) {
-
-          keys = Object.keys(originalData);
-          info = [];
-          markerType = this._findMarkerType(data);
-
-          keys.forEach(function(key) {
-            if(key !== 'time' && key !== 'label') {
-              info.push({
-                'key': key,
-                'value': originalData[key]
-              });
-            }
-          });
-
-          //update everything the tooltip needs
-          this.set('_additionalInfo', info);
-          this.set('_value', this._formatTimestampForType(data, markerType));
-          this.set('_eventType', this.markerConfig[markerType].tooltipLabel);
-        }
       }.bind(this), 5);
     },
 
@@ -222,11 +216,24 @@
       this._updateTooltipInfo(this.tooltipDataResult[this._currentTooltipIndex++]);
     },
 
-    _formatTimestampForType: function(data, type) {
-      var conf = this.markerConfig[type];
+    _formatData: function(data, type) {
+      if(type === 'time') {
+        return this._formatWholeTimestamp(data);
 
-      return  this.formatTimestamp(data.x, conf.timezone, conf.firstDateTimeFormat) +
-      ' ' + conf.separator + ' ' + this.formatTimestamp(data.x, conf.timezone,conf.secondDateTimeFormat);
+      } else if(type === 'number') {
+        // TODO hook up number formater
+        return data
+
+      } else if(type === 'localizable') {
+        return localize(data);
+
+      }
+
+      return data
+    },
+
+    _formatWholeTimestamp: function(time) {
+      return `${this.formatTimestamp(time, this.timezone, this.firstDateTimeFormat)} ${this.separator} ${this.formatTimestamp(time, this.timezone, this.secondDateTimeFormat)}`;
     },
 
     _leftDisabled: function() {
