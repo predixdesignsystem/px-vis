@@ -3565,15 +3565,15 @@ PxVisBehavior.showHideClasses = {
 
 /**
     Name:
-    PxVisBehavior.gradientColors
+    PxVisBehavior.gradientColorsProperty
 
     Description:
     Polymer behavior that defines the color gradient Array/String/Function input
 
 
-    @polymerBehavior PxVisBehavior.gradientColors
+    @polymerBehavior PxVisBehavior.gradientColorsProperty
 */
-PxVisBehavior.gradientColors = {
+PxVisBehavior.gradientColorsProperty = {
   properties: {
     /**
      * TODO: DOCUMENTATION
@@ -3597,7 +3597,7 @@ PxVisBehavior.gradientColors = {
 
     @polymerBehavior PxVisBehavior.gradientColorsFunction
 */
-PxVisBehavior.gradientColorsFunction = [{
+PxVisBehavior.gradientColorsFunction = {
   properties: {
     /**
      *
@@ -3613,10 +3613,6 @@ PxVisBehavior.gradientColorsFunction = [{
       type: Number,
       value: 1
     },
-    _gradientColorsFunction: {
-      type: Function,
-      computed: '_computeColorGradientFunction(gradientColors)'
-    }
   },
 
   /**
@@ -3658,10 +3654,6 @@ console.log('TOO MANY CALLS')
     }
   },
 
-  _computeColorGradientFunction: function() {
-    return this.createGradientFunction(this.gradientColors);
-  },
-
   _normalizeValue: function(val) {
     if(this.gradientColorsMin === this.gradientColorsMax) {
       return 0;
@@ -3669,7 +3661,6 @@ console.log('TOO MANY CALLS')
       return (val - this.gradientColorsMin) / (this.gradientColorsMax - this.gradientColorsMin);
     }
   }
-
-}, PxVisBehavior.gradientColors];
+};
 
 </script>

@@ -79,7 +79,8 @@ Custom property | Description
       PxVisBehavior.commonMethods,
       PxVisBehaviorD3.domainUpdate,
       PxVisBehavior.updateStylesOverride,
-      PxVisBehavior.gradientColorsFunction
+      PxVisBehavior.gradientColorsFunction,
+      PxVisBehavior.gradientColorsProperty
     ],
 
     /**
@@ -169,14 +170,21 @@ Custom property | Description
       },
       _clipPathId: {
         type: String
+      },
+      _gradientFunctions: {
+        type: Array,
+        value: function() {
+          return [];
+        }
       }
     },
 
     observers: [
       'drawElement(domainChanged, svg, axis, height, selectedDomain, _animationFrameDone, _stylesUpdated)',
-      '_styleGradient(gradientOverlay, _gradientColorsFunction)',
+      '_styleGradient(gradientOverlay, _gradientFunctions)',
       '_zoomBrush(chartDomain.*)',
-      '_chartDomainChanged(chartDomain)'
+      '_chartDomainChanged(chartDomain)',
+      '_computeGradientFunctions(gradientColors)'
     ],
 
     detached: function() {
@@ -247,10 +255,34 @@ Custom property | Description
           */
           this._brushGroup.select('rect.selection')
             .attr('y', 0)
-            .attr('stroke', this._checkThemeVariable('--px-vis-nav-brush-outline-color', 'rgb(0,0,0)'))
-            .attr('stroke-width',1)
+
             .attr('shape-rendering','crispEdges')
-            .attr('clip-path', 'url(#' + this._clipPathId + ')');
+            .attr('clip-path', 'url(#' + this._clipPathId + '0)')
+            .attr('fill-opacity', this._checkThemeVariable('--px-vis-nav-brush-opacity', 0.3))
+            .attr('fill','url(#overlayGradient0)');
+
+          if(this._gradientFunctions.length > 1) {
+            let originalRect = this._brushGroup.select('rect.selection'),
+                height = originalRect.attr('height'),
+                width = originalRect.attr('width'),
+                rectHeight = Math.floor(height/this._gradientFunctions.length);
+
+            originalRect.attr('height', rectHeight);
+
+//TODO: solve stroke
+            for(let i=1; i<this._gradientFunctions.length; i++) {
+              this._brushGroup.append('rect')
+                .attr('class', 'selection')
+                .attr('y', rectHeight * i)
+                .attr('height', rectHeight)
+                .attr('width', width)
+
+                .attr('shape-rendering','crispEdges')
+                .attr('clip-path', 'url(#' + this._clipPathId + 'i)')
+                .attr('fill-opacity', this._checkThemeVariable('--px-vis-nav-brush-opacity', 0.3))
+                .attr('fill',`url(#overlayGradient${i})`);
+            }
+          }
 
           this._styleGradient();
 
@@ -288,24 +320,27 @@ Custom property | Description
       if(!this._isD3Empty(this._brushGroup)) {
         let overlay = this._brushGroup.select('rect.selection');
 
-        if(this.gradientOverlay && this._gradientColorsFunction) {
-          let gradient = this.svg.append('defs')
-                .append('linearGradient')
-                .attr('id', 'overlayGradient');
+        if(this.gradientOverlay && this._gradientFunctions.length) {
 
-          let steps = 100,
-              interval = 100/steps;
-          for(let i=0; i<steps; i++) {
-            gradient.append('stop')
-              .attr('offset', (i*interval) + '%')
-              .attr('stop-color', this._gradientColorsFunction((i*interval)/100));
-          }
 
-          //TODO: reintroduce css var
-          overlay.attr('fill','url(#overlayGradient)')
-            .attr('fill-opacity', 0.5);
-          // overlay.attr('fill','url(#overlayGradient)')
-          //   .attr('fill-opacity', this._checkThemeVariable("--px-vis-nav-brush-opacity", 0.3));
+          this._gradientFunctions.forEach(function(fn, index) {
+
+            let steps = 100,
+                interval = 100/steps,
+                gradient = this.svg.append('defs')
+                            .append('linearGradient')
+                            .attr('id', `overlayGradient${index}`);
+
+            for(let i=0; i<steps; i++) {
+              gradient.append('stop')
+                .attr('offset', (i*interval) + '%')
+                .attr('stop-color', fn((i*interval)/100));
+            }
+
+            //TODO: opacity
+            // overlay.attr('fill',`url(#overlayGradient${index})`)
+            //   .attr('fill-opacity', this._checkThemeVariable("--px-vis-nav-brush-opacity", 0.3));
+          }.bind(this));
         } else {
           overlay.attr('fill',this._checkThemeVariable("--px-vis-nav-brush-fill-color", 'rgb(0,0,0)'))
             .attr('fill-opacity', this._checkThemeVariable("--px-vis-nav-brush-opacity", 0.3));
@@ -689,6 +724,22 @@ Custom property | Description
     _chartDomainChanged: function() {
       this.gradientColorsMin = this.chartDomain[0];
       this.gradientColorsMax = this.chartDomain[1];
+    },
+
+    _computeGradientFunctions: function() {
+      if(this.gradientColors) {
+        if(Array.isArray(this.gradientColors) && Array.isArray(this.gradientColors[0])) {
+
+          let newArr = [];
+          this.gradientColors.forEach(function(color) {
+            newArr.push(this.createGradientFunction(color));
+          }.bind(this));
+          this.set('_gradientFunctions', newArr);
+
+        } else {
+          this.set('_gradientFunctions', [this.createGradientFunction(this.gradientColors)]);
+        }
+      }
     }
   });
 </script>
