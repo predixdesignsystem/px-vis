@@ -1,6 +1,5 @@
 
 
-================
 * Added tooltipData.seriesObj property
 * Register Changes:
   * item: Simplified register data construction into a single string instead of multiple props
@@ -67,6 +66,14 @@
     * An array of colors (creating a linear gradient from those colors)
     * A custom function defining a gradient by returning a color for an input between 0 and 1.
 * Added PxVisBehaviorChart.searchToolbar to PxVisBehaviorChart.chartCommon, adding a `getToolbar` method for all charts
+
+v4.7.8
+=================
+* Remove number formatter default culture to avoid overriding of culture on element creation
+
+v4.7.7
+=================
+* Fixed bug where tooltip search on timeseries with prevent web worker would not return the timestamp
 
 v4.7.6
 =================
