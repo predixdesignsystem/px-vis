@@ -1,3 +1,7 @@
+v4.7.8
+=================
+* Remove number formatter default culture to avoid overriding of culture on element creation
+
 v4.7.7
 =================
 * Fixed bug where tooltip search on timeseries with prevent web worker would not return the timestamp
