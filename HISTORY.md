@@ -1,6 +1,5 @@
 
 
-================
 * Added tooltipData.seriesObj property
 * Register Changes:
   * item: Simplified register data construction into a single string instead of multiple props
@@ -63,6 +62,14 @@
   * domainChanged is not a Number with initial value of 0. This toggling easier and checking if it hasnt been toggled.
   * PxVisBehaviorD3.domainUpdateNotify has been removed. PxVisBehaviorD3.domainUpdate once again has `notify: true`.
 * Added PxVisBehaviorChart.searchToolbar to PxVisBehaviorChart.chartCommon, adding a `getToolbar` method for all charts
+
+v4.7.8
+=================
+* Remove number formatter default culture to avoid overriding of culture on element creation
+
+v4.7.7
+=================
+* Fixed bug where tooltip search on timeseries with prevent web worker would not return the timestamp
 
 v4.7.6
 =================
