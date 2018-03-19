@@ -129,15 +129,8 @@ Custom property | Description
       <!--main row-->
       <span id="mainRow" class$="flex [[_getRowDirection(horizontalAlignment)]]">
         <template id="mainRepeat" is="dom-repeat" items="{{_internalConfig}}" strip-whitespace>
-          <span class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item.disabled)]] [[_hide(item.hidden)]]" style$="{{item.customButtonStyle}}" on-tap="_clickItem" value="{{index}}">
+          <span class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item.disabled)]] [[_hide(item.hidden)]]" style$="{{item.customButtonStyle}}" on-tap="_clickItem" on-mouseenter="_onItemHover" on-mouseleave="_onItemLeave" value="{{index}}">
             <px-icon class$="icon [[_show(item.icon)]]" icon="[[item.icon]]" value="{{index}}"></px-icon>{{item.title}}
-            <template is="dom-if" if="[[_hasTooltip(item)]]">
-              <px-tooltip
-                tooltip-message="[[item.tooltipLabel]]"
-                orientation="top"
-                smart-orientation>
-              </px-tooltip>
-            </template>
           </span>
         </template>
       </span>
@@ -145,16 +138,9 @@ Custom property | Description
       <template id="templateSubRow" is="dom-if" if="[[_isWithinChart(withinChart)]]">
         <span id="subRow" class$="flex subrow--container [[_getRowDirection(horizontalAlignment)]] [[_getSubRowClass(subToolbarAlignment)]]">
           <template id="subRepeat" is="dom-repeat" items="{{currentSubConfig}}" strip-whitespace>
-              <span class$="u-p- flex__item main-item subrow--item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item.disabled)]] [[_hide(item.hidden)]]" on-tap="_clickSubItem" value="{{index}}">
+              <span class$="u-p- flex__item main-item subrow--item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item.disabled)]] [[_hide(item.hidden)]]" on-tap="_clickSubItem" on-mouseenter="_onItemHover" on-mouseleave="_onItemLeave" value="{{index}}">
                 <px-icon class$="icon [[_show(item.icon)]]" icon="[[item.icon]]" value="{{index}}"></px-icon>
                 {{item.title}}
-                <template is="dom-if" if="[[_hasTooltip(item)]]">
-                  <px-tooltip
-                    tooltip-message="[[item.tooltipLabel]]"
-                    orientation="top"
-                    smart-orientation>
-                  </px-tooltip>
-                </template>
               </span>
           </template>
         </span>
@@ -258,11 +244,15 @@ Custom property | Description
             'mousedown': 'startZooming',
             'mouseup': 'stopZooming',
             'mouseout': 'resetTooltip',
-            'mousemove': 'calcTooltipData',
-            'toolbar': this
+            'mousemove': 'calcTooltipData'
           };
         }
-      }
+      },
+      _tooltipRequested: {
+        type: Boolean,
+        value: false
+      },
+      _tooltipTimer: Number
     },
 
     observers: [
@@ -1395,6 +1385,44 @@ Custom property | Description
         return 'flex--row--rev right ';
       } else {
         return 'flex--row ';
+      }
+    },
+
+    _onItemHover: function(evt) {
+      const target = Polymer.dom(evt).rootTarget;
+      const conf = this._internalConfig[target.value];
+
+      if(!this._hasTooltip(conf)) {
+        return;
+      }
+
+      this._tooltipRequested = true;
+      this._tooltipTimer = setTimeout(() => {
+
+        const detail = {
+          origin: this,
+          is: this.is,
+          element: target,
+          orientation: 'top',
+          data: [{
+            text: conf.tooltipLabel
+          }]
+        }
+
+        this.dispatchEvent(new CustomEvent('central-tooltip-display-request', { bubbles: true, composed: true, detail: detail }));
+
+        this._tooltipRequested = false;
+
+      }, 500);
+    },
+
+    _onItemLeave: function(evt) {
+      if(this._tooltipRequested) {
+        clearTimeout(this._tooltipTimer);
+
+      } else {
+        this.dispatchEvent(new CustomEvent('central-tooltip-cancel-request', { bubbles: true, composed: true, detail: {origin: this } }));
+
       }
     }
   });
