@@ -63,12 +63,9 @@ Custom property | Description
 -->
 
 <dom-module id="px-vis-axis">
-    <template>
-      <style include="px-vis-styles"></style>
-      <template id="tooltipTemplate" is="dom-if" if="[[_titleTruncated]]">
-        <px-tooltip id="tooltip" delay="500">{{title}} {{_currentUnits}}</px-tooltip>
-      </template>
-    </template>
+  <template>
+    <style include="px-vis-styles"></style>
+  </template>
 </dom-module>
 
 <script>
@@ -151,8 +148,8 @@ Custom property | Description
            *
            */
           titleDrawn: {
-            type: Boolean,
-            value: null
+            type: Number,
+            value: 0
           },
           /**
            * The series ID this axis refers to, used to look in the config
@@ -258,7 +255,13 @@ Custom property | Description
             }
           },
 
-          _builtAxisType: String
+          _builtAxisType: String,
+          _tooltipTimer: Object,
+          _tooltipRequested: {
+            type: Boolean,
+            value: false
+          },
+          _titleText: Object
         },
 
         observers: [
@@ -275,6 +278,8 @@ Custom property | Description
         ],
 
         detached: function() {
+          this._setupTruncationTooltipListener(false);
+
           this.removeAll();
 
           if(this.drawnTickValues && this.drawnTickValues.length > 0) {
@@ -845,7 +850,8 @@ Custom property | Description
               .attr('transform','translate(' + x + ',' + y + ')');
 
             var themeVar = (this.labelPosition === 'inline') ? "--px-vis-axis-inline-title-color" : "--px-vis-axis-title-color";
-            this._titleGroup.append('text')
+
+            this._titleText = this._titleGroup.append('text')
               .attr('class','axis-title')
               .attr('fill', this._findAxisSubColor(this.axisTitleColor, themeVar, 'black'))
               .attr('font-size', this.titleTypeSize + 'px')
@@ -854,10 +860,19 @@ Custom property | Description
               .text(this.displayedTitle)
               .attr('text-anchor', anchor)
               .style('text-anchor', anchor)
-              .attr('transform','rotate(' + r + ')');
+              .attr('transform','rotate(' + r + ')')
+              .attr('pointer-events', 'none')
+              .on('mouseenter', null)
+              .on('mouseleave', null);
 
-          this._processTooltip();
-          this.set('titleDrawn', (this.titleDrawn === null) ? true : !this.titleDrawn);
+          if(this._titleTruncated) {
+            this._titleText
+              .attr('pointer-events', 'all')
+              .on('mouseenter', this._onTitleHover.bind(this))
+              .on('mouseleave', this._onTitleLeave.bind(this));
+          }
+
+          this.set('titleDrawn', this.titleDrawn + 1);
         },
         /**
          * Draws the color bars for each series
@@ -968,7 +983,6 @@ Custom property | Description
                 this.set('_titleTruncated', false);
               }
               if(newTitle !== oldTitle) {
-                this._processTooltip();
                 this.fire('px-vis-axis-displayed-title-changed', {displayedTitle: newTitle, title: this.title, id: this.seriesId});
                 this.set('displayedTitle', newTitle);
               }
@@ -989,26 +1003,6 @@ Custom property | Description
           }
         },
 
-        /**
-         * Assigns target to tooltip
-         */
-        _processTooltip: function() {
-          if(this._titleTruncated) {
-
-            //try getting a ref to the tooltip
-            if(!this._tooltipElem) {
-              this._tooltipElem = this.$$('px-tooltip');
-            }
-
-            if(this._tooltipElem && this._titleGroup &&
-              (this._tooltipElem.for !== this._titleGroup.node())) {
-              this._tooltipElem.for = this._titleGroup.node();
-            }
-          } else if(this._tooltipElem){
-            this._tooltipElem.for = null;
-          }
-        },
-
         _orientationChanged: function() {
           if(this.hasUndefinedArguments(arguments)) {
             return;
@@ -1024,6 +1018,44 @@ Custom property | Description
             return subProperty;
           } else {
             return this.axisColor ? this.axisColor : this._checkThemeVariable(cssVarName, cssVarDefault);
+          }
+        },
+
+        _onTitleHover: function() {
+          if(!this._titleTruncated) {
+            return;
+          }
+
+          this._tooltipRequested = true;
+          this._tooltipTimer = setTimeout(() => {
+
+            const detail = {
+              origin: this,
+              is: this.is,
+              element: this._titleText.node(),
+              data: [{
+                text: `${this.title} ${this._currentUnits}`
+              }]
+            }
+
+            this.dispatchEvent(new CustomEvent('central-tooltip-display-request', { bubbles: true, composed: true, detail: detail }));
+
+            this._tooltipRequested = false;
+
+          }, 500);
+        },
+
+        _onTitleLeave: function() {
+          if(!this._titleTruncated) {
+            return;
+          }
+
+          if(this._tooltipRequested) {
+            clearTimeout(this._tooltipTimer);
+
+          } else {
+            this.dispatchEvent(new CustomEvent('central-tooltip-cancel-request', { bubbles: true, composed: true, detail: {origin: this } }));
+
           }
         }
     });

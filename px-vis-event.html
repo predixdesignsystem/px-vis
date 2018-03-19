@@ -403,6 +403,7 @@ Custom property | Description
         element: elem,
         delay: 10,
         tooltipType: this.is,
+        origin: this,
         orientation: this._getConfigValue('tooltipOrientation', d.label, false),
         data: [{
           title: d.label,
@@ -443,7 +444,7 @@ Custom property | Description
         return;
       }
 
-      this.dispatchEvent(new CustomEvent('central-tooltip-cancel-request', { bubbles: true, composed: true }));
+      this.dispatchEvent(new CustomEvent('central-tooltip-cancel-request', { bubbles: true, composed: true, detail: { origin: this } }));
 
     },
 

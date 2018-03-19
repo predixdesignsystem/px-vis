@@ -164,23 +164,33 @@ PxVisBehaviorRegister.itemShared = [{
     _mouseEnterHandlerBound: Function,
     _mouseLeaveHandlerBound: Function,
     _hideAfterTransitionBound: Function,
+    _tooltipTimer: Object,
+    _tooltipRequested: {
+      type: Boolean,
+      value: false
+    }
   },
 
   observers: [
-    '_menuConfigChanged(dynamicMenuConfig)'
+    '_menuConfigChanged(dynamicMenuConfig)',
+    '_setupTruncationTooltipListener(_didTruncate)'
   ],
 
-  attached: function() {
-
+  created: function() {
+    this._onTitleHoverBound = this._onTitleHover.bind(this);
+    this._onTitleLeaveBound = this._onTitleLeave.bind(this);
     this._mouseEnterHandlerBound = this._mouseEnterHandler.bind(this);
     this._mouseLeaveHandlerBound = this._mouseLeaveHandler.bind(this);
     this._hideAfterTransitionBound = this._hideAfterTransition.bind(this);
+  },
 
+  attached: function() {
     this.addEventListener('mouseenter', this._mouseEnterHandlerBound);
     this.addEventListener('mouseleave', this._mouseLeaveHandlerBound);
   },
 
   detached: function() {
+    this._setupTruncationTooltipListener(false);
     this.removeEventListener('mouseenter', this._mouseEnterHandlerBound);
     this.removeEventListener('mouseleave', this._mouseLeaveHandlerBound);
   },
@@ -299,6 +309,50 @@ PxVisBehaviorRegister.itemShared = [{
     }
 
     this._hasDynamicMenu = this.dynamicMenuConfig && this.dynamicMenuConfig.length > 0;
+  },
+
+  _setupTruncationTooltipListener: function(didTruncate) {
+    if(didTruncate === undefined || !this.$.seriesName) {
+      return;
+    }
+
+    if(didTruncate) {
+      this.$.seriesName.addEventListener('mouseenter', this._onTitleHoverBound);
+      this.$.seriesName.addEventListener('mouseleave', this._onTitleLeaveBound);
+    } else {
+      this.$.seriesName.removeEventListener('mouseenter', this._onTitleHoverBound);
+      this.$.seriesName.removeEventListener('mouseleave', this._onTitleLeaveBound);
+    }
+
+  },
+
+  _onTitleHover: function() {
+    this._tooltipRequested = true;
+    this._tooltipTimer = setTimeout(() => {
+
+      const detail = {
+        origin: this,
+        is: this.is,
+        element: this.$.seriesName,
+        data: [{
+          text: this._configName
+        }]
+      }
+
+      this.dispatchEvent(new CustomEvent('central-tooltip-display-request', { bubbles: true, composed: true, detail: detail }));
+
+      this._tooltipRequested = false;
+
+    }, 500);
+  },
+  _onTitleLeave: function() {
+    if(this._tooltipRequested) {
+      clearTimeout(this._tooltipTimer);
+
+    } else {
+      this.dispatchEvent(new CustomEvent('central-tooltip-cancel-request', { bubbles: true, composed: true, detail: {origin: this } }));
+
+    }
   }
 }, PxVisBehavior.observerCheck, PxVisBehavior.dynamicMenuConfig];
 

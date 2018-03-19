@@ -3,7 +3,7 @@
 <link rel="import" href="../px-icon-set/px-icon.html" />
 <link rel="import" href="px-vis-behavior-datetime.html"/>
 <link rel="import" href="../px-icon-set/px-icon-set-utility.html" />
-<link rel="import" href="css/px-vis-markers-tooltip-content-styles.html">
+<link rel="import" href="css/px-vis-central-tooltip-content-styles.html">
 
 <!--
 
@@ -12,16 +12,16 @@
 
 
 
-@element px-vis-markers
-@blurb Element which draws markers on top or bottom of a chart
+@element px-vis-central-tooltip-content
+@blurb Element which draws content for a central tooltip
 @homepage index.html
 @demo demo/index.html
 
 -->
 
-<dom-module id="px-vis-markers-tooltip-content">
+<dom-module id="px-vis-central-tooltip-content">
   <template>
-    <style include="px-vis-markers-tooltip-content-styles"></style>
+    <style include="px-vis-central-tooltip-content-styles"></style>
 
       <div class$="flex flex--middle u-mb- u-mt-- [[_buttonsShown(_multipleTooltips)]]">
         <template is="dom-if" if="[[_multipleTooltips]]">
@@ -43,7 +43,7 @@
           </template>
 
           <template is="dom-if" if="[[_currentData.text]]">
-            <div class="u-mt- u-mb-">[[_currentData.time]]</div>
+            <div class="u-mt- u-mb-">[[_currentData.text]]</div>
           </template>
         </div>
         <template is="dom-if" if="[[_multipleTooltips]]">
@@ -58,7 +58,7 @@
 <script>
   Polymer({
 
-    is: 'px-vis-markers-tooltip-content',
+    is: 'px-vis-central-tooltip-content',
 
     behaviors: [
       PxVisBehavior.observerCheck,
@@ -126,7 +126,7 @@
       },
 
       /*
-       * Whether the tooltips we are displaying can have several values (markers)
+       * Whether the tooltips we are displaying can have several values (central)
        * on top of each other
        **/
       _multipleTooltips: {

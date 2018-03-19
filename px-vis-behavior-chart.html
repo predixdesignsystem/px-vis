@@ -3330,52 +3330,150 @@ PxVisBehaviorChart.centralTooltip = [{
       type: Boolean,
       value: true
     },
+
+    _availableTooltips: {
+      type: Array,
+      value: () => { return []; }
+    },
+
+    _usedTooltipMap: {
+      type: Map,
+      value: () => { return new Map(); }
+    },
+
+    _lockedTooltips: {
+      type: Set,
+      value: () => { return new Set(); }
+    }
   },
 
   listeners: {
     'central-tooltip-display-request': '_centralTooltipDisplayRequest',
-    'central-tooltip-cancel-request': '_centralTooltipCancelRequest'
+    'central-tooltip-cancel-request': '_centralTooltipCancelRequest',
+    'central-tooltip-lock-request': '_centralTooltipLockRequest',
+    'central-tooltip-lock-cancel': '_centralTooltipLockCancel'
+  },
+
+  observers: [
+    '_updateTooltipProps(tooltipOrientation, resources, useKeyIfMissing, language, firstDateTimeFormat, secondDateTimeFormat, separator, timezone)'
+  ],
+
+  ready: function() {
+    this._availableTooltips.push(this.$.centralTooltip);
+  },
+
+  _getTooltipToUse: function() {
+    // look for first available tooltip
+    for(var i=0; i<this._availableTooltips.length; i++) {
+      if(!this._lockedTooltips.has(this._availableTooltips[i])){
+        return this._availableTooltips[i];
+      }
+    }
+
+    return this._createTooltip();
+  },
+
+  _createTooltip: function() {
+    const copy = this._availableTooltips[0].cloneNode(true);
+
+    copy.setAttribute('id', undefined);
+
+    this._availableTooltips.push(copy);
+    this.appendChild(copy);
+
+    return copy;
   },
 
   _centralTooltipDisplayRequest: function(evt) {
+    const tooltip = this._getTooltipToUse();
+    const content = tooltip.querySelector('px-vis-central-tooltip-content');
+
+    this._usedTooltipMap.set(evt.detail.origin, tooltip);
+
     if(evt.detail.element) {
-      this.$.centralTooltip.set('for', evt.detail.element);
+      tooltip.set('for', evt.detail.element);
     }
 
     if(evt.detail.mouseCoords) {
-      this.$.centralTooltip.set('followMouse', true);
-      this.$.centralTooltip.set('mouseCoords', evt.detail.mouseCoords);
+      tooltip.set('followMouse', true);
+      tooltip.set('mouseCoords', evt.detail.mouseCoords);
     }
 
     if(evt.detail.orientation) {
-      this.$.centralTooltip.set('orientation', evt.detail.orientation);
+      tooltip.set('orientation', evt.detail.orientation);
     }
 
     if(evt.detail.data) {
-      this.$.centralTooltipContent.set('tooltipDataResult', evt.detail.data);
+      content.set('tooltipDataResult', evt.detail.data);
     }
 
-    this.$.centralTooltip.set('opened', true);
+    tooltip.set('opened', true);
 
+    evt.preventDefault();
+    evt.stopPropagation();
   },
 
   _centralTooltipCancelRequest: function(evt) {
-    this.$.centralTooltip.set('opened', false);
+    const tooltip = this._usedTooltipMap.get(evt.detail.origin);
+    const content = tooltip.querySelector('px-vis-central-tooltip-content');
 
-    this.$.centralTooltip.set('for', undefined);
-    this.$.centralTooltip.set('followMouse', false);
-    this.$.centralTooltip.set('mouseCoords', undefined);
+    tooltip.set('opened', false);
 
-    this.$.centralTooltipContent.set('tooltipDataResult', []);
-    this.$.centralTooltipContent.set('timestamp', undefined);
-    this.$.centralTooltipContent.set('tooltipTitle', '');
+    tooltip.set('for', undefined);
+    tooltip.set('followMouse', false);
+    tooltip.set('mouseCoords', undefined);
 
+    content.set('tooltipDataResult', []);
+
+    this._usedTooltipMap.delete(evt.detail.origin);
+
+    evt.preventDefault();
+    evt.stopPropagation();
+  },
+
+  _centralTooltipLockRequest: function(evt) {
+    const tooltip = this._usedTooltipMap.get(evt.detail.origin);
+    this._lockedTooltips.add(tooltip);
+
+    evt.preventDefault();
+    evt.stopPropagation();
+  },
+
+  _centralTooltipLockCancel: function(evt) {
+    this._lockedTooltips.delete(evt.detail.origin);
+
+    evt.preventDefault();
+    evt.stopPropagation();
   },
 
   _resizeTooltip: function() {
     // if the content changes, we need to resize to make sure
     // stuff fits / is aligned
     this.$.tooltip.setPosition();
+  },
+
+  _updateTooltipProps: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    // base tooltip is data bound
+    if(this._availableTooltips.length === 1) {
+      return;
+    }
+
+    for(var i=1; i<this._availableTooltips.length; i++) {
+      this._availableTooltips[i].set('tooltipOrientation', this.tooltipOrientation);
+
+      const content = this._availableTooltips[i].querySelector('px-vis-central-tooltip-content');
+      content.set('resources', this.resources);
+      content.set('useKeyIfMissing', this.useKeyIfMissing);
+      content.set('language', this.language);
+      content.set('firstDateTimeFormat', this.firstDateTimeFormat);
+      content.set('secondDateTimeFormat', this.secondDateTimeFormat);
+      content.set('separator', this.separator);
+      content.set('timezone', this.timezone);
+    }
   }
 
 
