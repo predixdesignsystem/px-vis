@@ -70,6 +70,9 @@
   * `onClick` definition in the config has been replaced by `onSelect`
   * Config definitions now have a 'click' defined by default. Custom configurations must now nullify this 'click' handler (if you dont use click).
   * No longer directly displays a tooltip. Instead, it fires an event up and will rely on the chart to display the tooltip with the supplied information
+* px-vis-marker-tooltip-content changes (BREAKING):
+  * Renamed to px-vis-central-tooltip-content
+  * Drastically modifed to generalize component and better disconnection from markers
 * Misc BREAKING:
   * `range` property has been removed from px-vis-chart-navigator. use `chartExtents.x` to control the timespan. The chart navigator does not support being used without data anymore
   * horizontal registers do not support custom alignment anymore and will use all available width
