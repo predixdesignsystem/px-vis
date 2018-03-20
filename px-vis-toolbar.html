@@ -129,8 +129,15 @@ Custom property | Description
       <!--main row-->
       <span id="mainRow" class$="flex [[_getRowDirection(horizontalAlignment)]]">
         <template id="mainRepeat" is="dom-repeat" items="{{_internalConfig}}" strip-whitespace>
-          <span class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item.disabled)]] [[_hide(item.hidden)]]" style$="{{item.customButtonStyle}}" on-tap="_clickItem" on-mouseenter="_onItemHover" on-mouseleave="_onItemLeave" value="{{index}}">
-            <px-icon class$="icon [[_show(item.icon)]]" icon="[[item.icon]]" value="{{index}}"></px-icon>{{item.title}}
+          <span
+            class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item.disabled)]] [[_hide(item.hidden)]]"
+            style$="{{item.customButtonStyle}}"
+            on-tap="_clickItem"
+            on-mouseenter="_onItemHover"
+            on-mouseleave="_onItemLeave"
+            value="{{index}}"
+            data-conf-type="main">
+              <px-icon class$="icon [[_show(item.icon)]]" icon="[[item.icon]]" value="{{index}}"></px-icon>{{item.title}}
           </span>
         </template>
       </span>
@@ -138,10 +145,16 @@ Custom property | Description
       <template id="templateSubRow" is="dom-if" if="[[_isWithinChart(withinChart)]]">
         <span id="subRow" class$="flex subrow--container [[_getRowDirection(horizontalAlignment)]] [[_getSubRowClass(subToolbarAlignment)]]">
           <template id="subRepeat" is="dom-repeat" items="{{currentSubConfig}}" strip-whitespace>
-              <span class$="u-p- flex__item main-item subrow--item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item.disabled)]] [[_hide(item.hidden)]]" on-tap="_clickSubItem" on-mouseenter="_onItemHover" on-mouseleave="_onItemLeave" value="{{index}}">
+            <span
+              class$="u-p- flex__item main-item subrow--item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item.disabled)]] [[_hide(item.hidden)]]"
+              on-tap="_clickSubItem"
+              on-mouseenter="_onItemHover"
+              on-mouseleave="_onItemLeave"
+              value="{{index}}"
+              data-conf-type="sub">
                 <px-icon class$="icon [[_show(item.icon)]]" icon="[[item.icon]]" value="{{index}}"></px-icon>
                 {{item.title}}
-              </span>
+            </span>
           </template>
         </span>
       </template>
@@ -1390,7 +1403,7 @@ Custom property | Description
 
     _onItemHover: function(evt) {
       const target = Polymer.dom(evt).rootTarget;
-      const conf = this._internalConfig[target.value];
+      const conf = target.dataset.confType === 'main' ? this._internalConfig[target.value] : this.currentSubConfig[target.value];
 
       if(!this._hasTooltip(conf)) {
         return;
