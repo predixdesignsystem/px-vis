@@ -237,8 +237,13 @@ function runTests() {
 
     suiteSetup(function(done) {
       numberFormatCulture = document.getElementById('numberFormatCulture');
+      numberFormatCulture.set('numberFormatCulture' , 'da-DK');
       var data = generateDataValues( generateEmptyData(2) );
       setData(numberFormatCulture, data,done);
+    });
+
+    suiteTeardown(function() {
+      numbro.culture('en-US');
     });
 
     test('numberFormatCulture fixtures are created', function() {

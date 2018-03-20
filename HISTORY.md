@@ -1,6 +1,5 @@
 
 
-================
 * Added tooltipData.seriesObj property
 * Register Changes:
   * item: Simplified register data construction into a single string instead of multiple props
@@ -63,9 +62,15 @@
   * Event no longer directly displays a tooltip. Instead, it fires an event up and will rely on the chart to display the tooltip with the supplied information
 * Marker changes (BREAKING):
   * Marker no longer directly displays a tooltip. Instead, it fires an event up and will rely on the chart to display the tooltip with the supplied information
-* BREAKING:
-  * Toolbar: `onClick` definition in the config has been replaced by `onSelect`
-  * Toolbar: Config definitions now have a 'click' defined by default. Custom configurations must now nullify this 'click' handler (if you dont use click).
+* Register changes (BREAKING):
+  * No longer directly displays a tooltip. Instead, it fires an event up and will rely on the chart to display the tooltip with the supplied information
+* Axis changes (BREAKING):
+  * No longer directly displays a tooltip. Instead, it fires an event up and will rely on the chart to display the tooltip with the supplied information
+* Toolbar changes (BREAKING):
+  * `onClick` definition in the config has been replaced by `onSelect`
+  * Config definitions now have a 'click' defined by default. Custom configurations must now nullify this 'click' handler (if you dont use click).
+  * No longer directly displays a tooltip. Instead, it fires an event up and will rely on the chart to display the tooltip with the supplied information
+* Misc BREAKING:
   * `range` property has been removed from px-vis-chart-navigator. use `chartExtents.x` to control the timespan. The chart navigator does not support being used without data anymore
   * horizontal registers do not support custom alignment anymore and will use all available width
   * domainChanged is not a Number with initial value of 0. This toggling easier and checking if it hasnt been toggled.
@@ -73,6 +78,19 @@
   * remove `_checkColorType` from PxVisBehavior.commonMethods
   * changed `PxVisBehaviorD3.icons._getIcon` to `PxVisBehaviorD3.icons._getPxIcon`
   * changed `PxVisBehaviorD3.icons._getPxIcon` to return an object with the icon, size, and scale instead of returning an icon and setting two props for size and scale
+  * `px-vis-brush` and `px-vis-chart-navigator` don't use opacity for gradients but colors instead. As such the `gradientOverlay` property has been replaced byt the `gradientColors` property which can be:
+    * A single color (string)
+    * An array of colors (creating a linear gradient from those colors)
+    * A custom function defining a gradient by returning a color for an input between 0 and 1.
+* Added PxVisBehaviorChart.searchToolbar to PxVisBehaviorChart.chartCommon, adding a `getToolbar` method for all charts
+
+v4.7.8
+=================
+* Remove number formatter default culture to avoid overriding of culture on element creation
+
+v4.7.7
+=================
+* Fixed bug where tooltip search on timeseries with prevent web worker would not return the timestamp
 
 v4.7.6
 =================

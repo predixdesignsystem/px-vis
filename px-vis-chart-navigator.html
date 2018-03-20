@@ -42,9 +42,7 @@ Custom property | Description
   `--px-vis-nav-brush-outline-color` | The stroke (border) color for the brushed box
   `--px-vis-nav-brush-fill-color` | The fill (background) color for the brushed box
   `--px-vis-nav-brush-opacity` | The opacity of the brushed box
-  `--px-vis-nav-brush-gradient-fill-color` | The fill (background) color for the brushed box when gradientOverlay is 'true'
-  `--px-vis-nav-brush-gradient-opacity-1` | The start opacity of the brushed box when gradientOverlay is 'true'
-  `--px-vis-nav-brush-gradient-opacity-2` | The end opacity of the brushed box when gradientOverlay is 'true'
+  `--px-vis-nav-brush-gradient-fill-color` | The fill (background) color for the brushed box when gradientColors is not defined
   `--px-vis-nav-brush-handle-fill-color` | The fill (background) color for the handles on the brushed box
   `--px-vis-nav-brush-handle-lines-color` | The stroke (border) color for the handles on the brushed box
   `--px-vis-nav-brush-handle-fill-color-hover` | The hover state fill (background) color for the handles on the brushed box
@@ -181,9 +179,9 @@ Custom property | Description
           width="[[width]]"
           margin="[[margin]]"
           domain-changed="[[domainChanged]]"
-          chart-domain=[[chartDomainX]]
+          chart-domain="[[chartDomainX]]"
           selected-domain="{{selectedDomain}}"
-          gradient-overlay="[[gradientOverlay]]">
+          gradient-colors="[[gradientColors]]">
         </px-vis-brush>
       </div>
     </template>
@@ -224,7 +222,8 @@ Custom property | Description
           PxVisBehaviorChart.webWorkerSynchronization,
           PxVisBehaviorD3.clipPath,
           PxVisBehaviorRenderer.base,
-          PxVisBehavior.mutedSeries
+          PxVisBehavior.mutedSeries,
+          PxVisBehavior.gradientColorsProperty
         ],
 
         /**
@@ -259,14 +258,6 @@ Custom property | Description
           chartDomainY: {
             type:Array,
             notify:true
-          },
-          /**
-           * Boolean specifying if the rectangular overlay should have a gradient applied
-           *
-           */
-          gradientOverlay: {
-            type: Boolean,
-            value: false
           },
           /**
           * Developer set chart extents for the chart. The chart will draw to whatever values are specified in the chartExtents.

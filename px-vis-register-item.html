@@ -114,7 +114,8 @@ Custom property | Description
       PxVisBehaviorRegister.itemShared,
       PxVisBehaviorRegister.generalItem,
       PxVisBehaviorRegister.disableClick,
-      PxVisBehavior.dataChecks
+      PxVisBehavior.dataChecks,
+      PxVisBehavior.gradientColorsFunction
     ],
     properties: {
       _formattedX: {
@@ -257,7 +258,21 @@ Custom property | Description
       // FIXME need to find a better way of doing this so it matches the SASS set height...
       // Does the height of hte dash pattern really matter? What happens is it goes to 100 and height is only 25?
       var HEIGHT = 25;
-      if((!patternItems || patternItems.length < 2) && !negative) {
+      if((!patternItems || patternItems.length < 2) && typeof color !== 'string') {
+
+        //build a gradient on 10 values
+        let gradient = this.createGradientFunction(color),
+            cssString = 'background:linear-gradient(';
+        for(let i=0; i<10; i++) {
+          cssString += gradient(i/10) + ',';
+        }
+
+        //remove last comma
+        cssString = cssString.slice(0, cssString.length -1);
+        cssString += ')';
+        return cssString;
+      }
+      else if((!patternItems || patternItems.length < 2) && !negative) {
         return 'background-color:' + color;
 
       } else if((!patternItems || patternItems.length < 2) && negative) {

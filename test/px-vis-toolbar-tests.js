@@ -87,10 +87,11 @@ function runTests() {
     });
 
     test('toolbar actionConfig', function() {
+
       assert.deepEqual(toolbar.actionConfig, {
         mouseout: "resetTooltip",
         mousemove: "calcTooltipData",
-        click: null,
+        click: toolbar._defaultActionsMapping.tooltip.actionConfig.click,
         mousedown: null,
         mouseup: null
       });
@@ -288,11 +289,10 @@ function runTests() {
     });
 
     test('toolbar sub items got correct icons', function() {
-
       assert.equal(subItems[0].querySelector('px-icon').icon, toolbar.currentSubConfig[0].icon);
       assert.equal(subItems[1].querySelector('px-icon').icon, toolbar.currentSubConfig[1].icon);
-      assert.equal(subItems[2].querySelector('px-icon').style['display'], 'none');
-      assert.equal(subItems[3].querySelector('px-icon').style['display'], 'none');
+      assert.equal(subItems[2].querySelector('px-icon').style['display'], '');
+      assert.equal(subItems[3].querySelector('px-icon').style['display'], '');
     });
 
     test('toolbar sub items are not selected', function() {

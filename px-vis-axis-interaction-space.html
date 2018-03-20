@@ -83,7 +83,8 @@ Custom property | Description
       PxVisBehavior.updateStylesOverride,
       PxVisBehavior.extentsData,
       PxVisBehavior.brushDomains,
-      PxVisBehavior.timeDomain
+      PxVisBehavior.timeDomain,
+      PxVisBehavior.gradientColorsFunction
     ],
 
     /**
@@ -247,7 +248,8 @@ Custom property | Description
       '_setupActions(actionConfig.*)',
       '_setDragBehavior(cartesianDragBehavior, dragContainerElem)',
       '_drawCursorIconAndGroup(svg, iconType)',
-      '_setBrushStyles(_stylesUpdated)'
+      '_setBrushStyles(_stylesUpdated)',
+      '_computeGradientRange(timeDomain)'
     ],
 
     attached: function() {
@@ -807,8 +809,11 @@ Custom property | Description
       //create our fake configuration object
       tooltipConfig[aid] = {};
 
-      //if using categies, use it, otherwise default
-      tooltipConfig[aid]["color"] = this.categoryKey && d[this.categoryKey] && this.completeSeriesConfig[d[this.categoryKey]] ? this.completeSeriesConfig[d[this.categoryKey]]["color"] : this.completeSeriesConfig[this.seriesKey]["color"];
+      //if using categies, use it, otherwise default. Check for gradients.
+      let baseColors = this.categoryKey && d[this.categoryKey] && this.completeSeriesConfig[d[this.categoryKey]] ? this.completeSeriesConfig[d[this.categoryKey]].color : this.completeSeriesConfig[this.seriesKey].color,
+          gradient = this.createGradientFunction(baseColors);
+
+      tooltipConfig[aid].color = gradient(d[this.seriesKey]);
 
       //if title is specified, use it, otherwiuse id
       tooltipConfig[aid]["name"] = this.completeSeriesConfig[aid] && this.completeSeriesConfig[aid]['title'] ? this.completeSeriesConfig[aid]["title"] : aid;

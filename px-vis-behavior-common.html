@@ -226,8 +226,7 @@ PxVisBehavior.formatting = [{
      * @default 'en-US'
      */
     numberFormatCulture: {
-      type:String,
-      value: 'en-US'
+      type:String
     },
     /**
      * Defines how a display number should be formatted:
@@ -3233,7 +3232,7 @@ PxVisBehavior.updateStylesOverride = {
 
     @polymerBehavior PxVisBehavior.timeDomain
 */
-PxVisBehavior.timeDomain = {
+PxVisBehavior.timeDomain = [{
   properties: {
     /**
      * Can be used to define a time domain to be used, typically to restrain/filter the amount
@@ -3244,9 +3243,27 @@ PxVisBehavior.timeDomain = {
       value: function() {
         return {};
       }
+    },
+    timeKey: {
+      type: String
+    }
+  },
+  observers: [
+    '_timeDomainChartData(chartData, timeKey)'
+  ],
+
+  _timeDomainChartData: function() {
+    if(this.timeKey && this.chartData && this.chartData.length && (!this._doesObjHaveValues(this.timeDomain) || !this.timeDomain.x || this.timeDomain.x.length === 0)) {
+
+      let domain = {};
+      if(this.timeDomain && this.timeDomain.y) {
+        domain.y = this.timeDomain.y;
+      }
+      domain.x = [this.chartData[0][this.timeKey], this.chartData[this.chartData.length - 1][this.timeKey]];
+      this.set('timeDomain', domain);
     }
   }
-};
+}, PxVisBehavior.dataset, PxVisBehavior.commonMethods];
 
 /**
     Name:
@@ -3400,7 +3417,7 @@ PxVisBehavior.scaleTypeCheck = {
     PxVisBehavior.referenceCurveProps
 
     Description:
-    Polymer behavior that providse the properties for the reference curve.
+    Polymer behavior that provide the properties for the reference curve.
 
 
     @polymerBehavior PxVisBehavior.referenceCurveProps
@@ -3468,6 +3485,109 @@ PxVisBehavior.showHideClasses = {
 
     return 'hide';
   },
+};
+
+/**
+    Name:
+    PxVisBehavior.gradientColorsProperty
+
+    Description:
+    Polymer behavior that defines the color gradient Array/String/Function input
+
+
+    @polymerBehavior PxVisBehavior.gradientColorsProperty
+*/
+PxVisBehavior.gradientColorsProperty = {
+  properties: {
+    /**
+     * Colors used to create a gradient. Can be one of the folowing:
+     * - A single color (string), resulting in that color being applied for the whole "gradient"
+     * - An Array of colors from which a linear gradient while be created
+     * - A custom function that defined a gradient. The function takes an input that will be between 0 and 1 and should return a color based on that input.
+     * - A d3 chromatic scale, which is effectively a function as described above with predefined colors. Please see the "interpolate" functions at https://github.com/d3/d3-scale-chromatic
+     * @type {Array|String|Function}
+     */
+     gradientColors: {
+      type: Array
+    }
+  }
+};
+
+/**
+    Name:
+    PxVisBehavior.gradientColorsFunction
+
+    Description:
+    Polymer behavior that defines the color gradient function based on an
+    Array/String/Function input
+
+
+    @polymerBehavior PxVisBehavior.gradientColorsFunction
+*/
+PxVisBehavior.gradientColorsFunction = {
+  properties: {
+    /**
+     *
+     */
+    gradientColorsMin :{
+      type: Number,
+      value: 0
+    },
+    /**
+     *
+     */
+    gradientColorsMax: {
+      type: Number,
+      value: 1
+    },
+  },
+
+  /**
+   * Computes the data range.
+   *
+   */
+   _computeGradientRange: function(timeDomain) {
+
+    if(timeDomain && timeDomain.x && timeDomain.x.length > 0) {
+      this.set('gradientColorsMin', Number(timeDomain.x[0]));
+      this.set('gradientColorsMax', Number(timeDomain.x[1]));
+    }
+  },
+
+  createGradientFunction: function(colors) {
+
+console.log('TOO MANY CALLS')
+    if(colors) {
+      if(typeof colors === 'string') {
+        return function() {
+          return colors;
+        }
+      } else if(Array.isArray(colors)) {
+
+        let fn;
+        if(colors.length === 2) {
+          fn = Px.d3.interpolateRgb(colors[0], colors[1]);
+        } else {
+          fn = Px.d3.interpolateRgbBasis(colors);
+        }
+        return function(val) {
+          return fn(this._normalizeValue(val));
+        }.bind(this);
+      } else if(typeof colors === 'function') {
+        return colors;
+      } else {
+        console.warn('Color gradient ' + colors + ' has an invalid type. Should be string, array or function');
+      }
+    }
+  },
+
+  _normalizeValue: function(val) {
+    if(this.gradientColorsMin === this.gradientColorsMax) {
+      return 0;
+    } else {
+      return (val - this.gradientColorsMin) / (this.gradientColorsMax - this.gradientColorsMin);
+    }
+  }
 };
 
 </script>
