@@ -109,19 +109,74 @@ function runTests() {
       assert.equal(Polymer.dom(series[1].root).querySelector('.seriesName').firstChild.textContent.trim(),'this_is_a_long_name1');
     });
 
-    test('tooltips are created (or not)', function() {
-      var truncateSeries = Polymer.dom(truncate.root).querySelectorAll('px-vis-register-item');
-      var truncateTT = Polymer.dom(truncateSeries[0].root).querySelector('.seriesName').querySelector('px-tooltip');
+    test('tooltips are created (or not)', function(done) {
+      let truncateSeries = Polymer.dom(truncate.root).querySelectorAll('px-vis-register-item')[0];
+      let truncateShortSeries = Polymer.dom(truncateShort.root).querySelectorAll('px-vis-register-item')[0];
+      let noTruncateSeries = Polymer.dom(noTruncate.root).querySelectorAll('px-vis-register-item')[0];
 
-      var truncateShortSeries = Polymer.dom(truncateShort.root).querySelectorAll('px-vis-register-item');
-      var truncateShortTT = Polymer.dom(truncateShortSeries[0].root).querySelector('.seriesName').querySelector('px-tooltip');
+      let truncateSeriesName = Polymer.dom(truncateSeries.root).querySelector('#seriesName');
+      let truncateShortSeriesName = Polymer.dom(truncateShortSeries.root).querySelector('#seriesName');
+      let noTruncateSeriesName = Polymer.dom(noTruncateSeries.root).querySelector('#seriesName');
 
-      var noTruncateSeries = Polymer.dom(noTruncate.root).querySelectorAll('px-vis-register-item');
-      var noTruncateTT = Polymer.dom(noTruncateSeries[0].root).querySelector('.seriesName').querySelector('px-tooltip');
+      let truncateDone = false,
+          truncateShortDone = false,
+          noTruncateFired = false,
+          truncateEvt,
+          truncateShortEvt;
 
-      assert.isTrue(truncateTT !== null);
-      assert.isTrue(truncateShortTT !== null);
-      assert.isTrue(noTruncateTT === null);
+      let allDone = function() {
+        if(truncateDone && truncateShortDone) {
+
+          assert.equal(truncateEvt.detail.data[0].text, 'this_is_a_long_name0');
+          assert.equal(truncateEvt.detail.origin, truncateSeries);
+          assert.equal(truncateEvt.detail.element, truncateSeriesName);
+
+          assert.equal(truncateShortEvt.detail.data[0].text, 'this_is_a_long_name0');
+          assert.equal(truncateShortEvt.detail.origin, truncateShortSeries);
+          assert.equal(truncateShortEvt.detail.element, truncateShortSeriesName);
+
+          assert.isFalse(noTruncateFired);
+
+          done();
+        }
+      }
+
+      truncate.addEventListener('central-tooltip-display-request', (evt) => {
+        truncateDone = true;
+        truncateEvt = evt;
+        allDone();
+      });
+
+      truncateShort.addEventListener('central-tooltip-display-request', (evt) => {
+        truncateShortDone = true;
+        truncateShortEvt = evt;
+        allDone();
+      });
+
+      noTruncate.addEventListener('central-tooltip-display-request', () => {
+        noTruncateFired = true;
+        allDone();
+      });
+
+      noTruncateSeriesName.dispatchEvent(new MouseEvent("mouseenter", {
+        bubbles: true,
+        cancelable: true,
+        view: window
+      }));
+
+      truncateSeriesName.dispatchEvent(new MouseEvent("mouseenter", {
+        bubbles: true,
+        cancelable: true,
+        view: window
+      }));
+
+      truncateShortSeriesName.dispatchEvent(new MouseEvent("mouseenter", {
+        bubbles: true,
+        cancelable: true,
+        view: window
+      }));
+
+
     });
   });
 

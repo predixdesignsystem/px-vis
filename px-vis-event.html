@@ -330,7 +330,7 @@ Custom property | Description
           }
         }
 
-        const icon = iconSvg.node().appendChild(this._iconInfo[iconName].icon);
+        const icon = iconSvg.node().appendChild(this._iconInfo[iconName].icon.cloneNode(true));
 
         Px.d3.select(icon)
           .attr('fill', 'transparent')
@@ -346,6 +346,10 @@ Custom property | Description
     _mergeLine: function(d, i, elem) {
       const key = this._getConfigValue('dataKey', d.label, false);
 
+      if(!d[key]) {
+        return;
+      }
+
       Px.d3.select(elem).select("line.event-line")
         .attr('stroke', this._getConfigValue('lineColor', d.label, "--px-vis-event-line-color"))
         .attr('stroke-width', this._getConfigValue('lineWeight', d.label, false))
@@ -358,6 +362,11 @@ Custom property | Description
 
     _mergeIcon: function(d, i, elem) {
       const key = this._getConfigValue('dataKey', d.label, false);
+
+      if(!d[key]) {
+        return;
+      }
+
       const size = Number(this._getConfigValue('size', d.label, false));
       const offset = this._getConfigValue('offset', d.label, false);
       const type = this._getConfigValue('type', d.label, false);
