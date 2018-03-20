@@ -1297,8 +1297,8 @@ PxVisBehaviorD3.radialLineGenerator = [{
         return _this.x(d[0]) * clockwiseFactor;
       })
       .radius(function(d) {
-        // ~~ --> round pixels values to optimize svg perfs
-        var radius = ~~_this.y(Number(d[1]));
+
+        var radius = Math.floor(_this.y(Number(d[1])));
 
         if(typeof _this.lineRadiusLimit === 'number' && radius < _this.lineRadiusLimit) {
           return _this.lineRadiusLimit;
@@ -1555,12 +1555,13 @@ PxVisBehaviorD3.lineShared = [{
 
     if(this.showGaps) {
       line = Px.d3.line()
-        .x(function(d) {
-          // ~~ --> round pixels values to optimize svg perfs
-          return ~~_this.x(d[xKey]);
+        .x(function(d, i) {
+          // round pixels values to optimize svg perfs
+          return Math.floor(_this.x(d[xKey]));
         })
         .y(function(d) {
-          return ~~_this.y(d[yKey]);
+
+          return Math.floor(_this.y(d[yKey]));
         })
         .defined(function(d,i) {
           return _this._isValidData(d[yKey]);
@@ -1569,21 +1570,21 @@ PxVisBehaviorD3.lineShared = [{
       line = Px.d3.line()
         .x(function(d,i) {
           if((d[xKey] || d[xKey] === 0) && (d[yKey] || d[yKey] === 0)) {
-            return ~~_this.x(d[xKey]);
+            return Math.floor(_this.x(d[xKey]));
           } else if(!renderToCanvas) {
 
             //svg needs to have a point defined where canvas will just ignore this point if no value
-            return ~~_this.x(_this.chartData[_this._currentDrawingOptions.lastPointRenderedIndex][xKey]);
+            return Math.floor(_this.x(_this.chartData[_this._currentDrawingOptions.lastPointRenderedIndex][xKey]);
           }
         })
         .y(function(d,i) {
           if((d[xKey] || d[xKey] === 0) && (d[yKey] || d[yKey] === 0 )) {
             _this._currentDrawingOptions.lastPointRenderedIndex = _this._currentDrawingOptions.currentBatchStartIndex + i;
-            return ~~_this.y(d[yKey]);
+            return Math.floor(_this.y(d[yKey]));
           } else if(!renderToCanvas) {
 
             //svg needs to have a point defined where canvas will just ignore this point if no value
-            return ~~_this.y(_this.chartData[_this._currentDrawingOptions.lastPointRenderedIndex][yKey]);
+            return Math.floor(_this.y(_this.chartData[_this._currentDrawingOptions.lastPointRenderedIndex][yKey]));
           }
         })
         .defined(function(d,i) {
@@ -1629,7 +1630,7 @@ PxVisBehaviorD3.lineShared = [{
               return false
             }
             //return [x,y] to path: x is ordinal based on dim; get the y-scale for the dim and use that particular scale on the data
-            return [~~this.x(p), ~~this.y[p](d[p])];
+            return [Math.floor(this.x(p)), Math.floor(this.y[p](d[p]))];
           }.bind(this)));
         }.bind(this);
 

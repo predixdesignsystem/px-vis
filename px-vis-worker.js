@@ -159,11 +159,11 @@ function flattenData(visData, d, xScale, yScale, index, arr) {
     if(visData.radial) {
 
       var pix = calcPixelCoordForRadial(d[visData.completeSeriesConfig[k]['x']], d[visData.completeSeriesConfig[k]['y']], axis, visData);
-      o['px'] = ~~pix[0];
-      o['py'] = ~~pix[1];
+      o['px'] = Math.floor(pix[0]);
+      o['py'] = Math.floor(pix[1]);
     } else {
-      o['px'] = ~~xScale(d[visData.completeSeriesConfig[k]['x']], axis);
-      o['py'] = ~~yScale(d[visData.completeSeriesConfig[k]['y']], axis);
+      o['px'] = Math.floor(xScale(d[visData.completeSeriesConfig[k]['x']], axis));
+      o['py'] = Math.floor(yScale(d[visData.completeSeriesConfig[k]['y']], axis));
     }
 
     arr.push(o);

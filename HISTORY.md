@@ -1,3 +1,7 @@
+v4.7.9
+=================
+* Use Math.floor instead of ~~ for flooring pixel values to avoid problems for big values
+
 v4.7.8
 =================
 * Remove number formatter default culture to avoid overriding of culture on element creation
