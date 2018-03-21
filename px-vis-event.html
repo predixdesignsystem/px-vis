@@ -416,7 +416,7 @@ Custom property | Description
         detail.data[0].time = d[this._getConfigValue('dataKey', d.label, false)];
       } else {
         detail.data[0].data.push({
-          title: 'X',
+          title: this._getConfigValue('dataKey', d.label, false),
           value: d[this._getConfigValue('dataKey', d.label, false)],
           type: 'number'
         });
@@ -429,7 +429,7 @@ Custom property | Description
     _getAllKeys: function(d) {
       const arr = [];
       Object.entries(d).forEach(([key,val]) => {
-        if(key !== 'time' && key !== 'label') {
+        if(key !== this._getConfigValue('dataKey', d.label, false) && key !== 'label') {
           arr.push({
             title: key,
             value: val
