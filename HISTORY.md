@@ -1,3 +1,7 @@
+v4.7.10
+=================
+* Fix wrong d3-import version
+
 v4.7.9
 =================
 * Use Math.floor instead of ~~ for flooring pixel values to avoid problems for big values
