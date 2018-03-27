@@ -1,3 +1,7 @@
+v4.7.11
+=================
+* Ensure binary search compares by number
+
 v4.7.10
 =================
 * Fix wrong d3-import version
