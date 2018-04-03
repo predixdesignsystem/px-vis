@@ -510,8 +510,8 @@ function runTests(){
   }); //suite
 
   suite('px-vis-event timeEvent works', function() {
-    let detail;
-    let icon;
+    var detail;
+    var icon;
     suiteSetup(function(done) {
       icon = timeEvent.eventGroup.selectAll('g.event-icon').nodes()[2];
 
