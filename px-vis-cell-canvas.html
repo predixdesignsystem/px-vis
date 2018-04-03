@@ -1,0 +1,167 @@
+<link rel="import" href="../polymer/polymer.html"/>
+<link rel="import" href="px-vis-behavior-common.html" />
+<link rel="import" href="px-vis-behavior-d3.html" />
+<link rel="import" href="css/px-vis-styles.html">
+
+<!--
+
+### Usage
+      <px-vis-svg-canvas
+        width="[[width]]"
+        height="[[height]]"
+        margin="[[margin]]"
+        canvas-context="{{canvasContext}}">
+      </px-vis-svg-canvas>
+      <px-vis-scale
+        x-axis-type="time"
+        y-axis-type="linear"
+        complete-series-config="[[seriesConfig]]"
+        data-extents="[[dataExtents]]"
+        width="[[width]]"
+        height="[[height]]"
+        margin="[[margin]]"
+        chart-data={{chartData}}
+        x="{{x}}"
+        y="{{y}}"
+        domainChanged="{{domainChanged}}"
+        selected-domain="[[selectedDomain]]">
+      </px-vis-scale>
+      <px-vis-cell-canvas
+        series-id="mySeries"
+        complete-series-config="[[seriesConfig]]"
+        chart-data="[[chartData]]"
+        x="[[x]]"
+        y="[[y]]"
+        width="[[width]]"
+        height="[[height]]"
+        margin="[[margin]]"
+        canvas-context="[[canvasContext]]"
+        domain-changed="[[domainChanged]]">
+      </px-vis-cell-canvas>
+
+@element px-vis-line
+@blurb Element which draws cells onto the chart
+@homepage index.html
+@demo demo.html
+-->
+
+<dom-module id="px-vis-cell-canvas">
+    <template>
+      <style include="px-vis-styles"></style>
+
+    </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'px-vis-cell-canvas',
+
+    behaviors: [
+      PxVisBehaviorD3.canvasContext,
+      PxVisBehavior.sizing,
+      PxVisBehavior.dataset,
+      PxVisBehavior.commonMethods,
+      PxVisBehavior.completeSeriesConfig,
+      PxVisBehavior.rendererType,
+      PxVisBehaviorD3.clipPathBoolean
+    ],
+
+    /**
+     * Properties block, expose attribute values to the DOM via 'reflect'
+     *
+     * @property properties
+     * @type Object
+     */
+    properties: {
+      showCellValue: {
+        type: Boolean,
+        value: false
+      },
+      colorScale: {
+        type: Object
+      },
+      /**
+       * Options currently in use for drawing lines: opacity, color, etc.
+       */
+      _currentDrawingOptions: {
+        type: Object,
+        value:function() {
+          return {};
+        }
+      }
+    },
+
+    attached: function() {
+      this.fire('px-vis-renderer-register', {'type': 'cell', 'renderMode': 'canvas', 'rendererType': this.rendererType, 'priority': 0});
+    },
+
+    detached: function() {
+      this.fire('px-vis-renderer-unregister',{'renderMode': 'canvas','rendererType': this.rendererType});
+    },
+
+    /**
+     * Defines the appropriate line generator and updates drawing
+     * variables: opacity, colors, etc.
+     */
+    initializeDrawingSession: function() {
+
+      this._currentDrawingOptions.cellTextColor = this._checkThemeVariable('--px-vis-cell-text-color', 'rgb(0,0,0)');
+      this._currentDrawingOptions.cellTextSize = this._checkThemeVariable('--px-vis-cell-text-size', '12');
+
+    },
+
+    /**
+     * Draws a clip path for canvas.
+     *
+     * @method drawClipPath
+     */
+    drawClipPath: function() {
+      this.canvasContext.beginPath();
+
+      var w = Math.max(this.width - this.margin.left - this.margin.right,0),
+          h = Math.max(this.height - this.margin.top - this.margin.bottom,0);
+
+      this.canvasContext.rect(0, 0, w, h);
+      this.canvasContext.clip();
+    },
+
+    renderOneBatch: function(start, stop) {
+
+      this.canvasContext.save();
+
+      if(this.clipPath) {
+        this.drawClipPath();
+      }
+
+      for(var i=start; i<stop; i++) {
+        this._drawCell(this.chartData[i]);
+      }
+
+      this.canvasContext.restore();
+    },
+
+    _drawCell: function(cellData) {
+        const borderWidth = this.cellBorderWidth,
+              valueKey = this.completeSeriesConfig[this.seriesId].value,
+              xKey = this.completeSeriesConfig[this.seriesId].x,
+              yKey = this.completeSeriesConfig[this.seriesId].y;
+
+        // draw and fill rectangle
+        this.canvasContext.beginPath();
+        this.canvasContext.fillStyle = this.colorScale(cellData[valueKey]);
+        this.canvasContext.fillRect(this.x(cellData[xKey]), this.y(cellData[yKey]), this.x.bandwidth(), this.y.bandwidth());
+
+        // draw text value if needed
+        if (this.showCellValue) {
+          const xPos = this.x(cellData[xKey]) + this.x.bandwidth() / 2;
+          const yPos = this.y(cellData[yKey]) + this.y.bandwidth() / 2;
+          this.canvasContext.beginPath();
+          this.canvasContext.font = this._currentDrawingOptions.cellTextSize + ' Arial';
+          this.canvasContext.fillStyle = this._currentDrawingOptions.cellTextColor;
+          this.canvasContext.textAlign = 'center';
+          this.canvasContext.textBaseline = 'middle';
+          this.canvasContext.fillText(cellData[valueKey], xPos, yPos, this.x.bandwidth());
+        }
+      },
+  });
+</script>

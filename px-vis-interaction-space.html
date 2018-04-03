@@ -334,6 +334,10 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       isBar: {
         type: Boolean,
         value: false
+      },
+      isHeatmap: {
+        type: Boolean,
+        value: false
       }
     },
 
@@ -739,7 +743,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
     },
 
     _searchLocally: function(mousePos, dataObj, x1) {
-      if(this._isTimeType(this.xAxisType) || this.isBar) {
+      if(this._isTimeType(this.xAxisType) || this.isBar || this.isHeatmap) {
         this._findSingleDataset(mousePos, dataObj, x1);
 
       } else {
@@ -755,6 +759,8 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         this._searchBarData(mousePos, dataObj, x1);
 
       //time based X axis
+      } else if(this.isHeatmap) {
+        this._searchHeatmapData(mousePos, dataObj);
       } else {
         this._searchTimeData(mousePos, dataObj, x1);
       }
@@ -1205,6 +1211,24 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           dataObj.series.push({'name': keys[i], 'value': result.series, 'coord': result.coord });
           dataObj.seriesObj[keys[i]] = {'value': result.series, 'coord': result.coord };
           dataObj.ordinalSet = ordVal;
+        }
+      }
+    },
+
+    _searchHeatmapData(mousePos, dataObj) {
+
+      const x = this.x.invert(mousePos[0]),
+            y = this.y.invert(mousePos[1]),
+            xKey = this.completeSeriesConfig[this.seriesKeys[0]].x,
+            yKey = this.completeSeriesConfig[this.seriesKeys[0]].y;
+
+      for(var i=0; i<this.chartData.length; i++) {
+        if(this.chartData[i][xKey] === x && this.chartData[i][yKey] === y) {
+          dataObj.series.push({
+            'name': this.seriesKeys[0],
+            'value': this.chartData[i],
+            'coord': [this.x(this.chartData[i][xKey]), this.y(this.chartData[i][yKey])]});
+          break;
         }
       }
     },
