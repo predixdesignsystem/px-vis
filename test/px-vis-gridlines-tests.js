@@ -124,8 +124,8 @@ test('baseXGrid ID is random', function() {
       assert.equal(baseXGrid._grid.tickSizeInner(),-240);
     });
 
-    test('baseXGrid translateAmt', function() {
-      assert.equal(JSON.stringify(baseXGrid.translateAmt),'[0,240]');
+    test('baseXGrid _translateAmt', function() {
+      assert.equal(JSON.stringify(baseXGrid._translateAmt),'[0,240]');
     });
 
     test('baseXGrid _gridGroup created', function() {
@@ -205,8 +205,8 @@ test('baseYGrid ID is random', function() {
       assert.equal(baseYGrid._grid.tickSizeInner(),-445);
     });
 
-    test('baseYGrid translateAmt', function() {
-      assert.equal(JSON.stringify(baseYGrid.translateAmt),'[0,0]');
+    test('baseYGrid _translateAmt', function() {
+      assert.equal(JSON.stringify(baseYGrid._translateAmt),'[0,0]');
     });
 
     test('baseYGrid _gridGroup created', function() {
