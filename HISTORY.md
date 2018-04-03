@@ -56,6 +56,7 @@ v5.0.0
   * In a similar way handlers for `onClick`, `onSelect` and `onDeselect` have direct access to the toolbar through `e.toolbar`.
   * when using preconfigured toolbar options keys with a value of `false` will be ignored, e.g : {zoom: true, pan: false} will only show zoom button
   * Adding a `switchConfigItems` convenience function for switching two toolbar items
+* Added `px-vis-cell-canvas`
 * Event changes (BREAKING):
   * Event now draws all events in the supplied data, not just one
   * Removed `xKey` property and instead rely on `dataKey` supplied in the config

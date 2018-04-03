@@ -119,11 +119,23 @@ function runTests(){
         baseClip;
     var clipPath, rect;
 
-    suiteSetup(function(){
-      baseSVG = document.getElementById('baseSVG');
-      baseClip = document.getElementById('baseClip');
-      clipPath = baseSVG.svg.select('clipPath');
-      rect = baseClip._clipPathSvg;
+    suiteSetup(function(done){
+      async.until(
+        ()=> {
+          baseSVG = document.getElementById('baseSVG');
+          baseClip = document.getElementById('baseClip');
+          clipPath = baseSVG.svg.select('clipPath');
+          rect = baseClip._clipPathSvg;
+          return baseSVG && clipPath.node() && baseClip;
+        },
+        (callback)=> {
+          setTimeout(callback, 50);
+        },
+        ()=> {
+          done();
+        }
+      );
+
     });
 
     test('baseClip ID is set', function() {
