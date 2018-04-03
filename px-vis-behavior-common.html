@@ -963,13 +963,14 @@ PxVisBehavior.commonMethods = [{
 
     var upperIndex = this.isVarNumber(upperIndex) ? upperIndex : data.length,
         lowerIndex = this.isVarNumber(lowerIndex) ? lowerIndex : 0,
-        index = Math.floor((upperIndex - lowerIndex) / 2) + lowerIndex;
+        index = Math.floor((upperIndex - lowerIndex) / 2) + lowerIndex,
+        dataVal = Number(data[index][key]);
 
-    if(data[index][key] === val) {
+    if(dataVal === val) {
       return data[index];
-    } else if(val < data[index][key]) {
+    } else if(val < dataVal) {
       return this._binarySearch(data, key, val, lowerIndex, index);
-    } else if(val > data[index][key]) {
+    } else if(val > dataVal) {
       return this._binarySearch(data, key, val, index+1, upperIndex);
     }
     return null;
@@ -985,13 +986,14 @@ PxVisBehavior.commonMethods = [{
 
     var upperIndex = this.isVarNumber(upperIndex) ? upperIndex : data.length,
         lowerIndex = this.isVarNumber(lowerIndex) ? lowerIndex : 0,
-        index = Math.floor((upperIndex - lowerIndex) / 2) + lowerIndex;
+        index = Math.floor((upperIndex - lowerIndex) / 2) + lowerIndex,
+        dataVal = Number(data[index][key]);
 
-    if(data[index][key] >= lowerFuzz && data[index][key] <= upperFuzz) {
+    if(dataVal >= lowerFuzz && dataVal <= upperFuzz) {
       return this._getAdjacentValues(data, key, lowerFuzz, upperFuzz, lowerIndex, upperIndex, index);
-    } else if(upperFuzz < data[index][key]) {
+    } else if(upperFuzz < dataVal) {
       return this._fuzzyBinarySearch(data, key, lowerFuzz, upperFuzz, lowerIndex, index);
-    } else if(lowerFuzz > data[index][key]) {
+    } else if(lowerFuzz > dataVal) {
       return this._fuzzyBinarySearch(data, key, lowerFuzz, upperFuzz, index+1, upperIndex);
     }
     return null;
@@ -2654,9 +2656,9 @@ PxVisBehavior.highlightShared = [{
           //https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function/apply
           //in practice we should be ok since each fuzzy search returns result for 1 point, if each point
           //returns tens of thousands we are in an absolutely crazy scenario
-          Array.prototype.push.apply(d,this._fuzzyBinarySearch(this.chartData, this.timeData, lowerFuzz, upperFuzz, null, null));
+          Array.prototype.push.apply(d,this._fuzzyBinarySearch(this.chartData, this.timeData, Number(lowerFuzz), Number(upperFuzz), null, null));
         } else {
-          d.push(this._binarySearch(this.chartData, this.timeData, this.crosshairData.timeStamps[i], null, null));
+          d.push(this._binarySearch(this.chartData, this.timeData, Number(this.crosshairData.timeStamps[i]), null, null));
         }
       }
     }

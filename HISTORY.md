@@ -1,5 +1,5 @@
 v5.0.0
-================
+===================
 * Added tooltipData.seriesObj property
 * Register Changes:
   * item: Simplified register data construction into a single string instead of multiple props
@@ -87,6 +87,18 @@ v5.0.0
     * An array of colors (creating a linear gradient from those colors)
     * A custom function defining a gradient by returning a color for an input between 0 and 1.
 * Added PxVisBehaviorChart.searchToolbar to PxVisBehaviorChart.chartCommon, adding a `getToolbar` method for all charts
+
+v4.7.11
+=================
+* Ensure binary search compares by number
+
+v4.7.10
+=================
+* Fix wrong d3-import version
+
+v4.7.9
+=================
+* Use Math.floor instead of ~~ for flooring pixel values to avoid problems for big values
 
 v4.7.8
 =================
