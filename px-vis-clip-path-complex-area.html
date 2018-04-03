@@ -85,43 +85,46 @@ https://developer.mozilla.org/en-US/docs/Web/SVG/Element/clipPath
        return;
      }
 
-      if(!this._clipPathObj) {
-        this.set('clipPath', this.generateRandomID('cp_'));
-        this.fire('px-vis-clip-path-updated', { 'dataVar': 'clipPath', 'data': this.clipPath, 'method':'set' });
+     if(this.domainChanged) {
 
-        this._clipPathObj =  this.svg
-          .append("clipPath")
-          .attr("id",this.clipPath);
+        if(!this._clipPathObj) {
+          this.set('clipPath', this.generateRandomID('cp_'));
+          this.fire('px-vis-clip-path-updated', { 'dataVar': 'clipPath', 'data': this.clipPath, 'method':'set' });
+
+          this._clipPathObj =  this.svg
+            .append("clipPath")
+            .attr("id",this.clipPath);
+        }
+
+        var _this = this,
+            area = Px.d3.radialArea()
+              .angle(function(d) {
+                return _this.x(d);
+              })
+              .innerRadius(function(d) {
+                  // ~~ --> round pixels values to optimize svg perfs
+                return ~~_this.y.range()[0];
+              })
+              .outerRadius(function(d) {
+                  // ~~ --> round pixels values to optimize svg perfs
+                return ~~_this.y.range()[1] + 1; //+1px to not clip the very edge
+              })
+              .defined( function(d) {
+                return _this.x(d) || _this.x(d) === 0;
+              })
+              .curve(Px.d3.curveLinearClosed);
+
+        this._clipPathSvg = this._clipPathObj.selectAll("path")
+          .data([this.dimensions])
+          .enter()
+          .append("path");
+
+        //cant do merge because our data is not changing. So always run
+        this._clipPathObj.selectAll("path")
+                         .attr('d', function(d) {
+                            return area(d);
+                          });
       }
-
-      var _this = this,
-          area = Px.d3.radialArea()
-            .angle(function(d) {
-              return _this.x(d);
-            })
-            .innerRadius(function(d) {
-                // ~~ --> round pixels values to optimize svg perfs
-              return ~~_this.y.range()[0];
-            })
-            .outerRadius(function(d) {
-                // ~~ --> round pixels values to optimize svg perfs
-              return ~~_this.y.range()[1] + 1; //+1px to not clip the very edge
-            })
-            .defined( function(d) {
-              return _this.x(d) || _this.x(d) === 0;
-            })
-            .curve(Px.d3.curveLinearClosed);
-
-      this._clipPathSvg = this._clipPathObj.selectAll("path")
-        .data([this.dimensions])
-        .enter()
-        .append("path");
-
-      //cant do merge because our data is not changing. So always run
-      this._clipPathObj.selectAll("path")
-        .attr('d', function(d) {
-          return area(d);
-        });
     }
   });
 </script>
