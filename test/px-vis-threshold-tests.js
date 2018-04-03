@@ -255,14 +255,14 @@ function runTests(){
       test('defaultThreshold thresholdRect width', function() {
         assert.equal(thresholdRects.nodes()[0].getAttribute('width'), 0);
         assert.closeTo(Number(thresholdRects.nodes()[1].getAttribute('width')),
-                       Number(thresholdTexts.nodes()[1].getBBox().width) + 6, 12); //dont understand why; FF only on travis has hugely differnt numbers. Everyone else passes with 2.
+                       Number(thresholdTexts.nodes()[1].getBBox().width) + 6, 15); //dont understand why; FF only on travis has hugely differnt numbers. Everyone else passes with 2.
         assert.closeTo(Number(thresholdRects.nodes()[2].getAttribute('width')),
-                       Number(thresholdTexts.nodes()[2].getBBox().width) + 6, 12);
+                       Number(thresholdTexts.nodes()[2].getBBox().width) + 6, 15);
         assert.equal(thresholdRects.nodes()[3].getAttribute('width'), 0);
         assert.closeTo(Number(thresholdRects.nodes()[4].getAttribute('width')),
-                       Number(thresholdTexts.nodes()[4].getBBox().width) + 6, 12);
+                       Number(thresholdTexts.nodes()[4].getBBox().width) + 6, 15);
         assert.closeTo(Number(thresholdRects.nodes()[5].getAttribute('width')),
-                       Number(thresholdTexts.nodes()[5].getBBox().width) + 6, 12);
+                       Number(thresholdTexts.nodes()[5].getBBox().width) + 6, 15);
         assert.equal(thresholdRects.nodes()[6].getAttribute('width'), 0);
       });
       test('defaultThreshold thresholdRect height', function() {
@@ -710,15 +710,15 @@ function runTests(){
       });
       test('defaultThreshold thresholdRect width', function() {
         assert.closeTo(Number(thresholdRects.nodes()[0].getAttribute('width')),
-                       Number(thresholdTexts.nodes()[0].getBBox().width) + 6, 12);
+                       Number(thresholdTexts.nodes()[0].getBBox().width) + 6, 15);
         assert.closeTo(Number(thresholdRects.nodes()[1].getAttribute('width')),
-                       Number(thresholdTexts.nodes()[1].getBBox().width) + 6, 12);
+                       Number(thresholdTexts.nodes()[1].getBBox().width) + 6, 15);
         assert.equal(thresholdRects.nodes()[2].getAttribute('width'), 0);
         assert.closeTo(Number(thresholdRects.nodes()[3].getAttribute('width')),
-                       Number(thresholdTexts.nodes()[3].getBBox().width) + 6, 12);
+                       Number(thresholdTexts.nodes()[3].getBBox().width) + 6, 15);
         assert.equal(thresholdRects.nodes()[4].getAttribute('width'), 0);
         assert.closeTo(Number(thresholdRects.nodes()[5].getAttribute('width')),
-                       Number(thresholdTexts.nodes()[5].getBBox().width) + 6, 12);
+                       Number(thresholdTexts.nodes()[5].getBBox().width) + 6, 15);
         assert.equal(thresholdRects.nodes()[6].getAttribute('width'), 0);
       });
       test('defaultThreshold thresholdRect height', function() {
@@ -939,14 +939,14 @@ function runTests(){
       test('defaultThreshold thresholdRect width', function() {
         assert.equal(thresholdRects.nodes()[0].getAttribute('width'), 0);
         assert.closeTo(Number(thresholdRects.nodes()[1].getAttribute('width')),
-                       Number(thresholdTexts.nodes()[1].getBBox().width) + 6, 12);
+                       Number(thresholdTexts.nodes()[1].getBBox().width) + 6, 15);
         assert.closeTo(Number(thresholdRects.nodes()[2].getAttribute('width')),
-                       Number(thresholdTexts.nodes()[2].getBBox().width) + 6, 12);
+                       Number(thresholdTexts.nodes()[2].getBBox().width) + 6, 15);
         assert.closeTo(Number(thresholdRects.nodes()[3].getAttribute('width')),
-                       Number(thresholdTexts.nodes()[3].getBBox().width) + 6, 12);
+                       Number(thresholdTexts.nodes()[3].getBBox().width) + 6, 15);
         assert.equal(thresholdRects.nodes()[4].getAttribute('width'), 0);
         assert.closeTo(Number(thresholdRects.nodes()[5].getAttribute('width')),
-                       Number(thresholdTexts.nodes()[5].getBBox().width) + 6, 12);
+                       Number(thresholdTexts.nodes()[5].getBBox().width) + 6, 15);
         assert.equal(thresholdRects.nodes()[6].getAttribute('width'), 0);
       });
       test('defaultThreshold thresholdRect height', function() {
@@ -1146,9 +1146,9 @@ function runTests(){
       test('defaultThreshold thresholdRect width', function() {
         assert.equal(thresholdRects.nodes()[0].getAttribute('width'), 0);
         assert.closeTo(Number(thresholdRects.nodes()[1].getAttribute('width')),
-                       Number(thresholdTexts.nodes()[1].getBBox().width) + 6, 12);
+                       Number(thresholdTexts.nodes()[1].getBBox().width) + 6, 15);
         assert.closeTo(Number(thresholdRects.nodes()[2].getAttribute('width')),
-                       Number(thresholdTexts.nodes()[2].getBBox().width) + 6, 12);
+                       Number(thresholdTexts.nodes()[2].getBBox().width) + 6, 15);
         assert.equal(thresholdRects.nodes()[3].getAttribute('width'), 0);
         assert.equal(thresholdRects.nodes()[4].getAttribute('width'), 0);
       });
@@ -1355,9 +1355,9 @@ function runTests(){
       test('defaultThreshold thresholdRect width', function() {
         assert.equal(thresholdRects.nodes()[0].getAttribute('width'), 0);
         assert.closeTo(Number(thresholdRects.nodes()[1].getAttribute('width')),
-                       Number(thresholdTexts.nodes()[1].getBBox().width) + 6, 12);
+                       Number(thresholdTexts.nodes()[1].getBBox().width) + 6, 15);
         assert.closeTo(Number(thresholdRects.nodes()[2].getAttribute('width')),
-                       Number(thresholdTexts.nodes()[2].getBBox().width) + 6, 12);
+                       Number(thresholdTexts.nodes()[2].getBBox().width) + 6, 15);
         assert.equal(thresholdRects.nodes()[3].getAttribute('width'), 0);
         assert.equal(thresholdRects.nodes()[4].getAttribute('width'), 0);
         assert.equal(thresholdRects.nodes()[5].getAttribute('width'), 0);
@@ -1581,8 +1581,8 @@ function runTests(){
       });
       test('defaultThreshold thresholdRect width', function() {
         assert.equal(thresholdRects.nodes()[0].getAttribute('width'), 0);
-        assert.closeTo(Number(thresholdRects.nodes()[1].getAttribute('width')), 104, 1);
-        assert.closeTo(Number(thresholdRects.nodes()[2].getAttribute('width')), 104, 1);
+        assert.closeTo(Number(thresholdRects.nodes()[1].getAttribute('width')), 104, 15);
+        assert.closeTo(Number(thresholdRects.nodes()[2].getAttribute('width')), 104, 15);
         assert.equal(thresholdRects.nodes()[3].getAttribute('width'), 0);
         assert.equal(thresholdRects.nodes()[4].getAttribute('width'), 0);
         assert.equal(thresholdRects.nodes()[5].getAttribute('width'), 0);
