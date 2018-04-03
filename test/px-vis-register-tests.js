@@ -570,10 +570,8 @@ suite('px-vis-register sorting menu is shown', function() {
     suiteSetup(function(done) {
       register = document.getElementById('yOnly');
       var data = generateOrdinalDataValues( generateEmptyData(2) );
-      register.setProperties({
-        displayYValuesOnly: true,
-        displayOrdinalValue: true
-      });
+      register.set('displayYValuesOnly', true);
+      register.set('displayOrdinalValue', true);
       setData(register, data);
       window.setTimeout(function() {
         done();
