@@ -932,12 +932,12 @@ TODO implement a dev setting to choose between only showing data at that x, snap
 
       for(var i=0; i<keys.length; i++) {
         yKey = this.completeSeriesConfig[keys[i]]['y'];
-        axisKey = (this.completeSeriesConfig[yKey]['axis'] && this.completeSeriesConfig[yKey]['axis']['id']) ? this.completeSeriesConfig[yKey]['axis']['id'] : null;
+        axisKey = (this.completeSeriesConfig[keys[i]]['axis'] && this.completeSeriesConfig[keys[i]]['axis']['id']) ? this.completeSeriesConfig[keys[i]]['axis']['id'] : null;
 
         coord = [this.x(result.series[this.timeData]), this.isMultiY ? this.y[axisKey](result.series[yKey]) : this.y(result.series[yKey])]
 
-        dataObj.series.push({'name': yKey, 'value': result.series, 'coord': coord });
-        dataObj.seriesObj[yKey] = {'value': result.series, 'coord': coord };
+        dataObj.series.push({'name': keys[i], 'value': result.series, 'coord': coord });
+        dataObj.seriesObj[keys[i]] = {'value': result.series, 'coord': coord };
       }
 
       dataObj.rawData = result.rawData;
