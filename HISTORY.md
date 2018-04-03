@@ -1,5 +1,5 @@
-
-
+v5.0.0
+================
 * Added tooltipData.seriesObj property
 * Register Changes:
   * item: Simplified register data construction into a single string instead of multiple props
@@ -55,6 +55,7 @@
   * Not a toolbar change per say but any custom event handler defined in `actionConfig` can access the toolbar by calling `getToolbar` on the chart (which is usually `this` in the handler).
   * In a similar way handlers for `onClick`, `onSelect` and `onDeselect` have direct access to the toolbar through `e.toolbar`.
   * when using preconfigured toolbar options keys with a value of `false` will be ignored, e.g : {zoom: true, pan: false} will only show zoom button
+  * Adding a `switchConfigItems` convenience function for switching two toolbar items
 * Event changes (BREAKING):
   * Event now draws all events in the supplied data, not just one
   * Removed `xKey` property and instead rely on `dataKey` supplied in the config
@@ -76,7 +77,7 @@
 * Misc BREAKING:
   * `range` property has been removed from px-vis-chart-navigator. use `chartExtents.x` to control the timespan. The chart navigator does not support being used without data anymore
   * horizontal registers do not support custom alignment anymore and will use all available width
-  * domainChanged is not a Number with initial value of 0. This toggling easier and checking if it hasnt been toggled.
+  * domainChanged is now a Number with initial value of 0. This toggling and checking if it hasnt been toggled easier.
   * PxVisBehaviorD3.domainUpdateNotify has been removed. PxVisBehaviorD3.domainUpdate once again has `notify: true`.
   * remove `_checkColorType` from PxVisBehavior.commonMethods
   * changed `PxVisBehaviorD3.icons._getIcon` to `PxVisBehaviorD3.icons._getPxIcon`
