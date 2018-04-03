@@ -1,0 +1,688 @@
+<link rel="import" href="../polymer/polymer.html">
+<link rel="import" href="px-vis-behavior-common.html">
+<link rel="import" href="px-vis-behavior-d3.html">
+<link rel="import" href="px-vis-scale.html">
+<link rel="import" href="px-vis-svg.html">
+
+
+<dom-module id="px-vis-box-whisker">
+  <script>
+    // TODO: properly document css vars
+    /**
+     * --px-vis-box-whisker-fill-color
+     * --px-vis-box-whisker-stroke-color
+     * --px-vis-box-whisker-median-color
+     * --px-vis-box-whisker-mean-color
+     * --px-vis-box-whisker-outlier-color
+     */
+    Polymer({
+
+      is: 'px-vis-box-whisker',
+
+      behaviors: [
+        PxVisBehavior.commonMethods,
+        PxVisBehavior.dynamicConfigProperties,
+        PxVisBehavior.svgDefinition,
+        PxVisBehavior.updateStylesOverride,
+        PxVisBehaviorD3.axes,
+        PxVisBehaviorD3.domainUpdate,
+        PxVisBehaviorD3.scatterMarkers
+      ],
+
+      properties: {
+
+        seriesKey: {
+          type: String
+        },
+
+        completeSeriesConfig: {
+          type: Object,
+        },
+
+        /**
+         * Data used to draw the box and whisker component.
+         *
+         */
+        data: {
+          type: Object,
+          value: {}
+        },
+
+        /**
+         * The position on the X axis. This can be a numeric value
+         * or a String value that exists on the axis.
+         */
+        position: {
+          type: String,
+          value: '0'
+        },
+
+        /**
+         * The direction of the box and whisker component.  Can be 'vertical'
+         * or 'horizontal'.  Defaults to vertical.
+         */
+        orientation: {
+          type: String,
+          value: 'vertical'
+        },
+
+        /**
+         * Width of the box.
+         */
+        boxWidth: {
+          type: Number,
+          value: 30
+        },
+
+        /**
+         * Width of the line that goes on top of the Q3 whisker
+         * and the line on the bottom of the Q1 whisker.
+         */
+        edgeWidth: {
+          type: Number,
+          value: 15
+        },
+
+        /**
+        * The symbol used for the outlier. This value is ready from the
+        * completeSeriesConfig. Supported symbols:
+        * - 'circle'
+        * - 'cross'
+        * - 'diamond'
+        * - 'square'
+        * - 'triangle-up'
+        * - 'star'
+        * - 'wye'
+        * more info at https://github.com/d3/d3-shape/blob/master/README.md#symbols
+        *
+        * Some additional "custom" types are also available:
+        * - 'bar'
+        * - 'thin-bar'
+        * - 'thick-bar'
+        * - 'x'
+        */
+        outlierSymbol: {
+          type: String
+        },
+
+        /**
+         * Size of the outlier symbol. This value is ready from the completeSeriesConfig.
+         */
+        outlierSize: {
+          type: Number
+        },
+
+        /**
+         * Scale of the outlier symbol. This value is ready from the completeSeriesConfig.
+         */
+        outlierScale: {
+          type: Number
+        },
+
+        /**
+        * The symbol used for the mean. This value is ready from the
+        * completeSeriesConfig. Supported symbols:
+        * - 'circle'
+        * - 'cross'
+        * - 'diamond'
+        * - 'square'
+        * - 'triangle-up'
+        * - 'star'
+        * - 'wye'
+        * more info at https://github.com/d3/d3-shape/blob/master/README.md#symbols
+        *
+        * Some additional "custom" types are also available:
+        * - 'bar'
+        * - 'thin-bar'
+        * - 'thick-bar'
+        * - 'x'
+        */
+        meanSymbol: {
+          type: String
+        },
+
+        /**
+         * Size of the mean symbol. This value is ready from the completeSeriesConfig.
+         */
+        meanSize: {
+          type: Number
+        },
+
+        /**
+         * Size of the mean scale. This value is ready from the completeSeriesConfig.
+         */
+        meanScale: {
+          type: Number
+        },
+
+        /**
+         * Fill color of the box. This value is ready from the completeSeriesConfig.
+         */
+        fillColor: {
+          type: String
+        },
+
+        /**
+         * Stroke color of the box. This value is ready from the completeSeriesConfig.
+         */
+        strokeColor: {
+          type: String
+        },
+
+        /**
+         * Stroke color for the median line. This value is ready from the completeSeriesConfig.
+         */
+        medianColor: {
+          type: String
+        },
+
+        /**
+         * Stroke width for the median line. This value is ready from the completeSeriesConfig.
+         */
+        medianWidth: {
+          type: String
+        },
+
+        /**
+         * Stroke color for mean circle. This value is ready from the completeSeriesConfig.
+         */
+        meanStrokeColor: {
+          type: String
+        },
+
+        /**
+         * Fill color for mean circle. This value is ready from the completeSeriesConfig.
+         */
+        meanFillColor: {
+          type: String
+        },
+
+        /**
+         * Stroke color for outlier circles. This value is ready from the completeSeriesConfig.
+         */
+        outlierStrokeColor: {
+          type: String
+        },
+
+        /**
+         * Fill color for outlier circles. This value is ready from the completeSeriesConfig.
+         */
+        outlierFillColor: {
+          type: String
+        },
+
+        /**
+         * A delay time used for drawing/updating the box and whisker
+         * svg.  This helps ensure the draw function is not called too
+         * many times when not needed.
+         */
+        drawDebounceTime: {
+          type: Number,
+          value: 50
+        },
+
+        /**
+         * Svg <g> element used to contain all drawings. This allows us
+         * to easily manipulate the entire box and whisker drawing.
+         */
+        _svgGroup: {
+          type: Object
+        },
+
+        /**
+         * Observe changes to this in order to know when css vars have changed.
+         */
+        _stylesResolved: {
+          type: Boolean,
+          value: false
+        }
+
+      },
+
+      observers: [
+        'draw(data, position, svg, x, y, domainChanged, boxWidth, edgeWidth, seriesKey, completeSeriesConfig, _stylesResolved)',
+        '_resolveCssVars(_stylesUpdated, completeSeriesConfig)'
+      ],
+
+      detached: function() {
+        // remove our data from svg
+        if (this._svgGroup) {
+          this._svgGroup.remove();
+        }
+      },
+
+      /**
+       * Returns SVG group element (<g>) that contains all of the box and whisker
+       * elements except for the outliers.
+       */
+      getSvgBoxElement: function() {
+        const boxEls = this._svgGroup.selectAll('.box');
+        if (boxEls && boxEls._groups && boxEls._groups[0]) {
+          return boxEls._groups[0][0];
+        }
+        return [];
+      },
+
+      /**
+       * Returns NodeList of outlier SVG path elements.
+       */
+      getSvgOutlierElements: function() {
+        const outlierEls = this._svgGroup.selectAll('.outlier');
+        if (outlierEls && outlierEls._groups) {
+          return outlierEls._groups[0];
+        }
+        return [];
+      },
+
+      /**
+       * Draw or update the box and whisker component to the svg component.
+       */
+      draw: function() {
+        if (this.hasUndefinedArguments(arguments)) {
+          return;
+        }
+        this.debounce('drawDebounce', function() {
+          this._drawDebounced();
+        }, this.drawDebounceTime);
+      },
+
+      /**
+       * Draw but delay by debounce time.
+       */
+      _drawDebounced: function() {
+        // remove previous drawing
+        if (!this._isObjEmpty(this._svgGroup)) {
+          this._svgGroup.remove();
+        }
+        // if data is empty, leave drawing empty
+        if (!this.data) {
+          console.warn('Skipping draw, no data');
+          return;
+        }
+        if (!this.x || !this.y) {
+          console.warn('Skipping draw, no x and y functions');
+          return;
+        }
+        // calc svg coord points for drawing
+        let drawingData;
+        try {
+          drawingData = this._getDrawingData(this.data, this.position,
+            this.orientation, this.boxWidth, this.edgeWidth);
+        } catch (e) {
+          console.info('Skipping draw, invalid draw data (likely due to out of date x or y function)');
+          return;
+        }
+
+        // init svg group
+        this._svgGroup = this.svg.append('g');
+        // group together box + whisker parts
+        const boxWhisker = this._svgGroup.append('g').attr('class', 'box hoverTransition');
+
+        // draw all lines and rectangles
+        // TODO: replace basic append methods with D3 way of doing it, such as for mean and outliers
+        this._appendLine(boxWhisker, drawingData.max, this.strokeColor, '1px');
+        this._appendLine(boxWhisker, drawingData.q3Whisker, this.strokeColor, '1px');
+        this._appendRectangle(boxWhisker, drawingData.q3Box, this.strokeColor, this.fillColor);
+        this._appendRectangle(boxWhisker, drawingData.q1Box, this.strokeColor, this.fillColor);
+        this._appendLine(boxWhisker, drawingData.q1Whisker, this.strokeColor, '1px');
+        this._appendLine(boxWhisker, drawingData.min, this.strokeColor, '1px');
+        this._appendLine(boxWhisker, drawingData.median, this.medianColor, this.medianWidth);
+
+        // draw mean with D3 for symbol/customization support
+        const meanBuilder = boxWhisker.selectAll('path.mean')
+          .data([this.data.mean]);
+        meanBuilder.exit().remove();
+        meanBuilder.enter()
+          .append('path')
+          .attr('class', 'mean')
+          // run whenever data array gets updated
+          .merge(meanBuilder)
+          .attr('d', Px.d3.symbol().type(this.markerMapping[this.meanSymbol]).size(this.meanSize))
+          .attr('fill', this.meanFillColor)
+          .attr('stroke', this.meanStrokeColor)
+          .attr('pointer-events', 'none')
+          .attr('transform', function(value) {
+            return this._getSvgTransform(value, this.position, this.meanScale, this.orientation);
+          }.bind(this));
+
+        // draw mean with D3 for symbol/customization support,
+        // this way each outlier svg retains original value for mouseover events
+        if (this.data.outliers) {
+          const outlierBuilder = this._svgGroup.selectAll('path.outlier')
+            .data(this.data.outliers);
+          outlierBuilder.exit().remove();
+          outlierBuilder.enter()
+            .append('path')
+            .attr('class', 'outlier hoverTransition')
+            .on('mouseover', this._handleOutlierMouseover.bind(this))
+            .on('mouseout', this._handleOutlierMouseout.bind(this))
+            .on('click', this._handleOutlierClick.bind(this))
+            // run whenever data array gets updated
+            .merge(outlierBuilder)
+            .attr('d', Px.d3.symbol().type(this.markerMapping[this.outlierSymbol]).size(this.outlierSize))
+            .attr('fill', this.outlierFillColor)
+            .attr('stroke', this.outlierStrokeColor)
+            .attr('transform', function(value) {
+              return this._getSvgTransform(value, this.position, this.outlierScale, this.orientation);
+            }.bind(this));
+        }
+
+        // in order to avoid repeating mouseover and mouseout events for each svg
+        // in the boxWhisker group, we will make a transparent rectange to handle
+        // pointer events
+        const mouseoverBox = {
+          x: drawingData.q3Box.x,
+          y: drawingData.q3Box.y,
+          height: drawingData.q3Box.height + drawingData.q1Box.height,
+          width: drawingData.q3Box.width
+        };
+        const mouseoverSvg = this._appendRectangle(boxWhisker, mouseoverBox, 'transparent', 'transparent');
+        mouseoverSvg.attr('pointer-events', 'all');
+        boxWhisker.on('mouseover', this._handleBoxMouseover.bind(this))
+          .on('mouseout', this._handleBoxMouseout.bind(this))
+          .on('click', this._handleBoxClick.bind(this));
+      },
+
+      /**
+       * Draw rectangle to existing svg element. Coordinates passed in by 'data.x' and 'data.y'
+       * should define the upper left point of the rectangle.
+       */
+      _appendRectangle: function(svg, data, strokeColor, fillColor) {
+        return svg.append('rect')
+          .attr('x', data.x)
+          .attr('y', data.y)
+          .attr('width', data.width)
+          .attr('height', data.height)
+          .attr('stroke', strokeColor)
+          .attr('fill', fillColor)
+          .attr('pointer-events', 'none');
+      },
+
+      /**
+       * Draw a single straight line to an existing svg element.
+       */
+      _appendLine: function(svg, data, strokeColor, strokeWidth) {
+        return svg.append('line')
+          .attr('x1', data.x1)
+          .attr('y1', data.y1)
+          .attr('x2', data.x2)
+          .attr('y2', data.y2)
+          .attr('stroke', strokeColor)
+          .attr('stroke-width', strokeWidth)
+          .attr('pointer-events', 'none');
+      },
+
+      /**
+       * Generates an object svg containing position information for each part
+       * of the box and whisker component. This information can be used to
+       * draw each part to an svg element.
+       */
+      _getDrawingData: function(data, position, orientation, boxWidth, minMaxWidth) {
+        return orientation === 'horizontal'
+          ? this._getDrawingDataHorizontal(data, position, boxWidth, minMaxWidth)
+          : this._getDrawingDataVertical(data, position, boxWidth, minMaxWidth);
+      },
+
+      /**
+       * Gets drawing coordinates for vertical box and whisker.
+       */
+      _getDrawingDataVertical: function(data, position, boxWidth, minMaxWidth) {
+        const drawingData = {};
+        // convert our raw data to svg points
+        const points = this._chartDataToSvgPoints(data, position, this.y, this.x);
+        // get the left and right boundries for the box
+        const boxLeft = points.middle - (boxWidth / 2);
+        const boxRight = boxLeft + boxWidth;
+        // get the left and right boundries for the min and max horiz lines
+        const minMaxLeft = points.middle - (minMaxWidth / 2);
+        const minMaxRight = minMaxLeft + minMaxWidth;
+        // generate position data
+        drawingData.max = {
+          x1: minMaxLeft, y1: points.max, x2: minMaxRight, y2: points.max
+        };
+        drawingData.min = {
+          x1: minMaxLeft, y1: points.min, x2: minMaxRight, y2: points.min
+        };
+        drawingData.q3Whisker = {
+          x1: points.middle, y1: points.max, x2: points.middle, y2: points.q3
+        };
+        drawingData.q1Whisker = {
+          x1: points.middle, y1: points.q1, x2: points.middle, y2: points.min
+        };
+        drawingData.q3Box = {
+          x: boxLeft, y: points.q3, width: boxWidth, height: points.median - points.q3
+        };
+        drawingData.q1Box = {
+          x: boxLeft, y: points.median, width: boxWidth, height: points.q1 - points.median
+        };
+        drawingData.median = {
+          x1: boxLeft, y1: points.median, x2: boxRight, y2: points.median
+        };
+        return drawingData;
+      },
+
+      /**
+       * Gets drawing coordinates for horizontal box and whisker.
+       */
+      _getDrawingDataHorizontal: function(data, position, boxWidth, minMaxWidth) {
+        const drawingData = {};
+        // convert our raw data to svg points
+        const points = this._chartDataToSvgPoints(data, position, this.x, this.y);
+        // get the left and right boundries for the box
+        const boxLeft = points.middle - (boxWidth / 2);
+        const boxRight = boxLeft + boxWidth;
+        // get the left and right boundries for the min and max horiz lines
+        const minMaxLeft = points.middle - (minMaxWidth / 2);
+        const minMaxRight = minMaxLeft + minMaxWidth;
+        // generate position data
+        drawingData.max = {
+          y1: minMaxLeft, x1: points.max, y2: minMaxRight, x2: points.max
+        };
+        drawingData.min = {
+          y1: minMaxLeft, x1: points.min, y2: minMaxRight, x2: points.min
+        };
+        drawingData.q3Whisker = {
+          y1: points.middle, x1: points.max, y2: points.middle, x2: points.q3
+        };
+        drawingData.q1Whisker = {
+          y1: points.middle, x1: points.q1, y2: points.middle, x2: points.min
+        };
+        drawingData.q3Box = {
+          y: boxLeft, x: points.median, height: boxWidth, width: points.q3 - points.median
+        };
+        drawingData.q1Box = {
+          y: boxLeft, x: points.q1, height: boxWidth, width: points.median - points.q1
+        };
+        drawingData.median = {
+          y1: boxLeft, x1: points.median, y2: boxRight, x2: points.median
+        };
+        return drawingData;
+      },
+
+      /**
+       * Returns copy of data object but with values converted
+       * to svg positions based on the px scale.
+       *
+       * Throws exception if any conversions are invalid.
+       */
+      _chartDataToSvgPoints: function(data, position, y, x) {
+        const formatted = {};
+        for (const key in data) {
+          if (Array.isArray(data[key])) {
+            formatted[key] = new Array(data[key].length);
+            // outliers will be in an array
+            for (const i in data[key]) {
+              if (typeof data[key][i] === 'number') {
+                formatted[key][i] = y(data[key][i]);
+                if (isNaN(formatted[key][i])) {
+                  throw String('Value ' + data[key][i] + ' converted to NaN');
+                }
+              }
+            }
+          } else if (typeof data[key] === 'number') {
+            formatted[key] = y(data[key]);
+            if (isNaN(formatted[key])) {
+              throw String('Value ' + data[key] + ' converted to NaN');
+            }
+          } else {
+            console.warn('unknown property');
+          }
+        }
+        // add special key for the mid point
+        // because we are using scaleband scaling, we need to add half the
+        // width (bandwidth) to center the point
+        formatted.middle = x(position) + x.bandwidth() / 2;
+        if (isNaN(formatted.middle)) {
+          throw String('Value ' + position + ' converted to NaN');
+        }
+        return formatted;
+      },
+
+      /**
+       * Gets transform string used to position an outlier value or mean value.
+       */
+      _getSvgTransform: function(value, position, scale, orientation) {
+        const transform = this._pointToSvgPoint(value, position, orientation);
+        // build translate string
+        let str = 'translate(' + transform.x + ',' + transform.y + ')';
+        if (scale !== undefined) {
+          str += ' scale(' + scale + ')';
+        }
+        return str;
+      },
+
+      /**
+       * Converts a chart data point to an svg position (x,y pair).
+       * In vertical mode, the 'value' param is the y value and the
+       * 'position' value is the x value. In horizontal mode these are
+       * flipped.
+       */
+      _pointToSvgPoint: function(value, position, orientation) {
+        if (orientation === 'horizontal') {
+          return {
+            x: this.x(value),
+            y: this.y(position) + this.y.bandwidth() / 2
+          };
+        } else {
+          return {
+            x: this.x(position) + this.x.bandwidth() / 2,
+            y: this.y(value)
+          };
+        }
+      },
+
+      _handleBoxMouseover: function(d, i, svgEl) {
+        this.fire('box-mouseover', {
+          seriesKey: this.seriesKey,
+          data: this.data,
+          position: this.position,
+          svgEl: svgEl[i]
+        });
+      },
+
+      _handleBoxMouseout: function(d, i, svgEl) {
+        this.fire('box-mouseout', {
+          seriesKey: this.seriesKey,
+          data: this.data,
+          position: this.position,
+          svgEl: svgEl[i]
+        });
+      },
+
+      _handleBoxClick: function(d, i, svgEl) {
+        this.fire('box-click', {
+          seriesKey: this.seriesKey,
+          data: this.data,
+          position: this.position,
+          svgEl: svgEl[i]
+        });
+      },
+
+      _handleOutlierMouseover: function(outlierValue, i, svgEl) {
+        this.fire('outlier-mouseover', {
+          seriesKey: this.seriesKey,
+          data: outlierValue,
+          position: this.position,
+          svgEl: svgEl[i]
+        });
+      },
+
+      _handleOutlierMouseout: function(outlierValue, i, svgEl) {
+        this.fire('outlier-mouseout', {
+          seriesKey: this.seriesKey,
+          data: outlierValue,
+          position: this.position,
+          svgEl: svgEl[i]
+        });
+      },
+
+      _handleOutlierClick: function(outlierValue, i, svgEl) {
+        this.fire('outlier-click', {
+          seriesKey: this.seriesKey,
+          data: outlierValue,
+          position: this.position,
+          svgEl: svgEl[i]
+        });
+      },
+
+      _resolveCssVars: function() {
+        if (this.hasUndefinedArguments(arguments)) {
+          return;
+        }
+        this.debounce('resolve-css-vars', function() {
+          const seriesConfig = this.completeSeriesConfig || {};
+          const config = seriesConfig[this.seriesKey] || {};
+          // check css vars
+          this.fillColor = config.color
+            || this._checkThemeVariable('--px-vis-box-whisker-fill-color', '#000');
+          this.strokeColor = config.strokeColor
+            || this._checkThemeVariable('--px-vis-box-whisker-stroke-color', '#000');
+          this.medianColor = config.medianColor
+            || this._checkThemeVariable('--px-vis-box-whisker-median-color', '#FFF');
+          this.medianWidth = config.medianWidth
+            || this._checkThemeVariable('--px-vis-box-whisker-median-width', '1px');
+          this.meanStrokeColor = config.meanStrokeColor
+            || this._checkThemeVariable('--px-vis-box-whisker-mean-color', this.strokeColor);
+          this.meanFillColor = config.meanFillColor
+            || this._checkThemeVariable('--px-vis-box-whisker-mean-fill-color', '#FFF');
+          this.meanSize = this._removePx(config.meanSize
+            || this._checkThemeVariable('--px-vis-box-whisker-mean-size', 10));
+          this.outlierStrokeColor = config.outlierStrokeColor
+            || this._checkThemeVariable('--px-vis-box-whisker-outlier-color', this.strokeColor);
+          this.outlierFillColor = config.outlierFillColor
+            || this._checkThemeVariable('--px-vis-box-whisker-outlier-fill-color', 'transparent');
+          this.outlierSize = this._removePx(config.outlierSize
+            || this._checkThemeVariable('--px-vis-box-whisker-outlier-size', 10));
+          // TODO: add css vars
+          this.outlierSymbol = config.outlierSymbol || 'circle';
+          this.outlierScale = config.outlierScale || 1;
+          this.meanSymbol = config.meanSymbol || 'circle';
+          this.meanScale = config.meanScale || 1;
+          // notify children
+          let comps;
+          if (this.shadowRoot) {
+            comps = this.shadowRoot.querySelectorAll('px-vis-box-whisker');
+          } else {
+            comps = Polymer.dom(this.root).querySelectorAll('px-vis-box-whisker');
+          }
+          if (comps) {
+            comps.forEach(function(comp) {
+              comp.updateStyles();
+            });
+          }
+          // notify that style vars have changed
+          this.set('_stylesResolved', !this._stylesResolved);
+        }.bind(this), 10);
+      },
+
+      _removePx: function(str) {
+        if (str && typeof str === 'string') {
+          return str.replace('px', '');
+        } else {
+          return str;
+        }
+      }
+
+    });
+  </script>
+</dom-module>
