@@ -289,7 +289,7 @@ function runTests(){
     test('timeEvent event icon image transform', function() {
       const icon = timeEvent.eventGroup.select('image.event-icon');
 
-      assert.equal(icon.attr('transform').replace(',',' '), 'translate(110 -25) ');
+      assert.equal(icon.attr('transform').replace(',','').replace(' ',''), 'translate(110-25)');
     });
 
     test('timeEvent event icon image attrs', function() {
