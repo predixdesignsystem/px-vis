@@ -1,3 +1,7 @@
+v5.0.1
+===================
+* Make register config name setter more robust in some specific timing situations
+
 v5.0.0
 ===================
 * Added tooltipData.seriesObj property
