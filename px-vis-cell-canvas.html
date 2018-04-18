@@ -87,6 +87,11 @@
         type: Object,
         value:function() {
           return {};
+        },
+
+        squareMode: {
+          type: Boolean,
+          value: false
         }
       }
     },
@@ -145,22 +150,33 @@
               valueKey = this.completeSeriesConfig[this.seriesId].value,
               xKey = this.completeSeriesConfig[this.seriesId].x,
               yKey = this.completeSeriesConfig[this.seriesId].y;
+        let width,
+            height;
+
+        if(this.squareMode) {
+          width = Math.min(this.x.bandwidth(), this.y.bandwidth());
+          height = width;
+        } else {
+          width = this.x.bandwidth();
+          height = this.y.bandwidth();
+        }
+
 
         // draw and fill rectangle
         this.canvasContext.beginPath();
         this.canvasContext.fillStyle = this.colorScale(cellData[valueKey]);
-        this.canvasContext.fillRect(this.x(cellData[xKey]), this.y(cellData[yKey]), this.x.bandwidth(), this.y.bandwidth());
+        this.canvasContext.fillRect(this.x(cellData[xKey]), this.y(cellData[yKey]), width, height);
 
         // draw text value if needed
         if (this.showCellValue) {
-          const xPos = this.x(cellData[xKey]) + this.x.bandwidth() / 2;
-          const yPos = this.y(cellData[yKey]) + this.y.bandwidth() / 2;
+          const xPos = this.x(cellData[xKey]) + width / 2;
+          const yPos = this.y(cellData[yKey]) + height / 2;
           this.canvasContext.beginPath();
           this.canvasContext.font = this._currentDrawingOptions.cellTextSize + ' Arial';
           this.canvasContext.fillStyle = this._currentDrawingOptions.cellTextColor;
           this.canvasContext.textAlign = 'center';
           this.canvasContext.textBaseline = 'middle';
-          this.canvasContext.fillText(cellData[valueKey], xPos, yPos, this.x.bandwidth());
+          this.canvasContext.fillText(cellData[valueKey], xPos, yPos, width);
         }
       },
   });

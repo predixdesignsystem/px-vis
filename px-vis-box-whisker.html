@@ -15,6 +15,78 @@
      * --px-vis-box-whisker-mean-color
      * --px-vis-box-whisker-outlier-color
      */
+
+    /**
+    * Fired when mousing over the box of a box and whisker
+    * Details include: {
+    *      seriesKey: series key for this entity,
+    *      data: data for this entity,
+    *      position: X value,
+    *      svgEl: the svg element representing the entity
+    *    }
+    *
+    * @event px-vis-box-mouseover
+    */
+
+    /**
+    * Fired when mousing out the box of a box and whisker
+    * Details include: {
+    *      seriesKey: series key for this entity,
+    *      data: data for this entity,
+    *      position: X value,
+    *      svgEl: the svg element representing the entity
+    *    }
+    *
+    * @event px-vis-box-mouseout
+    */
+
+    /**
+    * Fired when clicking the box of a box and whisker
+    * Details include: {
+    *      seriesKey: series key for this entity,
+    *      data: data for this entity,
+    *      position: X value,
+    *      svgEl: the svg element representing the entity
+    *    }
+    *
+    * @event px-vis-box-click
+    */
+
+    /**
+    * Fired when mousing over an outlier point of a box and whisker
+    * Details include: {
+    *      seriesKey: series key for this entity,
+    *      data: data for this entity,
+    *      position: X value,
+    *      svgEl: the svg element representing the entity
+    *    }
+    *
+    * @event px-vis-outlier-mouseover
+    */
+
+    /**
+    * Fired when mousing out an outlier point of a box and whisker
+    * Details include: {
+    *      seriesKey: series key for this entity,
+    *      data: data for this entity,
+    *      position: X value,
+    *      svgEl: the svg element representing the entity
+    *    }
+    *
+    * @event px-vis-outlier-mouseout
+    */
+
+    /**
+    * Fired when clicking an outlier point of a box and whisker
+    * Details include: {
+    *      seriesKey: series key for this entity,
+    *      data: data for this entity,
+    *      position: X value,
+    *      svgEl: the svg element representing the entity
+    *    }
+    *
+    * @event px-vis-box-click
+    */
     Polymer({
 
       is: 'px-vis-box-whisker',
@@ -572,7 +644,7 @@
       },
 
       _handleBoxMouseover: function(d, i, svgEl) {
-        this.fire('box-mouseover', {
+        this.fire('px-vis-box-mouseover', {
           seriesKey: this.seriesKey,
           data: this.data,
           position: this.position,
@@ -581,7 +653,7 @@
       },
 
       _handleBoxMouseout: function(d, i, svgEl) {
-        this.fire('box-mouseout', {
+        this.fire('px-vis-box-mouseout', {
           seriesKey: this.seriesKey,
           data: this.data,
           position: this.position,
@@ -590,7 +662,7 @@
       },
 
       _handleBoxClick: function(d, i, svgEl) {
-        this.fire('box-click', {
+        this.fire('px-vis-box-click', {
           seriesKey: this.seriesKey,
           data: this.data,
           position: this.position,
@@ -599,7 +671,7 @@
       },
 
       _handleOutlierMouseover: function(outlierValue, i, svgEl) {
-        this.fire('outlier-mouseover', {
+        this.fire('px-vis-outlier-mouseover', {
           seriesKey: this.seriesKey,
           data: outlierValue,
           position: this.position,
@@ -608,7 +680,7 @@
       },
 
       _handleOutlierMouseout: function(outlierValue, i, svgEl) {
-        this.fire('outlier-mouseout', {
+        this.fire('px-vis-outlier-mouseout', {
           seriesKey: this.seriesKey,
           data: outlierValue,
           position: this.position,
@@ -617,7 +689,7 @@
       },
 
       _handleOutlierClick: function(outlierValue, i, svgEl) {
-        this.fire('outlier-click', {
+        this.fire('px-vis-outlier-click', {
           seriesKey: this.seriesKey,
           data: outlierValue,
           position: this.position,
