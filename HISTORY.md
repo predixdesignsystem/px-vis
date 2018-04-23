@@ -1,3 +1,7 @@
+v5.0.2
+===================
+* Delete reference to file "px-vis-markers-tooltip-content.html" that no longer exists
+
 v5.0.1
 ===================
 * Make register config name setter more robust in some specific timing situations
