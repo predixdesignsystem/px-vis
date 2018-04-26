@@ -3571,7 +3571,9 @@ PxVisBehavior.gradientColorsFunction = {
           return fn(this._normalizeValue(val));
         }.bind(this);
       } else if(typeof colors === 'function') {
-        return colors;
+        return function(val) {
+          return colors(this._normalizeValue(val));
+        }.bind(this);
       } else {
         console.warn('Color gradient ' + colors + ' has an invalid type. Should be string, array or function');
       }

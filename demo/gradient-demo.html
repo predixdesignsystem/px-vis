@@ -97,6 +97,29 @@
             </px-vis-chart-navigator>
           </div>
 
+          <h1>Bucket function with gradients</h1>
+          <div style="height:100px">
+            <px-vis-chart-navigator
+                id="linearBucket"
+                gradient-overlay
+                height="100"
+                x-axis-type="time"
+                y-axis-type="linear"
+                margin='{
+                  "top": 5,
+                  "right": 10,
+                  "bottom": 20,
+                  "left": 10
+                }'
+                chart-data='[{"x": 1397102460000,"y": 0.56},{"x": 1397139660000,"y": 0.4},{"x": 1397177400000,"y": 0.43},{"x": 1397228040000,"y": 0.33},{"x": 1397248260000,"y": 0.47},{"x": 1397291280000,"y": 0.41},{"x": 1397318100000,"y": 0.26},{"x": 1397342100000,"y": 0.42},{"x": 1397390820000,"y": 0.27},{"x": 1397408100000,"y": 0.38},{"x": 1397458800000,"y": 0.36},{"x": 1397522940000,"y": 0.32}]'
+                include-all-series
+                chart-extents='{
+                  "x": ["dynamic", "dynamic"],
+                  "y": [0,1]
+                }'>
+              </px-vis-chart-navigator>
+            </div>
+
           <h1>Four colors</h1>
           <div style="height:100px">
             <px-vis-chart-navigator
@@ -151,7 +174,8 @@
   <script>
     document.addEventListener('WebComponentsReady', function() {
       var bucket = document.getElementById('bucket'),
-          d3nav = document.getElementById('d3scale');
+          d3nav = document.getElementById('d3scale'),
+          linearBucket = document.getElementById('linearBucket');
 
       bucket.gradientColors = function(val) {
         if(val < 0.1) {
@@ -159,9 +183,28 @@
           return Px.d3.interpolateRgb('rgb(255, 195, 193)', 'rgb(244, 76, 70)')(val * 3);
 
         } else if(val < 0.7) {
-          return 'green';
+          return Px.d3.interpolateRgb('rgb(0, 102, 0)', 'rgb(102, 255, 102)')((val - 0.1 ) *1.66);
         } else {
           return 'yellow';
+        }
+      };
+
+      linearBucket.gradientColors = function(val) {
+
+        //re normalize value for a bucket so that it's between 0 and 1 to take advantage of the full range of the gradient
+        normalizeVal = function(val, min, max) {
+          return (val - min) * 1/(max - min);
+        }
+
+        if(val < 0.3) {
+
+          return Px.d3.interpolateRgb('rgb(255, 179, 179)', 'rgb(230, 0, 0)')(normalizeVal(val, 0, 0.3));
+        } else if(val < 0.7) {
+
+          return Px.d3.interpolateRgb('rgb(153, 255, 102)', 'rgb(0, 51, 0)')(normalizeVal(val, 0.3, 0.7));
+        } else {
+
+          return Px.d3.interpolateRgb('rgb(153, 194, 255)', 'rgb(0, 0, 128)')(normalizeVal(val, 0.7 ,1));
         }
       };
 

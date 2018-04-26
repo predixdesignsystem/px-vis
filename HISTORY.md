@@ -1,3 +1,7 @@
+v5.0.3
+===================
+* Ensure gradient values are normalized when using a custom gradient function
+
 v5.0.2
 ===================
 * Delete reference to file "px-vis-markers-tooltip-content.html" that no longer exists
