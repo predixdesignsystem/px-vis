@@ -78,6 +78,7 @@ limitations under the License.
       <template id="canvasTemplate" is="dom-repeat" items="[[_returnKeys(canvasLayersConfig.*, width, height, margin.*, offset.*)]]">
         <px-vis-canvas
           class="abs-elem inline--flex"
+          style="[[_returnPointerEvents(item, canvasLayersConfig.*)]]"
           width="[[_returnProp(item, 'width', canvasLayersConfig.*, width)]]"
           height="[[_returnProp(item, 'height', canvasLayersConfig.*, height)]]"
           margin="[[_returnProp(item, 'margin', canvasLayersConfig.*, margin)]]"
@@ -143,6 +144,10 @@ limitations under the License.
             return this.canvasLayersConfig[item][prop];
           }
           return this[prop];
+        },
+
+        _returnPointerEvents: function(item, confs) {
+          return this.canvasLayersConfig[item]['mouseevents'] ? 'pointer-events: all;': 'pointer-events: none;';
         }
     });
 </script>

@@ -1,3 +1,8 @@
+v5.0.4
+===================
+* Fix for https://github.com/predixdesignsystem/px-vis-timeseries/issues/84
+* Fix for register alignment
+
 v5.0.3
 ===================
 * Ensure gradient values are normalized when using a custom gradient function
