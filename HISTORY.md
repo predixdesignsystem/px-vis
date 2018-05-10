@@ -1,3 +1,7 @@
+v5.1.0
+===================
+* Add options to timeseries lasso for y and freeform lasso types
+
 v5.0.4
 ===================
 * Fix for https://github.com/predixdesignsystem/px-vis-timeseries/issues/84
