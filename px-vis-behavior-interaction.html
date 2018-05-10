@@ -27,6 +27,7 @@ var PxVisBehaviorInteraction = window.PxVisBehaviorInteraction = (window.PxVisBe
 
     @polymerBehavior PxVisBehaviorInteraction.lasso
 */
+
 PxVisBehaviorInteraction.lasso = [{
   properties: {
     _isLassoing: {
@@ -65,7 +66,8 @@ PxVisBehaviorInteraction.lasso = [{
       type: Boolean,
       value: false,
       observer: '_resetLasso'
-    }
+    },
+    lassoType: String
   },
 
   _resetLasso: function() {
@@ -100,15 +102,24 @@ PxVisBehaviorInteraction.lasso = [{
 
 // TODO Change to box type and lasso type; toolbar selection
 // make available to all
-      if(this.xAxisType === 'time' || this.xAxisType === 'timeLocal') {
-
+      if(this._isTimeType(this.xAxisType) && this.lassoType !== 'freeform') {
         //timeseries lasso will be a box
-        var _height = Math.max(this.height - this.margin.bottom - this.margin.top,0);
-        this._lassoCoords.push([mousePos[0], 0], [mousePos[0], _height], [mousePos[0], 0], [mousePos[0], _height], [mousePos[0], 0]);
+        if(this.lassoType === 'yRect') {
+          const width = Math.max(this.width - this.margin.left - this.margin.right, 0);
+
+          this._lassoCoords.push([0, mousePos[1]], [width, mousePos[1]], [0, mousePos[1]], [width, mousePos[1]], [0, mousePos[1]]);
+
+        } else {
+          const _height = Math.max(this.height - this.margin.bottom - this.margin.top,0);
+
+          this._lassoCoords.push([mousePos[0], 0], [mousePos[0], _height], [mousePos[0], 0], [mousePos[0], _height], [mousePos[0], 0]);
+        }
+
       } else {
         //re add start at the end so that our polygon closes
         this._lassoCoords.push([mousePos[0], mousePos[1]], [mousePos[0], mousePos[1]]);
       }
+
       this._lassoGroup.append('path')
         .attr('class', 'lasso-line')
         .attr('fill', this._checkThemeVariable('--px-vis-zoom-brush-fill-color', 'rgb(0,0,0)'))
@@ -124,7 +135,7 @@ PxVisBehaviorInteraction.lasso = [{
     if(this._isLassoing) {
       var mousePos = Px.d3.mouse(this._rect.node());
 
-      if(this.xAxisType === 'time' || this.xAxisType === 'timeLocal') {
+      if(this._isTimeType(this.xAxisType) && this.lassoType !== 'freeform') {
         this._updateCoordsTS(mousePos);
       } else if(!this.radial) {
         this._updateCoordsCartesian(mousePos);
@@ -174,15 +185,28 @@ PxVisBehaviorInteraction.lasso = [{
   },
 
   _updateCoordsTS: function(mousePos) {
+    const last = this._lassoCoords.pop();
+    let first, second;
 
-    var _height = Math.max(this.height - this.margin.bottom - this.margin.top,0),
-        newX = this._constrainOnWidth(mousePos[0]),
-        last = this._lassoCoords.pop();
+    if(this.lassoType === 'yRect') {
+      const width = Math.max(this.width - this.margin.left - this.margin.right, 0);
+      const newY = this._constrainOnHeight(mousePos[1]);
+
+      first = [width, newY];
+      second = [0, newY];
+    } else {
+
+      const height = Math.max(this.height - this.margin.bottom - this.margin.top,0);
+      const newX = this._constrainOnWidth(mousePos[0]);
+
+      first = [newX, height];
+      second = [newX, 0];
+    }
 
     this._lassoCoords.pop();
     this._lassoCoords.pop();
-    this._lassoCoords.push([newX, this._height]);
-    this._lassoCoords.push([newX, 0]);
+    this._lassoCoords.push(first);
+    this._lassoCoords.push(second);
     this._lassoCoords.push(last);
   },
 
@@ -192,6 +216,14 @@ PxVisBehaviorInteraction.lasso = [{
 
     result = xVal < 0 ? 0 : xVal;
     result = result > _width ? _width : result;
+
+    return result;
+  },
+
+  _constrainOnHeight: function(yVal) {
+    const height = Math.max(this.height - this.margin.top - this.margin.bottom, 0);
+    let result = yVal < 0 ? 0 : yVal;
+    result = result > height ? height : result;
 
     return result;
   },

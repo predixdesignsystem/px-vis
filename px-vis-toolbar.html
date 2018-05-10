@@ -409,6 +409,55 @@ Custom property | Description
           }
         }
       },
+      crosshairLassoTimeseries: {
+        tooltipLabel: 'Lasso selection',
+        icon: 'px-vis:lasso',
+        buttonGroup: 1,
+        selectable: true,
+        onSelect: function() {
+          this.set('_internalShowTooltip', false);
+          this.set('interactionSpaceConfig.searchType', 'lasso');
+        },
+        actionConfig: {
+          mouseout: null,
+          mousemove: null,
+          click: null,
+          mousedown: 'startLasso',
+          mouseup: 'stopLasso'
+        },
+        subConfig: {
+          xRect: {
+            tooltipLabel: 'Lasso on X',
+            icon: 'px-vis:x-axis',
+            onClick: function() {
+              this.set('interactionSpaceConfig.lassoType', 'xRect');
+            }
+          },
+          yRect: {
+            tooltipLabel: 'Lasso on Y',
+            icon: 'px-vis:y-axis',
+            onClick: function() {
+              this.set('interactionSpaceConfig.lassoType', 'yRect');
+            }
+          },
+          freeform: {
+            tooltipLabel: 'Freeform Lasso',
+            icon: 'px-vis:xy-axis',
+            onClick: function() {
+              this.set('interactionSpaceConfig.lassoType', 'freeform');
+            }
+          },
+          clearCrosshair: {
+            tooltipLabel: 'Clear lasso data',
+            icon: 'px-nav:close',
+            onClick: function() {
+              this.set('crosshairData', { 'rawData': [], 'timeStamps': []});
+              this.set('interactionSpaceConfig.resetLassoData', !this.interactionSpaceConfig.resetLassoData);
+              this.set('resetLassoData', !this.resetLassoData);
+            }
+          }
+        }
+      },
       crosshair: {
         tooltipLabel: 'Crosshair',
         icon: 'px-vis:crosshair',
