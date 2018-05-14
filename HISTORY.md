@@ -1,3 +1,7 @@
+v5.1.1
+===================
+* Ensure vis respects strict mode
+
 v5.1.0
 ===================
 * Add options to timeseries lasso for y and freeform lasso types
