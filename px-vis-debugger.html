@@ -28,7 +28,7 @@ limitations under the License.
           chart,
           util = {};
 
-      initialize = function(chartToProcess) {
+      var initialize = function(chartToProcess) {
         chart = chartToProcess;
         isParaRadar = chart.nodeName === 'PX-VIS-PARALLEL-COORDINATES' || chart.nodeName === 'PX-VIS-RADAR';
       }
@@ -36,7 +36,7 @@ limitations under the License.
       /**********************************************************
        *  UTILITY
        **********************************************************/
-      _debugObjectHasKeys = function(obj, toFind) {
+      var _debugObjectHasKeys = function(obj, toFind) {
         var result = {
               hasKeys: false,
               otherKeys: []
@@ -65,7 +65,7 @@ limitations under the License.
         return result;
       };
 
-      _debugGetTimeKey = function() {
+      var _debugGetTimeKey = function() {
 
         var timeKey;
 
@@ -80,7 +80,7 @@ limitations under the License.
         return timeKey;
       };
 
-      _debugGetSeriesKeys = function() {
+      var _debugGetSeriesKeys = function() {
 
         if(isParaRadar) {
           return chart.dimensions;
@@ -89,12 +89,12 @@ limitations under the License.
         }
       };
 
-      log = function(msg) {
+      var log = function(msg) {
         console.warn(msg);
         hasLogged = true;
       };
 
-      logTitle = function(msg) {
+      var logTitle = function(msg) {
         console.log('Checking ' + msg);
         var separator = '=========';
         for(var i=0; i< msg.length; i++) {
@@ -104,19 +104,19 @@ limitations under the License.
         hasLogged = false;
       };
 
-      logEnd = function() {
+      var logEnd = function() {
         if(!hasLogged) {
           console.log('No problem found');
           console.log(' ');
         }
       };
 
-      warn = function(msg) {
+      var warn = function(msg) {
         console.log(msg);
         hasLogged = true;
       };
 
-      _getAllPropertiesKeys = function() {
+      var _getAllPropertiesKeys = function() {
         var result = Object.keys(chart.properties);
 
         for(var i=0; i<chart.behaviors.length; i++) {
@@ -131,7 +131,7 @@ limitations under the License.
        * Check functions
        * *********************************************************/
 
-      _debugCheckConfigInfoParaRadar = function() {
+      var _debugCheckConfigInfoParaRadar = function() {
 
         var current,
             keys;
@@ -194,7 +194,7 @@ limitations under the License.
         logEnd();
       };
 
-      _debugCheckMargin = function() {
+      var _debugCheckMargin = function() {
 
         var valid = _debugObjectHasKeys(chart.margin, ['top', 'bottom', 'left', 'right']);
 
@@ -206,7 +206,7 @@ limitations under the License.
         }
       };
 
-      _debugCheckChartExtents = function() {
+      var _debugCheckChartExtents = function() {
 
         logTitle('chartExtents');
 
@@ -237,7 +237,7 @@ limitations under the License.
        * Info functions
        * *********************************************************/
 
-       _debugAddDataInfo = function(info) {
+       var _debugAddDataInfo = function(info) {
 
         var data = {},
             extents = {};
@@ -272,7 +272,7 @@ limitations under the License.
         info.data = data;
       };
 
-      _debugAddConfigInfo = function(info) {
+      var _debugAddConfigInfo = function(info) {
 
         info.config = {};
 
@@ -286,12 +286,12 @@ limitations under the License.
         //TODO: check XY/TS/Polar conf?
       };
 
-      _debugAddMiscInfo = function(info) {
+      var _debugAddMiscInfo = function(info) {
         info.misc = {};
         info.misc.margin = chart.margin;
       };
 
-      _debugAddExtentsInfo = function(info) {
+      var _debugAddExtentsInfo = function(info) {
 
         info.extents = {};
 
@@ -318,7 +318,7 @@ limitations under the License.
         info.extents.x.range = chart.x.range();
       };
 
-      _debugAddSubCompInfo = function(info) {
+      var _debugAddSubCompInfo = function(info) {
         info.subConfigs = {};
 
         var keys = _getAllPropertiesKeys();
@@ -330,7 +330,7 @@ limitations under the License.
         }
       };
 
-      _debugAddRendererInfo = function(info) {
+      var _debugAddRendererInfo = function(info) {
 
         info.render = {};
         info.render.renderToCanvas = chart.renderToCanvas;

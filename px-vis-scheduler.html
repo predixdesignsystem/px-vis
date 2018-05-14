@@ -53,7 +53,7 @@ limitations under the License.
     //each chart will always use the same web worker. This is to get around
     //the problem of passing a lot of data around, so the thread will have
     //to keep the data for charts in sync
-    getWorkerIndexForChart = function(chartId) {
+    var getWorkerIndexForChart = function(chartId) {
 
       //if this chart  hasn't been registered yet do it
       if(!scheduler.chartWorkerMapping[chartId] && scheduler.chartWorkerMapping[chartId] !== 0) {
@@ -142,7 +142,7 @@ limitations under the License.
       startOrQueueWork(context, worker);
     };
 
-    startOrQueueWork = function(context, worker) {
+    var startOrQueueWork = function(context, worker) {
       // check if we have run updateData before so we can stick stuff in a queue if not
       var hasData = scheduler.hasChartData[context.chartId] ?
       scheduler.hasChartData[context.chartId] : (context.action === 'updateData');
@@ -218,7 +218,7 @@ limitations under the License.
       }
     };
 
-    webWorkerError = function(e) {
+    var webWorkerError = function(e) {
 
       window.dispatchEvent(new CustomEvent('px-vis-scheduler-work-error', { 'detail': { 'action': this.ctx.action, 'chartId': this.ctx.chartId, 'originatorName': this.ctx.originatorName}}));
 
