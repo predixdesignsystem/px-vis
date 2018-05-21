@@ -1,3 +1,7 @@
+v5.1.2
+===================
+* More strict mode fixes
+
 v5.1.1
 ===================
 * Ensure vis respects strict mode
