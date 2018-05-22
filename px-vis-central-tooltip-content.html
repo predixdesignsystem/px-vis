@@ -54,7 +54,7 @@ limitations under the License.
 
           <template id="infoTemplate" is="dom-repeat" items="[[_currentData.data]]" as="info">
             <div class="flex flex--justify u-mt--">
-              <span class="u-mr"><b>[[localize(info.title)]]</b>:</span> <span>[[_formatData(info.value, info.type)]]</span>
+              <span class="u-mr"><b>[[localize(info.title)]]</b>:</span> <span>[[_formatInfo(info)]]</span>
             </div>
           </template>
 
@@ -246,6 +246,10 @@ limitations under the License.
       }
 
       return data
+    },
+
+    _formatInfo: function(info) {
+      return this._formatData(info.value, info.type || '');
     },
 
     _formatWholeTimestamp: function(time) {
