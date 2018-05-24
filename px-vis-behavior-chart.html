@@ -2334,9 +2334,10 @@ PxVisBehaviorChart.multiAxis = [{
       this.set('numRightAxes', rDims.length);
 
       this.set('axes', lDims.concat(rDims));
+		// need to set this before setting dimensions because the dimensions observer calls this for multi-axis
+		this.set('_axisX', this._setAxisScale(lDims.sort(), rDims.sort(), this.leftAxisSize, this.rightAxisSize));
       this.set('dimensions', this.axes);
       this.set('seriesToAxes', seriesToAxes);
-      this.set('_axisX', this._setAxisScale(lDims.sort(), rDims.sort(), this.leftAxisSize, this.rightAxisSize));
 
       if(typeof this._axisX === 'function') {
         this.set('_axisDomainChanged', this._axisDomainChanged + 1);
