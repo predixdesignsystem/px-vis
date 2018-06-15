@@ -114,7 +114,7 @@ function runXYTests(){
 
     test('baseLine line series has the right dash pattern', function() {
     	// dasharray can be <number> or <number>px
-        assert.equal(linePath.attr('stroke-dasharray').split('px').join('').split(' ').join(''),baseLine.completeSeriesConfig.mySeries.dashPattern);
+      assert.equal(linePath.attr('stroke-dasharray').split('px').join('').split(' ').join(''),baseLine.completeSeriesConfig.mySeries.dashPattern);
     });
 
     test('baseLine line d', function() {
