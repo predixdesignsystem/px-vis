@@ -350,7 +350,7 @@ test('baseYAxis ID is random', function() {
     });
     test('Title series bars dash pattern', function() {
         var bar = baseYAxis._titleGroup.select('line');
-        assert.equal(bar.attr('stroke-dasharray').split(' ').join(''),baseYAxis.completeSeriesConfig.mySeries.dashPattern);
+        assert.equal(bar.attr('stroke-dasharray').split('px').join('').split(' ').join(''),baseYAxis.completeSeriesConfig.mySeries.dashPattern);
     });
     test('Title series bars opacity', function() {
       var bar = baseYAxis._titleGroup.select('line');
