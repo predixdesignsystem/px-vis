@@ -754,8 +754,10 @@ Custom property | Description
 
       if(this._calcTooltip) {
         ttD = this._createTooltipData(aid, mousePos, result);
-        this.set('tooltipData', ttD);
-        this.fire('px-vis-axis-interaction-space-tooltip-data', ttD);
+        if(ttD) {
+          this.set('tooltipData', ttD);
+          this.fire('px-vis-axis-interaction-space-tooltip-data', ttD);
+        }
       }
 
       if(this._calcCrosshair) {
@@ -805,12 +807,14 @@ Custom property | Description
      *
      */
     _createTooltipData: function(aid, mousePos, result) {
-      var tooltipData = this._createSingleDataset(aid, mousePos, result.rawData[0]);
+      var tooltipData;
+      if(result.rawData.length) {
+        tooltipData = this._createSingleDataset(aid, mousePos, result.rawData[0]);
+        tooltipData.additionalPoints = [];
 
-      tooltipData.additionalPoints = [];
-
-      for(var i=1; i< result.rawData.length; i++) {
-        tooltipData.additionalPoints.push(this._createSingleDataset(aid, mousePos, result.rawData[i]));
+        for (var i = 1; i < result.rawData.length; i++) {
+          tooltipData.additionalPoints.push(this._createSingleDataset(aid, mousePos, result.rawData[i]));
+        }
       }
 
       return tooltipData;
