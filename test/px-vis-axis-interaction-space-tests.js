@@ -785,7 +785,7 @@ function runTests(){
     });
     test('radialBrush._brushGroup.rect correct stroke', function() {
       assert.equal(radialBrush2._brushD3.select('rect.selection').attr('stroke').split(' ').join(''), rgbToHex(colors["primary-default"]));
-      assert.equal(radialBrush2._brushD3.select('rect.selection').attr('stroke-dasharray').split(' ').join(''), "5,5");
+      assert.equal(radialBrush2._brushD3.select('rect.selection').attr('stroke-dasharray').split('px').join('').split(' ').join(''), "5,5");
     });
   });
 

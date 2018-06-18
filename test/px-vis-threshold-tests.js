@@ -197,13 +197,13 @@ function runTests(){
         assert.equal(thresholdLines.nodes()[6].getAttribute('stroke-width'), 1);
       });
       test('defaultThreshold thresholdLine stroke dasharray', function() {
-        assert.equal(thresholdLines.nodes()[0].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[1].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[2].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[3].getAttribute('stroke-dasharray').split(' ').join(''),'5,0');
-        assert.equal(thresholdLines.nodes()[4].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[5].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[6].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[0].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[1].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[2].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[3].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,0');
+        assert.equal(thresholdLines.nodes()[4].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[5].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[6].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
       });
       test('defaultThreshold thresholdLine x1', function() {
         assert.equal(thresholdLines.nodes()[0].getAttribute('x1'),0);
@@ -425,13 +425,13 @@ function runTests(){
         assert.equal(thresholdLines.nodes()[6].getAttribute('stroke-width'), 1);
       });
       test('defaultThreshold thresholdLine stroke dasharray', function() {
-        assert.equal(thresholdLines.nodes()[0].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[1].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[2].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[3].getAttribute('stroke-dasharray').split(' ').join(''),'5,0');
-        assert.equal(thresholdLines.nodes()[4].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[5].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[6].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[0].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[1].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[2].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[3].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,0');
+        assert.equal(thresholdLines.nodes()[4].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[5].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[6].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
       });
       test('defaultThreshold thresholdLine x1', function() {
         assert.equal(thresholdLines.nodes()[0].getAttribute('x1'),0);
@@ -653,13 +653,13 @@ function runTests(){
         assert.equal(thresholdLines.nodes()[6].getAttribute('stroke-width'), 1);
       });
       test('defaultThreshold thresholdLine stroke dasharray', function() {
-        assert.equal(thresholdLines.nodes()[0].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[1].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[2].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[3].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[4].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[5].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[6].getAttribute('stroke-dasharray').split(' ').join(''),'5,0');
+        assert.equal(thresholdLines.nodes()[0].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[1].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[2].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[3].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[4].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[5].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[6].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,0');
       });
       test('defaultThreshold thresholdLine x1', function() {
         assert.equal(thresholdLines.nodes()[0].getAttribute('x1'),0);
@@ -881,13 +881,13 @@ function runTests(){
         assert.equal(thresholdLines.nodes()[6].getAttribute('stroke-width'), 1);
       });
       test('defaultThreshold thresholdLine stroke dasharray', function() {
-        assert.equal(thresholdLines.nodes()[0].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[1].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[2].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[3].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[4].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[5].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[6].getAttribute('stroke-dasharray').split(' ').join(''),'5,0');
+        assert.equal(thresholdLines.nodes()[0].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[1].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[2].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[3].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[4].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[5].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[6].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,0');
       });
       test('defaultThreshold thresholdLine x1', function() {
         assert.equal(thresholdLines.nodes()[0].getAttribute('x1'),0);
@@ -1104,11 +1104,11 @@ function runTests(){
         assert.equal(thresholdLines.nodes()[4].getAttribute('stroke-width'), 1);
       });
       test('defaultThreshold thresholdLine stroke dasharray', function() {
-        assert.equal(thresholdLines.nodes()[0].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[1].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[2].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[3].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[4].getAttribute('stroke-dasharray').split(' ').join(''),'5,0');
+        assert.equal(thresholdLines.nodes()[0].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[1].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[2].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[3].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[4].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,0');
       });
       test('defaultThreshold thresholdLine x1', function() {
         assert.equal(thresholdLines.nodes()[0].getAttribute('x1'),0);
@@ -1297,13 +1297,13 @@ function runTests(){
         assert.equal(thresholdLines.nodes()[6].getAttribute('stroke-width'), 1);
       });
       test('defaultThreshold thresholdLine stroke dasharray', function() {
-        assert.equal(thresholdLines.nodes()[0].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[1].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[2].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[3].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
-        assert.equal(thresholdLines.nodes()[4].getAttribute('stroke-dasharray').split(' ').join(''),'5,0');
-        assert.equal(thresholdLines.nodes()[5].getAttribute('stroke-dasharray').split(' ').join(''),'5,0');
-        assert.equal(thresholdLines.nodes()[6].getAttribute('stroke-dasharray').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[0].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[1].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[2].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[3].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
+        assert.equal(thresholdLines.nodes()[4].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,0');
+        assert.equal(thresholdLines.nodes()[5].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,0');
+        assert.equal(thresholdLines.nodes()[6].getAttribute('stroke-dasharray').split('px').join('').split(' ').join(''),'5,2');
       });
       test('defaultThreshold thresholdLine x1', function() {
         assert.equal(thresholdLines.nodes()[0].getAttribute('x1'),0);
