@@ -250,9 +250,9 @@ Custom property | Description
         return this.groupings
       }
 
-      if(this._mutedTooltipData.series.length < 16) {
+      if(this._mutedTooltipData && this._mutedTooltipData.series.length < 16) {
         return 1;
-      } else if(this._mutedTooltipData.series.length < 24) {
+      } else if(this._mutedTooltipData && this._mutedTooltipData.series.length < 24) {
         return 2;
       } else {
         return 3;
@@ -265,7 +265,7 @@ Custom property | Description
 
      if(this._mutedTooltipData) {
       var oldHidden = this._internalHidden,
-          hidden = this._mutedTooltipData.hidden || this.hide || this._mutedTooltipData.series.length === 0;
+          hidden = this._mutedTooltipData.hidden || this.hide || (this._mutedTooltipData.series && this._mutedTooltipData.series.length === 0);
       this.set('_internalHidden', hidden);
 
       if(!this._tooltipElem && !this._internalHidden) {
