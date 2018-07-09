@@ -279,8 +279,12 @@ limitations under the License.
         //get the position of the symbol
         translate = this._getTransform(this.chartData[i]);
 
-        // draw arrow
-        if(this.showArrows && i !== start) {
+        // draw arrow :
+        // only draw if segment length is over x pixels AND the previous data point is valid
+        // this draw arrows only in the locations where lines are drawn
+        if(this.showArrows && i !== start
+          && this._isValidData(this.chartData[i-1][this.completeSeriesConfig[this.seriesId]['y']])
+          && this._isValidData(this.chartData[i-1][this.completeSeriesConfig[this.seriesId]['x']])) {
           tx = (translate[0] - previousTranslate[0])/2;
           ty = (translate[1] - previousTranslate[1])/2;
           // thank you Mr Pythagoras of Samos
