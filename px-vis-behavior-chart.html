@@ -1813,13 +1813,14 @@ PxVisBehaviorChart.zooming = [{
 
     this._saveOrdinalOriginalExtents();
 
-    var selectedDomain = this.selectedDomain;
+		var selectedDomain = this.selectedDomain === 'reset' ? {} : this.selectedDomain;
 
     if(!this.selectedDomain.y || this.selectedDomain.y.length === 0) {
-      selectedDomain.y = this._processYValues(function(axis, index) {
+      var newY = this._processYValues(function(axis, index) {
         return axis.domain();
       });
-    }
+			selectedDomain.y = newY;
+		}
 
     this.push('zoomStack', selectedDomain);
   },
