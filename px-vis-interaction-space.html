@@ -714,6 +714,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           delete dataObj.timeStamps;
           this.set('tooltipData',dataObj);
           this.fire('px-vis-pinnedmarker-updated', { 'dataVar': 'tooltipData', 'data': dataObj, 'method':'set' });
+					this.set('_calcPinnedMarker', false);
         }
 
         this.set('_calculatingData', false);
@@ -1711,7 +1712,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         //update coords in tooltip data because of a scale change
         this.tooltipData.series.forEach(function(item, i) {
 
-          if(item.value && item.coord) {
+          if(item.value && item.coord && this.completeSeriesConfig[item.name]) {
             let axisKey;
             if(this.isMultiY) {
               axisKey = (this.completeSeriesConfig[item.name]['axis'] && this.completeSeriesConfig[item.name]['axis']['id']) ? this.completeSeriesConfig[item.name]['axis']['id'] : null;
