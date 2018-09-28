@@ -1813,6 +1813,36 @@ PxVisBehaviorD3.scatterMarkers = {
             context.closePath();
           }
         },
+        'ring': {
+          draw: function(context, size) {
+            var t = Math.sqrt(size) / 16,
+              r = Math.sqrt(size / Math.PI);
+            context.moveTo(r, 0);
+            context.arc(0, 0, r, 0, 2 * Math.PI);
+            context.moveTo(r - t, 0);
+            context.arc(0, 0, r - t, 0, 2 * Math.PI, true);
+            context.closePath();
+          }
+        },
+        'kite': {
+          draw: function(context, size) {
+            var w = Math.sqrt(size);
+            context.moveTo(0, w);
+            context.lineTo(w, -w/2);
+            context.lineTo(0, -w);
+            context.lineTo(-w, -w/2);
+            context.closePath();
+          }
+        },
+        'scalene': {
+          draw: function(context, size) {
+            var w = Math.sqrt(size);
+            context.moveTo(w, 0);
+            context.lineTo(w, -w);
+            context.lineTo(-w, w/2);
+            context.closePath();
+          }
+        }
       }
     },
     /**
