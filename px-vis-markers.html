@@ -267,15 +267,17 @@ limitations under the License.
           type,
           row,
           time,
+          datapoint,
           o;
 
       for(var i=0; i<this.markerData.length; i++) {
         time = this.markerData[i]['time'];
+        datapoint = this.markerData[i]['datapoint'];
         type = this.markerData[i]['label'];
         row = this.markerConfig && this.markerConfig[type] && this.markerConfig[type]['row'] ? this.markerConfig[type]['row'] : 0;
 
         o = {};
-        o.x = time;
+        o.x = datapoint || time;
         o[type] = row;
         o.originIndex = i;
         if(!data[type]) {
@@ -608,7 +610,7 @@ limitations under the License.
       data.forEach((d) => {
         formatted.push({
           title: this.markerData[d.originIndex]['label'],
-          time: d.x,
+          time: this.markerData[d.originIndex]['time'],
           data: this._getAllKeys(this.markerData[d.originIndex])
         });
       });
@@ -619,7 +621,7 @@ limitations under the License.
     _getAllKeys: function(d) {
       const arr = [];
       Object.entries(d).forEach(([key,val]) => {
-        if(key !== 'time' && key !== 'label') {
+        if(key !== 'time' && key !== 'label' && key !== 'datapoint') {
           arr.push({
             title: key,
             value: val
