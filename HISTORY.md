@@ -1,3 +1,7 @@
+v5.2.0
+===================
+* Added support for `datapoint` property used by px-vis-xy-chart's marker data support
+
 v5.1.2
 ===================
 * More strict mode fixes
