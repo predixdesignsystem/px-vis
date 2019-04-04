@@ -328,7 +328,7 @@ limitations under the License.
           bRowSet = {},
           tRow,
           bRow,
-		  row,
+          row,
           tScale,
           bScale,
           type;
@@ -490,7 +490,16 @@ limitations under the License.
       }.bind(this)).right;
       const maxDomain = this.x.domain()[1];
       const minDomain = this.x.domain()[0];
-      const mouseTime = this.x.invert(adjustedMousePos[0]);
+      let mouseTime;
+      // inversion with ordinal scale
+      if(this.x._scaleType === 'ordinal') {
+        const domain = this.x.domain();
+        const range = this.x.range();
+        const scale = d3.scaleQuantize().domain(range).range(domain);
+        mouseTime = new Date(scale(adjustedMousePos[0]));
+      } else {
+        mouseTime = this.x.invert(adjustedMousePos[0]);
+      }
 
       const right = bisect(data, mouseTime);
       const left = Math.max(0, right ? right-1 : 0);
