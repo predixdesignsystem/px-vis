@@ -387,28 +387,28 @@ Custom property | Description
         }
       }
 
-      //support for tick format
-      // https://github.com/mbostock/d3/wiki/Formatting#d3_format
-      if(this.tickFormat && !this._isOrdinalType(this.axisType)) {
-        if(typeof this.tickFormat === 'function') {
-          this._axis.tickFormat(this.tickFormat);
-        } else if(this.axisType === 'time') {
-          this._axis.tickFormat(Px.d3.utcFormat(this.tickFormat));
-        } else if(this.axisType === 'timeLocal') {
-          this._axis.tickFormat(Px.d3.timeFormat(this.tickFormat));
-        } else if(this.axisType === 'linear') {
-          this._axis.tickFormat(Px.d3.format(this.tickFormat));
-        }
-      }
+          //support for tick format
+          // https://github.com/mbostock/d3/wiki/Formatting#d3_format
+          if(this.tickFormat) {
+            if(typeof this.tickFormat === 'function') {
+              this._axis.tickFormat(this.tickFormat);
+            } else if(this.axisType === 'time' || this.axisType === 'ordinal') {
+              this._axis.tickFormat(Px.d3.utcFormat(this.tickFormat));
+            } else if(this.axisType === 'timeLocal') {
+              this._axis.tickFormat(Px.d3.timeFormat(this.tickFormat));
+            } else if(this.axisType === 'linear') {
+              this._axis.tickFormat(Px.d3.format(this.tickFormat));
+            }
+          }
 
-      //support for tick values
-      // https://github.com/d3/d3-axis/blob/master/README.md#axis_tickValues
-      if(this.tickValues && this.tickValues.length > 0 && !this._isOrdinalType(this.axisType)) {
-        //dont run if our domain is NaN. Otherwise raises errors
-        if(!isNaN(this.axis.domain()[0]) && !isNaN(this.axis.domain()[1])) {
-          this._axis.tickValues(this.tickValues);
-        }
-      }
+          //support for tick values
+          // https://github.com/d3/d3-axis/blob/master/README.md#axis_tickValues
+          if(this.tickValues && this.tickValues.length > 0) {
+            //dont run if our domain is NaN. Otherwise raises errors
+            if(!isNaN(this.axis.domain()[0]) && !isNaN(this.axis.domain()[1])) {
+              this._axis.tickValues(this.tickValues);
+            }
+          }
 
       //if we want our labels to be in a specific position
       if(this.labelPosition === 'inline') {
