@@ -201,6 +201,29 @@ Custom property | Description
               break;
 
             case 'ordinal':
+			  var xTimestamp = this.data.value[xKey];
+			  var offsetData = this.completeSeriesConfig.actual.offsetData 
+			  var offsetDataKeysArray = Object.keys(offsetData);
+			  if(offsetData) {
+				  for(var i = 0; i< offsetDataKeysArray.length; i++) {
+					  var currentOffsetData = offsetData[offsetDataKeysArray[i]];
+					  if(currentOffsetData && xTimestamp >= currentOffsetData.start && xTimestamp <= currentOffsetData.end) {
+						  xTimestamp = xTimestamp - currentOffsetData.offsetValue;
+						  break;
+					  }
+				  }
+			  }
+			  var xDate = new Date(xTimestamp);
+			  var paddedMonth = (xDate.getUTCMonth()+1 < 10) ? '0' + (xDate.getUTCMonth()+1) : xDate.getUTCMonth()+1;
+              var paddedDate = (xDate.getUTCDate() < 10) ? '0' + (xDate.getUTCDate()) : xDate.getUTCDate();
+              var paddedHour = (xDate.getUTCHours() < 10) ? '0' + (xDate.getUTCHours()) : xDate.getUTCHours();
+              var paddedMins = (xDate.getUTCMinutes() < 10) ? '0' + (xDate.getUTCMinutes()) : xDate.getUTCMinutes();
+              var paddedSeconds = xDate.getUTCSeconds() < 10 ? '0' + xDate.getUTCSeconds() : xDate.getUTCSeconds();
+
+              xVal = `${paddedMonth}/${paddedDate}/${xDate.getUTCFullYear()} - ${paddedHour}:${paddedMins}:${paddedSeconds}`;
+              xUnit = this.completeSeriesConfig[this.seriesKey]['xAxisUnit'] ? ' ' + this.completeSeriesConfig[this.seriesKey]['xAxisUnit'] : '';
+              slash = this.displayXValuesOnly ? '' : ' / ';
+              break;
             case 'scaleBand':
               xVal = this.data.value[xKey];
               xUnit = this.completeSeriesConfig[this.seriesKey]['xAxisUnit'] ? ' ' + this.completeSeriesConfig[this.seriesKey]['xAxisUnit'] : '';
