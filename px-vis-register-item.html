@@ -201,14 +201,15 @@ Custom property | Description
               break;
 
             case 'ordinal':
-			  var xTimestamp = this.data.value[xKey];
-			  var offsetData = this.completeSeriesConfig.actual.offsetData 
-			  var offsetDataKeysArray = Object.keys(offsetData);
-			  if(offsetData) {
+			var xTimestamp = this.data.value[xKey];
+	
+			  if(this.completeSeriesConfig && this.completeSeriesConfig.actual 
+				&& this.completeSeriesConfig.actual.offsetData) {
+				var offsetData = this.completeSeriesConfig && this.completeSeriesConfig.actual 
+				var offsetDataKeysArray = Object.keys(offsetData);
 				  for(var i = 0; i< offsetDataKeysArray.length; i++) {
-					  var currentOffsetData = offsetData[offsetDataKeysArray[i]];
-					  if(currentOffsetData && xTimestamp >= currentOffsetData.start && xTimestamp <= currentOffsetData.end) {
-						  xTimestamp = xTimestamp - currentOffsetData.offsetValue;
+					  if(xTimestamp >= offsetData[offsetDataKeysArray[i]].start && xTimestamp <= offsetData[offsetDataKeysArray[i]].end) {
+						  xTimestamp = xTimestamp - offsetData[offsetDataKeysArray[i]].offsetValue;
 						  break;
 					  }
 				  }
