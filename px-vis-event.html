@@ -361,8 +361,14 @@ Custom property | Description
       iconSvg
         .on('mouseenter', this._requestTooltip.bind(this,d,i,iconSvg.node()))
         .on('mouseleave', this._clearTooltipRequest.bind(this,d,i));
-    },
+	},
 	
+	/**
+    * checks if the text property exists and adds 
+    * text to the element with the class event-text
+    *
+    * @method _enterText
+    */
 	_enterText: function(d, i, elem) {
       const text = this._getConfigValue('text', d.label, false);
       let iconSvg;
@@ -415,7 +421,12 @@ Custom property | Description
       Px.d3.select(elem).select('.event-icon')
         .attr("transform", `${translate} ${scale}`);
 	},
-	
+	/**
+    * checks if the textOffset property exists and adds 
+    * it to the element with the class event-text
+    *
+    * @method _mergeText
+    */
 	_mergeText: function(d, i, elem) {
       const key = this._getConfigValue('dataKey', d.label, false);
 
