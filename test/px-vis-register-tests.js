@@ -37,7 +37,9 @@
 
   window.MouseEvent = MouseEvent;
 })(window);
-
+function registerFormatCallback(seriesConfig, time){
+	return `${time}${time}`;
+}
 document.addEventListener("WebComponentsReady", function() {
   runTests();
 });
@@ -352,7 +354,33 @@ function runTests() {
       var series = Polymer.dom(register.root).querySelector('px-vis-register-item');
       assert.equal(series._displayedData, 'StringyString xUnit / 1,015.20 yUnit');
     });
-  });
+	});
+	
+	// ############################################################################
+// ############################################################################
+
+suite('px-vis-register x axis is ordinal and has a registerFormatCallback', function() {
+	var register;
+
+	suiteSetup(function(done) {
+		register = document.getElementById('ordinalCallback');
+		var data = generateOrdinalDataValues( generateEmptyData(2) );
+		setData(register, data);
+		register.set('registerFormatCallback', registerFormatCallback);
+		window.setTimeout(function() {
+			done();
+		}, 150);
+	});
+
+	test('ordinal fixtures are created', function() {
+		assert.isTrue(register !== null);
+	});
+
+	test('ordinal formated', function() {
+		var series = Polymer.dom(register.root).querySelector('px-vis-register-item');
+		assert.equal(series._displayedData, 'StringyStringStringyString xUnit / 1,015.20 yUnit');
+	});
+});
 
 // ############################################################################
 // ############################################################################
