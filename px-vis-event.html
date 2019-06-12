@@ -415,8 +415,10 @@ Custom property | Description
       const y0 = offset[1] - 5;
       const y = type === "image" ? y0 : y0 - size;
       const translate = `translate(${x},${y})`;
-      const scale = type === "image" ? '' : `scale(${this._iconInfo[iconName].scale})`;
-
+			const scale = type === "image" ? '' : `scale(${this._iconInfo[iconName].scale})`;
+			if(isNaN(x)) {
+        return;
+      }
       Px.d3.select(elem).select('.event-icon')
         .attr("transform", `${translate} ${scale}`);
     },
@@ -438,7 +440,9 @@ Custom property | Description
       const x = this.x(d[key]) + offset[0];
       const y = offset[1] - 5;
       const translate = `translate(${x},${y})`;
-
+			if(isNaN(x)) {
+        return;
+      }
       Px.d3.select(elem).select('.event-text')
         .attr("transform", `${translate}`);
     },
