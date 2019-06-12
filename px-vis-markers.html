@@ -452,9 +452,9 @@ limitations under the License.
         this._closeTooltip();
         return;
       }
-      const location = mousePos[1] < this.height / 2 ? 'top' : 'bottom';
+
       //find all marker types for this row
-      const labels = this._findLabelsForRow(rowInfo.index, location);
+      const labels = this._findLabelsForRow(rowInfo.index);
 
       // if no markers we want a tooltip on in that row
       if(labels.length === 0) {
@@ -727,12 +727,12 @@ limitations under the License.
         return {'index': domain[domainIndex], 'rowY': rowY};
     },
 
-    _findLabelsForRow: function(rowIndex, location) {
+    _findLabelsForRow: function(rowIndex) {
       const index = Number(rowIndex);
       const result = [];
 
       Object.entries(this._markerConfig).forEach(([key,conf]) => {
-        if(location === conf.location && index === conf.row && conf.showTooltip) {
+        if(index === conf.row && conf.showTooltip) {
           result.push(key);
         }
       });
