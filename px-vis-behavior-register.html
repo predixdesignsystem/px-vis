@@ -331,8 +331,11 @@ PxVisBehaviorRegister.itemShared = [{
     if(didTruncate === undefined || !this.$.seriesName) {
       return;
     }
-
-    if(didTruncate) {
+    let tooltipData = '';
+    if(this.completeSeriesConfig && this.completeSeriesConfig[this.seriesKey]) {
+      tooltipData = this.completeSeriesConfig[this.seriesKey].tooltipData;
+    }
+    if(didTruncate || (tooltipData && tooltipData.length)) {
       this.$.seriesName.addEventListener('mouseenter', this._onTitleHoverBound);
       this.$.seriesName.addEventListener('mouseleave', this._onTitleLeaveBound);
     } else {
@@ -345,14 +348,16 @@ PxVisBehaviorRegister.itemShared = [{
   _onTitleHover: function() {
     this._tooltipRequested = true;
     this._tooltipTimer = setTimeout(() => {
-
+      const text = this._configName;
       const detail = {
         origin: this,
         is: this.is,
         element: this.$.seriesName,
-        data: [{
-          text: this._configName
-        }]
+        data: [{ text }]
+      };
+      if(this.completeSeriesConfig && this.completeSeriesConfig[this.seriesKey] && 
+        this.completeSeriesConfig[this.seriesKey].tooltipData) {
+        detail.data = [{ data: this.completeSeriesConfig[this.seriesKey].tooltipData }];
       }
 
       this.dispatchEvent(new CustomEvent('central-tooltip-display-request', { bubbles: true, composed: true, detail: detail }));
