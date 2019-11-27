@@ -1,0 +1,146 @@
+/*
+Copyright (c) 2018, General Electric
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+import '@polymer/polymer/polymer-legacy.js';
+
+import '../px-vis-line-canvas.js';
+import '../px-vis-behavior-common.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+import { html } from '@polymer/polymer/lib/utils/html-tag.js';
+Polymer({
+  _template: html`
+    <px-vis-svg-canvas width="[[width]]" height="[[height]]" margin="[[margin]]" canvas-context="{{canvasContext}}">
+      </px-vis-svg-canvas>
+      <px-vis-scale x-axis-type="time" y-axis-type="linear" complete-series-config="[[completeSeriesConfig]]" data-extents="[[dataExtents]]" width="[[width]]" height="[[height]]" margin="[[margin]]" chart-data="{{chartData}}" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}" selected-domain="[[selectedDomain]]">
+      </px-vis-scale>
+      <px-vis-line-canvas series-id="mySeries" complete-series-config="[[completeSeriesConfig]]" chart-data="[[chartData]]" x="[[x]]" y="[[y]]" width="[[width]]" height="[[height]]" margin="[[margin]]" canvas-context="[[canvasContext]]" domain-changed="[[domainChanged]]">
+      </px-vis-line-canvas>
+`,
+
+  is: 'px-vis-line-canvas-demo-component',
+
+  behaviors: [
+    PxColorsBehavior.dataVisColorTheming,
+    PxVisBehaviorRenderer.base,
+    PxColorsBehavior.getSeriesColors
+  ],
+
+  observers: ['_renderChartData(domainChanged, canvasContext, chartData.*, completeSeriesConfig.*)'],
+
+  properties: {
+    description: {
+      type: String,
+      value: "Element which draws lines series onto the chart"
+    },
+    width: {
+      type : Number,
+      value : 500
+    },
+    height:{
+      type : Number,
+      value : 200
+    },
+    margin:{
+      type : Object,
+      value : function() {
+        return {
+          "top": 10,
+          "right": 10,
+          "bottom": 10,
+          "left": 10
+        }
+      }
+    },
+    domainChanged:{
+      type: Number,
+      value: 0
+    },
+    chartData:{
+      type : Array,
+      value : function() {
+        return [{
+          'x': 1397102460000,
+          'y': 0.56
+        },{
+          'x': 1397139660000,
+          'y': 0.4
+        },{
+          'x': 1397177400000,
+          'y': 0.43
+        },{
+          'x': 1397228040000,
+          'y': 0.33
+        },{
+          'x': 1397248260000,
+          'y': 0.47
+        },{
+          'x': 1397291280000,
+          'y': 0.41
+        },{
+          'x': 1397318100000,
+          'y': 0.26
+        },{
+          'x': 1397342100000,
+          'y': 0.42
+        },{
+          'x': 1397390820000,
+          'y': 0.27
+        },{
+          'x': 1397408100000,
+          'y': 0.38
+        },{
+          'x': 1397458800000,
+          'y': 0.36
+        },{
+          'x': 1397522940000,
+          'y': 0.32
+        }]
+      }
+    },
+    completeSeriesConfig:{
+      type : Object
+    },
+    dataExtents:{
+      type : Object,
+      value: function() {
+        return {
+          "x": [Infinity,-Infinity],
+          "y": [0,-Infinity]
+        }
+      }
+    }
+  },
+
+  listeners: {
+    "px-data-vis-colors-applied" : '_returnCompleteSeriesConfig'
+  },
+
+  _returnCompleteSeriesConfig: function() {
+    this.set('completeSeriesConfig', {
+      'mySeries': {
+        "name":"My-Series",
+        "type": "line",
+        "x": 'x',
+        "y": 'y',
+        'color': this._getColor(0)
+      }
+    });
+  }
+});

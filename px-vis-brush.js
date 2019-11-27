@@ -1,0 +1,723 @@
+/*
+Copyright (c) 2018, General Electric
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/**
+
+### Usage
+
+    <px-vis-brush
+      svg="[[svg]]"
+      axis="[[x]]"
+      height="[[height]]"
+      width="[[width]]"
+      margin="[[margin]]"
+      domain-changed="[[domainChanged]]">
+    </px-vis-brush>
+    <px-vis-svg
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      svg="{{svg}}">
+    </px-vis-svg>
+    <px-vis-scale
+      x-axis-type="time"
+      y-axis-type="linear"
+      complete-series-config="[[seriesConfig]]"
+      data-extents="[[dataExtents]]"
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      chart-data="[[chartData]]"
+      x="{{x}}"
+      y="{{y}}"
+      domain-changed="{{domainChanged}}">
+    </px-vis-scale>
+
+### Styling
+The following custom properties are available for styling:
+
+Custom property | Description
+:----------------|:-------------
+  `--px-vis-nav-brush-outline-color` | The stroke (border) color for the brushed box
+  `--px-vis-nav-brush-fill-color` | The fill (background) color for the brushed box
+  `--px-vis-nav-brush-opacity` | The opacity of the brushed box
+  `--px-vis-nav-brush-gradient-fill-color` | The fill (background) color for the brushed box when gradientColors is not defined
+  `--px-vis-nav-brush-handle-fill-color` | The fill (background) color for the handles on the brushed box
+  `--px-vis-nav-brush-handle-lines-color` | The stroke (border) color for the handles on the brushed box
+  `--px-vis-nav-brush-handle-fill-color-hover` | The hover state fill (background) color for the handles on the brushed box
+  `--px-vis-nav-brush-handle-lines-color-hover` | The hover state stroke (border) color for the handles on the brushed box
+  `--px-vis-nav-brush-handle-fill-color-press` | The pressed/mousedown state fill (background) color for the handles on the brushed box
+  `--px-vis-nav-brush-handle-lines-color-press` | The pressed/mousedown state stroke (border) color for the handles on the brushed box
+
+@element px-vis-brush
+@blurb Element providing user interaction on the navigator.
+@homepage index.html
+@demo demo.html
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+import '@polymer/polymer/polymer-legacy.js';
+
+import './px-vis-behavior-common.js';
+import './px-vis-behavior-d3.js';
+import './css/px-vis-styles.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+import { html } from '@polymer/polymer/lib/utils/html-tag.js';
+Polymer({
+  _template: html`
+      <style include="px-vis-styles"></style>
+`,
+
+  is: 'px-vis-brush',
+
+  behaviors: [
+    PxVisBehavior.observerCheck,
+    PxVisBehavior.sizing,
+    PxVisBehaviorD3.svg,
+    PxVisBehaviorD3.axis,
+    PxVisBehaviorD3.selectedDomain,
+    PxVisBehavior.commonMethods,
+    PxVisBehaviorD3.domainUpdate,
+    PxVisBehavior.updateStylesOverride,
+    PxVisBehavior.gradientColorsFunction,
+    PxVisBehavior.gradientColorsProperty
+  ],
+
+  /**
+   * Properties block, expose attribute values to the DOM via 'reflect'
+   *
+   * @property properties
+   * @type Object
+   */
+  properties: {
+    /**
+     * Holder for the d3.svg.brush() object
+     *
+     * See: https://github.com/mbostock/d3/wiki/SVG-Controls
+     *
+     */
+    _brush:{
+      type: Object,
+      value: function() { return{}; }
+    },
+    /**
+     * Holder for a group of SVG <g> elements pertaining to the brush
+     *
+     */
+    _brushGroup:{
+      type: Object,
+      value: function() {return{};}
+    },
+    /**
+     * Holder for a group of SVG elements pertaining to the handles
+     *
+     */
+    _handleGroup:{
+      type: Object,
+      value: function() {return{};}
+    },
+    /**
+     * Holder for the calculated center of the extent box
+     *
+     */
+    _center:{
+      type:Object,
+      value: function() {return{};}
+    },
+    /**
+     * A boolean to tell if the extents box is currently moving
+     *
+     */
+    _centering:{
+      type:Boolean,
+      value:false
+    },
+    /**
+     * A boolean to tell if a handle is currently moving
+     *
+     */
+    _brushing:{
+      type:Boolean,
+      value:false
+    },
+    /**
+     * The parent chart's extents
+     *
+     */
+    chartDomain: {
+      type:Object,
+      notify:true
+    },
+    /**
+     * Allows or prevents changes to selectedDomain
+     */
+    _preventDomainChange: {
+      type: Boolean,
+      value: false
+    },
+
+    _animationFrameDone: {
+      type: Boolean,
+      value: false
+    },
+    _clipPathId: {
+      type: String
+    },
+    _gradientFunction: {
+      type: Function
+    }
+  },
+
+  observers: [
+    'drawElement(domainChanged, svg, axis, height, selectedDomain, _animationFrameDone, _stylesUpdated)',
+    '_styleGradient(_gradientFunction)',
+    '_zoomBrush(chartDomain.*)',
+    '_chartDomainChanged(chartDomain)',
+    '_computeGradientFunctions(gradientColors)'
+  ],
+
+  detached: function() {
+    this.unlisten(window,'mouseup','_brushMouseUp');
+  },
+
+  ready: function() {
+    window.requestAnimationFrame(function() {
+      this.set('_animationFrameDone', true);
+    }.bind(this));
+
+    this.set('_clipPathId', this.generateRandomID('navClipPath'));
+  },
+
+  /**
+   * Defines the svg for the brush, draws brush elements, and sets up listeners.
+   *
+   * Can be called manually after svg and domainChanged are set.
+   *
+   * @method drawElement
+   */
+  drawElement: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
+    if(this._animationFrameDone && this.domainChanged && this.height) {
+      var heightOffset = 5,
+          h = Math.max(this.height - this.margin.bottom - heightOffset, 1),  //make sure it is bigger than 0 for range
+          axisRange = this.axis.range(),
+          range;
+
+      // check that our range is ok and wont freak d3 out.
+      // x2 must be greater than x1
+      if(axisRange[0] > axisRange[1]) {
+        axisRange[0] = this.axis.range()[1];
+        axisRange[1] = this.axis.range()[0];
+      } else if(axisRange[0] === axisRange[1]) {
+        axisRange[1] += 1;
+      }
+
+      range = [
+        [axisRange[0], 0],
+        [axisRange[1], h]
+      ];
+
+      if(this._isObjEmpty(this._brush)) {
+
+        this._createClipPath([0,h]);
+        // first, define the brush using the axis
+        this._brush = Px.d3.brushX()
+          .extent(range)
+          .handleSize(6)
+          .on('start', this._brushstart.bind(this))
+          .on('brush', this._brushmove.bind(this))
+          .on('end', this._brushend.bind(this));
+
+          this._preventDomainChange = true;
+        // now that we have our new g, proceed with drawing brush
+        this._brushGroup = this.svg.append('g')
+          .attr('class', 'brush')
+          .call(this._brush)
+          .call(this._brush.move, axisRange);
+
+        /* Style the brush overlay box
+          There are actually two boxes, .selection and .overlay:
+          overlay captures the mouse events; selection is what is visible
+        */
+        this._brushGroup.select('rect.selection')
+          .attr('y', 0)
+          .attr('stroke', this._checkThemeVariable('--px-vis-nav-brush-outline-color', 'rgb(0,0,0)'))
+          .attr('stroke-width',1)
+          .attr('shape-rendering','crispEdges')
+          .attr('clip-path', 'url(#' + this._clipPathId + '0)');
+
+        this._styleGradient();
+
+        this._drawHandles(heightOffset);
+
+        // Setup listeners for click on the navigator so the brush will jump instead of redraw
+        this._brushGroup.select("rect.overlay")
+          .on("mousedown.brush", this._brushcenter.bind(this))
+          .on("touchstart.brush", this._brushcenter.bind(this));
+      } else {
+        this._drawClipPath([0,h]);
+
+        //make sure brush has the right extents in case of a height change
+         this._brush = this._brush.extent(range);
+        // //and update the g with the new extents
+         this._brushGroup = this.svg.select("g.brush")
+           .call(this._brush);
+
+        if(this.selectedDomain && this.selectedDomain.x.length > 0) {
+          //redraw the brush in the right place
+          this._brushGroup
+            .call(this._brush.move, [this.axis(this.selectedDomain.x[0]), this.axis(this.selectedDomain.x[1])]);
+         } else {
+
+          //make sure we redraw in case of a size change
+          this._brushGroup
+            .call(this._brush.move, axisRange);
+        }
+      }
+    }
+  },
+
+  _styleGradient: function() {
+
+    if(!this._isD3Empty(this._brushGroup)) {
+      let overlay = this._brushGroup.select('rect.selection'),
+          currentOverlayIndex = 0;
+
+      if(this._gradientFunction) {
+
+        let steps = 100,
+            interval = 100/steps,
+            gradient = this.svg.append('defs')
+                        .append('linearGradient')
+                        .attr('id', `overlayGradient`);
+
+        for(let i=0; i<=steps; i++) {
+          gradient.append('stop')
+            .attr('offset', (i*interval) + '%')
+            .attr('stop-color', this._gradientFunction((i*interval)/100));
+        }
+
+        overlay.attr('fill',`url(#overlayGradient)`)
+          .attr('fill-opacity', this._checkThemeVariable("--px-vis-nav-brush-opacity", 0.3));
+
+      } else {
+        overlay.attr('fill',this._checkThemeVariable("--px-vis-nav-brush-fill-color", 'rgb(0,0,0)'))
+          .attr('fill-opacity', this._checkThemeVariable("--px-vis-nav-brush-opacity", 0.3));
+      }
+    }
+  },
+
+  _createClipPath: function(vR) {
+    this._clipPathObj =  this.svg
+      .append("clipPath")
+      .attr("id", this._clipPathId);
+
+    this._clipPathObj.append("path");
+
+    this._drawClipPath(vR);
+  },
+
+  _drawClipPath: function(vR) {
+
+    var hR = this.axis.range(),
+        domain = this.axis.domain(),
+        clipLeft = this.selectedDomain.x[0] < domain[0],
+        clipRight = this.selectedDomain.x[1] > domain[1],
+        d = '';
+
+    vR[0] -= 5;
+    vR[1] += 5;
+
+    hR[0] -= 5;
+    hR[1] += 5;
+
+    var halfV = (vR[1] + vR[0]) / 2,
+        n = 10,
+        n2 = 5;
+        d = "M" + hR[0] + ',' + vR[0] +
+            "L" + hR[1] + ',' + vR[0];
+
+    //add squiglly line on right if clip
+    if(clipRight) {
+      d += "L" + hR[1] + ',' + (halfV - n) +
+        "L" + (hR[1] - 10) + ',' + (halfV - n2) +
+        "L" + (hR[1] + 10) + ',' + (halfV + n2) +
+        "L" + hR[1] + ',' + (halfV + n);
+    }
+
+    d += "L" + hR[1] + ',' + vR[1] +
+        "L" + hR[0] + ',' + vR[1];
+
+    //add squiggly line on left if clip
+    if(clipLeft) {
+        d += "L" + hR[0] + ',' + (halfV + n) +
+          "L" + (hR[0] + 10) + ',' + (halfV + n2) +
+          "L" + (hR[0] - 10) + ',' + (halfV - n2) +
+          "L" + hR[0] + ',' + (halfV - n);
+    }
+
+    d += "Z";
+
+    this._clipPathObj.select("path")
+      .attr("d", d);
+  },
+
+  /**
+   * Helper function to add class "selecting" to elements selected in the brush
+   *
+   * @method _brushstart
+   */
+  _brushstart: function() {
+    this.set("_brushing", true);
+    //TODO do we want to issue a color change? if not, delete/ comment out
+    this.svg.classed("selecting", true);
+  },
+
+  /**
+   * Helper function to remove class "selecting" to elements not selected in the brush
+   *
+   * @method _brushend
+   */
+  _brushend: function () {
+    this.set("_brushing", false);
+    // revert our handle style to normal
+    if(this._doesObjHaveValues(this._handleGroup)){
+      this._handleGroup.dispatch('brushmouseup');
+    }
+
+    // console.log(d3.event.selection);
+    //TODO do we want to issue a color change? if not, delete/ comment out
+    this.svg.classed("selecting", false);
+  },
+
+  /**
+   * Helper function fired when the brush is moved / extents are changed.
+   * Sets the attribute 'selectedDomain' with the new extents.
+   * This attr should travel up the component tree via observers and set the new domain in the chart.
+   *
+   * @method _brushmove
+   */
+  _brushmove: function(range) {
+    // var s = d3.event.selection;
+    // circle.classed("selected", function(d) { return s[0] <= d && d <= s[1]; });
+    this.debounce('brushed', function () {
+
+      var brushExt = Px.d3.brushSelection(this._brushGroup.node());
+      if(brushExt) {
+
+        //if our extents are the same (or less than 1 px apart), add or subtract one based on location and reset the brush
+        if(Math.abs(brushExt[0] - brushExt[1]) < 1) {
+          brushExt[0] = (brushExt[0] === 0) ? 0 : brushExt[1] - 1;
+          brushExt[1] = (brushExt[1] === 0) ? brushExt[0] + 1 : brushExt[1];
+
+          this._brushGroup
+            .call(this._brush.move,brushExt)
+        } else {
+
+         if(!this._preventDomainChange) {
+
+            var newDomain = brushExt.map(this.axis.invert, this.axis),
+            //make sure this is an actual update
+                changed = this.selectedDomain.x.length < 2 ||
+                            newDomain[0].toString() !== this.selectedDomain.x[0].toString() ||
+                            newDomain[1].toString() !== this.selectedDomain.x[1].toString();
+
+            if(changed) {
+              this.set('selectedDomain', {x:newDomain,y:[]});
+              this.fire('px-vis-selected-domain-updated', {
+                'data':{x:newDomain,y:[]}, 'method': 'set', 'dataVar': 'selectedDomain'
+              });
+            }
+         } else {
+           this._preventDomainChange = false;
+         }
+        }
+
+        // this._handleGroup.attr("transform", function(d,i) {
+        //   return "translate(" + (brushExt[i] - 10) + "," + (this.height-this.margin.bottom - this.margin.top-10)/2 + ")"
+        // }.bind(this));
+      }
+    }, 10);
+  },
+
+  /**
+   * Helper function fired when the navigator is clicked on
+   *
+   * @method _brushcenter
+   */
+  //_brushcenter
+  _brushcenter: function() {
+    var win = Px.d3.select(window),   // window
+        target = Px.d3.event.target,  //this._brushGroup
+        extent = Px.d3.brushSelection(this._brushGroup.node()), //array of brush currect size in pixelspace
+        size = extent[1] - extent[0],  //width in pixels
+        range = this.axis.range(),  //overall extents in pixelspace
+        x0 = range[0] + size / 2,
+        x1 = range[1] - size / 2;
+
+    this._recenter(true);
+    this._brushcentermove(target,x0,x1);
+
+    if (Px.d3.event.changedTouches) {
+      win.on("touchmove.brush", this._brushcentermove.bind(this,target,x0,x1))
+        .on("touchend.brush", this._brushcenterend.bind(this));
+    } else {
+      win.on("mousemove.brush", this._brushcentermove.bind(this,target,x0,x1))
+        .on("mouseup.brush", this._brushcenterend.bind(this));
+    }
+  },
+
+  /**
+   * Helper function to calculate the center point where the brush should move to
+   *
+   * @method _brushcentermove
+   */
+  _brushcentermove: function(target,x0,x1) {
+    Px.d3.event.stopPropagation();
+    // calc the center or pick an edge
+    this._center = Math.max(x0, Math.min(x1, Px.d3.mouse(target)[0]));
+
+    this._recenter(false);
+  },
+
+  /**
+   * Helper function to move the brush and disable listener
+   *
+   * @method _brushcenterend
+   */
+  _brushcenterend: function() {
+    this._brushmove();
+    Px.d3.select(window).on(".brush", null);
+  },
+
+  /**
+   * Helper function to tween and calculate the brush move
+   *
+   * @method _recenter
+   */
+  _recenter: function(smooth) {
+    var _this = this;
+
+    if (this._centering) {
+      return; // timer is active and already tweening
+    }
+
+    if (!smooth) {
+      return void _this.tween(1); // instantaneous jump
+    }
+
+    this._centering = true;
+
+    // sets up a timer to call tween
+    var timer = Px.d3.timer(function() {
+      _this.tween(0.2);
+      // stop the timer when we have centered
+      if(!_this._centering){
+        timer.stop();
+      }
+    });
+  },
+
+  /**
+   * Helper function to tween so that the brush slides rather than jumps
+   *
+   * @method tween
+   * @private
+   */
+  tween:function (alpha) {
+    var extent = Px.d3.brushSelection(this._brushGroup.node()), //recalc every time it moves
+        size = extent[1] - extent[0],
+        center1 = this._center * alpha + ( extent[0] + extent[1]) / 2 * (1 - alpha);
+    // move the brush
+    this._brushGroup
+        .call(this._brush.move,[center1 - size / 2, center1 + size / 2]);
+        // .call(this._brush.event);
+    // TODO check that it works with radically different extents, such as 0.0-1.0
+    // check if it has moved into position within a tolerance (based on overall size of the domain)
+    this._centering = Math.abs((center1) - (this._center)) > size * 0.01;
+  },
+
+  /**
+   * Helper function to draw the handle elements
+   *
+   * @method _drawHandles
+   */
+  _drawHandles:function(heightOffset){
+    // Setup sizes for the handles on either end
+    // var handleSize = {
+    //   'h':32,
+    //   'w':9,
+    //   's':1.5
+    // };
+
+    // handleSize['y'] = this.height/2 - handleSize.h/2 - heightOffset;
+    //
+    // var lineY = [handleSize.y + heightOffset * 1.5 , handleSize.y + handleSize.h - heightOffset * 1.5];
+
+    //draw a group to hold the handles
+    this._handleGroup = this._brushGroup.selectAll(".handle")
+      // provide listeners for hover and press events
+      .on('brushmouseup',this._handleGroupMouseUp.bind(this))
+      .on('mousedown.handle',this._handleGroupMouseDown.bind(this))
+      .on("mouseenter.handle", this._handleGroupMouseEnter.bind(this))
+      .on("mouseleave.handle", this._handleGroupMouseLeave.bind(this));
+
+    // this._handleGroup = this._brushGroup.selectAll(".handle--custom")
+    //   .data([{type: "w"}, {type: "e"}])
+    //   .enter().append("rect")
+    //     .attr("class", "handle--custom")
+    //     .attr("cursor", "ew-resize")
+    //     .attr("width", 20)
+    //     .attr("height", 20)
+    // draw the handle rect / base
+    this._handleGroup
+      .attr("clip-path", 'url(#' + this._clipPathId + ')')
+      .attr('stroke',this._checkThemeVariable("--px-vis-nav-brush-handle-lines-color", 'rgb(0,0,0)'))
+      .attr('fill',this._checkThemeVariable("--px-vis-nav-brush-handle-fill-color", 'rgb(255,255,255)'))
+      .attr('shape-rendering','crispEdges');
+
+    // draw the lines for the handles
+    // this._handleGroup.append("svg:line")
+    //   .attr("x1", handleSize.s )
+    //   .attr("x2", handleSize.s )
+    //   .attr("y1", lineY[0])
+    //   .attr("y2", lineY[1])
+    //   .attr("class", "handleLine")
+    //   .attr('fill','none')
+    //   .attr('stroke',this.colors.gray5);
+    //
+    // this._handleGroup.append("svg:line")
+    //     .attr("x1", -handleSize.s )
+    //     .attr("x2", -handleSize.s )
+    //     .attr("y1", lineY[0])
+    //     .attr("y2", lineY[1])
+    //     .attr("class", "handleLine")
+    //     .attr('fill','none')
+    //     .attr('stroke',this.colors.gray5);
+  },
+
+  /**
+   * Function to restyle handles on mousedown event
+   *
+   * @method _handleGroupMouseDown
+   */
+  _handleGroupMouseDown:function(d,i){
+      var elem = Px.d3.select(this._handleGroup.nodes()[i]);
+
+      // disable changes on mouseleave because when a person drags, they can leave the elem bounds and we dont want to restyle yet.
+      elem.on("mouseleave.handle", null);
+
+      // set the pressed styles
+      elem.attr('stroke', this._checkThemeVariable("--px-vis-nav-brush-handle-lines-color-press", 'rgb(0,0,0)'))
+        .attr('fill', this._checkThemeVariable("--px-vis-nav-brush-handle-fill-color-press", 'rgb(50,50,50)'));
+
+      // elem.selectAll('line.handleLine')
+      //   .attr('stroke', this.colors.gray7);
+  },
+
+  /**
+   * Function to restyle handles on mouseup event
+   *
+   * @method _handleGroupMouseUp
+   */
+  _handleGroupMouseUp:function(d,i){
+
+    var elem = Px.d3.select(this._handleGroup.nodes()[i]);
+
+    // reapply the mouseleave function and again, bind our index
+    elem.on("mouseleave.handle", this._handleGroupMouseLeave.bind(this,d,i));
+
+    elem.attr('stroke',this._checkThemeVariable("--px-vis-nav-brush-handle-lines-color", 'rgb(0,0,0)'))
+      .attr('fill',this._checkThemeVariable("--px-vis-nav-brush-handle-fill-color", 'rgb(255,255,255)'));
+    // elem.selectAll('line.handleLine')
+    //   .attr('stroke', this.colors.gray5);
+  },
+
+  /**
+   * Function to restyle handles on mouseleave event
+   *
+   * @method _handleGroupMouseLeave
+   */
+  _handleGroupMouseLeave:function(d,i){
+    var elem = Px.d3.select(this._handleGroup.nodes()[i]);
+    elem.attr('stroke',this._checkThemeVariable("--px-vis-nav-brush-handle-lines-color", 'rgb(0,0,0)'))
+      .attr('fill',this._checkThemeVariable("--px-vis-nav-brush-handle-fill-color", 'rgb(255,255,255)'))
+
+    // elem.selectAll('line.handleLine')
+    //   .attr('stroke', this.colors.gray5);
+  },
+
+  /**
+   * Function to restyle handles on mouseenter event
+   *
+   * @method _handleGroupMouseEnter
+   */
+  _handleGroupMouseEnter:function(d,i){
+    var elem = Px.d3.select(this._handleGroup.nodes()[i]);
+    elem.attr('stroke',this._checkThemeVariable("--px-vis-nav-brush-handle-lines-color-hover", 'rgb(0,0,0)'))
+      .attr('fill',this._checkThemeVariable("--px-vis-nav-brush-handle-fill-color-hover", 'rgb(150,150,150)'));
+
+    // elem.selectAll('line.handleLine')
+    //   .attr('stroke', this.colors.gray6);
+  },
+
+  /**
+   * Function to trigger a brush extent calculation when the main chart extents change.
+   *
+   * @method _zoomBrush
+   */
+  _zoomBrush: function(chartDomain) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
+    if(!this._brushing && !this._centering && this.chartDomain.length > 0 && this._doesObjHaveValues(this._brush) && this._doesObjHaveValues(this._brushGroup) && this._doesObjHaveValues(this.axis) && Px.d3.brushSelection(this._brushGroup.node())) {
+      var extent = Px.d3.brushSelection(this._brushGroup.node()),
+          range = [this.axis(this.chartDomain[0]),this.axis(this.chartDomain[1])];
+
+      // make sure brushes dont extend out of the navigator area
+      // range[0] = Math.max(range[0], this.axis.range()[0]);
+      // range[1] = Math.min(range[1], this.axis.range()[1]);
+      if(!(extent[0] === range[0] && extent[1] === range[1])) {
+
+        //we come from the chart, make sure we don't fire a selected domain change
+        //because of the debounce in brushmove we could theoretically have an issue
+        //if the user moves the brush himself after this call and before the debounce
+        //kicks in, in which case the user interaction will be ignored. In reality
+        //unlikely since _zoom brush usually happens on the chart zooming/panning
+        this._preventDomainChange = true;
+        this._brushGroup
+          .call(this._brush.move,range)
+      }
+    }
+  },
+
+  _chartDomainChanged: function() {
+    this.gradientColorsMin = this.chartDomain[0];
+    this.gradientColorsMax = this.chartDomain[1];
+  },
+
+  _computeGradientFunctions: function() {
+    if(this.gradientColors) {
+      this.set('_gradientFunction', this.createGradientFunction(this.gradientColors));
+    }
+  }
+});

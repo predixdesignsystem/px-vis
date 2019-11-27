@@ -1,0 +1,254 @@
+/*
+Copyright (c) 2018, General Electric
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+import '@polymer/polymer/polymer-legacy.js';
+
+import './px-vis-behavior-common.js';
+import './px-vis-behavior-d3.js';
+var PxVisBehaviorScale = window.PxVisBehaviorScale = (window.PxVisBehaviorScale || {});
+
+/*
+    Name:
+    PxVisBehaviorScale.radar
+
+    Description:
+    Polymer behavior that provides radar scales
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorScale.radar
+*/
+PxVisBehaviorScale.radar = [{
+  /**
+   * Properties block, expose attribute values to the DOM via 'reflect'
+   *
+   * @property properties
+   * @type Object
+   */
+  properties: {
+    /**
+    * Holder for the calculated extents
+    *
+    */
+    _calculatedExtents: {
+      type: Object,
+      notify: true
+    },
+    /**
+     * Whether the scale is for radar and should use a scalePoint X scale
+     * instead of a scaleLinear
+     */
+    radar: {
+      type: Boolean,
+      value: false
+    }
+  },
+
+  listeners: {
+    'px-vis-request-pixel-for-data': '_pixelRequest'
+  },
+
+  /**
+   *  Sets the x scale to a single ordinal, radial scale
+   *
+   * @method _setXScale
+   */
+  _setXScale: function(radius, forceRecreation) {
+    var range = [0, 2*Math.PI],
+        x;
+
+    if(this.x && !forceRecreation) {
+      this.x.range(range);
+
+      if(this.domainChanged) {
+        this.set('domainChanged', this.domainChanged + 1);
+      }
+
+    } else {
+      x = Px.d3.scalePoint().range(range).padding(0.5).align(0);
+      x._scaleType = "ordinal";
+      this.set('x', x);
+    }
+  },
+  /**
+   * Sets the y scale to multiple linear scales
+   *
+   * @method _setYScale
+   */
+  _setYScale: function(radius,centerOffset, forceRecreation) {
+    var range = [centerOffset, radius];
+
+    if(this.y && !forceRecreation) {
+      this.y.range(range);
+
+      if(this.domainChanged) {
+        this.set('domainChanged', this.domainChanged + 1);
+      }
+    } else {
+      var y = Px.d3.scaleLinear().nice().range(range);
+      y._scaleType = "linear";
+      this.set('y', y);
+    }
+  },
+
+  _recreateScales: function() {
+
+    if(this.x) {
+      this._setXScale(this._radius, true);
+    }
+
+    if(this.y) {
+      this._setYScale(this._radius, this.centerOffset, true);
+    }
+  },
+
+  /**
+   * Find overall data max and min
+   *
+   */
+  _generateChartExtents: function() {
+    if(this.chartData && this.chartData.length > 0 && this.dimensions && this.dimensions.length > 0) {
+      var ext = {
+            "x": (this.chartExtents && this.chartExtents.x) ? this.chartExtents.x : this.dimensions,
+            "y": null
+          },
+          min = Infinity,
+          max = -Infinity,
+          doMin = true,
+          doMax = true;
+
+      if(this.chartExtents && this.chartExtents.y && this.chartExtents.y.length === 2) {
+        min = this.chartExtents.y[0] === 'dynamic' ? Infinity : this.chartExtents.y[0];
+        max = this.chartExtents.y[1] === 'dynamic' ? -Infinity : this.chartExtents.y[1];
+
+        doMin = min === Infinity ? true : false;
+        doMax = max === -Infinity ? true : false;
+      }
+
+      if(doMin || doMax) {
+        // go through all data and find min and max
+        for(var i = 0; i < this.dimensions.length; i++) {
+          for(var j = 0; j < this.chartData.length; j++) {
+            if(this._isValidData(this.chartData[j][this.dimensions[i]]) && (!this.hardMute || !this._combinedMutedSeries[this.chartData[j][this.seriesKey]])) {
+              min = doMin ? Math.min(min, this.chartData[j][this.dimensions[i]]) : min;
+              max = doMax ? Math.max(max, this.chartData[j][this.dimensions[i]]) : max;
+            }
+          }
+        }
+      }
+
+      // if all data is the same value, add 1 so we still get a range
+      if(min === max){
+        max += 1;
+      }
+
+      ext.y = [min,max];
+
+      this.set('_calculatedExtents',ext);
+    }
+  },
+
+  /**
+   * Calculates and Sets the x and y domain after data loads
+   *
+   * https://github.com/mbostock/d3/wiki/API-Reference
+   *
+   * @method _setDomain
+   */
+    _setDomain: function() {
+    this.debounce('_setDomain', function() {
+      // check to make sure there is data
+      if(this._doesObjHaveValues(this.x) && this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this._calculatedExtents)){
+
+        var exts = this._calculatedExtents;
+
+        this.x.domain(exts.x);
+        this.y.domain(exts.y);
+
+        // Set the domains
+        this.set('domainChanged', this.domainChanged + 1);
+
+      }
+    }.bind(this), 10);
+  },
+
+  /**
+   * When the domain gets set via a user interaction, set the scale function to use the new domain
+   *
+   * @method _updateDomain
+   */
+  _updateDomain: function(axesDomain) {
+    if(this.y) {
+      this.y.domain(axesDomain.value);
+      this.set('domainChanged', this.domainChanged + 1);
+    }
+  },
+
+  /**
+   * Gets pixel values for data value relating to an axis. data is a number
+   * if margin is specified it will use those to adjust the pixel values
+   * instead of the normal `margin` property
+   */
+   getPixelFromData: function(data, axis, margin) {
+    var x,
+        y,
+        marg = margin ? margin : this.margin,
+        oob = false;
+
+    if(data > this.y.domain()[1] || data < this.y.domain()[0]) {
+      oob = true;
+    }
+
+    x = this.y(data) * Math.sin(this.x(axis)) + this._extendedCenter[0];
+    y = this.y(data) * Math.cos(Math.PI - this.x(axis)) + this._smallerSide/2 + marg.top;
+
+    return {
+      'pixel': [x, y],
+      'outOfBounds': oob
+    };
+  },
+
+  /**
+   * Gets data value for pixel value relating to an axis. Pixel val is a
+   * Y pixel value relating to an axis.
+   * It returns an array with the axis and the value: [axis, value]
+   * please note that the values returned have no guarantee to match any
+   * actual chart data, this is just a conversion based on pixel
+   */
+  getDataFromPixel: function(pixelVal, axis) {
+    return [axis, this.y.invert(pixelVal[1])];
+  },
+
+  _pixelRequest: function(evt) {
+    var res = this.getPixelFromData(evt.detail.data[1], evt.detail.series, evt.detail.margin);
+    evt.detail.callback(res);
+  }
+},
+  PxVisBehavior.commonMethods,
+  PxVisBehavior.dataset,
+  PxVisBehaviorD3.axes,
+  PxVisBehavior.sizing,
+  PxVisBehavior.chartExtents,
+  PxVisBehaviorD3.radialAxisConfig,
+  PxVisBehaviorD3.domainUpdate,
+  PxVisBehaviorD3.selectedDomain,
+  PxVisBehavior.mutedSeries
+];

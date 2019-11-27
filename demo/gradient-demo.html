@@ -23,211 +23,193 @@ limitations under the License.
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>gradient Demo</title>
     <!-- Requires Webcomponents.js polyfill is provided by the page for browsers that don't support html imports -->
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
 
-    <link rel="import" href="../../px-theme/px-theme-styles.html">
+    <script type="module" src="../../px-theme/px-theme-styles.js"></script>
     <!-- <link rel="import" href="../px-dark-theme/px-dark-theme-styles.html"> -->
 
-    <custom-style>
+    <!-- FIXME(polymer-modulizer):
+        These imperative modules that innerHTML your HTML are
+        a hacky way to be sure that any mixins in included style
+        modules are ready before any elements that reference them are
+        instantiated, otherwise the CSS @apply mixin polyfill won't be
+        able to expand the underlying CSS custom properties.
+        See: https://github.com/Polymer/polymer-modulizer/issues/154
+        -->
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<custom-style>
       <style include="px-theme-styles" is="custom-style"></style>
-    </custom-style>
+    </custom-style>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
 
     <!-- Import custom element. Note: see comment about relative paths to dependencies in the *.html file referenced below -->
-    <link rel="import" href="../../promise-polyfill/promise-polyfill-lite.html">
-    <link rel="import" href="../../iron-ajax/iron-ajax.html"/>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<link rel="import" href="../../promise-polyfill/promise-polyfill-lite.html">`;
+document.body.appendChild($_documentContainer.content);
+</script>lite.js"></script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<link rel="import" href="../../iron-ajax/iron-ajax.html">`;
+document.body.appendChild($_documentContainer.content);
+</script>jax.js"></script>
 
-    <link rel="import" href="../px-vis-chart-navigator.html" />
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<link rel="import" href="../px-vis-chart-navigator.html">`;
+document.body.appendChild($_documentContainer.content);
+</script>script>
   </head>
 
   <!-- <body style="padding:30px; background-color: rgb(27,42,51);"> -->
   <body>
 
-    <h3>Gradient</h3>
-    <dom-bind>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h3>Gradient</h3>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
 
       <h1>No gradient</h1>
       <div style="height:100px">
-        <px-vis-chart-navigator
-            height="100"
-            x-axis-type="time"
-            y-axis-type="linear"
-            margin='{
-              "top": 5,
-              "right": 10,
-              "bottom": 20,
-              "left": 10
-            }'
-            chart-data='[{"x": 1397102460000,"y": 0.56},{"x": 1397139660000,"y": 0.4},{"x": 1397177400000,"y": 0.43},{"x": 1397228040000,"y": 0.33},{"x": 1397248260000,"y": 0.47},{"x": 1397291280000,"y": 0.41},{"x": 1397318100000,"y": 0.26},{"x": 1397342100000,"y": 0.42},{"x": 1397390820000,"y": 0.27},{"x": 1397408100000,"y": 0.38},{"x": 1397458800000,"y": 0.36},{"x": 1397522940000,"y": 0.32}]'
-            include-all-series
-            chart-extents='{
-              "x": ["dynamic", "dynamic"],
-              "y": [0,1]
-            }'>
+        <px-vis-chart-navigator height="100" x-axis-type="time" y-axis-type="linear" margin="{
+              &quot;top&quot;: 5,
+              &quot;right&quot;: 10,
+              &quot;bottom&quot;: 20,
+              &quot;left&quot;: 10
+            }" chart-data="[{&quot;x&quot;: 1397102460000,&quot;y&quot;: 0.56},{&quot;x&quot;: 1397139660000,&quot;y&quot;: 0.4},{&quot;x&quot;: 1397177400000,&quot;y&quot;: 0.43},{&quot;x&quot;: 1397228040000,&quot;y&quot;: 0.33},{&quot;x&quot;: 1397248260000,&quot;y&quot;: 0.47},{&quot;x&quot;: 1397291280000,&quot;y&quot;: 0.41},{&quot;x&quot;: 1397318100000,&quot;y&quot;: 0.26},{&quot;x&quot;: 1397342100000,&quot;y&quot;: 0.42},{&quot;x&quot;: 1397390820000,&quot;y&quot;: 0.27},{&quot;x&quot;: 1397408100000,&quot;y&quot;: 0.38},{&quot;x&quot;: 1397458800000,&quot;y&quot;: 0.36},{&quot;x&quot;: 1397522940000,&quot;y&quot;: 0.32}]" include-all-series="" chart-extents="{
+              &quot;x&quot;: [&quot;dynamic&quot;, &quot;dynamic&quot;],
+              &quot;y&quot;: [0,1]
+            }">
           </px-vis-chart-navigator>
         </div>
 
       <h1>Linear red to blue</h1>
       <div style="height:100px">
-        <px-vis-chart-navigator
-            gradient-colors='["red", "blue"]'
-            gradient-overlay
-            height="100"
-            x-axis-type="time"
-            y-axis-type="linear"
-            margin='{
-              "top": 5,
-              "right": 10,
-              "bottom": 20,
-              "left": 10
-            }'
-            chart-data='[{"x": 1397102460000,"y": 0.56},{"x": 1397139660000,"y": 0.4},{"x": 1397177400000,"y": 0.43},{"x": 1397228040000,"y": 0.33},{"x": 1397248260000,"y": 0.47},{"x": 1397291280000,"y": 0.41},{"x": 1397318100000,"y": 0.26},{"x": 1397342100000,"y": 0.42},{"x": 1397390820000,"y": 0.27},{"x": 1397408100000,"y": 0.38},{"x": 1397458800000,"y": 0.36},{"x": 1397522940000,"y": 0.32}]'
-            include-all-series
-            chart-extents='{
-              "x": ["dynamic", "dynamic"],
-              "y": [0,1]
-            }'>
+        <px-vis-chart-navigator gradient-colors="[&quot;red&quot;, &quot;blue&quot;]" gradient-overlay="" height="100" x-axis-type="time" y-axis-type="linear" margin="{
+              &quot;top&quot;: 5,
+              &quot;right&quot;: 10,
+              &quot;bottom&quot;: 20,
+              &quot;left&quot;: 10
+            }" chart-data="[{&quot;x&quot;: 1397102460000,&quot;y&quot;: 0.56},{&quot;x&quot;: 1397139660000,&quot;y&quot;: 0.4},{&quot;x&quot;: 1397177400000,&quot;y&quot;: 0.43},{&quot;x&quot;: 1397228040000,&quot;y&quot;: 0.33},{&quot;x&quot;: 1397248260000,&quot;y&quot;: 0.47},{&quot;x&quot;: 1397291280000,&quot;y&quot;: 0.41},{&quot;x&quot;: 1397318100000,&quot;y&quot;: 0.26},{&quot;x&quot;: 1397342100000,&quot;y&quot;: 0.42},{&quot;x&quot;: 1397390820000,&quot;y&quot;: 0.27},{&quot;x&quot;: 1397408100000,&quot;y&quot;: 0.38},{&quot;x&quot;: 1397458800000,&quot;y&quot;: 0.36},{&quot;x&quot;: 1397522940000,&quot;y&quot;: 0.32}]" include-all-series="" chart-extents="{
+              &quot;x&quot;: [&quot;dynamic&quot;, &quot;dynamic&quot;],
+              &quot;y&quot;: [0,1]
+            }">
           </px-vis-chart-navigator>
         </div>
 
         <h1>Bucket function</h1>
         <div style="height:100px">
-          <px-vis-chart-navigator
-              id="bucket"
-              gradient-overlay
-              height="100"
-              x-axis-type="time"
-              y-axis-type="linear"
-              margin='{
-                "top": 5,
-                "right": 10,
-                "bottom": 20,
-                "left": 10
-              }'
-              chart-data='[{"x": 1397102460000,"y": 0.56},{"x": 1397139660000,"y": 0.4},{"x": 1397177400000,"y": 0.43},{"x": 1397228040000,"y": 0.33},{"x": 1397248260000,"y": 0.47},{"x": 1397291280000,"y": 0.41},{"x": 1397318100000,"y": 0.26},{"x": 1397342100000,"y": 0.42},{"x": 1397390820000,"y": 0.27},{"x": 1397408100000,"y": 0.38},{"x": 1397458800000,"y": 0.36},{"x": 1397522940000,"y": 0.32}]'
-              include-all-series
-              chart-extents='{
-                "x": ["dynamic", "dynamic"],
-                "y": [0,1]
-              }'>
+          <px-vis-chart-navigator id="bucket" gradient-overlay="" height="100" x-axis-type="time" y-axis-type="linear" margin="{
+                &quot;top&quot;: 5,
+                &quot;right&quot;: 10,
+                &quot;bottom&quot;: 20,
+                &quot;left&quot;: 10
+              }" chart-data="[{&quot;x&quot;: 1397102460000,&quot;y&quot;: 0.56},{&quot;x&quot;: 1397139660000,&quot;y&quot;: 0.4},{&quot;x&quot;: 1397177400000,&quot;y&quot;: 0.43},{&quot;x&quot;: 1397228040000,&quot;y&quot;: 0.33},{&quot;x&quot;: 1397248260000,&quot;y&quot;: 0.47},{&quot;x&quot;: 1397291280000,&quot;y&quot;: 0.41},{&quot;x&quot;: 1397318100000,&quot;y&quot;: 0.26},{&quot;x&quot;: 1397342100000,&quot;y&quot;: 0.42},{&quot;x&quot;: 1397390820000,&quot;y&quot;: 0.27},{&quot;x&quot;: 1397408100000,&quot;y&quot;: 0.38},{&quot;x&quot;: 1397458800000,&quot;y&quot;: 0.36},{&quot;x&quot;: 1397522940000,&quot;y&quot;: 0.32}]" include-all-series="" chart-extents="{
+                &quot;x&quot;: [&quot;dynamic&quot;, &quot;dynamic&quot;],
+                &quot;y&quot;: [0,1]
+              }">
             </px-vis-chart-navigator>
           </div>
 
           <h1>Bucket function with gradients</h1>
           <div style="height:100px">
-            <px-vis-chart-navigator
-                id="linearBucket"
-                gradient-overlay
-                height="100"
-                x-axis-type="time"
-                y-axis-type="linear"
-                margin='{
-                  "top": 5,
-                  "right": 10,
-                  "bottom": 20,
-                  "left": 10
-                }'
-                chart-data='[{"x": 1397102460000,"y": 0.56},{"x": 1397139660000,"y": 0.4},{"x": 1397177400000,"y": 0.43},{"x": 1397228040000,"y": 0.33},{"x": 1397248260000,"y": 0.47},{"x": 1397291280000,"y": 0.41},{"x": 1397318100000,"y": 0.26},{"x": 1397342100000,"y": 0.42},{"x": 1397390820000,"y": 0.27},{"x": 1397408100000,"y": 0.38},{"x": 1397458800000,"y": 0.36},{"x": 1397522940000,"y": 0.32}]'
-                include-all-series
-                chart-extents='{
-                  "x": ["dynamic", "dynamic"],
-                  "y": [0,1]
-                }'>
+            <px-vis-chart-navigator id="linearBucket" gradient-overlay="" height="100" x-axis-type="time" y-axis-type="linear" margin="{
+                  &quot;top&quot;: 5,
+                  &quot;right&quot;: 10,
+                  &quot;bottom&quot;: 20,
+                  &quot;left&quot;: 10
+                }" chart-data="[{&quot;x&quot;: 1397102460000,&quot;y&quot;: 0.56},{&quot;x&quot;: 1397139660000,&quot;y&quot;: 0.4},{&quot;x&quot;: 1397177400000,&quot;y&quot;: 0.43},{&quot;x&quot;: 1397228040000,&quot;y&quot;: 0.33},{&quot;x&quot;: 1397248260000,&quot;y&quot;: 0.47},{&quot;x&quot;: 1397291280000,&quot;y&quot;: 0.41},{&quot;x&quot;: 1397318100000,&quot;y&quot;: 0.26},{&quot;x&quot;: 1397342100000,&quot;y&quot;: 0.42},{&quot;x&quot;: 1397390820000,&quot;y&quot;: 0.27},{&quot;x&quot;: 1397408100000,&quot;y&quot;: 0.38},{&quot;x&quot;: 1397458800000,&quot;y&quot;: 0.36},{&quot;x&quot;: 1397522940000,&quot;y&quot;: 0.32}]" include-all-series="" chart-extents="{
+                  &quot;x&quot;: [&quot;dynamic&quot;, &quot;dynamic&quot;],
+                  &quot;y&quot;: [0,1]
+                }">
               </px-vis-chart-navigator>
             </div>
 
           <h1>Four colors</h1>
           <div style="height:100px">
-            <px-vis-chart-navigator
-                id="bucket"
-                gradient-overlay
-                gradient-colors='["blue", "green", "yellow", "red"]'
-                height="100"
-                x-axis-type="time"
-                y-axis-type="linear"
-                margin='{
-                  "top": 5,
-                  "right": 10,
-                  "bottom": 20,
-                  "left": 10
-                }'
-                chart-data='[{"x": 1397102460000,"y": 0.56},{"x": 1397139660000,"y": 0.4},{"x": 1397177400000,"y": 0.43},{"x": 1397228040000,"y": 0.33},{"x": 1397248260000,"y": 0.47},{"x": 1397291280000,"y": 0.41},{"x": 1397318100000,"y": 0.26},{"x": 1397342100000,"y": 0.42},{"x": 1397390820000,"y": 0.27},{"x": 1397408100000,"y": 0.38},{"x": 1397458800000,"y": 0.36},{"x": 1397522940000,"y": 0.32}]'
-                include-all-series
-                chart-extents='{
-                  "x": ["dynamic", "dynamic"],
-                  "y": [0,1]
-                }'>
+            <px-vis-chart-navigator id="bucket" gradient-overlay="" gradient-colors="[&quot;blue&quot;, &quot;green&quot;, &quot;yellow&quot;, &quot;red&quot;]" height="100" x-axis-type="time" y-axis-type="linear" margin="{
+                  &quot;top&quot;: 5,
+                  &quot;right&quot;: 10,
+                  &quot;bottom&quot;: 20,
+                  &quot;left&quot;: 10
+                }" chart-data="[{&quot;x&quot;: 1397102460000,&quot;y&quot;: 0.56},{&quot;x&quot;: 1397139660000,&quot;y&quot;: 0.4},{&quot;x&quot;: 1397177400000,&quot;y&quot;: 0.43},{&quot;x&quot;: 1397228040000,&quot;y&quot;: 0.33},{&quot;x&quot;: 1397248260000,&quot;y&quot;: 0.47},{&quot;x&quot;: 1397291280000,&quot;y&quot;: 0.41},{&quot;x&quot;: 1397318100000,&quot;y&quot;: 0.26},{&quot;x&quot;: 1397342100000,&quot;y&quot;: 0.42},{&quot;x&quot;: 1397390820000,&quot;y&quot;: 0.27},{&quot;x&quot;: 1397408100000,&quot;y&quot;: 0.38},{&quot;x&quot;: 1397458800000,&quot;y&quot;: 0.36},{&quot;x&quot;: 1397522940000,&quot;y&quot;: 0.32}]" include-all-series="" chart-extents="{
+                  &quot;x&quot;: [&quot;dynamic&quot;, &quot;dynamic&quot;],
+                  &quot;y&quot;: [0,1]
+                }">
               </px-vis-chart-navigator>
             </div>
 
             <h1>d3 predefined interpolate rainbow</h1>
             <div style="height:100px">
-              <px-vis-chart-navigator
-                  id="d3scale"
-                  gradient-overlay
-                  gradient-colors='["blue", "green", "red"]'
-                  height="100"
-                  x-axis-type="time"
-                  y-axis-type="linear"
-                  margin='{
-                    "top": 5,
-                    "right": 10,
-                    "bottom": 20,
-                    "left": 10
-                  }'
-                  chart-data='[{"x": 1397102460000,"y": 0.56},{"x": 1397139660000,"y": 0.4},{"x": 1397177400000,"y": 0.43},{"x": 1397228040000,"y": 0.33},{"x": 1397248260000,"y": 0.47},{"x": 1397291280000,"y": 0.41},{"x": 1397318100000,"y": 0.26},{"x": 1397342100000,"y": 0.42},{"x": 1397390820000,"y": 0.27},{"x": 1397408100000,"y": 0.38},{"x": 1397458800000,"y": 0.36},{"x": 1397522940000,"y": 0.32}]'
-                  include-all-series
-                  chart-extents='{
-                    "x": ["dynamic", "dynamic"],
-                    "y": [0,1]
-                  }'>
+              <px-vis-chart-navigator id="d3scale" gradient-overlay="" gradient-colors="[&quot;blue&quot;, &quot;green&quot;, &quot;red&quot;]" height="100" x-axis-type="time" y-axis-type="linear" margin="{
+                    &quot;top&quot;: 5,
+                    &quot;right&quot;: 10,
+                    &quot;bottom&quot;: 20,
+                    &quot;left&quot;: 10
+                  }" chart-data="[{&quot;x&quot;: 1397102460000,&quot;y&quot;: 0.56},{&quot;x&quot;: 1397139660000,&quot;y&quot;: 0.4},{&quot;x&quot;: 1397177400000,&quot;y&quot;: 0.43},{&quot;x&quot;: 1397228040000,&quot;y&quot;: 0.33},{&quot;x&quot;: 1397248260000,&quot;y&quot;: 0.47},{&quot;x&quot;: 1397291280000,&quot;y&quot;: 0.41},{&quot;x&quot;: 1397318100000,&quot;y&quot;: 0.26},{&quot;x&quot;: 1397342100000,&quot;y&quot;: 0.42},{&quot;x&quot;: 1397390820000,&quot;y&quot;: 0.27},{&quot;x&quot;: 1397408100000,&quot;y&quot;: 0.38},{&quot;x&quot;: 1397458800000,&quot;y&quot;: 0.36},{&quot;x&quot;: 1397522940000,&quot;y&quot;: 0.32}]" include-all-series="" chart-extents="{
+                    &quot;x&quot;: [&quot;dynamic&quot;, &quot;dynamic&quot;],
+                    &quot;y&quot;: [0,1]
+                  }">
                 </px-vis-chart-navigator>
               </div>
 
     </template>
-    </dom-bind>
+    </dom-bind>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
   </body>
-  <script>
-    document.addEventListener('WebComponentsReady', function() {
-      var bucket = document.getElementById('bucket'),
-          d3nav = document.getElementById('d3scale'),
-          linearBucket = document.getElementById('linearBucket');
+  <script type="module">
+import 'px-theme/px-theme-styles.js';
+import '@polymer/promise-polyfill/promise-polyfill-lite.js';
+import '@polymer/iron-ajax/iron-ajax.js';
+import '../px-vis-chart-navigator.js';
+var bucket = document.getElementById('bucket'),
+    d3nav = document.getElementById('d3scale'),
+    linearBucket = document.getElementById('linearBucket');
 
-      bucket.gradientColors = function(val) {
-        if(val < 0.1) {
+bucket.gradientColors = function(val) {
+  if(val < 0.1) {
 
-          return Px.d3.interpolateRgb('rgb(255, 195, 193)', 'rgb(244, 76, 70)')(val * 3);
+    return Px.d3.interpolateRgb('rgb(255, 195, 193)', 'rgb(244, 76, 70)')(val * 3);
 
-        } else if(val < 0.7) {
-          return Px.d3.interpolateRgb('rgb(0, 102, 0)', 'rgb(102, 255, 102)')((val - 0.1 ) *1.66);
-        } else {
-          return 'yellow';
-        }
-      };
+  } else if(val < 0.7) {
+    return Px.d3.interpolateRgb('rgb(0, 102, 0)', 'rgb(102, 255, 102)')((val - 0.1 ) *1.66);
+  } else {
+    return 'yellow';
+  }
+};
 
-      linearBucket.gradientColors = function(val) {
+linearBucket.gradientColors = function(val) {
 
-        //re normalize value for a bucket so that it's between 0 and 1 to take advantage of the full range of the gradient
-        normalizeVal = function(val, min, max) {
-          return (val - min) * 1/(max - min);
-        }
+  //re normalize value for a bucket so that it's between 0 and 1 to take advantage of the full range of the gradient
+  normalizeVal = function(val, min, max) {
+    return (val - min) * 1/(max - min);
+  }
 
-        if(val < 0.3) {
+  if(val < 0.3) {
 
-          return Px.d3.interpolateRgb('rgb(255, 179, 179)', 'rgb(230, 0, 0)')(normalizeVal(val, 0, 0.3));
-        } else if(val < 0.7) {
+    return Px.d3.interpolateRgb('rgb(255, 179, 179)', 'rgb(230, 0, 0)')(normalizeVal(val, 0, 0.3));
+  } else if(val < 0.7) {
 
-          return Px.d3.interpolateRgb('rgb(153, 255, 102)', 'rgb(0, 51, 0)')(normalizeVal(val, 0.3, 0.7));
-        } else {
+    return Px.d3.interpolateRgb('rgb(153, 255, 102)', 'rgb(0, 51, 0)')(normalizeVal(val, 0.3, 0.7));
+  } else {
 
-          return Px.d3.interpolateRgb('rgb(153, 194, 255)', 'rgb(0, 0, 128)')(normalizeVal(val, 0.7 ,1));
-        }
-      };
+    return Px.d3.interpolateRgb('rgb(153, 194, 255)', 'rgb(0, 0, 128)')(normalizeVal(val, 0.7 ,1));
+  }
+};
 
-      d3nav.gradientColors = d3.interpolateRainbow;
-
-    });
-
-  </script>
+d3nav.gradientColors = d3.interpolateRainbow;
+</script>
 
 </html>

@@ -15,22 +15,22 @@ limitations under the License.
 -->
 
 <!-- Common imports -->
-<link rel="import" href="../../polymer/polymer.html" />
-<link rel="import" href="../../px-icon-set/px-icon-set.html" />
+<script type="module" src="../../@polymer/polymer/polymer-legacy.js"></script>
+<script type="module" src="../../px-icon-set/px-icon-set.js"></script>
 
 <!-- Common demo imports -->
-<link rel="import" href="../../px-demo/px-demo-header.html" />
-<link rel="import" href="../../px-demo/px-demo-api-viewer.html" />
-<link rel="import" href="../../px-demo/px-demo-footer.html" />
-<link rel="import" href="../../px-demo/px-demo-props.html" />
-<link rel="import" href="../../px-demo/px-demo-configs.html" />
-<link rel="import" href="../../px-demo/px-demo-interactive.html" />
-<link rel="import" href="../../px-demo/px-demo-component-snippet.html" />
-<link rel="import" href="../../px-demo/px-demo-code-editor.html" />
+<script type="module" src="../../px-demo/px-demo-header.js"></script>
+<script type="module" src="../../px-demo/px-demo-api-viewer.js"></script>
+<script type="module" src="../../px-demo/px-demo-footer.js"></script>
+<script type="module" src="../../px-demo/px-demo-props.js"></script>
+<script type="module" src="../../px-demo/px-demo-configs.js"></script>
+<script type="module" src="../../px-demo/px-demo-interactive.js"></script>
+<script type="module" src="../../px-demo/px-demo-component-snippet.js"></script>
+<script type="module" src="../../px-demo/px-demo-code-editor.js"></script>
  
 
 <!-- Imports for this component -->
-<link rel="import" href="px-vis-register-demo-component.html">
+<script type="module" src="./px-vis-register-demo-component.js"></script>
 
 <!-- Demo DOM module -->
 <dom-module id="px-vis-register-demo">
@@ -73,70 +73,82 @@ limitations under the License.
   </template>
 
 </dom-module>
-<script>
-  Polymer({
-    is: 'px-vis-register-demo',
-    properties: {
-      description: {
-        type: String,
-        value: "The register displays data from the chart on mouseover. There are two options, a horizontal version for placement above or below the chart, and a vertical version for placement to the right or left of the chart. It must be paired with px-vis-interaction-space, which provides the mouseover capabilities. Clicking on a series name on the register adds that series to the mutedSeries property. Series on the chart can listen to this property to toggle series on and off."
-      },
-      /**
-       * @property demoProps
-       * @type {Object}
-       */
-      props: {
-        type: Object,
-        value: function(){ return this.demoProps; }
-      },
+<script type="module">
+import '@polymer/polymer/polymer-legacy.js';
+import 'px-icon-set/px-icon-set.js';
+import 'px-demo/px-demo-header.js';
+import 'px-demo/px-demo-api-viewer.js';
+import 'px-demo/px-demo-footer.js';
+import 'px-demo/px-demo-props.js';
+import 'px-demo/px-demo-configs.js';
+import 'px-demo/px-demo-interactive.js';
+import 'px-demo/px-demo-component-snippet.js';
+import 'px-demo/px-demo-code-editor.js';
+import './px-vis-register-demo-component.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+Polymer({
+  is: 'px-vis-register-demo',
+  properties: {
+    description: {
+      type: String,
+      value: "The register displays data from the chart on mouseover. There are two options, a horizontal version for placement above or below the chart, and a vertical version for placement to the right or left of the chart. It must be paired with px-vis-interaction-space, which provides the mouseover capabilities. Clicking on a series name on the register adds that series to the mutedSeries property. Series on the chart can listen to this property to toggle series on and off."
+    },
+    /**
+     * @property demoProps
+     * @type {Object}
+     */
+    props: {
+      type: Object,
+      value: function(){ return this.demoProps; }
+    },
 
-      /**
-       * @property demoProps
-       * @type {Array}
-       */
-      configs: {
-        type: Array,
-        value: function(){
-          return [
-              {
-                configName: "Horizontal",
-                configReset: true,
-                configShowProps: []
-              },
-              {
-                configName: "Vertical",
-                type: "vertical",
-                configShowProps: []
-              }
-          ];
-        },
+    /**
+     * @property demoProps
+     * @type {Array}
+     */
+    configs: {
+      type: Array,
+      value: function(){
+        return [
+            {
+              configName: "Horizontal",
+              configReset: true,
+              configShowProps: []
+            },
+            {
+              configName: "Vertical",
+              type: "vertical",
+              configShowProps: []
+            }
+        ];
       },
     },
-    demoProps: {
-      width:{
-				defaultValue:"[[width]]"
-			},
-      height:{
-				defaultValue:"[[height]]"
-			},
-      units:{
-				defaultValue:"Hz"
-			},
-      type:{
-				defaultValue:"horizontal"
-			},
-      completeSeriesConfig:{
-				defaultValue:"[[seriesConfig]]"
-			},
-      tooltipData:{
-				defaultValue:"[[tooltipData]]"
-			},
-      mutedSeries:{
-				defaultValue:"[[mutedSeries]]"
-			},
-      xAxisType:{
-				defaultValue:"time"
-      }
+  },
+  demoProps: {
+    width:{
+              defaultValue:"[[width]]"
+          },
+    height:{
+              defaultValue:"[[height]]"
+          },
+    units:{
+              defaultValue:"Hz"
+          },
+    type:{
+              defaultValue:"horizontal"
+          },
+    completeSeriesConfig:{
+              defaultValue:"[[seriesConfig]]"
+          },
+    tooltipData:{
+              defaultValue:"[[tooltipData]]"
+          },
+    mutedSeries:{
+              defaultValue:"[[mutedSeries]]"
+          },
+    xAxisType:{
+              defaultValue:"time"
     }
-  });
+  }
+});
 </script>

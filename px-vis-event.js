@@ -1,0 +1,498 @@
+/*
+Copyright (c) 2018, General Electric
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/**
+
+### Usage
+
+    <px-vis-event
+        svg="[[svg]]"
+        x-axis-type="[[xAxisType]]"
+        clip-path="[[clipPath]]"
+        event-id="[[item.id]]"
+        chart-data="[[item]]"
+        x="[[x]]"
+        y="[[y]]"
+        event-config="[[eventConfig]]">
+    </px-vis-event>
+
+The configuration object allows developers to set the icon used for each event type.
+
+It should follow this form:
+
+    eventConfig = {
+      "Event Name 1":{
+        "color": "blue",
+        "icon": "px-fea:deployments",
+        "type": "px",
+        "offset":[0,0]
+      },
+      "Event Name 2":{
+        "color": "green",
+        "icon": "px-nav:favorite",
+        "type": "px",
+        "offset":[0,0],
+        "lineWeight": 0
+      },
+      "Event Name 3":{
+        "icon": "Dancing_banana.gif",
+        "type": "image",
+        "offset":[-2,-20],
+        "size":"25"
+      }
+    }
+
+### Styling
+The following custom properties are available for styling:
+
+Custom property | Description
+:----------------|:-------------
+  `--px-vis-event-line-color` | The default color for the vertical lines below the icon
+  `--px-vis-event-icon-color` | The default color for the event icon markers
+
+@element px-vis-event
+@blurb d3 element which draws a line and icon on the chart representing an event.
+@homepage index.html
+@demo demo.html
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+import '@polymer/polymer/polymer-legacy.js';
+
+import './px-vis-behavior-common.js';
+import './px-vis-behavior-d3.js';
+import './px-vis-behavior-datetime.js';
+import 'px-icon-set/px-icon-set.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+import { html } from '@polymer/polymer/lib/utils/html-tag.js';
+Polymer({
+  _template: html`
+
+`,
+
+  is: 'px-vis-event',
+
+  behaviors: [
+    PxVisBehavior.observerCheck,
+    PxVisBehaviorD3.svg,
+    PxVisBehaviorD3.axes,
+    PxVisBehavior.sizing,
+    PxVisBehavior.axisTypes,
+    PxVisBehaviorD3.clipPath,
+    PxVisBehavior.commonMethods,
+    PxVisBehavior.events,
+    PxVisBehaviorD3.domainUpdate,
+    PxVisBehaviorD3.icons,
+    PxVisBehavior.updateStylesOverride,
+    PxVisBehavior.scaleTypeCheck
+  ],
+
+  /**
+   * Properties block, expose attribute values to the DOM via 'reflect'
+   *
+   * @property properties
+   * @type Object
+   */
+  properties: {
+
+    /**
+     * Holder object for the event svg "g" element.
+     *
+     * @property eventGroup
+     * @type Object
+     */
+    eventGroup:{
+      type:Object,
+      value: () => { return {}; }
+    },
+    /**
+     * Tracks if the event configuration has been edited.
+     *
+     */
+    _eventConfigChanged: {
+      type: Boolean,
+      value: false
+    },
+
+    _eventDrawn: {
+      type: Boolean,
+      value: false
+    },
+
+    /**
+     * Default defaultEventConfig
+     *
+     *```
+    * Default: {
+    *   'color': 'rgb(0,0,0)',
+    *   'icon': 'px-utl:information',
+    *   'type': 'px',
+    *   'offset': 0,
+    *   'size': 16,
+    *   'lineColor': 'rgb(0,0,0)',
+    *   'lineWeight': 1,
+    *   'enableTooltip': true,
+    *   'firstDateTimeFormat': 'HH:mm:ss ZZ',
+    *   'secondDateTimeFormat': 'DD MMM YYYY',
+    *   'separator': '|',
+    *   'timezone': 'utc',
+    *   'tooltipOrientation': 'left'
+    *   'dataKey': 'time'
+    * }
+    *```
+    *
+    */
+    _defaultDefaultEventConfig: {
+      type: Object,
+      value: () => {
+        return {
+          'color': 'rgb(0,0,0)',
+          'icon': 'px-utl:information',
+          'type': 'px',
+          'offset': [0,0],
+          'size': 16,
+          'lineColor': 'rgb(0,0,0)',
+          'lineWeight': 1,
+          'enableTooltip': true,
+          'firstDateTimeFormat': 'HH:mm:ss ZZ',
+          'secondDateTimeFormat': 'DD MMM YYYY',
+          'separator': '|',
+          'timezone': 'utc',
+          'tooltipOrientation': 'left',
+          'dataKey': 'time'
+        };
+      }
+    },
+
+    _iconInfo: {
+      type: Object,
+      value: () => { return {}; }
+    }
+  },
+
+  observers: [
+    'drawElement(svg, eventData.*, height, _stylesUpdated, domainChanged)',
+    '_eventConfigUpdated(eventConfig.*)',
+    '_eventConfigUpdated(defaultEventConfig.*)',
+    '_addClipPath(clipPath)'
+   ],
+
+  detached: function() {
+    this._eventDrawn = false;
+
+    if(this.eventGroup && this._doesD3HaveValues(this.eventGroup)) {
+      this.eventGroup.remove();
+      this.eventGroup = null;
+    }
+  },
+
+  ready: function() {
+    window.requestAnimationFrame(function() {
+      this.updateStyles();
+    }.bind(this));
+    this._iconCallbackQueue = [this._forceIconRedraw];
+  },
+
+  _getConfigValue: function(key, eventType, theme) {
+    if(this.eventConfig && this.eventConfig[eventType] && this.eventConfig[eventType][key]) {
+      return this.eventConfig[eventType][key];
+    }
+
+    if(theme) {
+      return this._getDefaultValueOrTheme(key, theme);
+    }
+
+    return this._getDefaultValue(key);
+  },
+
+  _getDefaultValue: function(key) {
+    return this.defaultEventConfig && this.defaultEventConfig[key] ? this.defaultEventConfig[key] : this._defaultDefaultEventConfig[key];
+  },
+
+  _getDefaultValueOrTheme: function(key, theme) {
+    return this.defaultEventConfig && this.defaultEventConfig[key] ? this.defaultEventConfig[key] : this._checkThemeVariable(theme, this._defaultDefaultEventConfig[key]);
+  },
+
+  _eventConfigUpdated: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    if(!this._eventDrawn) {
+      return;
+    }
+
+    this._forceIconRedraw();
+  },
+
+  _forceIconRedraw: function() {
+    this._eventConfigChanged = true;
+    this.drawElement();
+  },
+
+  drawElement: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    if(this.drawDebounceTime > 0) {
+      this.debounce('_drawEvents', function() {
+        this._drawElementDebounced();
+      }, this.drawDebounceTime);
+    } else {
+      this._drawElementDebounced();
+    }
+  },
+
+  /**
+  * Draws or updates the event element.
+  * Called from an observer watching for data and the necessary d3 objects.
+  *
+  * @method drawElement
+  */
+  _drawElementDebounced: function() {
+    if(!this.svg ||
+        !this.domainChanged) {
+      return;
+    }
+
+    let _this = this;
+
+    if(this._isD3Empty(this.eventGroup)) {
+      this.eventGroup = this.svg.append('g')
+        .attr('class', 'events')
+        .attr('pointer-events', 'all');
+
+      this._addClipPath();
+    }
+
+    this._eventBuilder = this.eventGroup.selectAll('g.event')
+      .data(this.eventData, function(d) { return d.id });
+
+    this._eventBuilder.exit().remove();
+
+    this._eventBuilder
+      .enter()
+        .append('g')
+        .attr('class', 'event')
+        .attr('event-id',function(d) { return d.id })
+        .each(function(d,i) {
+          _this._enterLine(d, i, this);
+          _this._enterIcon(d, i, this);
+        })
+      .merge(this._eventBuilder)
+        .each(function(d,i) {
+          // since the config controls the type of icon (image vs svg) we append, we cannot just rely on d3 updating. Have to remove and reappend the correct icon type
+          if(_this._eventConfigChanged) {
+            Px.d3.select(this).select('.event-icon').remove();
+            _this._enterIcon(d, i, this);
+          }
+
+          _this._mergeLine(d, i, this);
+          _this._mergeIcon(d, i, this);
+        });
+
+    this._eventConfigChanged = false;
+    this._eventDrawn = true;
+
+    this.dispatchEvent(new CustomEvent('px-vis-event-rendering-ended', { bubbles: true, composed: true}));
+  },
+
+  _enterLine: function(d, i, elem) {
+    Px.d3.select(elem).append("line")
+      .attr('class', 'event-line');
+  },
+
+  _enterIcon: function(d, i, elem) {
+    const iconType = this._getConfigValue('type', d.label, false);
+    let iconSvg;
+
+    if(iconType === 'image') {
+      iconSvg = Px.d3.select(elem).append("image")
+        .attr('class', 'event-icon')
+        .attr("xlink:href", this._getConfigValue('icon', d.label, false))
+        .attr("width", this._getConfigValue('size', d.label, false) + 'px')
+        .attr("height", this._getConfigValue('size', d.label, false) + 'px')
+        .style("cursor","pointer");
+
+    } else {
+      iconSvg = Px.d3.select(elem).append("g")
+        .attr('class', 'event-icon')
+        .style("cursor","pointer");
+
+      const iconName = this._getConfigValue('icon', d.label, false);
+      const size = this._getConfigValue('size', d.label, false);
+
+      if(!this._iconInfo[iconName]) {
+        this._iconInfo[iconName] = this._getPxIcon(iconName, size, 'px-utl', 'information');
+
+        if(!this._iconInfo[iconName]) {
+          // error messages and handling are in _getPxIcon
+          return;
+        }
+      }
+
+      const icon = iconSvg.node().appendChild(this._iconInfo[iconName].icon.cloneNode(true));
+
+      Px.d3.select(icon)
+        .attr('fill', 'transparent')
+        .attr('stroke', this._getConfigValue('color', d.label, "--px-vis-event-icon-color"))
+        .style("cursor","pointer");
+    }
+
+    iconSvg
+      .on('mouseenter', this._requestTooltip.bind(this,d,i,iconSvg.node()))
+      .on('mouseleave', this._clearTooltipRequest.bind(this,d,i));
+  },
+
+  _mergeLine: function(d, i, elem) {
+    const key = this._getConfigValue('dataKey', d.label, false);
+
+    if(!d[key]) {
+      return;
+    }
+
+    Px.d3.select(elem).select("line.event-line")
+      .attr('stroke', this._getConfigValue('lineColor', d.label, "--px-vis-event-line-color"))
+      .attr('stroke-width', this._getConfigValue('lineWeight', d.label, false))
+      .attr("x1", this.x(d[key]))
+      .attr("x2", this.x(d[key]))
+      .attr("y1", Math.max(this.height - this.margin.top, 0))
+      .attr("y2", 0);
+
+  },
+
+  _mergeIcon: function(d, i, elem) {
+    const key = this._getConfigValue('dataKey', d.label, false);
+
+    if(!d[key]) {
+      return;
+    }
+
+    const size = Number(this._getConfigValue('size', d.label, false));
+    const offset = this._getConfigValue('offset', d.label, false);
+    const type = this._getConfigValue('type', d.label, false);
+    const iconName = this._getConfigValue('icon', d.label, false);
+
+    const x = this.x(d[key]) - size/2 + offset[0];
+    const y0 = offset[1] - 5;
+    const y = type === "image" ? y0 : y0 - size;
+    const translate = `translate(${x},${y})`;
+    const scale = type === "image" ? '' : `scale(${this._iconInfo[iconName].scale})`;
+
+    Px.d3.select(elem).select('.event-icon')
+      .attr("transform", `${translate} ${scale}`);
+  },
+
+  /**
+   * Helper to call addClipPath with the element.
+   *
+   * @method _addClipPath
+   */
+  _addClipPath: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    this.addClipPath(this.eventGroup);
+  },
+
+  _requestTooltip: function(d,i, elem) {
+    if(!this._getConfigValue('enableTooltip', d.label, false)) {
+      return;
+    }
+
+    const detail = {
+      element: elem,
+      delay: 10,
+      tooltipType: this.is,
+      origin: this,
+      orientation: this._getConfigValue('tooltipOrientation', d.label, false),
+      data: [{
+        title: d.label,
+        data: this._getAllKeys(d)
+      }]
+    };
+
+    if(this._isTimeType(this.xAxisType)) {
+      detail.data[0].time = d[this._getConfigValue('dataKey', d.label, false)];
+    } else {
+      detail.data[0].data.push({
+        title: this._getConfigValue('dataKey', d.label, false),
+        value: d[this._getConfigValue('dataKey', d.label, false)],
+        type: 'number'
+      });
+    }
+
+    this.dispatchEvent(new CustomEvent('central-tooltip-display-request', { bubbles: true, composed: true, detail: detail }));
+
+  },
+
+  _getAllKeys: function(d) {
+    const arr = [];
+    Object.entries(d).forEach(([key,val]) => {
+      if(key !== this._getConfigValue('dataKey', d.label, false) && key !== 'label') {
+        arr.push({
+          title: key,
+          value: val
+        });
+      }
+    });
+
+    return arr;
+  },
+
+  _clearTooltipRequest: function(d,i) {
+    if(!this._getConfigValue('enableTooltip', d.label, false)) {
+      return;
+    }
+
+    this.dispatchEvent(new CustomEvent('central-tooltip-cancel-request', { bubbles: true, composed: true, detail: { origin: this } }));
+
+  },
+
+  /**
+   * Formats the datetime to match the custom format.
+   *
+   * @method _formatDatetime
+   */
+  _formatDatetime: function(time,format) {
+    return this.formatTimestamp(time, this.timezone, format);
+  },
+
+  /**
+   * Returns the title value to the tooltip.
+   *
+   */
+  _getValueTitle: function() {
+    return this._isTimeType(this.xAxisType) ? 'Timestamp' : 'X';
+  },
+
+  /**
+   * Returns the x value.
+   *
+   */
+  _getValue: function(xAxisType) {
+    if(this.xAxisType === 'time' || this.xAxisType === 'timeLocal') {
+      return ': ' + this._formatDatetime(this.eventData[this.xKey], this.firstDateTimeFormat) +
+        ' ' + this.separator + ' ' + this._formatDatetime(this.eventData[this.xKey], this.secondDateTimeFormat);
+    } else {
+      return ': ' + this.eventData[this.xKey];
+    }
+  }
+});

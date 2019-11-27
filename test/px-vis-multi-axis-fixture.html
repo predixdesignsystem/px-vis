@@ -22,32 +22,53 @@ limitations under the License.
     <title>Web Component Test : Fixture for px-vis-multi-axis</title>
 
     <!-- Requires Webcomponents.js polyfill is provided by the page for browsers that don't support html imports -->
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
     <!-- web-component-tester automatically provides local copy of brower.js below
          for any URL ending with "/web-component-tester/browser.js"
          when wct is run from the command line -->
-    <script src="../../web-component-tester/browser.js"></script>
-    <link rel="import" href="../px-vis-behavior-scale-multi-axis.html" />
-    <link rel="import" href="../px-vis-behavior-scale-radar.html" />
-    <link rel="import" href="../px-vis-svg.html" />
-    <link rel="import" href="../px-vis-multi-axis.html" />
-    <link rel="import" href="behaviors/px-colors-behavior.html" />
-    <link rel="import" href="../../polymer/lib/elements/dom-bind.html" />
+    <script src="../../wct-browser-legacy/browser.js"></script>
+    <script type="module" src="../px-vis-behavior-scale-multi-axis.js"></script>
+    <script type="module" src="../px-vis-behavior-scale-radar.js"></script>
+    <script type="module" src="../px-vis-svg.js"></script>
+    <script type="module" src="../px-vis-multi-axis.js"></script>
+    <script type="module" src="./behaviors/px-colors-behavior.js"></script>
+    <script type="module" src="../../@polymer/polymer/lib/elements/dom-bind.js"></script>
 
     <!-- Retain this link for px-theme.html -->
     <!-- px-theme is needed for WCT to run without errors -->
-    <link rel="import" href="../../px-theme/px-theme-styles.html">
+    <script type="module" src="../../px-theme/px-theme-styles.js"></script>
 
-    <custom-style>
+    <!-- FIXME(polymer-modulizer):
+        These imperative modules that innerHTML your HTML are
+        a hacky way to be sure that any mixins in included style
+        modules are ready before any elements that reference them are
+        instantiated, otherwise the CSS @apply mixin polyfill won't be
+        able to expand the underlying CSS custom properties.
+        See: https://github.com/Polymer/polymer-modulizer/issues/154
+        -->
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<custom-style>
     <style include="px-theme-styles" is="custom-style"></style>
-  </custom-style>
+  </custom-style>`;
 
-    <script src="px-vis-multi-axis-tests.js"></script>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script src="./px-vis-multi-axis-tests.js"></script>
   </head>
 
   <body>
-    <h3>Web Component Test : Fixture for px-vis-multi-axis</h3>
-    <div>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h3>Web Component Test : Fixture for px-vis-multi-axis</h3>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
       <script>
         document.addEventListener("WebComponentsReady", function() {
           Polymer({
@@ -61,7 +82,7 @@ limitations under the License.
             ]
           })
         });
-      </script>
+      &lt;/script>
       <script>
         document.addEventListener("WebComponentsReady", function() {
           Polymer({
@@ -76,103 +97,44 @@ limitations under the License.
             ]
           })
         });
-      </script>
+      &lt;/script>
       <dom-bind>
     <template is="dom-bind">
-        <px-vis-multi-scale
-          id="multiScale"
-          x="{{x}}"
-          y="{{y}}"
-          domain-changed="{{domainChanged}}">
+        <px-vis-multi-scale id="multiScale" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
         </px-vis-multi-scale>
-        <px-vis-svg
-          id="multiSVG"
-          svg="{{svg}}">
+        <px-vis-svg id="multiSVG" svg="{{svg}}">
         </px-vis-svg>
-        <px-vis-multi-axis
-          id="multiAxis"
-          svg="[[svg]]"
-          prevent-series-bar
-          title-location='[[titleLocation]]'
-          x="[[x]]"
-          y="[[y]]"
-          redraw-series="true"
-          stroke-width="2"
-          match-ticks
-          outer-tick-size="6"
-          label-type-size="10"
-          title-type-size="12"
-          displayed-values="{{displayedValues}}"
-          append-unit-in-title
-          domain-changed="[[domainChanged]]"
-          axis-groups="{{axisGroups}}">
+        <px-vis-multi-axis id="multiAxis" svg="[[svg]]" prevent-series-bar="" title-location="[[titleLocation]]" x="[[x]]" y="[[y]]" redraw-series="true" stroke-width="2" match-ticks="" outer-tick-size="6" label-type-size="10" title-type-size="12" displayed-values="{{displayedValues}}" append-unit-in-title="" domain-changed="[[domainChanged]]" axis-groups="{{axisGroups}}">
         </px-vis-multi-axis>
       </template>
     </dom-bind>
 
       <dom-bind>
     <template is="dom-bind">
-        <px-vis-multi-scale
-          id="multiScaleCommon"
-          x="{{x}}"
-          y="{{y}}"
-          domain-changed="{{domainChanged}}">
+        <px-vis-multi-scale id="multiScaleCommon" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
         </px-vis-multi-scale>
-        <px-vis-svg
-          id="multiSVGCommon"
-          svg="{{svg}}">
+        <px-vis-svg id="multiSVGCommon" svg="{{svg}}">
         </px-vis-svg>
-        <px-vis-multi-axis
-          id="multiAxisCommon"
-          svg="[[svg]]"
-          prevent-series-bar
-          title-location='[[titleLocation]]'
-          x="[[x]]"
-          y="[[y]]"
-          complete-series-config="{{completeSeriesConfig}}"
-          redraw-series="true"
-          stroke-width="2"
-          common-axis
-          grid-ticks="{{gridTicks}}"
-          grid-axis="{{gridAxis}}"
-          outer-tick-size="6"
-          label-type-size="10"
-          title-type-size="12"
-          displayed-values="{{displayedValues}}"
-          append-unit-in-title
-          domain-changed="[[domainChanged]]"
-          axis-groups="{{axisGroups}}">
+        <px-vis-multi-axis id="multiAxisCommon" svg="[[svg]]" prevent-series-bar="" title-location="[[titleLocation]]" x="[[x]]" y="[[y]]" complete-series-config="{{completeSeriesConfig}}" redraw-series="true" stroke-width="2" common-axis="" grid-ticks="{{gridTicks}}" grid-axis="{{gridAxis}}" outer-tick-size="6" label-type-size="10" title-type-size="12" displayed-values="{{displayedValues}}" append-unit-in-title="" domain-changed="[[domainChanged]]" axis-groups="{{axisGroups}}">
         </px-vis-multi-axis>
       </template>
     </dom-bind>
 
       <dom-bind>
     <template is="dom-bind">
-        <px-vis-multi-scale
-          id="noMatchScale"
-          axes="[[axes]]"
-          chart-data="[[chartData]]"
-          chart-extents="[[chartExtents]]"
-          x="{{x}}"
-          y="{{y}}"
-          domain-changed="{{domainChanged}}">
+        <px-vis-multi-scale id="noMatchScale" axes="[[axes]]" chart-data="[[chartData]]" chart-extents="[[chartExtents]]" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
         </px-vis-multi-scale>
-        <px-vis-svg
-          id="noMatchSVG"
-          svg="{{svg}}">
+        <px-vis-svg id="noMatchSVG" svg="{{svg}}">
         </px-vis-svg>
-        <px-vis-multi-axis
-          id="noMatchAxis"
-          svg="[[svg]]"
-          prevent-series-bar
-          title-location='[[titleLocation]]'
-          x="[[x]]"
-          y="[[y]]"
-          complete-series-config="{{completeSeriesConfig}}"
-          redraw-series="true"
-          stroke-width="2"
-          grid-ticks="{{gridTicks}}"
-          grid-axis="{{gridAxis}}"
+        <px-vis-multi-axis id="noMatchAxis" svg="[[svg]]" prevent-series-bar="" title-location="[[titleLocation]]" x="[[x]]" y="[[y]]" complete-series-config="{{completeSeriesConfig}}" redraw-series="true" stroke-width="2" grid-ticks="{{gridTicks}}" grid-axis="{{gridAxis}}" outer-tick-size="6" label-type-size="10" title-type-size="12" displayed-values="{{displayedValues}}" append-unit-in-title="" domain-changed="[[domainChanged]]" axis-groups="{{axisGroups}}">
+        </px-vis-multi-axis>
+      </template>
+    </dom-bind>
+
+      </div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>grid-axis="{{gridAxis}}"
           outer-tick-size="6"
           label-type-size="10"
           title-type-size="12"
@@ -185,43 +147,24 @@ limitations under the License.
     </dom-bind>
 
       </div>
-      <div>
+      <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
 
       <dom-bind>
     <template is="dom-bind">
-        <px-vis-radar-scale
-          id="radialScale"
-          radar
-          x="{{x}}"
-          y="{{y}}"
-          domain-changed="{{domainChanged}}">
+        <px-vis-radar-scale id="radialScale" radar="" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
         </px-vis-radar-scale>
-        <px-vis-svg
-          id="radialSVG"
-          svg="{{svg}}">
+        <px-vis-svg id="radialSVG" svg="{{svg}}">
         </px-vis-svg>
-        <px-vis-multi-axis
-          id="radialAxis"
-          prevent-series-bar
-          svg="[[svg]]"
-          x="[[x]]"
-          y="[[y]]"
-          domain-changed="[[domainChanged]]"
-          redraw-series="true"
-          stroke-width="2"
-          append-unit-in-title
-          radial
-          single-domain
-          label-position="inline"
-          label-one-axis
-          axis-color="grey4"
-          label-rotation="180"
-          brush-to-remove
-          title-type-size="15"
-          label-type-size="12">
+        <px-vis-multi-axis id="radialAxis" prevent-series-bar="" svg="[[svg]]" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]" redraw-series="true" stroke-width="2" append-unit-in-title="" radial="" single-domain="" label-position="inline" label-one-axis="" axis-color="grey4" label-rotation="180" brush-to-remove="" title-type-size="15" label-type-size="12">
         </px-vis-multi-axis>
       </template>
     </dom-bind>
-    </div>
+    </div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
   </body>
 </html>

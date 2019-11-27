@@ -1,0 +1,168 @@
+/*
+Copyright (c) 2018, General Electric
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/**
+
+### Usage
+
+    <px-vis-dynamic-menu
+      dynamic-menu-config="[[dynamicMenuConfig]]">
+    </px-vis-dynamic-menu>
+
+@element px-vis-dynamic-menu
+@blurb a configurable, dynamically built dropdown menu
+@homepage index.html
+@demo demo.html
+
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+import '@polymer/polymer/polymer-legacy.js';
+
+import '@polymer/iron-dropdown/iron-dropdown.js';
+import 'px-icon-set/px-icon-set.js';
+import 'px-icon-set/px-icon.js';
+import './px-vis-behavior-common.js';
+import './px-vis-behavior-d3.js';
+import './css/px-vis-dynamic-menu-styles.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+import { html } from '@polymer/polymer/lib/utils/html-tag.js';
+Polymer({
+  _template: html`
+    <style include="px-vis-dynamic-menu-styles"></style>
+
+    <button id="button" class="btn btn--bare--primary btn--icon" slot="dropdown-trigger" on-tap="_buttonClicked">
+      <px-icon icon="[[menuIcon]]" class="icon"></px-icon>
+    </button>
+    <iron-dropdown id="dropdown" opened="[[_opened]]" always-on-top="" no-animations="" dynamic-align="" allow-outside-scroll="" no-overlap="">
+      <div slot="dropdown-content" class="menu-wrapper">
+        <ul class="menu-list">
+          <template is="dom-repeat" items="{{dynamicMenuConfig}}">
+            <li class="menu-wrapper--item u-p--" on-tap="_clickItem" value="[[index]]">
+              <px-icon class="u-mr-- menu-icon" value="[[index]]" icon="[[item.icon]]"></px-icon>
+              <span>{{item.name}}</span>
+            </li>
+          </template>
+        </ul>
+      </div>
+    </iron-dropdown>
+`,
+
+  is: 'px-vis-dynamic-menu',
+
+  behaviors: [
+    PxVisBehavior.dynamicMenuConfig
+  ],
+
+  /**
+   * Properties block, expose attribute values to the DOM via 'reflect'
+   *
+   * @property properties
+   * @type Object
+   */
+  properties: {
+    menuIcon: {
+      type: String,
+      value: 'px-utl:app-settings'
+    },
+    /**
+     * Whether the menu is currently shown.
+     */
+    _shown: {
+      type: Boolean,
+      value: false
+    },
+    /**
+     * Whether the menu is currently opened.
+     */
+    _opened: {
+      type: Boolean,
+      value: false
+    },
+    /**
+     * Class to use when showing the element.
+     */
+    displayClass: {
+      type: String,
+      value: 'inline-block'
+    },
+    /**
+     * Data to be passed back out when running an item's action or firing the associated event.
+     */
+    additionalDetail: {
+      type: Object
+    }
+  },
+
+  attached: function() {
+    this.$.dropdown.set('positionTarget', this.$.button);
+  },
+
+  _buttonClicked: function() {
+    this.set('_opened', !this._opened);
+  },
+
+  _clickItem: function(evt) {
+
+    var target = evt.currentTarget,
+        item = this.dynamicMenuConfig[target.value];
+    //if a function has been defined for this entry then run it
+    if(item.action) {
+
+      var action = item.action;
+
+      //parse function if it's a string
+      if(typeof item.action === 'string') {
+        var fn = eval('var f = function() { return ' + action + ';}; f();');
+
+        item.action = fn;
+      }
+
+      //make sure we use a specific context if it exists
+      if(item.actionContext) {
+        var actionBound = item.action.bind(item.actionContext);
+        actionBound({
+            'menuItem': item,
+            'additionalDetail': this.additionalDetail
+        });
+      } else {
+
+        //use chart context
+        this.fire('px-vis-action-request', {
+          'function': item.action,
+          'data': {
+            'menuItem': item,
+            'additionalDetail': this.additionalDetail
+        }});
+      }
+    }
+
+    //fire an event if required
+    if(item.eventName) {
+
+      var detail = {};
+
+      //include context if it exists
+      detail.menuItem = item;
+      detail.additionalDetail = this.additionalDetail;
+
+      this.fire('px-vis-event-request', {'eventName': item.eventName, 'data': detail})
+    }
+    this.set('_opened', false);
+  }
+});

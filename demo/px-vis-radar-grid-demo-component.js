@@ -1,0 +1,196 @@
+/*
+Copyright (c) 2018, General Electric
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+import '@polymer/polymer/polymer-legacy.js';
+
+import '../px-vis-radar-grid.js';
+import '../px-vis-behavior-d3.js';
+import '../px-vis-behavior-scale-radar.js';
+import '../px-vis-svg.js';
+import '../px-vis-behavior-colors.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+import { html } from '@polymer/polymer/lib/utils/html-tag.js';
+Polymer({
+  _template: html`
+    <px-vis-radar-grid svg="[[svg]]" x="[[x]]" y="[[y]]" tick-values="[[drawnTickValues]]" dimensions="[[dimensions]]" margin="[[margin]]" domain-changed="[[domainChanged]]">
+    </px-vis-radar-grid>
+    <px-vis-svg id="svg" svg="{{svg}}" width="[[width]]" height="[[height]]" offset="[[offset]]">
+    </px-vis-svg>
+`,
+
+  is: 'px-vis-radar-grid-demo-component',
+
+  behaviors: [
+    PxVisBehaviorD3.axes,
+    PxVisBehaviorD3.domainUpdate,
+    PxVisBehaviorScale.radar
+  ],
+
+  properties: {
+    description: {
+      type: String,
+      value: "An element which draws polygonal grid lines."
+    },
+    radius:{
+      type: Number,
+      observer: 'setRadius'
+    },
+    _radius:{
+      type: Number,
+      value: 150
+    },
+    width:{
+      type: Number,
+      value: 400
+    },
+    height: {
+      type: Number,
+      value: 400
+    },
+    margin: {
+      type: Object,
+      value: function() {
+        return {top: 0, bottom: 0, right: 0, left: 0}
+      }
+    },
+    dimensions: {
+      type: Array,
+      value: function() { return ['a','b','c','d','e'] }
+    },
+    drawnTickValues: {
+      type: Array,
+      value: function() { return [0, 10, 20, 30,40,50] }
+    },
+    chartData: {
+      type: Array,
+      value: function() {
+        return [{
+          "TimeStamp":1465416480000,
+          "axis1":"1",
+          "axis2":"7",
+          "axis3":"6",
+          "axis4":"6",
+          "axis5":"7",
+          "category":"a"
+        },{
+          "TimeStamp":1465416540000,
+          "axis1":"3",
+          "axis2":"7",
+          "axis3":"7",
+          "axis4":"6",
+          "axis5":"6",
+          "category":"d"
+        },{
+          "TimeStamp":1465416600000,
+          "axis1":"4",
+          "axis2":"6",
+          "axis3":"7",
+          "axis4":"6",
+          "axis5":"7",
+          "category":"b"
+        },{
+          "TimeStamp":1465416660000,
+          "axis1":"6",
+          "axis2":"7",
+          "axis3":"7",
+          "axis4":"6",
+          "axis5":"6",
+          "category":"b"
+        },{
+          "TimeStamp":1465416720000,
+          "axis1":"8",
+          "axis2":"6",
+          "axis3":"6",
+          "axis4":"6",
+          "axis5":"7",
+          "category":"c"
+        },{
+          "TimeStamp":1465416780000,
+          "axis1":"9",
+          "axis2":"6",
+          "axis3":"8",
+          "axis4":"7",
+          "axis5":"8",
+          "category":"c"
+        },{
+          "TimeStamp":1465416840000,
+          "axis1":"10",
+          "axis2":"5",
+          "axis3":"7",
+          "axis4":"5",
+          "axis5":"6",
+          "category":"a"
+        },{
+          "TimeStamp":1465416900000,
+          "axis1":"7",
+          "axis2":"6",
+          "axis3":"7",
+          "axis4":"7",
+          "axis5":"7",
+          "category":"b"
+        },{
+          "TimeStamp":1465416960000,
+          "axis1":"5",
+          "axis2":"7",
+          "axis3":"6",
+          "axis4":"5",
+          "axis5":"6",
+          "category":"a"
+        },{
+          "TimeStamp":1465417020000,
+          "axis1":"2",
+          "axis2":"8",
+          "axis3":"6",
+          "axis4":"7",
+          "axis5":"6",
+          "category":"c"
+        }]
+      }
+    },
+    offset: {
+      type: Array,
+      value: function() { return [200,200] }
+    },
+    centerOffset: {
+      type: Number,
+      value: 50
+    },
+    chartExtents: {
+      type: Object,
+      value: function() {
+        return {
+          "x": ["a","b","c","d","e"],
+          "y": [0,50]
+        }
+      }
+    }
+  },
+
+  observers: [
+    '_setXScale(_radius)',
+    '_setYScale(_radius,centerOffset)',
+    '_generateChartExtents(chartExtents)',
+    '_setDomain(x, y, _calculatedExtents)'
+  ],
+
+  setRadius: function() {
+    this.set('_radius', this.radius);
+  }
+});

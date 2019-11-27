@@ -14,11 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-<link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="../px-tooltip/px-tooltip.html" />
-<link rel="import" href="px-vis-behavior-common.html" />
-<link rel="import" href="px-vis-behavior-d3.html" />
-<link rel="import" href="px-vis-scatter-canvas.html" />
+<script type="module" src="../@polymer/polymer/polymer-legacy.js"></script>
+<script type="module" src="../px-tooltip/px-tooltip.js"></script>
+<script type="module" src="./px-vis-behavior-common.js"></script>
+<script type="module" src="./px-vis-behavior-d3.js"></script>
+<script type="module" src="./px-vis-scatter-canvas.js"></script>
 
 <!--
 
@@ -83,671 +83,677 @@ limitations under the License.
     </template>
 </dom-module>
 
-<script>
-  Polymer({
+<script type="module">
+import '@polymer/polymer/polymer-legacy.js';
+import 'px-tooltip/px-tooltip.js';
+import './px-vis-behavior-common.js';
+import './px-vis-behavior-d3.js';
+import './px-vis-scatter-canvas.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+Polymer({
 
-    is: 'px-vis-markers',
+  is: 'px-vis-markers',
 
-    behaviors: [
-      PxVisBehavior.observerCheck,
-      PxVisBehavior.sizing,
-      PxVisBehaviorD3.canvasContext,
-      PxVisBehaviorD3.axes,
-      PxVisBehavior.dataset,
-      PxVisBehavior.commonMethods,
-      PxVisBehaviorD3.clipPath,
-      PxVisBehavior.dynamicConfigProperties,
-      PxVisBehavior.markers
-    ],
+  behaviors: [
+    PxVisBehavior.observerCheck,
+    PxVisBehavior.sizing,
+    PxVisBehaviorD3.canvasContext,
+    PxVisBehaviorD3.axes,
+    PxVisBehavior.dataset,
+    PxVisBehavior.commonMethods,
+    PxVisBehaviorD3.clipPath,
+    PxVisBehavior.dynamicConfigProperties,
+    PxVisBehavior.markers
+  ],
+
+  /**
+   * Properties block, expose attribute values to the DOM via 'reflect'
+   *
+   * @property properties
+   * @type Object
+   */
+  properties: {
+    _markerData: {
+      type:Object,
+      computed: '_computeMarkerData(markerData.*, _markerTypes.*)'
+    },
+
+    _markerConfig: {
+      type:Object,
+      computed: '_computeMarkerConfig(markerConfig.*)'
+    },
+
+    _markerTypes: {
+      type: Array
+    },
+
+    _topScale: {
+      type: Function
+    },
+
+    _bottomScale: {
+      type: Function
+    },
+
+    _topDomain: {
+      type: Number,
+      value: 0
+    },
+
+    _bottomDomain: {
+      type: Number,
+      value: 0
+    },
+
+    _canvas : {
+      type: Object,
+      computed: '_getCanvas(canvasContext)'
+    },
 
     /**
-     * Properties block, expose attribute values to the DOM via 'reflect'
-     *
-     * @property properties
-     * @type Object
+     * how close to a point the mouse has to be before we show a tooltip
      */
-    properties: {
-      _markerData: {
-        type:Object,
-        computed: '_computeMarkerData(markerData.*, _markerTypes.*)'
-      },
+    tooltipDetectionRadius: {
+      type: Number,
+      value: 20
+    },
 
-      _markerConfig: {
-        type:Object,
-        computed: '_computeMarkerConfig(markerConfig.*)'
-      },
+    _tooltipPosition: {
+      type: Array
+    },
 
-      _markerTypes: {
-        type: Array
-      },
+    _showTooltip: {
+      type: Boolean,
+      value: false
+    },
 
-      _topScale: {
-        type: Function
-      },
+    _lockTooltip: {
+      type: Boolean,
+      value: false
+    },
 
-      _bottomScale: {
-        type: Function
-      },
+    /*
+      * List of tooltips that can be displayed for current marker
+      */
+    _tooltipDataResult: {
+      type: Array
+    },
+    _isSearchingTooltip: {
+      type: Boolean,
+      value: false
+    },
 
-      _topDomain: {
-        type: Number,
-        value: 0
-      },
+    _tooltipShown: {
+      type: Boolean,
+      value: false
+    },
 
-      _bottomDomain: {
-        type: Number,
-        value: 0
-      },
-
-      _canvas : {
-        type: Object,
-        computed: '_getCanvas(canvasContext)'
-      },
-
-      /**
-       * how close to a point the mouse has to be before we show a tooltip
-       */
-      tooltipDetectionRadius: {
-        type: Number,
-        value: 20
-      },
-
-      _tooltipPosition: {
-        type: Array
-      },
-
-      _showTooltip: {
-        type: Boolean,
-        value: false
-      },
-
-      _lockTooltip: {
-        type: Boolean,
-        value: false
-      },
-
-      /*
-        * List of tooltips that can be displayed for current marker
-        */
-      _tooltipDataResult: {
-        type: Array
-      },
-      _isSearchingTooltip: {
-        type: Boolean,
-        value: false
-      },
-
-      _tooltipShown: {
-        type: Boolean,
-        value: false
-      },
-
-      _defaultMarkerConfig: {
-        type: Object,
-        readonly: true,
-        value: function() {
-          return {
-            'color': 'rgb(123,123,123)',
-            'markerStrokeOpacity': 0,
-            'markerSymbol': 'square',
-            'markerSize': 64,
-            'markerScale': 1,
-            'showTooltip': true,
-            'tooltipOrientation': 'top',
-            'priority': 0,
-            'row': 0,
-            'location': 'top'
-          };
-        }
-      }
-
-    }, //properties
-
-    observers: [
-      '_requestCanvasCreation(markerConfig, height, margin.*)',
-      '_createScales(height, margin.*, _markerTypes.*)',
-      '_redraw(domainChanged)'
-    ],
-
-    _computeMarkerConfig: function() {
-      if(this.hasUndefinedArguments(arguments)) {
-        return;
-      }
-
-      var types = Object.keys(this.markerConfig),
-          defaultKeys = Object.keys(this._defaultMarkerConfig),
-          type,
-          config = {};
-
-      for(var i=0; i < types.length; i++) {
-        type = types[i];
-        config[type] = {
-          x: 'x',
-          y: type
+    _defaultMarkerConfig: {
+      type: Object,
+      readonly: true,
+      value: function() {
+        return {
+          'color': 'rgb(123,123,123)',
+          'markerStrokeOpacity': 0,
+          'markerSymbol': 'square',
+          'markerSize': 64,
+          'markerScale': 1,
+          'showTooltip': true,
+          'tooltipOrientation': 'top',
+          'priority': 0,
+          'row': 0,
+          'location': 'top'
         };
-
-        //fill default if needed
-        for(var j=0; j<defaultKeys.length; j++) {
-          config[type][defaultKeys[j]] = (this.markerConfig[type][defaultKeys[j]] || this.markerConfig[type][defaultKeys[j]] === false || this.markerConfig[type][defaultKeys[j]] === 0) ? this.markerConfig[type][defaultKeys[j]] : this._defaultMarkerConfig[defaultKeys[j]];
-        }
-
-        config[type]['markerFillOpacity'] = this._getFillOpacity(this.markerConfig[type].markerFillOpacity, config[type]['markerFillOpacity']);
-
-      }
-
-      this.set('_markerTypes', types);
-
-      return config;
-    },
-
-    _getFillOpacity: function(fill,stroke) {
-      // if we have a fill, use it
-      if(fill) { return fill; }
-      // if we dont have a fill or stroke, set fill to 1
-      if(!stroke) { return 1}
-      // else, set to 0
-      return 0
-    },
-
-    _computeMarkerData: function() {
-      if(this.hasUndefinedArguments(arguments)) {
-        return;
-      }
-
-      if(this._lockTooltip) {
-        this._lockTooltip = false;
-        this._closeTooltip();
-      }
-
-      if(!this.markerData || this.markerData.length === 0) {
-        return [];
-      }
-
-      var data = this._prepDataObject(this._markerTypes),
-          type,
-          row,
-          time,
-          datapoint,
-          o;
-
-      for(var i=0; i<this.markerData.length; i++) {
-        time = this.markerData[i]['time'];
-        datapoint = this.markerData[i]['datapoint'];
-        type = this.markerData[i]['label'];
-        row = this.markerConfig && this.markerConfig[type] && this.markerConfig[type]['row'] ? this.markerConfig[type]['row'] : 0;
-
-        o = {};
-        o.x = datapoint || time;
-        o[type] = row;
-        o.originIndex = i;
-        if(!data[type]) {
-          data[type] = [];
-        }
-        data[type].push(o);
-      }
-
-      return data;
-    },
-
-    _prepDataObject: function(types) {
-      var data = {};
-
-      for(var i=0; i<types.length; i++) {
-        data[types[i]] = [];
-      }
-
-      return data;
-    },
-
-    _requestCanvasCreation: function() {
-      if(this.hasUndefinedArguments(arguments)) {
-        return;
-      }
-
-      this.set('canvasLayersConfig.markers', {
-        mouseevents: true,
-        height: this.height,
-        margin: { top: 0, bottom: 0, left: this.margin.left, right: this.margin.right }
-      });
-    },
-
-    _createScales: function() {
-      if(this.hasUndefinedArguments(arguments)) {
-        return;
-      }
-
-      this.debounce('createScalesMarker', function() {
-        this._createScalesDebounced();
-      }, 10);
-    },
-
-    _createScalesDebounced: function() {
-      var tH = this.margin.top,
-          bH = this.height - this.margin.bottom,
-          tRowSet = {},
-          bRowSet = {},
-          tRow,
-          bRow,
-		  row,
-          tScale,
-          bScale,
-          type;
-
-      for(var i=0; i<this._markerTypes.length; i++) {
-        type = this._markerTypes[i];
-        row = this.markerConfig[type]["row"];
-
-        if(this.markerConfig[type]['location'] === "bottom") {
-          bRowSet[row] = true;
-        } else {
-          tRowSet[row] = true;
-        }
-      }
-
-      bRow = Object.keys(bRowSet);
-      tRow = Object.keys(tRowSet);
-
-      bScale = Px.d3.scalePoint()
-        .range([bH, this.height])
-        .padding(0.5)
-        .domain(bRow);
-      tScale = Px.d3.scalePoint()
-        .range([0, tH])
-        .padding(0.5)
-        .domain(tRow);
-
-      this.set('_bottomScale', bScale);
-      this.set('_topScale', tScale);
-
-      this.set('_bottomDomain', this._bottomDomain + 1);
-      this.set('_topDomain', this._topDomain + 1);
-    },
-
-    _returnYScale: function(item) {
-      if(this.hasUndefinedArguments(arguments)) {
-        return;
-      }
-
-      if(this._topDomain && this._bottomDomain) {
-        return this.markerConfig[item]["location"] === "bottom" ? this._bottomScale : this._topScale;
-      }
-    },
-
-    _returnDomain: function(item) {
-      if(this.hasUndefinedArguments(arguments)) {
-        return;
-      }
-
-      if(this._topDomain && this._bottomDomain && this.domainChanged) {
-        return this.markerConfig[item]["location"] === "bottom" ? this._bottomDomain : this._topDomain;
-      }
-    },
-
-    _returnMarkerData: function(item) {
-      if(this.hasUndefinedArguments(arguments)) {
-        return;
-      }
-
-      return this._markerData[item];
-    },
-
-
-    _returnMargin: function() {
-      return { top: 0, bottom: 0, left: this.margin.left, right: this.margin.right };
-    },
-
-    _redraw: function() {
-      if(this.hasUndefinedArguments(arguments)) {
-        return;
-      }
-
-      if(this._topDomain && this._bottomDomain && this.domainChanged) {
-        this.set('_bottomDomain', this._bottomDomain + 1);
-        this.set('_topDomain', this._topDomain + 1);
-      }
-
-      //if tooltip is locked and we change the domain ensure we hide it
-      if(this._lockTooltip) {
-        this._lockTooltip = false;
-        this._closeTooltip();
-      }
-    },
-
-    _mouseMove: function(evt) {
-      var d3Event = {
-        mousePos: Px.d3.mouse(this._canvas),
-        pageX: Px.d3.event.pageX,
-        pageY: Px.d3.event.pageY
-      }
-
-      if(!this._isSearchingTooltip && this._topDomain) {
-        window.requestAnimationFrame(function() {
-
-          this._searchTooltip(d3Event);
-          this._isSearchingTooltip = false;
-        }.bind(this));
-
-        this._isSearchingTooltip = true;
-      }
-    },
-
-    _searchTooltip: function(d3Event) {
-      if(this._lockTooltip) {
-        return;
-      }
-
-      const mousePos = d3Event.mousePos;
-
-      // if not in the chart area
-      if(mousePos[0] <= this.margin.left || mousePos[0] >= (this.width - this.margin.right) || mousePos[1] <= 0) {
-        this._closeTooltip();
-        return;
-      }
-
-      //figure out which row we're hovering
-      const rowInfo = this._getRowInfoForMouse(mousePos);
-
-      // if not hovering a row
-      if(!(rowInfo.index || rowInfo.index === 0)) {
-        this._closeTooltip();
-        return;
-      }
-
-      //find all marker types for this row
-      const labels = this._findLabelsForRow(rowInfo.index);
-
-      // if no markers we want a tooltip on in that row
-      if(labels.length === 0) {
-        this._closeTooltip();
-        return;
-      }
-
-      let data = [];
-
-      //get data for all labels we're interested in
-      for(let i=0; i<labels.length; i++) {
-        if(this._markerData[labels[i]] && this._markerData[labels[i]].length) {
-          data = data.concat(this._markerData[labels[i]]);
-        }
-      }
-
-      // if there no longer is data
-      if(data.length === 0) {
-        this._closeTooltip();
-        return;
-      }
-
-      data.sort(function(a,b) {
-        return Px.d3.ascending(a.x, b.x);
-      });
-
-      //adjust mouse pos to get correct time
-      const adjustedMousePos = [mousePos[0] - this.margin.left, mousePos[1]];
-      //search for point on left and right
-      //bissect RIGHT in case we have a bunch of same timestamps
-      const bisect = Px.d3.bisector(function(d) {
-        return d.x;
-      }.bind(this)).right;
-      const maxDomain = this.x.domain()[1];
-      const minDomain = this.x.domain()[0];
-      const mouseTime = this.x.invert(adjustedMousePos[0]);
-
-      const right = bisect(data, mouseTime);
-      const left = Math.max(0, right ? right-1 : 0);
-      let indexChosen;
-
-      //decide which point to pick
-      if(!data[left] || data[left].x < minDomain) {
-        //out of bound on left
-        indexChosen = right;
-
-      } else if(!data[right] || data[right].x > maxDomain) {
-        //out of bound on right
-        indexChosen = left;
-
-      } else if(data[right] && (data[right].x - mouseTime) < (mouseTime - data[left].x)) {
-        //closer to right
-        indexChosen = right;
-
-      } else if(data[left]) {
-        //closer to left
-        indexChosen = left;
-      }
-
-      //check if we have additional points with same timestamp
-      const dataResult = this._createTooltipData(indexChosen, data);
-
-      if(!dataResult || dataResult.length === 0) {
-        this._closeTooltip();
-        return;
-      }
-
-      const detail = this._createStub(mousePos, dataResult[0], rowInfo, d3Event);
-
-      if(!detail) {
-        this._closeTooltip();
-        return;
-      }
-
-      detail.data = this._formatDataForTooltip(dataResult);
-
-      this._tooltipShown = true;
-      this.dispatchEvent(new CustomEvent('central-tooltip-display-request', { bubbles: true, composed: true, detail: detail }));
-
-    },
-
-    _createTooltipData: function(index, data) {
-      var result = [],
-          i=0,
-          currType = this._findMarkerType(data[index]),
-          newData = data[index];
-
-      //add result and then search for same timestamps
-      newData.priority = this._markerConfig[currType].priority;
-      result.push(newData);
-
-      //try right...
-      i=1;
-      while(data[index+i] && data[index].x === data[index+i].x) {
-        currType = this._findMarkerType(data[index+i]);
-        if(this._markerConfig[currType].showTooltip) {
-          newData = data[index+i];
-          newData.priority = this._markerConfig[currType].priority;
-          result.push(newData);
-        }
-        i++;
-      }
-
-      //try left
-      i=-1;
-      while(data[index+i] && data[index].x === data[index+i].x) {
-        currType = this._findMarkerType(data[index+i]);
-        if(this._markerConfig[currType].showTooltip) {
-          newData = data[index+i];
-          newData.priority = this._markerConfig[currType].priority;
-          result.push(newData);
-        }
-        i--;
-      }
-
-      result.sort(function(a, b) {
-        return Px.d3.descending(a.priority, b.priority);
-      });
-
-      return result;
-    },
-
-    _createStub: function(mousePos, dataResult, rowInfo, d3Event) {
-      const pixelResult = [];
-      const type = this._findMarkerType(dataResult);
-
-      if(!type || !this._markerConfig[type].showTooltip) {
-        return null;
-      }
-
-      pixelResult[0] = this.x(dataResult.x) + this.margin.left ;
-
-      //only show if we're close enough
-      if(Math.abs(pixelResult[0] - mousePos[0]) > this.tooltipDetectionRadius) {
-        return null;
-      }
-
-      //adjust pixel values to take canvas position into account
-      pixelResult[0] += (d3Event.pageX - mousePos[0]);
-      pixelResult[1] = d3Event.pageY - mousePos[1] + rowInfo.rowY;
-
-      return {
-        mouseCoords: pixelResult,
-        orientation: this._markerConfig[type].tooltipOrientation,
-        delay: 50,
-        tooltipType: this.is,
-        origin: this
-      };
-    },
-
-    _formatDataForTooltip: function(data) {
-      const formatted = [];
-      data.forEach((d) => {
-        formatted.push({
-          title: this.markerData[d.originIndex]['label'],
-          time: this.markerData[d.originIndex]['time'],
-          data: this._getAllKeys(this.markerData[d.originIndex])
-        });
-      });
-
-      return formatted;
-    },
-
-    _getAllKeys: function(d) {
-      const arr = [];
-      Object.entries(d).forEach(([key,val]) => {
-        if(key !== 'time' && key !== 'label' && key !== 'datapoint') {
-          arr.push({
-            title: key,
-            value: val
-          });
-        }
-      });
-
-      return arr;
-    },
-
-    _closeTooltip: function() {
-      if(!this._tooltipShown) {
-        return;
-      }
-
-      this._tooltipShown = false;
-      this.dispatchEvent(new CustomEvent('central-tooltip-cancel-request', { bubbles: true, composed: true, detail: { origin: this } }));
-    },
-
-
-    _findMarkerType: function(data) {
-      var type,
-          dataKey = Object.keys(data);
-
-      for(var i=0; i<dataKey.length; i++) {
-        if(this._markerTypes.indexOf(dataKey[i]) !== -1) {
-          type = dataKey[i];
-          break;
-        }
-      }
-
-      return type;
-    },
-
-    _mouseClick: function() {
-      if(this._tooltipShown) {
-
-        //prevent tooltip from closing or reallow it
-        this._lockTooltip = !this._lockTooltip;
-
-        const detail = {
-          is: this.is,
-          origin: this
-        }
-
-        if(this._lockTooltip) {
-          this.dispatchEvent(new CustomEvent('central-tooltip-lock-request', { bubbles: true, composed: true, detail: detail }));
-
-        } else {
-          this.dispatchEvent(new CustomEvent('central-tooltip-lock-cancel', { bubbles: true, composed: true, detail: detail }));
-
-          this._closeTooltip();
-        }
-      }
-    },
-
-    _mouseLeave: function() {
-      if(!this._lockTooltip) {
-        this._closeTooltip();
-      }
-    },
-
-    _getRowInfoForMouse: function(mousePos) {
-      var top = mousePos[1] <= this.margin.top ? true : false,
-            yStart,
-            scale,
-            domain,
-            availableSpace,
-            domainIndex = 0,
-            rowHeight,
-            rowY;
-
-        //init based on bottom or top rows
-        if(top) {
-          yStart = 0;
-          scale = this._topScale;
-          availableSpace = this.margin.top;
-        } else {
-          yStart = this.height - this.margin.bottom;
-          scale = this._bottomScale;
-          availableSpace = this.margin.bottom;
-        }
-        domain = scale.domain();
-
-        //find which row we're hovering
-        if(domain.length) {
-          rowHeight = availableSpace/domain.length;
-          domainIndex = Math.floor((mousePos[1] - yStart) / rowHeight);
-          rowY = yStart + (domainIndex + 0.5) * rowHeight;
-        } else {
-          rowY = yStart + availableSpace/2;
-        }
-
-        return {'index': domain[domainIndex], 'rowY': rowY};
-    },
-
-    _findLabelsForRow: function(rowIndex) {
-      const index = Number(rowIndex);
-      const result = [];
-
-      Object.entries(this._markerConfig).forEach(([key,conf]) => {
-        if(index === conf.row && conf.showTooltip) {
-          result.push(key);
-        }
-      });
-
-      return result;
-    },
-
-    _getCanvas: function() {
-      if(this.hasUndefinedArguments(arguments)) {
-        return;
-      }
-
-      if(this.canvasContext) {
-
-        if(this._canvas === undefined) {
-
-          //register handlers the first time
-          Px.d3.select(this.canvasContext.canvas).on('mousemove.markers', this._mouseMove.bind(this));
-          Px.d3.select(this.canvasContext.canvas).on('mousedown.markers', this._mouseClick.bind(this));
-          Px.d3.select(this.canvasContext.canvas).on('mouseleave.markers', this._mouseLeave.bind(this));
-        }
-
-        return this.canvasContext.canvas;
       }
     }
-  });
+
+  }, //properties
+
+  observers: [
+    '_requestCanvasCreation(markerConfig, height, margin.*)',
+    '_createScales(height, margin.*, _markerTypes.*)',
+    '_redraw(domainChanged)'
+  ],
+
+  _computeMarkerConfig: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    var types = Object.keys(this.markerConfig),
+        defaultKeys = Object.keys(this._defaultMarkerConfig),
+        type,
+        config = {};
+
+    for(var i=0; i < types.length; i++) {
+      type = types[i];
+      config[type] = {
+        x: 'x',
+        y: type
+      };
+
+      //fill default if needed
+      for(var j=0; j<defaultKeys.length; j++) {
+        config[type][defaultKeys[j]] = (this.markerConfig[type][defaultKeys[j]] || this.markerConfig[type][defaultKeys[j]] === false || this.markerConfig[type][defaultKeys[j]] === 0) ? this.markerConfig[type][defaultKeys[j]] : this._defaultMarkerConfig[defaultKeys[j]];
+      }
+
+      config[type]['markerFillOpacity'] = this._getFillOpacity(this.markerConfig[type].markerFillOpacity, config[type]['markerFillOpacity']);
+
+    }
+
+    this.set('_markerTypes', types);
+
+    return config;
+  },
+
+  _getFillOpacity: function(fill,stroke) {
+    // if we have a fill, use it
+    if(fill) { return fill; }
+    // if we dont have a fill or stroke, set fill to 1
+    if(!stroke) { return 1}
+    // else, set to 0
+    return 0
+  },
+
+  _computeMarkerData: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    if(this._lockTooltip) {
+      this._lockTooltip = false;
+      this._closeTooltip();
+    }
+
+    if(!this.markerData || this.markerData.length === 0) {
+      return [];
+    }
+
+    var data = this._prepDataObject(this._markerTypes),
+        type,
+        row,
+        time,
+        datapoint,
+        o;
+
+    for(var i=0; i<this.markerData.length; i++) {
+      time = this.markerData[i]['time'];
+      datapoint = this.markerData[i]['datapoint'];
+      type = this.markerData[i]['label'];
+      row = this.markerConfig && this.markerConfig[type] && this.markerConfig[type]['row'] ? this.markerConfig[type]['row'] : 0;
+
+      o = {};
+      o.x = datapoint || time;
+      o[type] = row;
+      o.originIndex = i;
+      if(!data[type]) {
+        data[type] = [];
+      }
+      data[type].push(o);
+    }
+
+    return data;
+  },
+
+  _prepDataObject: function(types) {
+    var data = {};
+
+    for(var i=0; i<types.length; i++) {
+      data[types[i]] = [];
+    }
+
+    return data;
+  },
+
+  _requestCanvasCreation: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    this.set('canvasLayersConfig.markers', {
+      mouseevents: true,
+      height: this.height,
+      margin: { top: 0, bottom: 0, left: this.margin.left, right: this.margin.right }
+    });
+  },
+
+  _createScales: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    this.debounce('createScalesMarker', function() {
+      this._createScalesDebounced();
+    }, 10);
+  },
+
+  _createScalesDebounced: function() {
+    var tH = this.margin.top,
+        bH = this.height - this.margin.bottom,
+        tRowSet = {},
+        bRowSet = {},
+        tRow,
+        bRow,
+        row,
+        tScale,
+        bScale,
+        type;
+
+    for(var i=0; i<this._markerTypes.length; i++) {
+      type = this._markerTypes[i];
+      row = this.markerConfig[type]["row"];
+
+      if(this.markerConfig[type]['location'] === "bottom") {
+        bRowSet[row] = true;
+      } else {
+        tRowSet[row] = true;
+      }
+    }
+
+    bRow = Object.keys(bRowSet);
+    tRow = Object.keys(tRowSet);
+
+    bScale = Px.d3.scalePoint()
+      .range([bH, this.height])
+      .padding(0.5)
+      .domain(bRow);
+    tScale = Px.d3.scalePoint()
+      .range([0, tH])
+      .padding(0.5)
+      .domain(tRow);
+
+    this.set('_bottomScale', bScale);
+    this.set('_topScale', tScale);
+
+    this.set('_bottomDomain', this._bottomDomain + 1);
+    this.set('_topDomain', this._topDomain + 1);
+  },
+
+  _returnYScale: function(item) {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    if(this._topDomain && this._bottomDomain) {
+      return this.markerConfig[item]["location"] === "bottom" ? this._bottomScale : this._topScale;
+    }
+  },
+
+  _returnDomain: function(item) {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    if(this._topDomain && this._bottomDomain && this.domainChanged) {
+      return this.markerConfig[item]["location"] === "bottom" ? this._bottomDomain : this._topDomain;
+    }
+  },
+
+  _returnMarkerData: function(item) {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    return this._markerData[item];
+  },
+
+
+  _returnMargin: function() {
+    return { top: 0, bottom: 0, left: this.margin.left, right: this.margin.right };
+  },
+
+  _redraw: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    if(this._topDomain && this._bottomDomain && this.domainChanged) {
+      this.set('_bottomDomain', this._bottomDomain + 1);
+      this.set('_topDomain', this._topDomain + 1);
+    }
+
+    //if tooltip is locked and we change the domain ensure we hide it
+    if(this._lockTooltip) {
+      this._lockTooltip = false;
+      this._closeTooltip();
+    }
+  },
+
+  _mouseMove: function(evt) {
+    var d3Event = {
+      mousePos: Px.d3.mouse(this._canvas),
+      pageX: Px.d3.event.pageX,
+      pageY: Px.d3.event.pageY
+    }
+
+    if(!this._isSearchingTooltip && this._topDomain) {
+      window.requestAnimationFrame(function() {
+
+        this._searchTooltip(d3Event);
+        this._isSearchingTooltip = false;
+      }.bind(this));
+
+      this._isSearchingTooltip = true;
+    }
+  },
+
+  _searchTooltip: function(d3Event) {
+    if(this._lockTooltip) {
+      return;
+    }
+
+    const mousePos = d3Event.mousePos;
+
+    // if not in the chart area
+    if(mousePos[0] <= this.margin.left || mousePos[0] >= (this.width - this.margin.right) || mousePos[1] <= 0) {
+      this._closeTooltip();
+      return;
+    }
+
+    //figure out which row we're hovering
+    const rowInfo = this._getRowInfoForMouse(mousePos);
+
+    // if not hovering a row
+    if(!(rowInfo.index || rowInfo.index === 0)) {
+      this._closeTooltip();
+      return;
+    }
+
+    //find all marker types for this row
+    const labels = this._findLabelsForRow(rowInfo.index);
+
+    // if no markers we want a tooltip on in that row
+    if(labels.length === 0) {
+      this._closeTooltip();
+      return;
+    }
+
+    let data = [];
+
+    //get data for all labels we're interested in
+    for(let i=0; i<labels.length; i++) {
+      if(this._markerData[labels[i]] && this._markerData[labels[i]].length) {
+        data = data.concat(this._markerData[labels[i]]);
+      }
+    }
+
+    // if there no longer is data
+    if(data.length === 0) {
+      this._closeTooltip();
+      return;
+    }
+
+    data.sort(function(a,b) {
+      return Px.d3.ascending(a.x, b.x);
+    });
+
+    //adjust mouse pos to get correct time
+    const adjustedMousePos = [mousePos[0] - this.margin.left, mousePos[1]];
+    //search for point on left and right
+    //bissect RIGHT in case we have a bunch of same timestamps
+    const bisect = Px.d3.bisector(function(d) {
+      return d.x;
+    }.bind(this)).right;
+    const maxDomain = this.x.domain()[1];
+    const minDomain = this.x.domain()[0];
+    const mouseTime = this.x.invert(adjustedMousePos[0]);
+
+    const right = bisect(data, mouseTime);
+    const left = Math.max(0, right ? right-1 : 0);
+    let indexChosen;
+
+    //decide which point to pick
+    if(!data[left] || data[left].x < minDomain) {
+      //out of bound on left
+      indexChosen = right;
+
+    } else if(!data[right] || data[right].x > maxDomain) {
+      //out of bound on right
+      indexChosen = left;
+
+    } else if(data[right] && (data[right].x - mouseTime) < (mouseTime - data[left].x)) {
+      //closer to right
+      indexChosen = right;
+
+    } else if(data[left]) {
+      //closer to left
+      indexChosen = left;
+    }
+
+    //check if we have additional points with same timestamp
+    const dataResult = this._createTooltipData(indexChosen, data);
+
+    if(!dataResult || dataResult.length === 0) {
+      this._closeTooltip();
+      return;
+    }
+
+    const detail = this._createStub(mousePos, dataResult[0], rowInfo, d3Event);
+
+    if(!detail) {
+      this._closeTooltip();
+      return;
+    }
+
+    detail.data = this._formatDataForTooltip(dataResult);
+
+    this._tooltipShown = true;
+    this.dispatchEvent(new CustomEvent('central-tooltip-display-request', { bubbles: true, composed: true, detail: detail }));
+
+  },
+
+  _createTooltipData: function(index, data) {
+    var result = [],
+        i=0,
+        currType = this._findMarkerType(data[index]),
+        newData = data[index];
+
+    //add result and then search for same timestamps
+    newData.priority = this._markerConfig[currType].priority;
+    result.push(newData);
+
+    //try right...
+    i=1;
+    while(data[index+i] && data[index].x === data[index+i].x) {
+      currType = this._findMarkerType(data[index+i]);
+      if(this._markerConfig[currType].showTooltip) {
+        newData = data[index+i];
+        newData.priority = this._markerConfig[currType].priority;
+        result.push(newData);
+      }
+      i++;
+    }
+
+    //try left
+    i=-1;
+    while(data[index+i] && data[index].x === data[index+i].x) {
+      currType = this._findMarkerType(data[index+i]);
+      if(this._markerConfig[currType].showTooltip) {
+        newData = data[index+i];
+        newData.priority = this._markerConfig[currType].priority;
+        result.push(newData);
+      }
+      i--;
+    }
+
+    result.sort(function(a, b) {
+      return Px.d3.descending(a.priority, b.priority);
+    });
+
+    return result;
+  },
+
+  _createStub: function(mousePos, dataResult, rowInfo, d3Event) {
+    const pixelResult = [];
+    const type = this._findMarkerType(dataResult);
+
+    if(!type || !this._markerConfig[type].showTooltip) {
+      return null;
+    }
+
+    pixelResult[0] = this.x(dataResult.x) + this.margin.left ;
+
+    //only show if we're close enough
+    if(Math.abs(pixelResult[0] - mousePos[0]) > this.tooltipDetectionRadius) {
+      return null;
+    }
+
+    //adjust pixel values to take canvas position into account
+    pixelResult[0] += (d3Event.pageX - mousePos[0]);
+    pixelResult[1] = d3Event.pageY - mousePos[1] + rowInfo.rowY;
+
+    return {
+      mouseCoords: pixelResult,
+      orientation: this._markerConfig[type].tooltipOrientation,
+      delay: 50,
+      tooltipType: this.is,
+      origin: this
+    };
+  },
+
+  _formatDataForTooltip: function(data) {
+    const formatted = [];
+    data.forEach((d) => {
+      formatted.push({
+        title: this.markerData[d.originIndex]['label'],
+        time: this.markerData[d.originIndex]['time'],
+        data: this._getAllKeys(this.markerData[d.originIndex])
+      });
+    });
+
+    return formatted;
+  },
+
+  _getAllKeys: function(d) {
+    const arr = [];
+    Object.entries(d).forEach(([key,val]) => {
+      if(key !== 'time' && key !== 'label' && key !== 'datapoint') {
+        arr.push({
+          title: key,
+          value: val
+        });
+      }
+    });
+
+    return arr;
+  },
+
+  _closeTooltip: function() {
+    if(!this._tooltipShown) {
+      return;
+    }
+
+    this._tooltipShown = false;
+    this.dispatchEvent(new CustomEvent('central-tooltip-cancel-request', { bubbles: true, composed: true, detail: { origin: this } }));
+  },
+
+
+  _findMarkerType: function(data) {
+    var type,
+        dataKey = Object.keys(data);
+
+    for(var i=0; i<dataKey.length; i++) {
+      if(this._markerTypes.indexOf(dataKey[i]) !== -1) {
+        type = dataKey[i];
+        break;
+      }
+    }
+
+    return type;
+  },
+
+  _mouseClick: function() {
+    if(this._tooltipShown) {
+
+      //prevent tooltip from closing or reallow it
+      this._lockTooltip = !this._lockTooltip;
+
+      const detail = {
+        is: this.is,
+        origin: this
+      }
+
+      if(this._lockTooltip) {
+        this.dispatchEvent(new CustomEvent('central-tooltip-lock-request', { bubbles: true, composed: true, detail: detail }));
+
+      } else {
+        this.dispatchEvent(new CustomEvent('central-tooltip-lock-cancel', { bubbles: true, composed: true, detail: detail }));
+
+        this._closeTooltip();
+      }
+    }
+  },
+
+  _mouseLeave: function() {
+    if(!this._lockTooltip) {
+      this._closeTooltip();
+    }
+  },
+
+  _getRowInfoForMouse: function(mousePos) {
+    var top = mousePos[1] <= this.margin.top ? true : false,
+          yStart,
+          scale,
+          domain,
+          availableSpace,
+          domainIndex = 0,
+          rowHeight,
+          rowY;
+
+      //init based on bottom or top rows
+      if(top) {
+        yStart = 0;
+        scale = this._topScale;
+        availableSpace = this.margin.top;
+      } else {
+        yStart = this.height - this.margin.bottom;
+        scale = this._bottomScale;
+        availableSpace = this.margin.bottom;
+      }
+      domain = scale.domain();
+
+      //find which row we're hovering
+      if(domain.length) {
+        rowHeight = availableSpace/domain.length;
+        domainIndex = Math.floor((mousePos[1] - yStart) / rowHeight);
+        rowY = yStart + (domainIndex + 0.5) * rowHeight;
+      } else {
+        rowY = yStart + availableSpace/2;
+      }
+
+      return {'index': domain[domainIndex], 'rowY': rowY};
+  },
+
+  _findLabelsForRow: function(rowIndex) {
+    const index = Number(rowIndex);
+    const result = [];
+
+    Object.entries(this._markerConfig).forEach(([key,conf]) => {
+      if(index === conf.row && conf.showTooltip) {
+        result.push(key);
+      }
+    });
+
+    return result;
+  },
+
+  _getCanvas: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    if(this.canvasContext) {
+
+      if(this._canvas === undefined) {
+
+        //register handlers the first time
+        Px.d3.select(this.canvasContext.canvas).on('mousemove.markers', this._mouseMove.bind(this));
+        Px.d3.select(this.canvasContext.canvas).on('mousedown.markers', this._mouseClick.bind(this));
+        Px.d3.select(this.canvasContext.canvas).on('mouseleave.markers', this._mouseLeave.bind(this));
+      }
+
+      return this.canvasContext.canvas;
+    }
+  }
+});
 </script>

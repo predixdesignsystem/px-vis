@@ -22,416 +22,420 @@ limitations under the License.
     <title>Web Component Test : Fixture for px-vis-register</title>
 
     <!-- Requires Webcomponents.js polyfill is provided by the page for browsers that don't support html imports -->
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
     <!-- web-component-tester automatically provides local copy of brower.js below
          for any URL ending with "/web-component-tester/browser.js"
          when wct is run from the command line -->
-    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../wct-browser-legacy/browser.js"></script>
 
-    <link rel="import" href="../px-vis-scale.html" />
-    <link rel="import" href="behaviors/px-colors-behavior.html" />
+    <script type="module" src="../px-vis-scale.js"></script>
+    <script type="module" src="./behaviors/px-colors-behavior.js"></script>
 
     <!-- Retain this link for px-theme.html -->
     <!-- px-theme is needed for WCT to run without errors -->
-    <link rel="import" href="../../px-theme/px-theme-styles.html">
+    <script type="module" src="../../px-theme/px-theme-styles.js"></script>
 
-    <custom-style>
+    <!-- FIXME(polymer-modulizer):
+        These imperative modules that innerHTML your HTML are
+        a hacky way to be sure that any mixins in included style
+        modules are ready before any elements that reference them are
+        instantiated, otherwise the CSS @apply mixin polyfill won't be
+        able to expand the underlying CSS custom properties.
+        See: https://github.com/Polymer/polymer-modulizer/issues/154
+        -->
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<custom-style>
 
     <style include="px-theme-styles" is="custom-style"></style>
-  </custom-style>
+  </custom-style>`;
 
-    <script src="px-vis-scale-tests.js"></script>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script src="./px-vis-scale-tests.js"></script>
   </head>
 
   <body>
-    <h3>Web Component Test : Fixture for px-vis-scale</h3>
-    <script>
-      window.Px = window.Px ? window.Px : {};
-      window.Px.vis = window.Px.vis ? window.Px.vis : {};
-    </script>
-    <px-vis-scale id="empty">
-    </px-vis-scale>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h3>Web Component Test : Fixture for px-vis-scale</h3>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+import '../px-vis-scale.js';
+import './behaviors/px-colors-behavior.js';
+import 'px-theme/px-theme-styles.js';
+window.Px = window.Px ? window.Px : {};
+window.Px.vis = window.Px.vis ? window.Px.vis : {};
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
 
-    <px-vis-scale
-      id="missingHeight"
-      x-axis-type="time"
-      y-axis-type="linear"
-      width="500"
-      margin='{
-        "top": 10,
-        "right": 5,
-        "bottom": 20,
-        "left": 15
-      }'>
-    </px-vis-scale>
+$_documentContainer.innerHTML = `<px-vis-scale id="empty">
+    </px-vis-scale>`;
 
-    <px-vis-scale
-      id="missingData"
-      x-axis-type="time"
-      y-axis-type="linear"
-      width="500"
-      height="300"
-      margin='{
-        "top": 10,
-        "right": 5,
-        "bottom": 20,
-        "left": 15
-      }'>
-    </px-vis-scale>
+document.body.appendChild($_documentContainer.content);
+</script>
 
-    <px-vis-scale
-      id="decTLScale"
-      x-axis-type="time"
-      y-axis-type="linear"
-      width="500"
-      height="300"
-      margin='{
-        "top": 10,
-        "right": 5,
-        "bottom": 20,
-        "left": 15
-      }'
-      complete-series-config='{"mySeries":{"type":"line","name":"mySeries","x":"x","y":"y"}}'
-      chart-extents='{"x":[1397102460000,1397219100000],"y":[0,10]}'
-      data-extents= '{"x":[1397102470000,1397219000000],"y":[0,5]}'
-      chart-data='[
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<px-vis-scale id="missingHeight" x-axis-type="time" y-axis-type="linear" width="500" margin="{
+        &quot;top&quot;: 10,
+        &quot;right&quot;: 5,
+        &quot;bottom&quot;: 20,
+        &quot;left&quot;: 15
+      }">
+    </px-vis-scale>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<px-vis-scale id="missingData" x-axis-type="time" y-axis-type="linear" width="500" height="300" margin="{
+        &quot;top&quot;: 10,
+        &quot;right&quot;: 5,
+        &quot;bottom&quot;: 20,
+        &quot;left&quot;: 15
+      }">
+    </px-vis-scale>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<px-vis-scale id="decTLScale" x-axis-type="time" y-axis-type="linear" width="500" height="300" margin="{
+        &quot;top&quot;: 10,
+        &quot;right&quot;: 5,
+        &quot;bottom&quot;: 20,
+        &quot;left&quot;: 15
+      }" complete-series-config="{&quot;mySeries&quot;:{&quot;type&quot;:&quot;line&quot;,&quot;name&quot;:&quot;mySeries&quot;,&quot;x&quot;:&quot;x&quot;,&quot;y&quot;:&quot;y&quot;}}" chart-extents="{&quot;x&quot;:[1397102460000,1397219100000],&quot;y&quot;:[0,10]}" data-extents="{&quot;x&quot;:[1397102470000,1397219000000],&quot;y&quot;:[0,5]}" chart-data="[
           {
-            "x": 1397102460000,
-            "y": 1
+            &quot;x&quot;: 1397102460000,
+            &quot;y&quot;: 1
           },{
-            "x": 1397131620000,
-            "y": 6
+            &quot;x&quot;: 1397131620000,
+            &quot;y&quot;: 6
           },{
-            "x": 1397160780000,
-            "y": 10
+            &quot;x&quot;: 1397160780000,
+            &quot;y&quot;: 10
           },{
-            "x": 1397189940000,
-            "y": 4
+            &quot;x&quot;: 1397189940000,
+            &quot;y&quot;: 4
           },{
-            "x": 1397219100000,
-            "y": 6
+            &quot;x&quot;: 1397219100000,
+            &quot;y&quot;: 6
           }
-        ]'>
-    </px-vis-scale>
+        ]">
+    </px-vis-scale>`;
 
-    <px-vis-scale
-      id="findExtents"
-      x-axis-type="time"
-      y-axis-type="linear"
-      width="500"
-      height="300"
-      margin='{
-        "top": 10,
-        "right": 5,
-        "bottom": 20,
-        "left": 15
-      }'
-      complete-series-config='{"mySeries":{"type":"line","name":"mySeries","x":"x","y":"y"}}'
-      chart-data='[
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<px-vis-scale id="findExtents" x-axis-type="time" y-axis-type="linear" width="500" height="300" margin="{
+        &quot;top&quot;: 10,
+        &quot;right&quot;: 5,
+        &quot;bottom&quot;: 20,
+        &quot;left&quot;: 15
+      }" complete-series-config="{&quot;mySeries&quot;:{&quot;type&quot;:&quot;line&quot;,&quot;name&quot;:&quot;mySeries&quot;,&quot;x&quot;:&quot;x&quot;,&quot;y&quot;:&quot;y&quot;}}" chart-data="[
           {
-            "x": 1397102460000,
-            "y": 1
+            &quot;x&quot;: 1397102460000,
+            &quot;y&quot;: 1
           },{
-            "x": 1397131620000,
-            "y": 6
+            &quot;x&quot;: 1397131620000,
+            &quot;y&quot;: 6
           },{
-            "x": 1397160780000,
-            "y": 10
+            &quot;x&quot;: 1397160780000,
+            &quot;y&quot;: 10
           },{
-            "x": 1397189940000,
-            "y": 4
+            &quot;x&quot;: 1397189940000,
+            &quot;y&quot;: 4
           },{
-            "x": 1397219100000,
-            "y": 6
+            &quot;x&quot;: 1397219100000,
+            &quot;y&quot;: 6
           }
-        ]'>
-    </px-vis-scale>
+        ]">
+    </px-vis-scale>`;
 
-    <px-vis-scale
-      id="updateData"
-      x-axis-type="time"
-      y-axis-type="linear"
-      width="500"
-      height="300"
-      margin='{
-        "top": 10,
-        "right": 5,
-        "bottom": 20,
-        "left": 15
-      }'
-      complete-series-config='{"mySeries":{"type":"line","name":"mySeries","x":"x","y":"y"}}'
-      chart-data='[
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<px-vis-scale id="updateData" x-axis-type="time" y-axis-type="linear" width="500" height="300" margin="{
+        &quot;top&quot;: 10,
+        &quot;right&quot;: 5,
+        &quot;bottom&quot;: 20,
+        &quot;left&quot;: 15
+      }" complete-series-config="{&quot;mySeries&quot;:{&quot;type&quot;:&quot;line&quot;,&quot;name&quot;:&quot;mySeries&quot;,&quot;x&quot;:&quot;x&quot;,&quot;y&quot;:&quot;y&quot;}}" chart-data="[
           {
-            "x": 1397102460000,
-            "y": 1
+            &quot;x&quot;: 1397102460000,
+            &quot;y&quot;: 1
           },{
-            "x": 1397131620000,
-            "y": 6
+            &quot;x&quot;: 1397131620000,
+            &quot;y&quot;: 6
           },{
-            "x": 1397160780000,
-            "y": 10
+            &quot;x&quot;: 1397160780000,
+            &quot;y&quot;: 10
           },{
-            "x": 1397189940000,
-            "y": 4
+            &quot;x&quot;: 1397189940000,
+            &quot;y&quot;: 4
           },{
-            "x": 1397219100000,
-            "y": 6
+            &quot;x&quot;: 1397219100000,
+            &quot;y&quot;: 6
           }
-        ]'>
-    </px-vis-scale>
+        ]">
+    </px-vis-scale>`;
 
-    <px-vis-scale
-      id="findXExtents"
-      x-axis-type="time"
-      y-axis-type="linear"
-      width="500"
-      height="300"
-      margin='{
-        "top": 10,
-        "right": 5,
-        "bottom": 20,
-        "left": 15
-      }'
-      complete-series-config='{"mySeries":{"type":"line","name":"mySeries","x":"x","y":"y"}}'
-      chart-data='[
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<px-vis-scale id="findXExtents" x-axis-type="time" y-axis-type="linear" width="500" height="300" margin="{
+        &quot;top&quot;: 10,
+        &quot;right&quot;: 5,
+        &quot;bottom&quot;: 20,
+        &quot;left&quot;: 15
+      }" complete-series-config="{&quot;mySeries&quot;:{&quot;type&quot;:&quot;line&quot;,&quot;name&quot;:&quot;mySeries&quot;,&quot;x&quot;:&quot;x&quot;,&quot;y&quot;:&quot;y&quot;}}" chart-data="[
           {
-            "x": 1397102460000,
-            "y": 1
+            &quot;x&quot;: 1397102460000,
+            &quot;y&quot;: 1
           },{
-            "x": 1397131620000,
-            "y": 6
+            &quot;x&quot;: 1397131620000,
+            &quot;y&quot;: 6
           },{
-            "x": 1397160780000,
-            "y": 10
+            &quot;x&quot;: 1397160780000,
+            &quot;y&quot;: 10
           },{
-            "x": 1397189940000,
-            "y": 4
+            &quot;x&quot;: 1397189940000,
+            &quot;y&quot;: 4
           },{
-            "x": 1397219100000,
-            "y": 6
+            &quot;x&quot;: 1397219100000,
+            &quot;y&quot;: 6
           }
-        ]'>
-    </px-vis-scale>
+        ]">
+    </px-vis-scale>`;
 
-    <px-vis-scale
-      id="findYExtents"
-      x-axis-type="time"
-      y-axis-type="linear"
-      width="500"
-      height="300"
-      margin='{
-        "top": 10,
-        "right": 5,
-        "bottom": 20,
-        "left": 15
-      }'
-      complete-series-config='{"mySeries":{"type":"line","name":"mySeries","x":"x","y":"y"}}'
-      chart-data='[
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<px-vis-scale id="findYExtents" x-axis-type="time" y-axis-type="linear" width="500" height="300" margin="{
+        &quot;top&quot;: 10,
+        &quot;right&quot;: 5,
+        &quot;bottom&quot;: 20,
+        &quot;left&quot;: 15
+      }" complete-series-config="{&quot;mySeries&quot;:{&quot;type&quot;:&quot;line&quot;,&quot;name&quot;:&quot;mySeries&quot;,&quot;x&quot;:&quot;x&quot;,&quot;y&quot;:&quot;y&quot;}}" chart-data="[
           {
-            "x": 1397102460000,
-            "y": 1
+            &quot;x&quot;: 1397102460000,
+            &quot;y&quot;: 1
           },{
-            "x": 1397131620000,
-            "y": 6
+            &quot;x&quot;: 1397131620000,
+            &quot;y&quot;: 6
           },{
-            "x": 1397160780000,
-            "y": 10
+            &quot;x&quot;: 1397160780000,
+            &quot;y&quot;: 10
           },{
-            "x": 1397189940000,
-            "y": 4
+            &quot;x&quot;: 1397189940000,
+            &quot;y&quot;: 4
           },{
-            "x": 1397219100000,
-            "y": 6
+            &quot;x&quot;: 1397219100000,
+            &quot;y&quot;: 6
           }
-        ]'>
-    </px-vis-scale>
+        ]">
+    </px-vis-scale>`;
 
-    <px-vis-scale
-      id="findLinearX"
-      x-axis-type="linear"
-      y-axis-type="linear"
-      width="500"
-      height="300"
-      margin='{
-        "top": 10,
-        "right": 5,
-        "bottom": 20,
-        "left": 15
-      }'
-      complete-series-config='{"mySeries":{"type":"line","name":"mySeries","x":"x","y":"y"}}'
-      chart-data='[
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<px-vis-scale id="findLinearX" x-axis-type="linear" y-axis-type="linear" width="500" height="300" margin="{
+        &quot;top&quot;: 10,
+        &quot;right&quot;: 5,
+        &quot;bottom&quot;: 20,
+        &quot;left&quot;: 15
+      }" complete-series-config="{&quot;mySeries&quot;:{&quot;type&quot;:&quot;line&quot;,&quot;name&quot;:&quot;mySeries&quot;,&quot;x&quot;:&quot;x&quot;,&quot;y&quot;:&quot;y&quot;}}" chart-data="[
           {
-            "x": 5,
-            "y": 1
+            &quot;x&quot;: 5,
+            &quot;y&quot;: 1
           },{
-            "x": 1,
-            "y": 6
+            &quot;x&quot;: 1,
+            &quot;y&quot;: 6
           },{
-            "x": 3,
-            "y": 10
+            &quot;x&quot;: 3,
+            &quot;y&quot;: 10
           },{
-            "x": 11,
-            "y": 4
+            &quot;x&quot;: 11,
+            &quot;y&quot;: 4
           },{
-            "x": 8,
-            "y": 6
+            &quot;x&quot;: 8,
+            &quot;y&quot;: 6
           }
-        ]'>
-    </px-vis-scale>
+        ]">
+    </px-vis-scale>`;
 
-    <px-vis-scale
-      id="findOrdinalX"
-      x-axis-type="ordinal"
-      y-axis-type="linear"
-      width="500"
-      height="300"
-      margin='{
-        "top": 10,
-        "right": 5,
-        "bottom": 20,
-        "left": 15
-      }'
-      complete-series-config='{"mySeries":{"type":"line","name":"mySeries","x":"x","y":"y"}}'
-      chart-data='[
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<px-vis-scale id="findOrdinalX" x-axis-type="ordinal" y-axis-type="linear" width="500" height="300" margin="{
+        &quot;top&quot;: 10,
+        &quot;right&quot;: 5,
+        &quot;bottom&quot;: 20,
+        &quot;left&quot;: 15
+      }" complete-series-config="{&quot;mySeries&quot;:{&quot;type&quot;:&quot;line&quot;,&quot;name&quot;:&quot;mySeries&quot;,&quot;x&quot;:&quot;x&quot;,&quot;y&quot;:&quot;y&quot;}}" chart-data="[
           {
-            "x": "a",
-            "y": 1
+            &quot;x&quot;: &quot;a&quot;,
+            &quot;y&quot;: 1
           },{
-            "x": "a",
-            "y": 6
+            &quot;x&quot;: &quot;a&quot;,
+            &quot;y&quot;: 6
           },{
-            "x": "c",
-            "y": 10
+            &quot;x&quot;: &quot;c&quot;,
+            &quot;y&quot;: 10
           },{
-            "x": "b",
-            "y": 4
+            &quot;x&quot;: &quot;b&quot;,
+            &quot;y&quot;: 4
           },{
-            "x": "a",
-            "y": 6
+            &quot;x&quot;: &quot;a&quot;,
+            &quot;y&quot;: 6
           }
-        ]'>
-    </px-vis-scale>
+        ]">
+    </px-vis-scale>`;
 
-    <px-vis-scale
-      id="setOrdinalX"
-      x-axis-type="ordinal"
-      y-axis-type="linear"
-      width="500"
-      height="300"
-      margin='{
-        "top": 10,
-        "right": 5,
-        "bottom": 20,
-        "left": 15
-      }'
-      complete-series-config='{"mySeries":{"type":"line","name":"mySeries","x":"x","y":"y"}}'
-      chart-data='[
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<px-vis-scale id="setOrdinalX" x-axis-type="ordinal" y-axis-type="linear" width="500" height="300" margin="{
+        &quot;top&quot;: 10,
+        &quot;right&quot;: 5,
+        &quot;bottom&quot;: 20,
+        &quot;left&quot;: 15
+      }" complete-series-config="{&quot;mySeries&quot;:{&quot;type&quot;:&quot;line&quot;,&quot;name&quot;:&quot;mySeries&quot;,&quot;x&quot;:&quot;x&quot;,&quot;y&quot;:&quot;y&quot;}}" chart-data="[
           {
-            "x": "a",
-            "y": 1
+            &quot;x&quot;: &quot;a&quot;,
+            &quot;y&quot;: 1
           },{
-            "x": "a",
-            "y": 6
+            &quot;x&quot;: &quot;a&quot;,
+            &quot;y&quot;: 6
           },{
-            "x": "c",
-            "y": 10
+            &quot;x&quot;: &quot;c&quot;,
+            &quot;y&quot;: 10
           },{
-            "x": "b",
-            "y": 4
+            &quot;x&quot;: &quot;b&quot;,
+            &quot;y&quot;: 4
           },{
-            "x": "a",
-            "y": 6
+            &quot;x&quot;: &quot;a&quot;,
+            &quot;y&quot;: 6
           }
-        ]'>
-    </px-vis-scale>
+        ]">
+    </px-vis-scale>`;
 
-    <px-vis-scale
-      id="diffXforY"
-      x-axis-type="time"
-      y-axis-type="linear"
-      width="500"
-      height="300"
-      margin='{
-        "top": 10,
-        "right": 5,
-        "bottom": 20,
-        "left": 15
-      }'
-      complete-series-config='{
-        "mySeries":{"type":"line","name":"mySeries","x":"x","y":"y"},
-        "mySeries2":{"type":"line","name":"mySeries2","x":"x","y":"y1"
-      }}'
-      chart-data='[
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<px-vis-scale id="diffXforY" x-axis-type="time" y-axis-type="linear" width="500" height="300" margin="{
+        &quot;top&quot;: 10,
+        &quot;right&quot;: 5,
+        &quot;bottom&quot;: 20,
+        &quot;left&quot;: 15
+      }" complete-series-config="{
+        &quot;mySeries&quot;:{&quot;type&quot;:&quot;line&quot;,&quot;name&quot;:&quot;mySeries&quot;,&quot;x&quot;:&quot;x&quot;,&quot;y&quot;:&quot;y&quot;},
+        &quot;mySeries2&quot;:{&quot;type&quot;:&quot;line&quot;,&quot;name&quot;:&quot;mySeries2&quot;,&quot;x&quot;:&quot;x&quot;,&quot;y&quot;:&quot;y1&quot;
+      }}" chart-data="[
           {
-            "x": 1397102460000,
-            "y": 1
+            &quot;x&quot;: 1397102460000,
+            &quot;y&quot;: 1
           },{
-            "x": 1397131620000,
-            "y": 6
+            &quot;x&quot;: 1397131620000,
+            &quot;y&quot;: 6
           },{
-            "x": 1397160780000,
-            "y1": 10
+            &quot;x&quot;: 1397160780000,
+            &quot;y1&quot;: 10
           },{
-            "x": 1397189940000,
-            "y1": 4
+            &quot;x&quot;: 1397189940000,
+            &quot;y1&quot;: 4
           },{
-            "x": 1397219100000,
-            "y1": 7
+            &quot;x&quot;: 1397219100000,
+            &quot;y1&quot;: 7
           }
-        ]'>
-    </px-vis-scale>
+        ]">
+    </px-vis-scale>`;
 
-    <px-vis-scale
-      id="cExts"
-      x-axis-type="time"
-      y-axis-type="linear"
-      width="500"
-      height="300"
-      margin='{
-        "top": 10,
-        "right": 5,
-        "bottom": 20,
-        "left": 15
-      }'
-      complete-series-config='{
-        "mySeries":{"type":"line","name":"mySeries","x":"x","y":"y"},
-        "mySeries2":{"type":"line","name":"mySeries2","x":"x","y":"y1"
-      }}'
-      chart-data='[
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<px-vis-scale id="cExts" x-axis-type="time" y-axis-type="linear" width="500" height="300" margin="{
+        &quot;top&quot;: 10,
+        &quot;right&quot;: 5,
+        &quot;bottom&quot;: 20,
+        &quot;left&quot;: 15
+      }" complete-series-config="{
+        &quot;mySeries&quot;:{&quot;type&quot;:&quot;line&quot;,&quot;name&quot;:&quot;mySeries&quot;,&quot;x&quot;:&quot;x&quot;,&quot;y&quot;:&quot;y&quot;},
+        &quot;mySeries2&quot;:{&quot;type&quot;:&quot;line&quot;,&quot;name&quot;:&quot;mySeries2&quot;,&quot;x&quot;:&quot;x&quot;,&quot;y&quot;:&quot;y1&quot;
+      }}" chart-data="[
           {
-            "x": 1397102460000,
-            "y": 1
+            &quot;x&quot;: 1397102460000,
+            &quot;y&quot;: 1
           },{
-            "x": 1397131620000,
-            "y": 6
+            &quot;x&quot;: 1397131620000,
+            &quot;y&quot;: 6
           },{
-            "x": 1397160780000,
-            "y1": 10
+            &quot;x&quot;: 1397160780000,
+            &quot;y1&quot;: 10
           },{
-            "x": 1397189940000,
-            "y1": 4
+            &quot;x&quot;: 1397189940000,
+            &quot;y1&quot;: 4
           },{
-            "x": 1397219100000,
-            "y1": 7
+            &quot;x&quot;: 1397219100000,
+            &quot;y1&quot;: 7
           }
-        ]'>
-    </px-vis-scale>
+        ]">
+    </px-vis-scale>`;
 
-    <px-vis-scale
-      id="webWorker"
-      chart-id="webWorker"
-      x-axis-type="time"
-      y-axis-type="linear"
-      width="500"
-      height="300"
-      margin='{
-        "top": 10,
-        "right": 5,
-        "bottom": 20,
-        "left": 15
-      }'
-      complete-series-config='{"mySeries":{"type":"line","name":"mySeries","x":"x","y":"y"}}'>
-    </px-vis-scale>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<px-vis-scale id="webWorker" chart-id="webWorker" x-axis-type="time" y-axis-type="linear" width="500" height="300" margin="{
+        &quot;top&quot;: 10,
+        &quot;right&quot;: 5,
+        &quot;bottom&quot;: 20,
+        &quot;left&quot;: 15
+      }" complete-series-config="{&quot;mySeries&quot;:{&quot;type&quot;:&quot;line&quot;,&quot;name&quot;:&quot;mySeries&quot;,&quot;x&quot;:&quot;x&quot;,&quot;y&quot;:&quot;y&quot;}}">
+    </px-vis-scale>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
 
   </body>
 </html>

@@ -1,0 +1,248 @@
+/*
+Copyright (c) 2018, General Electric
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+import { PolymerElement } from '@polymer/polymer/polymer-element.js';
+
+var PxColorsBehavior = window.PxColorsBehavior = (window.PxColorsBehavior || {});
+
+/*
+  Name:
+  PxColorsBehavior.dataVisColors
+
+  Description:
+  Polymer behavior that provides the dataVisColors and an order to use them
+
+  @polymerBehavior PxColorsBehavior.dataVisColors
+*/
+PxColorsBehavior.dataVisColors = {
+  properties: {
+    /**
+     * Defines an colors in order that will be used for series.
+     *
+     * @type {Array}
+     */
+    seriesColorList: {
+      type: Array,
+      value: [
+        'rgb(0,0,0)',
+        'rgb(75,75,75)',
+        'rgb(125,125,125)',
+        'rgb(200,200,200)'
+      ]
+    }
+  }
+};
+
+/*
+  Name:
+  PxColorsBehavior.dataVisColorTheming
+
+  Description:
+  Attempts to read data vis color theme from CSS style variables or default
+  values and apply to the visualization element.
+
+  @polymerBehavior PxColorsBehavior.dataVisColorTheming
+*/
+PxColorsBehavior.dataVisColorTheming = [{
+    observers: ['syncCSSTheme(_stylesUpdated)'],
+    ready: function() {
+      // To access any available CSS theming variables, we need to wait for the
+      // first animation frame to complete
+      window.requestAnimationFrame(this.syncCSSTheme.bind(this));
+    },
+
+    /**
+     * Retrieves the CSS style variables set on this element and applies them
+     * to the appropriate properties, triggering a redraw.
+     *
+     * @method syncCSSTheme
+     */
+    syncCSSTheme: function() {
+
+
+      // FIXME Aggressive debounce for simple charts. Look in solving the issue so we can reduce/remove this debounce.
+      this.debounce('syncCSSTheme', this._debounceSyncCSSTheme, 100);
+    },
+
+    /**
+     * Debounced function call for `syncCSSTheme` method. Loops through available
+     * style variables to apply them to appropriate objects.
+     *
+     * @private
+     * @method _debounceSyncCSSTheme
+     */
+    _debounceSyncCSSTheme: function() {
+      var firstThemedColor;
+
+
+      if (PolymerElement) {
+        // 2.0 code
+        if (window.ShadyCSS) {
+          firstThemedColor = ShadyCSS.getComputedStyleValue(this, '--px-vis-series-color-0');
+        } else {
+          firstThemedColor = getComputedStyle(this).getPropertyValue('--px-vis-series-color-0');
+        }
+      } else {
+        // 1.0 code
+        firstThemedColor = this.getComputedStyleValue('--px-vis-series-color-0');
+      }
+
+      // If there's a theme color set, attempt to get all CSS style variables
+      // and prepare to apply them.
+      if (firstThemedColor) {
+        this._applyStyleVariables();
+      }
+
+      this.dispatchEvent(new CustomEvent('px-data-vis-colors-applied'));
+    },
+
+    /**
+     * Called when there is at least one style variable applied (the first is
+     * expected to be named `--px-vis-series-color-0`). Loops through each
+     * style variable in the format `--px-vis-series-color-[n]` and applies
+     * the resulting values and series color order to the element. Stops looping
+     * through style variables when it finds a gap.
+     *
+     * @private
+     * @method _applyStyleVariables
+     */
+    _applyStyleVariables: function() {
+      var variableBase = '--px-vis-series-color-';
+      var newColors = [];
+      var index = 0;
+      var stop = false;
+      var currentColor;
+
+      //check if the developer passed in their own seriesColorOrder
+      var devSet = this._checkIfDevSetSeriesColorOrder();
+      if(devSet) {
+        return;
+      }
+
+      // Loop over style variables until a gap is found
+      while (!stop) {
+
+        if (PolymerElement) {
+          // 2.0 code
+          if (window.ShadyCSS) {
+            currentColor = ShadyCSS.getComputedStyleValue(this, '--px-vis-series-color-' + index);
+          } else {
+            currentColor = getComputedStyle(this).getPropertyValue('--px-vis-series-color-' + index);
+          }
+        } else {
+          // 1.0 code
+          currentColor = this.getComputedStyleValue('--px-vis-series-color-' + index);
+        }
+
+        if (!currentColor) {
+          // No more colors found, break out of while loop
+          stop = true;
+        };
+
+        if (currentColor) {
+          // Ensure the color is converted to RGB
+          currentColor = currentColor[0] === '#' ? this._colorHexToRgb(currentColor) : currentColor;
+
+          newColors.push(currentColor);
+        };
+
+        // Iterate index so we continue to get style variables
+        index += 1;
+      };
+
+      this.set('seriesColorList', newColors);
+    },
+
+
+    /**
+     * Converts a hex-format color to RGB.
+     *
+     * @private
+     * @method _colorHexToRgb
+     * @param {String} hex - A color in hex format
+     * @return {String} - A color in RGB format
+     */
+    _colorHexToRgb: function(hex) {
+      // Expand shorthand form (e.g. "03F") to full form (e.g. "0033FF")
+      var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+      hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+        return r + r + g + g + b + b;
+      });
+      var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result ? 'rgb(' + parseInt(result[1], 16) + ',' +
+                               parseInt(result[2], 16)+ ',' +
+                               parseInt(result[3], 16) + ')' : null;
+    },
+
+    /**
+     * Compares seriesColorOrder property value to the seriesColorOrder to determine if the dev set their own override.
+     *
+     * @private
+     * @method _checkIfDevSetSeriesColorOrder
+     * @return {Boolean} - true if dev set seriesColorOrder
+     */
+    _checkIfDevSetSeriesColorOrder: function() {
+      var defaultOrder = PxColorsBehavior.dataVisColors.properties.seriesColorList.value;
+
+      if(defaultOrder.length !== this.seriesColorList.length) {
+        return true;
+      }
+
+      for(var i = 0; i < defaultOrder.length; i++) {
+        if(defaultOrder[i] !== this.seriesColorList[i]) {
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+}, PxColorsBehavior.dataVisColors];
+
+/*
+    Name:
+    PxColorsBehavior.getSeriesColors
+
+    Description:
+    Polymer behavior that provides the ability to retrieve the color of a serie given an index
+
+    Dependencies:
+    -
+
+    @polymerBehavior PxColorsBehavior.getSeriesColors
+*/
+PxColorsBehavior.getSeriesColors = [{
+  /**
+   * Helper function to return the correct color for a particular index.
+   **/
+  _getColor: function(i) {
+    var l = this.seriesColorList.length,
+        index = this._calcIndex(i,l);
+
+    return this.seriesColorList[ index ];
+  },
+
+  /**
+   * Helper function to calculate the index. When we run out of indcies, it loops back over valid indicies.
+   **/
+  _calcIndex: function(i, l) {
+    return i < l ? i : this._calcIndex(i - l,l);
+  }
+}, PxColorsBehavior.dataVisColors ];

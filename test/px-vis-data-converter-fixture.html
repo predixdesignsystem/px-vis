@@ -22,41 +22,57 @@ limitations under the License.
     <title>Web Component Test : Fixture for px-vis-data-converter</title>
 
     <!-- Requires Webcomponents.js polyfill is provided by the page for browsers that don't support html imports -->
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
     <!-- web-component-tester automatically provides local copy of brower.js below
          for any URL ending with "/web-component-tester/browser.js"
          when wct is run from the command line -->
-    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../wct-browser-legacy/browser.js"></script>
     <!-- Retain this link for px-theme.html -->
-    <link rel="import" href="../px-vis-data-converter.html" />
-    <link rel="import" href="behaviors/px-colors-behavior.html" />
-    <link rel="import" href="../../polymer/lib/elements/dom-bind.html" />
+    <script type="module" src="../px-vis-data-converter.js"></script>
+    <script type="module" src="./behaviors/px-colors-behavior.js"></script>
+    <script type="module" src="../../@polymer/polymer/lib/elements/dom-bind.js"></script>
 
     <!-- px-theme is needed for WCT to run without errors -->
-    <link rel="import" href="../../px-theme/px-theme-styles.html">
+    <script type="module" src="../../px-theme/px-theme-styles.js"></script>
 
-    <custom-style>
+    <!-- FIXME(polymer-modulizer):
+        These imperative modules that innerHTML your HTML are
+        a hacky way to be sure that any mixins in included style
+        modules are ready before any elements that reference them are
+        instantiated, otherwise the CSS @apply mixin polyfill won't be
+        able to expand the underlying CSS custom properties.
+        See: https://github.com/Polymer/polymer-modulizer/issues/154
+        -->
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<custom-style>
     <style include="px-theme-styles" is="custom-style"></style>
-  </custom-style>
+  </custom-style>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
 
 
-    <script src="px-vis-data-converter-tests.js"></script>
+    <script src="./px-vis-data-converter-tests.js"></script>
   </head>
 
   <body>
-    <h3>Web Component Test : Fixture for px-vis-data-converter</h3>
-    <dom-bind>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h3>Web Component Test : Fixture for px-vis-data-converter</h3>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
       <px-vis-data-converter id="singleConverter"></px-vis-data-converter>
 
       <px-vis-data-converter id="singleConverterDataKeys"></px-vis-data-converter>
 
-      <px-vis-data-converter
-        id="singleConverterOptions"
-        data-key="series"
-        id-key="tag"
-        name-key="title"
-        new-x-key="time">
+      <px-vis-data-converter id="singleConverterOptions" data-key="series" id-key="tag" name-key="title" new-x-key="time">
       </px-vis-data-converter>
 
       <px-vis-data-converter id="twoConverter"></px-vis-data-converter>
@@ -65,13 +81,13 @@ limitations under the License.
 
       <px-vis-data-converter id="threeConverter"></px-vis-data-converter>
 
-      <px-vis-data-converter
-        id="threeConverterCustom"
-        data-ids='["series1","series2","series3"]'
-        data-names='["Series 1","Series 2","Series 3"]'>
+      <px-vis-data-converter id="threeConverterCustom" data-ids="[&quot;series1&quot;,&quot;series2&quot;,&quot;series3&quot;]" data-names="[&quot;Series 1&quot;,&quot;Series 2&quot;,&quot;Series 3&quot;]">
       </px-vis-data-converter>
 
     </template>
-    </dom-bind>
+    </dom-bind>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
   </body>
 </html>

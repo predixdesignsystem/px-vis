@@ -25,48 +25,62 @@ limitations under the License.
       Fast bootstrapping of the webcomponents-lite library. Only loads the library
       if the browser doesn't natively support web components.
     -->
-    <script type="text/javascript">
-    (function() {
-      'use strict';
+    <script type="module">
+import '@polymer/polymer/polymer-legacy.js';
+import 'px-theme/px-theme-styles.js';
+import './demo/index.js';
 
-      var onload = function() {
-        // For native Imports, manually fire WebComponentsReady so user code
-        // can use the same code path for native and polyfill'd imports.
-        if (!window.HTMLImports) {
-          document.dispatchEvent(
-            new CustomEvent('WebComponentsReady', {bubbles: true, composed: true})
-          );
-        }
-      };
+var onload = function() {
+  // For native Imports, manually fire WebComponentsReady so user code
+  // can use the same code path for native and polyfill'd imports.
+  if (!window.HTMLImports) {
+    document.dispatchEvent(
+      new CustomEvent('WebComponentsReady', {bubbles: true, composed: true})
+    );
+  }
+};
 
-      var webComponentsSupported = (
-        'registerElement' in document && 'import' in document.createElement('link') && 'content' in document.createElement('template')
-      );
+var webComponentsSupported = (
+  'registerElement' in document && 'import' in document.createElement('link') && 'content' in document.createElement('template')
+);
 
-      if (!webComponentsSupported) {
-        var script = document.createElement('script');
-        script.async = true;
-        script.src = '../webcomponentsjs/webcomponents-lite.js';
-        script.onload = onload;
-        document.head.appendChild(script);
-      } else {
-        onload();
-      }
-    })();
-    </script>
+if (!webComponentsSupported) {
+  var script = document.createElement('script');
+  script.async = true;
+  script.src = '../webcomponentsjs/webcomponents-lite.js';
+  script.onload = onload;
+  document.head.appendChild(script);
+} else {
+  onload();
+}
+</script>
 
     <!--
       Load the Polymer library.
     -->
-    <link rel="import" href="../polymer/polymer.html" />
+    <script type="module" src="../@polymer/polymer/polymer-legacy.js"></script>
 
     <!--
       Load theme files, apply default theme.
     -->
-    <link rel="import" href="../px-theme/px-theme-styles.html">
-    <custom-style>
+    <script type="module" src="../px-theme/px-theme-styles.js"></script>
+    <!-- FIXME(polymer-modulizer):
+        These imperative modules that innerHTML your HTML are
+        a hacky way to be sure that any mixins in included style
+        modules are ready before any elements that reference them are
+        instantiated, otherwise the CSS @apply mixin polyfill won't be
+        able to expand the underlying CSS custom properties.
+        See: https://github.com/Polymer/polymer-modulizer/issues/154
+        -->
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<custom-style>
       <style include="px-theme-styles" is="custom-style"></style>
-    </custom-style>
+    </custom-style>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
 
  
  
@@ -75,45 +89,50 @@ limitations under the License.
       Asynchronously import the px-catalog element, which is the entrypoint
       for our application.
     -->
-    <link
-        async
-        id="main-element-import"
-        rel="import"
-        href="demo/index.html">
-
-    <!--
-      Load the app icon and manifest for Android devices.
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<link async="" id="main-element-import" rel="import" href="demo/index.html">`;
+document.body.appendChild($_documentContainer.content);
+</script>Android devices.
     -->
-    <link defer rel="icon" href="favicon.ico" type="image/x-icon" />
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<link defer="" rel="icon" href="favicon.ico" type="image/x-icon">`;
+document.body.appendChild($_documentContainer.content);
+</script>
 
     <!--
       Basic page styles.
     -->
-    <style>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<style>
       html, body {
         margin: 0;
         padding: 0;
       }
-    </style>
+    </style>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
   </head>
   <body>
     <!-- Elements wait on the page and are upgraded after demo/index.html is loaded. -->
-    <local-element-demo></local-element-demo>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<local-element-demo></local-element-demo>`;
+document.body.appendChild($_documentContainer.content);
+</script>
 
     <!--
       Attempt to register a service worker with the correct scope. Fail quietly
       if this doesn't work, but log the result to the console.
     -->
-    <script type="text/javascript">
-      // if ('serviceWorker' in navigator) {
-      //   navigator.serviceWorker.register('service-worker.js').then(function(registration) {
-      //     // Registration was successful
-      //     console.log('ServiceWorker registration successful with scope: ', registration.scope);
-      //   }).catch(function(err) {
-      //     // registration failed :(
-      //     console.log('ServiceWorker registration failed: ', err);
-      //   });
-      // }
-    </script>
+    <script type="module">
+import '@polymer/polymer/polymer-legacy.js';
+import 'px-theme/px-theme-styles.js';
+import './demo/index.js';
+</script>
   </body>
 </html>

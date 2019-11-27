@@ -1,0 +1,443 @@
+/*
+Copyright (c) 2018, General Electric
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/**
+
+### Usage
+
+    <px-vis-interactive-axis
+        prevent-initial-drawing="[[preventInitialDrawing]]"
+        svg="[[svg]]"
+        x="[[x]]"
+        y="[[y]]"
+        dimension="[[dimension]]"
+        series-key="[[seriesKey]]"
+        height="[[height]]"
+        width="[[width]]"
+        margin="[[margin]]"
+        chart-data="[[chartData]]"
+        orientation="[[orientation]]"
+        title="[[title]]"
+        title-location='[[titleLocation]]'
+        title-type-size="[[titleTypeSize]]"
+        label-type-size="[[labelTypeSize]]"
+        stroke-width="[[strokeWidth]]"
+        outer-tick-size="0"
+        tick-values="[[tickValues]]"
+        truncation-length="[[truncationLength]]"
+        complete-series-config="[[completeSeriesConfig]]"
+        append-unit-in-title="[[appendUnitInTitle]]"
+        unit="[[unit]]"
+        prevent-series-bar="[[preventSeriesBar]]"
+        domain-changed="[[_internalDimensionsChanged]]"
+        selected-domain="[[selectedDomain]]"
+        title-truncation
+        disable-ticks="[[disableTicks]]"
+        label-position="[[labelPosition]]"
+        axis-color="[[axisColor]]"
+        ticks="[[ticks]]"
+        label-rotation="[[labelRotation]]"
+        label-translation="[[labelTranslation]]"
+        series-on-axis="[[seriesOnAxes]]"
+        muted-series="[[mutedSeries]]"
+        drawn-tick-values="[[drawnTickValues]]"
+        rebuild-on-draw="[[_rebuildOnDraw]]"
+        disable-brush="[[disableBrush]]"
+        drag-behavior="[[dragBehavior]]"
+        rebuild-on-draw="[[_rebuildOnDraw]]"
+        prevent-initial-drawing="[[preventInitialDrawing]]"
+        redraw-series="[[redrawSeries]]"
+        brush-domains="[[brushDomains]]"
+        hide-and-show-on-hover="[[hideAndShowOnHover]]">
+    </px-vis-interactive-axis>
+
+### d3 reference
+https://github.com/mbostock/d3/wiki/SVG-Axes
+
+### Styling
+The following custom properties are available for styling:
+
+Custom property | Description
+:----------------|:-------------
+  `--px-vis-font-family` | The font family for all labels and text
+  `--px-vis-axis-color` | The color for the axis lines, axis ticks, and axis tick labels
+  `--px-vis-axis-title-color` | The color for the axis title
+  `--px-vis-axis-inline-title-color` | The color for the axis title
+  `--px-vis-axis-inline-type-color` | The color for the axis lines, axis ticks, and axis tick labels when using 'inline' labelPosition
+  `--px-vis-axis-inline-box-color` | The color for the tick boxes when using 'inline' labelPosition
+  `--px-vis-axis-common-tick-color`
+
+
+@element px-vis-axis
+@blurb d3 element creating an axis for the chart
+@homepage index.html
+@demo demo.html
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+import '@polymer/polymer/polymer-legacy.js';
+
+import './px-vis-behavior-common.js';
+import './px-vis-behavior-chart.js';
+import './px-vis-behavior-d3.js';
+import './px-vis-axis.js';
+import './px-vis-axis-interaction-space.js';
+import './css/px-vis-styles.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+import { html } from '@polymer/polymer/lib/utils/html-tag.js';
+Polymer({
+  _template: html`
+      <style include="px-vis-styles"></style>
+      <px-vis-axis id="axis_[[dimension]]" class="interactiveAxis" svg="[[_axisGroup]]" axis="[[y]]" series-id="[[dimension]]" height="[[height]]" width="[[width]]" margin="[[margin]]" orientation="[[orientation]]" title="[[title]]" title-location="[[titleLocation]]" title-type-size="[[titleTypeSize]]" label-type-size="[[labelTypeSize]]" stroke-width="[[strokeWidth]]" outer-tick-size="0" tick-values="[[tickValues]]" truncation-length="[[truncationLength]]" complete-series-config="[[completeSeriesConfig]]" append-unit-in-title="[[appendUnitInTitle]]" unit="[[unit]]" prevent-series-bar="[[preventSeriesBar]]" domain-changed="[[domainChanged]]" selected-domain="[[selectedDomain]]" title-truncation="[[titleTruncation]]" disable-ticks="[[disableTicks]]" label-position="[[labelPosition]]" axis-color="[[axisColor]]" axis-line-color="[[axisLineColor]]" axis-tick-color="[[axisTickColor]]" axis-label-color="[[axisLabelColor]]" axis-title-color="[[axisTitleColor]]" ticks="[[ticks]]" label-rotation="[[labelRotation]]" label-translation="[[labelTranslation]]" series-on-axis="[[seriesOnAxis]]" muted-series="[[mutedSeries]]" drawn-tick-values="{{drawnTickValues}}" rebuild-on-draw="[[_rebuildOnDraw]]" prevent-initial-drawing="[[preventInitialDrawing]]">
+      </px-vis-axis>
+      <px-vis-axis-interaction-space id="axisIS" svg="[[_interactiveGroup]]" width="[[width]]" height="[[height]]" margin="[[margin]]" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]" complete-series-config="[[completeSeriesConfig]]" dimension="[[dimension]]" dimensions="[[dimensions]]" series-key="[[seriesKey]]" category-key="[[categoryKey]]" chart-data="[[chartData]]" muted-series="{{mutedSeries}}" combined-muted-series="[[combinedMutedSeries]]" hard-mute="[[hardMute]]" radial="[[radial]]" center-offset="[[centerOffset]]" smaller-side="[[smallerSide]]" brush-to-remove="[[brushToRemove]]" brush-domains="[[brushDomains]]" drag-container-elem="[[_returnDragContainer(svg)]]" cartesian-drag-behavior="[[cartesianDragBehavior]]" redraw-series="[[redrawSeries]]" dynamic-redraw="[[dynamicRedraw]]" action-config="[[actionConfig]]" orientation="[[orientation]]" time-domain="[[timeDomain]]" title-truncation="[[titleTruncation]]">
+      </px-vis-axis-interaction-space>
+`,
+
+  is: 'px-vis-interactive-axis',
+
+  behaviors: [
+    PxVisBehavior.observerCheck,
+    PxVisBehaviorD3.svg,
+    PxVisBehavior.sizing,
+    PxVisBehavior.completeSeriesConfig,
+    PxVisBehavior.commonMethods,
+    PxVisBehaviorD3.axisConfig,
+    PxVisBehavior.dataset,
+    PxVisBehavior.dimensions,
+    PxVisBehavior.mutedSeries,
+    PxVisBehavior.combinedMutedSeries,
+    PxVisBehaviorD3.dynamicRedraw,
+    PxVisBehaviorD3.domainUpdate,
+    PxVisBehaviorD3.selectedDomain,
+    PxVisBehavior.radial,
+    PxVisBehaviorD3.radialAxisConfig,
+    PxVisBehavior.seriesToAxes,
+    PxVisBehaviorChart.subConfiguration,
+    PxVisBehavior.preventInitialDrawing,
+    PxVisBehavior.categories,
+    PxVisBehavior.actionConfigGeneric,
+    PxVisBehavior.interactionSpaceConfigGeneric,
+    PxVisBehavior.brushDomains,
+    PxVisBehavior.timeDomain,
+    PxVisBehavior.titleTruncation
+  ],
+
+  /**
+   * Properties block, expose attribute values to the DOM via 'reflect'
+   *
+   * @property properties
+   * @type Object
+   */
+  properties: {
+    /**
+     * A dictionary of g elements for each dimension.
+     */
+    _interactiveGroup: {
+      type: Object
+    },
+
+    /**
+     * The string identifier for the axis.
+     */
+    dimension: {
+      type: String
+    },
+
+    /**
+     * Whether to append unit in brackets in axis title, e.g [Hz].
+     */
+    appendUnitInTitle: {
+      type: Boolean,
+      value: false
+    },
+    /**
+     * Array representing the actual displayed titles for each axis.
+     */
+    displayedValues: {
+      type: Object,
+      notify: true,
+      value: function() {
+        return {};
+      }
+    },
+
+    /**
+     * Whether the axis ticks should be hidden and shown on hover, or always shown.
+     */
+    showTicksOnHover: {
+      type: Boolean,
+      value: false
+    },
+    /**
+     * Boolean to decide if all axes or just one axis should get ticks.
+     */
+    disableTicks:{
+      type: Boolean,
+      value: false
+    },
+    /**
+     * Length of the axis.
+     */
+    length: {
+      type: Number,
+      value: null
+    },
+    /**
+     * Boolean controlling if brushing should retain or delete series.
+     */
+    brushToRemove: {
+      type: Boolean,
+      value: false
+    },
+
+    /**
+     * Force a redraw for titleLocation.
+     */
+    _pokeTitleLocation: {
+      type: Boolean,
+      value: false
+    },
+    /**
+     * Force a redraw if ticks.
+     */
+    recalcTicks: {
+      type: Boolean,
+      value: false
+    },
+
+    orientationFromDimensions: {
+      type: Boolean,
+      value: false
+    },
+
+    leftAxisSize: {
+      type: Number
+    },
+    rightAxisSize: {
+      type: Number
+    },
+
+    disableBrush: {
+      type: Boolean,
+      value: false
+    },
+    /**
+      * Boolean to specify whether to draw the series bars.
+      */
+    preventSeriesBar: {
+      type: Boolean,
+      value: false
+    },
+    cartesianDragBehavior: {
+      type: Boolean,
+      value: false
+    },
+    _pokeOrientation: {
+      type: Boolean,
+      value: false
+    },
+    axisConfig: {
+      type: Object,
+      value: function() {
+        return {};
+      }
+    },
+    allowEmptyTitle: {
+      type: Boolean,
+      value: false
+    },
+    _commonAxisRanAtLeastOnce: {
+      type: Boolean
+    },
+    _axisDoneCounter: {
+      type: Number,
+      value: 0
+    },
+    _rebuildOnDraw: {
+      type: Boolean,
+      value: true
+    },
+
+    hideAndShowOnHover: {
+      type: Boolean,
+      value: false
+    },
+
+    _axisGroup: {
+      type: Object
+    },
+    smallerSide: {
+      type: Number,
+      value: 0
+    },
+    _isDirty: {
+      type: Boolean,
+      value: false
+    }
+  },
+
+  observers: [
+    '_axisConfigChanged(axisConfig.*)',
+    '_createGroup(domainChanged, x, svg)',
+    '_interactionSpaceConfigChanged(interactionSpaceConfig.*)'
+  ],
+
+  listeners:{
+    'px-axis-done': '_setAxisStyles',
+    "dom-change": '_axisConfigChanged'
+  },
+
+  attached: function() {
+    if(this._isDirty) {
+      this._createGroup();
+      this._isDirty = false;
+    }
+  },
+
+  detached: function() {
+    if(this._doesD3HaveValues(this._interactiveGroup)) {
+      this._interactiveGroup.remove();
+      this._interactiveGroup = null;
+    }
+    this._isDirty = true;
+  },
+
+  _returnDragContainer: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    return this.svg.node();
+  },
+
+  _setDragBehavior: function() {
+    if(this.cartesianDragBehavior) {
+      this.createCartesianDrag();
+    } else {
+      this.createParallelAxisDrag();
+    }
+  },
+
+  _axisConfigChanged: function(conf) {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    if(this.axisConfig && this.dimension) {
+      this._applyConfigToElement(this.axisConfig, this.$$('#axis_' + this.dimension));
+    }
+  },
+
+  _interactionSpaceConfigChanged: function(conf) {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    if(this.interactionSpaceConfig && this.dimension) {
+      this._applyConfigToElement(this.interactionSpaceConfig, this.$$('#axisIS'));
+    }
+  },
+
+  /**
+   * Generates a group element for each dimension and moves it into the correct x coordinate.
+   *
+   * @method _createGroup
+   */
+  _createGroup: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
+    if(this._doesD3HaveValues(this.svg)) {
+      var _this = this;
+
+      if(this._isD3Empty(this._interactiveGroup)) {
+        var g = this.svg.append('g')
+          .attr("class", "dimension")
+          .attr("dimension", this.dimension);
+
+        this._interactiveGroup = g;
+
+        //create a separate subgroup for the axis so it doesnt interfere with our interaction-space
+        this._axisGroup = this._interactiveGroup.append('g')
+          .attr("class", "axis-g");
+      } else {
+        this._interactiveGroup.attr("dimension", this.dimension);
+      }
+
+      this._interactiveGroup.attr("transform", this._calcTransformation.bind(this));
+    }
+  },
+
+  _calcTransformation: function() {
+    var d = this.dimension;
+
+    if(this.radial) {
+    /*
+    +180 to flip orientation of axes to start at top (which matches where lines start)
+         180                        0
+        ____                       ____
+      .'    `.                   .'    `.
+     /        \                 /        \
+  90|          | 270  -->  270 |          |90
+     \        /                 \        /
+      `.____.'                   `.____.'
+         0                          180
+    */
+      return this.x(d) || this.x(d) === 0 ? "rotate(" + (this.x(d) * 180 / Math.PI + 180) + ")" : ''
+    }
+
+    // else cartesian:
+    return this.x(d) || this.x(d) === 0 ? "translate(" + this.x(d) + ",0)" : '';
+  },
+
+  /**
+   * Sets styles and on-hover states for common axis.
+   *
+   * @method _setAxisStyles
+   */
+  _setAxisStyles: function(e) {
+    if(this._interactiveGroup) {
+      var _this = this;
+
+      if(this.hideAndShowOnHover) {
+        this._commonAxisRanAtLeastOnce = true;
+        this._interactiveGroup.selectAll('g.tick text').classed('hideCommon',true);
+        this._interactiveGroup.selectAll('.hideCommon').style('display','none');
+        this._interactiveGroup.on('mouseover',function(){
+          _this._interactiveGroup.selectAll('.hideCommon').style('display',null)
+          _this._interactiveGroup.selectAll('.hideCommon').style('fill',_this._checkThemeVariable("--px-vis-axis-common-tick-color", _this.axisColor))
+        }).on('mouseout',function(){
+          _this._interactiveGroup.selectAll('.hideCommon').style('display','none')
+          _this._interactiveGroup.selectAll('.hideCommon').style('fill',_this._checkThemeVariable("--px-vis-axis-color", _this.axisColor))
+        });
+
+      } else if(this._commonAxisRanAtLeastOnce) {
+
+        this._interactiveGroup.selectAll('.hideCommon').style('display',null);
+        this._interactiveGroup.selectAll('.hideCommon').classed('hideCommon',false);
+
+      }
+    }
+  },
+
+  recalcTranform: function() {
+    this._interactiveGroup.attr("transform", this._calcTransformation.bind(this));
+  }
+});

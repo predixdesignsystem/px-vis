@@ -1,0 +1,249 @@
+/*
+Copyright (c) 2018, General Electric
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+import '@polymer/polymer/polymer-legacy.js';
+
+import './px-vis-behavior-common.js';
+import './px-vis-behavior-d3.js';
+var PxVisBehaviorScale = window.PxVisBehaviorScale = (window.PxVisBehaviorScale || {});
+
+/*
+    Name:
+    PxVisBehaviorScale.radial
+
+    Description:
+    Polymer behavior that provides radial scales
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorScale.radial
+*/
+PxVisBehaviorScale.radial = [{
+  /**
+   * Properties block, expose attribute values to the DOM via 'reflect'
+   *
+   * @property properties
+   * @type Object
+   */
+  properties: {
+    /**
+    * Holder for the calculated extents.
+    *
+    */
+    _calculatedExtents: {
+      type: Object,
+      notify: true
+    }
+  },
+
+  listeners: {
+    'px-vis-request-pixel-for-data': '_pixelRequest'
+  },
+
+  /**
+   * Sets the y scale to multiple linear scales.
+   *
+   * @method _setYScale
+   */
+  _setYScale: function(radius,centerOffset) {
+    var range = [centerOffset, radius],
+        y = Px.d3.scaleLinear().nice().range(range);
+
+    y._scaleType = "linear";
+
+    this.set('y', y);
+  },
+
+  _recreateScales: function() {
+    if(this.y) {
+      this._setYScale(this._radius, this.centerOffset);
+    }
+  },
+
+  /**
+   * Find overall data max and min.
+   *
+   * @method _generateChartExtents
+   */
+  _generateChartExtents: function() {
+    if(this.chartData && this.chartData.length > 0 && this._amplitudeKey && this._amplitudeKey.length > 0) {
+      var ext = null,
+          min = Infinity,
+          max = -Infinity,
+          doMin = true,
+          doMax = true;
+
+      /*
+        FOR POLAR
+        Min must be the min value, otherwise the angle is meaningless.
+        So if amplitudeExtents are provided, still search for a min, but use the provided extent as a default val. Max can be used normally
+      */
+      if(this.amplitudeExtents && this.amplitudeExtents.length === 2) {
+        min = this.amplitudeExtents[0] === 'dynamic' ? Infinity : this.amplitudeExtents[0];
+        max = this.amplitudeExtents[1] === 'dynamic' ? -Infinity : this.amplitudeExtents[1];
+
+        doMin = min === Infinity ? true : false;
+        doMax = max === -Infinity ? true : false;
+      }
+
+      if(doMin || doMax) {
+        // go through all data and find min and max
+        for(var i = 0; i < this._amplitudeKey.length; i++) {
+          for(var j = 0; j < this.chartData.length; j++) {
+
+            if(this._isValidData(this.chartData[j][this._amplitudeKey[i]]) && (!this.hardMute || !this.mutedSeries[this._amplitudeKey[i]])) {
+              min = doMin ? Math.min(min, this.chartData[j][this._amplitudeKey[i]]) : min;
+              max = doMax ? Math.max(max, this.chartData[j][this._amplitudeKey[i]]) : max;
+            }
+          }
+        }
+      }
+
+      // if all data is the same value, add 1 so we still get a range
+      if(min === max) {
+        max += 1;
+      }
+
+      //if negative values are absolutely bigger than max then use those as max
+      if(Math.abs(min) > max) {
+        max = Math.abs(min);
+      }
+
+      if(!this.allowNegativeValues) {
+        // if min is negative, set to 0
+        min = min < 0 ? 0 : min;
+      }
+
+      ext = [min,max];
+
+      this.set('_calculatedExtents',ext);
+    }
+  },
+
+  /**
+   * Calculates and sets the x and y domain after data loads.
+   *
+   * https://github.com/mbostock/d3/wiki/API-Reference
+   *
+   * @method _setDomain
+   */
+   _setDomain: function() {
+
+    this.debounce('_setDomain', function() {
+      // check to make sure there is data
+      if(this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this._calculatedExtents)){
+
+        var exts = this._calculatedExtents;
+
+        this.y.domain(exts);
+
+        /*
+          We dont actually need an x for Polar,
+          since we use the angle from the data directly
+          but various other components assume there will be an x
+          so just make a fake one to play nice
+        */
+        var domain = this.useDegrees ? [0, 360] : [0, 2*Math.PI];
+        this.x = Px.d3.scaleLinear().range([0,1]).domain(domain);
+
+        // Set the domains
+        this.set('domainChanged', this.domainChanged + 1);
+      }
+    }.bind(this), 10);
+  },
+
+  /**
+   * Gets pixel values for data values. data is an array: [xValue, yValue]
+   * returns an object with pixel values and whether the values are
+   * currently out of bounds in regards to the current domain
+   */
+  getPixelFromData: function(data, relativeToCenter) {
+    var domain = this.y.domain(),
+        range = this.y.range(),
+        domainTot = domain[1] - domain[0],
+        result,
+        oob = false;
+
+    result = this._getPixelCoordForRadialData(data[0], data[1], (range[1]-range[0]), domain, domainTot);
+
+    if(!relativeToCenter) {
+      //[0,0] is the center of the drawing, adjust to give the top left corner
+      // as [0,0]
+      result[0] += this._center[0];
+      result[1] += this._center[1];
+    }
+
+    //do the out of bounds check on pixel values since zoom on radial
+    //doesn't update the domain
+    if(result[0] < 0 || result[0] > this._smallerSide || result[1] < 0 || result[1] > this._smallerSide) {
+      oob= true;
+    }
+
+    return {
+      'pixel': result,
+      'outOfBounds': oob
+    }
+  },
+
+  /**
+   * Gets data values for pixel values. pixelVal is an array:
+   * [xValue, yValue]
+   * please note that the values returned have no guarantee to match any
+   * actual chart data, this is just a conversion based on pixel
+   */
+  getDataFromPixel: function(pixelVal) {
+    var x,
+        y;
+
+    y = this.y.invert(Math.sqrt(pixelVal[0]*pixelVal[0] + pixelVal[1]*pixelVal[1]));
+    x = Math.atan2(pixelVal[1],pixelVal[0]) + Math.PI/2;
+
+    if(this.counterClockwise) {
+      x *= -1;
+    }
+
+    if(x<0) {
+      x += 2 * Math.PI;
+    }
+
+    if(this.useDegrees) {
+      x = x * 360/(2 * Math.PI);
+    }
+
+    return [x,y];
+  },
+
+  _pixelRequest: function(evt) {
+    var res = this.getPixelFromData(evt.detail.data, evt.detail.relativeToCenter);
+    evt.detail.callback(res);
+  }
+},
+  PxVisBehaviorD3.axes,
+  PxVisBehavior.sizing,
+  PxVisBehavior.dataset,
+  PxVisBehavior.commonMethods,
+  PxVisBehavior.axisTypes,
+  PxVisBehavior.amplitudeExtents,
+  PxVisBehaviorD3.radialAxisConfig,
+  PxVisBehaviorD3.domainUpdate,
+  PxVisBehavior.polarData,
+  PxVisBehavior.mutedSeries
+]

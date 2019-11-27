@@ -1,0 +1,183 @@
+/*
+Copyright (c) 2018, General Electric
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+import '@polymer/polymer/polymer-legacy.js';
+
+import '../px-vis-behavior-d3.js';
+import '../px-vis-behavior-scale-multi-axis.js';
+import '../px-vis-svg.js';
+import '../px-vis-interactive-axis.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+import { html } from '@polymer/polymer/lib/utils/html-tag.js';
+Polymer({
+  _template: html`
+    <div class="outline">
+        <px-vis-svg width="[[width]]" height="[[height]]" margin="[[margin]]" svg="{{svg}}">
+      </px-vis-svg>
+      <px-vis-interactive-axis svg="[[svg]]" x="[[x]]" title="Draw a box and drag it" title-truncation="[[titleTruncation]]" title-location="{
+              &quot;x&quot;: 3,
+              &quot;y&quot;: 215,
+              &quot;r&quot;: 0,
+              &quot;anchor&quot;: &quot;middle&quot;
+            }" y="[[_returnY(y, domainChanged)]]" dimension="y" axes="[[axes]]" dimensions="[[dimensions]]" series-key="x" height="[[height]]" width="[[width]]" margin="[[margin]]" chart-data="[[chartData]]" orientation="left" complete-series-config="[[completeSeriesConfig]]" domain-changed="[[domainChanged]]" series-on-axis="[&quot;y&quot;]" action-config="[[actionConfig]]" prevent-series-bar="">
+      </px-vis-interactive-axis>
+      </div>
+`,
+
+  is: "px-vis-interactive-axis-demo-component",
+
+  behaviors: [
+    PxVisBehaviorD3.axes,
+    PxVisBehaviorD3.domainUpdate,
+    PxVisBehaviorScale.scaleMultiAxis
+  ],
+
+  properties:{
+    width: {
+      type : Number,
+      value : 150
+    },
+    height:{
+      type : Number,
+      value : 225
+    },
+    y: {
+      type: Object,
+      notify: true
+    },
+    margin:{
+      type : Object,
+      value : function() {
+        return {
+          "top": 5,
+          "right": 10,
+          "bottom": 25,
+          "left": 0
+        }
+      }
+    },
+    chartData:{
+      type : Array,
+      value : function() {
+        return [{
+          'x': 1397102460000,
+          'y': 0.56
+        },{
+          'x': 1397139660000,
+          'y': 0.4
+        },{
+          'x': 1397177400000,
+          'y': 0.43
+        },{
+          'x': 1397228040000,
+          'y': 0.33
+        },{
+          'x': 1397248260000,
+          'y': 0.47
+        },{
+          'x': 1397291280000,
+          'y': 0.41
+        },{
+          'x': 1397318100000,
+          'y': 0.26
+        },{
+          'x': 1397342100000,
+          'y': 0.42
+        },{
+          'x': 1397390820000,
+          'y': 0.27
+        },{
+          'x': 1397408100000,
+          'y': 0.38
+        },{
+          'x': 1397458800000,
+          'y': 0.36
+        },{
+          'x': 1397522940000,
+          'y': 0.32
+        }]
+      }
+    },
+    dimensions: {
+      type: Array,
+      value: function() {
+        return ['y']
+      }
+    },
+    axes: {
+      type: Array,
+      value: function() {
+        return ['y']
+      }
+    },
+    dataExtents: {
+      type: Object,
+      notify: true
+    },
+    chartExtents: {
+      type: Object,
+      value: function() {
+        return {'x': ['y'], 'y':[1,10]}
+      }
+    },
+    completeSeriesConfig: {
+      type: Object,
+      value: function() {
+        return {
+          "x":{
+            "type":"line",
+            "name":"mySeries",
+            "x":['y'],
+            "y":['y'],
+            "color": "rgb(93,165,218)"
+          }
+        }
+      }
+    },
+    titleTruncation: {
+      type: Boolean,
+      value: false
+    },
+    actionConfig: {
+      type: Object,
+      value: function() {
+        return {
+          mouseout: null,
+          mousemove: null,
+          mousedown: 'callAxisMute',
+          mouseup: 'callAxisMute'
+        }
+      }
+    }
+  },
+
+  observers: [
+    '_setXScale(width, margin)',
+    '_setYScale(height, margin, axes)',
+    '_generateDataExtents(chartExtents)',
+    '_setDomain(x, y, dataExtents)'
+  ],
+
+  _returnY: function(y, dc) {
+    if(this.y !== undefined && this.domainChanged) {
+      return y.y
+    }
+  }
+});

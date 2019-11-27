@@ -14,12 +14,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-<link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="px-vis-behavior-common.html" />
-<link rel="import" href="px-vis-behavior-d3.html" />
-<link rel="import" href="../px-icon-set/px-icon.html" />
-<link rel="import" href="../px-icon-set/px-icon-set-communication.html" />
-<link rel="import" href="css/px-vis-annotations-styles.html">
+<script type="module" src="../@polymer/polymer/polymer-legacy.js"></script>
+<script type="module" src="./px-vis-behavior-common.js"></script>
+<script type="module" src="./px-vis-behavior-d3.js"></script>
+<script type="module" src="../px-icon-set/px-icon.js"></script>
+<script type="module" src="../px-icon-set/px-icon-set-communication.js"></script>
+<script type="module" src="./css/px-vis-annotations-styles.js"></script>
 
 <!--
 
@@ -83,164 +83,172 @@ Custom property | Description
     </template>
 </dom-module>
 
-<script>
-  Polymer({
+<script type="module">
+import '@polymer/polymer/polymer-legacy.js';
+import './px-vis-behavior-common.js';
+import './px-vis-behavior-d3.js';
+import 'px-icon-set/px-icon.js';
+import 'px-icon-set/px-icon-set-communication.js';
+import './css/px-vis-annotations-styles.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+import { dom } from '@polymer/polymer/lib/legacy/polymer.dom.js';
+Polymer({
 
-    is: 'px-vis-annotations',
+  is: 'px-vis-annotations',
 
-    behaviors: [
-      PxVisBehavior.observerCheck,
-      PxVisBehavior.sizing,
-      PxVisBehaviorD3.svg,
-      PxVisBehavior.annotationData
-    ],
+  behaviors: [
+    PxVisBehavior.observerCheck,
+    PxVisBehavior.sizing,
+    PxVisBehaviorD3.svg,
+    PxVisBehavior.annotationData
+  ],
 
 
 
+  /**
+   * Fired when the mouse enters an annotation icon (mouseenter event)
+   *
+   * @event px-vis-annotation-enter
+   */
+
+   /**
+   * Fired when the mouse out an annotation icon (mouseout event)
+   *
+   * @event px-vis-annotation-out
+   */
+
+   /**
+   * Fired when the mouse hovers an annotation icon (mouseover event)
+   *
+   * @event px-vis-annotation-over
+   */
+
+   /**
+   * Fired when the mouse leave an annotation icon (mouseleave event)
+   *
+   * @event px-vis-annotation-leave
+   */
+
+   /**
+   * Fired when a click happens on an annotation icon (click event)
+   *
+   * @event px-vis-annotation-click
+   */
+
+   /**
+   * Fired when a click happens on the chart requesting the creation
+   * of an annotation. !! this event is defined by the toolbar !!
+   *
+   * this event detail will contain the following `data` object:
+   * data: {
+   *  chart: the chart responsible for this interaction
+   *  clickTarget: the actual interaction target that has been clicked. Usually an axis interaction space (parallell coordinates/radar) or an interaction space
+   *  mouseCoords: the coordinates of the mouse relative to the clickTarget
+   * }
+   *
+   * the mouse coordinates can be converted to data values by calling
+   * `getDataFromPixel(mouseCoords, series)` on the chart. `series` is
+   * a series which scale will be used to convert (a `seriesConfig` series
+   * for xy/timeseries/polar or an axes for parallel coordinates/radar)
+   *
+   * @event px-vis-annotation-creation
+   */
+
+  /**
+   * Properties block, expose attribute values to the DOM via 'reflect'
+   *
+   * @property properties
+   * @type Object
+   */
+  properties: {
+    _iconWidth: {
+      type: Number,
+      value: 12
+    },
+    _iconHeight: {
+      type: Number,
+      value: 12
+    },
     /**
-     * Fired when the mouse enters an annotation icon (mouseenter event)
-     *
-     * @event px-vis-annotation-enter
+     * when switched forces the annotations to recalculate their position
      */
-
-     /**
-     * Fired when the mouse out an annotation icon (mouseout event)
-     *
-     * @event px-vis-annotation-out
-     */
-
-     /**
-     * Fired when the mouse hovers an annotation icon (mouseover event)
-     *
-     * @event px-vis-annotation-over
-     */
-
-     /**
-     * Fired when the mouse leave an annotation icon (mouseleave event)
-     *
-     * @event px-vis-annotation-leave
-     */
-
-     /**
-     * Fired when a click happens on an annotation icon (click event)
-     *
-     * @event px-vis-annotation-click
-     */
-
-     /**
-     * Fired when a click happens on the chart requesting the creation
-     * of an annotation. !! this event is defined by the toolbar !!
-     *
-     * this event detail will contain the following `data` object:
-     * data: {
-     *  chart: the chart responsible for this interaction
-     *  clickTarget: the actual interaction target that has been clicked. Usually an axis interaction space (parallell coordinates/radar) or an interaction space
-     *  mouseCoords: the coordinates of the mouse relative to the clickTarget
-     * }
-     *
-     * the mouse coordinates can be converted to data values by calling
-     * `getDataFromPixel(mouseCoords, series)` on the chart. `series` is
-     * a series which scale will be used to convert (a `seriesConfig` series
-     * for xy/timeseries/polar or an axes for parallel coordinates/radar)
-     *
-     * @event px-vis-annotation-creation
-     */
-
+    forceRecalc: {
+      type: Boolean,
+      value: false
+    },
     /**
-     * Properties block, expose attribute values to the DOM via 'reflect'
-     *
-     * @property properties
-     * @type Object
+     * Whether the annotations should be hidden
      */
-    properties: {
-      _iconWidth: {
-        type: Number,
-        value: 12
-      },
-      _iconHeight: {
-        type: Number,
-        value: 12
-      },
-      /**
-       * when switched forces the annotations to recalculate their position
-       */
-      forceRecalc: {
-        type: Boolean,
-        value: false
-      },
-      /**
-       * Whether the annotations should be hidden
-       */
-      hide: {
-        type: Boolean,
-        value: false
-      },
-
-      strongClass: {
-        type: String,
-        value: '',
-        computed: '_computeStrongClass(showStrongIcon)'
-      }
-    }, //properties
-
-    _computeStrongClass: function(strong) {
-      return strong ? 'strong' : '';
+    hide: {
+      type: Boolean,
+      value: false
     },
 
-    _getTransform: function(item) {
-      if(this.hasUndefinedArguments(arguments)) {
-        return;
-      }
-
-      var coords,
-          oob;
-
-      if(this.hide) {
-        return 'display:none';
-      }
-
-      //ask the chart scale to convert those data values to pixels
-      this.fire('px-vis-request-pixel-for-data', {callback: function(info) {
-          coords = info.pixel;
-          oob = info.outOfBounds;
-        }.bind(this), data: [item.x, item.y], series: item.series, margin: this.margin}
-      );
-
-      //out of bounds or
-      //some coords might be NaN if the series doesn't exist,  just hide
-      if(oob || isNaN(coords[0]) || isNaN(coords[1])) {
-        return 'display: none';
-      } else {
-        coords[0] -= this._iconWidth/2;
-        coords[1] -= this._iconHeight;
-        return 'transform: translate(' + Math.floor(coords[0]) + 'px,' + Math.floor(coords[1]) + 'px)';
-      }
-    },
-
-    _mouseOver: function(evt) {
-      this._requestAnnotation(evt, 'over');
-    },
-
-    _mouseLeave: function(evt) {
-      this._requestAnnotation(evt, 'leave');
-    },
-
-    _mouseClick: function(evt) {
-      this._requestAnnotation(evt, 'click');
-    },
-
-    _mouseEnter: function(evt) {
-      this._requestAnnotation(evt, 'enter');
-    },
-
-    _mouseOut: function(evt) {
-      this._requestAnnotation(evt, 'out');
-    },
-
-    _requestAnnotation: function(evt, eventName) {
-      var target = Polymer.dom(evt).localTarget;
-
-      this.fire('px-vis-event-request', {'eventName': 'px-vis-annotation-' + eventName, 'data': {'annotationData': this.$.template.itemForElement(target), 'icon': target}});
+    strongClass: {
+      type: String,
+      value: '',
+      computed: '_computeStrongClass(showStrongIcon)'
     }
-  });
+  }, //properties
+
+  _computeStrongClass: function(strong) {
+    return strong ? 'strong' : '';
+  },
+
+  _getTransform: function(item) {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    var coords,
+        oob;
+
+    if(this.hide) {
+      return 'display:none';
+    }
+
+    //ask the chart scale to convert those data values to pixels
+    this.fire('px-vis-request-pixel-for-data', {callback: function(info) {
+        coords = info.pixel;
+        oob = info.outOfBounds;
+      }.bind(this), data: [item.x, item.y], series: item.series, margin: this.margin}
+    );
+
+    //out of bounds or
+    //some coords might be NaN if the series doesn't exist,  just hide
+    if(oob || isNaN(coords[0]) || isNaN(coords[1])) {
+      return 'display: none';
+    } else {
+      coords[0] -= this._iconWidth/2;
+      coords[1] -= this._iconHeight;
+      return 'transform: translate(' + Math.floor(coords[0]) + 'px,' + Math.floor(coords[1]) + 'px)';
+    }
+  },
+
+  _mouseOver: function(evt) {
+    this._requestAnnotation(evt, 'over');
+  },
+
+  _mouseLeave: function(evt) {
+    this._requestAnnotation(evt, 'leave');
+  },
+
+  _mouseClick: function(evt) {
+    this._requestAnnotation(evt, 'click');
+  },
+
+  _mouseEnter: function(evt) {
+    this._requestAnnotation(evt, 'enter');
+  },
+
+  _mouseOut: function(evt) {
+    this._requestAnnotation(evt, 'out');
+  },
+
+  _requestAnnotation: function(evt, eventName) {
+    var target = dom(evt).localTarget;
+
+    this.fire('px-vis-event-request', {'eventName': 'px-vis-annotation-' + eventName, 'data': {'annotationData': this.$.template.itemForElement(target), 'icon': target}});
+  }
+});
 </script>

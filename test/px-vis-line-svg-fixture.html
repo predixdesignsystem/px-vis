@@ -22,614 +22,489 @@ limitations under the License.
     <title>Web Component Test : Fixture for px-vis-line-svg</title>
 
     <!-- Requires Webcomponents.js polyfill is provided by the page for browsers that don't support html imports -->
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
     <!-- web-component-tester automatically provides local copy of brower.js below
          for any URL ending with "/web-component-tester/browser.js"
          when wct is run from the command line -->
-    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../wct-browser-legacy/browser.js"></script>
 
-    <link rel="import" href="../px-vis-scale.html" />
-    <link rel="import" href="../px-vis-svg.html" />
-    <link rel="import" href="../px-vis-svg-canvas.html" />
-    <link rel="import" href="../px-vis-line-svg.html" />
-    <link rel="import" href="../px-vis-line-canvas.html" />
-    <link rel="import" href="behaviors/px-colors-behavior.html" />
-    <link rel="import" href="../px-vis-behavior-scale-multi-axis.html" />
-    <link rel="import" href="../px-vis-behavior-scale-radial.html" />
-    <link rel="import" href="../px-vis-behavior-scale-radar.html" />
-    <link rel="import" href="../../polymer/lib/elements/dom-bind.html" />
-    <link rel="import" href="../../polymer/lib/elements/dom-repeat.html" />
+    <script type="module" src="../px-vis-scale.js"></script>
+    <script type="module" src="../px-vis-svg.js"></script>
+    <script type="module" src="../px-vis-svg-canvas.js"></script>
+    <script type="module" src="../px-vis-line-svg.js"></script>
+    <script type="module" src="../px-vis-line-canvas.js"></script>
+    <script type="module" src="./behaviors/px-colors-behavior.js"></script>
+    <script type="module" src="../px-vis-behavior-scale-multi-axis.js"></script>
+    <script type="module" src="../px-vis-behavior-scale-radial.js"></script>
+    <script type="module" src="../px-vis-behavior-scale-radar.js"></script>
+    <script type="module" src="../../@polymer/polymer/lib/elements/dom-bind.js"></script>
+    <script type="module" src="../../@polymer/polymer/lib/elements/dom-repeat.js"></script>
 
 
     <!-- Retain this link for px-theme.html -->
     <!-- px-theme is needed for WCT to run without errors -->
-    <link rel="import" href="../../px-theme/px-theme-styles.html">
+    <script type="module" src="../../px-theme/px-theme-styles.js"></script>
 
-    <custom-style>
+    <!-- FIXME(polymer-modulizer):
+        These imperative modules that innerHTML your HTML are
+        a hacky way to be sure that any mixins in included style
+        modules are ready before any elements that reference them are
+        instantiated, otherwise the CSS @apply mixin polyfill won't be
+        able to expand the underlying CSS custom properties.
+        See: https://github.com/Polymer/polymer-modulizer/issues/154
+        -->
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<custom-style>
       <style include="px-theme-styles" is="custom-style"></style>
-    </custom-style>
+    </custom-style>`;
 
-    <script src="px-vis-line-svg-xy-tests.js"></script>
-    <script src="px-vis-line-svg-parallel-tests.js"></script>
-    <script src="px-vis-line-svg-polar-tests.js"></script>
-    <script src="px-vis-line-svg-radar-tests.js"></script>
-    <script src="px-vis-line-svg-interpolation-tests.js"></script>
-    <script src="px-vis-line-svg-domrepeat-tests.js"></script>
-    <script src="px-vis-line-svg-tests.js"></script>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script src="./px-vis-line-svg-xy-tests.js"></script>
+    <script src="./px-vis-line-svg-parallel-tests.js"></script>
+    <script src="./px-vis-line-svg-polar-tests.js"></script>
+    <script src="./px-vis-line-svg-radar-tests.js"></script>
+    <script src="./px-vis-line-svg-interpolation-tests.js"></script>
+    <script src="./px-vis-line-svg-domrepeat-tests.js"></script>
+    <script src="./px-vis-line-svg-tests.js"></script>
   </head>
 
 
   <body>
-    <h3>Web Component Test : Fixture for px-vis-line-svg</h3>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h3>Web Component Test : Fixture for px-vis-line-svg</h3>`;
+document.body.appendChild($_documentContainer.content);
+</script>
 <!-- SVG -->
-  <dom-bind>
-    <template is="dom-bind">
-      <px-vis-scale
-        id="baseScale"
-        x-axis-type="time"
-        y-axis-type="linear"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
-      </px-vis-scale>
-      <px-vis-svg
-        id="baseSVG"
-        svg="{{svg}}">
-      </px-vis-svg>
-      <px-vis-line-svg
-        id="baseLine"
-        svg="[[svg]]"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]">
-      </px-vis-line-svg>
-    </template>
-  </dom-bind>
+  <script type="module">
+const $_documentContainer = document.createElement('template');
 
-  <dom-bind>
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
-      <px-vis-scale
-        id="mutedScale"
-        x-axis-type="time"
-        y-axis-type="linear"
-        x="{{x2}}"
-        y="{{y2}}"
-        domain-changed="{{domainChanged2}}">
+      <px-vis-scale id="baseScale" x-axis-type="time" y-axis-type="linear" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
       </px-vis-scale>
-      <px-vis-svg
-        id="mutedSVG"
-        svg="{{svg2}}">
+      <px-vis-svg id="baseSVG" svg="{{svg}}">
       </px-vis-svg>
-      <px-vis-line-svg
-        id="mutedLine1"
-        svg="[[svg2]]"
-        x="[[x2]]"
-        y="[[y2]]"
-        domain-changed="[[domainChanged2]]">
-      </px-vis-line-svg>
-      <px-vis-line-svg
-        id="mutedLine2"
-        svg="[[svg2]]"
-        x="[[x2]]"
-        y="[[y2]]"
-        domain-changed="[[domainChanged2]]">
+      <px-vis-line-svg id="baseLine" svg="[[svg]]" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
-    </dom-bind>
+  </dom-bind>`;
 
-    <dom-bind>
-    <template is="dom-bind">
-      <px-vis-scale
-        id="missingDataPointScale"
-        x-axis-type="time"
-        y-axis-type="linear"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
-      </px-vis-scale>
-      <px-vis-svg
-        id="missingDataPointSVG"
-        svg="{{svg}}">
-      </px-vis-svg>
-      <px-vis-line-svg
-        id="missingDataPointLine1"
-        svg="[[svg]]"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]">
-      </px-vis-line-svg>
-      <px-vis-line-svg
-        id="missingDataPointLine2"
-        svg="[[svg]]"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]">
-      </px-vis-line-svg>
-    </template>
-    </dom-bind>
+document.body.appendChild($_documentContainer.content);
+</script>
 
-    <dom-bind>
-    <template is="dom-bind">
-      <px-vis-scale
-        id="missingDataPointScaleNull"
-        x-axis-type="time"
-        y-axis-type="linear"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
-      </px-vis-scale>
-      <px-vis-svg
-        id="missingDataPointSVGNull"
-        svg="{{svg}}">
-      </px-vis-svg>
-      <px-vis-line-svg
-        id="missingDataPointLine1Null"
-        svg="[[svg]]"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]">
-      </px-vis-line-svg>
-      <px-vis-line-svg
-        id="missingDataPointLine2Null"
-        svg="[[svg]]"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]">
-      </px-vis-line-svg>
-    </template>
-    </dom-bind>
+  <script type="module">
+const $_documentContainer = document.createElement('template');
 
-    <dom-bind>
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
-      <px-vis-scale
-        id="missingDataPointScaleGap"
-        x-axis-type="time"
-        y-axis-type="linear"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
+      <px-vis-scale id="mutedScale" x-axis-type="time" y-axis-type="linear" x="{{x2}}" y="{{y2}}" domain-changed="{{domainChanged2}}">
       </px-vis-scale>
-      <px-vis-svg
-        id="missingDataPointSVGGap"
-        svg="{{svg}}">
+      <px-vis-svg id="mutedSVG" svg="{{svg2}}">
       </px-vis-svg>
-      <px-vis-line-svg
-        id="missingDataPointLine1Gap"
-        svg="[[svg]]"
-        x="[[x]]"
-        y="[[y]]"
-        show-gaps
-        domain-changed="[[domainChanged]]">
+      <px-vis-line-svg id="mutedLine1" svg="[[svg2]]" x="[[x2]]" y="[[y2]]" domain-changed="[[domainChanged2]]">
       </px-vis-line-svg>
-      <px-vis-line-svg
-        id="missingDataPointLine2Gap"
-        svg="[[svg]]"
-        x="[[x]]"
-        y="[[y]]"
-        show-gaps
-        domain-changed="[[domainChanged]]">
+      <px-vis-line-svg id="mutedLine2" svg="[[svg2]]" x="[[x2]]" y="[[y2]]" domain-changed="[[domainChanged2]]">
       </px-vis-line-svg>
     </template>
-    </dom-bind>
+    </dom-bind>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
+    <template is="dom-bind">
+      <px-vis-scale id="missingDataPointScale" x-axis-type="time" y-axis-type="linear" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
+      </px-vis-scale>
+      <px-vis-svg id="missingDataPointSVG" svg="{{svg}}">
+      </px-vis-svg>
+      <px-vis-line-svg id="missingDataPointLine1" svg="[[svg]]" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]">
+      </px-vis-line-svg>
+      <px-vis-line-svg id="missingDataPointLine2" svg="[[svg]]" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]">
+      </px-vis-line-svg>
+    </template>
+    </dom-bind>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
+    <template is="dom-bind">
+      <px-vis-scale id="missingDataPointScaleNull" x-axis-type="time" y-axis-type="linear" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
+      </px-vis-scale>
+      <px-vis-svg id="missingDataPointSVGNull" svg="{{svg}}">
+      </px-vis-svg>
+      <px-vis-line-svg id="missingDataPointLine1Null" svg="[[svg]]" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]">
+      </px-vis-line-svg>
+      <px-vis-line-svg id="missingDataPointLine2Null" svg="[[svg]]" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]">
+      </px-vis-line-svg>
+    </template>
+    </dom-bind>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
+    <template is="dom-bind">
+      <px-vis-scale id="missingDataPointScaleGap" x-axis-type="time" y-axis-type="linear" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
+      </px-vis-scale>
+      <px-vis-svg id="missingDataPointSVGGap" svg="{{svg}}">
+      </px-vis-svg>
+      <px-vis-line-svg id="missingDataPointLine1Gap" svg="[[svg]]" x="[[x]]" y="[[y]]" show-gaps="" domain-changed="[[domainChanged]]">
+      </px-vis-line-svg>
+      <px-vis-line-svg id="missingDataPointLine2Gap" svg="[[svg]]" x="[[x]]" y="[[y]]" show-gaps="" domain-changed="[[domainChanged]]">
+      </px-vis-line-svg>
+    </template>
+    </dom-bind>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
 
 
 <!--  PARALLEL COORDINATES SVG-->
-    <script>
-      document.addEventListener("WebComponentsReady", function() {
-        Polymer({
-          is: 'px-vis-multi-scale',
-          behaviors: [ PxVisBehaviorScale.scaleMultiAxis ],
-          observers: [
-            '_setXScale(width,margin)',
-            '_setYScale(height,margin,axes)',
-            '_generateDataExtents(dimensions)',
-            '_setDomain(x, y, dataExtents)',
-          ]
-        })
-      });
-    </script>
+    <script type="module">
+import '../px-vis-scale.js';
+import '../px-vis-svg.js';
+import '../px-vis-svg-canvas.js';
+import '../px-vis-line-svg.js';
+import '../px-vis-line-canvas.js';
+import './behaviors/px-colors-behavior.js';
+import '../px-vis-behavior-scale-multi-axis.js';
+import '../px-vis-behavior-scale-radial.js';
+import '../px-vis-behavior-scale-radar.js';
+import '@polymer/polymer/lib/elements/dom-bind.js';
+import '@polymer/polymer/lib/elements/dom-repeat.js';
+import 'px-theme/px-theme-styles.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+Polymer({
+  is: 'px-vis-multi-scale',
+  behaviors: [ PxVisBehaviorScale.scaleMultiAxis ],
+  observers: [
+    '_setXScale(width,margin)',
+    '_setYScale(height,margin,axes)',
+    '_generateDataExtents(dimensions)',
+    '_setDomain(x, y, dataExtents)',
+  ]
+})
+</script>
 
-    <dom-bind>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
-      <px-vis-multi-scale
-        id="parallelScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
+      <px-vis-multi-scale id="parallelScale" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
       </px-vis-multi-scale>
-      <px-vis-svg-canvas
-        id="parallelSVG"
-        svg="{{svg}}">
+      <px-vis-svg-canvas id="parallelSVG" svg="{{svg}}">
       </px-vis-svg-canvas>
-      <px-vis-line-svg
-        id="parallelLine"
-        svg="[[svg]]"
-        parallel-coordinates
-        multi-path
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]">
+      <px-vis-line-svg id="parallelLine" svg="[[svg]]" parallel-coordinates="" multi-path="" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
-    </dom-bind>
+    </dom-bind>`;
 
-    <dom-bind>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
-      <px-vis-multi-scale
-        id="parallelGradientScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
+      <px-vis-multi-scale id="parallelGradientScale" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
       </px-vis-multi-scale>
-      <px-vis-svg-canvas
-        id="parallelGradientSVG"
-        svg="{{svg}}">
+      <px-vis-svg-canvas id="parallelGradientSVG" svg="{{svg}}">
       </px-vis-svg-canvas>
-      <px-vis-line-svg
-        id="parallelGradientLine"
-        svg="[[svg]]"
-        parallel-coordinates
-        multi-path
-        gradient-line
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]">
+      <px-vis-line-svg id="parallelGradientLine" svg="[[svg]]" parallel-coordinates="" multi-path="" gradient-line="" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
-    </dom-bind>
+    </dom-bind>`;
 
-    <dom-bind>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
-      <px-vis-multi-scale
-        id="parallelCategoryScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
+      <px-vis-multi-scale id="parallelCategoryScale" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
       </px-vis-multi-scale>
-      <px-vis-svg-canvas
-        id="parallelCategorySVG"
-        svg="{{svg}}">
+      <px-vis-svg-canvas id="parallelCategorySVG" svg="{{svg}}">
       </px-vis-svg-canvas>
-      <px-vis-line-svg
-        id="parallelCategoryLine"
-        svg="[[svg]]"
-        parallel-coordinates
-        multi-path
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]">
+      <px-vis-line-svg id="parallelCategoryLine" svg="[[svg]]" parallel-coordinates="" multi-path="" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
-    </dom-bind>
+    </dom-bind>`;
 
-    <dom-bind>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
-      <px-vis-multi-scale
-        id="parallelCategoryGradientScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
+      <px-vis-multi-scale id="parallelCategoryGradientScale" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
       </px-vis-multi-scale>
-      <px-vis-svg-canvas
-        id="parallelCategoryGradientSVG"
-        svg="{{svg}}">
+      <px-vis-svg-canvas id="parallelCategoryGradientSVG" svg="{{svg}}">
       </px-vis-svg-canvas>
-      <px-vis-line-svg
-        id="parallelCategoryGradientLine"
-        svg="[[svg]]"
-        parallel-coordinates
-        multi-path
-        gradient-line
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]">
+      <px-vis-line-svg id="parallelCategoryGradientLine" svg="[[svg]]" parallel-coordinates="" multi-path="" gradient-line="" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
-    </dom-bind>
+    </dom-bind>`;
 
-    <dom-bind>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
-      <px-vis-multi-scale
-        id="parallelMissingScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
+      <px-vis-multi-scale id="parallelMissingScale" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
       </px-vis-multi-scale>
-      <px-vis-svg-canvas
-        id="parallelMissingSVG"
-        svg="{{svg}}">
+      <px-vis-svg-canvas id="parallelMissingSVG" svg="{{svg}}">
       </px-vis-svg-canvas>
-      <px-vis-line-svg
-        id="parallelMissingLine"
-        svg="[[svg]]"
-        parallel-coordinates
-        multi-path
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]">
+      <px-vis-line-svg id="parallelMissingLine" svg="[[svg]]" parallel-coordinates="" multi-path="" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
-    </dom-bind>
+    </dom-bind>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
 
 
     <!-- POLAR -->
-    <script>
-      document.addEventListener("WebComponentsReady", function() {
-        Polymer({
-          is: 'px-vis-radial-scale',
-          behaviors: [ PxVisBehaviorScale.radial ],
-          observers: [
-            '_setYScale(radius,offset)',
-            '_generateChartExtents(chartData.*, _amplitudeKey)',
-            '_setDomain(y, _calculatedExtents)',
-          ]
-        })
-      });
-    </script>
+    <script type="module">
+import '../px-vis-scale.js';
+import '../px-vis-svg.js';
+import '../px-vis-svg-canvas.js';
+import '../px-vis-line-svg.js';
+import '../px-vis-line-canvas.js';
+import './behaviors/px-colors-behavior.js';
+import '../px-vis-behavior-scale-multi-axis.js';
+import '../px-vis-behavior-scale-radial.js';
+import '../px-vis-behavior-scale-radar.js';
+import '@polymer/polymer/lib/elements/dom-bind.js';
+import '@polymer/polymer/lib/elements/dom-repeat.js';
+import 'px-theme/px-theme-styles.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+Polymer({
+  is: 'px-vis-radial-scale',
+  behaviors: [ PxVisBehaviorScale.radial ],
+  observers: [
+    '_setYScale(radius,offset)',
+    '_generateChartExtents(chartData.*, _amplitudeKey)',
+    '_setDomain(y, _calculatedExtents)',
+  ]
+})
+</script>
 
-    <dom-bind>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
-      <px-vis-radial-scale
-        id="polarScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
+      <px-vis-radial-scale id="polarScale" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
       </px-vis-radial-scale>
-      <px-vis-svg
-        id="polarSVG"
-        svg="{{svg}}">
+      <px-vis-svg id="polarSVG" svg="{{svg}}">
       </px-vis-svg>
-      <px-vis-line-svg
-        id="polarLine"
-        svg="[[svg]]"
-        radial-line
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]">
+      <px-vis-line-svg id="polarLine" svg="[[svg]]" radial-line="" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
-    </dom-bind>
+    </dom-bind>`;
 
-    <dom-bind>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
-      <px-vis-radial-scale
-        id="polarDegreeScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
+      <px-vis-radial-scale id="polarDegreeScale" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
       </px-vis-radial-scale>
-      <px-vis-svg
-        id="polarDegreeSVG"
-        svg="{{svg}}">
+      <px-vis-svg id="polarDegreeSVG" svg="{{svg}}">
       </px-vis-svg>
-      <px-vis-line-svg
-        id="polarDegreeLine"
-        svg="[[svg]]"
-        radial-line
-        use-degrees
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]">
+      <px-vis-line-svg id="polarDegreeLine" svg="[[svg]]" radial-line="" use-degrees="" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
-    </dom-bind>
+    </dom-bind>`;
 
-    <dom-bind>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
-      <px-vis-radial-scale
-        id="polarCCWScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
+      <px-vis-radial-scale id="polarCCWScale" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
       </px-vis-radial-scale>
-      <px-vis-svg
-        id="polarCCWSVG"
-        svg="{{svg}}">
+      <px-vis-svg id="polarCCWSVG" svg="{{svg}}">
       </px-vis-svg>
-      <px-vis-line-svg
-        id="polarCCWLine"
-        svg="[[svg]]"
-        radial-line
-        counter-clockwise
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]">
+      <px-vis-line-svg id="polarCCWLine" svg="[[svg]]" radial-line="" counter-clockwise="" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
-    </dom-bind>
+    </dom-bind>`;
 
-    <dom-bind>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
-      <px-vis-radial-scale
-        id="polarDegreeCCWScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
+      <px-vis-radial-scale id="polarDegreeCCWScale" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
       </px-vis-radial-scale>
-      <px-vis-svg
-        id="polarDegreeCCWSVG"
-        svg="{{svg}}">
+      <px-vis-svg id="polarDegreeCCWSVG" svg="{{svg}}">
       </px-vis-svg>
-      <px-vis-line-svg
-        id="polarDegreeCCWLine"
-        svg="[[svg]]"
-        radial-line
-        use-degrees
-        counter-clockwise
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]">
+      <px-vis-line-svg id="polarDegreeCCWLine" svg="[[svg]]" radial-line="" use-degrees="" counter-clockwise="" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
-    </dom-bind>
+    </dom-bind>`;
 
-    <dom-bind>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
-      <px-vis-radial-scale
-        id="polarMissingScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
+      <px-vis-radial-scale id="polarMissingScale" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
       </px-vis-radial-scale>
-      <px-vis-svg
-        id="polarMissingSVG"
-        svg="{{svg}}">
+      <px-vis-svg id="polarMissingSVG" svg="{{svg}}">
       </px-vis-svg>
-      <px-vis-line-svg
-        id="polarMissingLine"
-        svg="[[svg]]"
-        radial-line
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]">
+      <px-vis-line-svg id="polarMissingLine" svg="[[svg]]" radial-line="" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
-    </dom-bind>
+    </dom-bind>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
 
     <!--  RADAR -->
-    <script>
-      document.addEventListener("WebComponentsReady", function() {
-        Polymer({
-          is: 'px-vis-radar-scale',
-          behaviors: [ PxVisBehaviorScale.radar ],
-          observers: [
-            '_setXScale(_radius)',
-            '_setYScale(_radius,centerOffset)',
-            '_generateChartExtents(chartData.*, dimensions)',
-            '_generateChartExtents(chartExtents)',
-            '_setDomain(x, y, _calculatedExtents)',
-          ]
-        })
-      });
-    </script>
+    <script type="module">
+import '../px-vis-scale.js';
+import '../px-vis-svg.js';
+import '../px-vis-svg-canvas.js';
+import '../px-vis-line-svg.js';
+import '../px-vis-line-canvas.js';
+import './behaviors/px-colors-behavior.js';
+import '../px-vis-behavior-scale-multi-axis.js';
+import '../px-vis-behavior-scale-radial.js';
+import '../px-vis-behavior-scale-radar.js';
+import '@polymer/polymer/lib/elements/dom-bind.js';
+import '@polymer/polymer/lib/elements/dom-repeat.js';
+import 'px-theme/px-theme-styles.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+Polymer({
+  is: 'px-vis-radar-scale',
+  behaviors: [ PxVisBehaviorScale.radar ],
+  observers: [
+    '_setXScale(_radius)',
+    '_setYScale(_radius,centerOffset)',
+    '_generateChartExtents(chartData.*, dimensions)',
+    '_generateChartExtents(chartExtents)',
+    '_setDomain(x, y, _calculatedExtents)',
+  ]
+})
+</script>
 
-    <dom-bind>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
-      <px-vis-radar-scale
-        id="radarScale"
-        radar
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
+      <px-vis-radar-scale id="radarScale" radar="" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
       </px-vis-radar-scale>
-      <px-vis-svg-canvas
-        id="radarSVG"
-        svg="{{svg}}">
+      <px-vis-svg-canvas id="radarSVG" svg="{{svg}}">
       </px-vis-svg-canvas>
-      <px-vis-line-svg
-        id="radarLine"
-        svg="[[svg]]"
-        radial-line
-        multi-path
-        line-radius-limit="25"
-        interpolation-function="bofCompleteManually"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]">
+      <px-vis-line-svg id="radarLine" svg="[[svg]]" radial-line="" multi-path="" line-radius-limit="25" interpolation-function="bofCompleteManually" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
-    </dom-bind>
+    </dom-bind>`;
 
-    <dom-bind>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
-      <px-vis-radar-scale
-        id="radarMissingScale"
-        radar
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
+      <px-vis-radar-scale id="radarMissingScale" radar="" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
       </px-vis-radar-scale>
-      <px-vis-svg-canvas
-        id="radarMissingSVG"
-        svg="{{svg}}">
+      <px-vis-svg-canvas id="radarMissingSVG" svg="{{svg}}">
       </px-vis-svg-canvas>
-      <px-vis-line-svg
-        id="radarMissingLine"
-        svg="[[svg]]"
-        radial-line
-        multi-path
-        interpolation-function="bofCompleteManually"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]">
+      <px-vis-line-svg id="radarMissingLine" svg="[[svg]]" radial-line="" multi-path="" interpolation-function="bofCompleteManually" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
-    </dom-bind>
+    </dom-bind>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
 
 <!-- Interpolation-->
-<dom-bind>
+<script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
-      <px-vis-scale
-        id="interpolationScale"
-        x-axis-type="time"
-        y-axis-type="linear"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
+      <px-vis-scale id="interpolationScale" x-axis-type="time" y-axis-type="linear" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
       </px-vis-scale>
-      <px-vis-svg
-        id="interpolationSVG"
-        svg="{{svg}}">
+      <px-vis-svg id="interpolationSVG" svg="{{svg}}">
       </px-vis-svg>
-      <px-vis-line-svg
-        id="interpolationLine1"
-        svg="[[svg]]"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]">
+      <px-vis-line-svg id="interpolationLine1" svg="[[svg]]" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
-      <px-vis-line-svg
-        id="interpolationLine2"
-        svg="[[svg]]"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]">
+      <px-vis-line-svg id="interpolationLine2" svg="[[svg]]" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
-      <px-vis-line-svg
-        id="interpolationLine3"
-        svg="[[svg]]"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]">
+      <px-vis-line-svg id="interpolationLine3" svg="[[svg]]" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]">
       </px-vis-line-svg>
     </template>
-</dom-bind>
+</dom-bind>`;
 
-    <div id="domRepeatDiv">
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div id="domRepeatDiv">
         <dom-bind id="domRepeatDomBind2">
       <template id="domRepeatDomBind" is="dom-bind">
-        <px-vis-scale
-          id="domRepeatScale"
-          x-axis-type="time"
-          y-axis-type="linear"
-          x="{{x}}"
-          y="{{y}}"
-          domain-changed="{{domainChanged}}"
-          chart-data="[[chartData]]"
-          complete-series-config="[[completeSeriesConfig]]">
+        <px-vis-scale id="domRepeatScale" x-axis-type="time" y-axis-type="linear" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}" chart-data="[[chartData]]" complete-series-config="[[completeSeriesConfig]]">
         </px-vis-scale>
-        <px-vis-svg
-          id="domRepeatSVG"
-          svg="{{svg}}">
+        <px-vis-svg id="domRepeatSVG" svg="{{svg}}">
         </px-vis-svg>
 
         <dom-repeat>
           <template is="dom-repeat" items="[[seriesKeys]]">
-            <px-vis-line-svg
-              class$="[[_myClass(item)]]"
-              svg="[[svg]]"
-              x="[[x]]"
-              y="[[y]]"
-              domain-changed="[[domainChanged]]"
-              chart-data="[[chartData]]"
-              complete-series-config="[[completeSeriesConfig]]"
-              series-id="[[item]]">
+            <px-vis-line-svg class\$="[[_myClass(item)]]" svg="[[svg]]" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]" chart-data="[[chartData]]" complete-series-config="[[completeSeriesConfig]]" series-id="[[item]]">
             </px-vis-line-svg>
           </template>
         </dom-repeat>
       </template>
       </dom-bind>
-    </div>
+    </div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
 
   </body>
 </html>

@@ -1,0 +1,164 @@
+/*
+Copyright (c) 2018, General Electric
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/**
+
+### Usage
+
+    <px-vis-radial-gridlines
+        svg="[[svg]]"
+        axis="[[y]]"
+        domain-changed="[[domainChanged]]"
+        margin="[[margin]]"
+        tick-values="[[drawnTickValues]]">
+    </px-vis-radial-gridlines>
+
+### d3 reference
+https://github.com/mbostock/d3/wiki/SVG-Axes
+The gridlines still make use of the d3.axis object, just with different settings
+
+### Styling
+The following custom properties are available for styling:
+
+Custom property | Description
+:----------------|:-------------
+  `--px-vis-gridlines-color` | The color for the gridlines
+
+@element px-vis-radial-gridlines
+@blurb Drawing object which adds gridlines to the chart.
+@homepage index.html
+@demo demo.html
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+import '@polymer/polymer/polymer-legacy.js';
+
+import './px-vis-behavior-common.js';
+import './px-vis-behavior-d3.js';
+import './css/px-vis-styles.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+import { html } from '@polymer/polymer/lib/utils/html-tag.js';
+Polymer({
+  _template: html`
+      <style include="px-vis-styles"></style>
+`,
+
+  is: 'px-vis-radial-gridlines',
+
+  behaviors: [
+    PxVisBehavior.observerCheck,
+    PxVisBehaviorD3.svg,
+    PxVisBehavior.commonMethods,
+    PxVisBehaviorD3.axis,
+    PxVisBehaviorD3.axisConfig,
+    PxVisBehaviorD3.domainUpdate,
+    PxVisBehavior.updateStylesOverride
+  ],
+
+  /**
+   * Properties block, expose attribute values to the DOM via 'reflect'
+   *
+   * @property properties
+   * @type Object
+   */
+  properties: {
+
+    tickValues: {
+        type: Array,
+        value: function() { return []; }
+    },
+
+    _radialGroup: {
+      type: Object
+    },
+    _lineGroup: {
+      type: Object
+    }
+  },
+
+  observers: [
+    'drawElement(domainChanged, axis, margin, svg, tickValues, _stylesUpdated)'
+  ],
+
+  /**
+   * Draws the gridlines. Called by observer.
+   *
+   * @method _drawElement
+   */
+  drawElement: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
+    this.debounce('draw_grid', function() {
+
+      var radius = Math.max(0, this.axis.range()[1] - this.axis.range()[0]);
+
+      if(!this._radialGroup) {
+        this._lineGroup = this.svg.append('g')
+          .attr('class', 'axisGridLines');
+      }
+
+      this._lineGroup
+        .attr('stroke', this._checkThemeVariable("--px-vis-gridlines-color", 'rgb(125,125,125)'))
+        .attr('stroke-width', '1');
+
+      //draw the lines
+      var lineBuilder = this._lineGroup.selectAll('line')
+          //data is our degree markings that are not occupied by axes
+          .data([30,60,120,150,210,240,300,330]);
+
+      lineBuilder.enter()
+        .append('line')
+        .attr('transform', function(d) { return 'rotate(' + -d + ')'; })
+      .merge(lineBuilder)
+        .attr('x2', radius);
+
+
+      //draw the circles
+      //if we have ticks, use them, otherwise generate some from the scale
+      var tickValues = this.tickValues.length > 0 ? this.tickValues : this.axis.ticks(5).slice(1);
+
+      //make sure we have an outer circle.
+      if(this.axis.domain()) {
+        tickValues.push(this.axis.domain()[1]);
+      }
+
+      if(!this._radialGroup) {
+
+        this._radialGroup = this.svg.append('g')
+          .attr('class', 'radialGridlines');
+      }
+
+      this._radialGroup
+        .attr('fill', 'none')
+        .attr('stroke', this._checkThemeVariable("--px-vis-gridlines-color", 'rgb(125,125,125)'));
+
+      var circleBuilder = this._radialGroup.selectAll('circle')
+                                            .data(tickValues);
+
+      circleBuilder.exit().remove();
+
+      circleBuilder.enter()
+        .append('circle')
+      .merge(circleBuilder)
+          // pass in our scale to use as a callback function
+          .attr('r', this.axis);
+    },5);
+  }
+});

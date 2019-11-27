@@ -1,0 +1,87 @@
+/*
+Copyright (c) 2018, General Electric
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/**
+
+### Usage
+
+    <px-vis-register-datetime
+        first-date-time="[[_firstDateTime]]"
+        second-date-time="[[_secondDateTime]]"
+        separator="[[_separator]]"
+        x-axis-type="[[xAxisType]]">
+    </px-vis-register-datetime>
+
+
+### Time, number, and name formatting
+Formatting for the timestamps, the data values, and the series names can be controlled via a series of properties.
+Please see the properties for configuration details.
+
+@element px-vis-register-datetime
+@blurb Element providing a date formating for the register.
+@homepage index.html
+@demo demo.html
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+import '@polymer/polymer/polymer-legacy.js';
+
+import './px-vis-behavior-register.js';
+import './px-vis-behavior-common.js';
+import './css/px-vis-register-styles.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+import { html } from '@polymer/polymer/lib/utils/html-tag.js';
+Polymer({
+  _template: html`
+    <style include="px-vis-register-styles"></style>
+
+    <div id="dateTime">
+      <span class\$="seriesMarker [[_hide(seriesKey, completeSeriesConfig.*)]]" style\$="background-color:[[_computeItemColor(seriesKey, completeSeriesConfig.*)]]">&nbsp;</span>
+      <span id="firstDateTime">[[firstDateTime]]</span> <span>[[separator]]</span> <span id="secondDateTime">[[secondDateTime]]</span>  &nbsp;
+    </div>
+`,
+
+  is: 'px-vis-register-datetime',
+
+  behaviors: [
+    PxVisBehaviorRegister.datetime,
+    PxVisBehavior.completeSeriesConfig
+  ],
+
+  properties: {
+    seriesKey: {
+      type: String
+    }
+  },
+
+  _hide: function() {
+    if(!this.seriesKey || !this.completeSeriesConfig || !this.completeSeriesConfig[this.seriesKey]) {
+      return 'hide';
+    }
+
+    return '';
+  },
+
+  _computeItemColor: function(seriesKey) {
+    if(!this.seriesKey || !this.completeSeriesConfig || !this.completeSeriesConfig[seriesKey]) {
+      return '';
+    }
+
+    return this.completeSeriesConfig[seriesKey]['color'];
+  }
+});

@@ -42,7 +42,9 @@ limitations under the License.
     </template>
   </template>
 </dom-module>
-<script>
+<script type="module">
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+import { dom } from '@polymer/polymer/lib/legacy/polymer.dom.js';
 Polymer({
   is: "px-vis-demo-loop",
   properties: {
@@ -55,9 +57,9 @@ Polymer({
     }
   },
   _addDemo: function() {
-    var demoContainer = Polymer.dom(this.root).querySelector('.demo');
+    var demoContainer = dom(this.root).querySelector('.demo');
     var newDemoElement = document.createElement(this.item.name + '-demo-component');
-    Polymer.dom(this.root).querySelector('.demo').insertBefore(newDemoElement, demoContainer.firstChild);
+    dom(this.root).querySelector('.demo').insertBefore(newDemoElement, demoContainer.firstChild);
   },
   _tertiaryDescriptionExists: function(item) {
     return item.tertiaryDescription && item.tertiaryDescription.length;
@@ -73,5 +75,4 @@ Polymer({
     this.fire('px-demo-active-should-change', {name: name});
   }
 });
-
-  </script>
+</script>

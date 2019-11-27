@@ -22,206 +22,210 @@ limitations under the License.
     <title>Web Component Test : Fixture for px-vis-highlight-line</title>
 
     <!-- Requires Webcomponents.js polyfill is provided by the page for browsers that don't support html imports -->
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
     <!-- web-component-tester automatically provides local copy of brower.js below
          for any URL ending with "/web-component-tester/browser.js"
          when wct is run from the command line -->
-    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../wct-browser-legacy/browser.js"></script>
 
 
-    <link rel="import" href="../px-vis-svg-canvas.html" />
-    <link rel="import" href="../px-vis-behavior-scale-multi-axis.html" />
-    <link rel="import" href="../px-vis-behavior-scale-radar.html" />
-    <link rel="import" href="../px-vis-highlight-line.html" />
-    <link rel="import" href="behaviors/px-colors-behavior.html" />
-    <link rel="import" href="../../polymer/lib/elements/dom-bind.html" />
+    <script type="module" src="../px-vis-svg-canvas.js"></script>
+    <script type="module" src="../px-vis-behavior-scale-multi-axis.js"></script>
+    <script type="module" src="../px-vis-behavior-scale-radar.js"></script>
+    <script type="module" src="../px-vis-highlight-line.js"></script>
+    <script type="module" src="./behaviors/px-colors-behavior.js"></script>
+    <script type="module" src="../../@polymer/polymer/lib/elements/dom-bind.js"></script>
 
     <!-- Retain this link for px-theme.html -->
     <!-- px-theme is needed for WCT to run without errors -->
-    <link rel="import" href="../../px-theme/px-theme-styles.html">
+    <script type="module" src="../../px-theme/px-theme-styles.js"></script>
 
-    <custom-style>
+    <!-- FIXME(polymer-modulizer):
+        These imperative modules that innerHTML your HTML are
+        a hacky way to be sure that any mixins in included style
+        modules are ready before any elements that reference them are
+        instantiated, otherwise the CSS @apply mixin polyfill won't be
+        able to expand the underlying CSS custom properties.
+        See: https://github.com/Polymer/polymer-modulizer/issues/154
+        -->
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<custom-style>
     <style include="px-theme-styles" is="custom-style"></style>
-  </custom-style>
+  </custom-style>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
 
 
-    <script src="px-vis-highlight-line-tests.js"></script>
+    <script src="./px-vis-highlight-line-tests.js"></script>
   </head>
 
   <body>
-    <h3>Web Component Test : Fixture for px-vis-highlight-line</h3>
-    <script>
-      document.addEventListener("WebComponentsReady", function() {
-        Polymer({
-          is: 'px-vis-multi-scale',
-          behaviors: [ PxVisBehaviorScale.scaleMultiAxis ],
-          observers: [
-            '_setXScale(width,margin)',
-            '_setYScale(height,margin,axes)',
-            '_generateDataExtents(dimensions)',
-            '_setDomain(x, y, dataExtents)',
-          ]
-        })
-      });
-    </script>
-    <script>
-      document.addEventListener("WebComponentsReady", function() {
-        Polymer({
-          is: 'px-vis-radar-scale',
-          behaviors: [ PxVisBehaviorScale.radar ],
-          observers: [
-            '_setXScale(_radius)',
-            '_setYScale(_radius,centerOffset)',
-            '_generateChartExtents(chartData.*, dimensions)',
-            '_generateChartExtents(chartExtents)',
-            '_setDomain(x, y, _calculatedExtents)',
-          ]
-        })
-      });
-    </script>
-    <dom-bind>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h3>Web Component Test : Fixture for px-vis-highlight-line</h3>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+import '../px-vis-svg-canvas.js';
+import '../px-vis-behavior-scale-multi-axis.js';
+import '../px-vis-behavior-scale-radar.js';
+import '../px-vis-highlight-line.js';
+import './behaviors/px-colors-behavior.js';
+import '@polymer/polymer/lib/elements/dom-bind.js';
+import 'px-theme/px-theme-styles.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+Polymer({
+  is: 'px-vis-multi-scale',
+  behaviors: [ PxVisBehaviorScale.scaleMultiAxis ],
+  observers: [
+    '_setXScale(width,margin)',
+    '_setYScale(height,margin,axes)',
+    '_generateDataExtents(dimensions)',
+    '_setDomain(x, y, dataExtents)',
+  ]
+})
+</script>
+    <script type="module">
+import '../px-vis-svg-canvas.js';
+import '../px-vis-behavior-scale-multi-axis.js';
+import '../px-vis-behavior-scale-radar.js';
+import '../px-vis-highlight-line.js';
+import './behaviors/px-colors-behavior.js';
+import '@polymer/polymer/lib/elements/dom-bind.js';
+import 'px-theme/px-theme-styles.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+Polymer({
+  is: 'px-vis-radar-scale',
+  behaviors: [ PxVisBehaviorScale.radar ],
+  observers: [
+    '_setXScale(_radius)',
+    '_setYScale(_radius,centerOffset)',
+    '_generateChartExtents(chartData.*, dimensions)',
+    '_generateChartExtents(chartExtents)',
+    '_setDomain(x, y, _calculatedExtents)',
+  ]
+})
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
       <px-vis-svg-canvas id="parallelSVG">
       </px-vis-svg-canvas>
-      <px-vis-multi-scale
-        id="parallelScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
+      <px-vis-multi-scale id="parallelScale" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
       </px-vis-multi-scale>
-      <px-vis-highlight-line
-        id="parallelhighlight"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]"
-        parallel-coordinates>
+      <px-vis-highlight-line id="parallelhighlight" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]" parallel-coordinates="">
       </px-vis-highlight-line>
     </template>
-    </dom-bind>
+    </dom-bind>`;
 
-    <dom-bind>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
       <px-vis-svg-canvas id="radarSVG"></px-vis-svg-canvas>
-      <px-vis-radar-scale
-        id="radarScale"
-        radar
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
+      <px-vis-radar-scale id="radarScale" radar="" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
       </px-vis-radar-scale>
-      <px-vis-highlight-line
-        id="radarhighlight"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]"
-        radial-line
-        interpolation-function="bofCompleteManually">
+      <px-vis-highlight-line id="radarhighlight" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]" radial-line="" interpolation-function="bofCompleteManually">
       </px-vis-highlight-line>
     </template>
-    </dom-bind>
+    </dom-bind>`;
 
-    <dom-bind>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
       <px-vis-svg-canvas id="differentSVG">
       </px-vis-svg-canvas>
-      <px-vis-multi-scale
-        id="differentScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
+      <px-vis-multi-scale id="differentScale" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
       </px-vis-multi-scale>
-      <px-vis-highlight-line
-        id="differenthighlight"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]"
-        parallel-coordinates
-        different-dataset>
+      <px-vis-highlight-line id="differenthighlight" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]" parallel-coordinates="" different-dataset="">
       </px-vis-highlight-line>
     </template>
-    </dom-bind>
+    </dom-bind>`;
 
-    <dom-bind>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
       <px-vis-svg-canvas id="fuzzSVG">
       </px-vis-svg-canvas>
-      <px-vis-multi-scale
-        id="fuzzScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
+      <px-vis-multi-scale id="fuzzScale" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
       </px-vis-multi-scale>
-      <px-vis-highlight-line
-        id="fuzzhighlight"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]"
-        parallel-coordinates
-        different-dataset
-        fuzz="30000000">
+      <px-vis-highlight-line id="fuzzhighlight" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]" parallel-coordinates="" different-dataset="" fuzz="30000000">
       </px-vis-highlight-line>
     </template>
-    </dom-bind>
+    </dom-bind>`;
 
-    <dom-bind>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
       <px-vis-svg-canvas id="generatingSVG">
       </px-vis-svg-canvas>
-      <px-vis-multi-scale
-        id="generatingScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
+      <px-vis-multi-scale id="generatingScale" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
       </px-vis-multi-scale>
-      <px-vis-highlight-line
-        id="generatinghighlight"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]"
-        parallel-coordinates>
+      <px-vis-highlight-line id="generatinghighlight" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]" parallel-coordinates="">
       </px-vis-highlight-line>
     </template>
-    </dom-bind>
+    </dom-bind>`;
 
-    <dom-bind>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
       <px-vis-svg-canvas id="forceSVG">
       </px-vis-svg-canvas>
-      <px-vis-multi-scale
-        id="forceScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
+      <px-vis-multi-scale id="forceScale" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
       </px-vis-multi-scale>
-      <px-vis-highlight-line
-        id="forcehighlight"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]"
-        parallel-coordinates>
+      <px-vis-highlight-line id="forcehighlight" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]" parallel-coordinates="">
       </px-vis-highlight-line>
     </template>
-    </dom-bind>
+    </dom-bind>`;
 
-    <dom-bind>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
       <px-vis-svg-canvas id="tooltipSVG">
       </px-vis-svg-canvas>
-      <px-vis-multi-scale
-        id="tooltipScale"
-        x="{{x}}"
-        y="{{y}}"
-        domain-changed="{{domainChanged}}">
+      <px-vis-multi-scale id="tooltipScale" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}">
       </px-vis-multi-scale>
-      <px-vis-highlight-line
-        id="tooltiphighlight"
-        x="[[x]]"
-        y="[[y]]"
-        domain-changed="[[domainChanged]]"
-        parallel-coordinates>
+      <px-vis-highlight-line id="tooltiphighlight" x="[[x]]" y="[[y]]" domain-changed="[[domainChanged]]" parallel-coordinates="">
       </px-vis-highlight-line>
     </template>
-    </dom-bind>
+    </dom-bind>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
 
 
   </body>

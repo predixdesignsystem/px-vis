@@ -1,0 +1,292 @@
+/*
+Copyright (c) 2018, General Electric
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/**
+
+### Usage
+
+    <px-vis-tooltip
+        hover-target=[[mouseRect]]
+        mouse-position="[[mousePosition]]"
+        width="250"
+        margin="[[margin]]"
+        chart-data="[[chartData]]"
+        tooltip-data="[[tooltipData]]"
+        complete-series-config="[[completeSeriesConfig]]"
+        x-axis-type="time"
+        tooltip-style="light"
+        muted-series="[[mutedSeries]]">
+    </px-vis-tooltip>
+
+### Styling
+The following custom properties are available for styling:
+
+Custom property | Description
+:----------------|:-------------
+  `--px-vis-register-series-name` | The color of the data series name
+  `--px-vis-register-data-value` | The color of the data series value
+  `--px-vis-register-box` | The color of the box around the register when a scrollbar is present
+  |
+  |
+  |
+  `--px-tooltip-background-color` | The color of the tooltip
+  `--px-tooltip-text-color` | The color of the tooltip text
+  `--px-tooltip-light-background-color` | The color of the light version tooltip
+  `--px-tooltip-light-text-color` | The color of the light version tooltip text
+  `--px-tooltip-light-border-color`| The color of the light version tooltip border
+
+
+@element px-vis-tooltip
+@blurb Element providing on-chart hover functionality to get data values near the mouse cursor.
+@homepage index.html
+@demo demo.html
+
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+import '@polymer/polymer/polymer-legacy.js';
+
+import 'px-tooltip/px-tooltip.js';
+import './px-vis-behavior-common.js';
+import './px-vis-behavior-register.js';
+import './px-vis-behavior-d3.js';
+import './px-vis-behavior-datetime.js';
+import './px-vis-register.js';
+import './css/px-vis-tooltip-styles.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+import { html } from '@polymer/polymer/lib/utils/html-tag.js';
+Polymer({
+  _template: html`
+    <style include="px-vis-tooltip-styles"></style>
+
+    <template id="template" is="dom-if" if="[[!_internalHidden]]">
+      <px-tooltip id="tooltip" tooltip-style="[[tooltipStyle]]" for="[[hoverTarget]]" delay="50" orientation="[[orientation]]" smart-orientation="" follow-mouse="" mouse-coords="[[mousePosition]]">
+          <px-vis-register id="register" style="--px-tooltip-max-width: 10000px;--px-vis-register-border-color: transparent;" hide-pagination-controls="" tooltip-style="[[tooltipStyle]]" truncation-length="100" groupings="[[_groupings]]" force-date-time-display="[[forceDateTimeDisplay]]" chart-data="[[chartData]]" x-axis-type="[[xAxisType]]" y-axis-type="[[yAxisType]]" complete-series-config="[[_mutedCompleteSeriesConfig]]" muted-series="[[mutedSeries]]" number-format="[[numberFormat]]" number-format-culture="[[numberFormatCulture]]" number-format-is-currency\$="[[numberFormatIsCurrency]]" number-format-currency="[[numberFormatCurrency]]" number-format-zero="[[numberFormatZero]]" first-date-time-format="[[firstDateTimeFormat]]" second-date-time-format="[[secondDateTimeFormat]]" separator="[[separator]]" timezone="[[timezone]]" display-ordinal-value="[[displayOrdinalValue]]" display-x-values-only="[[displayXValuesOnly]]" display-y-values-only="[[displayYValuesOnly]]" icon-color="[[iconColor]]" prevent-min-size="">
+          </px-vis-register>
+      </px-tooltip>
+    </template>
+`,
+
+  is: 'px-vis-tooltip',
+
+  behaviors: [
+    PxVisBehavior.observerCheck,
+    PxVisBehavior.dataset,
+    PxVisBehavior.tooltipData,
+    PxVisBehavior.axisTypes,
+    PxVisBehavior.mutedCompleteSeriesConfig,
+    PxVisBehavior.formatting,
+    PxVisBehaviorTime.datetime,
+    PxVisBehavior.forceDateTimeDisplay,
+    PxVisBehaviorRegister.groupings,
+    PxVisBehavior.commonMethods,
+    PxVisBehaviorRegister.displayTypes
+  ],
+
+  /**
+   * Properties block, expose attribute values to the DOM via 'reflect'
+   *
+   * @property properties
+   * @type Object
+   */
+  properties: {
+    /**
+     * The DOM element over which the tooltip should be shown.
+     * Generally some <g> or <rect> element on the svg.
+     *
+     */
+    hoverTarget: {
+      type: Object
+    },
+    /**
+     * The x,y screen position where you want the tooltip to be displayed.
+     * Can be the mouse position; can also be any arbitrary screen position.
+     *
+     */
+    mousePosition:{
+      type: Array
+    },
+    /**
+     * Tooltip style supports two values:
+     * - `light` : gives the tooltip a white background
+     * - `dark`  : gives the tooltip a black background (default)
+     *
+     */
+    tooltipStyle: {
+      type: String,
+      value: "dark"
+    },
+    /**
+     * Orientation for the tooltip.
+     *
+     */
+    orientation: {
+      type: String,
+      value: "right"
+    },
+    _groupings: {
+      type: Number,
+      value: 1,
+      computed: '_checkGroups(_mutedTooltipData.*, groupings)'
+    },
+    /**
+     * Whether to hide the tooltip.
+     */
+    hide: {
+      type: Boolean,
+      value: false
+    },
+    _internalHidden: {
+      type: Boolean,
+      value: false
+    },
+    _tooltipElem: {
+      type: HTMLElement
+    },
+    _registerElem: {
+      type: HTMLElement
+    },
+    _mutedTooltipData: {
+      type: Object,
+      computed: '_computeMutedData(tooltipData.*, mutedSeries, hardMute)'
+    }
+  },
+
+  observers: ['_computeInternalHidden(hide, _mutedTooltipData)'],
+
+  attached: function() {
+    this.set('_tooltipElem', this.$$('px-tooltip'));
+    this.set('_registerElem', this.$$('px-vis-register'));
+  },
+
+  /**
+   *  Forces the tooltip to show by calling _show on px-tooltip.
+   */
+  forceShow: function(numberSeriesChanged) {
+    if(this._tooltipElem) {
+      this._tooltipElem.set('opened', true);
+    }
+
+    if(numberSeriesChanged) {
+      //make sure the tooltip will take its new size into account
+      this._tooltipElem.notifyResize();
+    }
+
+    // dirty workaround to force register to display mutedSeries properly
+    // if a series is muted while tooltip is hidden, muted class wont get applied
+    // workaround resets mutedSeries to force classes to be recalculated
+    var reg = this.shadowRoot ? this.shadowRoot.querySelector('#register') : this.querySelector('#register');
+
+    if(reg) {
+      reg.mutedSeries = {};
+      reg.set('mutedSeries', this.mutedSeries);
+    }
+  },
+
+  /**
+   *  Forces the tooltip to hide by calling _hide on px-tooltip.
+   */
+  forceHide: function() {
+
+    if(this._tooltipElem) {
+      this._tooltipElem.set('opened', false);
+    }
+  },
+
+  _checkGroups: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    // if the dev specified a number of groups
+    if(this.groupings && this.groupings > 1) {
+      return this.groupings
+    }
+
+    if(this._mutedTooltipData && this._mutedTooltipData.series.length < 16) {
+      return 1;
+    } else if(this._mutedTooltipData && this._mutedTooltipData.series.length < 24) {
+      return 2;
+    } else {
+      return 3;
+    }
+  },
+
+  _computeInternalHidden: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
+   if(this._mutedTooltipData) {
+    var oldHidden = this._internalHidden,
+        hidden = this._mutedTooltipData.hidden || this.hide ||
+          this._mutedTooltipData.series && this._mutedTooltipData.series.length === 0;
+    this.set('_internalHidden', hidden);
+
+    if(!this._tooltipElem && !this._internalHidden) {
+      this.$.template.render();
+      this.set('_tooltipElem', this.$$('px-tooltip'));
+      this.set('_registerElem', this.$$('px-vis-register'));
+    }
+
+    if(this._tooltipElem) {
+      if(hidden) {
+        if(!oldHidden) {
+          this.forceHide();
+        }
+      } else {
+        //only update tooltip data for register when we're shown to avoid
+        //non needed calculations by register
+        var numberSeriesChanged = false;
+        if(this._registerElem.tooltipData && this._registerElem.tooltipData.series.length !== this._mutedTooltipData.series.length) {
+          numberSeriesChanged = true;
+        }
+
+        this._registerElem.set('tooltipData', this._mutedTooltipData);
+        this.forceShow(numberSeriesChanged);
+      }
+    }
+   }
+  },
+
+  _computeMutedData: function() {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    if(!(this.tooltipData === undefined || this.hardMute === undefined || this.mutedSeries === undefined)) {
+
+      if(!this.hardMute || this._isObjEmpty(this.mutedSeries)) {
+        return this.tooltipData;
+      } else {
+        var result = this.clone(this.tooltipData),
+            newSeries = [];
+
+        //only keep non muted series
+        for(var j=0; j<this.tooltipData.series.length; j++) {
+          if(this.mutedSeries[this.tooltipData.series[j].name] !== true) {
+            newSeries.push(this.tooltipData.series[j]);
+          }
+        }
+        result.series = newSeries;
+
+        return result;
+      }
+    }
+  }
+});

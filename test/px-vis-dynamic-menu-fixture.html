@@ -22,36 +22,59 @@ limitations under the License.
     <title>Web Component Test : Fixture for px-vis-dynamic-menu</title>
 
     <!-- Requires Webcomponents.js polyfill is provided by the page for browsers that don't support html imports -->
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
     <!-- web-component-tester automatically provides local copy of brower.js below
          for any URL ending with "/web-component-tester/browser.js"
          when wct is run from the command line -->
-    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../wct-browser-legacy/browser.js"></script>
     <!-- Retain this link for px-theme.html -->
-    <link rel="import" href="../px-vis-dynamic-menu.html" />
-    <link rel="import" href="behaviors/px-colors-behavior.html" />
-    <link rel="import" href="../../polymer/lib/elements/dom-bind.html" />
+    <script type="module" src="../px-vis-dynamic-menu.js"></script>
+    <script type="module" src="./behaviors/px-colors-behavior.js"></script>
+    <script type="module" src="../../@polymer/polymer/lib/elements/dom-bind.js"></script>
 
     <!-- px-theme is needed for WCT to run without errors -->
-    <link rel="import" href="../../px-theme/px-theme-styles.html">
+    <script type="module" src="../../px-theme/px-theme-styles.js"></script>
 
-    <custom-style>
+    <!-- FIXME(polymer-modulizer):
+        These imperative modules that innerHTML your HTML are
+        a hacky way to be sure that any mixins in included style
+        modules are ready before any elements that reference them are
+        instantiated, otherwise the CSS @apply mixin polyfill won't be
+        able to expand the underlying CSS custom properties.
+        See: https://github.com/Polymer/polymer-modulizer/issues/154
+        -->
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<custom-style>
     <style include="px-theme-styles" is="custom-style"></style>
-  </custom-style>
+  </custom-style>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
 
 
-    <script src="px-vis-dynamic-menu-tests.js"></script>
+    <script src="./px-vis-dynamic-menu-tests.js"></script>
   </head>
 
   <body>
-    <h3>Web Component Test : Fixture for px-vis-dynamic-menu</h3>
-    <dom-bind>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h3>Web Component Test : Fixture for px-vis-dynamic-menu</h3>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
       <template is="dom-bind">
-        <px-vis-dynamic-menu id="dynamicMenu"
-        additional-detail='{"test": "aString"}'>
+        <px-vis-dynamic-menu id="dynamicMenu" additional-detail="{&quot;test&quot;: &quot;aString&quot;}">
         </px-vis-dynamic-menu>
 
       </template>
-    </dom-bind>
+    </dom-bind>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
   </body>
 </html>

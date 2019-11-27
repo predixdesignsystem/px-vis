@@ -22,213 +22,244 @@ limitations under the License.
     <title>Web Component Test : Fixture for px-vis-highlight-line-canvas</title>
 
     <!-- Requires Webcomponents.js polyfill is provided by the page for browsers that don't support html imports -->
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
     <!-- web-component-tester automatically provides local copy of brower.js below
          for any URL ending with "/web-component-tester/browser.js"
          when wct is run from the command line -->
-    <script src="../../web-component-tester/browser.js"></script>
+    <script src="../../wct-browser-legacy/browser.js"></script>
 
-    <link rel="import" href="../px-vis-svg-canvas.html" />
-    <link rel="import" href="../px-vis-behavior-scale-multi-axis.html" />
-    <link rel="import" href="../px-vis-behavior-scale-radar.html" />
-    <link rel="import" href="../px-vis-behavior-renderer.html" />
-    <link rel="import" href="../px-vis-behavior-chart.html" />
-    <link rel="import" href="../px-vis-behavior-common.html" />
-    <link rel="import" href="../px-vis-behavior-d3.html" />
-    <link rel="import" href="../px-vis-highlight-line-canvas.html" />
-    <link rel="import" href="behaviors/px-colors-behavior.html" />
-    <link rel="import" href="../../polymer/lib/elements/dom-bind.html" />
+    <script type="module" src="../px-vis-svg-canvas.js"></script>
+    <script type="module" src="../px-vis-behavior-scale-multi-axis.js"></script>
+    <script type="module" src="../px-vis-behavior-scale-radar.js"></script>
+    <script type="module" src="../px-vis-behavior-renderer.js"></script>
+    <script type="module" src="../px-vis-behavior-chart.js"></script>
+    <script type="module" src="../px-vis-behavior-common.js"></script>
+    <script type="module" src="../px-vis-behavior-d3.js"></script>
+    <script type="module" src="../px-vis-highlight-line-canvas.js"></script>
+    <script type="module" src="./behaviors/px-colors-behavior.js"></script>
+    <script type="module" src="../../@polymer/polymer/lib/elements/dom-bind.js"></script>
 
     <!-- Retain this link for px-theme.html -->
     <!-- px-theme is needed for WCT to run without errors -->
-    <link rel="import" href="../../px-theme/px-theme-styles.html">
+    <script type="module" src="../../px-theme/px-theme-styles.js"></script>
 
-    <custom-style>
+    <!-- FIXME(polymer-modulizer):
+        These imperative modules that innerHTML your HTML are
+        a hacky way to be sure that any mixins in included style
+        modules are ready before any elements that reference them are
+        instantiated, otherwise the CSS @apply mixin polyfill won't be
+        able to expand the underlying CSS custom properties.
+        See: https://github.com/Polymer/polymer-modulizer/issues/154
+        -->
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<custom-style>
     <style include="px-theme-styles" is="custom-style"></style>
-  </custom-style>
+  </custom-style>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
 
 
-    <script src="px-vis-highlight-line-canvas-tests.js"></script>
+    <script src="./px-vis-highlight-line-canvas-tests.js"></script>
   </head>
 
   <body>
-    <h3>Web Component Test : Fixture for px-vis-highlight-line-canvas</h3>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h3>Web Component Test : Fixture for px-vis-highlight-line-canvas</h3>`;
+document.body.appendChild($_documentContainer.content);
+</script>
 
-    <dom-module id="multi-test">
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-module id="multi-test">
       <template>
-        <px-vis-svg-canvas
-          id="canvas"
-          canvas-context="{{canvasContext}}"
-          canvas-layers="{{canvasLayers}}"
-          canvas-layers-config="[[canvasLayersConfig]]"
-          width="[[width]]"
-          height="[[height]]"
-          margin="[[margin]]">
+        <px-vis-svg-canvas id="canvas" canvas-context="{{canvasContext}}" canvas-layers="{{canvasLayers}}" canvas-layers-config="[[canvasLayersConfig]]" width="[[width]]" height="[[height]]" margin="[[margin]]">
         </px-vis-svg-canvas>
-        <px-vis-highlight-line-canvas
-          id="highlighter"
-          margin="[[margin]]"
-          canvas-context="[[canvasLayers.highlighter]]"
-          canvas-layers-config="{{canvasLayersConfig}}"
-          layers-to-mask="[[canvasContext]]"
-          x="[[x]]"
-          y="[[y]]"
-          parallel-coordinates
-          dimensions="[[dimensions]]"
-          domain-changed="[[domainChanged]]"
-          time-data="[[seriesKey]]"
-          complete-series-config="[[completeSeriesConfig]]"
-          series-id="[[seriesKey]]"
-          category-key="[[categoryKey]]"
-          categories="[[categories]]"
-          chart-data="[[chartData]]"
-          generating-crosshair-data="[[generatingCrosshairData]]"
-          crosshair-data="[[crosshairData]]"
-          default-empty-data="{{defaultEmptyData}}"
-          different-dataset="[[differentDataset]]"
-          fuzz="[[fuzz]]"
-          show-tooltip-data="[[showTooltipData]]">
+        <px-vis-highlight-line-canvas id="highlighter" margin="[[margin]]" canvas-context="[[canvasLayers.highlighter]]" canvas-layers-config="{{canvasLayersConfig}}" layers-to-mask="[[canvasContext]]" x="[[x]]" y="[[y]]" parallel-coordinates="" dimensions="[[dimensions]]" domain-changed="[[domainChanged]]" time-data="[[seriesKey]]" complete-series-config="[[completeSeriesConfig]]" series-id="[[seriesKey]]" category-key="[[categoryKey]]" categories="[[categories]]" chart-data="[[chartData]]" generating-crosshair-data="[[generatingCrosshairData]]" crosshair-data="[[crosshairData]]" default-empty-data="{{defaultEmptyData}}" different-dataset="[[differentDataset]]" fuzz="[[fuzz]]" show-tooltip-data="[[showTooltipData]]">
         </px-vis-highlight-line-canvas>
       </template>
-    </dom-bind>
-    </dom-module>
-    <script>
-      document.addEventListener("WebComponentsReady", function() {
-        Polymer({
-          is: 'multi-test',
-          behaviors: [
-            PxVisBehavior.sizing,
-            PxVisBehaviorScale.scaleMultiAxis,
-            PxVisBehaviorD3.canvas,
-            PxVisBehaviorD3.axes,
-            PxVisBehavior.dataset,
-            PxVisBehavior.dimensions,
-            PxVisBehaviorChart.layers,
-            PxVisBehaviorRenderer.base,
-            PxVisBehaviorChart.highlighterConfigs,
-            PxVisBehaviorD3.domainUpdate,
-            PxVisBehavior.crosshairData
-          ],
-          observers: [
-            '_setXScale(width,margin)',
-            '_setYScale(height,margin,axes)',
-            '_generateDataExtents(dimensions)',
-            '_setDomain(x, y, dataExtents)',
-            '_renderHighlight(domainChanged, canvasLayers.highlighter, completeSeriesConfig.*, preventInitialDrawing)'
-          ]
-        });
-      });
-    </script>
+    
+    </dom-module>`;
 
-    <dom-module id="radar-test">
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+import '../px-vis-svg-canvas.js';
+import '../px-vis-behavior-scale-multi-axis.js';
+import '../px-vis-behavior-scale-radar.js';
+import '../px-vis-behavior-renderer.js';
+import '../px-vis-behavior-chart.js';
+import '../px-vis-behavior-common.js';
+import '../px-vis-behavior-d3.js';
+import '../px-vis-highlight-line-canvas.js';
+import './behaviors/px-colors-behavior.js';
+import '@polymer/polymer/lib/elements/dom-bind.js';
+import 'px-theme/px-theme-styles.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+Polymer({
+  is: 'multi-test',
+  behaviors: [
+    PxVisBehavior.sizing,
+    PxVisBehaviorScale.scaleMultiAxis,
+    PxVisBehaviorD3.canvas,
+    PxVisBehaviorD3.axes,
+    PxVisBehavior.dataset,
+    PxVisBehavior.dimensions,
+    PxVisBehaviorChart.layers,
+    PxVisBehaviorRenderer.base,
+    PxVisBehaviorChart.highlighterConfigs,
+    PxVisBehaviorD3.domainUpdate,
+    PxVisBehavior.crosshairData
+  ],
+  observers: [
+    '_setXScale(width,margin)',
+    '_setYScale(height,margin,axes)',
+    '_generateDataExtents(dimensions)',
+    '_setDomain(x, y, dataExtents)',
+    '_renderHighlight(domainChanged, canvasLayers.highlighter, completeSeriesConfig.*, preventInitialDrawing)'
+  ]
+});
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-module id="radar-test">
       <template>
-        <px-vis-svg-canvas
-          id="canvas"
-          canvas-context="{{canvasContext}}"
-          canvas-layers="{{canvasLayers}}"
-          canvas-layers-config="[[canvasLayersConfig]]"
-          width="[[width]]"
-          height="[[height]]"
-          margin="[[margin]]"
-          offset="[[offset]]">
+        <px-vis-svg-canvas id="canvas" canvas-context="{{canvasContext}}" canvas-layers="{{canvasLayers}}" canvas-layers-config="[[canvasLayersConfig]]" width="[[width]]" height="[[height]]" margin="[[margin]]" offset="[[offset]]">
         </px-vis-svg-canvas>
-        <px-vis-highlight-line-canvas
-          id="highlighter"
-          width="[[width]]"
-          height="[[height]]"
-          margin="[[margin]]"
-          canvas-context="[[canvasLayers.highlighter]]"
-          canvas-layers-config="{{canvasLayersConfig}}"
-          layers-to-mask="[[canvasContext]]"
-          x="[[x]]"
-          y="[[y]]"
-          radial-line
-          dimensions="[[dimensions]]"
-          domain-changed="[[domainChanged]]"
-          time-data="[[seriesKey]]"
-          complete-series-config="[[completeSeriesConfig]]"
-          series-id="[[seriesKey]]"
-          category-key="[[categoryKey]]"
-          categories="[[categories]]"
-          chart-data="[[chartData]]"
-          generating-crosshair-data="[[generatingCrosshairData]]"
-          crosshair-data="[[crosshairData]]"
-          default-empty-data="{{defaultEmptyData}}"
-          interpolation-function="bofCompleteManually"
-          different-dataset="[[differentDataset]]"
-          fuzz="[[fuzz]]">
+        <px-vis-highlight-line-canvas id="highlighter" width="[[width]]" height="[[height]]" margin="[[margin]]" canvas-context="[[canvasLayers.highlighter]]" canvas-layers-config="{{canvasLayersConfig}}" layers-to-mask="[[canvasContext]]" x="[[x]]" y="[[y]]" radial-line="" dimensions="[[dimensions]]" domain-changed="[[domainChanged]]" time-data="[[seriesKey]]" complete-series-config="[[completeSeriesConfig]]" series-id="[[seriesKey]]" category-key="[[categoryKey]]" categories="[[categories]]" chart-data="[[chartData]]" generating-crosshair-data="[[generatingCrosshairData]]" crosshair-data="[[crosshairData]]" default-empty-data="{{defaultEmptyData}}" interpolation-function="bofCompleteManually" different-dataset="[[differentDataset]]" fuzz="[[fuzz]]">
         </px-vis-highlight-line-canvas>
       </template>
-    </dom-bind>
-    </dom-module>
-    <script>
-      document.addEventListener("WebComponentsReady", function() {
-        Polymer({
-          is: 'radar-test',
-          behaviors: [
-            PxVisBehavior.sizing,
-            PxVisBehaviorScale.radar,
-            PxVisBehaviorD3.canvas,
-            PxVisBehaviorD3.axes,
-            PxVisBehavior.dataset,
-            PxVisBehavior.dimensions,
-            PxVisBehaviorChart.layers,
-            PxVisBehaviorRenderer.base,
-            PxVisBehaviorChart.highlighterConfigs,
-            PxVisBehaviorD3.domainUpdate,
-            PxVisBehavior.crosshairData
-          ],
-          observers: [
-            '_setXScale(_radius)',
-            '_setYScale(_radius,centerOffset)',
-            '_generateChartExtents(chartData.*, dimensions)',
-            '_setDomain(x, y, _calculatedExtents)',
-            '_renderHighlight(domainChanged, canvasLayers.highlighter, completeSeriesConfig.*, preventInitialDrawing)'
-          ]
-        });
-      });
-    </script>
+    
+    </dom-module>`;
 
-    <dom-bind>
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+import '../px-vis-svg-canvas.js';
+import '../px-vis-behavior-scale-multi-axis.js';
+import '../px-vis-behavior-scale-radar.js';
+import '../px-vis-behavior-renderer.js';
+import '../px-vis-behavior-chart.js';
+import '../px-vis-behavior-common.js';
+import '../px-vis-behavior-d3.js';
+import '../px-vis-highlight-line-canvas.js';
+import './behaviors/px-colors-behavior.js';
+import '@polymer/polymer/lib/elements/dom-bind.js';
+import 'px-theme/px-theme-styles.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+Polymer({
+  is: 'radar-test',
+  behaviors: [
+    PxVisBehavior.sizing,
+    PxVisBehaviorScale.radar,
+    PxVisBehaviorD3.canvas,
+    PxVisBehaviorD3.axes,
+    PxVisBehavior.dataset,
+    PxVisBehavior.dimensions,
+    PxVisBehaviorChart.layers,
+    PxVisBehaviorRenderer.base,
+    PxVisBehaviorChart.highlighterConfigs,
+    PxVisBehaviorD3.domainUpdate,
+    PxVisBehavior.crosshairData
+  ],
+  observers: [
+    '_setXScale(_radius)',
+    '_setYScale(_radius,centerOffset)',
+    '_generateChartExtents(chartData.*, dimensions)',
+    '_setDomain(x, y, _calculatedExtents)',
+    '_renderHighlight(domainChanged, canvasLayers.highlighter, completeSeriesConfig.*, preventInitialDrawing)'
+  ]
+});
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
       <multi-test id="parallel"></multi-test>
     </template>
-    </dom-bind>
+    </dom-bind>`;
 
-    <dom-bind>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
       <radar-test id="radar"></radar-test>
     </template>
-    </dom-bind>
+    </dom-bind>`;
 
-    <dom-bind>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
       <multi-test id="different"></multi-test>
     </template>
-    </dom-bind>
+    </dom-bind>`;
 
-    <dom-bind>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
       <multi-test id="fuzz"></multi-test>
     </template>
-    </dom-bind>
+    </dom-bind>`;
 
-    <dom-bind>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
       <multi-test id="generating"></multi-test>
     </template>
-    </dom-bind>
+    </dom-bind>`;
 
-    <dom-bind>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
       <multi-test id="force"></multi-test>
     </template>
-    </dom-bind>
+    </dom-bind>`;
 
-    <dom-bind>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
       <multi-test id="tooltip"></multi-test>
     </template>
-    </dom-bind>
+    </dom-bind>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
   </body>
 </html>

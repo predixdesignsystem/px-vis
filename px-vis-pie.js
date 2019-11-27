@@ -1,0 +1,462 @@
+/*
+Copyright (c) 2018, General Electric
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/**
+
+### Usage
+
+    <px-vis-pie
+        svg="[[svg]]"
+        clip-path="[[clipPath]]"
+        series-id="[[item.name]]"
+        series-number="[[index]]"
+        chart-data="[[item]]"
+        x="[[x]]"
+        y="[[y]]"
+        muted-series="[[mutedSeries]]">
+    </px-vis-pie>
+
+### Styling
+The following custom properties are available for styling:
+
+Custom property | Description
+:----------------|:-------------
+  `--px-vis-pie-empty-color` | The color for an empty pie chart
+  `--px-vis-pie-title-color` | The color for the title name
+  `--px-vis-pie-title-font-size` | The size for the title name
+  `--px-vis-pie-title-value-color` | The color for the title data value
+  `--px-vis-pie-title-value-font-size` | The size for the title data value
+
+@element px-vis-pie
+@blurb Creates an interactive pie or donut chart
+@homepage index.html
+@demo demo.html
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+import '@polymer/polymer/polymer-legacy.js';
+
+import './px-vis-behavior-common.js';
+import './px-vis-behavior-d3.js';
+import './px-vis-behavior-colors.js';
+import './css/px-vis-pie-styles.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+import { html } from '@polymer/polymer/lib/utils/html-tag.js';
+Polymer({
+  _template: html`
+      <style include="px-vis-pie-styles"></style>
+`,
+
+  is: 'px-vis-pie',
+
+  behaviors: [
+    PxVisBehavior.observerCheck,
+    PxVisBehaviorD3.svg,
+    PxVisBehavior.dataset,
+    PxVisBehavior.mutedSeries,
+    PxVisBehavior.commonMethods,
+    PxVisBehavior.sizing,
+    PxVisBehavior.dataset,
+    PxVisBehavior.completeSeriesConfig,
+    PxColorsBehavior.getSeriesColors,
+    PxColorsBehavior.dataVisColorTheming,
+    PxVisBehavior.updateStylesOverride
+  ],
+
+  /**
+  * Fired when the pie finishes rotating, for centering on a slice.
+  * detail: { datum: datumRelativeToSlice}
+  * @event px-vis-pie-centered-on-slice
+  */
+  /**
+  * Fired when the mouse enters a pie slice.
+  * detail: { datum: datumRelativeToSlice, rotatedDatum: DatumUsedToDrawTheSlice}
+  * @event px-vis-pie-mouse-enter-slice
+  */
+  /**
+ * Fired when the mouse leaves a pie slice.
+ * detail: { datum: datumRelativeToSlice}
+ * @event px-vis-pie-mouse-leave-slice
+ */
+  /**
+  * Fired when a pie slice is clicked.
+  * detail: { datum: datumRelativeToSlice}
+  * @event px-vis-pie-slice-clicked
+  */
+
+  /**
+   * Properties block, expose attribute values to the DOM via 'reflect'
+   *
+   * @property properties
+   * @type Object
+   */
+  properties: {
+    /**
+     * Whether to draw an empty pie chart when data is empty/null.
+     */
+    empty: {
+      type: Boolean,
+      value: false,
+      observer: '_emptyChanged'
+    },
+    /**
+     * An index of the series used for calculating its color.
+     *
+     * @property scatterNumber
+     * @type String
+     */
+    seriesNumber:{
+      type:Number,
+      value:0
+    },
+    /**
+     * Number between 0 and 1 defining how much of the inner pie should be cut.
+     * Typically at 0 this is a pie chart, at 0.5 a donut chart and at 1 all
+     * the chart is cut (i.e. not visible).
+     *
+     */
+    innerRadius: {
+      type: Number,
+      value: 0
+    },
+    /**
+     * The actual inner radius value in pixels which will be used internally to draw the chart.
+     */
+    _innerRadiusPx: {
+      type: Number,
+      computed: '_calcInnerRadiusPx(innerRadius, radius, donut)'
+    },
+    /**
+     * Whether the chart should be displayed as a donut rather than a pie.
+     * If displayed as a donut, it will by default use 30px as the ring size.
+     * This can be overridden by using the "innerRadius" property (between 0 and 1).
+     */
+    donut: {
+      type: Boolean,
+      value: false
+    },
+    /**
+     * A holder object for the series object.
+     *
+     * @property linePath
+     * @type String
+     */
+    pieGroup:{
+      type:Object,
+      value: function() {return{};}
+    },
+    /**
+     * Total value of all slices.
+     */
+    total: {
+      Type: Number,
+      value: 0
+    },
+    /**
+     * Radius of the pie chart.
+     *
+     */
+    radius: {
+      type: Number
+    },
+    /**
+     * The current arc definitions.
+     */
+    _arcs: {
+      type: Object
+    },
+    /**
+     * How much the pie is currently rotated in radians.
+     */
+    _currentRotationAngle: {
+      type:Number,
+      value:0
+    },
+    /**
+     * Whether the values should be displayed in percent.
+     */
+    usePercentage: {
+      type: Boolean,
+      value: false
+    },
+    /**
+     * By default the pie chart slices will be ordered by value.
+     * Set to false to keep the data order.
+     */
+    preserveDataOrder: {
+      type: Boolean,
+      value: false
+    }
+  },
+
+  observers: [
+    'drawElement(radius,svg,chartData.*,completeSeriesConfig, usePercentage, donut, innerRadius, _stylesUpdated)'
+   ],
+
+  /**
+   * Draws or updates the pie element.
+   * Called from an observer watching for data and the necessary d3 objects.
+   *
+   * @method drawElement
+   */
+  drawElement: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
+
+    this._checkInitialGroupCreation();
+
+    this._updateDrawing();
+  },
+
+  /**
+   * Checks whether the group holding all of the slices has been created,
+   * and creates it if necessary.
+   */
+  _checkInitialGroupCreation: function() {
+    // checks to see if the group already exists. If not, create; if so, update
+    if(this._isObjEmpty(this.pieGroup)){
+      // draw the path and move it so the ie is centered
+      this.pieGroup = this.svg.append('g')
+        .attr('series-id', 'pie_')
+        .attr('class', 'pie-slice');
+    }
+  },
+
+  /**
+   * Updates drawing when adding, removing or updating data.
+   */
+  _updateDrawing: function() {
+
+    this.debounce('_updateDrawing', function() {
+
+      var _this = this,
+          data = this.chartData,
+          isFirstDrawing = this._arcs ? false : true;
+          xKey = this.empty ? '' : this.completeSeriesConfig[Object.keys(this.completeSeriesConfig)[0]].x;
+
+      //generate the pie data
+      if(this.empty) {
+        this._pie = Px.d3.pie()([1]);
+      } else {
+        var gen = Px.d3.pie().value(function(d){return d[xKey];});
+
+        //don't sort by value if required
+        if(this.preserveDataOrder) {
+          gen.sort(null).sortValues(null);
+        }
+
+        this._pie = gen(data);
+      }
+
+      //use new values
+      this._arcs = this.pieGroup
+                       .selectAll('.slice')
+                        //store previous data so that we can interpolate
+                        //between old and new data for animation
+                        .property('_previousData', function(d) {
+                            return {
+                              startAngle: d.startAngle,
+                              endAngle: d.endAngle,
+                              innerRadius: d.innerRadius,
+                              outerRadius: d.outerRadius
+                            };
+                          })
+                        .data(this._pie, function(d) {
+                          //map slices based on "y" in the data (name)
+                          return d.data.y;
+                        });
+
+      //function used to interpolate values between initial and final state. Used during
+      //transitioning
+      var tweenArc = function tweenArc(b) {
+
+          //update radius values
+          b.innerRadius = _this._innerRadiusPx;
+          b.outerRadius = _this.radius;
+
+         //initialise new slices
+         if(!this._previousData) {
+           this._previousData = {
+                              startAngle: isFirstDrawing ? 0 : b.startAngle,
+                              endAngle: isFirstDrawing ? 0 : b.startAngle,
+                              innerRadius: b.innerRadius ? b.innerRadius : 0,
+                              outerRadius: b.outerRadius ? b.outerRadius : _this._radius
+                            };
+         }
+
+          //create function allowing us to interpolate values for data being updated
+          var interpolate = Px.d3.interpolateObject(this._previousData, b);
+
+          return function(t) {
+            return Px.d3.arc()(interpolate(t));
+          };
+      };
+
+      //removed data, delete slices
+      this._arcs.exit().remove();
+
+      //new data, create new slices
+      this._arcs.enter()
+                .append('svg:path')
+                  .attr('class', 'slice')
+                  .on('tap', this._onSliceClick.bind(this))
+                  .on('mouseenter', this._sliceMouseEnter.bind(this))
+                  .on('mouseleave', this._mouseLeaveSlice.bind(this))
+                //new + update
+                .merge(this._arcs)
+                  .attr('fill', function(d, i) {
+                      d.innerRadius = this._innerRadiusPx;
+                      d.outerRadius = this._radius;
+                      return this.empty ?
+                        this._checkThemeVariable( "--px-vis-pie-empty-color", 'rgb(0,0,0)') :
+                        this._getColor(d.data.colorIndex);
+                  }.bind(this))
+                  .attr('opacity', this.empty ? 0.5 : 1)
+                  .transition()
+                  .duration(750)
+                  .attrTween('d', tweenArc);
+
+      //apply color depending on the chart "emptiness"
+      if(this.empty) {
+        this._arcs.selectAll('path')
+          .attr('fill', this._checkThemeVariable( "--px-vis-pie-empty-color", 'rgb(0,0,0)'));
+      } else {
+        this._arcs.selectAll('path')
+          .attr('fill', function(d, i) {
+                return this._getColor(d.data.colorIndex);
+            }.bind(this));
+      }
+
+      //make sure we're in the right pos
+      this._positionChart(0);
+      }.bind(this), 5);
+  },
+
+  /**
+   * Function used to display a tooltip for a specific slice.
+   *
+   * @method _sliceMouseEnter
+   */
+  _sliceMouseEnter: function(datum, index, group) {
+
+    //take current rotation into account
+    var rotatedDatum = {
+      startAngle: datum.startAngle + this._currentRotationAngle,
+      endAngle: datum.endAngle + this._currentRotationAngle,
+      innerRadius: this._innerRadiusPx,
+      outerRadius: this.radius
+    };
+
+    this.fire('px-vis-pie-mouse-enter-slice', {datum: datum, rotatedDatum: rotatedDatum});
+  },
+
+  _mouseLeaveSlice: function(datum, index, group) {
+
+    this.fire('px-vis-pie-mouse-leave-slice', {datum: datum});
+  },
+
+  /**
+   * Position the chart given the rotation angle.
+   */
+  _positionChart: function(transitionTime) {
+
+    //then add rotation
+    this.pieGroup
+        .transition()
+        .duration(transitionTime)
+        .attr('transform', 'rotate(' + this._radToDeg(this._currentRotationAngle) + ')');
+  },
+
+  /**
+   * Emits px-vis-pie-slice-clicked event with selected slice data.
+   *
+   * @method _onSliceClick
+   */
+  _onSliceClick: function (datum, index, group) {
+
+    this.fire('px-vis-pie-slice-clicked', {datum: datum});
+
+    this._centerOnSlice(datum, index, group);
+  },
+
+  /**
+   * Transforms the svg to show the slice at the top (12 o'clock).
+   *
+   * @method _centerOnSlice
+   */
+  _centerOnSlice: function(datum, index, group) {
+    if(!this.empty) {
+      this.set('_currentRotationAngle', this._getRotationAngle(datum));
+      this._positionChart(750);
+      //display a popover after the rotation
+      window.setTimeout(function() {
+        this.fire('px-vis-pie-centered-on-slice', {datum: datum});
+      }.bind(this), 750);
+    }
+  },
+
+  /**
+   * Converts radians to degrees.
+   *
+   * @method _radToDeg
+   */
+  _radToDeg: function(angle) {
+    return angle * 180 / Math.PI;
+  },
+
+  /**
+   * Calculates the appropriate rotation angle for the slice to be displayed at 12 o'clock.
+   *
+   * @method _getRotationAngle
+   */
+  _getRotationAngle: function(slice) {
+    //get angle to middle of slice, then adjust rotation direction
+    var start = slice.startAngle,
+        end = slice.endAngle,
+        mid = start + (end - start)/2,
+        adjusted = mid < Math.PI ? -mid : Math.PI * 2 - mid;
+
+    return adjusted;
+  },
+
+  _calcInnerRadiusPx: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
+    if(this.donut) {
+      //if no inner radius defined used 30px by default
+      return this.innerRadius === 0 ? (this.radius - 30) : this.innerRadius * this.radius;
+    } else {
+      //no donut
+      return 0;
+    }
+  },
+
+  _emptyChanged: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
+    if(this.empty) {
+      this.drawElement();
+    }
+  }
+});

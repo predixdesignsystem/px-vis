@@ -1,0 +1,224 @@
+/*
+Copyright (c) 2018, General Electric
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+import '@polymer/polymer/polymer-legacy.js';
+
+import '../px-vis-axis.js';
+import '../px-vis-scale.js';
+import '../px-vis-highlight-point.js';
+import '../px-vis-line-svg.js';
+import '../px-vis-svg.js';
+import 'px-buttons-design/css/px-buttons-design-demo-styles.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+import { html } from '@polymer/polymer/lib/utils/html-tag.js';
+import { dom } from '@polymer/polymer/lib/legacy/polymer.dom.js';
+Polymer({
+  _template: html`
+    <style include="px-buttons-design-demo-styles" is="custom-style"></style>
+    <px-vis-scale x-axis-type="time" y-axis-type="linear" complete-series-config="[[completeSeriesConfig]]" data-extents="{}" chart-extents="[[chartExtents]]" width="[[width]]" height="[[height]]" margin="[[margin]]" chart-data="[[chartData]]" x="{{x}}" y="{{y}}" domain-changed="{{domainChanged}}" selected-domain="[[selectedDomain]]">
+    </px-vis-scale>
+    <px-vis-line-svg id="line1" series-id="y" complete-series-config="[[completeSeriesConfig]]" chart-data="[[chartData]]" x="[[x]]" y="[[y]]" width="[[width]]" height="[[height]]" margin="[[margin]]" domain-changed="[[domainChanged]]">
+    </px-vis-line-svg>
+    <px-vis-line-svg id="line2" series-id="y1" complete-series-config="[[completeSeriesConfig]]" chart-data="[[chartData]]" x="[[x]]" y="[[y]]" width="[[width]]" height="[[height]]" margin="[[margin]]" domain-changed="[[domainChanged]]">
+    </px-vis-line-svg>
+    <px-vis-line-svg id="line3" series-id="y2" complete-series-config="[[completeSeriesConfig]]" chart-data="[[chartData]]" x="[[x]]" y="[[y]]" width="[[width]]" height="[[height]]" margin="[[margin]]" domain-changed="[[domainChanged]]">
+    </px-vis-line-svg>
+
+    <px-vis-axis id="axis1" axis="[[x]]" margin="[[margin]]" width="[[width]]" height="[[height]]" orientation="bottom" label-position="center" complete-series-config="[[completeSeriesConfig]]" domain-changed="[[domainChanged]]" prevent-series-bar="" ticks="[[ticks]]">
+    </px-vis-axis>
+    <px-vis-axis id="axis2" axis="[[y]]" margin="[[margin]]" width="[[width]]" height="[[height]]" orientation="left" label-position="center" complete-series-config="[[completeSeriesConfig]]" muted-series="[[mutedSeries]]" domain-changed="[[domainChanged]]">
+    </px-vis-axis>
+
+    <px-vis-svg id="svg" width="[[width]]" height="[[height]]" svg="{{svg}}" margin="[[margin]]">
+    </px-vis-svg>
+
+    <px-vis-highlight-point id="pointhighlight" width="[[width]]" height="[[height]]" margin="[[margin]]" x="[[x]]" y="[[y]]" dimensions="[[dimensions]]" domain-changed="[[domainChanged]]" time-data="x" complete-series-config="[[completeSeriesConfig]]" series-keys="[&quot;y&quot;,&quot;y1&quot;,&quot;y2&quot;]" chart-data="[[chartData]]">
+    </px-vis-highlight-point>
+
+    <div style="margin-top:15px;">
+      <button on-click="highlightData" class="btn">Toggle Highlight Data</button>
+    </div>
+`,
+
+  is: 'px-vis-highlight-point-demo-component',
+  behaviors: [PxColorsBehavior.getSeriesColors,PxColorsBehavior.dataVisColorTheming],
+
+  properties: {
+    description: {
+      type: String,
+      value: "d3 element which highlights data"
+    },
+    chartData: {
+      type: Array,
+      value: function() {
+        return [{
+          "x": 1397102460000,
+          "y": 1,
+          "y1": 1,
+          "y2": 1
+        },{
+          "x": 1397131620000,
+          "y": 6,
+          "y1": 15,
+          "y2": 21
+        },{
+          "x": 1397160780000,
+          "y": 10,
+          "y1": 8,
+          "y2": 3
+        },{
+          "x": 1397189940000,
+          "y": 4,
+          "y1": 10,
+          "y2": 10
+        },{
+          "x": 1397219100000,
+          "y": 6,
+          "y1": 20,
+          "y2": 27
+        }]
+      }
+    },
+    completeSeriesConfig: {
+      type: Object
+    },
+    width: {
+      type: Number,
+      value: 500
+    },
+    height: {
+      type: Number,
+      value: 250
+    },
+    chartExtents: {
+      type: Object,
+      value: function() {
+        return {
+          'x': [1397102460000,1397219100000],
+          'y':[1,27]
+        }
+      }
+    },
+    margin: {
+      type: Object,
+      value: function() {
+        return {
+          "top": 10,
+          "right": 10,
+          "bottom": 50,
+          "left": 50
+        }
+      }
+    },
+
+    layers: {
+      type: Array,
+      value: function() { return []; }
+    },
+
+    crosshairData: {
+      type: Object,
+      value: function() {
+        return {
+          "rawData":[{
+            "x": 1397131620000,
+            "y": 6,
+            "y1": 15,
+            "y2": 21
+          },{
+            "x": 1397160780000,
+            "y": 10,
+            "y1": 8,
+            "y2": 3
+          }],
+          "timeStamps":[ 1397131620000, 1397160780000 ]
+        }
+      }
+    },
+
+    ticks:{
+      type: Object,
+      value: function() {return {}}
+    }
+  },
+
+  listeners:{
+    'px-data-vis-colors-applied': '_genCSC'
+  },
+
+  observers: [
+    'generateLayers(svg)'
+  ],
+
+  generateLayers: function() {
+    var div = document.createElement('div');
+
+    var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    var layer = Px.d3.select(dom(this.svg.node()).appendChild(g));
+
+    this.layers.push(this.svg.append('g'));
+    this.layers.push(layer);
+    this.layers.push(this.svg.append('g'));
+
+    this.$.axis1.set('svg', this.layers[0]);
+    this.$.axis2.set('svg', this.layers[0]);
+
+    this.$.line1.set('svg', this.layers[1]);
+    this.$.line2.set('svg', this.layers[1]);
+    this.$.line3.set('svg', this.layers[1]);
+
+    this.$.pointhighlight.set('svg', this.layers[2]);
+    this.$.pointhighlight.set('layersToMask', this.layers[1]);
+  },
+
+  highlightData: function() {
+    if(this.$.pointhighlight.crosshairData && this.$.pointhighlight.crosshairData.timeStamps.length) {
+      this.$.pointhighlight.set('crosshairData', {rawData: [], timeStamps: []});
+    } else {
+      this.$.pointhighlight.set('crosshairData', this.crosshairData);
+    }
+  },
+
+  _genCSC: function() {
+    this.set('completeSeriesConfig', {
+      "y": {
+        "type":"line",
+        "name":"mySeries1",
+        "x":'x',
+        "y":'y',
+        "color": this._getColor(0)
+      },
+      "y1": {
+        "type":"line",
+        "name":"mySeries2",
+        "x":'x',
+        "y":'y1',
+        "color": this._getColor(1)
+      },
+      "y2": {
+        "type":"line",
+        "name":"mySeries3",
+        "x":'x',
+        "y":'y2',
+        "color": this._getColor(2)
+      }
+    });
+  }
+});

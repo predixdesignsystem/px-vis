@@ -1,0 +1,384 @@
+/*
+Copyright (c) 2018, General Electric
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+import '@polymer/polymer/polymer-legacy.js';
+
+import './px-vis-behavior-chart.js';
+import './px-vis-behavior-common.js';
+import './px-vis-behavior-d3.js';
+var PxVisBehaviorScale = window.PxVisBehaviorScale = (window.PxVisBehaviorScale || {});
+
+/*
+    Name:
+    PxVisBehaviorScale.scaleMultiAxis
+
+    Description:
+    Polymer behavior that provides some general properties
+
+    Dependencies:
+    - D3.js
+
+    @polymerBehavior PxVisBehaviorScale.scaleMultiAxis
+*/
+PxVisBehaviorScale.scaleMultiAxis = [{
+    properties: {
+      _usedChartExtents: {
+        type: Object,
+        value: function() {
+          return {};
+        }
+      }
+    },
+
+    listeners: {
+      'px-vis-request-pixel-for-data': '_pixelRequest'
+    },
+
+    _recreateScales: function() {
+      if(this.x) {
+        this._setXScale(this.width, this.margin, true);
+      }
+      if(this.y) {
+        this._setYScale(this.height, this.margin, this.axes);
+      }
+    },
+
+    /**
+     *  Sets the x scale to a single ordinal scale
+     *
+     * @method _setXScale
+     */
+    _setXScale: function(width, margin, forceRecreating) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+      var w = Math.max(width - margin.left - margin.right,0),
+          range = [0, w];
+
+      if(this.x && !forceRecreating) {
+        var oldDomain = this.x.domain();
+        this.x = Px.d3.scalePoint().range(range).domain(oldDomain).padding(0.5);
+      } else {
+        this.x = Px.d3.scalePoint().range(range).padding(0.5);
+      }
+
+      this.notifyPath('x.range', this.x.range);
+      this.fire('px-vis-x-updated', { 'dataVar': 'x', 'data': this.x, 'method':'set' });
+    },
+
+    /**
+     * Sets the y scale to multiple linear scales
+     *
+     * @method _setYScale
+     */
+    _setYScale: function(height, margin, axes, forceRecreating) {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+      var h = Math.max(height - margin.top - margin.bottom,0),
+          range = [h, 0],
+          newY = {};// y is an object with multiple scales
+
+      // if(this.y && !forceRecreating) {
+      //   for(var i = 0; i < axes.length; i++) {
+      //     if(this.y[axes[i]]) {
+      //       this.y[axes[i]].range(range);
+      //     } else {
+      //       this.y[axes[i]] = Px.d3.scaleLinear().range(range);
+      //     }
+      //   }
+      // } else {
+        // iterate through the axes and create a scale for each; set them in the y obj with the axes as keys so we can easily access them again later
+        for(var i = 0; i < axes.length; i++) {
+          newY[axes[i]] = Px.d3.scaleLinear().range(range);
+        }
+
+        this.set('y', newY);
+        this.fire('px-vis-y-updated', { 'dataVar': 'y', 'data': this.y, 'method':'set' });
+      // }
+    },
+
+    _calcDimExtent: function(dim, ext, searchMin, searchMax) {
+
+      var mutedCatKeys = Object.keys(this.mutedSeriesCategories).filter(function(cat) {
+              return this.mutedSeriesCategories[cat];
+            }.bind(this)),
+            checkForMute = this.hardMute && !!mutedCatKeys.length,
+            arrayAccessor = function(d) {
+              //ignore muted categories for extents
+              if(checkForMute && mutedCatKeys.indexOf(d[this.categoryKey]) !== -1) {
+                return;
+              }
+              return Number(d[dim]);
+            }.bind(this);
+
+      if(searchMin && searchMax) {
+        ext.y[dim] = Px.d3.extent(this.chartData, arrayAccessor);
+      } else if(searchMin) {
+        ext.y[dim][0] = Px.d3.min(this.chartData, arrayAccessor);
+      } else if(searchMax) {
+        ext.y[dim][1] = Px.d3.max(this.chartData, arrayAccessor);
+      }
+
+      //check for null/undefined/NaN values if no data
+      if(!ext.y[dim][0] && ext.y[dim][0] !== 0) {
+        if(!ext.y[dim][1] && ext.y[dim][1] !== 0) {
+          ext.y[dim][0] = 0;
+          ext.y[dim][1] = 1;
+        } else {
+          ext.y[dim][0] = ext.y[dim][1] - 1;
+        }
+      }
+      if(!ext.y[dim][1] && ext.y[dim][1] !== 0) {
+        if(!ext.y[dim][0] && ext.y[dim][0] !== 0) {
+          ext.y[dim][0] = 0;
+          ext.y[dim][1] = 1;
+        } else {
+          ext.y[dim][1] = ext.y[dim][0] + 1;
+        }
+      }
+
+      // if the same val, add 1 to get a range
+      if(ext.y[dim][0] === ext.y[dim][1]) {
+        ext.y[dim][0] -= 0.5;
+        ext.y[dim][1] += 0.5;
+      }
+    },
+
+    /**
+     * Generate dataExtents based on chartExtents and data
+     */
+    _generateDataExtents: function() {
+
+      if(!this.dimensions || this.dimensions.length === 0 || this.hasUndefinedArguments(arguments)) {
+        return
+      }
+
+      var usedChartExtents = {},
+          ext = {
+            "x": this.dimensions,
+            "y": {}
+          };
+
+      if(!this.chartExtents) {
+
+        //get all extents
+        for(var i = 0; i < this.dimensions.length; i++) {
+          this._calcDimExtent(this.dimensions[i], ext, true, true);
+        }
+
+        // if we want a common axis, find overall extents
+        if(this.commonAxis) {
+          var maxMin = d3.extent(d3.merge(d3.values(ext.y)));
+          for(var i = 0; i < this.dimensions.length; i++) {
+            // set each axis extent to max & min
+            // TODO this is not the most efficient strategy, but certainly is the easiest, especially to keep it dynamic. Better would be to use only a single scale instead of calculating a scale multiple times.
+            ext.y[this.dimensions[i]] = maxMin;
+          }
+        }
+      } else {
+
+        //we have some kind of chartExtents, possibly not complete
+        var searchMin,
+            searchMax,
+            commonMax = Number.MIN_VALUE,
+            commonMin = Number.MAX_VALUE;
+
+
+        for(var i = 0; i < this.dimensions.length; i++) {
+
+          searchMin = false,
+          searchMax = false;
+
+          //we have some extents specified for this dim
+          if(this.chartExtents[this.dimensions[i]]) {
+
+            ext.y[this.dimensions[i]] = [];
+
+            //deal with min
+            if(this.chartExtents[this.dimensions[i]][0] === "dynamic" || this.chartExtents[this.dimensions[i]][0] === Infinity) {
+              searchMin = true;
+            } else {
+              //keep this min
+              ext.y[this.dimensions[i]][0] = this.chartExtents[this.dimensions[i]][0];
+              usedChartExtents[this.dimensions[i]] = true;
+            }
+
+            //deal with max
+            if(this.chartExtents[this.dimensions[i]][1] === "dynamic" || this.chartExtents[this.dimensions[i]][1] === -Infinity) {
+              searchMax = true;
+            } else {
+              //keep this max
+              ext.y[this.dimensions[i]][1] = this.chartExtents[this.dimensions[i]][1];
+              usedChartExtents[this.dimensions[i]] = true;
+            }
+          } else {
+            searchMin = true;
+            searchMax = true;
+          }
+
+          //do search if needed
+          this._calcDimExtent(this.dimensions[i], ext, searchMin, searchMax);
+
+          if(this.commonAxis) {
+            commonMax = Math.max(commonMax, ext.y[this.dimensions[i]][1]);
+            commonMin = Math.min(commonMin, ext.y[this.dimensions[i]][0]);
+          }
+        }
+
+        //update all dims with the common axis max and min
+        if(this.commonAxis) {
+          for(var i=0; i<this.dimensions.length; i++) {
+            ext.y[this.dimensions[i]] = [commonMin, commonMax];
+          }
+        }
+      }
+
+      this._usedChartExtents = usedChartExtents;
+      this.set('dataExtents',ext);
+    },
+
+    /**
+     * Calculates and Sets the x and y domain after data loads
+     *
+     * https://github.com/mbostock/d3/wiki/API-Reference
+     *
+     */
+     _setDomain: function() {
+      if(this.hasUndefinedArguments(arguments)) {
+        return;
+      }
+      // check to make sure there is data
+      if(this._doesObjHaveValues(this.x) &&
+      this._doesObjHaveValues(this.y) && this._doesObjHaveValues(this.dataExtents)) {
+        this.debounce('settingDomain', function() {
+
+          var dims = this.dataExtents.x,
+              exts = this.dataExtents;
+
+          for(var i = 0; i < dims.length; i++){
+            if(!this.y[dims[i]]) {
+              return;
+            }
+            this.y[dims[i]].domain(exts.y[dims[i]]);
+
+            if(!this._usedChartExtents[dims[i]] || this.commonAxis) {
+              this.y[dims[i]].nice();
+            }
+
+            // if match ticks, make sure the domains can be aligned
+            // have to set our domain first sadly
+            if(this.matchTicks && !this.commonAxis) {
+              this._squareOffTicks(this.y[dims[i]], dims[i]);
+            }
+
+          }
+          this.x.domain(exts.x);
+
+          this.set('domainChanged', this.domainChanged + 1);
+        }, 5)
+      }
+    },
+
+    _squareOffTicks: function(scale, dim) {
+      var ticks = scale.ticks();
+// Really should develop a better algorithm for this
+      if(scale.ticks.length !== 11) {
+        var d = scale.domain(),
+            min = Math.floor(d[0]/10)*10,
+            max = Math.ceil(d[1]/10)*10;
+
+        scale.domain([min,max]);
+      }
+    },
+
+    /**
+     * When the domain gets set via a user interaction, set the scale function to use the new domain
+     *
+     * @method _updateDomain
+     */
+    _updateDomain: function(axesDomain) {
+      if(this._isObjEmpty(this.y) || this._isObjEmpty(axesDomain.value)) {
+        return;
+      }
+
+      var keys = Object.keys(axesDomain.value);
+      for(var i = 0; i < keys.length; i++) {
+        this.y[keys[i]].domain(axesDomain.value[keys[i]]);
+      }
+
+      this.set('domainChanged', this.domainChanged + 1);
+    },
+
+    /**
+     * Gets pixel values for data value relating to an axis. data is a number
+     * if margin is specified it will use those to adjust the pixel values
+     * instead of the normal `margin` property
+     * returns an object with pixel values and whether the values are
+     * currently out of bounds
+     */
+    getPixelFromData: function(data, axis, margin) {
+      var x,
+          y,
+          marg = margin ? margin : this.margin,
+          oob = false;
+
+      if(data < this.y[axis].domain()[0] || data > this.y[axis].domain()[1]) {
+        oob = true;
+      }
+
+      x = this.x(axis) + marg.left;
+      y = this.y[axis](data) + marg.top;
+
+      return {
+        'pixel': [x, y],
+        'outOfBounds': oob
+      }
+    },
+
+    /**
+     * Gets data value for pixel value relating to an axis. Pixel val is a
+     * Y pixel value relating to an axis.
+     * It returns an array with the axis and the value: [axis, value]
+     * please note that the values returned have no guarantee to match any
+     * actual chart data, this is just a conversion based on pixel
+     */
+    getDataFromPixel: function(pixelVal, axis) {
+      return [axis, this.y[axis].invert(pixelVal[1])];
+    },
+
+    _pixelRequest: function(evt) {
+      var res = this.getPixelFromData(evt.detail.data[1], evt.detail.series, evt.detail.margin);
+      evt.detail.callback(res);
+    }
+  },
+  PxVisBehaviorD3.svg,
+  PxVisBehavior.sizing,
+  PxVisBehaviorD3.axes,
+  PxVisBehavior.dataset,
+  PxVisBehavior.commonMethods,
+  PxVisBehaviorD3.selectedDomain,
+  PxVisBehavior.axisTypes,
+  PxVisBehavior.chartExtents,
+  PxVisBehavior.dataExtents,
+  PxVisBehavior.dimensions,
+  PxVisBehaviorD3.domainUpdate,
+  PxVisBehaviorChart.combineMutes
+];

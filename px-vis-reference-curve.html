@@ -14,11 +14,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-<link rel="import" href="../polymer/polymer.html"/>
-<link rel="import" href="px-vis-behavior-common.html" />
-<link rel="import" href="px-vis-behavior-d3.html" />
-<link rel="import" href="px-vis-line-svg.html"/>
-<link rel="import" href="css/px-vis-styles.html">
+<script type="module" src="../@polymer/polymer/polymer-legacy.js"></script>
+<script type="module" src="./px-vis-behavior-common.js"></script>
+<script type="module" src="./px-vis-behavior-d3.js"></script>
+<script type="module" src="./px-vis-line-svg.js"></script>
+<script type="module" src="./css/px-vis-styles.js"></script>
 
 <!--
 
@@ -70,193 +70,199 @@ An element which draws polygonal grid lines.
   </template>
 </dom-module>
 
-<script>
-  Polymer({
-    is: 'px-vis-reference-curve',
+<script type="module">
+import '@polymer/polymer/polymer-legacy.js';
+import './px-vis-behavior-common.js';
+import './px-vis-behavior-d3.js';
+import './px-vis-line-svg.js';
+import './css/px-vis-styles.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+Polymer({
+  is: 'px-vis-reference-curve',
 
-    behaviors: [
-      PxVisBehavior.observerCheck,
-      PxVisBehaviorD3.svg,
-      PxVisBehaviorD3.axes,
-      PxVisBehavior.commonMethods,
-      PxVisBehaviorD3.clipPath,
-      PxVisBehavior.updateStylesOverride,
-      PxVisBehavior.referenceCurveProps,
-      PxVisBehavior.scaleTypeCheck
-    ],
+  behaviors: [
+    PxVisBehavior.observerCheck,
+    PxVisBehaviorD3.svg,
+    PxVisBehaviorD3.axes,
+    PxVisBehavior.commonMethods,
+    PxVisBehaviorD3.clipPath,
+    PxVisBehavior.updateStylesOverride,
+    PxVisBehavior.referenceCurveProps,
+    PxVisBehavior.scaleTypeCheck
+  ],
 
-    /**
-     * Properties block, expose attribute values to the DOM via 'reflect'
-     *
-     * @property properties
-     * @type Object
-     */
-    properties: {
-      _referenceConfig: {
-        type: Object,
-        notify: true
-      },
-      _seriesKeys: Array,
-      _refCurveG: Object,
-      _textBuilder: Object,
-      _textNodes: Object,
-      _referenceData: {
-        type: Array,
-        computed: '_createReferenceData(referenceData.*, reverseData)'
-      },
-      reverseData: {
-        type: Boolean,
-        value: false
-      },
-      chartId: {
-        type: String,
-        value: ''
-      },
-      _idPrefix: {
-        type: String,
-        computed: '_computeIdPrefix(chartId)'
-      }
+  /**
+   * Properties block, expose attribute values to the DOM via 'reflect'
+   *
+   * @property properties
+   * @type Object
+   */
+  properties: {
+    _referenceConfig: {
+      type: Object,
+      notify: true
     },
-
-    observers: [
-      '_createRefCurveG(svg, domainChanged)',
-      '_buildReferenceConfig(referenceConfig.*)',
-      '_drawText(_referenceConfig.*, _refCurveG)'
-    ],
-
-    _createReferenceData: function() {
-      if(!this.referenceData) {
-        return;
-      }
-
-      var d = JSON.parse(JSON.stringify(this.referenceData));
-      if(this.reverseData) {
-        d.reverse();
-      }
-
-      return d;
+    _seriesKeys: Array,
+    _refCurveG: Object,
+    _textBuilder: Object,
+    _textNodes: Object,
+    _referenceData: {
+      type: Array,
+      computed: '_createReferenceData(referenceData.*, reverseData)'
     },
-
-    _createRefCurveG: function() {
-      if(this._isD3Empty(this.svg) || !this.domainChanged) {
-        return;
-      }
-
-      if(this._isD3Empty(this._refCurveG)) {
-        const g = this.svg.append('g')
-          .attr('class', 'reference-curves');
-
-        this.set('_refCurveG', g);
-      }
+    reverseData: {
+      type: Boolean,
+      value: false
     },
-
-    _buildReferenceConfig: function() {
-      if(!this.referenceConfig) {
-        return;
-      }
-
-      var keys = Object.keys(this.referenceConfig),
-          config = {};
-
-
-      keys.forEach(function(k) {
-        if(!this.referenceConfig[k]) {
-          return;
-        }
-
-        config[k] = {};
-
-        config[k]['x'] = this.referenceConfig[k]['x'] ? this.referenceConfig[k]['x'] : 'x';
-        config[k]['y'] = this.referenceConfig[k]['y'] ? this.referenceConfig[k]['y'] : 'y';
-        config[k]['interpolationFunction'] = this.referenceConfig[k]['interpolationFunction'] ? this.referenceConfig[k]['interpolationFunction'] : Px.d3.curveCardinal;
-        config[k]['color'] = this.referenceConfig[k]['color'] ? this.referenceConfig[k]['color'] : this._checkThemeVariable("--px-vis-reference-curve-default-color", 'rgb(0,0,0)');
-        config[k]['strokeWidth'] = this.referenceConfig[k]['strokeWidth'] ? this.referenceConfig[k]['strokeWidth'] : 1;
-        config[k]['axis'] = this.referenceConfig[k]['axis'] ? this.referenceConfig[k]['axis'] : { "id": "defaultAxis" };
-        config[k]['name'] = this.referenceConfig[k]['name'] ? this.referenceConfig[k]['name'] : null;
-      }.bind(this));
-
-      this.set('_seriesKeys', keys);
-      this.set('_referenceConfig', config);
+    chartId: {
+      type: String,
+      value: ''
     },
-
-    _drawText: function() {
-      if(this._isD3Empty(this._refCurveG) || this._isObjEmpty(this._referenceConfig)) {
-        return;
-      }
-
-      var _this = this;
-
-      this._textBuilder = this._refCurveG.selectAll('text.reference-curve-name')
-        .data(this._seriesKeys);
-
-      this._textBuilder.enter()
-        .append('text')
-        .style('font-family',this._checkThemeVariable("--px-vis-font-family", 'Comic Sans MS'))
-        .attr('font-style', this._checkThemeVariable("--px-vis-font-family", 'Comic Sans MS'))
-        .attr('font-size', '12px')
-        .each(function(d,i) {
-          _this._enterText.bind(_this)(d, i, this);
-        })
-      .merge(this._textBuilder)
-        .attr('fill', function(d) { return this.referenceConfig[d]['color']; }.bind(this))
-        .each(function(d,i) {
-          _this._mergeText.bind(_this)(d, i, this);
-        });
-
-      this._textNodes = this._refCurveG.selectAll('text.reference-curve-name');
-
-    },
-
-    _enterText: function(d, i, elem) {
-      Px.d3.select(elem).append('textPath')
-        .attr('class', 'reference-curve')
-        .attr('startOffset', 5)
-        .attr('alignment-baseline', 'after-edge');
-    },
-
-    _mergeText: function(d, i, elem) {
-      Px.d3.select(elem).select('textPath.reference-curve')
-        .attr("xlink:href", function(d) { return '#refCurve_' + this.chartId + d; }.bind(this))
-        .text(function(d) { return this.referenceConfig[d]['name']; }.bind(this));
-    },
-
-    /**
-     * Helper function to return a d3 interpolation function.
-     *
-     * @method _returnInterpolation
-     */
-    _returnInterpolation: function(item) {
-      if(this.hasUndefinedArguments(arguments)) {
-        return;
-      }
-
-      return this._referenceConfig[item]['interpolationFunction'];
-    },
-
-    _returnStrokeWidth: function(item) {
-      if(this.hasUndefinedArguments(arguments)) {
-        return;
-      }
-
-      return this._referenceConfig[item]['strokeWidth'];
-    },
-
-    _returnYScale: function(seriesId, config) {
-      if(this.domainChanged) {
-        if(typeof this.y === 'object') {
-          var d = config[seriesId]['axis']['id'];
-          if(this.y && this.y[d]) {
-            return this.y[d];
-          }
-        } else if(typeof this.y === 'function') {
-          return this.y;
-        }
-      }
-      return;
-    },
-
-    _computeIdPrefix: function() {
-      return 'refCurve_' + this.chartId;
+    _idPrefix: {
+      type: String,
+      computed: '_computeIdPrefix(chartId)'
     }
-  });
+  },
+
+  observers: [
+    '_createRefCurveG(svg, domainChanged)',
+    '_buildReferenceConfig(referenceConfig.*)',
+    '_drawText(_referenceConfig.*, _refCurveG)'
+  ],
+
+  _createReferenceData: function() {
+    if(!this.referenceData) {
+      return;
+    }
+
+    var d = JSON.parse(JSON.stringify(this.referenceData));
+    if(this.reverseData) {
+      d.reverse();
+    }
+
+    return d;
+  },
+
+  _createRefCurveG: function() {
+    if(this._isD3Empty(this.svg) || !this.domainChanged) {
+      return;
+    }
+
+    if(this._isD3Empty(this._refCurveG)) {
+      const g = this.svg.append('g')
+        .attr('class', 'reference-curves');
+
+      this.set('_refCurveG', g);
+    }
+  },
+
+  _buildReferenceConfig: function() {
+    if(!this.referenceConfig) {
+      return;
+    }
+
+    var keys = Object.keys(this.referenceConfig),
+        config = {};
+
+
+    keys.forEach(function(k) {
+      if(!this.referenceConfig[k]) {
+        return;
+      }
+
+      config[k] = {};
+
+      config[k]['x'] = this.referenceConfig[k]['x'] ? this.referenceConfig[k]['x'] : 'x';
+      config[k]['y'] = this.referenceConfig[k]['y'] ? this.referenceConfig[k]['y'] : 'y';
+      config[k]['interpolationFunction'] = this.referenceConfig[k]['interpolationFunction'] ? this.referenceConfig[k]['interpolationFunction'] : Px.d3.curveCardinal;
+      config[k]['color'] = this.referenceConfig[k]['color'] ? this.referenceConfig[k]['color'] : this._checkThemeVariable("--px-vis-reference-curve-default-color", 'rgb(0,0,0)');
+      config[k]['strokeWidth'] = this.referenceConfig[k]['strokeWidth'] ? this.referenceConfig[k]['strokeWidth'] : 1;
+      config[k]['axis'] = this.referenceConfig[k]['axis'] ? this.referenceConfig[k]['axis'] : { "id": "defaultAxis" };
+      config[k]['name'] = this.referenceConfig[k]['name'] ? this.referenceConfig[k]['name'] : null;
+    }.bind(this));
+
+    this.set('_seriesKeys', keys);
+    this.set('_referenceConfig', config);
+  },
+
+  _drawText: function() {
+    if(this._isD3Empty(this._refCurveG) || this._isObjEmpty(this._referenceConfig)) {
+      return;
+    }
+
+    var _this = this;
+
+    this._textBuilder = this._refCurveG.selectAll('text.reference-curve-name')
+      .data(this._seriesKeys);
+
+    this._textBuilder.enter()
+      .append('text')
+      .style('font-family',this._checkThemeVariable("--px-vis-font-family", 'Comic Sans MS'))
+      .attr('font-style', this._checkThemeVariable("--px-vis-font-family", 'Comic Sans MS'))
+      .attr('font-size', '12px')
+      .each(function(d,i) {
+        _this._enterText.bind(_this)(d, i, this);
+      })
+    .merge(this._textBuilder)
+      .attr('fill', function(d) { return this.referenceConfig[d]['color']; }.bind(this))
+      .each(function(d,i) {
+        _this._mergeText.bind(_this)(d, i, this);
+      });
+
+    this._textNodes = this._refCurveG.selectAll('text.reference-curve-name');
+
+  },
+
+  _enterText: function(d, i, elem) {
+    Px.d3.select(elem).append('textPath')
+      .attr('class', 'reference-curve')
+      .attr('startOffset', 5)
+      .attr('alignment-baseline', 'after-edge');
+  },
+
+  _mergeText: function(d, i, elem) {
+    Px.d3.select(elem).select('textPath.reference-curve')
+      .attr("xlink:href", function(d) { return '#refCurve_' + this.chartId + d; }.bind(this))
+      .text(function(d) { return this.referenceConfig[d]['name']; }.bind(this));
+  },
+
+  /**
+   * Helper function to return a d3 interpolation function.
+   *
+   * @method _returnInterpolation
+   */
+  _returnInterpolation: function(item) {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    return this._referenceConfig[item]['interpolationFunction'];
+  },
+
+  _returnStrokeWidth: function(item) {
+    if(this.hasUndefinedArguments(arguments)) {
+      return;
+    }
+
+    return this._referenceConfig[item]['strokeWidth'];
+  },
+
+  _returnYScale: function(seriesId, config) {
+    if(this.domainChanged) {
+      if(typeof this.y === 'object') {
+        var d = config[seriesId]['axis']['id'];
+        if(this.y && this.y[d]) {
+          return this.y[d];
+        }
+      } else if(typeof this.y === 'function') {
+        return this.y;
+      }
+    }
+    return;
+  },
+
+  _computeIdPrefix: function() {
+    return 'refCurve_' + this.chartId;
+  }
+});
 </script>

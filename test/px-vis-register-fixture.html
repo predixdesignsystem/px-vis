@@ -22,128 +22,371 @@ limitations under the License.
     <title>Web Component Test : Fixture for px-vis-register</title>
 
     <!-- Requires Webcomponents.js polyfill is provided by the page for browsers that don't support html imports -->
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
     <!-- web-component-tester automatically provides local copy of brower.js below
          for any URL ending with "/web-component-tester/browser.js"
          when wct is run from the command line -->
-    <script src="../../web-component-tester/browser.js"></script>
-    <link rel="import" href="../px-vis-register.html" />
-    <link rel="import" href="behaviors/px-colors-behavior.html" />
+    <script src="../../wct-browser-legacy/browser.js"></script>
+    <script type="module" src="../px-vis-register.js"></script>
+    <script type="module" src="./behaviors/px-colors-behavior.js"></script>
 
     <!-- Retain this link for px-theme.html -->
     <!-- px-theme is needed for WCT to run without errors -->
-    <link rel="import" href="../../px-theme/px-theme-styles.html">
+    <script type="module" src="../../px-theme/px-theme-styles.js"></script>
 
-    <script src="px-vis-register-tests.js"></script>
-    <custom-style>
+    <script src="./px-vis-register-tests.js"></script>
+    <!-- FIXME(polymer-modulizer):
+        These imperative modules that innerHTML your HTML are
+        a hacky way to be sure that any mixins in included style
+        modules are ready before any elements that reference them are
+        instantiated, otherwise the CSS @apply mixin polyfill won't be
+        able to expand the underlying CSS custom properties.
+        See: https://github.com/Polymer/polymer-modulizer/issues/154
+        -->
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<custom-style>
       <style include="px-theme-styles" is="custom-style"></style>
-    </custom-style>
+    </custom-style>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
   </head>
 
   <body style="margin-bottom:100px;">
-    <h3>Web Component Test : Fixture for px-vis-register</h3>
-    <h2>Empty register</h2>
-    <div>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h3>Web Component Test : Fixture for px-vis-register</h3>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h2>Empty register</h2>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
       <px-vis-register id="emptyRegister"></px-vis-register>
-    </div>
-    <h2>Vertical register</h2>
-    <div>
+    </div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h2>Vertical register</h2>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
       <px-vis-register id="verticalSeries" type="vertical" x-axis-type="time"></px-vis-register>
-    </div>
-    <h2>Zero value register</h2>
-    <div>
+    </div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h2>Zero value register</h2>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
       <px-vis-register id="checkZero"></px-vis-register>
-    </div>
-    <h2>Horizontal register</h2>
-    <div>
+    </div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h2>Horizontal register</h2>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
       <px-vis-register id="horizontalSeries" type="horizontal" x-axis-type="time"></px-vis-register>
-    </div>
-    <h2>Muting register</h2>
-    <div>
+    </div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h2>Muting register</h2>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
       <px-vis-register id="doesItMute"></px-vis-register>
-    </div>
-    <h2>Truncate register</h2>
-    <div>
+    </div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h2>Truncate register</h2>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
       <px-vis-register id="truncate"></px-vis-register>
-    </div>
-    <h2>Truncate shorter register</h2>
-    <div>
+    </div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h2>Truncate shorter register</h2>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
       <px-vis-register id="truncateShort" truncation-length="5"></px-vis-register>
-    </div>
-    <h2>Dont truncate register</h2>
-    <div>
+    </div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h2>Dont truncate register</h2>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
       <px-vis-register id="noTruncate" truncation-length="-1"></px-vis-register>
-    </div>
-    <h2>Date time format register</h2>
-    <div>
-    <px-vis-register
-        id="datetimeFormat"
-        first-date-time-format="MMMM Do, YYYY"
-        second-date-time-format="h:m:sA"
-        separator="@"
-        x-axis-type="time"></px-vis-register>
-    </div>
-    <h2>Units register</h2>
-    <div>
+    </div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h2>Date time format register</h2>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
+    <px-vis-register id="datetimeFormat" first-date-time-format="MMMM Do, YYYY" second-date-time-format="h:m:sA" separator="@" x-axis-type="time"></px-vis-register>
+    </div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h2>Units register</h2>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
       <px-vis-register id="units" units="Hz" x-axis-type="time"></px-vis-register>
-    </div>
-    <h2>Number format register</h2>
-    <div>
-      <px-vis-register id="numberFormat" number-format='0[.]00000' x-axis-type="time"></px-vis-register>
-    </div>
-    <h2>Number format culture register</h2>
-    <div>
+    </div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h2>Number format register</h2>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
+      <px-vis-register id="numberFormat" number-format="0[.]00000" x-axis-type="time"></px-vis-register>
+    </div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h2>Number format culture register</h2>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
       <px-vis-register id="numberFormatCulture" x-axis-type="time"></px-vis-register>
-    </div>
-    <h2>No time register</h2>
-    <div>
+    </div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h2>No time register</h2>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
       <px-vis-register id="nonTime" x-axis-type="linear"></px-vis-register>
-    </div>
-    <h2>No time default register</h2>
-    <div>
+    </div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h2>No time default register</h2>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
       <px-vis-register id="nonTimeDefault"></px-vis-register>
-    </div>
-    <h2>Ordinal register</h2>
-    <div>
+    </div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h2>Ordinal register</h2>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
       <px-vis-register id="ordinal" x-axis-type="ordinal"></px-vis-register>
-    </div>
-    <h2>Ordinal units register</h2>
-    <div>
+    </div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h2>Ordinal units register</h2>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
       <px-vis-register id="ordinalUnits" x-axis-type="ordinal"></px-vis-register>
-    </div>
-    <h2>Dash pattern register</h2>
-    <div>
+    </div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h2>Dash pattern register</h2>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
       <px-vis-register id="dashPattern"></px-vis-register>
-    </div>
-    <h2>Y only</h2>
-    <div>
+    </div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h2>Y only</h2>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
       <px-vis-register id="yOnly"></px-vis-register>
-    </div>
+    </div>`;
 
-    <h2>Negative value color range</h2>
-    <div>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h2>Negative value color range</h2>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
       <px-vis-register id="negative"></px-vis-register>
-    </div>
+    </div>`;
 
-    <h2>Pagnation</h2>
-    <div>
-      <px-vis-register id="pagnation1" type="horizontal" display-page-arrows></px-vis-register>
-      <px-vis-register id="pagnation2" type="vertical" display-page-arrows></px-vis-register>
-    </div>
+document.body.appendChild($_documentContainer.content);
+</script>
 
-    <h2>Sorting</h2>
-    <div>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h2>Pagnation</h2>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
+      <px-vis-register id="pagnation1" type="horizontal" display-page-arrows=""></px-vis-register>
+      <px-vis-register id="pagnation2" type="vertical" display-page-arrows=""></px-vis-register>
+    </div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h2>Sorting</h2>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
       <px-vis-register id="sorting" type="vertical"></px-vis-register>
-    </div>
+    </div>`;
 
-    <h2>Mmmm pie register</h2>
-    <div>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h2>Mmmm pie register</h2>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
       <px-vis-register id="pie" x-axis-type="pie" y-axis-type="pie"></px-vis-register>
-    </div>
-    <h2>Pie % register</h2>
-    <div>
-      <px-vis-register id="piePercent" x-axis-type="pie" y-axis-type="pie" use-percentage></px-vis-register>
-    </div>
+    </div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h2>Pie % register</h2>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<div>
+      <px-vis-register id="piePercent" x-axis-type="pie" y-axis-type="pie" use-percentage=""></px-vis-register>
+    </div>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
 
   </body>
 </html>

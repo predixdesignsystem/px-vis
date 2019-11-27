@@ -1,0 +1,84 @@
+/*
+Copyright (c) 2018, General Electric
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/**
+
+Interpreter components act as a converter, translating data points into their corresponding pixel coordinate.
+
+To do this, the interpreter needs to understand:
+   1. the type of data (xScale, yScale)
+   2. the size of the drawing area (width, height, margin)
+   3. the extents of the data and domain (chartData, selectedDomain)
+
+It then returns the interpreter functions for `x` and `y`
+and arrays for the current domain those `x` and `y` functions are using.
+
+### Usage
+    <px-vis-scale
+      x-axis-type="time"
+      y-axis-type="linear"
+      complete-series-config="[[seriesConfig]]"
+      data-extents="[[dataExtents]]"
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      chart-data={{chartData}}
+      x="{{x}}"
+      y="{{y}}"
+      domainChanged="{{domainChanged}}"
+      selected-domain="[[selectedDomain]]">
+    </px-vis-scale>
+
+### d3 Reference
+https://github.com/d3/d3/wiki/Scales
+
+https://github.com/d3/d3/wiki/API-Reference#d3scale-scales
+
+@element px-vis-scale
+@blurb Interpreter component which creates x & y interpreters.
+@homepage index.html
+@demo demo.html
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+import './px-vis-behavior-scale.js';
+
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+import { html } from '@polymer/polymer/lib/utils/html-tag.js';
+Polymer({
+  _template: html`
+
+`,
+
+  is: 'px-vis-scale',
+
+  behaviors: [
+    PxVisBehaviorScale.scale
+  ],
+
+  observers: [
+    '_setXScale(width, margin, xAxisType)',
+    '_setYScale(height, margin, yAxisType)',
+    '_setDomain(_chartDataHasChanged, x, y, completeSeriesConfig, dataExtents)',
+    '_setDomain(chartExtents, dataExtents)',
+    '_updateDomain(selectedDomain)',
+    '_chartDataChanged(chartData.*)',
+    '_updatePadding(scalePadding)',
+    '_updateLogBase(logBase)'
+  ]
+});

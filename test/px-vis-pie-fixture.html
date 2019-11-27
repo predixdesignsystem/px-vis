@@ -22,62 +22,72 @@ limitations under the License.
     <title>Web Component Test : Fixture for px-vis-pie</title>
 
     <!-- Requires Webcomponents.js polyfill is provided by the page for browsers that don't support html imports -->
-    <script src="../../webcomponentsjs/webcomponents-lite.js"></script>
+    <script src="../../@webcomponents/webcomponentsjs/webcomponents-bundle.js"></script>
     <!-- web-component-tester automatically provides local copy of brower.js below
          for any URL ending with "/web-component-tester/browser.js"
          when wct is run from the command pie -->
-    <script src="../../web-component-tester/browser.js"></script>
-    <link rel="import" href="../px-vis-scale.html" />
-    <link rel="import" href="../px-vis-svg.html" />
-    <link rel="import" href="../px-vis-pie.html" />
-    <link rel="import" href="behaviors/px-colors-behavior.html" />
-    <link rel="import" href="../../polymer/lib/elements/dom-bind.html" />
+    <script src="../../wct-browser-legacy/browser.js"></script>
+    <script type="module" src="../px-vis-scale.js"></script>
+    <script type="module" src="../px-vis-svg.js"></script>
+    <script type="module" src="../px-vis-pie.js"></script>
+    <script type="module" src="./behaviors/px-colors-behavior.js"></script>
+    <script type="module" src="../../@polymer/polymer/lib/elements/dom-bind.js"></script>
 
     <!-- Retain this link for px-theme.html -->
     <!-- px-theme is needed for WCT to run without errors -->
-    <link rel="import" href="../../px-theme/px-theme-styles.html">
+    <script type="module" src="../../px-theme/px-theme-styles.js"></script>
 
-    <custom-style>
+    <!-- FIXME(polymer-modulizer):
+        These imperative modules that innerHTML your HTML are
+        a hacky way to be sure that any mixins in included style
+        modules are ready before any elements that reference them are
+        instantiated, otherwise the CSS @apply mixin polyfill won't be
+        able to expand the underlying CSS custom properties.
+        See: https://github.com/Polymer/polymer-modulizer/issues/154
+        -->
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<custom-style>
     <style include="px-theme-styles" is="custom-style"></style>
-  </custom-style>
+  </custom-style>`;
 
-    <script src="px-vis-pie-tests.js"></script>
+document.body.appendChild($_documentContainer.content);
+</script>
+
+    <script src="./px-vis-pie-tests.js"></script>
   </head>
 
   <body>
-    <h3>Web Component Test : Fixture for px-vis-pie</h3>
-    <dom-bind>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+$_documentContainer.innerHTML = `<h3>Web Component Test : Fixture for px-vis-pie</h3>`;
+document.body.appendChild($_documentContainer.content);
+</script>
+    <script type="module">
+const $_documentContainer = document.createElement('template');
+
+$_documentContainer.innerHTML = `<dom-bind>
     <template is="dom-bind">
-      <px-vis-svg
-        id="baseSVG"
-        svg="{{svg}}"
-        width="500"
-        height="500"
-        offset="[250,250]"
-        margin='{
-          "top": 50,
-          "right": 5,
-          "bottom": 20,
-          "left": 15
-        }'
-        px-svg-elem="{{pxSvgElem}}">
+      <px-vis-svg id="baseSVG" svg="{{svg}}" width="500" height="500" offset="[250,250]" margin="{
+          &quot;top&quot;: 50,
+          &quot;right&quot;: 5,
+          &quot;bottom&quot;: 20,
+          &quot;left&quot;: 15
+        }" px-svg-elem="{{pxSvgElem}}">
       </px-vis-svg>
-      <px-vis-pie
-        id="baseLine"
-        svg="[[svg]]"
-        width="500"
-        height="500"
-        radius="250"
-        margin='{
-          "top": 50,
-          "right": 5,
-          "bottom": 20,
-          "left": 15
-        }'
-        px-svg-elem="[[pxSvgElem]]">
+      <px-vis-pie id="baseLine" svg="[[svg]]" width="500" height="500" radius="250" margin="{
+          &quot;top&quot;: 50,
+          &quot;right&quot;: 5,
+          &quot;bottom&quot;: 20,
+          &quot;left&quot;: 15
+        }" px-svg-elem="[[pxSvgElem]]">
       </px-vis-pie>
     </template>
-    </dom-bind>
+    </dom-bind>`;
+
+document.body.appendChild($_documentContainer.content);
+</script>
 
   </body>
 </html>

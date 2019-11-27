@@ -1,0 +1,435 @@
+/*
+Copyright (c) 2018, General Electric
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+/**
+
+### Usage
+
+    <px-vis-scale
+      x-axis-type="time"
+      y-axis-type="linear"
+      complete-series-config="[[seriesConfig]]"
+      data-extents="[[dataExtents]]"
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      chart-data="{{chartData}}"
+      x="{{x}}"
+      y="{{y}}"
+      domain-changed="{{domainChanged}}"
+      selected-domain="[[selectedDomain]]">
+    </px-vis-scale>
+    <px-vis-svg
+      width="[[width]]"
+      height="[[height]]"
+      margin="[[margin]]"
+      svg="{{svg}}">
+    </px-vis-svg>
+    <px-vis-scatter
+      svg="[[svg]]"
+      series-id="mySeries"
+      complete-series-config="[[seriesConfig]]"
+      chart-data="[[chartData]]"
+      x="[[x]]"
+      y="[[y]]"
+      domain-changed="[[domainChanged]]">
+    </px-vis-scatter>
+
+@element px-vis-scatter
+@blurb Element which draws a scatter series onto the chart
+@homepage index.html
+@demo demo.html
+*/
+/*
+  FIXME(polymer-modulizer): the above comments were extracted
+  from HTML and may be out of place here. Review them and
+  then delete this comment!
+*/
+import '@polymer/polymer/polymer-legacy.js';
+
+import './px-vis-behavior-common.js';
+import './px-vis-behavior-d3.js';
+import './css/px-vis-styles.js';
+import { Polymer } from '@polymer/polymer/lib/legacy/polymer-fn.js';
+import { html } from '@polymer/polymer/lib/utils/html-tag.js';
+Polymer({
+  _template: html`
+    <style include="px-vis-styles"></style>
+`,
+
+  is: 'px-vis-scatter',
+
+  behaviors: [
+    PxVisBehavior.observerCheck,
+    PxVisBehaviorD3.svg,
+    PxVisBehaviorD3.axes,
+    PxVisBehavior.dataset,
+    PxVisBehavior.mutedSeries,
+    PxVisBehavior.commonMethods,
+    PxVisBehaviorD3.clipPath,
+    PxVisBehavior.completeSeriesConfig,
+    PxVisBehaviorD3.radialLineGenerator,
+    PxVisBehaviorD3.domainUpdate,
+    PxVisBehavior.polarData,
+    PxVisBehavior.seriesId,
+    PxVisBehavior.dynamicConfigProperties,
+    PxVisBehaviorD3.serieToRedrawOnTopSVG,
+    PxVisBehavior.isAttached,
+    PxVisBehaviorD3.scatterMarkers,
+    PxVisBehaviorD3.scatterArrow
+  ],
+
+  /**
+   * Event fired when an svg scatter series has finished
+   * drawing its scatter points.
+   * @event px-vis-scatter-rendering-ended
+   */
+
+  /**
+   * Properties block, expose attribute values to the DOM via 'reflect'
+   *
+   * @property properties
+   * @type Object
+   */
+  properties: {
+    /**
+     * The index of the series, used for calculating its color.
+     *
+     * @property scatterNumber
+     * @type String
+     */
+    seriesNumber:{
+      type:Number,
+      value:0
+    },
+    /**
+     * A holder object for the series group.
+     *
+     * @property scatterGroup
+     * @type Object
+     */
+    scatterGroup:{
+      type:Object,
+      value: function() {return{};}
+    },
+    /**
+     * A holder object for the series objects.
+     *
+     */
+    scatterDots:{
+      type:Object
+    },
+    /**
+     * A holder object for the series builder.
+     *
+     */
+    scatterBuilder: {
+      type: Object
+    },
+    /**
+     * A holder object for the arrow objects.
+     *
+     */
+    arrowDots:{
+      type:Object
+    },
+    /**
+     * A holder object for the arrow builder.
+     *
+     */
+    arrowBuilder: {
+      type: Object
+    },
+    /**
+     * Whether the scatter plot is using radial coordinates (x=phase, y=amplitude).
+     */
+    radial: {
+      type: Boolean,
+      value: false
+    },
+    /**
+     * Name of the variable holding the time stamp in the data. Used for non-timeseries charts.
+     */
+    timeData: {
+      type: String,
+      value: 'Timestamp'
+    },
+    /**
+     * Debounce time to use for drawing.
+     */
+    drawDebounceTime: {
+      type: Number,
+      value: 10
+    }
+  },
+
+  observers: [
+    'drawElement(svg, domainChanged, chartData.*, completeSeriesConfig.*, radial, counterClockwise,markerSymbol, markerScale, markerSize, markerFillOpacity, markerStrokeOpacity)',
+    'isIdInMuted(mutedSeries.*)',
+    '_addClipPath(clipPath)',
+    '_drawOnTop(serieToRedrawOnTop)'
+   ],
+
+  ready:function() {
+    //generate properties dynamically
+    this._watchConfigProperty('markerSymbol', 'circle');
+    this._watchConfigProperty('markerScale', 1);
+    this._watchConfigProperty('markerSize', 64);
+    this._watchConfigProperty('markerFillOpacity', 0.6);
+    this._watchConfigProperty('markerStrokeOpacity', 1);
+    this._watchConfigProperty('mutedOpacity', 0.3);
+  },
+
+  attached: function() {
+    //if we've been detached and reattached make sure we redraw
+    if(this._isDirty) {
+      this.drawElement();
+    }
+
+    this._isDirty = false;
+  },
+
+  detached: function() {
+    this._isDirty = true;
+
+    this.scatterDots = null;
+    if(this._doesD3HaveValues(this.scatterGroup)) {
+      this.scatterGroup.remove();
+      this.scatterGroup = null;
+    }
+  },
+
+  /**
+  * Draws or updates the scatter element.
+  * Called from an observer that watches for data and the necessary d3 objects.
+  *
+  * @method drawElement
+  */
+  drawElement: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
+
+    if(!this.preventInitialDrawing) {
+      //if 0 don't debounce at all
+      if(this.drawDebounceTime > 0) {
+        this.debounce('draw',function() {
+          this._drawElementDebounced();
+        }.bind(this), this.drawDebounceTime);
+      } else {
+        this._drawElementDebounced();
+      }
+    }
+  },
+
+  /**
+   * Debounced version of the above method for drawing or updating the scatter element.
+   *
+   * @method _drawElementDebounced
+   */
+  _drawElementDebounced: function() {
+    if(this.y &&
+      this.domainChanged &&
+      this._isAttached &&
+      this.chartData) {
+
+      // checks to see if the group already exists. If not, create; if so, update
+      if(this._isObjEmpty(this.scatterGroup)) {
+
+        // draw the path
+        this.scatterGroup = this.svg.append('g')
+          .attr('series-id', 'scatter_' + this.seriesId)
+          .attr('class', 'series-scatter');
+      }
+
+      if(this.radial) {
+        this._defineRadialLine(false, this.multiPath, this.counterClockwise, this.useDegrees);
+
+        if(this.showArrows) {
+          this._buildArrows();
+        }
+      }
+
+      this.scatterBuilder = this.scatterGroup.selectAll('path.symbol')
+        .data(this.chartData);
+
+      this.scatterBuilder.exit().remove();
+
+      this.scatterBuilder.enter()
+        .append('path')
+        .attr('class', 'symbol')
+      .merge(this.scatterBuilder)
+        .attr('d', Px.d3.symbol().type(this.markerMapping[this.markerSymbol]).size(this.markerSize))
+        .attr('transform', this._applyTransform.bind(this))
+        .each(function(d,i,paths) {
+
+          // if this series is missing a datapoint, remove that point
+          if(!this._isValidData(d[this.completeSeriesConfig[this.seriesId]['y']]) ||
+            !this._isValidData(d[this.completeSeriesConfig[this.seriesId]['x']])) {
+            paths[i].remove();
+          }
+        }.bind(this));
+
+      this.scatterDots = this.scatterGroup.selectAll('path.symbol');
+
+      this._colorScatter();
+
+      this._addClipPath();
+
+      this.isIdInMuted();
+
+      this.fire('px-vis-scatter-rendering-ended');
+    }
+  },
+
+  /**
+   * Helper to call addClipPath with the element.
+   *
+   * @method _addClipPath
+   */
+  _addClipPath: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
+    this.addClipPath(this.scatterGroup);
+  },
+
+  /**
+   * Checks mutedSeries to see if this ID is in there.
+   * Called from an observer watching mutedSeries.
+   *
+   * @method isIdInMuted
+   */
+  isIdInMuted: function() {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
+    if(this.mutedSeries.hasOwnProperty(this.seriesId) && this._doesD3HaveValues(this.scatterDots)) {
+
+      this._colorScatter();
+    }
+  },
+
+  /**
+   * Applies the necessary translate and scale to the scatterDots.
+   *
+   * @method _applyTransform
+   */
+  _applyTransform: function(d) {
+    if(!this._isValidData(d[this.completeSeriesConfig[this.seriesId]['y']]) ||
+       !this._isValidData(d[this.completeSeriesConfig[this.seriesId]['x']])) {
+      return '';
+    }
+
+    if(this.radial) {
+      var line = this.line([d]),
+          coors = line.slice(1).slice(0, -1);
+      return 'translate(' + coors + ')' + ' scale(' + this.markerScale + ')';
+    } else {
+
+      var xTrans = this.x(d[this.completeSeriesConfig[this.seriesId]['x']]),
+          yTrans = this.y(d[this.completeSeriesConfig[this.seriesId]['y']]);
+
+      return 'translate(' + xTrans + ',' + yTrans + ')' + ' scale(' + this.markerScale + ')';
+    }
+  },
+
+  /**
+   * Adds full color to the scatters.
+   *
+   * @method _colorScatter
+   */
+  _colorScatter: function() {
+    var muted = this.mutedSeries[this.seriesId];
+    this.scatterGroup
+      .attr('fill',this.completeSeriesConfig[this.seriesId]['color'])
+      .attr('fill-opacity', muted ? this.mutedOpacity : this.markerFillOpacity)
+      .attr('stroke',this.completeSeriesConfig[this.seriesId]['color'])
+      .attr('stroke-opacity', muted ? 0 : this.markerStrokeOpacity);
+  },
+
+  /**
+   * Redraw this series on top if needed.
+   */
+  _drawOnTop: function(serieToRedrawOnTop) {
+   if(this.hasUndefinedArguments(arguments)) {
+     return;
+   }
+
+    if(this.scatterGroup && this.seriesId) {
+      this._drawSVGOnTop(serieToRedrawOnTop, this.seriesId, this.scatterGroup);
+    }
+  },
+
+  _buildArrows: function() {
+    this.arrowBuilder = this.scatterGroup.selectAll('path.arrow')
+        .data(this.chartData);
+
+    this.arrowBuilder.exit().remove();
+
+    this.arrowBuilder.enter()
+      .append('path')
+      .attr('class', 'arrow')
+    .merge(this.arrowBuilder)
+      .attr('d', Px.d3.symbol().type(this.markerMapping[this.arrowConfig.symbol]).size(this.arrowConfig.size))
+      .attr('transform', this._transformArrow.bind(this))
+      .each(function(d,i,paths) {
+        if(!this._isValidData(d[this.completeSeriesConfig[this.seriesId]['x']]) ||
+            !this._isValidData(d[this.completeSeriesConfig[this.seriesId]['y']]) ||
+            i === 0 ||
+            !this._isValidData(this.chartData[i-1][this.completeSeriesConfig[this.seriesId]['x']]) ||
+            !this._isValidData(this.chartData[i-1][this.completeSeriesConfig[this.seriesId]['y']])) {
+          paths[i].remove();
+        }
+      }.bind(this));
+
+    this.arrowDots = this.scatterGroup.selectAll('path.arrow');
+  },
+
+  _transformArrow: function(d, i) {
+
+    if(!this._isValidData(d[this.completeSeriesConfig[this.seriesId]['x']]) ||
+       !this._isValidData(d[this.completeSeriesConfig[this.seriesId]['y']]) ||
+       i === 0 ||
+       !this._isValidData(this.chartData[i-1][this.completeSeriesConfig[this.seriesId]['x']]) ||
+       !this._isValidData(this.chartData[i-1][this.completeSeriesConfig[this.seriesId]['y']])) {
+      return '';
+    }
+
+    var p0 = this.line([this.chartData[i-1]]),
+        p1 = this.line([d]),
+        coords0 = p0.slice(1).slice(0, -1).split(','),
+        coords1 = p1.slice(1).slice(0, -1).split(','),
+        dx = (Number(coords1[0]) - Number(coords0[0]))/2,
+        dy = (Number(coords1[1]) - Number(coords0[1]))/2,
+        // thank you Pythagoras
+        h = Math.sqrt(dx*dx + dy*dy),
+        x,y,angle,angleDeg;
+
+    if(h < this.arrowConfig.minLength) {
+      return '';
+    }
+
+    x = dx + Number(coords0[0]);
+    y = dy + Number(coords0[1]);
+    angle = Math.atan2(dy,dx) + Math.PI / 2;
+    angleDeg = angle * 180/Math.PI;
+
+    return 'rotate(' + angleDeg + ' ' + x + ',' + y + ') translate(' + x + ',' + y + ') scale(' + this.arrowConfig.scale + ')';
+  }
+});
