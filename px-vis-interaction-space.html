@@ -659,6 +659,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         var mousePos = Px.d3.mouse(this._rect.node());
 
         this.debounce('move',function() {
+          if (this.crosshairFrozen) {
+            this._calcCrosshair = this._calculatingData;
+          }
           this._getDataForAllSeries(mousePos);
         }, 10);
       }
