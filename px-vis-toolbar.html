@@ -1171,16 +1171,19 @@ Custom property | Description
     },
 
     /*
-     * This is mainly used to update the _internalConfig items
+     * To update _internalConfig items
+     * For example: _applyConfigChanges(toolbarConfig, 'filter', 'hidden');
+     * will read the value from toolbarConfig.fitler.hidden and assign it
+     * to _internalConfig.fitler.hidden
      */
     _applyConfigChanges: function(toolbarConfig, ...props) {
-      var val1 = '', val2;
-      for (var index in this._internalConfig){
+      for (let index in this._internalConfig){
         if (this._internalConfig[index].initialKey === props[0]){
+          let val1 = '';
           for (var j in props){
             val1 += '['+ props[j] +']';
           }
-          val2 = this._getNestedObjValue(toolbarConfig.config, ...props);
+          const val2 = this._getNestedObjValue(toolbarConfig.config, ...props);
           this.set('_internalConfig.' + index + '.' + val1, val2);
         }
       }
@@ -1190,20 +1193,24 @@ Custom property | Description
      * Get the value of nested object
      */
     _getNestedObjValue: function(obj, ...args) {
-      return args.reduce((obj, level) => obj && obj[level], obj)
+      return args.reduce((obj, level) => obj && obj[level], obj);
     },
 
 	  /*
-	   * This is mainly used to update the currentSubConfig without processing
+	   * To update the currentSubConfig without processing
 	   * entire subconfig which opens the toolbar
+	   *
+	   * For example: _applySubConfigChanges(toolbarConfig, 'crosshairLasso', 'disabled');
+     * will check toolbarConfig.config['crosshairLasso']subConfig for disabled fields
+     * and assign it to relevant fields in currentSubConfig
 	   */
     _applySubConfigChanges: function(toolbarConfig, configName, property) {
-      var subConfig = toolbarConfig.config[configName].subConfig;
-      var subConf = Object.values(subConfig);
+      const subConfig = toolbarConfig.config[configName].subConfig;
+      const subConf = Object.values(subConfig); // convert object to array
 
       // Change the property value on currentSubConfig
-      for (var i in subConf){
-        for (var j in this.currentSubConfig) {
+      for (let i in subConf){
+        for (let j in this.currentSubConfig) {
           if (subConf[i].hasOwnProperty(property)
             && this.currentSubConfig[j].tooltipLabel === subConf[i].tooltipLabel) {
             // set the property value from toolbarConfig which is passed to this method
