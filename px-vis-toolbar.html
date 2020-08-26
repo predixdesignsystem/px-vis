@@ -146,7 +146,7 @@ Custom property | Description
       <span id="mainRow" class$="flex [[_getRowDirection(horizontalAlignment)]]">
         <template id="mainRepeat" is="dom-repeat" items="{{_internalConfig}}" strip-whitespace>
           <span
-            class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item)]] [[_hide(item.hidden)]]"
+            class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item, item.*)]] [[_hide(item, item.*)]] [[item.class]]"
             style$="{{item.customButtonStyle}}"
             on-tap="_clickItem"
             on-mouseenter="_onItemHover"
@@ -162,7 +162,7 @@ Custom property | Description
         <span id="subRow" class$="flex subrow--container [[_getRowDirection(horizontalAlignment)]] [[_getSubRowClass(subToolbarAlignment)]]">
           <template id="subRepeat" is="dom-repeat" items="{{currentSubConfig}}" strip-whitespace>
             <span
-              class$="u-p- flex__item main-item subrow--item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item, currentSubConfig)]] [[_hide(item.hidden)]]"
+              class$="u-p- flex__item main-item subrow--item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item, item.*)]] [[_hide(item)]]"
               on-tap="_clickSubItem"
               on-mouseenter="_onItemHover"
               on-mouseleave="_onItemLeave"
@@ -453,6 +453,13 @@ Custom property | Description
           mouseup: 'stopLasso'
         },
         subConfig: {
+		  freeform: {
+		    tooltipLabel: 'Freeform Lasso',
+		    icon: 'px-vis:xy-axis',
+		    onClick: function() {
+			  this.set('interactionSpaceConfig.lassoType', 'freeform');
+		    }
+		  },
           xRect: {
             tooltipLabel: 'Lasso on X',
             icon: 'px-vis:x-axis',
@@ -481,13 +488,6 @@ Custom property | Description
 			      disabled: true,
             onClick: function() {
               this.fire('apply-lasso-filter', 'filterOut');
-            }
-          },
-          freeform: {
-            tooltipLabel: 'Freeform Lasso',
-            icon: 'px-vis:xy-axis',
-            onClick: function() {
-              this.set('interactionSpaceConfig.lassoType', 'freeform');
             }
           },
           clearCrosshair: {
@@ -1170,10 +1170,32 @@ Custom property | Description
       }
     },
 
-    _applyConfigChanges: function(toolbarConfig, configName) {
-      this.config = toolbarConfig.config;
-      var conf = this.config[configName];
-      this._tryProcessSubConfig(conf);
+	_applyConfigChanges: function(toolbarConfig, prop1, prop2) {
+	  for (var index in this._internalConfig){
+	    if (this._internalConfig[index].initialKey === prop1){
+		  this.set('_internalConfig.' + index + '.' + prop1[prop2], toolbarConfig.config[prop1][prop2]);
+	    }
+	  }
+	},
+
+	/*
+	 * This is mainly used to update the currentSubConfig without processing
+	 * entire subconfig which opens the toolbar
+	 */
+    _applySubConfigChanges: function(toolbarConfig, configName, property) {
+      var subConfig = toolbarConfig.config[configName].subConfig;
+      var subConf = Object.values(subConfig);
+
+      // Change the property value on subconfig
+      for (var i in subConf){
+		for (var j in this.currentSubConfig) {
+		  if (subConf[i].hasOwnProperty(property)
+		    && this.currentSubConfig[j].tooltipLabel === subConf[i].tooltipLabel) {
+		    // set the property value from toolbarConfig which is passed to this method
+			this.set('currentSubConfig.' + j + '.'+ property, subConf[i][property]);
+		  }
+		}
+	  }
     },
 
     _extendConfig: function(defaultConfig, customConfig) {
@@ -1448,6 +1470,9 @@ Custom property | Description
     _getDisabledClass: function(item) {
       return item && item.disabled ? 'disabled ' : '';
     },
+    _hide: function(item) {
+	  return item && item.hidden ? 'hide ' : 'show';
+	},
     _hasTooltip: function(item) {
      if(this.hasUndefinedArguments(arguments)) {
        return;
