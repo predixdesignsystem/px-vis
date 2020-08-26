@@ -1170,32 +1170,47 @@ Custom property | Description
       }
     },
 
-	_applyConfigChanges: function(toolbarConfig, prop1, prop2) {
-	  for (var index in this._internalConfig){
-	    if (this._internalConfig[index].initialKey === prop1){
-		  this.set('_internalConfig.' + index + '.' + prop1[prop2], toolbarConfig.config[prop1][prop2]);
-	    }
-	  }
-	},
+    /*
+     * This is mainly used to update the _internalConfig items
+     */
+    _applyConfigChanges: function(toolbarConfig, ...props) {
+      var val1 = '', val2;
+      for (var index in this._internalConfig){
+        if (this._internalConfig[index].initialKey === props[0]){
+          for (var j in props){
+            val1 += '['+ props[j] +']';
+          }
+          val2 = this._getNestedObjValue(toolbarConfig.config, ...props);
+          this.set('_internalConfig.' + index + '.' + val1, val2);
+        }
+      }
+    },
 
-	/*
-	 * This is mainly used to update the currentSubConfig without processing
-	 * entire subconfig which opens the toolbar
-	 */
+    /*
+     * Get the value of nested object
+     */
+    _getNestedObjValue: function(obj, ...args) {
+      return args.reduce((obj, level) => obj && obj[level], obj)
+    },
+
+	  /*
+	   * This is mainly used to update the currentSubConfig without processing
+	   * entire subconfig which opens the toolbar
+	   */
     _applySubConfigChanges: function(toolbarConfig, configName, property) {
       var subConfig = toolbarConfig.config[configName].subConfig;
       var subConf = Object.values(subConfig);
 
-      // Change the property value on subconfig
+      // Change the property value on currentSubConfig
       for (var i in subConf){
-		for (var j in this.currentSubConfig) {
-		  if (subConf[i].hasOwnProperty(property)
-		    && this.currentSubConfig[j].tooltipLabel === subConf[i].tooltipLabel) {
-		    // set the property value from toolbarConfig which is passed to this method
-			this.set('currentSubConfig.' + j + '.'+ property, subConf[i][property]);
-		  }
-		}
-	  }
+        for (var j in this.currentSubConfig) {
+          if (subConf[i].hasOwnProperty(property)
+            && this.currentSubConfig[j].tooltipLabel === subConf[i].tooltipLabel) {
+            // set the property value from toolbarConfig which is passed to this method
+            this.set('currentSubConfig.' + j + '.'+ property, subConf[i][property]);
+          }
+        }
+      }
     },
 
     _extendConfig: function(defaultConfig, customConfig) {
