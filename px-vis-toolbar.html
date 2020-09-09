@@ -1172,18 +1172,18 @@ Custom property | Description
 
     /*
      * To update _internalConfig items
-     * For example: _applyConfigChanges(toolbarConfig, 'filter', 'hidden');
+     * For example: _applyConfigChanges(toolbarConfig, ['filter', 'hidden']);
      * will read the value from toolbarConfig.fitler.hidden and assign it
      * to _internalConfig.fitler.hidden
      */
-    _applyConfigChanges: function(toolbarConfig, ...props) {
+    _applyConfigChanges: function(toolbarConfig, props) {
       for (let index in this._internalConfig){
         if (this._internalConfig[index].initialKey === props[0]){
           let val1 = '';
           for (var j in props){
             val1 += '['+ props[j] +']';
           }
-          const val2 = this._getNestedObjValue(toolbarConfig.config, ...props);
+          const val2 = this._getNestedObjValue(toolbarConfig.config, props);
           this.set('_internalConfig.' + index + '.' + val1, val2);
         }
       }
@@ -1192,7 +1192,7 @@ Custom property | Description
     /*
      * Get the value of nested object
      */
-    _getNestedObjValue: function(obj, ...args) {
+    _getNestedObjValue: function(obj, args) {
       return args.reduce((obj, level) => obj && obj[level], obj);
     },
 
@@ -1206,8 +1206,10 @@ Custom property | Description
 	   */
     _applySubConfigChanges: function(toolbarConfig, configName, property) {
       const subConfig = toolbarConfig.config[configName].subConfig;
-      const subConf = Object.values(subConfig); // convert object to array
-
+		  // convert object to array (not using Object.values as it doesn't work in IE)
+		  const subConf = Object.keys(subConfig).map(function(e) {
+			  return subConfig[e]
+		  });
       // Change the property value on currentSubConfig
       for (let i in subConf){
         for (let j in this.currentSubConfig) {
