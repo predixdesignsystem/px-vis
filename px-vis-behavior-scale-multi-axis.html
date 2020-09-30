@@ -120,7 +120,8 @@ PxVisBehaviorScale.scaleMultiAxis = [{
             checkForMute = this.hardMute && !!mutedCatKeys.length,
             arrayAccessor = function(d) {
               //ignore muted categories for extents
-              if(checkForMute && mutedCatKeys.indexOf(d[this.categoryKey]) !== -1) {
+              // ignore null or undefined values in extents calculation: DE144515 fix
+              if((checkForMute && mutedCatKeys.indexOf(d[this.categoryKey]) !== -1) || !d[dim]) {
                 return;
               }
               return Number(d[dim]);
