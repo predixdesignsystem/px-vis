@@ -968,6 +968,57 @@ Custom property | Description
           }
         }
       },
+      customZoom: {
+        tooltipLabel: 'Zoom',
+        icon: 'px-vis:zoom-toolbar',
+        cursorIcon: 'px-vis:zoom-toolbar',
+        onSelect: function () {
+          this.set('_internalShowTooltip', false);
+        },
+        selectable: true,
+        buttonGroup: 1,
+        actionConfig: {
+          mousedown: 'startZooming',
+          mouseup: 'stopZooming',
+          mouseout: null,
+          mousemove: null,
+          click: null
+        },
+        subConfig: {
+          x: {
+            icon: 'px-vis:x-axis',
+            buttonGroup: 1,
+            tooltipLabel: 'Zoom on X axis only',
+            eventName: 'my-custom-click',
+            selectable: true,
+            onSelect: function () { this.set('selectionType', 'xAxis'); }
+          },
+          y: {
+            icon: 'px-vis:y-axis',
+            buttonGroup: 1,
+            tooltipLabel: 'Zoom on Y axis only',
+            selectable: true,
+            onSelect: function () { this.set('selectionType', 'yAxis'); }
+          },
+          xy: {
+            icon: 'px-vis:xy-axis',
+            tooltipLabel: 'Zoom on X and Y axis',
+            buttonGroup: 1,
+            selectable: true,
+            onSelect: function () { this.set('selectionType', 'xy'); }
+          },
+          undoZoom: {
+            icon: 'px-vis:zoom-out-one-level',
+            tooltipLabel: 'Undo zoom',
+            eventName: 'px-vis-toolbar-undo-zoom'
+          },
+          resetZoom: {
+            icon: 'px-vis:full-screen',
+            tooltipLabel: 'Reset',
+            eventName: 'px-vis-toolbar-reset-zoom'
+          }
+        }
+      },
       advancedZoom: {
         tooltipLabel: 'Zoom',
         icon: 'px-vis:zoom-toolbar',
@@ -1220,6 +1271,53 @@ Custom property | Description
           }
         }
       }
+    },
+
+    /**
+		 * 	To update the current selection for main contrik and subcontrol in
+		 *  config & subConfig to new values
+		 *  also updates the toolbar dom instance by calling reProcessConfig
+		**/
+		updateToolbarConfigSelection: function (newControl, newSubControl) {
+      this._internalConfig.forEach(function (item, index) {
+        if (item.initialKey === newControl) {
+          let hasChanges = false;
+          if (!item.selected) {
+            this.set('_internalConfig.' + index + '.selected', true);
+            hasChanges = true;
+          }
+
+          if (newSubControl) {
+            let _currentSubControl = item.subConfig[newSubControl]
+            let allSubConfigs = Object.keys(item.subConfig);
+            for (let j = 0; j < allSubConfigs.length; j++) {
+              let currentSubConfig = item.subConfig[allSubConfigs[j]];
+              if (allSubConfigs[j] != newSubControl) {
+                currentSubConfig.selected = false;
+              }
+            }
+            if (!item.subConfig[newSubControl].selected) {
+              item.subConfig[newSubControl].selected = true;
+              hasChanges = true;
+            }
+          }
+
+          if (hasChanges) {
+            this.set('currentSubConfig', []);
+            this.debounce('updateSubConfig', function () {
+              this._tryProcessSubConfig(item);
+              this._processItem(item, false);
+              this._tryApplySelectedSub(item);
+              if (!item.opened) {
+                this.set('currentSubConfig', []);
+              }
+            }, 0);
+          }
+        } else if (item.selected) {
+          this.set('_internalConfig.' + index + '.selected', false);
+          this.set('_internalConfig.' + index + '.opened', false);
+        }
+      }.bind(this));
     },
 
     _extendConfig: function(defaultConfig, customConfig) {
