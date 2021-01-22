@@ -126,6 +126,10 @@ limitations under the License.
         value:function() {
           return {};
         }
+      },
+      drawDigitalTags: {
+        type: Boolean,
+        value: false
       }
     },
 
@@ -295,7 +299,12 @@ limitations under the License.
           opacity = this._isSerieMuted(data) ? this._currentDrawingOptions.mutedOpacity : 1;
           if(opacity !== 0) {
             this.canvasContext.globalAlpha = opacity;
-            this.line(data);
+            if(this.drawDigitalTags){
+              this.line.curve(d3.curveStepAfter);
+              this.line(data);
+            }else {
+                this.line(data);
+            }
           }
         } else {
 
