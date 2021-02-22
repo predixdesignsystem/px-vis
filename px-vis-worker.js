@@ -55,8 +55,11 @@
 
 // Global storage vars
 var dataMapping = {},
+    renderedDataMapping = {},
     quadtrees = {}
     quadtreeBuilt = false;
+
+  
 
 function reply(data) {
 
@@ -78,6 +81,22 @@ function deleteData(eventData) {
   delete dataMapping[eventData.chartId];
   delete quadtrees[eventData.chartId];
 
+  reply(null);
+}
+
+/**
+ * Updates the local data with new data
+ *
+ * @method updateRenderedData
+ */
+function updateRenderedData(eventData) {
+  renderedDataMapping[eventData.chartId] = eventData.data.chartData;
+  reply(null);
+}
+
+
+function deleteRenderedData(eventData) {
+  delete renderedDataMapping[eventData.chartId];
   reply(null);
 }
 
@@ -288,7 +307,9 @@ function createSingleQuadtree(data) {
       xScale = calcXScale(visData),
       yScale = calcYScale(visData),
       quadtree;
-
+    if(renderedDataMapping[data.chartId]) {
+      chartData = renderedDataMapping[data.chartId];
+    }
     if(chartData) {
       quadtree = d3.quadtree()
         .extent(visData.extents)
@@ -332,7 +353,9 @@ function createSeriesQuadtree(data) {
       yScale = function(d) {
         return visData.radial ? this.yScale(d) : this.yScale(d[this.yKey]);
       };
-
+      if(renderedDataMapping[data.chartId]) {
+        chartData = renderedDataMapping[data.chartId];
+      }
   if(chartData) {
   // FIXME Make work for POLAR
     for(var i = 0; i < visData.keys.length; i++) {
@@ -458,16 +481,22 @@ function calcClosestPoint(mousePos, foundPoint, series, time) {
  *
  * @method calcDataSeriesQuadtree
  */
-function calcDataSingleQuadtree(rawData, k, visData) {
+function calcDataSingleQuadtree(rawData, k, visData, renderedData) {
 
   var x = visData.completeSeriesConfig[k]['x'],
       y = visData.completeSeriesConfig[k]['y'],
       axis = visData.completeSeriesConfig[k]['axis'] ? visData.completeSeriesConfig[k]['axis']['id'] : "default",
-      value = calcValueQuadtree(rawData, x, y);
+      value = calcValueQuadtree(rawData, x, y),
+      renderedValue;
 
+      if(renderedData) {
+        renderedValue = calcValueQuadtree(renderedData, x, y);
+      } else {
+        renderedValue = value;
+      }
   //for each point calc its coords
   return {
-    "coord": visData.radial ? calcPixelCoordForRadial(value[x], value[y], axis, visData) : [ visData.xScale(value[x]), visData.yScale[axis](value[y]) ],
+    "coord": visData.radial ? calcPixelCoordForRadial(value[x], value[y], axis, visData) : [ visData.xScale(renderedValue[x]), visData.yScale[axis](renderedValue[y]) ],
     "name": k,
     "value": value
   }
@@ -504,7 +533,9 @@ function constructDataObj(result, dataObj, k, visData, isSingle, xScale) {
   } else if(isSingle) {
 
     var rawData = this.dataMapping[visData.chartId][result.i];
-    dataObj.seriesObj[k] = calcDataSingleQuadtree(rawData, k, visData);
+    // check for logical tags 
+    var renderedData = this.renderedDataMapping[visData.chartId][result.i];
+    dataObj.seriesObj[k] = calcDataSingleQuadtree(rawData, k, visData, renderedData);
     dataObj.series.push(dataObj.seriesObj[k]);
 
     // if we need to add crosshair data and are not doing all in area...
@@ -938,6 +969,10 @@ onmessage = function(e) {
       updateData(e.data);
       break;
 
+    case 'updateRenderedData':
+      updateRenderedData(e.data);
+      break;
+
     case 'createQuadtree':
       createQuadtree(e.data);
       break;
@@ -972,6 +1007,7 @@ onmessage = function(e) {
 
     case 'unregisterChart':
       deleteData(e.data);
+      deleteRenderedData(e.data)
       break;
 
     default:
