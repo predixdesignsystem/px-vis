@@ -363,10 +363,14 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         type: Boolean,
         value: false
       },
+      plotDigitalTags: {
+        type: Boolean,
+        value: false
+      },
       /**
        * contains rendered  chart data
        *
-       * @property chartData
+       * @property renderedChartData
        * @type Object
        */
       renderedChartData:{
@@ -382,10 +386,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       '_setupActions(actionConfig.*)',
       '_resetTooltipDataLegacy(completeSeriesConfig.*)',
       '_resetTooltipData(seriesKeys.*, defaultEmptyData.*)',
-      '_createQuadtreeData(wwDataSyncCounter, width, height, margin.*, domainChanged, searchType, useQuadtree, counterClockwise, xAxisType, preventWebWorkerSynchronization)',
+      '_createQuadtreeData(wwDataSyncCounter, width, height, margin.*, domainChanged, searchType, useQuadtree, counterClockwise, xAxisType, preventWebWorkerSynchronization, renderedChartData.*)',
       '_callCreateQuadtreeData(mutedSeries)',
-      '_updateTooltipData(domainChanged)',
-      '_createQuadtreeData(renderedChartData.*)'
+      '_updateTooltipData(domainChanged)'
     ],
 
     /**
@@ -980,7 +983,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         r = (x1 - d0[this.timeData] > d1[this.timeData] - x1) ? d1 : d0;
         result.series = r;
 
-        if(this.renderedChartData){
+        if(this.plotDigitalTags  && this.renderedChartData){
           d0 = this.renderedChartData[index - 1],
           d1 = (this.renderedChartData[index]) ? this.renderedChartData[index] : this.renderedChartData[index - 1],
           // sets result as the closest date to the mouse
@@ -991,7 +994,6 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         if(!result.timeStampsTracker[r[this.timeData]]) {
           //TODO: pixel search? Should the fuzzy time be applied here instead
           result.rawData.push(r);
-          result.renderedData.push(rd);
 
           // TODO Convert to SET when we can use ES6
           result.timeStamps.push(r[this.timeData]);

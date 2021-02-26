@@ -534,7 +534,10 @@ function constructDataObj(result, dataObj, k, visData, isSingle, xScale) {
 
     var rawData = this.dataMapping[visData.chartId][result.i];
     // check for logical tags 
-    var renderedData = this.renderedDataMapping[visData.chartId][result.i];
+    var renderedData;
+    if(this.renderedDataMapping[visData.chartId]) {
+      renderedData = this.renderedDataMapping[visData.chartId][result.i];
+    }
     dataObj.seriesObj[k] = calcDataSingleQuadtree(rawData, k, visData, renderedData);
     dataObj.series.push(dataObj.seriesObj[k]);
 
