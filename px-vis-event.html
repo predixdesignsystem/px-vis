@@ -292,17 +292,21 @@ Custom property | Description
           .each(function(d,i) {
             _this._enterLine(d, i, this);
             _this._enterIcon(d, i, this);
+            _this._enterText(d, i, this);
           })
         .merge(this._eventBuilder)
           .each(function(d,i) {
             // since the config controls the type of icon (image vs svg) we append, we cannot just rely on d3 updating. Have to remove and reappend the correct icon type
             if(_this._eventConfigChanged) {
               Px.d3.select(this).select('.event-icon').remove();
+              Px.d3.select(this).select('.event-text').remove();
               _this._enterIcon(d, i, this);
+              _this._enterText(d, i, this);
             }
 
             _this._mergeLine(d, i, this);
             _this._mergeIcon(d, i, this);
+            _this._mergeText(d, i, this);
           });
 
       this._eventConfigChanged = false;
@@ -357,6 +361,26 @@ Custom property | Description
         .on('mouseenter', this._requestTooltip.bind(this,d,i,iconSvg.node()))
         .on('mouseleave', this._clearTooltipRequest.bind(this,d,i));
     },
+  
+    /**
+    * checks if the text property exists and adds 
+    * text to the element with the class event-text
+    *
+    * @method _enterText
+    */
+    _enterText: function(d, i, elem) {
+      const text = this._getConfigValue('text', d.label, false);
+      let iconSvg;
+
+      if(text) {
+        iconSvg = Px.d3.select(elem).append('text')
+        .text(text)
+        .attr('class', 'event-text')
+        .attr('font-size', '12px')
+        .style('font-family',this._checkThemeVariable('--px-vis-font-family', 'Comic Sans MS'))
+        .attr('font-style', this._checkThemeVariable('--px-vis-font-family', 'Comic Sans MS'));
+      }
+    },
 
     _mergeLine: function(d, i, elem) {
       const key = this._getConfigValue('dataKey', d.label, false);
@@ -391,10 +415,36 @@ Custom property | Description
       const y0 = offset[1] - 5;
       const y = type === "image" ? y0 : y0 - size;
       const translate = `translate(${x},${y})`;
-      const scale = type === "image" ? '' : `scale(${this._iconInfo[iconName].scale})`;
-
+			const scale = type === "image" ? '' : `scale(${this._iconInfo[iconName].scale})`;
+			if(isNaN(x)) {
+        return;
+      }
       Px.d3.select(elem).select('.event-icon')
         .attr("transform", `${translate} ${scale}`);
+    },
+    /**
+    * checks if the textOffset property exists and adds 
+    * it to the element with the class event-text
+    *
+    * @method _mergeText
+    */
+    _mergeText: function(d, i, elem) {
+      const key = this._getConfigValue('dataKey', d.label, false);
+
+      if(!d[key]) {
+        return;
+      }
+
+      const offset = this._getConfigValue('textOffset', d.label, false) || [0, 0];
+
+      const x = this.x(d[key]) + offset[0];
+      const y = offset[1] - 5;
+      const translate = `translate(${x},${y})`;
+			if(isNaN(x)) {
+        return;
+      }
+      Px.d3.select(elem).select('.event-text')
+        .attr("transform", `${translate}`);
     },
 
     /**

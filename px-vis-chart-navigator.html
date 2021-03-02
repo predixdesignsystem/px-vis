@@ -357,9 +357,10 @@ Custom property | Description
           this.debounce('ironresize', function() {
             if(!this.preventResize) {
               var wrapperRect = this.$.wrapper.getBoundingClientRect();
-
-              this.set('width', wrapperRect.width);
-              this.set('height', wrapperRect.height);
+              if(wrapperRect.width > 0 || !this.width){
+                this.set('width', wrapperRect.width);
+                this.set('height', wrapperRect.height);
+              }
             }
           },100);
         }

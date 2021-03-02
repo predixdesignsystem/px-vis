@@ -126,7 +126,7 @@ Custom property | Description
     <div class="flex flex-row fullWidth fullHeight">  <!--  IE min-height + flex bug workaround-->
       <div id="registerWrap"
         class$="[[_getMinSizeClass(preventMinSize)]] inline--flex [[_registerWrapClass(_isHorizontal)]]"
-        style$="height:[[height]]px; [[_returnWidth(chartWidth, width, margin, type)]]">
+        style$="height:[[height]]px; max-height:[[height]]px; [[_returnWidth(chartWidth, width, margin, type)]]">
 
         <div class$="[[_show(_isHorizontal)]] [[_hide(hidePaginationControls)]] borderRight flex flex--center paginateButton">
           <button class$="[[_show(displayPageArrows)]] actionable flex__item--middle" on-click="_leftPage">
@@ -199,6 +199,7 @@ Custom property | Description
                       disable-click="[[disableClick]]"
                       muted-series="{{mutedSeries}}"
                       number-format="[[numberFormat]]"
+                      register-format-callback="[[registerFormatCallback]]"
                       number-format-culture="[[numberFormatCulture]]"
                       number-format-is-currency="[[numberFormatIsCurrency]]"
                       number-format-currency="[[numberFormatCurrency]]"
@@ -475,7 +476,10 @@ Custom property | Description
         type: Boolean,
         computed: '_computeHasHeaderData(_showDateTime, _sortTypes.length, displayOrdinalValue)'
       },
-      _timeSeriesKey: String
+      _timeSeriesKey: String,
+      registerFormatCallback: {
+        type: Function
+      }
     },
 
     observers: [

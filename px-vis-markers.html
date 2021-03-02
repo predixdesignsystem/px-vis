@@ -328,7 +328,7 @@ limitations under the License.
           bRowSet = {},
           tRow,
           bRow,
-		  row,
+          row,
           tScale,
           bScale,
           type;
@@ -368,7 +368,7 @@ limitations under the License.
         return;
       }
 
-      if(this._topDomain && this._bottomDomain) {
+      if(this._topDomain && this._bottomDomain && this.markerConfig && this.markerConfig[item]) {
         return this.markerConfig[item]["location"] === "bottom" ? this._bottomScale : this._topScale;
       }
     },
@@ -378,7 +378,7 @@ limitations under the License.
         return;
       }
 
-      if(this._topDomain && this._bottomDomain && this.domainChanged) {
+      if(this._topDomain && this._bottomDomain && this.domainChanged && this.markerConfig && this.markerConfig[item]) {
         return this.markerConfig[item]["location"] === "bottom" ? this._bottomDomain : this._topDomain;
       }
     },
@@ -452,9 +452,9 @@ limitations under the License.
         this._closeTooltip();
         return;
       }
-
+      const location = mousePos[1] < this.height / 2 ? 'top' : 'bottom';
       //find all marker types for this row
-      const labels = this._findLabelsForRow(rowInfo.index);
+      const labels = this._findLabelsForRow(rowInfo.index, location);
 
       // if no markers we want a tooltip on in that row
       if(labels.length === 0) {
@@ -490,7 +490,16 @@ limitations under the License.
       }.bind(this)).right;
       const maxDomain = this.x.domain()[1];
       const minDomain = this.x.domain()[0];
-      const mouseTime = this.x.invert(adjustedMousePos[0]);
+      let mouseTime;
+      // inversion with ordinal scale
+      if(this.x._scaleType === 'ordinal') {
+        const domain = this.x.domain();
+        const range = this.x.range();
+        const scale = d3.scaleQuantize().domain(range).range(domain);
+        mouseTime = new Date(scale(adjustedMousePos[0]));
+      } else {
+        mouseTime = this.x.invert(adjustedMousePos[0]);
+      }
 
       const right = bisect(data, mouseTime);
       const left = Math.max(0, right ? right-1 : 0);
@@ -718,12 +727,12 @@ limitations under the License.
         return {'index': domain[domainIndex], 'rowY': rowY};
     },
 
-    _findLabelsForRow: function(rowIndex) {
+    _findLabelsForRow: function(rowIndex, location) {
       const index = Number(rowIndex);
       const result = [];
 
       Object.entries(this._markerConfig).forEach(([key,conf]) => {
-        if(index === conf.row && conf.showTooltip) {
+        if(location === conf.location && index === conf.row && conf.showTooltip) {
           result.push(key);
         }
       });

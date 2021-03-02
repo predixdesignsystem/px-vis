@@ -146,7 +146,7 @@ Custom property | Description
       <span id="mainRow" class$="flex [[_getRowDirection(horizontalAlignment)]]">
         <template id="mainRepeat" is="dom-repeat" items="{{_internalConfig}}" strip-whitespace>
           <span
-            class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item.disabled)]] [[_hide(item.hidden)]]"
+            class$="u-p- flex__item main-item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item, item.*)]] [[_hide(item, item.*)]] [[item.class]]"
             style$="{{item.customButtonStyle}}"
             on-tap="_clickItem"
             on-mouseenter="_onItemHover"
@@ -162,7 +162,7 @@ Custom property | Description
         <span id="subRow" class$="flex subrow--container [[_getRowDirection(horizontalAlignment)]] [[_getSubRowClass(subToolbarAlignment)]]">
           <template id="subRepeat" is="dom-repeat" items="{{currentSubConfig}}" strip-whitespace>
             <span
-              class$="u-p- flex__item main-item subrow--item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item.disabled)]] [[_hide(item.hidden)]]"
+              class$="u-p- flex__item main-item subrow--item [[_getSelectedClass(item.selected)]] [[_getDisabledClass(item, item.*)]] [[_hide(item)]]"
               on-tap="_clickSubItem"
               on-mouseenter="_onItemHover"
               on-mouseleave="_onItemLeave"
@@ -390,6 +390,11 @@ Custom property | Description
         onSelect: function() {
           this.set('_internalShowTooltip', false);
           this.set('interactionSpaceConfig.searchType', 'lasso');
+			    var toolbarInfo = {
+				    toolbar: this.getToolbar(),
+				    configName: 'crosshairLasso'
+			    };
+			    this.fire('set-toolbar-info', toolbarInfo);
         },
         actionConfig: {
           mouseout: null,
@@ -399,6 +404,22 @@ Custom property | Description
           mouseup: 'stopLasso'
         },
         subConfig: {
+          filterIn: {
+           tooltipLabel: 'Filter in',
+           icon: 'px-vis:draw-stripe',
+           disabled: true,
+           onClick: function() {
+            this.fire('apply-lasso-filter', 'filterIn');
+           }
+          },
+          filterOut: {
+           tooltipLabel: 'Filter out',
+           icon: 'px-vis:remove-stripe',
+           disabled: true,
+           onClick: function() {
+             this.fire('apply-lasso-filter', 'filterOut');
+           }
+          },
           clearCrosshair: {
             tooltipLabel: 'Clear lasso data',
             icon: 'px-nav:close',
@@ -406,6 +427,7 @@ Custom property | Description
               this.set('crosshairData', { 'rawData': [], 'timeStamps': []});
               this.set('interactionSpaceConfig.resetLassoData', !this.interactionSpaceConfig.resetLassoData);
               this.set('resetLassoData', !this.resetLassoData);
+              this.fire('disable-lasso-filter');
             }
           }
         }
@@ -419,6 +441,11 @@ Custom property | Description
         onSelect: function() {
           this.set('_internalShowTooltip', false);
           this.set('interactionSpaceConfig.searchType', 'lasso');
+			    var toolbarInfo = {
+				    toolbar: this.getToolbar(),
+				    configName: 'crosshairLassoTimeseries'
+			    };
+			    this.fire('set-toolbar-info', toolbarInfo);
         },
         actionConfig: {
           mouseout: null,
@@ -428,6 +455,13 @@ Custom property | Description
           mouseup: 'stopLasso'
         },
         subConfig: {
+		  freeform: {
+		    tooltipLabel: 'Freeform Lasso',
+		    icon: 'px-vis:xy-axis',
+		    onClick: function() {
+			  this.set('interactionSpaceConfig.lassoType', 'freeform');
+		    }
+		  },
           xRect: {
             tooltipLabel: 'Lasso on X',
             icon: 'px-vis:x-axis',
@@ -442,11 +476,20 @@ Custom property | Description
               this.set('interactionSpaceConfig.lassoType', 'yRect');
             }
           },
-          freeform: {
-            tooltipLabel: 'Freeform Lasso',
-            icon: 'px-vis:xy-axis',
+          filterIn: {
+            tooltipLabel: 'Filter in',
+            icon: 'px-vis:draw-stripe',
+			      disabled: true,
             onClick: function() {
-              this.set('interactionSpaceConfig.lassoType', 'freeform');
+              this.fire('apply-lasso-filter', 'filterIn');
+            }
+          },
+          filterOut: {
+            tooltipLabel: 'Filter out',
+            icon: 'px-vis:remove-stripe',
+			      disabled: true,
+            onClick: function() {
+              this.fire('apply-lasso-filter', 'filterOut');
             }
           },
           clearCrosshair: {
@@ -456,6 +499,7 @@ Custom property | Description
               this.set('crosshairData', { 'rawData': [], 'timeStamps': []});
               this.set('interactionSpaceConfig.resetLassoData', !this.interactionSpaceConfig.resetLassoData);
               this.set('resetLassoData', !this.resetLassoData);
+              this.fire('disable-lasso-filter');
             }
           }
         }
@@ -926,6 +970,57 @@ Custom property | Description
           }
         }
       },
+      customZoom: {
+        tooltipLabel: 'Zoom',
+        icon: 'px-vis:zoom-toolbar',
+        cursorIcon: 'px-vis:zoom-toolbar',
+        onSelect: function () {
+          this.set('_internalShowTooltip', false);
+        },
+        selectable: true,
+        buttonGroup: 1,
+        actionConfig: {
+          mousedown: 'startZooming',
+          mouseup: 'stopZooming',
+          mouseout: null,
+          mousemove: null,
+          click: null
+        },
+        subConfig: {
+          x: {
+            icon: 'px-vis:x-axis',
+            buttonGroup: 1,
+            tooltipLabel: 'Zoom on X axis only',
+            eventName: 'my-custom-click',
+            selectable: true,
+            onSelect: function () { this.set('selectionType', 'xAxis'); }
+          },
+          y: {
+            icon: 'px-vis:y-axis',
+            buttonGroup: 1,
+            tooltipLabel: 'Zoom on Y axis only',
+            selectable: true,
+            onSelect: function () { this.set('selectionType', 'yAxis'); }
+          },
+          xy: {
+            icon: 'px-vis:xy-axis',
+            tooltipLabel: 'Zoom on X and Y axis',
+            buttonGroup: 1,
+            selectable: true,
+            onSelect: function () { this.set('selectionType', 'xy'); }
+          },
+          undoZoom: {
+            icon: 'px-vis:zoom-out-one-level',
+            tooltipLabel: 'Undo zoom',
+            eventName: 'px-vis-toolbar-undo-zoom'
+          },
+          resetZoom: {
+            icon: 'px-vis:full-screen',
+            tooltipLabel: 'Reset',
+            eventName: 'px-vis-toolbar-reset-zoom'
+          }
+        }
+      },
       advancedZoom: {
         tooltipLabel: 'Zoom',
         icon: 'px-vis:zoom-toolbar',
@@ -1128,6 +1223,105 @@ Custom property | Description
       }
     },
 
+    /*
+     * To update _internalConfig items
+     * For example: _applyConfigChanges(toolbarConfig, ['filter', 'hidden']);
+     * will read the value from toolbarConfig.fitler.hidden and assign it
+     * to _internalConfig.fitler.hidden
+     */
+    _applyConfigChanges: function(toolbarConfig, props) {
+      for (let index in this._internalConfig){
+        if (this._internalConfig[index].initialKey === props[0]){
+          let val1 = '';
+          for (var j in props){
+            val1 += '['+ props[j] +']';
+          }
+          const val2 = this._getNestedObjValue(toolbarConfig.config, props);
+          this.set('_internalConfig.' + index + '.' + val1, val2);
+        }
+      }
+    },
+
+    /*
+     * Get the value of nested object
+     */
+    _getNestedObjValue: function(obj, args) {
+      return args.reduce((obj, level) => obj && obj[level], obj);
+    },
+
+	  /*
+	   * To update the currentSubConfig without processing
+	   * entire subconfig which opens the toolbar
+	   *
+	   * For example: _applySubConfigChanges(toolbarConfig, 'crosshairLasso', 'disabled');
+     * will check toolbarConfig.config['crosshairLasso']subConfig for disabled fields
+     * and assign it to relevant fields in currentSubConfig
+	   */
+    _applySubConfigChanges: function(toolbarConfig, configName, property) {
+      const subConfig = toolbarConfig.config[configName].subConfig;
+		  // convert object to array (not using Object.values as it doesn't work in IE)
+		  const subConf = Object.keys(subConfig).map(function(e) {
+			  return subConfig[e]
+		  });
+      // Change the property value on currentSubConfig
+      for (let i in subConf){
+        for (let j in this.currentSubConfig) {
+          if (subConf[i].hasOwnProperty(property)
+            && this.currentSubConfig[j].tooltipLabel === subConf[i].tooltipLabel) {
+            // set the property value from toolbarConfig which is passed to this method
+            this.set('currentSubConfig.' + j + '.'+ property, subConf[i][property]);
+          }
+        }
+      }
+    },
+
+    /**
+		 * 	To update the current selection for main contrik and subcontrol in
+		 *  config & subConfig to new values
+		 *  also updates the toolbar dom instance by calling reProcessConfig
+		**/
+		updateToolbarConfigSelection: function (newControl, newSubControl) {
+      this._internalConfig.forEach(function (item, index) {
+        if (item.initialKey === newControl) {
+          let hasChanges = false;
+          if (!item.selected) {
+            this.set('_internalConfig.' + index + '.selected', true);
+            hasChanges = true;
+          }
+
+          if (newSubControl) {
+            let _currentSubControl = item.subConfig[newSubControl]
+            let allSubConfigs = Object.keys(item.subConfig);
+            for (let j = 0; j < allSubConfigs.length; j++) {
+              let currentSubConfig = item.subConfig[allSubConfigs[j]];
+              if (allSubConfigs[j] != newSubControl) {
+                currentSubConfig.selected = false;
+              }
+            }
+            if (!item.subConfig[newSubControl].selected) {
+              item.subConfig[newSubControl].selected = true;
+              hasChanges = true;
+            }
+          }
+
+          if (hasChanges) {
+            this.set('currentSubConfig', []);
+            this.debounce('updateSubConfig', function () {
+              this._tryProcessSubConfig(item);
+              this._processItem(item, false);
+              this._tryApplySelectedSub(item);
+              if (!item.opened) {
+                this.set('currentSubConfig', []);
+              }
+            }, 0);
+          }
+        } else if (item.selected) {
+          this.set('_internalConfig.' + index + '.selected', false);
+          this.set('_internalConfig.' + index + '.opened', false);
+        }
+      }.bind(this));
+    },
+
     _extendConfig: function(defaultConfig, customConfig) {
       var keys = Object.keys(customConfig),
           obj = defaultConfig || {};
@@ -1147,7 +1341,7 @@ Custom property | Description
 
       var internalConf = [],
           keys = Object.keys(this.config);
-
+      var isSelected = false;
       for(var i=0; i<keys.length; i++) {
 
         var toPush;
@@ -1176,6 +1370,7 @@ Custom property | Description
         if(toPush.selected) {
           this._tryProcessSubConfig(toPush);
           this._processItem(toPush, false);
+          isSelected = true;
         }
       }
 
@@ -1184,6 +1379,9 @@ Custom property | Description
         internalConf.reverse();
       }
       this.set('_internalConfig', internalConf);
+      if(!isSelected) {
+          this.set('currentSubConfig', []);  
+      }
     },
     /**
      * Called when clicking an item of the main toolbar.
@@ -1397,9 +1595,12 @@ Custom property | Description
     _getSelectedClass: function(selected) {
       return selected ? 'selected ' : '';
     },
-    _getDisabledClass: function(disabled) {
-      return disabled ? 'disabled ' : '';
+    _getDisabledClass: function(item) {
+      return item && item.disabled ? 'disabled ' : '';
     },
+    _hide: function(item) {
+	  return item && item.hidden ? 'hide ' : 'show';
+	},
     _hasTooltip: function(item) {
      if(this.hasUndefinedArguments(arguments)) {
        return;

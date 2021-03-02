@@ -278,39 +278,41 @@ limitations under the License.
 
         //get the position of the symbol
         translate = this._getTransform(this.chartData[i]);
+        // undefined check for translate[0] ,translate[1].
+        if(this._isValidData(translate[0]) && this._isValidData(translate[1])) {
 
-        // draw arrow :
-        // only draw if segment length is over x pixels AND the previous data point is valid
-        // this draw arrows only in the locations where lines are drawn
-        if(this.showArrows && i !== start
-          && this._isValidData(this.chartData[i-1][this.completeSeriesConfig[this.seriesId]['y']])
-          && this._isValidData(this.chartData[i-1][this.completeSeriesConfig[this.seriesId]['x']])) {
-          tx = (translate[0] - previousTranslate[0])/2;
-          ty = (translate[1] - previousTranslate[1])/2;
-          // thank you Mr Pythagoras of Samos
-          h = Math.sqrt(tx*tx + ty*ty);
-          //only draw if segment length is over x pixels
-          if(h > this.arrowConfig.minLength) {
-            angle = Math.atan2(ty,tx) + Math.PI / 2;
-            angle_2PI = angle < 0 ? angle + 2 * Math.PI : angle;
-            this.canvasContext.translate(tx,ty);
-            this.canvasContext.rotate(angle_2PI);
-            this._currentDrawingOptions.arrow();
-            previousTranslate = [tx + previousTranslate[0],ty + previousTranslate[1]];
-            this.canvasContext.rotate(-angle_2PI);
+          // draw arrow :
+          // only draw if segment length is over x pixels AND the previous data point is valid
+          // this draw arrows only in the locations where lines are drawn
+          if (this.showArrows && i !== start
+            && this._isValidData(this.chartData[i - 1][this.completeSeriesConfig[this.seriesId]['y']])
+            && this._isValidData(this.chartData[i - 1][this.completeSeriesConfig[this.seriesId]['x']])) {
+            tx = (translate[0] - previousTranslate[0]) / 2;
+            ty = (translate[1] - previousTranslate[1]) / 2;
+            // thank you Mr Pythagoras of Samos
+            h = Math.sqrt(tx * tx + ty * ty);
+            //only draw if segment length is over x pixels
+            if (h > this.arrowConfig.minLength) {
+              angle = Math.atan2(ty, tx) + Math.PI / 2;
+              angle_2PI = angle < 0 ? angle + 2 * Math.PI : angle;
+              this.canvasContext.translate(tx, ty);
+              this.canvasContext.rotate(angle_2PI);
+              this._currentDrawingOptions.arrow();
+              previousTranslate = [tx + previousTranslate[0], ty + previousTranslate[1]];
+              this.canvasContext.rotate(-angle_2PI);
+            }
           }
+
+          //move canvas to new pos
+          this.canvasContext.translate(translate[0] - previousTranslate[0], translate[1] - previousTranslate[1]);
+
+          //draw
+          this._currentDrawingOptions.symbol();
+
+          //remember pos so that we can move to the next point in 1 translate
+          //instead of restoring the translate here
+          previousTranslate = translate;
         }
-
-        //move canvas to new pos
-        this.canvasContext.translate(translate[0] - previousTranslate[0], translate[1] - previousTranslate[1]);
-
-        //draw
-        this._currentDrawingOptions.symbol();
-
-        //remember pos so that we can move to the next point in 1 translate
-        //instead of restoring the translate here
-        previousTranslate = translate;
-
       }
       this.canvasContext.closePath();
       this._currentDrawingOptions.drawingFunction();

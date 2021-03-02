@@ -362,6 +362,19 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       isHeatmap: {
         type: Boolean,
         value: false
+      },
+      plotDigitalTags: {
+        type: Boolean,
+        value: false
+      },
+      /**
+       * contains rendered  chart data
+       *
+       * @property renderedChartData
+       * @type Object
+       */
+      renderedChartData:{
+        type: Array
       }
     },
 
@@ -373,7 +386,7 @@ TODO implement a dev setting to choose between only showing data at that x, snap
       '_setupActions(actionConfig.*)',
       '_resetTooltipDataLegacy(completeSeriesConfig.*)',
       '_resetTooltipData(seriesKeys.*, defaultEmptyData.*)',
-      '_createQuadtreeData(wwDataSyncCounter, width, height, margin.*, domainChanged, searchType, useQuadtree, counterClockwise, xAxisType, preventWebWorkerSynchronization)',
+      '_createQuadtreeData(wwDataSyncCounter, width, height, margin.*, domainChanged, searchType, useQuadtree, counterClockwise, xAxisType, preventWebWorkerSynchronization, renderedChartData.*)',
       '_callCreateQuadtreeData(mutedSeries)',
       '_updateTooltipData(domainChanged)'
     ],
@@ -659,6 +672,9 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         var mousePos = Px.d3.mouse(this._rect.node());
 
         this.debounce('move',function() {
+          if (this.crosshairFrozen) {
+            this._calcCrosshair = this._calculatingData;
+          }
           this._getDataForAllSeries(mousePos);
         }, 10);
       }
@@ -915,8 +931,10 @@ TODO implement a dev setting to choose between only showing data at that x, snap
           d0,
           d1,
           r,
+          rd,
           result = {
             "series": {},
+            "renderedData": [],
             "rawData": dataObj.rawData,
             'timeStamps': dataObj.timeStamps,
             'timeStampsTracker': dataObj.timeStampsTracker
@@ -965,6 +983,14 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         r = (x1 - d0[this.timeData] > d1[this.timeData] - x1) ? d1 : d0;
         result.series = r;
 
+        if(this.plotDigitalTags  && this.renderedChartData){
+          d0 = this.renderedChartData[index - 1],
+          d1 = (this.renderedChartData[index]) ? this.renderedChartData[index] : this.renderedChartData[index - 1],
+          // sets result as the closest date to the mouse
+          rd = (x1 - d0[this.timeData] > d1[this.timeData] - x1) ? d1 : d0;
+          result.renderedSeries = rd;
+        }
+
         if(!result.timeStampsTracker[r[this.timeData]]) {
           //TODO: pixel search? Should the fuzzy time be applied here instead
           result.rawData.push(r);
@@ -982,7 +1008,11 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         yKey = this.completeSeriesConfig[keys[i]]['y'];
         axisKey = (this.completeSeriesConfig[keys[i]]['axis'] && this.completeSeriesConfig[keys[i]]['axis']['id']) ? this.completeSeriesConfig[keys[i]]['axis']['id'] : null;
 
-        coord = [this.x(result.series[this.timeData]), this.isMultiY ? this.y[axisKey](result.series[yKey]) : this.y(result.series[yKey])]
+        var tempSeries = result.series;
+        if(result.renderedSeries){
+          tempSeries = result.renderedSeries
+        }
+        coord = [this.x(tempSeries[this.timeData]), this.isMultiY ? this.y[axisKey](tempSeries[yKey]) : this.y(tempSeries[yKey])]
 
         dataObj.series.push({'name': keys[i], 'value': result.series, 'coord': coord });
         dataObj.seriesObj[keys[i]] = {'value': result.series, 'coord': coord };

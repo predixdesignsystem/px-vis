@@ -153,7 +153,10 @@ Custom property | Description
       displayXValuesOnly: {
         type: Boolean,
         value: false
-      }
+      },
+			registerFormatCallback: {
+				type: Function
+			}
     },
 
     observers: [
@@ -201,6 +204,17 @@ Custom property | Description
               break;
 
             case 'ordinal':
+              var xTimestamp = this.data.value[xKey];
+        
+              xVal = this.data.value[xKey];
+              // checks if registerFormatCallback is available, if so executes it expecting a return value for xVal
+              // allowing the user to set their own functionality.
+              if(this.completeSeriesConfig && this.registerFormatCallback) {
+                xVal = this.registerFormatCallback(this.completeSeriesConfig, xTimestamp, this.seriesKey);
+							} 
+              xUnit = this.completeSeriesConfig[this.seriesKey]['xAxisUnit'] ? ` ${this.completeSeriesConfig[this.seriesKey]['xAxisUnit']}` : '';
+              slash = this.displayXValuesOnly ? '' : ' / ';
+              break;
             case 'scaleBand':
               xVal = this.data.value[xKey];
               xUnit = this.completeSeriesConfig[this.seriesKey]['xAxisUnit'] ? ' ' + this.completeSeriesConfig[this.seriesKey]['xAxisUnit'] : '';
