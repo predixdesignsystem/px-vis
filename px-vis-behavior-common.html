@@ -2700,15 +2700,17 @@ PxVisBehavior.highlightShared = [{
         val[x] = dataset[x];
         val[y] = dataset[y];
 
-        if(this.radial) {
-          var domain = axis.domain(),
-              range = axis.range(),
-              dr = range[1] - range[0],
-              dd = domain[1] - domain[0];
-          coords = this._getPixelCoordForRadialData(dataset[x], dataset[y], dr, domain, dd);
-        } else {
-          coords.push(this.x(val[x]));
-          coords.push(axis(val[y]));
+        if(val[y] !== undefined && val[y] !== null) {
+          if(this.radial) {
+            var domain = axis.domain(),
+                range = axis.range(),
+                dr = range[1] - range[0],
+                dd = domain[1] - domain[0];
+            coords = this._getPixelCoordForRadialData(dataset[x], dataset[y], dr, domain, dd);
+          } else {
+            coords.push(this.x(val[x]));
+            coords.push(axis(val[y]));
+          }
         }
 
         arr.push({

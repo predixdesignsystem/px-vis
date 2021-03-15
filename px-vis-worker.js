@@ -495,11 +495,15 @@ function calcDataSingleQuadtree(rawData, k, visData, renderedData) {
         renderedValue = value;
       }
   //for each point calc its coords
-  return {
-    "coord": visData.radial ? calcPixelCoordForRadial(value[x], value[y], axis, visData) : [ visData.xScale(renderedValue[x]), visData.yScale[axis](renderedValue[y]) ],
+  var returnData = {
+    "coord": [],
     "name": k,
     "value": value
   }
+  if(visData.radial || (renderedValue[y] != null && renderedValue[y] != undefined) ) {
+    returnData.coord = visData.radial ? calcPixelCoordForRadial(value[x], value[y], axis, visData) : [ visData.xScale(renderedValue[x]), visData.yScale[axis](renderedValue[y]) ];
+  }
+  return returnData;
 }
 
 /**

@@ -1012,8 +1012,13 @@ TODO implement a dev setting to choose between only showing data at that x, snap
         if(result.renderedSeries){
           tempSeries = result.renderedSeries
         }
-        coord = [this.x(tempSeries[this.timeData]), this.isMultiY ? this.y[axisKey](tempSeries[yKey]) : this.y(tempSeries[yKey])]
 
+        if(tempSeries[yKey] != undefined || tempSeries[yKey] != null) {
+          coord = [this.x(tempSeries[this.timeData]), this.isMultiY ? this.y[axisKey](tempSeries[yKey]) : this.y(tempSeries[yKey])]
+        } else {
+          coord = [];
+        }
+        
         dataObj.series.push({'name': keys[i], 'value': result.series, 'coord': coord });
         dataObj.seriesObj[keys[i]] = {'value': result.series, 'coord': coord };
       }
